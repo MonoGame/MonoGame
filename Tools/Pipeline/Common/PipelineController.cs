@@ -381,9 +381,18 @@ namespace MonoGame.Tools.Pipeline
 
         public void Build(bool rebuild)
         {
-            var commands = string.Format("/@:\"{0}\" {1}", _project.OriginalPath, rebuild ? "/rebuild" : string.Empty);
-            if (LaunchDebugger)
-                commands += " /launchdebugger";
+            // jcf: this is incorrectly building the version of the project on disk not the one in memory!
+
+            // Construct the command line.
+            string commands = "";
+            {
+                // Insert this command first, so that if there is a parsing error later on, we can actually debug it.
+                if (LaunchDebugger)
+                    commands += "/launchdebugger ";
+
+                commands += string.Format("/@:\"{0}\" {1}", _project.OriginalPath, rebuild ? "/rebuild" : string.Empty);
+            }
+
             BuildCommand(commands);
         }
 
@@ -435,10 +444,15 @@ namespace MonoGame.Tools.Pipeline
                 parser.SaveProject(io, (i) => !items.Contains(i));
             }
 
-            // Run the build the command.
-            var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
-            if (LaunchDebugger)
-                commands += " /launchdebugger";
+            // Construct the command line.
+            string commands = "";
+            {
+                // Insert this command first, so that if there is a parsing error later on, we can actually debug it.
+                if (LaunchDebugger)
+                    commands += "/launchdebugger ";
+
+                commands += string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
+            }
 
             BuildCommand(commands);
 
@@ -463,22 +477,64 @@ namespace MonoGame.Tools.Pipeline
 
         public void Clean()
         {
-            Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
+            // jcf: we should be able to clean individual folders/items 
+            /*
+            var items = new List<IProjectItem>();
 
-            // Make sure we save first!
-            if (!AskSaveProject())
+            // If the project itself was selected, just
+            // rebuild the entire project
+            if (items.Contains(_project))
+            {
+                Build(true);
                 return;
+            }
 
-            View.OutputClear();
+            // Convert selected DirectoryItems into ContentItems
+            foreach (var item in SelectedItems)
+            {
+                if (item is ContentItem)
+                {
+                    if (!items.Contains(item))
+                        items.Add(item);
 
-            var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
-            if (LaunchDebugger)
-                commands += " /launchdebugger";
+                    continue;
+                }
 
-            _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
-            _buildTask.ContinueWith((e) => View.Invoke(UpdateMenu));
+                foreach (var subitem in GetItems(item))
+                    if (!items.Contains(subitem))
+                        items.Add(subitem);
+            }
+            */
 
-            UpdateMenu();       
+            // Create a unique file within the same folder as
+            // the normal project to store this incremental build.
+            // jcf: what?? put it in the intermediate folder at least...
+            var uniqueName = Guid.NewGuid().ToString();
+            var tempPath = Path.Combine(Path.GetDirectoryName(_project.OriginalPath), uniqueName);
+
+            // Write the incremental project file (this is stripping out all the actual content items
+            // and leaving just the stuff like 'platform', 'outputdir', etc.
+            using (var io = File.CreateText(tempPath))
+            {
+                var parser = new PipelineProjectParser(this, _project);
+                parser.SaveProject(io, (i) => true);
+            }
+
+            // Construct the command line.
+            string commands = "";
+            {
+                // Insert this command first, so that if there is a parsing error later on, we can actually debug it.
+                if (LaunchDebugger)
+                    commands += "/launchdebugger ";
+
+                commands += string.Format("/@:\"{0}\" /clean", tempPath);
+            }
+            
+
+            BuildCommand(commands);
+
+            // Cleanup the temp file once we're done.
+            _buildTask.ContinueWith((e) => File.Delete(tempPath));
         }
 
         private string FindMGCB()
@@ -1057,6 +1113,11 @@ namespace MonoGame.Tools.Pipeline
                 return path;
 
             var dirUri = new Uri(ProjectLocation);
+
+            path = path.Replace("/", Path.DirectorySeparatorChar.ToString());
+            if (path.StartsWith("\\"))
+                path = path.Substring(1);
+
             var fileUri = new Uri(path);
             var relativeUri = dirUri.MakeRelativeUri(fileUri);
 

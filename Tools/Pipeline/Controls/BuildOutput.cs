@@ -132,7 +132,7 @@ namespace MonoGame.Tools.Pipeline
         {
             textArea.Append(line + Environment.NewLine, _cmdAutoScroll.Checked);
 
-            if (string.IsNullOrEmpty(line))
+            if (string.IsNullOrEmpty(line) || line.StartsWith(">"))
                 return;
 
             _output.Parse(line);
@@ -154,8 +154,11 @@ namespace MonoGame.Tools.Pipeline
                     });
                     break;
                 case OutputState.Skipping:
-                    if (_items[_items.Count - 1].Icon == _iconProcessing)
-                        _items[_items.Count - 1].Icon = _iconSucceed;
+                    if (_items.Count > 0)
+                    {
+                        if (_items[_items.Count - 1].Icon == _iconProcessing)
+                            _items[_items.Count - 1].Icon = _iconSucceed;
+                    }
 
                     _items.Add(new BuildItem
                     {
@@ -165,8 +168,12 @@ namespace MonoGame.Tools.Pipeline
                     });
                     break;
                 case OutputState.BuildAsset:
-                    if (_items[_items.Count - 1].Icon == _iconProcessing)
-                        _items[_items.Count - 1].Icon = _iconSucceed;
+
+                    if (_items.Count > 0)
+                    { 
+                        if (_items[_items.Count - 1].Icon == _iconProcessing)
+                            _items[_items.Count - 1].Icon = _iconSucceed;
+                    }
 
                     _items.Add(new BuildItem
                     {
@@ -176,20 +183,32 @@ namespace MonoGame.Tools.Pipeline
                     });
                     break;
                 case OutputState.BuildError:
-                    _items[_items.Count - 1].Icon = _iconFail;
-                    _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
+                    if (_items.Count > 0)
+                    {
+                        _items[_items.Count - 1].Icon = _iconFail;
+                        _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
+                    }
                     break;
                 case OutputState.BuildErrorContinue:
-                    _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
+                    if (_items.Count > 0)
+                    {
+                        _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
+                    }
                     break;
                 case OutputState.BuildWarning:
-                    if (_items[_items.Count - 1].Icon == _iconProcessing)
-                        _items[_items.Count - 1].Icon = _iconSucceedWithWarnings;
-                    _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
+                    if (_items.Count > 0)
+                    {
+                        if (_items[_items.Count - 1].Icon == _iconProcessing)
+                            _items[_items.Count - 1].Icon = _iconSucceedWithWarnings;
+                        _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
+                    }
                     break;
                 case OutputState.BuildEnd:
-                    if (_items[_items.Count - 1].Icon == _iconProcessing)
-                        _items[_items.Count - 1].Icon = _iconSucceed;
+                    if (_items.Count > 0)
+                    {
+                        if (_items[_items.Count - 1].Icon == _iconProcessing)
+                            _items[_items.Count - 1].Icon = _iconSucceed;
+                    }
 
                     _items.Add(new BuildItem
                     {

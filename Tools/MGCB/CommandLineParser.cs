@@ -187,6 +187,9 @@ namespace MGCB
             {
                 showUsage = false;
 
+                // echo each command, at least if we aren't being run from a command window...
+                Console.WriteLine(">"+arg);
+
                 if (!ParseArgument(arg))
                 {
                     success = false;

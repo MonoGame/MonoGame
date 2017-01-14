@@ -20,6 +20,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public PipelineBuildEvent()
         {
+            CopyOnly = false;
             SourceFile = string.Empty;
             DestFile = string.Empty;
             Importer = string.Empty;
@@ -30,6 +31,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             BuildAsset = new List<string>();
             BuildOutput = new List<string>();
         }
+
+        /// <summary>
+        /// True if this item is a simple file copy, doing no importing or processing.
+        /// </summary>
+        public bool CopyOnly { get; set; }
 
         /// <summary>
         /// Absolute path to the source file.
@@ -162,6 +168,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             if (cachedEvent == null)
                 return true;
 
+            // jcf: Not sure if we need to deal with 'file exists in output but with different case'
+            //      here, or if that should be done elsewhere.
+
             // Verify that the last write time of the source file matches
             // what we recorded when it was built.  If it is different
             // that means someone modified it and we need to rebuild.
@@ -176,7 +185,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             // If the source file is newer than the dest file
             // then it must have been updated and needs a rebuild.
-            if (sourceWriteTime >= destWriteTime)
+            if (sourceWriteTime > destWriteTime)
                 return true;
 
             // Are any of the dependancy files newer than the dest file?
@@ -192,26 +201,29 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 cachedEvent.DestFile != DestFile)
                 return true;
 
-            // Did the importer assembly change?
-            if (manager.GetImporterAssemblyTimestamp(cachedEvent.Importer) > cachedEvent.ImporterTime)
-                return true;
+            if (!CopyOnly)
+            {
+                // Did the importer assembly change?
+                if (manager.GetImporterAssemblyTimestamp(cachedEvent.Importer) > cachedEvent.ImporterTime)
+                    return true;
 
-            // Did the importer change?
-            if (cachedEvent.Importer != Importer)
-                return true;
+                // Did the importer change?
+                if (cachedEvent.Importer != Importer)
+                    return true;
 
-            // Did the processor assembly change?
-            if (manager.GetProcessorAssemblyTimestamp(cachedEvent.Processor) > cachedEvent.ProcessorTime)
-                return true;
+                // Did the processor assembly change?
+                if (manager.GetProcessorAssemblyTimestamp(cachedEvent.Processor) > cachedEvent.ProcessorTime)
+                    return true;
 
-            // Did the processor change?
-            if (cachedEvent.Processor != Processor)
-                return true;
+                // Did the processor change?
+                if (cachedEvent.Processor != Processor)
+                    return true;
 
-            // Did the parameters change?
-            var defaultValues = manager.GetProcessorDefaultValues(Processor);
-            if (!AreParametersEqual(cachedEvent.Parameters, Parameters, defaultValues))
-                return true;
+                // Did the parameters change?
+                var defaultValues = manager.GetProcessorDefaultValues(Processor);
+                if (!AreParametersEqual(cachedEvent.Parameters, Parameters, defaultValues))
+                    return true;
+            }
 
             return false;
         }

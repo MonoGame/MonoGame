@@ -236,11 +236,7 @@ namespace MonoGame.Tools.Pipeline
             };
             _project.ContentItems.Add(item);
 
-            // Copy the current processor parameters blind as we
-            // will validate and remove invalid parameters during
-            // the build process later.
-            foreach (var pair in _processorParams)
-                item.ProcessorParams.Add(pair.Key, pair.Value);
+            _processorParams.Clear();
         }
 
         #endregion

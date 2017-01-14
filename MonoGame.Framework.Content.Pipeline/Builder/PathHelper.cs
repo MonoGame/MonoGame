@@ -4,6 +4,7 @@
 
 using System;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using System.IO;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder
 {
@@ -55,6 +56,75 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             var str = Uri.UnescapeDataString(uri.ToString());
 
             return Normalize(str);
+        }
+
+        /// <summary>
+        /// Returns null if 'fileName' does not exist.
+        /// Returns false if exists and the full path is identical.
+        /// Returns true if exists and does not match in case.
+        /// </summary>
+        public static bool? FileExistsWithDifferentCase(string fileName)
+        {
+            // jcf: if i use Normalize() instead, i'd have to also use it on the results from Directory.GetFiles...
+            fileName = NormalizeWindows(fileName);
+
+            bool? result = null;
+            if (File.Exists(fileName))
+            {
+                result = false;
+                string directory = Path.GetDirectoryName(fileName);
+                string fileTitle = Path.GetFileName(fileName);
+                string[] files = Directory.GetFiles(directory, fileTitle);
+                if (String.Compare(files[0], fileName, false) != 0)
+                    result = true;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns null if 'directoryName' does not exist.
+        /// Returns false if exists and the full path is identical.
+        /// Returns true if exists and does not match in case.
+        /// </summary>
+        public static bool? DirectoryExistsWithDifferentCase(string directoryName)
+        {
+			// jcf: if i use Normalize() instead, i'd have to also use it on the results from Directory.GetFiles...
+            directoryName = NormalizeWindows(directoryName);
+
+            bool? result = null;
+            if (Directory.Exists(directoryName))
+            {
+                result = false;
+                directoryName = directoryName.TrimEnd(Path.DirectorySeparatorChar);
+
+                int lastPathSeparatorIndex = directoryName.LastIndexOf(Path.DirectorySeparatorChar);
+                if (lastPathSeparatorIndex >= 0)
+                {
+                    string baseDirectory = directoryName.Substring(lastPathSeparatorIndex + 1);
+                    string parentDirectory = directoryName.Substring(0, lastPathSeparatorIndex);
+
+                    string[] directories = Directory.GetDirectories(parentDirectory, baseDirectory);
+                    if (String.Compare(directories[0], directoryName, false) != 0)
+                        result = true;
+                }
+                else
+                {
+                    //if directory is a drive
+                    directoryName += Path.DirectorySeparatorChar.ToString();
+                    DriveInfo[] drives = DriveInfo.GetDrives();
+                    foreach (DriveInfo driveInfo in drives)
+                    {
+                        if (String.Compare(driveInfo.Name, directoryName, true) == 0)
+                        {
+                            if (String.Compare(driveInfo.Name, directoryName, false) != 0)
+                                result = true;
+                            break;
+                        }
+                    }
+
+                }
+            }
+            return result;
         }
     }
 }
