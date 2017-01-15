@@ -283,7 +283,7 @@ namespace Microsoft.Xna.Framework.Graphics
             float w, h;
             if (sourceRectangle.HasValue)
             {
-				var srcRect = sourceRectangle.Value;
+				var srcRect = sourceRectangle.GetValueOrDefault();
 				w = srcRect.Width * scale.X;
 				h = srcRect.Height * scale.Y;
                 _texCoordTL.X = srcRect.X / (float)texture.Width;
@@ -388,8 +388,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(texture);
 
-            origin.X = origin.X * ((float)destinationRectangle.Width   / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Width  != 0) ? sourceRectangle.Value.Width  : texture.Width));
-            origin.Y = origin.Y * ((float)destinationRectangle.Height) / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Height != 0) ? sourceRectangle.Value.Height : texture.Height);
+            origin.X = origin.X * ((float)destinationRectangle.Width   / (float)( (sourceRectangle.HasValue && sourceRectangle.GetValueOrDefault().Width  != 0) ? sourceRectangle.GetValueOrDefault().Width  : texture.Width));
+            origin.Y = origin.Y * ((float)destinationRectangle.Height) / (float)( (sourceRectangle.HasValue && sourceRectangle.GetValueOrDefault().Height != 0) ? sourceRectangle.GetValueOrDefault().Height : texture.Height);
 			
 			var item = _batcher.CreateBatchItem();
 			item.Texture = texture;
@@ -413,7 +413,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			if (sourceRectangle.HasValue)
             {
-				var srcRect = sourceRectangle.Value;
+				var srcRect = sourceRectangle.GetValueOrDefault();
                 _texCoordTL.X = srcRect.X / (float)texture.Width;
                 _texCoordTL.Y = srcRect.Y / (float)texture.Height;
                 _texCoordBR.X = (srcRect.X + srcRect.Width) / (float)texture.Width;
@@ -496,7 +496,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (sourceRectangle.HasValue)
             {
-                var srcRect = sourceRectangle.Value;
+                var srcRect = sourceRectangle.GetValueOrDefault();
                 size = new Vector2(srcRect.Width, srcRect.Height);
                 _texCoordTL.X = srcRect.X / (float)texture.Width;
                 _texCoordTL.Y = srcRect.Y / (float)texture.Height;
@@ -541,7 +541,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
             if (sourceRectangle.HasValue)
             {
-                var srcRect = sourceRectangle.Value;
+                var srcRect = sourceRectangle.GetValueOrDefault();
                 _texCoordTL.X = srcRect.X / (float)texture.Width;
                 _texCoordTL.Y = srcRect.Y / (float)texture.Height;
                 _texCoordBR.X = (srcRect.X + srcRect.Width) / (float)texture.Width;
