@@ -49,7 +49,7 @@ namespace MonoGame.Framework
 
             _window.EnableClientSizeChangedEvent(false); // Disable ClientSizeChanged event while the window is initialised
 
-            _window.Initialize(gdm.PreferredBackBufferWidth, gdm.PreferredBackBufferHeight);
+            _window.ChangeClientSize(new Size(gdm.PreferredBackBufferWidth, gdm.PreferredBackBufferHeight));
 
             base.BeforeInitialize();
 
