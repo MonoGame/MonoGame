@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -25,12 +29,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public override int GetHashCode()
-        {
-            // TODO: FIc gethashcode
-            return 0;
-        }
-
         public override string ToString()
         {
             return "{{Position:" + this.Position + " Color:" + this.Color + " TextureCoordinate:" + this.TextureCoordinate + "}}";
@@ -38,7 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static bool operator ==(VertexPositionColorTexture left, VertexPositionColorTexture right)
         {
-            return (((left.Position == right.Position) && (left.Color == right.Color)) && (left.TextureCoordinate == right.TextureCoordinate));
+            return (left.Position == right.Position) && (left.Color == right.Color) && (left.TextureCoordinate == right.TextureCoordinate);
         }
 
         public static bool operator !=(VertexPositionColorTexture left, VertexPositionColorTexture right)
@@ -54,7 +52,18 @@ namespace Microsoft.Xna.Framework.Graphics
             if (obj.GetType() != base.GetType())
                 return false;
 
-            return (this == ((VertexPositionColorTexture)obj));
+            return this == (VertexPositionColorTexture) obj;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Position.GetHashCode();
+                hashCode = (hashCode*397) ^ Color.GetHashCode();
+                hashCode = (hashCode*397) ^ TextureCoordinate.GetHashCode();
+                return hashCode;
+            }
         }
 
         static VertexPositionColorTexture()

@@ -1,4 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -23,11 +27,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 return VertexDeclaration;
             }
         }
-        public override int GetHashCode()
-        {
-            // TODO: FIc gethashcode
-            return 0;
-        }
 
         public override string ToString()
         {
@@ -36,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static bool operator ==(VertexPositionNormalTexture left, VertexPositionNormalTexture right)
         {
-            return (((left.Position == right.Position) && (left.Normal == right.Normal)) && (left.TextureCoordinate == right.TextureCoordinate));
+            return (left.Position == right.Position) && (left.Normal == right.Normal) && (left.TextureCoordinate == right.TextureCoordinate);
         }
 
         public static bool operator !=(VertexPositionNormalTexture left, VertexPositionNormalTexture right)
@@ -54,7 +53,18 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 return false;
             }
-            return (this == ((VertexPositionNormalTexture)obj));
+            return this == (VertexPositionNormalTexture)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Position.GetHashCode();
+                hashCode = (hashCode*397) ^ Normal.GetHashCode();
+                hashCode = (hashCode*397) ^ TextureCoordinate.GetHashCode();
+                return hashCode;
+            }
         }
 
         static VertexPositionNormalTexture()
