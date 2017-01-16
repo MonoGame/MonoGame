@@ -354,17 +354,10 @@ namespace MonoGame.Framework
             // This is critical for some NUnit runners which
             // typically will run all the tests on the same
             // process/thread.
-#if DEBUG
-            var msg = new NativeMessage();
-            do
+            NativeMessage msg;
+            while (PeekMessage(out msg, IntPtr.Zero, WM_QUIT, WM_QUIT, 1))
             {
-                if (msg.msg == WM_QUIT)
-                    break;
-
-                Thread.Sleep(100);
-            } 
-            while (PeekMessage(out msg, IntPtr.Zero, 0, 1 << 5, 1));
-#endif
+            }
         }
 
         public void CenterForm()
