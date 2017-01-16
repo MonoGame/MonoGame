@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -41,11 +43,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </remarks>
         public static void CalculateNormals(GeometryContent geom, bool overwriteExistingNormals)
         {
+            VertexChannel<Vector3> channel;
             // Look for an existing normals channel.
             if (!geom.Vertices.Channels.Contains(VertexChannelNames.Normal()))
             {
                 // We don't have existing normals, so add a new channel.
-                geom.Vertices.Channels.Add<Vector3>(VertexChannelNames.Normal(), null);
+                channel = geom.Vertices.Channels.Add<Vector3>(VertexChannelNames.Normal(), null);
             }
             else
             {
@@ -53,9 +56,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // normals then we're done here.
                 if (!overwriteExistingNormals)
                     return;
+
+                channel = geom.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
             }
 
-            var channel = geom.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
             var positionIndices = geom.Vertices.PositionIndices;
             Debug.Assert(positionIndices.Count == channel.Count, "The position and channel sizes were different!");
 
@@ -373,18 +377,123 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return results;
         }
 
+        /// <summary>
+        /// Merge any positions in the <see cref="PositionCollection"/> of the
+        /// specified mesh that are at a distance less than the specified tolerance
+        /// from each other.
+        /// </summary>
+        /// <param name="mesh">Mesh to be processed.</param>
+        /// <param name="tolerance">Tolerance value that determines how close 
+        /// positions must be to each other to be merged.</param>
+        /// <remarks>
+        /// This method will also update the <see cref="VertexContent.PositionIndices"/>
+        /// in the <see cref="GeometryContent"/> of the specified mesh.
+        /// </remarks>
         public static void MergeDuplicatePositions(MeshContent mesh, float tolerance)
         {
-            throw new NotImplementedException();
+            if (mesh == null)
+                throw new ArgumentNullException("mesh");
+
+            // TODO Improve performance with spatial partitioning scheme
+            var indexLists = new List<IndexUpdateList>();
+            foreach (var geom in mesh.Geometry)
+            {
+                var list = new IndexUpdateList(geom.Vertices.PositionIndices);
+                indexLists.Add(list);
+            }
+
+            for (var i = mesh.Positions.Count - 1; i >= 1; i--)
+            {
+                var pi = mesh.Positions[i];
+                for (var j = i - 1; j >= 0; j--)
+                {
+                    var pj = mesh.Positions[j];
+                    if (Vector3.Distance(pi, pj) <= tolerance)
+                    {
+                        foreach (var list in indexLists)
+                            list.Update(i, j);
+                        mesh.Positions.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+
+            foreach (var list in indexLists)
+                list.Pack(mesh.Positions.Count);
         }
 
+        /// <summary>
+        /// Merge vertices with the same <see cref="VertexContent.PositionIndices"/> and
+        /// <see cref="VertexChannel"/> data within the specified
+        /// <see cref="GeometryContent"/>.
+        /// </summary>
+        /// <param name="geometry">Geometry to be processed.</param>
         public static void MergeDuplicateVertices(GeometryContent geometry)
         {
-            throw new NotImplementedException();
+            if (geometry == null)
+                throw new ArgumentNullException("geometry");
+
+            var verts = geometry.Vertices;
+            var hashMap = new Dictionary<int, List<VertexData>>();
+
+            var indices = new IndexUpdateList(geometry.Indices);
+            var vIndex = 0;
+
+            for (var i = 0; i < geometry.Indices.Count; i++)
+            {
+                var iIndex = geometry.Indices[i];
+                var iData = new VertexData
+                {
+                    Index = iIndex,
+                    PositionIndex = verts.PositionIndices[vIndex],
+                    ChannelData = new object[verts.Channels.Count]
+                };
+                
+                for (var channel = 0; channel < verts.Channels.Count; channel++)
+                    iData.ChannelData[channel] = verts.Channels[channel][vIndex];
+
+                var hash = iData.ComputeHash();
+
+                List<VertexData> candidates;
+                if (hashMap.TryGetValue(hash, out candidates))
+                {
+                    for (var candidateIndex = 0; candidateIndex < candidates.Count; candidateIndex++)
+                    {
+                        var c = candidates[candidateIndex];
+                        if (!iData.ContentEquals(c))
+                            continue;
+
+                        // Match! Update the corresponding indices and remove the vertex
+                        indices.Update(iIndex, c.Index);
+                        verts.RemoveAt(vIndex);
+                        goto nextOuterLoop;
+                    }
+                    candidates.Add(iData);
+                }
+                else
+                {
+                    // no vertices with the same hash yet, create a new list for the data
+                    hashMap.Add(hash, new List<VertexData> { iData });
+                }
+                vIndex++;
+                nextOuterLoop: ;
+            }
+
+            // update the indices because of the vertices we removed
+            indices.Pack(verts.VertexCount);
         }
 
+        /// <summary>
+        /// Merge vertices with the same <see cref="VertexContent.PositionIndices"/> and
+        /// <see cref="VertexChannel"/> data within the <see cref="MeshContent.Geometry"/>
+        /// of this mesh. If you want to merge positions too, call 
+        /// <see cref="MergeDuplicatePositions"/> on your mesh before this function.
+        /// </summary>
+        /// <param name="mesh">Mesh to be processed</param>
         public static void MergeDuplicateVertices(MeshContent mesh)
         {
+            if (mesh == null)
+                throw new ArgumentNullException("mesh");
             foreach (var geom in mesh.Geometry)
                 MergeDuplicateVertices(geom);
         }
@@ -436,7 +545,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (transform == Matrix.Identity)
                 return;
 
-            Matrix inverseTransform = Matrix.Invert(transform);
+            var inverseTransform = Matrix.Invert(transform);
 
             var work = new Stack<NodeContent>();
             work.Push(scene);
@@ -483,5 +592,173 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             float d = Vector3.Dot(xform.Right, Vector3.Cross(xform.Forward, xform.Up));
             return d < 0.0f;
         }
+
+        #region Private helpers
+
+        private static void UpdatePositionIndices(MeshContent mesh, int from, int to)
+        {
+            foreach (var geom in mesh.Geometry)
+            {
+                for (var i = 0; i < geom.Vertices.PositionIndices.Count; i++)
+                {
+                    var index = geom.Vertices.PositionIndices[i];
+                    if (index == from)
+                        geom.Vertices.PositionIndices[i] = to;
+                }
+            }
+        }
+
+        private class VertexData
+        {
+            public int Index;
+            public int PositionIndex;
+            public object[] ChannelData;
+
+            // Compute a hash based on PositionIndex and ChannelData
+            public int ComputeHash()
+            {
+                var hash = PositionIndex;
+                foreach (var channel in ChannelData)
+                    hash ^= channel.GetHashCode();
+
+                return hash;
+            }
+
+            // Check equality on PositionIndex and ChannelData
+            public bool ContentEquals(VertexData other)
+            {
+                if (PositionIndex != other.PositionIndex)
+                    return false;
+
+                if (ChannelData.Length != other.ChannelData.Length)
+                    return false;
+
+                for (var i = 0; i < ChannelData.Length; i++)
+                {
+                        if (!Equals(ChannelData[i], other.ChannelData[i]))
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        private struct IndirectValue : IComparable<IndirectValue>
+        {
+            public readonly int Position;
+            public readonly int Value;
+
+            public IndirectValue(int position, int value)
+            {
+                Position = position;
+                Value = value;
+            }
+
+            public int CompareTo(IndirectValue other)
+            {
+                return Value - other.Value;
+            }
+
+            public override string ToString()
+            {
+                return string.Format("{0} {1}", Position, Value);
+            }
+        }
+
+        // takes an IndexCollection and can efficiently update index values
+        private class IndexUpdateList
+        {
+            private readonly IList<int> _collectionToUpdate;
+            private readonly List<int> _indexPositions;
+            private readonly Dictionary<int, List<int>> _startPositions;
+            private readonly IndexToValueComparer _comparer;
+
+            // create the list, presort the values and compute the start positions of each value
+            public IndexUpdateList(IList<int> collectionToUpdate)
+            {
+                _collectionToUpdate = collectionToUpdate;
+                _indexPositions = new List<int>(_collectionToUpdate.Count);
+                _startPositions = new Dictionary<int, List<int>>();
+                _comparer = new IndexToValueComparer(_collectionToUpdate);
+                Initialize();
+            }
+
+            private void Initialize()
+            {
+                for (var i = 0; i < _collectionToUpdate.Count; i++)
+                    _indexPositions.Add(i);
+
+                _indexPositions.Sort(_comparer);
+
+                var currentValue = -1;
+                for (var pos = 0; pos < _indexPositions.Count; pos++)
+                {
+                    var v = _collectionToUpdate[_indexPositions[pos]];
+                    if (currentValue != v)
+                    {
+                        currentValue = v;
+                        _startPositions.Add(currentValue, new List<int>{ pos });
+                    }
+                }
+            }
+
+            public void Update(int from, int to)
+            {
+                if (from == to)
+                    return;
+
+                foreach (var startPos in _startPositions[from])
+                {
+                    for (var pos = startPos; pos < _indexPositions.Count && _collectionToUpdate[_indexPositions[pos]] == from; pos++)
+                        _collectionToUpdate[_indexPositions[pos]] = to;
+                }
+
+                _startPositions[to].AddRange(_startPositions[from]);
+                _startPositions.Remove(from);
+            }
+
+            // Pack all indices together starting from zero
+            // E.g. [5, 5, 3, 5, 21, 3] -> [1, 1, 0, 1, 2, 0]
+            public void Pack(int distinctValues)
+            {
+                if (_collectionToUpdate.Count == 0)
+                    return;
+
+                _indexPositions.Sort(_comparer);
+
+                var lastValue = _collectionToUpdate[_indexPositions[_indexPositions.Count - 1]];
+                var newIndex = distinctValues - 1;
+                for (var i = _indexPositions.Count - 1; i >= 0; i--)
+                {
+                    var indexPos = _indexPositions[i];
+                    var thisValue = _collectionToUpdate[indexPos];
+                    if (thisValue != lastValue)
+                    {
+                        newIndex--;
+                        lastValue = thisValue;
+                    }
+
+                    _collectionToUpdate[indexPos] = newIndex;
+                }
+            }
+
+            private class IndexToValueComparer : Comparer<int>
+            {
+                private readonly IList<int> _values;
+
+                public IndexToValueComparer(IList<int> values)
+                {
+                    _values = values;
+                }
+
+                public override int Compare(int x, int y)
+                {
+                    return _values[x] - _values[y];
+                }
+            }
+
+        }
+
+        #endregion
     }
 }
