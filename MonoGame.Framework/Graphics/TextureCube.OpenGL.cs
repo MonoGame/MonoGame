@@ -7,11 +7,13 @@ using System;
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.All;
+using PixelFormat = MonoMac.OpenGL.All;
 using Bool = MonoMac.OpenGL.Boolean;
 #endif
 #if (MONOMAC && !PLATFORM_MACOS_LEGACY)
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
+using PixelFormat = OpenTK.Graphics.OpenGL.All;
 using Bool = OpenTK.Graphics.OpenGL.Boolean;
 #endif
 #if DESKTOPGL
@@ -61,7 +63,34 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                     {
-                        throw new NotImplementedException();
+                        var imageSize = 0;
+                        switch (format)
+                        {
+                            case SurfaceFormat.RgbPvrtc2Bpp:
+                            case SurfaceFormat.RgbaPvrtc2Bpp:
+                                imageSize = (Math.Max(size, 16) * Math.Max(size, 8) * 2 + 7) / 8;
+                                break;
+                            case SurfaceFormat.RgbPvrtc4Bpp:
+                            case SurfaceFormat.RgbaPvrtc4Bpp:
+                                imageSize = (Math.Max(size, 8) * Math.Max(size, 8) * 4 + 7) / 8;
+                                break;
+                            case SurfaceFormat.Dxt1:
+                            case SurfaceFormat.Dxt1a:
+                            case SurfaceFormat.Dxt1SRgb:
+                            case SurfaceFormat.Dxt3:
+                            case SurfaceFormat.Dxt3SRgb:
+                            case SurfaceFormat.Dxt5:
+                            case SurfaceFormat.Dxt5SRgb:
+                            case SurfaceFormat.RgbEtc1:
+                            case SurfaceFormat.RgbaAtcExplicitAlpha:
+                            case SurfaceFormat.RgbaAtcInterpolatedAlpha:
+                                imageSize = ((size + 3) / 4) * ((size + 3) / 4) * GraphicsExtensions.GetSize(format);
+                                break;
+                            default:
+                                throw new NotSupportedException();
+                        }
+                        GL.CompressedTexImage2D(target, 0, glInternalFormat, size, size, 0, imageSize, IntPtr.Zero);
+                        GraphicsExtensions.CheckGLError();
                     }
                     else
                     {
@@ -95,7 +124,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        private void PlatformSetData<T>(CubeMapFace face, int level, IntPtr dataPtr, int xOffset, int yOffset, int width, int height)
+        private void PlatformSetData<T>(CubeMapFace face, int level, IntPtr dataPtr, int xOffset, int yOffset, int width, int height, int startIndex, int elementCount, int elementSize)
         {
             Threading.BlockOnUIThread(() =>
             {
@@ -105,7 +134,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 TextureTarget target = GetGLCubeFace(face);
                 if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                 {
-                    throw new NotImplementedException();
+                    GL.CompressedTexSubImage2D(target, level, xOffset, yOffset, width, height, (OpenGL.PixelFormat)glInternalFormat, elementCount * elementSize, dataPtr + (startIndex * elementSize));
+                    GraphicsExtensions.CheckGLError();
                 }
                 else
                 {

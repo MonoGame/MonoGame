@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformSetData<T>(CubeMapFace face, int level, IntPtr dataPtr, int xOffset, int yOffset, int width, int height)
+        private void PlatformSetData<T>(CubeMapFace face, int level, IntPtr dataPtr, int xOffset, int yOffset, int width, int height, int startIndex, int elementCount, int elementSize)
         {
                 var box = new DataBox(dataPtr, GetPitch(width), 0);
 
