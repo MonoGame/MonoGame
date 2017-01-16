@@ -145,6 +145,16 @@ namespace MonoGame.Tests {
 				handler (this, new FrameInfoEventArgs(FrameInfo));
 		}
 
+	    public void InitializeOnly()
+	    {
+            if (GraphicsDevice == null)
+            {
+                var graphicsDeviceManager = Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;
+                graphicsDeviceManager.CreateDevice();
+            }
+            Initialize();
+	    }
+
 		protected override void Initialize ()
 		{
 			SafeRaise (PreInitializeWith);

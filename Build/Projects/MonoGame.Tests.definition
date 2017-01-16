@@ -12,7 +12,7 @@
   </References>
 
   <Properties>
-    
+
     <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
@@ -96,7 +96,7 @@
 	<Compile Include="Framework\EnumConformingTest.cs" />
 	<Compile Include="Framework\FrameworkDispatcherTest.cs" />
     <Compile Include="Framework\GameComponentTest.cs" />
-    <Compile Include="Framework\GameTest.cs" />	
+    <Compile Include="Framework\GameTest.cs" />
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\GameTest+Properties.cs" />
     <Compile Include="Framework\GestureRecognizerTest.cs" />
@@ -122,7 +122,7 @@
     <Compile Include="Framework\Audio\SoundEffectTest.cs" />
     <Compile Include="Framework\Audio\XactTest.cs" />
     <Compile Include="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
-	
+
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
     <Compile Include="Framework\Components\FrameCompareComponent.cs" />
@@ -140,7 +140,9 @@
     <Compile Include="Framework\Graphics\BlendStateTest.cs" />
     <Compile Include="Framework\Graphics\EffectTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsAdapterTest.cs" />
-    <Compile Include="Framework\Graphics\GraphicsDeviceTest.cs" />
+    <Compile Include="Framework\Graphics\GraphicsDeviceTest.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Framework\Graphics\MiscellaneousTests.cs" />
     <Compile Include="Framework\Graphics\GraphicsDeviceTestFixtureBase.cs" />
     <Compile Include="Framework\Graphics\IndexBufferTest.cs" />
@@ -153,7 +155,9 @@
     <Compile Include="Framework\Input\MouseTest.cs" />
 
     <Compile Include="Framework\Graphics\DepthStencilStateTest.cs" />
-    <Compile Include="Framework\Graphics\GraphicsDeviceManagerTest.cs" />
+    <Compile Include="Framework\Graphics\GraphicsDeviceManagerTest.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Framework\Graphics\RasterizerStateTest.cs" />
     <Compile Include="Framework\Graphics\RenderTarget2DTest.cs" />
     <Compile Include="Framework\Graphics\RenderTargetCubeTest.cs" />
@@ -240,7 +244,7 @@
     <Content Include="Assets\Audio\Win\Tests.xwb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	
+
     <Content Include="Assets\Audio\bark_mono_11hz_8bit.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

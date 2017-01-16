@@ -34,6 +34,100 @@ namespace MonoGame.Tests.Graphics
             blend.Dispose();
         }
 
+        [Test]
+        public void CtorAdapterNull()
+        {
+            Assert.Throws<ArgumentNullException>(
+                () => new GraphicsDevice(null, GraphicsProfile.Reach, new PresentationParameters()));
+        }
+
+        [Test]
+        public void CtorPresentationParametersNull()
+        {
+            Assert.Throws<ArgumentNullException>(
+                () => new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile.Reach, null));
+        }
+
+        [Test]
+        public void DisposedWhenDisposingInvoked()
+        {
+            var count = 0;
+
+            gd.Disposing += (sender, args) =>
+            {
+                Assert.IsTrue(gd.IsDisposed);
+                count++;
+            };
+
+            gd.Dispose();
+            Assert.AreEqual(1, count);
+
+            // Disposing should not be invoked more than once
+            gd.Dispose();
+            Assert.AreEqual(1, count);
+        }
+
+        [Test]
+        public void ResetInvokedBeforeDeviceLost()
+        {
+            var resetCount = 0;
+            var devLostCount = 0;
+
+            gd.DeviceReset += (sender, args) =>
+            {
+                resetCount++;
+                Assert.AreEqual(0, devLostCount);
+            };
+
+            gd.DeviceLost += (sender, args) =>
+            {
+                devLostCount++;
+                Assert.AreEqual(1, resetCount);
+            };
+
+            gd.Reset();
+
+            Assert.AreEqual(1, resetCount);
+            Assert.AreEqual(1, devLostCount);
+        }
+
+        // TODO Make sure dynamic graphics resources are notified when graphics device is lost
+        [Test, Ignore]
+        public void ContentLostResources()
+        {
+            // https://blogs.msdn.microsoft.com/shawnhar/2007/12/12/virtualizing-the-graphicsdevice-in-xna-game-studio-2-0/
+
+            var rt = new RenderTarget2D(gdm.GraphicsDevice, 5, 5);
+            var vb = new DynamicVertexBuffer(gd, VertexPositionColor.VertexDeclaration, 1, BufferUsage.None);
+            var ib = new DynamicIndexBuffer(gd, IndexElementSize.SixteenBits, 1, BufferUsage.None);
+            var rtc = new RenderTargetCube(gd, 1, false, SurfaceFormat.Color, DepthFormat.Depth16);
+
+            gd.Reset();
+
+            Assert.IsTrue(rt.IsContentLost);
+            Assert.IsFalse(rt.IsDisposed);
+
+            Assert.IsTrue(vb.IsContentLost);
+            Assert.IsFalse(vb.IsDisposed);
+
+            Assert.IsTrue(ib.IsContentLost);
+            Assert.IsFalse(ib.IsDisposed);
+
+            Assert.IsTrue(rtc.IsContentLost);
+            Assert.IsFalse(rtc.IsDisposed);
+
+            rt.Dispose();
+            vb.Dispose();
+            ib.Dispose();
+            rtc.Dispose();
+        }
+
+        [Test]
+        public void ResetWindowHandleNullThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() => gd.Reset(new PresentationParameters()));
+        }
+
 		[Test]
 		public void Clear()
 		{
