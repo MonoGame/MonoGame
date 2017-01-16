@@ -43,6 +43,9 @@ namespace MonoGame.Tools.Pipeline
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
         };
 
+        private string _longParamPrefix = "/";
+        private string _shortParamPrefix = "/";
+
         public IEnumerable<ContentItemTemplate> Templates
         {
             get { return _templateItems; }
@@ -100,6 +103,17 @@ namespace MonoGame.Tools.Pipeline
 
         private PipelineController(IView view)
         {
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                _longParamPrefix = "/";
+                _shortParamPrefix = "/";
+            }
+            else
+            {
+                _longParamPrefix = "--";
+                _shortParamPrefix = "-";
+            }
+
             Instance = this;
             PipelineSettings.Default.Load();
 
@@ -381,9 +395,9 @@ namespace MonoGame.Tools.Pipeline
 
         public void Build(bool rebuild)
         {
-            var commands = string.Format("/@:\"{0}\" {1}", _project.OriginalPath, rebuild ? "/rebuild" : string.Empty);
+            var commands = string.Format("{2}@:\"{0}\" {1}", _project.OriginalPath, rebuild ? _longParamPrefix + "rebuild" : string.Empty, _shortParamPrefix);
             if (LaunchDebugger)
-                commands += " /launchdebugger";
+                commands += " " + _longParamPrefix + "launchdebugger";
             BuildCommand(commands);
         }
 
@@ -436,9 +450,9 @@ namespace MonoGame.Tools.Pipeline
             }
 
             // Run the build the command.
-            var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
+            var commands = string.Format("{1}@:\"{0}\" {2}rebuild {2}incremental", tempPath, _shortParamPrefix, _longParamPrefix);
             if (LaunchDebugger)
-                commands += " /launchdebugger";
+                commands += " " + _longParamPrefix + "launchdebugger";
 
             BuildCommand(commands);
 
@@ -471,9 +485,9 @@ namespace MonoGame.Tools.Pipeline
 
             View.OutputClear();
 
-            var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
+            var commands = string.Format("{2}clean {2}intermediateDir:\"{0}\" {2}outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir, _longParamPrefix);
             if (LaunchDebugger)
-                commands += " /launchdebugger";
+                commands += " " + _longParamPrefix + "launchdebugger";
 
             _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
             _buildTask.ContinueWith((e) => View.Invoke(UpdateMenu));

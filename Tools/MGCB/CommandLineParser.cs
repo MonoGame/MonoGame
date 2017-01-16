@@ -92,8 +92,22 @@ namespace MGCB
         public delegate void ErrorCallback(string msg, object[] args);
         public event ErrorCallback OnError;
 
+        private string _longParamPrefix = "/";
+        private string _shortParamPrefix = "/";
+
         public MGBuildParser(object optionsObject)
         {
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                _longParamPrefix = "/";
+                _shortParamPrefix = "/";
+            }
+            else
+            {
+                _longParamPrefix = "--";
+                _shortParamPrefix = "-";
+            }
+
             _optionsObject = optionsObject;
             _requiredOptions = new Queue<MemberInfo>();
             _optionalOptions = new Dictionary<string, MemberInfo>();
@@ -281,7 +295,7 @@ namespace MGCB
                     continue;
                 }
 
-                if (arg.StartsWith("/@:") || arg.StartsWith("-@:"))
+                if (arg.StartsWith(_shortParamPrefix + "@:"))
                 {
                     var file = arg.Substring(3);
                     var commands = File.ReadAllLines(file);
@@ -314,7 +328,7 @@ namespace MGCB
 
         private bool ParseArgument(string arg)
         {
-            if (arg.StartsWith("/") || arg.StartsWith("-"))
+            if (arg.StartsWith(_longParamPrefix))
             {
                 // After the first escaped argument we can no
                 // longer read non-escaped arguments.
