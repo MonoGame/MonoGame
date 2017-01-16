@@ -20,7 +20,12 @@ namespace MonoGame.Tests.Graphics
         public static GraphicsDevice GraphicsDevice { get; private set; }
         public static GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 
-        public static bool NeedsHardReset { get; private set; } = true;
+        public static bool NeedsHardReset { get; private set; }
+
+        public GraphicsDeviceSetUpFixture()
+        {
+            NeedsHardReset = true;
+        }
 
         [TearDown]
         public void RunAfterAllTests()
