@@ -821,7 +821,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // WINDOWS
 
-        public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
+        private void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
             // Clear options for depth/stencil buffer if not attached.
             if (_currentDepthStencilView != null)
@@ -920,7 +920,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif // WINDOWS_STOREAPP
         }
         
-        public void PlatformPresent()
+        private void PlatformPresent()
         {
 #if WINDOWS_STOREAPP || WINDOWS_UAP
             // The application may optionally specify "dirty" or "scroll" rects to improve efficiency
