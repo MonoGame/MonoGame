@@ -166,7 +166,7 @@ Start -> (Code | Technique_Declaration | Sampler_Declaration | Function_Header |
    return shader; 
 };
 
-Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration+ CloseBracket
+Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration+ CloseBracket SemiColon?
 {
    var technique = new TechniqueInfo();
    technique.name = $Identifier as string ?? string.Empty;

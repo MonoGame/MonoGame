@@ -166,6 +166,22 @@ namespace TwoMGFX
                 return;
             }
 
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Semicolon); // Option Rule
+            if (tok.Type == TokenType.Semicolon)
+            {
+
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
+                n = node.CreateNode(tok, tok.ToString() );
+                node.Token.UpdateRange(tok);
+                node.Nodes.Add(n);
+                if (tok.Type != TokenType.Semicolon) {
+                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Semicolon.ToString(), 0x1001, tok));
+                    return;
+                }
+            }
+
             parent.Token.UpdateRange(node.Token);
         } // NonTerminalSymbol: Technique_Declaration
 
