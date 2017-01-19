@@ -309,7 +309,7 @@
       <Link>Processors\MGFX\ShaderProfile.DirectX.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\ShaderProfile.GLFX.cs">
-      <Platforms>Windows</Platforms>
+      <Services>GLFX</Services>
       <Link>Processors\MGFX\ShaderProfile.GLFX.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\ShaderResult.cs">

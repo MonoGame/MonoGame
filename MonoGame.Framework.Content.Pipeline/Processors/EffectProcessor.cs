@@ -88,6 +88,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var shaderErrorsAndWarnings = string.Empty;
             try
             {
+                profile.BeforeCreation(shaderResult);
                 effect = EffectObject.CompileEffect(shaderResult, out shaderErrorsAndWarnings);
 
                 // If there were any additional output files we register
