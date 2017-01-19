@@ -76,6 +76,7 @@ using System.Text;
 using System.Threading;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 using MonoGame.Tests.Components;
 
@@ -93,7 +94,11 @@ namespace MonoGame.Tests {
 #if XNA
             Content.RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
 #endif
-			Services.AddService<IFrameInfoSource> (this);
+            // We do all the tests using the reference device to
+            // avoid driver glitches and get consistant rendering.
+            GraphicsAdapter.UseReferenceDevice = true;
+
+            Services.AddService<IFrameInfoSource>(this);
 			SuppressExtraUpdatesAndDraws = true;
 		}
 
