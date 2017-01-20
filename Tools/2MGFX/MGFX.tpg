@@ -440,7 +440,7 @@ Semantic_Variable -> GlslIn Identifier Identifier Semantic? Semicolon
 	var variable = new VsInputVariableInfo();
 	variable.TypeName = $Identifier[0] as string;
 	variable.Name = $Identifier[1] as string;
-	variable.SemanticName = $Identifier[2] as string;
+	variable.SemanticName = Nodes[3].Nodes[1].Text;
 	variable.AttributeSyntax = ($GlslIn[0] as string) == "attribute";
 	variable.Node = this;
 

@@ -10,7 +10,7 @@ namespace TwoMGFX
     {
         public string Name { get; private set; }
 
-        public int Size { get; private set; }
+        public int Size { get; internal set; }
 
         public List<int> ParameterIndex { get; private set; }
 
@@ -31,7 +31,7 @@ namespace TwoMGFX
         public bool SameAs(ConstantBufferData other)
         {
             // If the names of the constant buffers don't
-            // match then consider them different right off 
+            // match then consider them different right off
             // the bat... even if their parameters are the same.
             if (Name != other.Name)
                 return false;
@@ -40,7 +40,7 @@ namespace TwoMGFX
             if (    Size != other.Size ||
                     Parameters.Count != other.Parameters.Count)
                 return false;
-            
+
             // Compare the parameters themselves.
             for (var i = 0; i < Parameters.Count; i++)
             {

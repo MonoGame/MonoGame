@@ -19,7 +19,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static int PlatformProfile()
         {
+#if GLFX
+            return 2;
+#else
             return 0;
+#endif
         }
 
         private void PlatformConstruct(bool isVertexShader, byte[] shaderBytecode)

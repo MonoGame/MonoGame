@@ -87,7 +87,7 @@ namespace TwoMGFX
 
         private void PrintNode(StringBuilder sb, ParseNode node, int indent)
         {
-            
+
             string space = "".PadLeft(indent, ' ');
 
             sb.Append(space);
@@ -96,7 +96,7 @@ namespace TwoMGFX
             foreach (ParseNode n in node.Nodes)
                 PrintNode(sb, n, indent + 2);
         }
-        
+
         /// <summary>
         /// this is the entry point for executing and evaluating the parse tree.
         /// </summary>
@@ -114,18 +114,18 @@ namespace TwoMGFX
     {
         protected string text;
         protected List<ParseNode> nodes;
-        
+
         public List<ParseNode> Nodes { get {return nodes;} }
-        
+
         [XmlIgnore] // avoid circular references when serializing
         public ParseNode Parent;
         public Token Token; // the token/rule
 
         [XmlIgnore] // skip redundant text (is part of Token)
-        public string Text { // text to display in parse tree 
-            get { return text;} 
+        public string Text { // text to display in parse tree
+            get { return text;}
             set { text = value; }
-        } 
+        }
 
         public virtual ParseNode CreateNode(Token token, string text)
         {
@@ -526,10 +526,10 @@ namespace TwoMGFX
         protected virtual object EvalStart(ParseTree tree, params object[] paramlist)
         {
             var shader = new ShaderInfo();
-        
+
            foreach (var node in Nodes)
               node.Eval(tree, shader);
-        
+
            return shader;
         }
 
@@ -539,17 +539,17 @@ namespace TwoMGFX
            technique.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
            technique.startPos = Token.StartPos;
            technique.length = Token.Length;
-        
+
            foreach (var node in Nodes)
               node.Eval(tree, technique);
-           
+
            // Make sure we have at least one pass.
            if (technique.Passes.Count > 0)
            {
               var shaderInfo = paramlist[0] as ShaderInfo;
               shaderInfo.Techniques.Add(technique);
            }
-        
+
            return null;
         }
 
@@ -630,9 +630,9 @@ namespace TwoMGFX
 
         protected virtual object EvalColorsMasks(ParseTree tree, params object[] paramlist)
         {
-            return	(ColorWriteChannels)(this.GetValue(tree, TokenType.Colors, 0) ?? 0) | 
-        			(ColorWriteChannels)(this.GetValue(tree, TokenType.Colors, 1) ?? 0) | 
-        			(ColorWriteChannels)(this.GetValue(tree, TokenType.Colors, 2) ?? 0) | 
+            return	(ColorWriteChannels)(this.GetValue(tree, TokenType.Colors, 0) ?? 0) |
+        			(ColorWriteChannels)(this.GetValue(tree, TokenType.Colors, 1) ?? 0) |
+        			(ColorWriteChannels)(this.GetValue(tree, TokenType.Colors, 2) ?? 0) |
         			(ColorWriteChannels)(this.GetValue(tree, TokenType.Colors, 3) ?? 0);
         }
 
@@ -703,7 +703,7 @@ namespace TwoMGFX
 
         protected virtual object EvalBlends(ParseTree tree, params object[] paramlist)
         {
-            return	this.GetValue(tree, TokenType.Blend_Zero, 0) ?? this.GetValue(tree, TokenType.Blend_One, 0) ?? this.GetValue(tree, TokenType.Blend_SrcColor, 0) ?? this.GetValue(tree, TokenType.Blend_InvSrcColor, 0) ?? this.GetValue(tree, TokenType.Blend_SrcAlpha, 0) ?? this.GetValue(tree, TokenType.Blend_InvSrcAlpha, 0) ?? 
+            return	this.GetValue(tree, TokenType.Blend_Zero, 0) ?? this.GetValue(tree, TokenType.Blend_One, 0) ?? this.GetValue(tree, TokenType.Blend_SrcColor, 0) ?? this.GetValue(tree, TokenType.Blend_InvSrcColor, 0) ?? this.GetValue(tree, TokenType.Blend_SrcAlpha, 0) ?? this.GetValue(tree, TokenType.Blend_InvSrcAlpha, 0) ??
         			this.GetValue(tree, TokenType.Blend_DestAlpha, 0) ?? this.GetValue(tree, TokenType.Blend_InvDestAlpha, 0) ?? this.GetValue(tree, TokenType.Blend_DestColor, 0) ?? this.GetValue(tree, TokenType.Blend_InvDestColor, 0) ?? this.GetValue(tree, TokenType.Blend_SrcAlphaSat, 0) ??
         			this.GetValue(tree, TokenType.Blend_BlendFactor, 0) ?? this.GetValue(tree, TokenType.Blend_InvBlendFactor, 0);
         }
@@ -949,17 +949,17 @@ namespace TwoMGFX
         {
             var pass = new PassInfo();
            pass.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
-        
+
            foreach (var node in Nodes)
               node.Eval(tree, pass);
-        
+
            // We need to have a pixel or vertex shader to keep this pass.
            if (!string.IsNullOrEmpty(pass.psFunction) || !string.IsNullOrEmpty(pass.vsFunction))
            {
               var technique = paramlist[0] as TechniqueInfo;
               technique.Passes.Add(pass);
            }
-        
+
            return null;
         }
 
@@ -1112,33 +1112,33 @@ namespace TwoMGFX
         {
             // if there is a comma or closing paren at the end this is a sampler as a parameter of a function
         	if (this.GetValue(tree, TokenType.Semicolon, 0) == null) return null;
-        
+
         	var sampler = new SamplerStateInfo();
         	sampler.Name = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	
+
         	foreach (ParseNode node in Nodes)
         		node.Eval(tree, sampler);
-        	
+
         	var shaderInfo = paramlist[0] as ShaderInfo;
         	shaderInfo.SamplerStates.Add(sampler.Name, sampler);
-        	
+
         	return null;
         }
 
         protected virtual object EvalSemantic_Variable(ParseTree tree, params object[] paramlist)
         {
             if (this.GetValue(tree, TokenType.Semantic, 0) == null) return null;
-        
+
         	var variable = new VsInputVariableInfo();
         	variable.TypeName = this.GetValue(tree, TokenType.Identifier, 0) as string;
         	variable.Name = this.GetValue(tree, TokenType.Identifier, 1) as string;
-        	variable.SemanticName = this.GetValue(tree, TokenType.Identifier, 2) as string;
+            variable.SemanticName = Nodes[3].Nodes[1].Text;
         	variable.AttributeSyntax = (this.GetValue(tree, TokenType.GlslIn, 0) as string) == "attribute";
         	variable.Node = this;
-        
+
         	var shaderInfo = paramlist[0] as ShaderInfo;
         	shaderInfo.VsInputVariables.Add(variable.Name, variable);
-        
+
         	return null;
         }
 
@@ -1159,12 +1159,12 @@ namespace TwoMGFX
         	if (this.GetValue(tree, TokenType.GlslParam, 0) != null) return null;
         	var shaderInfo = paramlist[0] as ShaderInfo;
         	shaderInfo.Functions.Add(this.GetValue(tree, TokenType.Identifier, 0) as string, this);
-        
+
         	return null;
         }
 
 
     }
-    
+
     #endregion ParseTree
 }

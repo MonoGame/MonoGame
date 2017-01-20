@@ -80,7 +80,7 @@ namespace TwoMGFX
             builder.Remove(token.StartPos, token.Length);
             builder.Insert(token.StartPos, "main");
 
-            
+
             // TODO prepend the version to the content
             //builder.Insert(0, shaderProfile);
 
@@ -108,14 +108,28 @@ namespace TwoMGFX
 
             for(var i = 0; i < result.Inputs.Count; i++)
             {
-                // var usage = shaderInfo.VsInputVariables[result.Inputs[i].Name].SemanticName;
                 data._attributes[i] = new ShaderData.Attribute
                 {
                     index = i,
                     location = -1,
                     name = result.Inputs[i].Name,
-                    //usage =
                 };
+
+                // if this is a vertex shader we can set the semantics because we parsed them earlier
+                if (isVertexShader)
+                {
+                    var semantic = shaderInfo.VsInputVariables[result.Inputs[i].Name].SemanticName;
+                    VertexElementUsage usage;
+                    // semantic name can either be SEMANTIC or SEMANTICn where n is a number between 0 and 9
+                    if (Enum.TryParse(semantic, false, out usage) ||
+                        Enum.TryParse(semantic.Substring(0, semantic.Length - 1), false, out usage))
+                        data._attributes[i].usage = usage;
+                }
+                else
+                {
+                    // TODO do we want this for pixel shaders? That would mean changing the GLFX format
+                    data._attributes[i].usage = VertexElementUsage.Color;
+                }
             }
 
             data._samplers = new ShaderData.Sampler[result.Textures.Count];
@@ -135,10 +149,30 @@ namespace TwoMGFX
                     type = tex.Type.ToSamplerType()
                 };
             }
+
             // TODO somehow optimize parameters into 'constant buffers'
             // older GLSL does not have uniform buffers so we'd have to something else. Maybe the
             // optimization MojoShader does -> gather all floats, bools and ints in large arrays
-            data._cbuffers = new int[1];
+
+            // EDIT: this is a difficult optimization to make and glsl_optimizer is no longer being
+            // updated. For now we'll create a seperate cbuffer for each parameter. We should look
+            // into supporting uniform buffers (UBOs) when a modern GLSL version is being used.
+            // Users can do this optimization themselves by putting their uniforms in an array.
+            // Maybe we should put that in the docs.
+
+            data._cbuffers = new int[result.Uniforms.Count];
+
+            for (var i = 0; i < result.Uniforms.Count; i++)
+            {
+                var uniform = result.Uniforms[i];
+                var cb = new ConstantBufferData(uniform.Name);
+                cb.Parameters.Add(uniform.ToParameter());
+                cb.Size = uniform.GetSize();
+                cb.ParameterOffset.Add(0);
+
+                data._cbuffers[i] = effect.ConstantBuffers.Count;
+                effect.ConstantBuffers.Add(cb);
+            }
 
             effect.Shaders.Add(data);
 
@@ -157,7 +191,7 @@ namespace TwoMGFX
                     if (funcHeaderEnd >= text.Length)
                         throw new Exception("Function header without body!");
                     funcHeaderEnd++;
-                } 
+                }
 
                 // only the header is parsed and put inside the nodes, so we need
                 // to find the end of the function by matching brackets
@@ -232,6 +266,68 @@ namespace TwoMGFX
                 default:
                     throw new ArgumentOutOfRangeException("stage", stage, null);
             }
+        }
+
+        internal static EffectObject.d3dx_parameter ToParameter(this VariableInfo uniform)
+        {
+            var p = new EffectObject.d3dx_parameter();
+
+            p.name = uniform.Name;
+            p.columns = (uint) uniform.VectorSize;
+            p.rows = (uint) uniform.MatrixSize;
+            p.semantic = string.Empty;
+            var size = uniform.GetSize();
+            p.data = new byte[size];
+            p.bytes = (uint) size;
+            p.annotation_handles = new EffectObject.d3dx_parameter[0];
+
+            var arraySize = (uint) (uniform.ArraySize == -1 ? 0 : uniform.ArraySize);
+            p.element_count = arraySize;
+            p.member_handles = new EffectObject.d3dx_parameter[arraySize];
+
+            for (var i = 0; i < arraySize; i++)
+            {
+                var param = new EffectObject.d3dx_parameter();
+                param.name = uniform.Name;
+                param.columns = (uint) uniform.VectorSize;
+                param.rows = (uint) uniform.MatrixSize;
+                param.semantic = string.Empty;
+                param.annotation_handles = new EffectObject.d3dx_parameter[0];
+                param.element_count = 0;
+                param.member_handles = new EffectObject.d3dx_parameter[0];
+                param.data = new byte[4 * param.rows * param.columns];
+
+                p.member_handles[i] = param;
+            }
+
+            if (p.rows > 1)
+                p.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_ROWS;
+            else if (p.columns > 1)
+                p.class_ = EffectObject.D3DXPARAMETER_CLASS.VECTOR;
+            else
+                p.class_ = EffectObject.D3DXPARAMETER_CLASS.SCALAR;
+
+            switch (uniform.Type)
+            {
+                case BasicType.Bool:
+                    p.type = EffectObject.D3DXPARAMETER_TYPE.BOOL;
+                    break;
+                case BasicType.Int:
+                    p.type = EffectObject.D3DXPARAMETER_TYPE.INT;
+                    break;
+                case BasicType.Float:
+                    p.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
+                    break;
+            }
+            return p;
+        }
+
+        internal static int GetSize(this VariableInfo uniform)
+        {
+            var size = uniform.ArraySize == -1 ? 1 : uniform.ArraySize;
+            size *= uniform.MatrixSize;
+            size *= uniform.VectorSize;
+            return size * 4;
         }
     }
 }
