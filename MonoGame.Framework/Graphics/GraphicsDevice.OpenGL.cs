@@ -949,9 +949,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[3] *= -1.0f;
             }
 
+#if ANDROID
+            GL.Uniform4(posFixupLoc, 1, _posFixup);
+#else
             var handle = GCHandle.Alloc(_posFixup, GCHandleType.Pinned);
             GL.Uniform4(posFixupLoc, 1, (byte*) handle.AddrOfPinnedObject());
             handle.Free();
+#endif
 
             GraphicsExtensions.CheckGLError();
         }

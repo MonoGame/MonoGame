@@ -81,8 +81,9 @@
     <Recommends Name="OpenGLGraphics">
       <Platforms>Linux,MacOS</Platforms>
     </Recommends>
+    <!-- for now default all OpenGL builds to MojoShader -->
     <Recommends Name="MojoShader">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Platforms>WindowsGL,Linux,MacOS,Android,iOS,tvOS</Platforms>
     </Recommends>
   </Dependencies>
 
