@@ -214,16 +214,11 @@ namespace Microsoft.Xna.Framework
                 || point.Z > this.Max.Z)
             {
                 result = ContainmentType.Disjoint;
-            }//or if point is on box because coordonate of point is lesser or equal
-            else if (point.X == this.Min.X
-                || point.X == this.Max.X
-                || point.Y == this.Min.Y
-                || point.Y == this.Max.Y
-                || point.Z == this.Min.Z
-                || point.Z == this.Max.Z)
-                result = ContainmentType.Intersects;
+            }
             else
+            {
                 result = ContainmentType.Contains;
+            }
         }
 
         private static readonly Vector3 MaxVector3 = new Vector3(float.MaxValue);

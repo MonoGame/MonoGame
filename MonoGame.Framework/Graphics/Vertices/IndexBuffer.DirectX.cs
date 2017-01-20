@@ -131,7 +131,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+                var elementSizeInBytes = Utilities.ReflectionHelpers.SizeOf<T>.Get();
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 try
                 {

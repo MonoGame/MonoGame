@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework
 
         private TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
 
-
+        private bool _shouldExit;
         private bool _suppressDraw;
         
         public Game()
@@ -323,7 +323,7 @@ namespace Microsoft.Xna.Framework
 #endif
         public void Exit()
         {
-            Platform.Exit();
+            _shouldExit = true;
             _suppressDraw = true;
         }
 
@@ -501,6 +501,9 @@ namespace Microsoft.Xna.Framework
             {
                 DoDraw(_gameTime);
             }
+
+            if (_shouldExit)
+                Platform.Exit();
         }
 
         #endregion

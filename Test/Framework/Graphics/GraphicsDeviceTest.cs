@@ -14,6 +14,26 @@ namespace MonoGame.Tests.Graphics
     [TestFixture]
     internal class GraphicsDeviceTest : GraphicsDeviceTestFixtureBase
     {
+        [Test]
+        public void BlendFactor()
+        {
+            Assert.AreEqual(Color.White, gd.BlendFactor);
+
+            var blend = new BlendState
+            {
+                BlendFactor = Color.Crimson
+            };
+
+            gd.BlendState = blend;
+            Assert.AreEqual(Color.Crimson, gd.BlendFactor);
+
+            gd.BlendFactor = Color.CornflowerBlue;
+            Assert.AreEqual(Color.Crimson, gd.BlendState.BlendFactor);
+            Assert.AreEqual(Color.CornflowerBlue, gd.BlendFactor);
+
+            blend.Dispose();
+        }
+
 		[Test]
 		public void Clear()
 		{

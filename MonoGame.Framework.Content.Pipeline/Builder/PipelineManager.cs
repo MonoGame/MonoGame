@@ -59,7 +59,6 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public string IntermediateDirectory { get; private set; }
 
         private ContentCompiler _compiler;
-        private MethodInfo _compileMethod;
 
         public ContentBuildLogger Logger { get; set; }
 

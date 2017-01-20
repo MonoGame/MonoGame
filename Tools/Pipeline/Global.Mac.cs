@@ -14,13 +14,18 @@ namespace MonoGame.Tools.Pipeline
         {
             
         }
-    
-        private static Image PlatformGetDirectoryIcon(bool exists)
+
+        private static Image PlatformGetFileIcon(string path)
         {
             throw new NotImplementedException();
         }
 
-        private static Image PlatformGetFileIcon(string path, bool exists)
+        private static Bitmap ToEtoImage(Image image)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static Xwt.Drawing.Image ToXwtImage(Image image)
         {
             throw new NotImplementedException();
         }
@@ -28,11 +33,6 @@ namespace MonoGame.Tools.Pipeline
         private static void PlatformShowOpenWithDialog(string filePath)
         {
             throw new NotImplementedException();
-        }
-
-        private static bool PlatformSetIcon(Command cmd)
-        {
-            return false;
         }
     }
 }

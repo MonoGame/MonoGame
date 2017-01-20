@@ -192,10 +192,8 @@ namespace MonoGame.Tests.ContentPipeline
                     if (bitsPerSample == 32)
                         return -2;
                     return 1;
-                    break;
                 case ConversionFormat.Adpcm:
                     return 2;
-                    break;
                 case ConversionFormat.WindowsMedia:
                 case ConversionFormat.Xma:
                 default:

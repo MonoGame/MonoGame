@@ -114,11 +114,4 @@
   </group>
   -->
 
-  <!-- Ouya -->
-  <!--
-  <group api="ouya|OUYA">    
-    <source>..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\MonoGame.Framework.dll</source>
-  </group>
-  -->
-
 </config>

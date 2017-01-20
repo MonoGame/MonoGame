@@ -49,8 +49,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="content">The content to be compressed.</param>
         /// <param name="format">The user requested format for compression.</param>
         /// <param name="generateMipmaps">If mipmap generation is required.</param>
-        /// <param name="sharpAlpha">If the texture has sharp alpha cutouts.</param>
-        public void ConvertTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool generateMipmaps, bool sharpAlpha)
+        /// <param name="isSpriteFont">If the texture has represents a sprite font, i.e. is greyscale and has sharp black/white contrast.</param>
+        public void ConvertTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool generateMipmaps, bool isSpriteFont)
         {
             // We do nothing in this case.
             if (format == TextureProcessorOutputFormat.NoChange)
@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             try
             {
                 // All other formats require platform specific choices.
-                PlatformCompressTexture(context, content, format, generateMipmaps, false);
+                PlatformCompressTexture(context, content, format, generateMipmaps, isSpriteFont);
             }
             catch (EntryPointNotFoundException ex)
             {
@@ -94,6 +94,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        protected abstract void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool generateMipmaps, bool sharpAlpha);
+        protected abstract void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool generateMipmaps, bool isSpriteFont);
     }
 }

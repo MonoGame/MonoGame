@@ -34,17 +34,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 device._lastBlendEnable = blendEnabled;
             }
 
-            if (force || this.BlendFactor != device._lastBlendState.BlendFactor)
-            {
-                GL.BlendColor(
-                    this.BlendFactor.R / 255.0f,      
-                    this.BlendFactor.G / 255.0f, 
-                    this.BlendFactor.B / 255.0f, 
-                    this.BlendFactor.A / 255.0f);
-                GraphicsExtensions.CheckGLError();
-                device._lastBlendState.BlendFactor = this.BlendFactor;
-            }
-
             if (force || 
                 this.ColorBlendFunction != device._lastBlendState.ColorBlendFunction || 
                 this.AlphaBlendFunction != device._lastBlendState.AlphaBlendFunction)
