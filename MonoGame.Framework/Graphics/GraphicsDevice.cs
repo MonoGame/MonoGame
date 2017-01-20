@@ -1131,7 +1131,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotSupportedException();
         }
 
-        internal static GraphicsProfile GetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        public static GraphicsProfile GetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
         {
             return PlatformGetHighestSupportedGraphicsProfile(graphicsDevice);
         }
