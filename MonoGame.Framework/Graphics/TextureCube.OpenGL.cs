@@ -160,7 +160,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var target = GetGLCubeFace(face);
                     if (glFormat == (PixelFormat) GLPixelFormat.CompressedTextureFormats)
                     {
-                        GL.CompressedTexSubImage2D(target, level, rect.X, rect.Y, rect.Width, rect.Height, (PixelFormat)glInternalFormat, elementCount * startBytes, dataPtr);
+                        GL.CompressedTexSubImage2D(target, level, rect.X, rect.Y, rect.Width, rect.Height, glInternalFormat, elementCount * startBytes, dataPtr);
                         GraphicsExtensions.CheckGLError();
                     }
                     else
@@ -177,9 +177,9 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
 
-		private TextureTarget GetGLCubeFace(CubeMapFace face) 
+		private TextureTarget GetGLCubeFace(CubeMapFace face)
         {
-			switch (face) 
+			switch (face)
             {
 			case CubeMapFace.PositiveX: return TextureTarget.TextureCubeMapPositiveX;
 			case CubeMapFace.NegativeX: return TextureTarget.TextureCubeMapNegativeX;

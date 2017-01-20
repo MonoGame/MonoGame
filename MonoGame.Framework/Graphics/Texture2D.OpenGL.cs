@@ -146,7 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                     {
                         GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, rect.X, rect.Y,
-                            rect.Width, rect.Height, glFormat, elementCount - startBytes, dataPtr);
+                            rect.Width, rect.Height, glInternalFormat, elementCount - startBytes, dataPtr);
                         GraphicsExtensions.CheckGLError();
                     }
                     else
