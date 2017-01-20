@@ -67,6 +67,7 @@ monodroid*.msi
 
 #Unix temporary files
 *~
+*.swp
 
 # Output docs
 Documentation/Output/
