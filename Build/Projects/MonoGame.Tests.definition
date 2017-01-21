@@ -5,7 +5,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
-	<Reference Include="System.Web" />
+    <Reference Include="System.Web" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MonoGame.Tests.References" />
@@ -33,6 +33,33 @@
   </Properties>
 
   <Files>
+    <!-- Dependencies -->
+    <None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
+      <Platforms>WindowsGL</Platforms>
+      <Link>SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
+      <Platforms>WindowsGL</Platforms>
+      <Link>soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
+      <Platforms>Linux</Platforms>
+      <Link>x64\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
+      <Platforms>Linux</Platforms>
+      <Link>x64\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+    <None Include="MonoGame.Tests.dll.config">
+      <Platforms>Linux</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
 
     <None Include="ReadMe.md" />
 
@@ -140,9 +167,7 @@
     <Compile Include="Framework\Graphics\BlendStateTest.cs" />
     <Compile Include="Framework\Graphics\EffectTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsAdapterTest.cs" />
-    <Compile Include="Framework\Graphics\GraphicsDeviceTest.cs">
-        <Platforms>Windows</Platforms>
-    </Compile>
+    <Compile Include="Framework\Graphics\GraphicsDeviceTest.cs" />
     <Compile Include="Framework\Graphics\MiscellaneousTests.cs" />
     <Compile Include="Framework\Graphics\GraphicsDeviceTestFixtureBase.cs" />
     <Compile Include="Framework\Graphics\IndexBufferTest.cs" />
@@ -155,9 +180,7 @@
     <Compile Include="Framework\Input\MouseTest.cs" />
 
     <Compile Include="Framework\Graphics\DepthStencilStateTest.cs" />
-    <Compile Include="Framework\Graphics\GraphicsDeviceManagerTest.cs">
-        <Platforms>Windows</Platforms>
-    </Compile>
+    <Compile Include="Framework\Graphics\GraphicsDeviceManagerTest.cs" />
     <Compile Include="Framework\Graphics\RasterizerStateTest.cs" />
     <Compile Include="Framework\Graphics\RenderTarget2DTest.cs" />
     <Compile Include="Framework\Graphics\RenderTargetCubeTest.cs" />
