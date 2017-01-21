@@ -262,7 +262,7 @@ namespace MonoGame.Tests.Graphics
             gd.SetRenderTargets(originalRenderTargets);
 
             // Now render into backbuffer, using texture array as a shader resource.
-            var effect = AssetTestUtility.CompileEffect(gd, "TextureArrayEffect.fx");
+            var effect = content.Load<Effect>(Paths.Effect("TextureArrayEffect"));
             effect.Parameters["Texture"].SetValue(textureArray);
             effect.CurrentTechnique.Passes[0].Apply();
 

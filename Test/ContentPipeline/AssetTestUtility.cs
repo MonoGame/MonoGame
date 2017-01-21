@@ -20,7 +20,7 @@ namespace MonoGame.Tests.ContentPipeline
 #if !WINDOWS || DIRECTX || XNA
             var effectProcessor = new EffectProcessor();
             var context = new TestProcessorContext(TargetPlatform.Windows, "notused.xnb");
-            var effectPath = Paths.Effect(pathParts);
+            var effectPath = Paths.RawEffect(pathParts);
             var compiledEffect = effectProcessor.Process(new EffectContent
             {
                 EffectCode = File.ReadAllText(effectPath),

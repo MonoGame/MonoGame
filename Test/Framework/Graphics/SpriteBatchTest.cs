@@ -30,13 +30,7 @@ namespace MonoGame.Tests.Graphics {
                 View = Matrix.Identity,
                 World = Matrix.Identity
             };
-            var effect2Name = "Grayscale";
-#if XNA
-            effect2Name = System.IO.Path.Combine("XNA", effect2Name);
-#elif WINDOWS
-            effect2Name = System.IO.Path.Combine("DirectX", effect2Name);
-#endif
-            _effect2 = content.Load<Effect>(Paths.Effect(effect2Name));            
+            _effect2 = content.Load<Effect>(Paths.Effect("Grayscale"));            
 		}
 
 	    [TearDown]
@@ -296,7 +290,7 @@ namespace MonoGame.Tests.Graphics {
         [Test]
         public void DrawWithCustomEffectAndTwoTextures()
         {
-            var customSpriteEffect = AssetTestUtility.CompileEffect(gd, "CustomSpriteBatchEffect.fx");
+            var customSpriteEffect = content.Load<Effect>(Paths.Effect("CustomSpriteBatchEffect"));
             var texture2 = new Texture2D(gd, 1, 1, false, SurfaceFormat.Color);
 
             customSpriteEffect.Parameters["SourceTexture"].SetValue(texture2);

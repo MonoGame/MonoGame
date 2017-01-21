@@ -13,6 +13,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin ParserTest.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:ParserTest.fx
+
 #begin Bevels.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -60,4 +66,35 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:RainbowH.fx
+
+#begin Instancing.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Instancing.fx
+
+#begin VertexTextureEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:VertexTextureEffect.fx
+
+#begin CustomSpriteBatchEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:CustomSpriteBatchEffect.fx
+
+#begin CustomSpriteBatchEffectComparisonSampler.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/processorParam:Defines=
+/build:CustomSpriteBatchEffectComparisonSampler.fx
+
+#begin TextureArrayEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:TextureArrayEffect.fx
 
