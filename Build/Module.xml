@@ -5,7 +5,7 @@
   <DefaultLinuxPlatforms>Angle,Linux,WindowsGL</DefaultLinuxPlatforms>
   <DefaultMacOSPlatforms>Angle,MacOS,iOS,WindowsGL,Android,tvOS,Linux</DefaultMacOSPlatforms>
   <DefaultWindowsPlatforms>Android,Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone81,WindowsUniversal,iOS,tvOS</DefaultWindowsPlatforms>
-  <SupportedPlatforms>Android,Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone81,WindowsUniversal,iOS,MacOS,Web,tvOS,PSVita,XBoxOne</SupportedPlatforms>
+  <SupportedPlatforms>Android,Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone81,WindowsUniversal,iOS,MacOS,Web,tvOS,PSVita,XBoxOne,Switch</SupportedPlatforms>
   <DisableSynchronisation>true</DisableSynchronisation>
   <GenerateNuGetRepositories>false</GenerateNuGetRepositories>
   <Packages>
