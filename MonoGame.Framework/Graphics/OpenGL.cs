@@ -983,7 +983,7 @@ namespace OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
         public delegate void CompressedTexSubImage2DDelegate (TextureTarget target, int level,
-            int x, int y, int width, int height, PixelFormat format, int size, IntPtr data);
+            int x, int y, int width, int height, PixelInternalFormat format, int size, IntPtr data);
         public static CompressedTexSubImage2DDelegate CompressedTexSubImage2D;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
