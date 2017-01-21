@@ -114,6 +114,10 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
 		private OpenALSoundController()
         {
+            // On Windows, set the DLL search path for correct native binaries
+            if (PlatformParameters.DetectWindowsArchitecture)
+                NativeHelper.InitDllDirectory();
+            
             if (!OpenSoundController())
             {
                 return;
