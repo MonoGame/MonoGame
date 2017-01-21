@@ -560,7 +560,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         */
 
-#if WINDOWS && DIRECTX
         public void Reset()
         {
             if (DeviceResetting != null)
@@ -586,18 +585,6 @@ namespace Microsoft.Xna.Framework.Graphics
             PresentationParameters = presentationParameters;
             Reset();
         }
-#else
-        // TODO: implement these
-        public void Reset()
-        {
-            
-        }
-
-        public void Reset(PresentationParameters presentationParameters)
-        {
-
-        }
-#endif
 
         /*
         public void Reset(PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)

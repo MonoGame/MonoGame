@@ -277,6 +277,7 @@ namespace OpenGL
         MaxDrawBuffers = 0x8824,
         TextureBinding2D = 0x8069,
         MaxTextureMaxAnisotropyExt = 0x84FF,
+        MaxSamples = 0x8D57,
     }
 
     public enum StringName { 
