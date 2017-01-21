@@ -998,6 +998,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var programHash = _vertexShader.HashKey | _pixelShader.HashKey;
             _vertexBuffers.Get(0).VertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero, programHash);
 
+            if (vertexStart < 0)
+                vertexStart = 0;
+
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
 			              vertexCount);
