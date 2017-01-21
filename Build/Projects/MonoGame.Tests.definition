@@ -172,7 +172,9 @@
     <Compile Include="Framework\Graphics\GraphicsDeviceTestFixtureBase.cs" />
     <Compile Include="Framework\Graphics\IndexBufferTest.cs" />
     <Compile Include="Framework\Graphics\Texture2DNonVisualTest.cs" />
-    <Compile Include="Framework\Graphics\Texture3DNonVisualTest.cs" />
+    <Compile Include="Framework\Graphics\Texture3DNonVisualTest.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
 
     <Compile Include="Framework\Input\GamePadTest.cs" />
     <Compile Include="Framework\Input\JoystickTest.cs" />
@@ -187,7 +189,9 @@
     <Compile Include="Framework\Graphics\SamplerStateTest.cs" />
     <Compile Include="Framework\Graphics\ScissorRectangleTest.cs" />
     <Compile Include="Framework\Graphics\Texture2DTest.cs" />
-    <Compile Include="Framework\Graphics\Texture3DTest.cs" />
+    <Compile Include="Framework\Graphics\Texture3DTest.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Framework\Graphics\TextureCubeTest.cs" />
     <Compile Include="Framework\Graphics\VertexBufferTest.cs" />
     <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
