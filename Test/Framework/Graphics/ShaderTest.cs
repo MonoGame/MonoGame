@@ -87,8 +87,10 @@ namespace MonoGame.Tests.Graphics {
             PrepareFrameCapture();
 #if XNA
             effectName = Path.Combine("XNA", effectName);
-#elif WINDOWS
+#elif DIRECTX
             effectName = Path.Combine("DirectX", effectName);
+#elif DESKTOPGL
+            effectName = Path.Combine("OpenGL", effectName);
 #endif
 
             var spriteBatch = new SpriteBatch (gd);

@@ -900,6 +900,41 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Platforms>Windows</Platforms>
     </Content>
+
+    <Content Include="Assets\Effects\OpenGL\Bevels.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\BlackOut.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\ColorFlip.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\Grayscale.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\HighContrast.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\Invert.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\NoEffect.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\RainbowH.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+
+
     <Content Include="Assets\Textures\GlassPane.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
