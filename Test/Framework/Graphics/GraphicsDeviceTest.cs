@@ -565,6 +565,10 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        // Vertex Textures are not implemented for OpenGL
+        [Ignore]
+#endif
         public void VertexTexturesGetSet()
         {
             // TODO: The availability of vertex textures should depend on GraphicsProfile.
@@ -615,6 +619,10 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        // Vertex Textures are not implemented for OpenGL
+        [Ignore]
+#endif
         public void VertexTextureVisualTest()
         {
             // Implements an extremely simple terrain that reads from a heightmap in the vertex shader.
@@ -683,6 +691,10 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        // Vertex samplers are not implemented for OpenGL
+        [Ignore]
+#endif
         public void VertexSamplerStatesGetSet()
         {
             var samplerState = new SamplerState { Filter = TextureFilter.Point };
