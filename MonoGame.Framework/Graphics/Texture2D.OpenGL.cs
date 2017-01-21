@@ -121,9 +121,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     GraphicsExtensions.CheckGLError();
                 }
 
+                if (mipmap)
+                    GraphicsDevice.FramebufferHelper.Get().GenerateMipmap((int) glTarget);
+
                 // Restore the bound texture.
                 GL.BindTexture(TextureTarget.Texture2D, prevTexture);
                 GraphicsExtensions.CheckGLError();
+
             });
         }
 
@@ -564,8 +568,12 @@ namespace Microsoft.Xna.Framework.Graphics
         // to reload their textures after the GL context is lost.
         private void PlatformReload(Stream textureStream)
         {
+            var prev = GraphicsExtensions.GetBoundTexture2D();
+
             GenerateGLTextureIfRequired();
             FillTextureFromStream(textureStream);
+
+            GL.BindTexture(TextureTarget.Texture2D, prev);
         }
 
         private void GenerateGLTextureIfRequired()

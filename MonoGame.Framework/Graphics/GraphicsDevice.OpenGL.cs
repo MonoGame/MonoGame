@@ -279,22 +279,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _programCache.Clear();
             _shaderProgram = null;
 
-            if (GraphicsCapabilities.SupportsFramebufferObjectARB)
-            {
-                this.framebufferHelper = new FramebufferHelper(this);
-            }
-            #if !(GLES || MONOMAC)
-            else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
-            {
-                this.framebufferHelper = new FramebufferHelperEXT(this);
-            }
-            #endif
-            else
-            {
-                throw new PlatformNotSupportedException(
-                    "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
-                    "Try updating your graphics drivers.");
-            }
+            framebufferHelper = FramebufferHelper.Create(this);
 
             // Force resetting states
             this.PlatformApplyBlend(true);

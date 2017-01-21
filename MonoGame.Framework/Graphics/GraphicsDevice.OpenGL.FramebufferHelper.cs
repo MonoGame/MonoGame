@@ -309,6 +309,42 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
         internal class FramebufferHelper
         {
+
+            #region Singleton
+
+            private static FramebufferHelper _instance;
+
+            public static FramebufferHelper Create(GraphicsDevice gd)
+            {
+                if (gd.GraphicsCapabilities.SupportsFramebufferObjectARB)
+                {
+                    _instance = new FramebufferHelper(gd);
+                }
+#if !(GLES || MONOMAC)
+                else if (gd.GraphicsCapabilities.SupportsFramebufferObjectEXT)
+                {
+                    _instance = new FramebufferHelperEXT(gd);
+                }
+#endif
+                else
+                {
+                    throw new PlatformNotSupportedException(
+                        "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
+                        "Try updating your graphics drivers.");
+                }
+
+                return _instance;
+            }
+
+            public static FramebufferHelper Get()
+            {
+                if (_instance == null)
+                    throw new InvalidOperationException("The FramebufferHelper has not been created yet!");
+                return _instance;
+            }
+
+            #endregion
+
             public bool SupportsInvalidateFramebuffer { get; private set; }
 
             public bool SupportsBlitFramebuffer { get; private set; }
