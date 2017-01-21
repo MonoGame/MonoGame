@@ -18,8 +18,11 @@ namespace MonoGame.Tests.Graphics
 
 #if !XNA
         [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
-        [TestCase("Assets/Textures/LogoOnly_64px.dds")]
         [TestCase("Assets/Textures/LogoOnly_64px.tif")]
+#if !DESKTOPGL
+        // not supported
+        [TestCase("Assets/Textures/LogoOnly_64px.dds")]
+#endif
 #endif
         [TestCase("Assets/Textures/LogoOnly_64px.gif")]
         [TestCase("Assets/Textures/LogoOnly_64px.jpg")]
