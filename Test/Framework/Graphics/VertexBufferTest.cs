@@ -362,6 +362,10 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        // TODO we should figure out if there's a way to check this in OpenGL
+        [Ignore]
+#endif
         public void ShouldThrowHelpfulExceptionWhenVertexFormatDoesNotMatchShader()
         {
             var vertexBuffer = new VertexBuffer(
@@ -373,10 +377,9 @@ namespace MonoGame.Tests.Graphics
             effect.CurrentTechnique.Passes[0].Apply();
 
             var ex = Assert.Throws<InvalidOperationException>(() => gd.DrawPrimitives(PrimitiveType.TriangleList, 0, 1));
-            // TODO we should figure out if there's a way to check this in OpenGL
 #if XNA
             Assert.That(ex.Message, Is.EqualTo("The current vertex declaration does not include all the elements required by the current vertex shader. Position0 is missing."));
-#elif DIRECTX
+#else
             Assert.That(ex.Message, Is.EqualTo("An error occurred while preparing to draw. "
                 + "This is probably because the current vertex declaration does not include all the elements "
                 + "required by the current vertex shader. The current vertex declaration includes these elements: " 
