@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Drawing;
+using Microsoft.Xna.Framework.Utilities;
 using MonoGame.Utilities.Png;
 
 #if MONOMAC
@@ -122,7 +123,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 if (mipmap)
-                    GraphicsDevice.FramebufferHelper.Get().GenerateMipmap((int) glTarget);
+                {
+#if IOS || ANDROID
+				    GL.GenerateMipmap(TextureTarget.TextureCubeMap);
+#else
+                    // This updates the mipmaps after a change in the base texture
+                    GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int) Bool.True);
+#endif
+                }
 
                 // Restore the bound texture.
                 GL.BindTexture(TextureTarget.Texture2D, prevTexture);
@@ -141,7 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 try
                 {
                     var startBytes = startIndex * elementSizeInByte;
-                    var dataPtr = (IntPtr) (dataHandle.AddrOfPinnedObject().ToInt64() + startIndex*elementSizeInByte);
+                    var dataPtr = (IntPtr) (dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
                     // Store the current bound texture.
                     var prevTexture = GraphicsExtensions.GetBoundTexture2D();
 
@@ -152,7 +160,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                     {
                         GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, rect.X, rect.Y, rect.Width, rect.Height,
-                            (PixelInternalFormat) glInternalFormat, elementCount - startBytes, dataPtr);
+                            (PixelInternalFormat) glInternalFormat, elementCount * elementSizeInByte - startBytes, dataPtr);
                         GraphicsExtensions.CheckGLError();
                     }
                     else
@@ -188,8 +196,10 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
 
-        private void PlatformGetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformGetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
+            Threading.EnsureUIThread();
+
 #if GLES
             // TODO: check for for non renderable formats (formats that can't be attached to FBO)
 
@@ -220,34 +230,43 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.DeleteFramebuffers(1, ref framebufferId);
             GraphicsExtensions.CheckGLError();
 #else
+            var tSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
             GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
-            if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
+            if (glFormat == (PixelFormat) GLPixelFormat.CompressedTextureFormats)
             {
-                throw new NotImplementedException();
+                // Note: for compressed format Format.GetSize() returns the size of a 4x4 block
+                var pixelToT = Format.GetSize() / tSizeInByte;
+                var tFullWidth = Math.Max(this.width >> level, 1) / 4 * pixelToT;
+                var temp = new T[Math.Max(this.height >> level, 1) / 4 * tFullWidth];
+                GL.GetCompressedTexImage(TextureTarget.Texture2D, level, temp);
+                GraphicsExtensions.CheckGLError();
+
+                var rowCount = rect.Height / 4;
+                var tRectWidth = rect.Width / 4 * Format.GetSize() / tSizeInByte;
+                for (var r = 0; r < rowCount; r++)
+                {
+                    var tempStart = rect.X / 4 * pixelToT + (rect.Top / 4 + r) * tFullWidth;
+                    var dataStart = startIndex + r * tRectWidth;
+                    Array.Copy(temp, tempStart, data, dataStart, tRectWidth);
+                }
             }
             else
             {
-                if (rect.HasValue)
-                {
-                    var temp = new T[this.width * this.height];
-                    GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, temp);
-                    int z = 0, w = 0;
+                // we need to convert from our format size to the size of T here
+                var tFullWidth = Math.Max(this.width >> level, 1) * Format.GetSize() / tSizeInByte;
+                var temp = new T[Math.Max(this.height >> level, 1) * tFullWidth];
+                GL.GetTexImage(TextureTarget.Texture2D, level, glFormat, glType, temp);
+                GraphicsExtensions.CheckGLError();
 
-                    for (int y = rect.Value.Y; y < rect.Value.Y + rect.Value.Height; ++y)
-                    {
-                        for (int x = rect.Value.X; x < rect.Value.X + rect.Value.Width; ++x)
-                        {
-                            data[startIndex + z * rect.Value.Width + w] = temp[(y * width) + x];
-                            ++w;
-                        }
-                        ++z;
-                        w = 0;
-                    }
-                }
-                else
+                var pixelToT = Format.GetSize() / tSizeInByte;
+                var rowCount = rect.Height;
+                var tRectWidth = rect.Width * pixelToT;
+                for (var r = 0; r < rowCount; r++)
                 {
-                    GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
+                    var tempStart = rect.X * pixelToT + (r + rect.Top) * tFullWidth;
+                    var dataStart = startIndex + r * tRectWidth;
+                    Array.Copy(temp, tempStart, data, dataStart, tRectWidth);
                 }
             }
 #endif

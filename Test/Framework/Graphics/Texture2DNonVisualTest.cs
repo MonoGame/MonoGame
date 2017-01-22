@@ -86,6 +86,32 @@ namespace MonoGame.Tests.Graphics
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture2D(gd, 0, 0));
         }
 
+        [Test]
+        public void SimpleGetSetDataTest()
+        {
+            using (var tex = new Texture2D(gd, 4, 4, false, SurfaceFormat.Color))
+            {
+                const int startIndex = 5;
+                const int x = 2;
+                const int y = 2;
+                const int width = 2;
+                const int height = 2;
+                const int elementCount = 4 * width * height;
+
+                var data = new byte[startIndex + elementCount];
+                for (var i = 0; i < data.Length; i++)
+                    data[i] = (byte) i;
+
+                var rect = new Rectangle(x, y, width, height);
+
+                tex.SetData(0, rect, data, startIndex, elementCount);
+                tex.GetData(0, rect, data, startIndex, elementCount);
+
+                for (var i = 0; i < data.Length; i++)
+                    Assert.AreEqual(i, data[i]);
+            }
+        }
+
         [TestCase(25, 23, 1, 1, 0, 1)]
         [TestCase(25, 23, 1, 1, 1, 1)]
         [TestCase(25, 23, 2, 1, 0, 2)]
@@ -202,7 +228,10 @@ namespace MonoGame.Tests.Graphics
         }
 
         [TestCase(SurfaceFormat.HalfSingle, (short)(160 << 8 + 120))]
+#if !DESKTOPGL
+        // format not supported
         [TestCase(SurfaceFormat.Vector4, (long)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
+#endif
         [TestCase(SurfaceFormat.Vector2, (float)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
         [TestCase(SurfaceFormat.Color, (float)(200 << 24 + 180 << 16 + 160 << 8 + 120))]
         [TestCase(SurfaceFormat.Color, (byte)150)]
@@ -487,9 +516,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
-        [Ignore("GetData is not yet implemented for compressed images")]
-#endif
         public void GetAndSetDataDxtCompressed()
         {
             var t = content.Load<Texture2D>(Paths.Texture ("random_16px_dxt"));
@@ -545,9 +571,6 @@ namespace MonoGame.Tests.Graphics
         // DXT5
         [TestCase(16, "random_16px_dxt_alpha", 0)]
         [TestCase(16, "random_16px_dxt_alpha", 1)]
-#if DESKTOPGL
-        [Ignore("GetData is not yet implemented for compressed texture")]
-#endif
         public void GetAndSetDataDxtNotMultipleOf4Rounding(int bs, string texName, int mip)
         {
             var t = content.Load<Texture2D>(Paths.Texture (texName));
@@ -598,9 +621,6 @@ namespace MonoGame.Tests.Graphics
 
         [TestCase("random_16px_dxt", 8)]
         [TestCase("random_16px_dxt_alpha", 16)]
-#if DESKTOPGL
-        [Ignore("GetData is not yet implemented for compressed texture")]
-#endif
         public void GetAndSetDataDxtDontRoundWhenOutsideBounds(string texName, int bs)
         {
             var t = content.Load<Texture2D>(Paths.Texture(texName));
@@ -617,9 +637,6 @@ namespace MonoGame.Tests.Graphics
 
         [TestCase("random_16px_dxt", 8)]
         [TestCase("random_16px_dxt_alpha", 16)]
-#if DESKTOPGL
-        [Ignore("GetData is not yet implemented for compressed texture")]
-#endif
         public void GetAndSetDataDxtLowerMips(string texName, int bs)
         {
             var t = content.Load<Texture2D>(Paths.Texture(texName));
