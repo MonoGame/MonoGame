@@ -122,7 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsVertexTextures = false; // For now, until we implement vertex textures in OpenGL.
 
 #if __IOS__
-            GL.GetInteger((GetPName)All.MaxSamples, out MaxMultiSampleCount);
+            GL.GetInteger((GetPName)All.MaxSamplesApple, out MaxMultiSampleCount);
 #elif ANDROID
             GL.GetInteger((GetPName) GetParamName.MaxSamplesExt, out MaxMultiSampleCount);
 #else
