@@ -1052,7 +1052,7 @@ namespace OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
-        public delegate void BufferSubDataDelegate (BufferTarget target, IntPtr offset, IntPtr size, IntPtr data);
+        public delegate void BufferSubDataDelegate (BufferTarget target, int offset, int size, IntPtr data);
         public static BufferSubDataDelegate BufferSubData;
 
         [CLSCompliant (false)]

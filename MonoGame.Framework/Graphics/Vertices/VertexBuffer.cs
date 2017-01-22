@@ -53,10 +53,33 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformGraphicsDeviceResetting();
         }
 
+        /// <summary>
+        /// Get the vertex data froom this VertexBuffer.
+        /// </summary>
+        /// <typeparam name="T">The struct you want to fill.</typeparam>
+        /// <param name="offsetInBytes">The offset to the first element in the vertex buffer in bytes.</param>
+        /// <param name="data">An array of T's to be filled.
+        /// <param name="startIndex">The index to start filling the data array.</param>
+        /// <param name="elementCount">The number of T's to get.</param>
+        /// <param name="vertexStride">The size of how a vertex buffer element should be interpreted.</param>
+        ///
+        /// <remarks>
+        /// Note that this pulls data from VRAM into main memory and because of that is a very expensive operation.
+        /// It is often a better idea to keep a copy of the data in main memory.
+        /// </remarks>
+        ///
+        /// <remarks>
+        /// <p>Using this operation it is easy to get certain vertex elements from a VertexBuffer.</p>
+        /// <p>
+        /// For example to get the texture coordinates from a VertexBuffer of <see cref="VertexPositionTexture"/> you can call 
+        /// GetData(4 * 3, data, elementCount, 20). 'data'should be an array of <see cref="Vector2"/> in this example.
+        /// The offsetInBytes is the number of bytes taken up by the <see cref="VertexPositionTexture.Position"/> of the vertex.
+        /// For vertexStride we pass the size of a <see cref="VertexPositionTexture"/>.
+        /// </p>
+        /// </remarks>
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride = 0) where T : struct
         {
             var elementSizeInBytes = Utilities.ReflectionHelpers.SizeOf<T>.Get();
-
             if (vertexStride == 0)
                 vertexStride = elementSizeInBytes;
 
@@ -78,8 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
-            this.GetData<T>(0, data, startIndex, elementCount, elementSizeInByte);
+            this.GetData<T>(0, data, startIndex, elementCount, 0);
         }
 
         public void GetData<T>(T[] data) where T : struct
@@ -110,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// into the vertex buffer with padding between each element.
         /// If you specify <c>0</c> for this parameter, it will be treated as if you had specified <c>sizeof(T)</c>.
         /// With the exception of <c>0</c>, you must specify a value greater than or equal to <c>sizeof(T)</c>.</param>
-        /// <example>
+        /// <remarks>
         /// If <c>T</c> is <c>VertexPositionTexture</c>, but you want to set only the position component of the vertex data,
         /// you would call this method as follows:
         /// <code>
@@ -124,7 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Vector2[] texCoords = new Vector2[numVertices];
         /// vertexBuffer.SetData(12, texCoords, 0, numVertices, vertexBuffer.VertexDeclaration.VertexStride);
         /// </code>
-        /// </example>
+        /// </remarks>
         /// <remarks>
         /// If you provide a <c>byte[]</c> in the <paramref name="data"/> parameter, then you should almost certainly
         /// set <paramref name="vertexStride"/> to <c>1</c>, to avoid leaving any padding between the <c>byte</c> values
