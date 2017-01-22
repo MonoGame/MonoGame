@@ -11,8 +11,13 @@ namespace MonoGame.Tests.Visual {
 	class MiscellaneousTests : VisualTestFixtureBase
     {
 		[Test]
-#if XNA
-        [Ignore]
+#if !DESKTOPGL
+        // TODO: this sometimes crashes when trying to clean up a shader.
+        // it's notable that the cleanup is called from another thread and
+        // run in Threading.Run at the start of a run loop when the crash happens.
+        // I can consistently reproduce this by running the ShaderTests and this in
+        // succession using ReSharpers test runner
+        [Ignore("Shader cleanup causes a crash, we should investigate this")]
 #endif
 		public void DrawOrder_falls_back_to_order_of_addition_to_Game ()
 		{
