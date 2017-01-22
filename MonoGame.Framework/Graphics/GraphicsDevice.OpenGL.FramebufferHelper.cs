@@ -582,8 +582,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new InvalidOperationException(message);
                 }
             }
-#endif
-#endif
         }
+#endif
+#endif
     }
 }
