@@ -129,7 +129,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 var pixelToT = Format.GetSize() / tSizeInByte;
                 var tFullWidth = Math.Max(this.size >> level, 1) / 4 * pixelToT;
                 var temp = new T[Math.Max(this.size >> level, 1) / 4 * tFullWidth];
+
+#if MONOMAC
+                var tempHandle = GCHandle.Alloc(temp, GCHandleType.Pinned);
+                var ptr = tempHandle.AddrOfPinnedObject();
+                GL.GetCompressedTexImage(TextureTarget.Texture2D, level, ptr);
+                tempHandle.Free();
+#else
                 GL.GetCompressedTexImage(target, level, temp);
+#endif
+
                 GraphicsExtensions.CheckGLError();
 
                 var rowCount = rect.Height / 4;

@@ -54,8 +54,8 @@ namespace MonoGame.Tests.Graphics
             gdm.PreparingDeviceSettings += (s, a) => preparingCount++;
             gdm.DeviceCreated += (s, a) => createdCount++;
             gdm.DeviceDisposing += (s, a) => devDispCount++;
-            // TODO: re-add this when DesktopGL platfrom uses the new GDM
-#if !DESKTOPGL
+            // TODO remove MonoMac
+#if !MONOMAC
             gdm.Disposed += (s, a) => dispCount++;
 #endif
 

@@ -129,7 +129,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                     GraphicsDevice.FramebufferHelper.Get().GenerateMipmap((int) glTarget);
                     // This updates the mipmaps after a change in the base texture
-                    GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int) Bool.True);
+                    GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, 1);
 #endif
                 }
 
@@ -226,7 +226,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 var pixelToT = Format.GetSize() / tSizeInByte;
                 var tFullWidth = Math.Max(this.width >> level, 1) / 4 * pixelToT;
                 var temp = new T[Math.Max(this.height >> level, 1) / 4 * tFullWidth];
+#if MONOMAC
+                var tempHandle = GCHandle.Alloc(temp, GCHandleType.Pinned);
+                var ptr = tempHandle.AddrOfPinnedObject();
+                GL.GetCompressedTexImage(TextureTarget.Texture2D, level, ptr);
+                tempHandle.Free();
+#else
                 GL.GetCompressedTexImage(TextureTarget.Texture2D, level, temp);
+#endif
                 GraphicsExtensions.CheckGLError();
 
                 var rowCount = rect.Height / 4;
@@ -257,7 +264,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 #endif
-        }
+            }
 
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
