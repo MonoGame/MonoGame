@@ -34,9 +34,44 @@ namespace Microsoft.Xna.Framework.Graphics
     // ARB_framebuffer_object implementation
     partial class GraphicsDevice
     {
-#if GLES
         internal class FramebufferHelper
         {
+            #region Singleton
+
+            private static FramebufferHelper _instance;
+
+            public static FramebufferHelper Create(GraphicsDevice gd)
+            {
+                if (gd.GraphicsCapabilities.SupportsFramebufferObjectARB)
+                {
+                    _instance = new FramebufferHelper(gd);
+                }
+#if !(GLES || MONOMAC)
+                else if (gd.GraphicsCapabilities.SupportsFramebufferObjectEXT)
+                {
+                    _instance = new FramebufferHelperEXT(gd);
+                }
+#endif
+                else
+                {
+                    throw new PlatformNotSupportedException(
+                        "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
+                        "Try updating your graphics drivers.");
+                }
+
+                return _instance;
+            }
+
+            public static FramebufferHelper Get()
+            {
+                if (_instance == null)
+                    throw new InvalidOperationException("The FramebufferHelper has not been created yet!");
+                return _instance;
+            }
+
+            #endregion
+
+#if GLES
             public bool SupportsInvalidateFramebuffer { get; private set; }
 
             public bool SupportsBlitFramebuffer { get; private set; }
@@ -304,46 +339,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new InvalidOperationException(message);
                 }
             }
-        }
 
-#else
-        internal class FramebufferHelper
-        {
-
-            #region Singleton
-
-            private static FramebufferHelper _instance;
-
-            public static FramebufferHelper Create(GraphicsDevice gd)
-            {
-                if (gd.GraphicsCapabilities.SupportsFramebufferObjectARB)
-                {
-                    _instance = new FramebufferHelper(gd);
-                }
-#if !(GLES || MONOMAC)
-                else if (gd.GraphicsCapabilities.SupportsFramebufferObjectEXT)
-                {
-                    _instance = new FramebufferHelperEXT(gd);
-                }
-#endif
-                else
-                {
-                    throw new PlatformNotSupportedException(
-                        "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
-                        "Try updating your graphics drivers.");
-                }
-
-                return _instance;
-            }
-
-            public static FramebufferHelper Get()
-            {
-                if (_instance == null)
-                    throw new InvalidOperationException("The FramebufferHelper has not been created yet!");
-                return _instance;
-            }
-
-            #endregion
+#else // if GLES
 
             public bool SupportsInvalidateFramebuffer { get; private set; }
 
@@ -585,8 +582,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new InvalidOperationException(message);
                 }
             }
+#endif
+#endif
         }
-#endif
-#endif
     }
 }

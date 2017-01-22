@@ -123,6 +123,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if __IOS__
             GL.GetInteger((GetPName)All.MaxSamples, out MaxMultiSampleCount);
+#elif ANDROID
+            GL.GetInteger((GetPName) GetParamName.MaxSamplesExt, out MaxMultiSampleCount);
 #else
             GL.GetInteger((GetPName)GetParamName.MaxSamples, out MaxMultiSampleCount);
 #endif

@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var dataPtr = (IntPtr) (dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInBytes);
                 try
                 {
-                    GL.BufferSubData(BufferTarget.ArrayBuffer, offsetInBytes, elementSizeInBytes * elementCount, dataPtr);
+                    GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr) offsetInBytes, (IntPtr) (elementSizeInBytes * elementCount), dataPtr);
                     GraphicsExtensions.CheckGLError();
                 }
                 finally
@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var dataPtr = (IntPtr) (dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
                     for (var i = 0; i < elementCount; i++)
                     {
-                        GL.BufferSubData(BufferTarget.ArrayBuffer, dstOffset, elementSizeInByte, dataPtr);
+                        GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr) dstOffset, (IntPtr) elementSizeInByte, dataPtr);
                         GraphicsExtensions.CheckGLError();
 
                         dstOffset += vertexStride;

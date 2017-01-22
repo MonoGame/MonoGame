@@ -211,18 +211,8 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferSlot.ColorAttachment0, TextureTarget.Texture2D, this.glTexture, 0);
             GraphicsExtensions.CheckGLError();
-            var x = 0;
-            var y = 0;
-            var width = this.width;
-            var height = this.height;
-            if (rect.HasValue)
-            {
-                x = rect.Value.X;
-                y = rect.Value.Y;
-                width = rect.Value.Width;
-                height = rect.Value.Height;
-            }
-            GL.ReadPixels(x, y, width, height, this.glFormat, this.glType, data);
+
+            GL.ReadPixels(rect.X, rect.Y, rect.Width, rect.Height, this.glFormat, this.glType, data);
             GraphicsExtensions.CheckGLError();
             GL.DeleteFramebuffers(1, ref framebufferId);
             GraphicsExtensions.CheckGLError();
