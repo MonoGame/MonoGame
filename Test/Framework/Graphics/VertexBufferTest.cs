@@ -159,19 +159,25 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
-        //[TestCase(true)]
-        [TestCase(false, 1, -1, false, typeof(ArgumentOutOfRangeException))]
-        [TestCase(false, 0, 0, false, typeof(ArgumentOutOfRangeException))]
-        [TestCase(false, 80, 0, true, null)]
-        [TestCase(false, 80, 1, true, null)]
-        [TestCase(false, 1, 2, true, null)]
-        [TestCase(false, 1, 40, true, null)]
-        [TestCase(false, 2, 40, true, null)]
-        [TestCase(false, 2, 80, false, typeof(InvalidOperationException))]
-        [TestCase(false, 1, 80, true, null)]
-        [TestCase(false, 1, 81, true, null)]
-        [TestCase(false, 2, 81, false, typeof(InvalidOperationException))]
-        public void SetDataWithElementCountAndVertexStride(bool dynamic, int elementCount, int vertexStride, bool shouldSucceed, Type expectedExceptionType)
+        [TestCase(false, 1, -1, typeof(ArgumentOutOfRangeException))]
+        [TestCase(false, 0, 0, typeof(ArgumentOutOfRangeException))]
+        [TestCase(false, 80, 0, null)]
+        [TestCase(false, 80, 1, null)]
+        [TestCase(false, 1, 2, null)]
+        [TestCase(false, 1, 40, null)]
+        [TestCase(false, 2, 40, null)]
+        [TestCase(false, 2, 80, typeof(InvalidOperationException))]
+        [TestCase(false, 1, 80, null)]
+#if XNA
+        [TestCase(false, 1, 81, null)]
+        [TestCase(false, 2, 81, typeof(InvalidOperationException))]
+#else
+        // We throw when the vertex stride is too large
+        [TestCase(false, 1, 81, typeof(ArgumentOutOfRangeException))]
+        [TestCase(false, 2, 81, typeof(ArgumentOutOfRangeException))]
+#endif
+
+        public void SetDataWithElementCountAndVertexStride(bool dynamic, int elementCount, int vertexStride, Type expectedExceptionType)
         {
             var vertexBuffer = (dynamic)
                 ? new DynamicVertexBuffer(gd, typeof(VertexPositionTexture), savedData.Length,
@@ -180,7 +186,7 @@ namespace MonoGame.Tests.Graphics
                     BufferUsage.None);
             var savedDataBytes = ArrayUtil.ConvertFrom(savedData);
 
-            if (!shouldSucceed)
+            if (expectedExceptionType != null)
                 Assert.Throws(expectedExceptionType, () => vertexBuffer.SetData(0, savedDataBytes, 0, elementCount, vertexStride));
             else
             {
@@ -367,9 +373,10 @@ namespace MonoGame.Tests.Graphics
             effect.CurrentTechnique.Passes[0].Apply();
 
             var ex = Assert.Throws<InvalidOperationException>(() => gd.DrawPrimitives(PrimitiveType.TriangleList, 0, 1));
+            // TODO we should figure out if there's a way to check this in OpenGL
 #if XNA
             Assert.That(ex.Message, Is.EqualTo("The current vertex declaration does not include all the elements required by the current vertex shader. Position0 is missing."));
-#else
+#elif DIRECTX
             Assert.That(ex.Message, Is.EqualTo("An error occurred while preparing to draw. "
                 + "This is probably because the current vertex declaration does not include all the elements "
                 + "required by the current vertex shader. The current vertex declaration includes these elements: " 

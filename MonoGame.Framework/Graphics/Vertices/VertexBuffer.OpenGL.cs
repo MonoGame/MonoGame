@@ -65,16 +65,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
             // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
             throw new NotSupportedException("Vertex buffers are write-only on OpenGL ES platforms");
-#endif
-#if !GLES
-            if (Threading.IsOnUIThread())
-            {
-                GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride);
-            }
-            else
-            {
-                Threading.BlockOnUIThread (() => GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride));
-            }
+#else
+            Threading.BlockOnUIThread (() => GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride));
 #endif
         }
 
@@ -89,14 +81,17 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             // Pointer to the start of data to read in the vertex buffer
             ptr = new IntPtr (ptr.ToInt64 () + offsetInBytes);
-			if (typeof(T) == typeof(byte)) {
+			if (typeof(T) == typeof(byte))
+            {
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
                 // Copy from the vertex buffer to the destination array
                 Marshal.Copy (ptr, buffer, startIndex * vertexStride, elementCount * vertexStride);
-            } else {
+            }
+            else
+            {
                 // Temporary buffer to store the copied section of data
-                byte[] buffer = new byte[elementCount * vertexStride - offsetInBytes];
+                var buffer = new byte[elementCount * vertexStride];
                 // Copy from the vertex buffer to the temporary buffer
                 Marshal.Copy(ptr, buffer, 0, buffer.Length);
                 
@@ -130,14 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options, int bufferSize, int elementSizeInBytes) where T : struct
         {
-            if (Threading.IsOnUIThread())
-            {
-                SetBufferData(bufferSize, elementSizeInBytes, offsetInBytes, data, startIndex, elementCount, vertexStride, options);
-            }
-            else
-            {
-                Threading.BlockOnUIThread(() => SetBufferData(bufferSize, elementSizeInBytes, offsetInBytes, data, startIndex, elementCount, vertexStride, options));
-            }
+            Threading.BlockOnUIThread(() => SetBufferData(bufferSize, elementSizeInBytes, offsetInBytes, data, startIndex, elementCount, vertexStride, options));
         }
 
         private void SetBufferData<T>(int bufferSize, int elementSizeInBytes, int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
@@ -187,12 +175,14 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.BlockOnUIThread(() =>
                 {
-                    GL.DeleteBuffers(1, ref vbo);
-                    GraphicsExtensions.CheckGLError();
+                    if (!IsDisposed)
+                    {
+                        GL.DeleteBuffers(1, ref vbo);
+                        GraphicsExtensions.CheckGLError();
+                        base.Dispose(disposing);
+                    }
                 });
             }
-
-            base.Dispose(disposing);
         }
     }
 }

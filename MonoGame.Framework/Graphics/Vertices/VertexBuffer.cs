@@ -53,12 +53,16 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformGraphicsDeviceResetting();
         }
 
-        public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
+        public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride = 0) where T : struct
         {
             var elementSizeInBytes = Utilities.ReflectionHelpers.SizeOf<T>.Get();
 
             if (vertexStride == 0)
                 vertexStride = elementSizeInBytes;
+
+            var vertexByteSize = VertexCount * VertexDeclaration.VertexStride;
+            if (vertexStride > vertexByteSize)
+                throw new ArgumentOutOfRangeException("vertexStride", "Vertex stride can not be larger than the vertex buffer size.");
 
             if (data == null)
                 throw new ArgumentNullException("data");
@@ -66,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentOutOfRangeException("elementCount", "This parameter must be a valid index within the array.");
             if (BufferUsage == BufferUsage.WriteOnly)
                 throw new NotSupportedException("Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
-			if (elementCount > 1 && (elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride))
+			if (elementCount > 1 && elementCount * vertexStride > vertexByteSize)
                 throw new InvalidOperationException("The array is not the correct size for the amount of data requested.");
 
             PlatformGetData<T>(offsetInBytes, data, startIndex, elementCount, vertexStride);
@@ -173,6 +177,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (vertexStride == 0)
                 vertexStride = elementSizeInBytes;
+
+            var vertexByteSize = VertexCount * VertexDeclaration.VertexStride;
+            if (vertexStride > vertexByteSize)
+                throw new ArgumentOutOfRangeException("vertexStride", "Vertex stride can not be larger than the vertex buffer size.");
 
             if (startIndex + elementCount > data.Length || elementCount <= 0)
                 throw new ArgumentOutOfRangeException("data","The array specified in the data parameter is not the correct size for the amount of data requested.");
