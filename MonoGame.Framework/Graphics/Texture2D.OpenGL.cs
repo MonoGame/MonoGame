@@ -127,6 +127,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS || ANDROID
 				    GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
+                    GraphicsDevice.FramebufferHelper.Get().GenerateMipmap((int) glTarget);
                     // This updates the mipmaps after a change in the base texture
                     GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int) Bool.True);
 #endif
@@ -143,13 +144,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             Threading.BlockOnUIThread(() =>
             {
-                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 // Use try..finally to make sure dataHandle is freed in case of an error
                 try
                 {
                     var startBytes = startIndex * elementSizeInByte;
-                    var dataPtr = (IntPtr) (dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                    var dataPtr = new IntPtr(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
                     // Store the current bound texture.
                     var prevTexture = GraphicsExtensions.GetBoundTexture2D();
 
@@ -157,22 +158,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                     GraphicsExtensions.CheckGLError();
+
                     if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                     {
                         GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, rect.X, rect.Y, rect.Width, rect.Height,
-                            (PixelInternalFormat) glInternalFormat, elementCount * elementSizeInByte - startBytes, dataPtr);
+                            (PixelInternalFormat) glInternalFormat, elementCount * elementSizeInByte, dataPtr);
                         GraphicsExtensions.CheckGLError();
                     }
                     else
                     {
-                        // Set pixel alignment to match texel size in bytes
-                        GL.PixelStore(PixelStoreParameter.UnpackAlignment, Format.GetSize());
                         GL.TexSubImage2D(TextureTarget.Texture2D, level, rect.X, rect.Y,
                             rect.Width, rect.Height, glFormat, glType, dataPtr);
                         GraphicsExtensions.CheckGLError();
-
-                        // Return to default pixel alignment
-                        GL.PixelStore(PixelStoreParameter.UnpackAlignment, 4);
                     }
 
 #if !ANDROID

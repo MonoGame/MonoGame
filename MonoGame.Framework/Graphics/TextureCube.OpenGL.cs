@@ -105,6 +105,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS || ANDROID
 				    GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
+                    GraphicsDevice.FramebufferHelper.Get().GenerateMipmap((int) glTarget);
                     // This updates the mipmaps after a change in the base texture
                     GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)Bool.True);
 #endif
@@ -167,13 +168,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             Threading.BlockOnUIThread(() =>
             {
-                var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
+                var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 // Use try..finally to make sure dataHandle is freed in case of an error
                 try
                 {
                     var startBytes = startIndex * elementSizeInByte;
-                    var dataPtr = (IntPtr) (dataHandle.AddrOfPinnedObject().ToInt64() + startIndex*elementSizeInByte);
+                    var dataPtr = new IntPtr(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+
                     GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
                     GraphicsExtensions.CheckGLError();
 
@@ -181,7 +183,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (glFormat == (PixelFormat) GLPixelFormat.CompressedTextureFormats)
                     {
                         GL.CompressedTexSubImage2D(target, level, rect.X, rect.Y, rect.Width, rect.Height,
-                            (PixelInternalFormat) glInternalFormat, elementCount * startBytes, dataPtr);
+                            (PixelInternalFormat) glInternalFormat, elementCount * elementSizeInByte, dataPtr);
                         GraphicsExtensions.CheckGLError();
                     }
                     else
