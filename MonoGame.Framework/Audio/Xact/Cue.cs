@@ -307,6 +307,8 @@ namespace Microsoft.Xna.Framework.Audio
                     }
                 }
 
+                pitch = MathHelper.Clamp(pitch, -1.0f, 1.0f);
+
                 _curSound.UpdateState(_engine, volume, pitch, reverbMix, filterFrequency, filterQFactor);
             }
         }
