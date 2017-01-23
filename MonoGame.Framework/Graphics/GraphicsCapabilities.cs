@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         // The highest supported MSCount
         private const int MultiSampleCountLimit = 32;
-        internal int MaxMultiSampleCount { get; private set; }
+        internal int MaxMultiSampleCount;
 
         internal bool SupportsInstancing { get; private set; }
     }
