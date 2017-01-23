@@ -22,11 +22,12 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class VertexDeclaration
     {
-        Dictionary<int, VertexDeclarationAttributeInfo> shaderAttributeInfo = new Dictionary<int, VertexDeclarationAttributeInfo>();
+        private readonly Dictionary<int, VertexDeclarationAttributeInfo> _shaderAttributeInfo = new Dictionary<int, VertexDeclarationAttributeInfo>();
 
         internal VertexDeclarationAttributeInfo GetAttributeInfo(Shader shader, int programHash)
         {
-            if (shaderAttributeInfo.TryGetValue(programHash, out var attrInfo))
+            VertexDeclarationAttributeInfo attrInfo;
+            if (_shaderAttributeInfo.TryGetValue(programHash, out attrInfo))
                 return attrInfo;
 
             // Get the vertex attribute info and cache it
@@ -50,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 attrInfo.EnabledAttributes[attributeLocation] = true;
             }
 
-            shaderAttributeInfo.Add(programHash, attrInfo);
+            _shaderAttributeInfo.Add(programHash, attrInfo);
             return attrInfo;
         }
 
