@@ -250,11 +250,11 @@ namespace Microsoft.Xna.Framework.Audio
 
             XactSound[] sounds;
             if (!_sounds.TryGetValue(name, out sounds))
-                throw new ArgumentException();
+                throw new ArgumentException(string.Format("There is no XactSound with passed name '{0}'.", name), "name");
 
             float [] probs;
             if (!_probabilities.TryGetValue (name, out probs))
-                throw new ArgumentException ();
+                throw new ArgumentException (string.Format("There are no probabilities with passed name '{0}'.", name), "name");
 
             IsInUse = true;
 
@@ -274,11 +274,11 @@ namespace Microsoft.Xna.Framework.Audio
 
             XactSound[] sounds;
             if (!_sounds.TryGetValue(name, out sounds))
-                throw new ArgumentException();
+                throw new ArgumentException(string.Format("There is no XactSound with passed name '{0}'.", name), "name");
 
             float [] probs;
             if (!_probabilities.TryGetValue (name, out probs))
-                throw new ArgumentException ();
+                throw new ArgumentException (string.Format("There are no probabilities with passed name '{0}'.", name), "name");
 
             IsInUse = true;
             var cue = new Cue (_audioengine, name, sounds, probs);
@@ -302,11 +302,11 @@ namespace Microsoft.Xna.Framework.Audio
 
             XactSound[] sounds;
             if (!_sounds.TryGetValue(name, out sounds))
-                throw new InvalidOperationException();
+                throw new ArgumentException(string.Format("There is no XactSound with passed name '{0}'.", name), "name");
 
             float [] probs;
             if (!_probabilities.TryGetValue (name, out probs))
-                throw new ArgumentException ();
+                throw new ArgumentException (string.Format("There are no probabilities with passed name '{0}'.", name), "name");
 
             IsInUse = true;
 
