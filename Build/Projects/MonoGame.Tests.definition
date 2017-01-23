@@ -170,9 +170,6 @@
     <Compile Include="Framework\Visual\VideoTests.cs">
         <Platforms>Windows,MacOS</Platforms>
     </Compile>
-    <Compile Include="Framework\Visual\VideoTests.cs">
-        <Platforms>Windows,MacOS</Platforms>
-    </Compile>
     <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
     <Compile Include="Framework\Graphics\ShaderTest.cs" />
     <Compile Include="Framework\Graphics\SpriteBatchTest.cs" />

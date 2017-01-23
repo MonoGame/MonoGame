@@ -31,13 +31,9 @@ namespace Microsoft.Xna.Framework.Media
         private PresentationClock _clock;
         const int defaultTimeoutMs = 1000;
 
-        // HACK: Need SharpDX to fix this.
         private Guid AudioStreamVolumeGuid;
         private Texture2D _texture;
         private Callback _callback;
-        private static Texture2D _texture;
-        internal MediaSession Session { get { return _session; } }
-
         internal MediaSession Session { get { return _session; } }
 
         private class Callback : IAsyncCallback
@@ -105,7 +101,7 @@ namespace Microsoft.Xna.Framework.Media
             }
 
             if (_texture == null)
-                _texture = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
+                _texture = new Texture2D(_graphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
         }
 
         private Texture2D PlatformGetTexture()
@@ -155,7 +151,6 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformPlay()
         {
-            System.Diagnostics.Debug.WriteLine("PlatformPlay");
             // Cleanup the last video first.
             if (State != MediaState.Stopped)
             {
@@ -187,7 +182,6 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformStop()
         {
-            System.Diagnostics.Debug.WriteLine("PlatformStop");
             if (State == MediaState.Playing)
             {
                 _internalState = InternalState.WaitingForSessionStop;
@@ -198,7 +192,6 @@ namespace Microsoft.Xna.Framework.Media
             {
                 _internalState = InternalState.Stopped;
             }
-            System.Diagnostics.Debug.WriteLine("PlatformStopped");
         }
 
         bool WaitForInternalStateChange(InternalState expectedState, int milliseconds = defaultTimeoutMs)
@@ -296,13 +289,11 @@ namespace Microsoft.Xna.Framework.Media
 
         private void OnSessionStopped()
         {
-            System.Diagnostics.Debug.WriteLine("OnSessionStopped");
             _session.Close();
         }
  
         private void OnSessionClosed()
         {
-            System.Diagnostics.Debug.WriteLine("OnSessionClosed");
             if (_volumeController != null)
             {
                 _volumeController.Dispose();

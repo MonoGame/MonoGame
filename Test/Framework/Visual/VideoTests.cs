@@ -18,15 +18,21 @@ namespace MonoGame.Tests.Visual
         VideoPlayer _player;
         TimeSpan _start;
 
-        [SetUp]
-        public override void SetUp()
+        [Test]
+        public void Plain()
         {
-            base.SetUp();
+            Game.ExitCondition = x => _player.State == MediaState.Stopped;
+
+            Game.InitializeWith += (sender, e) =>
+            {
+                Game.Window.Title = "Not Looped";
+            };
 
             Game.LoadContentWith += (sender, e) =>
             {
                 _spriteBatch = new SpriteBatch(Game.GraphicsDevice);
                 _video = Game.Content.Load<Video>(Paths.Video("SampleVideo_360x240_5s"));
+                _player = new VideoPlayer(Game.GraphicsDevice);
                 _player.Play(_video);
                 _start = e.FrameInfo.TotalGameTime;
             };
@@ -40,29 +46,13 @@ namespace MonoGame.Tests.Visual
                 _video = null;
             };
 
-            Game.PreDrawWith += (sender, e) =>
-            {
-                Game.GraphicsDevice.Clear(Color.CornflowerBlue);
-            };
-        }
-
-        [Test]
-        public void Plain()
-        {
-            Game.ExitCondition = x => _player.State == MediaState.Stopped;
-
-            Game.InitializeWith += (sender, e) =>
-            {
-                Game.Window.Title = "Not Looped";
-                _player = new VideoPlayer();
-            };
-
             Game.UpdateWith += (sender, e) =>
             {
             };
 
             Game.DrawWith += (sender, e) =>
             {
+                Game.GraphicsDevice.Clear(Color.CornflowerBlue);
                 _spriteBatch.Begin();
                 _spriteBatch.Draw(_player.GetTexture(), Vector2.Zero, Color.White);
                 _spriteBatch.End();
@@ -79,8 +69,25 @@ namespace MonoGame.Tests.Visual
             Game.InitializeWith += (sender, e) =>
             {
                 Game.Window.Title = "Looped";
-                _player = new VideoPlayer();
+            };
+
+            Game.LoadContentWith += (sender, e) =>
+            {
+                _spriteBatch = new SpriteBatch(Game.GraphicsDevice);
+                _video = Game.Content.Load<Video>(Paths.Video("SampleVideo_360x240_5s"));
+                _player = new VideoPlayer(Game.GraphicsDevice);
                 _player.IsLooped = true;
+                _player.Play(_video);
+                _start = e.FrameInfo.TotalGameTime;
+            };
+
+            Game.UnloadContentWith += (sender, e) =>
+            {
+                _spriteBatch.Dispose();
+                _spriteBatch = null;
+                _player.Dispose();
+                _player = null;
+                _video = null;
             };
 
             Game.UpdateWith += (sender, e) =>
@@ -90,6 +97,7 @@ namespace MonoGame.Tests.Visual
 
             Game.DrawWith += (sender, e) =>
             {
+                Game.GraphicsDevice.Clear(Color.CornflowerBlue);
                 _spriteBatch.Begin();
                 _spriteBatch.Draw(_player.GetTexture(), Vector2.Zero, Color.White);
                 _spriteBatch.End();
