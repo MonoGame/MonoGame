@@ -253,8 +253,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void Update(float dt)
         {
-            if (_curSound != null)
-                _curSound.Update(dt);
+            if (_curSound == null)
+                return;
+
+            _curSound.Update(dt);
 
             // Evaluate the runtime parameter controls.
             var rpcCurves = _curSound.RpcCurves;
