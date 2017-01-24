@@ -274,6 +274,9 @@
     </Compile>
     <Compile Include="Framework\Graphics\TextureCubeTest.cs" />
     <Compile Include="Framework\Graphics\VertexBufferTest.cs" />
+    <Compile Include="Framework\Visual\VideoTests.cs">
+        <Platforms>Windows,MacOS</Platforms>
+    </Compile>
     <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
     <Compile Include="Framework\Graphics\ShaderTest.cs" />
     <Compile Include="Framework\Graphics\SpriteBatchTest.cs" />
@@ -358,6 +361,9 @@
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\TextureProcessorTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\VideoImporterTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\WavImporterTests.cs">
@@ -1007,6 +1013,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Textures\lines-diag-32.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Video\SampleVideo_320x240_5s.3gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Video\SampleVideo_360x240_5s.flv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Video\SampleVideo_360x240_5s.mkv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Video\SampleVideo_360x240_5s.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Video\SampleVideo_360x240_5s.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Textures\lines-diag-64.xnb">
