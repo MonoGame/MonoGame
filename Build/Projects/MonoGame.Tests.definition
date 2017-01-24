@@ -389,18 +389,75 @@
 
     <Content Include="Assets\Effects\DefinesTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\Instancing.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Effects\ParserTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Effects\PreprocessorInclude.fxh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Effects\PreprocessorTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Effects\Include.fxh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\TextureArrayEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\VertexTextureEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\Bevels.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\BlackOut.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\ColorFlip.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\Grayscale.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\HighContrast.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\Invert.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\NoEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\RainbowH.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\CustomSpriteBatchEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\CustomSpriteBatchEffectComparisonSampler.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
 
     <Content Include="Assets\ReferenceImages\BlendState\VisualTests.png">

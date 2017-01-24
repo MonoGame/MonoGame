@@ -336,7 +336,7 @@ namespace MonoGame.Tests {
 
         public static string RawEffect(params string[] pathParts)
         {
-            return Combine(EffectFolder, pathParts);
+            return Combine(EffectFolder, pathParts) + ".fx";
         }
 
 		public static string CompiledEffect (params string [] pathParts)
