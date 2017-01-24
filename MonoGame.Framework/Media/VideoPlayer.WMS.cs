@@ -30,6 +30,9 @@ namespace Microsoft.Xna.Framework.Media
         private AudioStreamVolume _volumeController;
         private PresentationClock _clock;
         const int defaultTimeoutMs = 1000;
+#if WINRT
+        readonly object _locker = new object();
+#endif
 
         private Guid AudioStreamVolumeGuid;
         private Texture2D _texture;
@@ -209,7 +212,8 @@ namespace Microsoft.Xna.Framework.Media
             while (_internalState != expectedState)
             {
 #if WINRT
-                Task.Delay(1).Wait();
+                lock (_locker)
+                    System.Threading.Monitor.Wait(_locker, 1);
 #else
                 Thread.Sleep(1);
 #endif
