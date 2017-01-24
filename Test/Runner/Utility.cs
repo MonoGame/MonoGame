@@ -339,7 +339,7 @@ namespace MonoGame.Tests {
             return Combine(EffectFolder, pathParts);
         }
 
-		public static string Effect (params string [] pathParts)
+		public static string CompiledEffect (params string [] pathParts)
 		{
 		    string type;
 #if XNA

@@ -5,6 +5,7 @@
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
@@ -28,7 +29,7 @@ namespace MonoGame.Tests.Graphics
             PrepareFrameCapture();
 
             var spriteBatch = new SpriteBatch(gd);
-            var effect = content.Load<Effect>(Paths.Effect(effectName));
+            var effect = AssetTestUtility.LoadEffect(content, effectName);
 			// A background texture to test that the effect doesn't
 			// mess up other textures
             var background = content.Load<Texture2D>(Paths.Texture ("fun-background"));

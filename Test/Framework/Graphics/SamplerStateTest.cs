@@ -166,7 +166,7 @@ namespace MonoGame.Tests.Graphics
                     FilterMode = TextureFilterMode.Comparison
                 };
 
-            var customEffect = content.Load<Effect>(Paths.Effect("CustomSpriteBatchEffectComparisonSampler"));
+            var customEffect = AssetTestUtility.LoadEffect(content, "CustomSpriteBatchEffectComparisonSampler");
 
             var size = new Vector2(100, 100);
             var offset = new Vector2(10, 10);

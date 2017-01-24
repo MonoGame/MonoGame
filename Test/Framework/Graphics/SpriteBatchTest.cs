@@ -34,7 +34,7 @@ namespace MonoGame.Tests.Graphics {
                 View = Matrix.Identity,
                 World = Matrix.Identity
             };
-            _effect2 = content.Load<Effect>(Paths.Effect("Grayscale"));            
+            _effect2 = content.Load<Effect>(Paths.CompiledEffect("Grayscale"));            
 		}
 
 	    [TearDown]
@@ -294,7 +294,7 @@ namespace MonoGame.Tests.Graphics {
         [Test]
         public void DrawWithCustomEffectAndTwoTextures()
         {
-            var customSpriteEffect = content.Load<Effect>(Paths.Effect("CustomSpriteBatchEffect"));
+            var customSpriteEffect = AssetTestUtility.LoadEffect(content, "CustomSpriteBatchEffect");
             var texture2 = new Texture2D(gd, 1, 1, false, SurfaceFormat.Color);
 
             customSpriteEffect.Parameters["SourceTexture"].SetValue(texture2);
