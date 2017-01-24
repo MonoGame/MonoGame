@@ -178,9 +178,6 @@ namespace Microsoft.Xna.Framework.Media
 
             WaitForInternalStateChange(InternalState.Playing);
 
-            // we need to dispose of the old texture if we have one
-            if (_videoCache != null)
-                _videoCache.Dispose();
             // Create cached texture
             _videoCache = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
         }
