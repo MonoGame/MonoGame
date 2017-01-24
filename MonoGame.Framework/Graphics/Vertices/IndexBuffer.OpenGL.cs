@@ -142,7 +142,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
             }
             
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr) offsetInBytes, (IntPtr) sizeInBytes, dataPtr);
+            GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
             GraphicsExtensions.CheckGLError();
             
             dataHandle.Free();
