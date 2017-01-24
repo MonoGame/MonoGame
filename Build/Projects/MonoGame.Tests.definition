@@ -5,6 +5,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Web" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MonoGame.Tests.References" />
