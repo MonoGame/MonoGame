@@ -6,10 +6,10 @@ namespace TwoMGFX
 {
     public class Options
     {
-        [CommandLineParser.Required]
+        [CommandLineParser.Name("SourceFile", "\t - Path of the shader source file")]
         public string SourceFile;
 
-        [CommandLineParser.Required]
+        [CommandLineParser.Name("OutputFile", "\t - Path of the output file")]
         public string OutputFile = string.Empty;
 
         [CommandLineParser.ProfileName]

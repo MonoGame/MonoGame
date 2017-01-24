@@ -24,6 +24,13 @@ namespace TwoMGFX
             if (!parser.ParseCommandLine(args))
                 return 1;
 
+            // Validate that we have a source file
+            if (string.IsNullOrEmpty(options.SourceFile))
+            {
+                Console.Error.WriteLine("A source file must be specified");
+                return 1;
+            }
+
             // Validate the input file exits.
             if (!File.Exists(options.SourceFile))
             {

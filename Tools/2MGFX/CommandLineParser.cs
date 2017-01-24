@@ -34,6 +34,7 @@ namespace TwoMGFX
         public CommandLineParser(object optionsObject)
         {
             this._optionsObject = optionsObject;
+            var prefix = Environment.OSVersion.Platform == PlatformID.Win32NT ? "/" : "-";
 
             // Reflect to find what commandline options are available.
             foreach (var field in optionsObject.GetType().GetFields())
@@ -54,9 +55,9 @@ namespace TwoMGFX
                     _optionalOptions.Add(fieldName.ToLowerInvariant(), field);
 
                     if (field.FieldType == typeof(bool))
-                        _optionalUsageHelp.Add(string.Format("/{0} {1}", fieldName, description));
+                        _optionalUsageHelp.Add(string.Format("{2}{0} {1}", fieldName, description, prefix));
                     else
-                        _optionalUsageHelp.Add(string.Format("/{0}:value {1}", fieldName, description));
+                        _optionalUsageHelp.Add(string.Format("{2}{0}:value {1}", fieldName, description, prefix));
                 }
             }
         }
@@ -86,7 +87,7 @@ namespace TwoMGFX
 
         bool ParseArgument(string arg)
         {
-            if (arg.StartsWith("/"))
+            if (arg.StartsWith("/") || arg.StartsWith("-"))
             {
                 // After the first escaped argument we can no
                 // longer read non-escaped arguments.
