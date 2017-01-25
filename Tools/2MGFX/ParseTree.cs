@@ -1132,7 +1132,7 @@ namespace TwoMGFX
         	var variable = new VsInputVariableInfo();
         	variable.TypeName = this.GetValue(tree, TokenType.Identifier, 0) as string;
         	variable.Name = this.GetValue(tree, TokenType.Identifier, 1) as string;
-            variable.SemanticName = Nodes[3].Nodes[1].Text;
+            variable.SemanticName = Nodes[3].Nodes[1].Token.Text;
         	variable.AttributeSyntax = (this.GetValue(tree, TokenType.GlslIn, 0) as string) == "attribute";
         	variable.Node = this;
 

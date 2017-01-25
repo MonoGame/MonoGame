@@ -113,22 +113,19 @@ namespace TwoMGFX
                 {
                     location = -1,
                     name = name,
-
                 };
 
                 // if this is a vertex shader we can set the semantics because we parsed them earlier
                 if (isVertexShader)
                 {
-                    var semantic = shaderInfo.VsInputVariables[result.Inputs[i].Name].SemanticName;
+                    if (!shaderInfo.VsInputVariables.ContainsKey(name))
+                        throw new ShaderCompilerException(string.Format("Did not find usage for VS input variable {0}", name));
+
+                    var semantic = shaderInfo.VsInputVariables[name].SemanticName;
                     VertexElementUsage usage;
                     int index;
-                    // semantic name can either be SEMANTIC or SEMANTICn where n is a number between 0 and 9
-                    if (Enum.TryParse(semantic, false, out usage))
-                        index = 0;
-                    else if (Enum.TryParse(semantic.Substring(0, semantic.Length - 1), false, out usage))
-                        index = int.Parse(semantic[semantic.Length - 1].ToString());
-                    else
-                        throw new ShaderCompilerException(string.Format("Did not find usage for VS input variable {0}", name));
+
+                    ParseSemantic(semantic, out usage, out index);
 
                     data._attributes[i].usage = usage;
                     data._attributes[i].index = index;
@@ -180,6 +177,34 @@ namespace TwoMGFX
             effect.Shaders.Add(data);
 
             return data;
+        }
+
+        private static void ParseSemantic(string semantic, out VertexElementUsage usage, out int index)
+        {
+            // semantic name can either be SEMANTIC or SEMANTICn where n is a number between 0 and 9
+            if (int.TryParse(semantic[semantic.Length - 1].ToString(), out index))
+                semantic = semantic.Substring(0, semantic.Length - 1);
+
+            // most enum names map to their semantics so they can be parsed directly
+            if (Enum.TryParse(semantic, true, out usage))
+                return;
+
+            // the following do not map to their semantics
+            switch (semantic.ToLower())
+            {
+                case "texcoord":
+                    usage = VertexElementUsage.TextureCoordinate;
+                    break;
+                case "psize":
+                    usage = VertexElementUsage.PointSize;
+                    break;
+                case "tessfactor":
+                    usage = VertexElementUsage.TessellateFactor;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(usage), usage,
+                        string.Format("Vertex input semantic {0} is not valid.", usage));
+            }
         }
 
         // replace functions corresponding to the given nodes with whitespace
