@@ -247,7 +247,7 @@ namespace Microsoft.Xna.Framework.Audio
             UpdateOutputMatrix();
         }
 
-        private void UpdateOutputMatrix()
+        internal void UpdateOutputMatrix()
         {
             var srcChannelCount = _voice.VoiceDetails.InputChannelCount;
             var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
