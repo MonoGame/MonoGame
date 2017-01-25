@@ -262,7 +262,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        private static float[] CalculateOutputMatrix(float pan, float scale, int inputChannels)
+        internal static float[] CalculateOutputMatrix(float pan, float scale, int inputChannels)
         {
             // XNA only ever outputs to the front left/right speakers (channels 0 and 1)
             // Assumes there are at least 2 speaker channels to output to
