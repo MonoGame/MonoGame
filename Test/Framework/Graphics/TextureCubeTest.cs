@@ -44,9 +44,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
-        [Ignore("GetData is not yet implemented for compressed images")]
-#endif
         public void GetAndSetDataDxtCompressed()
         {
             var t = content.Load<TextureCube>(Paths.Texture ("SampleCube64DXT1Mips"));
@@ -106,9 +103,6 @@ namespace MonoGame.Tests.Graphics
         // TODO DXT5
         //[TestCase(16, "SampleCube64DXT5Mips", 0)]
         //[TestCase(16, "SampleCube64DXT5Mips", 1)]
-#if DESKTOPGL
-        [Ignore("GetData is not yet implemented for compressed images")]
-#endif
         public void GetAndSetDataDxtNotMultipleOf4Rounding(int bs, string texName, int mip)
         {
             var t = content.Load<TextureCube>(Paths.Texture (texName));
@@ -163,9 +157,6 @@ namespace MonoGame.Tests.Graphics
 
         [TestCase("SampleCube64DXT1Mips", 8)]
         //[TestCase("SampleCube64DXT5Mips", 16)]
-#if DESKTOPGL
-        [Ignore("GetData is not yet implemented for compressed images")]
-#endif
         public void GetAndSetDataDxtDontRoundWhenOutsideBounds(string texName, int bs)
         {
             var t = content.Load<TextureCube>(Paths.Texture(texName));
@@ -186,9 +177,6 @@ namespace MonoGame.Tests.Graphics
 
         [TestCase("SampleCube64DXT1Mips", 8)]
         //[TestCase("SampleCube64DXT5Mips", 16)]
-#if DESKTOPGL
-        [Ignore("GetData is not yet implemented for compressed images")]
-#endif
         public void GetAndSetDataDxtLowerMips(string texName, int bs)
         {
             var t = content.Load<TextureCube>(Paths.Texture(texName));
