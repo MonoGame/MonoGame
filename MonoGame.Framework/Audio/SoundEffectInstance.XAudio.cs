@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private SharpDX.XAudio2.Fx.Reverb _reverb;
 
-        private static readonly float[] _panMatrix = new float[16];
+        private static readonly float[] _outputMatrix = new float[16];
 
         private float _reverbMix;
 
@@ -254,22 +254,22 @@ namespace Microsoft.Xna.Framework.Audio
 
             // Set the pan on the correct channels based on the reverb mix.
             if (!(_reverbMix > 0.0f))
-                _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, CalculatePanMatrix(_pan, 1.0f, srcChannelCount));
+                _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, CalculateOutputMatrix(_pan, 1.0f, srcChannelCount));
             else
             {
-                _voice.SetOutputMatrix(SoundEffect.ReverbVoice, srcChannelCount, dstChannelCount, CalculatePanMatrix(_pan, _reverbMix, srcChannelCount));
-                _voice.SetOutputMatrix(SoundEffect.MasterVoice, srcChannelCount, dstChannelCount, CalculatePanMatrix(_pan, 1.0f - Math.Min(_reverbMix, 1.0f), srcChannelCount));
+                _voice.SetOutputMatrix(SoundEffect.ReverbVoice, srcChannelCount, dstChannelCount, CalculateOutputMatrix(_pan, _reverbMix, srcChannelCount));
+                _voice.SetOutputMatrix(SoundEffect.MasterVoice, srcChannelCount, dstChannelCount, CalculateOutputMatrix(_pan, 1.0f - Math.Min(_reverbMix, 1.0f), srcChannelCount));
             }
         }
 
-        private static float[] CalculatePanMatrix(float pan, float scale, int inputChannels)
+        private static float[] CalculateOutputMatrix(float pan, float scale, int inputChannels)
         {
             // XNA only ever outputs to the front left/right speakers (channels 0 and 1)
             // Assumes there are at least 2 speaker channels to output to
 
             // Clear all the channels.
-            var panMatrix = _panMatrix;
-            Array.Clear(panMatrix, 0, panMatrix.Length);
+            var outputMatrix = _outputMatrix;
+            Array.Clear(outputMatrix, 0, outputMatrix.Length);
 
             if (inputChannels == 1) // Mono source
             {
@@ -277,8 +277,8 @@ namespace Microsoft.Xna.Framework.Audio
                 //   Pan -1.0: L = 1.0, R = 0.0
                 //   Pan  0.0: L = 1.0, R = 1.0
                 //   Pan +1.0: L = 0.0, R = 1.0
-                panMatrix[0] = (pan > 0f) ? ((1f - pan) * scale) : scale; // Front-left output
-                panMatrix[1] = (pan < 0f) ? ((1f + pan) * scale) : scale; // Front-right output
+                outputMatrix[0] = (pan > 0f) ? ((1f - pan) * scale) : scale; // Front-left output
+                outputMatrix[1] = (pan < 0f) ? ((1f + pan) * scale) : scale; // Front-right output
             }
             else if (inputChannels == 2) // Stereo source
             {
@@ -288,21 +288,21 @@ namespace Microsoft.Xna.Framework.Audio
                 //   Pan +1.0: Lo = 0.0Li + 0.0Ri, Ro = 0.5Li + 0.5Ri
                 if (pan <= 0f)
                 {
-                    panMatrix[0] = (1f + pan * 0.5f) * scale; // Front-left output, Left input
-                    panMatrix[1] = (-pan * 0.5f) * scale; // Front-left output, Right input
-                    panMatrix[2] = 0f; // Front-right output, Left input
-                    panMatrix[3] = (1f + pan) * scale; // Front-right output, Right input
+                    outputMatrix[0] = (1f + pan * 0.5f) * scale; // Front-left output, Left input
+                    outputMatrix[1] = (-pan * 0.5f) * scale; // Front-left output, Right input
+                    outputMatrix[2] = 0f; // Front-right output, Left input
+                    outputMatrix[3] = (1f + pan) * scale; // Front-right output, Right input
                 }
                 else
                 {
-                    panMatrix[0] = (1f - pan) * scale; // Front-left output, Left input
-                    panMatrix[1] = 0f; // Front-left output, Right input
-                    panMatrix[2] = (pan * 0.5f) * scale; // Front-right output, Left input
-                    panMatrix[3] = (1f - pan * 0.5f) * scale; // Front-right output, Right input
+                    outputMatrix[0] = (1f - pan) * scale; // Front-left output, Left input
+                    outputMatrix[1] = 0f; // Front-left output, Right input
+                    outputMatrix[2] = (pan * 0.5f) * scale; // Front-right output, Left input
+                    outputMatrix[3] = (1f - pan * 0.5f) * scale; // Front-right output, Right input
                 }
             }
 
-            return panMatrix;
+            return outputMatrix;
         }
 
         private void PlatformSetPitch(float value)
