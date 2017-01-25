@@ -108,11 +108,12 @@ namespace TwoMGFX
 
             for(var i = 0; i < result.Inputs.Count; i++)
             {
+                var name = result.Inputs[i].Name;
                 data._attributes[i] = new ShaderData.Attribute
                 {
-                    index = i,
                     location = -1,
-                    name = result.Inputs[i].Name,
+                    name = name,
+
                 };
 
                 // if this is a vertex shader we can set the semantics because we parsed them earlier
@@ -120,15 +121,17 @@ namespace TwoMGFX
                 {
                     var semantic = shaderInfo.VsInputVariables[result.Inputs[i].Name].SemanticName;
                     VertexElementUsage usage;
+                    int index;
                     // semantic name can either be SEMANTIC or SEMANTICn where n is a number between 0 and 9
-                    if (Enum.TryParse(semantic, false, out usage) ||
-                        Enum.TryParse(semantic.Substring(0, semantic.Length - 1), false, out usage))
-                        data._attributes[i].usage = usage;
-                }
-                else
-                {
-                    // TODO do we want this for pixel shaders? That would mean changing the GLFX format
-                    data._attributes[i].usage = VertexElementUsage.Color;
+                    if (Enum.TryParse(semantic, false, out usage))
+                        index = 0;
+                    else if (Enum.TryParse(semantic.Substring(0, semantic.Length - 1), false, out usage))
+                        index = int.Parse(semantic[semantic.Length - 1].ToString());
+                    else
+                        throw new ShaderCompilerException(string.Format("Did not find usage for VS input variable {0}", name));
+
+                    data._attributes[i].usage = usage;
+                    data._attributes[i].index = index;
                 }
             }
 
