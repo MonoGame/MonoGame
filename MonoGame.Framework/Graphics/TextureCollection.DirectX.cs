@@ -16,9 +16,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             if (_applyToVertexStage)
-                ClearTargets(targets, device._d3dContext.VertexShader);
+                ClearTargets(targets, device.Context.VertexShader);
             else
-                ClearTargets(targets, device._d3dContext.PixelShader);
+                ClearTargets(targets, device.Context.PixelShader);
         }
 
         private void ClearTargets(RenderTargetBinding[] targets, SharpDX.Direct3D11.CommonShaderStage shaderStage)
@@ -65,9 +65,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // locked the d3dContext for us to use.
             SharpDX.Direct3D11.CommonShaderStage shaderStage;
             if (_applyToVertexStage)
-                shaderStage = device._d3dContext.VertexShader;
+                shaderStage = device.Context.VertexShader;
             else
-                shaderStage = device._d3dContext.PixelShader;
+                shaderStage = device.Context.PixelShader;
 
             for (var i = 0; i < _textures.Length; i++)
             {

@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var region = new ResourceRegion(left, top, front, right, bottom, back);
 
-                var d3dContext = GraphicsDevice._d3dContext;
+                var d3dContext = GraphicsDevice.Context;
                 lock (d3dContext)
                     d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
             }
@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 OptionFlags = ResourceOptionFlags.None,
             };
 
-            var d3dContext = GraphicsDevice._d3dContext;
+            var d3dContext = GraphicsDevice.Context;
             using (var stagingTex = new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, desc))
             {
                 lock (d3dContext)

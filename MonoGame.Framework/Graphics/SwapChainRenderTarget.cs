@@ -152,7 +152,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public void Present()
         {
-            lock (GraphicsDevice._d3dContext)
+            lock (GraphicsDevice.Context)
             {
                 try
                 {

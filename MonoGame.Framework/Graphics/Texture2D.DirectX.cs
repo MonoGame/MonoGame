@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 
                 // TODO: We need to deal with threaded contexts here!
                 var subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
-                var d3dContext = GraphicsDevice._d3dContext;
+                var d3dContext = GraphicsDevice.Context;
                 lock (d3dContext)
                     d3dContext.UpdateSubresource(GetTexture(), subresourceIndex, region, dataPtr, GetPitch(rect.Width), 0);
             }
@@ -140,7 +140,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _cachedStagingTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
             }
 
-            var d3dContext = GraphicsDevice._d3dContext;
+            var d3dContext = GraphicsDevice.Context;
 
             lock (d3dContext)
             {

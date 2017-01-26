@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                var deviceContext = GraphicsDevice._d3dContext;
+                var deviceContext = GraphicsDevice.Context;
 
                 // Copy the texture to a staging resource
                 var stagingDesc = _buffer.Description;
@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 stagingDesc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
                 using (var stagingBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, stagingDesc))
                 {
-                    lock (GraphicsDevice._d3dContext)
+                    lock (GraphicsDevice.Context)
                         deviceContext.CopyResource(_buffer, stagingBuffer);
 
                     int TsizeInBytes = SharpDX.Utilities.SizeOf<T>();
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
                         SharpDX.DataPointer DataPointer = new SharpDX.DataPointer(dataPtr, elementCount * TsizeInBytes);
 
-                        lock (GraphicsDevice._d3dContext)
+                        lock (GraphicsDevice.Context)
                         {
                             // Map the staging resource to a CPU accessible memory
                             var box = deviceContext.MapSubresource(stagingBuffer, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if ((options & SetDataOptions.NoOverwrite) == SetDataOptions.NoOverwrite)
                     mode = SharpDX.Direct3D11.MapMode.WriteNoOverwrite;
 
-                var d3dContext = GraphicsDevice._d3dContext;
+                var d3dContext = GraphicsDevice.Context;
                 lock (d3dContext)
                 {
                     var dataBox = d3dContext.MapSubresource(_buffer, 0, mode, SharpDX.Direct3D11.MapFlags.None);
@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
 
                     // TODO: We need to deal with threaded contexts here!
-                    var d3dContext = GraphicsDevice._d3dContext;
+                    var d3dContext = GraphicsDevice.Context;
                     lock (d3dContext)
                         d3dContext.UpdateSubresource(box, _buffer, 0, region);
                 }

@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ConstantBuffer;
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
-            lock (GraphicsDevice._d3dContext)
+            lock (GraphicsDevice.Context)
                 _cbuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, desc);
         }
 
@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
-            var d3dContext = GraphicsDevice._d3dContext;
+            var d3dContext = GraphicsDevice.Context;
 
             // Update the hardware buffer.
             if (_dirty)
