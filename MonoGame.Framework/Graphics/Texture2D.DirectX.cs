@@ -67,10 +67,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 region.Right = w;
 
                 // TODO: We need to deal with threaded contexts here!
-                var subresourceIndex = CalculateSubresourceIndex(0, level);
-                var d3dContext = GraphicsDevice._d3dContext;
-                lock (d3dContext)
-                    d3dContext.UpdateSubresource(GetTexture(), subresourceIndex, region, dataPtr, GetPitch(w), 0);
+                var subresourceIndex = CalculateSubresourceIndex(0, level);                
+                var context = GraphicsDevice.Context;
+                lock (context)
+                    context._d3dContext.UpdateSubresource(GetTexture(), subresourceIndex, region, dataPtr, GetPitch(w), 0);
             }
             finally
             {
@@ -98,9 +98,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 
                 // TODO: We need to deal with threaded contexts here!
                 var subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
-                var d3dContext = GraphicsDevice.Context;
-                lock (d3dContext)
-                    d3dContext.UpdateSubresource(GetTexture(), subresourceIndex, region, dataPtr, GetPitch(rect.Width), 0);
+                var context = GraphicsDevice.Context;
+                lock (context)
+                    context._d3dContext.UpdateSubresource(GetTexture(), subresourceIndex, region, dataPtr, GetPitch(rect.Width), 0);
             }
             finally
             {
@@ -140,9 +140,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 _cachedStagingTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
             }
 
-            var d3dContext = GraphicsDevice.Context;
+            var context = GraphicsDevice.Context;
 
-            lock (d3dContext)
+            lock (context)
             {
                 var subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
 
@@ -150,13 +150,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 var elementsInRow = rect.Width;
                 var rows = rect.Height;
                 var region = new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1);
-                d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, _cachedStagingTexture, 0);
+                context._d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, _cachedStagingTexture, 0);
 
                 // Copy the data to the array.
                 DataStream stream = null;
                 try
                 {
-                    var databox = d3dContext.MapSubresource(_cachedStagingTexture, 0, MapMode.Read, MapFlags.None, out stream);
+                    var databox = context._d3dContext.MapSubresource(_cachedStagingTexture, 0, MapMode.Read, MapFlags.None, out stream);
 
                     var elementSize = _format.GetSize();
                     if (_format.IsCompressedFormat())
@@ -193,7 +193,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     SharpDX.Utilities.Dispose( ref stream);
 
-                    d3dContext.UnmapSubresource(_cachedStagingTexture, 0);
+                    context._d3dContext.UnmapSubresource(_cachedStagingTexture, 0);
                 }
             }
         }

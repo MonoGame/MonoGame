@@ -33,21 +33,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 PlatformInitialize();
 
             // NOTE: We make the assumption here that the caller has
-            // locked the d3dContext for us to use.
-            var d3dContext = GraphicsDevice.Context;
+            // locked the GraphicsContext for us to use.
+            var context = GraphicsDevice.Context;
 
             // Update the hardware buffer.
             if (_dirty)
             {
-                d3dContext.UpdateSubresource(_buffer, _cbuffer);
+                context._d3dContext.UpdateSubresource(_buffer, _cbuffer);
                 _dirty = false;
             }
             
             // Set the buffer to the right stage.
             if (stage == ShaderStage.Vertex)
-                d3dContext.VertexShader.SetConstantBuffer(slot, _cbuffer);
+                context._d3dContext.VertexShader.SetConstantBuffer(slot, _cbuffer);
             else
-                d3dContext.PixelShader.SetConstantBuffer(slot, _cbuffer);
+                context._d3dContext.PixelShader.SetConstantBuffer(slot, _cbuffer);
         }
 
         protected override void Dispose(bool disposing)

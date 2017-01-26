@@ -86,10 +86,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
 
             // NOTE: We make the assumption here that the caller has
-            // locked the d3dContext for us to use.
+            // locked the GraphicsContext for us to use.
 
             // Apply the state!
-            device.Context.Rasterizer.State = _state;
+            device.Context._d3dContext.Rasterizer.State = _state;
         }
 
         protected override void Dispose(bool disposing)
