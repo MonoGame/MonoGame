@@ -4,6 +4,7 @@ using Android.Content;
 using Android.Content.Res;
 using Android.Hardware;
 using Android.Views;
+using Android.Provider;
 
 namespace Microsoft.Xna.Framework
 {
@@ -26,6 +27,17 @@ namespace Microsoft.Xna.Framework
             // Avoid changing orientation whilst the screen is locked
             if (ScreenReceiver.ScreenLocked)
                 return;
+
+            // Check if screen orientation is locked by user: if it's locked, do not change orientation.
+            try
+            {
+                if (Settings.System.GetInt(Application.Context.ContentResolver, "accelerometer_rotation") == 0)
+                    return;
+            }
+            catch (Settings.SettingNotFoundException)
+            {
+                // Do nothing (or log warning?). In case android API or Xamarin do not support this Android system property.
+            }
 
             var disporientation = AndroidCompatibility.GetAbsoluteOrientation(orientation);
 
