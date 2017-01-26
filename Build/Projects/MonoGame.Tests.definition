@@ -122,6 +122,9 @@
     <Compile Include="Framework\Audio\SoundEffectTest.cs" />
     <Compile Include="Framework\Audio\XactTest.cs" />
     <Compile Include="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
+    <Compile Include="Framework\Audio\SoundEffectInstanceXAudioTest.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
 
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />

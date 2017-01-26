@@ -282,9 +282,12 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             if (voice == null && Device != null)
+            {
                 voice = new SourceVoice(Device, _format, VoiceFlags.UseFilter, XAudio2.MaximumFrequencyRatio);
+                inst._voice = voice;
+                inst.UpdateOutputMatrix(); // Ensure the output matrix is set for this new voice
+            }
 
-            inst._voice = voice;
             inst._format = _format;
         }
 
