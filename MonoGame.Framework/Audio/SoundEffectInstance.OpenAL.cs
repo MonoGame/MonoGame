@@ -114,6 +114,15 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformPlay()
         {
+            OpenTK.Vector3 listenerPosition = new OpenTK.Vector3(0, 0, 0);
+            OpenTK.Vector3 listenerVelocity = new OpenTK.Vector3(0, 0, 0);
+            OpenTK.Vector3 listenerForwardDirection = new OpenTK.Vector3(0, 0, 1);
+            OpenTK.Vector3 listenerUpDirection = new OpenTK.Vector3(0, 1, 0);
+
+            AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Position, ref listenerPosition); 
+            // If not working, try uncommenting these two lines also.
+            //AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Velocity, ref listenerVelocity); 
+            //AL.Listener(OpenTK.Audio.OpenAL.ALListenerfv.Orientation, ref listenerForwardDirection, ref listenerUpDirection); 
 
             SourceId = 0;
             HasSourceId = false;
