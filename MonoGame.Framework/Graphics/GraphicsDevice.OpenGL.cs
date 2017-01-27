@@ -37,9 +37,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
     {
-#if DESKTOPGL || ANGLE
-        internal IGraphicsContext Context { get; private set; }
-#endif
+        private GraphicsContext _context;
+        internal GraphicsContext Context { get { return _context; } }
 
 #if !GLES
         private DrawBuffersEnum[] _drawBuffers;
@@ -184,9 +183,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
 
-            if (Context == null || Context.IsDisposed)
+            if (_context == null || _context.IsDisposed)
             {
-                Context = GL.CreateContext(windowInfo);
+                _context = new GraphicsContext(this, windowInfo);
             }
 
             Context.MakeCurrent(windowInfo);
@@ -473,10 +472,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GraphicsDevice.AddDisposeAction(() =>
                                             {
-#if DESKTOPGL || ANGLE
-                Context.Dispose();
-                Context = null;
-#endif
+                _context.Dispose();
+                _context = null;
             });
         }
 

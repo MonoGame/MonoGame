@@ -620,10 +620,14 @@
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\GraphicsContext.cs">
-      <Services>DirectXGraphics</Services>
+      <Services>DirectXGraphics,OpenGLGraphics</Services>
     </Compile>
     <Compile Include="Graphics\GraphicsContext.DirectX.cs">
       <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsContext.OpenGL.cs">
+      <ExcludePlatforms>WindowsGL,Linux</ExcludePlatforms>
+      <Services>OpenGLGraphics</Services>
     </Compile>
     <Compile Include="Graphics\GraphicsContext.SDL.cs">
       <Platforms>WindowsGL,Linux</Platforms>

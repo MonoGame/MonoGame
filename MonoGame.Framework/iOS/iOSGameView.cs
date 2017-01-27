@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework {
 		//        GraphicsContext into an iOS-specific GraphicsDevice.
 		//        Some level of cooperation with the UIView/Layer will
 		//        probably always be necessary, unfortunately.
-		private GraphicsContext __renderbuffergraphicsContext;
+		private OpenTK.Graphics.GraphicsContext __renderbuffergraphicsContext;
 		private IOpenGLApi _glapi;
 		private void CreateContext ()
 		{
@@ -179,10 +179,10 @@ namespace Microsoft.Xna.Framework {
 			//var version = Version.Parse (strVersion);
 
 			try {
-				__renderbuffergraphicsContext = new GraphicsContext (null, null, 2, 0, GraphicsContextFlags.Embedded);
+				__renderbuffergraphicsContext = new OpenTK.Graphics.GraphicsContext(null, null, 2, 0, GraphicsContextFlags.Embedded);
 				_glapi = new Gles20Api ();
 			} catch {
-				__renderbuffergraphicsContext = new GraphicsContext (null, null, 1, 1, GraphicsContextFlags.Embedded);
+				__renderbuffergraphicsContext = new OpenTK.Graphics.GraphicsContext(null, null, 1, 1, GraphicsContextFlags.Embedded);
 				_glapi = new Gles11Api ();
 			}
 

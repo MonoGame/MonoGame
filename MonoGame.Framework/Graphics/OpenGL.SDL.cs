@@ -14,11 +14,6 @@ namespace OpenGL
         {
             BoundApi = RenderApi.GL;
         }
-
-        private static IGraphicsContext PlatformCreateContext (IWindowInfo info)
-        {
-            return new GraphicsContext(info);
-        }
     }
 
     internal class EntryPointHelper {
