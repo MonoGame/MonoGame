@@ -119,39 +119,32 @@ namespace Microsoft.Xna.Framework.Graphics
 
             #region GL_NV_framebuffer_multisample
 
-            internal const All AllFramebufferIncompleteMultisampleNV = (All) 0x8D56;
-            internal const All AllMaxSamplesNV = (All) 0x8D57;
-            internal const All AllReadFramebufferNV = (All) 0x8CA8;
-            internal const All AllDrawFramebufferNV = (All) 0x8CA9;
-            internal const All AllRenderBufferSamplesNV = (All) 0x8CAB;
+            internal const All AllFramebufferIncompleteMultisampleNV = (All)0x8D56;
+            internal const All AllMaxSamplesNV = (All)0x8D57;
+            internal const All AllReadFramebufferNV = (All)0x8CA8;
+            internal const All AllDrawFramebufferNV = (All)0x8CA9;
+            internal const All AllRenderBufferSamplesNV = (All)0x8CAB;
 
             #endregion
 
             #region GL_IMG_multisampled_render_to_texture
 
-            internal const All AllFramebufferIncompleteMultisampleImg = (All) 0x9134;
-            internal const All AllMaxSamplesImg = (All) 0x9135;
+            internal const All AllFramebufferIncompleteMultisampleImg = (All)0x9134;
+            internal const All AllMaxSamplesImg = (All)0x9135;
 
             #endregion
 
             #region GL_EXT_multisampled_render_to_texture
 
-            internal const All AllFramebufferIncompleteMultisampleExt = (All) 0x8D56;
-            internal const All AllMaxSamplesExt = (All) 0x8D57;
+            internal const All AllFramebufferIncompleteMultisampleExt = (All)0x8D56;
+            internal const All AllMaxSamplesExt = (All)0x8D57;
 
             #endregion
 
             internal delegate void GLInvalidateFramebufferDelegate(All target, int numAttachments, All[] attachments);
-
-            internal delegate void GLRenderbufferStorageMultisampleDelegate(
-                All target, int samples, All internalFormat, int width, int height);
-
-            internal delegate void GLBlitFramebufferDelegate(
-                int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1,
-                ClearBufferMask mask, TextureMagFilter filter);
-
-            internal delegate void GLFramebufferTexture2DMultisampleDelegate(
-                All target, All attachment, All textarget, int texture, int level, int samples);
+            internal delegate void GLRenderbufferStorageMultisampleDelegate(All target, int samples, All internalFormat, int width, int height);
+            internal delegate void GLBlitFramebufferDelegate(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, TextureMagFilter filter);
+            internal delegate void GLFramebufferTexture2DMultisampleDelegate(All target, All attachment, All textarget, int texture, int level, int samples);
 
             internal GLInvalidateFramebufferDelegate GLInvalidateFramebuffer;
             internal GLRenderbufferStorageMultisampleDelegate GLRenderbufferStorageMultisample;
