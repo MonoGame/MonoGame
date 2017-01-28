@@ -79,7 +79,6 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize ()
         {
-            _view.InitGraphics();
             SdlRunLoop();
 
             base.BeforeInitialize ();
