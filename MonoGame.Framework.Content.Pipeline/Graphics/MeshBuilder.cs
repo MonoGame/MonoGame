@@ -105,7 +105,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             _currentGeometryContent.Indices.Add(pos);
         }
 
-        public int CreateVertexChannel<T>(string usage) where T : struct
+        public int CreateVertexChannel<T>(string usage)
         {
             if (_finishedMesh)
                 throw new InvalidOperationException("This MeshBuilder can no longer be used because FinishMesh has been called.");
