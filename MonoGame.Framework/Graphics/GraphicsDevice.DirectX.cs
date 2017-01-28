@@ -710,9 +710,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (PresentationParameters.MultiSampleCount > 1)
             {
                 var quality = GetMultiSamplingQuality(format, PresentationParameters.MultiSampleCount);
-                
-                multisampleDesc.Count = PresentationParameters.MultiSampleCount;
-                multisampleDesc.Quality = quality;
+
+                // Zero is returned if the adapter does not support multisampling
+                if (quality > 0)
+                {
+                    multisampleDesc.Count = PresentationParameters.MultiSampleCount;
+                    multisampleDesc.Quality = quality;
+                }
             }
 
             // If the swap chain already exists... update it.
