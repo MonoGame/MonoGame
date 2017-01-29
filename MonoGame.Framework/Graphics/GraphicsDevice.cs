@@ -19,18 +19,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private GraphicsContext _context;
 
-        private Color _blendFactor = Color.White;
-        private bool _blendFactorDirty;
-
-        private BlendState _blendState;
-        private BlendState _actualBlendState;
-        private bool _blendStateDirty;
-
-        private BlendState _blendStateAdditive;
-        private BlendState _blendStateAlphaBlend;
-        private BlendState _blendStateNonPremultiplied;
-        private BlendState _blendStateOpaque;
-
         private DepthStencilState _depthStencilState;
         private DepthStencilState _actualDepthStencilState;
         private bool _depthStencilStateDirty;
@@ -246,13 +234,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures = new TextureCollection(this, MaxTextureSlots, false);
             SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, false);
 
-            _blendStateAdditive = BlendState.Additive.Clone();
-            _blendStateAlphaBlend = BlendState.AlphaBlend.Clone();
-            _blendStateNonPremultiplied = BlendState.NonPremultiplied.Clone();
-            _blendStateOpaque = BlendState.Opaque.Clone();
-
-            BlendState = BlendState.Opaque;
-
             _depthStencilStateDefault = DepthStencilState.Default.Clone();
             _depthStencilStateDepthRead = DepthStencilState.DepthRead.Clone();
             _depthStencilStateNone = DepthStencilState.None.Clone();
@@ -301,8 +282,8 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformInitialize();
 
             // Force set the default render states.
-            _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = true;
-            BlendState = BlendState.Opaque;
+            Context.SetDefaultRenderStates();
+            _depthStencilStateDirty = _rasterizerStateDirty = true;
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
 
@@ -380,52 +361,14 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public Color BlendFactor
         {
-            get { return _blendFactor; }
-            set
-            {
-                if (_blendFactor == value)
-                    return;
-                _blendFactor = value;
-                _blendFactorDirty = true;
-            }
+            get { return Context.BlendFactor; }
+            set { Context.BlendFactor = value; }
         }
 
         public BlendState BlendState
         {
-			get { return _blendState; }
-			set
-            {
-                if (value == null)
-                    throw new ArgumentNullException("value");
-
-                // Don't set the same state twice!
-                if (_blendState == value)
-                    return;
-
-				_blendState = value;
-
-                // Static state properties never actually get bound;
-                // instead we use our GraphicsDevice-specific version of them.
-                var newBlendState = _blendState;
-                if (ReferenceEquals(_blendState, BlendState.Additive))
-                    newBlendState = _blendStateAdditive;
-                else if (ReferenceEquals(_blendState, BlendState.AlphaBlend))
-                    newBlendState = _blendStateAlphaBlend;
-                else if (ReferenceEquals(_blendState, BlendState.NonPremultiplied))
-                    newBlendState = _blendStateNonPremultiplied;
-                else if (ReferenceEquals(_blendState, BlendState.Opaque))
-                    newBlendState = _blendStateOpaque;
-
-                // Blend state is now bound to a device... no one should
-                // be changing the state of the blend state object now!
-                newBlendState.BindToGraphicsDevice(this);
-
-                _actualBlendState = newBlendState;
-
-                BlendFactor = _actualBlendState.BlendFactor;
-
-                _blendStateDirty = true;
-            }
+			get { return Context.BlendState; }
+			set { Context.BlendState = value; }
 		}
 
         public DepthStencilState DepthStencilState
@@ -464,7 +407,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             PlatformBeginApplyState();
 
-            PlatformApplyBlend();
+            Context.ApplyBlend();
 
             if (_depthStencilStateDirty)
             {
@@ -541,12 +484,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Clear the effect cache.
                     EffectCache.Clear();
 
-                    _blendState = null;
-                    _actualBlendState = null;
-                    _blendStateAdditive.Dispose();
-                    _blendStateAlphaBlend.Dispose();
-                    _blendStateNonPremultiplied.Dispose();
-                    _blendStateOpaque.Dispose();
+                    _context.Dispose();
 
                     _depthStencilState = null;
                     _actualDepthStencilState = null;

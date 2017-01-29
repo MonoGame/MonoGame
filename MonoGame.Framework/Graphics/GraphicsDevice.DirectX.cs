@@ -1150,7 +1150,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures.Dirty();
             SamplerStates.Dirty();
             _depthStencilStateDirty = true;
-            _blendStateDirty = true;
+            Context._blendStateDirty = true;
             _indexBufferDirty = true;
             _vertexBuffersDirty = true;
             _pixelShaderDirty = true;
@@ -1181,35 +1181,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             Debug.Assert(Context != null, "The d3d context is null!");
         }
-
-        private void PlatformApplyBlend()
-        {
-            if (_blendFactorDirty || _blendStateDirty)
-            {
-                var state = _actualBlendState.GetDxState(this);
-                var factor = GetBlendFactor();
-                Context._d3dContext.OutputMerger.SetBlendState(state, factor);
-
-                _blendFactorDirty = false;
-                _blendStateDirty = false;
-            }
-        }
-
-#if WINDOWS_UAP
-        private SharpDX.Mathematics.Interop.RawColor4 GetBlendFactor()
-        {
-			return new SharpDX.Mathematics.Interop.RawColor4(
-					BlendFactor.R / 255.0f,
-					BlendFactor.G / 255.0f,
-					BlendFactor.B / 255.0f,
-					BlendFactor.A / 255.0f);
-        }
-#else
-        private Color4 GetBlendFactor()
-        {
-			return BlendFactor.ToColor4();
-        }
-#endif
 
         internal void PlatformApplyState(bool applyShaders)
         {

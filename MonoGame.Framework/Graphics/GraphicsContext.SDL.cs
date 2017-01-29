@@ -12,6 +12,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private IntPtr _context;
         private IntPtr _winHandle;
 
+        // Keeps track of last applied state to avoid redundant OpenGL calls
+        internal BlendState _lastBlendState = new BlendState();
+
         public int SwapInterval
         {
             get
@@ -58,6 +61,27 @@ namespace Microsoft.Xna.Framework.Graphics
                 _winHandle = info.Handle;
         }
 
+        private void PlatformApplyBlend(bool force = false)
+        {
+            _actualBlendState.PlatformApplyState(_device, force);
+            ApplyBlendFactor(force);
+        }
+
+        private void ApplyBlendFactor(bool force)
+        {
+            if (force || BlendFactor != _lastBlendState.BlendFactor)
+            {
+                GL.BlendColor(
+                    this.BlendFactor.R/255.0f,
+                    this.BlendFactor.G/255.0f,
+                    this.BlendFactor.B/255.0f,
+                    this.BlendFactor.A/255.0f);
+                GraphicsExtensions.CheckGLError();
+                _lastBlendState.BlendFactor = this.BlendFactor;
+            }
+        }
+
+        
         #region Implement IGraphicsContext
         public void MakeCurrent(IWindowInfo info)
         {

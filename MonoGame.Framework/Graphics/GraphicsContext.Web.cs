@@ -13,6 +13,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Initialize(device);
         }
         
+        private void PlatformApplyBlend(bool force = false)
+        {
+        }
+
         #region Implement IDisposable
         private void PlatformDispose(bool disposing)
         {            
