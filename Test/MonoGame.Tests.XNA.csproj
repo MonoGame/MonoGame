@@ -126,6 +126,7 @@
     <Compile Include="Framework\Graphics\MiscellaneousTests.cs" />
     <Compile Include="Framework\Graphics\ModelTest.cs" />
     <Compile Include="Framework\Graphics\OcclusionQueryTest.cs" />
+    <Compile Include="Framework\Graphics\ProfileReachTest.cs" />
     <Compile Include="Framework\Graphics\RasterizerStateTest.cs" />
     <Compile Include="Framework\Graphics\RenderTarget2DTest.cs" />
     <Compile Include="Framework\Graphics\RenderTargetCubeTest.cs" />

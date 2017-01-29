@@ -23,9 +23,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage, bool dynamic)
         {
 			if (graphicsDevice == null)
-            {
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
-            }
+            if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach && indexElementSize == IndexElementSize.ThirtyTwoBits)
+                throw new NotSupportedException("Reach profile does not support 32 bit indices");
+
 			this.GraphicsDevice = graphicsDevice;
 			this.IndexElementSize = indexElementSize;	
             this.IndexCount = indexCount;

@@ -766,6 +766,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     renderTargets = null;
                 }
             }
+                        
+            if (this.GraphicsProfile == GraphicsProfile.Reach && renderTargetCount > 1)
+                throw new NotSupportedException("Reach profile supports a maximum of 1 simultaneous rendertargets");
+
 
             // Try to early out if the current and new bindings are equal.
             if (_currentRenderTargetCount == renderTargetCount)
@@ -990,6 +994,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_indexBuffer == null)
                 throw new InvalidOperationException("Index buffer must be set before calling DrawIndexedPrimitives.");
+            
+            if (this.GraphicsProfile == GraphicsProfile.Reach && primitiveCount > 65535)
+                throw new NotSupportedException("Reach profile supports a maximum of 65535 primitives per draw call.");
 
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
@@ -1038,6 +1045,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertexOffset < 0 || vertexOffset >= vertexData.Length)
                 throw new ArgumentOutOfRangeException("vertexOffset");
 
+            if (this.GraphicsProfile == GraphicsProfile.Reach && primitiveCount > 65535)
+                throw new NotSupportedException("Reach profile supports a maximum of 65535 primitives per draw call.");
+
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
 
@@ -1071,6 +1081,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_vertexBuffers.Count == 0)
                 throw new InvalidOperationException("Vertex buffer must be set before calling DrawPrimitives.");
+            
+            if (this.GraphicsProfile == GraphicsProfile.Reach && primitiveCount > 65535)
+                throw new NotSupportedException("Reach profile supports a maximum of 65535 primitives per draw call.");
 
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
@@ -1144,6 +1157,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (indexOffset < 0 || indexOffset >= indexData.Length)
                 throw new ArgumentOutOfRangeException("indexOffset");
+            
+            if (this.GraphicsProfile == GraphicsProfile.Reach && primitiveCount > 65535)
+                throw new NotSupportedException("Reach profile supports a maximum of 65535 primitives per draw call.");
 
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
@@ -1204,6 +1220,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// in the array of vertices.</remarks>
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
+            if (this.GraphicsProfile == GraphicsProfile.Reach)
+                throw new NotSupportedException("Reach profile does not support 32 bit indices");
+
             // These parameter checks are a duplicate of the checks in the short[] overload of DrawUserIndexedPrimitives.
             // Inlined here for efficiency.
 
@@ -1224,6 +1243,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (indexOffset < 0 || indexOffset >= indexData.Length)
                 throw new ArgumentOutOfRangeException("indexOffset");
+            
+            if (this.GraphicsProfile == GraphicsProfile.Reach && primitiveCount > 65535)
+                throw new NotSupportedException("Reach profile supports a maximum of 65535 primitives per draw call.");
 
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");

@@ -94,6 +94,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
+            if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach && (width > 2048 || height > 2048))
+                throw new NotSupportedException("Reach profile supports a maximum Texture2D size of 2048");
+            if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach && mipmap && (!MathHelper.IsPowerOfTwo(width) || !MathHelper.IsPowerOfTwo(height)))
+                throw new NotSupportedException("Reach profile requires mipmapped Texture2D sizes to be powers of two");            
+            if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach && GraphicsExtensions.IsCompressedFormat(format) && (!MathHelper.IsPowerOfTwo(width) || !MathHelper.IsPowerOfTwo(height)))
+                throw new NotSupportedException("Reach profile requires compressed Texture2D sizes to be powers of two");
             if (width <= 0)
                 throw new ArgumentOutOfRangeException("width","Texture width must be greater than zero");
             if (height <= 0)

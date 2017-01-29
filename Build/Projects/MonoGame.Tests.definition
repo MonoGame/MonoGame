@@ -281,6 +281,7 @@
     <Compile Include="Framework\Graphics\ViewportTest.cs" />
     <Compile Include="Framework\Graphics\ModelTest.cs" />
     <Compile Include="Framework\Graphics\OcclusionQueryTest.cs" />
+    <Compile Include="Framework\Graphics\ProfileReachTest.cs" />
     <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
 

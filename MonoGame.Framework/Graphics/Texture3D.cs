@@ -39,6 +39,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		    if (graphicsDevice == null)
 		        throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
+            if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach)
+                throw new NotSupportedException("Reach profile does not support Texture3D");
             if (width <= 0)
                 throw new ArgumentOutOfRangeException("width","Texture width must be greater than zero");
             if (height <= 0)

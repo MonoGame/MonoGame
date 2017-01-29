@@ -33,6 +33,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
+            if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach && size > 512)
+                throw new NotSupportedException("Reach profile supports a maximum TextureCube size of 512");
+            if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach && !MathHelper.IsPowerOfTwo(size))
+                throw new NotSupportedException("Reach profile requires TextureCube sizes to be powers of two");
             if (size <= 0)
                 throw new ArgumentOutOfRangeException("size","Cube size must be greater than zero");
 
