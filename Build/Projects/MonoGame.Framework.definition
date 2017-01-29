@@ -619,9 +619,7 @@
     <Compile Include="Graphics\GraphicsCapabilities.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\GraphicsContext.cs">
-      <Services>DirectXGraphics,OpenGLGraphics,WebGraphics</Services>
-    </Compile>
+    <Compile Include="Graphics\GraphicsContext.cs" />
     <Compile Include="Graphics\GraphicsContext.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>

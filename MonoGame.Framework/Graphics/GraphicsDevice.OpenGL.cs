@@ -37,9 +37,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
     {
-        private GraphicsContext _context;
-        internal GraphicsContext Context { get { return _context; } }
-
 #if !GLES
         private DrawBuffersEnum[] _drawBuffers;
 #endif

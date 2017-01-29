@@ -33,7 +33,6 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         // Core Direct3D Objects
         internal SharpDX.Direct3D11.Device _d3dDevice;
-        private GraphicsContext _context;
         internal SharpDX.Direct3D11.RenderTargetView _renderTargetView;
         internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
         private int _vertexBufferSlotsUsed;
@@ -97,8 +96,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
         
-        internal GraphicsContext Context { get { return _context; } }
-
         /// <summary>
         /// Returns a handle to internal device object. Valid only on DirectX platforms.
         /// For usage, convert this to SharpDX.Direct3D11.Device.
