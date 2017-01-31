@@ -154,6 +154,11 @@ namespace MonoGame.Tools.Pipeline
                 }, true);
             }
         }
+
+        public void SetWidth()
+        {
+            propertyTable.SetWidth();
+        }
     }
 }
 

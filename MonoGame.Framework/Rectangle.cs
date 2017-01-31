@@ -339,7 +339,15 @@ namespace Microsoft.Xna.Framework
         /// <returns>Hash code of this <see cref="Rectangle"/>.</returns>
         public override int GetHashCode()
         {
-            return (X ^ Y ^ Width ^ Height);
+            unchecked
+            {
+                var hash = 17;
+                hash = hash * 23 + X.GetHashCode();
+                hash = hash * 23 + Y.GetHashCode();
+                hash = hash * 23 + Width.GetHashCode();
+                hash = hash * 23 + Height.GetHashCode();
+                return hash;
+            }
         }
 
         /// <summary>

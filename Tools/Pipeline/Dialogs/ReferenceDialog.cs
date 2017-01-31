@@ -27,7 +27,7 @@ namespace MonoGame.Tools.Pipeline
         public List<string> References { get; private set; }
 
         private IController _controller;
-        private FileDialogFilter _dllFileFilter, _allFileFilter;
+        private FileFilter _dllFileFilter, _allFileFilter;
         private SelectableFilterCollection<RefItem> _dataStore;
 
         public ReferenceDialog(IController controller, string[] refs)
@@ -36,8 +36,8 @@ namespace MonoGame.Tools.Pipeline
 
             _controller = controller;
 
-            _dllFileFilter = new FileDialogFilter("Dll Files (*.dll)", new[] { ".dll" });
-            _allFileFilter = new FileDialogFilter("All Files (*.*)", new[] { ".*" });
+            _dllFileFilter = new FileFilter("Dll Files (*.dll)", new[] { ".dll" });
+            _allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
 
             var assemblyColumn = new GridColumn();
             assemblyColumn.HeaderText = "Assembly";
