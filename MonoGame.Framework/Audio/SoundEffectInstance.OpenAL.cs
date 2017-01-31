@@ -1,6 +1,7 @@
 // MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+using System.Diagnostics;
 
 using System;
 
@@ -114,17 +115,20 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformPlay()
         {
-            OpenTK.Vector3 listenerPosition = new OpenTK.Vector3(0, 0, 0);
-            OpenTK.Vector3 listenerVelocity = new OpenTK.Vector3(0, 0, 0);
-            OpenTK.Vector3 listenerForwardDirection = new OpenTK.Vector3(0, 0, 1);
-            OpenTK.Vector3 listenerUpDirection = new OpenTK.Vector3(0, 1, 0);
+             OpenTK.Vector3 listenerPosition = new OpenTK.Vector3(0, 0, 0);
+             OpenTK.Vector3 listenerVelocity = new OpenTK.Vector3(0, 0, 0);
+             OpenTK.Vector3 listenerForwardDirection = new OpenTK.Vector3(0, 0, 1);
+             OpenTK.Vector3 listenerUpDirection = new OpenTK.Vector3(0, 1, 0);
 
+         
             AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Position, ref listenerPosition); 
-            // If not working, try uncommenting these two lines also.
-            //AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Velocity, ref listenerVelocity); 
-            //AL.Listener(OpenTK.Audio.OpenAL.ALListenerfv.Orientation, ref listenerForwardDirection, ref listenerUpDirection); 
+             // If not working, try uncommenting these two lines also.
+             //AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Velocity, ref listenerVelocity); 
+             //AL.Listener(OpenTK.Audio.OpenAL.ALListenerfv.Orientation, ref listenerForwardDirection, ref listenerUpDirection); 
 
-            SourceId = 0;
+
+
+             SourceId = 0;
             HasSourceId = false;
             SourceId = controller.ReserveSource();
             HasSourceId = true;
@@ -156,6 +160,91 @@ namespace Microsoft.Xna.Framework.Audio
             ApplyReverb ();
             ApplyFilter ();
 #endif
+            Debug.WriteLine("------------------------------------------------------------");
+            Debug.WriteLine("NEW SOUND---------------------------------------------------");
+            Debug.WriteLine("------------------------------------------------------------");
+
+            // TODO: ALc vs AL?
+
+            Debug.WriteLine("Listener -- ");
+
+            {
+                Type t = typeof(ALListenerf);
+                System.Array enumValues = System.Enum.GetValues(t);
+                
+                for (int i = 0; i < enumValues.Length; i++)
+                {                 
+                    float v = 0.0f;
+                    AL.GetListener((ALListenerf)enumValues.GetValue(i), out v);
+                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) +": "+ v.ToString());
+                }
+            }
+            {
+                Type t = typeof(ALListener3f);
+                System.Array enumValues = System.Enum.GetValues(t);
+
+                for (int i = 0; i < enumValues.Length; i++)
+                {
+                    OpenTK.Vector3 v = new OpenTK.Vector3(0, 0, 0);
+                    AL.GetListener((ALListener3f)enumValues.GetValue(i), out v);
+                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                }
+            }
+
+
+
+            Debug.WriteLine("Source -- ");
+
+            {
+                Type t = typeof(ALGetSourcei);
+                System.Array enumValues = System.Enum.GetValues(t);
+
+                for (int i = 0; i < enumValues.Length; i++)
+                {
+                    int v = 0;
+                    AL.GetSource(SourceId,(ALGetSourcei)enumValues.GetValue(i), out v);
+                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                }
+            }
+
+            {
+                Type t = typeof(ALSource3f);
+                System.Array enumValues = System.Enum.GetValues(t);
+
+                for (int i = 0; i < enumValues.Length; i++)
+                {
+                    OpenTK.Vector3 v = new OpenTK.Vector3(0, 0, 0);
+                    AL.GetSource(SourceId, (ALSource3f)enumValues.GetValue(i), out v);
+                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                }
+            }
+
+            {
+                Type t = typeof(ALSourceb);
+                System.Array enumValues = System.Enum.GetValues(t);
+
+                for (int i = 0; i < enumValues.Length; i++)
+                {
+                    bool v = false;
+                    AL.GetSource(SourceId, (ALSourceb)enumValues.GetValue(i), out v);
+                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                }
+            }
+
+            {
+                Type t = typeof(ALSourcef);
+                System.Array enumValues = System.Enum.GetValues(t);
+
+                for (int i = 0; i < enumValues.Length; i++)
+                {
+                    float v = 0;
+                    AL.GetSource(SourceId, (ALSourcef)enumValues.GetValue(i), out v);
+                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                }
+            }
+
+           
+
             AL.SourcePlay(SourceId);
             ALHelper.CheckError("Failed to play source.");
 
