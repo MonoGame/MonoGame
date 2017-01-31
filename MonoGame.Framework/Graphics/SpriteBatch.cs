@@ -389,12 +389,9 @@ namespace Microsoft.Xna.Framework.Graphics
             float layerDepth)
 		{
             CheckValid(texture);
-
-            origin.X = origin.X * ((float)destinationRectangle.Width   / (float)( (sourceRectangle.HasValue && sourceRectangle.GetValueOrDefault().Width  != 0) ? sourceRectangle.GetValueOrDefault().Width  : texture.Width));
-            origin.Y = origin.Y * ((float)destinationRectangle.Height) / (float)( (sourceRectangle.HasValue && sourceRectangle.GetValueOrDefault().Height != 0) ? sourceRectangle.GetValueOrDefault().Height : texture.Height);
-			
-			var item = _batcher.CreateBatchItem();
-			item.Texture = texture;
+            
+            var item = _batcher.CreateBatchItem();
+            item.Texture = texture;
 
             // set SortKey based on SpriteSortMode.
             switch ( _sortMode )
@@ -420,11 +417,23 @@ namespace Microsoft.Xna.Framework.Graphics
                 _texCoordTL.Y = srcRect.Y / (float)texture.Height;
                 _texCoordBR.X = (srcRect.X + srcRect.Width) / (float)texture.Width;
                 _texCoordBR.Y = (srcRect.Y + srcRect.Height) / (float)texture.Height;
+
+                if(srcRect.Width != 0)
+                    origin.X = origin.X * (float)destinationRectangle.Width / (float)srcRect.Width;
+                else
+                    origin.X = origin.X * (float)destinationRectangle.Width / (float)texture.Width;
+                if(srcRect.Height != 0)
+                    origin.Y = origin.Y * (float)destinationRectangle.Height / (float)srcRect.Height; 
+                else
+                    origin.Y = origin.Y * (float)destinationRectangle.Height / (float)texture.Height;
             }
             else
             {
                 _texCoordTL = Vector2.Zero;
                 _texCoordBR = Vector2.One;
+                
+                origin.X = origin.X * (float)destinationRectangle.Width  / (float)texture.Width;
+                origin.Y = origin.Y * (float)destinationRectangle.Height / (float)texture.Height;
             }
             
 			if ((effects & SpriteEffects.FlipVertically) != 0)
