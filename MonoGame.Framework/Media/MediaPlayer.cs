@@ -227,8 +227,10 @@ namespace Microsoft.Xna.Framework.Media
 		
 		private static void NextSong(int direction)
 		{
-            Stop();
-
+            if (!IsRepeating || _queue.Count > 1)
+            {
+                Stop();
+            }
             if (IsRepeating && _queue.ActiveSongIndex >= _queue.Count - 1)
             {
                 _queue.ActiveSongIndex = 0;
