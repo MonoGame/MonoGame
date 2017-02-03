@@ -65,7 +65,7 @@
           </in>
           <do>
              <echo message="${path::get-file-name(dylibname)}" />
-             <exec program="install_name_tool" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle" commandline=' -id "${path::get-file-name(dylibname)}" ${path::get-file-name(dylibname)}' />
+             <exec program="install_name_tool" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle" commandline=' -id "@executable_path/../MonoBundle/${path::get-file-name(dylibname)}" ${path::get-file-name(dylibname)}' />
           </do>
       </foreach>
       <exec program="pkgbuild" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release" commandline=" --component ./Pipeline.app --identifier com.monogame.pipeline --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Pipeline --install-location /Applications ${project::get-base-directory()}/Pipeline.MacOS.pkg" />
