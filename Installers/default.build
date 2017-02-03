@@ -54,7 +54,8 @@
       <copy todir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle">
          <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
              <include name="ff*"/>
-         </fileset>
+             <include name="*.dylib"/> 
+        </fileset>
       </copy>
       <!-- Correct the id of the dylibs -->
       <foreach item="File" property="dylibname">
