@@ -113,70 +113,53 @@ namespace Microsoft.Xna.Framework.Audio
             SoundState = SoundState.Paused;
         }
 
-        private void PlatformPlay()
+        public static void setAndCheckListenerPos()
         {
-             OpenTK.Vector3 listenerPosition = new OpenTK.Vector3(0, 0, 0);
-             OpenTK.Vector3 listenerVelocity = new OpenTK.Vector3(0, 0, 0);
-             OpenTK.Vector3 listenerForwardDirection = new OpenTK.Vector3(0, 0, 1);
-             OpenTK.Vector3 listenerUpDirection = new OpenTK.Vector3(0, 1, 0);
+            float x = 0.0f, y = 0.0f, z = 0.0f;
+            AL.GetListener(ALListener3f.Position, out x, out y, out z);
+            if (Math.Abs(x) > 1000 || Math.Abs(y) > 1000 || Math.Abs(z) > 1000)
+            {
+                throw new Exception("fail: ");
+            }
 
-         
-            AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Position, ref listenerPosition); 
-             // If not working, try uncommenting these two lines also.
-             //AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Velocity, ref listenerVelocity); 
-             //AL.Listener(OpenTK.Audio.OpenAL.ALListenerfv.Orientation, ref listenerForwardDirection, ref listenerUpDirection); 
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.checkAlError();
+            OpenTK.Vector3 posIn = new OpenTK.Vector3(0, 0, 0);
+            AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Position, ref posIn);
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.checkAlError();
+          
+            OpenTK.Vector3 v = new OpenTK.Vector3(0, 0, 0); // TODO: THIS SO FLOATS NOT DOUBLES?
+            AL.GetListener(ALListener3f.Position, out v);
+            if (Math.Abs(v.X) > 1000 || Math.Abs(v.Y) > 1000 || Math.Abs(v.Z) > 1000)
+            {
+                throw new Exception("fail: ");              
+            }
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.checkAlError();
 
+            x = 0.0f;
+            y = 0.0f;
+            z = 0.0f;
+            AL.GetListener(ALListener3f.Position, out x, out y, out z);
+            if (Math.Abs(x) > 1000 || Math.Abs(y) > 1000 || Math.Abs(z) > 1000)
+            {
+                throw new Exception("fail: ");
+            }
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.checkAlError();
+        }
 
-
-             SourceId = 0;
-            HasSourceId = false;
-            SourceId = controller.ReserveSource();
-            HasSourceId = true;
-
-            int bufferId = _effect.SoundBuffer.OpenALDataBuffer;
-            AL.Source(SourceId, ALSourcei.Buffer, bufferId);
-            ALHelper.CheckError("Failed to bind buffer to source.");
-
-            // Send the position, gain, looping, pitch, and distance model to the OpenAL driver.
-            if (!HasSourceId)
-				return;
-
-			// Distance Model
-			AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
-            ALHelper.CheckError("Failed set source distance.");
-			// Pan
-			AL.Source (SourceId, ALSource3f.Position, _pan, 0, 0.1f);
-            ALHelper.CheckError("Failed to set source pan.");
-			// Volume
-			AL.Source (SourceId, ALSourcef.Gain, _alVolume);
-            ALHelper.CheckError("Failed to set source volume.");
-			// Looping
-			AL.Source (SourceId, ALSourceb.Looping, IsLooped);
-            ALHelper.CheckError("Failed to set source loop state.");
-			// Pitch
-			AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
-            ALHelper.CheckError("Failed to set source pitch.");
-#if SUPPORTS_EFX
-            ApplyReverb ();
-            ApplyFilter ();
-#endif
-            Debug.WriteLine("------------------------------------------------------------");
-            Debug.WriteLine("NEW SOUND---------------------------------------------------");
-            Debug.WriteLine("------------------------------------------------------------");
-
-            // TODO: ALc vs AL?
-
-            Debug.WriteLine("Listener -- ");
+        public static void checkSourceAndListener(int SourceId)
+        {
+            
+         //   Debug.WriteLine("Listener -- ");
 
             {
                 Type t = typeof(ALListenerf);
                 System.Array enumValues = System.Enum.GetValues(t);
-                
+
                 for (int i = 0; i < enumValues.Length; i++)
-                {                 
+                {
                     float v = 0.0f;
                     AL.GetListener((ALListenerf)enumValues.GetValue(i), out v);
-                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) +": "+ v.ToString());
+                    //Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
                 }
             }
             {
@@ -187,13 +170,17 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     OpenTK.Vector3 v = new OpenTK.Vector3(0, 0, 0);
                     AL.GetListener((ALListener3f)enumValues.GetValue(i), out v);
-                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                    if(Math.Abs(v.X)>1000 || Math.Abs(v.Y) > 1000 || Math.Abs(v.Z) > 1000)
+                    {
+                        Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                        throw new Exception("fail: "+t.GetEnumName(enumValues.GetValue(i)));
+                    }                      
                 }
             }
 
 
 
-            Debug.WriteLine("Source -- ");
+           // Debug.WriteLine("Source -- ");
 
             {
                 Type t = typeof(ALGetSourcei);
@@ -202,8 +189,8 @@ namespace Microsoft.Xna.Framework.Audio
                 for (int i = 0; i < enumValues.Length; i++)
                 {
                     int v = 0;
-                    AL.GetSource(SourceId,(ALGetSourcei)enumValues.GetValue(i), out v);
-                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                    AL.GetSource(SourceId, (ALGetSourcei)enumValues.GetValue(i), out v);
+                   // Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
                 }
             }
 
@@ -215,7 +202,11 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     OpenTK.Vector3 v = new OpenTK.Vector3(0, 0, 0);
                     AL.GetSource(SourceId, (ALSource3f)enumValues.GetValue(i), out v);
-                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                    if (Math.Abs(v.X) > 1000 || Math.Abs(v.Y) > 1000 || Math.Abs(v.Z) > 1000)
+                    {
+                        Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                        throw new Exception("fail: " + t.GetEnumName(enumValues.GetValue(i)));
+                    }
                 }
             }
 
@@ -227,7 +218,7 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     bool v = false;
                     AL.GetSource(SourceId, (ALSourceb)enumValues.GetValue(i), out v);
-                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                    //Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
                 }
             }
 
@@ -239,17 +230,86 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     float v = 0;
                     AL.GetSource(SourceId, (ALSourcef)enumValues.GetValue(i), out v);
-                    Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
+                  //  Debug.WriteLine(System.Enum.GetName(t, enumValues.GetValue(i)) + ": " + v.ToString());
                 }
             }
+        }
 
-           
+        private void PlatformPlay()
+        {
+            setAndCheckListenerPos();
+
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
+            OpenTK.Vector3 listenerPosition = new OpenTK.Vector3(0, 0, 0);
+             OpenTK.Vector3 listenerVelocity = new OpenTK.Vector3(0, 0, 0);
+             OpenTK.Vector3 listenerForwardDirection = new OpenTK.Vector3(0, 0, 1);
+             OpenTK.Vector3 listenerUpDirection = new OpenTK.Vector3(0, 1, 0);
+
+
+            //AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Position, 0.0f,0.0f,0.0f);
+            // If not working, try uncommenting these two lines also.
+            //AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Velocity, ref listenerVelocity); 
+            //AL.Listener(OpenTK.Audio.OpenAL.ALListenerfv.Orientation, ref listenerForwardDirection, ref listenerUpDirection); 
+
+
+            setAndCheckListenerPos();
+
+            SourceId = 0;
+            HasSourceId = false;
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
+            SourceId = controller.ReserveSource();
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
+            HasSourceId = true;
+
+            int bufferId = _effect.SoundBuffer.OpenALDataBuffer;
+            AL.Source(SourceId, ALSourcei.Buffer, bufferId);
+            ALHelper.CheckError("Failed to bind buffer to source.");
+
+            // Send the position, gain, looping, pitch, and distance model to the OpenAL driver.
+            if (!HasSourceId)
+				return;
+
+            checkSourceAndListener(SourceId);
+
+            // Distance Model
+            AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
+            ALHelper.CheckError("Failed set source distance.");
+            checkSourceAndListener(SourceId);
+            // Pan
+            AL.Source (SourceId, ALSource3f.Position, _pan, 0, 0.1f);
+            checkSourceAndListener(SourceId);
+
+            //AL.GetSource(SourceId, (ALSource3f)enumValues.GetValue(i), out v);
+            ALHelper.CheckError("Failed to set source pan.");
+            checkSourceAndListener(SourceId);
+            // Volume
+            AL.Source (SourceId, ALSourcef.Gain, _alVolume);
+            ALHelper.CheckError("Failed to set source volume.");
+            checkSourceAndListener(SourceId);
+            // Looping
+            AL.Source (SourceId, ALSourceb.Looping, IsLooped);
+            ALHelper.CheckError("Failed to set source loop state.");
+            checkSourceAndListener(SourceId);
+            // Pitch
+            AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
+            ALHelper.CheckError("Failed to set source pitch.");
+
+            checkSourceAndListener(SourceId);
+#if SUPPORTS_EFX
+            ApplyReverb ();
+              checkSourceAndListener(SourceId);
+            ApplyFilter ();
+#endif
+            checkSourceAndListener(SourceId);
+
+
 
             AL.SourcePlay(SourceId);
             ALHelper.CheckError("Failed to play source.");
 
 
             SoundState = SoundState.Playing;
+            
         }
 
         private void PlatformResume()

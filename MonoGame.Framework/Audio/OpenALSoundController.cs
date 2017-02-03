@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 using MonoGame.Utilities;
 
 #if MONOMAC && PLATFORM_MACOS_LEGACY
@@ -39,8 +40,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
     internal static class ALHelper
     {
-        [System.Diagnostics.Conditional("DEBUG")]
-        [System.Diagnostics.DebuggerHidden]
+ 
         public static void CheckError(string message = "", params object[] args)
         {
             ALError error;
@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
     }
 
-	internal sealed class OpenALSoundController : IDisposable
+	public sealed class OpenALSoundController : IDisposable
     {
         private static OpenALSoundController _instance = null;
 #if SUPPORTS_EFX
@@ -127,8 +127,38 @@ namespace Microsoft.Xna.Framework.Audio
             _bSoundAvailable = true;
 
 			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
-			AL.GenSources(allSourcesArray);
             ALHelper.CheckError("Failed to generate sources.");
+            AL.GenSources(allSourcesArray);
+            ALHelper.CheckError("Failed to generate sources.");
+            checkAlError();
+            int numErr = 0;
+            for(int i=0;i<allSourcesArray.Length;++i)
+            {
+                for(int k=0;k<10;++k)
+                {
+                    AL.Source(allSourcesArray[i], ALSource3f.Position, 0, 0, 0);
+                }
+                checkAlError();
+                for (int kk = 0; kk < 20; ++kk)
+                {
+                    OpenTK.Vector3 posIn = new OpenTK.Vector3(0, 0, 0);
+                    AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Position, ref posIn);
+                    float x = 0.0f, y = 0.0f, z = 0.0f;
+                    checkAlError();
+                    AL.GetListener(ALListener3f.Position, out x, out y, out z);
+                    if ((Math.Abs(x) - posIn.X) > 0.01f || (Math.Abs(y) - posIn.Y) > 0.01f || (Math.Abs(z) - posIn.Z) > 0.01f)
+                    {
+                        byte[] bx = BitConverter.GetBytes(x);
+                        byte[] by = BitConverter.GetBytes(y);
+                        byte[] bz = BitConverter.GetBytes(z);
+                        numErr++;
+                    }
+                }
+                checkAlError();
+                Microsoft.Xna.Framework.Audio.SoundEffectInstance.checkSourceAndListener(allSourcesArray[i]);
+            }
+
+
             Filter = 0;
 #if SUPPORTS_EFX
             if (Efx.IsInitialized) {
@@ -137,10 +167,41 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
             availableSourcesCollection = new List<int>(allSourcesArray);
 			inUseSourcesCollection = new List<int>();
-		}
+
+
+            checkRopoErr();
+
+        }
+
+        public void checkRopoErr()
+        {
+            if(availableSourcesCollection!=null)
+            {
+                lock (availableSourcesCollection)
+                {
+                    for (int i = 0; i < availableSourcesCollection.Count; ++i)
+                    {
+                        Microsoft.Xna.Framework.Audio.SoundEffectInstance.checkSourceAndListener(availableSourcesCollection[i]);
+                    }
+                }
+            }
+          
+            if(inUseSourcesCollection!=null)
+            {
+                lock (inUseSourcesCollection)
+                {
+                    for (int i = 0; i < inUseSourcesCollection.Count; ++i)
+                    {
+                        Microsoft.Xna.Framework.Audio.SoundEffectInstance.checkSourceAndListener(inUseSourcesCollection[i]);
+                    }
+                }
+            }
+           
+        }
 
         ~OpenALSoundController()
         {
+            checkRopoErr();
             Dispose(false);
         }
 
@@ -156,7 +217,7 @@ namespace Microsoft.Xna.Framework.Audio
 #if MONOMAC
 			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
 #endif
-
+            checkRopoErr();
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
@@ -203,7 +264,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 See http://stackoverflow.com/questions/14842803/low-latency-audio-playback-on-android
                 */
-
+                checkRopoErr();
                 int frequency = DEFAULT_FREQUENCY;
                 int updateSize = DEFAULT_UPDATE_SIZE;
                 int updateBuffers = DEFAULT_UPDATE_BUFFER_COUNT;
@@ -248,6 +309,7 @@ namespace Microsoft.Xna.Framework.Audio
                     AlcUpdateBuffers, updateBuffers,
                     0
                 };
+                checkRopoErr();
 #elif IOS
                 EventHandler<AVAudioSessionInterruptionEventArgs> handler = delegate(object sender, AVAudioSessionInterruptionEventArgs e) {
                     switch (e.InterruptionType) {
@@ -274,7 +336,7 @@ namespace Microsoft.Xna.Framework.Audio
 #if DESKTOPGL
                 _oggstreamer = new OggStreamer();
 #endif
-
+                checkRopoErr();
                 if (CheckALError("Could not create AL context"))
                 {
                     CleanUpOpenAL();
@@ -286,10 +348,100 @@ namespace Microsoft.Xna.Framework.Audio
                     Alc.MakeContextCurrent(_context);
                     if (CheckALError("Could not make AL context current"))
                     {
+                        checkRopoErr();
                         CleanUpOpenAL();
                         return(false);
                     }
                     SupportsADPCM = AL.IsExtensionPresent ("AL_SOFT_MSADPCM");
+                    checkRopoErr();
+
+                    {
+                        int numErr = 0;
+                        for(int i=0;i<20;++i)
+                        {
+                            /* byte[] b = { 1,2,3,4 }; // 666.666f
+                             byte[] b1 = { 5, 6, 7, 8 }; // 666.666f
+                             byte[] b2 = { 9, 10, 11, 12 }; // 666.666f
+                             float myFloat = System.BitConverter.ToSingle(b,0);
+                             float[] f = { myFloat, myFloat, myFloat };
+                             // c# does not seem to corrupt floats in its own memory space, try the 3i integer method to see if bytes get corrupted also when passing ints.
+                             //AL.Listener(OpenTK.Audio.OpenAL.ALListenerfv.Position,ref f);
+                             int ii= System.BitConverter.ToInt32(b,0);
+                             int ival = 511;
+                             byte[] bb = System.BitConverter.GetBytes(ival);
+                             //AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Position, myFloat, myFloat, myFloat);
+                             */
+                            //AL.Listener3i(OpenTK.Audio.OpenAL.ALListener3i.Position,    System.BitConverter.ToInt32(b, 0), System.BitConverter.ToInt32(b1, 0), System.BitConverter.ToInt32(b2, 0));
+                            //AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Position, f[0],f[1],f[2]);
+
+
+                            /*  byte[] b = System.BitConverter.GetBytes(11);
+                              byte[] b1 = System.BitConverter.GetBytes(2233);
+                              byte[] b2 = System.BitConverter.GetBytes(88776655);
+
+                              AL.Listener3i(OpenTK.Audio.OpenAL.ALListener3i.Position, System.BitConverter.ToInt32(b, 0), System.BitConverter.ToInt32(b1, 0), System.BitConverter.ToInt32(b2, 0));
+                              int ii1 = System.BitConverter.ToInt32(b, 0);
+                              int ii2 = System.BitConverter.ToInt32(b1, 0);
+                              int ii3 = System.BitConverter.ToInt32(b2, 0);*/
+                            float f1 = 10.0f;
+                            float f2 = 666.666f;
+                            float f3 = 12345.0f;
+                            AL.ALVec3 v3 = new AL.ALVec3();
+                            v3.x = f1;
+                            v3.y = f2;
+                            v3.z = f3;
+                            byte[] b = System.BitConverter.GetBytes(f1);
+                            byte[] b1 = System.BitConverter.GetBytes(f2);
+                            byte[] b2 = System.BitConverter.GetBytes(f3);
+                            // PASSING FLOATS BY VALUE FAILS (EVEN IF PASS STRUCT BY VALUE, NOT SURE IF PROBLEM IS IN STRUCT),
+                            // BUT SEEMS THAT IF FLOATS PASSED BY VALUE IT FAILS.
+                            // PASSING INDIVIDUAL FLOATS BY POINTERS (ref f1, ref2, ref f3) WORKS.
+                            AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Position,    System.BitConverter.ToSingle(b, 0), System.BitConverter.ToSingle(b1, 0), System.BitConverter.ToSingle(b2, 0));
+                            // AL.Listener3fVecVal(OpenTK.Audio.OpenAL.ALListener3f.Position, v3);
+                            //AL.Listener3FFloatPtrIndividual(OpenTK.Audio.OpenAL.ALListener3f.Position, ref f1, ref f2, ref f3); // TODO: NEEDS FIXED KEYWORD?
+                             float ff1 = System.BitConverter.ToSingle(b, 0);
+                            float ff2 = System.BitConverter.ToSingle(b1, 0);
+                            float ff3 = System.BitConverter.ToSingle(b2, 0);
+                            float myFloat = System.BitConverter.ToSingle(b, 0);
+                            OpenTK.Vector3 posIn = new OpenTK.Vector3(myFloat, myFloat, myFloat);
+
+                        
+
+                            float x = 0.0f, y = 0.0f, z = 0.0f;
+                            AL.GetListener(ALListener3f.Position, out x, out y, out z);
+                            if ((Math.Abs(x) - posIn.X)>0.01f || (Math.Abs(y) - posIn.Y) > 0.01f || (Math.Abs(z) - posIn.Z) > 0.01f)
+                            {
+                                byte[] bx=BitConverter.GetBytes(x);
+                                byte[] by = BitConverter.GetBytes(y);
+                                byte[] bz = BitConverter.GetBytes(z);
+                                numErr++;
+                            }
+                        }
+                        if(numErr>0)
+                        {
+                          //  throw new Exception("error: " + numErr);
+                        }
+                        /*float x = 0.0f, y = 0.0f, z = 0.0f;
+                        AL.GetListener(ALListener3f.Position, out x, out y, out z);
+                        if (Math.Abs(x) > 1000 || Math.Abs(y) > 1000 || Math.Abs(z) > 1000)
+                        {
+                            throw new Exception("fail: ");
+                        }
+
+                        Microsoft.Xna.Framework.Audio.OpenALSoundController.checkAlError();
+                        OpenTK.Vector3 posIn = new OpenTK.Vector3(0, 0, 0);
+                        AL.Listener(OpenTK.Audio.OpenAL.ALListener3f.Position, ref posIn);
+                        Microsoft.Xna.Framework.Audio.OpenALSoundController.checkAlError();
+
+                        OpenTK.Vector3 v = new OpenTK.Vector3(0, 0, 0); // TODO: THIS SO FLOATS NOT DOUBLES?
+                        AL.GetListener(ALListener3f.Position, out v);
+                        if (Math.Abs(v.X) > 1000 || Math.Abs(v.Y) > 1000 || Math.Abs(v.Z) > 1000)
+                        {
+                            throw new Exception("fail: ");
+                        }
+                        Microsoft.Xna.Framework.Audio.OpenALSoundController.checkAlError();*/
+                    }
+
                     return (true);
                 }
             }
@@ -300,7 +452,9 @@ namespace Microsoft.Xna.Framework.Audio
 			get {
 				if (_instance == null)
 					_instance = new OpenALSoundController();
-				return _instance;
+                _instance.checkRopoErr();
+
+                return _instance;
 			}
 		}
 #if SUPPORTS_EFX
@@ -320,10 +474,34 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (_instance != null)
             {
+                _instance.checkRopoErr();
                 _instance.Dispose();
                 _instance = null;
             }
         }
+
+
+        public static void checkAlError()
+        {
+            if(_instance!=null)
+            {
+                AlcError e2 = Alc.GetError(_instance._device);
+
+                if (e2 != AlcError.NoError)
+                {
+                    Debug.WriteLine("ALError: " + e2);
+                    throw new Exception("AL Error: " + e2.ToString());
+                }
+            }
+
+            ALError e = AL.GetError();
+            if (e != ALError.NoError)
+            {
+                Debug.WriteLine("ALError: " + e);
+                throw new Exception("AL Error: " + e.ToString());
+            }
+        }
+
 
 
         /// <summary>
@@ -334,7 +512,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// <returns>true if an error occurs, and false if not.</returns>
 		public bool CheckALError (string operation)
 		{
-			_lastOpenALError = Alc.GetError (_device);
+            checkRopoErr();
+
+            _lastOpenALError = Alc.GetError (_device);
 
 			if (_lastOpenALError == AlcError.NoError) {
 				return(false);
@@ -353,6 +533,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         private void CleanUpOpenAL()
         {
+            checkRopoErr();
             Alc.MakeContextCurrent(NullContext);
 
             if (_context != NullContext)
@@ -374,6 +555,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         public void Dispose()
         {
+            checkRopoErr();
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -384,6 +566,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="disposing">If true, the managed resources are to be disposed.</param>
 		void Dispose(bool disposing)
 		{
+            checkRopoErr();
             if (!_isDisposed)
             {
                 if (disposing)
@@ -408,7 +591,8 @@ namespace Microsoft.Xna.Framework.Audio
                 }
                 _isDisposed = true;
             }
-		}
+            checkRopoErr();
+        }
 
         /// <summary>
         /// Reserves a sound buffer and return its identifier. If there are no available sources
@@ -422,7 +606,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 throw new InstancePlayLimitException();
             }
-
+            checkRopoErr();
             int sourceNumber;
 
             lock (availableSourcesCollection)
@@ -435,7 +619,10 @@ namespace Microsoft.Xna.Framework.Audio
                 sourceNumber = availableSourcesCollection.Last();
                 inUseSourcesCollection.Add(sourceNumber);
                 availableSourcesCollection.Remove(sourceNumber);
+                checkRopoErr();
             }
+
+            checkRopoErr();
 
             return sourceNumber;
 		}
@@ -460,7 +647,8 @@ namespace Microsoft.Xna.Framework.Audio
             inst.SourceId = 0;
             inst.HasSourceId = false;
             inst.SoundState = SoundState.Stopped;
-		}
+            checkRopoErr();
+        }
 
         /// <summary>
         /// Checks if the AL controller was initialized properly. If there was an
@@ -470,6 +658,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <returns>True if the controller was initialized, false if not.</returns>
         internal bool CheckInitState()
         {
+            checkRopoErr();
             if (!_bSoundAvailable)
             {
                 if (_SoundInitException != null)
@@ -478,13 +667,16 @@ namespace Microsoft.Xna.Framework.Audio
                     _SoundInitException = null;
                     throw new NoAudioHardwareException("No audio hardware available.", e);
                 }
+                checkRopoErr();
                 return (false);
             }
+            checkRopoErr();
             return (true);
         }
 
         public double SourceCurrentPosition (int sourceId)
 		{
+            checkRopoErr();
             if (!CheckInitState())
             {
                 return(0.0);
@@ -492,7 +684,8 @@ namespace Microsoft.Xna.Framework.Audio
             int pos;
 			AL.GetSource (sourceId, ALGetSourcei.SampleOffset, out pos);
             ALHelper.CheckError("Failed to set source offset.");
-			return pos;
+            checkRopoErr();
+            return pos;
 		}
 
 #if ANDROID
@@ -507,6 +700,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         void Activity_Paused(object sender, EventArgs e)
         {
+            checkRopoErr();
             // Pause all currently playing sounds. The internal pause count in OALSoundBuffer
             // will take care of sounds that were already paused.
             //            lock (playingSourcesCollection)
@@ -515,6 +709,7 @@ namespace Microsoft.Xna.Framework.Audio
             //                    source.Pause();
             //            }
             alcDevicePauseSOFT(_device);
+            checkRopoErr();
         }
 
         void Activity_Resumed(object sender, EventArgs e)
@@ -526,7 +721,9 @@ namespace Microsoft.Xna.Framework.Audio
             //                foreach (var source in playingSourcesCollection)
             //                    source.Resume();
             //            }
+            checkRopoErr();
             alcDeviceResumeSOFT(_device);
+            checkRopoErr();
         }
 #endif
 
