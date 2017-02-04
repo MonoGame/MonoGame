@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	    readonly EffectParameter _matrixTransform;
         readonly EffectPass _spritePass;
 
-		Matrix _matrix;
+		Matrix? _matrix;
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
 		Vector2 _texCoordBR = new Vector2 (0,0);
@@ -93,7 +93,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _depthStencilState = depthStencilState ?? DepthStencilState.None;
             _rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
             _effect = effect;
-            _matrix = transformMatrix ?? Matrix.Identity;
+            _matrix = transformMatrix;
 
             // Setup things now so a user can change them.
             if (sortMode == SpriteSortMode.Immediate)
@@ -143,7 +143,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 projection.M42 += -0.5f * projection.M22;
             }
 
-            Matrix.Multiply(ref _matrix, ref projection, out projection);
+            if (_matrix.HasValue)
+            {
+                var transformMatrix = _matrix.GetValueOrDefault();
+                Matrix.Multiply(ref transformMatrix, ref projection, out projection);
+            }
 
             _matrixTransform.SetValue(projection);
             _spritePass.Apply();
