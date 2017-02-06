@@ -281,9 +281,7 @@ namespace Microsoft.Xna.Framework.Media
                 return;
 
             // Get the volume interface.
-            IntPtr volumeObjectPtr;
-            MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObjectPtr);
-            _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
+            _volumeController = CppObject.FromPointer<AudioStreamVolume>(GetVolumeObjPtr());
 
             SetChannelVolumes();
 
@@ -293,6 +291,37 @@ namespace Microsoft.Xna.Framework.Media
             // Start playing.
             var varStart = new Variant();
             _session.Start(null, varStart);
+        }
+
+        private IntPtr GetVolumeObjPtr()
+        {
+            // Get the volume interface - shared between MediaPlayer and VideoPlayer
+            const int retries = 10;
+            const int sleepTimeFactor = 50;
+ 
+            var volumeObj = IntPtr.Zero;
+ 
+            // See https://github.com/mono/MonoGame/issues/2620
+            // MediaFactory.GetService throws a SharpDX exception for unknown reasons. It appears retrying will solve the problem but there
+            // is no specific number of times, nor pause that works. So we will retry N times with an increasing Sleep between each one
+            // before finally throwing the error we saw in the first place.
+            for (int i = 0; i < retries; i++)
+            {
+                try
+                {
+                    MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObj);
+                    break;
+                }
+                catch (SharpDXException)
+                {
+                    if (i == retries - 1)
+                    {
+                        throw;
+                    }
+                    Thread.Sleep(i * sleepTimeFactor); // Sleep for longer each time it fails
+                }
+            }
+            return volumeObj;
         }
 
         private void OnSessionStarted()

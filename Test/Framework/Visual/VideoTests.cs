@@ -19,7 +19,7 @@ namespace MonoGame.Tests.Visual
         TimeSpan _start;
 
         [Test]
-        public void Plain()
+        public void VideoNotLooped()
         {
             Game.ExitCondition = x => _player.State == MediaState.Stopped;
 
@@ -62,7 +62,7 @@ namespace MonoGame.Tests.Visual
         }
 
         [Test]
-        public void Looped()
+        public void VideoLooped()
         {
             Game.ExitCondition = x => (x.TotalGameTime - _start).TotalSeconds > 8.0;
 
