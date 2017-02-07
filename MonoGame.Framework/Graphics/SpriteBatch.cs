@@ -28,6 +28,8 @@ namespace Microsoft.Xna.Framework.Graphics
         readonly EffectPass _spritePass;
 
 		Matrix? _matrix;
+	    private Viewport _lastViewport;
+	    private Matrix _projection;
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
 		Vector2 _texCoordBR = new Vector2 (0,0);
@@ -126,30 +128,29 @@ namespace Microsoft.Xna.Framework.Graphics
 			gd.RasterizerState = _rasterizerState;
 			gd.SamplerStates[0] = _samplerState;
 			
-            // Setup the default sprite effect.
 			var vp = gd.Viewport;
-
-		    Matrix projection;
-
-            // Normal 3D cameras look into the -z direction (z = 1 is in font of z = 0). The
-            // sprite batch layer depth is the opposite (z = 0 is in front of z = 1).
-            // --> We get the correct matrix with near plane 0 and far plane -1.
-            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out projection);
-
-            // Some platforms require a half pixel offset to match DX.
-            if (NeedsHalfPixelOffset)
+            if ((vp.Width != _lastViewport.Width) || (vp.Height != _lastViewport.Height))
             {
-                projection.M41 += -0.5f * projection.M11;
-                projection.M42 += -0.5f * projection.M22;
+                // Normal 3D cameras look into the -z direction (z = 1 is in font of z = 0). The
+                // sprite batch layer depth is the opposite (z = 0 is in front of z = 1).
+                // --> We get the correct matrix with near plane 0 and far plane -1.
+                Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out _projection);
+
+                // Some platforms require a half pixel offset to match DX.
+                if (NeedsHalfPixelOffset)
+                {
+                    _projection.M41 += -0.5f * _projection.M11;
+                    _projection.M42 += -0.5f * _projection.M22;
+                }
+
+                _lastViewport = vp;
             }
 
             if (_matrix.HasValue)
-            {
-                var transformMatrix = _matrix.GetValueOrDefault();
-                Matrix.Multiply(ref transformMatrix, ref projection, out projection);
-            }
+                _matrixTransform.SetValue(_matrix.GetValueOrDefault() * _projection);
+            else
+                _matrixTransform.SetValue(_projection);
 
-            _matrixTransform.SetValue(projection);
             _spritePass.Apply();
 		}
 		
