@@ -147,16 +147,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             if (_matrix.HasValue)
-            {
-                var transformMatrix = _matrix.GetValueOrDefault();
-                Matrix projection;
-                Matrix.Multiply(ref transformMatrix, ref _projection, out projection);
-                _matrixTransform.SetValue(projection);
-            }
+                _matrixTransform.SetValue(_matrix.GetValueOrDefault() * _projection);
             else
-            {
                 _matrixTransform.SetValue(_projection);
-            }
 
             _spritePass.Apply();
 		}
