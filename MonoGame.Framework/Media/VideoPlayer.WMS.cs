@@ -25,11 +25,12 @@ namespace Microsoft.Xna.Framework.Media
             PresentationEnded,
         }
 
-        InternalState _internalState;
+        private InternalState _internalState;
         private MediaSession _session;
         private AudioStreamVolume _volumeController;
         private PresentationClock _clock;
-        const int defaultTimeoutMs = 1000;
+        private const int defaultTimeoutMs = 1000;
+        private byte[] _black = null;
 #if WINRT
         readonly object _locker = new object();
 #endif
@@ -123,9 +124,12 @@ namespace Microsoft.Xna.Framework.Media
                 else
                 {
                     // No texture data was returned, so make sure the texture is set to something.
-                    var black = new byte[_texture.Width * _texture.Height * SurfaceFormat.Bgr32.GetSize()];
-                    Array.Clear(black, 0, black.Length);
-                    _texture.SetData(black);
+                    if (_black == null)
+                    {
+                        _black = new byte[_texture.Width * _texture.Height * SurfaceFormat.Bgr32.GetSize()];
+                        Array.Clear(_black, 0, _black.Length);
+                    }
+                    _texture.SetData(_black);
                 }
             }
 
@@ -277,8 +281,21 @@ namespace Microsoft.Xna.Framework.Media
             if (_session.IsDisposed)
                 return;
 
-            // Get the volume interface.
-            _volumeController = CppObject.FromPointer<AudioStreamVolume>(GetVolumeObjPtr());
+            // Get the volume interface. Returns null if the video has no audio tracks.
+            IntPtr volumeObj;
+            try
+            {
+                MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObj);
+                _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObj);
+            }
+            catch (SharpDXException ex)
+            {
+                unchecked
+                {
+                    if (ex.HResult != (int)0x80004002) // E_NOINTERFACE
+                        throw;
+                }
+            }
 
             SetChannelVolumes();
 
@@ -288,37 +305,6 @@ namespace Microsoft.Xna.Framework.Media
             // Start playing.
             var varStart = new Variant();
             _session.Start(null, varStart);
-        }
-
-        private IntPtr GetVolumeObjPtr()
-        {
-            // Get the volume interface - shared between MediaPlayer and VideoPlayer
-            const int retries = 10;
-            const int sleepTimeFactor = 50;
- 
-            var volumeObj = IntPtr.Zero;
- 
-            // See https://github.com/mono/MonoGame/issues/2620
-            // MediaFactory.GetService throws a SharpDX exception for unknown reasons. It appears retrying will solve the problem but there
-            // is no specific number of times, nor pause that works. So we will retry N times with an increasing Sleep between each one
-            // before finally throwing the error we saw in the first place.
-            for (int i = 0; i < retries; i++)
-            {
-                try
-                {
-                    MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObj);
-                    break;
-                }
-                catch (SharpDXException)
-                {
-                    if (i == retries - 1)
-                    {
-                        throw;
-                    }
-                    Thread.Sleep(i * sleepTimeFactor); // Sleep for longer each time it fails
-                }
-            }
-            return volumeObj;
         }
 
         private void OnSessionStarted()
