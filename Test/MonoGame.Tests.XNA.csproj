@@ -128,6 +128,7 @@
     <Compile Include="Framework\Graphics\GraphicsDeviceTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsDeviceTestFixtureBase.cs" />
     <Compile Include="Framework\Graphics\MiscellaneousTests.cs" />
+    <Compile Include="Framework\Graphics\ModelTest.cs" />
     <Compile Include="Framework\Graphics\OcclusionQueryTest.cs" />
     <Compile Include="Framework\Graphics\RasterizerStateTest.cs" />
     <Compile Include="Framework\Graphics\RenderTarget2DTest.cs" />
@@ -844,6 +845,9 @@
     <None Include="Assets\Textures\SampleCube64DXT1Mips.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
