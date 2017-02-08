@@ -555,6 +555,14 @@ namespace Microsoft.Xna.Framework.Graphics
             _d2dContext.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Grayscale;
         }
 
+        internal void OnPresentationChanged()
+        {
+            CreateSizeDependentResources();
+            ApplyRenderTargets(null);
+        }
+
+#endif
+
         partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters)
         {
 #if WINDOWS_UAP
@@ -568,14 +576,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("PresentationParameters.DeviceWindowHandle must not be null.");
 #endif
         }
-
-        internal void OnPresentationChanged()
-        {
-            CreateSizeDependentResources();
-            ApplyRenderTargets(null);
-        }
-
-#endif
 
 #if WINDOWS_STOREAPP || WINDOWS_UAP || WINDOWS_PHONE
 

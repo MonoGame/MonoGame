@@ -555,8 +555,12 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         */
 
+        partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters);
+
         public void Reset()
         {
+            PlatformValidatePresentationParameters(PresentationParameters);
+
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
 
@@ -567,14 +571,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 DeviceReset(this, EventArgs.Empty);
         }
 
-        partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters);
-
         public void Reset(PresentationParameters presentationParameters)
         {
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
-
-            PlatformValidatePresentationParameters(presentationParameters);
 
             PresentationParameters = presentationParameters;
             Reset();
