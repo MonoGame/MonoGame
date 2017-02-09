@@ -1085,5 +1085,10 @@ namespace Microsoft.Xna.Framework.Graphics
             presentationParameters.MultiSampleCount = 4;
             quality = 0;
         }
+
+        internal void OnPresentationChanged()
+        {
+            ApplyRenderTargets(null);
+        }
     }
 }
