@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using System.IO;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 #if DIRECTX
 using System.Collections.Generic;
 using TwoMGFX;
@@ -120,6 +122,23 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.NotNull(output);
 
             // TODO: Should we test the writer?
+        }
+
+        [Test]
+        public void SamplerDoesNotProduceTextureParams()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+            ((IGraphicsDeviceManager) game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
+            var gd = game.GraphicsDevice;
+
+            var effect = AssetTestUtility.CompileEffect(gd, "SamplerRegistersEffect.fx");
+            Assert.AreEqual(0, effect.Parameters.Count);
+
+            effect.Dispose();
+            gd.Dispose();
+            gdm.Dispose();
+            game.Dispose();
         }
     }
 }

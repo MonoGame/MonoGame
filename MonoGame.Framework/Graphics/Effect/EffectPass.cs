@@ -119,6 +119,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             foreach (var sampler in shader.Samplers)
             {
+                // if sampler.parameter is 255 there is no matching texture parameter
+                if (sampler.parameter == 255)
+                    continue;
+
                 var param = _effect.Parameters[sampler.parameter];
                 var texture = param.Data as Texture;
 

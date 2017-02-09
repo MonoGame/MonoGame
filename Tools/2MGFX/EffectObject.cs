@@ -739,46 +739,11 @@ namespace TwoMGFX
                 for (var s = 0; s < shader._samplers.Length; s++)
                 {
                     var sampler = shader._samplers[s];
-
                     var match = parameters.FindIndex(e => e.name == sampler.parameterName);
-                    if (match == -1)
-                    {
-                        // Store the index for runtime lookup.
-                        shader._samplers[s].parameter = parameters.Count;
 
-                        var param = new d3dx_parameter();
-                        param.class_ = D3DXPARAMETER_CLASS.OBJECT;
-                        param.name = sampler.parameterName;
-                        param.semantic = string.Empty;
-
-                        switch (sampler.type)
-                        {
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D:
-                                param.type = D3DXPARAMETER_TYPE.TEXTURE1D;
-                                break;
-
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
-                                param.type = D3DXPARAMETER_TYPE.TEXTURE2D;
-                                break;
-
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
-                                param.type = D3DXPARAMETER_TYPE.TEXTURE3D;
-                                break;
-
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
-                                param.type = D3DXPARAMETER_TYPE.TEXTURECUBE;
-                                break;
-                        }
-
-                        parameters.Add(param);
-                    }
-                    else
-                    {
-                        // TODO: Make sure the type and size of 
-                        // the parameter match up!
-
-                        shader._samplers[s].parameter = match;
-                    }
+                    // if there is no matching texture, set parameter to 255 so we know at runtime
+                    // TODO: In case of match, make sure the type and size of the parameter match up!
+                    shader._samplers[s].parameter = match == -1 ? 255 : match;
                 }
             }
 
