@@ -113,7 +113,9 @@ namespace MonoGame.Tests.Graphics
             }
 
             var size = new Vector2(texture.Width * 0.5f, texture.Height * 0.5f);
-            var offset = new Vector2(10, 10);
+            var padding = new Vector2(10, 10);
+
+            CaptureRegion = new Rectangle(0, 0, (int) (size.X * blends.Length + 2 * padding.X), (int) (size.Y * blends.Length + 2 * padding.Y));
 
             PrepareFrameCapture();
 
@@ -123,7 +125,7 @@ namespace MonoGame.Tests.Graphics
             {
                 for (var x = 0; x < blends.Length; x++)
                 {
-                    var pos = offset + new Vector2(x*size.X, y*size.Y);
+                    var pos = padding + new Vector2(x*size.X, y*size.Y);
                     spriteBatch.Begin(SpriteSortMode.Deferred, blendStates[(y*blends.Length) + x]);
                     spriteBatch.Draw(texture, new Rectangle((int) pos.X, (int) pos.Y, (int) size.X, (int) size.Y),
                         Color.White);

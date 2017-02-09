@@ -32,10 +32,11 @@ namespace MonoGame.Tests.Graphics
             // Mipmaps created by XNA and MonoGame are different.
             // Mipmaps created by DirectX 11 and OpenGL can also be different - at least for 
             // NPOT textures.
+            var texture = content.Load<Texture2D>(Paths.Texture("MonoGameIcon"));
 
+            CaptureRegion = new Rectangle(0, 0, 128 * 4 + 3, 128 * 2 + 1);
             PrepareFrameCapture();
 
-            var texture = content.Load<Texture2D>(Paths.Texture("MonoGameIcon"));
             var spriteBatch = new SpriteBatch(gd);
 
             // Remember original (frame capture) render target.
@@ -44,7 +45,6 @@ namespace MonoGame.Tests.Graphics
             if (renderTargets != null && renderTargets.Length > 0)
                 originalRenderTarget = renderTargets[0].RenderTarget as RenderTarget2D;
 
-            var viewport = gd.Viewport;
             var renderTarget = new RenderTarget2D(
                 gd,
                 128,
@@ -90,7 +90,7 @@ namespace MonoGame.Tests.Graphics
                 spriteBatch.End();
 
                 x += renderTarget.Width + 1;
-                if (x + renderTarget.Width > viewport.Width)
+                if (i == 3)
                 {
                     x = 0;
                     y += renderTarget.Height + 1;

@@ -12,6 +12,125 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
+    [SetUpFixture]
+    internal class GraphicsDeviceSetUpFixture
+    {
+        public static bool Initialized { get; private set; }
+        public static TestGameBase Game { get; private set; }
+        public static GraphicsDevice GraphicsDevice { get; private set; }
+        public static GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
+
+        public static bool NeedsHardReset { get; private set; }
+
+        public GraphicsDeviceSetUpFixture()
+        {
+            NeedsHardReset = true;
+        }
+
+        [TearDown]
+        public void RunAfterAllTests()
+        {
+            Game.Dispose();
+        }
+
+        public static void ResetAsNeeded()
+        {
+            if (!Initialized || GraphicsDevice.IsDisposed)
+                NeedsHardReset = true;
+
+            if (NeedsHardReset)
+            {
+                HardReset();
+                NeedsHardReset = false;
+            }
+            else
+            {
+                SoftReset();
+            }
+        }
+
+        public static void HardReset()
+        {
+            if (Game != null)
+            {
+                Game.Content.Unload();
+                Game.Dispose();
+            }
+
+            Game = new TestGameBase();
+            GraphicsDeviceManager = new GraphicsDeviceManager(Game);
+            // some visual tests require a HiDef profile so we default to that
+            GraphicsDeviceManager.GraphicsProfile = GraphicsProfile.HiDef;
+            ((IGraphicsDeviceManager) Game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
+            GraphicsDevice = Game.GraphicsDevice;
+            Initialized = true;
+
+            GraphicsDeviceManager.DeviceReset += SetNeedsHardReset;
+            GraphicsDevice.DeviceReset += SetNeedsHardReset;
+        }
+
+        private static void SetNeedsHardReset(object sender, EventArgs e)
+        {
+            NeedsHardReset = true;
+        }
+
+        public static void SoftReset()
+        {
+            Game.Content.Unload();
+            ResetGame();
+            ResetGd();
+            ResetGdm();
+        }
+
+        private static void ResetGame()
+        {
+            Game.ExitCondition = null;
+            Game.SuppressExtraUpdatesAndDraws = false;
+            Game.ClearActions();
+            Game.Components.Clear();
+            // gameTime is only initialized when a game is run
+            try { Game.ResetElapsedTime(); } catch { }
+        }
+
+        private static void ResetGd()
+        {
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+            try
+            {
+                for (var i = 0; i < 16; i++)
+                GraphicsDevice.SamplerStates[i] = SamplerState.LinearWrap;
+            }
+            catch { }
+            try
+                {
+                    for (var i = 0; i < 16; i++)
+                GraphicsDevice.Textures[i] = null;
+            }
+            catch { }
+
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Indices = null;
+            GraphicsDevice.SetVertexBuffer(null);
+            //GraphicsDevice.Reset();
+        }
+
+        private static void ResetGdm()
+        {
+            GraphicsDeviceManager.PreferredBackBufferWidth = GraphicsDeviceManager.DefaultBackBufferWidth;
+            GraphicsDeviceManager.PreferredBackBufferHeight = GraphicsDeviceManager.DefaultBackBufferHeight;
+            GraphicsDeviceManager.GraphicsProfile = GraphicsProfile.HiDef;
+            GraphicsDeviceManager.IsFullScreen = false;
+            GraphicsDeviceManager.PreferMultiSampling = false;
+            GraphicsDeviceManager.PreferredBackBufferFormat = SurfaceFormat.Color;
+            GraphicsDeviceManager.PreferredDepthStencilFormat = DepthFormat.Depth24;
+#if !XNA
+            GraphicsDeviceManager.HardwareModeSwitch = true;
+#endif
+        }
+    }
+
     internal class GraphicsDeviceTestFixtureBase
     {
         protected TestGameBase game;
@@ -40,6 +159,8 @@ namespace MonoGame.Tests.Graphics
         protected bool ExactNumberSubmits;
         protected Color ClearColor;
 
+        protected Rectangle? CaptureRegion;
+
         #endregion
 
         #region SetUp and TearDown
@@ -47,11 +168,11 @@ namespace MonoGame.Tests.Graphics
         [SetUp]
         public virtual void SetUp()
         {
-            game = new TestGameBase();
-            gdm = new GraphicsDeviceManager(game);
-            // some visual tests require a HiDef profile
-            gdm.GraphicsProfile = GraphicsProfile.HiDef;
-            ((IGraphicsDeviceManager) game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
+            GraphicsDeviceSetUpFixture.ResetAsNeeded();
+
+            game = GraphicsDeviceSetUpFixture.Game;
+            gdm = GraphicsDeviceSetUpFixture.GraphicsDeviceManager;
+
             gd = game.GraphicsDevice;
             content = game.Content;
 
@@ -64,6 +185,7 @@ namespace MonoGame.Tests.Graphics
             WriteDiffs = WriteSettings.WhenFailed;
             ExactNumberSubmits = false;
             ClearColor = Color.CornflowerBlue;
+            CaptureRegion = null;
 
             Paths.SetStandardWorkingDirectory();
         }
@@ -71,7 +193,8 @@ namespace MonoGame.Tests.Graphics
         [TearDown]
         public virtual void TearDown()
         {
-            game.Dispose();
+            if (!object.ReferenceEquals(game, GraphicsDeviceSetUpFixture.Game))
+                game.Dispose();
 
             if (_framePrepared && !_framesChecked)
                 Assert.Fail("Initialized fixture for rendering but did not check frames.");
@@ -80,6 +203,15 @@ namespace MonoGame.Tests.Graphics
         #endregion
 
         #region Utility Methods
+
+        protected void HardReset()
+        {
+            GraphicsDeviceSetUpFixture.HardReset();
+            game = GraphicsDeviceSetUpFixture.Game;
+            gdm = GraphicsDeviceSetUpFixture.GraphicsDeviceManager;
+            gd = GraphicsDeviceSetUpFixture.GraphicsDevice;
+            content = game.Content;
+        }
 
         protected void Sleep(int ms)
         {
@@ -114,8 +246,11 @@ namespace MonoGame.Tests.Graphics
                 throw new Exception("PrepareFrameCapture should only be called once.");
             _framePrepared = true;
             _totalFramesExpected = expected;
+
+            var rect = CaptureRegion ?? new Rectangle(0, 0, gd.Viewport.Width, gd.Viewport.Height);
+
 			_captureRenderTarget = new RenderTarget2D(
-				gd, gd.Viewport.Width, gd.Viewport.Height,
+				gd, rect.Width, rect.Height,
 				false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
             _submittedFrames = new List<FramePixelData>();
 

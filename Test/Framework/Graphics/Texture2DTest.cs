@@ -74,77 +74,9 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     class Texture2DTest : GraphicsDeviceTestFixtureBase
     {
-        [TestCase(1, 1)]
-        [TestCase(8, 8)]
-        [TestCase(31, 7)]
-        public void ShouldSetAndGetData(int width, int height)
-        {
-            var dataSize = width * height;
-            var texture2D = new Texture2D(gd, width, height, false, SurfaceFormat.Color);
-            var savedData = new Color[dataSize];
-            for (var index = 0; index < dataSize; index++) savedData[index] = new Color(index % 255, index % 255, index % 255);
-            texture2D.SetData(savedData);
 
-            var readData = new Color[dataSize];
-            texture2D.GetData(readData);
-
-            Assert.AreEqual(savedData, readData);
-
-            texture2D.Dispose();
-        }
-
-        [TestCase(1, 1)]
-        [TestCase(8, 8)]
-        [TestCase(31, 7)]
-        public void ShouldSetAndGetDataForLevel(int width, int height)
-        {
-            var texture2D = new Texture2D(gd, width, height, true, SurfaceFormat.Color);
-
-            for (int i = 0; i < texture2D.LevelCount; i++)
-            {
-                var levelSize = Math.Max(width >> i, 1) * Math.Max(height >> i, 1);
-
-                var savedData = new Color[levelSize];
-                for (var index = 0; index < levelSize; index++)
-                    savedData[index] = new Color(index % 255, index % 255, index % 255);
-                texture2D.SetData(i, null, savedData, 0, savedData.Length);
-
-                var readData = new Color[levelSize];
-                texture2D.GetData(i, null, readData, 0, savedData.Length);
-
-                Assert.AreEqual(savedData, readData);
-            }
-
-            texture2D.Dispose();
-        }
-
-        [Test]
-        public void ShouldGetDataFromRectangle()
-        {
-            const int dataSize = 128 * 128;
-            var texture2D = new Texture2D(gd, 128, 128, false, SurfaceFormat.Color);
-            var savedData = new Color[dataSize];
-            for (var index = 0; index < dataSize; index++) savedData[index] = new Color(index % 255, index % 255, index % 255);
-            texture2D.SetData(savedData);
-
-            var readData = new Color[4];
-            texture2D.GetData(0, new Rectangle(126, 126, 2, 2), readData, 0, 4);
-
-            var expectedData = new[]
-            {
-                new Color(189, 189, 189),
-                new Color(190, 190, 190),
-                new Color(62, 62, 62),
-                new Color(63, 63, 63)
-            };
-            Assert.AreEqual(expectedData, readData);
-
-            texture2D.Dispose();
-        }
-		
 #if !XNA
         [TestCase(SurfaceFormat.Color, false)]
         [TestCase(SurfaceFormat.Color, true)]
@@ -196,35 +128,6 @@ namespace MonoGame.Tests.Graphics
 
             spriteBatch.Dispose();
             texture.Dispose();
-        }
-#endif
-
-#if !XNA
-        [TestCase(1, 1)]
-        [TestCase(8, 8)]
-        [TestCase(31, 7)]
-        public void ShouldSetAndGetDataForTextureArray(int width, int height)
-        {
-            const int arraySize = 4;
-            var texture2D = new Texture2D(gd, width, height, true, SurfaceFormat.Color, arraySize);
-
-            for (var i = 0; i < arraySize; i++)
-                for (var j = 0; j < texture2D.LevelCount; j++)
-                {
-                    var levelSize = Math.Max(width >> j, 1) * Math.Max(height >> j, 1);
-
-                    var savedData = new Color[levelSize];
-                    for (var index = 0; index < levelSize; index++)
-                        savedData[index] = new Color((index + i) % 255, (index + i) % 255, (index + i) % 255);
-                    texture2D.SetData(j, i, null, savedData, 0, savedData.Length);
-
-                    var readData = new Color[levelSize];
-                    texture2D.GetData(j, i, null, readData, 0, readData.Length);
-
-                    Assert.AreEqual(savedData, readData);
-                }
-
-            texture2D.Dispose();
         }
 #endif
 

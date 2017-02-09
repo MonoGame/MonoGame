@@ -36,7 +36,10 @@ namespace MonoGame.Tests.Graphics {
 #elif WINDOWS
             effect2Name = System.IO.Path.Combine("DirectX", effect2Name);
 #endif
-            _effect2 = content.Load<Effect>(Paths.Effect(effect2Name));            
+            _effect2 = content.Load<Effect>(Paths.Effect(effect2Name));
+            
+            // use a pretty small rectangle by default for all tests that only draw 1 or 2 sprites
+            CaptureRegion = new Rectangle(0, 0, 120, 120);
 		}
 
 	    [TearDown]
@@ -93,6 +96,7 @@ namespace MonoGame.Tests.Graphics {
 		[TestCase(1.25f, 0.8f)]
 		public void Draw_stretched (float xScale, float yScale)
 		{
+            CaptureRegion = new Rectangle(0, 0, 200, 200);
             PrepareFrameCapture();
 
             var rect = new Rectangle (
@@ -159,6 +163,7 @@ namespace MonoGame.Tests.Graphics {
 		[TestCase(20, 30, 80, 60)]
 		public void Draw_with_source_and_dest_rect (int x, int y, int width, int height)
 		{
+            CaptureRegion = new Rectangle(0, 0, 120, 120);
             PrepareFrameCapture();
 
 			var destRect = new Rectangle(x, y, width, height);
@@ -219,6 +224,7 @@ namespace MonoGame.Tests.Graphics {
 		[Test]
 		public void Draw_with_matrix ([Range(0, 4)]int matrixIndex)
 		{
+            CaptureRegion = new Rectangle(0, 0, 250, 250);
             PrepareFrameCapture();
 
 			var matrix = Matrices [matrixIndex];
@@ -243,35 +249,21 @@ namespace MonoGame.Tests.Graphics {
         public void Draw_with_SpriteSortMode(SpriteSortMode sortMode)
         {
             Similarity = 0.995f;
+            CaptureRegion = new Rectangle(0, 0, 180, 180);
             PrepareFrameCapture();
 
             _spriteBatch.Begin(sortMode, BlendState.AlphaBlend);
-            _spriteBatch.Draw(_texture, new Vector2(110, 110), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
-            _spriteBatch.Draw(_texture2, new Vector2(130, 130), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.2f);
-            _spriteBatch.Draw(_texture3, new Vector2(145, 145), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.3f);
-            _spriteBatch.Draw(_texture, new Vector2(160, 160), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.5f);
-            _spriteBatch.Draw(_texture3, new Vector2(205, 205), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
-            _spriteBatch.Draw(_texture2, new Vector2(190, 190), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.1f);
+
+            _spriteBatch.Draw(_texture, new Vector2(10), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.Draw(_texture2, new Vector2(30), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.2f);
+            _spriteBatch.Draw(_texture3, new Vector2(45), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.3f);
+            _spriteBatch.Draw(_texture, new Vector2(60), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.5f);
+            _spriteBatch.Draw(_texture3, new Vector2(105), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
+            _spriteBatch.Draw(_texture2, new Vector2(90, 90), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.1f);
             _spriteBatch.End();
 
             CheckFrames();
         }
-
-		// FIXME: This scissoring code is not valid in XNA. It
-		//        complains about RasterizerState being
-		//        immutable after it's bound to a
-		//        GraphicsDevice.  MonoGame probably should to,
-		//        rather than allowing mutation.
-
-		// Now let's try some scissoring
-		//_spriteBatch.Begin ();
-		//_spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle (50, 40, (int) _clippingSize, (int) _clippingSize);
-		//_spriteBatch.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
-		//_spriteBatch.Draw (_texture, new Rectangle (50, 40, 320, 40), Color.White);
-		//_spriteBatch.DrawString (_font, "Scissor Clipping Test", new Vector2 (50, 40), Color.Red);
-		//_spriteBatch.End ();
-
-		//_spriteBatch.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
 
         [Test]
         public void DrawRequiresTexture()
@@ -316,6 +308,7 @@ namespace MonoGame.Tests.Graphics {
         [Test]
         public void DrawWithLayerDepth()
         {
+            CaptureRegion = new Rectangle(0, 0, 250, 250);
             PrepareFrameCapture();
 
              // Row 0, column 0: Deferred, no depth test.
@@ -388,6 +381,7 @@ namespace MonoGame.Tests.Graphics {
         [Test]
         public void Draw_many()
         {
+            CaptureRegion = null;
             PrepareFrameCapture();
 
             _spriteBatch.Begin();
@@ -404,6 +398,7 @@ namespace MonoGame.Tests.Graphics {
         public void Draw_with_viewport_changing(SpriteSortMode sortMode)
         {
             Similarity = 0.975f;
+            CaptureRegion = null;
             PrepareFrameCapture();
 
             // Test SpriteEffect

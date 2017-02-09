@@ -14,7 +14,7 @@ namespace MonoGame.Tests.Graphics
     {
         Texture3D t;
         Color[] reference;
-        const int w=50, h=50, d=50, a = w * d * h;
+        const int w=8, h=8, d=8, a = w * d * h;
         private Game _game;
 
         [TestFixtureSetUp]

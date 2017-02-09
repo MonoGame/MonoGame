@@ -39,6 +39,7 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void Draw_with_render_target_change()
         {
+            CaptureRegion = _texture.Bounds;
             PrepareFrameCapture();
 
             gd.Clear(new Color(68, 34, 136, 255));
@@ -56,12 +57,10 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void Draw_without_render_target_change()
         {
+            CaptureRegion = _texture.Bounds;
             PrepareFrameCapture();
-
-            var renderTargets = gd.GetRenderTargets();
+            
             gd.ScissorRectangle = new Rectangle(0, 0, 20, 20);
-            gd.SetRenderTargets(renderTargets);
-
             DrawTexture();
 
             CheckFrames();

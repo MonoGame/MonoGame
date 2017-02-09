@@ -45,6 +45,8 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void QueryOccludedSprites()
         {
+            HardReset();
+
             var spriteBatch = new SpriteBatch(gd);
             var whiteTexture = content.Load<Texture2D>(Paths.Texture("white-64"));
 

@@ -86,6 +86,8 @@ namespace MonoGame.Tests.Graphics {
 
             _spriteBatch = new SpriteBatch (gd);
             _defaultFont = content.Load<SpriteFont> (Paths.Font ("Default"));
+
+            CaptureRegion = new Rectangle(0, 0, 450, 250);
 		}
 
 	    [TearDown]
@@ -270,7 +272,7 @@ namespace MonoGame.Tests.Graphics {
 
             _spriteBatch.Begin ();
             _spriteBatch.DrawString (
-                _defaultFont, "hullabaloo2", new Vector2 (100, 150), Color.Yellow,
+                _defaultFont, "hullabaloo2", new Vector2 (100, 50), Color.Yellow,
                 MathHelper.ToRadians(130), new Vector2(40f, 60f), new Vector2(1.8f, 1.1f),
                 SpriteEffects.FlipVertically, 0.0f);
             _spriteBatch.End ();
@@ -281,6 +283,7 @@ namespace MonoGame.Tests.Graphics {
 		[Test]
 		public void Multiline ()
 		{
+            CaptureRegion = new Rectangle(0, 0, 600, 400);
             PrepareFrameCapture();
 
             _spriteBatch.Begin ();
