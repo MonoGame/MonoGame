@@ -133,9 +133,6 @@ namespace MonoGame.Framework
                 ExitFullScreen();
                 _window.OnClientSizeChanged();
             }
-
-            if (!_window.UserResized)
-                _window.CenterForm();
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
