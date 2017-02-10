@@ -47,7 +47,11 @@ namespace Microsoft.Xna.Framework
 
                 return new Point(x, y);
             }
-            set { Sdl.Window.SetPosition(Handle, value.X, value.Y); }
+            set
+            {
+                Sdl.Window.SetPosition(Handle, value.X, value.Y);
+                _wasMoved = true;
+            }
         }
 
         public override DisplayOrientation CurrentOrientation
@@ -84,6 +88,7 @@ namespace Microsoft.Xna.Framework
         private bool _resizable, _borderless, _willBeFullScreen, _mouseVisible, _hardwareSwitch;
         private string _screenDeviceName;
         private int _winx, _winy, _width, _height;
+        private bool _wasMoved, _supressMoved;
 
         public SdlGameWindow(Game game)
         {
@@ -263,11 +268,24 @@ namespace Microsoft.Xna.Framework
             // after the window gets resized, window position information
             // becomes wrong (for me it always returned 10 8). Solution is
             // to not try and set the window position because it will be wrong.
-            if (Sdl.Patch > 4 || !AllowUserResizing)
+            if ((Sdl.Patch > 4 || !AllowUserResizing) && !_wasMoved)
                 Sdl.Window.SetPosition(Handle, centerX, centerY);
 
             IsFullScreen = _willBeFullScreen;
             OnClientSizeChanged();
+
+            _supressMoved = true;
+        }
+
+        internal void Moved()
+        {
+            if (_supressMoved)
+            {
+                _supressMoved = false;
+                return;
+            }
+
+            _wasMoved = true;
         }
 
         public void ClientResize(int width, int height)
