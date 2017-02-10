@@ -1,8 +1,8 @@
-MonoGame supports more than one method of using fonts, the following is an explanation of how to use TrueType fonts.
+MonoGame supports multiple methods of using different fonts.  The following is an explanation on how to use TrueType fonts.
 
 #### Using TrueType Fonts with MonoGame
-To be able to use a truetype font, MonoGame requires the truetype font file and a .spritefont file.
-Truetype fonts may be installed on the system, or added to the project manually using your IDE in the same directory as the .spritefont file.
+To use a TrueType font in MonoGame, you require 2 files: the TrueType font file, and a .spritefont file.
+You can use TrueType fonts installed on the system, or add them to the project manually in the same directory as the .spritefont file.
 
 1. Create the .spritefont file.
 
@@ -14,30 +14,41 @@ Truetype fonts may be installed on the system, or added to the project manually 
 <img src="images/adding_ttf_fonts_step_2.PNG"/>
 </p>
 
-2- Open the newly created .spritefont file in your text editor of choice, find this line and change it to your selected .ttf font.
-If the font is installed on the system, just type the name of the font.
+2- Open the newly created .spritefont file in your text editor of choice.
+
+3- Find the line below: 
+
 ```
 <FontName>Arial</FontName>
 ```
 
+4- Replace the text between the tags with the name of your TrueType font.
+If the font is installed on the system, the file extension ".ttf" does not need to be included.
+
+
 #### Usage Example
-Make a class variable of type Spritefont
+1- Make a class variable of type SpriteFont.
+
 ```
 SpriteFont font;
 ```
-Load the font in the LoadContent function
+
+2- Load the font in the LoadContent function of your game.
+
 ```
 font = myGame.Content.Load<SpriteFont>("Fonts/myFont")
 ```
-Draw any text in the Draw function
+
+3- Draw any text in the Draw function of your game. The example below uses a Vector2 to find the center of the text to be displayed, and places it in the center of the window using an other Vector2.
+
 ```
 spriteBatch.Begin();
 // Finds the center of the string in coordinates inside the text rectangle
 Vector2 textMiddlePoint = font.MeasureString(text) / 2;
-// Places text in center of the screen
+// Places text in center of the window
 Vector2 position = new Vector2(myGame.Window.ClientBounds.Width / 2, myGame.Window.ClientBounds.Height / 2);
 spriteBatch.DrawString(font, "MonoGame Font Test", position, Color.White, 0, textMiddlePoint, 1.0f, SpriteEffects.None, 0.5f)
 spriteBatch.End();
 ```
 
-If you want to know more, please refer to the [API Documentation]()
+If you want to read more on fonts, please refer to the [API Documentation]()
