@@ -315,6 +315,7 @@ namespace MonoGame.Tests {
 		private static readonly string TextureFolder = Path.Combine (AssetFolder, "Textures");
 		private static readonly string EffectFolder = Path.Combine (AssetFolder, "Effects");
 		private static readonly string ModelFolder = Path.Combine (AssetFolder, "Models");
+        private static readonly string VideoFolder = Path.Combine(AssetFolder, "Video");
         private static readonly string XmlFolder = Path.Combine(AssetFolder, "Xml");
         private const string CapturedFrameFolder = "CapturedFrames";
 		private const string CapturedFrameDiffFolder = "Diffs";
@@ -329,24 +330,29 @@ namespace MonoGame.Tests {
 			return Combine (FontFolder, pathParts);
 		}
 
-		public static string Texture (params string [] pathParths)
+		public static string Texture (params string [] pathPaths)
 		{
-			return Combine (TextureFolder, pathParths);
+			return Combine (TextureFolder, pathPaths);
 		}
 
-		public static string Effect (params string [] pathParths)
+		public static string Effect (params string [] pathPaths)
 		{
-			return Combine (EffectFolder, pathParths);
+			return Combine (EffectFolder, pathPaths);
 		}
 
-		public static string Model (params string [] pathParths)
+		public static string Model (params string [] pathPaths)
 		{
-			return Combine (ModelFolder, pathParths);
+			return Combine (ModelFolder, pathPaths);
 		}
 
-        public static string Xml(params string[] pathParths)
+        public static string Video(params string[] pathPaths)
         {
-            return Combine(XmlFolder, pathParths);
+            return Combine(VideoFolder, pathPaths);
+        }
+
+        public static string Xml(params string[] pathPaths)
+        {
+            return Combine(XmlFolder, pathPaths);
         }
 
 		public static string ReferenceImage (params string [] pathParts)
