@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // Set the new normals on the vertex channel.
             for (var i = 0; i < channel.Count; i++)
-                channel[i] = normals[positionIndices[i]];
+                channel[i] = normals[geom.Indices[i]];
         }
 
         /// <summary>
@@ -413,13 +413,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                         foreach (var list in indexLists)
                             list.Update(i, j);
                         mesh.Positions.RemoveAt(i);
-                        break;
                     }
                 }
             }
-
-            foreach (var list in indexLists)
-                list.Pack(mesh.Positions.Count);
         }
 
         /// <summary>
@@ -454,6 +450,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                 var hash = iData.ComputeHash();
 
+                var merged = false;
                 List<VertexData> candidates;
                 if (hashMap.TryGetValue(hash, out candidates))
                 {
@@ -466,21 +463,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                         // Match! Update the corresponding indices and remove the vertex
                         indices.Update(iIndex, c.Index);
                         verts.RemoveAt(vIndex);
-                        goto nextOuterLoop;
+                        merged = true;
                     }
-                    candidates.Add(iData);
+                    if (!merged)
+                        candidates.Add(iData);
                 }
                 else
                 {
                     // no vertices with the same hash yet, create a new list for the data
                     hashMap.Add(hash, new List<VertexData> { iData });
                 }
-                vIndex++;
-                nextOuterLoop: ;
+
+                if (!merged)
+                    vIndex++;
             }
 
             // update the indices because of the vertices we removed
-            indices.Pack(verts.VertexCount);
+            indices.Pack();
         }
 
         /// <summary>
@@ -643,118 +642,67 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        private struct IndirectValue : IComparable<IndirectValue>
-        {
-            public readonly int Position;
-            public readonly int Value;
-
-            public IndirectValue(int position, int value)
-            {
-                Position = position;
-                Value = value;
-            }
-
-            public int CompareTo(IndirectValue other)
-            {
-                return Value - other.Value;
-            }
-
-            public override string ToString()
-            {
-                return string.Format("{0} {1}", Position, Value);
-            }
-        }
-
         // takes an IndexCollection and can efficiently update index values
         private class IndexUpdateList
         {
             private readonly IList<int> _collectionToUpdate;
-            private readonly List<int> _indexPositions;
-            private readonly Dictionary<int, List<int>> _startPositions;
-            private readonly IndexToValueComparer _comparer;
+            private readonly Dictionary<int, List<int>> _indexPositions;
 
             // create the list, presort the values and compute the start positions of each value
             public IndexUpdateList(IList<int> collectionToUpdate)
             {
                 _collectionToUpdate = collectionToUpdate;
-                _indexPositions = new List<int>(_collectionToUpdate.Count);
-                _startPositions = new Dictionary<int, List<int>>();
-                _comparer = new IndexToValueComparer(_collectionToUpdate);
+                _indexPositions = new Dictionary<int, List<int>>();
                 Initialize();
             }
 
             private void Initialize()
             {
-                for (var i = 0; i < _collectionToUpdate.Count; i++)
-                    _indexPositions.Add(i);
-
-                _indexPositions.Sort(_comparer);
-
-                var currentValue = -1;
-                for (var pos = 0; pos < _indexPositions.Count; pos++)
+                for (var pos = 0; pos < _collectionToUpdate.Count; pos++)
                 {
-                    var v = _collectionToUpdate[_indexPositions[pos]];
-                    if (currentValue != v)
-                    {
-                        currentValue = v;
-                        _startPositions.Add(currentValue, new List<int>{ pos });
-                    }
+                    var v = _collectionToUpdate[pos];
+                    if (_indexPositions.ContainsKey(v))
+                        _indexPositions[v].Add(pos);
+                    else
+                        _indexPositions.Add(v, new List<int> {pos});
                 }
             }
 
             public void Update(int from, int to)
             {
-                if (from == to)
+                if (from == to || !_indexPositions.ContainsKey(from))
                     return;
 
-                foreach (var startPos in _startPositions[from])
-                {
-                    for (var pos = startPos; pos < _indexPositions.Count && _collectionToUpdate[_indexPositions[pos]] == from; pos++)
-                        _collectionToUpdate[_indexPositions[pos]] = to;
-                }
+                foreach (var pos in _indexPositions[from])
+                    _collectionToUpdate[pos] = to;
 
-                _startPositions[to].AddRange(_startPositions[from]);
-                _startPositions.Remove(from);
+                if (_indexPositions.ContainsKey(to))
+                    _indexPositions[to].AddRange(_indexPositions[from]);
+                else
+                    _indexPositions.Add(to, _indexPositions[from]);
+
+                _indexPositions.Remove(from);
             }
 
             // Pack all indices together starting from zero
             // E.g. [5, 5, 3, 5, 21, 3] -> [1, 1, 0, 1, 2, 0]
-            public void Pack(int distinctValues)
+            // note that the order must be kept
+            public void Pack()
             {
                 if (_collectionToUpdate.Count == 0)
                     return;
 
-                _indexPositions.Sort(_comparer);
+                var sorted = new SortedSet<int>(_collectionToUpdate);
 
-                var lastValue = _collectionToUpdate[_indexPositions[_indexPositions.Count - 1]];
-                var newIndex = distinctValues - 1;
-                for (var i = _indexPositions.Count - 1; i >= 0; i--)
+                var newIndex = 0;
+                foreach (var value in sorted)
                 {
-                    var indexPos = _indexPositions[i];
-                    var thisValue = _collectionToUpdate[indexPos];
-                    if (thisValue != lastValue)
-                    {
-                        newIndex--;
-                        lastValue = thisValue;
-                    }
+                    foreach (var pos in _indexPositions[value])
+                        _collectionToUpdate[pos] = newIndex;
 
-                    _collectionToUpdate[indexPos] = newIndex;
-                }
-            }
-
-            private class IndexToValueComparer : Comparer<int>
-            {
-                private readonly IList<int> _values;
-
-                public IndexToValueComparer(IList<int> values)
-                {
-                    _values = values;
+                    newIndex++;
                 }
 
-                public override int Compare(int x, int y)
-                {
-                    return _values[x] - _values[y];
-                }
             }
 
         }

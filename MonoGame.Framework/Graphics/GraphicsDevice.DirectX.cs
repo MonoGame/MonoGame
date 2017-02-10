@@ -563,6 +563,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
+        partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters)
+        {
+#if WINDOWS_UAP
+            if (presentationParameters.SwapChainPanel == null)
+                throw new ArgumentException("PresentationParameters.SwapChainPanel must not be null.");
+#elif WINDOWS_STOREAPP
+            if (presentationParameters.DeviceWindowHandle == IntPtr.Zero && presentationParameters.SwapChainBackgroundPanel == null)
+                throw new ArgumentException("PresentationParameters.DeviceWindowHandle or PresentationParameters.SwapChainBackgroundPanel must be not null.");
+#else
+            if (presentationParameters.DeviceWindowHandle == IntPtr.Zero)
+                throw new ArgumentException("PresentationParameters.DeviceWindowHandle must not be null.");
+#endif
+        }
+
 #if WINDOWS_STOREAPP || WINDOWS_UAP || WINDOWS_PHONE
 
         private void SetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
@@ -821,7 +835,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // WINDOWS
 
-        public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
+        private void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
             // Clear options for depth/stencil buffer if not attached.
             if (_currentDepthStencilView != null)
@@ -920,7 +934,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif // WINDOWS_STOREAPP
         }
         
-        public void PlatformPresent()
+        private void PlatformPresent()
         {
 #if WINDOWS_STOREAPP || WINDOWS_UAP
             // The application may optionally specify "dirty" or "scroll" rects to improve efficiency

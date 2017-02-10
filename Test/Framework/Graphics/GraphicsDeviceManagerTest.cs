@@ -326,7 +326,7 @@ namespace MonoGame.Tests.Graphics
     internal class GraphicsDeviceManagerFixtureTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        public void ResettingDeviceTriggersGdmEvents()
+        public void ResettingDeviceTriggersResetEvents()
         {
             var resetCount = 0;
             var resettingCount = 0;
@@ -344,6 +344,29 @@ namespace MonoGame.Tests.Graphics
 
             Assert.AreEqual(1, resetCount);
             Assert.AreEqual(1, resettingCount);
+        }
+        
+        [Test]
+        public void NewDeviceDoesNotTriggerReset()
+        {
+            var resetCount = 0;
+            var devLostCount = 0;
+
+            gd.DeviceReset += (sender, args) =>
+            {
+                resetCount++;
+            };
+            gd.DeviceLost += (sender, args) =>
+            {
+                devLostCount++;
+            };
+
+            // changing the profile requires creating a new device
+            gdm.GraphicsProfile = GraphicsProfile.Reach;
+            gdm.ApplyChanges();
+
+            Assert.AreEqual(0, resetCount);
+            Assert.AreEqual(0, devLostCount);
         }
 
         [Test]

@@ -202,13 +202,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (adapter == null)
                 throw new ArgumentNullException("adapter");
-#if DIRECTX
             if (!adapter.IsProfileSupported(graphicsProfile))
                 throw new NoSuitableGraphicsDeviceException(String.Format("Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
-#else
-            if (!adapter.IsProfileSupported(graphicsProfile))
-                throw new NoSuitableGraphicsDeviceException(String.Format("Adapter does not support the {1} profile.", graphicsProfile));
-#endif
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
             Adapter = adapter;
@@ -561,8 +556,12 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         */
 
+        partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters);
+
         public void Reset()
         {
+            PlatformValidatePresentationParameters(PresentationParameters);
+
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
 
@@ -571,28 +570,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (DeviceReset != null)
                 DeviceReset(this, EventArgs.Empty);
-
-            if (DeviceLost != null)
-                DeviceLost(this, EventArgs.Empty);
         }
 
         public void Reset(PresentationParameters presentationParameters)
         {
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
-            if (presentationParameters.DeviceWindowHandle == IntPtr.Zero)
-                throw new ArgumentException("PresentationParameters.DeviceWindowHandle must not be null.");
 
             PresentationParameters = presentationParameters;
             Reset();
         }
-
-        /*
-        public void Reset(PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
-        {
-            throw new NotImplementedException();
-        }
-        */
 
         /// <summary>
         /// Trigger the DeviceResetting event

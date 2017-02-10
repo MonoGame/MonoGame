@@ -276,6 +276,8 @@ namespace Microsoft.Xna.Framework
 
         partial void PlatformApplyChanges();
 
+        partial void PlatformPreparePresentationParameters(PresentationParameters presentationParameters);
+
         private void PreparePresentationParameters(PresentationParameters presentationParameters)
         {
             presentationParameters.BackBufferFormat = _preferredBackBufferFormat;
@@ -300,6 +302,8 @@ namespace Microsoft.Xna.Framework
             {
                 presentationParameters.MultiSampleCount = 0;
             }
+
+            PlatformPreparePresentationParameters(presentationParameters);
         }
 
         private void PrepareGraphicsDeviceInformation(GraphicsDeviceInformation gdi)

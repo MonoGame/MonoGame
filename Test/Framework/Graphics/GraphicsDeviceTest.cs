@@ -69,8 +69,9 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        public void ResetInvokedBeforeDeviceLost()
+        public void ResetDoesNotTriggerDeviceLost()
         {
+            // TODO figure out exactly when a device is lost
             var resetCount = 0;
             var devLostCount = 0;
 
@@ -89,7 +90,7 @@ namespace MonoGame.Tests.Graphics
             gd.Reset();
 
             Assert.AreEqual(1, resetCount);
-            Assert.AreEqual(1, devLostCount);
+            Assert.AreEqual(0, devLostCount);
         }
 
         // TODO Make sure dynamic graphics resources are notified when graphics device is lost
