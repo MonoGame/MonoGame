@@ -211,6 +211,16 @@ namespace MonoGame.Utilities.Png
 
             switch (texture2D.Format)
             {
+                case SurfaceFormat.Single:
+                    var floatData = new float[colorDataLength];
+                    texture2D.GetData<float>(floatData);
+                    
+                    for (int i = 0; i < colorDataLength; i++) {
+                        // Export as a greyscale image.
+                        colorData[i] = new Color(floatData[i], floatData[i], floatData[i]);
+                    }
+                    break;
+
                 case SurfaceFormat.Color:
                     texture2D.GetData<Color>(colorData);
                     break;
