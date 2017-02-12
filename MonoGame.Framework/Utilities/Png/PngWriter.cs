@@ -214,10 +214,12 @@ namespace MonoGame.Utilities.Png
                 case SurfaceFormat.Single:
                     var floatData = new float[colorDataLength];
                     texture2D.GetData<float>(floatData);
-                    
-                    for (int i = 0; i < colorDataLength; i++) {
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        float brightness = floatData[i];
                         // Export as a greyscale image.
-                        colorData[i] = new Color(floatData[i], floatData[i], floatData[i]);
+                        colorData[i] = new Color(brightness, brightness, brightness);
                     }
                     break;
 
