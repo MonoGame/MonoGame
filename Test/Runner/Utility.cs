@@ -329,24 +329,41 @@ namespace MonoGame.Tests {
 			return Combine (FontFolder, pathParts);
 		}
 
-		public static string Texture (params string [] pathParths)
+		public static string Texture (params string [] pathParts)
 		{
-			return Combine (TextureFolder, pathParths);
+			return Combine (TextureFolder, pathParts);
 		}
 
-		public static string Effect (params string [] pathParths)
-		{
-			return Combine (EffectFolder, pathParths);
-		}
-
-		public static string Model (params string [] pathParths)
-		{
-			return Combine (ModelFolder, pathParths);
-		}
-
-        public static string Xml(params string[] pathParths)
+        public static string RawEffect(params string[] pathParts)
         {
-            return Combine(XmlFolder, pathParths);
+            return Combine(EffectFolder, pathParts) + ".fx";
+        }
+
+		public static string CompiledEffect (params string [] pathParts)
+		{
+		    string type;
+#if XNA
+            type = "XNA";
+#elif DIRECTX
+            type = "DirectX";
+#elif DESKTOPGL
+            type = "OpenGL";
+#else
+            throw new Exception("Make sure the effect path is set up correctly for this platform!");
+#endif
+			var path = Combine(type, pathParts);
+		    return Combine(EffectFolder, path);
+
+		}
+
+		public static string Model (params string [] pathParts)
+		{
+			return Combine (ModelFolder, pathParts);
+		}
+
+        public static string Xml(params string[] pathParts)
+        {
+            return Combine(XmlFolder, pathParts);
         }
 
 		public static string ReferenceImage (params string [] pathParts)
@@ -365,7 +382,7 @@ namespace MonoGame.Tests {
 		}
 
 
-		private static string Combine (string head, string [] tail)
+		private static string Combine (string head, params string [] tail)
 		{
 			return Path.Combine (head, Path.Combine (tail));
 		}
