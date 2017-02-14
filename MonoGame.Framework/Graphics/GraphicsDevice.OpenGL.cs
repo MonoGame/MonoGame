@@ -362,11 +362,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		    BlendState = prevBlendState;
         }
 
-        private void OnPresentationChanged()
-        {
-            // TODO make changes to the default Framebuffer to reflect the new PresentationParameters
-        }
-
         private void PlatformDispose()
         {
             // Free all the cached shader programs.
