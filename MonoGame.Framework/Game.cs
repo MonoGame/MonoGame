@@ -398,6 +398,9 @@ namespace Microsoft.Xna.Framework
                 Platform.StartRunLoop();
                 break;
             case GameRunBehavior.Synchronous:
+                // XNA runs one Update even before showing the window
+                DoUpdate(new GameTime());
+
                 Platform.RunLoop();
                 EndRun();
 				DoExiting();

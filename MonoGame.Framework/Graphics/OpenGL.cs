@@ -277,6 +277,7 @@ namespace OpenGL
         MaxDrawBuffers = 0x8824,
         TextureBinding2D = 0x8069,
         MaxTextureMaxAnisotropyExt = 0x84FF,
+        MaxSamples = 0x8D57,
     }
 
     public enum StringName { 
@@ -1009,6 +1010,11 @@ namespace OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
+        internal delegate void GetCompressedTexImageDelegate(TextureTarget target, int level, [Out] IntPtr pixels);
+        internal static GetCompressedTexImageDelegate GetCompressedTexImageInternal;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [MonoNativeFunctionWrapper]       
         public delegate void TexImage3DDelegate(TextureTarget target,int level, PixelInternalFormat internalFormat,
             int width, int height, int depth, int border,PixelFormat format, PixelType pixelType, IntPtr data);
         public static TexImage3DDelegate TexImage3D;
@@ -1188,6 +1194,7 @@ namespace OpenGL
             PixelStore = (PixelStoreDelegate)LoadEntryPoint<PixelStoreDelegate>("glPixelStorei");
             Finish = (FinishDelegate)LoadEntryPoint<FinishDelegate>("glFinish");
             GetTexImageInternal = (GetTexImageDelegate)LoadEntryPoint<GetTexImageDelegate>("glGetTexImage");
+            GetCompressedTexImageInternal = (GetCompressedTexImageDelegate)LoadEntryPoint<GetCompressedTexImageDelegate>("glGetCompressedTexImage");
             TexImage3D = (TexImage3DDelegate)LoadEntryPoint<TexImage3DDelegate>("glTexImage3D");
             TexSubImage3D = (TexSubImage3DDelegate)LoadEntryPoint<TexSubImage3DDelegate>("glTexSubImage3D");
             DeleteTextures = (DeleteTexturesDelegate)LoadEntryPoint<DeleteTexturesDelegate>("glDeleteTextures");
@@ -1354,16 +1361,29 @@ namespace OpenGL
             TexParameteri(target, name, value);
         }
 
-        public static unsafe void GetTexImage<T>(TextureTarget target, int level, PixelFormat format, PixelType type, [In] [Out] T[] pixels) where T : struct
+        public static void GetTexImage<T>(TextureTarget target, int level, PixelFormat format, PixelType type, T[] pixels) where T : struct
         {
-            GCHandle pixels_ptr = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+            var pixelsPtr = GCHandle.Alloc(pixels, GCHandleType.Pinned);
             try
             {
-                GetTexImageInternal(target, (Int32)level, format, type, (IntPtr)pixels_ptr.AddrOfPinnedObject());
+                GetTexImageInternal(target, level, format, type, pixelsPtr.AddrOfPinnedObject());
             }
             finally
             {
-                pixels_ptr.Free();
+                pixelsPtr.Free();
+            }
+        }
+
+        public static void GetCompressedTexImage<T>(TextureTarget target, int level, T[] pixels) where T : struct
+        {
+            var pixelsPtr = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+            try
+            {
+                GetCompressedTexImageInternal(target, level, pixelsPtr.AddrOfPinnedObject());
+            }
+            finally
+            {
+                pixelsPtr.Free();
             }
         }
     }

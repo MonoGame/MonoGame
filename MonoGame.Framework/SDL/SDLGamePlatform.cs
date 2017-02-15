@@ -96,9 +96,9 @@ namespace Microsoft.Xna.Framework
 
             while (true)
             {
-                Threading.Run();
                 SdlRunLoop();
                 Game.Tick();
+                Threading.Run();
 
                 if (_isExiting > 0)
                     break;

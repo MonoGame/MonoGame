@@ -5,6 +5,7 @@
 using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
@@ -321,7 +322,7 @@ namespace MonoGame.Tests.Graphics
             // No vertex shader or pixel shader.
             Assert.Throws<InvalidOperationException>(() => gd.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 3, 0, 1, 10));
 
-            var effect = AssetTestUtility.CompileEffect(gd, "Instancing.fx");
+            var effect = AssetTestUtility.LoadEffect(content, "Instancing");
             effect.Techniques[0].Passes[0].Apply();
 
             // No vertexBuffers.
@@ -396,7 +397,7 @@ namespace MonoGame.Tests.Graphics
             var projection = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.PiOver4, gd.Viewport.AspectRatio, 0.1f, 100);
 
-            var effect = AssetTestUtility.CompileEffect(gd, "Instancing.fx");
+            var effect = AssetTestUtility.LoadEffect(content, "Instancing");
             effect.Parameters["View"].SetValue(view);
             effect.Parameters["Projection"].SetValue(projection);
             pass = effect.Techniques[0].Passes[0];
@@ -566,6 +567,10 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        // Vertex Textures are not implemented for OpenGL
+        [Ignore]
+#endif
         public void VertexTexturesGetSet()
         {
             // TODO: The availability of vertex textures should depend on GraphicsProfile.
@@ -616,6 +621,10 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        // Vertex Textures are not implemented for OpenGL
+        [Ignore]
+#endif
         public void VertexTextureVisualTest()
         {
             // Implements an extremely simple terrain that reads from a heightmap in the vertex shader.
@@ -633,7 +642,7 @@ namespace MonoGame.Tests.Graphics
             var projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
                 gd.Viewport.AspectRatio, 1.0f, 100.0f);
 
-            var effect = AssetTestUtility.CompileEffect(gd, "VertexTextureEffect.fx");
+            var effect = AssetTestUtility.LoadEffect(content, "VertexTextureEffect");
             effect.Parameters["WorldViewProj"].SetValue(viewMatrix * projectionMatrix);
             effect.Parameters["HeightMapTexture"].SetValue(heightMapTexture);
             effect.Parameters["HeightMapSize"].SetValue((float) heightMapSize);
@@ -684,6 +693,10 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        // Vertex samplers are not implemented for OpenGL
+        [Ignore]
+#endif
         public void VertexSamplerStatesGetSet()
         {
             var samplerState = new SamplerState { Filter = TextureFilter.Point };
