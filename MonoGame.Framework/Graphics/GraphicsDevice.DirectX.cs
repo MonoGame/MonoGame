@@ -149,19 +149,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if WINDOWS_PHONE
-#endif
-#if WINDOWS_UAP
-			CreateSizeDependentResources();
-#endif
-#if WINDOWS_STOREAPP
-            CreateSizeDependentResources();
-#endif
-#if WINDOWS
-            CreateSizeDependentResources();
-#endif
-        }
-
-#if WINDOWS_PHONE
 
         private void UpdateDevice(Device device, DeviceContext context)
         {
