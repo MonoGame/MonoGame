@@ -143,6 +143,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformInitialize()
         {
+#if !WINDOWS_PHONE
+            CreateSizeDependentResources();
+#endif
+        }
+
 #if WINDOWS_PHONE
 #endif
 #if WINDOWS_UAP
@@ -836,11 +841,16 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Round down MultiSampleCount to the nearest power of two
                 // hack from http://stackoverflow.com/a/2681094
+                // Note: this will return an incorrect, but large value
+                // for very large numbers. That doesn't matter because
+                // the number will get clamped below anyway in this case.
+                // Also MultiSampleCount should never be larger than 32 
+                // (which is MultiSampleCountLimit)
                 var msc = PresentationParameters.MultiSampleCount;
                 msc = msc | (msc >> 1);
                 msc = msc | (msc >> 2);
                 msc = msc | (msc >> 4);
-                msc = msc - (msc >> 1);
+                msc -= (msc >> 1);
                 // and clamp it to what the device can handle
                 if (msc > GraphicsCapabilities.MaxMultiSampleCount)
                     msc = GraphicsCapabilities.MaxMultiSampleCount;

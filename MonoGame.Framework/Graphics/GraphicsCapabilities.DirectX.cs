@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsDepthClamp = device.GraphicsProfile == GraphicsProfile.HiDef;
             SupportsVertexTextures = device.GraphicsProfile == GraphicsProfile.HiDef;
 
-            MaxMultiSampleCount = GetMaxMultiSampleCount(device);
+            _maxMultiSampleCount = GetMaxMultiSampleCount(device);
         }
 
         private void PlatformInitializeAfterResources(GraphicsDevice device)
