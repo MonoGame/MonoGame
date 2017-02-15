@@ -661,17 +661,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext>();
         }
 
-        /// <returns>Higher than zero if multiSampleCount is supported. 
-        /// Zero if multiSampleCount is not supported.</returns>
-        private int GetMultiSamplingQuality(Format format, int multiSampleCount)
-        {
-            // The valid range is between zero and one less than the level returned by CheckMultisampleQualityLevels
-            // https://msdn.microsoft.com/en-us/library/windows/desktop/bb173072(v=vs.85).aspx
-            var quality = _d3dDevice.CheckMultisampleQualityLevels(format, multiSampleCount) - 1;
-            // NOTE: should we always return highest quality?
-            return Math.Max(quality, 0); // clamp minimum to 0 
-        }
-
         internal void SetHardwareFullscreen()
         {
             // This force to switch to fullscreen mode when hardware mode enabled(working in WindowsDX mode).
@@ -819,6 +808,25 @@ namespace Microsoft.Xna.Framework.Graphics
             };
         }
 
+        
+
+        internal void OnPresentationChanged()
+        {
+            CreateSizeDependentResources();
+            ApplyRenderTargets(null);
+        }
+
+#endif // WINDOWS
+        /// <returns>Higher than zero if multiSampleCount is supported. 
+        /// Zero if multiSampleCount is not supported.</returns>
+        private int GetMultiSamplingQuality(Format format, int multiSampleCount)
+        {
+            // The valid range is between zero and one less than the level returned by CheckMultisampleQualityLevels
+            // https://msdn.microsoft.com/en-us/library/windows/desktop/bb173072(v=vs.85).aspx
+            var quality = _d3dDevice.CheckMultisampleQualityLevels(format, multiSampleCount) - 1;
+            // NOTE: should we always return highest quality?
+            return Math.Max(quality, 0); // clamp minimum to 0 
+        }
         private SampleDescription GetSupportedSampleDescription(Format format)
         {
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
@@ -850,14 +858,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return multisampleDesc;
         }
-
-        internal void OnPresentationChanged()
-        {
-            CreateSizeDependentResources();
-            ApplyRenderTargets(null);
-        }
-
-#endif // WINDOWS
 
         private void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
