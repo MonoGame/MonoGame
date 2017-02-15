@@ -30,6 +30,11 @@
       <MonoExe Condition=" '$(OS)' != 'Windows_NT' And Exists ('/usr/bin/mono') ">/usr/bin/mono</MonoExe>
       <MonoExe Condition=" '$(OS)' != 'Windows_NT' And '$(MonoExe)' == '' ">mono</MonoExe>
 
+      <LongParamPrefix Condition=" '$(OS)' != 'Windows_NT' ">--</MonoExe>
+      <LongParamPrefix Condition=" '$(OS)' == 'Windows_NT' ">/</MonoExe>
+      <ShortParamPrefix Condition=" '$(OS)' != 'Windows_NT' ">-</MonoExe>
+      <ShortParamPrefix Condition=" '$(OS)' == 'Windows_NT' ">/</MonoExe>
+
       <MonoGameContentBuilderExe Condition="'$(MonoGameContentBuilderExe)' == ''">$(MSBuildThisFileDirectory)Tools\MGCB.exe</MonoGameContentBuilderExe>
       <MonoGameContentBuilderCmd>&quot;$(MonoGameContentBuilderExe)&quot;</MonoGameContentBuilderCmd>
       <MonoGameContentBuilderCmd Condition=" '$(OS)' != 'Windows_NT' ">$(MonoExe) $(MonoGameContentBuilderCmd)</MonoGameContentBuilderCmd>
@@ -38,7 +43,7 @@
       <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'Android'">Assets\</PlatformResourcePrefix>
       <PlatformResourcePrefix Condition="'$(PlatformResourcePrefix)' == ''"></PlatformResourcePrefix>
 
-      <Header>/platform:$(MonoGamePlatform) /outputDir:&quot;$(ParentOutputDir)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)&quot; /quiet</Header>
+      <Header>$(LongParamPrefix)platform:$(MonoGamePlatform) $(LongParamPrefix)outputDir:&quot;$(ParentOutputDir)&quot; $(LongParamPrefix)intermediateDir:&quot;$(ParentIntermediateDir)&quot; $(LongParamPrefix)quiet</Header>
     </PropertyGroup>
 
     <!-- Get all Mono Game Content References and store them in a list -->
@@ -87,7 +92,7 @@
   </PropertyGroup>
 
   <Target Name="RunContentBuilder">
-    <Exec Condition=" '%(ContentReferences.FullPath)' != '' " Command="$(MonoGameContentBuilderCmd) /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)"
+    <Exec Condition=" '%(ContentReferences.FullPath)' != '' " Command="$(MonoGameContentBuilderCmd) $(ShortParamPrefix)@:&quot;%(ContentReferences.FullPath)&quot; $(Header)"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
 
     <CreateItem Include="$(ParentOutputDir)\**\*.*">
