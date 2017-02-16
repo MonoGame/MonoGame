@@ -158,11 +158,15 @@ namespace Microsoft.Xna.Framework
                 else if (ev.Type == Sdl.EventType.WindowEvent)
                 {
                     if (ev.Window.EventID == Sdl.Window.EventId.Resized || ev.Window.EventID == Sdl.Window.EventId.SizeChanged)
-                        _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
-                    else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
+                        _view.ClientResize (ev.Window.Data1, ev.Window.Data2);
+                    else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained) {
                         IsActive = true;
-                    else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
+                        Sdl.DisableScreenSaver ();
+                        _view.SetCursorVisible (_game.IsMouseVisible);
+                    } else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost) {
                         IsActive = false;
+                        Sdl.EnableScreenSaver ();
+                    }
                 }
             }
         }
