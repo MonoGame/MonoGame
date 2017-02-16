@@ -138,5 +138,61 @@ namespace MonoGame.Tests.Graphics
             depthStencilState.Dispose();
             cube.UnloadContent();
         }
+
+        [TestCase(0)]
+        [TestCase(45)]
+        [TestCase(60)]
+        public void VisualTestStencilBufferClip(int angle)
+        {
+            var spriteBatch = new SpriteBatch(gd);
+            var plainWhite = new Texture2D(gd, 1, 1);
+            plainWhite.SetData(new Color[] { Color.White });
+
+            var stencilWriteOnly = new DepthStencilState()
+            {
+                DepthBufferEnable = false,
+                DepthBufferWriteEnable = false,
+                StencilFunction = CompareFunction.Always,
+                StencilFail = StencilOperation.IncrementSaturation,
+                StencilPass = StencilOperation.IncrementSaturation,
+                ReferenceStencil = 0,
+                StencilEnable = true,
+                StencilMask = 0,
+            };
+
+            var stencilReadOnly = new DepthStencilState()
+            {
+                DepthBufferEnable = false,
+                DepthBufferWriteEnable = false,
+                StencilFunction = CompareFunction.Less,
+                StencilFail = StencilOperation.Keep,
+                StencilPass = StencilOperation.Keep,
+                ReferenceStencil = 0,
+                StencilEnable = true
+            };
+
+            PrepareFrameCapture();
+
+            gd.Clear(Color.CornflowerBlue);
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, stencilWriteOnly);
+            spriteBatch.Draw(plainWhite, new Rectangle(400, 240, 300, 300), null, Color.Transparent, MathHelper.ToRadians((float)angle), Vector2.One / 2, SpriteEffects.None, 0);
+            spriteBatch.End();
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, stencilReadOnly);
+            spriteBatch.Draw(plainWhite, new Rectangle(250, 90, 300, 300), Color.Red);
+            spriteBatch.End();
+
+            CheckFrames();
+
+            stencilReadOnly.Dispose();
+            stencilReadOnly = null;
+            stencilWriteOnly.Dispose();
+            stencilWriteOnly = null;
+            plainWhite.Dispose();
+            plainWhite = null;
+            spriteBatch.Dispose();
+            spriteBatch = null;
+        }
     }
 }
