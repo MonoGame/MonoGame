@@ -11,6 +11,10 @@ using System.Linq;
 
 namespace MonoGame.Tests.Graphics
 {
+
+#if !XNA // Disabled because XNA doesn't support manual Model creation
+
+
     [TestFixture]
     internal sealed class ModelTest : GraphicsDeviceTestFixtureBase
     {
@@ -71,4 +75,5 @@ namespace MonoGame.Tests.Graphics
             Assert.Throws<ArgumentOutOfRangeException>(() => model.CopyBoneTransformsTo(new Matrix[0]));
         }
     }
+#endif
 }

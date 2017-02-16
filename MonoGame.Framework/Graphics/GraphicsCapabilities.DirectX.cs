@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformInitializeAfterResources(GraphicsDevice device)
         {
-            MaxMultiSampleCount = GetMaxMultiSampleCount(device);
+            _maxMultiSampleCount = GetMaxMultiSampleCount(device);
         }
 
         private int GetMaxMultiSampleCount(GraphicsDevice device)

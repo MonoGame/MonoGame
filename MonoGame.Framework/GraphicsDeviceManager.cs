@@ -215,10 +215,14 @@ namespace Microsoft.Xna.Framework
                 {
                     // Round down MultiSampleCount to the nearest power of two
                     // hack from http://stackoverflow.com/a/2681094
+                    // Note: this will return an incorrect, but large value
+                    // for very large numbers. That doesn't matter because
+                    // the number will get clamped below anyway in this case.
                     var msc = gdi.PresentationParameters.MultiSampleCount;
                     msc = msc | (msc >> 1);
                     msc = msc | (msc >> 2);
                     msc = msc | (msc >> 4);
+                    msc -= (msc >> 1);
 
                     if (GraphicsDevice != null)
                     {
@@ -226,8 +230,7 @@ namespace Microsoft.Xna.Framework
                         if (msc > GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount)
                             msc = GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount;
                     }
-
-                    gdi.PresentationParameters.MultiSampleCount = msc - (msc >> 1);
+                    gdi.PresentationParameters.MultiSampleCount = msc;
                 }
             }
 
@@ -273,6 +276,8 @@ namespace Microsoft.Xna.Framework
 
         partial void PlatformApplyChanges();
 
+        partial void PlatformPreparePresentationParameters(PresentationParameters presentationParameters);
+
         private void PreparePresentationParameters(PresentationParameters presentationParameters)
         {
             presentationParameters.BackBufferFormat = _preferredBackBufferFormat;
@@ -297,6 +302,8 @@ namespace Microsoft.Xna.Framework
             {
                 presentationParameters.MultiSampleCount = 0;
             }
+
+            PlatformPreparePresentationParameters(presentationParameters);
         }
 
         private void PrepareGraphicsDeviceInformation(GraphicsDeviceInformation gdi)
