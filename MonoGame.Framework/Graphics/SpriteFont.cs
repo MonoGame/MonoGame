@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	public sealed class SpriteFont 
     {
-		static class Errors 
+		internal static class Errors 
         {
 			public const string TextContainsUnresolvableCharacters =
 				"Text contains characters that cannot be resolved by this SpriteFont.";
@@ -22,6 +22,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		private readonly Dictionary<char, Glyph> _glyphs;
 		
 		private readonly Texture2D _texture;
+        
+		internal Dictionary<char, Glyph> Glyphs { get { return _glyphs; } }
 
 		class CharComparer: IEqualityComparer<char>
 		{
@@ -136,7 +138,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return size;
 		}
 
-		private void MeasureString(ref CharacterSource text, out Vector2 size)
+		internal void MeasureString(ref CharacterSource text, out Vector2 size)
 		{
 			if (text.Length == 0)
             {
@@ -205,133 +207,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             size.X = width;
             size.Y = offset.Y + finalLineHeight;
-		}
-
-        internal void DrawInto( SpriteBatch spriteBatch, ref CharacterSource text, Vector2 position, Color color,
-			                    float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
-		{
-            var flipAdjustment = Vector2.Zero;
-
-            var flippedVert = (effect & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
-            var flippedHorz = (effect & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
-
-            if (flippedVert || flippedHorz)
-            {
-                Vector2 size;
-                MeasureString(ref text, out size);
-
-                if (flippedHorz)
-                {
-                    origin.X *= -1;
-                    flipAdjustment.X = -size.X;
-                }
-
-                if (flippedVert)
-                {
-                    origin.Y *= -1;
-                    flipAdjustment.Y = LineSpacing - size.Y;
-                }
-            }
-
-            // OPTIMIZED
-            //Matrix transformation, temp;
-            //Matrix.CreateTranslation(-origin.X, -origin.Y, 0f, out transformation);
-            //Matrix.CreateScale((flippedHorz ? -scale.X : scale.X), (flippedVert ? -scale.Y : scale.Y), 1f, out temp);
-            //Matrix.Multiply(ref transformation, ref temp, out transformation);
-            //Matrix.CreateTranslation(flipAdjustment.X, flipAdjustment.Y, 0, out temp);
-            //Matrix.Multiply(ref temp, ref transformation, out transformation);
-            //Matrix.CreateRotationZ(rotation, out temp);
-            //Matrix.Multiply(ref transformation, ref temp, out transformation);
-            //Matrix.CreateTranslation(position.X, position.Y, 0f, out temp);
-            //Matrix.Multiply(ref transformation, ref temp, out transformation);
-            
-            Matrix transformation = Matrix.Identity;
-            if (rotation == 0)
-            {
-                transformation.M11 = (flippedHorz ? -scale.X : scale.X);
-                transformation.M22 = (flippedVert ? -scale.Y : scale.Y);
-                transformation.M41 = ((flipAdjustment.X - origin.X) * transformation.M11) + position.X;
-                transformation.M42 = ((flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y;
-            }
-            else
-            {
-                var cos = (float)Math.Cos(rotation);
-                var sin = (float)Math.Sin(rotation);
-                transformation.M11 = (flippedHorz ? -scale.X : scale.X) * cos;
-                transformation.M12 = (flippedHorz ? -scale.X : scale.X) * sin;
-                transformation.M21 = (flippedVert ? -scale.Y : scale.Y) * (-sin);
-                transformation.M22 = (flippedVert ? -scale.Y : scale.Y) * cos;
-                transformation.M41 = (((flipAdjustment.X - origin.X) * transformation.M11) + (flipAdjustment.Y - origin.Y) * transformation.M21) + position.X;
-                transformation.M42 = (((flipAdjustment.X - origin.X) * transformation.M12) + (flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y; 
-            }
-
-            // Get the default glyph here once.
-            Glyph? defaultGlyph = null;
-            if (DefaultCharacter.HasValue)
-                defaultGlyph = _glyphs[DefaultCharacter.Value];
-
-            var currentGlyph = Glyph.Empty;
-            var offset = Vector2.Zero;
-            var firstGlyphOfLine = true;
-
-			for (var i = 0; i < text.Length; ++i)
-            {
-                var c = text[i];
-
-                if (c == '\r')
-                    continue;
-
-                if (c == '\n')
-                {
-                    offset.X = 0;
-                    offset.Y += LineSpacing;
-                    firstGlyphOfLine = true;
-                    continue;
-                }
-
-                if (!_glyphs.TryGetValue(c, out currentGlyph))
-                {
-                    if (!defaultGlyph.HasValue)
-                        throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
-
-                    currentGlyph = defaultGlyph.Value;
-                }
-
-                // The first character on a line might have a negative left side bearing.
-                // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
-                //  so that text does not hang off the left side of its rectangle.
-                if (firstGlyphOfLine) {
-                    offset.X = Math.Max(currentGlyph.LeftSideBearing, 0);
-                    firstGlyphOfLine = false;
-                } else {
-                    offset.X += Spacing + currentGlyph.LeftSideBearing;
-                }
-
-                var p = offset;
-
-				if (flippedHorz)
-                    p.X += currentGlyph.BoundsInTexture.Width;
-                p.X += currentGlyph.Cropping.X;
-
-				if (flippedVert)
-                    p.Y += currentGlyph.BoundsInTexture.Height - LineSpacing;
-                p.Y += currentGlyph.Cropping.Y;
-
-				Vector2.Transform(ref p, ref transformation, out p);
-
-                var destRect = new Vector4( p.X, p.Y, 
-                                            currentGlyph.BoundsInTexture.Width * scale.X,
-                                            currentGlyph.BoundsInTexture.Height * scale.Y);
-
-				spriteBatch.DrawInternal(
-                    _texture, destRect, currentGlyph.BoundsInTexture,
-					color, rotation, Vector2.Zero, effect, depth, false);
-
-                offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
-			}
-
-			// We need to flush if we're using Immediate sort mode.
-			spriteBatch.FlushIfNeeded();
 		}
 
         internal struct CharacterSource 
