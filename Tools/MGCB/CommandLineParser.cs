@@ -281,6 +281,18 @@ namespace MGCB
                     continue;
                 }
 
+                if (arg.StartsWith("/define:") || arg.StartsWith("-define:"))
+                {
+                    var words = arg.Substring(8).Split('=');
+                    var name = words[0];
+                    var value = words[1];
+
+                    _properties[name] = value;
+
+                    continue;
+
+                }
+
                 if (arg.StartsWith("/@:") || arg.StartsWith("-@:"))
                 {
                     var file = arg.Substring(3);
