@@ -41,13 +41,12 @@ namespace MonoGame.Tests.Graphics
         {
             PrepareFrameCapture();
 
-            gd.Clear(new Color(68, 34, 136, 255));
-
             var renderTargets = gd.GetRenderTargets();
             gd.ScissorRectangle = new Rectangle(0, 0, 20, 20);
             gd.SetRenderTarget(_extraRenderTarget);
             gd.SetRenderTargets(renderTargets);
 
+            gd.Clear(new Color(68, 34, 136, 255));
             DrawTexture();
 
             CheckFrames();
