@@ -322,9 +322,6 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            // XNA runs one Update even before showing the window
-            Game.DoUpdate(new GameTime());
-
             // https://bugzilla.novell.com/show_bug.cgi?id=487896
             // Since there's existing bug from implementation with mono WinForms since 09'
             // Application.Idle is not working as intended
