@@ -342,6 +342,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(texture);
 
+            if(origin != Vector2.Zero)
+            {
+                if(sourceRectangle.HasValue && sourceRectangle.Value.Width  != 0)
+                    origin.X = origin.X * ((float)destinationRectangle.Width ) / (float)sourceRectangle.Value.Width;
+                else
+                    origin.X = origin.X * ((float)destinationRectangle.Width ) * (float)texture._texelSize.X;
+
+                if(sourceRectangle.HasValue && sourceRectangle.Value.Height != 0)
+                    origin.Y = origin.Y * ((float)destinationRectangle.Height) / (float)sourceRectangle.Value.Height;
+                else
+                    origin.Y = origin.Y * ((float)destinationRectangle.Height) * (float)texture._texelSize.Y;
+            }
+
             DrawInternal(texture,
 			      new Vector4(destinationRectangle.X,
 			                  destinationRectangle.Y,
@@ -350,8 +363,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			      sourceRectangle,
 			      color,
 			      rotation,
-			      new Vector2(origin.X * ((float)destinationRectangle.Width / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Width != 0) ? sourceRectangle.Value.Width : texture.Width)),
-                        			origin.Y * ((float)destinationRectangle.Height) / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Height != 0) ? sourceRectangle.Value.Height : texture.Height)),
+			      origin,
 			      effects,
                   layerDepth,
 			      true);
@@ -390,18 +402,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			if (sourceRectangle.HasValue)
             {
-				_tempRect = sourceRectangle.Value;
-                _texCoordTL.X = _tempRect.X / (float)texture.Width;
-                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
-                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
-                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+                _texCoordTL.X = sourceRectangle.Value.X * texture._texelSize.X;
+                _texCoordTL.Y = sourceRectangle.Value.Y * texture._texelSize.Y;
+                _texCoordBR.X = _texCoordTL.X + sourceRectangle.Value.Width * texture._texelSize.X;
+                _texCoordBR.Y = _texCoordTL.Y + sourceRectangle.Value.Height * texture._texelSize.Y;
             }
             else
             {
-                _texCoordTL.X = 0f;
-                _texCoordTL.Y = 0f;
-                _texCoordBR.X = 1f;
-                _texCoordBR.Y = 1f;
+                _texCoordTL = Vector2.Zero;
+                _texCoordBR = Vector2.One;
             }
             
 			if ((effect & SpriteEffects.FlipVertically) != 0) {
@@ -428,14 +437,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
 		    {
-                item.Set(destinationRectangle.X,
-                        destinationRectangle.Y,
-                        -origin.X,
-                        -origin.Y,
+                var sin = (float)Math.Sin(rotation);
+                var cos = (float)Math.Cos(rotation);
+                item.Set(destinationRectangle.X - (origin.X*cos-origin.Y*sin),
+                        destinationRectangle.Y - (origin.X*sin+origin.Y*cos),
                         destinationRectangle.Z,
                         destinationRectangle.W,
-                        (float)Math.Sin(rotation),
-                        (float)Math.Cos(rotation),
+                        sin,
+                        cos,
                         color,
                         _texCoordTL,
                         _texCoordBR,
