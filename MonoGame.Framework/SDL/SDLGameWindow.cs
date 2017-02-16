@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework
         public bool IsFullScreen;
 
         internal readonly Game _game;
-        private IntPtr _handle;
+        private IntPtr _handle, _icon;
         private bool _disposed;
         private bool _resizable, _borderless, _willBeFullScreen, _mouseVisible, _hardwareSwitch;
         private string _screenDeviceName;
@@ -108,17 +108,7 @@ namespace Microsoft.Xna.Framework
                 _winx = display.X + display.Width / 2;
                 _winy = display.Y + display.Height / 2;
             }
-
-            var initflags =
-                Sdl.Window.State.OpenGL |
-                Sdl.Window.State.Hidden |
-                Sdl.Window.State.InputFocus |
-                Sdl.Window.State.MouseFocus;
-
-            _handle = Sdl.Window.Create(MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle(),
-                _winx - _width / 2, _winy - _height / 2,
-                _width, _height, initflags);
-
+            
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
             Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
@@ -134,52 +124,39 @@ namespace Microsoft.Xna.Framework
                         try
                         {
                             var src = Sdl.RwFromMem(br.ReadBytes((int)stream.Length), (int)stream.Length);
-                            var icon = Sdl.LoadBMP_RW(src, 1);
-                            Sdl.Window.SetIcon(_handle, icon);
-                            Sdl.FreeSurface(icon);
+                            _icon = Sdl.LoadBMP_RW(src, 1);
                         }
                         catch { }
                     }
             }
 
-            SetCursorVisible(_mouseVisible);
+            _handle = Sdl.Window.Create("", _winx, _winy,
+                GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight,
+                Sdl.Window.State.Hidden);
         }
 
-        // TODO Move this to GraphicsDeviceManager
-        internal void InitGraphics()
+        internal void CreateWindow()
         {
-            var surfaceFormat = _game.graphicsDeviceManager.PreferredBackBufferFormat.GetColorFormat();
-            var depthStencilFormat = _game.graphicsDeviceManager.PreferredDepthStencilFormat;
+            var initflags =
+                Sdl.Window.State.OpenGL |
+                Sdl.Window.State.Hidden |
+                Sdl.Window.State.InputFocus |
+                Sdl.Window.State.MouseFocus;
 
-            // TODO Need to get this data from the Presentation Parameters
-            Sdl.GL.SetAttribute(Sdl.GL.Attribute.RedSize, surfaceFormat.R);
-            Sdl.GL.SetAttribute(Sdl.GL.Attribute.GreenSize, surfaceFormat.G);
-            Sdl.GL.SetAttribute(Sdl.GL.Attribute.BlueSize, surfaceFormat.B);
-            Sdl.GL.SetAttribute(Sdl.GL.Attribute.AlphaSize, surfaceFormat.A);
+            if (_handle != IntPtr.Zero)
+                Sdl.Window.Destroy(_handle);
 
-            switch (depthStencilFormat)
-            {
-                case DepthFormat.None:
-                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.DepthSize, 0);
-                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.StencilSize, 0);
-                    break;
-                case DepthFormat.Depth16:
-                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.DepthSize, 16);
-                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.StencilSize, 0);
-                    break;
-                case DepthFormat.Depth24:
-                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.DepthSize, 24);
-                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.StencilSize, 0);
-                    break;
-                case DepthFormat.Depth24Stencil8:
-                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.DepthSize, 24);
-                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.StencilSize, 8);
-                    break;
-            }
+            _handle = Sdl.Window.Create(MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle(),
+                _winx - _width / 2, _winy - _height / 2,
+                _width, _height, initflags);
 
-            Sdl.GL.SetAttribute(Sdl.GL.Attribute.DoubleBuffer, 1);
-            Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMajorVersion, 2);
-            Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMinorVersion, 1);
+            if (_icon != IntPtr.Zero)
+                Sdl.Window.SetIcon(_handle, _icon);
+
+            Sdl.Window.SetBordered(_handle, _borderless ? 0 : 1);
+            Sdl.Window.SetResizable(_handle, _resizable);
+
+            SetCursorVisible(_mouseVisible);
         }
 
         ~SdlGameWindow()
@@ -333,6 +310,9 @@ namespace Microsoft.Xna.Framework
 
             Sdl.Window.Destroy(_handle);
             _handle = IntPtr.Zero;
+
+            if (_icon != IntPtr.Zero)
+                Sdl.FreeSurface(_icon);
 
             _disposed = true;
         }
