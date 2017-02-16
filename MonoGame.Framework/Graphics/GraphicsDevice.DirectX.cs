@@ -817,8 +817,18 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #endif // WINDOWS
-        /// <returns>Higher than zero if multiSampleCount is supported. 
-        /// Zero if multiSampleCount is not supported.</returns>
+
+
+        /// <summary>
+        /// Get highest multisample quality level for specified format and multisample count.
+        /// Returns 0 if multisampling is not supported for input parameters.
+        /// </summary>
+        /// <param name="format">The texture format.</param>
+        /// <param name="multiSampleCount">The number of samples during multisampling.</param>
+        /// <returns>
+        /// Higher than zero if multiSampleCount is supported. 
+        /// Zero if multiSampleCount is not supported.
+        /// </returns>
         private int GetMultiSamplingQuality(Format format, int multiSampleCount)
         {
             // The valid range is between zero and one less than the level returned by CheckMultisampleQualityLevels
@@ -827,6 +837,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // NOTE: should we always return highest quality?
             return Math.Max(quality, 0); // clamp minimum to 0 
         }
+
         private SampleDescription GetSupportedSampleDescription(Format format)
         {
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
@@ -834,25 +845,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (PresentationParameters.MultiSampleCount > 1)
             {
-                // Round down MultiSampleCount to the nearest power of two
-                // hack from http://stackoverflow.com/a/2681094
-                // Note: this will return an incorrect, but large value
-                // for very large numbers. That doesn't matter because
-                // the number will get clamped below anyway in this case.
-                // Also MultiSampleCount should never be larger than 32 
-                // (which is MultiSampleCountLimit)
-                var msc = PresentationParameters.MultiSampleCount;
-                msc = msc | (msc >> 1);
-                msc = msc | (msc >> 2);
-                msc = msc | (msc >> 4);
-                msc -= (msc >> 1);
-                // and clamp it to what the device can handle
-                if (msc > GraphicsCapabilities.MaxMultiSampleCount)
-                    msc = GraphicsCapabilities.MaxMultiSampleCount;
+                // NOTE: MultiSampleCount should be already clamped before to supported count 
+                // by ClampMultisampleCountToSupportedByCurrentDevice()
+                var quality = GetMultiSamplingQuality(format, PresentationParameters.MultiSampleCount);
 
-                var quality = GetMultiSamplingQuality(format, msc);
-
-                multisampleDesc.Count = msc;
+                multisampleDesc.Count = PresentationParameters.MultiSampleCount;
                 multisampleDesc.Quality = quality;
             }
 

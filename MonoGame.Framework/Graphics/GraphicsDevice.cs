@@ -179,7 +179,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        internal GraphicsDevice ()
+        internal GraphicsDevice()
 		{
             PresentationParameters = new PresentationParameters();
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
@@ -267,10 +267,34 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
+        void ClampMultisampleCountToSupportedByCurrentDevice()
+        {
+            if (PresentationParameters.MultiSampleCount > 1)
+            {
+                // Round down MultiSampleCount to the nearest power of two
+                // hack from http://stackoverflow.com/a/2681094
+                // Note: this will return an incorrect, but large value
+                // for very large numbers. That doesn't matter because
+                // the number will get clamped below anyway in this case.
+                // Also MultiSampleCount should never be larger than 32 
+                // (which is MultiSampleCountLimit)
+                var msc = PresentationParameters.MultiSampleCount;
+                msc = msc | (msc >> 1);
+                msc = msc | (msc >> 2);
+                msc = msc | (msc >> 4);
+                msc -= (msc >> 1);
+                // and clamp it to what the device can handle
+                if (msc > GraphicsCapabilities.MaxMultiSampleCount)
+                    msc = GraphicsCapabilities.MaxMultiSampleCount;
+
+                PresentationParameters.MultiSampleCount = msc;
+            }
+            else PresentationParameters.MultiSampleCount = 0;
+        }
         internal void Initialize()
         {
+            ClampMultisampleCountToSupportedByCurrentDevice();
             PlatformInitialize();
-            GraphicsCapabilities.InitializeAfterResources(this);
 
             // Force set the default render states.
             _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = true;
@@ -564,6 +588,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
+
+            ClampMultisampleCountToSupportedByCurrentDevice();
 
             // Update the back buffer.
             OnPresentationChanged();

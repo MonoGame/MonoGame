@@ -29,11 +29,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _maxMultiSampleCount = GetMaxMultiSampleCount(device);
         }
 
-        private void PlatformInitializeAfterResources(GraphicsDevice device)
-        {
-            
-        }
-
         private int GetMaxMultiSampleCount(GraphicsDevice device)
         {
             var format = SharpDXHelper.ToFormat(device.PresentationParameters.BackBufferFormat);
