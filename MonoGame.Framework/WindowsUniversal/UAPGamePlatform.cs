@@ -128,10 +128,18 @@ namespace Microsoft.Xna.Framework
         {
             System.Threading.CancellationToken t = new System.Threading.CancellationToken();
             Task.Factory.StartNew(
-                  () => RunGameLoopInWorkerThread(),
-                  t,
-                  TaskCreationOptions.LongRunning,
-                  TaskScheduler.Default);
+                   () => RunGameLoopInWorkerThread(),
+                   t,
+                   TaskCreationOptions.LongRunning,
+                   TaskScheduler.Default);
+
+
+
+            CompositionTarget.Rendering += (o, a) =>
+            {
+
+            };
+
         }
 
         private void RunGameLoopInWorkerThread()

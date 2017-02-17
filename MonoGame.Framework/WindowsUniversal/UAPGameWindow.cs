@@ -12,6 +12,7 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.Graphics.Display;
 using Windows.UI.Xaml.Controls;
+using Windows.System.Threading;
 
 using Microsoft.Xna.Framework.Input.Touch;
 
@@ -34,7 +35,8 @@ namespace Microsoft.Xna.Framework
         private Rectangle _viewBounds;
         private Queue<KeyEvent> _windowKeyEventsToPlayback = new Queue<KeyEvent>(); // we record keys on UI thread and play them back on game thread.
 
-        private object _eventLocker = new object();
+        // private object _eventLocker = new object();
+        private bool _disableGameTicking = false; // Needed alongside locks to make app responsive
 
         private InputEvents _windowEvents;
 
@@ -72,13 +74,17 @@ namespace Microsoft.Xna.Framework
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
+            _disableGameTicking = true;
             lock (UAPGameWindow.Instance)
             {
                 // We don't want to trigger orientation changes 
                 // when no preference is being changed.
                 if (_supportedOrientations == orientations)
+                {
+                    _disableGameTicking = false;
                     return;
-
+                }
+     
                 _supportedOrientations = orientations;
 
                 DisplayOrientations supported;
@@ -96,6 +102,7 @@ namespace Microsoft.Xna.Framework
 
                 DisplayInformation.AutoRotationPreferences = supported;
             }
+            _disableGameTicking = false;
         }
 
         #endregion
@@ -109,8 +116,6 @@ namespace Microsoft.Xna.Framework
 
         public void Initialize(CoreWindow coreWindow, UIElement inputElement, TouchQueue touchQueue)
         {
-            lock (UAPGameWindow.Instance)
-            {
                 _coreWindow = coreWindow;
                 _windowEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
 
@@ -135,11 +140,12 @@ namespace Microsoft.Xna.Framework
                 SetViewBounds(_appView.VisibleBounds.Width, _appView.VisibleBounds.Height);
 
                 SetCursor(false);
-            }
+        
         }
 
         private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
         {
+            _disableGameTicking = true;
             lock (UAPGameWindow.Instance)
             {
                 if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
@@ -147,31 +153,38 @@ namespace Microsoft.Xna.Framework
                 else
                     Platform.IsActive = true;
             }
+            _disableGameTicking = false;
         }
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
         {
+            _disableGameTicking = true;
             lock (UAPGameWindow.Instance)
             {
                 Game.SuppressDraw();
                 Game.Platform.Exit();
             }
+            _disableGameTicking = false;
         }
 
         private void SetViewBounds(double width, double height)
         {
+            _disableGameTicking = true;
             lock (UAPGameWindow.Instance)
             {
                 var pixelWidth = Math.Max(1, (int)Math.Round(width * _dinfo.RawPixelsPerViewPixel));
                 var pixelHeight = Math.Max(1, (int)Math.Round(height * _dinfo.RawPixelsPerViewPixel));
                 _viewBounds = new Rectangle(0, 0, pixelWidth, pixelHeight);
             }
+            _disableGameTicking = false;
         }
 
         private void SwapChain_SizeChanged(object sender, SizeChangedEventArgs args)
         {
-            lock (_eventLocker)
+            _disableGameTicking = true;
+            // lock (_eventLocker)
             {
+                
                 lock (UAPGameWindow.Instance)
                 {
                     var manager = Game.graphicsDeviceManager;
@@ -192,12 +205,15 @@ namespace Microsoft.Xna.Framework
                     // the client size changed event.
                     OnClientSizeChanged();
                 }
+              
             }
+            _disableGameTicking = false;
         }
 
         private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
         {
             // Cannot use 'lock(UAPGameWindow.Instance)' because it blocks keyboard input because of waiting for main loops lock.
+            _disableGameTicking = true;
             lock (_windowKeyEventsToPlayback)
             {
                 KeyEvent e = new KeyEvent();
@@ -205,12 +221,12 @@ namespace Microsoft.Xna.Framework
                 e.sender = sender;
                 _windowKeyEventsToPlayback.Enqueue(e);
             }
+            _disableGameTicking = false;
         }
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
         {
-            lock (UAPGameWindow.Instance)
-            {
+          
                 var result = DisplayOrientation.Default;
                 if ((orientations & DisplayOrientations.Landscape) != 0)
                     result |= DisplayOrientation.LandscapeLeft;
@@ -222,14 +238,11 @@ namespace Microsoft.Xna.Framework
                     result |= DisplayOrientation.PortraitDown;
 
                 return result;
-            }
-
+ 
         }
 
         private static DisplayOrientations FromOrientation(DisplayOrientation orientation)
-        {
-            lock (UAPGameWindow.Instance)
-            {
+        {          
                 var result = DisplayOrientations.None;
                 if ((orientation & DisplayOrientation.LandscapeLeft) != 0)
                     result |= DisplayOrientations.Landscape;
@@ -241,19 +254,26 @@ namespace Microsoft.Xna.Framework
                     result |= DisplayOrientations.PortraitFlipped;
 
                 return result;
-            }
         }
 
         internal void SetClientSize(int width, int height)
         {
+            _disableGameTicking = true;
             lock (UAPGameWindow.Instance)
             {
                 if (_appView.IsFullScreenMode)
+                {
+                    _disableGameTicking = false;
                     return;
-
+                }
+        
                 if (_viewBounds.Width == width &&
                     _viewBounds.Height == height)
+                {
+                    _disableGameTicking = false;
                     return;
+                }
+                    
 
                 var viewSize = new Windows.Foundation.Size(width / _dinfo.RawPixelsPerViewPixel, height / _dinfo.RawPixelsPerViewPixel);
 
@@ -263,11 +283,13 @@ namespace Microsoft.Xna.Framework
                     // TODO: What now?
                 }
             }
+            _disableGameTicking = false;
         }
 
         private void DisplayProperties_OrientationChanged(DisplayInformation dinfo, object sender)
         {
-            lock (_eventLocker)
+            _disableGameTicking = true;
+            //lock (_eventLocker)
             {
                 lock (UAPGameWindow.Instance)
                 {
@@ -280,30 +302,38 @@ namespace Microsoft.Xna.Framework
                     // If we have a valid client bounds then update the graphics device.
                     if (_viewBounds.Width > 0 && _viewBounds.Height > 0)
                         Game.graphicsDeviceManager.ApplyChanges();
-                }
+                }            
             }
+            _disableGameTicking = false;
         }
 
         protected override void SetTitle(string title)
         {
+            _disableGameTicking = true;
             lock (UAPGameWindow.Instance)
             {
                 Debug.WriteLine("WARNING: GameWindow.Title has no effect under UWP.");
             }
+            _disableGameTicking = false;
         }
 
         internal void SetCursor(bool visible)
         {
+            _disableGameTicking = true;
             lock (UAPGameWindow.Instance)
             {
                 if (_coreWindow == null)
+                {
+                    _disableGameTicking = false;
                     return;
-
+                }
+     
                 if (visible)
                     _coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
                 else
                     _coreWindow.PointerCursor = null;
             }
+            _disableGameTicking = false;
         }
 
         internal void RunLoop()
@@ -333,10 +363,18 @@ namespace Microsoft.Xna.Framework
         }
 
         internal void Tick()
-        {
+        {       
+            // Must return before lock happens
+            if (_disableGameTicking == true)
+            {
+                return;
+            }
+
+            _windowEvents.CopyKeyStateToGameThread();
+
             lock (UAPGameWindow.Instance)
             {
-                // Playback keys that the window recieved on the game thread
+                 // Playback keys that the window recieved on the game thread
                 lock (_windowKeyEventsToPlayback)
                 {
                     while (_windowKeyEventsToPlayback.Count > 0)
@@ -346,39 +384,54 @@ namespace Microsoft.Xna.Framework
                     }
                 }
 
+                _windowEvents.UpdateKeyboardState();
+
                 // Update state based on window events.
-                _windowEvents.UpdateState(); // todo: lock
+                //_windowEvents.UpdateState(); // todo: lock
+
+                //UAPGameWindow.Log("gameWindow Tick 3");
 
                 // Update and render the game.
                 if (Game != null)
                     Game.Tick();
+
+               // UAPGameWindow.Log("gameWindow Tick 4");
+
             }
+            //UAPGameWindow.Log("gameWindow Tick 5");
+
         }
 
         #region Public Methods
 
         public void Dispose()
         {
+            _disableGameTicking = true;
             lock (UAPGameWindow.Instance)
             {
                 //window.Dispose();
             }
+            _disableGameTicking = false;
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
+            _disableGameTicking = true;
             lock (UAPGameWindow.Instance)
             {
 
             }
+            _disableGameTicking = false;
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
+            _disableGameTicking = true;
             lock (UAPGameWindow.Instance)
             {
 
             }
+            _disableGameTicking = false;
         }
         #endregion
 

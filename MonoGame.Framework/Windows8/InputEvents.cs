@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework
         private async System.Threading.Tasks.Task RunInputAsync(UIElement inputElement)
         {
             CoreInputDeviceTypes inputDevices = CoreInputDeviceTypes.Mouse | CoreInputDeviceTypes.Pen | CoreInputDeviceTypes.Touch;
-          
+
             CoreIndependentInputSource coreIndependentInputSource;
             if (inputElement is SwapChainBackgroundPanel)
                 coreIndependentInputSource = ((SwapChainBackgroundPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
@@ -46,25 +46,6 @@ namespace Microsoft.Xna.Framework
         {
             _touchQueue = touchQueue;
 
-            /*if (inputElement != null)
-            {
-                // If we have an input UIElement then we bind input events
-                // to it else we'll get events for overlapping XAML controls.
-                inputElement.PointerPressed += UIElement_PointerPressed;
-                inputElement.PointerReleased += UIElement_PointerReleased;
-                inputElement.PointerCanceled += UIElement_PointerReleased;
-                inputElement.PointerMoved += UIElement_PointerMoved;
-                inputElement.PointerWheelChanged += UIElement_PointerWheelChanged;
-            }
-            else
-            {
-                // If we only have a CoreWindow then use it for input events.
-                window.PointerPressed += CoreWindow_PointerPressed;
-                window.PointerReleased += CoreWindow_PointerReleased;
-                window.PointerMoved += CoreWindow_PointerMoved;
-                window.PointerWheelChanged += CoreWindow_PointerWheelChanged;
-            }*/
-
             // The key events are always tied to the window as those will
             // only arrive here if some other control hasn't gotten it.
             window.KeyDown += CoreWindow_KeyDown;
@@ -78,26 +59,6 @@ namespace Microsoft.Xna.Framework
                 System.Threading.Tasks.TaskCreationOptions taskFlags = System.Threading.Tasks.TaskCreationOptions.LongRunning;
                 System.Threading.CancellationToken t = new System.Threading.CancellationToken();
                 System.Threading.Tasks.Task.Factory.StartNew(() => RunInputAsync(inputElement), t, taskFlags, System.Threading.Tasks.TaskScheduler.Default);
-
-
-                /*WorkItemHandler workItemHandler = action =>
-                {
-                    CoreInputDeviceTypes inputDevices = CoreInputDeviceTypes.Mouse | CoreInputDeviceTypes.Pen | CoreInputDeviceTypes.Touch;
-
-                    CoreIndependentInputSource coreIndependentInputSource;
-                    if (inputElement is SwapChainBackgroundPanel)
-                        coreIndependentInputSource = ((SwapChainBackgroundPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
-                    else
-                        coreIndependentInputSource = ((SwapChainPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
-
-                    coreIndependentInputSource.PointerPressed += CoreWindow_PointerPressed;
-                    coreIndependentInputSource.PointerMoved += CoreWindow_PointerMoved;
-                    coreIndependentInputSource.PointerReleased += CoreWindow_PointerReleased;
-
-                    coreIndependentInputSource.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
-                };
-
-                _inputLoopWorker = ThreadPool.RunAsync(workItemHandler, WorkItemPriority.Normal, WorkItemOptions.None);*/
             }
         }
 
@@ -248,7 +209,7 @@ namespace Microsoft.Xna.Framework
             Mouse.PrimaryWindow.MouseState.MiddleButton = state.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
         }
 
-        public void UpdateState()
+        public void CopyKeyStateToGameThread()
         {
             // Copy keys from ui thread to keys for game thread
             lock (_keysUiThread)
@@ -256,7 +217,10 @@ namespace Microsoft.Xna.Framework
                 _keysGameThread.Clear();
                 _keysGameThread.AddRange(_keysUiThread);
             }
+        }
 
+        public void UpdateKeyboardState()
+        {
             // Update the keyboard state.
             Keyboard.SetKeys(_keysGameThread); // todo: lock
         }
