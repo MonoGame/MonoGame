@@ -25,9 +25,6 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} SDK Installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © The MonoGame Team"
 
-; Request application privileges for Windows Vista
-RequestExecutionLevel admin
-
 ;Interface Configuration
 
 !define MUI_HEADERIMAGE
@@ -72,8 +69,76 @@ RequestExecutionLevel admin
 
 ;--------------------------------
 
-; The stuff to install
+; The templates to install
+Section "Visual Studio 2010 Templates" VS2010
+
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\10.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    SetOutPath "$1\Visual C#\MonoGame"
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+    DetailPrint "Visual Studio 2010 not found"
+  EndTemplates:
+
+SectionEnd
+
+Section "Visual Studio 2012 Templates" VS2012
+
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\11.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    SetOutPath "$1\Visual C#\MonoGame"
+    File /r '..\..\ProjectTemplates\VisualStudio2012\*.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+    DetailPrint "Visual Studio 2012 not found"
+  EndTemplates:
+
+SectionEnd
+
+Section "Visual Studio 2013 Templates" VS2013
+
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\12.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    SetOutPath "$1\Visual C#\MonoGame"
+    File /r '..\..\ProjectTemplates\VisualStudio2013\*.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+    DetailPrint "Visual Studio 2013 not found"
+  EndTemplates:
+
+SectionEnd
+
+Section "Visual Studio 2015 Templates" VS2015
+
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\14.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    SetOutPath "$1\Visual C#\MonoGame"
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2013\WindowsPhone8.1.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2015\*.zip'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+    DetailPrint "Visual Studio 2015 not found"
+  EndTemplates:
+
+SectionEnd
+
+; The core stuff to install
 Section "MonoGame Core Components" CoreComponents ;No components page, name is not important
+  ; Request application privileges for Windows Vista
+  RequestExecutionLevel admin
+
   SectionIn RO
 
   ; Install the VS support files.
@@ -192,71 +257,6 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   ; Uninstaller
   WriteUninstaller "uninstall.exe"
 
-
-SectionEnd
-
-Section "Visual Studio 2010 Templates" VS2010
-
-  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\10.0" "UserProjectTemplatesLocation"
-  ExpandEnvStrings $1 $1
-  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
-  InstallTemplates:
-    SetOutPath "$1\Visual C#\MonoGame"
-    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
-    GOTO EndTemplates
-  CannotInstallTemplates:
-    DetailPrint "Visual Studio 2010 not found"
-  EndTemplates:
-
-SectionEnd
-
-Section "Visual Studio 2012 Templates" VS2012
-
-  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\11.0" "UserProjectTemplatesLocation"
-  ExpandEnvStrings $1 $1
-  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
-  InstallTemplates:
-    SetOutPath "$1\Visual C#\MonoGame"
-    File /r '..\..\ProjectTemplates\VisualStudio2012\*.zip'
-    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
-    GOTO EndTemplates
-  CannotInstallTemplates:
-    DetailPrint "Visual Studio 2012 not found"
-  EndTemplates:
-
-SectionEnd
-
-Section "Visual Studio 2013 Templates" VS2013
-
-  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\12.0" "UserProjectTemplatesLocation"
-  ExpandEnvStrings $1 $1
-  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
-  InstallTemplates:
-    SetOutPath "$1\Visual C#\MonoGame"
-    File /r '..\..\ProjectTemplates\VisualStudio2013\*.zip'
-    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
-    GOTO EndTemplates
-  CannotInstallTemplates:
-    DetailPrint "Visual Studio 2013 not found"
-  EndTemplates:
-
-SectionEnd
-
-Section "Visual Studio 2015 Templates" VS2015
-
-  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\14.0" "UserProjectTemplatesLocation"
-  ExpandEnvStrings $1 $1
-  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
-  InstallTemplates:
-    SetOutPath "$1\Visual C#\MonoGame"
-    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
-    File /r '..\..\ProjectTemplates\VisualStudio2013\WindowsPhone8.1.zip'
-    File /r '..\..\ProjectTemplates\VisualStudio2015\*.zip'
-    GOTO EndTemplates
-  CannotInstallTemplates:
-    DetailPrint "Visual Studio 2015 not found"
-  EndTemplates:
-
 SectionEnd
 
 ; Optional section (can be disabled by the user)
@@ -350,6 +350,24 @@ FunctionEnd
 
 Section "Uninstall"
 
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\10.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  RMDir /r "$1\Visual C#\MonoGame"
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\11.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  RMDir /r "$1\Visual C#\MonoGame"
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\12.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  RMDir /r "$1\Visual C#\MonoGame"
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\14.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  RMDir /r "$1\Visual C#\MonoGame"
+  RMDir /r "${MSBuildInstallDir}"
+  RMDir /r "$SMPROGRAMS\${APPNAME}"
+
+  ; Request application privileges for Windows Vista
+  RequestExecutionLevel admin
+
   DeleteRegKey HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Desktop OpenGL'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows'
@@ -395,21 +413,6 @@ Section "Uninstall"
   ${Else}
   RMDir /r "$0\AddIns\MonoDevelop.MonoGame"
   ${EndIf}
-  
-  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\10.0" "UserProjectTemplatesLocation"
-  ExpandEnvStrings $1 $1
-  RMDir /r "$1\Visual C#\MonoGame"
-  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\11.0" "UserProjectTemplatesLocation"
-  ExpandEnvStrings $1 $1
-  RMDir /r "$1\Visual C#\MonoGame"
-  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\12.0" "UserProjectTemplatesLocation"
-  ExpandEnvStrings $1 $1
-  RMDir /r "$1\Visual C#\MonoGame"
-  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\14.0" "UserProjectTemplatesLocation"
-  ExpandEnvStrings $1 $1
-  RMDir /r "$1\Visual C#\MonoGame"
-  RMDir /r "${MSBuildInstallDir}"
-  RMDir /r "$SMPROGRAMS\${APPNAME}"
 
   Delete "$INSTDIR\Uninstall.exe"
   RMDir /r "$INSTDIR"
