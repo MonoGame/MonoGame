@@ -25,6 +25,8 @@ namespace MonoGame.Tools.Pipeline
 
         PipelineProject ProjectItem { get; }
 
+        List<string> BuildOutput { get; }
+
         /// <summary>
         /// True if there is a project.
         /// </summary>

@@ -27,6 +27,7 @@ namespace MonoGame.Tools.Pipeline
         private Process _buildProcess;
 
         private readonly List<ContentItemTemplate> _templateItems;
+        private readonly List<string> _buildOutput;
 
         private static readonly string [] _mgcbSearchPaths = new []       
         {
@@ -46,6 +47,11 @@ namespace MonoGame.Tools.Pipeline
         public IEnumerable<ContentItemTemplate> Templates
         {
             get { return _templateItems; }
+        }
+
+        public List<string> BuildOutput
+        {
+            get { return _buildOutput; }
         }
 
         public bool LaunchDebugger { get; set; }
@@ -113,6 +119,7 @@ namespace MonoGame.Tools.Pipeline
             _watcher = new FileWatcher(this, view);
 
             _templateItems = new List<ContentItemTemplate>();
+            _buildOutput = new List<string>();
             LoadTemplates(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
             UpdateMenu();
 
@@ -258,7 +265,7 @@ namespace MonoGame.Tools.Pipeline
                 _project = new PipelineProject();
                 
                 var parser = new PipelineProjectParser(this, _project);
-                var errorCallback = new MGBuildParser.ErrorCallback((msg, args) => View.OutputAppend(string.Format(Path.GetFileName(projectFilePath) + ": " + msg, args)));
+                var errorCallback = new MGBuildParser.ErrorCallback((msg, args) => View.ShowError("Error while opening the project", string.Format(Path.GetFileName(projectFilePath) + ": " + msg, args)));
                 parser.OpenProject(projectFilePath, errorCallback);
 
                 ResolveTypes();
@@ -505,8 +512,11 @@ namespace MonoGame.Tools.Pipeline
                 _buildProcess.StartInfo.UseShellExecute = false;
                 _buildProcess.StartInfo.RedirectStandardOutput = true;
                 _buildProcess.StartInfo.StandardOutputEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
-                _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
+                _buildProcess.OutputDataReceived += (sender, args) => _buildOutput.Add(args.Data);
 
+                _buildOutput.Clear();
+                View.OutputThreadStart();
+                
                 // Fire off the process.
                 _buildProcess.Start();
                 _buildProcess.BeginOutputReadLine();
@@ -516,12 +526,12 @@ namespace MonoGame.Tools.Pipeline
             {
                 // If we got a message assume it has everything the user needs to know.
                 if (!string.IsNullOrEmpty(ex.Message))
-                    View.OutputAppend("Build failed:  " + ex.Message);
+                    _buildOutput.Add("Build failed:  " + ex.Message);
                 else
                 {
                     // Else we need to get verbose.
-                    View.OutputAppend("Build failed:" + Environment.NewLine);
-                    View.OutputAppend(ex.ToString());
+                    _buildOutput.Add("Build failed:" + Environment.NewLine);
+                    _buildOutput.Add(ex.ToString());
                 }
             }
 
@@ -543,7 +553,7 @@ namespace MonoGame.Tools.Pipeline
                 
                 _buildProcess.Kill();
                 _buildProcess = null;
-                View.OutputAppend("Build terminated!" + Environment.NewLine);
+                _buildOutput.Add("Build terminated!" + Environment.NewLine);
             }
         }
 
