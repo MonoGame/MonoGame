@@ -2,14 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
-
-//using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -19,12 +12,12 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml;
 using Windows.UI.Core;
 using Microsoft.Xna.Framework.Input;
+using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework
 {
     class UAPGamePlatform : GamePlatform
     {
-		//private OpenALSoundController soundControllerInstance = null;
         internal static string LaunchParameters;
 
         internal static readonly TouchQueue TouchQueue = new TouchQueue();
@@ -36,7 +29,7 @@ namespace Microsoft.Xna.Framework
         {
             // Setup the game window.
             Window = UAPGameWindow.Instance;
-			UAPGameWindow.Instance.Game = game;
+            UAPGameWindow.Instance.Game = game;
 
             // Setup the launch parameters.
             // - Parameters can optionally start with a forward slash.
@@ -133,18 +126,37 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            CompositionTarget.Rendering += (o, a) =>
-            {
-				UAPGameWindow.Instance.Tick();
-                GamePad.Back = false;
-            };
+            System.Threading.CancellationToken t = new System.Threading.CancellationToken();
+            Task.Factory.StartNew(
+                  () => RunGameLoopInWorkerThread(),
+                  t,
+                  TaskCreationOptions.LongRunning,
+                  TaskScheduler.Default);
         }
-        
+
+        private void RunGameLoopInWorkerThread()
+        {
+            // Don't directly access UI elements from this method.
+            while (true)
+            {
+                UAPGameWindow.Instance.Tick();
+                GamePad.Back = false;
+            }
+        }
+
+        public void StopRunLoop()
+        {
+            lock (UAPGameWindow.Instance)
+            {
+
+            }
+        }
+
         public override void Exit()
         {
             if (!UAPGameWindow.Instance.IsExiting)
             {
-				UAPGameWindow.Instance.IsExiting = true;
+                UAPGameWindow.Instance.IsExiting = true;
                 Application.Current.Exit();
             }
         }
@@ -160,11 +172,11 @@ namespace Microsoft.Xna.Framework
             var device = Game.GraphicsDevice;
             if (device != null)
             {
-				// For a UAP app we need to re-apply the
-				// render target before every draw.  
-				// 
-				// I guess the OS changes it and doesn't restore it?
-				device.ResetRenderTargets();
+                // For a UAP app we need to re-apply the
+                // render target before every draw.  
+                // 
+                // I guess the OS changes it and doesn't restore it?
+                device.ResetRenderTargets();
             }
 
             return true;
@@ -173,14 +185,14 @@ namespace Microsoft.Xna.Framework
         public override void EnterFullScreen()
         {
             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-		}
+        }
 
-		public override void ExitFullScreen()
+        public override void ExitFullScreen()
         {
             ApplicationView.GetForCurrentView().ExitFullScreenMode();
         }
 
-		public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
         }
 
@@ -196,15 +208,15 @@ namespace Microsoft.Xna.Framework
         public override void Present()
         {
             var device = Game.GraphicsDevice;
-            if ( device != null )
+            if (device != null)
                 device.Present();
         }
 
-        protected override void OnIsMouseVisibleChanged() 
+        protected override void OnIsMouseVisibleChanged()
         {
-			UAPGameWindow.Instance.SetCursor(Game.IsMouseVisible);
+            UAPGameWindow.Instance.SetCursor(Game.IsMouseVisible);
         }
-		
+
         protected override void Dispose(bool disposing)
         {
             // Make sure we dispose the graphics system.
@@ -212,9 +224,9 @@ namespace Microsoft.Xna.Framework
             if (graphicsDeviceManager != null)
                 graphicsDeviceManager.Dispose();
 
-			UAPGameWindow.Instance.Dispose();
-			
-			base.Dispose(disposing);
+            UAPGameWindow.Instance.Dispose();
+
+            base.Dispose(disposing);
         }
     }
 }
