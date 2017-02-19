@@ -317,9 +317,6 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            // XNA runs one Update even before showing the window
-            Game.DoUpdate(new GameTime());
-
             // center now in case the user changed the window size
             // in the first update call
             Form.CenterOnPrimaryMonitor();

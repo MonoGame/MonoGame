@@ -119,8 +119,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     // OpenGL only: The last two mip levels require the width and height to be
                     // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy
                     // a 4x4 block.
-                    checkedRect.Width > 4 ? roundedWidth : checkedRect.Width,
-                    checkedRect.Height > 4 ? roundedHeight : checkedRect.Height);
+                    checkedRect.Width < 4 && textureBounds.Width < 4 ? textureBounds.Width : roundedWidth,
+                    checkedRect.Height < 4 && textureBounds.Height < 4 ? textureBounds.Height : roundedHeight);
 #else
                     roundedWidth, roundedHeight);
 #endif

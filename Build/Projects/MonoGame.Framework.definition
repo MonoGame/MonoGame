@@ -537,13 +537,16 @@
     <Compile Include="Graphics\DeviceNotResetException.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
     <Compile Include="GraphicsDeviceManager.cs">
-		<Platforms>Windows,Windows8,WindowsPhone81,WindowsUniversal,Web</Platforms>
+		<Platforms>Windows,WindowsGL,Linux,Windows8,WindowsPhone81,WindowsUniversal,Web</Platforms>
+    </Compile>
+    <Compile Include="GraphicsDeviceManager.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="GraphicsDeviceManager.WinRT.cs">
 		<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="GraphicsDeviceManager.Legacy.cs">
-		<Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS</Platforms>
+		<Platforms>Android,Angle,iOS,MacOS,tvOS</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsMetrics.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />

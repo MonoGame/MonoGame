@@ -23,7 +23,7 @@ namespace MonoGame.Framework
         /// </summary>
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="window">The core window object.</param>
-        /// <param name="swapChainBackgroundPanel">The XAML SwapChainBackgroundPanel to which we render the scene and recieve input events.</param>
+        /// <param name="swapChainPanel">The XAML SwapChainPanel to which we render the scene and receive input events.</param>
         /// <returns></returns>
         static public T Create(string launchParameters, CoreWindow window, SwapChainPanel swapChainPanel)
         {

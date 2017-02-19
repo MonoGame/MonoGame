@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using Microsoft.Xna.Framework.Utilities;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -201,13 +202,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (adapter == null)
                 throw new ArgumentNullException("adapter");
-#if DIRECTX
             if (!adapter.IsProfileSupported(graphicsProfile))
                 throw new NoSuitableGraphicsDeviceException(String.Format("Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
-#else
-            if (!adapter.IsProfileSupported(graphicsProfile))
-                throw new NoSuitableGraphicsDeviceException(String.Format("Adapter does not support the {1} profile.", graphicsProfile));
-#endif
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
             Adapter = adapter;
@@ -560,9 +556,12 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         */
 
-#if WINDOWS && DIRECTX
+        partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters);
+
         public void Reset()
         {
+            PlatformValidatePresentationParameters(PresentationParameters);
+
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
 
@@ -577,31 +576,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
-            if (presentationParameters.DeviceWindowHandle == IntPtr.Zero)
-                throw new ArgumentException("PresentationParameters.DeviceWindowHandle must not be null.");
 
             PresentationParameters = presentationParameters;
             Reset();
         }
-#else
-        // TODO: implement these
-        public void Reset()
-        {
-            
-        }
-
-        public void Reset(PresentationParameters presentationParameters)
-        {
-
-        }
-#endif
-
-        /*
-        public void Reset(PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
-        {
-            throw new NotImplementedException();
-        }
-        */
 
         /// <summary>
         /// Trigger the DeviceResetting event
@@ -1129,6 +1107,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertexDeclaration == null)
                 throw new ArgumentNullException("vertexDeclaration");
 
+            if (vertexDeclaration.VertexStride < ReflectionHelpers.SizeOf<T>.Get())
+                throw new ArgumentOutOfRangeException("vertexDeclaration", "Vertex stride of vertexDeclaration should be at least as big as the stride of the actual vertices.");
+
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
 
             unchecked
@@ -1205,6 +1186,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (vertexDeclaration == null)
                 throw new ArgumentNullException("vertexDeclaration");
+
+            if (vertexDeclaration.VertexStride < ReflectionHelpers.SizeOf<T>.Get())
+                throw new ArgumentOutOfRangeException("vertexDeclaration", "Vertex stride of vertexDeclaration should be at least as big as the stride of the actual vertices.");
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
             
