@@ -23,10 +23,10 @@ namespace MonoGame.Tools.Pipeline
             var folder = ExtractIcon(4).ToBitmap();
             var folderMissing = ExtractIcon(234).ToBitmap();
 
-            _files["."] = ToEtoImage(file).WithSize(16, 16);
-            _fileMissing = ToEtoImage(fileMissing).WithSize(16, 16);
-            _folder = ToEtoImage(folder).WithSize(16, 16);
-            _folderMissing = ToEtoImage(folderMissing).WithSize(16, 16);
+            _files["."] = ToEtoImage(file);
+            _fileMissing = ToEtoImage(fileMissing);
+            _folder = ToEtoImage(folder);
+            _folderMissing = ToEtoImage(folderMissing);
         }
 
         public static System.Drawing.Icon ExtractIcon(int number)
@@ -43,7 +43,7 @@ namespace MonoGame.Tools.Pipeline
             return System.Drawing.Icon.ExtractAssociatedIcon(path).ToBitmap();
         }
 
-        private static Bitmap ToEtoImage(System.Drawing.Bitmap bitmap)
+        private static Image ToEtoImage(System.Drawing.Bitmap bitmap)
         {
             var ret = new BitmapImage();
 
@@ -58,7 +58,7 @@ namespace MonoGame.Tools.Pipeline
                 ret.EndInit();
             }
 
-            return new Bitmap(new BitmapHandler(ret));
+            return (new Bitmap(new BitmapHandler(ret))).WithSize(16, 16);
         }
     }
 }
