@@ -14,7 +14,8 @@ namespace MonoGame.Tools.Pipeline
         public static Point MouseLocation;
         public static int Count;
 
-        private bool _tryScroll;
+        private bool _tryScroll, _setHeight;
+        private int _reqWidth = 0;
         private OutputParser _output;
         private List<BuildItem> _items;
         private CheckCommand _cmdFilterOutput, _cmdAutoScroll, _cmdShowSkipped, _cmdShowSuccessful, _cmdShowCleaned;
@@ -115,7 +116,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void ClearOutput()
         {
-            drawable.Width = 0;
+            drawable.Width = _reqWidth = 0;
             scrollable1.ScrollPosition = new Point(0, 0);
             textArea.Text = "";
             _items.Clear();
@@ -197,6 +198,7 @@ namespace MonoGame.Tools.Pipeline
                     break;
             }
 
+            _setHeight = true;
             drawable.Invalidate();
         }
 
@@ -218,12 +220,13 @@ namespace MonoGame.Tools.Pipeline
             if (_selectedItem != null)
                 _selectedItem.OnClick();
 
-            var width = 0;
+            _reqWidth = 0;
             foreach (var item in _items)
-                if (item.RequestedWidth > width)
-                    width = item.RequestedWidth;
+                if (item.RequestedWidth > _reqWidth)
+                    _reqWidth = item.RequestedWidth;
 
-            drawable.Width = width;
+            drawable.Width = _reqWidth;
+            _setHeight = true;
             drawable.Invalidate();
         }
 
@@ -287,8 +290,12 @@ namespace MonoGame.Tools.Pipeline
                 y += item.Height + 3;
             }
 
-            drawable.Height = Math.Max(y - 3, 1);
-
+            if (_setHeight)
+            {
+                _setHeight = false;
+                drawable.Size = new Size(_reqWidth, Math.Max(y - 3, 1));
+            }
+            
             if (Count == -1)
                 _tryScroll = true;
         }

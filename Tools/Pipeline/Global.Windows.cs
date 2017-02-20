@@ -23,15 +23,10 @@ namespace MonoGame.Tools.Pipeline
             var folder = ExtractIcon(4).ToBitmap();
             var folderMissing = ExtractIcon(234).ToBitmap();
 
-            _files["."] = ToEtoImage(file);
-            _fileMissing = ToEtoImage(fileMissing);
-            _folder = ToEtoImage(folder);
-            _folderMissing = ToEtoImage(folderMissing);
-
-            _xwtFiles["."] = ToXwtImage(file);
-            _xwtFileMissing = ToXwtImage(fileMissing);
-            _xwtFolder = ToXwtImage(folder);
-            _xwtFolderMissing = ToXwtImage(folderMissing);
+            _files["."] = ToEtoImage(file).WithSize(16, 16);
+            _fileMissing = ToEtoImage(fileMissing).WithSize(16, 16);
+            _folder = ToEtoImage(folder).WithSize(16, 16);
+            _folderMissing = ToEtoImage(folderMissing).WithSize(16, 16);
         }
 
         public static System.Drawing.Icon ExtractIcon(int number)
@@ -64,20 +59,6 @@ namespace MonoGame.Tools.Pipeline
             }
 
             return new Bitmap(new BitmapHandler(ret));
-        }
-
-        private static Xwt.Drawing.Image ToXwtImage(System.Drawing.Bitmap bitmap)
-        {
-            Xwt.Drawing.Image ret;
-
-            using (MemoryStream stream = new MemoryStream())
-            {
-                bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                stream.Position = 0;
-                ret = Xwt.Drawing.Image.FromStream(stream);
-            }
-           
-            return ret.Scale(0.5);
         }
     }
 }

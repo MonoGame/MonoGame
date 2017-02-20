@@ -33,16 +33,20 @@ namespace MonoGame.Tools.Pipeline
             layout1.Padding = new Padding(6);
             layout1.BeginVertical();
 
+            layout1.Add(null, true, true);
+
             label1 = new Label();
-            layout1.AddRow(label1);
+            layout1.Add(label1);
 
             textBox1 = new TextBox();
-            layout1.AddRow(textBox1);
+            layout1.Add(textBox1);
             
             label2 = new Label();
             label2.TextColor = new Color(SystemColors.ControlText, 0.5f);
             label2.TextAlignment = TextAlignment.Center;
-            layout1.AddRow(label2);
+            layout1.Add(label2);
+
+            layout1.Add(null, true, true);
 
             layout1.EndVertical();
             Content = layout1;

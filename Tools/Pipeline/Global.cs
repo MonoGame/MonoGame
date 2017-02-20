@@ -34,10 +34,10 @@ namespace MonoGame.Tools.Pipeline
             Unix = Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX;
 
             _files = new Dictionary<string, Image>();
-            _files.Add(".", Bitmap.FromResource("TreeView.File.png"));
-            _fileMissing = Bitmap.FromResource("TreeView.FileMissing.png");
-            _folder = Bitmap.FromResource("TreeView.Folder.png");
-            _folderMissing = Bitmap.FromResource("TreeView.FolderMissing.png");
+            _files.Add(".", Bitmap.FromResource("TreeView.File.png").WithSize(16, 16));
+            _fileMissing = Bitmap.FromResource("TreeView.FileMissing.png").WithSize(16, 16);
+            _folder = Bitmap.FromResource("TreeView.Folder.png").WithSize(16, 16);
+            _folderMissing = Bitmap.FromResource("TreeView.FolderMissing.png").WithSize(16, 16);
 
             PlatformInit();
         }
@@ -71,7 +71,7 @@ namespace MonoGame.Tools.Pipeline
 
             try
             {
-                icon = ToEtoImage(PlatformGetFileIcon(path));
+                icon = ToEtoImage(PlatformGetFileIcon(path)).WithSize(16, 16);
             }
             catch
             {

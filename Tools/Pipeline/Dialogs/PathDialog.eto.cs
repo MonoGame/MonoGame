@@ -19,7 +19,7 @@ namespace MonoGame.Tools.Pipeline
         private void InitializeComponent()
         {
             Title = "Select Folder";
-            Size = new Size(370, 165);
+            Size = new Size(370, 200);
 
             buttonOk = new Button();
             buttonOk.Text = "Ok";
@@ -35,6 +35,8 @@ namespace MonoGame.Tools.Pipeline
             layout1.DefaultSpacing = new Size(4, 4);
             layout1.Padding = new Padding(6);
             layout1.BeginVertical();
+
+            layout1.Add(null, true, true);
 
             label1 = new Label();
             label1.Text = "Path to use:";
@@ -71,6 +73,8 @@ namespace MonoGame.Tools.Pipeline
             }
 
             layout1.Add(stack2);
+
+            layout1.Add(null, true, true);
 
             Content = layout1;
 

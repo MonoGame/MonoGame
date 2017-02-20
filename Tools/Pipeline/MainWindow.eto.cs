@@ -35,7 +35,7 @@ namespace MonoGame.Tools.Pipeline
         private void InitializeComponent()
         {
             Title = "MonoGame Pipeline Tool";
-            Icon = Icon.FromResource("Icons.monogame.png");
+            Icon = Icon.FromResource("MonoGame.Tools.Pipeline.App.ico");
             Width = 750;
             Height = 550;
 

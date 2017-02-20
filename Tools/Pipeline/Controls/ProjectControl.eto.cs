@@ -15,13 +15,13 @@ namespace MonoGame.Tools.Pipeline
             Title = "Project";
 
             _treeView = new TreeGridView();
-            _treeView.MouseDown += (sender, e) => { };
             _treeView.ShowHeader = false;
             _treeView.AllowMultipleSelection = true;
-            _treeView.Columns.Add(new GridColumn {
-                DataCell = new ImageTextCell(0, 1),
-                AutoSize = true
-            });
+
+            var column = new GridColumn();
+            column.DataCell = new ImageTextCell(0, 1);
+            column.AutoSize = true;
+            _treeView.Columns.Add(column);
 
             CreateContent(_treeView);
 

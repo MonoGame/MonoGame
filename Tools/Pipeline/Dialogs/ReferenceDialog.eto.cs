@@ -19,6 +19,7 @@ namespace MonoGame.Tools.Pipeline
         {
             Title = "Reference Editor";
             Resizable = true;
+            Padding = new Padding(4);
             Size = new Size(500, 400);
             MinimumSize = new Size(450, 300);
 
