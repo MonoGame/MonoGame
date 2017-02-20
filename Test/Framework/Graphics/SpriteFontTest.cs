@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009-2012 The MonoGame Team
@@ -67,6 +67,7 @@ non-infringement.
 #endregion License
 
 using System;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -135,8 +136,12 @@ namespace MonoGame.Tests.Graphics {
             PrepareFrameCapture();
 
             _spriteBatch.Begin ();
+            // Row 0: String test.
             _spriteBatch.DrawString (
                 _defaultFont, "plain old text", new Vector2 (50, 50), Color.Violet);
+            // Row 1: StringBuilder test.
+            _spriteBatch.DrawString (
+                _defaultFont, new StringBuilder("plain old text"), new Vector2 (50, 290), Color.Violet);
             _spriteBatch.End ();
 
             CheckFrames();
@@ -148,9 +153,20 @@ namespace MonoGame.Tests.Graphics {
             PrepareFrameCapture();
 
             _spriteBatch.Begin ();
+            // Row 0: String test.
             _spriteBatch.DrawString (
                 _defaultFont, "rotated", new Vector2 (50, 50), Color.Orange,
+                MathHelper.PiOver4, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);            
+            _spriteBatch.DrawString (
+                _defaultFont, "rotated", new Vector2 (450, 50), Color.Orange,
+                MathHelper.PiOver4, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.0f);
+            // Row 1: StringBuilder test.
+            _spriteBatch.DrawString (
+                _defaultFont, new StringBuilder("rotated"), new Vector2 (50, 290), Color.Orange,
                 MathHelper.PiOver4, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString (
+                _defaultFont, new StringBuilder("rotated"), new Vector2 (450, 290), Color.Orange,
+                MathHelper.PiOver4, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.0f);
             _spriteBatch.End ();
 
             CheckFrames();
@@ -162,8 +178,19 @@ namespace MonoGame.Tests.Graphics {
             PrepareFrameCapture();
 
             _spriteBatch.Begin ();
+            // Row 0: String test.
             _spriteBatch.DrawString (
                 _defaultFont, "scaled", new Vector2 (50, 50), Color.Orange,
+                0, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString (
+                _defaultFont, "scaled", new Vector2 (450, 50), Color.Orange,
+                0, Vector2.Zero, new Vector2(3.0f, 1.5f), SpriteEffects.None, 0.0f);
+            // Row 1: StringBuilder test.
+            _spriteBatch.DrawString (
+                _defaultFont, new StringBuilder("scaled"), new Vector2 (50, 290), Color.Orange,
+                0, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString (
+                _defaultFont, new StringBuilder("scaled"), new Vector2 (450, 290), Color.Orange,
                 0, Vector2.Zero, new Vector2(3.0f, 1.5f), SpriteEffects.None, 0.0f);
             _spriteBatch.End ();
 
@@ -178,8 +205,19 @@ namespace MonoGame.Tests.Graphics {
             PrepareFrameCapture();
 
             _spriteBatch.Begin ();
+            // Row 0: String test.
             _spriteBatch.DrawString (
                 _defaultFont, effects.ToString(), new Vector2 (50, 50), Color.Orange,
+                0, Vector2.Zero, 1f, effects, 0.0f);            
+            _spriteBatch.DrawString (
+                _defaultFont, effects.ToString(), new Vector2 (450, 50), Color.Orange,
+                0, Vector2.Zero, Vector2.One, effects, 0.0f);
+            // Row 1: StringBuilder test.
+            _spriteBatch.DrawString (
+                _defaultFont, new StringBuilder(effects.ToString()), new Vector2 (50, 290), Color.Orange,
+                0, Vector2.Zero, 1f, effects, 0.0f);            
+            _spriteBatch.DrawString (
+                _defaultFont, new StringBuilder(effects.ToString()), new Vector2 (450, 290), Color.Orange,
                 0, Vector2.Zero, Vector2.One, effects, 0.0f);
             _spriteBatch.End ();
 
@@ -212,6 +250,24 @@ namespace MonoGame.Tests.Graphics {
                 _defaultFont, text, position, Color.Violet, MathHelper.PiOver4,
                 new Vector2(40f, 40f), 1.0f, SpriteEffects.None, 0.0f);
 
+            position = new Vector2 (500, 100);
+
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Orange, MathHelper.PiOver4,
+                new Vector2(0f, 0f), new Vector2(1.0f, 1.0f), SpriteEffects.None, 0.0f);
+
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Blue, MathHelper.PiOver4,
+                new Vector2(40f, 0f), new Vector2(1.0f, 1.0f), SpriteEffects.None, 0.0f);
+
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.HotPink, MathHelper.PiOver4,
+                new Vector2(0f, 40f), new Vector2(1.0f, 1.0f), SpriteEffects.None, 0.0f);
+
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Violet, MathHelper.PiOver4,
+                new Vector2(40f, 40f), new Vector2(1.0f, 1.0f), SpriteEffects.None, 0.0f);
+
             _spriteBatch.End ();
 
             CheckFrames();
@@ -242,12 +298,169 @@ namespace MonoGame.Tests.Graphics {
             _spriteBatch.DrawString (
                 _defaultFont, text, position, Color.Violet, 0,
                 new Vector2(40f, 40f), 1.0f, SpriteEffects.None, 0.0f);
+            
+            position = new Vector2 (500, 100);
+            
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Orange, 0,
+                new Vector2(0f, 0f), new Vector2(2.0f, 0.5f), SpriteEffects.None, 0.0f);
+
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Blue, 0,
+                new Vector2(40f, 0f), new Vector2(2.0f, 2.0f), SpriteEffects.None, 0.0f);
+
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.HotPink, 0,
+                new Vector2(0f, 40f), new Vector2(2.0f, 0.75f), SpriteEffects.None, 0.0f);
+
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Violet, 0,
+                new Vector2(40f, 40f), new Vector2(2.0f, 1.0f), SpriteEffects.None, 0.0f);
 
             _spriteBatch.End ();
 
             CheckFrames();
 		}
+        
+		[Test]
+		public void Draw_with_LayerDepth()
+		{
+            PrepareFrameCapture();
 
+            var text = "depth";
+
+            // Row 0, column 0: Deferred, no depth test.
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(30, 30), Color.Red,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.8f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(40, 40), Color.Green,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(40, 40), Color.Blue,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.3f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(60, 60), Color.White,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.End();
+
+            // Row 0, column 1: Deferred, with depth test.
+            _spriteBatch.Begin(SpriteSortMode.Deferred, null, null, DepthStencilState.Default, null);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(330, 30), Color.Red,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.8f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(340, 40), Color.Green,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(350, 50), Color.Blue,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.3f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(360, 60), Color.White,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.End();
+
+            // Row 1, column 0: BackToFront, no depth test.
+            _spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, DepthStencilState.None, null);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(30, 130), Color.Red,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.8f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(40, 140), Color.Green,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(50, 150), Color.Blue,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.3f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(60, 160), Color.White,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.End();
+
+            // Row 1, column 1: BackToFront, with depth test.
+            _spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, DepthStencilState.Default, null);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(330, 130), Color.Red,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.8f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(340, 140), Color.Green,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(350, 150), Color.Blue,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.3f);
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2(360, 160), Color.White,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.End();
+                        
+            var sb = new StringBuilder(text);
+            // Row 2, column 0: Deferred, no depth test, StringBuilder.
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(30, 270), Color.Red,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.8f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(40, 280), Color.Green,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(40, 280), Color.Blue,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.3f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(60, 300), Color.White,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.End();
+
+            // Row 2, column 1: Deferred, with depth test, StringBuilder.
+            _spriteBatch.Begin(SpriteSortMode.Deferred, null, null, DepthStencilState.Default, null);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(330, 270), Color.Red,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.8f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(340, 280), Color.Green,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(350, 280), Color.Blue,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.3f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(360, 300), Color.White,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.End();
+
+            // Row 3, column 0: BackToFront, no depth test, StringBuilder.
+            _spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, DepthStencilState.None, null);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(30, 370), Color.Red,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.8f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(40, 380), Color.Green,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(50, 380), Color.Blue,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.3f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(60, 400), Color.White,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.End();
+
+            // Row 3, column 1: BackToFront, with depth test, StringBuilder.
+            _spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, DepthStencilState.Default, null);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(330, 370), Color.Red,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.8f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(340, 380), Color.Green,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(350, 380), Color.Blue,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0.3f);
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2(360, 400), Color.White,
+                0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.End();
+
+            CheckFrames();
+		}
+        
 		[Test]
 		public void Hullabaloo ()
 		{
@@ -278,27 +491,54 @@ namespace MonoGame.Tests.Graphics {
             CheckFrames();
 		}
 
-		[Test]
-		public void Multiline ()
-		{
-            PrepareFrameCapture();
-
-            _spriteBatch.Begin ();
-
-            var text =
-@"A programming genius called Hugh
+		
+        [TestCase("The quick brown fox jumps over the lazy dog. 1234567890", TestName = "Multiline_noNewline")]
+        [TestCase("The quick brown fox jumps\nover the lazy dog.\n1234567890", TestName = "Multiline_Newline")]
+        [TestCase("The quick brown fox jumps over the lazy dog.\r1234567890", TestName = "Multiline_CarriageReturn")]
+        [TestCase(@"A programming genius called Hugh
 Said 'I really must see if it's true.'
 So he wrote a routine
 To ask 'What's it all mean?'
 But the answer was still '42'.
-                R Humphries, Sutton Coldfield";
+                R Humphries, Sutton Coldfield", TestName = "Multiline_verbatimString")]
+		public void Multiline (string text)
+		{
+            PrepareFrameCapture();
 
-            _spriteBatch.DrawString (
+            _spriteBatch.Begin ();
+            
+            // Row 0: String test.
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2 (10, 10), Color.LightGreen);
+                        
+            _spriteBatch.DrawString(
                 _defaultFont, text, new Vector2 (100, 150), Color.Yellow,
-                MathHelper.ToRadians (20), new Vector2 (40f, 60f), new Vector2 (0.9f, 0.9f),
+                MathHelper.ToRadians (20), new Vector2 (40f, 60f), 0.9f,
                 SpriteEffects.None, 0.0f);
+
+            _spriteBatch.DrawString(
+                _defaultFont, text, new Vector2 (500, 150), Color.Blue,
+                MathHelper.ToRadians (20), new Vector2 (40f, 60f), new Vector2 (0.4f, 0.8f),
+                SpriteEffects.None, 0.0f);
+
+            // Row 1: StringBuilder test.
+            var sb = new StringBuilder(text);                         
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2 (10, 250), Color.LightGreen);
+                        
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2 (100, 390), Color.Yellow,
+                MathHelper.ToRadians (20), new Vector2 (40f, 60f), 0.9f,
+                SpriteEffects.None, 0.0f);
+
+            _spriteBatch.DrawString(
+                _defaultFont, sb, new Vector2 (500, 390), Color.Blue,
+                MathHelper.ToRadians (20), new Vector2 (40f, 60f), new Vector2 (0.4f, 0.8f),
+                SpriteEffects.None, 0.0f);
+
             _spriteBatch.End ();
 
+            Similarity = 0.985f;
             CheckFrames();
 		}
 
@@ -308,11 +548,22 @@ But the answer was still '42'.
             PrepareFrameCapture();
 			// DataFont has a non-zero Spacing property.
 			var font = content.Load<SpriteFont> (Paths.Font ("DataFont"));
+            var text = "Now is the time for all good DataFonts";
 
             _spriteBatch.Begin ();
-            _spriteBatch.DrawString (
-                font, "Now is the time for all good DataFonts",
-                new Vector2 (50, 50), Color.Violet);
+            // Row 0: String test.
+            _spriteBatch.DrawString (font, text, new Vector2 (50, 50), Color.Violet);
+            _spriteBatch.DrawString (font, text, new Vector2 (50, 70), Color.Violet, 
+                1f, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            _spriteBatch.DrawString (font, text, new Vector2 (50, 90), Color.Violet,
+                1f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+            // Row 1: StringBuilder test.            
+            var sb = new StringBuilder(text);
+            _spriteBatch.DrawString (font, sb, new Vector2 (50, 290), Color.Violet);
+            _spriteBatch.DrawString (font, sb, new Vector2 (50, 310), Color.Violet, 
+                1f, Vector2.Zero, 1f, SpriteEffects.None, 0);            
+            _spriteBatch.DrawString (font, sb, new Vector2 (50, 330), Color.Violet,
+                1f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             _spriteBatch.End ();
 
             CheckFrames();

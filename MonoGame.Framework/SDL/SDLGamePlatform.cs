@@ -79,7 +79,6 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize ()
         {
-            _view.InitGraphics();
             SdlRunLoop();
 
             base.BeforeInitialize ();
@@ -163,6 +162,8 @@ namespace Microsoft.Xna.Framework
                         IsActive = true;
                     else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
                         IsActive = false;
+                    else if (ev.Window.EventID == Sdl.Window.EventId.Moved)
+                        _view.Moved();
                 }
             }
         }

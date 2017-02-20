@@ -539,6 +539,9 @@
     <Compile Include="GraphicsDeviceManager.cs">
 		<Platforms>Windows,WindowsGL,Linux,Windows8,WindowsPhone81,WindowsUniversal,Web</Platforms>
     </Compile>
+    <Compile Include="GraphicsDeviceManager.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
     <Compile Include="GraphicsDeviceManager.WinRT.cs">
 		<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
