@@ -9,6 +9,7 @@ using System.Diagnostics;
 using Eto.Forms;
 using Eto.Drawing;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -77,16 +78,9 @@ namespace MonoGame.Tools.Pipeline
             _xnaFileFilter = new FileFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
         }
 
-        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             e.Cancel = !PipelineController.Instance.Exit();
-
-#if WINDOWS || LINUX
-            if (!e.Cancel)
-                Xwt.Application.Exit();
-#endif
-
-            base.OnClosing(e);
         }
 
         #region IView implements
@@ -233,13 +227,13 @@ namespace MonoGame.Tools.Pipeline
         public bool ShowDeleteDialog(List<IProjectItem> items)
         {
             var dialog = new DeleteDialog(PipelineController.Instance, items);
-            return dialog.Run(this) == DialogResult.Ok;
+            return dialog.ShowModal(this);
         }
 
         public bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname)
         {
             var dialog = new EditDialog(title, text, oldname, file);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             newname = dialog.Text;
 
@@ -276,7 +270,7 @@ namespace MonoGame.Tools.Pipeline
         public bool ChooseItemTemplate(string folder, out ContentItemTemplate template, out string name)
         {
             var dialog = new NewItemDialog(PipelineController.Instance.Templates.GetEnumerator(), folder);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             template = dialog.Selected;
             name = dialog.Name;
@@ -287,7 +281,7 @@ namespace MonoGame.Tools.Pipeline
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
             var dialog = new AddItemDialog(file, exists, FileType.File);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             action = dialog.Responce;
             applyforall = dialog.ApplyForAll;
@@ -300,7 +294,7 @@ namespace MonoGame.Tools.Pipeline
             var afd = new AddItemDialog(folder, exists, FileType.Folder);
             applyforall = false;
 
-            if (afd.Run(this) == DialogResult.Ok)
+            if (afd.ShowModal(this))
             {
                 action = afd.Responce;
                 return true;

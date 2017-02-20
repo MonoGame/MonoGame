@@ -3,8 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
 using Eto.Drawing;
 using Eto.GtkSharp.Drawing;
@@ -29,7 +27,6 @@ namespace MonoGame.Tools.Pipeline
     static partial class Global
     {
         private static IconTheme _theme;
-        private static Application _app;
 
         private static void PlatformInit()
         {
@@ -49,18 +46,6 @@ namespace MonoGame.Tools.Pipeline
             _folder = ToEtoImage(folder);
             _folderMissing = ToEtoImage(folderMissing);
 
-            _xwtFiles["."] = ToXwtImage(file);
-            _xwtFileMissing = ToXwtImage(fileMissing);
-            _xwtFolder = ToXwtImage(folder);
-            _xwtFolderMissing = ToXwtImage(folderMissing);
-
-            if (Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16)
-            {
-                _app = new Application(null, GLib.ApplicationFlags.None);
-                _app.Register(GLib.Cancellable.Current);
-
-                UseHeaderBar = Gtk3Wrapper.gtk_application_prefers_app_menu(_app.Handle);
-            }
         }
 
         private static Gdk.Pixbuf PlatformGetFileIcon(string path)
@@ -90,23 +75,6 @@ namespace MonoGame.Tools.Pipeline
         private static Eto.Drawing.Image ToEtoImage(Gdk.Pixbuf icon)
         {
             return new Bitmap(new BitmapHandler(icon));
-        }
-
-        private static Xwt.Drawing.Image ToXwtImage(Gdk.Pixbuf icon)
-        {
-            Xwt.Drawing.Image ret;
-
-            var icon2 = new Gdk.Pixbuf(icon.Colorspace, true, icon.BitsPerSample, icon.Width + 1, icon.Height);
-            icon2.Fill(0);
-            icon.Composite(icon2, 0, 0, icon.Width, icon.Height, 0, 0, 1, 1, Gdk.InterpType.Tiles, 255);
-
-            using (var stream = new MemoryStream(icon2.SaveToBuffer("png")))
-            {
-                stream.Position = 0;
-                ret = Xwt.Drawing.Image.FromStream(stream);
-            }
-
-            return ret;
         }
 
         private static Gdk.Pixbuf PlatformGetIcon(string resource)

@@ -87,9 +87,6 @@
 	<Compile Include="Styles.Windows.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-	<Compile Include="Controls\ProjectControl.xwt.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
     
     <!-- Native Linux -->
     <EmbeddedResource Include="MainWindow.glade">
@@ -104,9 +101,6 @@
 	<Compile Include="Styles.Linux.cs">
       <Platforms>Linux</Platforms>
     </Compile>
-	<Compile Include="Controls\ProjectControl.xwt.cs">
-      <Platforms>Linux</Platforms>
-    </Compile>
     
     <!-- Native Mac -->
 	<Compile Include="Global.Mac.cs">
@@ -114,9 +108,6 @@
       <Platforms>MacOS</Platforms>
     </Compile>
 	<Compile Include="Styles.Mac.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-	<Compile Include="Controls\ProjectControl.eto.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
 	
@@ -140,6 +131,10 @@
 	<Compile Include="Controls\BuildOutput.eto.cs">
       <DependentUpon>BuildOutput.cs</DependentUpon>
     </Compile>
+	<Compile Include="Controls\ProjectControl.cs" />
+	<Compile Include="Controls\ProjectControl.eto.cs">
+      <DependentUpon>ProjectControl.cs</DependentUpon>
+    </Compile>
 	<Compile Include="Controls\PropertyGridControl.cs" />
 	<Compile Include="Controls\PropertyGridControl.eto.cs">
       <DependentUpon>PropertyGridControl.cs</DependentUpon>
@@ -157,10 +152,6 @@
 	<Compile Include="Dialogs\DeleteDialog.cs" />
 	<Compile Include="Dialogs\DeleteDialog.eto.cs">
       <DependentUpon>DeleteDialog.cs</DependentUpon>
-    </Compile>
-	<Compile Include="Dialogs\DialogBase.cs" />
-	<Compile Include="Dialogs\DialogBase.eto.cs">
-      <DependentUpon>DialogBase.cs</DependentUpon>
     </Compile>
 	<Compile Include="Dialogs\EditDialog.cs" />
 	<Compile Include="Dialogs\EditDialog.eto.cs">

@@ -7,18 +7,30 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class DeleteDialog : DialogBase
+    partial class DeleteDialog : Dialog<bool>
     {
         DynamicLayout layout1;
         Label label1;
         TreeGridView treeView1;
+        Button buttonDelete, buttonCancel;
 
         private void InitializeComponent()
         {
             Title = "Delete Items";
             Resizable = true;
-            Width = 450;
-            Height = 300;
+            Size = new Size(450, 300);
+            MinimumSize = new Size(350, 250);
+
+            buttonDelete = new Button();
+            buttonDelete.Text = "Delete";
+            PositiveButtons.Add(buttonDelete);
+            DefaultButton = buttonDelete;
+            buttonDelete.Style = "Destuctive";
+
+            buttonCancel = new Button();
+            buttonCancel.Text = "Cancel";
+            NegativeButtons.Add(buttonCancel);
+            AbortButton = buttonCancel;
 
             layout1 = new DynamicLayout();
             layout1.DefaultSpacing = new Size(2, 2);
@@ -35,7 +47,10 @@ namespace MonoGame.Tools.Pipeline
 
             DefaultButton.Text = "Delete";
 
-            CreateContent(layout1);
+            Content = layout1;
+
+            buttonDelete.Click += ButtonDelete_Click;
+            buttonCancel.Click += ButtonCancel_Click;
         }
     }
 }

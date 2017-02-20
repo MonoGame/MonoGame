@@ -19,7 +19,6 @@ namespace MonoGame.Tools.Pipeline
         {
             var editText = new TextBox();
             editText.Tag = this;
-            editText.Style = "OverrideSize";
             editText.Width = _lastRec.Width;
             editText.Height = _lastRec.Height;
 
