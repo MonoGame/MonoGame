@@ -26,8 +26,8 @@ namespace MonoGame.Tools.Pipeline
 
             scrollable1 = new Scrollable();
             scrollable1.BackgroundColor = DrawInfo.BackColor;
-            /*scrollable1.ExpandContentWidth = true;
-            scrollable1.ExpandContentHeight = true;*/
+            scrollable1.ExpandContentWidth = true;
+            scrollable1.ExpandContentHeight = true;
             drawable = new Drawable();
             scrollable1.Content = drawable;
 
