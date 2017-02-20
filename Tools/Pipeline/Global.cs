@@ -71,7 +71,7 @@ namespace MonoGame.Tools.Pipeline
 
             try
             {
-                icon = ToEtoImage(PlatformGetFileIcon(path)).WithSize(16, 16);
+                icon = ToEtoImage(PlatformGetFileIcon(path));
             }
             catch
             {
