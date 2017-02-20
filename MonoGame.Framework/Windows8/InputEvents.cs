@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework
         private readonly List<Keys> _keysGameThread = new List<Keys>();
         private IAsyncAction _inputLoopWorker;
 
-        private async System.Threading.Tasks.Task RunInputAsync(UIElement inputElement)
+        private void RunInputAsync(UIElement inputElement)
         {
             CoreInputDeviceTypes inputDevices = CoreInputDeviceTypes.Mouse | CoreInputDeviceTypes.Pen | CoreInputDeviceTypes.Touch;
 
