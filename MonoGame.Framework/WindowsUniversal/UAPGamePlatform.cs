@@ -126,18 +126,18 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            System.Threading.CancellationToken t = new System.Threading.CancellationToken();
+           /* System.Threading.CancellationToken t = new System.Threading.CancellationToken();
             Task.Factory.StartNew(
                    () => RunGameLoopInWorkerThread(),
                    t,
                    TaskCreationOptions.LongRunning,
                    TaskScheduler.Default);
-
-            /*CompositionTarget.Rendering += (o, a) =>
+            */
+            CompositionTarget.Rendering += (o, a) =>
             {
                 UAPGameWindow.Instance.Tick();
                 GamePad.Back = false;
-            };*/
+            };
         }
 
         private void RunGameLoopInWorkerThread()

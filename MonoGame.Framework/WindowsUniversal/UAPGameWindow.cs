@@ -199,10 +199,10 @@ namespace Microsoft.Xna.Framework
 
         private void SwapChain_SizeChanged(object sender, SizeChangedEventArgs args)
         {
-            lockySwap = 1;
+           // lockySwap = 1;
 
             SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("SwapChain_SizeChanged 1");
-            lockySwap = 2;
+           // lockySwap = 2;
 
             _disableGameTicking = true;
             // lock (_eventLocker)
@@ -210,16 +210,16 @@ namespace Microsoft.Xna.Framework
               //  SWAP CHAIN CALLS OTHER CALLBACKS(HENCE THE LOGS) AND THEY LOCK UP, RECURSIVE LOCK ??
                 lock (UAPGameWindow.Instance)
                 {
-                    lockySwap = 3;
+                   // lockySwap = 3;
 
                     SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("SwapChain_SizeChanged 1.1");
 
                     var manager = Game.graphicsDeviceManager;
-                    lockySwap = 4;
+                  //  lockySwap = 4;
 
                     // Set the new client bounds.
                     SetViewBounds(args.NewSize.Width, args.NewSize.Height);
-                    lockySwap = 5;
+                 //   lockySwap = 5;
 
                     SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("SwapChain_SizeChanged 1.2");
 
@@ -228,7 +228,7 @@ namespace Microsoft.Xna.Framework
 
                     manager.IsFullScreen = _appView.IsFullScreenMode;
                     SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("SwapChain_SizeChanged 1.3");
-                    lockySwap = 6;
+                  //  lockySwap = 6;
 
                     manager.PreferredBackBufferWidth = _viewBounds.Width;
                     manager.PreferredBackBufferHeight = _viewBounds.Height;
@@ -236,7 +236,7 @@ namespace Microsoft.Xna.Framework
 
                     manager.ApplyChanges();
                     SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("SwapChain_SizeChanged 1.5");
-                    lockySwap = 7;
+                  //  lockySwap = 7;
 
                     // Set the new view state which will trigger the 
                     // Game.ApplicationViewChanged event and signal
@@ -244,13 +244,13 @@ namespace Microsoft.Xna.Framework
                     OnClientSizeChanged();
                     SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("SwapChain_SizeChanged 1.6");
 
-                    lockySwap = 8;
+                  //  lockySwap = 8;
 
                 }
                
 
             }
-            lockySwap = 9;
+          //  lockySwap = 9;
 
             _disableGameTicking = false;
             SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("SwapChain_SizeChanged end");
@@ -439,9 +439,9 @@ namespace Microsoft.Xna.Framework
 
         }
 
-        public static volatile int lockyGame = 0;
-        public static volatile int lockySwap = 0;
-        public static volatile bool loggy = false;
+       // public static volatile int lockyGame = 0;
+        //public static volatile int lockySwap = 0;
+       // public static volatile bool loggy = false;
 
         internal void Tick()
         {
@@ -453,12 +453,12 @@ namespace Microsoft.Xna.Framework
 
             _windowEvents.CopyKeyStateToGameThread();
 
-            lockyGame = 1;
+           // lockyGame = 1;
             // DO NOT LOG THIS DIRECTLY, ADD A VOLATILE BOOL FLAG TO SEE WHICH PART EXECUTED LAST
             //SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("game loop 1");
             lock (UAPGameWindow.Instance)
             {
-                lockyGame = 2;
+                //lockyGame = 2;
 
                 // Playback keys that the window recieved on the game thread
                 lock (_windowKeyEventsToPlayback)
@@ -469,7 +469,7 @@ namespace Microsoft.Xna.Framework
                         OnTextInput(e.sender, new TextInputEventArgs((char)e.args.KeyCode));
                     }
                 }
-                lockyGame = 3;
+               // lockyGame = 3;
 
                 _windowEvents.UpdateKeyboardState();
 
@@ -477,81 +477,81 @@ namespace Microsoft.Xna.Framework
                 //_windowEvents.UpdateState(); // todo: lock
 
                 //UAPGameWindow.Log("gameWindow Tick 3");
-                lockyGame = 4;
+               // lockyGame = 4;
 
                 // Update and render the game.
                 if (Game != null)
                     Game.Tick();
 
-                if(loggy)
+              /*  if(loggy)
                 {
                     SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy 1");
-                }
+                }*/
 
                 // UAPGameWindow.Log("gameWindow Tick 4");
 
-                lockyGame = 5;
+               // lockyGame = 5;
             }
 
-            lockyGame = 6;
+            //lockyGame = 6;
 
 
-            if (loggy)
-            {
-                SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy 2");
-            }
+/*   if (loggy)
+ {
+     SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy 2");
+ }*/
 
-            loggy = false;
-            //  SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("game loop 1");
-            //UAPGameWindow.Log("gameWindow Tick 5");
+// loggy = false;
+ //  SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("game loop 1");
+ //UAPGameWindow.Log("gameWindow Tick 5");
 
-        }
+}
 
-        #region Public Methods
+#region Public Methods
 
-        public void Dispose()
-        {
-            SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("Dispose 1");
-            _disableGameTicking = true;
-            lock (UAPGameWindow.Instance)
-            {
-                //window.Dispose();
-            }
-            _disableGameTicking = false;
-            SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("Dispose end");
-        }
+public void Dispose()
+{
+ SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("Dispose 1");
+ _disableGameTicking = true;
+ lock (UAPGameWindow.Instance)
+ {
+     //window.Dispose();
+ }
+ _disableGameTicking = false;
+ SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("Dispose end");
+}
 
-        public override void BeginScreenDeviceChange(bool willBeFullScreen)
-        {
-            SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("BeginScreenDeviceChange 1");
+public override void BeginScreenDeviceChange(bool willBeFullScreen)
+{
+ SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("BeginScreenDeviceChange 1");
 
-            _disableGameTicking = true;
-            lock (UAPGameWindow.Instance)
-            {
+ _disableGameTicking = true;
+ lock (UAPGameWindow.Instance)
+ {
 
-            }
-            _disableGameTicking = false;
+ }
+ _disableGameTicking = false;
 
-            SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("BeginScreenDeviceChange end");
+ SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("BeginScreenDeviceChange end");
 
-        }
+}
 
-        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
-        {
-            SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("EndScreenDeviceChange 1");
+public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+{
+ SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("EndScreenDeviceChange 1");
 
-            _disableGameTicking = true;
-            lock (UAPGameWindow.Instance)
-            {
+ _disableGameTicking = true;
+ lock (UAPGameWindow.Instance)
+ {
 
-            }
-            _disableGameTicking = false;
+ }
+ _disableGameTicking = false;
 
-            SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("BeginScreenDeviceChange end");
+ SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("BeginScreenDeviceChange end");
 
-        }
-        #endregion
+}
+#endregion
 
-    }
+}
 }
 

@@ -27,7 +27,7 @@ namespace SaladFuzzTester
         }
 
         // Creates socket, sends message, closes socket, so no need to handle anything else.
-        public static void SendMessageToFuzzTesterBlocking(FuzzTesterEvent message)
+        public static void SendMessageToFuzzTesterBlocking2(FuzzTesterEvent message)
         {
             // Data buffer for incoming data.  
             byte[] bytes = new byte[1];
@@ -50,36 +50,145 @@ namespace SaladFuzzTester
             }
         }
 
+        class UserData
+        {
+            public byte[] msg;
+            public string timestamp;
+        }
+        public static void SendMessageToFuzzTesterAsync(FuzzTesterEvent message)
+        {
+            // Data buffer for incoming data.  
+            byte[] bytes = new byte[1];
+
+            try
+            {
+                int port = 43151;
+                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);
+                Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+                SocketAsyncEventArgs eventArgs = new SocketAsyncEventArgs();
+                eventArgs.RemoteEndPoint = remoteEP;
+                eventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(onConnectedAsync);
+                UserData ud = new UserData();
+                ud.msg = BitConverter.GetBytes((byte)message);
+                ud.timestamp = DateTime.Now.ToString("HH:mm:ss.ff");
+                eventArgs.UserToken = ud;
+              
+                // returns false if executed sync OR returns true if async (in which case we must wait for callback).
+                if (!socket.ConnectAsync(eventArgs))
+                {
+                    onConnectedAsync(socket, eventArgs);
+                }                
+            }
+            catch (Exception e)
+            {
+                showErrorDialog("Error: exception trying to send data to Fuzz tester: " + e.ToString());
+            }
+        }
+
         // Starts the given task which pings the given message periodicaly. You can call this function multiple times for the 
         // same FuzzTesterEvent value, but if it's already running for that message it won't start again so its safe to call it
         // multiple times with the same FuzzTesterEvent value.
-      /*  public static void StartPingTaskOnce(
-            FuzzTesterEvent pingMessage,
-            int pingPeriodMillis = 2000 // MUST BE MUCH LARGER THAN THE PERIOD IN WHICH THE FUZZ TESTER SLEEPS PING THREADS!
-            )
-        {
-            lock (_startedPingTasks)
-            {
-                // return if already added
-                if (_startedPingTasks.Contains(pingMessage))
-                {
-                    return;
-                }
+        /*  public static void StartPingTaskOnce(
+              FuzzTesterEvent pingMessage,
+              int pingPeriodMillis = 2000 // MUST BE MUCH LARGER THAN THE PERIOD IN WHICH THE FUZZ TESTER SLEEPS PING THREADS!
+              )
+          {
+              lock (_startedPingTasks)
+              {
+                  // return if already added
+                  if (_startedPingTasks.Contains(pingMessage))
+                  {
+                      return;
+                  }
 
-                _startedPingTasks.Add(pingMessage);
+                  _startedPingTasks.Add(pingMessage);
 
-                // start the actual task
-                startPingTask(pingMessage, pingPeriodMillis);
-            }
-        }*/
+                  // start the actual task
+                  startPingTask(pingMessage, pingPeriodMillis);
+              }
+          }*/
 
         #endregion
 
         #region Implementation
 
+        static void onConnectedAsync(object sender, SocketAsyncEventArgs e)
+        {
+            UserData ud = (UserData)e.UserToken;
+            byte[] dataToSend = (byte[])ud.msg;
+            logToFileBlocking("onConnectedAsync 1 from: " + ud.timestamp);
+
+            //  logToFileBlocking("onConnectedAsync 1");
+            if (e.LastOperation != SocketAsyncOperation.Connect || e.SocketError != SocketError.Success)
+            {
+                showErrorDialog("Failed to connect to Fuzz Tester, onConnectedAsync. Last operation: " + e.LastOperation.ToString() + ", Socket status: " + e.SocketError.ToString()+", data: "+ dataToSend[0]);
+            }
+            /*
+             TODO
+            THESE TWO THINGS COULD HAPPEN:
+             1) GAME THREAD FREEZA, ENABLE LOGGERS WHEN WE PING FIZZ TESTER
+             2) FUZZ TESTER LISTENER LOOP FREEZES, MAKE IT ASYNC + LOG IT
+          */
+            SocketAsyncEventArgs eventArgs = new SocketAsyncEventArgs();
+            eventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(onDataSentAsync);
+            eventArgs.SetBuffer(dataToSend, 0, dataToSend.Length);
+            eventArgs.UserToken = e.UserToken;
+          //  logToFileBlocking("onConnectedAsync 2");
+            Socket newSocket = (Socket)sender;
+            logToFileBlocking("onConnectedAsync 2 from: " + ud.timestamp);
+
+            if (!newSocket.SendAsync(eventArgs))
+            {
+                onDataSentAsync(newSocket, eventArgs);
+            }
+
+          //  logToFileBlocking("onConnectedAsync end");
+        }
+
+        // required callback because socket is async so we know when its done.
+        static async void onDataSentAsync(object sender, SocketAsyncEventArgs e)
+        {
+            UserData ud = (UserData)e.UserToken;
+
+             logToFileBlocking("onDataSentAsync 1 at: " + ud.timestamp);
+
+            //logToFileBlocking("onDataSentAsync 1");
+            if (e.LastOperation != SocketAsyncOperation.Send || e.SocketError != SocketError.Success)
+            {
+                showErrorDialog("Failed to send data to Fuzz Tester. Last operation: " + e.LastOperation.ToString() + ", Socket status: " + e.SocketError.ToString());
+            }
+            // logToFileBlocking("onDataSentAsync 2");
+            try
+            {
+
+                Socket newSocket = (Socket)sender;
+                if(newSocket.Connected == false)
+                {
+                    //newSocket.Shutdown(SocketShutdown.Both);
+                    newSocket.Dispose();
+                    logToFileBlocking("ERROR: socket failed to connect & send");
+                    throw new Exception("ERROR: socket failed to connect & send");
+                }
+                logToFileBlocking("onDataSentAsync 2 at: " + ud.timestamp);
+
+                await Task.Delay(1000); // for sanity before we kill it just in case
+
+                newSocket.Dispose();
+
+            }
+            catch (Exception ex)
+            {
+                string s = ex.ToString();
+                logToFileBlocking(s);
+            }
+            
+        }
+
         // stores ping tasks that were already started so that we cannot start multiple ping tasks for the same FuzzTesterEvent value.
         static HashSet<FuzzTesterEvent> _startedPingTasks = new HashSet<FuzzTesterEvent>();
 
+        // TODO: REMOVE BLOCKING FUNCTIONS
         static void connectBlocking(Socket socket, IPEndPoint remoteEP)
         {
             SocketAsyncEventArgs eventArgs = new SocketAsyncEventArgs();
@@ -159,7 +268,7 @@ namespace SaladFuzzTester
                               return;
                           }
 
-                          SendMessageToFuzzTesterBlocking(eventToPing);
+                          SendMessageToFuzzTesterBlocking2(eventToPing);
                           await Task.Delay(pingPeriodMillis, tokenSource); // wait
                       }
                   },
@@ -174,14 +283,20 @@ namespace SaladFuzzTester
         // This does not work if the UI thread is blocked, no dialog will be shown!
         static void showErrorDialog(string message)
         {
+            string logLine = DateTime.Now.ToString("HH:mm:ss.ff") + ": " + message;
+
+            logToFileBlocking("ERROR Dialog: " + logLine);
+
             // must run on UI thread
             Windows.Foundation.IAsyncAction action = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
                  Windows.UI.Core.CoreDispatcherPriority.High,
               () =>
               {
-                  var dialog = new Windows.UI.Popups.MessageDialog(DateTime.Now.ToString("HH:mm:ss.ff") +": "+ message);
+                  var dialog = new Windows.UI.Popups.MessageDialog(logLine);
                   var a = dialog.ShowAsync();
               });
+
+            throw new Exception("ERROR Dialog: " + logLine);     
         }
 
         // Sent as user data object to socket async method which sets the flag when the operation completed.
@@ -230,7 +345,7 @@ namespace SaladFuzzTester
         // Writes to C:\Users\<username>\AppData\Local\Packages\<app_package_name>\LocalState\FuzzTester.txt
         public static void logToFileBlocking(string logMessage)
         {
-            /*
+            
             int threadId = Environment.CurrentManagedThreadId;
 
             WorkItemHandler workItemHandler = action =>
@@ -258,7 +373,7 @@ namespace SaladFuzzTester
 
             Windows.Foundation.IAsyncAction a = ThreadPool.RunAsync(workItemHandler, WorkItemPriority.High, WorkItemOptions.None);
             while (a.Status != Windows.Foundation.AsyncStatus.Completed) ;
-            */
+            
         }
 
         #endregion

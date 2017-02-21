@@ -507,10 +507,11 @@ namespace Microsoft.Xna.Framework
                 DoUpdate(_gameTime);
             }
 
-            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+            /*if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
             {
                 SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy pre draw");
             }
+            */
 
             // Draw unless the update suppressed it.
             if (_suppressDraw)
@@ -520,10 +521,11 @@ namespace Microsoft.Xna.Framework
                 DoDraw(_gameTime);
             }
 
-            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
-            {
-                SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy post draw");
-            }
+            /* if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+             {
+                 SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy post draw");
+             }
+             */
         }
 
         #endregion
@@ -689,31 +691,31 @@ namespace Microsoft.Xna.Framework
             // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
 
-            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+            /*if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
             {
                 SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 1");
-            }
+            }*/
             if (Platform.BeforeDraw(gameTime) && BeginDraw())
             {
-                if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
-                {
-                    SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 2");
-                }
+                /*  if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+                  {
+                      SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 2");
+                  }*/
                 Draw(gameTime);
-                if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
-                {
-                    SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 3");
-                }
+                 /* if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+                  {
+                      SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 3");
+                  }*/
                 EndDraw();
-                if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
-                {
-                    SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 4");
-                }
+                 /* if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+                  {
+                      SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 4");
+                  }*/
             }
-            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+            /*if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
             {
                 SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 6");
-            }
+            }*/
         }
 
         internal void DoInitialize()
