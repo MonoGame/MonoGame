@@ -22,8 +22,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal int height;
         internal int ArraySize;
                 
-        public float TexelWidth { get; private set; }
-        public float TexelHeight { get; private set; }
+        public float WidthReciprocal { get; private set; }
+        public float HeightReciprocal { get; private set; }
 
         /// <summary>
         /// Gets the dimensions of the texture
@@ -101,8 +101,8 @@ namespace Microsoft.Xna.Framework.Graphics
             this.GraphicsDevice = graphicsDevice;
             this.width = width;
             this.height = height;
-            this.TexelWidth = 1f / (float)width;
-            this.TexelHeight = 1f / (float)height;
+            this.WidthReciprocal = 1f / (float)width;
+            this.HeightReciprocal = 1f / (float)height;
 
             this._format = format;
             this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
