@@ -920,6 +920,9 @@
     <Content Include="Assets\Xml\27_Colors.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Content Include="Assets\Xml\28_XnaCurve.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\Fonts\Default.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
