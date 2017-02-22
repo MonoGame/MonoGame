@@ -36,6 +36,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         }
 
         public static string JoinElements(IEnumerable<string> elements)
-            => string.Join(_writeSeperator, elements);
+        {
+            return string.Join(_writeSeperator, elements);
+        }
     }
 }
