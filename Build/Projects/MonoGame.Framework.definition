@@ -271,6 +271,7 @@
     <Compile Include="GamePlatform.Mobile.cs">
       <Platforms>Android,iOS,Web,tvOS</Platforms>
     </Compile>
+    <Compile Include="GamePlatformType.cs" />
     <Compile Include="GameRunBehavior.cs" />
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />

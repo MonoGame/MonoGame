@@ -58,6 +58,11 @@ namespace Microsoft.Xna.Framework
 
         partial void PlatformConstruct();       
 
+        public GamePlatformType GamePlatformType
+        {
+            get { return Platform.GamePlatformType; }
+        }
+        
         public Game()
         {
             _instance = this;

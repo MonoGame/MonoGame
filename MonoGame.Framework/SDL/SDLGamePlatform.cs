@@ -28,6 +28,11 @@ namespace Microsoft.Xna.Framework
         private int _isExiting;
         private SdlGameWindow _view;
 
+        public override GamePlatformType GamePlatformType
+        {
+            get { return GamePlatformType.DesktopGL; }
+        }
+
         public SdlGamePlatform(Game game)
             : base(game)
         {

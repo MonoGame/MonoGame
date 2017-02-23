@@ -91,6 +91,11 @@ namespace Microsoft.Xna.Framework
         private List<NSObject> _applicationObservers;
         private CADisplayLink _displayLink;
 
+        public override GamePlatformType GamePlatformType
+        {
+            get { return GamePlatformType.iOS; }
+        }
+
         public iOSGamePlatform(Game game) :
             base(game)
         {
