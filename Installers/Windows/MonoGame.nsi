@@ -154,6 +154,9 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   SetOutPath '$INSTDIR\Assemblies\iOS'
   File '..\..\MonoGame.Framework\bin\iOS\iPhoneSimulator\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\iOS\iPhoneSimulator\Release\*.xml'
+  SetOutPath '$INSTDIR\Assemblies\tvOS'
+  File '..\..\MonoGame.Framework\bin\tvOS\iPhoneSimulator\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\tvOS\iPhoneSimulator\Release\*.xml'
   SkipiOSAssemblies:
 
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Desktop OpenGL' '' '$INSTDIR\Assemblies\DesktopGL'
