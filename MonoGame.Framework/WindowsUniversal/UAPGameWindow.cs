@@ -27,17 +27,15 @@ namespace Microsoft.Xna.Framework
         }
 
         private DisplayOrientation _supportedOrientations;
-        private volatile DisplayOrientation _orientation;
+        private DisplayOrientation _orientation;
         private CoreWindow _coreWindow;
         private DisplayInformation _dinfo;
         private ApplicationView _appView;
         private SwapChainPanel _swapChainPanel;
         private Rectangle _viewBounds;
+
         private Queue<KeyEvent> _windowKeyEventsToPlayback = new Queue<KeyEvent>(); // we record keys on UI thread and play them back on game thread.
         private object _gameAndUiThreadLock = new object(); // Prevents the UI thread and game thread from executing at the same time
-
-
-        // private object _eventLocker = new object();
         private bool _disableGameTicking = false; // Needed alongside locks to make app responsive
 
         private InputEvents _windowEvents;

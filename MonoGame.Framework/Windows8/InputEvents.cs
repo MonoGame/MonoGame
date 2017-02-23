@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Windows.Devices.Input;
 using Windows.Foundation;
-using Windows.System.Threading;
+using System.Threading.Tasks;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
 using Windows.UI.Input;
@@ -23,8 +23,7 @@ namespace Microsoft.Xna.Framework
         private readonly TouchQueue _touchQueue;
         private readonly List<Keys> _keysUiThread = new List<Keys>(); // separate keys for UI thread and game thread to minimize locking
         private readonly List<Keys> _keysGameThread = new List<Keys>();
-        private IAsyncAction _inputLoopWorker;
-
+      
         private void RunInputAsync(UIElement inputElement)
         {
             CoreInputDeviceTypes inputDevices = CoreInputDeviceTypes.Mouse | CoreInputDeviceTypes.Pen | CoreInputDeviceTypes.Touch;
@@ -56,9 +55,8 @@ namespace Microsoft.Xna.Framework
 
             if (inputElement is SwapChainPanel || inputElement is SwapChainBackgroundPanel)
             {
-                System.Threading.Tasks.TaskCreationOptions taskFlags = System.Threading.Tasks.TaskCreationOptions.LongRunning;
-                System.Threading.CancellationToken t = new System.Threading.CancellationToken();
-                System.Threading.Tasks.Task.Factory.StartNew(() => RunInputAsync(inputElement), t, taskFlags, System.Threading.Tasks.TaskScheduler.Default);
+                TaskCreationOptions taskFlags = System.Threading.Tasks.TaskCreationOptions.LongRunning;
+                Task.Factory.StartNew(() => RunInputAsync(inputElement), System.Threading.CancellationToken.None, taskFlags, TaskScheduler.Default);
             }
         }
 
@@ -128,9 +126,7 @@ namespace Microsoft.Xna.Framework
         #endregion // CoreWindow Events
 
         private void PointerPressed(PointerPoint pointerPoint, UIElement target, Pointer pointer)
-        {
-            //  System.Diagnostics.Debug.WriteLine("press");
-
+        {          
             // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
@@ -222,7 +218,7 @@ namespace Microsoft.Xna.Framework
         public void UpdateKeyboardState()
         {
             // Update the keyboard state.
-            Keyboard.SetKeys(_keysGameThread); // todo: lock
+            Keyboard.SetKeys(_keysGameThread);
         }
 
         private static Keys KeyTranslate(Windows.System.VirtualKey inkey, CorePhysicalKeyStatus keyStatus)
