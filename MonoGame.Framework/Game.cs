@@ -429,8 +429,9 @@ namespace Microsoft.Xna.Framework
             // with even what looks like a safe change.  Be sure to test 
             // any change fully in both the fixed and variable timestep 
             // modes across multiple devices and platforms.
+            UAPGameWindow.lockyGame = 41;
 
-        RetryTick:
+            RetryTick:
 
             // Advance the accumulated elapsed time.
             var currentTicks = _gameTimer.Elapsed.Ticks;
@@ -454,6 +455,7 @@ namespace Microsoft.Xna.Framework
 #endif
                 goto RetryTick;
             }
+            UAPGameWindow.lockyGame = 42;
 
             // Do not allow any update to take longer than our maximum.
             if (_accumulatedElapsedTime > _maxElapsedTime)
@@ -503,29 +505,38 @@ namespace Microsoft.Xna.Framework
                 _gameTime.ElapsedGameTime = _accumulatedElapsedTime;
                 _gameTime.TotalGameTime += _accumulatedElapsedTime;
                 _accumulatedElapsedTime = TimeSpan.Zero;
+                UAPGameWindow.lockyGame = 43;
 
                 DoUpdate(_gameTime);
+
+                UAPGameWindow.lockyGame = 44;
+
             }
 
-            /*if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
             {
                 SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy pre draw");
             }
-            */
+            
 
             // Draw unless the update suppressed it.
             if (_suppressDraw)
                 _suppressDraw = false;
             else
             {
+                UAPGameWindow.lockyGame = 45;
+
                 DoDraw(_gameTime);
+
+                UAPGameWindow.lockyGame = 46;
+
             }
 
-            /* if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
              {
                  SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy post draw");
              }
-             */
+             
         }
 
         #endregion
@@ -669,19 +680,27 @@ namespace Microsoft.Xna.Framework
 
         internal void DoUpdate(GameTime gameTime)
         {
+            UAPGameWindow.lockyGame = 431;
+
             AssertNotDisposed();
             if (Platform.BeforeUpdate(gameTime))
             {
+                UAPGameWindow.lockyGame = 432;
+
                 // Once per frame, we need to check currently 
                 // playing sounds to see if they've stopped,
                 // and return them back to the pool if so.
                 SoundEffectInstancePool.Update();
+                UAPGameWindow.lockyGame = 433;
 
                 Update(gameTime);
+                UAPGameWindow.lockyGame = 434;
 
                 //The TouchPanel needs to know the time for when touches arrive
                 TouchPanelState.CurrentTimestamp = gameTime.TotalGameTime;
             }
+            UAPGameWindow.lockyGame = 435;
+
         }
 
         internal void DoDraw(GameTime gameTime)
@@ -691,31 +710,41 @@ namespace Microsoft.Xna.Framework
             // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
 
-            /*if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+            UAPGameWindow.lockyGame = 451;
+
+            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
             {
                 SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 1");
-            }*/
+            }
             if (Platform.BeforeDraw(gameTime) && BeginDraw())
             {
-                /*  if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+                  if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
                   {
                       SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 2");
-                  }*/
+                  }
+                UAPGameWindow.lockyGame = 452;
+
                 Draw(gameTime);
-                 /* if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+                  if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
                   {
                       SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 3");
-                  }*/
+                  }
+                UAPGameWindow.lockyGame = 453;
+
                 EndDraw();
-                 /* if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+                  if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
                   {
                       SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 4");
-                  }*/
+                  }
+                UAPGameWindow.lockyGame = 454;
+
             }
-            /*if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
+            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
             {
                 SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 6");
-            }*/
+            }
+            UAPGameWindow.lockyGame = 455;
+
         }
 
         internal void DoInitialize()

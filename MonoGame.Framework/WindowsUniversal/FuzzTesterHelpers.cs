@@ -13,12 +13,16 @@ namespace SaladFuzzTester
     {
         #region PublicInterface
 
+        public static bool _doDetailedLogging = true;
+
         // Event message which can be sent to fuzz tester
+        // NO ENUM VALUES MUST BE ZERO BECAUSE OF WINDOWS OS PORT SCANNING!
         public enum FuzzTesterEvent
         {
             // [0,255] RANGE ONLY SUPPORTED NOW BECAUSE 1 BYTE IS SENT!
-            PingFromUiThread = 1,
-            PingFromGameThread = 2
+            PingFromUiThread = 1, // MUST NOT BE 0 BECAUSE OF WINDOWS OS PORT SCANNING ACTION!
+            PingFromGameThread = 2  // MUST NOT BE 0 BECAUSE OF WINDOWS OS PORT SCANNING ACTION!
+
         }
 
         public static int GetPingSendIntervalMillis()
@@ -62,6 +66,8 @@ namespace SaladFuzzTester
 
             try
             {
+                SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("SendMessageToFuzzTesterAsync 1: msg: " + message.ToString());
+
                 int port = 43151;
                 IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);
                 Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -73,12 +79,17 @@ namespace SaladFuzzTester
                 ud.msg = BitConverter.GetBytes((byte)message);
                 ud.timestamp = DateTime.Now.ToString("HH:mm:ss.ff");
                 eventArgs.UserToken = ud;
-              
+                SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("SendMessageToFuzzTesterAsync 2: msg: " + message.ToString());
+
                 // returns false if executed sync OR returns true if async (in which case we must wait for callback).
                 if (!socket.ConnectAsync(eventArgs))
                 {
+                    SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("SendMessageToFuzzTesterAsync 3: msg: " + message.ToString());
+
                     onConnectedAsync(socket, eventArgs);
-                }                
+                }
+                SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("SendMessageToFuzzTesterAsync 4: msg: " + message.ToString());
+
             }
             catch (Exception e)
             {
@@ -115,13 +126,29 @@ namespace SaladFuzzTester
 
         static void onConnectedAsync(object sender, SocketAsyncEventArgs e)
         {
+            // needed for special cases when windows scans input ports
+            if (e.SocketError == SocketError.ConnectionReset)
+            {
+                logToFileBlocking("WARNING: onConnectedAsync: RESET SCANNING PORT FIX"); // TODO REMOVE THIS LOG
+                return;
+            }
+
             UserData ud = (UserData)e.UserToken;
             byte[] dataToSend = (byte[])ud.msg;
-            logToFileBlocking("onConnectedAsync 1 from: " + ud.timestamp);
+            logToFileBlocking("onConnectedAsync 1, msg: "+ dataToSend[0]+", from: " + ud.timestamp);
+
+            bool op1 = e.LastOperation != SocketAsyncOperation.Connect;
+            logToFileBlocking("onConnectedAsync 1.1, msg: " + dataToSend[0] + ", from: " + ud.timestamp);
+
+            bool op2 = e.SocketError != SocketError.Success;
+            logToFileBlocking("onConnectedAsync 1.2, msg: " + dataToSend[0] + ", from: " + ud.timestamp);
+
 
             //  logToFileBlocking("onConnectedAsync 1");
-            if (e.LastOperation != SocketAsyncOperation.Connect || e.SocketError != SocketError.Success)
+            if ( op1 || op2)
             {
+                logToFileBlocking("onConnectedAsync 1.3, msg: " + dataToSend[0] + ", from: " + ud.timestamp);
+
                 showErrorDialog("Failed to connect to Fuzz Tester, onConnectedAsync. Last operation: " + e.LastOperation.ToString() + ", Socket status: " + e.SocketError.ToString()+", data: "+ dataToSend[0]);
             }
             /*
@@ -130,13 +157,17 @@ namespace SaladFuzzTester
              1) GAME THREAD FREEZA, ENABLE LOGGERS WHEN WE PING FIZZ TESTER
              2) FUZZ TESTER LISTENER LOOP FREEZES, MAKE IT ASYNC + LOG IT
           */
+            logToFileBlocking("onConnectedAsync 1.4, msg: " + dataToSend[0] + ", from: " + ud.timestamp);
+
             SocketAsyncEventArgs eventArgs = new SocketAsyncEventArgs();
             eventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(onDataSentAsync);
             eventArgs.SetBuffer(dataToSend, 0, dataToSend.Length);
+            logToFileBlocking("onConnectedAsync 1.5, msg: " + dataToSend[0] + ", from: " + ud.timestamp);
+
             eventArgs.UserToken = e.UserToken;
           //  logToFileBlocking("onConnectedAsync 2");
             Socket newSocket = (Socket)sender;
-            logToFileBlocking("onConnectedAsync 2 from: " + ud.timestamp);
+            logToFileBlocking("onConnectedAsync 2 , msg: " + dataToSend[0] + ", from: " + ud.timestamp);
 
             if (!newSocket.SendAsync(eventArgs))
             {
@@ -149,16 +180,24 @@ namespace SaladFuzzTester
         // required callback because socket is async so we know when its done.
         static async void onDataSentAsync(object sender, SocketAsyncEventArgs e)
         {
+            // needed for special cases when windows scans input ports
+            if (e.SocketError == SocketError.ConnectionReset)
+            {
+                logToFileBlocking("WARNING: onDataSentAsync: RESET SCANNING PORT FIX"); // TODO REMOVE THIS LOG
+                return;
+            }
+
             UserData ud = (UserData)e.UserToken;
 
-             logToFileBlocking("onDataSentAsync 1 at: " + ud.timestamp);
+             logToFileBlocking("onDataSentAsync 1 , msg: " + ud.msg[0] + ", at: " + ud.timestamp);
 
-            //logToFileBlocking("onDataSentAsync 1");
             if (e.LastOperation != SocketAsyncOperation.Send || e.SocketError != SocketError.Success)
             {
                 showErrorDialog("Failed to send data to Fuzz Tester. Last operation: " + e.LastOperation.ToString() + ", Socket status: " + e.SocketError.ToString());
             }
-            // logToFileBlocking("onDataSentAsync 2");
+
+             logToFileBlocking("onDataSentAsync 2 , msg: " + ud.msg[0] + ", at: " + ud.timestamp);
+
             try
             {
 
@@ -339,19 +378,21 @@ namespace SaladFuzzTester
             return tokenSource;
         }
 
-
         static object loggerWriteLock = new object(); // to prevent 2 threads writing/reading at same time
 
         // Writes to C:\Users\<username>\AppData\Local\Packages\<app_package_name>\LocalState\FuzzTester.txt
         public static void logToFileBlocking(string logMessage)
         {
-            
-            int threadId = Environment.CurrentManagedThreadId;
-
+            /*int threadId = Environment.CurrentManagedThreadId;
+            String timeStamp1 = "Timestamp logToFileBlocking call: "+DateTime.Now.ToString("HH:mm:ss.ff.");
             WorkItemHandler workItemHandler = action =>
             {
+                String timeStamp2 = "Timestamp logToFileBlocking call: " + DateTime.Now.ToString("HH:mm:ss.ff.");
+
                 lock (loggerWriteLock)
                 {
+                    String timeStamp3 = "Timestamp logToFileBlocking call: " + DateTime.Now.ToString("HH:mm:ss.ff.");
+
                     // Create sample file; replace if exists.
                     Windows.Storage.StorageFolder storageFolder =
                         Windows.Storage.ApplicationData.Current.LocalFolder;
@@ -359,13 +400,16 @@ namespace SaladFuzzTester
                     Windows.Foundation.IAsyncOperation<Windows.Storage.StorageFile> sampleFile =
                          storageFolder.CreateFileAsync("FuzzTester.txt", Windows.Storage.CreationCollisionOption.OpenIfExists);
 
+                    String timeStamp4 = "Timestamp logToFileBlocking call: " + DateTime.Now.ToString("HH:mm:ss.ff.");
+
                     Task<Windows.Storage.StorageFile> ft = sampleFile.AsTask();
 
                     ft.Wait();
                     Windows.Storage.StorageFile f = ft.Result;
 
                     String timeStamp = DateTime.Now.ToString("HH:mm:ss.ff");
-                    Windows.Foundation.IAsyncAction aa = Windows.Storage.FileIO.AppendTextAsync(f, timeStamp + ": " + " thread: " + threadId + " : "+ logMessage + "\r\n"); ;
+                    string ts = ". " + timeStamp1 + " . " + timeStamp2 + " . " + timeStamp3 + " . " + timeStamp4 + " . ";
+                    Windows.Foundation.IAsyncAction aa = Windows.Storage.FileIO.AppendTextAsync(f, timeStamp + ": " + " thread: " + threadId + " : "+ logMessage + " @@"+ ts+ "\r\n"); ;
                     while (aa.Status != Windows.Foundation.AsyncStatus.Completed) ;
                 }
 
@@ -373,7 +417,7 @@ namespace SaladFuzzTester
 
             Windows.Foundation.IAsyncAction a = ThreadPool.RunAsync(workItemHandler, WorkItemPriority.High, WorkItemOptions.None);
             while (a.Status != Windows.Foundation.AsyncStatus.Completed) ;
-            
+            */
         }
 
         #endregion
