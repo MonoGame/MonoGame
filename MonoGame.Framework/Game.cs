@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework
                 d => d.Visible,
                 (d, handler) => d.VisibleChanged += handler,
                 (d, handler) => d.VisibleChanged -= handler,
-                (d1 ,d2) => Comparer<int>.Default.Compare(d1.DrawOrder, d2.DrawOrder),
+                (d1, d2) => Comparer<int>.Default.Compare(d1.DrawOrder, d2.DrawOrder),
                 (d, handler) => d.DrawOrderChanged += handler,
                 (d, handler) => d.DrawOrderChanged -= handler);
 
@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework
 
 
         private bool _suppressDraw;
-        
+
         public Game()
         {
             _instance = this;
@@ -80,11 +80,11 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
-		[System.Diagnostics.Conditional("DEBUG")]
-		internal void Log(string Message)
-		{
-			if (Platform != null) Platform.Log(Message);
-		}
+        [System.Diagnostics.Conditional("DEBUG")]
+        internal void Log(string Message)
+        {
+            if (Platform != null) Platform.Log(Message);
+        }
 
         #region IDisposable Implementation
 
@@ -244,7 +244,8 @@ namespace Microsoft.Xna.Framework
             set { _isFixedTimeStep = value; }
         }
 
-        public GameServiceContainer Services {
+        public GameServiceContainer Services
+        {
             get { return _services; }
         }
 
@@ -341,7 +342,7 @@ namespace Microsoft.Xna.Framework
         {
             _suppressDraw = true;
         }
-        
+
         public void RunOneFrame()
         {
             if (Platform == null)
@@ -350,18 +351,19 @@ namespace Microsoft.Xna.Framework
             if (!Platform.BeforeRun())
                 return;
 
-            if (!_initialized) {
-                DoInitialize ();
+            if (!_initialized)
+            {
+                DoInitialize();
                 _gameTimer = Stopwatch.StartNew();
                 _initialized = true;
             }
 
-            BeginRun();            
+            BeginRun();
 
             //Not quite right..
-            Tick ();
+            Tick();
 
-            EndRun ();
+            EndRun();
 
         }
 
@@ -380,8 +382,9 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
-            if (!_initialized) {
-                DoInitialize ();
+            if (!_initialized)
+            {
+                DoInitialize();
                 _initialized = true;
             }
 
@@ -389,20 +392,20 @@ namespace Microsoft.Xna.Framework
             _gameTimer = Stopwatch.StartNew();
             switch (runBehavior)
             {
-            case GameRunBehavior.Asynchronous:
-                Platform.AsyncRunLoopEnded += Platform_AsyncRunLoopEnded;
-                Platform.StartRunLoop();
-                break;
-            case GameRunBehavior.Synchronous:
-                Platform.RunLoop();
+                case GameRunBehavior.Asynchronous:
+                    Platform.AsyncRunLoopEnded += Platform_AsyncRunLoopEnded;
+                    Platform.StartRunLoop();
+                    break;
+                case GameRunBehavior.Synchronous:
+                    Platform.RunLoop();
 #if !DESKTOPGL
-                EndRun();
-				DoExiting();
+                    EndRun();
+                    DoExiting();
 #endif
-                break;
-            default:
-                throw new ArgumentException(string.Format(
-                    "Handling for the run behavior {0} is not implemented.", runBehavior));
+                    break;
+                default:
+                    throw new ArgumentException(string.Format(
+                        "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
         }
 
@@ -429,7 +432,6 @@ namespace Microsoft.Xna.Framework
             // with even what looks like a safe change.  Be sure to test 
             // any change fully in both the fixed and variable timestep 
             // modes across multiple devices and platforms.
-            UAPGameWindow.lockyGame = 41;
 
             RetryTick:
 
@@ -455,7 +457,6 @@ namespace Microsoft.Xna.Framework
 #endif
                 goto RetryTick;
             }
-            UAPGameWindow.lockyGame = 42;
 
             // Do not allow any update to take longer than our maximum.
             if (_accumulatedElapsedTime > _maxElapsedTime)
@@ -505,38 +506,18 @@ namespace Microsoft.Xna.Framework
                 _gameTime.ElapsedGameTime = _accumulatedElapsedTime;
                 _gameTime.TotalGameTime += _accumulatedElapsedTime;
                 _accumulatedElapsedTime = TimeSpan.Zero;
-                UAPGameWindow.lockyGame = 43;
 
                 DoUpdate(_gameTime);
 
-                UAPGameWindow.lockyGame = 44;
-
             }
-
-            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
-            {
-                SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy pre draw");
-            }
-            
 
             // Draw unless the update suppressed it.
             if (_suppressDraw)
                 _suppressDraw = false;
             else
             {
-                UAPGameWindow.lockyGame = 45;
-
                 DoDraw(_gameTime);
-
-                UAPGameWindow.lockyGame = 46;
-
             }
-
-            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
-             {
-                 SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy post draw");
-             }
-             
         }
 
         #endregion
@@ -595,24 +576,24 @@ namespace Microsoft.Xna.Framework
         protected virtual void Update(GameTime gameTime)
         {
             _updateables.ForEachFilteredItem(UpdateAction, gameTime);
-		}
+        }
 
         protected virtual void OnExiting(object sender, EventArgs args)
         {
             Raise(Exiting, args);
         }
-		
-		protected virtual void OnActivated (object sender, EventArgs args)
-		{
-			AssertNotDisposed();
-			Raise(Activated, args);
-		}
-		
-		protected virtual void OnDeactivated (object sender, EventArgs args)
-		{
-			AssertNotDisposed();
-			Raise(Deactivated, args);
-		}
+
+        protected virtual void OnActivated(object sender, EventArgs args)
+        {
+            AssertNotDisposed();
+            Raise(Activated, args);
+        }
+
+        protected virtual void OnDeactivated(object sender, EventArgs args)
+        {
+            AssertNotDisposed();
+            Raise(Deactivated, args);
+        }
 
         #endregion Protected Methods
 
@@ -640,7 +621,7 @@ namespace Microsoft.Xna.Framework
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
-			DoExiting();
+            DoExiting();
         }
 
 #if WINDOWS_STOREAPP && !WINDOWS_PHONE81
@@ -661,7 +642,7 @@ namespace Microsoft.Xna.Framework
 
         internal void applyChanges(GraphicsDeviceManager manager)
         {
-			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
+            Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
 
 #if !(WINDOWS && DIRECTX)
 
@@ -671,36 +652,28 @@ namespace Microsoft.Xna.Framework
                 Platform.ExitFullScreen();
 #endif
             var viewport = new Viewport(0, 0,
-			                            GraphicsDevice.PresentationParameters.BackBufferWidth,
-			                            GraphicsDevice.PresentationParameters.BackBufferHeight);
+                                        GraphicsDevice.PresentationParameters.BackBufferWidth,
+                                        GraphicsDevice.PresentationParameters.BackBufferHeight);
 
             GraphicsDevice.Viewport = viewport;
-			Platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
+            Platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
         }
 
         internal void DoUpdate(GameTime gameTime)
         {
-            UAPGameWindow.lockyGame = 431;
-
             AssertNotDisposed();
             if (Platform.BeforeUpdate(gameTime))
             {
-                UAPGameWindow.lockyGame = 432;
-
                 // Once per frame, we need to check currently 
                 // playing sounds to see if they've stopped,
                 // and return them back to the pool if so.
                 SoundEffectInstancePool.Update();
-                UAPGameWindow.lockyGame = 433;
 
                 Update(gameTime);
-                UAPGameWindow.lockyGame = 434;
 
                 //The TouchPanel needs to know the time for when touches arrive
                 TouchPanelState.CurrentTimestamp = gameTime.TotalGameTime;
             }
-            UAPGameWindow.lockyGame = 435;
-
         }
 
         internal void DoDraw(GameTime gameTime)
@@ -710,40 +683,12 @@ namespace Microsoft.Xna.Framework
             // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
 
-            UAPGameWindow.lockyGame = 451;
-
-            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
-            {
-                SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 1");
-            }
             if (Platform.BeforeDraw(gameTime) && BeginDraw())
             {
-                  if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
-                  {
-                      SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 2");
-                  }
-                UAPGameWindow.lockyGame = 452;
-
                 Draw(gameTime);
-                  if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
-                  {
-                      SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 3");
-                  }
-                UAPGameWindow.lockyGame = 453;
 
                 EndDraw();
-                  if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
-                  {
-                      SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 4");
-                  }
-                UAPGameWindow.lockyGame = 454;
-
             }
-            if (Microsoft.Xna.Framework.UAPGameWindow.loggy)
-            {
-                SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("loggy DoDraw 6");
-            }
-            UAPGameWindow.lockyGame = 455;
 
         }
 
@@ -763,11 +708,11 @@ namespace Microsoft.Xna.Framework
             _components.ComponentRemoved += Components_ComponentRemoved;
         }
 
-		internal void DoExiting()
-		{
-			OnExiting(this, EventArgs.Empty);
-			UnloadContent();
-		}
+        internal void DoExiting()
+        {
+            OnExiting(this, EventArgs.Empty);
+            UnloadContent();
+        }
 
         #endregion Internal Methods
 
@@ -781,7 +726,7 @@ namespace Microsoft.Xna.Framework
                         Services.GetService(typeof(IGraphicsDeviceManager));
 
                     if (_graphicsDeviceManager == null)
-                        throw new InvalidOperationException ("No Graphics Device Manager");
+                        throw new InvalidOperationException("No Graphics Device Manager");
                 }
                 return (GraphicsDeviceManager)_graphicsDeviceManager;
             }

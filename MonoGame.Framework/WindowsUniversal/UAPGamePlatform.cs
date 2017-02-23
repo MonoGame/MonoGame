@@ -132,12 +132,6 @@ namespace Microsoft.Xna.Framework
                    t,
                    TaskCreationOptions.LongRunning,
                    TaskScheduler.Default);
-            
-           /* CompositionTarget.Rendering += (o, a) =>
-            {
-                UAPGameWindow.Instance.Tick();
-                GamePad.Back = false;
-            };*/
         }
 
         private void RunGameLoopInWorkerThread()
@@ -152,12 +146,10 @@ namespace Microsoft.Xna.Framework
 
         public void StopRunLoop()
         {
-            SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("StartRunLoop 1");
-            lock (UAPGameWindow.Instance)
+            lock (UAPGameWindow.Instance.GetGameAndUIThreadLock())
             {
 
             }
-            SaladFuzzTester.FuzzTesterHelpers.logToFileBlocking("StartRunLoop end");
         }
 
         public override void Exit()
