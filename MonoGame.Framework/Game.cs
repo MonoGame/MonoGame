@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework
                 d => d.Visible,
                 (d, handler) => d.VisibleChanged += handler,
                 (d, handler) => d.VisibleChanged -= handler,
-                (d1, d2) => Comparer<int>.Default.Compare(d1.DrawOrder, d2.DrawOrder),
+                (d1 ,d2) => Comparer<int>.Default.Compare(d1.DrawOrder, d2.DrawOrder),
                 (d, handler) => d.DrawOrderChanged += handler,
                 (d, handler) => d.DrawOrderChanged -= handler);
 
@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework
 
 
         private bool _suppressDraw;
-
+        
         public Game()
         {
             _instance = this;
@@ -80,11 +80,11 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
-        [System.Diagnostics.Conditional("DEBUG")]
-        internal void Log(string Message)
-        {
-            if (Platform != null) Platform.Log(Message);
-        }
+		[System.Diagnostics.Conditional("DEBUG")]
+		internal void Log(string Message)
+		{
+			if (Platform != null) Platform.Log(Message);
+		}
 
         #region IDisposable Implementation
 
@@ -244,8 +244,7 @@ namespace Microsoft.Xna.Framework
             set { _isFixedTimeStep = value; }
         }
 
-        public GameServiceContainer Services
-        {
+        public GameServiceContainer Services {
             get { return _services; }
         }
 
@@ -342,7 +341,7 @@ namespace Microsoft.Xna.Framework
         {
             _suppressDraw = true;
         }
-
+        
         public void RunOneFrame()
         {
             if (Platform == null)
@@ -351,19 +350,18 @@ namespace Microsoft.Xna.Framework
             if (!Platform.BeforeRun())
                 return;
 
-            if (!_initialized)
-            {
-                DoInitialize();
+            if (!_initialized) {
+                DoInitialize ();
                 _gameTimer = Stopwatch.StartNew();
                 _initialized = true;
             }
 
-            BeginRun();
+            BeginRun();            
 
             //Not quite right..
-            Tick();
+            Tick ();
 
-            EndRun();
+            EndRun ();
 
         }
 
@@ -382,9 +380,8 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
-            if (!_initialized)
-            {
-                DoInitialize();
+            if (!_initialized) {
+                DoInitialize ();
                 _initialized = true;
             }
 
@@ -392,20 +389,20 @@ namespace Microsoft.Xna.Framework
             _gameTimer = Stopwatch.StartNew();
             switch (runBehavior)
             {
-                case GameRunBehavior.Asynchronous:
-                    Platform.AsyncRunLoopEnded += Platform_AsyncRunLoopEnded;
-                    Platform.StartRunLoop();
-                    break;
-                case GameRunBehavior.Synchronous:
-                    Platform.RunLoop();
+            case GameRunBehavior.Asynchronous:
+                Platform.AsyncRunLoopEnded += Platform_AsyncRunLoopEnded;
+                Platform.StartRunLoop();
+                break;
+            case GameRunBehavior.Synchronous:
+                Platform.RunLoop();
 #if !DESKTOPGL
-                    EndRun();
-                    DoExiting();
+                EndRun();
+				DoExiting();
 #endif
-                    break;
-                default:
-                    throw new ArgumentException(string.Format(
-                        "Handling for the run behavior {0} is not implemented.", runBehavior));
+                break;
+            default:
+                throw new ArgumentException(string.Format(
+                    "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
         }
 
@@ -433,7 +430,7 @@ namespace Microsoft.Xna.Framework
             // any change fully in both the fixed and variable timestep 
             // modes across multiple devices and platforms.
 
-            RetryTick:
+        RetryTick:
 
             // Advance the accumulated elapsed time.
             var currentTicks = _gameTimer.Elapsed.Ticks;
@@ -508,7 +505,6 @@ namespace Microsoft.Xna.Framework
                 _accumulatedElapsedTime = TimeSpan.Zero;
 
                 DoUpdate(_gameTime);
-
             }
 
             // Draw unless the update suppressed it.
@@ -576,24 +572,24 @@ namespace Microsoft.Xna.Framework
         protected virtual void Update(GameTime gameTime)
         {
             _updateables.ForEachFilteredItem(UpdateAction, gameTime);
-        }
+		}
 
         protected virtual void OnExiting(object sender, EventArgs args)
         {
             Raise(Exiting, args);
         }
-
-        protected virtual void OnActivated(object sender, EventArgs args)
-        {
-            AssertNotDisposed();
-            Raise(Activated, args);
-        }
-
-        protected virtual void OnDeactivated(object sender, EventArgs args)
-        {
-            AssertNotDisposed();
-            Raise(Deactivated, args);
-        }
+		
+		protected virtual void OnActivated (object sender, EventArgs args)
+		{
+			AssertNotDisposed();
+			Raise(Activated, args);
+		}
+		
+		protected virtual void OnDeactivated (object sender, EventArgs args)
+		{
+			AssertNotDisposed();
+			Raise(Deactivated, args);
+		}
 
         #endregion Protected Methods
 
@@ -621,7 +617,7 @@ namespace Microsoft.Xna.Framework
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
-            DoExiting();
+			DoExiting();
         }
 
 #if WINDOWS_STOREAPP && !WINDOWS_PHONE81
@@ -642,7 +638,7 @@ namespace Microsoft.Xna.Framework
 
         internal void applyChanges(GraphicsDeviceManager manager)
         {
-            Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
+			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
 
 #if !(WINDOWS && DIRECTX)
 
@@ -652,11 +648,11 @@ namespace Microsoft.Xna.Framework
                 Platform.ExitFullScreen();
 #endif
             var viewport = new Viewport(0, 0,
-                                        GraphicsDevice.PresentationParameters.BackBufferWidth,
-                                        GraphicsDevice.PresentationParameters.BackBufferHeight);
+			                            GraphicsDevice.PresentationParameters.BackBufferWidth,
+			                            GraphicsDevice.PresentationParameters.BackBufferHeight);
 
             GraphicsDevice.Viewport = viewport;
-            Platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
+			Platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
         }
 
         internal void DoUpdate(GameTime gameTime)
@@ -682,14 +678,11 @@ namespace Microsoft.Xna.Framework
             // Draw and EndDraw should not be called if BeginDraw returns false.
             // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
-
             if (Platform.BeforeDraw(gameTime) && BeginDraw())
             {
                 Draw(gameTime);
-
                 EndDraw();
             }
-
         }
 
         internal void DoInitialize()
@@ -708,11 +701,11 @@ namespace Microsoft.Xna.Framework
             _components.ComponentRemoved += Components_ComponentRemoved;
         }
 
-        internal void DoExiting()
-        {
-            OnExiting(this, EventArgs.Empty);
-            UnloadContent();
-        }
+		internal void DoExiting()
+		{
+			OnExiting(this, EventArgs.Empty);
+			UnloadContent();
+		}
 
         #endregion Internal Methods
 
@@ -726,7 +719,7 @@ namespace Microsoft.Xna.Framework
                         Services.GetService(typeof(IGraphicsDeviceManager));
 
                     if (_graphicsDeviceManager == null)
-                        throw new InvalidOperationException("No Graphics Device Manager");
+                        throw new InvalidOperationException ("No Graphics Device Manager");
                 }
                 return (GraphicsDeviceManager)_graphicsDeviceManager;
             }
