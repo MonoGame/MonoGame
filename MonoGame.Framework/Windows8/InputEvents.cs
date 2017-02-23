@@ -7,18 +7,39 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Windows.Devices.Input;
+using Windows.Foundation;
+using System.Threading.Tasks;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Controls;
 
 namespace Microsoft.Xna.Framework
 {
     internal class InputEvents
     {
         private readonly TouchQueue _touchQueue;
-        private readonly List<Keys> _keys = new List<Keys>();
+        private readonly List<Keys> _keysUiThread = new List<Keys>(); // separate keys for UI thread and game thread to minimize locking
+        private readonly List<Keys> _keysGameThread = new List<Keys>();
+      
+        private void RunInputAsync(UIElement inputElement)
+        {
+            CoreInputDeviceTypes inputDevices = CoreInputDeviceTypes.Mouse | CoreInputDeviceTypes.Pen | CoreInputDeviceTypes.Touch;
+
+            CoreIndependentInputSource coreIndependentInputSource;
+            if (inputElement is SwapChainBackgroundPanel)
+                coreIndependentInputSource = ((SwapChainBackgroundPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
+            else
+                coreIndependentInputSource = ((SwapChainPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
+
+            coreIndependentInputSource.PointerPressed += CoreWindow_PointerPressed;
+            coreIndependentInputSource.PointerMoved += CoreWindow_PointerMoved;
+            coreIndependentInputSource.PointerReleased += CoreWindow_PointerReleased;
+
+            coreIndependentInputSource.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
+        }
 
         public InputEvents(CoreWindow window, UIElement inputElement, TouchQueue touchQueue)
         {
@@ -32,23 +53,10 @@ namespace Microsoft.Xna.Framework
             window.Activated += CoreWindow_Activated;
             window.SizeChanged += CoreWindow_SizeChanged;
 
-            if (inputElement != null)
+            if (inputElement is SwapChainPanel || inputElement is SwapChainBackgroundPanel)
             {
-                // If we have an input UIElement then we bind input events
-                // to it else we'll get events for overlapping XAML controls.
-                inputElement.PointerPressed += UIElement_PointerPressed;
-                inputElement.PointerReleased += UIElement_PointerReleased;
-                inputElement.PointerCanceled += UIElement_PointerReleased;
-                inputElement.PointerMoved += UIElement_PointerMoved;
-                inputElement.PointerWheelChanged += UIElement_PointerWheelChanged;
-            }
-            else
-            {
-                // If we only have a CoreWindow then use it for input events.
-                window.PointerPressed += CoreWindow_PointerPressed;
-                window.PointerReleased += CoreWindow_PointerReleased;
-                window.PointerMoved += CoreWindow_PointerMoved;
-                window.PointerWheelChanged += CoreWindow_PointerWheelChanged;
+                TaskCreationOptions taskFlags = System.Threading.Tasks.TaskCreationOptions.LongRunning;
+                Task.Factory.StartNew(() => RunInputAsync(inputElement), System.Threading.CancellationToken.None, taskFlags, TaskScheduler.Default);
             }
         }
 
@@ -118,7 +126,7 @@ namespace Microsoft.Xna.Framework
         #endregion // CoreWindow Events
 
         private void PointerPressed(PointerPoint pointerPoint, UIElement target, Pointer pointer)
-        {
+        {          
             // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
@@ -126,7 +134,7 @@ namespace Microsoft.Xna.Framework
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
 
             _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos, !isTouch);
-            
+
             if (!isTouch)
             {
                 // Mouse or stylus event.
@@ -197,10 +205,20 @@ namespace Microsoft.Xna.Framework
             Mouse.PrimaryWindow.MouseState.MiddleButton = state.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
         }
 
-        public void UpdateState()
+        public void CopyKeyStateToGameThread()
+        {
+            // Copy keys from ui thread to keys for game thread
+            lock (_keysUiThread)
+            {
+                _keysGameThread.Clear();
+                _keysGameThread.AddRange(_keysUiThread);
+            }
+        }
+
+        public void UpdateKeyboardState()
         {
             // Update the keyboard state.
-            Keyboard.SetKeys(_keys);
+            Keyboard.SetKeys(_keysGameThread);
         }
 
         private static Keys KeyTranslate(Windows.System.VirtualKey inkey, CorePhysicalKeyStatus keyStatus)
@@ -215,11 +233,11 @@ namespace Microsoft.Xna.Framework
                 case Windows.System.VirtualKey.Shift:
                     // we can detect right shift by checking the scancode value.
                     // left shift is 0x2A, right shift is 0x36. IsExtendedKey is always false.
-                    return (keyStatus.ScanCode==0x36) ? Keys.RightShift : Keys.LeftShift;
+                    return (keyStatus.ScanCode == 0x36) ? Keys.RightShift : Keys.LeftShift;
                 // Note that the Alt key is now refered to as Menu.
                 // ALT key doesn't get fired by KeyUp/KeyDown events.
                 // One solution could be to check CoreWindow.GetKeyState(...) on every tick.
-                case Windows.System.VirtualKey.Menu:                    
+                case Windows.System.VirtualKey.Menu:
                     return Keys.LeftAlt;
 
                 default:
@@ -231,39 +249,54 @@ namespace Microsoft.Xna.Framework
         {
             var xnaKey = KeyTranslate(args.VirtualKey, args.KeyStatus);
 
-            if (_keys.Contains(xnaKey))
-                _keys.Remove(xnaKey);
+            lock (_keysUiThread)
+            {
+                if (_keysUiThread.Contains(xnaKey))
+                    _keysUiThread.Remove(xnaKey);
+            }
         }
 
         private void CoreWindow_KeyDown(object sender, KeyEventArgs args)
         {
             var xnaKey = KeyTranslate(args.VirtualKey, args.KeyStatus);
 
-            if (!_keys.Contains(xnaKey))
-                _keys.Add(xnaKey);
+            lock (_keysUiThread)
+            {
+                if (!_keysUiThread.Contains(xnaKey))
+                    _keysUiThread.Add(xnaKey);
+            }
         }
 
         private void CoreWindow_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
             // If the window is resized then also 
             // drop any current key states.
-            _keys.Clear();
+            lock (_keysUiThread)
+            {
+                _keysUiThread.Clear();
+            }
         }
 
         private void CoreWindow_Activated(CoreWindow sender, WindowActivatedEventArgs args)
         {
             // Forget about the held keys when we lose focus as we don't
             // receive key events for them while we are in the background
-            if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
-                _keys.Clear();
+            lock (_keysUiThread)
+            {
+                if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
+                    _keysUiThread.Clear();
+            }
         }
 
         private void CoreWindow_VisibilityChanged(CoreWindow sender, VisibilityChangedEventArgs args)
         {
             // Forget about the held keys when we disappear as we don't
             // receive key events for them while we are in the background
-            if (!args.Visible)
-                _keys.Clear();
+            lock (_keysUiThread)
+            {
+                if (!args.Visible)
+                    _keysUiThread.Clear();
+            }
         }
     }
 }

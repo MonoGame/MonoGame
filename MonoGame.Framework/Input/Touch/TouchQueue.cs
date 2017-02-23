@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
     /// Stores touches to apply them once a frame for platforms that dispatch touches asynchronously
     /// while user code is running.
     /// </summary>
-    internal class TouchQueue
+    public class TouchQueue
     {
         private readonly List<TouchEvent> _queue = new List<TouchEvent>(); 
 

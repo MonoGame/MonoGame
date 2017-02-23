@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
-        internal static bool Back;
+        internal volatile static bool Back;
 
         private static int PlatformGetMaxNumberOfGamePads()
         {
