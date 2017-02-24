@@ -88,9 +88,13 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void TestDefines()
         {
-            Assert.DoesNotThrow(() => BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows));
+            Assert.DoesNotThrow(() => BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows, "MACRO_DEFINE_TEST=3"));
             Assert.Throws<InvalidContentException>(() =>
-                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows, "INVALID_SYNTAX;ANOTHER_MACRO"));
+                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows, "MACRO_DEFINE_TEST=4"));
+            Assert.Throws<InvalidContentException>(() =>
+                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows));
+            Assert.Throws<InvalidContentException>(() =>
+                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows, "INVALID_SYNTAX;ANOTHER_MACRO;MACRO_DEFINE_TEST=3"));
         }
 
         [Test]
