@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework
 
         private object _eventLocker = new object();
 
-        private InputEvents _windowEvents;
+        private InputEvents _inputEvents;
 
         #region Internal Properties
 
@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework
         public void Initialize(CoreWindow coreWindow, UIElement inputElement, TouchQueue touchQueue)
         {
             _coreWindow = coreWindow;
-            _windowEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
+            _inputEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
 
 			_dinfo = DisplayInformation.GetForCurrentView();
             _appView = ApplicationView.GetForCurrentView();
@@ -278,11 +278,17 @@ namespace Microsoft.Xna.Framework
                     break;
             }
         }
+      
+        void ProcessWindowEvents()
+        {
+            // Update input
+            _inputEvents.UpdateState();
+        }
 
         internal void Tick()
         {
             // Update state based on window events.
-            _windowEvents.UpdateState();
+            ProcessWindowEvents();
 
             // Update and render the game.
             if (Game != null)

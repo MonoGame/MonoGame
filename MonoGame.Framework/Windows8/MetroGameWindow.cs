@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework
 #if !WINDOWS_PHONE81
         private ApplicationViewState _currentViewState;
 #endif
-        private InputEvents _windowEvents;
+        private InputEvents _inputEvents;
 
 
         private Vector2 _backBufferScale;
@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework
         public void Initialize(CoreWindow coreWindow, UIElement inputElement, TouchQueue touchQueue)
         {
             _coreWindow = coreWindow;
-            _windowEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
+            _inputEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
 
             _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
@@ -278,10 +278,16 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        void ProcessWindowEvents()
+        {
+            // Update input
+            _inputEvents.UpdateState();
+        }
+
         internal void Tick()
         {
             // Update state based on window events.
-            _windowEvents.UpdateState();
+            ProcessWindowEvents();
 
             // Update and render the game.
             if (Game != null)
