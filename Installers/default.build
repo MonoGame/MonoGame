@@ -75,6 +75,7 @@
       <delete dir="./root/tmp" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Tools" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/tvOS" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOSX" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Linux" />
@@ -93,6 +94,11 @@
       </copy>
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS">
          <fileset basedir="../MonoGame.Framework/bin/iOS/iPhoneSimulator/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/tvOS">
+         <fileset basedir="../MonoGame.Framework/bin/tvOS/iPhoneSimulator/Release">
                 <include name="*.*"/>
          </fileset>
       </copy>
