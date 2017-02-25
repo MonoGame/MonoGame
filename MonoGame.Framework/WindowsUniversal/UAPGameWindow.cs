@@ -37,6 +37,8 @@ namespace Microsoft.Xna.Framework
         #region Internal Properties
 
         internal Game Game { get; set; }
+                
+        public ApplicationView AppView { get { return _appView; } }
 
         internal bool IsExiting { get; set; }
 
