@@ -33,6 +33,8 @@ namespace Microsoft.Xna.Framework
 
         private InputEvents _inputEvents;
         private readonly ConcurrentQueue<char> _textQueue = new ConcurrentQueue<char>();
+        private bool _isSizeChanged = false;
+        private Rectangle _newViewBounds;
 
         #region Internal Properties
 
@@ -155,10 +157,23 @@ namespace Microsoft.Xna.Framework
         {
             lock (_eventLocker)
             {
+                _isSizeChanged = true;
+                var pixelWidth  = Math.Max(1, (int)Math.Round(args.NewSize.Width * _dinfo.RawPixelsPerViewPixel));
+                var pixelHeight = Math.Max(1, (int)Math.Round(args.NewSize.Height * _dinfo.RawPixelsPerViewPixel));
+                _newViewBounds = new Rectangle(0, 0, pixelWidth, pixelHeight);
+            }
+        }
+
+        private void UpdateSize()
+        {
+            lock (_eventLocker)
+            {
+                _isSizeChanged = false;
+
                 var manager = Game.graphicsDeviceManager;
 
                 // Set the new client bounds.
-                SetViewBounds(args.NewSize.Width, args.NewSize.Height);
+                _viewBounds = _newViewBounds;
 
                 // Set the default new back buffer size and viewport, but this
                 // can be overloaded by the two events below.
@@ -301,6 +316,10 @@ namespace Microsoft.Xna.Framework
             // Update TextInput
             if(!_textQueue.IsEmpty)
                 UpdateTextInput();
+
+            // Update size
+            if (_isSizeChanged)
+                UpdateSize();
         }
 
         internal void Tick()

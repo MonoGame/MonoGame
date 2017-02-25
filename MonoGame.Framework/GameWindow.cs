@@ -122,8 +122,9 @@ namespace Microsoft.Xna.Framework {
 
 		internal void OnClientSizeChanged ()
 		{
-			if (ClientSizeChanged != null)
-				ClientSizeChanged (this, EventArgs.Empty);
+            var handler = ClientSizeChanged;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
 		}
 
 		protected void OnDeactivated ()
