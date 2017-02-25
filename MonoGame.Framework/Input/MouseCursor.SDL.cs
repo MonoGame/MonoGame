@@ -4,8 +4,8 @@
 
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Input
             IntPtr handle;
 
             var stream = new MemoryStream();
-            texture.SaveAsImage(stream, texture.Width, texture.Height, ImageFormat.Bmp);
+            texture.SaveAsImage(stream, texture.Width, texture.Height, ImageWriterFormat.Bmp);
             stream.Position = 0;
 
             using (var br = new BinaryReader(stream))
