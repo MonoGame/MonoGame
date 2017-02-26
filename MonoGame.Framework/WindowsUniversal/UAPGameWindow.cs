@@ -37,6 +37,8 @@ namespace Microsoft.Xna.Framework
         private Rectangle _newViewBounds;
         private bool _isOrientationChanged = false;
         private DisplayOrientation _newOrientation;
+        private bool _isFocusChanged = false;
+        private CoreWindowActivationState _newActivationState;
 
         #region Internal Properties
 
@@ -136,10 +138,24 @@ namespace Microsoft.Xna.Framework
 
         private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
         {
-            if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
-                Platform.IsActive = false;
-            else
-                Platform.IsActive = true;
+            lock (_eventLocker)
+            {
+                _isFocusChanged = true;
+                _newActivationState = args.WindowActivationState;
+            }
+        }
+
+        private void UpdateFocus()
+        {            
+            lock (_eventLocker)
+            {                
+                _isFocusChanged = false;
+                
+                if (_newActivationState == CoreWindowActivationState.Deactivated)
+                    Platform.IsActive = false;
+                else
+                    Platform.IsActive = true;
+            }
         }
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
@@ -337,6 +353,9 @@ namespace Microsoft.Xna.Framework
             // Update orientation
             if (_isOrientationChanged)
                 UpdateOrientation();
+
+            if (_isFocusChanged)
+                UpdateFocus();
         }
 
         internal void Tick()
