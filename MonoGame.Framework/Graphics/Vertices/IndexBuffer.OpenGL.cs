@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class IndexBuffer
     {
-		internal uint ibo;	
+        internal uint ibo;
 
         private void PlatformConstruct(IndexElementSize indexElementSize, int indexCount)
         {
@@ -59,12 +59,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-#if GLES
+#if GLES && !IOS
             // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
             // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
             throw new NotSupportedException("Index buffers are write-only on OpenGL ES platforms");
-#endif
-#if !GLES
+#else
             if (Threading.IsOnUIThread())
             {
                 GetBufferData(offsetInBytes, data, startIndex, elementCount);
@@ -76,16 +75,21 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if !GLES
+#if !GLES || IOS
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
             GraphicsExtensions.CheckGLError();
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
-            IntPtr ptr = GL.MapBuffer(BufferTarget.ElementArrayBuffer, BufferAccess.ReadOnly);
+
+#if IOS
+            var ptr = GL.Ext.MapBufferRange(All.ElementArrayBuffer, (IntPtr)0, (IntPtr)(elementCount * elementSizeInByte), (int)All.MapReadBitExt);
+#elif
+            var ptr = GL.MapBuffer(BufferTarget.ElementArrayBuffer, BufferAccess.ReadOnly);
+#endif
             // Pointer to the start of data to read in the index buffer
             ptr = new IntPtr(ptr.ToInt64() + offsetInBytes);
-			if (typeof(T) == typeof(byte))
+            if (typeof(T) == typeof(byte))
             {
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
@@ -101,7 +105,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Copy from the temporary buffer to the destination array
                 Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
             }
+#if IOS
+            GL.Oes.UnmapBuffer(All.ElementArrayBuffer);
+#else
             GL.UnmapBuffer(BufferTarget.ElementArrayBuffer);
+#endif
             GraphicsExtensions.CheckGLError();
         }
 #endif

@@ -61,27 +61,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
-#if GLES
+#if GLES && !IOS
             // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
             // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
             throw new NotSupportedException("Vertex buffers are write-only on OpenGL ES platforms");
 #else
-            Threading.BlockOnUIThread (() => GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride));
+            Threading.BlockOnUIThread(() => GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride));
 #endif
         }
 
-#if !GLES
-
+#if !GLES || IOS
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
             GraphicsExtensions.CheckGLError();
 
             // Pointer to the start of data in the vertex buffer
+#if IOS
+            var ptr = GL.Ext.MapBufferRange(All.ArrayBuffer, (IntPtr)0, (IntPtr)(elementCount * vertexStride), (int)All.MapReadBitExt);
+#elif
             var ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
+#endif
+
             GraphicsExtensions.CheckGLError();
 
-            ptr = (IntPtr) (ptr.ToInt64() + offsetInBytes);
+            ptr = (IntPtr)(ptr.ToInt64() + offsetInBytes);
 
             if (typeof(T) == typeof(byte) && vertexStride == 1)
             {
@@ -112,11 +116,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     tmpHandle.Free();
                 }
             }
-
+#if IOS 
+            GL.Oes.UnmapBuffer(All.ArrayBuffer);
+#else
             GL.UnmapBuffer(BufferTarget.ArrayBuffer);
+#endif
             GraphicsExtensions.CheckGLError();
         }
-        
+
 #endif
 
         private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options, int bufferSize, int elementSizeInBytes) where T : struct
