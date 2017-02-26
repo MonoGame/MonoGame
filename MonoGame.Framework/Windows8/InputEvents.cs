@@ -20,7 +20,6 @@ namespace Microsoft.Xna.Framework
     internal class InputEvents
     {
         private readonly TouchQueue _touchQueue;
-        private readonly List<Keys> _keys = new List<Keys>();
 
         public InputEvents(CoreWindow window, UIElement inputElement, TouchQueue touchQueue)
         {
@@ -224,7 +223,7 @@ namespace Microsoft.Xna.Framework
         public void UpdateState()
         {
             // Update the keyboard state.
-            Keyboard.SetKeys(_keys);
+            Keyboard.UpdateState();
         }
 
         private static Keys KeyTranslate(Windows.System.VirtualKey inkey, CorePhysicalKeyStatus keyStatus)
@@ -255,23 +254,21 @@ namespace Microsoft.Xna.Framework
         {
             var xnaKey = KeyTranslate(args.VirtualKey, args.KeyStatus);
 
-            if (_keys.Contains(xnaKey))
-                _keys.Remove(xnaKey);
+            Keyboard.ClearKey(xnaKey);
         }
 
         private void CoreWindow_KeyDown(object sender, KeyEventArgs args)
         {
             var xnaKey = KeyTranslate(args.VirtualKey, args.KeyStatus);
 
-            if (!_keys.Contains(xnaKey))
-                _keys.Add(xnaKey);
+            Keyboard.SetKey(xnaKey);
         }
 
         private void CoreWindow_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
             // If the window is resized then also 
             // drop any current key states.
-            _keys.Clear();
+            Keyboard.Clear();
         }
 
         private void CoreWindow_Activated(CoreWindow sender, WindowActivatedEventArgs args)
@@ -279,7 +276,7 @@ namespace Microsoft.Xna.Framework
             // Forget about the held keys when we lose focus as we don't
             // receive key events for them while we are in the background
             if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
-                _keys.Clear();
+                Keyboard.Clear();
         }
 
         private void CoreWindow_VisibilityChanged(CoreWindow sender, VisibilityChangedEventArgs args)
@@ -287,7 +284,7 @@ namespace Microsoft.Xna.Framework
             // Forget about the held keys when we disappear as we don't
             // receive key events for them while we are in the background
             if (!args.Visible)
-                _keys.Clear();
+                Keyboard.Clear();
         }
     }
 }
