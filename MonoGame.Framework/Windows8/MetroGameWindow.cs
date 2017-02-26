@@ -35,6 +35,8 @@ namespace Microsoft.Xna.Framework
         private InputEvents _inputEvents;
         private bool _isSizeChanged = false;
         private Rectangle _newClientBounds;
+        private bool _isOrientationChanged = false;
+        private DisplayOrientation _newOrientation;
 
 
         private Vector2 _backBufferScale;
@@ -249,15 +251,29 @@ namespace Microsoft.Xna.Framework
 
         private void DisplayProperties_OrientationChanged(object sender)
         {
-            // Set the new orientation.
-            _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
+            lock (_eventLocker)
+            {
+                _isOrientationChanged = true;
+                _newOrientation = ToOrientation(DisplayProperties.CurrentOrientation);
+            }
+        }
 
-            // Call the user callback.
-            OnOrientationChanged();
+        private void UpdateOrientation()
+        {
+            lock (_eventLocker)
+            {
+                _isOrientationChanged = false;
 
-            // If we have a valid client bounds then update the graphics device.
-            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-                Game.graphicsDeviceManager.ApplyChanges();
+                // Set the new orientation.
+                _orientation = _newOrientation;
+
+                // Call the user callback.
+                OnOrientationChanged();
+
+                // If we have a valid client bounds then update the graphics device.
+                if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+                    Game.graphicsDeviceManager.ApplyChanges();
+            }
         }
 
         protected override void SetTitle(string title)
@@ -311,6 +327,10 @@ namespace Microsoft.Xna.Framework
             // Update size
             if (_isSizeChanged)
                 UpdateSize();
+
+            // Update orientation
+            if (_isOrientationChanged)
+                UpdateOrientation();
         }
 
         internal void Tick()
