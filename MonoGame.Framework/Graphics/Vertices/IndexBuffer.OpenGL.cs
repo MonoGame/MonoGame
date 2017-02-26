@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if IOS
             var ptr = GL.Ext.MapBufferRange(All.ElementArrayBuffer, (IntPtr)0, (IntPtr)(elementCount * elementSizeInByte), (int)All.MapReadBitExt);
-#elif
+#else
             var ptr = GL.MapBuffer(BufferTarget.ElementArrayBuffer, BufferAccess.ReadOnly);
 #endif
             // Pointer to the start of data to read in the index buffer

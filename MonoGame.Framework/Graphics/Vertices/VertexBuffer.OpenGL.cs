@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Pointer to the start of data in the vertex buffer
 #if IOS
             var ptr = GL.Ext.MapBufferRange(All.ArrayBuffer, (IntPtr)0, (IntPtr)(elementCount * vertexStride), (int)All.MapReadBitExt);
-#elif
+#else
             var ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
 #endif
 
