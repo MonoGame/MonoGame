@@ -35,6 +35,8 @@ namespace Microsoft.Xna.Framework
         private readonly ConcurrentQueue<char> _textQueue = new ConcurrentQueue<char>();
         private bool _isSizeChanged = false;
         private Rectangle _newViewBounds;
+        private bool _isOrientationChanged = false;
+        private DisplayOrientation _newOrientation;
 
         #region Internal Properties
 
@@ -254,8 +256,19 @@ namespace Microsoft.Xna.Framework
         {
             lock(_eventLocker)
             {
+                _isOrientationChanged = true;
+                _newOrientation = ToOrientation(dinfo.CurrentOrientation);                
+            }
+        }
+
+        private void UpdateOrientation()
+        {
+            lock (_eventLocker)
+            {
+                _isOrientationChanged = false;
+                
                 // Set the new orientation.
-                _orientation = ToOrientation(dinfo.CurrentOrientation);
+                _orientation = _newOrientation;
 
                 // Call the user callback.
                 OnOrientationChanged();
@@ -320,6 +333,10 @@ namespace Microsoft.Xna.Framework
             // Update size
             if (_isSizeChanged)
                 UpdateSize();
+
+            // Update orientation
+            if (_isOrientationChanged)
+                UpdateOrientation();
         }
 
         internal void Tick()

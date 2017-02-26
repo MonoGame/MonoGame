@@ -133,8 +133,9 @@ namespace Microsoft.Xna.Framework {
          
 		protected void OnOrientationChanged ()
 		{
-			if (OrientationChanged != null)
-				OrientationChanged (this, EventArgs.Empty);
+            var handler = OrientationChanged;
+            if (handler != null)
+                handler (this, EventArgs.Empty);
 		}
 
 		protected void OnPaint ()
