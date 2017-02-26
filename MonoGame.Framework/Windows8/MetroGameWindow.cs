@@ -29,7 +29,12 @@ namespace Microsoft.Xna.Framework
 #if !WINDOWS_PHONE81
         private ApplicationViewState _currentViewState;
 #endif
+
+        private object _eventLocker = new object();
+        
         private InputEvents _inputEvents;
+        private bool _isSizeChanged = false;
+        private Rectangle _newClientBounds;
 
 
         private Vector2 _backBufferScale;
@@ -146,53 +151,70 @@ namespace Microsoft.Xna.Framework
 
         private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
-            var manager = Game.graphicsDeviceManager;
-
-            // If we haven't calculated the back buffer scale then do it now.
-            if (_backBufferScale == Vector2.Zero)
+            lock (_eventLocker)
             {
-                // Make sure the scale is calculated in terms of the same orientation as the preferred back buffer
-                float clientWidth;
-                float clientHeight;
-                if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
-                {
-                    clientWidth = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
-                    clientHeight = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
-                }
-                else
-                {
-                    clientWidth = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
-                    clientHeight = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
-                }
-                _backBufferScale = new Vector2( manager.PreferredBackBufferWidth / clientWidth, 
-                                                manager.PreferredBackBufferHeight / clientHeight);
+                _isSizeChanged = true;
+                var dpi = DisplayProperties.LogicalDpi;
+                var pwidth = (int)Math.Round(args.Size.Width * dpi / 96.0);
+                var pheight = (int)Math.Round(args.Size.Height * dpi / 96.0);
+                _newClientBounds = new Rectangle(0, 0, pwidth, pheight);
             }
+        }
 
-            // Set the new client bounds.
-            SetClientBounds(args.Size.Width, args.Size.Height);
+        private void UpdateSize()
+        {
+            lock (_eventLocker)
+            {
+                _isSizeChanged = false;
 
-            // Set the default new back buffer size and viewport, but this
-            // can be overloaded by the two events below.
+                var manager = Game.graphicsDeviceManager;
+
+                // If we haven't calculated the back buffer scale then do it now.
+                if (_backBufferScale == Vector2.Zero)
+                {
+                    // Make sure the scale is calculated in terms of the same orientation as the preferred back buffer
+                    float clientWidth;
+                    float clientHeight;
+                    if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
+                    {
+                        clientWidth = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
+                        clientHeight = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
+                    }
+                    else
+                    {
+                        clientWidth = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
+                        clientHeight = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
+                    }
+                    _backBufferScale = new Vector2( manager.PreferredBackBufferWidth / clientWidth, 
+                                                    manager.PreferredBackBufferHeight / clientHeight);
+                }
+
+                // Set the new client bounds.
+                _clientBounds = _newClientBounds;
+
+                // Set the default new back buffer size and viewport, but this
+                // can be overloaded by the two events below.
             
-            var newWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
-            var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
-            manager.PreferredBackBufferWidth = newWidth;
-            manager.PreferredBackBufferHeight = newHeight;
-            if(manager.GraphicsDevice!=null)
-            manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
+                var newWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
+                var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
+                manager.PreferredBackBufferWidth = newWidth;
+                manager.PreferredBackBufferHeight = newHeight;
+                if(manager.GraphicsDevice!=null)
+                    manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);
 
-            // If we have a valid client bounds then 
-            // update the graphics device.
-            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-                manager.ApplyChanges();
+                // If we have a valid client bounds then 
+                // update the graphics device.
+                if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+                    manager.ApplyChanges();
 
-            // Set the new view state which will trigger the 
-            // Game.ApplicationViewChanged event and signal
-            // the client size changed event.
+                // Set the new view state which will trigger the 
+                // Game.ApplicationViewChanged event and signal
+                // the client size changed event.
 #if !WINDOWS_PHONE81
-            Platform.ViewState = ApplicationView.Value;
+                Platform.ViewState = ApplicationView.Value;
 #endif
-            OnClientSizeChanged();
+                OnClientSizeChanged();
+            }
         }
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
@@ -285,6 +307,10 @@ namespace Microsoft.Xna.Framework
         {
             // Update input
             _inputEvents.UpdateState();
+
+            // Update size
+            if (_isSizeChanged)
+                UpdateSize();
         }
 
         internal void Tick()
