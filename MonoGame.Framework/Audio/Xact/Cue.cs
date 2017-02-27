@@ -254,58 +254,61 @@ namespace Microsoft.Xna.Framework.Audio
         internal void Update(float dt)
         {
             if (_curSound != null)
+            {
                 _curSound.Update(dt);
 
-            // Evaluate the runtime parameter controls.
-            var rpcCurves = _curSound.RpcCurves;
-            if (rpcCurves.Length > 0)
-            {
-                var volume = 1.0f;
-                var pitch = 0.0f;
-                var reverbMix = 1.0f;
-                float? filterFrequency = null;
-                float? filterQFactor = null;
+                // Evaluate the runtime parameter controls.
+                var rpcCurves = _curSound.RpcCurves;
 
-                for (var i = 0; i < rpcCurves.Length; i++)
+                if (rpcCurves.Length > 0)
                 {
-                    var rpcCurve = _engine.RpcCurves[rpcCurves[i]];
+                    var volume = 1.0f;
+                    var pitch = 0.0f;
+                    var reverbMix = 1.0f;
+                    float? filterFrequency = null;
+                    float? filterQFactor = null;
 
-                    // Some curves are driven by global variables and others by cue instance variables.
-                    float value;
-                    if (rpcCurve.IsGlobal)
-                        value = rpcCurve.Evaluate(_engine.GetGlobalVariable(rpcCurve.Variable));
-                    else
-                        value = rpcCurve.Evaluate(_variables[rpcCurve.Variable].Value);
-
-                    // Process the final curve value based on the parameter type it is.
-                    switch (rpcCurve.Parameter)
+                    for (var i = 0; i < rpcCurves.Length; i++)
                     {
-                        case RpcParameter.Volume:
-                            volume *= XactHelpers.ParseVolumeFromDecibels(value / 100.0f);
-                            break;
+                        var rpcCurve = _engine.RpcCurves[rpcCurves[i]];
 
-                        case RpcParameter.Pitch:
-                            pitch += value / 1000.0f;
-                            break;
+                        // Some curves are driven by global variables and others by cue instance variables.
+                        float value;
+                        if (rpcCurve.IsGlobal)
+                            value = rpcCurve.Evaluate(_engine.GetGlobalVariable(rpcCurve.Variable));
+                        else
+                            value = rpcCurve.Evaluate(_variables[rpcCurve.Variable].Value);
 
-                        case RpcParameter.ReverbSend:
-                            reverbMix *= XactHelpers.ParseVolumeFromDecibels(value / 100.0f);
-                            break;
+                        // Process the final curve value based on the parameter type it is.
+                        switch (rpcCurve.Parameter)
+                        {
+                            case RpcParameter.Volume:
+                                volume *= XactHelpers.ParseVolumeFromDecibels(value/100.0f);
+                                break;
 
-                        case RpcParameter.FilterFrequency:
-                            filterFrequency = value;
-                            break;
+                            case RpcParameter.Pitch:
+                                pitch += value/1000.0f;
+                                break;
 
-                        case RpcParameter.FilterQFactor:
-                            filterQFactor = value;
-                            break;
+                            case RpcParameter.ReverbSend:
+                                reverbMix *= XactHelpers.ParseVolumeFromDecibels(value/100.0f);
+                                break;
 
-                        default:
-                            throw new ArgumentOutOfRangeException("rpcCurve.Parameter");
+                            case RpcParameter.FilterFrequency:
+                                filterFrequency = value;
+                                break;
+
+                            case RpcParameter.FilterQFactor:
+                                filterQFactor = value;
+                                break;
+
+                            default:
+                                throw new ArgumentOutOfRangeException("rpcCurve.Parameter");
+                        }
                     }
-                }
 
-                _curSound.UpdateState(_engine, volume, pitch, reverbMix, filterFrequency, filterQFactor);
+                    _curSound.UpdateState(_engine, volume, pitch, reverbMix, filterFrequency, filterQFactor);
+                }
             }
         }
         
