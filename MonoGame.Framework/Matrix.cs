@@ -188,6 +188,13 @@ namespace Microsoft.Xna.Framework
 
         #region Indexers
 
+        /// <summary>
+        /// Get or set the matrix element at row index / 4 and column index % 4.
+        /// </summary>
+        /// <param name="index">The linearized, zero-based index of the matrix element.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If the index is less than <code>0</code> or larger than <code>15</code>.
+        /// </exception>
         public float this[int index]
         {
             get
@@ -239,6 +246,14 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// Get or set the index at the specified row and column (indices are zero-based).
+        /// </summary>
+        /// <param name="row">The row of the element.</param>
+        /// <param name="column">The column of the element.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If the row or column is less than <code>0</code> or larger than <code>3</code>.
+        /// </exception>
         public float this[int row, int column]
         {
             get
@@ -996,6 +1011,7 @@ namespace Microsoft.Xna.Framework
             CreatePerspectiveOffCenter(left, right, bottom, top, nearPlaneDistance, farPlaneDistance, out result);
             return result;
         }
+
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for customized perspective view.
         /// </summary>

@@ -168,18 +168,32 @@ namespace Microsoft.Xna.Framework
 
         #region IGraphicsDeviceService Members
 
+        /// <inheritdoc />
         public event EventHandler<EventArgs> DeviceCreated;
-        public event EventHandler<EventArgs> DeviceDisposing;
-        public event EventHandler<EventArgs> DeviceReset;
-        public event EventHandler<EventArgs> DeviceResetting;
-        public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
-        public event EventHandler<EventArgs> Disposed;
 
+        /// <inheritdoc />
+        public event EventHandler<EventArgs> DeviceDisposing;
+
+        /// <inheritdoc />
+        public event EventHandler<EventArgs> DeviceReset;
+
+        /// <inheritdoc />
+        public event EventHandler<EventArgs> DeviceResetting;
+
+        /// <summary>
+        /// Called when a <see cref="GraphicsDevice"/> is disposed. Raises the <see cref="DeviceDisposing"/> event.
+        /// </summary>
+        /// <param name="e"></param>
         protected void OnDeviceDisposing(EventArgs e)
         {
             EventHelpers.Raise(this, DeviceDisposing, e);
         }
 
+        /// <summary>
+        /// Called before a <see cref="Graphics.GraphicsDevice"/> is reset.
+        /// Raises the <see cref="DeviceResetting"/> event.
+        /// </summary>
+        /// <param name="e"></param>
         protected void OnDeviceResetting(EventArgs e)
         {
             EventHelpers.Raise(this, DeviceResetting, e);
@@ -194,6 +208,27 @@ namespace Microsoft.Xna.Framework
         {
             EventHelpers.Raise(this, DeviceCreated, e);
         }
+
+        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
+            where TEventArgs : EventArgs
+        {
+            if (handler != null)
+                handler(this, e);
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Raised by <see cref="CreateDevice()"/> or <see cref="ApplyChanges"/>. Allows users
+        /// to override the <see cref="PresentationParameters"/> to pass to the
+        /// <see cref="Graphics.GraphicsDevice"/>.
+        /// </summary>
+        public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
+
+        /// <summary>
+        /// Raised when this <see cref="GraphicsDeviceManager"/> is disposed.
+        /// </summary>
+        public event EventHandler<EventArgs> Disposed;
 
         /// <summary>
         /// This populates a GraphicsDeviceInformation instance and invokes PreparingDeviceSettings to
@@ -218,8 +253,6 @@ namespace Microsoft.Xna.Framework
 
             return gdi;
         }
-
-        #endregion
 
         #region IDisposable Members
 
