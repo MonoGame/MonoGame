@@ -29,9 +29,22 @@ namespace MonoGame.Framework
         /// <param name="window">The core window object.</param>
         /// <param name="swapChainBackgroundPanel">The XAML SwapChainBackgroundPanel to which we render the scene and recieve input events.</param>
         /// <returns></returns>
+        [Obsolete("Use Create(string launchParameters, CoreWindow window, SwapChainPanel swapChainPanel) instead. In future versions this method can be removed.")]
         static public T Create(string launchParameters, CoreWindow window, SwapChainBackgroundPanel swapChainBackgroundPanel)
         {
             return Create(launchParameters, window, new GenericSwapChainPanel(swapChainBackgroundPanel));
+        }
+
+        /// <summary>
+        /// Creates your Game class initializing it to work within a XAML application window.
+        /// </summary>
+        /// <param name="launchParameters">The command line arguments from launch.</param>
+        /// <param name="window">The core window object.</param>
+        /// <param name="swapChainPanel">The XAML SwapChainPanel to which we render the scene and receive input events.</param>
+        /// <returns></returns>
+        static public T Create(string launchParameters, CoreWindow window, SwapChainPanel swapChainPanel)
+        {
+            return Create(launchParameters, window, new GenericSwapChainPanel(swapChainPanel));
         }
         
         static private T Create(string launchParameters, CoreWindow window, GenericSwapChainPanel swapChainPanel)

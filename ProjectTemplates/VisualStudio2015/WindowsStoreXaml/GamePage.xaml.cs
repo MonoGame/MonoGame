@@ -9,7 +9,7 @@ namespace $safeprojectname$
     /// <summary>
     /// The root page used to display the game.
     /// </summary>
-    public sealed partial class GamePage : SwapChainBackgroundPanel
+    public sealed partial class GamePage : Page
     {
         readonly Game1 _game;
 

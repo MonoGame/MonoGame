@@ -20,7 +20,7 @@ namespace $safeprojectname$
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class GamePage : SwapChainBackgroundPanel
+    public sealed partial class GamePage : Page
     {
         readonly Game1 _game;
 
@@ -28,7 +28,7 @@ namespace $safeprojectname$
         {
             this.InitializeComponent();
 
-            _game = XamlGame<Game1>.Create(launchArguments, Window.Current.CoreWindow, this);
+            _game = XamlGame<Game1>.Create(launchArguments, Window.Current.CoreWindow, swapChainPanel);
         }
     }
 }

@@ -20,6 +20,7 @@
     <PackageCertificateKeyFile>$ext_safeprojectname$.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
     $endif$
     <MonoGamePlatform>WindowsStoreApp</MonoGamePlatform>
+    <TargetPlatformVersion>8.1</TargetPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
