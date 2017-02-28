@@ -149,8 +149,9 @@ namespace Microsoft.Xna.Framework {
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
 		protected void OnTextInput(object sender, TextInputEventArgs e)
 		{
-			if (TextInput != null)
-				TextInput(sender, e);
+            var handler = TextInput;
+            if (handler != null)
+                handler(sender, e);
 		}
 #endif
 

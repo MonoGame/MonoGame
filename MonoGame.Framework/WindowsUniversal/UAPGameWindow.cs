@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -31,6 +32,7 @@ namespace Microsoft.Xna.Framework
         private object _eventLocker = new object();
 
         private InputEvents _inputEvents;
+        private readonly ConcurrentQueue<char> _textQueue = new ConcurrentQueue<char>();
 
         #region Internal Properties
 
@@ -173,8 +175,15 @@ namespace Microsoft.Xna.Framework
 
 		private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
 		{
-			OnTextInput(sender, new TextInputEventArgs((char)args.KeyCode));
+            _textQueue.Enqueue((char)args.KeyCode);
 		}
+
+        private void UpdateTextInput()
+        {
+            char ch;
+            while (_textQueue.TryDequeue(out ch))
+			    OnTextInput(_coreWindow, new TextInputEventArgs(ch));
+        }
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
         {
@@ -283,6 +292,10 @@ namespace Microsoft.Xna.Framework
         {
             // Update input
             _inputEvents.UpdateState();
+
+            // Update TextInput
+            if(!_textQueue.IsEmpty)
+                UpdateTextInput();
         }
 
         internal void Tick()
