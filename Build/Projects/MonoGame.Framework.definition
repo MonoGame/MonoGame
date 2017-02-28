@@ -1185,7 +1185,7 @@
 
     <!-- Utility Classes -->
     <Compile Include="Utilities\AssemblyHelper.cs">
-      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,Web</Platforms>
     </Compile>
     <Compile Include="Utilities\CurrentPlatform.cs">
       <Platforms>WindowsGL,Linux</Platforms>
