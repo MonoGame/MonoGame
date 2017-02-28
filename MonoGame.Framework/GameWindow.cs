@@ -37,7 +37,8 @@ namespace Microsoft.Xna.Framework {
 
 		public abstract string ScreenDeviceName { get; }
 
-		private string _title;
+		private string _title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
+
         /// <summary>
         /// Gets or sets the title of the game window.
         /// </summary>
