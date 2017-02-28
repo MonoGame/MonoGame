@@ -1396,6 +1396,9 @@
     <Compile Include="Windows8\GameFrameworkViewSource.cs">
       <Platforms>Windows8</Platforms>
     </Compile>
+    <Compile Include="Windows8\GenericSwapChainPanel.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+    </Compile>    
     <Compile Include="Windows8\InputEvents.cs">
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>

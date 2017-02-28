@@ -43,11 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
         SharpDX.Direct2D1.Bitmap1 _bitmapTarget;
         SharpDX.DXGI.SwapChain1 _swapChain;
 
-#if WINDOWS_UAP
-		SwapChainPanel _swapChainPanel;
-#else
-		SwapChainBackgroundPanel _swapChainBackgroundPanel;
-#endif
+        GenericSwapChainPanel _swapChainPanel;
 
 		float _dpi; 
 #endif
@@ -353,7 +349,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS_UAP
 					PresentationParameters.SwapChainPanel == null)
 #else
-					(PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainBackgroundPanel == null))
+					(PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null))
 #endif
 			{
                 if (_swapChain != null)
@@ -371,9 +367,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				_swapChainPanel = null;
 #else
-			if (PresentationParameters.SwapChainBackgroundPanel != _swapChainBackgroundPanel)
+			if (PresentationParameters.SwapChainPanel != _swapChainPanel)
             {
-                _swapChainBackgroundPanel = null;
+                _swapChainPanel = null;
 #endif
 
 				if (_swapChain != null)
@@ -402,11 +398,13 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS_STOREAPP
                 // SwapChainBackgroundPanel behaves erratically when the SwapChain is resized outside of SizeChanged event.
                 // By re-assigning the SwapChain we force it to update the correct size/scale.
-                var asyncResult = PresentationParameters.SwapChainBackgroundPanel.Dispatcher.RunIdleAsync( (e) =>
+                if(PresentationParameters.SwapChainPanel.Panel is SwapChainBackgroundPanel)
                 {
-                    using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainBackgroundPanel))
-                        nativePanel.SwapChain = _swapChain;
-                });
+                    var asyncResult = PresentationParameters.SwapChainPanel.Panel.Dispatcher.RunIdleAsync( (e) =>
+                    {
+                        PresentationParameters.SwapChainPanel.SetSwapChain(_swapChain);
+                    });
+                }
 #endif
             }
 
@@ -452,26 +450,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     else
                     {
-#if WINDOWS_UAP
-						_swapChainPanel = PresentationParameters.SwapChainPanel;
-						using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainPanelNative>(PresentationParameters.SwapChainPanel))
-						{
-							_swapChain = new SwapChain1(dxgiFactory2, dxgiDevice2, ref desc, null);
-							nativePanel.SwapChain = _swapChain;
-						}
-#else
-						_swapChainBackgroundPanel = PresentationParameters.SwapChainBackgroundPanel;
-                        using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainBackgroundPanel))
-                        {
-#if WINDOWS_PHONE81 || WINRT
+#if WINDOWS_UAP || WINDOWS_PHONE81 || WINRT
                             _swapChain = new SwapChain1(dxgiFactory2, dxgiDevice2, ref desc, null);
 #else
                             _swapChain = dxgiFactory2.CreateSwapChainForComposition(_d3dDevice, ref desc, null);
 #endif
-
-                            nativePanel.SwapChain = _swapChain;
-                        }
-#endif
+                        _swapChainPanel = PresentationParameters.SwapChainPanel;         
+                        _swapChainPanel.SetSwapChain(_swapChain);
                     }
 
                     // Ensure that DXGI does not queue more than one frame at a time. This both reduces 
@@ -580,7 +565,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (PresentationParameters.SwapChainPanel == null)
                 throw new ArgumentException("PresentationParameters.SwapChainPanel must not be null.");
 #elif WINDOWS_STOREAPP
-            if (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainBackgroundPanel == null)
+            if (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null)
                 throw new ArgumentException("PresentationParameters.DeviceWindowHandle or PresentationParameters.SwapChainBackgroundPanel must be not null.");
 #else
             if (PresentationParameters.DeviceWindowHandle == IntPtr.Zero)

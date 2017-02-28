@@ -12,14 +12,8 @@ namespace Microsoft.Xna.Framework
 {
     partial class GraphicsDeviceManager
     {
-#if WINDOWS_STOREAPP
-        [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
-#endif
-
-#if WINDOWS_UAP
-        [CLSCompliant(false)] 
-        public SwapChainPanel SwapChainPanel { get; set; }
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+        public GenericSwapChainPanel SwapChainPanel { get; set; }
 #endif
 
         partial void PlatformPreparePresentationParameters(PresentationParameters presentationParameters)
@@ -33,15 +27,15 @@ namespace Microsoft.Xna.Framework
 
             // The graphics device can use a XAML panel or a window
             // to created the default swapchain target.
-            if (SwapChainBackgroundPanel != null)
+            if (SwapChainPanel != null)
             {
                 presentationParameters.DeviceWindowHandle = IntPtr.Zero;
-                presentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
+                presentationParameters.SwapChainPanel = this.SwapChainPanel;
             }
             else
             {
                 presentationParameters.DeviceWindowHandle = _game.Window.Handle;
-                presentationParameters.SwapChainBackgroundPanel = null;
+                presentationParameters.SwapChainPanel = null;
             }
 #endif
         }

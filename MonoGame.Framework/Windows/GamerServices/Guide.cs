@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
 #if WINDOWS_STOREAPP
 			// If SwapChainBackgroundPanel is null then we are running the non-XAML template
-			if (Game.Instance.graphicsDeviceManager.SwapChainBackgroundPanel == null)
+			if (Game.Instance.graphicsDeviceManager.SwapChainPanel == null)
 			{
 				throw new NotImplementedException("This method works only when using the XAML template.");
 			}

@@ -27,6 +27,11 @@ namespace MonoGame.Framework
         /// <returns></returns>
         static public T Create(string launchParameters, CoreWindow window, SwapChainPanel swapChainPanel)
         {
+            return Create(launchParameters, window, new GenericSwapChainPanel(swapChainPanel));
+        }
+        
+        static private T Create(string launchParameters, CoreWindow window, GenericSwapChainPanel swapChainPanel)
+        { 
             if (launchParameters == null)
                 throw new NullReferenceException("The launch parameters cannot be null!");
             if (window == null)
@@ -38,7 +43,7 @@ namespace MonoGame.Framework
             UAPGamePlatform.LaunchParameters = launchParameters;
 
 			// Setup the window class.
-			UAPGameWindow.Instance.Initialize(window, swapChainPanel, UAPGamePlatform.TouchQueue);
+			UAPGameWindow.Instance.Initialize(window, swapChainPanel.Panel, UAPGamePlatform.TouchQueue);
 
             // Construct the game.
             var game = new T();

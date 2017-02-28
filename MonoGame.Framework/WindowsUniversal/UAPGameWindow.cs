@@ -26,7 +26,6 @@ namespace Microsoft.Xna.Framework
         private CoreWindow _coreWindow;
         private DisplayInformation _dinfo;
         private ApplicationView _appView;
-        private SwapChainPanel _swapChainPanel;
         private Rectangle _viewBounds;
 
         private object _eventLocker = new object();
@@ -123,9 +122,8 @@ namespace Microsoft.Xna.Framework
 
             _orientation = ToOrientation(_dinfo.CurrentOrientation);
             _dinfo.OrientationChanged += DisplayProperties_OrientationChanged;
-            _swapChainPanel = inputElement as SwapChainPanel;
 
-            _swapChainPanel.SizeChanged += SwapChain_SizeChanged;
+            ((FrameworkElement)inputElement).SizeChanged += SwapChain_SizeChanged;
 
             _coreWindow.Closed += Window_Closed;
             _coreWindow.Activated += Window_FocusChanged;

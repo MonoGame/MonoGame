@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework
 		public SwapChainPanel SwapChainPanel { get; set; }
 #else
 		[CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
+        public GenericSwapChainPanel SwapChainPanel { get; set; }
 #endif
 
         public event EventHandler<EventArgs> DeviceCreated;
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework
 #if WINDOWS_UAP
 			presentationParameters.SwapChainPanel = this.SwapChainPanel;
 #else
-			presentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
+			presentationParameters.SwapChainPanel = this.SwapChainPanel;
 #endif
 
             if (createDevice)

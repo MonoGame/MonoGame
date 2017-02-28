@@ -103,14 +103,8 @@ namespace Microsoft.Xna.Framework.Graphics
             set { deviceWindowHandle = value; }
         }
 
-#if WINDOWS_STOREAPP
-        [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
-#endif
-
-#if WINDOWS_UAP
-        [CLSCompliant(false)]
-        public SwapChainPanel SwapChainPanel { get; set; }
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+        public GenericSwapChainPanel SwapChainPanel { get; set; }
 #endif
 
         /// <summary>
