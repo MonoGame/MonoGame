@@ -17,8 +17,6 @@ using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Point = System.Drawing.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using XnaPoint = Microsoft.Xna.Framework.Point;
-using System.Diagnostics;
-using Microsoft.Xna.Framework.Properties;
 
 namespace MonoGame.Framework
 {
