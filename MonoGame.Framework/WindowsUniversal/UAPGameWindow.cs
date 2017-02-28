@@ -261,10 +261,13 @@ namespace Microsoft.Xna.Framework
             if ( _coreWindow == null )
                 return;
 
-            if (visible)
-                _coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
-            else
-                _coreWindow.PointerCursor = null;
+            var asyncResult = _coreWindow.Dispatcher.RunIdleAsync( (e) =>
+            {            
+                if (visible)
+                    _coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
+                else
+                    _coreWindow.PointerCursor = null;
+            });
         }
 
         internal void RunLoop()
