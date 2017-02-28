@@ -402,6 +402,15 @@ namespace Microsoft.Xna.Framework.Graphics
                                             PresentationParameters.BackBufferHeight,
                                             format, 
                                             SwapChainFlags.None);
+#if WINDOWS_STOREAPP
+                // SwapChainBackgroundPanel behaves erratically when the SwapChain is resized outside of SizeChanged event.
+                // By re-assigning the SwapChain we force it to update the correct size/scale.
+                var asyncResult = PresentationParameters.SwapChainBackgroundPanel.Dispatcher.RunIdleAsync( (e) =>
+                {
+                    using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainBackgroundPanel))
+                        nativePanel.SwapChain = _swapChain;
+                });
+#endif
             }
 
             // Otherwise, create a new swap chain.
