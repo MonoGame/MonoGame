@@ -19,6 +19,7 @@ namespace MonoGame.Tools.Pipeline
         private void InitializeComponent()
         {
             Title = "Select Folder";
+            DisplayMode = DialogDisplayMode.Attached;
             Size = new Size(370, 200);
 
             buttonOk = new Button();

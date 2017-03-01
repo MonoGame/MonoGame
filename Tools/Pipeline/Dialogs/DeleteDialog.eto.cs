@@ -17,6 +17,7 @@ namespace MonoGame.Tools.Pipeline
         private void InitializeComponent()
         {
             Title = "Delete Items";
+            DisplayMode = DialogDisplayMode.Attached;
             Resizable = true;
             Size = new Size(450, 300);
             MinimumSize = new Size(350, 250);

@@ -19,6 +19,7 @@ namespace MonoGame.Tools.Pipeline
         private void InitializeComponent()
         {
             Title = "New File";
+            DisplayMode = DialogDisplayMode.Attached;
             Size = new Size(370, 285);
             MinimumSize = new Size(370, 200);
             Resizable = true;

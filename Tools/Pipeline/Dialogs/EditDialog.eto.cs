@@ -16,6 +16,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitializeComponent()
         {
+            DisplayMode = DialogDisplayMode.Attached;
             Size = new Size(400, 160);
 
             buttonOk = new Button();
