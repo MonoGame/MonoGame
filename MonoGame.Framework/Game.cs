@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework
 
         private TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
 
-
+        private bool _shouldExit;
         private bool _suppressDraw;
         
         public Game()
@@ -69,6 +69,9 @@ namespace Microsoft.Xna.Framework
             Platform.Activated += OnActivated;
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
+
+            // Calling Update() for first time initializes some systems
+            FrameworkDispatcher.Update();
 
 #if WINDOWS_STOREAPP && !WINDOWS_PHONE81
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
@@ -323,7 +326,7 @@ namespace Microsoft.Xna.Framework
 #endif
         public void Exit()
         {
-            Platform.Exit();
+            _shouldExit = true;
             _suppressDraw = true;
         }
 
@@ -350,7 +353,8 @@ namespace Microsoft.Xna.Framework
             if (!Platform.BeforeRun())
                 return;
 
-            if (!_initialized) {
+            if (!_initialized)
+            {
                 DoInitialize ();
                 _gameTimer = Stopwatch.StartNew();
                 _initialized = true;
@@ -394,28 +398,18 @@ namespace Microsoft.Xna.Framework
                 Platform.StartRunLoop();
                 break;
             case GameRunBehavior.Synchronous:
+                // XNA runs one Update even before showing the window
+                DoUpdate(new GameTime());
+
                 Platform.RunLoop();
-#if !DESKTOPGL
                 EndRun();
 				DoExiting();
-#endif
                 break;
             default:
                 throw new ArgumentException(string.Format(
                     "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
         }
-
-#if DESKTOPGL
-        // This code is used so that the Window could stay alive
-        // while all the resources are getting destroyed
-        internal void ExitEverything()
-        {
-            EndRun();
-            DoExiting();
-            this.Dispose();
-        }
-#endif
 
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
@@ -465,7 +459,7 @@ namespace Microsoft.Xna.Framework
                 var stepCount = 0;
 
                 // Perform as many full fixed length time steps as we can.
-                while (_accumulatedElapsedTime >= TargetElapsedTime)
+                while (_accumulatedElapsedTime >= TargetElapsedTime && !_shouldExit)
                 {
                     _gameTime.TotalGameTime += TargetElapsedTime;
                     _accumulatedElapsedTime -= TargetElapsedTime;
@@ -514,6 +508,9 @@ namespace Microsoft.Xna.Framework
             {
                 DoDraw(_gameTime);
             }
+
+            if (_shouldExit)
+                Platform.Exit();
         }
 
         #endregion
@@ -534,7 +531,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Initialize()
         {
-            // TODO: We shouldn't need to do this here.
+            // TODO: This should be removed once all platforms use the new GraphicsDeviceManager
             applyChanges(graphicsDeviceManager);
 
             // According to the information given on MSDN (see link below), all
@@ -547,9 +544,6 @@ namespace Microsoft.Xna.Framework
             _graphicsDeviceService = (IGraphicsDeviceService)
                 Services.GetService(typeof(IGraphicsDeviceService));
 
-            // FIXME: If this test fails, is LoadContent ever called?  This
-            //        seems like a condition that warrants an exception more
-            //        than a silent failure.
             if (_graphicsDeviceService != null &&
                 _graphicsDeviceService.GraphicsDevice != null)
             {
@@ -660,11 +654,8 @@ namespace Microsoft.Xna.Framework
             AssertNotDisposed();
             if (Platform.BeforeUpdate(gameTime))
             {
-                // Once per frame, we need to check currently 
-                // playing sounds to see if they've stopped,
-                // and return them back to the pool if so.
-                SoundEffectInstancePool.Update();
-
+                FrameworkDispatcher.Update();
+				
                 Update(gameTime);
 
                 //The TouchPanel needs to know the time for when touches arrive
@@ -688,6 +679,9 @@ namespace Microsoft.Xna.Framework
         internal void DoInitialize()
         {
             AssertNotDisposed();
+            if (GraphicsDevice == null && graphicsDeviceManager != null)
+                _graphicsDeviceManager.CreateDevice();
+
             Platform.BeforeInitialize();
             Initialize();
 
@@ -717,9 +711,6 @@ namespace Microsoft.Xna.Framework
                 {
                     _graphicsDeviceManager = (IGraphicsDeviceManager)
                         Services.GetService(typeof(IGraphicsDeviceManager));
-
-                    if (_graphicsDeviceManager == null)
-                        throw new InvalidOperationException ("No Graphics Device Manager");
                 }
                 return (GraphicsDeviceManager)_graphicsDeviceManager;
             }
@@ -732,12 +723,8 @@ namespace Microsoft.Xna.Framework
         //       Components.ComponentAdded.
         private void InitializeExistingComponents()
         {
-            // TODO: Would be nice to get rid of this copy, but since it only
-            //       happens once per game, it's fairly low priority.
-            var copy = new IGameComponent[Components.Count];
-            Components.CopyTo(copy, 0);
-            foreach (var component in copy)
-                component.Initialize();
+            for(int i = 0; i < Components.Count; ++i)
+                Components[i].Initialize();
         }
 
         private void CategorizeComponents()

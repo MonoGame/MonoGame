@@ -36,17 +36,6 @@
     <Reference Include="Lidgren.Network" />
   </Platform>
 
-  <Platform Type="Ouya">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Core" />
-    <Reference Include="mscorlib" />
-    <Reference Include="Lidgren.Network" />
-    <Binary
-      Name="Ouya.Console.Api"
-      Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
-  </Platform>
-
   <Platform Type="Windows">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
@@ -66,17 +55,6 @@
     <Reference Include="Lidgren.Network" />
   </Platform>
 
-  <Platform Type="WindowsPhone">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="Microsoft.Xna.Framework.GamerServices">
-      <Alias Platform="WindowsPhone">MicrosoftXnaGamerServices</Alias>
-    </Reference>
-    <Reference Include="Microsoft.Xna.Framework">
-      <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
-    </Reference>
-  </Platform>
-  
   <Platform Type="WindowsPhone81">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />

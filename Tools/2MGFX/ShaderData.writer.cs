@@ -36,8 +36,7 @@ namespace TwoMGFX
 				else
 					writer.Write(false);
 
-                if (options.Profile == ShaderProfile.OpenGL)
-                    writer.Write(sampler.samplerName);
+                writer.Write(sampler.samplerName);
 
                 writer.Write((byte)sampler.parameter);
             }
@@ -46,18 +45,13 @@ namespace TwoMGFX
             foreach (var cb in _cbuffers)
                 writer.Write((byte)cb);
 
-            if (options.Profile != ShaderProfile.OpenGL)
-                return;
-
-            // The rest of this is for GL only!
-
             writer.Write((byte)_attributes.Length);
             foreach (var attrib in _attributes)
             {
                 writer.Write(attrib.name);
                 writer.Write((byte)attrib.usage);
                 writer.Write((byte)attrib.index);
-                writer.Write((short)0); // Unused
+                writer.Write((short)attrib.location);
             }
         }
     }

@@ -11,11 +11,7 @@ using Android.Views;
 namespace Microsoft.Xna.Framework
 {
 	[CLSCompliant(false)]
-#if OUYA
-    public class AndroidGameActivity : Ouya.Console.Api.OuyaActivity
-#else
     public class AndroidGameActivity : Activity
-#endif
     {
         internal Game Game { private get; set; }
 

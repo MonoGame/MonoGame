@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Describes a 2D-vector.
     /// </summary>
-#if WINDOWS
+#if XNADESIGNPROVIDED
     [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Vector2TypeConverter))]
 #endif
     [DataContract]

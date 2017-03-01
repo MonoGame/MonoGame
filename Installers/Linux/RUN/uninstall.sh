@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #check removale priviledge
 if [ "$(id -u)" != "0" ]; then
@@ -7,7 +7,8 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 #remove terminal commands for mgcb and pipeline tool
-rm -f /usr/bin/monogame-pipeline
+rm -f /usr/bin/monogame-pipeline-tool
+rm -f /usr/bin/monogame-uninstall
 rm -f /usr/bin/mgcb
 
 #remove application icon

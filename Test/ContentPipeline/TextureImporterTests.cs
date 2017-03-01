@@ -1,14 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
+﻿using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using NUnit.Framework;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Microsoft.Xna.Framework.Graphics;
-using System.IO;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
+using NUnit.Framework;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -46,16 +41,19 @@ namespace MonoGame.Tests.ContentPipeline
         {
             ImportStandard("Assets/Textures/LogoOnly_64px.bmp", SurfaceFormat.Color);
         }
+
         [Test]
         public void ImportBmpRGB555( )
         {
             ImportStandard("Assets/Textures/Logo555.bmp", SurfaceFormat.Color);
         }
+
         [Test]
         public void ImportBmpRGB565( )
         {
             ImportStandard("Assets/Textures/Logo565.bmp", SurfaceFormat.Color);
         }
+
         [Test]
         public void ImportBmp4bits( )
         {
@@ -97,6 +95,7 @@ namespace MonoGame.Tests.ContentPipeline
         {
             ImportStandard("Assets/Textures/LogoOnly_64px.tif", SurfaceFormat.Color);
         }
+
         /// <summary>
         /// This test tries to load a tiff file encoded in rgbf, but freeimage seems to be failing to read files with this encoding
         /// Might be necessary to modify this test with future updates of freeimage.
@@ -109,6 +108,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.Throws(typeof(InvalidContentException), ( ) => ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Vector4));
             //ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Color);
         }
+
         [Test]
         public void ImportRGBA16Png()
         {
@@ -135,6 +135,7 @@ namespace MonoGame.Tests.ContentPipeline
             {
             }
         }
+
         [Test]
         public void ImportDdsCubemapDxt1()
         {
@@ -145,7 +146,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(content.Faces.Count, 6);
             for (int f = 0; f < 6; ++f)
             {
-                CheckDdsFace(content, f);
+                CheckDdsFace(content, f, 7, 64, 64);
             }
             SurfaceFormat format;
             Assert.True(content.Faces[0][0].TryGetFormat(out format));
@@ -161,10 +162,42 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
+        public void ImportDdsCubemapColor()
+        {
+            var importer = new TextureImporter();
+            var context = new TestImporterContext(intermediateDirectory, outputDirectory);
+            var content = importer.Import("Assets/Textures/Sunset.dds", context);
+            Assert.NotNull(content);
+            Assert.AreEqual(content.Faces.Count, 6);
+            for (int f = 0; f < 6; ++f)
+            {
+                CheckDdsFace(content, f, 1, 512, 512);
+            }
+            SurfaceFormat format;
+            Assert.True(content.Faces[0][0].TryGetFormat(out format));
+            // Ensure the red and blue bytes have been correctly swapped
+            Assert.AreEqual(format, SurfaceFormat.Color);
+            var bytes = content.Faces[0][0].GetPixelData();
+            Assert.AreEqual(bytes[0], 208);
+            Assert.AreEqual(bytes[2], 62);
+            // Clean-up the directories it may have produced, ignoring DirectoryNotFound exceptions
+            try
+            {
+                Directory.Delete(intermediateDirectory, true);
+                Directory.Delete(outputDirectory, true);
+            }
+            catch (DirectoryNotFoundException)
+            { }
+        }
+
+        [Test]
         public void ImportDds()
         {
             ImportStandard("Assets/Textures/LogoOnly_64px.dds", SurfaceFormat.Dxt3);
+            ImportStandard("Assets/Textures/LogoOnly_64px-R8G8B8.dds", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/LogoOnly_64px-X8R8G8B8.dds", SurfaceFormat.Color);
         }
+
         [Test]
         public void ImportDdsMipMap()
         {
@@ -174,7 +207,7 @@ namespace MonoGame.Tests.ContentPipeline
             var content = importer.Import("Assets/Textures/LogoOnly_64px-mipmaps.dds", context);
             Assert.NotNull(content);
             Assert.AreEqual(content.Faces.Count, 1);
-            CheckDdsFace(content, 0);
+            CheckDdsFace(content, 0, 7, 64, 64);
 
             SurfaceFormat format;
             Assert.True(content.Faces[0][0].TryGetFormat(out format));
@@ -189,28 +222,15 @@ namespace MonoGame.Tests.ContentPipeline
             {
             }
         }
-        /// <summary>
-        /// Checks that the face of the texture contains 7 mipmaps and that their sizes decline from 64x64 to 1x1
-        /// </summary>
-        /// <param name="content">Texture to check</param>
-        /// <param name="faceIndex">Index of the face from the texture</param>
-        private static void CheckDdsFace(TextureContent content, int faceIndex)
+
+        private static void CheckDdsFace(TextureContent content, int faceIndex, int mipMapCount, int width, int height)
         {
-            Assert.AreEqual(content.Faces[faceIndex].Count, 7);
-            Assert.AreEqual(content.Faces[faceIndex][0].Width, 64);
-            Assert.AreEqual(content.Faces[faceIndex][0].Height, 64);
-            Assert.AreEqual(content.Faces[faceIndex][1].Width, 32);
-            Assert.AreEqual(content.Faces[faceIndex][1].Height, 32);
-            Assert.AreEqual(content.Faces[faceIndex][2].Width, 16);
-            Assert.AreEqual(content.Faces[faceIndex][2].Height, 16);
-            Assert.AreEqual(content.Faces[faceIndex][3].Width, 8);
-            Assert.AreEqual(content.Faces[faceIndex][3].Height, 8);
-            Assert.AreEqual(content.Faces[faceIndex][4].Width, 4);
-            Assert.AreEqual(content.Faces[faceIndex][4].Height, 4);
-            Assert.AreEqual(content.Faces[faceIndex][5].Width, 2);
-            Assert.AreEqual(content.Faces[faceIndex][5].Height, 2);
-            Assert.AreEqual(content.Faces[faceIndex][6].Width, 1);
-            Assert.AreEqual(content.Faces[faceIndex][6].Height, 1);
+            Assert.AreEqual(content.Faces[faceIndex].Count, mipMapCount);
+            for (int i = 0; i < mipMapCount; ++i)
+            {
+                Assert.AreEqual(content.Faces[faceIndex][i].Width, width >> i);
+                Assert.AreEqual(content.Faces[faceIndex][i].Height, height >> i);
+            }
         }
     }
 }

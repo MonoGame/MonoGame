@@ -1,7 +1,8 @@
 ﻿using System;
-using MonoDevelop.Projects;
+using MonoDevelop.Projects.MSBuild;
 using MonoDevelop.Core.Assemblies;
 using System.Xml;
+using MonoDevelop.Projects;
 
 namespace MonoDevelop.MonoGame
 {

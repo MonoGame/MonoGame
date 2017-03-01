@@ -75,32 +75,33 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.Components {
-	class Colored3DCubeComponent : VisualTestDrawableGameComponent {
+	class Colored3DCubeComponent
+	{
+	    GraphicsDevice graphicsDevice;
 		BasicEffect basicEffect;
 
 		Matrix worldMatrix, viewMatrix, projectionMatrix;
 
         public Vector3 CubePosition { get; set; }
 
-		public Colored3DCubeComponent (Game game) : base(game)
+		public Colored3DCubeComponent(GraphicsDevice gd)
 		{
+		    graphicsDevice = gd;
 		}
 
-		protected override void LoadContent ()
+		public void LoadContent ()
 		{
-			base.LoadContent();
-
 			// setup our graphics scene matrices
 			worldMatrix = Matrix.Identity;
 			viewMatrix = Matrix.CreateLookAt (new Vector3 (0, 0, 5), Vector3.Zero, Vector3.Up);
-			projectionMatrix = Matrix.CreatePerspectiveFieldOfView (MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 1, 10);
+			projectionMatrix = Matrix.CreatePerspectiveFieldOfView (MathHelper.PiOver4, graphicsDevice.Viewport.AspectRatio, 1, 10);
 
 			worldMatrix *= Matrix.CreateRotationX (-0.05f * 30f);
 			worldMatrix *= Matrix.CreateRotationY (-0.05f * 20f);
 		    worldMatrix *= Matrix.CreateTranslation(CubePosition);
 
 			// Setup our basic effect
-			basicEffect = new BasicEffect (GraphicsDevice);
+			basicEffect = new BasicEffect(graphicsDevice);
 			basicEffect.World = worldMatrix;
 			basicEffect.View = viewMatrix;
 			basicEffect.Projection = projectionMatrix;
@@ -110,22 +111,24 @@ namespace MonoGame.Tests.Components {
 			CreateCubeIndexBuffer ();
 		}
 
-		protected override void UnloadContent ()
+	    public void UnloadContent()
+	    {
+            basicEffect.Dispose();
+	        basicEffect = null;
+
+            vertices.Dispose();
+	        vertices = null;
+
+            indices.Dispose();
+	        indices = null;
+	    }
+
+		public void Draw()
 		{
-			indices.Dispose ();
-			indices = null;
-			vertices.Dispose ();
-			vertices = null;
+			graphicsDevice.Clear (Color.CornflowerBlue);
 
-			base.UnloadContent ();
-		}
-
-		public override void Draw (GameTime gameTime)
-		{
-			GraphicsDevice.Clear (Color.CornflowerBlue);
-
-			GraphicsDevice.SetVertexBuffer (vertices);
-			GraphicsDevice.Indices = indices;
+			graphicsDevice.SetVertexBuffer (vertices);
+			graphicsDevice.Indices = indices;
 
 			//RasterizerState rasterizerState1 = new RasterizerState ();
 			//rasterizerState1.CullMode = CullMode.None;
@@ -136,10 +139,9 @@ namespace MonoGame.Tests.Components {
 			foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes) {
                 pass.Apply();
 
-				GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, number_of_vertices, 0, number_of_indices / 3);
+				graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, number_of_vertices, 0, number_of_indices / 3);
 
 			}
-			base.Draw (gameTime);
 		}
 
 		const int number_of_vertices = 8;
@@ -168,7 +170,7 @@ namespace MonoGame.Tests.Components {
 			cubeVertices [6].Color = Color.White;
 			cubeVertices [7].Color = Color.Cyan;
 
-			vertices = new VertexBuffer (GraphicsDevice, VertexPositionColor.VertexDeclaration, number_of_vertices, BufferUsage.WriteOnly);
+			vertices = new VertexBuffer (graphicsDevice, VertexPositionColor.VertexDeclaration, number_of_vertices, BufferUsage.WriteOnly);
 			vertices.SetData<VertexPositionColor> (cubeVertices);
 		}
 
@@ -226,9 +228,10 @@ namespace MonoGame.Tests.Components {
 			cubeIndices [34] = 6;
 			cubeIndices [35] = 7;
 
-			indices = new IndexBuffer (GraphicsDevice, IndexElementSize.SixteenBits, number_of_indices, BufferUsage.WriteOnly);
+			indices = new IndexBuffer (graphicsDevice, IndexElementSize.SixteenBits, number_of_indices, BufferUsage.WriteOnly);
 			indices.SetData<UInt16> (cubeIndices);
 
 		}
+
 	}
 }

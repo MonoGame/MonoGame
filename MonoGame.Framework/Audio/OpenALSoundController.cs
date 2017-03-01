@@ -7,11 +7,21 @@ using MonoGame.Utilities;
 
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenAL;
-#else
+#endif
+#if MONOMAC && !PLATFORM_MACOS_LEGACY
 using OpenTK.Audio.OpenAL;
 using OpenTK.Audio;
+#endif
+
+#if GLES
+using OpenTK.Audio.OpenAL;
 using OpenTK;
 #endif
+
+#if DESKTOPGL
+using OpenAL;
+#endif
+using OpenGL;
 
 #if ANDROID
 using System.Globalization;
@@ -47,10 +57,19 @@ namespace Microsoft.Xna.Framework.Audio
 	internal sealed class OpenALSoundController : IDisposable
     {
         private static OpenALSoundController _instance = null;
+#if SUPPORTS_EFX
+        private static EffectsExtension _efx = null;
+#endif
         private IntPtr _device;
-        private ContextHandle _context;
-		//int outputSource;
-		//int[] buffers;
+#if !DESKTOPGL
+        ContextHandle _context;
+        ContextHandle NullContext = ContextHandle.Zero;
+#else
+        private IntPtr _context;
+        IntPtr NullContext = IntPtr.Zero;
+#endif
+        //int outputSource;
+        //int[] buffers;
         private AlcError _lastOpenALError;
         private int[] allSourcesArray;
 #if DESKTOPGL || ANGLE
@@ -81,24 +100,25 @@ namespace Microsoft.Xna.Framework.Audio
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
 #elif DESKTOPGL
-        #pragma warning disable 414
-        private static AudioContext _acontext;
-        #pragma warning restore 414
         private static OggStreamer _oggstreamer;
 #endif
         private List<int> availableSourcesCollection;
         private List<int> inUseSourcesCollection;
-        private List<int> playingSourcesCollection;
-        private List<int> purgeMe;
         private bool _bSoundAvailable = false;
         private Exception _SoundInitException; // Here to bubble back up to the developer
         bool _isDisposed;
+        public bool SupportsADPCM = false;
 
         /// <summary>
         /// Sets up the hardware resources used by the controller.
         /// </summary>
 		private OpenALSoundController()
         {
+#if WINDOWS
+            // On Windows, set the DLL search path for correct native binaries
+            NativeHelper.InitDllDirectory();
+#endif
+            
             if (!OpenSoundController())
             {
                 return;
@@ -109,11 +129,14 @@ namespace Microsoft.Xna.Framework.Audio
 			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
 			AL.GenSources(allSourcesArray);
             ALHelper.CheckError("Failed to generate sources.");
-
+            Filter = 0;
+#if SUPPORTS_EFX
+            if (Efx.IsInitialized) {
+                Filter = Efx.GenFilter ();
+            }
+#endif
             availableSourcesCollection = new List<int>(allSourcesArray);
 			inUseSourcesCollection = new List<int>();
-			playingSourcesCollection = new List<int>();
-            purgeMe = new List<int>();
 		}
 
         ~OpenALSoundController()
@@ -137,6 +160,9 @@ namespace Microsoft.Xna.Framework.Audio
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
+#if DESKTOPGL
+                EffectsExtension.device = _device;
+#endif
             }
             catch (Exception ex)
             {
@@ -240,16 +266,13 @@ namespace Microsoft.Xna.Framework.Audio
                 AVAudioSession.Notifications.ObserveInterruption(handler);
 
                 int[] attribute = new int[0];
-#elif !DESKTOPGL
+#else
                 int[] attribute = new int[0];
 #endif
 
-#if DESKTOPGL
-                _acontext = new AudioContext();
-                _context = Alc.GetCurrentContext();
-                _oggstreamer = new OggStreamer();
-#else
                 _context = Alc.CreateContext(_device, attribute);
+#if DESKTOPGL
+                _oggstreamer = new OggStreamer();
 #endif
 
                 if (CheckALError("Could not create AL context"))
@@ -258,7 +281,7 @@ namespace Microsoft.Xna.Framework.Audio
                     return(false);
                 }
 
-                if (_context != ContextHandle.Zero)
+                if (_context != NullContext)
                 {
                     Alc.MakeContextCurrent(_context);
                     if (CheckALError("Could not make AL context current"))
@@ -266,6 +289,7 @@ namespace Microsoft.Xna.Framework.Audio
                         CleanUpOpenAL();
                         return(false);
                     }
+                    SupportsADPCM = AL.IsExtensionPresent ("AL_SOFT_MSADPCM");
                     return (true);
                 }
             }
@@ -279,6 +303,18 @@ namespace Microsoft.Xna.Framework.Audio
 				return _instance;
 			}
 		}
+#if SUPPORTS_EFX
+        public static EffectsExtension Efx {
+            get {
+                if (_efx == null)
+                    _efx = new EffectsExtension ();
+                return _efx;
+            }
+        }
+#endif
+        public int Filter {
+            get; private set;
+        }
 
         public static void DestroyInstance()
         {
@@ -317,25 +353,19 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         private void CleanUpOpenAL()
         {
-            Alc.MakeContextCurrent(ContextHandle.Zero);
-#if DESKTOPGL
-            if (_acontext != null)
-            {
-                _acontext.Dispose();
-                _acontext = null;
-            }
-#else
-            if (_context != ContextHandle.Zero)
+            Alc.MakeContextCurrent(NullContext);
+
+            if (_context != NullContext)
             {
                 Alc.DestroyContext (_context);
-                _context = ContextHandle.Zero;
+                _context = NullContext;
             }
             if (_device != IntPtr.Zero)
             {
                 Alc.CloseDevice (_device);
                 _device = IntPtr.Zero;
             }
-#endif
+
             _bSoundAvailable = false;
         }
 
@@ -369,7 +399,10 @@ namespace Microsoft.Xna.Framework.Audio
                             AL.DeleteSource(allSourcesArray[i]);
                             ALHelper.CheckError("Failed to delete source.");
                         }
-                        
+#if SUPPORTS_EFX
+                        if (Filter != 0 && Efx.IsInitialized)
+                            Efx.DeleteFilter (Filter);
+#endif
                         CleanUpOpenAL();
                     }
                 }
@@ -378,27 +411,31 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
         /// <summary>
-        /// Reserves the given sound buffer. If there are no available sources then false is
-        /// returned, otherwise true will be returned and the sound buffer can be played. If
-        /// the controller was not able to setup the hardware, then false will be returned.
+        /// Reserves a sound buffer and return its identifier. If there are no available sources
+        /// or the controller was not able to setup the hardware then an
+        /// <see cref="InstancePlayLimitException"/> is thrown.
         /// </summary>
-        /// <param name="soundBuffer">The sound buffer you want to play</param>
-        /// <returns>True if the buffer can be played, and false if not.</returns>
+        /// <returns>The source number of the reserved sound buffer.</returns>
 		public int ReserveSource()
 		{
             if (!CheckInitState())
             {
                 throw new InstancePlayLimitException();
             }
+
             int sourceNumber;
-			if (availableSourcesCollection.Count == 0)
-            {
-                throw new InstancePlayLimitException();
-			}
-			
-			sourceNumber = availableSourcesCollection.First ();
-            inUseSourcesCollection.Add(sourceNumber);
-			availableSourcesCollection.Remove (sourceNumber);
+
+            lock (availableSourcesCollection)
+            {                
+                if (availableSourcesCollection.Count == 0)
+                {
+                    throw new InstancePlayLimitException();
+                }
+
+                sourceNumber = availableSourcesCollection.Last();
+                inUseSourcesCollection.Add(sourceNumber);
+                availableSourcesCollection.Remove(sourceNumber);
+            }
 
             return sourceNumber;
 		}
@@ -409,29 +446,16 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 return;
             }
-            inUseSourcesCollection.Remove(sourceId);
-            availableSourcesCollection.Add(sourceId);
-		}
 
-        public void PlaySound(SoundEffectInstance inst)
-        {
-            if (!CheckInitState())
+            lock (availableSourcesCollection)
             {
-                return;
+                inUseSourcesCollection.Remove(sourceId);
+                availableSourcesCollection.Add(sourceId);
             }
-            lock (playingSourcesCollection)
-            {
-                playingSourcesCollection.Add(inst.SourceId);
-            }
-            AL.SourcePlay(inst.SourceId);
-            ALHelper.CheckError("Failed to play source.");
 		}
 
         public void FreeSource(SoundEffectInstance inst)
         {
-            lock (playingSourcesCollection) {
-                playingSourcesCollection.Remove(inst.SourceId);
-            }
             RecycleSource(inst.SourceId);
             inst.SourceId = 0;
             inst.HasSourceId = false;
@@ -470,47 +494,6 @@ namespace Microsoft.Xna.Framework.Audio
             ALHelper.CheckError("Failed to set source offset.");
 			return pos;
 		}
-
-        /// <summary>
-        /// Called repeatedly, this method cleans up the state of the management lists. This method
-        /// will also lock on the playingSourcesCollection. Sources that are stopped will be recycled
-        /// using the RecycleSource method.
-        /// </summary>
-		public void Update()
-        {
-            if (!_bSoundAvailable)
-            {
-                //OK to ignore this here because the game can run without sound.
-                 return;
-            }
-
-            ALSourceState state;
-            lock (playingSourcesCollection)
-            {
-                for (int i = playingSourcesCollection.Count - 1; i >= 0; --i)
-                {
-                    int sourceId = playingSourcesCollection[i];
-                    state = AL.GetSourceState(sourceId);
-                    ALHelper.CheckError("Failed to get source state.");
-                    if (state == ALSourceState.Stopped)
-                    {
-                        purgeMe.Add(sourceId);
-                        playingSourcesCollection.RemoveAt(i);
-                    }
-                }
-            }
-            lock (purgeMe)
-            {
-                foreach (int sourceId in purgeMe)
-                {
-                    AL.Source(sourceId, ALSourcei.Buffer, 0);
-                    ALHelper.CheckError("Failed to free source from buffer.");
-                    inUseSourcesCollection.Remove(sourceId);
-                    availableSourcesCollection.Add(sourceId);
-                }
-                purgeMe.Clear();
-            }
-        }
 
 #if ANDROID
         const string Lib = "openal32.dll";

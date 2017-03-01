@@ -45,6 +45,9 @@ project.lock.json
 /MonoGame.Framework/MonoGame.Framework.WindowsUniversal.project.lock.json
 artifacts/
 
+# JetBrains Rider
+.idea/
+
 #Tooling
 _ReSharper*/
 *.resharper
@@ -93,3 +96,4 @@ Test/*.csproj
 *.zip
 
 Installers/MacOS/Scripts/Framework/postinstall
+IDE/MonoDevelop/MonoDevelop.MonoGame/templates/Common/MonoGame.Framework.dll.config

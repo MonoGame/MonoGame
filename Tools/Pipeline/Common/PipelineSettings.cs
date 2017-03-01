@@ -2,12 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.IsolatedStorage;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace MonoGame.Tools.Pipeline
@@ -16,6 +13,7 @@ namespace MonoGame.Tools.Pipeline
     {
         private const string SettingsPath = "Settings.xml";
         private IsolatedStorageFile _isoStore;
+        private bool _isoStoreInit;
 
         public static PipelineSettings Default { get; private set; }
 
@@ -23,7 +21,8 @@ namespace MonoGame.Tools.Pipeline
         public string StartupProject;
         public Microsoft.Xna.Framework.Point Size;
         public int HSeparator, VSeparator;
-        public bool Maximized, FilterOutput, DebugMode;
+        public bool Maximized, DebugMode, PropertyGroupSort;
+        public bool FilterOutput, FilterShowSkipped, FilterShowSuccessful, FilterShowCleaned, AutoScrollBuildOutput;
 
         static PipelineSettings()
         {
@@ -33,7 +32,20 @@ namespace MonoGame.Tools.Pipeline
         public PipelineSettings()
         {
             ProjectHistory = new List<string>();
-            _isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);            
+
+            PropertyGroupSort = true;
+            FilterOutput = true;
+            FilterShowSkipped = true;
+            FilterShowSuccessful = true;
+            FilterShowCleaned = true;
+            AutoScrollBuildOutput = true;
+
+            try
+            {
+                _isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
+                _isoStoreInit = true;
+            }
+            catch { }
         }
 
         /// <summary>
@@ -61,32 +73,53 @@ namespace MonoGame.Tools.Pipeline
 
         public void Save()
         {
-            var mode = FileMode.CreateNew;
-            if (_isoStore.FileExists (SettingsPath)) 
-				mode = FileMode.Truncate;
+            if (!_isoStoreInit)
+                return;
 
-            using (var isoStream = new IsolatedStorageFileStream(SettingsPath, mode, _isoStore))
+            try
             {
-                using (var writer = new StreamWriter(isoStream))
+                var mode = FileMode.CreateNew;
+                if (_isoStore.FileExists(SettingsPath))
+                    mode = FileMode.Truncate;
+
+                using (var isoStream = new IsolatedStorageFileStream(SettingsPath, mode, _isoStore))
                 {
-                    var serializer = new XmlSerializer(typeof(PipelineSettings));
-                    serializer.Serialize(writer, this);
+                    using (var writer = new StreamWriter(isoStream))
+                    {
+                        var serializer = new XmlSerializer(typeof(PipelineSettings));
+                        serializer.Serialize(writer, this);
+                    }
                 }
-            }
+            } catch { }
         }
 
         public void Load()
 		{
-            if (_isoStore.FileExists(SettingsPath))
+            if (!_isoStoreInit)
+                return;
+            
+            try
             {
-                using (var isoStream = new IsolatedStorageFileStream(SettingsPath, FileMode.Open, _isoStore))
+                if (_isoStore.FileExists(SettingsPath))
                 {
-                    using (var reader = new StreamReader(isoStream))
+                    using (var isoStream = new IsolatedStorageFileStream(SettingsPath, FileMode.Open, _isoStore))
                     {
-                        var serializer = new XmlSerializer(typeof(PipelineSettings));
-                        Default = (PipelineSettings)serializer.Deserialize(reader);
+                        using (var reader = new StreamReader(isoStream))
+                        {
+                            var serializer = new XmlSerializer(typeof(PipelineSettings));
+                            Default = (PipelineSettings)serializer.Deserialize(reader);
+
+                            var history = Default.ProjectHistory.ToArray();
+                            foreach (var h in history)
+                                if (!File.Exists(h))
+                                    Default.ProjectHistory.Remove(h);
+                        }
                     }
                 }
+            }
+            catch
+            {
+                Save();
             }
         }
     }

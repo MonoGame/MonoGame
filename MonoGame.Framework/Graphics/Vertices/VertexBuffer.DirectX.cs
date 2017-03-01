@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                     try
                     {
-                        var startBytes = startIndex * vertexStride;
+                        var startBytes = startIndex * TsizeInBytes;
                         var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
                         lock (GraphicsDevice._d3dContext)
@@ -154,7 +154,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     if (vertexStride == elementSizeInBytes)
                     {
-                        var box = new SharpDX.DataBox(dataPtr, 1, 0);
+                        var box = new SharpDX.DataBox(dataPtr, elementCount * elementSizeInBytes, 0);
 
                         var region = new SharpDX.Direct3D11.ResourceRegion();
                         region.Top = 0;

@@ -17,7 +17,8 @@
     <PackageCertificateKeyFile>$projectname$_TemporaryKey.pfx</PackageCertificateKeyFile>
     $endif$
     <MonoGamePlatform>WindowsStoreApp</MonoGamePlatform>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetPlatformVersion>8.1</TargetPlatformVersion>
+    <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>

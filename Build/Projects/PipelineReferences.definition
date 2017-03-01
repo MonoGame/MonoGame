@@ -2,6 +2,11 @@
 <ExternalProject Name="PipelineReferences">
 
   <Platform Type="Linux">
+    <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
+    <Binary Name="Eto.Gtk3" Path="ThirdParty\Dependencies\Eto\Eto.Gtk3.dll" />
+    <Binary Name="Xwt" Path="ThirdParty\Dependencies\xwt\Xwt.dll" />
+    <Binary Name="Xwt.Gtk3" Path="ThirdParty\Dependencies\xwt\Xwt.Gtk3.dll" />
+      
     <Binary
       Name="gtk-sharp"
       Path="ThirdParty\Dependencies\Gtk3\gtk-sharp.dll"
@@ -37,20 +42,24 @@
   </Platform>
 
   <Platform Type="MacOS">
-    <Reference Include="atk-sharp"/>
-    <Reference Include="gdk-sharp"/>
-    <Reference Include="glade-sharp"/>
-    <Reference Include="glib-sharp"/>
-    <Reference Include="gtk-dotnet"/>
-    <Reference Include="gtk-sharp"/>
-    <Reference Include="pango-sharp"/>
-    <Reference Include="Mono.Posix"/>
+    <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
+    <Binary Name="Eto.XamMac2" Path="ThirdParty\Dependencies\Eto\Eto.XamMac2.dll" />
+    <Binary Name="Xwt" Path="ThirdParty\Dependencies\xwt\Xwt.dll" />
   </Platform>
 
   <Platform Type="Windows">
+    <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
+    <Binary Name="Eto.Wpf" Path="ThirdParty\Dependencies\Eto\Eto.Wpf.dll" />
+    <Binary Name="Xwt" Path="ThirdParty\Dependencies\xwt\Xwt.dll" />
+    <Binary Name="Xwt.WPF" Path="ThirdParty\Dependencies\xwt\Xwt.WPF.dll" />
+    
     <Reference Include="System.Deployment" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
   </Platform>
 	
 </ExternalProject>

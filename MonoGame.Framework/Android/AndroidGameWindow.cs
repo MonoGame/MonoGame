@@ -9,10 +9,6 @@ using Android.Views;
 using Microsoft.Xna.Framework.Input.Touch;
 using OpenTK;
 
-#if OUYA
-using Microsoft.Xna.Framework.Input;
-#endif
-
 namespace Microsoft.Xna.Framework
 {
     [CLSCompliant(false)]
@@ -53,10 +49,6 @@ namespace Microsoft.Xna.Framework
 
             GameView.RequestFocus();
             GameView.FocusableInTouchMode = true;
-
-#if OUYA
-            GamePad.Initialize();
-#endif
         }
 
         #region AndroidGameView Methods
@@ -299,8 +291,6 @@ namespace Microsoft.Xna.Framework
                     {
                         TouchPanelState.ReleaseAllTouches();
                     }
-
-                    Game.Activity.RequestedOrientation = requestedOrientation;
 
                     OnOrientationChanged();
                 }

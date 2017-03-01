@@ -14,7 +14,7 @@ namespace MonoGame.Tools.Pipeline
     /// <summary>
     /// Custom converter for the Processor property of a ContentItem.
     /// </summary>
-    internal class ProcessorConverter : TypeConverter
+    public class ProcessorConverter : TypeConverter
     {
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {

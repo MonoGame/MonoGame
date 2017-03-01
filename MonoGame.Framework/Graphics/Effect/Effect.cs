@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 7;
+            public const int MGFXVersion = 8;
 
             public int Signature;
             public int Version;
@@ -132,13 +132,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (header.Version > MGFXHeader.MGFXVersion)
                 throw new Exception("This MGFX effect seems to be for a newer release of MonoGame.");
 
-#if DIRECTX
-            if (header.Profile != 1)
-#else
-			if (header.Profile != 0)
-#endif
-                throw new Exception("This MGFX effect was built for a different platform!");
-            
+            if (header.Profile != Shader.Profile)
+                throw new Exception("This MGFX effect was built for a different platform!");          
             
             return header;
         }
@@ -192,9 +187,8 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Effect(this);
 		}
 
-        protected internal virtual bool OnApply()
+        protected internal virtual void OnApply()
         {
-            return false;
         }
 
         protected override void Dispose(bool disposing)
@@ -242,13 +236,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			var buffers = (int)reader.ReadByte ();
 			ConstantBuffers = new ConstantBuffer[buffers];
 			for (var c = 0; c < buffers; c++) 
-            {
-				
-#if OPENGL
-				string name = reader.ReadString ();               
-#else
-				string name = null;
-#endif
+            {				
+				var name = reader.ReadString ();               
 
 				// Create the backing system memory buffer.
 				var sizeInBytes = (int)reader.ReadInt16 ();
@@ -421,9 +410,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					{						
                         case EffectParameterType.Bool:
                         case EffectParameterType.Int32:
-#if DIRECTX
-                            // Under DirectX we properly store integers and booleans
-                            // in an integer type.
+#if !OPENGL
+                            // Under most platforms we properly store integers and 
+                            // booleans in an integer type.
                             //
                             // MojoShader on the otherhand stores everything in float
                             // types which is why this code is disabled under OpenGL.

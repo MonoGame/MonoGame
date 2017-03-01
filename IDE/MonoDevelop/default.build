@@ -42,12 +42,10 @@
       <!--
      <get src="https://www.nuget.org/api/v2/package/MonoGame.Framework.MonoMac/3.2.99-Beta" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.MonoMac.3.3.0.nupkg" />
      -->
-     <get src="https://www.nuget.org/api/v2/package/MonoGame.Framework.Ouya/3.4.0.459" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.Ouya.3.4.0.459.nupkg" />
      <get src="https://www.nuget.org/api/v2/package/MonoGame.Framework.WindowsDX/3.4.0.459" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.WindowsDX.3.4.0.459.nupkg" />
      <get src="https://www.nuget.org/api/v2/package/MonoGame.Framework.WindowsGL/3.4.0.459" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.WindowsGL.3.4.0.459.nupkg" />
      <get src="https://www.nuget.org/api/v2/package/MonoGame.Framework.Portable/3.2.99.1-Beta" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.Portable.3.2.99.1-Beta.nupkg" />
      <get src="https://www.nuget.org/api/v2/package/MonoGame.Framework.Content.Pipeline.Portable/3.2.99.1-Beta" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.Content.Pipeline.Portable.3.2.99.1-Beta.nupkg" />
-     <get src="https://www.nuget.org/api/v2/package/Ouya.Console.Api/1.0.13.1" dest="MonoDevelop.MonoGame/packages/Ouya.Console.Api.1.0.13.1.nupkg"/>
      <if test="${os == 'MacOS'}">
        <delete failonerror="false">
           <fileset>
