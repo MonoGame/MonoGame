@@ -106,6 +106,9 @@
     <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilter.cs">
       <Link>MonoGame.Framework\TextureFilter.cs</Link>
     </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilterMode.cs">
+      <Link>MonoGame.Framework\TextureFilterMode.cs</Link>
+    </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\Vertices\VertexElementUsage.cs">
       <Link>MonoGame.Framework\VertexElementUsage.cs</Link>
     </Compile>
@@ -160,7 +163,15 @@
     <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs">
       <Link>MonoGame.Framework\Utilities\Hash.cs</Link>
     </Compile>
-
+    
+    <!-- We also use a few types from the content pipeline. -->
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs">
+      <Link>MonoGame.Framework.Content.Pipeline\ExternalTool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\LoadedTypeCollection.cs">
+      <Link>MonoGame.Framework.Content.Pipeline\LoadedTypeCollection.c</Link>
+    </Compile>
+    
     <!-- A fake GraphicsDevice to satisfy some of the framework classes above! -->
     <Compile Include="MonoGame.Framework\GraphicsDevice.cs" />
 
@@ -184,6 +195,8 @@
     <Compile Include="SamplerStateInfo.cs" />
     <Compile Include="ShaderInfo.cs" />
     <Compile Include="ShaderProfile.cs" />
+    <Compile Include="ShaderProfile.OpenGL.cs" />
+    <Compile Include="ShaderProfile.DirectX.cs" />
     <Compile Include="TechniqueInfo.cs" />
     <Compile Include="TextureFilterType.cs" />
 
@@ -200,5 +213,6 @@
     
     <!-- The MGFX preprocessor -->
     <Compile Include="Preprocessor.cs" />
+    
   </Files>
 </Project>

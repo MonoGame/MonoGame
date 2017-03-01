@@ -9,7 +9,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
 #endif
@@ -32,17 +32,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     GL.Disable(EnableCap.Blend);
                 GraphicsExtensions.CheckGLError();
                 device._lastBlendEnable = blendEnabled;
-            }
-
-            if (force || this.BlendFactor != device._lastBlendState.BlendFactor)
-            {
-                GL.BlendColor(
-                    this.BlendFactor.R / 255.0f,      
-                    this.BlendFactor.G / 255.0f, 
-                    this.BlendFactor.B / 255.0f, 
-                    this.BlendFactor.A / 255.0f);
-                GraphicsExtensions.CheckGLError();
-                device._lastBlendState.BlendFactor = this.BlendFactor;
             }
 
             if (force || 

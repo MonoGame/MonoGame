@@ -54,16 +54,29 @@
       <copy todir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle">
          <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
              <include name="ff*"/>
-         </fileset>
+             <include name="*.dylib"/> 
+        </fileset>
       </copy>
+      <!-- Correct the id of the dylibs -->
+      <foreach item="File" property="dylibname">
+          <in>
+             <items basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle/">
+             <include name="*.dylib" />
+             </items>
+          </in>
+          <do>
+             <echo message="${path::get-file-name(dylibname)}" />
+             <exec program="install_name_tool" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle" commandline=' -id "@executable_path/../MonoBundle/${path::get-file-name(dylibname)}" ${path::get-file-name(dylibname)}' />
+          </do>
+      </foreach>
       <exec program="pkgbuild" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release" commandline=" --component ./Pipeline.app --identifier com.monogame.pipeline --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Pipeline --install-location /Applications ${project::get-base-directory()}/Pipeline.MacOS.pkg" />
       <exec program="pkgbuild" workingdir="." commandline=" --root ./root --identifier com.monogame.xsaddin --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Addin ${project::get-base-directory()}/MonoGame.XamarinStudio.Addin.pkg" />
       <!-- Build Framework .pkg -->
       <delete dir="./root/tmp" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Tools" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/tvOS" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android" />
-      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/OUYA" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOSX" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Linux" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL" />
@@ -84,13 +97,13 @@
                 <include name="*.*"/>
          </fileset>
       </copy>
-      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android">
-         <fileset basedir="../MonoGame.Framework/bin/Android/AnyCPU/Release">
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/tvOS">
+         <fileset basedir="../MonoGame.Framework/bin/tvOS/iPhoneSimulator/Release">
                 <include name="*.*"/>
          </fileset>
       </copy>
-      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/OUYA">
-         <fileset basedir="../MonoGame.Framework/bin/Ouya/AnyCPU/Release">
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android">
+         <fileset basedir="../MonoGame.Framework/bin/Android/AnyCPU/Release">
                 <include name="*.*"/>
          </fileset>
       </copy>
@@ -144,31 +157,6 @@ fi
 
     <!-- Linux Installer -->
     <if test="${(os == 'Unix' or os == 'MacOS') and directory::exists('../Tools/Pipeline/bin/Linux/AnyCPU/Release')}">
-      
-      <!-- .deb installer -->
-      <delete dir="Linux/tmp_deb" failonerror="false"/>
-      <mkdir dir="Linux/tmp_deb"/>
-      <copy todir="Linux/tmp_deb/DEBIAN/">
-        <fileset basedir="Linux/DEBIAN"/>
-      </copy>
-      <copy todir="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/Tools">
-        <fileset basedir="../Tools/Pipeline/bin/Linux/AnyCPU/Release"/>
-      </copy>
-      <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="Linux/tmp_deb/tmp/MonoDevelop.MonoGame.mpack" overwrite="true"/>
-      <copy file="Linux/Main/mgcb.xml" tofile="Linux/tmp_deb/tmp/mgcb.xml"/>
-      <copy file="Linux/Main/mgcb" tofile="Linux/tmp_deb/usr/bin/mgcb"/>
-      <copy file="Linux/Main/monogame-pipeline" tofile="Linux/tmp_deb/usr/bin/monogame-pipeline"/>
-      <copy file="Linux/Main/monogame.svg" tofile="Linux/tmp_deb/usr/share/icons/hicolor/scalable/mimetypes/monogame.svg"/>
-      <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets" tofile="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/MonoGame.Content.Builder.targets"/>
-      <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Common.props" tofile="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/MonoGame.Common.props"/>
-      <echo file="Linux/tmp_deb/DEBIAN/control" append="true">version: ${buildNumber}&#xa;</echo>
-      <copy todir="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/DesktopGL">
-         <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
-                <include name="*.*"/>
-         </fileset>
-      </copy>
-
-      <!-- .run installer -->
       <delete dir="Linux/tmp_run" failonerror="false"/>
       <mkdir dir="Linux/tmp_run"/>
       <copy todir="Linux/tmp_run/Main/">
@@ -189,9 +177,12 @@ fi
         <fileset basedir="Linux/RUN"/>
       </copy>
       <move file="Linux/tmp_run/uninstall.sh" tofile="Linux/tmp_run/MonoGameSDK/uninstall.sh" />
-      
-      <exec program="Linux/compile.sh" workingdir="Linux/"/>
-      <delete dir="Linux/tmp_deb" failonerror="false"/>
+      <exec program="../ThirdParty/Dependencies/makeself/makeself.sh" workingdir="Linux/">
+        <arg value="tmp_run/"/>
+        <arg value="monogame-sdk.run"/>
+        <arg value="Monogame Pipeline Installer"/>
+        <arg value="./postinstall.sh"/>
+      </exec>
       <delete dir="Linux/tmp_run" failonerror="false"/>
     </if>
 

@@ -6,8 +6,15 @@ using System;
 
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenAL;
-#elif OPENAL
+#endif
+#if MONOMAC && !PLATFORM_MACOS_LEGACY
 using OpenTK.Audio.OpenAL;
+#endif
+#if GLES
+using OpenTK.Audio.OpenAL;
+#endif
+#if DESKTOPGL
+using OpenAL;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio
@@ -19,13 +26,20 @@ namespace Microsoft.Xna.Framework.Audio
 		private float _alVolume = 1;
 
 		internal int SourceId;
+        private float reverb = 0f;
+        bool applyFilter = false;
+#if SUPPORTS_EFX
+        EfxFilterType filterType;
+#endif
+        float filterQ;
+        float frequency;
         int pauseCount;
         
-        private OpenALSoundController controller;
+        internal OpenALSoundController controller;
         
         internal bool HasSourceId = false;
 
-        #region Initialization
+#region Initialization
 
         /// <summary>
         /// Creates a standalone SoundEffectInstance from given wavedata.
@@ -44,7 +58,7 @@ namespace Microsoft.Xna.Framework.Audio
             controller = OpenALSoundController.GetInstance;
         }
 
-        #endregion // Initialization
+#endregion // Initialization
 
         /// <summary>
         /// Converts the XNA [-1, 1] pitch range to OpenAL pitch (0, INF) or Android SoundPool playback rate [0.5, 2].
@@ -52,19 +66,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         private static float XnaPitchToAlPitch(float xnaPitch)
         {
-            /*XNA sets pitch bounds to [-1.0f, 1.0f], each end being one octave.
-            •OpenAL's AL_PITCH boundaries are (0.0f, INF). *
-            •Consider the function f(x) = 2 ^ x
-            •The domain is (-INF, INF) and the range is (0, INF). *
-            •0.0f is the original pitch for XNA, 1.0f is the original pitch for OpenAL.
-            •Note that f(0) = 1, f(1) = 2, f(-1) = 0.5, and so on.
-            •XNA's pitch values are on the domain, OpenAL's are on the range.
-            •Remember: the XNA limit is arbitrarily between two octaves on the domain. *
-            •To convert, we just plug XNA pitch into f(x).*/
-
-            if (xnaPitch < -1.0f || xnaPitch > 1.0f)
-                throw new ArgumentOutOfRangeException("XNA PITCH MUST BE WITHIN [-1.0f, 1.0f]!");
-
             return (float)Math.Pow(2, xnaPitch);
         }
 
@@ -142,9 +143,14 @@ namespace Microsoft.Xna.Framework.Audio
 			// Pitch
 			AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
             ALHelper.CheckError("Failed to set source pitch.");
+#if SUPPORTS_EFX
+            ApplyReverb ();
+            ApplyFilter ();
+#endif
+            AL.SourcePlay(SourceId);
+            ALHelper.CheckError("Failed to play source.");
 
-            controller.PlaySound (this);
-            //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
+
             SoundState = SoundState.Playing;
         }
 
@@ -176,9 +182,6 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (HasSourceId)
             {
-                //Console.WriteLine ("stop " + sourceId + " : " + soundEffect.Name);
-                
-
                 if (!controller.CheckInitState())
                 {
                     return;
@@ -186,6 +189,14 @@ namespace Microsoft.Xna.Framework.Audio
                 AL.SourceStop(SourceId);
                 ALHelper.CheckError("Failed to stop source.");
 
+#if SUPPORTS_EFX
+                // Reset the SendFilter to 0 if we are NOT using revert since 
+                // sources are recyled
+                OpenALSoundController.Efx.BindSourceToAuxiliarySlot (SourceId, 0, 0, 0);
+                ALHelper.CheckError ("Failed to unset reverb.");
+                AL.Source (SourceId, ALSourcei.EfxDirectFilter, 0);
+                ALHelper.CheckError ("Failed to unset filter.");
+#endif
                 AL.Source(SourceId, ALSourcei.Buffer, 0);
                 ALHelper.CheckError("Failed to free source from buffer.");
 
@@ -264,6 +275,95 @@ namespace Microsoft.Xna.Framework.Audio
                 AL.Source(SourceId, ALSourcef.Gain, _alVolume);
                 ALHelper.CheckError("Failed to set source volume.");
             }
+        }
+
+        internal void PlatformSetReverbMix(float mix)
+        {
+#if SUPPORTS_EFX
+            if (!OpenALSoundController.Efx.IsInitialized)
+                return;
+            reverb = mix;
+            if (State == SoundState.Playing) {
+                ApplyReverb ();
+                reverb = 0f;
+            }
+#endif
+        }
+
+#if SUPPORTS_EFX
+        void ApplyReverb ()
+        {
+            if (reverb > 0f && SoundEffect.ReverbSlot != 0) {
+                OpenALSoundController.Efx.BindSourceToAuxiliarySlot (SourceId, (int)SoundEffect.ReverbSlot, 0, 0);
+                ALHelper.CheckError ("Failed to set reverb.");
+            }
+        }
+
+        void ApplyFilter ()
+        {
+            if (applyFilter && controller.Filter > 0) {
+                var freq = frequency / 20000f;
+                var lf = 1.0f - freq;
+                var efx = OpenALSoundController.Efx;
+                efx.Filter (controller.Filter, EfxFilteri.FilterType, (int)filterType);
+                ALHelper.CheckError ("Failed to set filter.");
+                switch (filterType) {
+                case EfxFilterType.Lowpass:
+                    efx.Filter (controller.Filter, EfxFilterf.LowpassGainHF, freq);
+                    ALHelper.CheckError ("Failed to set LowpassGainHF.");
+                    break;
+                case EfxFilterType.Highpass:
+                    efx.Filter (controller.Filter, EfxFilterf.HighpassGainLF, freq);
+                    ALHelper.CheckError ("Failed to set HighpassGainLF.");
+                    break;
+                case EfxFilterType.Bandpass:
+                    efx.Filter (controller.Filter, EfxFilterf.BandpassGainHF, freq);
+                    ALHelper.CheckError ("Failed to set BandpassGainHF.");
+                    efx.Filter (controller.Filter, EfxFilterf.BandpassGainLF, lf);
+                    ALHelper.CheckError ("Failed to set BandpassGainLF.");
+                    break;
+                }
+                AL.Source (SourceId, ALSourcei.EfxDirectFilter, controller.Filter);
+                ALHelper.CheckError ("Failed to set DirectFilter.");
+            }
+        }
+#endif
+
+        internal void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
+        {
+#if SUPPORTS_EFX
+            if (!OpenALSoundController.Efx.IsInitialized)
+                return;
+
+            applyFilter = true;
+            switch (mode) {
+            case FilterMode.BandPass:
+                filterType = EfxFilterType.Bandpass;
+                break;
+                case FilterMode.LowPass:
+                filterType = EfxFilterType.Lowpass;
+                break;
+                case FilterMode.HighPass:
+                filterType = EfxFilterType.Highpass;
+                break;
+            }
+            this.filterQ = filterQ;
+            this.frequency = frequency;
+            if (State == SoundState.Playing) {
+                ApplyFilter ();
+                applyFilter = false;
+            }
+#endif
+        }
+
+        internal void PlatformClearFilter()
+        {
+#if SUPPORTS_EFX
+            if (!OpenALSoundController.Efx.IsInitialized)
+                return;
+
+            applyFilter = false;
+#endif
         }
 
         private void PlatformDispose(bool disposing)

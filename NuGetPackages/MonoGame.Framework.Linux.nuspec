@@ -11,7 +11,7 @@
         <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
-      The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
+      The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8 and Windows UWP.</description>
         <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
         <releaseNotes></releaseNotes>
         <copyright>Copyright  2016</copyright>
@@ -20,9 +20,7 @@
     <files>
         <file src="Linux\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
         <file src="Linux\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
-        <file src="Linux\AnyCPU\Release\NVorbis.dll" target="lib\net40\NVorbis.dll" />
-        <file src="Linux\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
-        <file src="Linux\AnyCPU\Release\OpenTK.dll.config" target="content\net40\OpenTK.dll.config" />
+        <file src="Linux\AnyCPU\Release\MonoGame.Framework.dll.config" target="content\net40\MonoGame.Framework.dll.config" />
         <file src="..\..\NuGetPackages\tools\MonoGame.Framework\Linux\install.ps1" target="tools\install.ps1" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>

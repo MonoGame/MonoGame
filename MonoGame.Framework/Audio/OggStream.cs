@@ -13,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using NVorbis;
-using OpenTK.Audio.OpenAL;
+using OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -320,7 +320,7 @@ namespace Microsoft.Xna.Framework.Audio
     internal class OggStreamer : IDisposable
     {
         public readonly XRamExtension XRam = new XRamExtension();
-        public readonly EffectsExtension Efx = new EffectsExtension();
+        public readonly EffectsExtension Efx = OpenALSoundController.Efx;
 
         const float DefaultUpdateRate = 10;
         const int DefaultBufferSize = 44100;
@@ -405,10 +405,8 @@ namespace Microsoft.Xna.Framework.Audio
         public bool FillBuffer(OggStream stream, int bufferId)
         {
             int readSamples;
-            long readerPosition = 0;
             lock (readMutex)
             {
-                readerPosition = stream.Reader.DecodedPosition;
                 readSamples = stream.Reader.ReadSamples(readSampleBuffer, 0, BufferSize);
                 CastBuffer(readSampleBuffer, castBuffer, readSamples);
             }

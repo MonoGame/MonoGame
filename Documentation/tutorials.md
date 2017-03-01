@@ -35,7 +35,6 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [BMFont rendering with MonoGame](http://www.craftworkgames.com/blog/tutorial-bmfont-rendering-with-monogame/)
  - [RB Whitaker's MonoGame Tutorials](http://rbwhitaker.wikidot.com/monogame-tutorials)
  - [RB Whitaker's XNA Tutorials including sharers, 2D, 3D, Game loops, advancted topics](http://rbwhitaker.wikidot.com/xna-tutorials)
- - [Another list of tutorials from the MonoGame github](https://github.com/mono/MonoGame/wiki/Tutorials)
  - [Setting window position tutorial](http://projectdrake.net/blog/?p=176)
  - [Using Spine with MonoGame - by Randolph Burt (Randeroo)](http://randolphburt.co.uk/2013/03/30/dragons-and-dancing-crabs/)
  - [Mac porting series](http://benkane.wordpress.com/2012/01/20/the-great-porting-adventure-day-8/)

@@ -14,7 +14,45 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
-    [ContentImporter(".dae", ".fbx", ".x", DisplayName = "Open Asset Import Library - MonoGame", DefaultProcessor = "ModelProcessor")]
+    [ContentImporter(
+        ".dae", // Collada
+        ".gltf", "glb", // glTF
+        ".blend", // Blender 3D
+        ".3ds", // 3ds Max 3DS
+        ".ase", // 3ds Max ASE
+        ".obj", // Wavefront Object
+        ".ifc", // Industry Foundation Classes (IFC/Step)
+        ".xgl", ".zgl", // XGL
+        ".ply", // Stanford Polygon Library
+        ".dxf", // AutoCAD DXF
+        ".lwo", // LightWave
+        ".lws", // LightWave Scene
+        ".lxo", // Modo
+        ".stl", // Stereolithography
+        ".ac", // AC3D
+        ".ms3d", // Milkshape 3D
+        ".cob", ".scn", // TrueSpace
+        ".bvh", // Biovision BVH
+        ".csm", // CharacterStudio Motion
+        ".irrmesh", // Irrlicht Mesh
+        ".irr", // Irrlicht Scene
+        ".mdl", // Quake I, 3D GameStudio (3DGS)
+        ".md2", // Quake II
+        ".md3", // Quake III Mesh
+        ".pk3", // Quake III Map/BSP
+        ".mdc", // Return to Castle Wolfenstein
+        ".md5", // Doom 3
+        ".smd", ".vta", // Valve Model 
+        ".ogex", // Open Game Engine Exchange
+        ".3d", // Unreal
+        ".b3d", // BlitzBasic 3D
+        ".q3d", ".q3s", // Quick3D
+        ".nff", // Neutral File Format, Sense8 WorldToolKit
+        ".off", // Object File Format
+        ".ter", // Terragen Terrain
+        ".hmp", // 3D GameStudio (3DGS) Terrain
+        ".ndo", // Izware Nendo
+        DisplayName = "Open Asset Import Library - MonoGame", DefaultProcessor = "ModelProcessor")]
     public class OpenAssetImporter : ContentImporter<NodeContent>
     {
         // Assimp has a few limitations (not all FBX files are supported):
@@ -442,6 +480,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // For the children, this is the new parent.
                 aiParent = aiNode;
                 parent = node;
+
+                if (_scene.HasAnimations)
+                {
+                    foreach (var animation in _scene.Animations)
+                    {
+                        var animationContent = ImportAnimation(animation, node.Name);
+                        if (animationContent.Channels.Count > 0)
+                            node.Animations.Add(animationContent.Name, animationContent);
+                    }
+                }
             }
 
             Debug.Assert(parent != null);
@@ -739,8 +787,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Converts the specified animation to XNA.
         /// </summary>
         /// <param name="aiAnimation">The animation.</param>
+        /// <param name="nodeName">An optional filter.</param>
         /// <returns>The animation converted to XNA.</returns>
-        private AnimationContent ImportAnimation(Animation aiAnimation)
+        private AnimationContent ImportAnimation(Animation aiAnimation, string nodeName = null)
         {
             var animation = new AnimationContent
             {
@@ -754,8 +803,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             //                 "nodeXyz_$AssimpFbx$_Rotation",
             //                 "nodeXyz_$AssimpFbx$_Scaling"
             // Group animation channels by name (strip the "_$AssimpFbx$" part).
-            var channelGroups = aiAnimation.NodeAnimationChannels
+            IEnumerable < IGrouping < string,NodeAnimationChannel >> channelGroups;
+            if (nodeName != null)
+            {
+                channelGroups = aiAnimation.NodeAnimationChannels
+                                           .Where(channel => nodeName == GetNodeName(channel.NodeName))
                                            .GroupBy(channel => GetNodeName(channel.NodeName));
+            }
+            else
+            {
+                channelGroups = aiAnimation.NodeAnimationChannels
+                                           .GroupBy(channel => GetNodeName(channel.NodeName));
+            }
 
             foreach (var channelGroup in channelGroups)
             {

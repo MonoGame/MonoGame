@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using Microsoft.Xna.Framework.Utilities;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -13,9 +14,11 @@ namespace Microsoft.Xna.Framework.Graphics
     public partial class GraphicsDevice : IDisposable
     {
         private Viewport _viewport;
-        private GraphicsProfile _graphicsProfile;
 
         private bool _isDisposed;
+
+        private Color _blendFactor = Color.White;
+        private bool _blendFactorDirty;
 
         private BlendState _blendState;
         private BlendState _actualBlendState;
@@ -53,6 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
         private int _currentRenderTargetCount;
+        private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
 
         internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
 
@@ -118,14 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
 
-        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
-        {
-            return
-                DeviceLost != null &&
-                ResourceCreated != null &&
-                ResourceDestroyed != null &&
-                Disposing != null;
-        }
+        internal event EventHandler<EventArgs> PresentationChanged;
 
         private int _maxVertexBufferSlots;
         internal int MaxTextureSlots;
@@ -155,6 +152,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        internal DepthFormat ActiveDepthFormat
+        {
+            get
+            {
+                return IsRenderTargetBound
+                    ? _currentRenderTargetBindings[0].DepthFormat
+                    : PresentationParameters.DepthStencilFormat;
+            }
+        }
+
         public GraphicsAdapter Adapter
         {
             get;
@@ -170,14 +177,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public GraphicsMetrics Metrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
 
         internal GraphicsDevice(GraphicsDeviceInformation gdi)
+            : this(gdi.Adapter, gdi.GraphicsProfile, gdi.PresentationParameters)
         {
-            if (gdi.PresentationParameters == null)
-                throw new ArgumentNullException("presentationParameters");
-            PresentationParameters = gdi.PresentationParameters;
-            Setup();
-            GraphicsCapabilities = new GraphicsCapabilities(this);
-            GraphicsProfile = gdi.GraphicsProfile;
-            Initialize();
         }
 
         internal GraphicsDevice ()
@@ -185,7 +186,8 @@ namespace Microsoft.Xna.Framework.Graphics
             PresentationParameters = new PresentationParameters();
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
             Setup();
-            GraphicsCapabilities = new GraphicsCapabilities(this);
+            GraphicsCapabilities = new GraphicsCapabilities();
+            GraphicsCapabilities.Initialize(this);
             Initialize();
         }
 
@@ -200,20 +202,35 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </exception>
         public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
         {
-            Adapter = adapter;
+            if (adapter == null)
+                throw new ArgumentNullException("adapter");
+            if (!adapter.IsProfileSupported(graphicsProfile))
+                throw new NoSuitableGraphicsDeviceException(String.Format("Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
+            Adapter = adapter;
             PresentationParameters = presentationParameters;
+            _graphicsProfile = graphicsProfile;
             Setup();
-            GraphicsCapabilities = new GraphicsCapabilities(this);
-            GraphicsProfile = graphicsProfile;
+            GraphicsCapabilities = new GraphicsCapabilities();
+            GraphicsCapabilities.Initialize(this);
             Initialize();
         }
 
         private void Setup()
         {
-			// Initialize the main viewport
-			_viewport = new Viewport (0, 0,
+#if DEBUG
+            if (DisplayMode == null)
+            {
+                throw new Exception(
+                    "Unable to determine the current display mode.  This can indicate that the " +
+                    "game is not configured to be HiDPI aware under Windows 10 or later.  See " +
+                    "https://github.com/MonoGame/MonoGame/issues/5040 for more information.");
+            }
+#endif
+
+            // Initialize the main viewport
+            _viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
 
@@ -255,6 +272,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void Initialize()
         {
             PlatformInitialize();
+            GraphicsCapabilities.InitializeAfterResources(this);
 
             // Force set the default render states.
             _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = true;
@@ -327,6 +345,25 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// The color used as blend factor when alpha blending.
+        /// </summary>
+        /// <remarks>
+        /// When only changing BlendFactor, use this rather than <see cref="Graphics.BlendState.BlendFactor"/> to
+        /// only update BlendFactor so the whole BlendState does not have to be updated.
+        /// </remarks>
+        public Color BlendFactor
+        {
+            get { return _blendFactor; }
+            set
+            {
+                if (_blendFactor == value)
+                    return;
+                _blendFactor = value;
+                _blendFactorDirty = true;
+            }
+        }
+
         public BlendState BlendState
         {
 			get { return _blendState; }
@@ -358,6 +395,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 newBlendState.BindToGraphicsDevice(this);
 
                 _actualBlendState = newBlendState;
+
+                BlendFactor = _actualBlendState.BlendFactor;
 
                 _blendStateDirty = true;
             }
@@ -399,11 +438,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             PlatformBeginApplyState();
 
-            if (_blendStateDirty)
-            {
-                _actualBlendState.PlatformApplyState(this);
-                _blendStateDirty = false;
-            }
+            PlatformApplyBlend();
 
             if (_depthStencilStateDirty)
             {
@@ -484,6 +519,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 _isDisposed = true;
+
+                if (Disposing != null)
+                    Disposing(this, EventArgs.Empty);
             }
         }
 
@@ -505,6 +543,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Present()
         {
+            // We cannot present with a RT set on the device.
+            if (_currentRenderTargetCount != 0)
+                throw new InvalidOperationException("Cannot call Present when a render target is active.");
+
             _graphicsMetrics = new GraphicsMetrics();
             PlatformPresent();
         }
@@ -514,31 +556,34 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             throw new NotImplementedException();
         }
+        */
+
+        partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters);
 
         public void Reset()
         {
-            // Manually resetting the device is not currently supported.
-            throw new NotImplementedException();
-        }
-        */
+            PlatformValidatePresentationParameters(PresentationParameters);
 
-#if WINDOWS && DIRECTX
-        public void Reset(PresentationParameters presentationParameters)
-        {
-            PresentationParameters = presentationParameters;
+            if (DeviceResetting != null)
+                DeviceResetting(this, EventArgs.Empty);
 
             // Update the back buffer.
-            CreateSizeDependentResources();
-            ApplyRenderTargets(null);
-        }
-#endif
+            OnPresentationChanged();
 
-        /*
-        public void Reset(PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
-        {
-            throw new NotImplementedException();
+            if (PresentationChanged != null)
+                PresentationChanged(this, EventArgs.Empty);
+            if (DeviceReset != null)
+                DeviceReset(this, EventArgs.Empty);
         }
-        */
+
+        public void Reset(PresentationParameters presentationParameters)
+        {
+            if (presentationParameters == null)
+                throw new ArgumentNullException("presentationParameters");
+
+            PresentationParameters = presentationParameters;
+            Reset();
+        }
 
         /// <summary>
         /// Trigger the DeviceResetting event
@@ -609,22 +654,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        private readonly GraphicsProfile _graphicsProfile;
         public GraphicsProfile GraphicsProfile
         {
-            get
-            {
-                return _graphicsProfile;
-            }
-            internal set
-            {
-                //Check if Profile is supported.
-                //TODO: [DirectX] Recreate the Device using the new
-                //      feature level each time the Profile changes.
-                if(value > GetHighestSupportedGraphicsProfile(this))
-                    throw new NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
-                _graphicsProfile = value;
-                GraphicsCapabilities.Initialize(this);
-            }
+            get { return _graphicsProfile; }
         }
 
         public Rectangle ScissorRectangle
@@ -655,17 +688,27 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
+		    {
                 SetRenderTargets(null);
+		    }
 			else
-				SetRenderTargets(new RenderTargetBinding(renderTarget));
+			{
+				_tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget);
+				SetRenderTargets(_tempRenderTargetBinding);
+			}
 		}
 
         public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
         {
             if (renderTarget == null)
-                SetRenderTarget(null);
+            {
+                SetRenderTargets(null);
+            }
             else
-                SetRenderTargets(new RenderTargetBinding(renderTarget, cubeMapFace));
+            {
+                _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, cubeMapFace);
+                SetRenderTargets(_tempRenderTargetBinding);
+            }
         }
 
 		public void SetRenderTargets(params RenderTargetBinding[] renderTargets)
@@ -712,7 +755,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 unchecked
                 {
-                    _graphicsMetrics._targetCount += (ulong)renderTargetCount;
+                    _graphicsMetrics._targetCount += renderTargetCount;
                 }
             }
         }
@@ -841,6 +884,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _vertexShader = value;
+                _vertexConstantBuffers.Clear();
                 _vertexShaderDirty = true;
             }
         }
@@ -855,6 +899,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _pixelShader = value;
+                _pixelConstantBuffers.Clear();
                 _pixelShaderDirty = true;
             }
         }
@@ -885,6 +930,13 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
         }
 
+        /// <summary>
+        /// Draw geometry by indexing into the vertex buffer.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives in the index buffer.</param>
+        /// <param name="baseVertex">Used to offset the vertex range indexed from the vertex buffer.</param>
+        /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
+        /// <param name="primitiveCount">The number of primitives to render from the index buffer.</param>
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
             if (_vertexShader == null)
@@ -904,15 +956,34 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong)primitiveCount;
+                _graphicsMetrics._primitiveCount += primitiveCount;
             }
         }
 
+        /// <summary>
+        /// Draw primitives of the specified type from the data in an array of vertices without indexing.
+        /// </summary>
+        /// <typeparam name="T">The type of the vertices.</typeparam>
+        /// <param name="primitiveType">The type of primitives to draw with the vertices.</param>
+        /// <param name="vertexData">An array of vertices to draw.</param>
+        /// <param name="vertexOffset">The index in the array of the first vertex that should be rendered.</param>
+        /// <param name="primitiveCount">The number of primitives to draw.</param>
+        /// <remarks>The <see cref="VertexDeclaration"/> will be found by getting <see cref="IVertexType.VertexDeclaration"/>
+        /// from an instance of <typeparamref name="T"/> and cached for subsequent calls.</remarks>
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
             DrawUserPrimitives(primitiveType, vertexData, vertexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
+        /// <summary>
+        /// Draw primitives of the specified type from the data in the given array of vertices without indexing.
+        /// </summary>
+        /// <typeparam name="T">The type of the vertices.</typeparam>
+        /// <param name="primitiveType">The type of primitives to draw with the vertices.</param>
+        /// <param name="vertexData">An array of vertices to draw.</param>
+        /// <param name="vertexOffset">The index in the array of the first vertex that should be rendered.</param>
+        /// <param name="primitiveCount">The number of primitives to draw.</param>
+        /// <param name="vertexDeclaration">The layout of the vertices.</param>
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
             if (vertexData == null)
@@ -940,10 +1011,16 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += primitiveCount;
             }
         }
 
+        /// <summary>
+        /// Draw primitives of the specified type from the currently bound vertexbuffers without indexing.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives to draw.</param>
+        /// <param name="vertexStart">Index of the vertex to start at.</param>
+        /// <param name="primitiveCount">The number of primitives to draw.</param>
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
             if (_vertexShader == null)
@@ -962,15 +1039,46 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount +=  primitiveCount;
             }
         }
 
+        /// <summary>
+        /// Draw primitives of the specified type by indexing into the given array of vertices with 16-bit indices.
+        /// </summary>
+        /// <typeparam name="T">The type of the vertices.</typeparam>
+        /// <param name="primitiveType">The type of primitives to draw with the vertices.</param>
+        /// <param name="vertexData">An array of vertices to draw.</param>
+        /// <param name="vertexOffset">The index in the array of the first vertex to draw.</param>
+        /// <param name="indexOffset">The index in the array of indices of the first index to use</param>
+        /// <param name="primitiveCount">The number of primitives to draw.</param>
+        /// <param name="numVertices">The number of vertices to draw.</param>
+        /// <param name="indexData">The index data.</param>
+        /// <remarks>The <see cref="VertexDeclaration"/> will be found by getting <see cref="IVertexType.VertexDeclaration"/>
+        /// from an instance of <typeparamref name="T"/> and cached for subsequent calls.</remarks>
+        /// <remarks>All indices in the vertex buffer are interpreted relative to the specified <paramref name="vertexOffset"/>.
+        /// For example a value of zero in the array of indices points to the vertex at index <paramref name="vertexOffset"/>
+        /// in the array of vertices.</remarks>
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
             DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
+        /// <summary>
+        /// Draw primitives of the specified type by indexing into the given array of vertices with 16-bit indices.
+        /// </summary>
+        /// <typeparam name="T">The type of the vertices.</typeparam>
+        /// <param name="primitiveType">The type of primitives to draw with the vertices.</param>
+        /// <param name="vertexData">An array of vertices to draw.</param>
+        /// <param name="vertexOffset">The index in the array of the first vertex to draw.</param>
+        /// <param name="indexOffset">The index in the array of indices of the first index to use</param>
+        /// <param name="primitiveCount">The number of primitives to draw.</param>
+        /// <param name="numVertices">The number of vertices to draw.</param>
+        /// <param name="indexData">The index data.</param>
+        /// <param name="vertexDeclaration">The layout of the vertices.</param>
+        /// <remarks>All indices in the vertex buffer are interpreted relative to the specified <paramref name="vertexOffset"/>.
+        /// For example a value of zero in the array of indices points to the vertex at index <paramref name="vertexOffset"/>
+        /// in the array of vertices.</remarks>
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
             // These parameter checks are a duplicate of the checks in the int[] overload of DrawUserIndexedPrimitives.
@@ -1003,20 +1111,54 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertexDeclaration == null)
                 throw new ArgumentNullException("vertexDeclaration");
 
+            if (vertexDeclaration.VertexStride < ReflectionHelpers.SizeOf<T>.Get())
+                throw new ArgumentOutOfRangeException("vertexDeclaration", "Vertex stride of vertexDeclaration should be at least as big as the stride of the actual vertices.");
+
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
 
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount +=  primitiveCount;
             }
         }
 
+        /// <summary>
+        /// Draw primitives of the specified type by indexing into the given array of vertices with 32-bit indices.
+        /// </summary>
+        /// <typeparam name="T">The type of the vertices.</typeparam>
+        /// <param name="primitiveType">The type of primitives to draw with the vertices.</param>
+        /// <param name="vertexData">An array of vertices to draw.</param>
+        /// <param name="vertexOffset">The index in the array of the first vertex to draw.</param>
+        /// <param name="indexOffset">The index in the array of indices of the first index to use</param>
+        /// <param name="primitiveCount">The number of primitives to draw.</param>
+        /// <param name="numVertices">The number of vertices to draw.</param>
+        /// <param name="indexData">The index data.</param>
+        /// <remarks>The <see cref="VertexDeclaration"/> will be found by getting <see cref="IVertexType.VertexDeclaration"/>
+        /// from an instance of <typeparamref name="T"/> and cached for subsequent calls.</remarks>
+        /// <remarks>All indices in the vertex buffer are interpreted relative to the specified <paramref name="vertexOffset"/>.
+        /// For example a value of zero in the array of indices points to the vertex at index <paramref name="vertexOffset"/>
+        /// in the array of vertices.</remarks>
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
             DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
+        /// <summary>
+        /// Draw primitives of the specified type by indexing into the given array of vertices with 32-bit indices.
+        /// </summary>
+        /// <typeparam name="T">The type of the vertices.</typeparam>
+        /// <param name="primitiveType">The type of primitives to draw with the vertices.</param>
+        /// <param name="vertexData">An array of vertices to draw.</param>
+        /// <param name="vertexOffset">The index in the array of the first vertex to draw.</param>
+        /// <param name="indexOffset">The index in the array of indices of the first index to use</param>
+        /// <param name="primitiveCount">The number of primitives to draw.</param>
+        /// <param name="numVertices">The number of vertices to draw.</param>
+        /// <param name="indexData">The index data.</param>
+        /// <param name="vertexDeclaration">The layout of the vertices.</param>
+        /// <remarks>All indices in the vertex buffer are interpreted relative to the specified <paramref name="vertexOffset"/>.
+        /// For example value of zero in the array of indices points to the vertex at index <paramref name="vertexOffset"/>
+        /// in the array of vertices.</remarks>
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
             // These parameter checks are a duplicate of the checks in the short[] overload of DrawUserIndexedPrimitives.
@@ -1049,17 +1191,46 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertexDeclaration == null)
                 throw new ArgumentNullException("vertexDeclaration");
 
+            if (vertexDeclaration.VertexStride < ReflectionHelpers.SizeOf<T>.Get())
+                throw new ArgumentOutOfRangeException("vertexDeclaration", "Vertex stride of vertexDeclaration should be at least as big as the stride of the actual vertices.");
+
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
             
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount +=  primitiveCount;
             }
         }
 
+        /// <summary>
+        /// Draw instanced geometry from the bound vertex buffers and index buffer.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives in the index buffer.</param>
+        /// <param name="baseVertex">Used to offset the vertex range indexed from the vertex buffer.</param>
+        /// <param name="minVertexIndex">This is unused and remains here only for XNA API compatibility.</param>
+        /// <param name="numVertices">This is unused and remains here only for XNA API compatibility.</param>
+        /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
+        /// <param name="primitiveCount">The number of primitives in a single instance.</param>
+        /// <param name="instanceCount">The number of instances to render.</param>
+        /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
+        [Obsolete("Use DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount) instead. In future versions this method can be removed.")]
         public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex,
                                             int numVertices, int startIndex, int primitiveCount, int instanceCount)
+        {
+            DrawInstancedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount, instanceCount);
+        }
+
+        /// <summary>
+        /// Draw instanced geometry from the bound vertex buffers and index buffer.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives in the index buffer.</param>
+        /// <param name="baseVertex">Used to offset the vertex range indexed from the vertex buffer.</param>
+        /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
+        /// <param name="primitiveCount">The number of primitives in a single instance.</param>
+        /// <param name="instanceCount">The number of instances to render.</param>
+        /// <remarks>Draw geometry with data from multiple bound vertex streams at different frequencies.</remarks>
+        public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
         {
             if (_vertexShader == null)
                 throw new InvalidOperationException("Vertex shader must be set before calling DrawInstancedPrimitives.");
@@ -1078,7 +1249,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong)(primitiveCount * instanceCount);
+                _graphicsMetrics._primitiveCount += (primitiveCount * instanceCount);
             }
         }
 
@@ -1102,6 +1273,24 @@ namespace Microsoft.Xna.Framework.Graphics
         internal static GraphicsProfile GetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
         {
             return PlatformGetHighestSupportedGraphicsProfile(graphicsDevice);
+        }
+
+        // uniformly scales down the given rectangle by 10%
+        internal static Rectangle GetDefaultTitleSafeArea(int x, int y, int width, int height)
+        {
+            var marginX = (width + 19) / 20;
+            var marginY = (height + 19) / 20;
+            x += marginX;
+            y += marginY;
+
+            width -= marginX * 2;
+            height -= marginY * 2;
+            return new Rectangle(x, y, width, height);
+        }
+
+        internal static Rectangle GetTitleSafeArea(int x, int y, int width, int height)
+        {
+            return PlatformGetTitleSafeArea(x, y, width, height);
         }
     }
 }

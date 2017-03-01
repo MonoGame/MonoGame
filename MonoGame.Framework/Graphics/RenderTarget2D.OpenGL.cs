@@ -7,9 +7,10 @@
 using MonoMac.OpenGL;
 #else
 using OpenGL;
+using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 using System;
 using System.Collections.Generic;
 #elif GLES
@@ -20,9 +21,24 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTarget2D
     {
-        internal int glColorBuffer;
-        internal int glDepthBuffer;
-        internal int glStencilBuffer;
+        int IRenderTarget.GLTexture
+        {
+            get { return glTexture; }
+        }
+
+        TextureTarget IRenderTarget.GLTarget
+        {
+            get { return glTarget; }
+        }
+
+        int IRenderTarget.GLColorBuffer { get; set; }
+        int IRenderTarget.GLDepthBuffer { get; set; }
+        int IRenderTarget.GLStencilBuffer { get; set; }
+
+        TextureTarget IRenderTarget.GetFramebufferTarget(RenderTargetBinding renderTargetBinding)
+        {
+            return glTarget;
+        }
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)

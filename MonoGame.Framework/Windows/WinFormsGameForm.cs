@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input.Touch;
 
@@ -41,6 +45,13 @@ namespace Microsoft.Xna.Framework.Windows
         public WinFormsGameForm(GameWindow window)
         {
             _window = window;
+        }
+
+        public void CenterOnPrimaryMonitor()
+        {
+             Location = new System.Drawing.Point(
+                 (Screen.PrimaryScreen.WorkingArea.Width  - Width ) / 2,
+                 (Screen.PrimaryScreen.WorkingArea.Height - Height) / 2);
         }
 
         [System.Security.Permissions.PermissionSet(System.Security.Permissions.SecurityAction.Demand, Name = "FullTrust")]

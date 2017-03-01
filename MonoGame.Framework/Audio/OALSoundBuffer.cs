@@ -6,9 +6,19 @@ using System;
 
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenAL;
-#else
+#endif
+#if MONOMAC && !PLATFORM_MACOS_LEGACY
 using OpenTK.Audio.OpenAL;
 #endif
+
+#if GLES 
+using OpenTK.Audio.OpenAL;
+#endif
+
+#if DESKTOPGL
+using OpenAL;
+#endif
+
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -49,12 +59,20 @@ namespace Microsoft.Xna.Framework.Audio
 			set;
 		}
 
-        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate)
+        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int alignment = 0)
         {
             openALFormat = format;
             dataSize = size;
             this.sampleRate = sampleRate;
-            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, dataSize, this.sampleRate);
+            int unpackedSize = 0;
+#if DESKTOPGL
+            if (alignment > 0) {
+                AL.Bufferi (openALDataBuffer, ALBufferi.UnpackBlockAlignmentSoft, alignment);
+                ALHelper.CheckError ("Failed to fill buffer.");
+            }
+#endif
+
+            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, size, this.sampleRate);
             ALHelper.CheckError("Failed to fill buffer.");
 
             int bits, channels;
@@ -73,12 +91,19 @@ namespace Microsoft.Xna.Framework.Audio
                 alError = AL.GetError();
                 if (alError != ALError.NoError)
                 {
-                    Console.WriteLine("Failed to get buffer bits: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
+                    Console.WriteLine("Failed to get buffer channels: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
                     Duration = -1;
                 }
                 else
                 {
-                    Duration = (float)(size / ((bits / 8) * channels)) / (float)sampleRate;
+                    AL.GetBuffer (openALDataBuffer, ALGetBufferi.Size, out unpackedSize);
+                    alError = AL.GetError ();
+                    if (alError != ALError.NoError) {
+                        Console.WriteLine ("Failed to get buffer size: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString (alError), format, size, sampleRate);
+                        Duration = -1;
+                    } else {
+                        Duration = (float)(unpackedSize / ((bits / 8) * channels)) / (float)sampleRate;
+                    }
                 }
             }
             //Console.WriteLine("Duration: " + Duration + " / size: " + size + " bits: " + bits + " channels: " + channels + " rate: " + sampleRate);

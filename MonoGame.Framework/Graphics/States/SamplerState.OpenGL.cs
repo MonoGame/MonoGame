@@ -12,7 +12,8 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
+using ExtTextureFilterAnisotropic = OpenGL.TextureParameterName;
 #elif GLES
 using OpenTK.Graphics.ES20;
 #endif
@@ -163,17 +164,20 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.TexParameter(target, TextureParameterName.TextureLodBias, MipMapLevelOfDetailBias);
             GraphicsExtensions.CheckGLError();
             // Comparison samplers are not supported in OpenGL ES 2.0 (without an extension, anyway)
-            if (ComparisonFunction != CompareFunction.Never)
+            switch (FilterMode)
             {
-                GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.CompareRefToTexture);
-                GraphicsExtensions.CheckGLError();
-                GL.TexParameter(target, TextureParameterName.TextureCompareFunc, (int) ComparisonFunction.GetDepthFunction());
-                GraphicsExtensions.CheckGLError();
-            }
-            else
-            {
-                GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.None);
-                GraphicsExtensions.CheckGLError();
+                case TextureFilterMode.Comparison:
+                    GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.CompareRefToTexture);
+                    GraphicsExtensions.CheckGLError();
+                    GL.TexParameter(target, TextureParameterName.TextureCompareFunc, (int) ComparisonFunction.GetDepthFunction());
+                    GraphicsExtensions.CheckGLError();
+                    break;
+                case TextureFilterMode.Default:
+                    GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.None);
+                    GraphicsExtensions.CheckGLError();
+                    break;
+                default:
+                    throw new InvalidOperationException("Invalid filter mode!");
             }
 #endif
             if (GraphicsDevice.GraphicsCapabilities.SupportsTextureMaxLevel)
@@ -198,7 +202,7 @@ namespace Microsoft.Xna.Framework.Graphics
       case TextureAddressMode.Wrap:
         return (int)TextureWrapMode.Repeat;
       case TextureAddressMode.Mirror:
-        return (int)All.MirroredRepeat;
+        return (int)TextureWrapMode.MirroredRepeat;
 #if !GLES
       case TextureAddressMode.Border:
         return (int)TextureWrapMode.ClampToBorder;

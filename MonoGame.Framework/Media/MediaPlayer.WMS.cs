@@ -14,6 +14,7 @@ namespace Microsoft.Xna.Framework.Media
     {
         private static MediaSession _session;
         private static AudioStreamVolume _volumeController;
+        private static readonly object _volumeLock = new object();
         private static PresentationClock _clock;
 
         private static Song _nextSong;
@@ -46,7 +47,7 @@ namespace Microsoft.Xna.Framework.Media
 
                 switch (ev.TypeInfo)
                 {
-                    case MediaEventTypes.EndOfPresentation:
+                    case MediaEventTypes.SessionEnded:
                         _sessionState = SessionState.Ended;
                         OnSongFinishedPlaying(null, null);
                         break;
@@ -147,12 +148,15 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void SetChannelVolumes()
         {
-            if (_volumeController == null)
-                return;
+            lock (_volumeLock)
+            {
+                if (_volumeController == null)
+                    return;
 
-            float volume = _isMuted ? 0f : _volume;
-            for (int i = 0; i < _volumeController.ChannelCount; i++)
-                _volumeController.SetChannelVolume(i, volume);
+                float volume = _isMuted ? 0f : _volume;
+                for (int i = 0; i < _volumeController.ChannelCount; i++)
+                    _volumeController.SetChannelVolume(i, volume);
+            }
         }
 
         private static void PlatformSetVolume(float volume)
@@ -209,10 +213,13 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void StartNewSong(Song song, TimeSpan? startPosition)
         {
-            if (_volumeController != null)
+            lock (_volumeLock)
             {
-                _volumeController.Dispose();
-                _volumeController = null;
+                if (_volumeController != null)
+                {
+                    _volumeController.Dispose();
+                    _volumeController = null;
+                }
             }
 
             _currentSong = song;
@@ -236,9 +243,12 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void OnTopologyReady()
         {
-            IntPtr volumeObjectPtr;
-            MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObjectPtr);
-            _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
+            lock (_volumeLock)
+            {
+                IntPtr volumeObjectPtr;
+                MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObjectPtr);
+                _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
+            }
 
             SetChannelVolumes();
 

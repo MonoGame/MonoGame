@@ -405,12 +405,12 @@ namespace MonoGame.Tests.ContentPipeline
             Deserialize<ExternalReferences>("17_ExternalReferences.xml", externalReferences =>
             {
                 Assert.NotNull(externalReferences.Texture);
-                Assert.IsTrue(externalReferences.Texture.Filename.EndsWith(@"\Xml\grass.tga"));
+                Assert.IsTrue(externalReferences.Texture.Filename.EndsWith("/Xml/grass.tga".Replace('/', Path.DirectorySeparatorChar)));
                 Assert.NotNull(externalReferences.Texture2);
-                Assert.IsTrue(externalReferences.Texture2.Filename.EndsWith(@"\Xml\grass.tga"));
+                Assert.IsTrue(externalReferences.Texture2.Filename.EndsWith("/Xml/grass.tga".Replace ('/', Path.DirectorySeparatorChar)));
                 Assert.AreNotSame(externalReferences.Texture, externalReferences.Texture2);
                 Assert.NotNull(externalReferences.Shader);
-                Assert.IsTrue(externalReferences.Shader.Filename.EndsWith(@"\Xml\foliage.fx"));
+                Assert.IsTrue(externalReferences.Shader.Filename.EndsWith("/Xml/foliage.fx".Replace ('/', Path.DirectorySeparatorChar)));
             });
         }
 
@@ -591,6 +591,30 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(colors.Red, Color.Red);
                 Assert.AreEqual(colors.Green, Color.Green);
                 Assert.AreEqual(colors.Blue, Color.Blue);
+            });
+        }
+
+        [Test]
+        public void XnaCurve()
+        {
+            // Curve in 28_XnaCurve.xml is formated the same way as by XNA's serializer
+            DeserializeCompileAndLoad<Curve>("28_XnaCurve.xml", curve =>
+            {
+                Assert.AreEqual(CurveLoopType.Constant, curve.PreLoop);
+                Assert.AreEqual(CurveLoopType.Constant, curve.PostLoop);
+                Assert.AreEqual(2, curve.Keys.Count);
+                var key1 = curve.Keys[0];
+                Assert.AreEqual(0, key1.Position);
+                Assert.AreEqual(1, key1.Value);
+                Assert.AreEqual(0, key1.TangentIn);
+                Assert.AreEqual(0, key1.TangentOut);
+                Assert.AreEqual(CurveContinuity.Smooth, key1.Continuity);
+                var key2 = curve.Keys[1];
+                Assert.AreEqual(0.5f, key2.Position);
+                Assert.AreEqual(0.5f, key2.Value);
+                Assert.AreEqual(0, key2.TangentIn);
+                Assert.AreEqual(0, key2.TangentOut);
+                Assert.AreEqual(CurveContinuity.Smooth, key2.Continuity);
             });
         }
     }

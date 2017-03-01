@@ -23,9 +23,10 @@
     <Import file="templates/Common/Content.mgcb" />
     <Import file="templates/Common/OpenTK.dll.config" />
     <Import file="templates/Common/Tao.Sdl.dll.config" />
+    <Import file="templates/Common/MonoGame.Framework.dll.config" />
+    <Import file="templates/Common/app.manifest" />
     <!-- Android Templates -->
     <Import file="templates/MonoGameAndroidProject.xpt.xml" />
-    <Import file="templates/MonoGameOUYAProject.xpt.xml" />
     <Import file="templates/Android/Activity1.cs" />
     <Import file="templates/Android/Resource.cs" />
     <Import file="templates/Android/AndroidManifest.xml" />
@@ -60,15 +61,24 @@
     <Import file="MonoDevelop.MonoGame.Core.dll" />
     <Import file="MonoDevelop.MonoGame.iOS.dll" />
     <Import file="MonoDevelop.MonoGame.Mac.dll" />
+    <!-- Native Libraries -->
+    <Import file="templates/libs/x64/libopenal.so.1" />
+    <Import file="templates/libs/x86/libopenal.so.1" />
+    <Import file="templates/libs/libopenal.1.dylib" />
+    <Import file="templates/libs/x64/soft_oal.dll" />
+    <Import file="templates/libs/x86/soft_oal.dll" />
+    <Import file="templates/libs/x64/libSDL2-2.0.so.0" />
+    <Import file="templates/libs/x86/libSDL2-2.0.so.0" />
+    <Import file="templates/libs/libSDL2-2.0.0.dylib" />
+    <Import file="templates/libs/x64/SDL2.dll" />
+    <Import file="templates/libs/x86/SDL2.dll" />
     <!-- Nuget Packages -->
     <Import file="packages/MonoGame.Framework.Android.3.4.0.459.nupkg" />
     <Import file="packages/MonoGame.Framework.iOS.3.4.0.459.nupkg" />
     <Import file="packages/MonoGame.Framework.Linux.3.4.0.459.nupkg" />
     <Import file="packages/MonoGame.Framework.MacOS.3.4.0.459.nupkg" />
-    <Import file="packages/MonoGame.Framework.Ouya.3.4.0.459.nupkg" />
     <Import file="packages/MonoGame.Framework.WindowsDX.3.4.0.459.nupkg" />
     <Import file="packages/MonoGame.Framework.WindowsGL.3.4.0.459.nupkg" />
-    <Import file="packages/Ouya.Console.Api.1.0.13.1.nupkg" />
     <Import file="packages/MonoGame.Framework.Content.Pipeline.Portable.3.2.99.1-Beta.nupkg" />
     <Import file="packages/MonoGame.Framework.Portable.3.2.99.1-Beta.nupkg" />
     <!-- Exclude non .net files from a scan -->
@@ -77,8 +87,8 @@
     <Import file="exclude.addins" />
   </Runtime>
   <Dependencies>
-    <Addin id="Core" version="5.0" />
-    <Addin id="Ide" version="5.0" />
+    <Addin id="Core" version="6.0" />
+    <Addin id="Ide" version="6.0" />
     <Addin id="DesignerSupport" version="4.0" />
   </Dependencies>
   <ConditionType id="IsWindows" type="MonoDevelop.MonoGame.MonoGameIsWindowsCondition" />
@@ -87,14 +97,15 @@
   <Extension path="/MonoDevelop/Core/StockIcons">
     <StockIcon stockid="monogame-project" file="icons/monogame-project-32.png" />
   </Extension>
-  <Extension path="/MonoDevelop/ProjectModel/MSBuildExtensions">
+  <Extension path="/MonoDevelop/ProjectModel/ProjectModelExtensions">
     <Class class="MonoDevelop.MonoGame.MonoGameMSBuildImports" />
   </Extension>
+  <!--
   <Extension path="/MonoDevelop/ProjectModel/MSBuildItemTypes">
     <DotNetProjectSubtype id="MonoGame" guid="{9b831fef-f496-498f-9fe8-180da5cb4258}" type="MonoDevelop.MonoGame.MonoGameProject">
-      <!-- Add MonoGame Specific Imports  -->
     </DotNetProjectSubtype>
   </Extension>
+	-->
   <Extension path="/MonoDevelop/Ide/ProjectTemplateCategories">
     <Category id="monogame" name="MonoGame" icon="monogame-project" insertbefore="other">
       <Category id="app" name="App">
@@ -109,9 +120,11 @@
   <Extension path="/MonoDevelop/Ide/FileTemplateTypes">
     <FileTemplateType name="ContentFile" class="MonoDevelop.MonoGame.ContentItemTemplate" />
   </Extension>
+  <!--
   <Extension path="/MonoDevelop/ProjectModel/ProjectBindings">
     <ProjectBinding id="MonoGame" class="MonoDevelop.MonoGame.MonoGameProjectBinding" />
   </Extension>
+	-->
   <Extension path="/MonoDevelop/Ide/ProjectTemplates">
     <ProjectTemplate id="MonoGameSharedProject" file="templates/MonoGameSharedProject.xpt.xml" />
     <ProjectTemplate id="MonoGamePCLProject" file="templates/MonoGamePCLProject.xpt.xml" />
@@ -151,9 +164,11 @@
     <DisplayBinding id="MonoGamePipeline" insertbefore="DefaultDisplayBinding" class="MonoDevelop.MonoGame.PipelineDisplayBinding" />
   </Extension>
   <!-- We still need this for MonoMac and Xamarin Mac Classic support -->
+  <!--
   <Extension path="/MonoDevelop/ProjectModel/ProjectServiceExtensions">
     <Class class="MonoDevelop.MonoGame.MonoGameBuildExtension" />
   </Extension>
+  -->
   <Module>
     <Runtime>
       <Import assembly="MonoDevelop.MonoGame.Android.dll" />
@@ -163,7 +178,6 @@
     </Dependencies>
     <Extension path="/MonoDevelop/Ide/ProjectTemplates">
       <ProjectTemplate id="MonoGameForAndroidProject" file="templates/MonoGameAndroidProject.xpt.xml" />
-      <ProjectTemplate id="MonoGameForOUYAProject" file="templates/MonoGameOUYAProject.xpt.xml" />
     </Extension>
   </Module>
   <Module>

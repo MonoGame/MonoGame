@@ -2,56 +2,60 @@
 using System.Xml;
 using System.Xml.XPath;
 using System.Linq;
-using MonoDevelop.Projects.Formats.MSBuild;
 using System.Collections.Generic;
+using MonoDevelop.Projects.MSBuild;
 using MonoDevelop.Projects;
 
 namespace MonoDevelop.MonoGame
 {
-	public class MonoGameMSBuildImports : MSBuildExtension
+	public class MonoGameMSBuildImports : DotNetProjectExtension
 	{
 		const string MonoGameContentBuildTargets = "$(MSBuildExtensionsPath)\\MonoGame\\v3.0\\MonoGame.Content.Builder.targets";
 		const string MonoGameCommonProps = "$(MSBuildExtensionsPath)\\MonoGame\\v3.0\\MonoGame.Common.props";
 		const string MonoGameExtensionsPath = @"$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\{0}\{1}";
 		const string MonoGameExtensionsAbsolutePath = @"/Library/Frameworks/MonoGame.framework/v3.0/Assemblies/{0}/{1}";
 
-		static bool UpgradeMonoGameProject (MonoDevelop.Core.IProgressMonitor monitor, MonoDevelop.Projects.SolutionEntityItem item, MSBuildProject project)
+		static bool UpgradeMonoGameProject (MonoDevelop.Core.ProgressMonitor monitor, DotNetProjectExtension extension, MSBuildProject project)
 		{
 			bool needsSave = false;
 			bool containsMGCB = project.ItemGroups.Any (x => x.Items.Any (i => System.IO.Path.GetExtension (i.Include) == ".mgcb"));
-			bool isMonoGame = project.PropertyGroups.Any (x => x.Properties.Any (p => p.Name == "MonoGamePlatform")) ||
+			bool isMonoGame = project.PropertyGroups.Any (x => x.GetProperties().Any (p => p.Name == "MonoGamePlatform")) ||
 				project.ItemGroups.Any (x => x.Items.Any (i => i.Name == "Reference" && i.Include == "MonoGame.Framework")) ||
 				containsMGCB;
-			bool isApplication = project.PropertyGroups.Any (x => x.Properties.Any (p => p.Name == "OutputType" && p.GetValue () == "Exe")) ||
-				project.PropertyGroups.Any (x => x.Properties.Any (p => p.Name == "AndroidApplication" && string.Compare (p.GetValue (), bool.TrueString, true)==0));
-			bool isShared = project.PropertyGroups.Any (x => x.Properties.Any (p => p.Name == "HasSharedItems" && p.GetValue () == "true"));
-			var type = item.GetType ().Name;
+			bool isDesktopGL = project.ItemGroups.Any (x => x.Items.Any (i => i.Include.EndsWith ("SDL2.dll")));
+			bool isApplication = project.PropertyGroups.Any (x => x.GetProperties().Any (p => p.Name == "OutputType" && p.Value == "Exe"))
+			                            | project.PropertyGroups.Any (x => x.GetProperties().Any (p => p.Name == "AndroidApplication" && string.Compare (p.Value, bool.TrueString, true)==0));
+			bool isShared = project.PropertyGroups.Any (x => x.GetProperties().Any (p => p.Name == "HasSharedItems" && p.Value == "true"));
+			bool absoluteReferenes = false;
+			var type = extension.Project.GetType ().Name;
+
 			monitor.Log.WriteLine ("Found {0}", type);
-			var platform = Environment.OSVersion.Platform == PlatformID.Win32NT ? "Windows" : "DesktopGL";
+			monitor.Log.WriteLine ("Found {0}", project.GetType ().Name);
+			var platform = isDesktopGL ? "DesktopGL" : "Windows";
 			var path = MonoGameExtensionsPath;
-			switch (type) {
-			case "XamarinIOSProject":
+			if (extension.Project.FlavorGuids.Contains ("{FEACFBD2-3405-455C-9665-78FE426C6842}")) {
 				platform = "iOS";
-				break;
-			case "MonoDroidProject":
+			}
+			if (extension.Project.FlavorGuids.Contains ("{06FA79CB-D6CD-4721-BB4B-1BD202089C55}")) {
+				platform = "tvOS";
+			}
+			if (extension.Project.FlavorGuids.Contains ("{EFBA0AD7-5A72-4C68-AF49-83D382785DCF}")) {
 				platform = "Android";
-				break;
-			case "XamMac2Project":
-			case "MonoGameProject":
-				platform = "DesktopGL";
-				break;
-			case "XamMac":
-			case "XamMacProject":
-				platform = "DesktopGL";
-				// Xamarin.Mac Classic does not use MSBuild so we need to absolute path.
-				path = MonoGameExtensionsAbsolutePath;
-				break;
-			case "MonoMac":
-			case "MonoMacProject":
+			}
+			if (extension.Project.FlavorGuids.Contains ("{948B3504-5B70-4649-8FE4-BDE1FB46EC69}")) {
 				platform = "MacOSX";
+				// MonoMac Classic does not use MSBuild so we need to absolute path.
+				path = MonoGameExtensionsAbsolutePath;
+				absoluteReferenes = true;
+			}
+			if (extension.Project.FlavorGuids.Contains ("{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23}")) {
+				platform = "DesktopGL";
 				// Xamarin.Mac Classic does not use MSBuild so we need to absolute path.
 				path = MonoGameExtensionsAbsolutePath;
-				break;
+				absoluteReferenes = true;
+			}
+			if (extension.Project.FlavorGuids.Contains ("{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1}")) {
+				platform = "DesktopGL";
 			}
 			monitor.Log.WriteLine ("Platform = {0}", platform);
 			monitor.Log.WriteLine ("Path = {0}", path);
@@ -60,40 +64,28 @@ namespace MonoDevelop.MonoGame
 				var ritems = new List<MSBuildItem> ();
 				foreach (var ig in project.ItemGroups) {
 					foreach (var i in ig.Items.Where (x => x.Name == "Reference" && x.Include == "MonoGame.Framework")) {
-						if (!i.HasMetadata ("HintPath")) {
+						var metaData = i.Metadata;
+						if (!metaData.HasProperty("HintPath")) {
 							monitor.Log.WriteLine ("Fixing {0} to be MonoGameContentReference", i.Include);
-							var a = ig.AddNewItem ("Reference", i.Include);
-							a.SetMetadata ("HintPath", string.Format (path, platform, "MonoGame.Framework.dll"));
-							ritems.Add (i);
+							metaData.SetValue ("HintPath", string.Format (path, platform, "MonoGame.Framework.dll"));
 							needsSave = true;
 						}
 					}
 					foreach (var i in ig.Items.Where (x => x.Name == "Reference" && x.Include == "Tao.Sdl")) {
-						if (!i.HasMetadata ("HintPath")) {
+						var metaData = i.Metadata;
+						if (!metaData.HasProperty("HintPath")) {
 							monitor.Log.WriteLine ("Fixing {0} to be Tao.Sdl", i.Include);
-							var a = ig.AddNewItem ("Reference", i.Include);
-							a.SetMetadata ("HintPath", string.Format (path, platform, "Tao.Sdl.dll"));
-							ritems.Add (i);
+							metaData.SetValue ("HintPath", string.Format (path, platform, "Tao.Sdl.dll"));
 							needsSave = true;
 						}
 					}
 					foreach (var i in ig.Items.Where (x => x.Name == "Reference" && x.Include.StartsWith ("OpenTK") &&
 							(platform != "iOS" && platform != "Android"))) {
-						if (!i.HasMetadata ("HintPath")) {
-							monitor.Log.WriteLine ("Fixing {0} to be OpenTK", i.Include);
-							var a = ig.AddNewItem ("Reference", i.Include);
-							a.SetMetadata ("HintPath", string.Format (path, platform, "OpenTK.dll"));
-							a.SetMetadata ("SpecificVersion", "true");
-							ritems.Add (i);
-							needsSave = true;
-						}
-					}
-					foreach (var i in ig.Items.Where (x => x.Name == "Reference" && x.Include == "NVorbis")) {
-						if (!i.HasMetadata ("HintPath")) {
-							monitor.Log.WriteLine ("Fixing {0} to be NVorbis", i.Include);
-							var a = ig.AddNewItem ("Reference", i.Include);
-							a.SetMetadata ("HintPath", string.Format (path, platform, "NVorbis.dll"));
-							ritems.Add (i);
+						var metaData = i.Metadata;
+						if (!metaData.HasProperty ("HintPath")) {
+							monitor.Log.WriteLine("Fixing {0} to be OpenTK", i.Include);
+							metaData.SetValue ("HintPath", string.Format (path, platform, "OpenTK.dll"));
+							metaData.SetValue ("SpecificVersion", "true");
 							needsSave = true;
 						}
 					}
@@ -101,26 +93,22 @@ namespace MonoDevelop.MonoGame
 				foreach (var a in ritems) {
 					project.RemoveItem (a);
 				}
-				var dotNetProject = item as DotNetProject;
-				if (dotNetProject != null && (type == "MonoMacProject" || type == "XamMacProject" )) {
+				var dotNetProject = extension.Project;
+				if (dotNetProject != null && absoluteReferenes) {
 					var items = new List<ProjectReference> ();
 					var newitems = new List<ProjectReference> ();
 					foreach (var reference in dotNetProject.References) {
 						if (reference.Reference == "MonoGame.Framework" && string.IsNullOrEmpty (reference.HintPath)) {
 							items.Add (reference);
-							newitems.Add (new ProjectReference (ReferenceType.Assembly, reference.Reference, string.Format (path, platform, "MonoGame.Framework.dll")));
+							newitems.Add (ProjectReference.CreateCustomReference  (ReferenceType.Assembly, reference.Reference, string.Format(path, platform, "MonoGame.Framework.dll")));
 						}
-						if (reference.Reference.StartsWith ("OpenTK") && string.IsNullOrEmpty (reference.HintPath)) {
+						if (reference.Reference.StartsWith ("OpenTK", StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty (reference.HintPath)) {
 							items.Add (reference);
-							newitems.Add (new ProjectReference (ReferenceType.Assembly, reference.Reference, string.Format (path, platform, "OpenTK.dll")));
-						}
-						if (reference.Reference == "NVorbis" && string.IsNullOrEmpty (reference.HintPath)) {
-							items.Add (reference);
-							newitems.Add (new ProjectReference (ReferenceType.Assembly, reference.Reference, string.Format (path, platform, "NVorbis.dll")));
+							newitems.Add (ProjectReference.CreateCustomReference (ReferenceType.Assembly, reference.Reference, string.Format (path, platform, "OpenTK.dll")));
 						}
 						if (reference.Reference == "Tao.Sdl" && string.IsNullOrEmpty (reference.HintPath)) {
 							items.Add (reference);
-							newitems.Add (new ProjectReference (ReferenceType.Assembly, reference.Reference, string.Format (path, platform, "Tao.Sdl.dll")));
+							newitems.Add (ProjectReference.CreateCustomReference (ReferenceType.Assembly, reference.Reference, string.Format (path, platform, "Tao.Sdl.dll")));
 						}
 					}
 					dotNetProject.References.RemoveRange (items);
@@ -128,21 +116,14 @@ namespace MonoDevelop.MonoGame
 				}
 			}
 			if (isMonoGame && containsMGCB && (isApplication || isShared)) {
-				if (!project.PropertyGroups.Any (x => x.Properties.Any (p => p.Name == "MonoGamePlatform")) && !isShared) {
-					monitor.Log.WriteLine ("Adding MonoGamePlatform", platform);
-					project.PropertyGroups.First ().SetPropertyValue ("MonoGamePlatform", platform, true);
+				if (!project.PropertyGroups.Any (x => x.GetProperties().Any (p => p.Name == "MonoGamePlatform")) && !isShared) {
+					monitor.Log.WriteLine ("Adding MonoGamePlatform {0}", platform == "tvOS" ? "iOS" : platform);
+					project.PropertyGroups.First ().SetValue ("MonoGamePlatform", platform == "tvOS" ? "iOS" : platform, true);
 					needsSave = true;
 				}
 				if (!project.Imports.Any (x => x.Project.StartsWith (MonoGameCommonProps, StringComparison.OrdinalIgnoreCase))&& !isShared) {
 					monitor.Log.WriteLine ("Adding MonoGame.Common.props Import");
-					var e = project.Document.DocumentElement;
-					var manager = new XmlNamespaceManager (new NameTable ());
-					var schema = "http://schemas.microsoft.com/developer/msbuild/2003";
-					manager.AddNamespace ("tns", schema);
-					var import = project.Document.CreateElement ("Import", schema);
-					import.SetAttribute ("Project", MonoGameCommonProps);
-					import.SetAttribute ("Condition", string.Format ("Exists('{0}')", MonoGameCommonProps));
-					project.Document.DocumentElement.InsertBefore (import, project.Document.DocumentElement.FirstChild);
+					project.AddNewImport(MonoGameCommonProps, string.Format ("Exists('{0}')", MonoGameCommonProps), project.PropertyGroups.First());
 					needsSave = true;
 				}
 				if (containsMGCB) {
@@ -170,21 +151,25 @@ namespace MonoDevelop.MonoGame
 			return needsSave;
 		}
 
-		public override void LoadProject (MonoDevelop.Core.IProgressMonitor monitor, MonoDevelop.Projects.SolutionEntityItem item, MSBuildProject project)
+		protected override void OnWriteProject(MonoDevelop.Core.ProgressMonitor monitor, MSBuildProject msproject)
 		{
-			var changed = (UpgradeMonoGameProject (monitor, item, project));
-			base.LoadProject (monitor, item, project);
-			if (changed) {
-				project.Save (project.FileName);
+			base.OnWriteProject(monitor, msproject);
+			var changed = UpgradeMonoGameProject (monitor, this, msproject);
+			if (changed)
+			{
+				msproject.Save(msproject.FileName);
+				this.Project.NeedsReload = true;
 			}
 		}
 
-		public override void SaveProject (MonoDevelop.Core.IProgressMonitor monitor, MonoDevelop.Projects.SolutionEntityItem item, MSBuildProject project)
+		protected override void OnReadProject(MonoDevelop.Core.ProgressMonitor monitor, MSBuildProject msproject)
 		{
-			var changed = UpgradeMonoGameProject (monitor, item, project);
-			base.SaveProject (monitor, item, project);
-			if (changed) {
-				this.LoadProject (monitor, item, project);
+			base.OnReadProject (monitor, msproject);
+			var changed = (UpgradeMonoGameProject(monitor, this, msproject));
+			if (changed)
+			{
+				msproject.Save (msproject.FileName);
+				this.Project.NeedsReload = true;
 			}
 		}
 	}

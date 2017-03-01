@@ -7,10 +7,8 @@ namespace TwoMGFX
     {
         public static ShaderData CreateHLSL(byte[] byteCode, bool isVertexShader, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
         {
-            var dxshader = new ShaderData();
-            dxshader.IsVertexShader = isVertexShader;
-            dxshader.SharedIndex = sharedIndex;
-            dxshader.Bytecode = (byte[])byteCode.Clone();
+            var dxshader = new ShaderData(isVertexShader, sharedIndex, byteCode);
+            dxshader._attributes = new Attribute[0];
 
             // Strip the bytecode we're gonna save!
             var stripFlags = SharpDX.D3DCompiler.StripFlags.CompilerStripReflectionData |
@@ -57,6 +55,7 @@ namespace TwoMGFX
 
                             var sampler = new Sampler
                             {
+                                samplerName = string.Empty,
                                 textureSlot = rdesc.BindPoint,
                                 samplerSlot = rdesc.BindPoint,
                                 parameterName = samplerName

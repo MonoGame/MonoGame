@@ -131,14 +131,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+                var elementSizeInBytes = Utilities.ReflectionHelpers.SizeOf<T>.Get();
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 try
                 {
                     var startBytes = startIndex * elementSizeInBytes;
                     var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
-                    var box = new SharpDX.DataBox(dataPtr, 1, 0);
+                    var box = new SharpDX.DataBox(dataPtr, elementCount * elementSizeInBytes, 0);
 
                     var region = new SharpDX.Direct3D11.ResourceRegion();
                     region.Top = 0;
