@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                if (!HasNativeWindow)
+                if (Handle == IntPtr.Zero)
                     return _position;
 
                 int x = 0, y = 0;
@@ -67,11 +67,6 @@ namespace Microsoft.Xna.Framework
         public override IntPtr Handle
         {
             get { return _handle; }
-        }
-
-        private bool HasNativeWindow
-        {
-            get { return Handle != IntPtr.Zero; }
         }
 
         public override string ScreenDeviceName
@@ -110,13 +105,11 @@ namespace Microsoft.Xna.Framework
             _game = game;
             Instance = this;
 
-            var display = GetMouseDisplay();
+            Sdl.Rectangle bounds;
+            var display = GetMouseDisplay(out bounds);
             if (display != -1)
             {
                 _screenDeviceName = Sdl.Display.GetDisplayName(display);
-
-                Sdl.Rectangle bounds;
-                Sdl.Display.GetBounds(display, out bounds);
 
                 var x = bounds.X + (bounds.Width - GraphicsDeviceManager.DefaultBackBufferWidth) / 2;
                 var y = bounds.Y + (bounds.Height - GraphicsDeviceManager.DefaultBackBufferHeight) / 2;
@@ -147,7 +140,7 @@ namespace Microsoft.Xna.Framework
 
         internal void CreateWindow(PresentationParameters pp)
         {
-            if (HasNativeWindow)
+            if (Handle != IntPtr.Zero)
                 Sdl.Window.Destroy(Handle);
 
             _width = pp.BackBufferWidth;
@@ -188,7 +181,7 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
-        private static int GetMouseDisplay()
+        private static int GetMouseDisplay(out Sdl.Rectangle bounds)
         {
             int x, y;
             Sdl.Mouse.GetGlobalState(out x, out y);
@@ -201,9 +194,13 @@ namespace Microsoft.Xna.Framework
 
                 if (x >= rect.X && x < rect.X + rect.Width &&
                     y >= rect.Y && y < rect.Y + rect.Height)
+                {
+                    bounds = rect;
                     return i;
+                }
             }
 
+            bounds = default(Sdl.Rectangle);
             return -1;
         }
 

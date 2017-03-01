@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework {
 
 		public abstract string ScreenDeviceName { get; }
 
-		private string _title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
+	    private string _title;
 
         /// <summary>
         /// Gets or sets the title of the game window.
@@ -79,6 +79,7 @@ namespace Microsoft.Xna.Framework {
 
         protected GameWindow()
         {
+            _title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
             TouchPanelState = new TouchPanelState(this);
         }
 
