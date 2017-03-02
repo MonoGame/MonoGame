@@ -708,7 +708,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var format = PresentationParameters.BackBufferFormat == SurfaceFormat.Color ?
                             SharpDX.DXGI.Format.B8G8R8A8_UNorm :
                             SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
-            SampleDescription multisampleDesc = GetSupportedSampleDescription(format);
+            SampleDescription multisampleDesc = GetSupportedSampleDescription(
+                format, 
+                PresentationParameters.MultiSampleCount);
 
             // If the swap chain already exists... update it.
             if (_swapChain != null)
@@ -838,18 +840,19 @@ namespace Microsoft.Xna.Framework.Graphics
             return Math.Max(quality, 0); // clamp minimum to 0 
         }
 
-        private SampleDescription GetSupportedSampleDescription(Format format)
+        internal SampleDescription GetSupportedSampleDescription(Format format, int multiSampleCount)
         {
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
 
+            multiSampleCount =
+                GetClampedMultisampleCountToSupportedByCurrentDevice
+                    (multiSampleCount);
 
-            if (PresentationParameters.MultiSampleCount > 1)
+            if (multiSampleCount > 1)
             {
-                // NOTE: MultiSampleCount should be already clamped before to supported count 
-                // by ClampMultisampleCountToSupportedByCurrentDevice()
-                var quality = GetMultiSamplingQuality(format, PresentationParameters.MultiSampleCount);
+                var quality = GetMultiSamplingQuality(format, multiSampleCount);
 
-                multisampleDesc.Count = PresentationParameters.MultiSampleCount;
+                multisampleDesc.Count = multiSampleCount;
                 multisampleDesc.Quality = quality;
             }
 

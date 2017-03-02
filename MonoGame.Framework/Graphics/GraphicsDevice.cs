@@ -269,14 +269,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
         void ClampMultisampleCountToSupportedByCurrentDevice()
         {
-            if (PresentationParameters.MultiSampleCount > 1)
+            PresentationParameters.MultiSampleCount =
+                GetClampedMultisampleCountToSupportedByCurrentDevice
+                    (PresentationParameters.MultiSampleCount);
+        }
+        internal int GetClampedMultisampleCountToSupportedByCurrentDevice(
+            int multiSampleCount)
+        {
+            if (multiSampleCount > 1)
             {
                 // Round down MultiSampleCount to the nearest power of two
                 // hack from http://stackoverflow.com/a/2681094
                 // Note: this will return an incorrect, but large value
                 // for very large numbers. That doesn't matter because
                 // the number will get clamped below anyway in this case.
-                var msc = PresentationParameters.MultiSampleCount;
+                var msc = multiSampleCount;
                 msc = msc | (msc >> 1);
                 msc = msc | (msc >> 2);
                 msc = msc | (msc >> 4);
@@ -285,9 +292,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (msc > GraphicsCapabilities.MaxMultiSampleCount)
                     msc = GraphicsCapabilities.MaxMultiSampleCount;
 
-                PresentationParameters.MultiSampleCount = msc;
+                return msc;
             }
-            else PresentationParameters.MultiSampleCount = 0;
+            else return 0;
         }
         internal void Initialize()
         {
