@@ -21,6 +21,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal int width;
 		internal int height;
         internal int ArraySize;
+                
+        internal float TexelWidth { get; private set; }
+        internal float TexelHeight { get; private set; }
+
         /// <summary>
         /// Gets the dimensions of the texture
         /// </summary>
@@ -97,6 +101,9 @@ namespace Microsoft.Xna.Framework.Graphics
             this.GraphicsDevice = graphicsDevice;
             this.width = width;
             this.height = height;
+            this.TexelWidth = 1f / (float)width;
+            this.TexelHeight = 1f / (float)height;
+
             this._format = format;
             this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
             this.ArraySize = arraySize;
@@ -332,8 +339,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     // OpenGL only: The last two mip levels require the width and height to be
                     // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy
                     // a 4x4 block.
-                    checkedRect.Width > 4 ? roundedWidth : checkedRect.Width,
-                    checkedRect.Height > 4 ? roundedHeight : checkedRect.Height);
+                    checkedRect.Width < 4 && textureBounds.Width < 4 ? textureBounds.Width : roundedWidth,
+                    checkedRect.Height < 4 && textureBounds.Height < 4 ? textureBounds.Height : roundedHeight);
 #else
                     roundedWidth, roundedHeight);
 #endif

@@ -49,7 +49,22 @@ namespace TwoMGFX
 		    {
 		        var defines = options.Defines.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var define in defines)
-                    macros.Add(define, "1");
+                {
+                    var name = define;
+                    var value = "1";
+                    if (define.Contains("="))
+                    {
+                        var parts = define.Split('=');
+
+                        if (parts.Length > 0)
+                            name = parts[0].Trim();
+
+                        if (parts.Length > 1)
+                            value = parts[1].Trim();
+                    }
+
+                    macros.Add(name, value);
+                }
 		    }
 
 		    // Use the D3DCompiler to pre-process the file resolving 

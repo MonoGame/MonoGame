@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using Microsoft.Xna.Framework.Utilities;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -120,6 +121,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
+
+        internal event EventHandler<EventArgs> PresentationChanged;
 
         private int _maxVertexBufferSlots;
         internal int MaxTextureSlots;
@@ -567,6 +570,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Update the back buffer.
             OnPresentationChanged();
 
+            if (PresentationChanged != null)
+                PresentationChanged(this, EventArgs.Empty);
             if (DeviceReset != null)
                 DeviceReset(this, EventArgs.Empty);
         }
@@ -1106,6 +1111,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertexDeclaration == null)
                 throw new ArgumentNullException("vertexDeclaration");
 
+            if (vertexDeclaration.VertexStride < ReflectionHelpers.SizeOf<T>.Get())
+                throw new ArgumentOutOfRangeException("vertexDeclaration", "Vertex stride of vertexDeclaration should be at least as big as the stride of the actual vertices.");
+
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
 
             unchecked
@@ -1182,6 +1190,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (vertexDeclaration == null)
                 throw new ArgumentNullException("vertexDeclaration");
+
+            if (vertexDeclaration.VertexStride < ReflectionHelpers.SizeOf<T>.Get())
+                throw new ArgumentOutOfRangeException("vertexDeclaration", "Vertex stride of vertexDeclaration should be at least as big as the stride of the actual vertices.");
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
             

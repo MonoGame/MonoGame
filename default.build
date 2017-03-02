@@ -147,6 +147,11 @@
         <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release\|iPhoneSimulator MonoGame.Framework.iOS.sln" />
         <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release\|iPhoneSimulator MonoGame.Framework.iOS.sln" />
       </if>
+      <if test="${file::exists('/Library/Frameworks/Mono.framework/External/xbuild/Xamarin/TVOS/Xamarin.TVOS.CSharp.targets')}" >
+        <exec program="mono" commandline="Protobuild.exe -generate tvOS" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release\|iPhoneSimulator MonoGame.Framework.tvOS.sln" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release\|iPhoneSimulator MonoGame.Framework.tvOS.sln" />
+      </if>
     </if>
   </target>
 

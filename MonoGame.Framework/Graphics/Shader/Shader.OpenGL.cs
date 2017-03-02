@@ -128,11 +128,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!IsDisposed && _shaderHandle != -1)
             {
                 Threading.BlockOnUIThread(() =>
-                    {
-                        GL.DeleteShader(_shaderHandle);
-                        GraphicsExtensions.CheckGLError();
-                        _shaderHandle = -1;
-                    });
+                {
+                    GL.DeleteShader(_shaderHandle);
+                    GraphicsExtensions.CheckGLError();
+                    _shaderHandle = -1;
+                });
             }
 
             base.Dispose(disposing);

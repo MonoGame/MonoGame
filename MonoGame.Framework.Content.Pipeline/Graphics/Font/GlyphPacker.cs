@@ -59,8 +59,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		static BitmapContent CopyGlyphsToOutput(List<ArrangedGlyph> glyphs, int width, int height)
 		{
             var output = new PixelBitmapContent<Color>(width, height);
-            // Fill the output with non-premultiplied black
-            output.ReplaceColor(Color.Transparent, Color.Black);
 
 			foreach (var glyph in glyphs)
 			{
@@ -69,9 +67,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 				var destinationRegion = new Rectangle(glyph.X + 1, glyph.Y + 1, sourceRegion.Width, sourceRegion.Height);
 
 				BitmapContent.Copy(sourceGlyph.Bitmap, sourceRegion, output, destinationRegion);
-
-				// TODO: This causes artifacts around borders.
-				//BitmapUtils.PadBorderPixels(output, destinationRegion);
 
 				sourceGlyph.Bitmap = output;
 				sourceGlyph.Subrect = destinationRegion;

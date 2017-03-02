@@ -57,7 +57,13 @@ namespace Microsoft.Xna.Framework.Audio
             Size = size;
             Rate = freq;
 
-            duration = TimeSpan.FromSeconds((float)size / freq);
+            var bytesPerSecond = freq;
+            if (format == ALFormat.Mono16 || format == ALFormat.Stereo8)
+                bytesPerSecond *= 2;
+            else if (format == ALFormat.Stereo16)
+                bytesPerSecond *= 4;
+
+            duration = TimeSpan.FromSeconds((float) size / bytesPerSecond);
 #endif
 
 #if MONOMAC || IOS
