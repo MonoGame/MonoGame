@@ -108,9 +108,6 @@ namespace Microsoft.Xna.Framework
                 _winx = display.X + display.Width / 2;
                 _winy = display.Y + display.Height / 2;
             }
-            
-            Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
-            Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
             using (
                 var stream =
