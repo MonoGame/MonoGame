@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using SharpDX.Direct3D11;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -10,7 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal SharpDX.Direct3D11.Resource _texture;
 
-        private SharpDX.Direct3D11.ShaderResourceView _resourceView;
+        protected internal SharpDX.Direct3D11.ShaderResourceView resourceView;
 
         /// <summary>
         /// Gets the handle to a shared resource.
@@ -27,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal abstract SharpDX.Direct3D11.Resource CreateTexture();
 
-        internal SharpDX.Direct3D11.Resource GetTexture()
+        internal virtual SharpDX.Direct3D11.Resource GetTexture()
         {
             if (_texture == null)
                 _texture = CreateTexture();
@@ -35,17 +36,17 @@ namespace Microsoft.Xna.Framework.Graphics
             return _texture;
         }
 
-        internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
+        internal virtual SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
         {
-            if (_resourceView == null)
-                _resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
+            if (resourceView == null)
+                resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
 
-            return _resourceView;
+            return resourceView;
         }
 
         private void PlatformGraphicsDeviceResetting()
         {
-            SharpDX.Utilities.Dispose(ref _resourceView);
+            SharpDX.Utilities.Dispose(ref resourceView);
             SharpDX.Utilities.Dispose(ref _texture);
         }
 
@@ -53,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (disposing)
             {
-                SharpDX.Utilities.Dispose(ref _resourceView);
+                SharpDX.Utilities.Dispose(ref resourceView);
                 SharpDX.Utilities.Dispose(ref _texture);
             }
 

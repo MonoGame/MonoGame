@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using Resource = SharpDX.Direct3D11.Resource;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -10,6 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal RenderTargetView[] _renderTargetViews;
         internal DepthStencilView _depthStencilView;
+        private RenderTarget2D _resolvedTexture;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
@@ -123,6 +126,73 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             GenerateIfRequired();
             return _depthStencilView;
+        }
+
+        protected internal override SampleDescription CreateSampleDescription()
+        {
+            return this.GraphicsDevice.GetSupportedSampleDescription
+                (SharpDXHelper.ToFormat(this._format), this.MultiSampleCount);
+        }
+
+        internal void ResolveSubresource()
+        {
+            GraphicsDevice._d3dContext.ResolveSubresource(this._texture, 0, _resolvedTexture._texture, 0,
+                SharpDXHelper.ToFormat(_format));
+        }
+
+        internal override Resource CreateTexture()
+        {
+            var rt = base.CreateTexture();
+
+            // MSAA RT needs another non-MSAA texture where it is resolved
+            if (sampleDescription.Count > 1)
+            {
+                _resolvedTexture = new RenderTarget2D(
+                    GraphicsDevice,
+                    Width,
+                    Height,
+                    mipmap,
+                    Format,
+                    DepthStencilFormat,
+                    1,
+                    RenderTargetUsage,
+                    shared,
+                    ArraySize);
+            }
+
+            return rt;
+        }
+
+        internal override ShaderResourceView GetShaderResourceView()
+        {
+            if (MultiSampleCount > 1)
+            {
+                if (resourceView == null)
+                    resourceView = new SharpDX.Direct3D11.ShaderResourceView
+                        (GraphicsDevice._d3dDevice, _resolvedTexture.GetTexture());
+
+                return resourceView;
+            }
+            else return base.GetShaderResourceView();
+        }
+
+        protected internal override Texture2DDescription GetTexture2DDescription()
+        {
+            var desc = base.GetTexture2DDescription();
+
+            desc.BindFlags |= BindFlags.RenderTarget;
+            if (desc.SampleDescription.Count > 1)
+                desc.BindFlags &= ~BindFlags.ShaderResource;
+
+            if (mipmap)
+            {
+                // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
+                // because generation of mipmaps is not supported on the Xbox 360.
+                // TODO: New method Texture.GenerateMipMaps() required.
+                desc.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
+            }
+
+            return desc;
         }
     }
 }
