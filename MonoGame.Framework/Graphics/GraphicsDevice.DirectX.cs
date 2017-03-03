@@ -671,6 +671,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void CreateSizeDependentResources()
         {
+            // Clamp MultiSampleCount
+            PresentationParameters.MultiSampleCount =
+                GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
+
             _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null,
                                                 (SharpDX.Direct3D11.RenderTargetView)null);
 
@@ -846,9 +850,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
 
-            multiSampleCount =
-                GetClampedMultisampleCountToSupportedByCurrentDevice
-                    (multiSampleCount);
+            multiSampleCount = GetClampedMultisampleCount(multiSampleCount);
 
             if (multiSampleCount > 1)
             {

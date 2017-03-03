@@ -267,13 +267,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
-        void ClampMultisampleCountToSupportedByCurrentDevice()
-        {
-            PresentationParameters.MultiSampleCount =
-                GetClampedMultisampleCountToSupportedByCurrentDevice
-                    (PresentationParameters.MultiSampleCount);
-        }
-        internal int GetClampedMultisampleCountToSupportedByCurrentDevice(
+        private int GetClampedMultisampleCount(
             int multiSampleCount)
         {
             if (multiSampleCount > 1)
@@ -298,7 +292,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         internal void Initialize()
         {
-            ClampMultisampleCountToSupportedByCurrentDevice();
             PlatformInitialize();
 
             // Force set the default render states.
@@ -593,8 +586,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
-
-            ClampMultisampleCountToSupportedByCurrentDevice();
 
             // Update the back buffer.
             OnPresentationChanged();
