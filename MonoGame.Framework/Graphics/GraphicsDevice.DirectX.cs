@@ -1073,7 +1073,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Resolve MSAA render targets
                 var renderTarget = renderTargetBinding.RenderTarget as RenderTarget2D;
-                if (renderTarget != null && renderTarget.MultiSampleCount > 0)
+                if (renderTarget != null && renderTarget.MultiSampleCount > 1)
                     renderTarget.ResolveSubresource();
 
                 // Generate mipmaps.
