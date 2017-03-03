@@ -491,5 +491,58 @@ namespace MonoGame.Tests.Graphics
             tex.Dispose();
             spriteBatch.Dispose();
         }
+
+        [Test]
+        public void UnsupportedMultiSampleCountDoesNotThrowException()
+        {
+            gdm.PreferMultiSampling = true;
+
+            gdm.PreparingDeviceSettings += (sender, args) =>
+            {
+                var pp = args.GraphicsDeviceInformation.PresentationParameters;
+                pp.MultiSampleCount = 33; // Set too high. In DX11 is max 32.
+            };
+
+            Assert.DoesNotThrow(()=>gdm.ApplyChanges(), "GraphicDeviceManager.ApplyChanges()");
+            Assert.DoesNotThrow(() =>
+            {
+                var pp = gdm.GraphicsDevice.PresentationParameters.Clone();
+                pp.MultiSampleCount = 10000; // Set too high. In DX11 is max 32.
+                gdm.GraphicsDevice.Reset(pp);
+            }, "GraphicsDevice.Reset(PresentationParameters)");
+        }
+
+#if DIRECTX
+        [Test]
+        public void TooHighMultiSampleCountClampedToMaxSupported()
+        {
+            gdm.PreferMultiSampling = true;
+
+            gdm.PreparingDeviceSettings += (sender, args) =>
+            {
+                var pp1 = args.GraphicsDeviceInformation.PresentationParameters;
+                pp1.MultiSampleCount = 33;
+            };
+            gdm.ApplyChanges();
+
+            // Reference device supports 32 samples
+            Assert.AreEqual
+                (gdm.GraphicsDevice.PresentationParameters.MultiSampleCount, 32);
+
+            // Test again for GraphicsDevice.Reset(PresentationParameters)
+            var pp2 = gdm.GraphicsDevice.PresentationParameters.Clone();
+            pp2.MultiSampleCount = 0;
+            gdm.GraphicsDevice.Reset(pp2);
+            Assert.AreEqual
+                (gdm.GraphicsDevice.PresentationParameters.MultiSampleCount, 0);
+            var pp3 = gdm.GraphicsDevice.PresentationParameters.Clone();
+            pp3.MultiSampleCount = 500; // Set too high. In DX11 is max 32.
+            gdm.GraphicsDevice.Reset(pp3);
+            // Reference device supports 32 samples
+            Assert.AreEqual
+                (gdm.GraphicsDevice.PresentationParameters.MultiSampleCount, 32);
+            
+        }
+#endif
     }
 }

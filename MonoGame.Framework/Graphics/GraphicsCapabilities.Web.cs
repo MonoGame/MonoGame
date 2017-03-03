@@ -13,9 +13,5 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        private void PlatformInitializeAfterResources(GraphicsDevice device)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
