@@ -261,8 +261,9 @@ Section "Visual Studio 2017 Templates" VS2017
   InstallTemplates:
     SetOutPath "$DOCUMENTS\Visual Studio 2017\Templates\ProjectTemplates\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
-    File /r '..\..\ProjectTemplates\VisualStudio2013\WindowsPhone8.1.zip'
-    File /r '..\..\ProjectTemplates\VisualStudio2015\*.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2013\MonoGameShared.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2015\WindowsUniversal10.VB.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2017\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
     DetailPrint "Visual Studio 2017 not found"
