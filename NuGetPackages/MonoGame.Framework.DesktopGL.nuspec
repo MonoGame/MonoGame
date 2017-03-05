@@ -18,9 +18,20 @@
         <language>en-US</language>
     </metadata>
     <files>
-        <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
-        <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
-        <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll.config" target="content\net40\MonoGame.Framework.dll.config" />
+        <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />
+        <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net45\MonoGame.Framework.xml" />
+        <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll.config" target="content\net45\MonoGame.Framework.dll.config" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
+        <file src="..\..\NuGetPackages\build\MonoGame.Framework.Native.targets" target="build\MonoGame.Framework.DesktopGL.targets" />
+        <file src="..\..\ThirdParty\Dependencies\openal-soft\Linux\x64\*" target="build\x64" />
+        <file src="..\..\ThirdParty\Dependencies\openal-soft\Linux\x86\*" target="build\x86" />
+        <file src="..\..\ThirdParty\Dependencies\openal-soft\Windows\x64\*" target="build\x64" />
+        <file src="..\..\ThirdParty\Dependencies\openal-soft\Windows\x86\*" target="build\x86" />
+        <file src="..\..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\*" target="build" />
+        <file src="..\..\ThirdParty\Dependencies\SDL\Linux\x64\*" target="build\x64" />
+        <file src="..\..\ThirdParty\Dependencies\SDL\Linux\x86\*" target="build\x86" />
+        <file src="..\..\ThirdParty\Dependencies\SDL\Windows\x64\*" target="build\x64" />
+        <file src="..\..\ThirdParty\Dependencies\SDL\Windows\x86\*" target="build\x86" />
+        <file src="..\..\ThirdParty\Dependencies\SDL\MacOS\Universal\*" target="build" />
     </files>
 </package>
