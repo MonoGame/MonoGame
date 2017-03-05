@@ -104,8 +104,6 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
         private List<int> availableSourcesCollection;
         private List<int> inUseSourcesCollection;
-        private bool _bSoundAvailable = false;
-        private Exception _SoundInitException; // Here to bubble back up to the developer
         bool _isDisposed;
         public bool SupportsADPCM = false;
 
@@ -118,13 +116,13 @@ namespace Microsoft.Xna.Framework.Audio
             // On Windows, set the DLL search path for correct native binaries
             NativeHelper.InitDllDirectory();
 #endif
-            
+
             if (!OpenSoundController())
             {
-                return;
+                throw new NoAudioHardwareException("OpenAL device could not be initialized, see console output for details.");
             }
+
             // We have hardware here and it is ready
-            _bSoundAvailable = true;
 
 			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
 			AL.GenSources(allSourcesArray);
@@ -164,15 +162,17 @@ namespace Microsoft.Xna.Framework.Audio
                 EffectsExtension.device = _device;
 #endif
             }
+            catch (DllNotFoundException ex)
+            {
+                throw ex;
+            }
             catch (Exception ex)
             {
-                _SoundInitException = ex;
-                return (false);
+                throw new NoAudioHardwareException("OpenAL device could not be initialized.", ex);
             }
-            if (CheckALError("Could not open AL device"))
-            {
-                return(false);
-            }
+
+            CheckALError("Could not open AL device");
+
             if (_device != IntPtr.Zero)
             {
 #if ANDROID
@@ -275,20 +275,12 @@ namespace Microsoft.Xna.Framework.Audio
                 _oggstreamer = new OggStreamer();
 #endif
 
-                if (CheckALError("Could not create AL context"))
-                {
-                    CleanUpOpenAL();
-                    return(false);
-                }
+                CheckALError("Could not create AL context");
 
                 if (_context != NullContext)
                 {
                     Alc.MakeContextCurrent(_context);
-                    if (CheckALError("Could not make AL context current"))
-                    {
-                        CleanUpOpenAL();
-                        return(false);
-                    }
+                    CheckALError("Could not make AL context current");
                     SupportsADPCM = AL.IsExtensionPresent ("AL_SOFT_MSADPCM");
                     return (true);
                 }
@@ -328,24 +320,24 @@ namespace Microsoft.Xna.Framework.Audio
 
         /// <summary>
         /// Checks the error state of the OpenAL driver. If a value that is not AlcError.NoError
-        /// is returned, then the operation message and the error code is output to the console.
+        /// is returned, then the operation message and the error code is thrown in an Exception.
         /// </summary>
         /// <param name="operation">the operation message</param>
-        /// <returns>true if an error occurs, and false if not.</returns>
-		public bool CheckALError (string operation)
+		public void CheckALError (string operation)
 		{
 			_lastOpenALError = Alc.GetError (_device);
 
-			if (_lastOpenALError == AlcError.NoError) {
-				return(false);
-			}
+			if (_lastOpenALError == AlcError.NoError)
+				return;			
+
+            CleanUpOpenAL();
 
 			string errorFmt = "OpenAL Error: {0}";
-			Console.WriteLine (String.Format ("{0} - {1}",
-							operation,
-							//string.Format (errorFmt, Alc.GetString (_device, _lastOpenALError))));
-							string.Format (errorFmt, _lastOpenALError)));
-            return (true);
+
+            throw new NoAudioHardwareException(String.Format("{0} - {1}",
+                            operation,
+                            //string.Format (errorFmt, Alc.GetString (_device, _lastOpenALError))));
+                            string.Format(errorFmt, _lastOpenALError)));
 		}
 
         /// <summary>
@@ -365,8 +357,6 @@ namespace Microsoft.Xna.Framework.Audio
                 Alc.CloseDevice (_device);
                 _device = IntPtr.Zero;
             }
-
-            _bSoundAvailable = false;
         }
 
         /// <summary>
@@ -388,23 +378,20 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (disposing)
                 {
-                    if (_bSoundAvailable)
-                    {
 #if DESKTOPGL
-                        if(_oggstreamer != null)
-                            _oggstreamer.Dispose();
+                    if(_oggstreamer != null)
+                        _oggstreamer.Dispose();
 #endif
-                        for (int i = 0; i < allSourcesArray.Length; i++)
-                        {
-                            AL.DeleteSource(allSourcesArray[i]);
-                            ALHelper.CheckError("Failed to delete source.");
-                        }
-#if SUPPORTS_EFX
-                        if (Filter != 0 && Efx.IsInitialized)
-                            Efx.DeleteFilter (Filter);
-#endif
-                        CleanUpOpenAL();
+                    for (int i = 0; i < allSourcesArray.Length; i++)
+                    {
+                        AL.DeleteSource(allSourcesArray[i]);
+                        ALHelper.CheckError("Failed to delete source.");
                     }
+#if SUPPORTS_EFX
+                    if (Filter != 0 && Efx.IsInitialized)
+                        Efx.DeleteFilter (Filter);
+#endif
+                    CleanUpOpenAL();                    
                 }
                 _isDisposed = true;
             }
@@ -418,11 +405,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// <returns>The source number of the reserved sound buffer.</returns>
 		public int ReserveSource()
 		{
-            if (!CheckInitState())
-            {
-                throw new InstancePlayLimitException();
-            }
-
             int sourceNumber;
 
             lock (availableSourcesCollection)
@@ -442,11 +424,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void RecycleSource(int sourceId)
 		{
-            if (!CheckInitState())
-            {
-                return;
-            }
-
             lock (availableSourcesCollection)
             {
                 inUseSourcesCollection.Remove(sourceId);
@@ -462,33 +439,8 @@ namespace Microsoft.Xna.Framework.Audio
             inst.SoundState = SoundState.Stopped;
 		}
 
-        /// <summary>
-        /// Checks if the AL controller was initialized properly. If there was an
-        /// exception thrown during the OpenAL init, then that exception is thrown
-        /// inside of NoAudioHardwareException.
-        /// </summary>
-        /// <returns>True if the controller was initialized, false if not.</returns>
-        internal bool CheckInitState()
-        {
-            if (!_bSoundAvailable)
-            {
-                if (_SoundInitException != null)
-                {
-                    Exception e = _SoundInitException;
-                    _SoundInitException = null;
-                    throw new NoAudioHardwareException("No audio hardware available.", e);
-                }
-                return (false);
-            }
-            return (true);
-        }
-
         public double SourceCurrentPosition (int sourceId)
 		{
-            if (!CheckInitState())
-            {
-                return(0.0);
-            }
             int pos;
 			AL.GetSource (sourceId, ALGetSourcei.SampleOffset, out pos);
             ALHelper.CheckError("Failed to set source offset.");
