@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // Convert to FreeImage bitmap
             var bytes = src.GetPixelData();
-            var fi = FreeImage.ConvertFromRawBits(bytes, src.Width, src.Height, SurfaceFormat.Vector4.GetSize() * src.Width, 128, 0, 0, 0, true);
+            var fi = FreeImage.ConvertFromRawBits(bytes, FREE_IMAGE_TYPE.FIT_RGBAF, src.Width, src.Height, SurfaceFormat.Vector4.GetSize() * src.Width, 128, 0, 0, 0, true);
 
             // Resize
             var newfi = FreeImage.Rescale(fi, newWidth, newHeight, FREE_IMAGE_FILTER.FILTER_BICUBIC);

@@ -92,7 +92,7 @@ namespace FreeImageAPI
         FICC_PHASE
     }
 
-    public class FreeImage
+    partial class FreeImage
     {
         private const string NativeLibName = "FreeImage";
 
@@ -171,5 +171,14 @@ namespace FreeImageAPI
 
         [DllImport(NativeLibName, EntryPoint = "FreeImage_GetBlueMask")]
         public static extern uint GetBlueMask(IntPtr dib);
+
+        [DllImport(NativeLibName, EntryPoint = "FreeImage_AllocateT")]
+        public static extern IntPtr AllocateT(FREE_IMAGE_TYPE type, int width, int height, int bpp, uint red_mask, uint green_mask, uint blue_mask);
+
+        [DllImport(NativeLibName, EntryPoint = "FreeImage_GetScanLine")]
+        public static extern IntPtr GetScanLine(IntPtr dib, int scanline);
+
+        [DllImport(NativeLibName, EntryPoint = "FreeImage_GetLine")]
+        public static extern uint GetLine(IntPtr dib);
     }
 }
