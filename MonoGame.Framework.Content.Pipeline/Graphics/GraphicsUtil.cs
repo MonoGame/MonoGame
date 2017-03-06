@@ -26,18 +26,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // Convert to FreeImage bitmap
             var bytes = src.GetPixelData();
-            var fi = FreeImage.ConvertFromRawBits(bytes, FREE_IMAGE_TYPE.FIT_RGBAF, src.Width, src.Height, SurfaceFormat.Vector4.GetSize() * src.Width, 128, 0, 0, 0, true);
+            var fi = FreeImage.ConvertFromRawBits(bytes, src.Width, src.Height, SurfaceFormat.Vector4.GetSize() * src.Width, 128, 0, 0, 0, true);
 
             // Resize
             var newfi = FreeImage.Rescale(fi, newWidth, newHeight, FREE_IMAGE_FILTER.FILTER_BICUBIC);
-            FreeImage.UnloadEx(ref fi);
+            FreeImage.Unload(fi);
 
             // Convert back to PixelBitmapContent<Vector4>
             src = new PixelBitmapContent<Vector4>(newWidth, newHeight);
             bytes = new byte[SurfaceFormat.Vector4.GetSize() * newWidth * newHeight];
             FreeImage.ConvertToRawBits(bytes, newfi, SurfaceFormat.Vector4.GetSize() * newWidth, 128, 0, 0, 0, true);
             src.SetPixelData(bytes);
-            FreeImage.UnloadEx(ref newfi);
+            FreeImage.Unload(newfi);
             // Convert back to source type if required
             if (format != SurfaceFormat.Vector4)
             {
