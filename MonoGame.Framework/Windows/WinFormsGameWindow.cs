@@ -209,7 +209,6 @@ namespace MonoGame.Framework
             }
             finally
             {
-				// On success or failure, release write lock
                 _allWindowsReaderWriterLockSlim.ExitWriteLock();
             }
         }
@@ -217,8 +216,6 @@ namespace MonoGame.Framework
 		// Make aware all other windows of this window's departure
         private void UnregisterFromAllWindows()
         {
-
-			// Acquire lock
             _allWindowsReaderWriterLockSlim.EnterWriteLock();
 
             try
@@ -228,7 +225,6 @@ namespace MonoGame.Framework
             }
             finally
             {
-				// On success or failure, release write lock
                 _allWindowsReaderWriterLockSlim.ExitWriteLock();
             }
         }
@@ -403,7 +399,7 @@ namespace MonoGame.Framework
         internal void UpdateWindows()
         {
 
-			// Acquire lock
+			// Acquire lock (Same one used to register/unregister windows)
             _allWindowsReaderWriterLockSlim.EnterReadLock();
 
             try
@@ -415,7 +411,6 @@ namespace MonoGame.Framework
             }
             finally
             {
-				// On success or failure, release lock
                 _allWindowsReaderWriterLockSlim.ExitReadLock();
             }
         }
