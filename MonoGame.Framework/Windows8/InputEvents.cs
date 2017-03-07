@@ -21,6 +21,7 @@ namespace Microsoft.Xna.Framework
     {
         private readonly TouchQueue _touchQueue;
 
+        // To convert from DIPs (device independent pixels) to actual screen resolution pixels.
         private static float _currentDipFactor;
 
         public InputEvents(CoreWindow window, UIElement inputElement, TouchQueue touchQueue)
@@ -151,7 +152,6 @@ namespace Microsoft.Xna.Framework
 
         private void PointerPressed(PointerPoint pointerPoint, UIElement target, Pointer pointer)
         {
-            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * _currentDipFactor;
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
@@ -171,7 +171,6 @@ namespace Microsoft.Xna.Framework
 
         private void PointerMoved(PointerPoint pointerPoint)
         {
-            // To convert from DIPs (device independent pixels) to actual screen resolution pixels.
             var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * _currentDipFactor;
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
@@ -191,7 +190,6 @@ namespace Microsoft.Xna.Framework
 
         private void PointerReleased(PointerPoint pointerPoint, UIElement target, Pointer pointer)
         {
-            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * _currentDipFactor;
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
@@ -211,7 +209,6 @@ namespace Microsoft.Xna.Framework
 
         private static void UpdateMouse(PointerPoint point)
         {
-            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var x = (int)(point.Position.X * _currentDipFactor);
             var y = (int)(point.Position.Y * _currentDipFactor);
 
