@@ -21,6 +21,8 @@ namespace Microsoft.Xna.Framework
     {
         private readonly TouchQueue _touchQueue;
 
+        private static float _currentDipFactor;
+
         public InputEvents(CoreWindow window, UIElement inputElement, TouchQueue touchQueue)
         {
             _touchQueue = touchQueue;
@@ -32,6 +34,9 @@ namespace Microsoft.Xna.Framework
             window.VisibilityChanged += CoreWindow_VisibilityChanged;
             window.Activated += CoreWindow_Activated;
             window.SizeChanged += CoreWindow_SizeChanged;
+
+            DisplayInformation.GetForCurrentView().DpiChanged += InputEvents_DpiChanged;
+            _currentDipFactor = DisplayInformation.GetForCurrentView().LogicalDpi / 96.0f;
 
             if (inputElement is SwapChainPanel || inputElement is SwapChainBackgroundPanel)
             {
@@ -72,6 +77,11 @@ namespace Microsoft.Xna.Framework
                 window.PointerMoved += CoreWindow_PointerMoved;
                 window.PointerWheelChanged += CoreWindow_PointerWheelChanged;
             }
+        }
+
+        private void InputEvents_DpiChanged(DisplayInformation sender, object args)
+        {
+            _currentDipFactor = DisplayInformation.GetForCurrentView().LogicalDpi / 96.0f;
         }
 
         #region UIElement Events
@@ -142,8 +152,7 @@ namespace Microsoft.Xna.Framework
         private void PointerPressed(PointerPoint pointerPoint, UIElement target, Pointer pointer)
         {
             // To convert from DIPs (device independent pixels) to screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
+            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * _currentDipFactor;
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
 
@@ -163,8 +172,7 @@ namespace Microsoft.Xna.Framework
         private void PointerMoved(PointerPoint pointerPoint)
         {
             // To convert from DIPs (device independent pixels) to actual screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
+            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * _currentDipFactor;
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
             var touchIsDown = pointerPoint.IsInContact;
@@ -184,8 +192,7 @@ namespace Microsoft.Xna.Framework
         private void PointerReleased(PointerPoint pointerPoint, UIElement target, Pointer pointer)
         {
             // To convert from DIPs (device independent pixels) to screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
+            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * _currentDipFactor;
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
 
@@ -205,9 +212,8 @@ namespace Microsoft.Xna.Framework
         private static void UpdateMouse(PointerPoint point)
         {
             // To convert from DIPs (device independent pixels) to screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            var x = (int)(point.Position.X * dipFactor);
-            var y = (int)(point.Position.Y * dipFactor);
+            var x = (int)(point.Position.X * _currentDipFactor);
+            var y = (int)(point.Position.Y * _currentDipFactor);
 
             var state = point.Properties;
 
