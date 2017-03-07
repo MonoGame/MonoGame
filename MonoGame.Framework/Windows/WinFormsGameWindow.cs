@@ -32,6 +32,7 @@ namespace MonoGame.Framework
 
         private WinFormsGamePlatform _platform;
 
+		//Define booleans for 4 binary properties of the window
         private bool _isResizable;
 
         private bool _isBorderless;
