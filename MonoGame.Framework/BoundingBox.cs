@@ -7,6 +7,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
+
+/// <summary>
+/// Defines a box in 3D-space
+/// </summary>
+
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
@@ -40,9 +45,17 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
+
+        /// <summary>
+        /// Determines the <see cref="ContainmentType"/> between this <see cref="BoundingBox"/> and another.
+        /// </summary>
+        /// <param name="box">The <see cref="BoundingBox"/> to compare to.</param>
+        /// <returns>The <see cref="ContainmentType"/> relationship between the two objects.</returns>
         public ContainmentType Contains(BoundingBox box)
         {
-            //test if all corner is in the same side of a face by just checking min and max
+            // If, in any dimension: the other box's MAX is less than this box's MIN, OR
+            //                       the other box's MIN is is more than this box's MAX
+            //                    then the two must be disjoint
             if (box.Max.X < Min.X
                 || box.Min.X > Max.X
                 || box.Max.Y < Min.Y
@@ -51,7 +64,7 @@ namespace Microsoft.Xna.Framework
                 || box.Min.Z > Max.Z)
                 return ContainmentType.Disjoint;
 
-
+            // Apply DeMorgan's property to the "disjoint" condition above to arrive at the "contains" condition:
             if (box.Min.X >= Min.X
                 && box.Max.X <= Max.X
                 && box.Min.Y >= Min.Y
@@ -60,14 +73,25 @@ namespace Microsoft.Xna.Framework
                 && box.Max.Z <= Max.Z)
                 return ContainmentType.Contains;
 
+            // Not disjoint and not containing -> intersecting
             return ContainmentType.Intersects;
         }
 
+        /// <summary>
+        /// Determines the <see cref="ContainmentType"/> between this <see cref="BoundingBox"/> and another, putting the result in the <see cref="ContainmentType"/> parameter.
+        /// </summary>
+        /// <param name="box">The <see cref="BoundingBox"/> to compare to.</param>
+        /// <param name="result">The <see cref="ContainmentType"/> to store the result in.</param>
         public void Contains(ref BoundingBox box, out ContainmentType result)
         {
             result = Contains(box);
         }
 
+        /// <summary>
+        /// Determines the <see cref="ContainmentType"/> between this <see cref="BoundingBox"/> and a given <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <param name="frustum">The <see cref="BoundingFrustum"/> to compare to.</param>
+        /// <returns>The <see cref="ContainmentType"/> relationship between the two objects.</returns>
         public ContainmentType Contains(BoundingFrustum frustum)
         {
             //TODO: bad done here need a fix. 
@@ -107,8 +131,16 @@ namespace Microsoft.Xna.Framework
             return ContainmentType.Contains;
         }
 
+        /// <summary>
+        /// Determines the <see cref="ContainmentType"/> between this <see cref="BoundingBox"/> and a <see cref="BoundingSphere"/>.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingSphere"/> to compare to.</param>
+        /// <returns>The <see cref="ContainmentType"/> relationship between the two objects.</returns>
         public ContainmentType Contains(BoundingSphere sphere)
         {
+            // A box contains a sphere if:
+            //     The box's minimum, in every dimension, is less than the sphere's center minus its radius, AND
+            //     The box's maximum, in every dimension, is more than the sphere's center plus it radius
             if (sphere.Center.X - Min.X >= sphere.Radius
                 && sphere.Center.Y - Min.Y >= sphere.Radius
                 && sphere.Center.Z - Min.Z >= sphere.Radius
@@ -117,8 +149,14 @@ namespace Microsoft.Xna.Framework
                 && Max.Z - sphere.Center.Z >= sphere.Radius)
                 return ContainmentType.Contains;
 
+            // If we get here, we know the sphere is not entirely contained within the box
+
+            // For in-depth explanation, see: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
+            //                           and: www.mrtc.mdh.se/projects/3Dgraphics/paperF.pdf
+
             double dmin = 0;
 
+            // Dimension X
             double e = sphere.Center.X - Min.X;
             if (e < 0)
             {
@@ -141,6 +179,7 @@ namespace Microsoft.Xna.Framework
                 }
             }
 
+            // Dimension Y
             e = sphere.Center.Y - Min.Y;
             if (e < 0)
             {
@@ -163,6 +202,7 @@ namespace Microsoft.Xna.Framework
                 }
             }
 
+            // Dimension Z
             e = sphere.Center.Z - Min.Z;
             if (e < 0)
             {
@@ -191,11 +231,21 @@ namespace Microsoft.Xna.Framework
             return ContainmentType.Disjoint;
         }
 
+        /// <summary>
+        /// Determines the <see cref="ContainmentType"/> between this <see cref="BoundingBox"/> and a <see cref="BoundingSphere"/>, putting the result in the <see cref="ContainmentType"/> parameter.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingSphere"/> to compare to.</param>
+        /// <param name="result">The <see cref="ContainmentType"/> to store the result in.</param>
         public void Contains(ref BoundingSphere sphere, out ContainmentType result)
         {
             result = this.Contains(sphere);
         }
 
+        /// <summary>
+        /// Determines if a given <see cref="Vector3"/> is contained by the <see cref="ContainmentType"/>.
+        /// </summary>
+        /// <param name="point">The <see cref="Vector3"/> to compare to.</param>
+        /// <returns>The <see cref="ContainmentType"/> relationship between the two objects.</returns>
         public ContainmentType Contains(Vector3 point)
         {
             ContainmentType result;
@@ -203,9 +253,15 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+
+        /// <summary>
+        /// Determines if a given <see cref="Vector3"/> is contained by this <see cref="BoundingBox"/>, putting the result in the <see cref="ContainmentType"/> parameter.
+        /// </summary>
+        /// <param name="point">The <see cref="Vector3"/> to compare to.</param>
+        /// <param name="result">The <see cref="ContainmentType"/> to store the result in.</param>
         public void Contains(ref Vector3 point, out ContainmentType result)
         {
-            //first we get if point is out of box
+            // First we get if point is out of box
             if (point.X < this.Min.X
                 || point.X > this.Max.X
                 || point.Y < this.Min.Y
@@ -238,6 +294,8 @@ namespace Microsoft.Xna.Framework
             var empty = true;
             var minVec = MaxVector3;
             var maxVec = MinVector3;
+
+            // Global min/max must contain all points within the cloud
             foreach (var ptVector in points)
             {
                 minVec.X = (minVec.X < ptVector.X) ? minVec.X : ptVector.X;
@@ -256,6 +314,11 @@ namespace Microsoft.Xna.Framework
             return new BoundingBox(minVec, maxVec);
         }
 
+        /// <summary>
+        /// Create a bounding box that perfectly contains a given sphere.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingSphere"/> to base the box upon.</param>
+        /// <returns>A bounding box that encapsulates the given sphere</returns>
         public static BoundingBox CreateFromSphere(BoundingSphere sphere)
         {
             BoundingBox result;
@@ -263,6 +326,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Create a bounding box given a sphere, putting resulting bounding box in the given <see cref="BoundingBox"/> parameter.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingSphere"/> to base the box upon.</param>
+        /// <param name="BoundingBox">The <see cref="BoundingBox"/> to put the result in.</param>
         public static void CreateFromSphere(ref BoundingSphere sphere, out BoundingBox result)
         {
             var corner = new Vector3(sphere.Radius);
@@ -270,6 +338,12 @@ namespace Microsoft.Xna.Framework
             result.Max = sphere.Center + corner;
         }
 
+        /// <summary>
+        /// Create a bounding box that contains two given bounding boxes.
+        /// </summary>
+        /// <param name="original">The first <see cref="BoundingBox"/>.</param>
+        /// <param name="additional">The second <see cref="BoundingBox"/>.</param>
+        /// <returns>A bounding box that contains both given boxes</returns>
         public static BoundingBox CreateMerged(BoundingBox original, BoundingBox additional)
         {
             BoundingBox result;
@@ -277,8 +351,15 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Create a bounding box that contains two given bounding boxes, putting the result in the result <see cref="BoundingBox"/> parameter.
+        /// </summary>
+        /// <param name="original">The first <see cref="BoundingBox"/>.</param>
+        /// <param name="additional">The second <see cref="BoundingBox"/>.</param>
+        /// <param name="result">The <see cref="BoundingBox"/> to store the result in.</param>
         public static void CreateMerged(ref BoundingBox original, ref BoundingBox additional, out BoundingBox result)
         {
+            // For each dimension, set the min/max to the extreme of either boxes
             result.Min.X = Math.Min(original.Min.X, additional.Min.X);
             result.Min.Y = Math.Min(original.Min.Y, additional.Min.Y);
             result.Min.Z = Math.Min(original.Min.Z, additional.Min.Z);
@@ -287,6 +368,11 @@ namespace Microsoft.Xna.Framework
             result.Max.Z = Math.Max(original.Max.Z, additional.Max.Z);
         }
 
+        /// <summary>
+        /// Evaluates equality between two boxes
+        /// </summary>
+        /// <param name="original">The bounding box to compare to.</param>
+        /// <returns>True is boxes are equal, false otherwise.</returns>
         public bool Equals(BoundingBox other)
         {
             return (this.Min == other.Min) && (this.Max == other.Max);
@@ -297,6 +383,10 @@ namespace Microsoft.Xna.Framework
             return (obj is BoundingBox) ? this.Equals((BoundingBox)obj) : false;
         }
 
+        /// <summary>
+        /// Gets the box's corners.
+        /// </summary>
+        /// <returns>A 1-dimensional array of <see cref="Vector3"/>.</returns>
         public Vector3[] GetCorners()
         {
             return new Vector3[] {
@@ -311,6 +401,12 @@ namespace Microsoft.Xna.Framework
             };
         }
 
+        /// <summary>
+        /// Gets the box's corners, and stores them in the given array.
+        /// </summary>
+        /// <param name="corners">The array of 3-dimensional vectors (<see cref="Vector3"/>) to store the corners in</param>
+        /// <exception cref="ArgumentNullException">Thrown if the input array was not instantiated.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the input array has less than 8 elements (Box has 8 corners)</exception>
         public void GetCorners(Vector3[] corners)
         {
             if (corners == null)
