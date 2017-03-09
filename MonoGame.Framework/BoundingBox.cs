@@ -448,6 +448,11 @@ namespace Microsoft.Xna.Framework
             return this.Min.GetHashCode() + this.Max.GetHashCode();
         }
 
+        /// <summary>
+        /// Determines if this <see cref="BoundingBox"> intersects with another.
+        /// </summary>
+        /// <param name="box">The box to test against</param>
+        /// <returns>True if the boxes intersect, false otherwise</returns>
         public bool Intersects(BoundingBox box)
         {
             bool result;
@@ -455,20 +460,25 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Determines if this <see cref="BoundingBox"> intersects with another, placing the result in the "result" parameter
+        /// </summary>
+        /// <param name="box">The box to test against</param>
+        /// <param name="result">The boolean in which to place the result</param>
         public void Intersects(ref BoundingBox box, out bool result)
         {
             if ((this.Max.X >= box.Min.X) && (this.Min.X <= box.Max.X))
             {
-                if ((this.Max.Y < box.Min.Y) || (this.Min.Y > box.Max.Y))
+                if ((this.Max.Y >= box.Min.Y) && (this.Min.Y <= box.Max.Y))
                 {
-                    result = false;
+                    result = (this.Max.Z >= box.Min.Z) && (this.Min.Z <= box.Max.Z);
                     return;
                 }
 
-                result = (this.Max.Z >= box.Min.Z) && (this.Min.Z <= box.Max.Z);
+                result = false;
                 return;
             }
-
+            
             result = false;
             return;
         }
