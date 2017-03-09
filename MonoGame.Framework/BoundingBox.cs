@@ -7,17 +7,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
-
-/// <summary>
-/// Defines a box in 3D-space
-/// </summary>
-
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct BoundingBox : IEquatable<BoundingBox>
     {
+
+        /// <summary>
+        /// Defines a box in 3D-space
+        /// </summary>
 
         #region Public Fields
 
@@ -34,11 +33,11 @@ namespace Microsoft.Xna.Framework
 
         #region Public Constructors
 
-		/// <summary>
-		/// Constructs a BoundingBox using two corners
-		/// </summary>
-		/// <param name="min">The minimum-corner of the box.</param>
-		/// <param name="max">The maximum-corner of the box.</param>
+        /// <summary>
+        /// Constructs a BoundingBox using two corners
+        /// </summary>
+        /// <param name="min">The minimum-corner of the box.</param>
+        /// <param name="max">The maximum-corner of the box.</param>
         public BoundingBox(Vector3 min, Vector3 max)
         {
             this.Min = min;
@@ -58,9 +57,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The <see cref="ContainmentType"/> relationship between the two objects.</returns>
         public ContainmentType Contains(BoundingBox box)
         {
-            // If, in any dimension: the other box's MAX is less than this box's MIN, OR
-            //                       the other box's MIN is is more than this box's MAX
-            //                    then the two must be disjoint
+            //test if all corner is in the same side of a face by just checking min and max
             if (box.Max.X < Min.X
                 || box.Min.X > Max.X
                 || box.Max.Y < Min.Y
@@ -69,7 +66,6 @@ namespace Microsoft.Xna.Framework
                 || box.Min.Z > Max.Z)
                 return ContainmentType.Disjoint;
 
-            // Apply DeMorgan's property to the "disjoint" condition above to arrive at the "contains" condition:
             if (box.Min.X >= Min.X
                 && box.Max.X <= Max.X
                 && box.Min.Y >= Min.Y
@@ -78,7 +74,6 @@ namespace Microsoft.Xna.Framework
                 && box.Max.Z <= Max.Z)
                 return ContainmentType.Contains;
 
-            // Not disjoint and not containing -> intersecting
             return ContainmentType.Intersects;
         }
 
@@ -474,13 +469,13 @@ namespace Microsoft.Xna.Framework
         {
             if ((this.Max.X >= box.Min.X) && (this.Min.X <= box.Max.X))
             {
-                if ((this.Max.Y >= box.Min.Y) && (this.Min.Y <= box.Max.Y))
+                if ((this.Max.Y < box.Min.Y) || (this.Min.Y > box.Max.Y))
                 {
-                    result = (this.Max.Z >= box.Min.Z) && (this.Min.Z <= box.Max.Z);
+                    result = false;
                     return;
                 }
 
-                result = false;
+                result = (this.Max.Z >= box.Min.Z) && (this.Min.Z <= box.Max.Z);
                 return;
             }
 
