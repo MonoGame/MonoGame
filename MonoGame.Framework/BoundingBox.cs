@@ -34,6 +34,11 @@ namespace Microsoft.Xna.Framework
 
         #region Public Constructors
 
+		/// <summary>
+		/// Constructs a BoundingBox using two corners
+		/// </summary>
+		/// <param name="min">The minimum-corner of the box.</param>
+		/// <param name="max">The maximum-corner of the box.</param>
         public BoundingBox(Vector3 min, Vector3 max)
         {
             this.Min = min;
