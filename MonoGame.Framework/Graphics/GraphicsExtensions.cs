@@ -365,10 +365,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		public static BlendingFactorSrc GetBlendFactorSrc (this Blend blend)
 		{
 			switch (blend) {
+            case Blend.BlendFactor:
+                return BlendingFactorSrc.ConstantColor;
 			case Blend.DestinationAlpha:
 				return BlendingFactorSrc.DstAlpha;
 			case Blend.DestinationColor:
 				return BlendingFactorSrc.DstColor;
+            case Blend.InverseBlendFactor:
+                return BlendingFactorSrc.OneMinusConstantColor;
 			case Blend.InverseDestinationAlpha:
 				return BlendingFactorSrc.OneMinusDstAlpha;
 			case Blend.InverseDestinationColor:
@@ -404,15 +408,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		public static BlendingFactorDest GetBlendFactorDest (this Blend blend)
 		{
 			switch (blend) {
+            case Blend.BlendFactor:
+                return BlendingFactorDest.ConstantColor;
 			case Blend.DestinationAlpha:
 				return BlendingFactorDest.DstAlpha;
-//			case Blend.DestinationColor:
-//				return BlendingFactorDest.DstColor;
-			case Blend.InverseDestinationAlpha:
+            case Blend.DestinationColor:
+                return BlendingFactorDest.DstColor;
+            case Blend.InverseBlendFactor:
+                return BlendingFactorDest.OneMinusConstantColor;
+            case Blend.InverseDestinationAlpha:
 				return BlendingFactorDest.OneMinusDstAlpha;
-//			case Blend.InverseDestinationColor:
-//				return BlendingFactorDest.OneMinusDstColor;
-			case Blend.InverseSourceAlpha:
+            case Blend.InverseDestinationColor:
+                return BlendingFactorDest.OneMinusDstColor;
+            case Blend.InverseSourceAlpha:
 				return BlendingFactorDest.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
 				return BlendingFactorDest.OneMinusSrcColor;
@@ -420,10 +428,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				return BlendingFactorDest.One;
 			case Blend.SourceAlpha:
 				return BlendingFactorDest.SrcAlpha;
-//			case Blend.SourceAlphaSaturation:
-//				return BlendingFactorDest.SrcAlphaSaturate;
-			case Blend.SourceColor:
-				return BlendingFactorDest.SrcColor;
+            case Blend.SourceAlphaSaturation:
+                return BlendingFactorDest.SrcAlphaSaturate;
+            case Blend.SourceColor:
+			    return BlendingFactorDest.SrcColor;
 			case Blend.Zero:
 				return BlendingFactorDest.Zero;
 			default:
