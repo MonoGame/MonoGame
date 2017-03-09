@@ -449,7 +449,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Determines if this <see cref="BoundingBox"> intersects with another.
+        /// Determines if this <see cref="BoundingBox"/> intersects with another.
         /// </summary>
         /// <param name="box">The box to test against</param>
         /// <returns>True if the boxes intersect, false otherwise</returns>
@@ -461,7 +461,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Determines if this <see cref="BoundingBox"> intersects with another, placing the result in the "result" parameter
+        /// Determines if this <see cref="BoundingBox"/> intersects with another, placing the result in the "result" parameter
         /// </summary>
         /// <param name="box">The box to test against</param>
         /// <param name="result">The boolean in which to place the result</param>
@@ -478,18 +478,30 @@ namespace Microsoft.Xna.Framework
                 result = false;
                 return;
             }
-            
+
             result = false;
             return;
         }
 
+        /// <summary>
+        /// Determines if this <see cref="BoundingBox"/> intersects with a given frustum.
+        /// </summary>
+        /// <param name="frustum">The <see cref="BoundingFrustum"/> to test against</param>
+        /// <remark>This is logically equivalent to (frustum.Contains(this) == contains || frustum.contains(this) == intersecting). For details, see <see cref="BoundingFrustum"/></remark>
         public bool Intersects(BoundingFrustum frustum)
         {
             return frustum.Intersects(this);
         }
 
+        /// <summary>
+        /// Determines if this <see cref="BoundingBox"/> intersects with a given <see cref="BoundingSphere"/>.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingSphere"/> to test against</param>
         public bool Intersects(BoundingSphere sphere)
         {
+
+            // The implementation of this method is similar to the implementation of this.Contains(BoundingSphere).
+
             if (sphere.Center.X - Min.X > sphere.Radius
                 && sphere.Center.Y - Min.Y > sphere.Radius
                 && sphere.Center.Z - Min.Z > sphere.Radius
@@ -521,11 +533,20 @@ namespace Microsoft.Xna.Framework
             return false;
         }
 
+        /// <summary>
+        /// Determines if this <see cref="BoundingBox"/> intersects with a given <see cref="BoundingSphere"/>, placing the result in the "result" parameter.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingSphere"/> to test against</param>
+        /// <param name="result">True if the two objects intersect, false otherwise</param>
         public void Intersects(ref BoundingSphere sphere, out bool result)
         {
             result = Intersects(sphere);
         }
 
+        /// <summary>
+        /// Determines if this <see cref="BoundingBox"/> intersects with a given <see cref="Plane"/>.
+        /// </summary>
+        /// <param name="plane">The <see cref="Plane"/> to test against</param>
         public PlaneIntersectionType Intersects(Plane plane)
         {
             PlaneIntersectionType result;
@@ -533,6 +554,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Determines if this <see cref="BoundingBox"/> intersects with a given <see cref="Plane"/>, placing the result in the "result" parameter.
+        /// </summary>
+        /// <param name="plane">The <see cref="Plane"/> to test against.</param>
+        /// <param name="result">The <see cref="PlaneIntersectionType"/> to store the result in.</param>
         public void Intersects(ref Plane plane, out PlaneIntersectionType result)
         {
             // See http://zach.in.tu-clausthal.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
