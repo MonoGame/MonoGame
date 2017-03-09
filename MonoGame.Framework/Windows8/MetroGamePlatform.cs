@@ -12,6 +12,8 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Windows.ApplicationModel.Activation;
+using Windows.Foundation;
+using Windows.System.Threading;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Media;
 #if WINDOWS_PHONE81
@@ -114,10 +116,16 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            CompositionTarget.Rendering += (o, a) =>
+            ThreadPool.RunAsync(delegate(IAsyncAction action)
             {
-                MetroGameWindow.Instance.Tick();
-            };
+                while (action.Status == AsyncStatus.Started)
+                {
+                    lock (MetroGameWindow.Instance.RunLock)
+                    {
+                        MetroGameWindow.Instance.Tick();
+                    }
+                }
+            }, WorkItemPriority.High, WorkItemOptions.TimeSliced);
         }
         
         public override void Exit()
