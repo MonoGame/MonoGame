@@ -9,15 +9,13 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
+    /// <summary>
+    /// Defines a box in 3D-space
+    /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct BoundingBox : IEquatable<BoundingBox>
     {
-
-        /// <summary>
-        /// Defines a box in 3D-space
-        /// </summary>
-
         #region Public Fields
 
         [DataMember]
