@@ -399,9 +399,9 @@ namespace Microsoft.Xna.Framework.Graphics
         #endif
 			case Blend.Zero:
 				return BlendingFactorSrc.Zero;
-			default:
-				return BlendingFactorSrc.One;
-			}
+            default:
+                throw new ArgumentOutOfRangeException("blend", "The specified blend function is not implemented.");
+            }
 
 		}
 
@@ -413,13 +413,21 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.DestinationAlpha:
 				return BlendingFactorDest.DstAlpha;
             case Blend.DestinationColor:
+#if MONOMAC
+                return (BlendingFactorDest)All.DstColor;
+#else
                 return BlendingFactorDest.DstColor;
+#endif
             case Blend.InverseBlendFactor:
                 return BlendingFactorDest.OneMinusConstantColor;
             case Blend.InverseDestinationAlpha:
 				return BlendingFactorDest.OneMinusDstAlpha;
             case Blend.InverseDestinationColor:
+#if MONOMAC
+                return (BlendingFactorDest)All.OneMinusDstColor;
+#else
                 return BlendingFactorDest.OneMinusDstColor;
+#endif
             case Blend.InverseSourceAlpha:
 				return BlendingFactorDest.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
@@ -429,13 +437,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceAlpha:
 				return BlendingFactorDest.SrcAlpha;
             case Blend.SourceAlphaSaturation:
+#if MONOMAC
+                return (BlendingFactorDest)All.SrcAlphaSaturate;
+#else
                 return BlendingFactorDest.SrcAlphaSaturate;
+#endif
             case Blend.SourceColor:
 			    return BlendingFactorDest.SrcColor;
 			case Blend.Zero:
 				return BlendingFactorDest.Zero;
 			default:
-				return BlendingFactorDest.One;
+				throw new ArgumentOutOfRangeException("blend", "The specified blend function is not implemented.");
 			}
 
 		}
@@ -759,7 +771,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-        public static int GetSyncInterval(this PresentInterval interval)
+                    public static int GetSyncInterval(this PresentInterval interval)
         {
             switch (interval)
             {
