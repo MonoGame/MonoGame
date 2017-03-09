@@ -4,90 +4,71 @@
 
 using System;
 using System.IO;
-using Microsoft.Xna.Framework.Audio;
-using OpenAL;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
-        private OggStream stream;
-        private float _volume = 1f;
+        private static float _volume = 1f;
+
+        private IntPtr _music;
+        private Stopwatch _timer;
+        private TimeSpan? _startPos;
 
         private void PlatformInitialize(string fileName)
         {
-            stream = new OggStream(fileName, OnFinishedPlaying);
-            stream.Prepare();
-
-            _duration = stream.GetLength();
+            _music = SdlMixer.LoadMUS(fileName);
+            _timer = new Stopwatch();
         }
         
         internal void SetEventHandler(FinishedPlayingHandler handler) { }
-
-        internal void OnFinishedPlaying()
-        {
-            MediaPlayer.OnSongFinishedPlaying(null, null);
-        }
 		
         void PlatformDispose(bool disposing)
         {
-            if (stream == null)
-                return;
-
-            stream.Dispose();
-            stream = null;
+            if (_music != IntPtr.Zero)
+            {
+                SdlMixer.FreeMusic(_music);
+                _music = IntPtr.Zero;
+            }
         }
 
         internal void Play(TimeSpan? startPosition)
         {
-            if (stream == null)
-                return;
-
-            stream.Play();
-            if (startPosition != null)
-                stream.SeekToPosition((TimeSpan)startPosition);
-
+            SdlMixer.PlayMusic(_music, 1);
+            _timer.Start();
+            if (startPosition.HasValue)
+                SdlMixer.SetMusicPosition(startPosition.Value.TotalMilliseconds / 1000.0);
+            _startPos = startPosition;
             _playCount++;
         }
 
         internal void Resume()
         {
-            if (stream == null)
-                return;
-
-            stream.Resume();
+            SdlMixer.ResumeMusic();
+            _timer.Start();
         }
 
         internal void Pause()
         {
-            if (stream == null)
-                return;
-
-            stream.Pause();
+            SdlMixer.PauseMusic();
+            _timer.Stop();
         }
 
         internal void Stop()
         {
-            if (stream == null)
-                return;
-
-            stream.Stop();
+            SdlMixer.PauseMusic();
+            _timer.Reset();
             _playCount = 0;
         }
 
         internal float Volume
         {
-            get
-            {
-                if (stream == null)
-                    return 0.0f;
-                return _volume; 
-            }
+            get { return _volume; }
             set
             {
                 _volume = value;
-                if (stream != null)
-                    stream.Volume = _volume;
+                SdlMixer.VolumeMusic((int)(_volume * 128));
             }
         }
 
@@ -95,9 +76,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                if (stream == null)
-                    return TimeSpan.FromSeconds(0.0);
-                return stream.GetPosition();
+                return _startPos.HasValue ? _startPos.Value + _timer.Elapsed : _timer.Elapsed;
             }
         }
 

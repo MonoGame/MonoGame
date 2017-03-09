@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Utilities;
+using Microsoft.Xna.Framework.Media;
 
 namespace Microsoft.Xna.Framework
 {
@@ -62,6 +63,12 @@ namespace Microsoft.Xna.Framework
                 Sdl.InitFlags.GameController |
                 Sdl.InitFlags.Haptic
             ));
+
+            SdlMixer.Init(SdlMixer.InitFlag.Ogg);
+            SdlMixer.OpenAudio(44100, 32784, 2, 4096);
+            SdlMixer.HookMusicFinished((Action)delegate {
+                MediaPlayer.OnSongFinishedPlaying(null, null);
+            });
 
             Sdl.DisableScreenSaver();
 
@@ -235,6 +242,9 @@ namespace Microsoft.Xna.Framework
                 _view = null;
 
                 Joystick.CloseDevices();
+
+                SdlMixer.CloseAudio();
+                SdlMixer.Quit();
 
                 Sdl.Quit();
             }

@@ -77,9 +77,6 @@
     <Uses Name="_XNADesignProvided">
       <Platforms>Windows,WindowsGL,Linux,MacOS</Platforms>
     </Uses>
-    <Uses Name="NVorbis">
-      <Platforms>WindowsGL,Linux</Platforms>
-    </Uses>
     <Recommends Name="DirectXGraphics">
       <Platforms>Windows</Platforms>
     </Recommends>
@@ -128,9 +125,6 @@
     <Service Name="WebAudio">
       <Platforms>Web</Platforms>
       <Conflicts>OpenALAudio,XAudioAudio</Conflicts>
-    </Service>
-    <Service Name="NVorbis">
-      <Platforms>WindowsGL,Linux</Platforms>
     </Service>
 
     <!-- Base supporting features -->
@@ -190,20 +184,36 @@
       <Link>OpenTK.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\MonoGame.Framework.dll.config">
+    <None Include="SDL\MonoGame.Framework.dll.config">
       <Platforms>WindowsGL,Linux</Platforms>
       <Link>MonoGame.Framework.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	
+	<!-- Windows x86 -->
 	<None Include="..\ThirdParty\Dependencies\SDL\Windows\x86\SDL2.dll">
 	  <Platforms>WindowsGL,Linux</Platforms>
       <Link>x86\SDL2.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-	<None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Windows\x86\SDL2_Mixer.dll">
 	  <Platforms>WindowsGL,Linux</Platforms>
-      <Link>x64\SDL2.dll</Link>
+      <Link>x86\SDL2_Mixer.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Windows\x86\libogg-0.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libogg-0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Windows\x86\libvorbis-0.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libvorbis.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Windows\x86\libvorbisfile-3.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libvorbisfile-3.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	<None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll">
@@ -211,19 +221,63 @@
       <Link>x86\soft_oal.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    
+    <!-- Windows x64 -->
+	<None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Windows\x64\SDL2_Mixer.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\SDL2_Mixer.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Windows\x64\libogg-0.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libogg-0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Windows\x64\libvorbis-0.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libvorbis-0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Windows\x64\libvorbisfile-3.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libvorbisfile-3.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 	<None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
 	  <Platforms>WindowsGL,Linux</Platforms>
       <Link>x64\soft_oal.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    
+    <!-- Linux x86 -->
     <None Include="..\ThirdParty\Dependencies\SDL\Linux\x86\libSDL2-2.0.so.0">
 	  <Platforms>WindowsGL,Linux</Platforms>
       <Link>x86\libSDL2-2.0.so.0</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-	<None Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Linux\x86\libSDL2_mixer-2.0.so.0">
 	  <Platforms>WindowsGL,Linux</Platforms>
-      <Link>x64\libSDL2-2.0.so.0</Link>
+      <Link>x86\libSDL2_mixer-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Linux\x86\libogg.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libogg.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Linux\x86\libvorbis.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libvorbis.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Linux\x86\libvorbisfile.so.3">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libvorbisfile.so.3</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	<None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x86\libopenal.so.1">
@@ -231,14 +285,63 @@
       <Link>x86\libopenal.so.1</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    
+    <!-- Linux x64 -->
+	<None Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Linux\x64\libSDL2_mixer-2.0.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libSDL2_mixer-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Linux\x64\libogg.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libogg.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Linux\x64\libvorbis.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libvorbis.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\Linux\x64\libvorbisfile.so.3">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libvorbisfile.so.3</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 	<None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
 	  <Platforms>WindowsGL,Linux</Platforms>
       <Link>x64\libopenal.so.1</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    
+    <!-- MacOS -->
 	<None Include="..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib">
 	  <Platforms>WindowsGL,Linux</Platforms>
       <Link>libSDL2-2.0.0.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\MacOS\libSDL2_mixer-2.0.dylib">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>libSDL2_mixer-2.0.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\MacOS\libogg.0.dylib">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>libogg.0.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\MacOS\libvorbis.0.dylib">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>libvorbis.0.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL_Mixer\MacOS\libvorbisfile.3.dylib">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>libvorbisfile.3.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	<None Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib">
@@ -378,9 +481,6 @@
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Audio\OALSoundBuffer.cs">
       <Services>OpenALAudio</Services>
-    </Compile>
-	<Compile Include="Audio\OggStream.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Audio\OpenAL.cs">
       <Platforms>WindowsGL,Linux</Platforms>
@@ -1109,7 +1209,7 @@
     <Compile Include="Media\Song.IOS.cs">
         <Platforms>iOS,tvOS</Platforms>
     </Compile>
-    <Compile Include="Media\Song.NVorbis.cs">
+    <Compile Include="Media\Song.SDL.cs">
         <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Media\Song.WMS.cs">
@@ -1258,6 +1358,9 @@
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
     <Compile Include="SDL\SDL2.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="SDL\SDLMixer.cs">
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardUtil.SDL.cs">
@@ -1465,108 +1568,6 @@
     <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo">
       <Services>DirectXGraphics</Services>
     </EmbeddedResource>
-
-    <!-- NVorbis -->
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\BufferedReadStream.cs">
-      <Link>Utilities\NVorbis\BufferedReadStream.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\DataPacket.cs">
-      <Link>Utilities\NVorbis\DataPacket.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Huffman.cs">
-      <Link>Utilities\NVorbis\Huffman.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IContainerReader.cs">
-      <Link>Utilities\NVorbis\IContainerReader.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IPacketProvider.cs">
-      <Link>Utilities\NVorbis\IPacketProvider.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IVorbisStreamStatus.cs">
-      <Link>Utilities\NVorbis\IVorbisStreamStatus.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Mdct.cs">
-      <Link>Utilities\NVorbis\Mdct.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\NewStreamEventArgs.cs">
-      <Link>Utilities\NVorbis\NewStreamEventArgs.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\ParameterChangeEventArgs.cs">
-      <Link>Utilities\NVorbis\ParameterChangeEventArgs.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\RingBuffer.cs">
-      <Link>Utilities\NVorbis\RingBuffer.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\StreamReadBuffer.cs">
-      <Link>Utilities\NVorbis\StreamReadBuffer.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Utils.cs">
-      <Link>Utilities\NVorbis\Utils.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisCodebook.cs">
-      <Link>Utilities\NVorbis\VorbisCodebook.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisFloor.cs">
-      <Link>Utilities\NVorbis\VorbisFloor.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisMapping.cs">
-      <Link>Utilities\NVorbis\VorbisMapping.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisMode.cs">
-      <Link>Utilities\NVorbis\VorbisMode.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisReader.cs">
-      <Link>Utilities\NVorbis\VorbisReader.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisResidue.cs">
-      <Link>Utilities\NVorbis\VorbisResidue.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisStreamDecoder.cs">
-      <Link>Utilities\NVorbis\VorbisStreamDecoder.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisTime.cs">
-      <Link>Utilities\NVorbis\VorbisTime.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggContainerReader.cs">
-      <Link>Utilities\NVorbis\Ogg\OggContainerReader.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggCrc.cs">
-      <Link>Utilities\NVorbis\Ogg\OggCrc.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPacket.cs">
-      <Link>Utilities\NVorbis\Ogg\OggPacket.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPacketReader.cs">
-      <Link>Utilities\NVorbis\Ogg\OggPacketReader.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPageFlags.cs">
-      <Link>Utilities\NVorbis\Ogg\OggPageFlags.cs</Link>
-      <Services>NVorbis</Services>
-    </Compile>
 
   </Files>
 </Project>
