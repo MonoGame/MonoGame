@@ -63,20 +63,10 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
-            // Assume the window client size as the default back 
-            // buffer resolution in the landscape orientation.
             var clientBounds = _game.Window.ClientBounds;
-            if (clientBounds.Width >= clientBounds.Height)
-            {
-                _preferredBackBufferWidth = clientBounds.Width;
-                _preferredBackBufferHeight = clientBounds.Height;
-            }
-            else
-            {
-                _preferredBackBufferWidth = clientBounds.Height;
-                _preferredBackBufferHeight = clientBounds.Width;
-            }
-
+            _preferredBackBufferWidth = clientBounds.Width;
+            _preferredBackBufferHeight = clientBounds.Height;
+            
             // Default to windowed mode... this is ignored on platforms that don't support it.
             _wantFullScreen = false;
 

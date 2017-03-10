@@ -40,8 +40,6 @@ namespace Microsoft.Xna.Framework
         private CoreWindowActivationState _newActivationState;
 
 
-        private Vector2 _backBufferScale;
-
         #region Internal Properties
 
         internal Game Game { get; set; }
@@ -186,38 +184,16 @@ namespace Microsoft.Xna.Framework
 
                 var manager = Game.graphicsDeviceManager;
 
-                // If we haven't calculated the back buffer scale then do it now.
-                if (_backBufferScale == Vector2.Zero)
-                {
-                    // Make sure the scale is calculated in terms of the same orientation as the preferred back buffer
-                    float clientWidth;
-                    float clientHeight;
-                    if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
-                    {
-                        clientWidth = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
-                        clientHeight = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
-                    }
-                    else
-                    {
-                        clientWidth = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
-                        clientHeight = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
-                    }
-                    _backBufferScale = new Vector2( manager.PreferredBackBufferWidth / clientWidth, 
-                                                    manager.PreferredBackBufferHeight / clientHeight);
-                }
-
                 // Set the new client bounds.
                 _clientBounds = _newClientBounds;
 
                 // Set the default new back buffer size and viewport, but this
                 // can be overloaded by the two events below.
             
-                var newWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
-                var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
-                manager.PreferredBackBufferWidth = newWidth;
-                manager.PreferredBackBufferHeight = newHeight;
+                manager.PreferredBackBufferWidth = _clientBounds.Width;
+                manager.PreferredBackBufferHeight = _clientBounds.Height;
                 if(manager.GraphicsDevice!=null)
-                    manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);
+                    manager.GraphicsDevice.Viewport = new Viewport(0, 0, _clientBounds.Width, _clientBounds.Height);
 
                 // If we have a valid client bounds then 
                 // update the graphics device.
