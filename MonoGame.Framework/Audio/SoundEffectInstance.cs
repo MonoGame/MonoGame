@@ -140,6 +140,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>Throws an exception if more sounds are playing than the platform allows.</remarks>
         public virtual void Play()
         {
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
             if (_isDisposed)
                 throw new ObjectDisposedException("SoundEffectInstance");
 
@@ -150,18 +151,21 @@ namespace Microsoft.Xna.Framework.Audio
             // if we're resuming from a paused state.
             if (State != SoundState.Paused)
             {
+                Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
                 if (!SoundEffectInstancePool.SoundsAvailable)
                     throw new InstancePlayLimitException();
-
+                Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
                 SoundEffectInstancePool.Remove(this);
+                Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
             }
-            
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
             // For non-XAct sounds we need to be sure the latest
             // master volume level is applied before playback.
             if (!_isXAct)
                 PlatformSetVolume(_volume * SoundEffect.MasterVolume);
-
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
             PlatformPlay();
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
         }
 
         /// <summary>Resumes playback for a SoundEffectInstance.</summary>

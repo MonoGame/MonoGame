@@ -262,10 +262,11 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public bool Play()
         {
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
             var inst = GetPooledInstance(false);
             if (inst == null)
                 return false;
-
+            Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance.checkRopoErr();
             inst.Play();
 
             return true;
