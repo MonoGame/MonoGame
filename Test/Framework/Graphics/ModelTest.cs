@@ -43,7 +43,7 @@ namespace MonoGame.Tests.Graphics
             CheckFrames();
         }
 
-#if !XNA // Tests below are valid for Monogame only because.
+#if !XNA // Tests below are valid for Monogame only because of manual model creation.
 
         [Test]
         public void ShouldConstructAndInitialize()
