@@ -113,7 +113,12 @@ namespace MonoGame.Tools.Pipeline
             _watcher = new FileWatcher(this, view);
 
             _templateItems = new List<ContentItemTemplate>();
-            LoadTemplates(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
+            var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            if (Directory.Exists(Path.Combine (root, "..", "Resources", "Templates")))
+            {
+                root = Path.Combine(root, "..", "Resources");
+            }
+            LoadTemplates(Path.Combine(root, "Templates"));
             UpdateMenu();
 
             view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);

@@ -122,6 +122,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
 
+        internal event EventHandler<EventArgs> PresentationChanged;
+
         private int _maxVertexBufferSlots;
         internal int MaxTextureSlots;
         internal int MaxVertexTextureSlots;
@@ -568,6 +570,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Update the back buffer.
             OnPresentationChanged();
 
+            if (PresentationChanged != null)
+                PresentationChanged(this, EventArgs.Empty);
             if (DeviceReset != null)
                 DeviceReset(this, EventArgs.Empty);
         }

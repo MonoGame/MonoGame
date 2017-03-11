@@ -37,10 +37,12 @@ namespace MonoGame.Framework
 
         private bool _isMouseInBounds;
 
+        // true if window position was moved either through code or by dragging/resizing the form
+        private bool _wasMoved;
+
         #region Internal Properties
 
         internal Game Game { get; private set; }
-        internal bool UserResized { get; private set; }
 
         #endregion
 
@@ -96,7 +98,11 @@ namespace MonoGame.Framework
         public override XnaPoint Position
         {
             get { return new XnaPoint(Form.Location.X, Form.Location.Y); }
-            set { Form.Location = new Point(value.X, value.Y); }
+            set
+            {
+                _wasMoved = true;
+                Form.Location = new Point(value.X, value.Y);
+            }
         }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
@@ -280,12 +286,11 @@ namespace MonoGame.Framework
         internal void Initialize(int width, int height)
         {
             Form.ClientSize = new Size(width, height);
-            CenterForm();
         }
 
         private void OnResizeEnd(object sender, EventArgs eventArgs)
         {
-            UserResized = true;
+            _wasMoved = true;
             if (Game.Window == this)
             {
                 var manager = Game.graphicsDeviceManager;
@@ -317,10 +322,6 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            // center now in case the user changed the window size
-            // in the first update call
-            Form.CenterOnPrimaryMonitor();
-
             // https://bugzilla.novell.com/show_bug.cgi?id=487896
             // Since there's existing bug from implementation with mono WinForms since 09'
             // Application.Idle is not working as intended
@@ -362,11 +363,6 @@ namespace MonoGame.Framework
             while (PeekMessage(out msg, IntPtr.Zero, 0, 1 << 5, 1));
         }
 
-        public void CenterForm()
-        {
-            Form.CenterOnPrimaryMonitor();
-        }
-
         internal void UpdateWindows()
         {
             _allWindowsReaderWriterLockSlim.EnterReadLock();
@@ -401,6 +397,10 @@ namespace MonoGame.Framework
         {
             if(this.Form.ClientSize != clientBounds)
                 this.Form.ClientSize = clientBounds;
+
+            // if the window wasn't moved manually and it's resized, it should be centered
+            if (!_wasMoved)
+                Form.CenterOnPrimaryMonitor();
         }
 
         [System.Security.SuppressUnmanagedCodeSecurity] // We won't use this maliciously

@@ -12,12 +12,11 @@ Each NuGet now targets an individual platform to make for easier management and 
 The currently available packages are:
 	* Windows GL (OpenGL)
 	* Windows DX (DirectX)
-	* Windows 8 & 8.1
-	* Windows Phone 8
+	* Windows 8.1
 	* Windows Phone 8.1 
-	* Windows Universal projects
+	* Windows Universal / UWP projects
 	* iOS (Xamarin.iOS only)
-	* MacOS (net4 / net45 / MonoMac and Xamarin.Mac)
+	* MacOS (net45 / MonoMac and Xamarin.Mac)
 	* Android
 	* Linux
 

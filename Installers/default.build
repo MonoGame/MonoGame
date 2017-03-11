@@ -54,14 +54,28 @@
       <copy todir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle">
          <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
              <include name="ff*"/>
-         </fileset>
+             <include name="*.dylib"/> 
+        </fileset>
       </copy>
+      <!-- Correct the id of the dylibs -->
+      <foreach item="File" property="dylibname">
+          <in>
+             <items basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle/">
+             <include name="*.dylib" />
+             </items>
+          </in>
+          <do>
+             <echo message="${path::get-file-name(dylibname)}" />
+             <exec program="install_name_tool" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle" commandline=' -id "@executable_path/../MonoBundle/${path::get-file-name(dylibname)}" ${path::get-file-name(dylibname)}' />
+          </do>
+      </foreach>
       <exec program="pkgbuild" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release" commandline=" --component ./Pipeline.app --identifier com.monogame.pipeline --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Pipeline --install-location /Applications ${project::get-base-directory()}/Pipeline.MacOS.pkg" />
       <exec program="pkgbuild" workingdir="." commandline=" --root ./root --identifier com.monogame.xsaddin --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Addin ${project::get-base-directory()}/MonoGame.XamarinStudio.Addin.pkg" />
       <!-- Build Framework .pkg -->
       <delete dir="./root/tmp" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Tools" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/tvOS" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOSX" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Linux" />
@@ -80,6 +94,11 @@
       </copy>
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS">
          <fileset basedir="../MonoGame.Framework/bin/iOS/iPhoneSimulator/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/tvOS">
+         <fileset basedir="../MonoGame.Framework/bin/tvOS/iPhoneSimulator/Release">
                 <include name="*.*"/>
          </fileset>
       </copy>
