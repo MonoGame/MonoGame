@@ -36,8 +36,8 @@
     <!-- We do this here so we are compatible with xbuild -->
     <ItemGroup>
       <ContentReferences Include="@(MonoGameContentReference)">
-        <ContentOutputDir>$(ProjectDir)%(RelativeDir)\bin\$(MonoGamePlatform)\%(Filename)</ContentOutputDir>
-        <ContentIntermediateOutputDir>$(ProjectDir)%(RelativeDir)\obj\$(MonoGamePlatform)\%(Filename)</ContentIntermediateOutputDir>
+        <ContentOutputDir>$(ProjectDir)%(RelativeDir)bin\$(MonoGamePlatform)\%(Filename)</ContentOutputDir>
+        <ContentIntermediateOutputDir>$(ProjectDir)%(RelativeDir)obj\$(MonoGamePlatform)\%(Filename)</ContentIntermediateOutputDir>
       </ContentReferences>
     </ItemGroup>
 
