@@ -67,40 +67,40 @@ namespace MonoGame.Tests.Graphics
             Assert.Throws<ArgumentNullException>(() => new Model(gd, emptyBonesList, null));
         }
 
-        //[Test]
-        //public void ShouldReadTransformationsFromBones()
-        //{
-        //    var someBones = new[] { new ModelBone(), new ModelBone() }.ToList();
-        //    var model = new Model(gd, someBones, new List<ModelMesh>());
+        [Test]
+        public void ShouldReadTransformationsFromBones()
+        {
+            var someBones = new[] { new ModelBone(), new ModelBone() }.ToList();
+            var model = new Model(gd, someBones, new List<ModelMesh>());
 
-        //    var expected = new[] { Matrix.Identity * 1, Matrix.Identity * 2 };
-        //    var actual = new Matrix[2];
-        //    Assume.That(actual, Is.Not.EqualTo(expected));
+            var expected = new[] { Matrix.Identity * 1, Matrix.Identity * 2 };
+            var actual = new Matrix[2];
+            Assume.That(actual, Is.Not.EqualTo(expected));
 
-        //    model.CopyBoneTransformsFrom(expected);
-        //    model.CopyBoneTransformsTo(actual);
+            model.CopyBoneTransformsFrom(expected);
+            model.CopyBoneTransformsTo(actual);
 
-        //    Assert.That(actual, Is.EqualTo(expected));
-        //}
+            Assert.That(actual, Is.EqualTo(expected));
+        }
 
-        //[Test]
-        //public void CopyBoneTransformsFrom_Exceptions()
-        //{
-        //    var someBones = new[] { new ModelBone() }.ToList();
-        //    var model = new Model(gd, someBones, new List<ModelMesh>());
+        [Test]
+        public void CopyBoneTransformsFrom_Exceptions()
+        {
+            var someBones = new[] { new ModelBone() }.ToList();
+            var model = new Model(gd, someBones, new List<ModelMesh>());
 
-        //    Assert.Throws<ArgumentNullException>(() => model.CopyBoneTransformsFrom(null));
-        //    Assert.Throws<ArgumentOutOfRangeException>(() => model.CopyBoneTransformsFrom(new Matrix[0]));
-        //}
+            Assert.Throws<ArgumentNullException>(() => model.CopyBoneTransformsFrom(null));
+            Assert.Throws<ArgumentOutOfRangeException>(() => model.CopyBoneTransformsFrom(new Matrix[0]));
+        }
 
-        //[Test]
-        //public void CopyBoneTransformsTo_Exceptions()
-        //{
-        //    var someBones = new[] { new ModelBone() }.ToList();
-        //    var model = new Model(gd, someBones, new List<ModelMesh>());
-        //    Assert.Throws<ArgumentNullException>(() => model.CopyBoneTransformsTo(null));
-        //    Assert.Throws<ArgumentOutOfRangeException>(() => model.CopyBoneTransformsTo(new Matrix[0]));
-        //}
+        [Test]
+        public void CopyBoneTransformsTo_Exceptions()
+        {
+            var someBones = new[] { new ModelBone() }.ToList();
+            var model = new Model(gd, someBones, new List<ModelMesh>());
+            Assert.Throws<ArgumentNullException>(() => model.CopyBoneTransformsTo(null));
+            Assert.Throws<ArgumentOutOfRangeException>(() => model.CopyBoneTransformsTo(new Matrix[0]));
+        }
 
 #endif
     }
