@@ -27,6 +27,7 @@ namespace Microsoft.Xna.Framework
 
         private int _isExiting;
         private SdlGameWindow _view;
+        internal bool SupressWindowEvents;
 
         public SdlGamePlatform(Game game)
             : base(game)
@@ -66,7 +67,7 @@ namespace Microsoft.Xna.Framework
             Sdl.DisableScreenSaver();
 
             GamePad.InitDatabase();
-            Window = _view = new SdlGameWindow(_game);
+            Window = _view = new SdlGameWindow(_game, this);
 
             try
             {
@@ -167,15 +168,23 @@ namespace Microsoft.Xna.Framework
                 else if (ev.Type == Sdl.EventType.WindowEvent)
                 {
                     if (ev.Window.EventID == Sdl.Window.EventId.SizeChanged)
-                        _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
+                    {
+                        if (!SupressWindowEvents)
+                            _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
+                    }
                     else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
                         IsActive = true;
                     else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
                         IsActive = false;
                     else if (ev.Window.EventID == Sdl.Window.EventId.Moved)
-                        _view.Moved();
+                    {
+                        if (!SupressWindowEvents)
+                            _view.Moved();
+                    }
                 }
             }
+
+            SupressWindowEvents = false;
         }
 
         public override void StartRunLoop()
@@ -196,14 +205,6 @@ namespace Microsoft.Xna.Framework
         public override bool BeforeDraw(GameTime gameTime)
         {
             return true;
-        }
-
-        public override void EnterFullScreen()
-        {
-        }
-
-        public override void ExitFullScreen()
-        {
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)

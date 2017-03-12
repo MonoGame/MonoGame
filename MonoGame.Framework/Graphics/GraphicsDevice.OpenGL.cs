@@ -1076,6 +1076,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // TODO update GL context for new presentation parameters
             //      we need to recreate the window if depth/back buffer format/ms count changed
+            Viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
             ApplyRenderTargets(null);
         }
     }

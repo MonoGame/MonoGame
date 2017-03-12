@@ -88,21 +88,24 @@ namespace Microsoft.Xna.Framework
         public bool IsFullScreen { get; private set; }
 
         private readonly Game _game;
+        private readonly SdlGamePlatform _platform;
+
         private IntPtr _handle, _icon;
         private bool _disposed;
         private bool _resizable, _borderless, _mouseVisible, _hardwareSwitch;
         private string _screenDeviceName;
         private Point _position;
         private int _width, _height;
-        private bool _wasMoved, _supressMoved;
+        private bool _wasMoved;
 
         private ColorFormat _surfaceFormat;
         private DepthFormat _depthStencilFormat;
         private int _multisampleCount;
 
-        public SdlGameWindow(Game game)
+        public SdlGameWindow(Game game, SdlGamePlatform platform)
         {
             _game = game;
+            _platform = platform;
             Instance = this;
 
             Sdl.Rectangle bounds;
@@ -172,8 +175,6 @@ namespace Microsoft.Xna.Framework
             Sdl.Window.SetResizable(_handle, _resizable);
 
             SetCursorVisible(_mouseVisible);
-
-            _supressMoved = true;
         }
 
         ~SdlGameWindow()
@@ -217,6 +218,7 @@ namespace Microsoft.Xna.Framework
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
             var pp = _game.GraphicsDevice.PresentationParameters;
+            var clientSizeChanged = false;
 
             // TODO recreate the window if depth format, back buffer format or multisample count changed
 
@@ -235,7 +237,7 @@ namespace Microsoft.Xna.Framework
                 Sdl.Window.SetFullscreen(Handle, fullscreenFlag);
                 _hardwareSwitch = pp.HardwareModeSwitch;
 
-                OnClientSizeChanged();
+                clientSizeChanged = true;
             }
             else if (IsFullScreen && !pp.IsFullScreen)
             {
@@ -243,7 +245,7 @@ namespace Microsoft.Xna.Framework
                 Sdl.Window.SetFullscreen(Handle, 0);
                 Sdl.Window.SetPosition(Handle, _position.X, _position.Y);
 
-                OnClientSizeChanged();
+                clientSizeChanged = true;
             }
 
             if (!IsFullScreen || _hardwareSwitch)
@@ -261,8 +263,12 @@ namespace Microsoft.Xna.Framework
             if (!_wasMoved && !IsFullScreen)
                 CenterWindow();
 
-            _supressMoved = true;
+            if (clientSizeChanged)
+            {
+                OnClientSizeChanged();
+                _platform.SupressWindowEvents = true;
             }
+        }
 
         private void CenterWindow()
         {
@@ -288,12 +294,6 @@ namespace Microsoft.Xna.Framework
 
         internal void Moved()
         {
-            if (_supressMoved)
-            {
-                _supressMoved = false;
-                return;
-            }
-
             int x, y;
             Sdl.Window.GetPosition(Handle, out x, out y);
             _position = new Point(x, y);
@@ -303,25 +303,23 @@ namespace Microsoft.Xna.Framework
 
         public void ClientResize(int width, int height)
         {
-            // SDL reports many resize events even if the Size didn't change.
-            // Only call the code below if it actually changed.
-            if (_game.GraphicsDevice.PresentationParameters.BackBufferWidth == width &&
-                _game.GraphicsDevice.PresentationParameters.BackBufferHeight == height) {
+            if (width == _width && height == _height)
                 return;
-            }
 
-            // TODO This should not even be working... We should change preferredBackBufferWidth/Height on the
-            // GraphicsDeviceManager, but that currently causes issues because this event is raised when
-            // switching to full screen with width and height the size of the display. So it messes up
-            // the back buffer size if we set it with those values...
+            _wasMoved = true;
 
-            // The issues with the current implementation are very noticeable when
-            // both letting the user resize and resizing the backbuffer through code.
-            _game.GraphicsDevice.PresentationParameters.BackBufferWidth = width;
-            _game.GraphicsDevice.PresentationParameters.BackBufferHeight = height;
-            _game.GraphicsDevice.Viewport = new Viewport(0, 0, width, height);
+            // TODO investigate if this is a good solution. Works on Windows, but SDL behaves
+            // very differently on Xorg and possibly Wayland/Mir/Cocoa
 
-            Sdl.Window.GetSize(Handle, out _width, out _height);
+            // we don't want ApplyChanges below triggering another resize
+            _platform.SupressWindowEvents = true;
+
+            _game.graphicsDeviceManager.PreferredBackBufferWidth = width;
+            _game.graphicsDeviceManager.PreferredBackBufferHeight = height;
+            _game.graphicsDeviceManager.ApplyChanges();
+
+            _width = width;
+            _height = height;
 
             OnClientSizeChanged();
         }
