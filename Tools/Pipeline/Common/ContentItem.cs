@@ -32,6 +32,10 @@ namespace MonoGame.Tools.Pipeline
         [Browsable(false)]
         public string OriginalPath { get; set; }
 
+        // For now making this not browsable, until the core functionality works
+        [Browsable(false)]
+        public string Link { get; set; }
+
         [Category("Common")]
         [Description("The file name of this item.")]
         public string Name 

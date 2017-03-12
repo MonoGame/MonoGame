@@ -21,9 +21,14 @@ namespace MGCB
         [XmlArrayItem("File")]
         public List<string> SourceFiles { get; set; }
 
+        [XmlArrayItem("File")]
+        public List<string> DestFiles { get; set; }
+
+
         public SourceFileCollection()
         {
             SourceFiles = new List<string>();
+            DestFiles = new List<string>();
             Config = string.Empty;
         }
 
@@ -56,6 +61,13 @@ namespace MGCB
                 var inContent = SourceFiles.Any(e => string.Equals(e, sourceFile, StringComparison.InvariantCultureIgnoreCase));
                 if (!inContent)
                     SourceFiles.Add(sourceFile);
+            }
+
+            foreach (var destFile in other.DestFiles)
+            {
+                var inContent = DestFiles.Any(e => string.Equals(e, destFile, StringComparison.InvariantCultureIgnoreCase));
+                if (!inContent)
+                    DestFiles.Add(destFile);
             }
         }
     }
