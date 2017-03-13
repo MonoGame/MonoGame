@@ -286,6 +286,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             presentationParameters.IsFullScreen = _wantFullScreen;
+            presentationParameters.HardwareModeSwitch = _hardwareModeSwitch;
             presentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.One : PresentInterval.Immediate;
             presentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
             presentationParameters.DeviceWindowHandle = _game.Window.Handle;
