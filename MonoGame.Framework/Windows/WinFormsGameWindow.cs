@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Windows;
@@ -30,12 +31,13 @@ namespace MonoGame.Framework
         private WinFormsGamePlatform _platform;
 
         private bool _isResizable;
-
         private bool _isBorderless;
-
         private bool _isMouseHidden;
-
         private bool _isMouseInBounds;
+
+        private Point _locationBeforeFullScreen;
+        // flag to indicate that we're switching to/from full screen and should ignore resize events
+        private bool _switchingFullScreen;
 
         // true if window position was moved either through code or by dragging/resizing the form
         private bool _wasMoved;
@@ -125,6 +127,9 @@ namespace MonoGame.Framework
             }
         }
 
+        public bool IsFullScreen { get; private set; }
+        public bool HardwareModeSwitch { get; private set; }
+
         #endregion
 
         internal WinFormsGameWindow(WinFormsGamePlatform platform)
@@ -150,6 +155,7 @@ namespace MonoGame.Framework
 
             Form.Activated += OnActivated;
             Form.Deactivate += OnDeactivate;
+            Form.Resize += OnResize;
             Form.ResizeEnd += OnResizeEnd;
 
             Form.KeyPress += OnKeyPress;
@@ -307,31 +313,54 @@ namespace MonoGame.Framework
                 Form.CenterOnPrimaryMonitor();
         }
 
+        internal void Initialize(PresentationParameters pp)
+        {
+            Form.ClientSize = new Size(pp.BackBufferWidth, pp.BackBufferHeight);
+            if (!_wasMoved)
+                Form.CenterOnPrimaryMonitor();
+            if (pp.IsFullScreen)
+                EnterFullScreen(pp);
+        }
+
+        private FormWindowState _lastFormState;
+
+        private void OnResize(object sender, EventArgs eventArgs)
+        {
+            if (_switchingFullScreen || Form.WindowState == _lastFormState)
+                return;
+
+            _lastFormState = Form.WindowState;
+
+            if (Game.Window == this && Form.WindowState != FormWindowState.Minimized)
+                UpdateBackBufferSize();
+
+            OnClientSizeChanged();
+        }
+
         private void OnResizeEnd(object sender, EventArgs eventArgs)
         {
             _wasMoved = true;
             if (Game.Window == this)
-            {
-                var manager = Game.graphicsDeviceManager;
-                if (manager.GraphicsDevice == null)
-                    return;
+                UpdateBackBufferSize();
 
-                var newSize = Form.ClientSize;
-                if (newSize.Width == manager.PreferredBackBufferWidth
-                    && newSize.Height == manager.PreferredBackBufferHeight)
-                    return;
-
-                // Set the default new back buffer size and viewport, but this
-                // can be overloaded by the two events below.
-                manager.PreferredBackBufferWidth = newSize.Width;
-                manager.PreferredBackBufferHeight = newSize.Height;
-                manager.ApplyChanges();
-            }
-
-            // Set the new view state which will trigger the 
-            // Game.ApplicationViewChanged event and signal
-            // the client size changed event.
             OnClientSizeChanged();
+        }
+
+        private void UpdateBackBufferSize()
+        {
+            var manager = Game.graphicsDeviceManager;
+            if (manager.GraphicsDevice == null)
+                return;
+
+            var newSize = Form.ClientSize;
+            if (newSize.Width == manager.PreferredBackBufferWidth
+                && newSize.Height == manager.PreferredBackBufferHeight)
+                return;
+
+            // Set the default new back buffer size
+            manager.PreferredBackBufferWidth = newSize.Width;
+            manager.PreferredBackBufferHeight = newSize.Height;
+            manager.ApplyChanges();
         }
 
         protected override void SetTitle(string title)
@@ -475,7 +504,65 @@ namespace MonoGame.Framework
             }
         }
 
+        public void OnPresentationChanged(PresentationParameters pp)
+        {
+            if (pp.IsFullScreen && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
+            {
+                EnterFullScreen(pp);
+                OnClientSizeChanged();
+            }
+            else if (!pp.IsFullScreen && IsFullScreen)
+            {
+                ExitFullScreen();
+                ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
+                OnClientSizeChanged();
+            }
+            else
+            {
+                ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
+            }
+        }
+
         #endregion
+
+        private void EnterFullScreen(PresentationParameters pp)
+        {
+            _switchingFullScreen = true;
+
+            // store the location of the window so we can restore it later
+            if (!IsFullScreen)
+                _locationBeforeFullScreen = Form.Location;
+
+            _platform.Game.GraphicsDevice.SetHardwareFullscreen();
+
+            if (!pp.HardwareModeSwitch)
+            {
+                IsBorderless = true;
+                Form.WindowState = FormWindowState.Maximized;
+
+                pp.BackBufferWidth = ClientBounds.Width;
+                pp.BackBufferHeight = ClientBounds.Height;
+            }
+
+            IsFullScreen = true;
+            HardwareModeSwitch = pp.HardwareModeSwitch;
+
+            _switchingFullScreen = false;
+        }
+
+        private void ExitFullScreen()
+        {
+            _switchingFullScreen = true;
+
+            _platform.Game.GraphicsDevice.SetHardwareFullscreen();
+
+            IsBorderless = false;
+            Form.WindowState = FormWindowState.Normal;
+            Form.Location = _locationBeforeFullScreen;
+            IsFullScreen = false;
+
+            _switchingFullScreen = false;
+        }
     }
 }
 

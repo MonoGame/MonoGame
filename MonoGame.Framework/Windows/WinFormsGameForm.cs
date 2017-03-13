@@ -5,6 +5,7 @@
 using System;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input.Touch;
+using MonoGame.Framework;
 
 
 namespace Microsoft.Xna.Framework.Windows
@@ -31,7 +32,8 @@ namespace Microsoft.Xna.Framework.Windows
     [System.ComponentModel.DesignerCategory("Code")]
     internal class WinFormsGameForm : Form
     {
-        GameWindow _window;
+        private readonly WinFormsGameWindow _window;
+
         public const int WM_MOUSEHWHEEL = 0x020E;
         public const int WM_POINTERUP = 0x0247;
         public const int WM_POINTERDOWN = 0x0246;
@@ -49,7 +51,7 @@ namespace Microsoft.Xna.Framework.Windows
 
         #endregion
 
-        public WinFormsGameForm(GameWindow window)
+        public WinFormsGameForm(WinFormsGameWindow window)
         {
             _window = window;
         }
@@ -89,15 +91,12 @@ namespace Microsoft.Xna.Framework.Windows
                     switch (m.WParam.ToInt32())
                     {
                         case 0x5B:  // Left Windows Key
+                        case 0x5C: // Right Windows Key
 
-                            if (this.WindowState == FormWindowState.Maximized)
-                            {
+                            if (_window.IsFullScreen && _window.HardwareModeSwitch)
                                 this.WindowState = FormWindowState.Minimized;
-                            }
  		 
                             break;
-                        case 0x5C: // Right Windows Key
-                            goto case 0x5B;
                     }
                     break;
 #endif

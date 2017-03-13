@@ -695,7 +695,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void SetHardwareFullscreen()
         {
             // This force to switch to fullscreen mode when hardware mode enabled(working in WindowsDX mode).
-            _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen, null);
+            _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen && PresentationParameters.HardwareModeSwitch, null);
         }
 
         internal void CreateSizeDependentResources()
