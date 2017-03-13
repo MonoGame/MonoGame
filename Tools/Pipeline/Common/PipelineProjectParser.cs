@@ -188,7 +188,7 @@ namespace MonoGame.Tools.Pipeline
                 Observer = _observer,
                 BuildAction = BuildAction.Build,
                 OriginalPath = sourceFile,
-                Link = link,
+                DestinationPath = link,
                 ImporterName = Importer,
                 ProcessorName = Processor,
                 ProcessorParams = new OpaqueDataDictionary(),
@@ -385,9 +385,9 @@ namespace MonoGame.Tools.Pipeline
                     }
 
                     string buildValue = i.OriginalPath;
-                    if(!string.IsNullOrEmpty(i.Link))
+                    if(!string.IsNullOrEmpty(i.DestinationPath))
                     {
-                        buildValue += ";" + i.Link;
+                        buildValue += ";" + i.DestinationPath;
                     }
                     line = string.Format(lineFormat, "build", buildValue);
                     io.WriteLine(line);
