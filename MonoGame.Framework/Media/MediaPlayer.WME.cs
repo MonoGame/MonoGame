@@ -6,7 +6,7 @@ using System;
 using SharpDX.MediaFoundation;
 using SharpDX.Multimedia;
 using Windows.UI.Core;
-
+using Windows.ApplicationModel.Core;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -32,7 +32,8 @@ namespace Microsoft.Xna.Framework.Media
                 _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
             }
 
-            _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+
+            _dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
         }
 
         private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
