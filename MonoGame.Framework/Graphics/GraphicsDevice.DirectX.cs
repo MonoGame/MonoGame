@@ -793,7 +793,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                     BufferCount = 2,
                     SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters.PresentationInterval),
-                    IsWindowed = true
+                    IsWindowed = true,
+                    Flags = SwapChainFlags.AllowModeSwitch
                 };
 
                 // Once the desired swap chain description is configured, it must be created on the same adapter as our D3D Device
