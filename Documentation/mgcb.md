@@ -50,13 +50,16 @@ Set the target platform for this build. It must be a member of the TargetPlatfor
 * Xbox360
 * iOS
 * Android
-* Linux
+* DesktopGL
 * MacOSX
 * WindowsStoreApp
 * NativeClient
+* PlayStationMobile
 * PlayStation4
 * WindowsPhone8
 * RaspberryPi
+* PSVita
+* XboxOne
 
 If not set it will default to Windows.
 
