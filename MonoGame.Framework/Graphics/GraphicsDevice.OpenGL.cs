@@ -104,9 +104,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 Context = GL.CreateContext(windowInfo);
             }
 
-            Context.MakeCurrent(windowInfo);
-            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
-
             /*if (Threading.BackgroundContext == null)
             {
                 Threading.BackgroundContext = GL.CreateContext(windowInfo);
@@ -115,6 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }*/
 
             Context.MakeCurrent(windowInfo);
+            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 
             /*GraphicsMode mode = GraphicsMode.Default;
             var wnd = OpenTK.Platform.Utilities.CreateSdl2WindowInfo(Game.Instance.Window.Handle);
@@ -1076,6 +1074,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void OnPresentationChanged()
         {
+            // TODO update GL context for new presentation parameters
+            //      we need to recreate the window if depth/back buffer format/ms count changed
+            Viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
             ApplyRenderTargets(null);
         }
     }

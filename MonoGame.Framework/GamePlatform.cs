@@ -186,18 +186,6 @@ namespace Microsoft.Xna.Framework
         public abstract bool BeforeDraw(GameTime gameTime);
 
         /// <summary>
-        /// When implemented in a derived class, causes the game to enter
-        /// full-screen mode.
-        /// </summary>
-        public abstract void EnterFullScreen();
-
-        /// <summary>
-        /// When implemented in a derived class, causes the game to exit
-        /// full-screen mode.
-        /// </summary>
-        public abstract void ExitFullScreen();
-
-        /// <summary>
         /// Gives derived classes an opportunity to modify
         /// Game.TargetElapsedTime before it is set.
         /// </summary>

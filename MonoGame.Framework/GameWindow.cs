@@ -37,7 +37,8 @@ namespace Microsoft.Xna.Framework {
 
 		public abstract string ScreenDeviceName { get; }
 
-		private string _title;
+	    private string _title;
+
         /// <summary>
         /// Gets or sets the title of the game window.
         /// </summary>
@@ -78,6 +79,7 @@ namespace Microsoft.Xna.Framework {
 
         protected GameWindow()
         {
+            _title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
             TouchPanelState = new TouchPanelState(this);
         }
 
@@ -157,14 +159,5 @@ namespace Microsoft.Xna.Framework {
 		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 		protected abstract void SetTitle (string title);
 
-#if DIRECTX && WINDOWS
-        public static GameWindow Create(Game game, int width, int height)
-        {
-            var window = new MonoGame.Framework.WinFormsGameWindow((MonoGame.Framework.WinFormsGamePlatform)game.Platform);
-            window.Initialize(width, height);
-
-            return window;
-        }
-#endif
     }
 }

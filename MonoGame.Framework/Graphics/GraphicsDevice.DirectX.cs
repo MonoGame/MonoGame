@@ -811,8 +811,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     BindFlags = SharpDX.Direct3D11.BindFlags.DepthStencil,
                 }))
 
-                    // Create a DepthStencil view on this surface to use on bind.
-                    _depthStencilView = new SharpDX.Direct3D11.DepthStencilView(_d3dDevice, depthBuffer);
+                // Create a DepthStencil view on this surface to use on bind.
+                _depthStencilView = new SharpDX.Direct3D11.DepthStencilView(_d3dDevice, depthBuffer);
             }
 
             // Set the current viewport.

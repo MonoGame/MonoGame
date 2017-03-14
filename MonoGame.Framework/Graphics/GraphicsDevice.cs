@@ -208,6 +208,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NoSuitableGraphicsDeviceException(String.Format("Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
+
+            ValidatePresentationParameters(presentationParameters);
+
             Adapter = adapter;
             PresentationParameters = presentationParameters;
             _graphicsProfile = graphicsProfile;
@@ -560,9 +563,28 @@ namespace Microsoft.Xna.Framework.Graphics
 
         partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters);
 
+        private void ValidatePresentationParameters(PresentationParameters presentationParameters)
+        {
+            if (presentationParameters.IsFullScreen)
+            {
+                if (!presentationParameters.HardwareModeSwitch)
+                {
+                    // force the back buffer size to the display resolution if we're going to soft full screen
+                    presentationParameters.BackBufferWidth = DisplayMode.Width;
+                    presentationParameters.BackBufferHeight = DisplayMode.Height;
+                }
+                else
+                {
+                    // TODO figure out the display mode resolution when switching to full screen
+                }
+            }
+
+            PlatformValidatePresentationParameters(presentationParameters);
+        }
+
         public void Reset()
         {
-            PlatformValidatePresentationParameters(PresentationParameters);
+            ValidatePresentationParameters(PresentationParameters);
 
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
@@ -572,6 +594,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (PresentationChanged != null)
                 PresentationChanged(this, EventArgs.Empty);
+
             if (DeviceReset != null)
                 DeviceReset(this, EventArgs.Empty);
         }

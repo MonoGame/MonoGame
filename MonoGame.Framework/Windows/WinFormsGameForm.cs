@@ -5,6 +5,7 @@
 using System;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input.Touch;
+using MonoGame.Framework;
 
 
 namespace Microsoft.Xna.Framework.Windows
@@ -31,7 +32,7 @@ namespace Microsoft.Xna.Framework.Windows
     [System.ComponentModel.DesignerCategory("Code")]
     internal class WinFormsGameForm : Form
     {
-        GameWindow _window;
+        private readonly WinFormsGameWindow _window;
         public const int WM_POINTERUP = 0x0247;
         public const int WM_POINTERDOWN = 0x0246;
         public const int WM_POINTERUPDATE = 0x0245;
@@ -42,7 +43,7 @@ namespace Microsoft.Xna.Framework.Windows
 
         public bool AllowAltF4 = true;
 
-        public WinFormsGameForm(GameWindow window)
+        public WinFormsGameForm(WinFormsGameWindow window)
         {
             _window = window;
         }
@@ -81,16 +82,15 @@ namespace Microsoft.Xna.Framework.Windows
                 case WM_KEYDOWN:
                     switch (m.WParam.ToInt32())
                     {
+                        case 0x5C: // Right Windows Key
                         case 0x5B:  // Left Windows Key
 
-                            if (this.WindowState == FormWindowState.Maximized)
+                            if (_window.IsFullScreen)
                             {
                                 this.WindowState = FormWindowState.Minimized;
                             }
  		 
                             break;
-                        case 0x5C: // Right Windows Key
-                            goto case 0x5B;
                     }
                     break;
 #endif
