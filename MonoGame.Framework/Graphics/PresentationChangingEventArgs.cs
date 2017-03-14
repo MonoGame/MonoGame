@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     internal class PresentationChangingEventArgs : EventArgs
     {
-        public PresentationParameters PresentationParameters { get; }
+        public PresentationParameters PresentationParameters { get; private set; }
 
         public PresentationChangingEventArgs(PresentationParameters presentationParameters)
         {
