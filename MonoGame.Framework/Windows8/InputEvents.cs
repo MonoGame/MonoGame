@@ -8,9 +8,11 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Windows.Devices.Input;
 using Windows.Graphics.Display;
+using Windows.System.Threading;
 using Windows.UI.Core;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
 namespace Microsoft.Xna.Framework
@@ -31,6 +33,33 @@ namespace Microsoft.Xna.Framework
             window.VisibilityChanged += CoreWindow_VisibilityChanged;
             window.Activated += CoreWindow_Activated;
             window.SizeChanged += CoreWindow_SizeChanged;
+
+            if (inputElement is SwapChainPanel || inputElement is SwapChainBackgroundPanel)
+            {
+                // Create a thread to precess input events.
+                var workItemHandler = new WorkItemHandler((action) =>
+                {
+                    // We subscribe only to Mouse & Pen. Touch is still processed from inputElement.
+                    // Currently PointerVisualizationSettings don't apply to CreateCoreIndependentInputSource 
+                    // and ContactFeedback is always visible when we create a coreIndependentInputSource for Touch.
+                    var inputDevices = CoreInputDeviceTypes.Mouse | CoreInputDeviceTypes.Pen;
+
+                    CoreIndependentInputSource coreIndependentInputSource;
+                    if (inputElement is SwapChainBackgroundPanel)
+                        coreIndependentInputSource = ((SwapChainBackgroundPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
+                    else
+                        coreIndependentInputSource = ((SwapChainPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
+                    
+                    // PointerVisualizationSettings don't apply to CreateCoreIndependentInputSource and ContactFeedback is 
+                    // always visible. If this bug get fixed we can add the Touch & Pen InputDeviceTypes.
+                    
+                    coreIndependentInputSource.PointerPressed += CoreWindow_PointerPressed;
+                    coreIndependentInputSource.PointerMoved += CoreWindow_PointerMoved;
+                    coreIndependentInputSource.PointerReleased += CoreWindow_PointerReleased;
+                    coreIndependentInputSource.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
+                });
+                var m_inputLoopWorker = ThreadPool.RunAsync(workItemHandler, WorkItemPriority.High, WorkItemOptions.TimeSliced);
+            }
 
             if (inputElement != null)
             {
@@ -189,12 +218,13 @@ namespace Microsoft.Xna.Framework
 
             var state = point.Properties;
 
-            Mouse.PrimaryWindow.MouseState.X = x;
-            Mouse.PrimaryWindow.MouseState.Y = y;
-            Mouse.PrimaryWindow.MouseState.ScrollWheelValue += state.MouseWheelDelta;
-            Mouse.PrimaryWindow.MouseState.LeftButton = state.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-            Mouse.PrimaryWindow.MouseState.RightButton = state.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-            Mouse.PrimaryWindow.MouseState.MiddleButton = state.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+            Mouse.PrimaryWindow.MouseState = new MouseState(x, y, 
+                Mouse.PrimaryWindow.MouseState.ScrollWheelValue + state.MouseWheelDelta,
+                state.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released,
+                state.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released,
+                state.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released,
+                state.IsXButton1Pressed ? ButtonState.Pressed : ButtonState.Released,
+                state.IsXButton2Pressed ? ButtonState.Pressed : ButtonState.Released);
         }
 
         public void UpdateState()
