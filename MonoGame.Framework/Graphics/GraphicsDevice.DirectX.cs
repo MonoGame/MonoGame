@@ -212,7 +212,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal void OnPresentationChanged()
+        internal void OnPresentationChanging()
         {
             // Display orientation is always portrait on WP8
             PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
@@ -569,7 +569,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _d2dContext.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Grayscale;
         }
 
-        internal void OnPresentationChanged()
+        internal void OnPresentationChanging()
         {
             CreateSizeDependentResources();
             ApplyRenderTargets(null);

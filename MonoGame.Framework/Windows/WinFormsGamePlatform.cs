@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using Microsoft.Xna.Framework;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace MonoGame.Framework
@@ -94,11 +95,10 @@ namespace MonoGame.Framework
         public override void ExitFullScreen()
         {
         }
- 
-        internal override void OnPresentationChanged()
+
+        internal override void OnPresentationChanging(PresentationParameters pp)
         {
-            var pp = Game.GraphicsDevice.PresentationParameters;
-            _window.OnPresentationChanged(pp);
+            _window.OnPresentationChanging(pp);
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)

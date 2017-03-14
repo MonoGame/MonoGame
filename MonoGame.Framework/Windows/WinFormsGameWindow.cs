@@ -504,7 +504,7 @@ namespace MonoGame.Framework
             }
         }
 
-        public void OnPresentationChanged(PresentationParameters pp)
+        public void OnPresentationChanging(PresentationParameters pp)
         {
             if (pp.IsFullScreen && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
             {
@@ -539,10 +539,10 @@ namespace MonoGame.Framework
             {
                 IsBorderless = true;
                 Form.WindowState = FormWindowState.Maximized;
-
-                pp.BackBufferWidth = ClientBounds.Width;
-                pp.BackBufferHeight = ClientBounds.Height;
             }
+
+            pp.BackBufferWidth = ClientBounds.Width;
+            pp.BackBufferHeight = ClientBounds.Height;
 
             IsFullScreen = true;
             HardwareModeSwitch = pp.HardwareModeSwitch;
