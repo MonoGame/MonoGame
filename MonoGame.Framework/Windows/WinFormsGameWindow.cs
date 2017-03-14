@@ -329,11 +329,14 @@ namespace MonoGame.Framework
             if (_switchingFullScreen || Form.WindowState == _lastFormState)
                 return;
 
-            _lastFormState = Form.WindowState;
-
-            if (Game.Window == this && Form.WindowState != FormWindowState.Minimized)
+            if (Game.Window == this && Form.WindowState != FormWindowState.Minimized) {
+                // we may need to restore full screen when coming back from a minimized window
+                if (_lastFormState == FormWindowState.Minimized)
+                    _platform.Game.GraphicsDevice.SetHardwareFullscreen();
                 UpdateBackBufferSize();
+            }
 
+            _lastFormState = Form.WindowState;
             OnClientSizeChanged();
         }
 
