@@ -6,11 +6,11 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal class PresentationChangingEventArgs : EventArgs
+    internal class PresentationEventArgs : EventArgs
     {
         public PresentationParameters PresentationParameters { get; private set; }
 
-        public PresentationChangingEventArgs(PresentationParameters presentationParameters)
+        public PresentationEventArgs(PresentationParameters presentationParameters)
         {
             PresentationParameters = presentationParameters;
         }

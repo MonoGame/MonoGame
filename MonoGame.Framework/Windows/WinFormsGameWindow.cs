@@ -42,6 +42,8 @@ namespace MonoGame.Framework
         // true if window position was moved either through code or by dragging/resizing the form
         private bool _wasMoved;
 
+        private bool _raiseClientSizeChanged;
+
         #region Internal Properties
 
         internal Game Game { get; private set; }
@@ -512,17 +514,26 @@ namespace MonoGame.Framework
             if (pp.IsFullScreen && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
             {
                 EnterFullScreen(pp);
-                OnClientSizeChanged();
+                _raiseClientSizeChanged = true;
             }
             else if (!pp.IsFullScreen && IsFullScreen)
             {
                 ExitFullScreen();
                 ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
-                OnClientSizeChanged();
+                _raiseClientSizeChanged = true;
             }
             else
             {
                 ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
+            }
+        }
+
+        public void OnPresentationChanged(PresentationParameters pp)
+        {
+            if (_raiseClientSizeChanged)
+            {
+                OnClientSizeChanged();
+                _raiseClientSizeChanged = false;
             }
         }
 

@@ -101,6 +101,11 @@ namespace MonoGame.Framework
             _window.OnPresentationChanging(pp);
         }
 
+        internal override void OnPresentationChanged(PresentationParameters pp)
+        {
+            _window.OnPresentationChanged(pp);
+        }
+
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
         }

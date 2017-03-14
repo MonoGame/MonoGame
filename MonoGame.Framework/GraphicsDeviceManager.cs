@@ -138,6 +138,7 @@ namespace Microsoft.Xna.Framework
             // update the touchpanel display size when the graphicsdevice is reset
             _graphicsDevice.DeviceReset += UpdateTouchPanel;
             _graphicsDevice.PresentationChanging += OnPresentationChanging;
+            _graphicsDevice.PresentationChanged += OnPresentationChanged;
 
             OnDeviceCreated(EventArgs.Empty);
         }
@@ -364,9 +365,14 @@ namespace Microsoft.Xna.Framework
             ApplyChanges();
         }
 
-        private void OnPresentationChanging(object sender, PresentationChangingEventArgs args)
+        private void OnPresentationChanging(object sender, PresentationEventArgs args)
         {
             _game.Platform.OnPresentationChanging(args.PresentationParameters);
+        }
+
+        private void OnPresentationChanged(object sender, PresentationEventArgs args)
+        {
+            _game.Platform.OnPresentationChanged(args.PresentationParameters);
         }
 
         /// <summary>
