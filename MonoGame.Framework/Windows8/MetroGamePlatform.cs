@@ -12,8 +12,12 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Core;
+using Windows.ApplicationModel;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
 #if WINDOWS_PHONE81
 using Windows.UI.Xaml;
 #endif
@@ -27,6 +31,8 @@ namespace Microsoft.Xna.Framework
         internal static readonly TouchQueue TouchQueue = new TouchQueue();
 
         internal static ApplicationExecutionState PreviousExecutionState { get; set; }
+                
+        bool _enableRunLoop = false;
 
         public MetroGamePlatform(Game game)
             : base(game)
@@ -99,7 +105,21 @@ namespace Microsoft.Xna.Framework
                 }
             }
 
+
+            Application.Current.Suspending += this.CoreApplication_Suspending;
+            Application.Current.Resuming += this.CoreApplication_Resuming;
+
             Game.PreviousExecutionState = PreviousExecutionState;
+        }
+
+        private void CoreApplication_Suspending(object sender, SuspendingEventArgs e)
+        {
+            _enableRunLoop = false;
+        }
+
+        private void CoreApplication_Resuming(object sender, Object e)
+        {
+            StartRunLoop();
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -114,10 +134,41 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            CompositionTarget.Rendering += (o, a) =>
+            if (!_enableRunLoop)
             {
-                MetroGameWindow.Instance.Tick();
-            };
+                _enableRunLoop = true;
+                MetroGameWindow.Instance.CoreWindow.Dispatcher.RunIdleAsync(OnRenderFrame);
+            }
+        }
+
+        private void OnRenderFrame(IdleDispatchedHandlerArgs e)
+        {
+            if (_enableRunLoop)
+                OnRenderFrame(e.IsDispatcherIdle);
+        }
+
+        private void OnRenderFrame()
+        {
+            if (_enableRunLoop)
+            {
+                var dispatcher = MetroGameWindow.Instance.CoreWindow.Dispatcher;
+                if(dispatcher.ShouldYield(CoreDispatcherPriority.Idle))
+                    dispatcher.RunIdleAsync(OnRenderFrame);
+                else
+                    OnRenderFrame(true);
+            }
+        }
+
+        private void OnRenderFrame(bool isQueueEmpty)
+        {
+            MetroGameWindow.Instance.Tick();
+
+            // Request next frame
+            var dispatcher = MetroGameWindow.Instance.CoreWindow.Dispatcher;
+            if (isQueueEmpty)
+                dispatcher.RunAsync(CoreDispatcherPriority.Low, OnRenderFrame);
+            else
+                dispatcher.RunIdleAsync(OnRenderFrame);
         }
         
         public override void Exit()

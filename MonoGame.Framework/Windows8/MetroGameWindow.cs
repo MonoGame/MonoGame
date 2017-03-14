@@ -36,6 +36,8 @@ namespace Microsoft.Xna.Framework
 
         #region Internal Properties
 
+        internal CoreWindow CoreWindow { get { return _coreWindow; } }
+
         internal Game Game { get; set; }
 
         internal bool IsExiting { get; set; }
