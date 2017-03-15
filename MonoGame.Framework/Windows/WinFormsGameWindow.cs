@@ -553,6 +553,7 @@ namespace MonoGame.Framework
             {
                 IsBorderless = true;
                 Form.WindowState = FormWindowState.Maximized;
+                _lastFormState = FormWindowState.Maximized;
             }
 
             pp.BackBufferWidth = ClientBounds.Width;
@@ -572,6 +573,7 @@ namespace MonoGame.Framework
 
             IsBorderless = false;
             Form.WindowState = FormWindowState.Normal;
+            _lastFormState = FormWindowState.Normal;
             Form.Location = _locationBeforeFullScreen;
             IsFullScreen = false;
 
