@@ -376,6 +376,7 @@
     <Compile Include="Serialization\Intermediate\ContentTypeSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializerAttribute.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializerT.cs" />
+    <Compile Include="Serialization\Intermediate\CurveKeyCollectionSerializer.cs" />
     <Compile Include="Serialization\Intermediate\DictionarySerializer.cs" />    
     <Compile Include="Serialization\Intermediate\DoubleSerializer.cs" />    
     <Compile Include="Serialization\Intermediate\ElementSerializerT.cs" />    
@@ -394,6 +395,7 @@
     <Compile Include="Serialization\Intermediate\NamespaceAliasHelper.cs" />
     <Compile Include="Serialization\Intermediate\NonGenericIListSerializer.cs" />
     <Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
+	<Compile Include="Serialization\Intermediate\PackedElementsHelper.cs" />
     <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
     <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />

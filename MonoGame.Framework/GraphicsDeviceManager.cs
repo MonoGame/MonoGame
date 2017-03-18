@@ -136,6 +136,7 @@ namespace Microsoft.Xna.Framework
 
             // update the touchpanel display size when the graphicsdevice is reset
             _graphicsDevice.DeviceReset += UpdateTouchPanel;
+            _graphicsDevice.PresentationChanged += OnPresentationChanged;
 
             OnDeviceCreated(EventArgs.Empty);
         }
@@ -285,6 +286,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             presentationParameters.IsFullScreen = _wantFullScreen;
+            presentationParameters.HardwareModeSwitch = _hardwareModeSwitch;
             presentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.One : PresentInterval.Immediate;
             presentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
             presentationParameters.DeviceWindowHandle = _game.Window.Handle;
@@ -346,9 +348,6 @@ namespace Microsoft.Xna.Framework
 
             GraphicsDevice.Reset(gdi.PresentationParameters);
 
-            // Update the platform window.
-            _game.Platform.OnPresentationChanged();
-
             _shouldApplyChanges = false;
         }
 
@@ -394,6 +393,11 @@ namespace Microsoft.Xna.Framework
         {
             IsFullScreen = !IsFullScreen;
             ApplyChanges();
+        }
+
+        private void OnPresentationChanged(object sender, EventArgs args)
+        {
+            _game.Platform.OnPresentationChanged();
         }
 
         /// <summary>

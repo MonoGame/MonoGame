@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		//
 		// Summary:
 		//     Gets a collection of effects associated with this mesh.
-		public ModelEffectCollection Effects { get; set; }
+		public ModelEffectCollection Effects { get; internal set; }
 		//
 		// Summary:
 		//     Gets the ModelMeshPart objects that make up this mesh. Each part of a mesh

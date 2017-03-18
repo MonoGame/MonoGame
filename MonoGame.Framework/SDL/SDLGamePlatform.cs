@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Utilities;
 
@@ -87,6 +88,15 @@ namespace Microsoft.Xna.Framework
         protected override void OnIsMouseVisibleChanged()
         {
             _view.SetCursorVisible(_game.IsMouseVisible);
+        }
+
+        internal override void OnPresentationChanged()
+        {
+            var displayIndex = Sdl.Window.GetDisplayIndex(Window.Handle);
+            var displayName = Sdl.Display.GetDisplayName(displayIndex);
+            var pp = _game.GraphicsDevice.PresentationParameters;
+            BeginScreenDeviceChange(pp.IsFullScreen);
+            EndScreenDeviceChange(displayName, pp.BackBufferWidth, pp.BackBufferHeight);
         }
 
         public override void RunLoop()

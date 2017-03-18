@@ -197,6 +197,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="layerDepth">An optional depth of the layer of this sprite. 0 by default.</param>
         /// <exception cref="InvalidOperationException">Throwns if both <paramref name="position"/> and <paramref name="destinationRectangle"/> been used.</exception>
         /// <remarks>This overload uses optional parameters. This overload requires only one of <paramref name="position"/> and <paramref name="destinationRectangle"/> been used.</remarks>
+        [Obsolete("In future versions this method can be removed.")]
         public void Draw (Texture2D texture,
                 Vector2? position = null,
                 Rectangle? destinationRectangle = null,

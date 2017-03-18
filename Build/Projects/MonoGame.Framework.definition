@@ -984,13 +984,16 @@
 		<ExcludePlatforms>Android</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\Keyboard.Default.cs">
-		<ExcludePlatforms>Android,Windows,WindowsGL,Linux</ExcludePlatforms>
+		<ExcludePlatforms>Android,Windows8,WindowsPhone81,WindowsUniversal,Windows,WindowsGL,Linux</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\Keyboard.SDL.cs">
 		<Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Input\Keyboard.Windows.cs">
 		<Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.cs">
       <Platforms>Android,iOS,Windows8,WindowsPhone81,WindowsUniversal</Platforms>
