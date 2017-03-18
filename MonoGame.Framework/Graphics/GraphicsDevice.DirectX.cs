@@ -402,6 +402,15 @@ namespace Microsoft.Xna.Framework.Graphics
                                             PresentationParameters.BackBufferHeight,
                                             format, 
                                             SwapChainFlags.None);
+#if WINDOWS_STOREAPP
+                // SwapChainBackgroundPanel behaves erratically when the SwapChain is resized outside of SizeChanged event.
+                // By re-assigning the SwapChain we force it to update the correct size/scale.
+                var asyncResult = PresentationParameters.SwapChainBackgroundPanel.Dispatcher.RunIdleAsync( (e) =>
+                {
+                    using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainBackgroundPanel))
+                        nativePanel.SwapChain = _swapChain;
+                });
+#endif
             }
 
             // Otherwise, create a new swap chain.
@@ -480,13 +489,14 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS_UAP
             // Counter act the composition scale of the render target as 
             // we already handle this in the platform window code. 
-            using (var swapChain2 = _swapChain.QueryInterface<SwapChain2>())
-            {
+            var asyncResult = PresentationParameters.SwapChainPanel.Dispatcher.RunIdleAsync( (e) =>
+            {   
                 var inverseScale = new RawMatrix3x2();
                 inverseScale.M11 = 1.0f / PresentationParameters.SwapChainPanel.CompositionScaleX;
                 inverseScale.M22 = 1.0f / PresentationParameters.SwapChainPanel.CompositionScaleY;
-                swapChain2.MatrixTransform = inverseScale;
-            }
+                using (var swapChain2 = _swapChain.QueryInterface<SwapChain2>())
+                    swapChain2.MatrixTransform = inverseScale;
+            });
 #endif
 
             // Obtain the backbuffer for this window which will be the final 3D rendertarget.
