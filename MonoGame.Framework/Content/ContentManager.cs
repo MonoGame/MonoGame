@@ -48,6 +48,7 @@ namespace Microsoft.Xna.Framework.Content
             'P', // PlayStation4
             'v', // PSVita
             'O', // XboxOne
+            'S', // Nintendo Switch
 
             // NOTE: There are additional idenfiers for consoles that 
             // are not defined in this repository.  Be sure to ask the
