@@ -4,11 +4,14 @@
 
 using System;
 using System.IO;
+using System.Text;
 
 namespace Microsoft.Xna.Framework.Utilities
 {
     internal static class FileHelpers
     {
+        private static readonly char[] UrlSafeChars = new[] { '.', '_', '-', ';', '/', '?', '\\', ':' };
+
         public static readonly char ForwardSlash = '/';
         public static readonly string ForwardSlashString = new string(ForwardSlash, 1);
         public static readonly char BackwardSlash = '\\';
@@ -44,9 +47,9 @@ namespace Microsoft.Xna.Framework.Utilities
                 filePath = ForwardSlashString + filePath;
 
             // Get a uri for filePath using the file:// schema and no host.
-            var src = new Uri("file://" + filePath);
+            var src = new Uri("file://" + UrlEncode(filePath));
 
-            var dst = new Uri(src, relativeFile);
+            var dst = new Uri(src, UrlEncode(relativeFile));
 
             // The uri now contains the path to the relativeFile with 
             // relative addresses resolved... get the local path.
@@ -58,6 +61,30 @@ namespace Microsoft.Xna.Framework.Utilities
             // Convert the directory separator characters to the 
             // correct platform specific separator.
             return NormalizeFilePathSeparators(localPath);
+        }
+
+        private static string UrlEncode(string url)
+        {
+            var encoder = new UTF8Encoding();
+            var safeline = new StringBuilder(encoder.GetByteCount(url) * 3);
+
+            foreach (var c in url)
+            {
+                if ((c >= 48 && c <= 57) || (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || Array.IndexOf(UrlSafeChars, c) != -1)
+                    safeline.Append(c);
+                else
+                {
+                    var bytes = encoder.GetBytes(c.ToString());
+
+                    foreach (var num in bytes)
+                    {
+                        safeline.Append("%");
+                        safeline.Append(num.ToString("X"));
+                    }
+                }
+            }
+
+            return safeline.ToString();
         }
     }
 }

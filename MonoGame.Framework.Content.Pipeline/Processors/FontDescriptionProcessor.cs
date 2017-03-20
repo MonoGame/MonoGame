@@ -141,16 +141,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 var idx = 0;
                 for (; idx < data.Length; )
                 {
-                    var r = data[idx + 0];
-                    var g = data[idx + 1];
-                    var b = data[idx + 2];
-                    var a = data[idx + 3];
-                    var col = Color.FromNonPremultiplied(r, g, b, a);
+                    var r = data[idx];
 
-                    data[idx + 0] = col.R;
-                    data[idx + 1] = col.G;
-                    data[idx + 2] = col.B;
-                    data[idx + 3] = col.A;
+                    // Special case of simply copying the R component into the A, since R is the value of white alpha we want
+                    data[idx + 0] = r;
+                    data[idx + 1] = r;
+                    data[idx + 2] = r;
+                    data[idx + 3] = r;
+
+                    idx += 4;
+                }
+
+                bmp.SetPixelData(data);
+            }
+            else
+            {
+                var bmp = output.Texture.Faces[0][0];
+                var data = bmp.GetPixelData();
+                var idx = 0;
+                for (; idx < data.Length; )
+                {
+                    var r = data[idx];
+
+                    // Special case of simply moving the R component into the A and setting RGB to solid white, since R is the value of white alpha we want
+                    data[idx + 0] = 255;
+                    data[idx + 1] = 255;
+                    data[idx + 2] = 255;
+                    data[idx + 3] = r;
 
                     idx += 4;
                 }

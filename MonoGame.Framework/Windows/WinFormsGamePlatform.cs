@@ -16,13 +16,14 @@ namespace MonoGame.Framework
         //internal static string LaunchParameters;
 
         private WinFormsGameWindow _window;
+        private System.Drawing.Point _locationBeforeFullscreen;
 
         public WinFormsGamePlatform(Game game)
             : base(game)
         {
             _window = new WinFormsGameWindow(this);
 
-            Mouse.Window = _window._form;
+            Mouse.Window = _window.Form;
 
             Window = _window;
         }
@@ -45,20 +46,21 @@ namespace MonoGame.Framework
 
         public override void BeforeInitialize()
         {
-            var gdm = Game.graphicsDeviceManager;
-
-            _window.EnableClientSizeChangedEvent(false); // Disable ClientSizeChanged event while the window is initialised
-
-            _window.Initialize(gdm.PreferredBackBufferWidth, gdm.PreferredBackBufferHeight);
-
             base.BeforeInitialize();
 
-            if (gdm.IsFullScreen)
-                EnterFullScreen();
+            var gdm = Game.graphicsDeviceManager;
+            if (gdm == null)
+            {
+                _window.Initialize(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
+            }
             else
-                ExitFullScreen();
+            {
+                var pp = Game.GraphicsDevice.PresentationParameters;
+                _window.Initialize(pp.BackBufferWidth, pp.BackBufferHeight);
 
-            _window.EnableClientSizeChangedEvent(true); // Re-enable (and trigger) ClientSizeChanged event
+                if (gdm.IsFullScreen)
+                    EnterFullScreen();
+            }
         }
 
         public override void RunLoop()
@@ -91,61 +93,46 @@ namespace MonoGame.Framework
 
         public override void EnterFullScreen()
         {
-            if (_alreadyInFullScreenMode)
-                return;
-
+            // store the location of the window so we can restore it later
+            _locationBeforeFullscreen = _window.Form.Location;
             if (Game.graphicsDeviceManager.HardwareModeSwitch)
-            {
-                Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
                 Game.GraphicsDevice.SetHardwareFullscreen();
-            }
             else
-            {
                 _window.IsBorderless = true;
-            }
 
-            _window._form.WindowState = FormWindowState.Maximized;
+            _window.Form.WindowState = FormWindowState.Maximized;
 
-            _alreadyInWindowedMode = false;
-            _alreadyInFullScreenMode = true;
+            InFullScreenMode = true;
         }
 
         public override void ExitFullScreen()
         {
-            if (_alreadyInWindowedMode)
-               return;
-
             if (Game.graphicsDeviceManager.HardwareModeSwitch)
-            {
-                Game.GraphicsDevice.PresentationParameters.IsFullScreen = false;
                 Game.GraphicsDevice.SetHardwareFullscreen();
-            }
             else
-            {
                 _window.IsBorderless = false;
-            }
 
-            _window._form.WindowState = FormWindowState.Normal;
+            _window.Form.WindowState = FormWindowState.Normal;
+            _window.Form.Location = _locationBeforeFullscreen;
 
-            _alreadyInWindowedMode = true;
-            _alreadyInFullScreenMode = false;
+            InFullScreenMode = false;
         }
 
         internal override void OnPresentationChanged()
         {
-            _window.EnableClientSizeChangedEvent(false); // Disable ClientSizeChanged event while the window is resized
+            var pp = Game.GraphicsDevice.PresentationParameters;
+            _window.ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
 
-            if (Game.GraphicsDevice.PresentationParameters.IsFullScreen)
+            if (Game.GraphicsDevice.PresentationParameters.IsFullScreen && !InFullScreenMode)
             {
                 EnterFullScreen();
+                _window.OnClientSizeChanged();
             }
-            else
+            else if (!Game.GraphicsDevice.PresentationParameters.IsFullScreen && InFullScreenMode)
             {
                 ExitFullScreen();
-                _window.ChangeClientSize(new Size(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight));
+                _window.OnClientSizeChanged();
             }
-
-            _window.EnableClientSizeChangedEvent(true); // Re-enable (and trigger) ClientSizeChanged event
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)

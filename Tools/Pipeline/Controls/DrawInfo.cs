@@ -5,6 +5,8 @@ namespace MonoGame.Tools.Pipeline
 {
     static class DrawInfo
     {
+        private static bool once;
+
         public static int TextHeight;
         public static Color TextColor, BackColor, HoverTextColor, HoverBackColor, DisabledTextColor, BorderColor;
 
@@ -18,6 +20,15 @@ namespace MonoGame.Tools.Pipeline
             DisabledTextColor = SystemColors.ControlText;
             DisabledTextColor.A = 0.4f;
             BorderColor = Global.Unix ? SystemColors.WindowBackground : SystemColors.Control;
+        }
+
+        public static void SetPixelsPerPoint(Graphics g)
+        {
+            if (!once && !Global.Unix)
+            {
+                once = true;
+                TextHeight = (int)(SystemFonts.Default().LineHeight * g.PixelsPerPoint + 0.5);
+            }
         }
 
         public static Color GetTextColor(bool selected, bool disabled)

@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'P', // PlayStation4
             'v', // PSVita
             'O', // XboxOne
+            'S', // Nintendo Switch
         };
 
         /// <summary>
