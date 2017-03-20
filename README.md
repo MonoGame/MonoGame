@@ -32,18 +32,21 @@ Our [build server](http://teamcity.monogame.net/?guest=1) builds, tests, and pac
 We support a growing list of platforms across the desktop, mobile, and console space.  If there is a platform we don't support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
 
  * Desktop PCs
-   * Windows Store Apps (8, 8.1 and 10)
-   * Windows (OpenGL & DirectX)
+   * Windows Store Apps (8.1 and 10)
+   * Windows Win32 (OpenGL & DirectX)
    * Linux (OpenGL)
    * Mac OS X (OpenGL)
- * Mobile Devices
+ * Mobile/Tablet Devices
    * Android (OpenGL)
-   * iOS (OpenGL)
-   * Windows Phone (8, 8.1 and 10)
+   * iPhone/iPad (OpenGL)
+   * Windows Phone (8.1 and 10)
  * Consoles (for registered developers)
    * PlayStation 4
    * PlayStation Vita
    * Xbox One (both UWP and XDK)
+   * Nintendo Switch
+ * Other
+   * tvOS (OpenGL)
 
 
 ## Support and Contributions
