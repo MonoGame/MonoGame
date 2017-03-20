@@ -22,6 +22,12 @@ namespace Microsoft.Xna.Framework.Input
         public string Identifier { get; internal set; }
 
         /// <summary>
+        /// Gets a value indicating if the joystick is a gamepad.
+        /// </summary>
+        /// <value><c>true</c> if the joystick is a gamepad; otherwise, <c>false</c>.</value>
+        public bool IsGamepad { get; internal set; }
+
+        /// <summary>
         /// Gets the axis count.
         /// </summary>
         /// <value>The number of axes that the joystick possesses.</value>
@@ -55,7 +61,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Microsoft.Xna.Framework.Input.JoystickCapabilities"/>.</returns>
         public override string ToString()
         {
-            return "[JoystickCapabilities: IsConnected=" + IsConnected + ", Identifier=" + Identifier + ", AxisCount=" + AxisCount + ", ButtonCount=" + ButtonCount + ", HatCount=" + HatCount + "]";
+            return "[JoystickCapabilities: IsConnected=" + IsConnected + ", Identifier=" + Identifier + ", IsGamepad=" + IsGamepad + " , AxisCount=" + AxisCount + ", ButtonCount=" + ButtonCount + ", HatCount=" + HatCount + "]";
         }
     }
 }
