@@ -95,6 +95,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Xbox One
         /// </summary>
         XboxOne,
+
+        /// <summary>
+        /// Nintendo Switch
+        /// </summary>
+        Switch,
     }
 
 

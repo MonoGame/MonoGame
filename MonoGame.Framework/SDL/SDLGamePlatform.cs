@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Utilities;
 
@@ -79,7 +80,6 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize ()
         {
-            _view.InitGraphics();
             SdlRunLoop();
 
             base.BeforeInitialize ();
@@ -90,15 +90,24 @@ namespace Microsoft.Xna.Framework
             _view.SetCursorVisible(_game.IsMouseVisible);
         }
 
+        internal override void OnPresentationChanged()
+        {
+            var displayIndex = Sdl.Window.GetDisplayIndex(Window.Handle);
+            var displayName = Sdl.Display.GetDisplayName(displayIndex);
+            var pp = _game.GraphicsDevice.PresentationParameters;
+            BeginScreenDeviceChange(pp.IsFullScreen);
+            EndScreenDeviceChange(displayName, pp.BackBufferWidth, pp.BackBufferHeight);
+        }
+
         public override void RunLoop()
         {
             Sdl.Window.Show(Window.Handle);
 
             while (true)
             {
-                Threading.Run();
                 SdlRunLoop();
                 Game.Tick();
+                Threading.Run();
 
                 if (_isExiting > 0)
                     break;
@@ -163,6 +172,8 @@ namespace Microsoft.Xna.Framework
                         IsActive = true;
                     else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
                         IsActive = false;
+                    else if (ev.Window.EventID == Sdl.Window.EventId.Moved)
+                        _view.Moved();
                 }
             }
         }

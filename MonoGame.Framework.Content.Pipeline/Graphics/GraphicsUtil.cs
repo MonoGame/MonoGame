@@ -165,10 +165,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Test the alpha channel to figure out if we have alpha.
             var alphaRange = CalculateAlphaRange(face);
 
-            if (alphaRange == AlphaRange.Opaque)
-                Compress(typeof(Dxt1BitmapContent), content, generateMipMaps);
-            else if (isSpriteFont)
+            if (isSpriteFont)
                 CompressFontDXT3(content, generateMipMaps);
+            else if (alphaRange == AlphaRange.Opaque)
+                Compress(typeof(Dxt1BitmapContent), content, generateMipMaps);
             else if (alphaRange == AlphaRange.Cutout)
                 Compress(typeof(Dxt3BitmapContent), content, generateMipMaps);
             else
@@ -468,22 +468,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             buffer[offset + 11] = 255;
 
             // Get the red (to be used for green and blue channels as well) into a 0-15 range
-            a0 = (int)(colors[0].Z * 15.0);
-            a1 = (int)(colors[1].Z * 15.0);
-            a2 = (int)(colors[2].Z * 15.0);
-            a3 = (int)(colors[3].Z * 15.0);
-            a4 = (int)(colors[4].Z * 15.0);
-            a5 = (int)(colors[5].Z * 15.0);
-            a6 = (int)(colors[6].Z * 15.0);
-            a7 = (int)(colors[7].Z * 15.0);
-            a8 = (int)(colors[8].Z * 15.0);
-            a9 = (int)(colors[9].Z * 15.0);
-            a10 = (int)(colors[10].Z * 15.0);
-            a11 = (int)(colors[11].Z * 15.0);
-            a12 = (int)(colors[12].Z * 15.0);
-            a13 = (int)(colors[13].Z * 15.0);
-            a14 = (int)(colors[14].Z * 15.0);
-            a15 = (int)(colors[15].Z * 15.0);
+            a0 = (int)(colors[0].X * 15.0);
+            a1 = (int)(colors[1].X * 15.0);
+            a2 = (int)(colors[2].X * 15.0);
+            a3 = (int)(colors[3].X * 15.0);
+            a4 = (int)(colors[4].X * 15.0);
+            a5 = (int)(colors[5].X * 15.0);
+            a6 = (int)(colors[6].X * 15.0);
+            a7 = (int)(colors[7].X * 15.0);
+            a8 = (int)(colors[8].X * 15.0);
+            a9 = (int)(colors[9].X * 15.0);
+            a10 = (int)(colors[10].X * 15.0);
+            a11 = (int)(colors[11].X * 15.0);
+            a12 = (int)(colors[12].X * 15.0);
+            a13 = (int)(colors[13].X * 15.0);
+            a14 = (int)(colors[14].X * 15.0);
+            a15 = (int)(colors[15].X * 15.0);
 
             // Duplicate the top two bits into the bottom two bits so we get one of four values: b0000, b0101, b1010, b1111
             a0 = (a0 & 0xC) | (a0 >> 2);

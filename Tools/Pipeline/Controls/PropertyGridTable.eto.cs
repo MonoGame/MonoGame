@@ -28,6 +28,10 @@ namespace MonoGame.Tools.Pipeline
             pixel1.Style = "Stretch";
             drawable.Style = "Stretch";
 
+#if MONOMAC
+            drawable.Width = 10;
+#endif
+
             drawable.Paint += Drawable_Paint;
             drawable.MouseDown += Drawable_MouseDown;
             drawable.MouseUp += Drawable_MouseUp;

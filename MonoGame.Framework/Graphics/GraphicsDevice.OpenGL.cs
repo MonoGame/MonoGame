@@ -279,22 +279,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _programCache.Clear();
             _shaderProgram = null;
 
-            if (GraphicsCapabilities.SupportsFramebufferObjectARB)
-            {
-                this.framebufferHelper = new FramebufferHelper(this);
-            }
-            #if !(GLES || MONOMAC)
-            else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
-            {
-                this.framebufferHelper = new FramebufferHelperEXT(this);
-            }
-            #endif
-            else
-            {
-                throw new PlatformNotSupportedException(
-                    "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
-                    "Try updating your graphics drivers.");
-            }
+            framebufferHelper = FramebufferHelper.Create(this);
 
             // Force resetting states
             this.PlatformApplyBlend(true);
@@ -360,11 +345,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (depth != _lastClearDepth)
                 {
- #if GLES
-                    GL.ClearDepth (depth);
- #else
                     GL.ClearDepth(depth);
- #endif
                     GraphicsExtensions.CheckGLError();
                     _lastClearDepth = depth;
                 }
@@ -443,11 +424,8 @@ namespace Microsoft.Xna.Framework.Graphics
             else
                 GL.Viewport(value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
             GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.Viewport");
-#if GLES
+
             GL.DepthRange(value.MinDepth, value.MaxDepth);
-#else
-            GL.DepthRange(value.MinDepth, value.MaxDepth);
-#endif
             GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.DepthRange");
                 
             // In OpenGL we have to re-apply the special "posFixup"
@@ -541,7 +519,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 switch (preferredDepthFormat)
                 {
                     case DepthFormat.Depth16: 
-                        depthInternalFormat = RenderbufferStorage.DepthComponent16; break;
+                        depthInternalFormat = RenderbufferStorage.DepthComponent16;
+                        break;
 #if GLES
                     case DepthFormat.Depth24:
                         if (GraphicsCapabilities.SupportsDepth24)
@@ -567,8 +546,12 @@ namespace Microsoft.Xna.Framework.Graphics
                         }
                         break;
 #else
-                    case DepthFormat.Depth24: depthInternalFormat = RenderbufferStorage.DepthComponent24; break;
-                    case DepthFormat.Depth24Stencil8: depthInternalFormat = RenderbufferStorage.Depth24Stencil8; break;
+                    case DepthFormat.Depth24:
+                        depthInternalFormat = RenderbufferStorage.DepthComponent24;
+                        break;
+                    case DepthFormat.Depth24Stencil8:
+                        depthInternalFormat = RenderbufferStorage.Depth24Stencil8;
+                        break;
 #endif
                 }
 
@@ -993,6 +976,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var programHash = _vertexShader.HashKey | _pixelShader.HashKey;
             _vertexBuffers.Get(0).VertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero, programHash);
 
+            if (vertexStart < 0)
+                vertexStart = 0;
+
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
 			              vertexCount);
@@ -1086,6 +1072,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             presentationParameters.MultiSampleCount = 4;
             quality = 0;
+        }
+
+        internal void OnPresentationChanged()
+        {
+            ApplyRenderTargets(null);
         }
     }
 }

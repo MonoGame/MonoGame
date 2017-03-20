@@ -172,6 +172,34 @@ namespace MonoGame.Tests {
         public class Misc
         {
             [Test]
+            // TODO MG crashes when no graphicsDeviceManager is set and Run is called
+            [Ignore]
+            public void LoadContentNotCalledWithoutGdm()
+            {
+                var g = new CountCallsGame();
+                g.PublicInitialize();
+
+                Assert.AreEqual(0, g.LoadContentCount);
+
+                g.Dispose();
+            }
+
+            [Test]
+            // TODO MG crashes when no GraphicsDevice is set and Run is called
+            [Ignore]
+            public void LoadContentNotCalledWithoutGd()
+            {
+                var g = new CountCallsGame();
+                var gdm = new GraphicsDeviceManager(g);
+
+                g.PublicInitialize();
+
+                Assert.AreEqual(0, g.LoadContentCount);
+
+                g.Dispose();
+            }
+
+            [Test]
             public void ExitHappensAtEndOfTick()
             {
                 // Exit called in Run
@@ -180,7 +208,7 @@ namespace MonoGame.Tests {
                 // TODO this is not necessary for XNA, but MG crashes when no GDM is set and Run is called
                 new GraphicsDeviceManager(g);
                 g.Run();
-                Assert.AreEqual(1, g.UpdateCount);
+                Assert.AreEqual(2, g.UpdateCount);
                 Assert.AreEqual(0, g.DrawCount); // Draw should be suppressed
                 Assert.AreEqual(1, g.ExitingCount);
 
@@ -189,12 +217,18 @@ namespace MonoGame.Tests {
 
             private class ExitTestGame : CountCallsGame
             {
+                private int count = 0;
+
                 protected override void Update(GameTime gameTime)
                 {
-                    Exit();
+                    if (count > 0)
+                        Exit();
+
                     base.Update(gameTime);
                     Assert.IsNotNull(Window);
                     Assert.AreEqual(0, ExitingCount);
+
+                    count++;
                 }
             }
 
@@ -214,14 +248,23 @@ namespace MonoGame.Tests {
                 public int ExitingCount { get; set; }
                 public int DisposeCount { get; set; }
 
+                public void PublicBeginRun() { BeginRun(); }
                 protected override void BeginRun() { BeginRunCount++; base.BeginRun(); }
+                public void PublicInitialize() { Initialize(); }
                 protected override void Initialize() { InitializeCount++; base.Initialize(); }
+                public void PublicLoadContent() { LoadContent(); }
                 protected override void LoadContent() { LoadContentCount++; base.LoadContent(); }
+                public void PublicUnloadContent() { UnloadContent(); }
                 protected override void UnloadContent() { UnloadContentCount++; base.UnloadContent(); }
+                public void PublicUpdate(GameTime gt = null) { Update(gt ?? new GameTime()); }
                 protected override void Update(GameTime gameTime) { UpdateCount++; base.Update(gameTime); }
+                public bool PublicBeginDraw() { return BeginDraw(); }
                 protected override bool BeginDraw() { BeginDrawCount++; return base.BeginDraw(); }
+                public void PublicDraw(GameTime gt) { Draw(gt ?? new GameTime()); }
                 protected override void Draw(GameTime gameTime) { DrawCount++; base.Draw(gameTime); }
+                public bool PublicEndDraw() { return BeginDraw(); }
                 protected override void EndDraw() { EndDrawCount++; base.EndDraw(); }
+                public void PublicEndRun() { EndRun(); }
                 protected override void EndRun() { EndRunCount++; base.EndRun(); }
 
                 protected override void OnActivated(object sender, EventArgs args) { ActivatedCount++; base.OnActivated(sender, args); }

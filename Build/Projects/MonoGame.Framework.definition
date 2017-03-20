@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS,PSVita,XBoxOne">
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS,PSVita,XBoxOne,Switch">
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
     for backwards compatibility with existing users of MonoGame, and are not
@@ -80,9 +80,6 @@
     <Uses Name="NVorbis">
       <Platforms>WindowsGL,Linux</Platforms>
     </Uses>
-    <Uses Name="_FrameworkDispatcherProvided">
-      <Platforms>Windows,WindowsGL,MacOS</Platforms>
-    </Uses>
     <Recommends Name="DirectXGraphics">
       <Platforms>Windows</Platforms>
     </Recommends>
@@ -143,9 +140,6 @@
     <Service Name="_XNADesignProvided">
       <AddDefine>XNADESIGNPROVIDED</AddDefine>
       <!-- Allows the Microsoft.Xna.Framework.Design framework to be present -->
-    </Service>
-    <Service Name="_FrameworkDispatcherProvided">
-      <!-- Allows the FrameworkDispatcher class to be present -->
     </Service>
 
   </Services>
@@ -284,9 +278,7 @@
     <Compile Include="CurveTangent.cs" />
     <Compile Include="DisplayOrientation.cs" />
     <Compile Include="DrawableGameComponent.cs" />
-    <Compile Include="FrameworkDispatcher.cs">
-      <Platforms>_FrameworkDispatcherProvided</Platforms>
-    </Compile>
+    <Compile Include="FrameworkDispatcher.cs" />
 	<Compile Include="FrameworkResources.cs" />
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="GameComponentCollectionEventArgs.cs" />
@@ -545,13 +537,16 @@
     <Compile Include="Graphics\DeviceNotResetException.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
     <Compile Include="GraphicsDeviceManager.cs">
-		<Platforms>Windows,Windows8,WindowsPhone81,WindowsUniversal,Web</Platforms>
+		<Platforms>Windows,WindowsGL,Linux,Windows8,WindowsPhone81,WindowsUniversal,Web</Platforms>
+    </Compile>
+    <Compile Include="GraphicsDeviceManager.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="GraphicsDeviceManager.WinRT.cs">
 		<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="GraphicsDeviceManager.Legacy.cs">
-		<Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS</Platforms>
+		<Platforms>Android,Angle,iOS,MacOS,tvOS</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsMetrics.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
@@ -603,8 +598,14 @@
       <Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS,Web</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
-    <Compile Include="Graphics\GraphicsCapabilities.Default.cs">
-      <Services>ANGLEGraphics,OpenGLGraphics,DirectXGraphics,WebGraphics</Services>
+    <Compile Include="Graphics\GraphicsCapabilities.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsCapabilities.OpenGL.cs">
+      <Services>OpenGLGraphics,ANGLEGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsCapabilities.Web.cs">
+      <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\GraphicsContext.SDL.cs">
       <Platforms>WindowsGL,Linux</Platforms>
@@ -983,13 +984,16 @@
 		<ExcludePlatforms>Android</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\Keyboard.Default.cs">
-		<ExcludePlatforms>Android,Windows,WindowsGL,Linux</ExcludePlatforms>
+		<ExcludePlatforms>Android,Windows8,WindowsPhone81,WindowsUniversal,Windows,WindowsGL,Linux</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\Keyboard.SDL.cs">
 		<Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Input\Keyboard.Windows.cs">
 		<Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.cs">
       <Platforms>Android,iOS,Windows8,WindowsPhone81,WindowsUniversal</Platforms>

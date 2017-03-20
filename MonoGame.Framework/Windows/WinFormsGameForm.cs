@@ -47,6 +47,13 @@ namespace Microsoft.Xna.Framework.Windows
             _window = window;
         }
 
+        public void CenterOnPrimaryMonitor()
+        {
+             Location = new System.Drawing.Point(
+                 (Screen.PrimaryScreen.WorkingArea.Width  - Width ) / 2,
+                 (Screen.PrimaryScreen.WorkingArea.Height - Height) / 2);
+        }
+
         [System.Security.Permissions.PermissionSet(System.Security.Permissions.SecurityAction.Demand, Name = "FullTrust")]
         protected override void WndProc(ref Message m)
         {

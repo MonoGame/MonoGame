@@ -15,9 +15,7 @@ namespace MonoGame.Tests.Audio
         [SetUp]
         public void SetUp()
         {
-#if XNA
             FrameworkDispatcher.Update();
-#endif
         }
         
 
@@ -403,11 +401,7 @@ namespace MonoGame.Tests.Audio
             int cycles = ms / 10;
             for (int i = 0; i < cycles; i++)
             {
-#if XNA
                 FrameworkDispatcher.Update();
-#else
-                DynamicSoundEffectInstanceManager.UpdatePlayingInstances();
-#endif
                 Thread.Sleep(10);
             }
         }

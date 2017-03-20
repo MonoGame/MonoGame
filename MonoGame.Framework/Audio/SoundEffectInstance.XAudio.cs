@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private SharpDX.XAudio2.Fx.Reverb _reverb;
 
-        private static readonly float[] _panMatrix = new float[8];
+        private static readonly float[] _outputMatrix = new float[16];
 
         private float _reverbMix;
 
@@ -247,95 +247,62 @@ namespace Microsoft.Xna.Framework.Audio
             UpdateOutputMatrix();
         }
 
-        private void UpdateOutputMatrix()
+        internal void UpdateOutputMatrix()
         {
             var srcChannelCount = _voice.VoiceDetails.InputChannelCount;
             var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
 
             // Set the pan on the correct channels based on the reverb mix.
             if (!(_reverbMix > 0.0f))
-                _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, CalculatePanMatrix(_pan, 1.0f));
+                _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, CalculateOutputMatrix(_pan, 1.0f, srcChannelCount));
             else
             {
-                _voice.SetOutputMatrix(SoundEffect.ReverbVoice, srcChannelCount, dstChannelCount, CalculatePanMatrix(_pan, _reverbMix));
-                _voice.SetOutputMatrix(SoundEffect.MasterVoice, srcChannelCount, dstChannelCount, CalculatePanMatrix(_pan, 1.0f - Math.Min(_reverbMix, 1.0f)));
+                _voice.SetOutputMatrix(SoundEffect.ReverbVoice, srcChannelCount, dstChannelCount, CalculateOutputMatrix(_pan, _reverbMix, srcChannelCount));
+                _voice.SetOutputMatrix(SoundEffect.MasterVoice, srcChannelCount, dstChannelCount, CalculateOutputMatrix(_pan, 1.0f - Math.Min(_reverbMix, 1.0f), srcChannelCount));
             }
         }
 
-        private static float[] CalculatePanMatrix(float pan, float scale)
+        internal static float[] CalculateOutputMatrix(float pan, float scale, int inputChannels)
         {
-            // From X3DAudio documentation:
-            /*
-                For submix and mastering voices, and for source voices without a channel mask or a channel mask of 0, 
-                   XAudio2 assumes default speaker positions according to the following table. 
-
-                Channels
-
-                Implicit Channel Positions
-
-                1 Always maps to FrontLeft and FrontRight at full scale in both speakers (special case for mono sounds) 
-                2 FrontLeft, FrontRight (basic stereo configuration) 
-                3 FrontLeft, FrontRight, LowFrequency (2.1 configuration) 
-                4 FrontLeft, FrontRight, BackLeft, BackRight (quadraphonic) 
-                5 FrontLeft, FrontRight, FrontCenter, SideLeft, SideRight (5.0 configuration) 
-                6 FrontLeft, FrontRight, FrontCenter, LowFrequency, SideLeft, SideRight (5.1 configuration) (see the following remarks) 
-                7 FrontLeft, FrontRight, FrontCenter, LowFrequency, SideLeft, SideRight, BackCenter (6.1 configuration) 
-                8 FrontLeft, FrontRight, FrontCenter, LowFrequency, BackLeft, BackRight, SideLeft, SideRight (7.1 configuration) 
-                9 or more No implicit positions (one-to-one mapping)                      
-             */
+            // XNA only ever outputs to the front left/right speakers (channels 0 and 1)
+            // Assumes there are at least 2 speaker channels to output to
 
             // Clear all the channels.
-            var panMatrix = _panMatrix;
-            Array.Clear(panMatrix, 0, panMatrix.Length);
+            var outputMatrix = _outputMatrix;
+            Array.Clear(outputMatrix, 0, outputMatrix.Length);
 
-            // Notes:
-            //
-            // Since XNA does not appear to expose any 'master' voice channel mask / speaker configuration,
-            // I assume the mappings listed above should be used.
-            //
-            // Assuming it is correct to pan all channels which have a left/right component.
-
-            var lVal = (1.0f - pan) * scale;
-            var rVal = (1.0f + pan) * scale;
-
-            switch (SoundEffect.Speakers)
+            if (inputChannels == 1) // Mono source
             {
-                case Speakers.Stereo:
-                case Speakers.TwoPointOne:
-                case Speakers.Surround:
-                    panMatrix[0] = lVal;
-                    panMatrix[1] = rVal;
-                    break;
-
-                case Speakers.Quad:
-                    panMatrix[0] = panMatrix[2] = lVal;
-                    panMatrix[1] = panMatrix[3] = rVal;
-                    break;
-
-                case Speakers.FourPointOne:
-                    panMatrix[0] = panMatrix[3] = lVal;
-                    panMatrix[1] = panMatrix[4] = rVal;
-                    break;
-
-                case Speakers.FivePointOne:
-                case Speakers.SevenPointOne:
-                case Speakers.FivePointOneSurround:
-                    panMatrix[0] = panMatrix[4] = lVal;
-                    panMatrix[1] = panMatrix[5] = rVal;
-                    break;
-
-                case Speakers.SevenPointOneSurround:
-                    panMatrix[0] = panMatrix[4] = panMatrix[6] = lVal;
-                    panMatrix[1] = panMatrix[5] = panMatrix[7] = rVal;
-                    break;
-
-                case Speakers.Mono:
-                default:
-                    // don't do any panning here   
-                    break;
+                // Left/Right output levels:
+                //   Pan -1.0: L = 1.0, R = 0.0
+                //   Pan  0.0: L = 1.0, R = 1.0
+                //   Pan +1.0: L = 0.0, R = 1.0
+                outputMatrix[0] = (pan > 0f) ? ((1f - pan) * scale) : scale; // Front-left output
+                outputMatrix[1] = (pan < 0f) ? ((1f + pan) * scale) : scale; // Front-right output
+            }
+            else if (inputChannels == 2) // Stereo source
+            {
+                // Left/Right input (Li/Ri) mix for Left/Right outputs (Lo/Ro):
+                //   Pan -1.0: Lo = 0.5Li + 0.5Ri, Ro = 0.0Li + 0.0Ri
+                //   Pan  0.0: Lo = 1.0Li + 0.0Ri, Ro = 0.0Li + 1.0Ri
+                //   Pan +1.0: Lo = 0.0Li + 0.0Ri, Ro = 0.5Li + 0.5Ri
+                if (pan <= 0f)
+                {
+                    outputMatrix[0] = (1f + pan * 0.5f) * scale; // Front-left output, Left input
+                    outputMatrix[1] = (-pan * 0.5f) * scale; // Front-left output, Right input
+                    outputMatrix[2] = 0f; // Front-right output, Left input
+                    outputMatrix[3] = (1f + pan) * scale; // Front-right output, Right input
+                }
+                else
+                {
+                    outputMatrix[0] = (1f - pan) * scale; // Front-left output, Left input
+                    outputMatrix[1] = 0f; // Front-left output, Right input
+                    outputMatrix[2] = (pan * 0.5f) * scale; // Front-right output, Left input
+                    outputMatrix[3] = (1f - pan * 0.5f) * scale; // Front-right output, Right input
+                }
             }
 
-            return panMatrix;
+            return outputMatrix;
         }
 
         private void PlatformSetPitch(float value)

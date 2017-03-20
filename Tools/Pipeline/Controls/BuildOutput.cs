@@ -236,7 +236,9 @@ namespace MonoGame.Tools.Pipeline
 
         private void Scrollable1_SizeChanged(object sender, EventArgs e)
         {
+#if WINDOWS
             SetWidth();
+#endif
             drawable.Invalidate();
         }
 
@@ -246,7 +248,7 @@ namespace MonoGame.Tools.Pipeline
             drawable.Invalidate();
         }
 
-        private void SetWidth()
+        public void SetWidth()
         {
 #if WINDOWS
             var scrollsize = (drawable.Height >= scrollable1.Height) ? System.Windows.SystemParameters.VerticalScrollBarWidth : 0.0;
@@ -255,6 +257,10 @@ namespace MonoGame.Tools.Pipeline
             if (ReqWidth > width)
                 width = ReqWidth;
 
+            if (drawable.Width != width)
+                drawable.Width = width;
+#elif MONOMAC
+            var width = Math.Max(ReqWidth, scrollable1.Width - 3);
             if (drawable.Width != width)
                 drawable.Width = width;
 #endif
@@ -298,12 +304,16 @@ namespace MonoGame.Tools.Pipeline
                 // Add border
                 y += item.Height + 3;
             }
-            
+
+#if MONOMAC
+            drawable.Height = Math.Max(y - 3, scrollable1.Height - 3);
+#else
             drawable.Height = Math.Max(y - 3, 1);
             SetWidth();
+#endif
 
-#if WINDOWS
-            if (Count == -1 && PipelineSettings.Default.AutoScrollBuildOutput)
+#if WINDOWS || MONOMAC
+            if (Count == -1 && PipelineSettings.Default.AutoScrollBuildOutput && y - 3 >= scrollable1.Height - 3)
                 scrollable1.ScrollPosition = new Point(0, y - scrollable1.Height);
 #endif
         }
