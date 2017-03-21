@@ -310,7 +310,7 @@ namespace MonoGame.Tests.Framework
 
 			var packed = new Short2(x, y).PackedValue;
 			var unpacked = new Short2() { PackedValue = packed }.ToVector2();
-			Assert.AreEqual(127f, unpacked.X);
+			Assert.AreEqual(128f, unpacked.X);
 			Assert.AreEqual(-5f, unpacked.Y);
 
         }
