@@ -430,15 +430,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (int value)
 		{
-            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
+            if ((ParameterClass != EffectParameterClass.Scalar && ParameterClass != EffectParameterClass.Vector) || 
+                (ParameterType != EffectParameterType.Int32 && ParameterType != EffectParameterType.Single))
                 throw new InvalidCastException();
 
-#if OPENGL
-            // MojoShader encodes integers into a float.
-            ((float[])Data)[0] = value;
-#else
-            ((int[])Data)[0] = value;
-#endif
+            switch (ParameterType)
+            {
+                case EffectParameterType.Int32:
+                    var iData = (int[])Data;
+                    for (int i = 0; i < iData.Length; i++)
+                        iData[i] = value;
+                    break;
+                case EffectParameterType.Single:
+                    var fData = (float[])Data;
+                    for (int i = 0; i < fData.Length; i++)
+                        fData[i] = value;
+                    break;
+            }
             StateKey = unchecked(NextStateKey++);
 		}
 
@@ -799,7 +807,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetValue (Single[] value)
 		{
 			for (var i=0; i<value.Length; i++)
-				Elements[i].SetValue (value[i]);
+				((float[])Data)[i] = value[i];
 
             StateKey = unchecked(NextStateKey++);
 		}
