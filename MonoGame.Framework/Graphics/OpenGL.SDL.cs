@@ -23,10 +23,8 @@ namespace OpenGL
 
     internal class EntryPointHelper {
 
-        private const string NativeLibName = "SDL2.dll";
-
         [SuppressUnmanagedCodeSecurity]
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl,
+        [DllImport(Sdl.NativeLibName, CallingConvention = CallingConvention.Cdecl,
             EntryPoint = "SDL_GL_GetProcAddress", ExactSpelling = true)]
         public static extern IntPtr GetProcAddress(IntPtr proc);
         public static IntPtr GetAddress(string proc)
