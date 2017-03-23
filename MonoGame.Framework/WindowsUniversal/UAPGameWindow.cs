@@ -321,17 +321,11 @@ namespace Microsoft.Xna.Framework
 
             while (true)
             {
-                if (Platform.IsActive)
-                {
-                    // Process events incoming to the window.
-                    _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
+                // Process events incoming to the window.
+                _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
 
-                    Tick();
-                }
-                else
-                {
-                    _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessOneAndAllPending);
-                }
+                Tick();
+
                 if (IsExiting)
                     break;
             }
