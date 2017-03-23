@@ -264,10 +264,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 throw new ArgumentOutOfRangeException("index");
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
-            // Don't insert a channel with the same name
-            if (IndexOf(name) >= 0)
-                throw new ArgumentException("Vertex channel with name " + name + " already exists");
-            var channel = new VertexChannel<ElementType>(name);
+            var existingIndex = IndexOf (name);
+            var exists = existingIndex >= 0;
+            var channel = exists ? (VertexChannel<ElementType>)channels[existingIndex] : new VertexChannel<ElementType>(name);
+            if (exists) {
+                channel.Items.Clear ();
+                channels.Remove (channel);
+            }
             if (channelData != null)
             {
                 // Insert the values from the enumerable into the channel
