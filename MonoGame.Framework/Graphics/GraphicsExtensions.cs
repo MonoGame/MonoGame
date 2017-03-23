@@ -683,7 +683,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 break;
 
             case SurfaceFormat.Rgba64:
-                glInternalFormat = PixelInternalFormat.Rgba16ui;
+                glInternalFormat = PixelInternalFormat.Rgba16;
                 glFormat = PixelFormat.Rgba;
                 glType = PixelType.UnsignedShort;
                 break;
