@@ -113,10 +113,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             MaxTextureSlots = 16;
             MaxVertexTextureSlots = 16;
-        }
 
-        private void PlatformInitialize()
-        {
 #if WINDOWS_PHONE
 
             UpdateDevice(DrawingSurfaceState.Device, DrawingSurfaceState.Context);
@@ -130,22 +127,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			CreateDeviceIndependentResources();
 			CreateDeviceResources();
 			Dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
-			CreateSizeDependentResources();
 #endif
 #if WINDOWS_STOREAPP
 
             CreateDeviceIndependentResources();
             CreateDeviceResources();
             Dpi = DisplayProperties.LogicalDpi;
-            CreateSizeDependentResources();
 #endif
 #if WINDOWS
-
             CreateDeviceResources();
-            CreateSizeDependentResources();
 #endif
 
             _maxVertexBufferSlots = _d3dDevice.FeatureLevel >= FeatureLevel.Level_11_0 ? SharpDX.Direct3D11.InputAssemblerStage.VertexInputResourceSlotCount : 16;
+        }
+
+        private void PlatformInitialize()
+        {
+#if !WINDOWS_PHONE
+            CreateSizeDependentResources();
+#endif
         }
 
 #if WINDOWS_PHONE
@@ -382,17 +382,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 }                
             }
 
-            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
-            if ( PresentationParameters.MultiSampleCount > 1 )
-            {
-                multisampleDesc.Count = PresentationParameters.MultiSampleCount;
-                multisampleDesc.Quality = (int)SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
-            }
-
             // Use BGRA for the swap chain.
             var format = PresentationParameters.BackBufferFormat == SurfaceFormat.Color ? 
                             SharpDX.DXGI.Format.B8G8R8A8_UNorm : 
                             SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
+            var multisampleDesc = GetSupportedSampleDescription(
+                format, 
+                PresentationParameters.MultiSampleCount);
 
             // If the swap chain already exists... update it.
             if (_swapChain != null)
@@ -677,11 +673,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext>();
         }
 
-        private int GetMultiSamplingQuality(Format format, int multiSampleCount)
-        {
-            return _d3dDevice.CheckMultisampleQualityLevels(format, multiSampleCount) - 1;
-        }
-
         internal void SetHardwareFullscreen()
         {
             // This force to switch to fullscreen mode when hardware mode enabled(working in WindowsDX mode).
@@ -690,6 +681,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void CreateSizeDependentResources()
         {
+            // Clamp MultiSampleCount
+            PresentationParameters.MultiSampleCount =
+                GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
+
             _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null,
                                                 (SharpDX.Direct3D11.RenderTargetView)null);
 
@@ -729,15 +724,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var format = PresentationParameters.BackBufferFormat == SurfaceFormat.Color ?
                             SharpDX.DXGI.Format.B8G8R8A8_UNorm :
                             SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
-
-            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
-            if (PresentationParameters.MultiSampleCount > 1)
-            {
-                var quality = GetMultiSamplingQuality(format, PresentationParameters.MultiSampleCount);
-                
-                multisampleDesc.Count = PresentationParameters.MultiSampleCount;
-                multisampleDesc.Quality = quality;
-            }
+            var multisampleDesc = GetSupportedSampleDescription(
+                format, 
+                PresentationParameters.MultiSampleCount);
 
             // If the swap chain already exists... update it.
             if (_swapChain != null)
@@ -837,6 +826,8 @@ namespace Microsoft.Xna.Framework.Graphics
             };
         }
 
+        
+
         internal void OnPresentationChanged()
         {
             CreateSizeDependentResources();
@@ -844,6 +835,43 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #endif // WINDOWS
+
+
+        /// <summary>
+        /// Get highest multisample quality level for specified format and multisample count.
+        /// Returns 0 if multisampling is not supported for input parameters.
+        /// </summary>
+        /// <param name="format">The texture format.</param>
+        /// <param name="multiSampleCount">The number of samples during multisampling.</param>
+        /// <returns>
+        /// Higher than zero if multiSampleCount is supported. 
+        /// Zero if multiSampleCount is not supported.
+        /// </returns>
+        private int GetMultiSamplingQuality(Format format, int multiSampleCount)
+        {
+            // The valid range is between zero and one less than the level returned by CheckMultisampleQualityLevels
+            // https://msdn.microsoft.com/en-us/library/windows/desktop/bb173072(v=vs.85).aspx
+            var quality = _d3dDevice.CheckMultisampleQualityLevels(format, multiSampleCount) - 1;
+            // NOTE: should we always return highest quality?
+            return Math.Max(quality, 0); // clamp minimum to 0 
+        }
+
+        internal SampleDescription GetSupportedSampleDescription(Format format, int multiSampleCount)
+        {
+            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
+
+            multiSampleCount = GetClampedMultisampleCount(multiSampleCount);
+
+            if (multiSampleCount > 1)
+            {
+                var quality = GetMultiSamplingQuality(format, multiSampleCount);
+
+                multisampleDesc.Count = multiSampleCount;
+                multisampleDesc.Quality = quality;
+            }
+
+            return multisampleDesc;
+        }
 
         private void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
