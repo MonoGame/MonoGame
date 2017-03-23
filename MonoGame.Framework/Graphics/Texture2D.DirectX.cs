@@ -47,6 +47,37 @@ namespace Microsoft.Xna.Framework.Graphics
             _mipmap = mipmap;
         }
 
+        private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount) where T : struct
+        {
+            int w, h;
+            GetSizeForLevel(Width, Height, level, out w, out h);
+            var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            // Use try..finally to make sure dataHandle is freed in case of an error
+            try
+            {
+                var startBytes = startIndex * elementSizeInByte;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                var region = new ResourceRegion();
+                region.Top = 0;
+                region.Front = 0;
+                region.Back = 1;
+                region.Bottom = h;
+                region.Left = 0;
+                region.Right = w;
+
+                // TODO: We need to deal with threaded contexts here!
+                var subresourceIndex = CalculateSubresourceIndex(0, level);
+                var d3dContext = GraphicsDevice._d3dContext;
+                lock (d3dContext)
+                    d3dContext.UpdateSubresource(GetTexture(), subresourceIndex, region, dataPtr, GetPitch(w), 0);
+            }
+            finally
+            {
+                dataHandle.Free();
+            }
+        }
+
         private void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();

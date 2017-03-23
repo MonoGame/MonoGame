@@ -411,6 +411,7 @@ namespace OpenGL
 
     public enum TextureParameterName {
         TextureMaxAnisotropyExt = 0x84FE,
+        TextureBaseLevel = 0x813C,
         TextureMaxLevel = 0x813D,
         TextureMinFilter = 0x2801,
         TextureMagFilter = 0x2800,

@@ -159,7 +159,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount"></param>
         public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
         {
-            this.SetData(level, 0, rect, data, startIndex, elementCount);
+            if (rect == null)
+                PlatformSetData(level, data, startIndex, elementCount);
+            else
+                this.SetData(level, 0, rect, data, startIndex, elementCount);
         }
         /// <summary>
         /// Changes the texture's pixels
@@ -170,7 +173,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount"></param>
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            this.SetData(0, null, data, startIndex, elementCount);
+            PlatformSetData(0, data, startIndex, elementCount);
         }
 		/// <summary>
         /// Changes the texture's pixels
@@ -181,7 +184,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		    if (data == null)
 		        throw new ArgumentNullException("data");
-			this.SetData(0, null, data, 0, data.Length);
+            PlatformSetData(0, data, 0, data.Length);
         }
         /// <summary>
         /// Retrieves the contents of the texture
