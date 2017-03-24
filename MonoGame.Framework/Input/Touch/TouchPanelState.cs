@@ -48,8 +48,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
             get { return _currentTimestamp; }
             set
             {
-                _previousTimestamp = _currentTimestamp;
-                _currentTimestamp = value;
+                if (_currentTimestamp != value)
+                {
+                    if (_currentTimestamp > _previousTimestamp)
+                        _previousTimestamp = _currentTimestamp;
+                    _currentTimestamp = value;
+                    // handle time rewinding
+                    if (_currentTimestamp < _previousTimestamp)
+                        _previousTimestamp = _currentTimestamp;
+                }
             }
         }
         private static TimeSpan _currentTimestamp;
