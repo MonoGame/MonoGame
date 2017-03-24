@@ -729,7 +729,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 PresentationParameters.MultiSampleCount);
 
             // If the swap chain already exists... update it.
-            if (_swapChain != null)
+            if (_swapChain != null
+                // check if multisampling hasn't changed
+                && _swapChain.Description.SampleDescription.Count == multisampleDesc.Count
+                && _swapChain.Description.SampleDescription.Quality == multisampleDesc.Quality)
             {
                 _swapChain.ResizeBuffers(2,
                                         PresentationParameters.BackBufferWidth,
@@ -741,6 +744,10 @@ namespace Microsoft.Xna.Framework.Graphics
             // Otherwise, create a new swap chain.
             else
             {
+                // Dispose of old swap chain if exists
+                if (_swapChain != null)
+                    _swapChain.Dispose();
+
                 // SwapChain description
                 var desc = new SharpDX.DXGI.SwapChainDescription()
                 {
