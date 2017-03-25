@@ -107,6 +107,71 @@ namespace MonoGame.Tests.Graphics
             tx.Dispose();
         }
         
+        [TestCase(SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Bgr565)]
+        [TestCase(SurfaceFormat.Bgra5551)]
+        [TestCase(SurfaceFormat.Bgra4444)]
+        [TestCase(SurfaceFormat.Dxt1)]
+        [TestCase(SurfaceFormat.Dxt3)]
+        [TestCase(SurfaceFormat.Dxt5)]
+        [TestCase(SurfaceFormat.NormalizedByte2)]
+        [TestCase(SurfaceFormat.NormalizedByte4)]
+        [TestCase(SurfaceFormat.Rgba1010102, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Rg32, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Rgba64, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Alpha8, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Single, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Vector2, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Vector4, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.HalfSingle, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.HalfVector2, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.HalfVector4, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.HdrBlendable, ExpectedException = typeof(NotSupportedException))]
+        public void Texture2DSurface(SurfaceFormat surfaceFormat)
+        {
+            CheckProfile();
+
+            Texture2D tx = new Texture2D(_gd, 16, 16, false, surfaceFormat);
+            tx.Dispose();
+        }
+
+        [TestCase(SurfaceFormat.Color, ExpectedException = typeof(NotSupportedException))]
+        public void Texture3DSurface(SurfaceFormat surfaceFormat)
+        {
+            CheckProfile();
+
+            Texture3D tx = new Texture3D(_gd, 16, 16, 16, false, surfaceFormat);
+            tx.Dispose();
+        }
+
+        [TestCase(SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Bgr565)]
+        [TestCase(SurfaceFormat.Bgra5551)]
+        [TestCase(SurfaceFormat.Bgra4444)]
+        [TestCase(SurfaceFormat.Dxt1)]
+        [TestCase(SurfaceFormat.Dxt3)]
+        [TestCase(SurfaceFormat.Dxt5)]
+        [TestCase(SurfaceFormat.NormalizedByte2, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.NormalizedByte4, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Rgba1010102, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Rg32, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Rgba64, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Alpha8, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Single, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Vector2, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.Vector4, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.HalfSingle, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.HalfVector2, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.HalfVector4, ExpectedException = typeof(NotSupportedException))]
+        [TestCase(SurfaceFormat.HdrBlendable, ExpectedException = typeof(NotSupportedException))]
+        public void TextureCubeSurface(SurfaceFormat surfaceFormat)
+        {
+            CheckProfile();
+
+            TextureCube tx = new TextureCube(_gd, 16, false, surfaceFormat);
+            tx.Dispose();
+        }
+
         [TestCase("DrawPrimitives", 0, MaxPrimitives)]
         [TestCase("DrawPrimitives", 3, MaxPrimitives)]
         [TestCase("DrawPrimitives", 0, MaxPrimitives+1, ExpectedException = typeof(NotSupportedException))]
