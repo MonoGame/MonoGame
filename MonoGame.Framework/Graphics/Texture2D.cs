@@ -100,6 +100,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotSupportedException("Reach profile requires mipmapped Texture2D sizes to be powers of two");            
             if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach && GraphicsExtensions.IsCompressedFormat(format) && (!MathHelper.IsPowerOfTwo(width) || !MathHelper.IsPowerOfTwo(height)))
                 throw new NotSupportedException("Reach profile requires compressed Texture2D sizes to be powers of two");
+            if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach && (format == SurfaceFormat.Rgba1010102 || format == SurfaceFormat.Rg32 || format == SurfaceFormat.Rgba64 || format == SurfaceFormat.Alpha8 || format == SurfaceFormat.Single || format == SurfaceFormat.Vector2 || format == SurfaceFormat.Vector4 || format == SurfaceFormat.HalfSingle || format == SurfaceFormat.HalfVector2 || format == SurfaceFormat.HalfVector4 || format == SurfaceFormat.HdrBlendable))
+                throw new NotSupportedException("Reach profile does not support Texture2D format "+ format);
             if (width <= 0)
                 throw new ArgumentOutOfRangeException("width","Texture width must be greater than zero");
             if (height <= 0)

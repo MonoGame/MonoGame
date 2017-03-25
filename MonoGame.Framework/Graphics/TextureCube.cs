@@ -37,6 +37,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotSupportedException("Reach profile supports a maximum TextureCube size of 512");
             if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach && !MathHelper.IsPowerOfTwo(size))
                 throw new NotSupportedException("Reach profile requires TextureCube sizes to be powers of two");
+            if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach && (format == SurfaceFormat.NormalizedByte2 || format == SurfaceFormat.NormalizedByte4 || format == SurfaceFormat.Rgba1010102 || format == SurfaceFormat.Rg32 || format == SurfaceFormat.Rgba64 || format == SurfaceFormat.Alpha8 || format == SurfaceFormat.Single || format == SurfaceFormat.Vector2 || format == SurfaceFormat.Vector4 || format == SurfaceFormat.HalfSingle || format == SurfaceFormat.HalfVector2 || format == SurfaceFormat.HalfVector4 || format == SurfaceFormat.HdrBlendable))
+                throw new NotSupportedException("Reach profile does not support Texture2D format "+ format);
             if (size <= 0)
                 throw new ArgumentOutOfRangeException("size","Cube size must be greater than zero");
 
