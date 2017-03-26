@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
+using Windows.System.Threading;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml;
@@ -132,11 +133,15 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            CompositionTarget.Rendering += (o, a) =>
+            var workItemHandler = new WorkItemHandler((action) =>
             {
-				UAPGameWindow.Instance.Tick();
-                GamePad.Back = false;
-            };
+                while (true)
+                {
+                    UAPGameWindow.Instance.Tick();
+                    GamePad.Back = false;
+                }
+            });
+            var tickWorker = ThreadPool.RunAsync(workItemHandler, WorkItemPriority.High, WorkItemOptions.TimeSliced);
         }
         
         public override void Exit()
@@ -171,12 +176,12 @@ namespace Microsoft.Xna.Framework
 
         public override void EnterFullScreen()
         {
-            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            UAPGameWindow.Instance.AppView.TryEnterFullScreenMode();
 		}
 
 		public override void ExitFullScreen()
         {
-            ApplicationView.GetForCurrentView().ExitFullScreenMode();
+            UAPGameWindow.Instance.AppView.ExitFullScreenMode();
         }
 
         internal override void OnPresentationChanged()

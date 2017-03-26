@@ -136,9 +136,5 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        private void PlatformInitializeAfterResources(GraphicsDevice device)
-        {
-            
-        }
     }
 }

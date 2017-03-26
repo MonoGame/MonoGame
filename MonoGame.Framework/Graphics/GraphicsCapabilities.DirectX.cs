@@ -27,10 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsVertexTextures = device.GraphicsProfile == GraphicsProfile.HiDef;
 
             SupportsInstancing = true;
-        }
 
-        private void PlatformInitializeAfterResources(GraphicsDevice device)
-        {
             _maxMultiSampleCount = GetMaxMultiSampleCount(device);
         }
 
