@@ -16,6 +16,22 @@ namespace Microsoft.Xna.Framework.Input
         public bool IsConnected { get; internal set; }
 
         /// <summary>
+        /// Gets the gamepad display name.
+        /// 
+        /// This property is not available in XNA.
+        /// </summary>
+        /// <value>String representing the display name of the gamepad.</value>
+        public string DisplayName { get; internal set; }
+
+        /// <summary>
+        /// Gets the unique identifier of the gamepad.
+        /// 
+        /// This property is not available in XNA.
+        /// </summary>
+        /// <value>String representing the unique identifier of the gamepad.</value>
+        public string Identifier { get; internal set; }
+
+        /// <summary>
         /// Gets a value indicating whether the controller has the button A.
         /// </summary>
         /// <value><c>true</c> if it has the button A; otherwise, <c>false</c>.</value>
@@ -176,6 +192,8 @@ namespace Microsoft.Xna.Framework.Input
         {
             var eq = true;
 
+            eq &= (left.DisplayName == right.DisplayName);
+            eq &= (left.Identifier == right.Identifier);
             eq &= (left.IsConnected == right.IsConnected);
             eq &= (left.HasAButton == right.HasAButton);
             eq &= (left.HasBackButton == right.HasBackButton);
@@ -236,65 +254,7 @@ namespace Microsoft.Xna.Framework.Input
         /// hash table.</returns>
         public override int GetHashCode()
         {
-            var hash = 0;
-
-            if (IsConnected)
-                hash |= (1 << 0);
-            if (HasAButton)
-                hash |= (1 << 1);
-            if (HasBackButton)
-                hash |= (1 << 2);
-            if (HasBButton)
-                hash |= (1 << 3);
-            if (HasDPadDownButton)
-                hash |= (1 << 4);
-            if (HasDPadLeftButton)
-                hash |= (1 << 5);
-            if (HasDPadRightButton)
-                hash |= (1 << 6);
-            if (HasDPadUpButton)
-                hash |= (1 << 7);
-            if (HasLeftShoulderButton)
-                hash |= (1 << 8);
-            if (HasLeftStickButton)
-                hash |= (1 << 9);
-            if (HasRightShoulderButton)
-                hash |= (1 << 10);
-            if (HasRightStickButton)
-                hash |= (1 << 11);
-            if (HasStartButton)
-                hash |= (1 << 12);
-            if (HasXButton)
-                hash |= (1 << 13);
-            if (HasYButton)
-                hash |= (1 << 14);
-            if (HasBigButton)
-                hash |= (1 << 15);
-            if (HasLeftXThumbStick)
-                hash |= (1 << 16);
-            if (HasLeftYThumbStick)
-                hash |= (1 << 17);
-            if (HasRightXThumbStick)
-                hash |= (1 << 18);
-            if (HasRightYThumbStick)
-                hash |= (1 << 19);
-            if (HasStartButton)
-                hash |= (1 << 20);
-            if (HasLeftTrigger)
-                hash |= (1 << 21);
-            if (HasRightTrigger)
-                hash |= (1 << 22);
-            if (HasLeftVibrationMotor)
-                hash |= (1 << 23);
-            if (HasRightVibrationMotor)
-                hash |= (1 << 24);
-            if (HasVoiceSupport)
-                hash |= (1 << 25);
-
-            unchecked
-            {
-                return (hash * 397) ^ (int)GamePadType;
-            }
+            return Identifier.GetHashCode();
         }
 
         /// <summary>
@@ -304,6 +264,8 @@ namespace Microsoft.Xna.Framework.Input
         public override string ToString()
         {
             return "[GamePadCapabilities: IsConnected=" + IsConnected +
+                ", DisplayName=" + DisplayName +
+                ", Identifier=" + Identifier +
                 ", HasAButton=" + HasAButton +
                 ", HasBackButton=" + HasBackButton +
                 ", HasBButton=" + HasBButton +
@@ -333,4 +295,3 @@ namespace Microsoft.Xna.Framework.Input
         }
     }
 }
-

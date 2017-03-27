@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Input
                 return new JoystickCapabilities
                 {
                     IsConnected = false,
-                    Id = "",
+                    Identifier = "",
                     AxisCount = 0,
                     ButtonCount = 0,
                     HatCount = 0
@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickCapabilities
             {
                 IsConnected = true,
-                Id = Sdl.Joystick.GetGUID(jdevice).ToString(),
+                Identifier = Sdl.Joystick.GetGUID(jdevice).ToString(),
                 AxisCount = Sdl.Joystick.NumAxes(jdevice),
                 ButtonCount = Sdl.Joystick.NumButtons(jdevice),
                 HatCount = Sdl.Joystick.NumHats(jdevice)

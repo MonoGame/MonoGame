@@ -122,40 +122,90 @@ namespace Microsoft.Xna.Framework.Input
             if (!Gamepads.ContainsKey(index))
                 return new GamePadCapabilities();
 
-            if (Sdl.GameController.GetName(Gamepads[index].Device) == "Unknown Gamepad")
-                return new GamePadCapabilities
-                {
-                    IsConnected = true
-                };
+            var gamecontroller = Gamepads[index].Device;
+            var caps = new GamePadCapabilities();
+            var mapping = Sdl.GameController.GetMapping(gamecontroller).Split(',');
 
-            return new GamePadCapabilities
+            caps.IsConnected = true;
+            caps.DisplayName = Sdl.GameController.GetName(gamecontroller);
+            caps.Identifier = Sdl.Joystick.GetGUID(Sdl.GameController.GetJoystick(gamecontroller)).ToString();
+            caps.HasLeftVibrationMotor = caps.HasRightVibrationMotor = (Gamepads[index].HapticType != 0);
+
+            foreach (var map in mapping)
             {
-                IsConnected = true,
-                HasAButton = true,
-                HasBButton = true,
-                HasXButton = true,
-                HasYButton = true,
-                HasBackButton = true,
-                HasStartButton = true,
-                HasDPadDownButton = true,
-                HasDPadLeftButton = true,
-                HasDPadRightButton = true,
-                HasDPadUpButton = true,
-                HasLeftShoulderButton = true,
-                HasRightShoulderButton = true,
-                HasLeftStickButton = true,
-                HasRightStickButton = true,
-                HasLeftTrigger = true,
-                HasRightTrigger = true,
-                HasLeftXThumbStick = true,
-                HasLeftYThumbStick = true,
-                HasRightXThumbStick = true,
-                HasRightYThumbStick = true,
-                HasLeftVibrationMotor = true,
-                HasRightVibrationMotor = true,
-                HasVoiceSupport = true,
-                HasBigButton = true
-            };
+                var split = map.Split(':');
+                if (split.Length != 2)
+                    continue;
+
+                switch (split[0])
+                {
+                    case "a":
+                        caps.HasAButton = true;
+                        break;
+                    case "b":
+                        caps.HasBButton = true;
+                        break;
+                    case "x":
+                        caps.HasXButton = true;
+                        break;
+                    case "y":
+                        caps.HasYButton = true;
+                        break;
+                    case "back":
+                        caps.HasBackButton = true;
+                        break;
+                    case "guide":
+                        caps.HasBigButton = true;
+                        break;
+                    case "start":
+                        caps.HasStartButton = true;
+                        break;
+                    case "dpleft":
+                        caps.HasDPadLeftButton = true;
+                        break;
+                    case "dpdown":
+                        caps.HasDPadDownButton = true;
+                        break;
+                    case "dpright":
+                        caps.HasDPadRightButton = true;
+                        break;
+                    case "dpup":
+                        caps.HasDPadUpButton = true;
+                        break;
+                    case "leftshoulder":
+                        caps.HasLeftShoulderButton = true;
+                        break;
+                    case "lefttrigger":
+                        caps.HasLeftTrigger = true;
+                        break;
+                    case "rightshoulder":
+                        caps.HasRightShoulderButton = true;
+                        break;
+                    case "righttrigger":
+                        caps.HasRightTrigger = true;
+                        break;
+                    case "leftstick":
+                        caps.HasLeftStickButton = true;
+                        break;
+                    case "rightstick":
+                        caps.HasRightStickButton = true;
+                        break;
+                    case "leftx":
+                        caps.HasLeftXThumbStick = true;
+                        break;
+                    case "lefty":
+                        caps.HasLeftYThumbStick = true;
+                        break;
+                    case "rightx":
+                        caps.HasRightXThumbStick = true;
+                        break;
+                    case "righty":
+                        caps.HasRightYThumbStick = true;
+                        break;
+                }
+            }
+
+            return caps;
         }
 
         private static float GetFromSdlAxis(int axis)
