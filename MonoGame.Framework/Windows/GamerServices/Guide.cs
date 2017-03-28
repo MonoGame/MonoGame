@@ -71,9 +71,6 @@ using Microsoft.Xna.Framework.Net;
 #endif
 #endif
 
-#if WINDOWS_UAP
-using Windows.Services.Store; //need to check if trial or not
-#endif
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.GamerServices
@@ -95,9 +92,8 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
 #if WINDOWS_STOREAPP || WINDOWS_UAP
             _dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
-#endif
-            //Windows UAP does not have currentapp.licenseinformation
-#if WINDOWS_STOREAPP
+
+
             var licenseInformation = CurrentApp.LicenseInformation;
             licenseInformation.LicenseChanged += () => isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
             isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
