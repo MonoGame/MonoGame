@@ -806,8 +806,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Single[] value)
 		{
-			for (var i=0; i<value.Length; i++)
-				((float[])Data)[i] = value[i];
+            for (var i = 0; i < value.Length; i++)
+            {
+                if (Data != null)
+                    ((float[])Data)[i] = value[i];
+                else
+                    Elements[i].SetValue (value[i]);
+            }
 
             StateKey = unchecked(NextStateKey++);
 		}
