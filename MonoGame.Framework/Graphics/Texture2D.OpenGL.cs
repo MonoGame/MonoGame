@@ -5,8 +5,8 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Drawing;
 using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 using MonoGame.Utilities.Png;
 
 #if MONOMAC
@@ -58,10 +58,6 @@ using PixelInternalFormat = OpenTK.Graphics.ES20.PixelFormat;
 using Android.Graphics;
 #endif
 #endif // OPENGL
-
-#if DESKTOPGL || MONOMAC || ANGLE
-using System.Drawing.Imaging;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -304,31 +300,15 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
 #if DESKTOPGL || ANGLE
-            Bitmap image = (Bitmap)Bitmap.FromStream(stream);
-            try
-            {
-                // Fix up the Image to match the expected format
-                image = (Bitmap)image.RGBToBGR();
-
-                var data = new byte[image.Width * image.Height * 4];
-
-                BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
-                    ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                if (bitmapData.Stride != image.Width * 4)
-                    throw new NotImplementedException();
-                Marshal.Copy(bitmapData.Scan0, data, 0, data.Length);
-                image.UnlockBits(bitmapData);
+            var reader = new ImageReaderFromStream();
+            int x, y, comp;
+            var data = reader.Read(stream, out x, out y, out comp, Imaging.STBI_rgb_alpha);
 
                 Texture2D texture = null;
-                texture = new Texture2D(graphicsDevice, image.Width, image.Height);
+                texture = new Texture2D(graphicsDevice, x, y);
                 texture.SetData(data);
 
                 return texture;
-            }
-            finally
-            {
-                image.Dispose();
-            }
 #endif
         }
 
@@ -482,7 +462,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
 #if DESKTOPGL || MONOMAC
-			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
+			SaveAsImage(stream, width, height, ImageWriterType.Jpg);
 #elif ANDROID
             SaveAsImage(stream, width, height, Bitmap.CompressFormat.Jpeg);
 #else
@@ -501,7 +481,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if DESKTOPGL || MONOMAC
-        internal void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
+        internal void SaveAsImage(Stream stream, int width, int height, ImageWriterType format)
 		{
 			if (stream == null)
 			{
@@ -515,42 +495,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new ArgumentOutOfRangeException("height", height, "'height' cannot be less than or equal to zero");
 			}
-			if (format == null)
-			{
-				throw new ArgumentNullException("format", "'format' cannot be null (Nothing in Visual Basic)");
-			}
-
 			byte[] data = null;
-			GCHandle? handle = null;
-			Bitmap bitmap = null;
 			try
 			{
 				data = new byte[width * height * 4];
-				handle = GCHandle.Alloc(data, GCHandleType.Pinned);
 				GetData(data);
 
-				// internal structure is BGR while bitmap expects RGB
-				for(int i = 0; i < data.Length; i += 4)
-				{
-					byte temp = data[i + 0];
-					data[i + 0] = data[i + 2];
-					data[i + 2] = temp;
-				}
-
-				bitmap = new Bitmap(width, height, width * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, handle.Value.AddrOfPinnedObject());
-
-				bitmap.Save(stream, format);
+                var writer = new ImageWriterToStream();
+                writer.Write(data, width, height, 4, format, stream);
 			}
 			finally
 			{
-				if (bitmap != null)
-				{
-					bitmap.Dispose();
-				}
-				if (handle.HasValue)
-				{
-					handle.Value.Free();
-				}
 				if (data != null)
 				{
 					data = null;
@@ -618,4 +573,3 @@ namespace Microsoft.Xna.Framework.Graphics
         }
     }
 }
-
