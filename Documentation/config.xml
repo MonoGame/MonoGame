@@ -62,12 +62,14 @@
   <!-- Windows Desktop -->
   <group api="default|Windows DirectX Desktop">    
     <source>..\MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.dll</source>
+	<source>..\MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.Net.dll</source>
     <source>..\MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
   </group>
 
   <!-- Linux Desktop -->
   <group api="linux|Linux Desktop">    
     <source>..\MonoGame.Framework\bin\Linux\AnyCPU\Release\MonoGame.Framework.dll</source>
+	<source>..\MonoGame.Framework\bin\Linux\AnyCPU\Release\MonoGame.Framework.Net.dll</source>
     <source>..\MonoGame.Framework.Content.Pipeline\bin\Linux\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
   </group>
   
@@ -82,6 +84,7 @@
   <!-- WindowsGL Desktop -->
   <group api="wingl|Windows OpenGL Desktop">    
     <source>..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.dll</source>
+	<source>..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.Net.dll</source>
   </group>
 
   <!-- Windows 8 Store -->
