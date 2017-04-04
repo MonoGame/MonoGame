@@ -27,34 +27,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
         public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
 
-		string FontsDirectory
-		{
-			get
-			{
-#if WINDOWS
-				var windowsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-				return Path.Combine(windowsDirectory, "Fonts");
-#elif MAC
-				return "/Library/Fonts";
-#else
-				return null;
-#endif
-			}
-		}
-
-		string LocalFontsDirectory
-		{
-			get
-			{
-#if MAC
-				var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-				return Path.Combine(homeDirectory, "Library/Fonts");
-#else
-				return null;
-#endif
-			}
-		}
-
         public FontDescriptionProcessor()
         {
             PremultiplyAlpha = true;
@@ -78,20 +50,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				fontName = input.FontName;
 #endif
 
-			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
-
 			List<string> directories = new List<string>();
-			directories.Add(directory);
-			if (LocalFontsDirectory != null)
-			{
-				directories.Add(LocalFontsDirectory);
-			}
-			if (FontsDirectory != null)
-			{
-				directories.Add(FontsDirectory);
-			}
 
-			foreach( var dir in directories) {
+			var directory = Path.GetDirectoryName(input.Identity.SourceFilename);
+			directories.Add(directory);
+#if MAC
+			var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+			var localFontsDirectory = Path.Combine(homeDirectory, "Library/Fonts");
+			directories.Add(localFontsDirectory);
+			directories.Add("/Library/Fonts");
+#elif WINDOWS
+			var windowsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+			var fontsDirectory = Path.Combine(windowsDirectory, "Fonts");
+			directories.Add(fontsDirectory);
+#endif
+
+			foreach (var dir in directories) {
 				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
 					fontName += ".ttf";
 					directory = dir;
@@ -270,6 +244,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			}
 
 			return glyphs.ToArray();
+		}
+
+		List<string> GetFontDirectories()
+		{
+
 		}
 
 #if WINDOWS
