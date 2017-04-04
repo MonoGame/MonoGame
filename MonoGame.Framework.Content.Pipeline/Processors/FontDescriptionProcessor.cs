@@ -27,6 +27,34 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
         public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
 
+		string FontsDirectory
+		{
+			get
+			{
+#if WINDOWS
+				var windowsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+				return Path.Combine(windowsDirectory, "Fonts");
+#elif MAC
+				return "/Library/Fonts";
+#else
+				return null;
+#endif
+			}
+		}
+
+		string LocalFontsDirectory
+		{
+			get
+			{
+#if MAC
+				var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+				return Path.Combine(homeDirectory, "Library/Fonts");
+#else
+				return null;
+#endif
+			}
+		}
+
         public FontDescriptionProcessor()
         {
             PremultiplyAlpha = true;
@@ -42,28 +70,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 #if WINDOWS || LINUX
 #if WINDOWS
-			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
-		    var fontDirectory = Path.Combine(windowsfolder,"Fonts");
-			fontName = FindFontFileFromFontName (fontName, fontDirectory);
+			fontName = FindFontFileFromFontName(fontName, fontDirectory);
 #elif LINUX
             fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
 #endif
 			if (string.IsNullOrWhiteSpace(fontName)) {
 				fontName = input.FontName;
 #endif
-				
-			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
 
-			var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-			var localFontsDirectory = Path.Combine(homeDirectory, "Library/Fonts");
+			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
 
 			List<string> directories = new List<string>();
 			directories.Add(directory);
-			directories.Add(localFontsDirectory);
-			directories.Add("/Library/Fonts");
-#if WINDOWS
-			directories.Add(fontDirectory);
-#endif
+			if (LocalFontsDirectory != null)
+			{
+				directories.Add(LocalFontsDirectory);
+			}
+			if (FontsDirectory != null)
+			{
+				directories.Add(FontsDirectory);
+			}
 
 			foreach( var dir in directories) {
 				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
