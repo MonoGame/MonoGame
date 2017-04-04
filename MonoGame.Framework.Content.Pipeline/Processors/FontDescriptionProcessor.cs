@@ -40,16 +40,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			var fontName = input.FontName;
 
-#if WINDOWS || LINUX
-#if WINDOWS
-			fontName = FindFontFileFromFontName(fontName, FontsDirectory);
-#elif LINUX
-            fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
-#endif
-			if (string.IsNullOrWhiteSpace(fontName)) {
-				fontName = input.FontName;
-#endif
-
 			List<string> directories = new List<string>();
 
 			var directory = Path.GetDirectoryName(input.Identity.SourceFilename);
@@ -63,6 +53,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			var windowsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
 			var fontsDirectory = Path.Combine(windowsDirectory, "Fonts");
 			directories.Add(fontsDirectory);
+#endif
+
+#if WINDOWS || LINUX
+#if WINDOWS
+			fontName = FindFontFileFromFontName(fontName, fontsDirectory);
+#elif LINUX
+            fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
+#endif
+			if (string.IsNullOrWhiteSpace(fontName)) {
+				fontName = input.FontName;
 #endif
 
 			foreach (var dir in directories) {
