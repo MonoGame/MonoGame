@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 #if WINDOWS || LINUX
 #if WINDOWS
-			fontName = FindFontFileFromFontName(fontName, fontDirectory);
+			fontName = FindFontFileFromFontName(fontName, FontsDirectory);
 #elif LINUX
             fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
 #endif
