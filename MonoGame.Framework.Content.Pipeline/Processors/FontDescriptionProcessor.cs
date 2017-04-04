@@ -246,11 +246,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			return glyphs.ToArray();
 		}
 
-		List<string> GetFontDirectories()
-		{
-
-		}
-
 #if WINDOWS
 		string FindFontFileFromFontName (string fontName, string fontDirectory)
 		{
