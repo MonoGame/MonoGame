@@ -54,8 +54,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				
 			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
 
+			var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+			var localFontsDirectory = Path.Combine(homeDirectory, "Library/Fonts");
+
 			List<string> directories = new List<string>();
 			directories.Add(directory);
+			directories.Add(localFontsDirectory);
 			directories.Add("/Library/Fonts");
 #if WINDOWS
 			directories.Add(fontDirectory);
