@@ -245,10 +245,14 @@ namespace MonoGame.Framework
             // Don't process touch state if we're not active 
             // and the mouse is within the client area.
             if (!_platform.IsActive || !withinClient)
-            {     
-                // Release mouse TouchLocation
-                if (MouseState.LeftButton == ButtonState.Pressed)                
-                    TouchPanelState.AddEvent(0, TouchLocationState.Released, new Vector2(MouseState.X, MouseState.Y), true);
+            {                
+                if (MouseState.LeftButton == ButtonState.Pressed)
+                {
+                    // Release mouse TouchLocation
+                    var touchX = MathHelper.Clamp(MouseState.X, 0, Form.ClientRectangle.Width-1);
+                    var touchY = MathHelper.Clamp(MouseState.Y, 0, Form.ClientRectangle.Height-1);
+                    TouchPanelState.AddEvent(0, TouchLocationState.Released, new Vector2(touchX, touchY), true);
+                }
                 return;
             }
             
