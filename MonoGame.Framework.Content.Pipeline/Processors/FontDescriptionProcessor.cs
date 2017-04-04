@@ -40,28 +40,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			var fontName = input.FontName;
 
+			List<string> directories = new List<string>();
+
+			var directory = Path.GetDirectoryName(input.Identity.SourceFilename);
+			directories.Add(directory);
+#if MAC
+			var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+			var localFontsDirectory = Path.Combine(homeDirectory, "Library/Fonts");
+			directories.Add(localFontsDirectory);
+			directories.Add("/Library/Fonts");
+#elif WINDOWS
+			var windowsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+			var fontsDirectory = Path.Combine(windowsDirectory, "Fonts");
+			directories.Add(fontsDirectory);
+#endif
+
 #if WINDOWS || LINUX
 #if WINDOWS
-			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
-		    var fontDirectory = Path.Combine(windowsfolder,"Fonts");
-			fontName = FindFontFileFromFontName (fontName, fontDirectory);
+			fontName = FindFontFileFromFontName(fontName, fontsDirectory);
 #elif LINUX
             fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
 #endif
 			if (string.IsNullOrWhiteSpace(fontName)) {
 				fontName = input.FontName;
 #endif
-				
-			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
 
-			List<string> directories = new List<string>();
-			directories.Add(directory);
-			directories.Add("/Library/Fonts");
-#if WINDOWS
-			directories.Add(fontDirectory);
-#endif
-
-			foreach( var dir in directories) {
+			foreach (var dir in directories) {
 				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
 					fontName += ".ttf";
 					directory = dir;
