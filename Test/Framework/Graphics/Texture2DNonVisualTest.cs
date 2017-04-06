@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
@@ -17,8 +18,11 @@ namespace MonoGame.Tests.Graphics
 
 #if !XNA
         [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
-        [TestCase("Assets/Textures/LogoOnly_64px.dds")]
         [TestCase("Assets/Textures/LogoOnly_64px.tif")]
+#if !DESKTOPGL
+        // not supported
+        [TestCase("Assets/Textures/LogoOnly_64px.dds")]
+#endif
 #endif
         [TestCase("Assets/Textures/LogoOnly_64px.gif")]
         [TestCase("Assets/Textures/LogoOnly_64px.jpg")]
@@ -82,6 +86,32 @@ namespace MonoGame.Tests.Graphics
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture2D(gd, 0, 0));
         }
 
+        [Test]
+        public void SimpleGetSetDataTest()
+        {
+            using (var tex = new Texture2D(gd, 4, 4, false, SurfaceFormat.Color))
+            {
+                const int startIndex = 5;
+                const int x = 2;
+                const int y = 2;
+                const int width = 2;
+                const int height = 2;
+                const int elementCount = 4 * width * height;
+
+                var data = new byte[startIndex + elementCount];
+                for (var i = 0; i < data.Length; i++)
+                    data[i] = (byte) i;
+
+                var rect = new Rectangle(x, y, width, height);
+
+                tex.SetData(0, rect, data, startIndex, elementCount);
+                tex.GetData(0, rect, data, startIndex, elementCount);
+
+                for (var i = 0; i < data.Length; i++)
+                    Assert.AreEqual(i, data[i]);
+            }
+        }
+
         [TestCase(25, 23, 1, 1, 0, 1)]
         [TestCase(25, 23, 1, 1, 1, 1)]
         [TestCase(25, 23, 2, 1, 0, 2)]
@@ -128,10 +158,7 @@ namespace MonoGame.Tests.Graphics
                 t.Dispose();
             }
         }
-#if !XNA
-        [TestCase(2000000)]
-        [TestCase(4097)]
-#endif
+
         [TestCase(4096)]
         public void SetData1ParameterGoodTest(int arraySize)
         {
@@ -169,12 +196,11 @@ namespace MonoGame.Tests.Graphics
                 t.Dispose();
             }
         }
+
         [TestCase(2000)]
         [TestCase(4095)]
-#if XNA
         [TestCase(2000000)]
         [TestCase(4097)]
-#endif
         public void SetData1ParameterExceptionTest(int arraySize)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
@@ -201,11 +227,109 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
-#if !XNA
-        [TestCase(4098, 1, 4097)]
-        [TestCase(4097, 0, 4097)]
-        [TestCase(4096, 0, 4095)]
+        [TestCase(SurfaceFormat.HalfSingle, (short)(160 << 8 + 120))]
+#if !DESKTOPGL
+        // format not supported
+        [TestCase(SurfaceFormat.Vector4, (long)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
 #endif
+        [TestCase(SurfaceFormat.Vector2, (float)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
+        [TestCase(SurfaceFormat.Color, (float)(200 << 24 + 180 << 16 + 160 << 8 + 120))]
+        [TestCase(SurfaceFormat.Color, (byte)150)]
+        [TestCase(SurfaceFormat.Color, (short)(160 << 8 + 120))]
+        [TestCase(SurfaceFormat.Single, (byte)150)]
+        [TestCase(SurfaceFormat.Single, (short)(160 << 8 + 120))]
+        [TestCase(SurfaceFormat.Single, (float)(200 << 24 + 180 << 16 + 160 << 8 + 120))]
+        public void SetDataFormatTest<TBuffer>(SurfaceFormat format, TBuffer value) where TBuffer : struct
+        {
+            const int textureSize = 16;
+
+            var surfaceFormatSize = GetFormatSize(format);
+            var textureSizeBytes = textureSize * surfaceFormatSize;
+
+            var tSizeBytes = Marshal.SizeOf(typeof(TBuffer));
+            var bufferSize = textureSizeBytes / tSizeBytes;
+
+            var buffer = new TBuffer[bufferSize];
+            for (var i = 0; i < bufferSize; i++)
+                buffer[i] = value;
+
+            var t = new Texture2D(gd, textureSize, 1, false, format);
+            t.SetData(buffer);
+
+            var buffer2 = new TBuffer[bufferSize];
+            t.GetData(buffer2);
+
+            for (var i = 0; i < buffer.Length; i++)
+                Assert.AreEqual(buffer[i], buffer2[i]);
+
+            t.Dispose();
+        }
+
+        [TestCase(SurfaceFormat.Color, (long)0)]
+        [TestCase(SurfaceFormat.HalfSingle, (float)0)]
+        public void SetDataFormatFailingTestTBufferTooLarge<TBuffer>(SurfaceFormat format, TBuffer value) where TBuffer : struct
+        {
+            const int textureSize = 16;
+
+            var surfaceFormatSize = GetFormatSize(format);
+            var textureSizeBytes = textureSize * surfaceFormatSize;
+
+            var tSizeBytes = Marshal.SizeOf(typeof(TBuffer));
+            var bufferSize = textureSizeBytes / tSizeBytes;
+
+            var buffer = new TBuffer[bufferSize];
+            for (var i = 0; i < bufferSize; i++)
+                buffer[i] = value;
+
+            var t = new Texture2D(gd, textureSize, 1, false, format);
+            Assert.Throws<ArgumentException>(() => t.SetData(buffer));
+
+            t.Dispose();
+        }
+
+        [Test]
+        public void SetDataFormatFailingTestModTBufferNotZero()
+        {
+            const int textureSize = 12;
+            var format = SurfaceFormat.Vector4;
+            var value = new Vector3(20, 15, 18);
+
+            var surfaceFormatSize = GetFormatSize(format);
+            var textureSizeBytes = textureSize * surfaceFormatSize;
+
+            var tSizeBytes = 12;
+            var bufferSize = textureSizeBytes / tSizeBytes;
+
+            var buffer = new Vector3[bufferSize];
+            for (var i = 0; i < bufferSize; i++)
+                buffer[i] = value;
+
+            var t = new Texture2D(gd, textureSize, 1, false, format);
+            Assert.Throws<ArgumentException>(() => t.SetData(buffer));
+
+            t.Dispose();
+        }
+
+        public static int GetFormatSize(SurfaceFormat surfaceFormat)
+        {
+            switch (surfaceFormat)
+            {
+                case SurfaceFormat.Alpha8:
+                    return 1;
+                case SurfaceFormat.HalfSingle:
+                    return 2;
+                case SurfaceFormat.Single:
+                case SurfaceFormat.Color:
+                    return 4;
+                case SurfaceFormat.Vector2:
+                    return 8;
+                case SurfaceFormat.Vector4:
+                    return 16;
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
         [TestCase(4200, 0, 4096)]
         [TestCase(4097, 1, 4096)]
         [TestCase(4097, 0, 4096)]
@@ -257,11 +381,9 @@ namespace MonoGame.Tests.Graphics
         [TestCase(4095, 0, 4094)]
         [TestCase(4097, 1, 4097)]
         [TestCase(4097, 1, 4098)]
-#if XNA
         [TestCase(4098, 1, 4097)]
         [TestCase(4097, 0, 4097)]
         [TestCase(4096, 0, 4095)]
-#endif
         public void SetData3ParameterExceptionTest(int arraySize, int startIndex, int elements)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
@@ -289,14 +411,6 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
-#if !XNA
-        [TestCase(4096, 0, 4096, 1, 1, 63, 63)]
-        [TestCase(4096, 0, 4095, 0, 0, 64, 64)]
-        [TestCase(4096, 0, 3844, 1, 1, 63, 63)]
-        [TestCase(4097, 1, 4096, 1, 1, 63, 63)]
-        [TestCase(4097, 1, 4095, 0, 0, 64, 64)]
-        [TestCase(4097, 1, 3844, 1, 1, 63, 63)]
-#endif
         [TestCase(4096, 0, 4096, 0, 0, 64, 64)]
         [TestCase(4096, 0, 3969, 1, 1, 63, 63)]
         [TestCase(3969, 0, 3969, 1, 1, 63, 63)]
@@ -348,7 +462,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(3969, 0, 4096, 1, 1, 63, 63)]
         [TestCase(3970, 1, 4096, 1, 1, 63, 63)]
         [TestCase(4096, 0, 4096, -1, -1, 65, 65)]
-#if XNA
         [TestCase(4096, 0, 4096, 1, 1, 63, 63)]
         [TestCase(4096, 0, 4095, 0, 0, 64, 64)]
         [TestCase(4096, 0, 3844, 1, 1, 63, 63)]
@@ -356,7 +469,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(4097, 1, 4095, 0, 0, 64, 64)]
         [TestCase(4097, 1, 3844, 1, 1, 63, 63)]
         [TestCase(3970, 1, 4096, 1, 1, 63, 63)]
-#endif
         public void SetData5ParameterExceptionTest(int arraySize, int startIndex, int elements, int x, int y, int w, int h)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
@@ -385,5 +497,166 @@ namespace MonoGame.Tests.Graphics
                 t.Dispose();
             }
         }
+
+        [Test]
+        public void GetDataNegativeOrZeroRectWidthAndHeightThrows()
+        {
+            using (var t = new Texture2D(gd, 10, 10))
+            {
+                var data = new Color[4];
+                var data2 = new Color[0];
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5,  2, -2), data, 0, 4));
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5, -2,  2), data, 0, 4));
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5, -2, -2), data, 0, 4));
+
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5, 0, 2), data2, 0, 4));
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5, 2, 0), data2, 0, 4));
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5, 0, 0), data2, 0, 4));
+            }
+        }
+
+        [Test]
+        public void GetAndSetDataDxtCompressed()
+        {
+            var t = content.Load<Texture2D>(Paths.Texture ("random_16px_dxt"));
+
+            var b = new byte[t.Width*t.Height/2];
+            var b2 = new byte[t.Width*t.Height/2];
+
+            t.GetData(b);
+            t.SetData(b);
+            t.GetData(b2);
+
+            Assert.AreEqual(b, b2);
+
+            // MonoGame allows any kind of type that is not larger than one element while XNA only allows byte
+#if !XNA
+            var b3 = new short[t.Width*t.Height/4];
+            t.GetData(b3);
+            t.SetData(b3);
+
+            t.GetData(b2);
+            Assert.AreEqual(b, b2);
+
+            var b4 = new int[t.Width*t.Height/8];
+            t.GetData(b4);
+            t.SetData(b4);
+
+            t.GetData(b2);
+            Assert.AreEqual(b, b2);
+
+            var b5 = new long[t.Width*t.Height/16];
+            t.GetData(b5);
+            t.SetData(b5);
+
+            t.GetData(b2);
+            Assert.AreEqual(b, b2);
+
+            // this is too large, DXT1 blocks are 64 bits while Vector4 is 128 bits
+            var b6 = new Vector4[t.Width*t.Height/32];
+            Assert.Throws<ArgumentException>(() => t.GetData(b6));
+            Assert.Throws<ArgumentException>(() => t.SetData(b6));
+
+            var b7 = new Vector3[t.Width*t.Height/24];
+            Assert.Throws<ArgumentException>(() => t.GetData(b7));
+            Assert.Throws<ArgumentException>(() => t.SetData(b7));
+#endif
+
+            t.Dispose();
+        }
+
+        // DXT1
+        [TestCase(8, "random_16px_dxt", 0)]
+        [TestCase(8, "random_16px_dxt", 1)]
+        // DXT5
+        [TestCase(16, "random_16px_dxt_alpha", 0)]
+        [TestCase(16, "random_16px_dxt_alpha", 1)]
+        public void GetAndSetDataDxtNotMultipleOf4Rounding(int bs, string texName, int mip)
+        {
+            var t = content.Load<Texture2D>(Paths.Texture (texName));
+
+            var before = new byte[t.Width*t.Height*bs/16];
+            t.GetData(before);
+
+            var b1 = new byte[bs];
+            var b2 = new byte[bs];
+
+            t.GetData(mip, new Rectangle(0, 0, 4, 4), b1, 0, bs);
+
+            t.GetData(mip, new Rectangle(0,0,1,1), b2, 0, bs);
+            t.SetData(mip, new Rectangle(0,0,1,1), b2, 0, bs);
+            Assert.AreEqual(b1, b2);
+
+            t.GetData(mip, new Rectangle(0,0,1,3), b2, 0, bs);
+            t.SetData(mip, new Rectangle(0,0,1,3), b2, 0, bs);
+            Assert.AreEqual(b1, b2);
+
+            t.GetData(mip, new Rectangle(0,0,4,3), b2, 0, bs);
+            t.SetData(mip, new Rectangle(0,0,4,3), b2, 0, bs);
+            Assert.AreEqual(b1, b2);
+
+            t.GetData(mip, new Rectangle(0, 2, 4, 4), b2, 0, bs);
+            t.SetData(mip, new Rectangle(0, 2, 4, 4), b2, 0, bs);
+            Assert.AreEqual(b1, b2);
+
+            t.GetData(mip, new Rectangle(2, 2, 4, 4), b2, 0, bs);
+            t.SetData(mip, new Rectangle(2, 2, 4, 4), b2, 0, bs);
+            Assert.AreEqual(b1, b2);
+
+            t.GetData(mip, new Rectangle(3, 3, 4, 4), b2, 0, bs);
+            t.SetData(mip, new Rectangle(3, 3, 4, 4), b2, 0, bs);
+            Assert.AreEqual(b1, b2);
+
+            t.GetData(mip, new Rectangle(4, 4, 4, 4), b2, 0, bs);
+            t.SetData(mip, new Rectangle(4, 4, 4, 4), b2, 0, bs);
+            Assert.AreNotEqual(b1, b2);
+
+            var after = new byte[t.Width*t.Height*bs/16];
+            t.GetData(after);
+
+            Assert.AreEqual(before, after);
+
+            t.Dispose();
+        }
+
+        [TestCase("random_16px_dxt", 8)]
+        [TestCase("random_16px_dxt_alpha", 16)]
+        public void GetAndSetDataDxtDontRoundWhenOutsideBounds(string texName, int bs)
+        {
+            var t = content.Load<Texture2D>(Paths.Texture(texName));
+
+            var b = new byte[bs];
+
+            // don't round if the unrounded rectangle would be outside the texture area
+            Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(15, 15, 3, 3), b, 0, bs));
+            // this does work
+            t.GetData(0, new Rectangle(15, 15, 1, 1), b, 0, bs);
+
+            t.Dispose();
+        }
+
+        [TestCase("random_16px_dxt", 8)]
+        [TestCase("random_16px_dxt_alpha", 16)]
+        public void GetAndSetDataDxtLowerMips(string texName, int bs)
+        {
+            var t = content.Load<Texture2D>(Paths.Texture(texName));
+
+            var b = new byte[bs];
+            var b2 = new byte[bs];
+
+            t.GetData(0, new Rectangle(0,0,4,4), b, 0, bs);
+            t.GetData(1, new Rectangle(0,0,4,4), b2, 0, bs);
+            t.GetData(2, new Rectangle(0,0,4,4), b2, 0, bs);
+            t.GetData(3, new Rectangle(0,0,2,2), b2, 0, bs);
+            t.GetData(4, new Rectangle(0,0,1,1), b2, 0, bs);
+            t.SetData(3, new Rectangle(0,0,2,2), b2, 0, bs);
+            
+            // would be rounded, but the rectangle is outside the texture area so it wil throw before rounding
+            Assert.Throws<ArgumentException>(() => t.GetData(3, new Rectangle(1, 1, 2, 2), b, 0, bs));
+            Assert.Throws<ArgumentException>(() => t.GetData(3, new Rectangle(0, 0, 3, 3), b, 0, bs));
+
+            t.Dispose();
+        }
+
     }
 }

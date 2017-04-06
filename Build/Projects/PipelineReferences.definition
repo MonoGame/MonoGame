@@ -43,18 +43,8 @@
 
   <Platform Type="MacOS">
     <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
-    <Binary Name="Eto.Gtk2" Path="ThirdParty\Dependencies\Eto\Eto.Gtk2.dll" />
+    <Binary Name="Eto.XamMac2" Path="ThirdParty\Dependencies\Eto\Eto.XamMac2.dll" />
     <Binary Name="Xwt" Path="ThirdParty\Dependencies\xwt\Xwt.dll" />
-    <Binary Name="Xwt.Gtk2" Path="ThirdParty\Dependencies\xwt\Xwt.Gtk2.dll" />
-    
-    <Reference Include="atk-sharp"/>
-    <Reference Include="gdk-sharp"/>
-    <Reference Include="glade-sharp"/>
-    <Reference Include="glib-sharp"/>
-    <Reference Include="gtk-dotnet"/>
-    <Reference Include="gtk-sharp"/>
-    <Reference Include="pango-sharp"/>
-    <Reference Include="Mono.Posix"/>
   </Platform>
 
   <Platform Type="Windows">

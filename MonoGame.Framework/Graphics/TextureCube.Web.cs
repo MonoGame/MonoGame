@@ -13,12 +13,12 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        private void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
+        private void PlatformGetData<T>(CubeMapFace cubeMapFace, int level, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             throw new NotImplementedException();
         }
 
-        private void PlatformSetData<T>(CubeMapFace face, int level, IntPtr dataPtr, int xOffset, int yOffset, int width, int height)
+        private void PlatformSetData<T>(CubeMapFace face, int level, Rectangle rect, T[] data, int startIndex, int elementCount)
         {
             throw new NotImplementedException();
         }

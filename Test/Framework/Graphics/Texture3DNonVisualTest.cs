@@ -24,11 +24,7 @@ namespace MonoGame.Tests.Graphics
             _game = new Game();
             var graphicsDeviceManager = new GraphicsDeviceManager(_game);
             graphicsDeviceManager.GraphicsProfile = GraphicsProfile.HiDef;
-#if XNA
             graphicsDeviceManager.ApplyChanges();
-#else
-            graphicsDeviceManager.CreateDevice();
-#endif
 
             t = new Texture3D(_game.GraphicsDevice, w, h, d, false, SurfaceFormat.Color);
             for (int layer = 0; layer < d; layer++)
@@ -74,10 +70,6 @@ namespace MonoGame.Tests.Graphics
             t.GetData(written);
             Assert.AreEqual(reference, written);
         }
-#if !XNA
-        [TestCase(a, 0, a + 1)]
-        [TestCase(a + 1, 1, a + 1)]
-#endif
 
         [TestCase(a, 0, a)]
         [TestCase(a + 1, 0, a)]
@@ -107,10 +99,8 @@ namespace MonoGame.Tests.Graphics
         [TestCase(a, 0, a - 1)]
         [TestCase(a - 1, 0, a)]
         [TestCase(a, 1, a)]
-#if XNA
         [TestCase(a, 0, a + 1)]
         [TestCase(a + 1, 1, a + 1)]
-#endif
         public void SetData3ParametersExceptionTest(int arrayLength, int startIndex, int elementCount)
         {
             Color[] write = new Color[arrayLength];

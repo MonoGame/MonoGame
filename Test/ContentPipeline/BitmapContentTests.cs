@@ -51,7 +51,7 @@ namespace MonoGame.Tests.ContentPipeline
                     Assert.AreEqual(color1, b2.GetPixel(x, y));
         }
 
-        void BitmapCopyFullResize<T>(T color1)
+        void BitmapCopyFullResize<T>(T color1, IEqualityComparer<T> comparer)
             where T : struct, IEquatable<T>
         {
             var b1 = new PixelBitmapContent<T>(8, 8);
@@ -61,7 +61,7 @@ namespace MonoGame.Tests.ContentPipeline
 
             for (var y = 0; y < b2.Height; y++)
                 for (var x = 0; x < b2.Width; x++)
-                    Assert.AreEqual(color1, b2.GetPixel(x, y));
+                    Assert.That(color1, Is.EqualTo(b2.GetPixel(x, y)).Using(comparer));
         }
 
         void BitmapConvertFullNoResize<T, U>(T color1, U color2)
@@ -126,7 +126,7 @@ namespace MonoGame.Tests.ContentPipeline
                     Assert.AreEqual(x >= 4 && y >= 4 ? color1 : color2, b2.GetPixel(x, y));
         }
 
-        void BitmapCopyRegionResize<T>(T color1, T color2)
+        void BitmapCopyRegionResize<T>(T color1, T color2, IEqualityComparer<T> comparer)
             where T : struct, IEquatable<T>
         {
             var b1 = new PixelBitmapContent<T>(8, 8);
@@ -137,13 +137,15 @@ namespace MonoGame.Tests.ContentPipeline
 
             for (var y = 0; y < b2.Height; y++)
                 for (var x = 0; x < b2.Width; x++)
-                    Assert.AreEqual(x < 3 && y < 6 ? color1 : color2, b2.GetPixel(x, y));
+                    Assert.That(x < 3 && y < 6 ? color1 : color2, Is.EqualTo(b2.GetPixel(x, y)).Using(comparer));
         }
 
         [Test]
         public void BitmapCopyFullNoResize()
         {
+#if !XNA
             BitmapCopyFullNoResize<byte>(56);
+#endif
             BitmapCopyFullNoResize<float>(0.56f);
             BitmapCopyFullNoResize<Color>(Color.Red);
             BitmapCopyFullNoResize<Vector4>(new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -152,17 +154,21 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void BitmapCopyFullResize()
         {
-            BitmapCopyFullResize<byte>(56);
-            BitmapCopyFullResize<float>(0.56f);
-            BitmapCopyFullResize<Color>(Color.Red);
-            BitmapCopyFullResize<Vector4>(new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+#if !XNA
+            BitmapCopyFullResize<byte>(56, ByteComparer.Equal);
+#endif
+            BitmapCopyFullResize<float>(0.56f, FloatComparer.Epsilon);
+            BitmapCopyFullResize<Color>(Color.Red, ColorComparer.Equal);
+            BitmapCopyFullResize<Vector4>(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), Vector4Comparer.Epsilon);
         }
 
         [Test]
         public void BitmapConvertFullNoResize()
         {
-            BitmapConvertFullNoResize<byte, Color>(byte.MaxValue, Color.White);
-            BitmapConvertFullNoResize<float, Color>(1.0f, Color.White);
+#if !XNA
+            BitmapConvertFullNoResize<byte, Color>(byte.MaxValue, Color.Red);
+#endif
+            BitmapConvertFullNoResize<float, Color>(1.0f, Color.Red);
             BitmapConvertFullNoResize<Color, Vector4>(Color.Red, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
             BitmapConvertFullNoResize<Vector4, Color>(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), Color.Red);
         }
@@ -170,7 +176,9 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void BitmapCompressFullNoResize()
         {
+#if !XNA
             BitmapCompressFullNoResize<byte>(56);
+#endif
             BitmapCompressFullNoResize<float>(0.56f);
             BitmapCompressFullNoResize<Color>(Color.Red);
             BitmapCompressFullNoResize<Vector4>(new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -179,7 +187,9 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void BitmapCompressFullResize()
         {
+#if !XNA
             BitmapCompressFullResize<byte>(56);
+#endif
             BitmapCompressFullResize<float>(0.56f);
             BitmapCompressFullResize<Color>(Color.Red);
             BitmapCompressFullResize<Vector4>(new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -188,7 +198,9 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void BitmapCopySameRegionNoResize()
         {
+#if !XNA
             BitmapCopySameRegionNoResize<byte>(56, 48);
+#endif
             BitmapCopySameRegionNoResize<float>(0.56f, 0.48f);
             BitmapCopySameRegionNoResize<Color>(Color.Red, Color.Blue);
             BitmapCopySameRegionNoResize<Vector4>(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), new Vector4(0.0f, 0.0f, 1.0f, 1.0f));
@@ -197,7 +209,9 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void BitmapCopyMoveRegionNoResize()
         {
+#if !XNA
             BitmapCopyMoveRegionNoResize<byte>(56, 48);
+#endif
             BitmapCopyMoveRegionNoResize<float>(0.56f, 0.48f);
             BitmapCopyMoveRegionNoResize<Color>(Color.Red, Color.Blue);
             BitmapCopyMoveRegionNoResize<Vector4>(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), new Vector4(0.0f, 0.0f, 1.0f, 1.0f));
@@ -206,10 +220,12 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void BitmapCopyRegionResize()
         {
-            BitmapCopyRegionResize<byte>(56, 48);
-            BitmapCopyRegionResize<float>(0.56f, 0.48f);
-            BitmapCopyRegionResize<Color>(Color.Red, Color.Blue);
-            BitmapCopyRegionResize<Vector4>(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), new Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+#if !XNA
+            BitmapCopyRegionResize<byte>(56, 48, ByteComparer.Equal);
+#endif
+            BitmapCopyRegionResize<float>(0.56f, 0.48f, FloatComparer.Epsilon);
+            BitmapCopyRegionResize<Color>(Color.Red, Color.Blue, ColorComparer.Equal);
+            BitmapCopyRegionResize<Vector4>(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), new Vector4(0.0f, 0.0f, 1.0f, 1.0f), Vector4Comparer.Epsilon);
         }
     }
 }

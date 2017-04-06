@@ -145,7 +145,7 @@ namespace MonoGame.Tests.Graphics
             texture2D.Dispose();
         }
 		
-#if !XNA
+#if DIRECTX
         [TestCase(SurfaceFormat.Color, false)]
         [TestCase(SurfaceFormat.Color, true)]
         [TestCase(SurfaceFormat.ColorSRgb, false)]
@@ -203,6 +203,9 @@ namespace MonoGame.Tests.Graphics
         [TestCase(1, 1)]
         [TestCase(8, 8)]
         [TestCase(31, 7)]
+#if DESKTOPGL
+        [Ignore("Not yet implemented in OpenGL")]
+#endif
         public void ShouldSetAndGetDataForTextureArray(int width, int height)
         {
             const int arraySize = 4;
@@ -262,7 +265,7 @@ namespace MonoGame.Tests.Graphics
             gd.SetRenderTargets(originalRenderTargets);
 
             // Now render into backbuffer, using texture array as a shader resource.
-            var effect = AssetTestUtility.CompileEffect(gd, "TextureArrayEffect.fx");
+            var effect = AssetTestUtility.LoadEffect(content, "TextureArrayEffect");
             effect.Parameters["Texture"].SetValue(textureArray);
             effect.CurrentTechnique.Passes[0].Apply();
 

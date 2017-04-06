@@ -194,6 +194,8 @@ namespace MonoGame.Tests.ContentPipeline
         public void ImportDds()
         {
             ImportStandard("Assets/Textures/LogoOnly_64px.dds", SurfaceFormat.Dxt3);
+            ImportStandard("Assets/Textures/LogoOnly_64px-R8G8B8.dds", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/LogoOnly_64px-X8R8G8B8.dds", SurfaceFormat.Color);
         }
 
         [Test]

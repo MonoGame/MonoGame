@@ -5,14 +5,14 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
-	<Reference Include="System.Web" />
+    <Reference Include="System.Web" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MonoGame.Tests.References" />
   </References>
 
   <Properties>
-    
+
     <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
@@ -33,6 +33,33 @@
   </Properties>
 
   <Files>
+    <!-- Dependencies -->
+    <None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
+      <Platforms>WindowsGL</Platforms>
+      <Link>SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
+      <Platforms>WindowsGL</Platforms>
+      <Link>soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
+      <Platforms>Linux</Platforms>
+      <Link>x64\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
+      <Platforms>Linux</Platforms>
+      <Link>x64\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+    <None Include="MonoGame.Tests.dll.config">
+      <Platforms>Linux</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
 
     <None Include="ReadMe.md" />
 
@@ -94,8 +121,9 @@
 	<Compile Include="Framework\CurveKeyTest.cs" />
 	<Compile Include="Framework\CurveTest.cs" />
 	<Compile Include="Framework\EnumConformingTest.cs" />
+	<Compile Include="Framework\FrameworkDispatcherTest.cs" />
     <Compile Include="Framework\GameComponentTest.cs" />
-    <Compile Include="Framework\GameTest.cs" />	
+    <Compile Include="Framework\GameTest.cs" />
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\GameTest+Properties.cs" />
     <Compile Include="Framework\GestureRecognizerTest.cs" />
@@ -121,7 +149,10 @@
     <Compile Include="Framework\Audio\SoundEffectTest.cs" />
     <Compile Include="Framework\Audio\XactTest.cs" />
     <Compile Include="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
-	
+    <Compile Include="Framework\Audio\SoundEffectInstanceXAudioTest.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
+
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
     <Compile Include="Framework\Components\FrameCompareComponent.cs" />
@@ -144,7 +175,9 @@
     <Compile Include="Framework\Graphics\GraphicsDeviceTestFixtureBase.cs" />
     <Compile Include="Framework\Graphics\IndexBufferTest.cs" />
     <Compile Include="Framework\Graphics\Texture2DNonVisualTest.cs" />
-    <Compile Include="Framework\Graphics\Texture3DNonVisualTest.cs" />
+    <Compile Include="Framework\Graphics\Texture3DNonVisualTest.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
 
     <Compile Include="Framework\Input\GamePadTest.cs" />
     <Compile Include="Framework\Input\JoystickTest.cs" />
@@ -159,7 +192,9 @@
     <Compile Include="Framework\Graphics\SamplerStateTest.cs" />
     <Compile Include="Framework\Graphics\ScissorRectangleTest.cs" />
     <Compile Include="Framework\Graphics\Texture2DTest.cs" />
-    <Compile Include="Framework\Graphics\Texture3DTest.cs" />
+    <Compile Include="Framework\Graphics\Texture3DTest.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Framework\Graphics\TextureCubeTest.cs" />
     <Compile Include="Framework\Graphics\VertexBufferTest.cs" />
     <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
@@ -167,6 +202,7 @@
     <Compile Include="Framework\Graphics\SpriteBatchTest.cs" />
     <Compile Include="Framework\Graphics\SpriteFontTest.cs" />
     <Compile Include="Framework\Graphics\ViewportTest.cs" />
+    <Compile Include="Framework\Graphics\ModelTest.cs" />
     <Compile Include="Framework\Graphics\OcclusionQueryTest.cs" />
     <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
@@ -194,6 +230,12 @@
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\IntermediateSerializerTest.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\MeshBuilderTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\MeshHelperTest.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\ModelProcessorTests.cs">
@@ -239,7 +281,7 @@
     <Content Include="Assets\Audio\Win\Tests.xwb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	
+
     <Content Include="Assets\Audio\bark_mono_11hz_8bit.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -349,35 +391,77 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
-    <Content Include="Assets\Effects\CustomSpriteBatchEffect.fx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Effects\CustomSpriteBatchEffectComparisonSampler.fx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Assets\Effects\DefinesTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Effects\Instancing.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Effects\ParserTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Effects\PreprocessorInclude.fxh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Effects\PreprocessorTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Effects\Include.fxh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Effects\TextureArrayEffect.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Effects\VertexTextureEffect.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\Bevels.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\BlackOut.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\ColorFlip.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\Grayscale.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\HighContrast.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\Invert.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\NoEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\RainbowH.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\CustomSpriteBatchEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\CustomSpriteBatchEffectComparisonSampler.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
 
     <Content Include="Assets\ReferenceImages\BlendState\VisualTests.png">
@@ -662,6 +746,9 @@
     <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_many.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Draw_with_LayerDepth.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -680,7 +767,16 @@
     <Content Include="Assets\ReferenceImages\SpriteFont\Hullabaloo2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ReferenceImages\SpriteFont\Multiline.png">
+    <Content Include="Assets\ReferenceImages\SpriteFont\Multiline_CarriageReturn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Multiline_Newline.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Multiline_noNewline.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Multiline_verbatimString.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\SpriteFont\Origins_rotated.png">
@@ -824,6 +920,9 @@
     <Content Include="Assets\Xml\27_Colors.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Content Include="Assets\Xml\28_XnaCurve.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\Fonts\Default.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -834,6 +933,7 @@
     <Content Include="Assets\Textures\Surge.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+
     <Content Include="Assets\Effects\DirectX\Bevels.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Platforms>Windows</Platforms>
@@ -866,6 +966,66 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Platforms>Windows</Platforms>
     </Content>
+    <Content Include="Assets\Effects\DirectX\CustomSpriteBatchEffect.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\DirectX\CustomSpriteBatchEffectComparisonSampler.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+   <Content Include="Assets\Effects\DirectX\Instancing.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\DirectX\TextureArrayEffect.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\DirectX\VertexTextureEffect.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
+
+
+    <Content Include="Assets\Effects\OpenGL\Bevels.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\BlackOut.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\ColorFlip.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\Grayscale.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\HighContrast.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\Invert.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\NoEffect.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\RainbowH.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+    <Content Include="Assets\Effects\OpenGL\CustomSpriteBatchEffect.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Content>
+ 
+
     <Content Include="Assets\Textures\GlassPane.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -935,13 +1095,28 @@
     <Content Include="Assets\Textures\LogoOnly_64px.tif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Textures\random_16px_dxt.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\random_16px_dxt_alpha.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Textures\SampleCube64DXT1Mips.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\SampleCube64DXT1Mips.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Textures\Sunset.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 	<Content Include="Assets\Textures\LogoOnly_64px.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	<Content Include="Assets\Textures\LogoOnly_64px-R8G8B8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	<Content Include="Assets\Textures\LogoOnly_64px-X8R8G8B8.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 	<Content Include="Assets\Textures\LogoOnly_64px-mipmaps.dds">
