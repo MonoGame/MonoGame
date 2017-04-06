@@ -10,6 +10,21 @@ namespace Microsoft.Xna.Framework.Input.Touch
     public class TouchPanelState
     {
         /// <summary>
+        /// If game loop runs on a worker thread we must lock it because the UI thread sends events.
+        /// </summary>
+        private static object _lock = new object ();
+
+        /// <summary>
+        /// For locking properties.
+        /// </summary>
+        private GestureType _enabledGestures;
+        private IntPtr _windowHandle;
+        private static TimeSpan _currentTimestamp;
+        private DisplayOrientation _displayOrientation;
+        private bool _enableMouseTouchPoint;
+        private bool _enableMouseGestures;
+
+        /// <summary>
         /// The reserved touchId for all mouse touch points.
         /// </summary>
         private const int MouseTouchId = 1;
@@ -43,7 +58,23 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The current timestamp that we use for setting the timestamp of new TouchLocations
         /// </summary>
-        internal static TimeSpan CurrentTimestamp { get; set; }
+        internal static TimeSpan CurrentTimestamp
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _currentTimestamp;
+                }
+            }
+            set
+            {
+                lock (_lock)
+                {
+                    _currentTimestamp = value;
+                }
+            }
+        }
 
         /// <summary>
         /// The mapping between platform specific touch ids
@@ -51,7 +82,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         private readonly Dictionary<int, int> _touchIds = new Dictionary<int, int>();
 
-        internal readonly Queue<GestureSample> GestureList = new Queue<GestureSample>();
+        readonly Queue<GestureSample> GestureList = new Queue<GestureSample>();
 
         private TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
 
@@ -65,7 +96,23 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The window handle of the touch panel. Purely for Xna compatibility.
         /// </summary>
-        public IntPtr WindowHandle { get; set; }
+        public IntPtr WindowHandle
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _windowHandle;
+                }
+            }
+            set
+            {
+                lock (_lock)
+                {
+                    _windowHandle = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Returns capabilities of touch panel device.
@@ -73,8 +120,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns><see cref="TouchPanelCapabilities"/></returns>
         public TouchPanelCapabilities GetCapabilities()
         {
-            Capabilities.Initialize();
-            return Capabilities;
+            lock(_lock)
+            {
+                Capabilities.Initialize ();
+                return Capabilities;
+            }                            
         }
 
         /// <summary>
@@ -134,92 +184,102 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public TouchCollection GetState()
         {
-            //Clear out touches from previous frames that were released on the same frame they were touched that haven't been seen
-            for (var i = _touchState.Count - 1; i >= 0; i--)
+            lock (_lock)
             {
-                var touch = _touchState[i];
-
-                //If a touch was pressed and released in a previous frame and the user didn't ask about it then trash it.
-                if (touch.SameFrameReleased && touch.Timestamp < CurrentTimestamp && touch.State == TouchLocationState.Pressed)
+                //Clear out touches from previous frames that were released on the same frame they were touched that haven't been seen
+                for (var i = _touchState.Count - 1; i >= 0; i--)
                 {
-                    _touchState.RemoveAt(i);
-                }
-            }
+                    var touch = _touchState[i];
 
-            var result = (_touchState.Count > 0) ? new TouchCollection(_touchState.ToArray()) : TouchCollection.Empty;
-            AgeTouches(_touchState);
-            return result;
+                    //If a touch was pressed and released in a previous frame and the user didn't ask about it then trash it.
+                    if (touch.SameFrameReleased && touch.Timestamp < CurrentTimestamp && touch.State == TouchLocationState.Pressed)
+                    {
+                        _touchState.RemoveAt (i);
+                    }
+                }
+
+                var result = (_touchState.Count > 0) ? new TouchCollection (_touchState.ToArray ()) : TouchCollection.Empty;
+                AgeTouches (_touchState);
+                return result;
+            }
         }
 
         internal void AddEvent(int id, TouchLocationState state, Vector2 position)
         {
-            AddEvent(id, state, position, false);
+            // In case of any future update so we don't forget this
+            lock (_lock)
+            {
+                AddEvent (id, state, position, false);
+            }
         }
 
         internal void AddEvent(int id, TouchLocationState state, Vector2 position, bool isMouse)
         {
-            // Different platforms return different touch identifiers
-            // based on the specifics of their implementation and the
-            // system drivers.
-            //
-            // Sometimes these ids are suitable for our use, but other
-            // times it can recycle ids or do cute things like return
-            // the same id for double tap events.
-            //
-            // We instead provide consistent ids by generating them
-            // ourselves on the press and looking them up on move 
-            // and release events.
-            // 
-            if (state == TouchLocationState.Pressed)
+            lock (_lock)
             {
-                if (isMouse)
+                // Different platforms return different touch identifiers
+                // based on the specifics of their implementation and the
+                // system drivers.
+                //
+                // Sometimes these ids are suitable for our use, but other
+                // times it can recycle ids or do cute things like return
+                // the same id for double tap events.
+                //
+                // We instead provide consistent ids by generating them
+                // ourselves on the press and looking them up on move 
+                // and release events.
+                // 
+                if (state == TouchLocationState.Pressed)
                 {
-                    // Mouse pointing devices always use a reserved Id
-                    _touchIds[id] = MouseTouchId;
+                    if (isMouse)
+                    {
+                        // Mouse pointing devices always use a reserved Id
+                        _touchIds[id] = MouseTouchId;
+                    }
+                    else
+                    {
+                        _touchIds[id] = _nextTouchId++;
+                    }
                 }
-                else
+
+                // Try to find the touch id.
+                int touchId;
+                if (!_touchIds.TryGetValue (id, out touchId))
                 {
-                    _touchIds[id] = _nextTouchId++;
+                    // If we got here that means either the device is sending
+                    // us bad, out of order, or old touch events.  In any case
+                    // just ignore them.
+                    return;
                 }
+
+                if (!isMouse || EnableMouseTouchPoint || EnableMouseGestures)
+                {
+                    // Add the new touch event keeping the list from getting
+                    // too large if no one happens to be requesting the state.
+                    var evt = new TouchLocation (touchId, state, position * _touchScale, CurrentTimestamp);
+
+                    if (!isMouse || EnableMouseTouchPoint)
+                    {
+                        ApplyTouch (_touchState, evt);
+                    }
+
+                    //If we have gestures enabled then collect events for those too.
+                    //We also have to keep tracking any touches while we know about touches so we don't miss releases even if gesture recognition is disabled
+                    if ((EnabledGestures != GestureType.None || _gestureState.Count > 0) && (!isMouse || EnableMouseGestures))
+                    {
+                        ApplyTouch (_gestureState, evt);
+
+                        if (EnabledGestures != GestureType.None)
+                            UpdateGestures (true);
+
+                        AgeTouches (_gestureState);
+                    }
+                }
+
+                // If this is a release unmap the hardware id.
+                if (state == TouchLocationState.Released)
+                    _touchIds.Remove (id);
             }
-
-            // Try to find the touch id.
-            int touchId;
-            if (!_touchIds.TryGetValue(id, out touchId))
-            {
-                // If we got here that means either the device is sending
-                // us bad, out of order, or old touch events.  In any case
-                // just ignore them.
-                return;
-            }
-
-            if (!isMouse || EnableMouseTouchPoint || EnableMouseGestures)
-            {
-                // Add the new touch event keeping the list from getting
-                // too large if no one happens to be requesting the state.
-                var evt = new TouchLocation(touchId, state, position * _touchScale, CurrentTimestamp);
-
-                if (!isMouse || EnableMouseTouchPoint)
-                {
-                    ApplyTouch(_touchState, evt);
-                }
-
-                //If we have gestures enabled then collect events for those too.
-                //We also have to keep tracking any touches while we know about touches so we don't miss releases even if gesture recognition is disabled
-                if ((EnabledGestures != GestureType.None || _gestureState.Count > 0) && (!isMouse || EnableMouseGestures))
-                {
-                    ApplyTouch(_gestureState, evt);
-
-                    if (EnabledGestures != GestureType.None)
-                        UpdateGestures(true);
-
-                    AgeTouches(_gestureState);
-                }
-            }
-
-            // If this is a release unmap the hardware id.
-            if (state == TouchLocationState.Released)
-                _touchIds.Remove(id);
         }
 
         private void UpdateTouchScale()
@@ -238,30 +298,33 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         internal void ReleaseAllTouches()
         {
-            var mostToRemove = Math.Max(_touchState.Count, _gestureState.Count);
-            if (mostToRemove > 0)
+            lock (_lock)
             {
-                var temp = new List<TouchLocation>(mostToRemove);
-
-                // Submit a new event for each non-released location.
-                temp.AddRange(_touchState);
-                foreach (var touch in temp)
+                var mostToRemove = Math.Max (_touchState.Count, _gestureState.Count);
+                if (mostToRemove > 0)
                 {
-                    if (touch.State != TouchLocationState.Released)
-                        ApplyTouch(_touchState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position, CurrentTimestamp));
+                    var temp = new List<TouchLocation> (mostToRemove);
+
+                    // Submit a new event for each non-released location.
+                    temp.AddRange (_touchState);
+                    foreach (var touch in temp)
+                    {
+                        if (touch.State != TouchLocationState.Released)
+                            ApplyTouch (_touchState, new TouchLocation (touch.Id, TouchLocationState.Released, touch.Position, CurrentTimestamp));
+                    }
+
+                    temp.Clear ();
+                    temp.AddRange (_gestureState);
+                    foreach (var touch in temp)
+                    {
+                        if (touch.State != TouchLocationState.Released)
+                            ApplyTouch (_gestureState, new TouchLocation (touch.Id, TouchLocationState.Released, touch.Position, CurrentTimestamp));
+                    }
                 }
 
-                temp.Clear();
-                temp.AddRange(_gestureState);
-                foreach (var touch in temp)
-                {
-                    if (touch.State != TouchLocationState.Released)
-                        ApplyTouch(_gestureState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position, CurrentTimestamp));
-                }
+                // Release all the touch id mappings.
+                _touchIds.Clear ();
             }
-
-            // Release all the touch id mappings.
-            _touchIds.Clear();
         }
 
         /// <summary>
@@ -271,19 +334,41 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                return _displaySize.Y;
+                lock (_lock)
+                {
+                    return _displaySize.Y;
+                }
             }
             set
             {
-                _displaySize.Y = value;
-                UpdateTouchScale();
+                lock (_lock)
+                {
+                    _displaySize.Y = value;
+                    UpdateTouchScale ();
+                }
             }
         }
 
         /// <summary>
         /// Gets or sets the display orientation of the touch panel.
         /// </summary>
-        public DisplayOrientation DisplayOrientation { get; set; }
+        public DisplayOrientation DisplayOrientation
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _displayOrientation;
+                }
+            }
+            set
+            {
+                lock (_lock)
+                {
+                    _displayOrientation = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the display width of the touch panel.
@@ -292,23 +377,77 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                return _displaySize.X;
+                lock (_lock)
+                {
+                    return _displaySize.X;
+                }
             }
             set
             {
-                _displaySize.X = value;
-                UpdateTouchScale();
+                lock (_lock)
+                {
+                    _displaySize.X = value;
+                    UpdateTouchScale ();
+                }
             }
         }
 
         /// <summary>
         /// Gets or sets enabled gestures.
         /// </summary>
-        public GestureType EnabledGestures { get; set; }
+        public GestureType EnabledGestures
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _enabledGestures;
+                }
+            }
+            set
+            {
+                lock (_lock)
+                {
+                    _enabledGestures = value;
+                }
+            }
+        }
 
-        public bool EnableMouseTouchPoint { get; set; }
+        public bool EnableMouseTouchPoint
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _enableMouseTouchPoint;
+                }
+            }
+            set
+            {
+                lock (_lock)
+                {
+                    _enableMouseTouchPoint = value;
+                }
+            }
+        }
 
-        public bool EnableMouseGestures { get; set; }
+        public bool EnableMouseGestures
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _enableMouseGestures;
+                }
+            }
+            set
+            {
+                lock (_lock)
+                {
+                    _enableMouseGestures = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Returns true if a touch gesture is available.
@@ -317,10 +456,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                // Process the pending gesture events. (May cause hold events)
-                UpdateGestures(false);
+                lock (_lock)
+                {
+                    // Process the pending gesture events. (May cause hold events)
+                    UpdateGestures (false);
 
-                return GestureList.Count > 0;
+                    return GestureList.Count > 0;
+                }
             }
         }
 
@@ -330,8 +472,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns><see cref="GestureSample"/></returns>
         public GestureSample ReadGesture()
         {
-            // Return the next gesture.
-            return GestureList.Dequeue();
+            lock (_lock)
+            {
+                // Return the next gesture.
+                return GestureList.Dequeue ();
+            }
         }
 
         #region Gesture Recognition
