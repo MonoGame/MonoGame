@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal PixelType glType;
         internal SamplerState glLastSamplerState;
 
-#if GLES
+#if !DESKTOPGL
         internal const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)All.TextureMaxAnisotropyExt;
         internal const TextureParameterName TextureParameterNameTextureMaxLevel = (TextureParameterName)0x813D;
 #else
