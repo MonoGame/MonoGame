@@ -89,37 +89,45 @@ namespace Microsoft.Xna.Framework
         {
             var movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
             var movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
-
-            this.MouseState.X = Math.Min(Math.Max(this.MouseState.X + movementX, 0), glcanvas.clientWidth);
-            this.MouseState.Y = Math.Min(Math.Max(this.MouseState.Y + movementY, 0), glcanvas.clientHeight);
+                        
+            var newMouseState = MouseState;
+            newMouseState.X = Math.Min(Math.Max(this.MouseState.X + movementX, 0), glcanvas.clientWidth);
+            newMouseState.Y = Math.Min(Math.Max(this.MouseState.Y + movementY, 0), glcanvas.clientHeight);
+            MouseState = newMouseState;
         }
 
         private void OnMouseDown(dynamic e)
         {
+            var newMouseState = MouseState;
             if (e.button == 0)
-                this.MouseState.LeftButton = ButtonState.Pressed;
+                newMouseState.LeftButton = ButtonState.Pressed;
             else if (e.button == 1)
-                this.MouseState.MiddleButton = ButtonState.Pressed;
+                newMouseState.MiddleButton = ButtonState.Pressed;
             else if (e.button == 2)
-                this.MouseState.RightButton = ButtonState.Pressed;
+                newMouseState.RightButton = ButtonState.Pressed;
+            MouseState = newMouseState;
         }
 
         private void OnMouseUp(dynamic e)
         {
+            var newMouseState = MouseState;
             if (e.button == 0)
-                this.MouseState.LeftButton = ButtonState.Released;
+                newMouseState.LeftButton = ButtonState.Released;
             else if (e.button == 1)
-                this.MouseState.MiddleButton = ButtonState.Released;
+                newMouseState.MiddleButton = ButtonState.Released;
             else if (e.button == 2)
-                this.MouseState.RightButton = ButtonState.Released;
+                newMouseState.RightButton = ButtonState.Released;
+            MouseState = newMouseState;
         }
 
         private void OnMouseWheel(dynamic e)
         {
+            var newMouseState = MouseState;
             if (e.deltaY < 0)
-                this.MouseState.ScrollWheelValue += 120;
+                newMouseState.ScrollWheelValue += 120;
             else
-                this.MouseState.ScrollWheelValue -= 120;
+                newMouseState.ScrollWheelValue -= 120;
+            MouseState = newMouseState;
         }
 
         private void OnKeyDown(dynamic e)

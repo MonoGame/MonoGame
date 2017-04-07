@@ -73,8 +73,14 @@ namespace Microsoft.Xna.Framework {
             }
         }
 
-        internal MouseState MouseState;
+        private MouseState _mouseState;
 	    internal TouchPanelState TouchPanelState;
+
+        internal MouseState MouseState
+        {
+            get { return _mouseState; }
+            set { _mouseState = value; }
+        }
 
         protected GameWindow()
         {

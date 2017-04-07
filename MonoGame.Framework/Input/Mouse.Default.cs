@@ -20,8 +20,10 @@ namespace Microsoft.Xna.Framework.Input
 
         private static void PlatformSetPosition(int x, int y)
         {
-            PrimaryWindow.MouseState.X = x;
-            PrimaryWindow.MouseState.Y = y;
+            var newMouseState = PrimaryWindow.MouseState;
+            newMouseState.X = x;
+            newMouseState.Y = y;
+            PrimaryWindow.MouseState = newMouseState;
         }
 
         public static void PlatformSetCursor(MouseCursor cursor)

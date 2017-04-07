@@ -25,37 +25,43 @@ namespace Microsoft.Xna.Framework.Input
                     Sdl.Mouse.GetGlobalState(out x, out y) :
                     Sdl.Mouse.GetState(out x, out y);
             
+            var newMouseState = window.MouseState;
+
             if ((winFlags & Sdl.Window.State.MouseFocus) != 0)
             {
-                window.MouseState.LeftButton = (state & Sdl.Mouse.Button.Left) != 0 ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.MiddleButton = (state & Sdl.Mouse.Button.Middle) != 0 ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.RightButton = (state & Sdl.Mouse.Button.Right) != 0 ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.XButton1 = (state & Sdl.Mouse.Button.X1Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.XButton2 = (state & Sdl.Mouse.Button.X2Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
+                newMouseState.LeftButton = (state & Sdl.Mouse.Button.Left) != 0 ? ButtonState.Pressed : ButtonState.Released;
+                newMouseState.MiddleButton = (state & Sdl.Mouse.Button.Middle) != 0 ? ButtonState.Pressed : ButtonState.Released;
+                newMouseState.RightButton = (state & Sdl.Mouse.Button.Right) != 0 ? ButtonState.Pressed : ButtonState.Released;
+                newMouseState.XButton1 = (state & Sdl.Mouse.Button.X1Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
+                newMouseState.XButton2 = (state & Sdl.Mouse.Button.X2Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
 
-                window.MouseState.HorizontalScrollWheelValue = ScrollX;
-                window.MouseState.ScrollWheelValue = ScrollY;
+                newMouseState.HorizontalScrollWheelValue = ScrollX;
+                newMouseState.ScrollWheelValue = ScrollY;
             }
 
             if (Sdl.Patch > 4)
             {
                 var clientBounds = window.ClientBounds;
-                window.MouseState.X = x - clientBounds.X;
-                window.MouseState.Y = y - clientBounds.Y;
+                newMouseState.X = x - clientBounds.X;
+                newMouseState.Y = y - clientBounds.Y;
             }
             else
             {
-                window.MouseState.X = x;
-                window.MouseState.Y = y;
+                newMouseState.X = x;
+                newMouseState.Y = y;
             }
+
+            window.MouseState = newMouseState;
 
             return window.MouseState;
         }
 
         private static void PlatformSetPosition(int x, int y)
         {
-            PrimaryWindow.MouseState.X = x;
-            PrimaryWindow.MouseState.Y = y;
+            var newMouseState = PrimaryWindow.MouseState;
+            newMouseState.X = x;
+            newMouseState.Y = y;
+            PrimaryWindow.MouseState = newMouseState;
             
             Sdl.Mouse.WarpInWindow(PrimaryWindow.Handle, x, y);
         }

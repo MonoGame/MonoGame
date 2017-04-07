@@ -220,12 +220,16 @@ namespace MonoGame.Framework
 
         private void OnMouseScroll(object sender, MouseEventArgs mouseEventArgs)
         {
-            MouseState.ScrollWheelValue += mouseEventArgs.Delta;
+            var newMouseState = MouseState;
+            newMouseState.ScrollWheelValue += mouseEventArgs.Delta;
+            MouseState = newMouseState;
         }
 
         private void OnMouseHorizontalScroll(object sender, HorizontalMouseWheelEventArgs mouseEventArgs)
         {
-            MouseState.HorizontalScrollWheelValue += mouseEventArgs.Delta;
+            var newMouseState = MouseState;
+            newMouseState.HorizontalScrollWheelValue += mouseEventArgs.Delta;            
+            MouseState = newMouseState;
         }
 
         private void UpdateMouseState()
@@ -240,13 +244,15 @@ namespace MonoGame.Framework
             var withinClient = Form.ClientRectangle.Contains(clientPos);
             var buttons = Control.MouseButtons;
 
-            var previousState = MouseState.LeftButton;
+            var newMouseState = MouseState;
+            var previousState = newMouseState.LeftButton;
 
-            MouseState.X = clientPos.X;
-            MouseState.Y = clientPos.Y;
-            MouseState.LeftButton = (buttons & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
-            MouseState.MiddleButton = (buttons & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
-            MouseState.RightButton = (buttons & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
+            newMouseState.X = clientPos.X;
+            newMouseState.Y = clientPos.Y;
+            newMouseState.LeftButton = (buttons & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
+            newMouseState.MiddleButton = (buttons & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
+            newMouseState.RightButton = (buttons & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
+            MouseState = newMouseState;
 
             // Don't process touch state if we're not active 
             // and the mouse is within the client area.
