@@ -413,6 +413,14 @@
     </Compile>
     <Compile Include="Audio\SoundEffectInstancePool.cs" />
     <Compile Include="Audio\SoundState.cs" />
+	<Compile Include="Audio\Microphone.cs" />
+	<Compile Include="Audio\Microphone.OpenAL.cs">
+      <Services>OpenALAudio</Services>
+    </Compile>
+	<Compile Include="Audio\Microphone.Default.cs">
+      <Services>XAudioAudio,WebAudio</Services>
+    </Compile>
+	<Compile Include="Audio\NoMicrophoneConnectedException.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Audio Xact-->

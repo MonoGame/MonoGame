@@ -103,6 +103,9 @@ namespace OpenAL
 
     public enum AlcGetString
     {
+        CaptureDeviceSpecifier = 0x0310,
+        CaptureDefaultDeviceSpecifier = 0x0311,
+        CaptureSamples = 0x0312,
         Extensions = 0x1006,
     }
 
@@ -442,6 +445,14 @@ namespace OpenAL
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcGetError")]
         public static extern AlcError GetError (IntPtr device);
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcGetIntegerv")]
+        internal static extern void alcGetIntegerv(IntPtr device, int param, int size, int[] values);
+
+        public static void GetIntegerv(IntPtr device, AlcGetString param, int size, int[] values)
+        {
+            alcGetIntegerv(device, (int)param, size, values);
+        }
+
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcGetCurrentContext")]
         public static extern IntPtr GetCurrentContext ();
@@ -461,6 +472,31 @@ namespace OpenAL
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcOpenDevice")]
         public static extern IntPtr OpenDevice ([MarshalAs (UnmanagedType.LPStr)]  string device);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCaptureOpenDevice")]
+        internal static extern IntPtr alcCaptureOpenDevice([In()] [MarshalAs(UnmanagedType.LPStr)] string device, uint sampleRate, int format, int sampleSize);
+
+        [CLSCompliant(false)]
+        public static IntPtr OpenCaptureDevice(string device, uint sampleRate, ALFormat format, int sampleSize)
+        {
+            return alcCaptureOpenDevice(device, sampleRate, (int)format, sampleSize);
+        }
+
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCaptureStart")]
+        public static extern IntPtr CaptureStart([MarshalAs(UnmanagedType.LPStr)]  string device);
+
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCaptureSamples")]
+        public static extern void CaptureSamples(IntPtr device, IntPtr buffer, int samples);
+
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCaptureStop")]
+        public static extern IntPtr CaptureStop([MarshalAs(UnmanagedType.LPStr)]  string device);
+
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCaptureCloseDevice")]
+        public static extern IntPtr CaptureCloseDevice([MarshalAs(UnmanagedType.LPStr)]  string device);
 
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcIsExtensionPresent")]
         public static extern bool IsExtensionPresent (IntPtr device, [MarshalAs (UnmanagedType.LPStr)] string extensionName);

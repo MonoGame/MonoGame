@@ -122,9 +122,12 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new NoAudioHardwareException("OpenAL device could not be initialized, see console output for details.");
             }
 
+            if (Alc.IsExtensionPresent(_device, "ALC_EXT_CAPTURE"))
+                Microphone.PopulateCaptureDevices();
+
             // We have hardware here and it is ready
 
-			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
+            allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
 			AL.GenSources(allSourcesArray);
             ALHelper.CheckError("Failed to generate sources.");
             Filter = 0;
@@ -391,6 +394,7 @@ namespace Microsoft.Xna.Framework.Audio
                     if (Filter != 0 && Efx.IsInitialized)
                         Efx.DeleteFilter (Filter);
 #endif
+                    Microphone.StopMicrophones();
                     CleanUpOpenAL();                    
                 }
                 _isDisposed = true;
