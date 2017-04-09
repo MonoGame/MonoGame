@@ -2,11 +2,28 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using OpenAL;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
+
+#if MONOMAC && PLATFORM_MACOS_LEGACY
+using MonoMac.AudioToolbox;
+using MonoMac.AudioUnit;
+using MonoMac.OpenAL;
+#elif OPENAL
+#if GLES || MONOMAC
+using OpenTK.Audio;
+using OpenTK.Audio.OpenAL;
+#else
+using OpenAL;
+#endif
+#if IOS || MONOMAC
+using AudioToolbox;
+using AudioUnit;
+using AVFoundation;
+#endif
+#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {
