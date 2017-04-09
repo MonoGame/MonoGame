@@ -211,15 +211,17 @@ namespace Microsoft.Xna.Framework.Audio
         internal static void UpdateMicrophones()
         {
             // querying all running microphones for new samples available
-            for (int i = 0; i < _allMicrophones.Count; i++)
-                _allMicrophones[i].Update();
+            if (_allMicrophones != null)
+                for (int i = 0; i < _allMicrophones.Count; i++)
+                    _allMicrophones[i].Update();
         }
 
         internal static void StopMicrophones()
         {
             // stopping all running microphones before shutting down audio devices
-            for (int i = 0; i < _allMicrophones.Count; i++)
-                _allMicrophones[i].Stop();
+            if (_allMicrophones != null)
+                for (int i = 0; i < _allMicrophones.Count; i++)
+                    _allMicrophones[i].Stop();
         }
 
         #endregion
