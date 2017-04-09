@@ -115,7 +115,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (_allMicrophones == null)
                     _allMicrophones = new List<Microphone>();
-                return _allMicrophones.AsReadOnly();
+                return new ReadOnlyCollection<Microphone>(_allMicrophones);
             }
         }
 
