@@ -105,8 +105,12 @@ namespace OpenAL
     {
         CaptureDeviceSpecifier = 0x0310,
         CaptureDefaultDeviceSpecifier = 0x0311,
-        CaptureSamples = 0x0312,
         Extensions = 0x1006,
+    }
+
+    public enum AlcGetInteger
+    {
+        CaptureSamples = 0x0312,
     }
 
     public enum EfxFilteri
@@ -448,7 +452,7 @@ namespace OpenAL
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcGetIntegerv")]
         internal static extern void alcGetIntegerv(IntPtr device, int param, int size, int[] values);
 
-        public static void GetIntegerv(IntPtr device, AlcGetString param, int size, int[] values)
+        public static void GetInteger(IntPtr device, AlcGetInteger param, int size, int[] values)
         {
             alcGetIntegerv(device, (int)param, size, values);
         }
@@ -477,7 +481,7 @@ namespace OpenAL
         internal static extern IntPtr alcCaptureOpenDevice([In()] [MarshalAs(UnmanagedType.LPStr)] string device, uint sampleRate, int format, int sampleSize);
 
         [CLSCompliant(false)]
-        public static IntPtr OpenCaptureDevice(string device, uint sampleRate, ALFormat format, int sampleSize)
+        public static IntPtr CaptureOpenDevice(string device, uint sampleRate, ALFormat format, int sampleSize)
         {
             return alcCaptureOpenDevice(device, sampleRate, (int)format, sampleSize);
         }

@@ -61,6 +61,7 @@ namespace Microsoft.Xna.Framework.Audio
             // default device
             string defaultDevice = Alc.GetString(IntPtr.Zero, AlcGetString.CaptureDefaultDeviceSpecifier);
 
+#if DESKTOPGL
             // enumarating capture devices
             IntPtr deviceList = Alc.alGetString(IntPtr.Zero, (int)AlcGetString.CaptureDeviceSpecifier);
             // we need to marshal a string array
@@ -74,6 +75,13 @@ namespace Microsoft.Xna.Framework.Audio
                 deviceList += deviceIdentifier.Length + 1;
                 deviceIdentifier = Marshal.PtrToStringAnsi(deviceList);
             }
+#else
+            // Xamarin platforms don't provide an handle to alGetString that allow to marshal string arrays
+            // so we're basically only adding the default microphone
+            Microphone microphone = new Microphone(defaultDevice);
+            _allMicrophones.Add(microphone);
+            _default = microphone;
+#endif
         }
 
         internal void PlatformStart()
@@ -81,11 +89,11 @@ namespace Microsoft.Xna.Framework.Audio
             if (_state == MicrophoneState.Started)
                 return;
 
-            _captureDevice = Alc.OpenCaptureDevice(
+            _captureDevice = Alc.CaptureOpenDevice(
                 Name,
                 (uint)_sampleRate,
                 ALFormat.Mono16,
-                GetSameSizeInBytes(_bufferDuration));
+                GetSampleSizeInBytes(_bufferDuration));
 
             CheckALCError("Failed to open capture device.");
 
@@ -121,7 +129,7 @@ namespace Microsoft.Xna.Framework.Audio
                 return 0;
 
             int[] values = new int[1];
-            Alc.GetIntegerv(_captureDevice, AlcGetString.CaptureSamples, 1, values); // always returns 0?!
+            Alc.GetInteger(_captureDevice, AlcGetInteger.CaptureSamples, 1, values); // always returns 0?!
 
             CheckALCError("Failed to query capture samples.");
 

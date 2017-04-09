@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         /// <param name="duration">TimeSpan object that contains the duration of the audio sample. </param>
         /// <returns>Size (10 ms block aligned), in bytes, of the audio buffer.</returns>
-        public int GetSameSizeInBytes(TimeSpan duration)
+        public int GetSampleSizeInBytes(TimeSpan duration)
         {
             // this should be 10ms aligned
             // this assumes 16bit mono data
