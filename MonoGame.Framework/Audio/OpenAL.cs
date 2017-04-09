@@ -484,7 +484,7 @@ namespace OpenAL
 
         [CLSCompliant(false)]
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCaptureStart")]
-        public static extern IntPtr CaptureStart([MarshalAs(UnmanagedType.LPStr)]  string device);
+        public static extern IntPtr CaptureStart(IntPtr device);
 
         [CLSCompliant(false)]
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCaptureSamples")]
@@ -492,11 +492,11 @@ namespace OpenAL
 
         [CLSCompliant(false)]
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCaptureStop")]
-        public static extern IntPtr CaptureStop([MarshalAs(UnmanagedType.LPStr)]  string device);
+        public static extern IntPtr CaptureStop(IntPtr device);
 
         [CLSCompliant(false)]
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCaptureCloseDevice")]
-        public static extern IntPtr CaptureCloseDevice([MarshalAs(UnmanagedType.LPStr)]  string device);
+        public static extern IntPtr CaptureCloseDevice(IntPtr device);
 
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcIsExtensionPresent")]
         public static extern bool IsExtensionPresent (IntPtr device, [MarshalAs (UnmanagedType.LPStr)] string extensionName);

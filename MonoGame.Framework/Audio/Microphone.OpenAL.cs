@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (_captureDevice != IntPtr.Zero)
             {
-                Alc.CaptureStart(Name);
+                Alc.CaptureStart(_captureDevice);
                 CheckALCError("Failed to start capture.");
 
                 _state = MicrophoneState.Started;
@@ -106,9 +106,9 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (_state == MicrophoneState.Started)
             {
-                Alc.CaptureStop(Name);
+                Alc.CaptureStop(_captureDevice);
                 CheckALCError("Failed to stop capture.");
-                Alc.CaptureCloseDevice(Name);
+                Alc.CaptureCloseDevice(_captureDevice);
                 CheckALCError("Failed to close capture device.");
                 _captureDevice = IntPtr.Zero;
             }
