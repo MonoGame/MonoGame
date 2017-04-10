@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.AudioToolbox;
@@ -129,7 +128,7 @@ namespace Microsoft.Xna.Framework.Audio
                 return 0;
 
             int[] values = new int[1];
-            Alc.GetInteger(_captureDevice, AlcGetInteger.CaptureSamples, 1, values); // always returns 0?!
+            Alc.GetInteger(_captureDevice, AlcGetInteger.CaptureSamples, 1, values);
 
             CheckALCError("Failed to query capture samples.");
 

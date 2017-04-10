@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Audio
@@ -13,11 +12,7 @@ namespace Microsoft.Xna.Framework.Audio
     /// The exception thrown when no audio hardware is present, or driver issues are detected.
     /// </summary>
     [DataContract]
-#if WINRT
     public sealed class NoMicrophoneConnectedException : Exception
-#else
-    public sealed class NoMicrophoneConnectedException : ExternalException
-#endif
     {
         /// <param name="msg">A message describing the error.</param>
         public NoMicrophoneConnectedException(string msg)

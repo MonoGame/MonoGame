@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Public Properties
 
-        private TimeSpan _bufferDuration = TimeSpan.FromMilliseconds(500.0); // what's the XNA default? 
+        private TimeSpan _bufferDuration = TimeSpan.FromMilliseconds(1000.0);
 
         /// <summary>
         /// Gets or sets audio capture buffer duration of the microphone.

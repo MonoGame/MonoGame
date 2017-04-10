@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             // We have hardware here and it is ready
 
-            allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
+			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
 			AL.GenSources(allSourcesArray);
             ALHelper.CheckError("Failed to generate sources.");
             Filter = 0;
