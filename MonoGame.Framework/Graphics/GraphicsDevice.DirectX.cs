@@ -744,9 +744,15 @@ namespace Microsoft.Xna.Framework.Graphics
             // Otherwise, create a new swap chain.
             else
             {
+                var isWindowed = true;//TODO: should we use PresentationParameters here?
                 // Dispose of old swap chain if exists
                 if (_swapChain != null)
+                {
+                    isWindowed = !_swapChain.IsFullScreen;
+                    // Before releasing a swap chain, first switch to windowed mode
+                    _swapChain.SetFullscreenState(false, null);
                     _swapChain.Dispose();
+                }
 
                 // SwapChain description
                 var desc = new SharpDX.DXGI.SwapChainDescription()
@@ -768,7 +774,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                     BufferCount = 2,
                     SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters.PresentationInterval),
-                    IsWindowed = true
+                    IsWindowed = isWindowed
                 };
 
                 // Once the desired swap chain description is configured, it must be created on the same adapter as our D3D Device
