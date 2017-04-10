@@ -24,6 +24,11 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _dirty; }
         }
 
+        public int Size
+        {
+            get { return _buffer.Length; }
+        }
+
         public ConstantBuffer(ConstantBuffer cloneSource)
         {
             GraphicsDevice = cloneSource.GraphicsDevice;
@@ -95,6 +100,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public void SetParameter(int offset, byte[] data)
+        {
+            Buffer.BlockCopy(data, 0, _buffer, offset, data.Length);
+        }
+
         private int SetParameter(int offset, EffectParameter param)
         {
             const int elementSize = 4;
@@ -140,7 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return rowsUsed;
         }
 
-        public void Update(EffectParameterCollection parameters)
+        internal void Update(EffectParameterCollection parameters)
         {
             // TODO:  We should be doing some sort of dirty state 
             // testing here.
