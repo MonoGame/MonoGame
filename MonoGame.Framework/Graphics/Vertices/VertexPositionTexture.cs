@@ -23,8 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         public override int GetHashCode()
         {
-            // TODO: Fix get hashcode
-            return 0;
+            return Position.GetHashCode() ^ TextureCoordinate.GetHashCode();
         }
 
         public override string ToString()

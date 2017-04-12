@@ -32,8 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public override int GetHashCode()
 		{
-			// TODO: Fix gethashcode
-			return 0;
+			return Position.GetHashCode() ^ Color.GetHashCode();
 		}
 
 		public override string ToString()
