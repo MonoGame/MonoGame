@@ -26,6 +26,11 @@ namespace MonoGame.Tools.Pipeline
         public IEnumerable<string> FileExtensions;
         public Type OutputType;
 
+        public ImporterTypeDescription()
+        {
+            TypeName = "Invalid / Missing Importer";
+        }
+
         public override string ToString()
         {
             return TypeName;
@@ -56,8 +61,10 @@ namespace MonoGame.Tools.Pipeline
         public struct Property
         {
             public string Name;
+            public string DisplayName;
             public Type Type;
             public object DefaultValue;
+            public bool Browsable;
 
             public override string ToString()
             {
@@ -282,14 +289,26 @@ namespace MonoGame.Tools.Pipeline
                 var properties = new List<ProcessorTypeDescription.Property>();
                 foreach (var i in typeProperties)
                 {
-                    // TODO:
-                    //p.GetCustomAttribute(typeof(ContentPipelineIgnore))
+                    var attrs = i.GetCustomAttributes(true);
+                    var name = i.Name;
+                    var browsable = true;
+                    var defvalue = i.GetValue(obj, null);
+
+                    foreach (var a in attrs)
+                    {
+                        if (a is BrowsableAttribute)
+                            browsable = (a as BrowsableAttribute).Browsable;
+                        else if (a is DisplayNameAttribute)
+                            name = (a as DisplayNameAttribute).DisplayName;
+                    }
 
                     var p = new ProcessorTypeDescription.Property()
                         {
                             Name = i.Name,
+                            DisplayName = name,
                             Type = i.PropertyType,
-                            DefaultValue = i.GetValue(obj, null),
+                            DefaultValue = defvalue,
+                            Browsable = browsable
                         };
                     properties.Add(p);
                 }
@@ -408,6 +427,9 @@ namespace MonoGame.Tools.Pipeline
                 try
 #endif
                 {
+                    if (!asm.ToString().Contains("MonoGame"))
+                        continue;
+
                     var types = asm.GetTypes();
                     ProcessTypes(types);
                 }

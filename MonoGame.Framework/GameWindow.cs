@@ -31,10 +31,6 @@ namespace Microsoft.Xna.Framework {
         public abstract Point Position { get; set; }
 #endif
 
-#if DESKTOPGL
-        public abstract System.Drawing.Icon Icon { get; set; }
-#endif
-
 		public abstract DisplayOrientation CurrentOrientation { get; }
 
 		public abstract IntPtr Handle { get; }
@@ -42,7 +38,14 @@ namespace Microsoft.Xna.Framework {
 		public abstract string ScreenDeviceName { get; }
 
 		private string _title;
-		public string Title {
+        /// <summary>
+        /// Gets or sets the title of the game window.
+        /// </summary>
+        /// <remarks>
+        /// For Windows 8 and Windows 10 UWP this has no effect. For these platforms the title should be
+        /// set by using the DisplayName property found in the app manifest file.
+        /// </remarks>
+        public string Title {
 			get { return _title; }
 			set {
 				if (_title != value) {
@@ -117,10 +120,11 @@ namespace Microsoft.Xna.Framework {
 		{
 		}
 
-		protected void OnClientSizeChanged ()
+		internal void OnClientSizeChanged ()
 		{
-			if (ClientSizeChanged != null)
-				ClientSizeChanged (this, EventArgs.Empty);
+            var handler = ClientSizeChanged;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
 		}
 
 		protected void OnDeactivated ()
@@ -129,8 +133,9 @@ namespace Microsoft.Xna.Framework {
          
 		protected void OnOrientationChanged ()
 		{
-			if (OrientationChanged != null)
-				OrientationChanged (this, EventArgs.Empty);
+            var handler = OrientationChanged;
+            if (handler != null)
+                handler (this, EventArgs.Empty);
 		}
 
 		protected void OnPaint ()
@@ -146,8 +151,9 @@ namespace Microsoft.Xna.Framework {
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
 		protected void OnTextInput(object sender, TextInputEventArgs e)
 		{
-			if (TextInput != null)
-				TextInput(sender, e);
+            var handler = TextInput;
+            if (handler != null)
+                handler(sender, e);
 		}
 #endif
 

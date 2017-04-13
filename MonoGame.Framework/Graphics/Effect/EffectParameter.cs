@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Diagnostics;
 
@@ -105,68 +106,78 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (!string.IsNullOrEmpty(Semantic))                
                     semanticStr = string.Concat(" <", Semantic, ">");
 
-                string valueStr;
-                if (Data == null)
-                    valueStr = "(null)";
-                else
-                {
-                    switch (ParameterClass)
-                    {
-                        // Object types are stored directly in the Data property.
-                        // Display Data's string value.
-                        case EffectParameterClass.Object:
-                            valueStr = Data.ToString();
-                            break;
-
-                        // Matrix types are stored in a float[16] which we don't really have room for.
-                        // Display "...".
-                        case EffectParameterClass.Matrix:
-                            valueStr = "...";
-                            break;
-
-                        // Scalar types are stored as a float[1].
-                        // Display the first (and only) element's string value.                    
-                        case EffectParameterClass.Scalar:
-                            valueStr = (Data as Array).GetValue(0).ToString();
-                            break;
-
-                        // Vector types are stored as an Array<Type>.
-                        // Display the string value of each array element.
-                        case EffectParameterClass.Vector:
-                            var array = Data as Array;
-                            var arrayStr = new string[array.Length];
-                            var idx = 0;
-                            foreach (var e in array)
-                            {
-                                arrayStr[idx] = array.GetValue(idx).ToString();
-                                idx++;
-                            }
-
-                            valueStr = string.Join(" ", arrayStr);
-                            break;
-
-                        // Handle additional cases here...
-                        default:
-                            valueStr = Data.ToString();
-                            break;
-                    }
-                }
-                
-                return string.Concat("[", ParameterClass, " ", ParameterType, "]", semanticStr, " ", Name, " : ", valueStr);
+                return string.Concat("[", ParameterClass, " ", ParameterType, "]", semanticStr, " ", Name, " : ", GetDataValueString());
             }
         }
 
+        private string GetDataValueString()
+        {
+            string valueStr;
+
+            if (Data == null)
+            {
+                if (Elements == null)
+                    valueStr = "(null)";
+                else                
+                    valueStr = string.Join(", ", Elements.Select(e => e.GetDataValueString()));                
+            }
+            else
+            {
+                switch (ParameterClass)
+                {
+                        // Object types are stored directly in the Data property.
+                        // Display Data's string value.
+                    case EffectParameterClass.Object:
+                        valueStr = Data.ToString();
+                        break;
+
+                        // Matrix types are stored in a float[16] which we don't really have room for.
+                        // Display "...".
+                    case EffectParameterClass.Matrix:
+                        valueStr = "...";
+                        break;
+
+                        // Scalar types are stored as a float[1].
+                        // Display the first (and only) element's string value.                    
+                    case EffectParameterClass.Scalar:
+                        valueStr = (Data as Array).GetValue(0).ToString();
+                        break;
+
+                        // Vector types are stored as an Array<Type>.
+                        // Display the string value of each array element.
+                    case EffectParameterClass.Vector:
+                        var array = Data as Array;
+                        var arrayStr = new string[array.Length];
+                        var idx = 0;
+                        foreach (var e in array)
+                        {
+                            arrayStr[idx] = array.GetValue(idx).ToString();
+                            idx++;
+                        }
+
+                        valueStr = string.Join(" ", arrayStr);
+                        break;
+
+                        // Handle additional cases here...
+                    default:
+                        valueStr = Data.ToString();
+                        break;
+                }
+            }
+
+            return string.Concat("{", valueStr, "}");                
+        }
 
         public bool GetValueBoolean ()
 		{
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Bool)
                 throw new InvalidCastException();
 
-#if DIRECTX
-            return ((int[])Data)[0] != 0;
-#else
+#if OPENGL
             // MojoShader encodes even booleans into a float.
             return ((float[])Data)[0] != 0.0f;
+#else
+            return ((int[])Data)[0] != 0;
 #endif
         }
         
@@ -182,11 +193,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
                 throw new InvalidCastException();
 
-#if DIRECTX
-            return ((int[])Data)[0];
-#else
+#if OPENGL
             // MojoShader encodes integers into a float.
             return (int)((float[])Data)[0];
+#else
+            return ((int[])Data)[0];
 #endif
         }
         
@@ -400,14 +411,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Bool)
                 throw new InvalidCastException();
 
-#if DIRECTX
-            // We store the bool as an integer as that
-            // is what the constant buffers expect.
-            ((int[])Data)[0] = value ? 1 : 0;
-#else
+#if OPENGL
             // MojoShader encodes even booleans into a float.
             ((float[])Data)[0] = value ? 1 : 0;
+#else
+            ((int[])Data)[0] = value ? 1 : 0;
 #endif
+
             StateKey = unchecked(NextStateKey++);
 		}
 
@@ -423,11 +433,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
                 throw new InvalidCastException();
 
-#if DIRECTX
-            ((int[])Data)[0] = value;
-#else
+#if OPENGL
             // MojoShader encodes integers into a float.
             ((float[])Data)[0] = value;
+#else
+            ((int[])Data)[0] = value;
 #endif
             StateKey = unchecked(NextStateKey++);
 		}
@@ -872,5 +882,5 @@ namespace Microsoft.Xna.Framework.Graphics
 				Elements[i].SetValue (value[i]);
             StateKey = unchecked(NextStateKey++);
 		}
-	}
+	}    
 }

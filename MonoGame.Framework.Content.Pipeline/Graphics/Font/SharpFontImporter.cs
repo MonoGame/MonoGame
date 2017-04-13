@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using SharpFont;
@@ -86,7 +87,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		}
 
 		// Rasterizes a single character glyph.
-		static Glyph ImportGlyph(char character, Face face)
+		private Glyph ImportGlyph(char character, Face face)
 		{
 			uint glyphIndex = face.GetCharIndex(character);
 			face.LoadGlyph(glyphIndex, LoadFlags.Default, LoadTarget.Normal);
@@ -98,7 +99,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 glyphBitmap = new PixelBitmapContent<byte>(face.Glyph.Bitmap.Width, face.Glyph.Bitmap.Rows);
 				byte[] gpixelAlphas = new byte[face.Glyph.Bitmap.Width * face.Glyph.Bitmap.Rows];
-				Marshal.Copy(face.Glyph.Bitmap.Buffer, gpixelAlphas, 0, gpixelAlphas.Length);
+                //if the character bitmap has 1bpp we have to expand the buffer data to get the 8bpp pixel data
+                //each byte in bitmap.bufferdata contains the value of to 8 pixels in the row
+                //if bitmap is of width 10, each row has 2 bytes with 10 valid bits, and the last 6 bits of 2nd byte must be discarded
+                if(face.Glyph.Bitmap.PixelMode == PixelMode.Mono)
+                {
+                    //variables needed for the expansion, amount of written data, length of the data to write
+                    int written = 0, length = face.Glyph.Bitmap.Width * face.Glyph.Bitmap.Rows;
+                    for(int i = 0; written < length; i++)
+                    {
+                        //width in pixels of each row
+                        int width = face.Glyph.Bitmap.Width;
+                        while(width > 0)
+                        {
+                            //valid data in the current byte
+                            int stride = MathHelper.Min(8, width);
+                            //copy the valid bytes to pixeldata
+                            //System.Array.Copy(ExpandByte(face.Glyph.Bitmap.BufferData[i]), 0, gpixelAlphas, written, stride);
+                            ExpandByteAndCopy(face.Glyph.Bitmap.BufferData[i], stride, gpixelAlphas, written);
+                            written += stride;
+                            width -= stride;
+                            if(width > 0)
+                                i++;
+                        }
+                    }
+                }
+                else
+                    Marshal.Copy(face.Glyph.Bitmap.Buffer, gpixelAlphas, 0, gpixelAlphas.Length);
                 glyphBitmap.SetPixelData(gpixelAlphas);
 			}
 
@@ -128,5 +155,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 				CharacterWidths = abc
 			};
 		}
-	}
+
+
+        /// <summary>
+        /// Reads each individual bit of a byte from left to right and expands it to a full byte, 
+        /// ones get byte.maxvalue, and zeros get byte.minvalue.
+        /// </summary>
+        /// <param name="origin">Byte to expand and copy</param>
+        /// <param name="length">Number of Bits of the Byte to copy, from 1 to 8</param>
+        /// <param name="destination">Byte array where to copy the results</param>
+        /// <param name="startIndex">Position where to begin copying the results in destination</param>
+        private static void ExpandByteAndCopy(byte origin, int length, byte[] destination, int startIndex)
+        {
+            byte tmp;
+            for(int i = 7; i > 7 - length; i--)
+            {
+                tmp = (byte) (1 << i);
+                if(origin / tmp == 1)
+                {
+                    destination[startIndex + 7 - i] = byte.MaxValue;
+                    origin -= tmp;
+                }
+                else
+                    destination[startIndex + 7 - i] = byte.MinValue;
+            }
+        }
+    }
 }

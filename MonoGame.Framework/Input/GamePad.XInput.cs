@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Input
         private static readonly long[] _timeout = new long[4];
         private static readonly long TimeoutTicks = TimeSpan.FromSeconds(1).Ticks;
 
-        private static int PlatformGetMaxIndex()
+        private static int PlatformGetMaxNumberOfGamePads()
         {
             return 4;
         }
@@ -132,8 +132,8 @@ namespace Microsoft.Xna.Framework.Input
             ret.HasLeftVibrationMotor = hasForceFeedback && capabilities.Vibration.LeftMotorSpeed > 0;
             ret.HasRightVibrationMotor = hasForceFeedback && capabilities.Vibration.RightMotorSpeed > 0;
 #else
-            ret.HasLeftVibrationMotor = false;
-            ret.HasRightVibrationMotor = false;
+            ret.HasLeftVibrationMotor = (capabilities.Vibration.LeftMotorSpeed > 0);
+            ret.HasRightVibrationMotor = (capabilities.Vibration.RightMotorSpeed > 0);
 #endif
 
             // other
@@ -169,7 +169,7 @@ namespace Microsoft.Xna.Framework.Input
                 packetNumber = xistate.PacketNumber;
                 gamepad = xistate.Gamepad;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
 
@@ -198,10 +198,6 @@ namespace Microsoft.Xna.Framework.Input
 
             var buttons = ConvertToButtons(
                 buttonFlags: gamepad.Buttons,
-                leftThumbX: gamepad.LeftThumbX,
-                leftThumbY: gamepad.LeftThumbY,
-                rightThumbX: gamepad.RightThumbX,
-                rightThumbY: gamepad.RightThumbY,
                 leftTrigger: gamepad.LeftTrigger,
                 rightTrigger: gamepad.RightTrigger);
 
@@ -232,29 +228,7 @@ namespace Microsoft.Xna.Framework.Input
             return buttonState == ButtonState.Pressed ? xnaButton : 0;
         }
 
-        private static Buttons AddThumbstickButtons(
-            short thumbX, short thumbY, short deadZone, 
-            Buttons thumbstickLeft, 
-            Buttons thumbStickRight, 
-            Buttons thumbStickUp, 
-            Buttons thumbStickDown)
-        {
-            // TODO: this needs adjustment. Very naive implementation. Doesn't match XNA yet
-            var result = (Buttons)0;
-            if (thumbX < -deadZone)
-                result |= thumbstickLeft;
-            if (thumbX > deadZone)
-                result |= thumbStickRight;
-            if (thumbY < -deadZone)
-                result |= thumbStickDown;
-            else if (thumbY > deadZone)
-                result |= thumbStickUp;
-            return result;
-        }
-
         private static GamePadButtons ConvertToButtons(SharpDX.XInput.GamepadButtonFlags buttonFlags,
-            short leftThumbX, short leftThumbY,
-            short rightThumbX, short rightThumbY,
             byte leftTrigger,
             byte rightTrigger)
         {
@@ -274,20 +248,6 @@ namespace Microsoft.Xna.Framework.Input
             ret |= AddButtonIfPressed(buttonFlags, GBF.X, Buttons.X);
             ret |= AddButtonIfPressed(buttonFlags, GBF.Y, Buttons.Y);
 
-            ret |= AddThumbstickButtons(leftThumbX, leftThumbY,
-                SharpDX.XInput.Gamepad.LeftThumbDeadZone,
-                Buttons.LeftThumbstickLeft, 
-                Buttons.LeftThumbstickRight, 
-                Buttons.LeftThumbstickUp, 
-                Buttons.LeftThumbstickDown);
-
-            ret |= AddThumbstickButtons(rightThumbX, rightThumbY,
-                SharpDX.XInput.Gamepad.RightThumbDeadZone,
-                Buttons.RightThumbstickLeft, 
-                Buttons.RightThumbstickRight, 
-                Buttons.RightThumbstickUp, 
-                Buttons.RightThumbstickDown);
-
             if (leftTrigger >= SharpDX.XInput.Gamepad.TriggerThreshold)
                 ret |= Buttons.LeftTrigger;
 
@@ -303,7 +263,6 @@ namespace Microsoft.Xna.Framework.Input
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
-#if DIRECTX11_1
             if (!_connected[index])
                 return false;
 
@@ -315,9 +274,6 @@ namespace Microsoft.Xna.Framework.Input
             });
 
             return result == SharpDX.Result.Ok;
-#else
-            return false;
-#endif            
         }
     }
 }

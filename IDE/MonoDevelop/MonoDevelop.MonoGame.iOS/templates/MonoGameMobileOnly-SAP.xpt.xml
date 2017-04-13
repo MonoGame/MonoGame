@@ -2,7 +2,7 @@
 <Template>
 	<TemplateConfiguration>
 		<_Name>Universal MonoGame Mobile Application (Shared Project) </_Name>
-		<_Category>C#/MonoGame</_Category>
+		<Category>monogame/app/games</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates a MonoGame Application for the iPhone/iPad and Android which uses a Shared Project to shared common code.</_Description>
@@ -31,17 +31,15 @@
 				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />				
 				<Reference type="Gac" refto="Xamarin.iOS" />
 				<Reference type="Project" refto="${ProjectName}"/>
+				<Reference type="Package" refto="MonoGame.Framework" />
 			</References>
-			<Packages>
-				<Package id="MonoGame.Framework.iOS" version="3.3.0" targetFramework="XamariniOS" />
-			</Packages>
 			<Files>
 				<File name="Main.cs" AddStandardHeader="True" src="Shared/Program.cs" />
 				<File name="Info.plist" AddStandardHeader="False" src="iOS/iOSInfo.plist" />
 				<RawFile name="Default.png" src="iOS/iOSDefault.png" />
 				<RawFile name="GameThumbnail.png" src="iOS/iOSGameThumbnail.png" />
 				<Directory name="Content">
-					<File name="Content.mgcb" src="Common/Content.mgcb"/>
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
 				</Directory>
 				<Directory name="Properties">
 					<File name="AssemblyInfo.cs" AddStandardHeader="True" src="Common/AssemblyInfo.cs" />
@@ -60,12 +58,10 @@
 				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
 				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />				
 				<Reference type="Gac" refto="Mono.Android" />
-				<Reference type="Gac" refto="OpenTK" />
+				<Reference type="Gac" refto="OpenTK-1.0" />
 				<Reference type="Project" refto="${ProjectName}"/>
+				<Reference type="Package" refto="MonoGame.Framework" />
 			</References>
-			<Packages>
-				<Package id="MonoGame.Framework.Android" version="3.3.0" targetFramework="MonoAndroid" />
-			</Packages>
 			<Files>
 				<File name="Activity1.cs" src="Shared/Activity1.cs" />
 				<Directory name="Resources">
@@ -86,7 +82,7 @@
 				<Directory name="Assets">
 					<RawFile name="AboutAssets.txt" src="Android/AboutAssets.txt" />
 					<Directory name="Content">
-						<File name="Content.mgcb" src="Common/Content.mgcb"/>
+						<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
 					</Directory>
 				</Directory>
 			</Files>

@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // that from here, so we'll work with the absolute path and let the
             // higher level process sort out any relative paths they need.
             var basePath = Path.GetDirectoryName(relativeToContent.SourceFilename);
-            Filename = PathHelper.NormalizeOS(Path.GetFullPath(Path.Combine(basePath, filename)));
+            Filename = PathHelper.Normalize(Path.GetFullPath(Path.Combine(basePath, filename)));
         }
     }
 }

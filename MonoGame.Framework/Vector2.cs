@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Describes a 2D-vector.
     /// </summary>
-#if WINDOWS
+#if XNADESIGNPROVIDED
     [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Vector2TypeConverter))]
 #endif
     [DataContract]
@@ -595,6 +595,39 @@ namespace Microsoft.Xna.Framework
         {
             result.X = MathHelper.Lerp(value1.X, value2.X, amount);
             result.Y = MathHelper.Lerp(value1.Y, value2.Y, amount);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains linear interpolation of the specified vectors.
+        /// Uses <see cref="MathHelper.LerpPrecise"/> on MathHelper for the interpolation.
+        /// Less efficient but more precise compared to <see cref="Vector2.Lerp(Vector2, Vector2, float)"/>.
+        /// See remarks section of <see cref="MathHelper.LerpPrecise"/> on MathHelper for more info.
+        /// </summary>
+        /// <param name="value1">The first vector.</param>
+        /// <param name="value2">The second vector.</param>
+        /// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
+        /// <returns>The result of linear interpolation of the specified vectors.</returns>
+        public static Vector2 LerpPrecise(Vector2 value1, Vector2 value2, float amount)
+        {
+            return new Vector2(
+                MathHelper.LerpPrecise(value1.X, value2.X, amount),
+                MathHelper.LerpPrecise(value1.Y, value2.Y, amount));
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains linear interpolation of the specified vectors.
+        /// Uses <see cref="MathHelper.LerpPrecise"/> on MathHelper for the interpolation.
+        /// Less efficient but more precise compared to <see cref="Vector2.Lerp(ref Vector2, ref Vector2, float, out Vector2)"/>.
+        /// See remarks section of <see cref="MathHelper.LerpPrecise"/> on MathHelper for more info.
+        /// </summary>
+        /// <param name="value1">The first vector.</param>
+        /// <param name="value2">The second vector.</param>
+        /// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
+        /// <param name="result">The result of linear interpolation of the specified vectors as an output parameter.</param>
+        public static void LerpPrecise(ref Vector2 value1, ref Vector2 value2, float amount, out Vector2 result)
+        { 
+            result.X = MathHelper.LerpPrecise(value1.X, value2.X, amount);
+            result.Y = MathHelper.LerpPrecise(value1.Y, value2.Y, amount);
         }
 
         /// <summary>

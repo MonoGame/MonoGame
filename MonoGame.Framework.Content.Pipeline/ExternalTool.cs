@@ -55,8 +55,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 RedirectStandardInput = true,
             };
 
-            EnsureExecutable(fullPath);
-
             using (var process = new Process())
             {
                 process.StartInfo = processInfo;
@@ -116,6 +114,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </remarks>
         private static string FindCommand(string command)
         {
+            // Expand any environment variables.
+            command = Environment.ExpandEnvironmentVariables(command);
+
             // If we have a full path just pass it through.
             if (File.Exists(command))
                 return command;
@@ -143,28 +144,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }
 
         /// <summary>
-        /// Ensures the specified executable has the executable bit set.  If the
-        /// executable doesn't have the executable bit set on Linux or Mac OS, then
-        /// Mono will refuse to execute it.
+        /// Safely deletes the file if it exists.
         /// </summary>
-        /// <param name="path">The full path to the executable.</param>
-        private static void EnsureExecutable(string path)
+        /// <param name="filePath">The path to the file to delete.</param>
+        public static void DeleteFile(string filePath)
         {
-#if LINUX || MACOS
-            if(path == "/bin/bash")
-                return;
-
             try
             {
-                var p = Process.Start("chmod", "u+x '" + path + "'");
-                p.WaitForExit();
+                File.Delete(filePath);
             }
-            catch
-            {
-                // This platform may not have chmod in the path, in which case we can't
-                // do anything reasonable here.
+            catch (Exception)
+            {                    
             }
-#endif
         }
     }
 }

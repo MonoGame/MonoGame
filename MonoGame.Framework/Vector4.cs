@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Describes a 4D-vector.
     /// </summary>
-#if WINDOWS
+#if XNADESIGNPROVIDED
     [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Vector4TypeConverter))]
 #endif
     [DataContract]
@@ -567,6 +567,43 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains linear interpolation of the specified vectors.
+        /// Uses <see cref="MathHelper.LerpPrecise"/> on MathHelper for the interpolation.
+        /// Less efficient but more precise compared to <see cref="Vector4.Lerp(Vector4, Vector4, float)"/>.
+        /// See remarks section of <see cref="MathHelper.LerpPrecise"/> on MathHelper for more info.
+        /// </summary>
+        /// <param name="value1">The first vector.</param>
+        /// <param name="value2">The second vector.</param>
+        /// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
+        /// <returns>The result of linear interpolation of the specified vectors.</returns>
+        public static Vector4 LerpPrecise(Vector4 value1, Vector4 value2, float amount)
+        {
+            return new Vector4(
+                MathHelper.LerpPrecise(value1.X, value2.X, amount),
+                MathHelper.LerpPrecise(value1.Y, value2.Y, amount),
+                MathHelper.LerpPrecise(value1.Z, value2.Z, amount),
+                MathHelper.LerpPrecise(value1.W, value2.W, amount));
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains linear interpolation of the specified vectors.
+        /// Uses <see cref="MathHelper.LerpPrecise"/> on MathHelper for the interpolation.
+        /// Less efficient but more precise compared to <see cref="Vector4.Lerp(ref Vector4, ref Vector4, float, out Vector4)"/>.
+        /// See remarks section of <see cref="MathHelper.LerpPrecise"/> on MathHelper for more info.
+        /// </summary>
+        /// <param name="value1">The first vector.</param>
+        /// <param name="value2">The second vector.</param>
+        /// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
+        /// <param name="result">The result of linear interpolation of the specified vectors as an output parameter.</param>
+        public static void LerpPrecise(ref Vector4 value1, ref Vector4 value2, float amount, out Vector4 result)
+        {
+            result.X = MathHelper.LerpPrecise(value1.X, value2.X, amount);
+            result.Y = MathHelper.LerpPrecise(value1.Y, value2.Y, amount);
+            result.Z = MathHelper.LerpPrecise(value1.Z, value2.Z, amount);
+            result.W = MathHelper.LerpPrecise(value1.W, value2.W, amount);
+        }
+
+        /// <summary>
         /// Creates a new <see cref="Vector4"/> that contains a maximal values from the two vectors.
         /// </summary>
         /// <param name="value1">The first vector.</param>
@@ -904,22 +941,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
         public static void Transform(ref Vector2 value, ref Quaternion rotation, out Vector4 result)
         {
-            double xx = rotation.X + rotation.X;
-            double yy = rotation.Y + rotation.Y;
-            double zz = rotation.Z + rotation.Z;
-            double wxx = rotation.W * xx;
-            double wyy = rotation.W * yy;
-            double wzz = rotation.W * zz;
-            double xxx = rotation.X * xx;
-            double xyy = rotation.X * yy;
-            double xzz = rotation.X * zz;
-            double yyy = rotation.Y * yy;
-            double yzz = rotation.Y * zz;
-            double zzz = rotation.Z * zz;
-            result.X = (float)((double)value.X * (1.0 - yyy - zzz) + (double)value.Y * (xyy - wzz));
-            result.Y = (float)((double)value.X * (xyy + wzz) + (double)value.Y * (1.0 - xxx - zzz));
-            result.Z = (float)((double)value.X * (xzz - wyy) + (double)value.Y * (yzz + wxx));
-            result.W = 1f;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -944,22 +966,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
         public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector4 result)
         {
-            double xx = rotation.X + rotation.X;
-            double yy = rotation.Y + rotation.Y;
-            double zz = rotation.Z + rotation.Z;
-            double wxx = rotation.W * xx;
-            double wyy = rotation.W * yy;
-            double wzz = rotation.W * zz;
-            double xxx = rotation.X * xx;
-            double xyy = rotation.X * yy;
-            double xzz = rotation.X * zz;
-            double yyy = rotation.Y * yy;
-            double yzz = rotation.Y * zz;
-            double zzz = rotation.Z * zz;
-            result.X = (float)((double)value.X * (1.0 - yyy - zzz) + (double)value.Y * (xyy - wzz) + (double)value.Z * (xzz + wyy));
-            result.Y = (float)((double)value.X * (xyy + wzz) + (double)value.Y * (1.0 - xxx - zzz) + (double)value.Z * (yzz - wxx));
-            result.Z = (float)((double)value.X * (xzz - wyy) + (double)value.Y * (yzz + wxx) + (double)value.Z * (1.0 - xxx - yyy));
-            result.W = 1f;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -988,22 +995,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
         public static void Transform(ref Vector4 value, ref Quaternion rotation, out Vector4 result)
         {
-            double xx = rotation.X + rotation.X;
-            double yy = rotation.Y + rotation.Y;
-            double zz = rotation.Z + rotation.Z;
-            double wxx = rotation.W * xx;
-            double wyy = rotation.W * yy;
-            double wzz = rotation.W * zz;
-            double xxx = rotation.X * xx;
-            double xyy = rotation.X * yy;
-            double xzz = rotation.X * zz;
-            double yyy = rotation.Y * yy;
-            double yzz = rotation.Y * zz;
-            double zzz = rotation.Z * zz;
-            result.X = (float)((double)value.X * (1.0 - yyy - zzz) + (double)value.Y * (xyy - wzz) + (double)value.Z * (xzz + wyy));
-            result.Y = (float)((double)value.X * (xyy + wzz) + (double)value.Y * (1.0 - xxx - zzz) + (double)value.Z * (yzz - wxx));
-            result.Z = (float)((double)value.X * (xzz - wyy) + (double)value.Y * (yzz + wxx) + (double)value.Z * (1.0 - xxx - yyy));
-            result.W = value.W;
+            throw new NotImplementedException();
         }
 
         /// <summary>

@@ -5,7 +5,14 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Utilities;
 using MonoGame.Utilities.Png;
+using SharpDX;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using SharpDX.WIC;
+using MapFlags = SharpDX.Direct3D11.MapFlags;
+using Resource = SharpDX.Direct3D11.Resource;
 
 #if WINDOWS_PHONE
 using System.Threading;
@@ -27,74 +34,40 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _renderTarget;
         private bool _mipmap;
+
+        private SampleDescription _sampleDescription;
+
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
             _shared = shared;
 
             _renderTarget = (type == SurfaceType.RenderTarget);
             _mipmap = mipmap;
-
-            // Create texture
-            GetTexture();
         }
 
-        private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             // Use try..finally to make sure dataHandle is freed in case of an error
             try
             {
                 var startBytes = startIndex * elementSizeInByte;
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-                int x, y, w, h;
-                if (rect.HasValue)
-                {
-                    x = rect.Value.X;
-                    y = rect.Value.Y;
-                    w = rect.Value.Width;
-                    h = rect.Value.Height;
-                }
-                else
-                {
-                    x = 0;
-                    y = 0;
-                    w = Math.Max(width >> level, 1);
-                    h = Math.Max(height >> level, 1);
-
-                    // For DXT textures the width and height of each level is a multiple of 4.
-                    // OpenGL only: The last two mip levels require the width and height to be 
-                    // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
-                    // a 4x4 block. 
-                    // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-                    if (_format == SurfaceFormat.Dxt1 ||
-                        _format == SurfaceFormat.Dxt1SRgb ||
-                        _format == SurfaceFormat.Dxt1a ||
-                        _format == SurfaceFormat.Dxt3 ||
-                        _format == SurfaceFormat.Dxt3SRgb ||
-                        _format == SurfaceFormat.Dxt5 ||
-                        _format == SurfaceFormat.Dxt5SRgb)
-                    {
-                        w = (w + 3) & ~3;
-                        h = (h + 3) & ~3;
-                    }
-                }
-
-                var box = new SharpDX.DataBox(dataPtr, GetPitch(w), 0);
-
-                var region = new SharpDX.Direct3D11.ResourceRegion();
-                region.Top = y;
+                var region = new ResourceRegion();
+                region.Top = rect.Top;
                 region.Front = 0;
                 region.Back = 1;
-                region.Bottom = y + h;
-                region.Left = x;
-                region.Right = x + w;
+                region.Bottom = rect.Bottom;
+                region.Left = rect.Left;
+                region.Right = rect.Right;
 
+                
                 // TODO: We need to deal with threaded contexts here!
-                int subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
+                var subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
                 var d3dContext = GraphicsDevice._d3dContext;
                 lock (d3dContext)
-                    d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
+                    d3dContext.UpdateSubresource(GetTexture(), subresourceIndex, region, dataPtr, GetPitch(rect.Width), 0);
             }
             finally
             {
@@ -102,59 +75,60 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformGetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformGetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             // Create a temp staging resource for copying the data.
             // 
             // TODO: We should probably be pooling these staging resources
             // and not creating a new one each time.
             //
-            var levelWidth = Math.Max(width >> level, 1);
-            var levelHeight = Math.Max(height >> level, 1);
+            var min = _format.IsCompressedFormat() ? 4 : 1;
+            var levelWidth = Math.Max(width >> level, min);
+            var levelHeight = Math.Max(height >> level, min);
 
-            var desc = new SharpDX.Direct3D11.Texture2DDescription();
+            var desc = new Texture2DDescription();
             desc.Width = levelWidth;
             desc.Height = levelHeight;
             desc.MipLevels = 1;
             desc.ArraySize = 1;
             desc.Format = SharpDXHelper.ToFormat(_format);
-            desc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
-            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read;
+            desc.BindFlags = BindFlags.None;
+            desc.CpuAccessFlags = CpuAccessFlags.Read;
             desc.SampleDescription.Count = 1;
             desc.SampleDescription.Quality = 0;
-            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
-            desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+            desc.Usage = ResourceUsage.Staging;
+            desc.OptionFlags = ResourceOptionFlags.None;
+
+            // Save sampling description.
+            _sampleDescription = desc.SampleDescription;
 
             var d3dContext = GraphicsDevice._d3dContext;
             using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
             {
                 lock (d3dContext)
                 {
-                    int subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
+                    var subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
 
                     // Copy the data from the GPU to the staging texture.
-                    int elementsInRow;
-                    int rows;
-                    if (rect.HasValue)
-                    {
-                        elementsInRow = rect.Value.Width;
-                        rows = rect.Value.Height;
-                        d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left, rect.Value.Top, 0, rect.Value.Right, rect.Value.Bottom, 1), stagingTex, 0, 0, 0, 0);
-                    }
-                    else
-                    {
-                        elementsInRow = levelWidth;
-                        rows = height;
-                        d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, null, stagingTex, 0, 0, 0, 0);
-                    }
+                    var elementsInRow = rect.Width;
+                    var rows = rect.Height;
+                    var region = new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1);
+                    d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, stagingTex, 0);
 
                     // Copy the data to the array.
-                    SharpDX.DataStream stream = null;
+                    DataStream stream = null;
                     try
                     {
-                        var databox = d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
+                        var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);
 
                         var elementSize = _format.GetSize();
+                        if (_format.IsCompressedFormat())
+                        {
+                            // for 4x4 block compression formats an element is one block, so elementsInRow
+                            // and number of rows are 1/4 of number of pixels in width and height of the rectangle
+                            elementsInRow /= 4;
+                            rows /= 4;
+                        }
                         var rowSize = elementSize * elementsInRow;
                         if (rowSize == databox.RowPitch)
                             stream.ReadRange(data, startIndex, elementCount);
@@ -162,14 +136,14 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             // Some drivers may add pitch to rows.
                             // We need to copy each row separatly and skip trailing zeros.
-                            stream.Seek(startIndex, SeekOrigin.Begin);
+                            stream.Seek(0, SeekOrigin.Begin);
 
-                            int elementSizeInByte = Marshal.SizeOf(typeof(T));
+                            var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
                             for (var row = 0; row < rows; row++)
                             {
                                 int i;
                                 for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
-                                    data[i] = stream.Read<T>();
+                                    data[i + startIndex] = stream.Read<T>();
 
                                 if (i >= elementCount)
                                     break;
@@ -239,7 +213,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
 #if WINDOWS_STOREAPP || WINDOWS_UAP
-            SaveAsImage(BitmapEncoder.JpegEncoderId, stream, width, height);
+            SaveAsImage(Windows.Graphics.Imaging.BitmapEncoder.JpegEncoderId, stream, width, height);
 #endif
 #if WINDOWS_PHONE
 
@@ -274,7 +248,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 for (int col = 0; col < (uint)pixelWidth; col++)
                 {
-                    offset = (row * (int)pixelWidth * 4) + (col * 4);
+                    offset = (row * pixelWidth * 4) + (col * 4);
 
                     byte B = pixels[offset];
                     byte R = pixels[offset + 2];
@@ -306,7 +280,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var memstream = new InMemoryRandomAccessStream();
 
                 // Write the png.
-                var encoder = await BitmapEncoder.CreateAsync(encoderId, memstream);
+                var encoder = await Windows.Graphics.Imaging.BitmapEncoder.CreateAsync(encoderId, memstream);
                 encoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Ignore, (uint)width, (uint)height, 96, 96, pixelData);
                 await encoder.FlushAsync();
 
@@ -319,91 +293,98 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 #if !WINDOWS_PHONE
 
-        [CLSCompliant(false)]
-        public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
+        static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(BitmapSource bsource, GraphicsDevice device)
         {
 
-            SharpDX.Direct3D11.Texture2DDescription desc;
+            Texture2DDescription desc;
             desc.Width = bsource.Size.Width;
             desc.Height = bsource.Size.Height;
             desc.ArraySize = 1;
-            desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
-            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
-            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            desc.BindFlags = BindFlags.ShaderResource;
+            desc.Usage = ResourceUsage.Default;
+            desc.CpuAccessFlags = CpuAccessFlags.None;
             desc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
             desc.MipLevels = 1;
-            desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+            desc.OptionFlags = ResourceOptionFlags.None;
             desc.SampleDescription.Count = 1;
             desc.SampleDescription.Quality = 0;
 
-            using(SharpDX.DataStream s = new SharpDX.DataStream(bsource.Size.Height * bsource.Size.Width * 4, true, true))
+            using(DataStream s = new DataStream(bsource.Size.Height * bsource.Size.Width * 4, true, true))
             {
                 bsource.CopyPixels(bsource.Size.Width * 4, s);
 
-                SharpDX.DataRectangle rect = new SharpDX.DataRectangle(s.DataPointer, bsource.Size.Width * 4);
+                DataRectangle rect = new DataRectangle(s.DataPointer, bsource.Size.Width * 4);
 
                 return new SharpDX.Direct3D11.Texture2D(device._d3dDevice, desc, rect);
             }
         }
 
-        static SharpDX.WIC.ImagingFactory imgfactory = null;
-        private static SharpDX.WIC.BitmapSource LoadBitmap(Stream stream, out SharpDX.WIC.BitmapDecoder decoder)
+        static ImagingFactory imgfactory;
+        private static BitmapSource LoadBitmap(Stream stream, out SharpDX.WIC.BitmapDecoder decoder)
         {
             if (imgfactory == null)
             {
-                imgfactory = new SharpDX.WIC.ImagingFactory();
+                imgfactory = new ImagingFactory();
             }
 
             decoder = new SharpDX.WIC.BitmapDecoder(
                 imgfactory,
                 stream,
-                SharpDX.WIC.DecodeOptions.CacheOnDemand
+                DecodeOptions.CacheOnDemand
                 );
 
-            var fconv = new SharpDX.WIC.FormatConverter(imgfactory);
+            var fconv = new FormatConverter(imgfactory);
 
             fconv.Initialize(
                 decoder.GetFrame(0),
-                SharpDX.WIC.PixelFormat.Format32bppPRGBA,
-                SharpDX.WIC.BitmapDitherType.None, null,
-                0.0, SharpDX.WIC.BitmapPaletteType.Custom);
+                PixelFormat.Format32bppPRGBA,
+                BitmapDitherType.None, null,
+                0.0, BitmapPaletteType.Custom);
 
             return fconv;
         }
 
 #endif
 
-        internal override SharpDX.Direct3D11.Resource CreateTexture()
+        internal override Resource CreateTexture()
 		{
             // TODO: Move this to SetData() if we want to make Immutable textures!
-            var desc = new SharpDX.Direct3D11.Texture2DDescription();
+            var desc = new Texture2DDescription();
             desc.Width = width;
             desc.Height = height;
             desc.MipLevels = _levelCount;
             desc.ArraySize = ArraySize;
             desc.Format = SharpDXHelper.ToFormat(_format);
-            desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
-            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            desc.BindFlags = BindFlags.ShaderResource;
+            desc.CpuAccessFlags = CpuAccessFlags.None;
             desc.SampleDescription.Count = 1;
             desc.SampleDescription.Quality = 0;
-            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
-            desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+            desc.Usage = ResourceUsage.Default;
+            desc.OptionFlags = ResourceOptionFlags.None;
 
             if (_renderTarget)
             {
-                desc.BindFlags |= SharpDX.Direct3D11.BindFlags.RenderTarget;
+                desc.BindFlags |= BindFlags.RenderTarget;
                 if (_mipmap)
                 {
                     // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
                     // because generation of mipmaps is not supported on the Xbox 360.
                     // TODO: New method Texture.GenerateMipMaps() required.
-                    desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.GenerateMipMaps;
+                    desc.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
                 }
             }
             if (_shared)
-                desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.Shared;
+                desc.OptionFlags |= ResourceOptionFlags.Shared;
+
+            // Save sampling description.
+            _sampleDescription = desc.SampleDescription;
 
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+        }
+
+        internal SampleDescription GetTextureSampleDescription()
+        {
+            return _sampleDescription;
         }
 
         private void PlatformReload(Stream textureStream)

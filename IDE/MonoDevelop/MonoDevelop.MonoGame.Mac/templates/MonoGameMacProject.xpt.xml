@@ -2,7 +2,7 @@
 <Template>
 	<TemplateConfiguration>
 		<_Name>MonoGame Mac Application (MonoMac)</_Name>
-		<_Category>C#/MonoGame</_Category>
+		<Category>monogame/app/games</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates a MonoGame Application for Mac OS. This application uses MonoMac as a result you will need to have mono installed on your users machine.</_Description>
@@ -28,16 +28,17 @@
 				<Reference type="Gac" refto="System.Xml.Linq" />
 				<Reference type="Gac" refto="System.Drawing" />
 				<Reference type="Gac" refto="MonoMac" SpecificVersion="false" />
+				<Reference type="Package" refto="MonoGame.Framework" />
+				<Reference type="Package" refto="OpenTK" />
+				<Reference type="Package" refto="Tao.Sdl" />
 			</References>
-			<Packages>
-				<Package id="MonoGame.Framework.MacOS" version="3.3.0" targetFramework="net40" />
-			</Packages>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
 				<File name="Main.cs" AddStandardHeader="True" src="Mac/Program.cs" />
 				<File name="Info.plist" AddStandardHeader="False" src="Mac/MacInfo.plist" />
+				<File name="MainMenu.xib" AddStandardHeader="False" src="Mac/MainMenu.xib" />
 				<Directory name="Content">
-					<File name="Content.mgcb" src="Common/Content.mgcb"/>
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
 				</Directory>
 				<Directory name="Properties">
 					<File name="AssemblyInfo.cs" AddStandardHeader="True" src="Common/AssemblyInfo.cs" />

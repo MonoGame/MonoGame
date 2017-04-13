@@ -39,16 +39,8 @@
       <HintPath>/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/MonoDevelop.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MonoDevelop.MonoMac">
-      <HintPath>/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.MonoMac/MonoDevelop.MonoMac.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MonoDevelop.DesignerSupport">
       <HintPath>/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.DesignerSupport/MonoDevelop.DesignerSupport.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MonoDevelop.MacDev">
-      <HintPath>/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.MacDev/MonoDevelop.MacDev.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -78,6 +70,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="templates\MonoGameOSXProject.xpt.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="templates\Mac\MainMenu.xib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="templates\MonoGameXamMacProject.xpt.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="templates\Mac\XamMac2Program.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="templates\Mac\XamMacProgram.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

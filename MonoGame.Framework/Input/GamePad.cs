@@ -28,8 +28,8 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>The capabilites of the controller.</returns>
         public static GamePadCapabilities GetCapabilities(int index)
         {
-            if (index < 0 || index > PlatformGetMaxIndex())
-                throw new InvalidOperationException();
+            if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
+                return new GamePadCapabilities();
 
             return PlatformGetCapabilities(index);
         }
@@ -75,8 +75,8 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>The state of the controller.</returns>
         public static GamePadState GetState(int index, GamePadDeadZone deadZoneMode)
         {
-            if (index < 0 || index > PlatformGetMaxIndex())
-                throw new InvalidOperationException();
+            if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
+                return GamePadState.Default;
             
             return PlatformGetState(index, deadZoneMode);
         }
@@ -102,10 +102,20 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>Returns true if the vibration motors were set.</returns>
         public static bool SetVibration(int index, float leftMotor, float rightMotor)
         {
-            if (index < 0 || index > PlatformGetMaxIndex())
-                throw new InvalidOperationException();
+            if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
+                return false;
             
             return PlatformSetVibration(index, MathHelper.Clamp(leftMotor, 0.0f, 1.0f), MathHelper.Clamp(rightMotor, 0.0f, 1.0f));
+        }
+
+        /// <summary>
+        /// The maximum number of game pads supported on this system.  Attempting to
+        /// access a gamepad index higher than this number will result in an <see cref="InvalidOperationException"/>
+        /// being thrown by the API.
+        /// </summary>
+        public static int MaximumGamePadCount
+        {
+            get { return PlatformGetMaxNumberOfGamePads(); }
         }
     }
 }

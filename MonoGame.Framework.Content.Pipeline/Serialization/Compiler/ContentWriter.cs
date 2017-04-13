@@ -43,18 +43,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             'w', // Windows (DirectX)
             'x', // Xbox360
-            'm', // WindowsPhone
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
             'X', // MacOSX
             'W', // WindowsStoreApp
             'n', // NativeClient
-            'u', // Ouya
             'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
+            'v', // PSVita
+            'O', // XboxOne
+            'S', // Nintendo Switch
         };
 
         /// <summary>
