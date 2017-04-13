@@ -17,12 +17,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The current touch state.
         /// </summary>
-        private readonly List<TouchLocation> _touchState = new List<TouchLocation>();
+        private readonly List<InternalTouchLocation> _touchState = new List<InternalTouchLocation>();
 
         /// <summary>
         /// The current gesture state.
         /// </summary>
-        private readonly List<TouchLocation> _gestureState = new List<TouchLocation>();
+        private readonly List<InternalTouchLocation> _gestureState = new List<InternalTouchLocation>();
 
         /// <summary>
         /// The positional scale to apply to touch input.
@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// Age all the touches, so any that were Pressed become Moved, and any that were Released are removed
         /// </summary>
-        private void AgeTouches(List<TouchLocation> state)
+        private void AgeTouches(List<InternalTouchLocation> state)
         {
             for (var i = state.Count - 1; i >= 0; i--)
             {
@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// Apply the given new touch to the state. If it is a Pressed it will be added as a new touch, otherwise we update the existing touch it matches
         /// </summary>
-        private void ApplyTouch(List<TouchLocation> state, TouchLocation touch)
+        private void ApplyTouch(List<InternalTouchLocation> state, InternalTouchLocation touch)
         {
             if (touch.State == TouchLocationState.Pressed)
             {
@@ -146,7 +146,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 }
             }
 
-            var result = (_touchState.Count > 0) ? new TouchCollection(_touchState.ToArray()) : TouchCollection.Empty;
+            var result = (_touchState.Count > 0) ? new TouchCollection(_touchState) : TouchCollection.Empty;
             AgeTouches(_touchState);
             return result;
         }
@@ -197,7 +197,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 // Add the new touch event keeping the list from getting
                 // too large if no one happens to be requesting the state.
-                var evt = new TouchLocation(touchId, state, position * _touchScale, CurrentTimestamp);
+                var evt = new InternalTouchLocation(touchId, state, position * _touchScale, CurrentTimestamp);
 
                 if (!isMouse || EnableMouseTouchPoint)
                 {
@@ -241,14 +241,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
             var mostToRemove = Math.Max(_touchState.Count, _gestureState.Count);
             if (mostToRemove > 0)
             {
-                var temp = new List<TouchLocation>(mostToRemove);
+                var temp = new List<InternalTouchLocation>(mostToRemove);
 
                 // Submit a new event for each non-released location.
                 temp.AddRange(_touchState);
                 foreach (var touch in temp)
                 {
                     if (touch.State != TouchLocationState.Released)
-                        ApplyTouch(_touchState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position, CurrentTimestamp));
+                        ApplyTouch(_touchState, new InternalTouchLocation(touch.Id, TouchLocationState.Released, touch.Position, CurrentTimestamp));
                 }
 
                 temp.Clear();
@@ -256,7 +256,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 foreach (var touch in temp)
                 {
                     if (touch.State != TouchLocationState.Released)
-                        ApplyTouch(_gestureState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position, CurrentTimestamp));
+                        ApplyTouch(_gestureState, new InternalTouchLocation(touch.Id, TouchLocationState.Released, touch.Position, CurrentTimestamp));
                 }
             }
 
@@ -347,7 +347,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The pinch touch locations.
         /// </summary>
-        private readonly TouchLocation[] _pinchTouch = new TouchLocation[2];
+        private readonly InternalTouchLocation[] _pinchTouch = new InternalTouchLocation[2];
 
         /// <summary>
         /// If true the pinch touch locations are valid and
@@ -469,8 +469,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                                                             Vector2.Zero, Vector2.Zero));
 
                                 _pinchGestureStarted = false;
-                                _pinchTouch[0] = TouchLocation.Invalid;
-                                _pinchTouch[1] = TouchLocation.Invalid;
+                                _pinchTouch[0] = InternalTouchLocation.Invalid;
+                                _pinchTouch[1] = InternalTouchLocation.Invalid;
                                 break;
                             }
 
@@ -529,8 +529,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // Make sure a partial pinch state 
                 // is not left hanging around.
                 _pinchGestureStarted = false;
-                _pinchTouch[0] = TouchLocation.Invalid;
-                _pinchTouch[1] = TouchLocation.Invalid;
+                _pinchTouch[0] = InternalTouchLocation.Invalid;
+                _pinchTouch[1] = InternalTouchLocation.Invalid;
             }
 
             // If all points are released then clear some states.
@@ -542,7 +542,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
         }
 
-        private void ProcessHold(TouchLocation touch)
+        private void ProcessHold(InternalTouchLocation touch)
         {
             if (!GestureIsEnabled(GestureType.Hold) || _holdDisabled)
                 return;
@@ -560,7 +560,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                                     Vector2.Zero, Vector2.Zero));
         }
 
-        private bool ProcessDoubleTap(TouchLocation touch)
+        private bool ProcessDoubleTap(InternalTouchLocation touch)
         {
             if (!GestureIsEnabled(GestureType.DoubleTap) || _tapDisabled || _lastTap.State == TouchLocationState.Invalid)
                 return false;
@@ -588,9 +588,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return true;
         }
 
-        private TouchLocation _lastTap;
+        private InternalTouchLocation _lastTap;
 
-        private void ProcessTap(TouchLocation touch)
+        private void ProcessTap(InternalTouchLocation touch)
         {
             if (_tapDisabled)
                 return;
@@ -624,7 +624,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         private GestureType _dragGestureStarted = GestureType.None;
 
-        private void ProcessDrag(TouchLocation touch)
+        private void ProcessDrag(InternalTouchLocation touch)
         {
             var dragH = GestureIsEnabled(GestureType.HorizontalDrag);
             var dragV = GestureIsEnabled(GestureType.VerticalDrag);
@@ -635,7 +635,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // Make sure this is a move event and that we have
             // a previous touch location.
-            TouchLocation prevTouch;
+            InternalTouchLocation prevTouch;
             if (touch.State != TouchLocationState.Moved || !touch.TryGetPreviousLocation(out prevTouch))
                 return;
 
@@ -688,10 +688,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
                                     delta, Vector2.Zero));
         }
 
-        private void ProcessPinch(TouchLocation[] touches)
+        private void ProcessPinch(InternalTouchLocation[] touches)
         {
-            TouchLocation prevPos0;
-            TouchLocation prevPos1;
+            InternalTouchLocation prevPos0;
+            InternalTouchLocation prevPos1;
 
             if (!touches[0].TryGetPreviousLocation(out prevPos0))
                 prevPos0 = touches[0];
