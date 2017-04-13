@@ -13,12 +13,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
     /// </summary>
     public struct TouchCollection : IList<TouchLocation>
 	{
+        private readonly int _count;
+        private readonly TouchLocation _value0, _value1, _value2, _value3;
         private readonly TouchLocation[] _collection;
-
-        private TouchLocation[] Collection
-        {
-            get { return _collection ?? EmptyLocationArray; }
-        }
 
         #region Properties
 
@@ -27,23 +24,36 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         public bool IsConnected { get { return TouchPanel.GetCapabilities().IsConnected; } }
 
-        private static readonly TouchLocation[] EmptyLocationArray = new TouchLocation[0];
-        internal static readonly TouchCollection Empty = new TouchCollection(EmptyLocationArray);
-
 		#endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TouchCollection"/> with a pre-determined set of touch locations.
         /// </summary>
         /// <param name="touches">Array of <see cref="TouchLocation"/> items to initialize with.</param>
-        public TouchCollection(TouchLocation[] touches)
+        public TouchCollection(TouchLocation[] touches): this((IList<TouchLocation>)touches)
+        {
+        }
+        
+        internal TouchCollection(IList<TouchLocation> touches)
         {
             if (touches == null)
                 throw new ArgumentNullException("touches");
 
-            _collection = touches;
-        }
+            _count = touches.Count;
 
+            _value0 = (_count > 0) ? touches[0] : TouchLocation.Invalid;
+            _value1 = (_count > 1) ? touches[1] : TouchLocation.Invalid;
+            _value2 = (_count > 2) ? touches[2] : TouchLocation.Invalid;
+            _value3 = (_count > 3) ? touches[3] : TouchLocation.Invalid;
+            _collection = null;
+
+            if (_count > 4)
+            {
+                _collection = new TouchLocation[_count];
+                touches.CopyTo(_collection, 0);
+            }
+        }
+        
         /// <summary>
         /// Returns <see cref="TouchLocation"/> specified by ID.
         /// </summary>
@@ -52,17 +62,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns></returns>
         public bool FindById(int id, out TouchLocation touchLocation)
 		{
-            for (var i = 0; i < Collection.Length; i++)
+            for (var i = 0; i < Count; i++)
             {
-                var location = Collection[i];
-                if (location.Id == id)
+                if (this[i].Id == id)
                 {
-                    touchLocation = location;
+                    touchLocation = this[i];
                     return true;
                 }
             }
 
-            touchLocation = default(TouchLocation);
+            touchLocation = TouchLocation.Invalid;
             return false;
 		}
 
@@ -83,9 +92,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns></returns>
         public int IndexOf(TouchLocation item)
         {
-            for (var i = 0; i < Collection.Length; i++)
+            for (var i = 0; i < Count; i++)
             {
-                if (item == Collection[i])
+                if (item == this[i])
                     return i;
             }
 
@@ -120,12 +129,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                return Collection[index];
+                if (index < 0 || index >= _count)
+                    throw new ArgumentOutOfRangeException("index");
+
+                switch (index)
+                {
+                    case 0: return _value0;
+                    case 1: return _value1;
+                    case 2: return _value2;
+                    case 3: return _value3;
+                    default: return _collection[index];
+                } 
             }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            set { throw new NotSupportedException(); }
         }
 
         /// <summary>
@@ -152,9 +168,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns>Returns true if queried item is found, false otherwise.</returns>
         public bool Contains(TouchLocation item)
         {
-            for (var i = 0; i < Collection.Length; i++)
+            for (var i = 0; i < Count; i++)
             {
-                if (item == Collection[i])
+                if (item == this[i])
                     return true;
             }
 
@@ -168,7 +184,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <param name="arrayIndex">The starting index of the copy operation.</param>
         public void CopyTo(TouchLocation[] array, int arrayIndex)
         {
-            Collection.CopyTo(array, arrayIndex);
+            for (var i = 0; i < Count; i++)
+            {
+                array[arrayIndex + i] = this[i];
+            }
         }
 
         /// <summary>
@@ -176,10 +195,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         public int Count
         {
-            get
-            {
-                return Collection.Length;
-            }
+            get { return _count; }
         }
 
         /// <summary>
