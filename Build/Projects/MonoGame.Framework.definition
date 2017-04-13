@@ -447,6 +447,7 @@
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentReader.cs" />
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\AnimationClipReader.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BooleanReader.cs" />
@@ -757,7 +758,11 @@
     <Compile Include="Graphics\SpriteBatchItem.cs" />
     <Compile Include="Graphics\SpriteEffects.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
-    <Compile Include="Graphics\SpriteSortMode.cs" />
+    <Compile Include="Graphics\SpriteSortMode.cs" />    
+    <Compile Include="Graphics\SkinnedAnimation\AnimationClip.cs" />
+    <Compile Include="Graphics\SkinnedAnimation\AnimationPlayer.cs" />
+    <Compile Include="Graphics\SkinnedAnimation\Keyframe.cs" />
+    <Compile Include="Graphics\SkinnedAnimation\SkinningData.cs" />    
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
