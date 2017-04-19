@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 namespace Microsoft.Xna.Framework.Audio
 {
     /// <summary>
-    /// Enumeration that indicates whether the recording state of the Microphone has started or stopped. 
+    /// Microphone state. 
     /// </summary>
     public enum MicrophoneState
     {
@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Audio
     }
 
     /// <summary>
-    /// Provides properties, methods, and fields and events for capturing audio data with microphones. 
+    /// Provides microphones capture features. 
     /// </summary>
     public sealed partial class Microphone
     {
@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Audio
         private TimeSpan _bufferDuration = TimeSpan.FromMilliseconds(1000.0);
 
         /// <summary>
-        /// Gets or sets audio capture buffer duration of the microphone.
+        /// Gets or sets the capture buffer duration. This value must be greater than 100 milliseconds, lower than 1000 milliseconds, and must be 10 milliseconds aligned (BufferDuration % 10 == 10).
         /// </summary>
         public TimeSpan BufferDuration
         {
@@ -72,8 +72,9 @@ namespace Microsoft.Xna.Framework.Audio
         private const bool _isHeadset = false;
 #endif
         /// <summary>
-        /// Determines if the microphone is a wired headset or a Bluetooth device.
-        /// Note: this is always true on mobile platforms, and always false otherwise
+        /// Determines if the microphone is a wired headset.
+        /// Note: XNA could know if a headset microphone was plugged in an Xbox 360 controller but MonoGame can't.
+        /// Hence, this is always true on mobile platforms, and always false otherwise.
         /// </summary>
         public bool IsHeadset
         {
@@ -83,7 +84,8 @@ namespace Microsoft.Xna.Framework.Audio
         private int _sampleRate = 44100; // XNA default is 44100, don't know if it supports any other rates
 
         /// <summary>
-        /// Returns the sample rate at which the microphone is capturing audio data. 
+        /// Returns the sample rate of the captured audio.
+        /// Note: default value is 44100hz
         /// </summary>
         public int SampleRate
         {
@@ -93,7 +95,7 @@ namespace Microsoft.Xna.Framework.Audio
         private MicrophoneState _state = MicrophoneState.Stopped;
 
         /// <summary>
-        /// Returns the recording state of the Microphone object. 
+        /// Returns the state of the Microphone. 
         /// </summary>
         public MicrophoneState State
         {
@@ -107,7 +109,7 @@ namespace Microsoft.Xna.Framework.Audio
         private static List<Microphone> _allMicrophones = null;
 
         /// <summary>
-        /// Returns the collection of all currently-available microphones.
+        /// Returns all compatible microphones.
         /// </summary>
         public static ReadOnlyCollection<Microphone> All
         {
@@ -122,7 +124,7 @@ namespace Microsoft.Xna.Framework.Audio
         private static Microphone _default = null;
 
         /// <summary>
-        /// Returns the default attached microphone.
+        /// Returns the default microphone.
         /// </summary>
         public static Microphone Default
         {
@@ -134,10 +136,10 @@ namespace Microsoft.Xna.Framework.Audio
         #region Public Methods
 
         /// <summary>
-        /// Returns the duration of audio playback based on the size of the buffer.
+        /// Returns the duration based on the size of the buffer (assuming 16-bit PCM data).
         /// </summary>
-        /// <param name="sizeInBytes">Size, in bytes, of the audio data.</param>
-        /// <returns>TimeSpan object that represents the duration of the audio playback.</returns>
+        /// <param name="sizeInBytes">Size, in bytes</param>
+        /// <returns>TimeSpan of the duration.</returns>
         public TimeSpan GetSampleDuration(int sizeInBytes)
         {
             // this should be 10ms aligned
@@ -146,10 +148,10 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>
-        /// Returns the size of the byte array required to hold the specified duration of audio for this microphone object. 
+        /// Returns the size, in bytes, of the array required to hold the specified duration of 16-bit PCM data. 
         /// </summary>
-        /// <param name="duration">TimeSpan object that contains the duration of the audio sample. </param>
-        /// <returns>Size (10 ms block aligned), in bytes, of the audio buffer.</returns>
+        /// <param name="duration">TimeSpan of the duration of the sample.</param>
+        /// <returns>Size, in bytes, of the buffer.</returns>
         public int GetSampleSizeInBytes(TimeSpan duration)
         {
             // this should be 10ms aligned
@@ -158,7 +160,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>
-        /// Starts microphone audio capture.
+        /// Starts microphone capture.
         /// </summary>
         public void Start()
         {
@@ -166,7 +168,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>
-        /// Stops microphone audio capture.
+        /// Stops microphone capture.
         /// </summary>
         public void Stop()
         {
@@ -174,22 +176,22 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>
-        /// Gets the latest recorded data from the microphone based on the audio capture buffer.
+        /// Gets the latest available data from the microphone.
         /// </summary>
-        /// <param name="buffer">Buffer, in bytes, containing the captured audio data. The audio format must be PCM wave data.</param>
-        /// <returns>The buffer size, in bytes, of the audio data.</returns>
+        /// <param name="buffer">Buffer, in bytes, of the captured data (16-bit PCM).</param>
+        /// <returns>The buffer size, in bytes, of the captured data.</returns>
         public int GetData(byte[] buffer)
         {
             return GetData(buffer, 0, buffer.Length);
         }
 
         /// <summary>
-        /// Gets the latest captured audio data from the microphone based on the specified offset and byte count.
+        /// Gets the latest available data from the microphone.
         /// </summary>
-        /// <param name="buffer">Buffer, in bytes, containing the captured audio data. The audio format must be PCM wave data.</param>
-        /// <param name="offset">Offset, in bytes, to the starting position of the data. </param>
-        /// <param name="count">Amount, in bytes, of desired audio data. </param>
-        /// <returns>The buffer size, in bytes, of the audio data.</returns>
+        /// <param name="buffer">Buffer, in bytes, of the captured data (16-bit PCM).</param>
+        /// <param name="offset">Byte offset.</param>
+        /// <param name="count">Amount, in bytes.</param>
+        /// <returns>The buffer size, in bytes, of the captured data.</returns>
         public int GetData(byte[] buffer, int offset, int count)
         {
             return PlatformGetData(buffer, offset, count);
@@ -200,7 +202,7 @@ namespace Microsoft.Xna.Framework.Audio
         #region Public Events
 
         /// <summary>
-        /// Event that occurs when the audio capture buffer is ready to processed.
+        /// Event fired when the audio data are available.
         /// </summary>
         public event EventHandler<EventArgs> BufferReady;
 

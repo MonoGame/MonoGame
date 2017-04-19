@@ -6,7 +6,10 @@ using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Audio
-{ 
+{
+    /// <summary>
+    /// Provides microphones capture features. 
+    /// </summary>	
     public sealed partial class Microphone
     {
         internal void PlatformStart()

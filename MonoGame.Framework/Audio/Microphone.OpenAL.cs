@@ -27,7 +27,7 @@ using AVFoundation;
 namespace Microsoft.Xna.Framework.Audio
 {
     /// <summary>
-    /// Provides properties, methods, and fields and events for capturing audio data with microphones. 
+    /// Provides microphones capture features.  
     /// </summary>
     public sealed partial class Microphone
     {
