@@ -38,6 +38,25 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         /// <value>The number of hats/dpads that the joystick possesses.</value>
         public int HatCount { get; internal set; }
+
+        /// <summary>
+        /// Serves as a hash function for a <see cref="T:Microsoft.Xna.Framework.Input.JoystickCapabilities"/> object.
+        /// </summary>
+        /// <returns>A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a
+        /// hash table.</returns>
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
+
+        /// <summary>
+        /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Microsoft.Xna.Framework.Input.JoystickCapabilities"/>.
+        /// </summary>
+        /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Microsoft.Xna.Framework.Input.JoystickCapabilities"/>.</returns>
+        public override string ToString()
+        {
+            return "[JoystickCapabilities: IsConnected=" + IsConnected + ", Id=" + Id + ", AxisCount=" + AxisCount + ", ButtonCount=" + ButtonCount + ", HatCount=" + HatCount + "]";
+        }
     }
 }
 
