@@ -42,8 +42,7 @@ namespace MonoGame.Tools.Pipeline
 
             private void ExistsThread()
             {
-                var loop = true;
-                while (loop)
+                while (true)
                 {
                     // Can't lock without major code modifications
                     try
@@ -63,7 +62,7 @@ namespace MonoGame.Tools.Pipeline
                     }
                     catch (ThreadAbortException ex)
                     {
-                        loop = false;
+                        return;
                     }
                     catch 
                     {
