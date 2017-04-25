@@ -19,12 +19,6 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformInitialize(device);
         }
 
-        // For figuring out some capabilities we need native resources for querying
-        internal void InitializeAfterResources(GraphicsDevice device)
-        {
-            PlatformInitializeAfterResources(device);
-        }
-
         /// <summary>
         /// Whether the device fully supports non power-of-two textures, including
         /// mip maps and wrap modes other than CLAMP_TO_EDGE

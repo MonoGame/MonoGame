@@ -25,10 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsTextureArrays = device.GraphicsProfile == GraphicsProfile.HiDef;
             SupportsDepthClamp = device.GraphicsProfile == GraphicsProfile.HiDef;
             SupportsVertexTextures = device.GraphicsProfile == GraphicsProfile.HiDef;
-        }
 
-        private void PlatformInitializeAfterResources(GraphicsDevice device)
-        {
             _maxMultiSampleCount = GetMaxMultiSampleCount(device);
         }
 

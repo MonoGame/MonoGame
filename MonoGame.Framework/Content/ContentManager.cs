@@ -188,6 +188,8 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     Unload();
                 }
+
+                scratchBuffer = null;
 				disposed = true;
 			}
 		}

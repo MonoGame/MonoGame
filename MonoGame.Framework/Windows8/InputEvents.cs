@@ -55,6 +55,8 @@ namespace Microsoft.Xna.Framework
                     coreIndependentInputSource.PointerPressed += CoreWindow_PointerPressed;
                     coreIndependentInputSource.PointerMoved += CoreWindow_PointerMoved;
                     coreIndependentInputSource.PointerReleased += CoreWindow_PointerReleased;
+                    coreIndependentInputSource.PointerWheelChanged += CoreWindow_PointerWheelChanged;
+
                     coreIndependentInputSource.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
                 });
                 var inputWorker = ThreadPool.RunAsync(workItemHandler, WorkItemPriority.High, WorkItemOptions.TimeSliced);
