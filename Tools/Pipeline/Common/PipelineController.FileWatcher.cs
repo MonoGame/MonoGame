@@ -42,7 +42,8 @@ namespace MonoGame.Tools.Pipeline
 
             private void ExistsThread()
             {
-                while (true)
+                var loop = true;
+                while (loop)
                 {
                     // Can't lock without major code modifications
                     try
@@ -59,6 +60,10 @@ namespace MonoGame.Tools.Pipeline
                             item.Exists = !item.Exists;
                             _view.Invoke(() => _view.UpdateTreeItem(item));
                         }
+                    }
+                    catch (ThreadAbortException ex)
+                    {
+                        loop = false;
                     }
                     catch 
                     {
