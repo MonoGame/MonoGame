@@ -30,12 +30,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		public override int GetHashCode()
-		{
-			return Position.GetHashCode() ^ Color.GetHashCode();
-		}
+	    public override int GetHashCode()
+	    {
+	        unchecked {
+	            return (Position.GetHashCode() * 397) ^ Color.GetHashCode();
+	        }
+	    }
 
-		public override string ToString()
+	    public override string ToString()
 		{
             return "{{Position:" + this.Position + " Color:" + this.Color + "}}";
 		}
