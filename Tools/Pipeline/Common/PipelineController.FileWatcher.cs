@@ -60,6 +60,10 @@ namespace MonoGame.Tools.Pipeline
                             _view.Invoke(() => _view.UpdateTreeItem(item));
                         }
                     }
+                    catch (ThreadAbortException ex)
+                    {
+                        return;
+                    }
                     catch 
                     {
                     }
