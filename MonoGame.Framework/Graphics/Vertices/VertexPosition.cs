@@ -26,10 +26,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			get { return VertexDeclaration; }
 		}
 
-		public override int GetHashCode()
-		{
-		    return Position.GetHashCode();
-		}
+	    public override int GetHashCode()
+	    {
+	        return Position.GetHashCode();
+	    }
 
 		public override string ToString()
 		{
