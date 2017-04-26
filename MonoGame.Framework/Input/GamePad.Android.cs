@@ -12,6 +12,7 @@ namespace Microsoft.Xna.Framework.Input
         public int _deviceId;
         public string _descriptor;
         public bool _isConnected;
+        public bool DPadButtons;
 
         public Buttons _buttons;
         public float _leftTrigger, _rightTrigger;
@@ -226,6 +227,10 @@ namespace Microsoft.Xna.Framework.Input
             if (gamePad == null)
                 return false;
 
+            gamePad.DPadButtons |= e.KeyCode == Keycode.DpadLeft ||
+                                   e.KeyCode == Keycode.DpadUp || 
+                                   e.KeyCode == Keycode.DpadRight || 
+                                   e.KeyCode == Keycode.DpadDown;
             gamePad._buttons |= ButtonForKeyCode(keyCode);
 
             return true;
@@ -254,6 +259,41 @@ namespace Microsoft.Xna.Framework.Input
             gamePad._rightStick = new Vector2(e.GetAxisValue(Axis.Z), -e.GetAxisValue(Axis.Rz));
             gamePad._leftTrigger = e.GetAxisValue(Axis.Ltrigger);
             gamePad._rightTrigger = e.GetAxisValue(Axis.Rtrigger);
+
+            if(!gamePad.DPadButtons)
+            {
+                if(e.GetAxisValue(Axis.HatX) < 0)
+                {
+                    gamePad._buttons |= Buttons.DPadLeft;
+                    gamePad._buttons &= ~Buttons.DPadRight;
+                }
+                else if(e.GetAxisValue(Axis.HatX) > 0)
+                {
+                    gamePad._buttons &= ~Buttons.DPadLeft;
+                    gamePad._buttons |= Buttons.DPadRight;
+                }
+                else
+                {
+                    gamePad._buttons &= ~Buttons.DPadLeft;
+                    gamePad._buttons &= ~Buttons.DPadRight;
+                }
+
+                if(e.GetAxisValue(Axis.HatY) < 0)
+                {
+                    gamePad._buttons |= Buttons.DPadUp;
+                    gamePad._buttons &= ~Buttons.DPadDown;
+                }
+                else if(e.GetAxisValue(Axis.HatY) > 0)
+                {
+                    gamePad._buttons &= ~Buttons.DPadUp;
+                    gamePad._buttons |= Buttons.DPadDown;
+                }
+                else
+                {
+                    gamePad._buttons &= ~Buttons.DPadUp;
+                    gamePad._buttons &= ~Buttons.DPadDown;
+                }
+            }
 
             return true;
         }
