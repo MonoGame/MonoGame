@@ -36,7 +36,6 @@ namespace Microsoft.Xna.Framework.Input
                     break;
                 }
             }
-
         }
 
         internal static void CloseDevices()
@@ -78,7 +77,7 @@ namespace Microsoft.Xna.Framework.Input
                 return new JoystickState
                 {
                     IsConnected = false,
-                    Axes = new float[0],
+                    Axes = new int[0],
                     Buttons = new ButtonState[0],
                     Hats = new JoystickHat[0]
                 };
@@ -86,7 +85,7 @@ namespace Microsoft.Xna.Framework.Input
             var jcap = PlatformGetCapabilities(index);
             var jdevice = Joysticks[index];
 
-            var axes = new float[jcap.AxisCount];
+            var axes = new int[jcap.AxisCount];
             for (var i = 0; i < axes.Length; i++)
                 axes[i] = Sdl.Joystick.GetAxis(jdevice, i);
 
