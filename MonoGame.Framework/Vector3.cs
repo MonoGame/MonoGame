@@ -521,7 +521,8 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <returns>Hash code of this <see cref="Vector3"/>.</returns>
         public override int GetHashCode() {
-            unchecked {
+            unchecked
+            {
                 var hashCode = X.GetHashCode();
                 hashCode = (hashCode * 397) ^ Y.GetHashCode();
                 hashCode = (hashCode * 397) ^ Z.GetHashCode();

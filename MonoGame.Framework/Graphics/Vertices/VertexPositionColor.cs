@@ -32,7 +32,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public override int GetHashCode()
 	    {
-	        unchecked {
+	        unchecked
+            {
 	            return (Position.GetHashCode() * 397) ^ Color.GetHashCode();
 	        }
 	    }
