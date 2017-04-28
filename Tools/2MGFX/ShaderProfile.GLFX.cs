@@ -202,7 +202,7 @@ namespace TwoMGFX
                     usage = VertexElementUsage.TessellateFactor;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(usage), usage,
+                    throw new ArgumentOutOfRangeException("usage", usage,
                         string.Format("Vertex input semantic {0} is not valid.", usage));
             }
         }
