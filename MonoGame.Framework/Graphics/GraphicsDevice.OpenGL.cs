@@ -949,7 +949,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[3] *= -1.0f;
             }
 
-#if ANDROID
+#if ANDROID || MONOMAC
             GL.Uniform4(posFixupLoc, 1, _posFixup);
 #else
             var handle = GCHandle.Alloc(_posFixup, GCHandleType.Pinned);
