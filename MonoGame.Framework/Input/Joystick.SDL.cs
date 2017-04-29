@@ -48,6 +48,8 @@ namespace Microsoft.Xna.Framework.Input
             Joysticks.Clear ();
         }
 
+        private const bool PlatformIsSupported = true;
+
         private static JoystickCapabilities PlatformGetCapabilities(int index)
         {
             if (!Joysticks.ContainsKey(index))
