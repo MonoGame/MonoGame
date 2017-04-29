@@ -949,7 +949,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[3] *= -1.0f;
             }
 
-#if ANDROID || MONOMAC
+#if GLES || MONOMAC
             fixed (float* floatPtr = _posFixup)
             {
                 GL.Uniform4(posFixupLoc, 1, floatPtr);
