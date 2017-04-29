@@ -950,7 +950,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #if ANDROID || MONOMAC
-            GL.Uniform4(posFixupLoc, 1, _posFixup);
+            fixed (float* floatPtr = _posFixup)
+            {
+                GL.Uniform4(posFixupLoc, 1, floatPtr);
+            }
 #else
             var handle = GCHandle.Alloc(_posFixup, GCHandleType.Pinned);
             GL.Uniform4(posFixupLoc, 1, (byte*) handle.AddrOfPinnedObject());
