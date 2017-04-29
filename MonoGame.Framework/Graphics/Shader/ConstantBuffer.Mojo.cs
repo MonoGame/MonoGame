@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // TODO: We need to know the type of buffer float/int/bool
                 // and cast this correctly... else it doesn't work as i guess
                 // GL is checking the type of the uniform.
-#if GLES
+#if GLES || MONOMAC
                 GL.Uniform4(_location, _buffer.Length / 16, (float*) bytePtr);
 #else
                 GL.Uniform4(_location, _buffer.Length / 16, bytePtr);
