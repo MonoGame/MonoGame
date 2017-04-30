@@ -4,24 +4,29 @@
 
 namespace Microsoft.Xna.Framework.Input
 {
+    /// <summary>
+    /// A struct that represents the current stick (thumbstick) states for the controller.
+    /// </summary>
     public struct GamePadThumbSticks
     {
-        Vector2 left;
-        Vector2 right;
+        private Vector2 _left, _right;
 
+        /// <summary>
+        /// Gets a value indicating the position of the left stick (thumbstick). 
+        /// </summary>
+        /// <value>A <see cref="Vector2"/> indicating the current position of the left stick (thumbstick).</value>
         public Vector2 Left
         {
-        	get
-            {
-                return left;
-            }
+            get { return _left; }
         }
+
+        /// <summary>
+        /// Gets a value indicating the position of the right stick (thumbstick). 
+        /// </summary>
+        /// <value>A <see cref="Vector2"/> indicating the current position of the right stick (thumbstick).</value>
         public Vector2 Right
         {
-        	get
-            {
-                return right;
-            }
+            get { return _right; }
         }
 
         internal Buttons VirtualButtons { get; private set; }
@@ -38,20 +43,20 @@ namespace Microsoft.Xna.Framework.Input
         private const float rightThumbDeadZone = 0.265f;
 #endif
 
-		public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition):this()
-		{
-			left = leftPosition;
-			right = rightPosition;
+        public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition) : this()
+        {
+            _left = leftPosition;
+            _right = rightPosition;
             ApplySquareClamp();
 
             SetVirtualButtons(leftPosition, rightPosition);
-		}
+        }
 
-        internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone deadZoneMode):this()
+        internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone deadZoneMode) : this()
         {
             // XNA applies dead zones before rounding/clamping values. The public ctor does not allow this because the dead zone must be known before
-            left = leftPosition;
-            right = rightPosition;
+            _left = leftPosition;
+            _right = rightPosition;
             ApplyDeadZone(deadZoneMode);
             if (deadZoneMode == GamePadDeadZone.Circular)
                 ApplyCircularClamp();
@@ -63,16 +68,16 @@ namespace Microsoft.Xna.Framework.Input
 
         private void ApplySquareClamp()
         {
-            left = new Vector2(MathHelper.Clamp(left.X, -1f, 1f), MathHelper.Clamp(left.Y, -1f, 1f));
-            right = new Vector2(MathHelper.Clamp(right.X, -1f, 1f), MathHelper.Clamp(right.Y, -1f, 1f));
+            _left = new Vector2(MathHelper.Clamp(Left.X, -1f, 1f), MathHelper.Clamp(Left.Y, -1f, 1f));
+            _right = new Vector2(MathHelper.Clamp(Right.X, -1f, 1f), MathHelper.Clamp(Right.Y, -1f, 1f));
         }
 
         private void ApplyCircularClamp()
         {
-            if (left.LengthSquared() > 1f)
-                left.Normalize();
-            if (right.LengthSquared() > 1f)
-                right.Normalize();
+            if (_left.LengthSquared() > 1f)
+                _left.Normalize();
+            if (_right.LengthSquared() > 1f)
+                _right.Normalize();
         }
 
         private void ApplyDeadZone(GamePadDeadZone dz)
@@ -82,12 +87,12 @@ namespace Microsoft.Xna.Framework.Input
                 case GamePadDeadZone.None:
                     break;
                 case GamePadDeadZone.IndependentAxes:
-                    left = ExcludeIndependentAxesDeadZone(left, leftThumbDeadZone);
-                    right = ExcludeIndependentAxesDeadZone(right, rightThumbDeadZone);
+                    _left = ExcludeIndependentAxesDeadZone(Left, leftThumbDeadZone);
+                    _right = ExcludeIndependentAxesDeadZone(Right, rightThumbDeadZone);
                     break;
                 case GamePadDeadZone.Circular:
-                    left = ExcludeCircularDeadZone(left, leftThumbDeadZone);
-                    right = ExcludeCircularDeadZone(right, rightThumbDeadZone);
+                    _left = ExcludeCircularDeadZone(Left, leftThumbDeadZone);
+                    _right = ExcludeCircularDeadZone(Right, rightThumbDeadZone);
                     break;
             }
         }
@@ -152,8 +157,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.</returns>
         public static bool operator ==(GamePadThumbSticks left, GamePadThumbSticks right)
         {
-            return (left.left == right.left)
-                && (left.right == right.right);
+            return (left.Left == right.Left) && (left.Right == right.Right);
         }
 
         /// <summary>
@@ -177,9 +181,26 @@ namespace Microsoft.Xna.Framework.Input
             return (obj is GamePadThumbSticks) && (this == (GamePadThumbSticks)obj);
         }
 
-        public override int GetHashCode ()
+        /// <summary>
+        /// Serves as a hash function for a <see cref="T:Microsoft.Xna.Framework.Input.GamePadThumbSticks"/> object.
+        /// </summary>
+        /// <returns>A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a
+        /// hash table.</returns>
+        public override int GetHashCode()
         {
-            return this.Left.GetHashCode () + 37 * this.Right.GetHashCode ();
+            unchecked
+            {
+                return (Left.GetHashCode() * 397) ^ Right.GetHashCode();
+            }
+        }
+
+        /// <summary>
+        /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Microsoft.Xna.Framework.Input.GamePadThumbSticks"/>.
+        /// </summary>
+        /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Microsoft.Xna.Framework.Input.GamePadThumbSticks"/>.</returns>
+        public override string ToString()
+        {
+            return "[GamePadThumbSticks: Left=" + Left + ", Right=" + Right + "]";
         }
     }
 }
