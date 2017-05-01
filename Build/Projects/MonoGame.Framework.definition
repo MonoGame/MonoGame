@@ -436,6 +436,9 @@
     <Compile Include="Audio\Xact\SoundBank.cs" />
     <Compile Include="Audio\Xact\VolumeEvent.cs" />
     <Compile Include="Audio\Xact\WaveBank.cs" />
+    <Compile Include="Audio\Xact\WaveBank.Default.cs">	
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS</Platforms>
+    </Compile>
     <Compile Include="Audio\Xact\XactClip.cs" />
     <Compile Include="Audio\Xact\XactHelpers.cs" />
     <Compile Include="Audio\Xact\XactSound.cs" />

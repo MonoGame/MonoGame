@@ -20,6 +20,7 @@ namespace Microsoft.Xna.Framework.Audio
         private readonly bool _useReverb;
 
         private SoundEffectInstance _wave;
+        private bool _streaming;
 
         private float _cueVolume = 1;
         private float _cuePitch = 0;
@@ -150,7 +151,7 @@ namespace Microsoft.Xna.Framework.Audio
                 if (_wave != null && _wave.State != SoundState.Stopped && _wave.IsLooped)
                     _wave.Stop();
                 else
-                    _wave = _soundBank.GetSoundEffectInstance(_waveBankIndex, _trackIndex);
+                    _wave = _soundBank.GetSoundEffectInstance(_waveBankIndex, _trackIndex, out _streaming);
 
                 if (_wave == null)
                 {
@@ -176,7 +177,11 @@ namespace Microsoft.Xna.Framework.Audio
             else
             {
                 if (_wave != null && _wave.State == SoundState.Stopped)
+                {
+                    if (_streaming)
+                        _wave.Dispose();
                     _wave = null;
+                }
             }
         }
 
@@ -192,6 +197,8 @@ namespace Microsoft.Xna.Framework.Audio
                 if (_wave != null)
                 {
                     _wave.Stop();
+                    if (_streaming)
+                        _wave.Dispose();
                     _wave = null;
                 }
             }
@@ -209,6 +216,8 @@ namespace Microsoft.Xna.Framework.Audio
                 if (_wave != null)
                 {
                     _wave.Stop();
+                    if (_streaming)
+                        _wave.Dispose();
                     _wave = null;
                 }
             }
