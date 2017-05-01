@@ -54,6 +54,26 @@ MonoGame uses OpenGL ES 2.0. Google requires the following to be added to Androi
 The Market can also filter games by the types of texture compression they support. Add a  ```
 <supports-gl-texture> ``` node for each type of texture compression used in your game. See the [Android documentation](http://developer.android.com/guide/topics/manifest/supports-gl-texture-element.html) for further details on this node.
 
+
+## Migrating to OpenTK 1.0
+
+We are migrating the MonoGame project from OpenTK-0.9.9.3 to OpenTK-1.0 on iOS and Android. This also affects OUYA as it is derived from our Android platform. This change to OpenTK-1.0 brings with it a consistent OpenGL API with the desktop platforms, meaning less conditional code in the MonoGame codebase.
+
+As part of the migration, there is a small reference change that needs to be made in your Android projects. iOS projects need no changes.
+
+### In Visual Studio
+- Open the References node in your project and delete the  OpenTK  reference.
+- Right-click the References node and select  Add Reference... .
+ -Find  OpenTK-1.0  in the Assemblies tab and add it as a reference.
+
+### In MonoDevelop
+- Right-click the References node and select  Edit References .
+- Uncheck  OpenTK .
+- Check  OpenTK-1.0 .
+
+This should be all you need to do in your Android projects. Now you can build and deploy once again.
+
+
 ## References
 
 [Such Android API Levels, Much Confuse. Wow.](http://redth.codes/such-android-api-levels-much-confuse-wow/) is a blog post by Redth going into more detail about setting the Android versions in a Xamarin project.
