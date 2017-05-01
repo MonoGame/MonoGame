@@ -114,6 +114,10 @@ namespace Microsoft.Xna.Framework
                 Sdl.Window.State.InputFocus |
                 Sdl.Window.State.MouseFocus;
 
+            // Tell SDL we want a stencil buffer before we create the window.
+            // Otherwise we don't get one.
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.StencilSize, 8);
+
             _handle = Sdl.Window.Create(MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle(),
                 _winx - _width / 2, _winy - _height / 2,
                 _width, _height, initflags);
