@@ -8,7 +8,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class EditDialog : DialogBase
+    partial class EditDialog : Dialog<bool>
     {
         public string Text { get; private set; }
 
@@ -53,6 +53,17 @@ namespace MonoGame.Tools.Pipeline
             label2.Text = !stringOk ? _errInvalidName : "";
 
             Text = textBox1.Text;
+        }
+
+        private void ButtonOk_Click(object sender, EventArgs e)
+        {
+            Result = true;
+            Close();
+        }
+
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }
