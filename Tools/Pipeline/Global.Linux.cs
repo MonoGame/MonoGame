@@ -29,7 +29,6 @@ namespace MonoGame.Tools.Pipeline
     static partial class Global
     {
         private static IconTheme _theme;
-        private static Application _app;
 
         private static void PlatformInit()
         {
@@ -53,14 +52,6 @@ namespace MonoGame.Tools.Pipeline
             _xwtFileMissing = ToXwtImage(fileMissing);
             _xwtFolder = ToXwtImage(folder);
             _xwtFolderMissing = ToXwtImage(folderMissing);
-
-            if (Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16)
-            {
-                _app = new Application(null, GLib.ApplicationFlags.None);
-                _app.Register(GLib.Cancellable.Current);
-
-                UseHeaderBar = Gtk3Wrapper.gtk_application_prefers_app_menu(_app.Handle);
-            }
         }
 
         private static Gdk.Pixbuf PlatformGetFileIcon(string path)
