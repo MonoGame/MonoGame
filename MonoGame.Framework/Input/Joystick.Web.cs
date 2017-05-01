@@ -9,6 +9,8 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class Joystick
     {
+        private const bool PlatformIsSupported = true;
+
         internal static bool TrackEvents = false;
 
         private static JoystickCapabilities PlatformGetCapabilities(int index)
