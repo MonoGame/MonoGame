@@ -9,7 +9,20 @@ namespace Microsoft.Xna.Framework.Input
     /// </summary>
     public struct GamePadThumbSticks
     {
-        private Vector2 _left, _right;
+#if DIRECTX && !WINDOWS_PHONE && !WINDOWS_PHONE81 && !WINDOWS_UAP
+        // XInput Xbox 360 Controller dead zones
+        // Dead zones are slighty different between left and right sticks, this may come from Microsoft usability tests
+        private const float leftThumbDeadZone = SharpDX.XInput.Gamepad.LeftThumbDeadZone / (float)short.MaxValue;
+        private const float rightThumbDeadZone = SharpDX.XInput.Gamepad.RightThumbDeadZone / (float)short.MaxValue;
+#else
+        // Default & SDL Xbox 360 Controller dead zones
+        // Based on the XInput constants
+        private const float leftThumbDeadZone = 0.24f;
+        private const float rightThumbDeadZone = 0.265f;
+#endif
+
+        internal readonly Buttons _virtualButtons;
+        private readonly Vector2 _left, _right;
 
         /// <summary>
         /// Gets a value indicating the position of the left stick (thumbstick). 
@@ -29,72 +42,70 @@ namespace Microsoft.Xna.Framework.Input
             get { return _right; }
         }
 
-        internal Buttons VirtualButtons { get; private set; }
-
-#if DIRECTX && !WINDOWS_PHONE && !WINDOWS_PHONE81 && !WINDOWS_UAP
-        // XInput Xbox 360 Controller dead zones
-        // Dead zones are slighty different between left and right sticks, this may come from Microsoft usability tests
-        private const float leftThumbDeadZone = SharpDX.XInput.Gamepad.LeftThumbDeadZone / (float)short.MaxValue;
-        private const float rightThumbDeadZone = SharpDX.XInput.Gamepad.RightThumbDeadZone / (float)short.MaxValue;
-#else
-        // Default & SDL Xbox 360 Controller dead zones
-        // Based on the XInput constants
-        private const float leftThumbDeadZone = 0.24f;
-        private const float rightThumbDeadZone = 0.265f;
-#endif
-
-        public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition) : this()
+        public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition)
+            : this(leftPosition, rightPosition, GamePadDeadZone.None)
         {
-            _left = leftPosition;
-            _right = rightPosition;
-            ApplySquareClamp();
-
-            SetVirtualButtons(leftPosition, rightPosition);
+            
         }
 
         internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone deadZoneMode) : this()
         {
             // XNA applies dead zones before rounding/clamping values. The public ctor does not allow this because the dead zone must be known before
-            _left = leftPosition;
-            _right = rightPosition;
-            ApplyDeadZone(deadZoneMode);
-            if (deadZoneMode == GamePadDeadZone.Circular)
-                ApplyCircularClamp();
-            else
-                ApplySquareClamp();
 
-            SetVirtualButtons(leftPosition, rightPosition);
-        }
-
-        private void ApplySquareClamp()
-        {
-            _left = new Vector2(MathHelper.Clamp(Left.X, -1f, 1f), MathHelper.Clamp(Left.Y, -1f, 1f));
-            _right = new Vector2(MathHelper.Clamp(Right.X, -1f, 1f), MathHelper.Clamp(Right.Y, -1f, 1f));
-        }
-
-        private void ApplyCircularClamp()
-        {
-            if (_left.LengthSquared() > 1f)
-                _left.Normalize();
-            if (_right.LengthSquared() > 1f)
-                _right.Normalize();
-        }
-
-        private void ApplyDeadZone(GamePadDeadZone dz)
-        {
-            switch (dz)
+            // Apply dead zone
+            switch (deadZoneMode)
             {
                 case GamePadDeadZone.None:
+                    _left = leftPosition;
+                    _right = rightPosition;
                     break;
                 case GamePadDeadZone.IndependentAxes:
-                    _left = ExcludeIndependentAxesDeadZone(Left, leftThumbDeadZone);
-                    _right = ExcludeIndependentAxesDeadZone(Right, rightThumbDeadZone);
+                    _left = ExcludeIndependentAxesDeadZone(leftPosition, leftThumbDeadZone);
+                    _right = ExcludeIndependentAxesDeadZone(rightPosition, rightThumbDeadZone);
                     break;
                 case GamePadDeadZone.Circular:
-                    _left = ExcludeCircularDeadZone(Left, leftThumbDeadZone);
-                    _right = ExcludeCircularDeadZone(Right, rightThumbDeadZone);
+                    _left = ExcludeCircularDeadZone(leftPosition, leftThumbDeadZone);
+                    _right = ExcludeCircularDeadZone(rightPosition, rightThumbDeadZone);
                     break;
             }
+
+            // Apply clamp
+            if (deadZoneMode == GamePadDeadZone.Circular)
+            {
+                if (_left.LengthSquared() > 1f)
+                    _left.Normalize();
+                if (_right.LengthSquared() > 1f)
+                    _right.Normalize();
+            }
+            else
+            {
+                _left = new Vector2(MathHelper.Clamp(Left.X, -1f, 1f), MathHelper.Clamp(Left.Y, -1f, 1f));
+                _right = new Vector2(MathHelper.Clamp(Right.X, -1f, 1f), MathHelper.Clamp(Right.Y, -1f, 1f));
+            }
+
+            // VirtualButtons should always behave like deadzone is IndependentAxes. 
+            // This is consistent with XNA behaviour and generally most convenient (e.g. for menu navigation)
+            _virtualButtons = 0;
+
+            if (leftPosition.X < -leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickLeft;
+            else if (leftPosition.X > leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickRight;
+
+            if (leftPosition.Y < -leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickDown;
+            else if (leftPosition.Y > leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickUp;
+
+            if (rightPosition.X < -rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickLeft;
+            else if (rightPosition.X > rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickRight;
+
+            if (rightPosition.Y < -rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickDown;
+            else if (rightPosition.Y > rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickUp;
         }
 
         private Vector2 ExcludeIndependentAxesDeadZone(Vector2 value, float deadZone)
@@ -120,33 +131,6 @@ namespace Microsoft.Xna.Framework.Input
                 return Vector2.Zero;
             var newLength = (originalLength - deadZone) / (1f - deadZone);
             return value * (newLength / originalLength);
-        }
-
-        private void SetVirtualButtons(Vector2 leftPosition, Vector2 rightPosition)
-        {
-            VirtualButtons = 0;
-
-            // VirtualButtons should always behave like deadzone is IndependentAxes. 
-            // This is consistent with XNA behaviour and generally most convenient (e.g. for menu navigation)
-            if (leftPosition.X < -leftThumbDeadZone)
-                VirtualButtons |= Buttons.LeftThumbstickLeft;
-            else if (leftPosition.X > leftThumbDeadZone)
-                VirtualButtons |= Buttons.LeftThumbstickRight;
-
-            if (leftPosition.Y < -leftThumbDeadZone)
-                VirtualButtons |= Buttons.LeftThumbstickDown;
-            else if (leftPosition.Y > leftThumbDeadZone)
-                VirtualButtons |= Buttons.LeftThumbstickUp;
-
-            if (rightPosition.X < -rightThumbDeadZone)
-                VirtualButtons |= Buttons.RightThumbstickLeft;
-            else if (rightPosition.X > rightThumbDeadZone)
-                VirtualButtons |= Buttons.RightThumbstickRight;
-
-            if (rightPosition.Y < -rightThumbDeadZone)
-                VirtualButtons |= Buttons.RightThumbstickDown;
-            else if (rightPosition.Y > rightThumbDeadZone)
-                VirtualButtons |= Buttons.RightThumbstickUp;
         }
 
         /// <summary>

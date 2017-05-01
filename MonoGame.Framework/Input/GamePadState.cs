@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             var result = Buttons._buttons;
 
-            result |= ThumbSticks.VirtualButtons;
+            result |= ThumbSticks._virtualButtons;
             
             if (DPad.Down == ButtonState.Pressed)
                 result |= Microsoft.Xna.Framework.Input.Buttons.DPadDown;
