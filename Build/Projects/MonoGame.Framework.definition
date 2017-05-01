@@ -341,7 +341,7 @@
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Threading.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,WindowsPhone,tvOS</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows,WindowsGL,WindowsPhone,tvOS</Platforms>
     </Compile>
     <Compile Include="TitleContainer.cs" />
     <Compile Include="TitleContainer.Android.cs">
