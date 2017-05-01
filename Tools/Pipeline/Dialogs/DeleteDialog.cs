@@ -2,13 +2,14 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class DeleteDialog : DialogBase
+    partial class DeleteDialog : Dialog<bool>
     {
         private IController _controller;
         private TreeGridItem _treeBase;
@@ -62,7 +63,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             var ret = new TreeGridItem();
-            var icon = folder ? Global.GetEtoDirectoryIcon(true) : Global.GetEtoFileIcon(fullpath, true);
+            var icon = folder ? Global.GetDirectoryIcon(true) : Global.GetFileIcon(fullpath, true);
             ret.Values = new object[] { icon, text };
             root.Children.Add(ret);
             root.Expanded = true;
@@ -78,6 +79,17 @@ namespace MonoGame.Tools.Pipeline
 
             if (path.Contains(Path.DirectorySeparatorChar.ToString()))
                 Add(item, string.Join(Path.DirectorySeparatorChar.ToString(), split, 1, split.Length - 1), folder, fullpath);
+        }
+
+        private void ButtonDelete_Click(object sender, EventArgs e)
+        {
+            Result = true;
+            Close();
+        }
+
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

@@ -7,36 +7,54 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class EditDialog : DialogBase
+    partial class EditDialog : Dialog<bool>
     {
         DynamicLayout layout1;
         Label label1, label2;
         TextBox textBox1;
+        Button buttonOk, buttonCancel;
 
         private void InitializeComponent()
         {
-            Width = 370;
-            Height = 160;
+            DisplayMode = DialogDisplayMode.Attached;
+            Size = new Size(400, 160);
+
+            buttonOk = new Button();
+            buttonOk.Text = "Ok";
+            PositiveButtons.Add(buttonOk);
+            DefaultButton = buttonOk;
+
+            buttonCancel = new Button();
+            buttonCancel.Text = "Cancel";
+            NegativeButtons.Add(buttonCancel);
+            AbortButton = buttonCancel;
 
             layout1 = new DynamicLayout();
             layout1.DefaultSpacing = new Size(4, 4);
             layout1.Padding = new Padding(6);
             layout1.BeginVertical();
 
+            layout1.Add(null, true, true);
+
             label1 = new Label();
-            layout1.AddRow(label1);
+            layout1.Add(label1);
 
             textBox1 = new TextBox();
-            layout1.AddRow(textBox1);
+            layout1.Add(textBox1);
             
             label2 = new Label();
             label2.TextColor = new Color(SystemColors.ControlText, 0.5f);
-            layout1.AddRow(label2);
+            label2.TextAlignment = TextAlignment.Center;
+            layout1.Add(label2);
+
+            layout1.Add(null, true, true);
 
             layout1.EndVertical();
-            CreateContent(layout1);
+            Content = layout1;
 
             textBox1.TextChanged += TextBox1_TextChanged;
+            buttonOk.Click += ButtonOk_Click;
+            buttonCancel.Click += ButtonCancel_Click;
         }
     }
 }

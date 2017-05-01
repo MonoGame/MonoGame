@@ -13,8 +13,9 @@ namespace MonoGame.Tools.Pipeline
     {
         public static Point MouseLocation;
         public static int Count;
-        public static int ReqWidth;
 
+        private bool _tryScroll, _setHeight;
+        private int _reqWidth = 0;
         private OutputParser _output;
         private List<BuildItem> _items;
         private CheckCommand _cmdFilterOutput, _cmdAutoScroll, _cmdShowSkipped, _cmdShowSuccessful, _cmdShowCleaned;
@@ -24,19 +25,18 @@ namespace MonoGame.Tools.Pipeline
         public BuildOutput()
         {
             InitializeComponent();
-            scrollable1.Style = "BuildOutput";
             
             _output = new OutputParser();
 
-            _iconInformation = Global.GetEtoIcon("Build.Information.png");
-            _iconFail = Global.GetEtoIcon("Build.Fail.png");
-            _iconProcessing = Global.GetEtoIcon("Build.Processing.png");
-            _iconSkip = Global.GetEtoIcon("Build.Skip.png");
-            _iconStart = Global.GetEtoIcon("Build.Start.png");
-            _iconEndSucceed = Global.GetEtoIcon("Build.EndSucceed.png");
-            _iconEndFailed = Global.GetEtoIcon("Build.EndFailed.png");
-            _iconSucceed = Global.GetEtoIcon("Build.Succeed.png");
-            _iconSucceedWithWarnings = Global.GetEtoIcon("Build.SucceedWithWarnings.png");
+            _iconInformation = Global.GetIcon("Build.Information.png");
+            _iconFail = Global.GetIcon("Build.Fail.png");
+            _iconProcessing = Global.GetIcon("Build.Processing.png");
+            _iconSkip = Global.GetIcon("Build.Skip.png");
+            _iconStart = Global.GetIcon("Build.Start.png");
+            _iconEndSucceed = Global.GetIcon("Build.EndSucceed.png");
+            _iconEndFailed = Global.GetIcon("Build.EndFailed.png");
+            _iconSucceed = Global.GetIcon("Build.Succeed.png");
+            _iconSucceedWithWarnings = Global.GetIcon("Build.SucceedWithWarnings.png");
 
             _items = new List<BuildItem>();
 
@@ -66,12 +66,6 @@ namespace MonoGame.Tools.Pipeline
             AddCommand(_cmdAutoScroll);
 
             MouseLocation = new Point(-1, -1);
-
-#if LINUX
-            var scrollView = scrollable1.ControlObject as Gtk.ScrolledWindow;
-            scrollView.Vadjustment.ValueChanged += Scrollable1_Scroll;
-            scrollView.Hadjustment.ValueChanged += Scrollable1_Scroll;
-#endif
         }
 
         public override void LoadSettings()
@@ -122,6 +116,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void ClearOutput()
         {
+            drawable.Width = _reqWidth = 0;
             scrollable1.ScrollPosition = new Point(0, 0);
             textArea.Text = "";
             _items.Clear();
@@ -143,7 +138,6 @@ namespace MonoGame.Tools.Pipeline
                 case OutputState.BuildBegin:
                     _items.Add(new BuildItem { Text = line, Icon = _iconStart });
                     Count = -1;
-                    ReqWidth = 0;
                     break;
                 case OutputState.Cleaning:
                     _items.Add(new BuildItem
@@ -204,6 +198,7 @@ namespace MonoGame.Tools.Pipeline
                     break;
             }
 
+            _setHeight = true;
             drawable.Invalidate();
         }
 
@@ -225,45 +220,35 @@ namespace MonoGame.Tools.Pipeline
             if (_selectedItem != null)
                 _selectedItem.OnClick();
 
-            ReqWidth = 0;
+            _reqWidth = 0;
             foreach (var item in _items)
-                if (item.RequestedWidth > ReqWidth)
-                    ReqWidth = item.RequestedWidth;
+                if (item.RequestedWidth > _reqWidth)
+                    _reqWidth = item.RequestedWidth;
 
-            SetWidth();
+            drawable.Width = _reqWidth;
+            _setHeight = true;
             drawable.Invalidate();
+        }
+
+        private void Drawable_SizeChanged(object sender, EventArgs e)
+        {
+            if (_tryScroll)
+            {
+                _tryScroll = false;
+
+                if (PipelineSettings.Default.AutoScrollBuildOutput)
+                    scrollable1.ScrollPosition = new Point(0, drawable.Height + 10 - scrollable1.Height);
+            }
         }
 
         private void Scrollable1_SizeChanged(object sender, EventArgs e)
         {
-#if WINDOWS
-            SetWidth();
-#endif
             drawable.Invalidate();
         }
-
 
         private void Scrollable1_Scroll(object sender, EventArgs e)
         {
             drawable.Invalidate();
-        }
-
-        public void SetWidth()
-        {
-#if WINDOWS
-            var scrollsize = (drawable.Height >= scrollable1.Height) ? System.Windows.SystemParameters.VerticalScrollBarWidth : 0.0;
-            var width = (int)(Width - scrollsize - System.Windows.SystemParameters.BorderWidth * 2);
-
-            if (ReqWidth > width)
-                width = ReqWidth;
-
-            if (drawable.Width != width)
-                drawable.Width = width;
-#elif MONOMAC
-            var width = Math.Max(ReqWidth, scrollable1.Width - 3);
-            if (drawable.Width != width)
-                drawable.Width = width;
-#endif
         }
 
         private void Drawable_Paint(object sender, PaintEventArgs e)
@@ -305,17 +290,14 @@ namespace MonoGame.Tools.Pipeline
                 y += item.Height + 3;
             }
 
-#if MONOMAC
-            drawable.Height = Math.Max(y - 3, scrollable1.Height - 3);
-#else
-            drawable.Height = Math.Max(y - 3, 1);
-            SetWidth();
-#endif
-
-#if WINDOWS || MONOMAC
-            if (Count == -1 && PipelineSettings.Default.AutoScrollBuildOutput && y - 3 >= scrollable1.Height - 3)
-                scrollable1.ScrollPosition = new Point(0, y - scrollable1.Height);
-#endif
+            if (_setHeight)
+            {
+                _setHeight = false;
+                drawable.Size = new Size(_reqWidth, Math.Max(y - 3, 1));
+            }
+            
+            if (Count == -1)
+                _tryScroll = true;
         }
     }
 }

@@ -56,7 +56,6 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            combo.Style = "OverrideSize";
             combo.Width = _lastRec.Width;
             combo.Height = _lastRec.Height;
             control.Add(combo, _lastRec.X, _lastRec.Y);
