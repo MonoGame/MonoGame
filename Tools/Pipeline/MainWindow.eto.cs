@@ -36,8 +36,8 @@ namespace MonoGame.Tools.Pipeline
         {
             Title = "MonoGame Pipeline Tool";
             Icon = Icon.FromResource("Icons.monogame.png");
-            Width = 750;
-            Height = 550;
+            Size = new Size(750, 550);
+            MinimumSize = new Size(400, 400);
 
             InitalizeCommands();
             InitalizeMenu();
@@ -47,12 +47,15 @@ namespace MonoGame.Tools.Pipeline
             splitterHorizontal = new Splitter();
             splitterHorizontal.Orientation = Orientation.Horizontal;
             splitterHorizontal.Position = 200;
+            splitterHorizontal.Panel1MinimumSize = 100;
+            splitterHorizontal.Panel2MinimumSize = 100;
 
             splitterVertical = new Splitter();
-            splitterVertical.Width = 150;
             splitterVertical.Orientation = Orientation.Vertical;
             splitterVertical.Position = 230;
             splitterVertical.FixedPanel = SplitterFixedPanel.None;
+            splitterVertical.Panel1MinimumSize = 100;
+            splitterVertical.Panel2MinimumSize = 100;
 
             projectControl = new ProjectControl();
             _pads.Add(projectControl);
