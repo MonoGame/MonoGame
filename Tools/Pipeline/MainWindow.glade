@@ -217,7 +217,7 @@
         <child>
           <object class="GtkModelButton" id="exit_button">
             <property name="visible">True</property>
-            <property name="text" translatable="yes">Exit</property>
+            <property name="text" translatable="yes">Quit</property>
           </object>
         </child>
       </object>
