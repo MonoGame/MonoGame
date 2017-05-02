@@ -408,6 +408,7 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItem.Enabled = info.OpenItem;
             cmdOpenItemWith.Enabled = info.OpenItemWith;
             cmdOpenItemLocation.Enabled = info.OpenItemLocation;
+            cmdOpenOutputItemLocation.Enabled = info.OpenOutputItemLocation;
             cmdCopyAssetPath.Enabled = info.CopyAssetPath;
             cmdRebuildItem.Enabled = info.RebuildItem;
 
@@ -424,6 +425,7 @@ namespace MonoGame.Tools.Pipeline
             AddContextMenu(cmAdd, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmOpenItemLocation, ref sep);
+            AddContextMenu(cmOpenOutputItemLocation, ref sep);
             AddContextMenu(cmCopyAssetPath, ref sep);
             AddContextMenu(cmRebuildItem, ref sep);
             AddSeparator(ref sep);
@@ -652,6 +654,28 @@ namespace MonoGame.Tools.Pipeline
         {
             if (PipelineController.Instance.SelectedItem != null)
                 Process.Start(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.Location));
+        }
+
+        private void CmdOpenOutputItemLocation_Executed(object sender, EventArgs e)
+        {
+            if (PipelineController.Instance.SelectedItem != null)
+            {
+                var dir = Path.Combine(
+                    PipelineController.Instance.ProjectItem.Location,
+                    PipelineController.Instance.ProjectOutputDir,
+                    PipelineController.Instance.SelectedItem.Location
+                );
+
+                dir = dir.Replace("$(Platform)", PipelineController.Instance.ProjectItem.Platform.ToString());
+                dir = dir.Replace("$(Configuration)", PipelineController.Instance.ProjectItem.Config);
+                dir = dir.Replace("$(Config)", PipelineController.Instance.ProjectItem.Config);
+                dir = dir.Replace("$(Profile)", PipelineController.Instance.ProjectItem.Profile.ToString());
+
+                if (Directory.Exists(dir))
+                    Process.Start(dir);
+                else
+                    ShowError("Directory Not Found", "The project output directory was not found, did you forget to build the project?");
+            }
         }
 
         private void CmdCopyAssetPath_Executed(object sender, EventArgs e)
