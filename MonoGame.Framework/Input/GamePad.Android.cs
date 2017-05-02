@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework.Input
             // we need to add the default "no gamepad connected but the user hit back"
             // behaviour here
             GamePadCapabilities capabilities = new GamePadCapabilities();
-            capabilities.IsConnected = (index == 0);
+            capabilities.IsConnected = false;
             capabilities.HasBackButton = true;
 
             return capabilities;
@@ -153,6 +153,7 @@ namespace Microsoft.Xna.Framework.Input
                     // Consume state
                     Back = false;
                     state = new GamePadState(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons(Buttons.Back), new GamePadDPad());
+                    state.IsConnected = false;
                 }
                 else
                     state = new GamePadState();
