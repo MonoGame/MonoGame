@@ -695,7 +695,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
             }
 
-            // Use BGRA for the swap chain.
             var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
             var multisampleDesc = GetSupportedSampleDescription(
                 format, 
