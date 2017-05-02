@@ -762,6 +762,9 @@ internal static class Sdl
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerAddMapping")]
         public static extern int AddMapping(string mappingString);
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerAddMappingsFromRW")]
+        public static extern int AddMappingFromRw(IntPtr rw, int freew);
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerClose")]
         public static extern void Close(IntPtr gamecontroller);
 
