@@ -38,13 +38,6 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal bool SupportsFramebufferObjectEXT { get; private set; }
 
-        /// <summary>
-        /// Gets the max texture anisotropy. This value typically lies
-        /// between 0 and 16, where 0 means anisotropic filtering is not
-        /// supported.
-        /// </summary>
-        internal int MaxTextureAnisotropy { get; private set; }
-
         private void PlatformInitialize(GraphicsDevice device)
         {
 #if GLES

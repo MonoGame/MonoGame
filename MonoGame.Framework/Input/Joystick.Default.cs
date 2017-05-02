@@ -8,6 +8,8 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class Joystick
     {
+        private const bool PlatformIsSupported = false;
+
         private static JoystickCapabilities PlatformGetCapabilities(int index)
         {
             return new JoystickCapabilities()
@@ -24,7 +26,7 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickState()
             {
                 IsConnected = false,
-                Axes = new float[0],
+                Axes = new int[0],
                 Buttons = new ButtonState[0],
                 Hats = new JoystickHat[0]
             };

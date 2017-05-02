@@ -28,6 +28,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             SupportsInstancing = true;
 
+            MaxTextureAnisotropy = (device.GraphicsProfile == GraphicsProfile.Reach) ? 2 : 16;
+
             _maxMultiSampleCount = GetMaxMultiSampleCount(device);
         }
 

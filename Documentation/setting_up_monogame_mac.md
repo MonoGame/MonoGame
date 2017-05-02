@@ -11,7 +11,7 @@ But to get started you can use the Linux or DesktopGL platforms which will run q
 on MacOS providing you have mono installed.
 
 So to get setup you will first need to install mono. 
-* Go to [Mono Downloads page] (http://www.mono-project.com/download/)
+* Go to [Mono Downloads page](http://www.mono-project.com/download/)
 * Download the latest Mac OS installer.
 
 Note: If you are running El Capitan you will need to install the very latest mono otherwise things 

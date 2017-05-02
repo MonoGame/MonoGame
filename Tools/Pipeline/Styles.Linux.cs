@@ -109,6 +109,12 @@ namespace MonoGame.Tools.Pipeline
 
         public static void Load()
         {
+            Style.Add<ApplicationHandler>("PipelineTool", h =>
+            {
+                if (Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16)
+                    Global.UseHeaderBar = Gtk3Wrapper.gtk_application_prefers_app_menu(h.Control.Handle);
+            });
+
             Style.Add<FormHandler>("MainWindow", h =>
             {
                 if (!Global.UseHeaderBar)
