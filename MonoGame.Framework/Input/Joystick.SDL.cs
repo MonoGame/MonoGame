@@ -57,6 +57,7 @@ namespace Microsoft.Xna.Framework.Input
                 {
                     IsConnected = false,
                     Identifier = "",
+                    IsGamepad = false,
                     AxisCount = 0,
                     ButtonCount = 0,
                     HatCount = 0
@@ -67,6 +68,7 @@ namespace Microsoft.Xna.Framework.Input
             {
                 IsConnected = true,
                 Identifier = Sdl.Joystick.GetGUID(jdevice).ToString(),
+                IsGamepad = (Sdl.GameController.IsGameController(index) == 1),
                 AxisCount = Sdl.Joystick.NumAxes(jdevice),
                 ButtonCount = Sdl.Joystick.NumButtons(jdevice),
                 HatCount = Sdl.Joystick.NumHats(jdevice)
