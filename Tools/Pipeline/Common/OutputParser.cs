@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Text.RegularExpressions;
 
 namespace MonoGame.Tools.Pipeline
@@ -25,32 +24,28 @@ namespace MonoGame.Tools.Pipeline
 
     public class OutputParser
     {
-        internal OutputState State { get; private set; }
-        internal String Filename { get; private set; }
-        internal String ErrorMessage { get; private set; }
-        internal String BuildBeginTime { get; private set; }
-        internal String BuildInfo { get; private set; }
-        internal String BuildElapsedTime { get; private set; }
+        public OutputState State { get; private set; }
+        public string Filename { get; private set; }
+        public string ErrorMessage { get; private set; }
+        public string BuildBeginTime { get; private set; }
+        public string BuildInfo { get; private set; }
+        public string BuildElapsedTime { get; private set; }
 
-
-        Regex _reBuildBegin = new Regex(@"^(Build started)\W+(?<buildBeginTime>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reCleaning = new Regex(@"^(Cleaning)\W(?<filename>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reSkipping = new Regex(@"^(Skipping)\W(?<filename>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reBuildAsset = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reBuildError = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\W*?:\W*?error\W*?:\W*(?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reFileErrorWithLineNum = new Regex(@"^(?<filename>.+?)(\((?<line>[0-9]+),(?<column>[0-9]+)\))?:\W*?(error)\W*(?<errorCode>[A-Z][0-9]+):\W*(?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reFileWarningWithLineNum = new Regex(@"^(?<filename>.+?)(\((?<line>[0-9]+),(?<column>[0-9]+)\))?:\W*?(warning)\W*(?<warningCode>[A-Z][0-9]+):\W*(?<warningMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reFileError = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\W*?: (?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reBuildEnd = new Regex(@"^(Build)\W+(?<buildInfo>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reBuildTime = new Regex(@"^(Time elapsed)\W+(?<buildElapsedTime>.*?)\.\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        
+        private readonly Regex _reBuildBegin = new Regex(@"^(Build started)\W+(?<buildBeginTime>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex _reBuildAsset = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex _reBuildError = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\W*?:\W*?error\W*?:\W*(?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex _reFileErrorWithLineNum = new Regex(@"^(?<filename>.+?)(\((?<line>[0-9]+),(?<column>[0-9]+)\))?:\W*?(error)\W*(?<errorCode>[A-Z][0-9]+):\W*(?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex _reFileWarningWithLineNum = new Regex(@"^(?<filename>.+?)(\((?<line>[0-9]+),(?<column>[0-9]+)\))?:\W*?(warning)\W*(?<warningCode>[A-Z][0-9]+):\W*(?<warningMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex _reFileError = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\W*?: (?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex _reBuildEnd = new Regex(@"^(Build)\W+(?<buildInfo>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex _reBuildTime = new Regex(@"^(Time elapsed)\W+(?<buildElapsedTime>.*?)\.\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public OutputParser()
         {
             Reset();
         }
 
-        internal void Reset()
+        public void Reset()
         {
             State = OutputState.Initialized;
             Filename = null;
@@ -60,11 +55,10 @@ namespace MonoGame.Tools.Pipeline
             ErrorMessage = null;
         }
 
-        internal void Parse(string text)
-        {   
+        public void Parse(string text)
+        {
             ParseLine(text);
         }
-
 
         private void ParseLine(string line)
         {
@@ -90,13 +84,63 @@ namespace MonoGame.Tools.Pipeline
             var prevFilename = Filename;
 
             State = OutputState.Unknown;
-            Filename = null;            
+            Filename = null;
             BuildBeginTime = null;
             BuildInfo = null;
             BuildElapsedTime = null;
             ErrorMessage = null;
 
-            if (_reBuildBegin.IsMatch(line))
+            if (line.StartsWith("Skipping"))
+            {
+                State = OutputState.Skipping;
+                Filename = line.Substring(9);
+            }
+            else if (line.StartsWith("Cleaning"))
+            {
+                State = OutputState.Cleaning;
+                Filename = line.Substring(9);
+            }
+            else if (_reBuildAsset.IsMatch(line))
+            {
+                State = OutputState.BuildAsset;
+                var m = _reBuildAsset.Match(line);
+                Filename = m.Groups["filename"].Value;
+            }
+            else if (_reBuildError.IsMatch(line))
+            {
+                State = OutputState.BuildError;
+                var m = _reBuildError.Match(line);
+                Filename = m.Groups["filename"].Value;
+                ErrorMessage = m.Groups["errorMessage"].Value;
+            }
+            else if (_reFileError.IsMatch(line))
+            {
+                State = OutputState.BuildError;
+                var m = _reFileError.Match(line);
+                Filename = m.Groups["filename"].Value;
+                ErrorMessage = m.Groups["errorMessage"].Value;
+            }
+            else if (_reFileErrorWithLineNum.IsMatch(line))
+            {
+                State = OutputState.BuildError;
+                var m = _reFileErrorWithLineNum.Match(line);
+                var lineNum = m.Groups["line"];
+                var column = m.Groups["column"];
+                var errorCode = m.Groups["errorCode"];
+                Filename = m.Groups["filename"].Value.Replace("\\\\", "/").Replace("\\", "/");
+                ErrorMessage = string.Format("{0} ({1},{2}): {3}", errorCode, lineNum, column, m.Groups["errorMessage"].Value);
+            }
+            else if (_reFileWarningWithLineNum.IsMatch(line))
+            {
+                State = OutputState.BuildWarning;
+                var m = _reFileWarningWithLineNum.Match(line);
+                var lineNum = m.Groups["line"];
+                var column = m.Groups["column"];
+                var errorCode = m.Groups["warningCode"];
+                Filename = m.Groups["filename"].Value.Replace("\\\\", "/").Replace("\\", "/");
+                ErrorMessage = string.Format("{0} ({1},{2}): {3}", errorCode, lineNum, column, m.Groups["warningMessage"].Value);
+            }
+            else if (_reBuildBegin.IsMatch(line))
             {
                 State = OutputState.BuildBegin;
                 var m = _reBuildBegin.Match(line);
@@ -113,58 +157,6 @@ namespace MonoGame.Tools.Pipeline
                 State = OutputState.BuildTime;
                 var m = _reBuildTime.Match(line);
                 BuildElapsedTime = m.Groups["buildElapsedTime"].Value;
-            }
-            else if (_reCleaning.IsMatch(line))
-            {
-                State = OutputState.Cleaning;
-                var m = _reCleaning.Match(line);
-                Filename = m.Groups["filename"].Value;
-            }
-            else if (_reSkipping.IsMatch(line))
-            {
-                State = OutputState.Skipping;
-                var m = _reSkipping.Match(line);
-                Filename = m.Groups["filename"].Value;
-            }
-            else if (_reBuildError.IsMatch(line))
-            {
-                State = OutputState.BuildError;
-                var m = _reBuildError.Match(line);
-                Filename = m.Groups["filename"].Value;
-                ErrorMessage = m.Groups["errorMessage"].Value;
-            }
-            else if (_reFileErrorWithLineNum.IsMatch(line))
-            {
-                State = OutputState.BuildError;
-                var m = _reFileErrorWithLineNum.Match(line);
-                var lineNum = m.Groups["line"];
-                var column = m.Groups["column"];
-                var errorCode = m.Groups["errorCode"];
-                Filename = m.Groups["filename"].Value.Replace("\\\\","/").Replace("\\", "/");
-                ErrorMessage = string.Format("{0} ({1},{2}): {3}", errorCode, lineNum, column, m.Groups["errorMessage"].Value);
-            }
-            else if (_reFileWarningWithLineNum.IsMatch(line))
-            {
-                State = OutputState.BuildWarning;
-                var m = _reFileWarningWithLineNum.Match(line);
-                var lineNum = m.Groups["line"];
-                var column = m.Groups["column"];
-                var errorCode = m.Groups["warningCode"];
-                Filename = m.Groups["filename"].Value.Replace("\\\\", "/").Replace("\\", "/");
-                ErrorMessage = string.Format("{0} ({1},{2}): {3}", errorCode, lineNum, column, m.Groups["warningMessage"].Value);
-            }
-            else if (_reFileError.IsMatch(line))
-            {
-                State = OutputState.BuildError;
-                var m = _reFileError.Match(line);
-                Filename = m.Groups["filename"].Value;
-                ErrorMessage = m.Groups["errorMessage"].Value;
-            }
-            else if (_reBuildAsset.IsMatch(line))
-            {
-                State = OutputState.BuildAsset;
-                var m = _reBuildAsset.Match(line);
-                Filename = m.Groups["filename"].Value;
             }
             else if (prevState == OutputState.BuildError || prevState == OutputState.BuildErrorContinue)
             {

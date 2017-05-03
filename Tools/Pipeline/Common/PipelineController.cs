@@ -460,8 +460,14 @@ namespace MonoGame.Tools.Pipeline
 
             View.OutputClear();
 
+            View.OutputThreadStart();
+
             _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
-            _buildTask.ContinueWith((e) => View.Invoke(UpdateMenu));
+            _buildTask.ContinueWith((e) =>
+            {
+                View.Invoke(UpdateMenu);
+                View.OutputThreadEnd();
+            });
 
             UpdateMenu();
         }

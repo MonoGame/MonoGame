@@ -62,7 +62,6 @@ namespace MonoGame.Tools.Pipeline
                 setw++;
                 if (setw > 2)
                 {
-                    buildOutput.SetWidth();
                     propertyGridControl.SetWidth();
                     setw = 0;
                 }
@@ -220,14 +219,24 @@ namespace MonoGame.Tools.Pipeline
             propertyGridControl.SetObjects(PipelineController.Instance.SelectedItems);
         }
 
+        public void OutputThreadStart()
+        {
+            buildOutput.OutputThreadStart();
+        }
+
         public void OutputAppend(string text)
         {
-            Application.Instance.AsyncInvoke(() => buildOutput.WriteLine(text));
+            buildOutput.OutputAppend(text);
         }
 
         public void OutputClear()
         {
-            Application.Instance.Invoke(() => buildOutput.ClearOutput());
+            buildOutput.OutputClear(true);
+        }
+
+        public void OutputThreadEnd()
+        {
+            buildOutput.OutputThreadEnd();
         }
 
         public bool ShowDeleteDialog(List<IProjectItem> items)
