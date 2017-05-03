@@ -46,6 +46,46 @@ namespace Microsoft.Xna.Framework.Input
         public int HatCount { get; internal set; }
 
         /// <summary>
+        /// Determines whether a specified instance of <see cref="Microsoft.Xna.Framework.Input.JoystickCapabilities"/>
+        /// is equal to another specified <see cref="Microsoft.Xna.Framework.Input.JoystickCapabilities"/>.
+        /// </summary>
+        /// <param name="left">The first <see cref="Microsoft.Xna.Framework.Input.JoystickCapabilities"/> to compare.</param>
+        /// <param name="right">The second <see cref="Microsoft.Xna.Framework.Input.JoystickCapabilities"/> to compare.</param>
+        /// <returns><c>true</c> if <c>left</c> and <c>right</c> are equal; otherwise, <c>false</c>.</returns>
+        public static bool operator ==(JoystickCapabilities left, JoystickCapabilities right)
+        {
+            return left.IsConnected == right.IsConnected &&
+               left.Identifier == right.Identifier &&
+               left.IsGamepad == right.IsGamepad &&
+               left.AxisCount == right.AxisCount &&
+               left.ButtonCount == right.ButtonCount &&
+               left.HatCount == right.HatCount;
+        }
+
+        /// <summary>
+        /// Determines whether a specified instance of <see cref="Microsoft.Xna.Framework.Input.JoystickCapabilities"/>
+        /// is not equal to another specified <see cref="Microsoft.Xna.Framework.Input.JoystickCapabilities"/>.
+        /// </summary>
+        /// <param name="left">The first <see cref="Microsoft.Xna.Framework.Input.JoystickCapabilities"/> to compare.</param>
+        /// <param name="right">The second <see cref="Microsoft.Xna.Framework.Input.JoystickCapabilities"/> to compare.</param>
+        /// <returns><c>true</c> if <c>left</c> and <c>right</c> are not equal; otherwise, <c>false</c>.</returns>
+        public static bool operator !=(JoystickCapabilities left, JoystickCapabilities right)
+        {
+            return !(left == right);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="object"/> is equal to the current <see cref="T:Microsoft.Xna.Framework.Input.JoystickCapabilities"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="T:Microsoft.Xna.Framework.Input.JoystickCapabilities"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="object"/> is equal to the current
+        /// <see cref="T:Microsoft.Xna.Framework.Input.JoystickCapabilities"/>; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object obj)
+        {
+            return (obj is JoystickCapabilities) && (this == (JoystickCapabilities)obj);
+        }
+
+        /// <summary>
         /// Serves as a hash function for a <see cref="T:Microsoft.Xna.Framework.Input.JoystickCapabilities"/> object.
         /// </summary>
         /// <returns>A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a
