@@ -14,7 +14,9 @@ namespace Microsoft.Xna.Framework.Windows
     {     
         public static int GetPointerId(this Message msg)
         {
-            return (short)msg.WParam;
+            return IntPtr.Size == 4
+                    ? (short)msg.WParam
+                    : (int)msg.WParam;
         }
 
         public static System.Drawing.Point GetPointerLocation(this Message msg)
