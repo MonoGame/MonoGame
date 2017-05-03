@@ -17,7 +17,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public class Game : IDisposable
+    public class Game : IGame
     {
         private GameComponentCollection _components;
         private GameServiceContainer _services;
