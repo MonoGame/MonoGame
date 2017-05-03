@@ -31,7 +31,7 @@ namespace MonoGame.Tools.Pipeline
         public override void Edit(PixelLayout control)
         {
             var dialog = new ReferenceDialog(PipelineController.Instance, (Value as List<string>).ToArray());
-            if (dialog.Run(control) == DialogResult.Ok && _eventHandler != null)
+            if (dialog.ShowModal(control) && _eventHandler != null)
             {
                 _eventHandler(dialog.References, EventArgs.Empty);
                 PipelineController.Instance.OnReferencesModified();
