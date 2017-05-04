@@ -262,13 +262,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public bool Play()
         {
-            var inst = GetPooledInstance(false);
-            if (inst == null)
-                return false;
-
-            inst.Play();
-
-            return true;
+            return Play(1f, 0f, 0f);
         }
 
         /// <summary>Gets an internal SoundEffectInstance and plays it with the specified volume, pitch, and panning.</summary>
