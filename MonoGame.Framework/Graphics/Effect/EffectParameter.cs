@@ -6,8 +6,8 @@ using System.Diagnostics;
 namespace Microsoft.Xna.Framework.Graphics
 {
     [DebuggerDisplay("{DebugDisplayString}")]
-	public class EffectParameter
-	{
+	public class EffectParameter : IEffectParameter
+    {
         /// <summary>
         /// The next state key used when an effect parameter
         /// is updated by any of the 'set' methods.
@@ -881,6 +881,55 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < value.Length; i++)
 				Elements[i].SetValue (value[i]);
             StateKey = unchecked(NextStateKey++);
-		}
-	}    
+        }
+
+        #region Interface Members
+
+        string IEffectParameter.Name
+        {
+            get { return Name; }
+        }
+
+        string IEffectParameter.Semantic
+        {
+            get { return Semantic; }
+        }
+
+        EffectParameterClass IEffectParameter.ParameterClass
+        {
+            get { return ParameterClass; }
+        }
+
+        EffectParameterType IEffectParameter.ParameterType
+        {
+            get { return ParameterType; }
+        }
+
+        int IEffectParameter.RowCount
+        {
+            get { return RowCount; }
+        }
+
+        int IEffectParameter.ColumnCount
+        {
+            get { return ColumnCount; }
+        }
+
+        IEffectParameterCollection IEffectParameter.Elements
+        {
+            get { return Elements; }
+        }
+
+        IEffectParameterCollection IEffectParameter.StructureMembers
+        {
+            get { return StructureMembers; }
+        }
+
+        IEffectAnnotationCollection IEffectParameter.Annotations
+        {
+            get { return Annotations; }
+        }
+
+        #endregion
+    }    
 }

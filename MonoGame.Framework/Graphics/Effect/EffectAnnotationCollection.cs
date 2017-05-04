@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class EffectAnnotationCollection : IEnumerable<EffectAnnotation>
+	public class EffectAnnotationCollection : IEnumerable<EffectAnnotation>, IEffectAnnotationCollection
 	{
         internal static readonly EffectAnnotationCollection Empty = new EffectAnnotationCollection(new EffectAnnotation[0]);
 
@@ -45,6 +45,25 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return _annotations.GetEnumerator();
         }
-	}
+
+        #region Interface Members
+
+        IEffectAnnotation IEffectAnnotationCollection.this[int index]
+        {
+            get { return this[index]; }
+        }
+
+        IEffectAnnotation IEffectAnnotationCollection.this[string name]
+        {
+            get { return this[name]; }
+        }
+
+        IEnumerable<IEffectAnnotation> IEffectAnnotationCollection.Interfaces
+        {
+            get { return this; }
+        }
+
+        #endregion
+    }
 }
 

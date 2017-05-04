@@ -1,8 +1,9 @@
+using System;
 using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class EffectPass
+    public class EffectPass : IEffectPass
     {
         private readonly Effect _effect;
 
@@ -129,5 +130,24 @@ namespace Microsoft.Xna.Framework.Graphics
                     samplerStates[sampler.samplerSlot] = sampler.state;
             }
         }
+
+        #region Interface Members
+
+        string IEffectPass.Name
+        {
+            get { return Name; }
+        }
+
+        IEffectAnnotationCollection IEffectPass.Annotations
+        {
+            get { return Annotations; }
+        }
+
+        void IEffectPass.Apply()
+        {
+            Apply();
+        }
+
+        #endregion
     }
 }

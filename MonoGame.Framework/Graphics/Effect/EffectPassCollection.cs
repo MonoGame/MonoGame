@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class EffectPassCollection : IEnumerable<EffectPass>
+    public class EffectPassCollection : IEnumerable<EffectPass>, IEffectPassCollection
     {
 		private readonly EffectPass[] _passes;
 
@@ -112,5 +112,30 @@ namespace Microsoft.Xna.Framework.Graphics
                 _current = null;
             }
         }
+
+        #region Interface Members
+        
+        int IEffectPassCollection.Count
+        {
+            get { return Count; }
+        }
+
+        IEffectPass IEffectPassCollection.this[string name]
+        {
+            get { return this[name]; }
+        }
+
+        IEffectPass IEffectPassCollection.this[int index]
+        {
+            get { return this[index]; }
+        }
+
+        IEnumerable<IEffectPass> IEffectPassCollection.Interfaces
+        {
+            get { return this; }
+        }
+
+        #endregion
+
     }
 }
