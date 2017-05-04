@@ -178,6 +178,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 if (effectMaterial.Effect == null)
                     throw new PipelineException("EffectMaterialContent.Effect or EffectMaterialContent.CompiledEffect should be set for materials with a custom effect.");
                 effectMaterial.CompiledEffect = BuildEffect(effectMaterial.Effect, context);
+                effectMaterial.Effect = null;
                 // TODO: Docs say to validate OpaqueData for SetValue/SetValueTranspose
                 // Does that mean to match up with effect param names??
             }
