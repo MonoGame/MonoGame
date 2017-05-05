@@ -62,7 +62,6 @@ namespace MonoGame.Tools.Pipeline
                 setw++;
                 if (setw > 2)
                 {
-                    buildOutput.SetWidth();
                     propertyGridControl.SetWidth();
                     setw = 0;
                 }

@@ -18,8 +18,7 @@ namespace MonoGame.Tools.Pipeline
         public CheckCommand cmdDebugMode;
         public Command cmdHelp, cmdAbout;
         public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdOpenOutputItemLocation, cmdCopyAssetPath, cmdRebuildItem;
-
-        MenuBar menubar;
+        
         ToolBar toolbar;
         ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuView, menuBuild, menuHelp;
         ToolItem toolBuild, toolRebuild, toolClean, toolCancelBuild;
@@ -258,11 +257,9 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitalizeMenu()
         {
-            menubar = new MenuBar();
-#if MONOMAC
-            Menu = menubar;
-            Menu.Items.Clear(); // HACK: Eto.Forms adds some pointless items on Mac
-#endif
+            Menu = new MenuBar();
+            Menu.Style = "MenuBar";
+            Menu.IncludeSystemItems = MenuBarSystemItems.None;
 
             menuFile = new ButtonMenuItem();
             menuFile.Text = "File";
@@ -279,7 +276,7 @@ namespace MonoGame.Tools.Pipeline
             menuFile.Items.Add(new SeparatorMenuItem());
             menuFile.Items.Add(cmdSave);
             menuFile.Items.Add(cmdSaveAs);
-            menubar.Items.Add(menuFile);
+            Menu.Items.Add(menuFile);
 
             menuEdit = new ButtonMenuItem();
             menuEdit.Text = "Edit";
@@ -300,13 +297,13 @@ namespace MonoGame.Tools.Pipeline
             menuEdit.Items.Add(new SeparatorMenuItem());
             menuEdit.Items.Add(cmdRename);
             menuEdit.Items.Add(cmdDelete);
-            menubar.Items.Add(menuEdit);
+            Menu.Items.Add(menuEdit);
 
             // View Commands
 
             menuView = new ButtonMenuItem();
             menuView.Text = "View";
-            menubar.Items.Add(menuView);
+            Menu.Items.Add(menuView);
 
             menuBuild = new ButtonMenuItem();
             menuBuild.Text = "Build";
@@ -316,18 +313,15 @@ namespace MonoGame.Tools.Pipeline
             menuBuild.Items.Add(cmdCancelBuild);
             menuBuild.Items.Add(new SeparatorMenuItem());
             menuBuild.Items.Add(cmdDebugMode);
-            menubar.Items.Add(menuBuild);
+            Menu.Items.Add(menuBuild);
 
             menuHelp = new ButtonMenuItem();
             menuHelp.Text = "Help";
             menuHelp.Items.Add(cmdHelp);
-            menubar.Items.Add(menuHelp);
+            Menu.Items.Add(menuHelp);
 
-            menubar.QuitItem = cmdExit;
-            menubar.AboutItem = cmdAbout;
-
-            Menu = menubar;
-            Menu.Style = "MenuBar";
+            Menu.QuitItem = cmdExit;
+            Menu.AboutItem = cmdAbout;
         }
 
         private void InitalizeContextMenu()
