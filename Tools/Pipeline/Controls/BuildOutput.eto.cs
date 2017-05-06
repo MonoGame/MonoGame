@@ -26,6 +26,8 @@ namespace MonoGame.Tools.Pipeline
 
             scrollable1 = new Scrollable();
             scrollable1.BackgroundColor = DrawInfo.BackColor;
+            scrollable1.ExpandContentWidth = true;
+            scrollable1.ExpandContentHeight = true;
             drawable = new Drawable();
             scrollable1.Content = drawable;
 
@@ -35,10 +37,10 @@ namespace MonoGame.Tools.Pipeline
             drawable.MouseDown += Drawable_MouseDown;
             drawable.MouseMove += Drawable_MouseMove;
             drawable.MouseLeave += Drawable_MouseLeave;
+            drawable.SizeChanged += Drawable_SizeChanged;
             drawable.Paint += Drawable_Paint;
             scrollable1.SizeChanged += Scrollable1_SizeChanged;
             scrollable1.Scroll += Scrollable1_Scroll;
         }
     }
 }
-

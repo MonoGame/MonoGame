@@ -219,25 +219,6 @@ namespace MonoGame.Tools.Pipeline
                 h.Control.IconSize = Gtk.IconSize.SmallToolbar;
             });
 
-            Style.Add<TreeViewHandler>("Scroll", h =>
-            {
-                var treeView = h.Control.Child as Gtk.TreeView;
-
-                Gtk.TreeIter lastIter, iter;
-
-                if (treeView.Model.GetIterFirst(out iter))
-                {
-                    do
-                    {
-                        lastIter = iter;
-                    }
-                    while (treeView.Model.IterNext(ref iter));
-
-                    var path = treeView.Model.GetPath(lastIter);
-                    treeView.ScrollToCell(path, null, false, 0, 0);
-                }
-            });
-
             Style.Add<DrawableHandler>("Stretch", h =>
             {
                 var parent = h.Control.Parent.Parent.Parent.Parent.Parent.Parent;
@@ -259,43 +240,6 @@ namespace MonoGame.Tools.Pipeline
                      var al = h.Control.Allocation;
                      al.Width = parent.AllocatedWidth;
                      h.Control.SetAllocation(al);
-                };
-            });
-
-            Style.Add<TextBoxHandler>("OverrideSize", h =>
-            {
-                h.Control.WidthChars = 0;
-            });
-
-            Style.Add<ScrollableHandler>("BuildOutput", h =>
-            {
-                var child = ((((h.Control.Child as Gtk.Viewport).Child as Gtk.VBox).Children[0] as Gtk.HBox).Children[0] as Gtk.Alignment).Child;
-                var ok = false;
-
-                h.Control.SizeAllocated += delegate
-                {
-                    // Set Width of the Drawable
-                    var al = child.Allocation;
-                    al.Width = h.Control.AllocatedWidth - 2;
-                    if (BuildOutput.ReqWidth > al.Width)
-                        al.Width = BuildOutput.ReqWidth;
-                    child.SetAllocation(al);
-
-                    if (PipelineSettings.Default.AutoScrollBuildOutput)
-                    {
-                        // Scroll to bottom
-                        if (BuildOutput.Count == -1)
-                            ok = false;
-
-                        if (!ok)
-                        {
-                            var adj = h.Control.Vadjustment;
-                            adj.Value = adj.Upper - adj.PageSize;
-
-                            if (adj.Upper >= BuildOutput.Count && BuildOutput.Count != -1)
-                                ok = true;
-                        }
-                    }
                 };
             });
         }
