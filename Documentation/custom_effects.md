@@ -46,6 +46,7 @@ These are some tips for writing or converting effects for use with MonoGame.
 * Note that on GL platforms default values on Effect parameters do not work.  Either set the parameter from code or use a real constant like a #define.
 * Do not name your sampler `Sampler` - it will not compile.
 * The effect compiler is aggressive about removing unused paramters, be sure the parameters you are setting are actually used.
+* As compiler is aggressive it is required to maintain strict arguments definition in pixel shader for register assigments(`sampler TextureSampler : register(s0)`) to work, like: `float4 PixelShaderFunction(float4 position : SV_Position, float4 color : COLOR0, float2 texCoord : TEXCOORD0) : COLOR0{...}`
 * If you think you've found a bug porting a shader [please let us know](https://github.com/mono/MonoGame/issues).
 
 # Roadmap
