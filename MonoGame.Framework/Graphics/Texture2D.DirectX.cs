@@ -169,7 +169,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected override void Dispose(bool disposing)
         {
-            SharpDX.Utilities.Dispose(ref _cachedStagingTexture);
+            if (disposing)
+            {
+                SharpDX.Utilities.Dispose(ref _cachedStagingTexture);
+            }
 
             base.Dispose(disposing);
         }
