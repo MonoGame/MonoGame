@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private SampleDescription _sampleDescription;
 
-        private SharpDX.Direct3D11.Texture2D cachedStagingTexture;
+        private SharpDX.Direct3D11.Texture2D _cachedStagingTexture;
 
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var levelWidth = Math.Max(width >> level, min);
             var levelHeight = Math.Max(height >> level, min);
 
-            if (cachedStagingTexture == null)
+            if (_cachedStagingTexture == null)
             {
                 var desc = new Texture2DDescription();
                 desc.Width = levelWidth;
@@ -106,7 +106,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Save sampling description.
                 _sampleDescription = desc.SampleDescription;
 
-                cachedStagingTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+                _cachedStagingTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
             }
 
             var d3dContext = GraphicsDevice._d3dContext;
@@ -119,13 +119,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 var elementsInRow = rect.Width;
                 var rows = rect.Height;
                 var region = new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1);
-                d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, cachedStagingTexture, 0);
+                d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, _cachedStagingTexture, 0);
 
                 // Copy the data to the array.
                 DataStream stream = null;
                 try
                 {
-                    var databox = d3dContext.MapSubresource(cachedStagingTexture, 0, MapMode.Read, MapFlags.None, out stream);
+                    var databox = d3dContext.MapSubresource(_cachedStagingTexture, 0, MapMode.Read, MapFlags.None, out stream);
 
                     var elementSize = _format.GetSize();
                     if (_format.IsCompressedFormat())
@@ -161,8 +161,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 finally
                 {
                     SharpDX.Utilities.Dispose( ref stream);
+
+                    d3dContext.UnmapSubresource(_cachedStagingTexture, 0);
                 }
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            SharpDX.Utilities.Dispose(ref _cachedStagingTexture);
+
+            base.Dispose(disposing);
         }
 
         private int CalculateSubresourceIndex(int arraySlice, int level)
