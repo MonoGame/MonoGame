@@ -218,7 +218,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        internal SoundEffectInstance GetSoundEffectInstance(int waveBankIndex, int trackIndex)
+        internal SoundEffectInstance GetSoundEffectInstance(int waveBankIndex, int trackIndex, out bool streaming)
         {
             var waveBank = _waveBanks[waveBankIndex];
 
@@ -231,8 +231,7 @@ namespace Microsoft.Xna.Framework.Audio
                 _waveBanks[waveBankIndex] = waveBank;                
             }
 
-            var sound = waveBank.GetSoundEffect(trackIndex);
-            return sound.GetPooledInstance(true);
+            return waveBank.GetSoundEffectInstance(trackIndex, out streaming);
         }
         
         /// <summary>
