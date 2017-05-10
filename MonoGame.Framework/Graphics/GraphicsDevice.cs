@@ -222,6 +222,21 @@ namespace Microsoft.Xna.Framework.Graphics
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities();
             GraphicsCapabilities.Initialize(this);
+
+#if DIRECTX
+            if (PresentationParameters.IsFullScreen)
+            {
+                int newWidth, newHeight;
+                if (PresentationParameters.HardwareModeSwitch)
+                    GetModeSwitchedSize(out newWidth, out newHeight);
+                else
+                    GetDisplayResolution(out newWidth, out newHeight);
+
+                PresentationParameters.BackBufferWidth = newWidth;
+                PresentationParameters.BackBufferHeight = newHeight;
+            }
+#endif
+
             Initialize();
         }
 
@@ -609,9 +624,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Reset()
         {
+            // Window size can be modified when we're going full screen, we need to take that into account
+            // now so the back buffer has the right size.
+            if (PresentationParameters.IsFullScreen)
+            {
+                int newWidth, newHeight;
+                if (PresentationParameters.HardwareModeSwitch)
+                    GetModeSwitchedSize(out newWidth, out newHeight);
+                else
+                    GetDisplayResolution(out newWidth, out newHeight);
+
+                PresentationParameters.BackBufferWidth = newWidth;
+                PresentationParameters.BackBufferHeight = newHeight;
+            }
+
             PlatformValidatePresentationParameters(PresentationParameters);
+
             EventHelpers.Raise(this, DeviceResetting, EventArgs.Empty);
-            EventHelpers.Raise(this, PresentationChanging, new PresentationEventArgs(PresentationParameters));
 
             // Update the back buffer.
             OnPresentationChanged();

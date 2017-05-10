@@ -694,8 +694,61 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetHardwareFullscreen()
         {
-            // This force to switch to fullscreen mode when hardware mode enabled(working in WindowsDX mode).
             _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen && PresentationParameters.HardwareModeSwitch, null);
+        }
+
+        internal void ResizeTargets()
+        {
+            var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
+            var descr = new ModeDescription()
+            {
+                Format = format,
+#if WINRT
+                Scaling = DisplayModeScaling.Stretched,
+#else
+                Scaling = DisplayModeScaling.Unspecified,
+#endif
+                Width = PresentationParameters.BackBufferWidth,
+                Height = PresentationParameters.BackBufferHeight,
+            };
+
+            _swapChain.ResizeTarget(ref descr);
+        }
+
+        internal void GetModeSwitchedSize(out int width, out int height)
+        {
+            var output = _swapChain.ContainingOutput;
+            var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
+            var target = new ModeDescription()
+            {
+                Format = format,
+#if WINRT
+                Scaling = DisplayModeScaling.Stretched,
+#else
+                Scaling = DisplayModeScaling.Unspecified,
+#endif
+                Width = PresentationParameters.BackBufferWidth,
+                Height = PresentationParameters.BackBufferHeight,
+            };
+
+            ModeDescription closest;
+            output.GetClosestMatchingMode(_d3dDevice, target, out closest);
+            width = closest.Width;
+            height = closest.Height;
+        }
+
+        internal void GetDisplayResolution(out int width, out int height)
+        {
+            if (_swapChain == null)
+            {
+                width = Adapter.CurrentDisplayMode.Width;
+                height = Adapter.CurrentDisplayMode.Height;
+            }
+            else
+            {
+                width = _swapChain.ContainingOutput.Description.DesktopBounds.Width;
+                height = _swapChain.ContainingOutput.Description.DesktopBounds.Height;
+            }
         }
 
         internal void CreateSizeDependentResources()

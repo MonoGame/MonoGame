@@ -96,11 +96,6 @@ namespace MonoGame.Framework
         {
         }
 
-        internal override void OnPresentationChanging(PresentationParameters pp)
-        {
-            _window.OnPresentationChanging(pp);
-        }
-
         internal override void OnPresentationChanged(PresentationParameters pp)
         {
             _window.OnPresentationChanged(pp);

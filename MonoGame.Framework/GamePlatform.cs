@@ -247,20 +247,8 @@ namespace Microsoft.Xna.Framework
         protected virtual void OnIsMouseVisibleChanged() {}
 
         /// <summary>
-        /// Called by the GraphicsDeviceManager to notify the platform window
-        /// when the graphics device is going to change the presentation. This function
-        /// can also update the presentation parameters to match window properties.
-        /// For example when switching to soft full screen the back buffer size should
-        /// be set to the client bounds of the window after it has been maximized.
-        /// </summary>
-        /// <param name="pp">The new presentation parameters.</param>
-        internal virtual void OnPresentationChanging(PresentationParameters pp)
-        {
-        }
-
-        /// <summary>
         /// Called by the GraphicsDeviceManager to notify the platform
-        /// when the graphics device has changed the presentation.
+        /// that the presentation parameters have changed.
         /// </summary>
         /// <param name="pp">The new presentation parameters.</param>
         internal virtual void OnPresentationChanged(PresentationParameters pp)

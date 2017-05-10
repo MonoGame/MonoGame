@@ -397,7 +397,6 @@ namespace MonoGame.Framework
 
                     continue;
                 }
-
                 UpdateWindows();
                 Game.Tick();
             }
@@ -513,32 +512,29 @@ namespace MonoGame.Framework
             }
         }
 
-        public void OnPresentationChanging(PresentationParameters pp)
+        public void OnPresentationChanged(PresentationParameters pp)
         {
-            if (pp.IsFullScreen && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
+            var raiseClientSizeChanged = false;
+            if (pp.IsFullScreen && pp.HardwareModeSwitch && IsFullScreen && HardwareModeSwitch)
+            {
+                // stay in hardware full screen, need to call ResizeTargets so the displaymode can be switched
+                _platform.Game.GraphicsDevice.ResizeTargets();
+            }
+            else if (pp.IsFullScreen && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
             {
                 EnterFullScreen(pp);
-                _raiseClientSizeChanged = true;
+                raiseClientSizeChanged = true;
             }
             else if (!pp.IsFullScreen && IsFullScreen)
             {
                 ExitFullScreen();
-                ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
-                _raiseClientSizeChanged = true;
+                raiseClientSizeChanged = true;
             }
-            else
-            {
-                ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
-            }
-        }
 
-        public void OnPresentationChanged(PresentationParameters pp)
-        {
-            if (_raiseClientSizeChanged)
-            {
+            ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
+
+            if (raiseClientSizeChanged)
                 OnClientSizeChanged();
-                _raiseClientSizeChanged = false;
-            }
         }
 
         #endregion
@@ -564,14 +560,15 @@ namespace MonoGame.Framework
                 _lastFormState = FormWindowState.Maximized;
             }
 
-            pp.BackBufferWidth = ClientBounds.Width;
-            pp.BackBufferHeight = ClientBounds.Height;
-
             IsFullScreen = true;
             HardwareModeSwitch = pp.HardwareModeSwitch;
 
             _switchingFullScreen = false;
         }
+
+
+        [DllImport("user32.dll")]
+        static extern bool RedrawWindow(IntPtr hWnd, IntPtr lprcUpdate, IntPtr hrgnUpdate, uint flags);
 
         private void ExitFullScreen()
         {
@@ -584,6 +581,10 @@ namespace MonoGame.Framework
             _lastFormState = FormWindowState.Normal;
             Form.Location = _locationBeforeFullScreen;
             IsFullScreen = false;
+
+            // Windows does not always correctly redraw the desktop when exiting soft full screen, so force a redraw
+            if (!HardwareModeSwitch)
+                RedrawWindow(IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, 1);
 
             _switchingFullScreen = false;
         }
