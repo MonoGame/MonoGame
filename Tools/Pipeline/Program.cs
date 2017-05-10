@@ -16,14 +16,15 @@ namespace MonoGame.Tools.Pipeline
         [STAThread]
         static void Main(string[] args)
         {
-            var app = new Application(Platform.Detect);
             Styles.Load();
 
+            var app = new Application(Platform.Detect);
 #if WINDOWS
             Xwt.Application.InitializeAsGuest(Xwt.ToolkitType.Wpf);
 #elif LINUX
             Xwt.Application.InitializeAsGuest(Xwt.ToolkitType.Gtk3);
 #endif
+            app.Style = "PipelineTool";
 
             var win = new MainWindow();
             var controller = PipelineController.Create(win);

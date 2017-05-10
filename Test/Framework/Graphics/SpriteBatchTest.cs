@@ -48,6 +48,19 @@ namespace MonoGame.Tests.Graphics {
             _effect2.Dispose();
 	    }
 
+        [Test]
+        public void BeginCalledTwiceThrows()
+        {
+            _spriteBatch.Begin();
+            Assert.Throws<InvalidOperationException>(() => _spriteBatch.Begin());
+        }
+
+        [Test]
+        public void BeginNotCalledThrows()
+        {
+            Assert.Throws<InvalidOperationException>(() => _spriteBatch.End());
+        }
+        
 		[Test]
 		public void Draw_without_blend ()
 		{

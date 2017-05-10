@@ -520,7 +520,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>Hash code of this <see cref="Vector2"/>.</returns>
         public override int GetHashCode()
         {
-            return X.GetHashCode() + Y.GetHashCode();
+            unchecked
+            {
+                return (X.GetHashCode() * 397) ^ Y.GetHashCode();
+            }
         }
 
         /// <summary>

@@ -248,8 +248,10 @@ namespace Microsoft.Xna.Framework
             if ((Sdl.Patch > 4 || !AllowUserResizing) && !_wasMoved)
                 Sdl.Window.SetPosition(Handle, centerX, centerY);
 
+            if (IsFullScreen != _willBeFullScreen)
+                OnClientSizeChanged();
+
             IsFullScreen = _willBeFullScreen;
-            OnClientSizeChanged();
 
             _supressMoved = true;
         }

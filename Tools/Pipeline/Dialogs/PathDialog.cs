@@ -7,7 +7,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class PathDialog : DialogBase
+    partial class PathDialog : Dialog<bool>
     {
         public string Path { get; set; }
 
@@ -53,6 +53,17 @@ namespace MonoGame.Tools.Pipeline
 
             if (dialog.ShowDialog(this) == DialogResult.Ok)
                 textBox1.Text = _controller.GetRelativePath(dialog.Directory);
+        }
+
+        private void ButtonOk_Click(object sender, EventArgs e)
+        {
+            Result = true;
+            Close();
+        }
+
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }
