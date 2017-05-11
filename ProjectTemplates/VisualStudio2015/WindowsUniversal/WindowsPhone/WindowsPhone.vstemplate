@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+	<TemplateData>
+		<Name>$ext_safeprojectname$.WindowsPhone</Name>
+		<DefaultName>App</DefaultName>
+		<ProjectType>CSharp</ProjectType>
+		<TargetPlatformName>Windows</TargetPlatformName>
+		<RequiredPlatformVersion>6.3.0</RequiredPlatformVersion>
+		<CreateInPlace>true</CreateInPlace>
+		<CreateNewFolder>true</CreateNewFolder>
+		<LocationField>Enabled</LocationField>
+		<Hidden>true</Hidden>
+	</TemplateData>
+	<TemplateContent>
+		<Project File="WindowsPhone.Application.WindowsPhone.csproj" ReplaceParameters="true">
+			<Folder Name="Assets">
+				<ProjectItem ReplaceParameters="false" TargetFileName="Logo.scale-240.png">Phone.Logo.png</ProjectItem>
+				<ProjectItem ReplaceParameters="false" TargetFileName="SmallLogo.scale-240.png">Phone.SmallLogo.png</ProjectItem>
+				<ProjectItem ReplaceParameters="false" TargetFileName="SplashScreen.scale-240.png">Phone.SplashScreen.png</ProjectItem>
+				<ProjectItem ReplaceParameters="false" TargetFileName="Square71x71Logo.scale-240.png">Phone.Square71x71Logo.png</ProjectItem>
+				<ProjectItem ReplaceParameters="false" TargetFileName="StoreLogo.scale-240.png">Phone.StoreLogo.png</ProjectItem>
+				<ProjectItem ReplaceParameters="false" TargetFileName="WideLogo.scale-240.png">Phone.WideLogo.png</ProjectItem>
+			</Folder>
+			<Folder Name="Properties">
+				<ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">WindowsPhone.AssemblyInfo.cs</ProjectItem>
+			</Folder>
+			<ProjectItem ReplaceParameters="true" TargetFileName="Package.appxmanifest">Package-PhoneAppx.appxmanifest</ProjectItem>
+		</Project>
+	</TemplateContent>
+    <WizardExtension>
+      <Assembly>Microsoft.VisualStudio.WinRT.TemplateWizards, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+      <FullClassName>Microsoft.VisualStudio.WinRT.TemplateWizards.CreateProjectCertificate.Wizard</FullClassName>
+    </WizardExtension>
+</VSTemplate>

@@ -193,6 +193,33 @@
             <property name="text" translatable="yes">Close</property>
           </object>
         </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="margin_top">3</property>
+            <property name="margin_bottom">3</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="help_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">Help</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="about_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">About</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="exit_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">Quit</property>
+          </object>
+        </child>
       </object>
       <packing>
         <property name="submenu">main</property>

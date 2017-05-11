@@ -37,7 +37,6 @@ namespace Microsoft.Xna.Framework.Content
         {
             'w', // Windows (DirectX)
             'x', // Xbox360
-            'm', // WindowsPhone
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
@@ -49,6 +48,7 @@ namespace Microsoft.Xna.Framework.Content
             'P', // PlayStation4
             'v', // PSVita
             'O', // XboxOne
+            'S', // Nintendo Switch
 
             // NOTE: There are additional idenfiers for consoles that 
             // are not defined in this repository.  Be sure to ask the
@@ -188,6 +188,8 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     Unload();
                 }
+
+                scratchBuffer = null;
 				disposed = true;
 			}
 		}

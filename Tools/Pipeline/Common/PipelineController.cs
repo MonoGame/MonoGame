@@ -113,7 +113,12 @@ namespace MonoGame.Tools.Pipeline
             _watcher = new FileWatcher(this, view);
 
             _templateItems = new List<ContentItemTemplate>();
-            LoadTemplates(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
+            var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            if (Directory.Exists(Path.Combine (root, "..", "Resources", "Templates")))
+            {
+                root = Path.Combine(root, "..", "Resources");
+            }
+            LoadTemplates(Path.Combine(root, "Templates"));
             UpdateMenu();
 
             view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
@@ -1127,6 +1132,7 @@ namespace MonoGame.Tools.Pipeline
             info.OpenItem = exists && oneselected && SelectedItem is ContentItem;
             info.OpenItemWith = exists && oneselected && !(SelectedItem is DirectoryItem);
             info.OpenItemLocation = exists && oneselected;
+            info.OpenOutputItemLocation = exists && oneselected && SelectedItem is ContentItem;
             info.CopyAssetPath = exists && oneselected && SelectedItem is ContentItem;
             info.Add = (exists && oneselected && !(SelectedItem is ContentItem)) || !somethingselected && ProjectOpen;
             info.Exclude = somethingselected && !SelectedItems.Contains(_project);

@@ -45,6 +45,9 @@ project.lock.json
 /MonoGame.Framework/MonoGame.Framework.WindowsUniversal.project.lock.json
 artifacts/
 
+# JetBrains Rider
+.idea/
+
 #Tooling
 _ReSharper*/
 *.resharper

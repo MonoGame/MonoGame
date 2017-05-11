@@ -24,11 +24,10 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         Dictionary<int, VertexDeclarationAttributeInfo> shaderAttributeInfo = new Dictionary<int, VertexDeclarationAttributeInfo>();
 
-		internal void Apply(Shader shader, IntPtr offset)
+		internal void Apply(Shader shader, IntPtr offset, int programHash)
 		{
             VertexDeclarationAttributeInfo attrInfo;
-            int shaderHash = shader.GetHashCode();
-            if (!shaderAttributeInfo.TryGetValue(shaderHash, out attrInfo))
+            if (!shaderAttributeInfo.TryGetValue(programHash, out attrInfo))
             {
                 // Get the vertex attribute info and cache it
                 attrInfo = new VertexDeclarationAttributeInfo(GraphicsDevice.MaxVertexAttributes);
@@ -51,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                 }
 
-                shaderAttributeInfo.Add(shaderHash, attrInfo);
+                shaderAttributeInfo.Add(programHash, attrInfo);
             }
 
             // Apply the vertex attribute info

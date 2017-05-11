@@ -98,11 +98,6 @@ namespace Microsoft.Xna.Framework.Audio
             if (!HasSourceId || SoundState != SoundState.Playing)
                 return;
 
-            if (!controller.CheckInitState())
-            {
-                return;
-            }
-
             if (pauseCount == 0)
             {
                 AL.SourcePause(SourceId);
@@ -164,10 +159,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (SoundState == SoundState.Paused)
             {
-                if (!controller.CheckInitState())
-                {
-                    return;
-                }
                 --pauseCount;
                 if (pauseCount == 0)
                 {
@@ -182,10 +173,6 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (HasSourceId)
             {
-                if (!controller.CheckInitState())
-                {
-                    return;
-                }
                 AL.SourceStop(SourceId);
                 ALHelper.CheckError("Failed to stop source.");
 

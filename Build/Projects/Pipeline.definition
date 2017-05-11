@@ -28,6 +28,10 @@
       <Platform Name="MacOS">TRACE;MONOMAC;GTK2</Platform>
       <Platform Name="Linux">TRACE;LINUX;GTK3</Platform>
     </CustomDefinitions>
+    <FrameworkVersions>
+      <Platform Name="MacOS"><Version>v4.6.1</Version></Platform>
+    </FrameworkVersions>
+    <IncludeMonoRuntimeOnMac>True</IncludeMonoRuntimeOnMac>
   </Properties>
 
   <Files>
@@ -74,7 +78,6 @@
     
 	<!-- General Stuff -->
 	<Compile Include="Global.cs" />
-	<Compile Include="XwtUtil.cs" />
 	<Compile Include="MainWindow.cs" />
 	<Compile Include="MainWindow.eto.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
@@ -86,6 +89,9 @@
       <Platforms>Windows</Platforms>
     </Compile>
 	<Compile Include="Styles.Windows.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+	<Compile Include="Controls\ProjectControl.xwt.cs">
       <Platforms>Windows</Platforms>
     </Compile>
     
@@ -102,6 +108,9 @@
 	<Compile Include="Styles.Linux.cs">
       <Platforms>Linux</Platforms>
     </Compile>
+	<Compile Include="Controls\ProjectControl.xwt.cs">
+      <Platforms>Linux</Platforms>
+    </Compile>
     
     <!-- Native Mac -->
 	<Compile Include="Global.Mac.cs">
@@ -109,6 +118,9 @@
       <Platforms>MacOS</Platforms>
     </Compile>
 	<Compile Include="Styles.Mac.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+	<Compile Include="Controls\ProjectControl.eto.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
 	
@@ -132,10 +144,6 @@
 	<Compile Include="Controls\BuildOutput.eto.cs">
       <DependentUpon>BuildOutput.cs</DependentUpon>
     </Compile>
-	<Compile Include="Controls\ProjectControl.cs" />
-	<Compile Include="Controls\ProjectControl.xwt.cs">
-      <DependentUpon>ProjectControl.cs</DependentUpon>
-    </Compile>
 	<Compile Include="Controls\PropertyGridControl.cs" />
 	<Compile Include="Controls\PropertyGridControl.eto.cs">
       <DependentUpon>PropertyGridControl.cs</DependentUpon>
@@ -146,10 +154,6 @@
     </Compile>
 	
     <!-- GUI Dialogs -->
-	<Compile Include="Dialogs\AboutDialog.cs" />
-	<Compile Include="Dialogs\AboutDialog.eto.cs">
-      <DependentUpon>AboutDialog.cs</DependentUpon>
-    </Compile>
 	<Compile Include="Dialogs\AddItemDialog.cs" />
 	<Compile Include="Dialogs\AddItemDialog.eto.cs">
       <DependentUpon>AddItemDialog.cs</DependentUpon>
@@ -157,10 +161,6 @@
 	<Compile Include="Dialogs\DeleteDialog.cs" />
 	<Compile Include="Dialogs\DeleteDialog.eto.cs">
       <DependentUpon>DeleteDialog.cs</DependentUpon>
-    </Compile>
-	<Compile Include="Dialogs\DialogBase.cs" />
-	<Compile Include="Dialogs\DialogBase.eto.cs">
-      <DependentUpon>DialogBase.cs</DependentUpon>
     </Compile>
 	<Compile Include="Dialogs\EditDialog.cs" />
 	<Compile Include="Dialogs\EditDialog.eto.cs">
@@ -186,6 +186,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Icons\Settings.png">
       <LogicalName>Icons.Settings.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\LICENSE.txt">
+      <Link>LICENSE.txt</Link>
+      <LogicalName>LICENSE.txt</LogicalName>
     </EmbeddedResource>
 	
 	<!--- The resources for treeview -->
@@ -297,39 +301,39 @@
     </EmbeddedResource>
 
     <!-- Copy the template resources to the output -->
-	<None Include="Templates\Effect.png">
+	<Content Include="Templates\Effect.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-	<None Include="Templates\Effect.fx">
+    </Content>
+	<Content Include="Templates\Effect.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-	<None Include="Templates\Effect.template">
+    </Content>
+	<Content Include="Templates\Effect.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-	<None Include="Templates\SpriteEffect.fx">
+    </Content>
+	<Content Include="Templates\SpriteEffect.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-	<None Include="Templates\SpriteEffect.template">
+    </Content>
+	<Content Include="Templates\SpriteEffect.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Templates\Xml.png">
+    </Content>
+    <Content Include="Templates\Xml.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Templates\XmlContent.xml">
+    </Content>
+    <Content Include="Templates\XmlContent.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Templates\XmlContent.template">
+    </Content>
+    <Content Include="Templates\XmlContent.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Templates\Font.png">
+    </Content>
+    <Content Include="Templates\Font.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Templates\SpriteFont.spritefont">
+    </Content>
+    <Content Include="Templates\SpriteFont.spritefont">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Templates\SpriteFont.template">
+    </Content>
+    <Content Include="Templates\SpriteFont.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
 
     <BundleResource Include="Resources\App.icns">
       <Platforms>MacOS</Platforms>

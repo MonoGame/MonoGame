@@ -12,12 +12,11 @@ Each NuGet now targets an individual platform to make for easier management and 
 The currently available packages are:
 	* Windows GL (OpenGL)
 	* Windows DX (DirectX)
-	* Windows 8 & 8.1
-	* Windows Phone 8
+	* Windows 8.1
 	* Windows Phone 8.1 
-	* Windows Universal projects
+	* Windows Universal / UWP projects
 	* iOS (Xamarin.iOS only)
-	* MacOS (net4 / net45 / MonoMac and Xamarin.Mac)
+	* MacOS (net45 / MonoMac and Xamarin.Mac)
 	* Android
 	* Linux
 
@@ -47,7 +46,7 @@ This will install all the project templates for Visual Studio including the new 
 To upgrade your project you will need to edit your .CSPROJ file for your solution (either from windows explorer or using the VS power tools to edit the project file) and add the following entries:
 	*  <MonoGamePlatform>WindowsGL</MonoGamePlatform>  <- Placed just before the 1st line with   </PropertyGroup> (in the initial project definition section)
 
-**Note, the platform name should be one of the following: Android, iOS, Linux, MacOSX, NativeClient, Playstation4, RaspberryPi, Windows, WindowsGL, WindowsPhone, WindowsPhone8, WindowsStoreApp   (depending on your project platform)
+**Note, the platform name should be one of the following: Android, iOS, Linux, MacOSX, NativeClient, Playstation4, RaspberryPi, Windows, WindowsGL, WindowsPhone8, WindowsStoreApp   (depending on your project platform)
 	*  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />  <- Placed with the other IMPORT references at the end of the CSPROJ file
 
 This will enable the new Content Builder to function an run.

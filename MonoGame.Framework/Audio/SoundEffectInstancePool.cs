@@ -108,7 +108,8 @@ namespace Microsoft.Xna.Framework.Audio
                 if (inst.IsDisposed || inst.State == SoundState.Stopped || (inst._effect == null && !inst._isDynamic))
                 {
 #if OPENAL
-                    inst.Stop(true); // force stopping it to free its AL source
+                    if (!inst.IsDisposed)
+                        inst.Stop(true); // force stopping it to free its AL source
 #endif
                     Add(inst);
                     continue;

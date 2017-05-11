@@ -46,6 +46,7 @@ namespace MonoGame.Tools.Pipeline
             editText.Width = _lastRec.Width;
             editText.Height = _lastRec.Height;
             editText.Text = DisplayValue;
+            editText.Tag = this;
 
             control.Add(editText, _lastRec.X, _lastRec.Y);
 
@@ -66,7 +67,6 @@ namespace MonoGame.Tools.Pipeline
                 catch { }
             };
 
-            editText.EnabledChanged += (sender, e) => OnKill.Invoke();
             editText.KeyDown += (sender, e) =>
             {
                 if (e.Key == Keys.Enter)

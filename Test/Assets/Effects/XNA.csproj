@@ -1,0 +1,82 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <XnaInstall>C:\Program Files (x86)\MSBuild\Microsoft\XNA Game Studio\v4.0</XnaInstall>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <XnaPlatform>Windows</XnaPlatform>
+    <XnaProfile>HiDef</XnaProfile>
+  </PropertyGroup>
+
+  <!-- You can change the ouput path here, note that the project name will be prepended. -->
+  <PropertyGroup>
+    <OutputPath>.</OutputPath>
+  </PropertyGroup>
+
+  <!-- Needed importers should be referenced here -->
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.EffectImporter, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Bevels.fx">
+      <Name>Bevels</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="ColorFlip.fx">
+      <Name>ColorFlip</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="HighContrast.fx">
+      <Name>HighContrast</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="NoEffect.fx">
+      <Name>NoEffect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="BlackOut.fx">
+      <Name>BlackOut</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Grayscale.fx">
+      <Name>Grayscale</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Invert.fx">
+      <Name>Invert</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="RainbowH.fx">
+      <Name>RainbowH</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+
+    <Compile Include="CustomSpriteBatchEffect.fx">
+      <Name>CustomSpriteBatchEffect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+
+    <Compile Include="Instancing.fx">
+      <Name>Instancing</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+
+  </ItemGroup>
+
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
+</Project>
