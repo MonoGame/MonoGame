@@ -33,9 +33,9 @@ namespace OpenGL
 
 	internal static class EntryPointHelper {
 		
-		static IntPtr libES1 = DL.Open("/system/lib/libGLESv1_CM.so");
-		static IntPtr libES2 = DL.Open("/system/lib/libGLESv2.so");
-		static IntPtr libGL = DL.Open("/system/lib/libGL.so");
+		static IntPtr libES1 = DL.Open("libGLESv1_CM.so");
+		static IntPtr libES2 = DL.Open("libGLESv2.so");
+		static IntPtr libGL = DL.Open("libGL.so");
 	
 		public static IntPtr GetAddress(String function)
 		{

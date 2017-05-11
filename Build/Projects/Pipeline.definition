@@ -162,10 +162,6 @@
 	<Compile Include="Dialogs\DeleteDialog.eto.cs">
       <DependentUpon>DeleteDialog.cs</DependentUpon>
     </Compile>
-	<Compile Include="Dialogs\DialogBase.cs" />
-	<Compile Include="Dialogs\DialogBase.eto.cs">
-      <DependentUpon>DialogBase.cs</DependentUpon>
-    </Compile>
 	<Compile Include="Dialogs\EditDialog.cs" />
 	<Compile Include="Dialogs\EditDialog.eto.cs">
       <DependentUpon>EditDialog.cs</DependentUpon>

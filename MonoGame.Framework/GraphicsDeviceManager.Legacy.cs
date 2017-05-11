@@ -65,7 +65,9 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
-            GraphicsProfile = GraphicsDevice.GetHighestSupportedGraphicsProfile(null);
+            // XNA would read this from the manifest, but it would always default
+            // to Reach unless changed.  So lets mimic that without the manifest bit.
+            GraphicsProfile = GraphicsProfile.Reach;
 
             if (_game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
                 throw new ArgumentException("Graphics Device Manager Already Present");

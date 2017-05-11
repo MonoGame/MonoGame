@@ -32,15 +32,8 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public OALSoundBuffer ()
 		{
-            try
-            {
-                AL.GenBuffers(1, out openALDataBuffer);
-                ALHelper.CheckError("Failed to generate OpenAL data buffer.");
-            }
-            catch (DllNotFoundException e)
-            {
-                throw new NoAudioHardwareException("OpenAL drivers could not be found.", e);
-            }
+            AL.GenBuffers(1, out openALDataBuffer);
+            ALHelper.CheckError("Failed to generate OpenAL data buffer.");
 		}
 
         ~OALSoundBuffer()

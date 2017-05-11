@@ -7,19 +7,32 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class ReferenceDialog : DialogBase
+    partial class ReferenceDialog : Dialog<bool>
     {
         DynamicLayout layout1;
         StackLayout stack1;
         GridView grid1;
         Button buttonAdd, buttonRemove;
+        Button buttonOk, buttonCancel;
 
         private void InitializeComponent()
         {
             Title = "Reference Editor";
+            DisplayMode = DialogDisplayMode.Attached;
             Resizable = true;
-            Width = 500;
-            Height = 400;
+            Padding = new Padding(4);
+            Size = new Size(500, 400);
+            MinimumSize = new Size(450, 300);
+
+            buttonOk = new Button();
+            buttonOk.Text = "Ok";
+            PositiveButtons.Add(buttonOk);
+            DefaultButton = buttonOk;
+
+            buttonCancel = new Button();
+            buttonCancel.Text = "Cancel";
+            NegativeButtons.Add(buttonCancel);
+            AbortButton = buttonCancel;
 
             layout1 = new DynamicLayout();
             layout1.DefaultSpacing = new Size(4, 4);
@@ -43,12 +56,14 @@ namespace MonoGame.Tools.Pipeline
 
             layout1.Add(stack1, false, true);
 
-            CreateContent(layout1);
+            Content = layout1;
 
             grid1.SelectionChanged += Grid1_SelectionChanged;
             grid1.KeyDown += Grid1_KeyDown;
             buttonAdd.Click += ButtonAdd_Click;
             buttonRemove.Click += ButtonRemove_Click;
+            buttonOk.Click += ButtonOk_Click;
+            buttonCancel.Click += ButtonCancel_Click;
         }
     }
 }

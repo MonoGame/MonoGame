@@ -76,6 +76,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal bool SupportsVertexTextures { get; private set; }
 
+        /// <summary>
+        /// Gets the max texture anisotropy. This value typically lies
+        /// between 0 and 16, where 0 means anisotropic filtering is not
+        /// supported.
+        /// </summary>
+        internal int MaxTextureAnisotropy { get; private set; }
+
         // The highest possible MSCount
         private const int MultiSampleCountLimit = 32;
         private int _maxMultiSampleCount;

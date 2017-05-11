@@ -1292,11 +1292,6 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotSupportedException();
         }
 
-        internal static GraphicsProfile GetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
-        {
-            return PlatformGetHighestSupportedGraphicsProfile(graphicsDevice);
-        }
-
         // uniformly scales down the given rectangle by 10%
         internal static Rectangle GetDefaultTitleSafeArea(int x, int y, int width, int height)
         {

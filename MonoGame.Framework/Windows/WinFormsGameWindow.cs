@@ -154,6 +154,8 @@ namespace MonoGame.Framework
             Form.KeyPress += OnKeyPress;
 
             RegisterToAllWindows();
+
+            Form.CenterOnPrimaryMonitor();
         }
 
         [DllImport("shell32.dll", CharSet = CharSet.Auto, BestFitMapping = false)]
@@ -286,6 +288,8 @@ namespace MonoGame.Framework
         internal void Initialize(int width, int height)
         {
             Form.ClientSize = new Size(width, height);
+            if (!_wasMoved)
+                Form.CenterOnPrimaryMonitor();
         }
 
         private void OnResizeEnd(object sender, EventArgs eventArgs)

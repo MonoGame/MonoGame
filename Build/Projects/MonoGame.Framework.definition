@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS,PSVita,XBoxOne">
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS,PSVita,XBoxOne,Switch">
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
     for backwards compatibility with existing users of MonoGame, and are not
@@ -436,6 +436,9 @@
     <Compile Include="Audio\Xact\SoundBank.cs" />
     <Compile Include="Audio\Xact\VolumeEvent.cs" />
     <Compile Include="Audio\Xact\WaveBank.cs" />
+    <Compile Include="Audio\Xact\WaveBank.Default.cs">	
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS</Platforms>
+    </Compile>
     <Compile Include="Audio\Xact\XactClip.cs" />
     <Compile Include="Audio\Xact\XactHelpers.cs" />
     <Compile Include="Audio\Xact\XactSound.cs" />
@@ -496,13 +499,13 @@
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Content\ContentReaders\Texture3DReader.cs">
-      <Platforms>Angle,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone81,WindowsUniversal</Platforms>
+      <ExcludePlatforms>Android,iOS,tvOS,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TextureCubeReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone81,WindowsUniversal,tvOS</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TextureReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone81,WindowsUniversal,tvOS</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
     <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
@@ -984,13 +987,16 @@
 		<ExcludePlatforms>Android</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\Keyboard.Default.cs">
-		<ExcludePlatforms>Android,Windows,WindowsGL,Linux</ExcludePlatforms>
+		<ExcludePlatforms>Android,Windows8,WindowsPhone81,WindowsUniversal,Windows,WindowsGL,Linux</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\Keyboard.SDL.cs">
 		<Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Input\Keyboard.Windows.cs">
 		<Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.cs">
       <Platforms>Android,iOS,Windows8,WindowsPhone81,WindowsUniversal</Platforms>
