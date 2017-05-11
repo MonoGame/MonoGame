@@ -134,7 +134,15 @@ namespace Microsoft.Xna.Framework
                     var key = KeyboardUtil.ToXna (ev.Key.Keysym.Sym);
                     if (!_keys.Contains (key))
                         _keys.Add (key);
+
                     char character = (char)ev.Key.Keysym.Sym;
+#if LINUX
+                    // On this platform SDL spuriously repeats some control characters way too aggressively.
+                    // Suppress them.
+                    if (ev.Key.Repeat != 0 && char.IsControl (character)) {
+                        return;
+                    }
+#endif
                     if (char.IsControl (character))
                         _view.CallTextInput (character, key);
 
