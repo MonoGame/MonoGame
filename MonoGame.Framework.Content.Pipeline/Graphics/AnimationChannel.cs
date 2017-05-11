@@ -15,6 +15,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     {
         List<AnimationKeyframe> keyframes;
 
+        public Dictionary<TimeSpan, Vector3> Translation;
+        public Dictionary<TimeSpan, Vector3> Scale;
+        public Dictionary<TimeSpan, Quaternion> Rotation;
+
         /// <summary>
         /// Gets the number of keyframes in the collection.
         /// </summary>
@@ -54,6 +58,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public AnimationChannel()
         {
             keyframes = new List<AnimationKeyframe>();
+            Translation = new Dictionary<TimeSpan, Vector3>();
+            Scale = new Dictionary<TimeSpan,Vector3>();
+            Rotation = new Dictionary<TimeSpan,Quaternion>();
         }
 
         /// <summary>

@@ -864,6 +864,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     }
                 }
 
+                var translateTime = (TimeSpan.TicksPerSecond / aiAnimation.TicksPerSecond);
+                foreach (var key in scaleKeys)
+                {
+                    long ticks = (long)(key.Time * translateTime);
+                    TimeSpan time = TimeSpan.FromTicks(ticks);
+                    channel.Scale[time] = ToXna(key.Value);
+                }
+                foreach (var key in rotationKeys)
+                {
+                    long ticks = (long)(key.Time * translateTime);
+                    TimeSpan time = TimeSpan.FromTicks(ticks);
+                    channel.Rotation[time] = ToXna(key.Value);
+                }
+                foreach (var key in translationKeys)
+                {
+                    long ticks = (long)(key.Time * translateTime);
+                    TimeSpan time = TimeSpan.FromTicks(ticks);
+                    channel.Translation[time] = ToXna(key.Value);
+                }
+                
                 // Get all unique keyframe times. (Assuming that no two key frames
                 // have the same time, which is usually a safe assumption.)
                 var times = scaleKeys.Select(k => k.Time)
