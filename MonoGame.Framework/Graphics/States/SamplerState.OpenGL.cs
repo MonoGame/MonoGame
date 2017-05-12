@@ -21,7 +21,15 @@ namespace Microsoft.Xna.Framework.Graphics
 {
   public partial class SamplerState
   {
-      private readonly float[] _openGLBorderColor = new float[4];
+#if !DESKTOPGL
+        internal const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)All.TextureMaxAnisotropyExt;
+        internal const TextureParameterName TextureParameterNameTextureMaxLevel = (TextureParameterName)0x813D;
+#else
+        internal const TextureParameterName TextureParameterNameTextureMaxAnisotropy = TextureParameterName.TextureMaxAnisotropyExt;
+        internal const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
+#endif
+
+        private readonly float[] _openGLBorderColor = new float[4];
 
         internal void Activate(GraphicsDevice device, TextureTarget target, bool useMipmaps = false)
         {
@@ -38,7 +46,7 @@ namespace Microsoft.Xna.Framework.Graphics
       case TextureFilter.Point:
 				if (GraphicsDevice.GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
-                    GL.TexParameter(target, Texture.TextureParameterNameTextureMaxAnisotropy, 1.0f);
+                    GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
                 }
         GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest));
@@ -49,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
       case TextureFilter.Linear:
 				if (GraphicsDevice.GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
-                    GL.TexParameter(target, Texture.TextureParameterNameTextureMaxAnisotropy, 1.0f);
+                    GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
                 }
         GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
@@ -60,7 +68,7 @@ namespace Microsoft.Xna.Framework.Graphics
       case TextureFilter.Anisotropic:
 				if (GraphicsDevice.GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
-                    GL.TexParameter(target, Texture.TextureParameterNameTextureMaxAnisotropy, MathHelper.Clamp(this.MaxAnisotropy, 1.0f, GraphicsDevice.GraphicsCapabilities.MaxTextureAnisotropy));
+                    GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, MathHelper.Clamp(this.MaxAnisotropy, 1.0f, GraphicsDevice.GraphicsCapabilities.MaxTextureAnisotropy));
                     GraphicsExtensions.CheckGLError();
                 }
         GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
@@ -71,7 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
       case TextureFilter.PointMipLinear:
 				if (GraphicsDevice.GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
-                    GL.TexParameter(target, Texture.TextureParameterNameTextureMaxAnisotropy, 1.0f);
+                    GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
                 }
         GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapLinear : TextureMinFilter.Nearest));
@@ -82,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
             case TextureFilter.LinearMipPoint:
 				if (GraphicsDevice.GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
-                    GL.TexParameter(target, Texture.TextureParameterNameTextureMaxAnisotropy, 1.0f);
+                    GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
                 }
                 GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapNearest : TextureMinFilter.Linear));
@@ -93,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
             case TextureFilter.MinLinearMagPointMipLinear:
 				if (GraphicsDevice.GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
-                    GL.TexParameter(target, Texture.TextureParameterNameTextureMaxAnisotropy, 1.0f);
+                    GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
                 }
                 GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
@@ -104,7 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
             case TextureFilter.MinLinearMagPointMipPoint:
 				if (GraphicsDevice.GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
-                    GL.TexParameter(target, Texture.TextureParameterNameTextureMaxAnisotropy, 1.0f);
+                    GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
                 }
                 GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapNearest: TextureMinFilter.Linear));
@@ -115,7 +123,7 @@ namespace Microsoft.Xna.Framework.Graphics
             case TextureFilter.MinPointMagLinearMipLinear:
 				if (GraphicsDevice.GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
-                    GL.TexParameter(target, Texture.TextureParameterNameTextureMaxAnisotropy, 1.0f);
+                    GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
                 }
                 GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapLinear: TextureMinFilter.Nearest));
@@ -126,7 +134,7 @@ namespace Microsoft.Xna.Framework.Graphics
             case TextureFilter.MinPointMagLinearMipPoint:
 				if (GraphicsDevice.GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
-                    GL.TexParameter(target, Texture.TextureParameterNameTextureMaxAnisotropy, 1.0f);
+                    GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
                 }
                 GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest: TextureMinFilter.Nearest));
@@ -175,11 +183,11 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (this.MaxMipLevel > 0)
                 {
-                    GL.TexParameter(TextureTarget.Texture2D, Texture.TextureParameterNameTextureMaxLevel, this.MaxMipLevel);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterNameTextureMaxLevel, this.MaxMipLevel);
                 }
                 else
                 {
-                    GL.TexParameter(TextureTarget.Texture2D, Texture.TextureParameterNameTextureMaxLevel, 1000);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterNameTextureMaxLevel, 1000);
                 }
                 GraphicsExtensions.CheckGLError();
             }

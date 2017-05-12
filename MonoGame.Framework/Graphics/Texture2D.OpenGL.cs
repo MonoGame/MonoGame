@@ -614,11 +614,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     if (_levelCount > 0)
                     {
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterNameTextureMaxLevel, _levelCount - 1);
+                        GL.TexParameter(TextureTarget.Texture2D, SamplerState.TextureParameterNameTextureMaxLevel, _levelCount - 1);
                     }
                     else
                     {
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterNameTextureMaxLevel, 1000);
+                        GL.TexParameter(TextureTarget.Texture2D, SamplerState.TextureParameterNameTextureMaxLevel, 1000);
                     }
                     GraphicsExtensions.CheckGLError();
                 }
