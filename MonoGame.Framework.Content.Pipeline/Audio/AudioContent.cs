@@ -17,7 +17,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
     public class AudioContent : ContentItem, IDisposable
     {
         private bool _disposed;
-        private readonly string _fileName;
         private readonly AudioFileType _fileType;
         private ReadOnlyCollection<byte> _data;
         private TimeSpan _duration;
@@ -29,7 +28,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// The name of the original source audio file.
         /// </summary>
         [ContentSerializer(AllowNull = false)]
-        public string FileName { get { return _fileName; } }
+        public string FileName { get { return Identity.SourceFilename; } }
 
         /// <summary>
         /// The type of the original source audio file.
@@ -48,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             get
             {
                 if (_disposed || _data == null)                
-                    throw new InvalidContentException("Could not read the audio data from file \"" + Path.GetFileName(_fileName) + "\".");
+                    throw new InvalidContentException("Could not read the audio data from file \"" + Path.GetFileName(FileName) + "\".");
                 return _data;
             }
         }
@@ -108,7 +107,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <remarks>Constructs the object from the specified source file, in the format specified.</remarks>
         public AudioContent(string audioFileName, AudioFileType audioFileType)
         {
-            _fileName = audioFileName;
+            Identity = new ContentIdentity(audioFileName);
 
             try
             {
@@ -131,7 +130,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                     // Must be opened in read mode otherwise it fails to open
                     // read-only files (found in some source control systems)
-                    using (var fs = new FileStream(_fileName, FileMode.Open, FileAccess.Read))
+                    using (var fs = new FileStream(audioFileName, FileMode.Open, FileAccess.Read))
                     {
                         rawData = new byte[fs.Length];
                         fs.Read(rawData, 0, rawData.Length);
@@ -142,8 +141,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                     if (riffAudioFormat != null)
                     {
-                        if (_format.BlockAlign != riffAudioFormat.BlockAlign)
-                            throw new InvalidOperationException("Calcualted block align does not match RIFF " + _format.BlockAlign + " : " + riffAudioFormat.BlockAlign);
+                        if ((_format.Format != 2 && _format.Format != 17) && _format.BlockAlign != riffAudioFormat.BlockAlign)
+                            throw new InvalidOperationException("Calculated block align does not match RIFF " + _format.BlockAlign + " : " + riffAudioFormat.BlockAlign);
                         if (_format.ChannelCount != riffAudioFormat.ChannelCount || _format.Format != riffAudioFormat.Format
                             || _format.SampleRate != riffAudioFormat.SampleRate || _format.AverageBytesPerSecond != riffAudioFormat.AverageBytesPerSecond)
                             throw new InvalidOperationException("Probed audio format does not match RIFF");

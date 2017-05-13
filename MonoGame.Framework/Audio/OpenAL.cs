@@ -14,8 +14,12 @@ namespace OpenAL
         Mono16 = 0x1101,
         Stereo8 = 0x1102,
         Stereo16 = 0x1103,
-        MonoMSADPCM =0x1302,
-        StereoMSADPCM =0x1303,
+        MonoIma4 = 0x1300,
+        StereoIma4 = 0x1301,
+        MonoMSAdpcm = 0x1302,
+        StereoMSAdpcm = 0x1303,
+        MonoFloat32 = 0x10010,
+        StereoFloat32 = 0x10011,
     }
 
     public enum ALError
@@ -53,6 +57,7 @@ namespace OpenAL
 
     public enum ALSourcei
     {
+        SourceRelative = 0x202,
         Buffer = 0x1009,
         EfxDirectFilter = 0x20005,
         EfxAuxilarySendFilter = 0x20006,
@@ -94,6 +99,7 @@ namespace OpenAL
 
     public enum ALDistanceModel
     {
+        None = 0,
         InverseDistanceClamped = 0xD002,
     }
 

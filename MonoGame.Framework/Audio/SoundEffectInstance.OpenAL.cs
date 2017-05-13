@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Audio
     {
 		internal SoundState SoundState = SoundState.Stopped;
 		private bool _looped = false;
-		private float _alVolume = 1;
+		private float _alVolume = 1f;
 
 		internal int SourceId;
         private float reverb = 0f;
@@ -130,14 +130,19 @@ namespace Microsoft.Xna.Framework.Audio
             if (!HasSourceId)
 				return;
 
-			// Distance Model
+            AL.Source(SourceId, ALSourcei.SourceRelative, 1);
+            ALHelper.CheckError("Failed set source relative.");
+            // Distance Model
 			AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
             ALHelper.CheckError("Failed set source distance.");
 			// Pan
-			AL.Source (SourceId, ALSource3f.Position, _pan, 0, 0.1f);
+			AL.Source (SourceId, ALSource3f.Position, _pan, 0f, 0f);
+            ALHelper.CheckError("Failed to set source pan.");
+            // Velocity
+			AL.Source (SourceId, ALSource3f.Velocity, 0f, 0f, 0f);
             ALHelper.CheckError("Failed to set source pan.");
 			// Volume
-			AL.Source (SourceId, ALSourcef.Gain, _alVolume);
+            AL.Source(SourceId, ALSourcef.Gain, _alVolume);
             ALHelper.CheckError("Failed to set source volume.");
 			// Looping
 			AL.Source (SourceId, ALSourceb.Looping, IsLooped);

@@ -52,7 +52,8 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 var channels = BitConverter.ToInt16(header, 2);
                 var sampleRate = BitConverter.ToInt32(header, 4);
-                PlatformInitializePcm(buffer, 0, bufferSize, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+                var bitsPerSample = BitConverter.ToInt16(header, 14);
+                PlatformInitializePcm(buffer, 0, bufferSize, bitsPerSample, sampleRate, (AudioChannels)channels, loopStart, loopLength);
                 return;
             }
 
@@ -67,7 +68,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (codec == MiniFormatTag.Pcm)
             {
                 _duration = TimeSpan.FromSeconds((float)buffer.Length / (sampleRate * blockAlignment));
-                PlatformInitializePcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+                PlatformInitializePcm(buffer, 0, buffer.Length, 16, sampleRate, (AudioChannels)channels, loopStart, loopLength);
                 return;
             }
 
@@ -142,7 +143,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             _duration = GetSampleDuration(count, sampleRate, channels);
 
-            PlatformInitializePcm(buffer, offset, count, sampleRate, channels, loopStart, loopLength);
+            PlatformInitializePcm(buffer, offset, count, 16, sampleRate, channels, loopStart, loopLength);
         }
 
         #endregion

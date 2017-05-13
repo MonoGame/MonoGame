@@ -310,7 +310,8 @@ namespace MonoGame.Tests {
 	static class Paths
     {
 		private const string AssetFolder = "Assets";
-		private static readonly string FontFolder = Path.Combine (AssetFolder, "Fonts");
+        private static readonly string AudioFolder = Path.Combine(AssetFolder, "Audio");
+        private static readonly string FontFolder = Path.Combine(AssetFolder, "Fonts");
 		private static readonly string ReferenceImageFolder = Path.Combine (AssetFolder, "ReferenceImages");
 		private static readonly string TextureFolder = Path.Combine (AssetFolder, "Textures");
 		private static readonly string EffectFolder = Path.Combine (AssetFolder, "Effects");
@@ -324,7 +325,12 @@ namespace MonoGame.Tests {
 			return Combine (AssetFolder, pathParts);
 		}
 
-		public static string Font (params string [] pathParts)
+        public static string Audio(params string[] pathParts)
+        {
+            return Combine(AudioFolder, pathParts);
+        }
+
+        public static string Font(params string[] pathParts)
 		{
 			return Combine (FontFolder, pathParts);
 		}

@@ -31,98 +31,81 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal OALSoundBuffer SoundBuffer;
 
-        internal float Rate { get; set; }
-
-        internal int Size { get; set; }
-
-        internal ALFormat Format { get; set; }
-
         #region Public Constructors
 
-        private void PlatformLoadAudioStream(Stream s, out TimeSpan duration)
+        // Converts block alignment in bytes to sample alignment, primarily for compressed formats
+        // Calculation of sample alignment from http://kcat.strangesoft.net/openal-extensions/SOFT_block_alignment.txt
+        int SampleAlignment(ALFormat format, int blockAlignment)
+        {
+            switch (format)
+            {
+                case ALFormat.MonoIma4:
+                    return (blockAlignment - 4) / 4 * 8 + 1;
+                case ALFormat.StereoIma4:
+                    return (blockAlignment / 2 - 4) / 4 * 8 + 1;
+                case ALFormat.MonoMSAdpcm:
+                    return (blockAlignment - 7) * 2 + 2;
+                case ALFormat.StereoMSAdpcm:
+                    return (blockAlignment / 2 - 7) * 2 + 2;
+            }
+            return 0;
+        }
+
+        private void PlatformLoadAudioStream(Stream stream, out TimeSpan duration)
         {
             byte[] buffer;
 
-#if OPENAL && !(MONOMAC || IOS)
-            
             ALFormat format;
-            int size;
             int freq;
+            int blockAlignment;
+            int byteRate;
+            buffer = AudioLoader.Load(stream, out format, out freq, out blockAlignment, out byteRate);
 
-            var stream = s;
+            duration = TimeSpan.FromSeconds((float)buffer.Length / (float)byteRate);
 
-            buffer = AudioLoader.Load(stream, out format, out size, out freq);
-
-            Format = format;
-            Size = size;
-            Rate = freq;
-
-            var bytesPerSecond = freq;
-            if (format == ALFormat.Mono16 || format == ALFormat.Stereo8)
-                bytesPerSecond *= 2;
-            else if (format == ALFormat.Stereo16)
-                bytesPerSecond *= 4;
-
-            duration = TimeSpan.FromSeconds((float) size / bytesPerSecond);
-#endif
-
-#if MONOMAC || IOS
-
-            var audiodata = new byte[s.Length];
-            s.Read(audiodata, 0, (int)s.Length);
-
-            using (AudioFileStream afs = new AudioFileStream (AudioFileType.WAVE))
-            {
-                afs.ParseBytes (audiodata, false);
-                Size = (int)afs.DataByteCount;
-
-                buffer = new byte[afs.DataByteCount];
-                Array.Copy (audiodata, afs.DataOffset, buffer, 0, afs.DataByteCount);
-
-                AudioStreamBasicDescription asbd = afs.DataFormat;
-                int channelsPerFrame = asbd.ChannelsPerFrame;
-                int bitsPerChannel = asbd.BitsPerChannel;
-
-                Rate = (float)asbd.SampleRate;
-                double durationSec = (Size / ((bitsPerChannel / 8) * channelsPerFrame)) / asbd.SampleRate;
-                duration = TimeSpan.FromSeconds(durationSec);
-
-                if (channelsPerFrame == 1)
-                    Format = (bitsPerChannel == 8) ? ALFormat.Mono8 : ALFormat.Mono16;
-                else
-                    Format = (bitsPerChannel == 8) ? ALFormat.Stereo8 : ALFormat.Stereo16;
-            }
-
-#endif
-            // bind buffer
-            SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
-        }
-
-        private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
-        {
-            Rate = (float)sampleRate;
-            Size = (int)count;
-            Format = channels == AudioChannels.Stereo ? ALFormat.Stereo16 : ALFormat.Mono16;
+            int sampleAlignment = SampleAlignment(format, blockAlignment);
 
             // bind buffer
             SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
+            SoundBuffer.BindDataBuffer(buffer, format, buffer.Length, freq, sampleAlignment);
         }
 
-        private void PlatformInitializeAdpcm (byte [] buffer, int offset, int count, int sampleRate, AudioChannels channels, int dataFormat, int loopStart, int loopLength)
+        private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleBits, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
-            Rate = (float)sampleRate;
-            Size = (int)count;
-            #if DESKTOPGL
-            Format = channels == AudioChannels.Stereo ? ALFormat.StereoMSADPCM : ALFormat.MonoMSADPCM;
-            #else
-            Format = channels == AudioChannels.Stereo ? (ALFormat)0x1303 : (ALFormat)0x1302;
-            #endif
+            var format = AudioLoader.GetSoundFormat(1, (int)channels, sampleBits);
 
             // bind buffer
-            SoundBuffer = new OALSoundBuffer ();
-            SoundBuffer.BindDataBuffer (buffer, Format, Size, (int)Rate, dataFormat);
+            SoundBuffer = new OALSoundBuffer();
+            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate);
+        }
+
+        private void PlatformInitializeIeeeFloat(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        {
+            var format = AudioLoader.GetSoundFormat(3, (int)channels, 32);
+
+            // bind buffer
+            SoundBuffer = new OALSoundBuffer();
+            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate);
+        }
+
+        private void PlatformInitializeAdpcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int blockAlignment, int loopStart, int loopLength)
+        {
+            var format = AudioLoader.GetSoundFormat(2, (int)channels, 0);
+            int sampleAlignment = SampleAlignment(format, blockAlignment);
+
+            // bind buffer
+            SoundBuffer = new OALSoundBuffer();
+            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate, sampleAlignment);
+        }
+
+        private void PlatformInitializeIma4(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int blockAlignment, int loopStart, int loopLength)
+        {
+            var format = AudioLoader.GetSoundFormat(17, (int)channels, 0);
+            int sampleAlignment = SampleAlignment(format, blockAlignment);
+
+            // bind buffer
+            SoundBuffer = new OALSoundBuffer();
+            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate, sampleAlignment);
         }
 
         private void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)
@@ -131,26 +114,35 @@ namespace Microsoft.Xna.Framework.Audio
             var channels = BitConverter.ToInt16(header, 2);
             var sampleRate = BitConverter.ToInt32(header, 4);
             var blockAlignment = BitConverter.ToInt16(header, 12);
+            var bitsPerSample = BitConverter.ToInt16(header, 14);
 
-            // We need to decode MSADPCM.
+            // We may need to decode MSADPCM.
             var supportsADPCM = OpenALSoundController.GetInstance.SupportsADPCM;
             if (format == 2 && !supportsADPCM)
             {
-                using (var stream = new MemoryStream(buffer))
-                using (var reader = new BinaryReader(stream))
+                using (var reader = new BinaryReader(new MemoryStream(buffer, 0, bufferSize)))
                 {
-                    buffer = MSADPCMToPCM.MSADPCM_TO_PCM (reader, (short)channels, (short)blockAlignment);
+                    buffer = MSADPCMToPCM.MSADPCM_TO_PCM(reader, (short)channels, (short)blockAlignment);
                     format = 1;
                 }
             }
 
-            if (!supportsADPCM && format != 1)
-                throw new NotSupportedException("Unsupported wave format!");
-
-            if (supportsADPCM && format == 2) {
-                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
-            } else {
-                PlatformInitializePcm (buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+            switch (format)
+            {
+                case 1: // PCM
+                    PlatformInitializePcm(buffer, 0, bufferSize, bitsPerSample, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+                    break;
+                case 2: // MS-ADPCM
+                    PlatformInitializeAdpcm(buffer, 0, bufferSize, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
+                    break;
+                case 3: // IEEE Float
+                    PlatformInitializeIeeeFloat(buffer, 0, bufferSize, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+                    break;
+                case 17: // IMA/ADPCM
+                    PlatformInitializeIma4(buffer, 0, bufferSize, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
+                    break;
+                default:
+                    throw new NotSupportedException("Unsupported wave format!");
             }
         }
 

@@ -105,7 +105,8 @@ namespace Microsoft.Xna.Framework.Audio
         private List<int> availableSourcesCollection;
         private List<int> inUseSourcesCollection;
         bool _isDisposed;
-        public bool SupportsADPCM = false;
+        public bool SupportsIma4 { get; private set; }
+        public bool SupportsADPCM { get; private set; }
 
         /// <summary>
         /// Sets up the hardware resources used by the controller.
@@ -284,6 +285,7 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     Alc.MakeContextCurrent(_context);
                     CheckALError("Could not make AL context current");
+                    SupportsIma4 = AL.IsExtensionPresent("AL_EXT_IMA4");
                     SupportsADPCM = AL.IsExtensionPresent ("AL_SOFT_MSADPCM");
                     return (true);
                 }

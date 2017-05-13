@@ -19,7 +19,6 @@ using OpenTK.Audio.OpenAL;
 using OpenAL;
 #endif
 
-
 namespace Microsoft.Xna.Framework.Audio
 {
 	internal class OALSoundBuffer : IDisposable
@@ -27,7 +26,6 @@ namespace Microsoft.Xna.Framework.Audio
 		int openALDataBuffer;
 		ALFormat openALFormat;
 		int dataSize;
-		int sampleRate;
         bool _isDisposed;
 
 		public OALSoundBuffer ()
@@ -52,30 +50,35 @@ namespace Microsoft.Xna.Framework.Audio
 			set;
 		}
 
-        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int alignment = 0)
+        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int sampleAlignment = 0)
         {
+            if ((format == ALFormat.MonoMSAdpcm || format == ALFormat.StereoMSAdpcm) && !OpenALSoundController.GetInstance.SupportsADPCM)
+                throw new InvalidOperationException("MS-ADPCM is not supported by this OpenAL driver");
+            if ((format == ALFormat.MonoIma4 || format == ALFormat.StereoIma4) && !OpenALSoundController.GetInstance.SupportsIma4)
+                throw new InvalidOperationException("IMA/ADPCM is not supported by this OpenAL driver");
+
             openALFormat = format;
             dataSize = size;
-            this.sampleRate = sampleRate;
             int unpackedSize = 0;
 #if DESKTOPGL
-            if (alignment > 0) {
-                AL.Bufferi (openALDataBuffer, ALBufferi.UnpackBlockAlignmentSoft, alignment);
+            if (sampleAlignment > 0)
+            {
+                AL.Bufferi (openALDataBuffer, ALBufferi.UnpackBlockAlignmentSoft, sampleAlignment);
                 ALHelper.CheckError ("Failed to fill buffer.");
             }
 #endif
 
-            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, size, this.sampleRate);
+            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, size, sampleRate);
             ALHelper.CheckError("Failed to fill buffer.");
 
             int bits, channels;
 
+            Duration = -1;
             AL.GetBuffer(openALDataBuffer, ALGetBufferi.Bits, out bits);
             ALError alError = AL.GetError();
             if (alError != ALError.NoError)
             {
                 Console.WriteLine("Failed to get buffer bits: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
-                Duration = -1;
             }
             else
             {
@@ -85,22 +88,21 @@ namespace Microsoft.Xna.Framework.Audio
                 if (alError != ALError.NoError)
                 {
                     Console.WriteLine("Failed to get buffer channels: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
-                    Duration = -1;
                 }
                 else
                 {
                     AL.GetBuffer (openALDataBuffer, ALGetBufferi.Size, out unpackedSize);
                     alError = AL.GetError ();
-                    if (alError != ALError.NoError) {
+                    if (alError != ALError.NoError)
+                    {
                         Console.WriteLine ("Failed to get buffer size: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString (alError), format, size, sampleRate);
-                        Duration = -1;
-                    } else {
+                    }
+                    else
+                    {
                         Duration = (float)(unpackedSize / ((bits / 8) * channels)) / (float)sampleRate;
                     }
                 }
             }
-            //Console.WriteLine("Duration: " + Duration + " / size: " + size + " bits: " + bits + " channels: " + channels + " rate: " + sampleRate);
-
         }
 
 		public void Dispose()
