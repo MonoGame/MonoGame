@@ -159,10 +159,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount"></param>
         public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
         {
-            if (rect == null)
-                PlatformSetData(level, data, startIndex, elementCount);
-            else
-                this.SetData(level, 0, rect, data, startIndex, elementCount);
+            Rectangle checkedRect;
+            ValidateParams(level, 0, rect, data, startIndex, elementCount, out checkedRect);
+            PlatformSetData(level, 0, checkedRect, data, startIndex, elementCount);
         }
         /// <summary>
         /// Changes the texture's pixels
@@ -173,6 +172,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount"></param>
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
+            Rectangle checkedRect;
+            ValidateParams(0, 0, null, data, startIndex, elementCount, out checkedRect);
             PlatformSetData(0, data, startIndex, elementCount);
         }
 		/// <summary>
@@ -182,8 +183,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data"></param>
 		public void SetData<T>(T[] data) where T : struct
 		{
-		    if (data == null)
-		        throw new ArgumentNullException("data");
+            Rectangle checkedRect;
+            ValidateParams(0, 0, null, data, 0, data.Length, out checkedRect);
             PlatformSetData(0, data, 0, data.Length);
         }
         /// <summary>
