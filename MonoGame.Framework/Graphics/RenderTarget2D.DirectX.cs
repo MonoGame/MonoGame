@@ -145,35 +145,31 @@ namespace Microsoft.Xna.Framework.Graphics
             var rt = base.CreateTexture();
 
             // MSAA RT needs another non-MSAA texture where it is resolved
-            if (sampleDescription.Count > 1)
+            if (SampleDescription.Count > 1)
             {
                 _resolvedTexture = new RenderTarget2D(
                     GraphicsDevice,
                     Width,
                     Height,
-                    mipmap,
+                    Mipmap,
                     Format,
                     DepthStencilFormat,
                     1,
                     RenderTargetUsage,
-                    shared,
+                    Shared,
                     ArraySize);
             }
 
             return rt;
         }
 
-        internal override ShaderResourceView GetShaderResourceView()
+        protected override ShaderResourceView CreateShaderResourceView()
         {
             if (MultiSampleCount > 1)
-            {
-                if (resourceView == null)
-                    resourceView = new SharpDX.Direct3D11.ShaderResourceView
-                        (GraphicsDevice._d3dDevice, _resolvedTexture.GetTexture());
-
-                return resourceView;
-            }
-            else return base.GetShaderResourceView();
+                return new SharpDX.Direct3D11.ShaderResourceView
+                (GraphicsDevice._d3dDevice, _resolvedTexture.GetTexture());
+            else
+                return base.CreateShaderResourceView();
         }
 
         protected internal override Texture2DDescription GetTexture2DDescription()
@@ -184,7 +180,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (desc.SampleDescription.Count > 1)
                 desc.BindFlags &= ~BindFlags.ShaderResource;
 
-            if (mipmap)
+            if (Mipmap)
             {
                 // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
                 // because generation of mipmaps is not supported on the Xbox 360.

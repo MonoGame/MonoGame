@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using SharpDX.Direct3D11;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -11,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal SharpDX.Direct3D11.Resource _texture;
 
-        protected internal SharpDX.Direct3D11.ShaderResourceView resourceView;
+        private SharpDX.Direct3D11.ShaderResourceView _resourceView;
 
         /// <summary>
         /// Gets the handle to a shared resource.
@@ -36,17 +35,23 @@ namespace Microsoft.Xna.Framework.Graphics
             return _texture;
         }
 
-        internal virtual SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
+        internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
         {
-            if (resourceView == null)
-                resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
+            if (_resourceView == null)
+                _resourceView = CreateShaderResourceView();
 
-            return resourceView;
+            return _resourceView;
+        }
+
+        protected virtual SharpDX.Direct3D11.ShaderResourceView
+            CreateShaderResourceView()
+        {
+            return new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
         }
 
         private void PlatformGraphicsDeviceResetting()
         {
-            SharpDX.Utilities.Dispose(ref resourceView);
+            SharpDX.Utilities.Dispose(ref _resourceView);
             SharpDX.Utilities.Dispose(ref _texture);
         }
 
@@ -54,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (disposing)
             {
-                SharpDX.Utilities.Dispose(ref resourceView);
+                SharpDX.Utilities.Dispose(ref _resourceView);
                 SharpDX.Utilities.Dispose(ref _texture);
             }
 

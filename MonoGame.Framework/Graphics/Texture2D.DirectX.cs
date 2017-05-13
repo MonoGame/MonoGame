@@ -30,14 +30,18 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D : Texture
     {
-        protected internal bool shared;
-        protected internal bool mipmap;
-        protected internal SampleDescription sampleDescription;
+        protected bool Shared { get { return _shared; } }
+        protected bool Mipmap { get { return _mipmap; } }
+        protected SampleDescription SampleDescription { get { return _sampleDescription; } }
+
+        private bool _shared;
+        private bool _mipmap;
+        private SampleDescription _sampleDescription;
 
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
-            this.shared = shared;
-            this.mipmap = mipmap;
+            this._shared = shared;
+            this._mipmap = mipmap;
         }
 
         private void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
@@ -94,7 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.OptionFlags = ResourceOptionFlags.None;
 
             // Save sampling description.
-            sampleDescription = desc.SampleDescription;
+            _sampleDescription = desc.SampleDescription;
 
             var d3dContext = GraphicsDevice._d3dContext;
             using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
@@ -354,7 +358,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Usage = ResourceUsage.Default;
             desc.OptionFlags = ResourceOptionFlags.None;
 
-            if (shared)
+            if (_shared)
                 desc.OptionFlags |= ResourceOptionFlags.Shared;
 
             return desc;
@@ -365,7 +369,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var desc = GetTexture2DDescription();
 
             // Save sampling description.
-            sampleDescription = desc.SampleDescription;
+            _sampleDescription = desc.SampleDescription;
 
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
         }
@@ -377,7 +381,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal SampleDescription GetTextureSampleDescription()
         {
-            return sampleDescription;
+            return _sampleDescription;
         }
 
         private void PlatformReload(Stream textureStream)
