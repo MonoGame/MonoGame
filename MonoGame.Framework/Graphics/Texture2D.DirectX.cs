@@ -40,8 +40,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
-            this._shared = shared;
-            this._mipmap = mipmap;
+            _shared = shared;
+            _mipmap = mipmap;
         }
 
         private void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
