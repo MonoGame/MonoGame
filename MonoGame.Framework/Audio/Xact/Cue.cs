@@ -253,8 +253,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void Update(float dt)
         {
-            if (_curSound != null)
-                _curSound.Update(dt);
+            if (_curSound == null)
+                return;
+
+            _curSound.Update(dt);
 
             // Evaluate the runtime parameter controls.
             var rpcCurves = _curSound.RpcCurves;
@@ -304,6 +306,8 @@ namespace Microsoft.Xna.Framework.Audio
                             throw new ArgumentOutOfRangeException("rpcCurve.Parameter");
                     }
                 }
+
+                pitch = MathHelper.Clamp(pitch, -1.0f, 1.0f);
 
                 _curSound.UpdateState(_engine, volume, pitch, reverbMix, filterFrequency, filterQFactor);
             }
