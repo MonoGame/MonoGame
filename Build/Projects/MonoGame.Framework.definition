@@ -1200,10 +1200,10 @@
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.Default.cs" >
-      <Platforms>Android,iOS,MacOS,Windows8,WindowsPhone81,WindowsUniversal,tvOS</Platforms>
+      <Platforms>Android,iOS,Windows8,WindowsPhone81,WindowsUniversal,tvOS</Platforms>
     </Compile>
     <Compile Include="Utilities\ReflectionHelpers.Legacy.cs" >
-      <Platforms>Angle,Linux,Windows,WindowsGL,WindowsPhone,Web</Platforms>
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsPhone,Web</Platforms>
     </Compile>
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
     <Compile Include="Utilities\LzxStream\LzxDecoderStream.cs" />
