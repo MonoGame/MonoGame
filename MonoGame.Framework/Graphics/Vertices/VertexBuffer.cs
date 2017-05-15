@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <typeparam name="T">The struct you want to fill.</typeparam>
         /// <param name="offsetInBytes">The offset to the first element in the vertex buffer in bytes.</param>
-        /// <param name="data">An array of T's to be filled.
+        /// <param name="data">An array of T's to be filled.</param>
         /// <param name="startIndex">The index to start filling the data array.</param>
         /// <param name="elementCount">The number of T's to get.</param>
         /// <param name="vertexStride">The size of how a vertex buffer element should be interpreted.</param>
