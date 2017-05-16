@@ -82,7 +82,10 @@ namespace MonoGame.Tests.ContentPipeline
                 TextureFormat = TextureProcessorOutputFormat.Color
             };
 
-            var face = new PixelBitmapContent<Color>(8, 8);
+            var width = 8;
+            var height = 8;
+
+            var face = new PixelBitmapContent<Color>(width, height);
             Fill(face, Color.Red);
             var input = new Texture2DContent();
             input.Faces[0] = face;
@@ -95,9 +98,6 @@ namespace MonoGame.Tests.ContentPipeline
 
             var outChain = output.Faces[0];
             Assert.AreEqual(4, outChain.Count);
-
-            var width = 8;
-            var height = 8;
 
             foreach (var outFace in outChain)
             {
@@ -128,7 +128,10 @@ namespace MonoGame.Tests.ContentPipeline
                 TextureFormat = TextureProcessorOutputFormat.Color
             };
 
-            var face = new PixelBitmapContent<Color>(16, 8);
+            var width = 16;
+            var height = 8;
+
+            var face = new PixelBitmapContent<Color>(width, height);
             Fill(face, Color.Red);
             var input = new Texture2DContent();
             input.Faces[0] = face;
@@ -140,9 +143,6 @@ namespace MonoGame.Tests.ContentPipeline
 
             var outChain = output.Faces[0];
             Assert.AreEqual(5, outChain.Count);
-
-            var width = 16;
-            var height = 8;
 
             foreach (var outFace in outChain)
             {
@@ -175,7 +175,10 @@ namespace MonoGame.Tests.ContentPipeline
                 TextureFormat = TextureProcessorOutputFormat.Color
             };
 
-            var face = new PixelBitmapContent<Color>(23, 5);
+            var width = 23;
+            var height = 5;
+
+            var face = new PixelBitmapContent<Color>(width, height);
             Fill(face, Color.Red);
             var input = new Texture2DContent();
             input.Faces[0] = face;
@@ -187,9 +190,6 @@ namespace MonoGame.Tests.ContentPipeline
 
             var outChain = output.Faces[0];
             Assert.AreEqual(5, outChain.Count);
-
-            var width = 23;
-            var height = 5;
 
             foreach (var outFace in outChain)
             {
