@@ -126,7 +126,6 @@ namespace Microsoft.Xna.Framework.Audio
         {
             _cueVolume = volume;
             var category = engine.Categories[_categoryID];
-            UpdateCategoryVolume(category._volume[0]);
 
             var curInstances = category.GetPlayingInstanceCount();
             if (curInstances >= category.maxInstances)
@@ -141,10 +140,17 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
 
+            float finalVolume = _volume * _cueVolume * category._volume[0];
+            float finalPitch = _pitch + _cuePitch;
+            float finalMix = _useReverb ? _cueReverbMix : 0.0f;
+
             if (_complexSound) 
             {
                 foreach (XactClip clip in _soundClips)
+                {
+                    clip.UpdateState(finalVolume, finalPitch, finalMix, _cueFilterFrequency, _cueFilterQFactor);
                     clip.Play();
+                }
             } 
             else 
             {
@@ -160,9 +166,9 @@ namespace Microsoft.Xna.Framework.Audio
                     return;
                 }
 
-                _wave.Pitch = _pitch + _cuePitch;
-                _wave.Volume = _volume * _cueVolume * category._volume[0];
-                _wave.PlatformSetReverbMix(_useReverb ? _cueReverbMix : 0.0f);
+                _wave.Pitch = finalPitch;
+                _wave.Volume = finalVolume;
+                _wave.PlatformSetReverbMix(finalMix);
                 _wave.Play();
             }
         }
@@ -295,6 +301,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 _wave.PlatformSetReverbMix(_useReverb ? _cueReverbMix : 0.0f);
                 _wave.Pitch = finalPitch;
+                _wave.Volume = finalVolume;
             }
         }
 
