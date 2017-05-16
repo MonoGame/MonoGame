@@ -118,35 +118,28 @@ namespace Microsoft.Xna.Framework
         //        GraphicsDevice to raise these events without help?
         internal void OnDeviceDisposing(EventArgs e)
         {
-            Raise(DeviceDisposing, e);
+            EventHelper.Raise(this, DeviceDisposing, e);
         }
 
         // FIXME: Why does the GraphicsDeviceManager not know enough about the
         //        GraphicsDevice to raise these events without help?
         internal void OnDeviceResetting(EventArgs e)
         {
-            Raise(DeviceResetting, e);
+            EventHelper.Raise(this, DeviceResetting, e);
         }
 
         // FIXME: Why does the GraphicsDeviceManager not know enough about the
         //        GraphicsDevice to raise these events without help?
         internal void OnDeviceReset(EventArgs e)
         {
-            Raise(DeviceReset, e);
+            EventHelper.Raise(this, DeviceReset, e);
         }
 
         // FIXME: Why does the GraphicsDeviceManager not know enough about the
         //        GraphicsDevice to raise these events without help?
         internal void OnDeviceCreated(EventArgs e)
         {
-            Raise(DeviceCreated, e);
-        }
-
-        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
-            where TEventArgs : EventArgs
-        {
-            if (handler != null)
-                handler(this, e);
+            EventHelper.Raise(this, DeviceCreated, e);
         }
 
         #endregion
