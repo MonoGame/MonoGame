@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
     // TODO: We should convert the types below 
     // into the start of a Shader reflection API.
 
-    internal enum SamplerType
+    public enum SamplerType
     {
         Sampler2D = 0,
         SamplerCube = 1,
@@ -59,61 +59,43 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public VertexAttribute[] Attributes { get; private set; }
 
-        internal Shader(GraphicsDevice device, BinaryReader reader)
+        internal Shader(GraphicsDevice device, IShaderReader reader)
         {
             GraphicsDevice = device;
 
-            var isVertexShader = reader.ReadBoolean();
-            Stage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
+            Stage = reader.GetStage();
 
-            var shaderLength = reader.ReadInt32();
-            var shaderBytecode = reader.ReadBytes(shaderLength);
+            var shaderBytecode = reader.GetBytecode();
 
-            var samplerCount = (int)reader.ReadByte();
+            var samplerCount = reader.GetSamplerCount();
             Samplers = new SamplerInfo[samplerCount];
             for (var s = 0; s < samplerCount; s++)
             {
-                Samplers[s].type = (SamplerType)reader.ReadByte();
-                Samplers[s].textureSlot = reader.ReadByte();
-                Samplers[s].samplerSlot = reader.ReadByte();
+                Samplers[s].type = reader.GetSamplerType(s);
+                Samplers[s].textureSlot = reader.GetSamplerTextureSlot(s);
+                Samplers[s].samplerSlot = reader.GetSamplerSamplerSlot(s);
+                Samplers[s].state = reader.GetSamplerState(s);
 
-				if (reader.ReadBoolean())
-				{
-					Samplers[s].state = new SamplerState();
-					Samplers[s].state.AddressU = (TextureAddressMode)reader.ReadByte();
-					Samplers[s].state.AddressV = (TextureAddressMode)reader.ReadByte();
-					Samplers[s].state.AddressW = (TextureAddressMode)reader.ReadByte();
-                    Samplers[s].state.BorderColor = new Color(
-                        reader.ReadByte(), 
-                        reader.ReadByte(), 
-                        reader.ReadByte(), 
-                        reader.ReadByte());
-					Samplers[s].state.Filter = (TextureFilter)reader.ReadByte();
-					Samplers[s].state.MaxAnisotropy = reader.ReadInt32();
-					Samplers[s].state.MaxMipLevel = reader.ReadInt32();
-					Samplers[s].state.MipMapLevelOfDetailBias = reader.ReadSingle();
-				}
-
-                Samplers[s].name = reader.ReadString();
-                Samplers[s].parameter = reader.ReadByte();
+                Samplers[s].name = reader.GetSamplerName(s);
+                Samplers[s].parameter = reader.GetSamplerParameter(s);
             }
 
-            var cbufferCount = (int)reader.ReadByte();
+            var cbufferCount = reader.GetConstantBufferCount();
             CBuffers = new int[cbufferCount];
             for (var c = 0; c < cbufferCount; c++)
-                CBuffers[c] = reader.ReadByte();
+                CBuffers[c] = reader.GetConstantBufferValue(c);
 
-            var attributeCount = (int)reader.ReadByte();
+            var attributeCount = reader.GetAttributeCount();
             Attributes = new VertexAttribute[attributeCount];
             for (var a = 0; a < attributeCount; a++)
             {
-                Attributes[a].name = reader.ReadString();
-                Attributes[a].usage = (VertexElementUsage)reader.ReadByte();
-                Attributes[a].index = reader.ReadByte();
-                Attributes[a].location = reader.ReadInt16();
+                Attributes[a].name = reader.GetAttributeName(a);
+                Attributes[a].usage = reader.GetAttributeUsage(a);
+                Attributes[a].index = reader.GetAttributeIndexInShader(a);
+                Attributes[a].location = reader.GetAttributeLocation(a);
             }
 
-            PlatformConstruct(isVertexShader, shaderBytecode);
+            PlatformConstruct(Stage == ShaderStage.Vertex, shaderBytecode);
         }
 
         internal protected override void GraphicsDeviceResetting()
