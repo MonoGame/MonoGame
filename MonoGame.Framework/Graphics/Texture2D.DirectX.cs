@@ -293,7 +293,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 #if !WINDOWS_PHONE
 
-        static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(BitmapSource bsource, GraphicsDevice device)
+        static unsafe SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(BitmapSource bsource, GraphicsDevice device)
         {
 
             Texture2DDescription desc;
@@ -312,6 +312,18 @@ namespace Microsoft.Xna.Framework.Graphics
             using(DataStream s = new DataStream(bsource.Size.Height * bsource.Size.Width * 4, true, true))
             {
                 bsource.CopyPixels(bsource.Size.Width * 4, s);
+
+                // XNA blacks out any pixels with an alpha of zero.
+                var data = (byte*)s.DataPointer;
+                for (var i = 0; i < s.Length; i+=4)
+                {
+                    if (data[i + 3] == 0)
+                    {
+                        data[i + 0] = 0;
+                        data[i + 1] = 0;
+                        data[i + 2] = 0;
+                    }
+                }
 
                 DataRectangle rect = new DataRectangle(s.DataPointer, bsource.Size.Width * 4);
 
@@ -337,7 +349,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             fconv.Initialize(
                 decoder.GetFrame(0),
-                PixelFormat.Format32bppPRGBA,
+                PixelFormat.Format32bppRGBA,
                 BitmapDitherType.None, null,
                 0.0, BitmapPaletteType.Custom);
 
