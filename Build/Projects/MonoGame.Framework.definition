@@ -309,6 +309,7 @@
     <Compile Include="IGraphicsDeviceManager.cs" />
     <Compile Include="IUpdateable.cs" />
     <Compile Include="LaunchParameters.cs" />
+	<Compile Include="Line1D.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="NamespaceDocs.cs" />
@@ -324,6 +325,7 @@
     <Compile Include="Ray.cs" />
     <Compile Include="Rectangle.cs" />
     <Compile Include="ReusableItemList.cs" />
+	<Compile Include="SatIntersectionResult.cs" />
     <Compile Include="SharedGraphicsDeviceManager.cs">
       <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>

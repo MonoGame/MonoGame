@@ -9,6 +9,9 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
+    /// <summary>
+    /// Represents an axis aligned bounding box.
+    /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct BoundingBox : IEquatable<BoundingBox>
@@ -16,12 +19,21 @@ namespace Microsoft.Xna.Framework
 
         #region Public Fields
 
+        /// <summary>
+        /// Minimal edge of the box.
+        /// </summary>
         [DataMember]
         public Vector3 Min;
       
+        /// <summary>
+        /// Maximum edge of the box.
+        /// </summary>
         [DataMember]
         public Vector3 Max;
 
+        /// <summary>
+        /// Count of Corners, which will always be 8.
+        /// </summary>
         public const int CornerCount = 8;
 
         #endregion Public Fields
@@ -29,6 +41,11 @@ namespace Microsoft.Xna.Framework
 
         #region Public Constructors
 
+        /// <summary>
+        /// Creates an axis aligned bounding box defining minimum and maximum edge.
+        /// </summary>
+        /// <param name="min">Minimum edge.</param>
+        /// <param name="max">Maximum edge.</param>
         public BoundingBox(Vector3 min, Vector3 max)
         {
             this.Min = min;
@@ -37,9 +54,13 @@ namespace Microsoft.Xna.Framework
 
         #endregion Public Constructors
 
-
         #region Public Methods
 
+        /// <summary>
+        /// Checks for containing one bounding box in another.
+        /// </summary>
+        /// <param name="box">Box to test with.</param>
+        /// <returns>Containment type.</returns>
         public ContainmentType Contains(BoundingBox box)
         {
             //test if all corner is in the same side of a face by just checking min and max
@@ -63,11 +84,21 @@ namespace Microsoft.Xna.Framework
             return ContainmentType.Intersects;
         }
 
+        /// <summary>
+        /// Checks for containing one bounding box in another.
+        /// </summary>
+        /// <param name="box">Box to test with.</param>
+        /// <param name="result">Containment type.</param>
         public void Contains(ref BoundingBox box, out ContainmentType result)
         {
             result = Contains(box);
         }
 
+        /// <summary>
+        /// Checks for containment in a bounding frustum.
+        /// </summary>
+        /// <param name="frustum">Bounding frustum to test with.</param>
+        /// <returns>Containment type.</returns>
         public ContainmentType Contains(BoundingFrustum frustum)
         {
             //TODO: bad done here need a fix. 
@@ -106,7 +137,12 @@ namespace Microsoft.Xna.Framework
             // If we get here, then we know all the points were actually contained, therefore result is Contains
             return ContainmentType.Contains;
         }
-
+        
+        /// <summary>
+        /// Checks for containing a bounding sphere.
+        /// </summary>
+        /// <param name="sphere">Bounding sphere to test with.</param>
+        /// <returns>Containment type.</returns>
         public ContainmentType Contains(BoundingSphere sphere)
         {
             if (sphere.Center.X - Min.X >= sphere.Radius
@@ -191,11 +227,21 @@ namespace Microsoft.Xna.Framework
             return ContainmentType.Disjoint;
         }
 
+        /// <summary>
+        /// Checks for containing a bounding sphere.
+        /// </summary>
+        /// <param name="sphere">Bounding sphere to test with.</param>
+        /// <param name="result">Containment type.</param>
         public void Contains(ref BoundingSphere sphere, out ContainmentType result)
         {
             result = this.Contains(sphere);
         }
 
+        /// <summary>
+        /// Checks for containing a Point.
+        /// </summary>
+        /// <param name="point">Point to test with.</param>
+        /// <returns>Containment type.</returns>
         public ContainmentType Contains(Vector3 point)
         {
             ContainmentType result;
@@ -203,6 +249,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Checks for containing a Point.
+        /// </summary>
+        /// <param name="point">Point to test with.</param>
+        /// <param name="result">Containment type.</param>
         public void Contains(ref Vector3 point, out ContainmentType result)
         {
             //first we get if point is out of box
@@ -256,6 +307,11 @@ namespace Microsoft.Xna.Framework
             return new BoundingBox(minVec, maxVec);
         }
 
+        /// <summary>
+        /// Creates a so called smallest enclosing box from a sphere.
+        /// </summary>
+        /// <param name="sphere">Sphere to enclose.</param>
+        /// <returns>Enclosing bounding box.</returns>
         public static BoundingBox CreateFromSphere(BoundingSphere sphere)
         {
             BoundingBox result;
@@ -263,6 +319,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Creates a so called smallest enclosing box from a sphere.
+        /// </summary>
+        /// <param name="sphere">Sphere to enclose.</param>
+        /// <param name="result">Enclosing bounding box.</param>
         public static void CreateFromSphere(ref BoundingSphere sphere, out BoundingBox result)
         {
             var corner = new Vector3(sphere.Radius);
@@ -270,6 +331,12 @@ namespace Microsoft.Xna.Framework
             result.Max = sphere.Center + corner;
         }
 
+        /// <summary>
+        /// Merges two bounding boxes to a combined one.
+        /// </summary>
+        /// <param name="original">First bounding box.</param>
+        /// <param name="additional">Second bounding box.</param>
+        /// <returns>Merged bounding box.</returns>
         public static BoundingBox CreateMerged(BoundingBox original, BoundingBox additional)
         {
             BoundingBox result;
@@ -277,6 +344,12 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Merges two bounding boxes to a combined one.
+        /// </summary>
+        /// <param name="original">First bounding box.</param>
+        /// <param name="additional">Second bounding box.</param>
+        /// <param name="result">Merged bounding box.</param>
         public static void CreateMerged(ref BoundingBox original, ref BoundingBox additional, out BoundingBox result)
         {
             result.Min.X = Math.Min(original.Min.X, additional.Min.X);
@@ -287,16 +360,30 @@ namespace Microsoft.Xna.Framework
             result.Max.Z = Math.Max(original.Max.Z, additional.Max.Z);
         }
 
+        /// <summary>
+        /// Check for data equality of the bounding box to another.
+        /// </summary>
+        /// <param name="other">Bounding box comparing to.</param>
+        /// <returns>Equality.</returns>
         public bool Equals(BoundingBox other)
         {
             return (this.Min == other.Min) && (this.Max == other.Max);
         }
 
+        /// <summary>
+        /// Object-equality falling back to data equality when <see cref="obj"/> is a bounding box as well.
+        /// </summary>
+        /// <param name="obj">Comparing object.</param>
+        /// <returns>Equality</returns>
         public override bool Equals(object obj)
         {
             return (obj is BoundingBox) ? this.Equals((BoundingBox)obj) : false;
         }
 
+        /// <summary>
+        /// Gets all 8 Corners of the Bounding box as an array.
+        /// </summary>
+        /// <returns>All 8 Corners.</returns>
         public Vector3[] GetCorners()
         {
             return new Vector3[] {
@@ -311,6 +398,10 @@ namespace Microsoft.Xna.Framework
             };
         }
 
+        /// <summary>
+        /// Gets all 8 Corners of the Bounding box as an array.
+        /// </summary>
+        /// <param name="corners">All 8 Corners.</param>
         public void GetCorners(Vector3[] corners)
         {
             if (corners == null)
@@ -347,11 +438,20 @@ namespace Microsoft.Xna.Framework
             corners[7].Z = this.Min.Z;
         }
 
+        /// <summary>
+        /// Calculates the Hashcode of the bounding box.
+        /// </summary>
+        /// <returns>Hashcode.</returns>
         public override int GetHashCode()
         {
             return this.Min.GetHashCode() + this.Max.GetHashCode();
         }
 
+        /// <summary>
+        /// Checks for intersection to another bounding box.
+        /// </summary>
+        /// <param name="box">Bounding box to test with.</param>
+        /// <returns>If they intersects.</returns>
         public bool Intersects(BoundingBox box)
         {
             bool result;
@@ -359,6 +459,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Checks for intersection to another bounding box.
+        /// </summary>
+        /// <param name="box">Bounding box to test with.</param>
+        /// <param name="result">If they intersects.</param>
         public void Intersects(ref BoundingBox box, out bool result)
         {
             if ((this.Max.X >= box.Min.X) && (this.Min.X <= box.Max.X))
@@ -377,11 +482,85 @@ namespace Microsoft.Xna.Framework
             return;
         }
 
+        /// <summary>
+        /// Checks for intersection to another bounding box and returning information about separtion.
+        /// </summary>
+        /// <param name="other">Bounding box to teset with.</param>
+        /// <param name="result">Result containing intersection result.</param>
+        public void IntersectsWithSat(BoundingBox other, out SatIntersectionResult result)
+        {
+            //as we have axis aligned colliders, there are just the three main axis to test.
+            var axis = new[]
+            {
+                Vector3.UnitX,
+                Vector3.UnitY,
+                Vector3.UnitZ
+            };
+
+            var shortestAxis = Vector3.Zero;
+            var shortestOverlap = float.MaxValue;
+
+            //go through all axis and get the overlapping size on the projected one-dimensional line.
+            for (var i = 0; i < axis.Length; i++)
+            {
+                var currentAxis = axis[i];
+                var p1 = GetProjectedPoints(this, currentAxis);
+                var p2 = GetProjectedPoints(other, currentAxis);
+
+                var overlapValue = p1.OverlapSize(p2);
+
+                //if there is overlap, save axis and distance if the overlap is smaller than previous one.
+                if (overlapValue > 0.0f)
+                {
+                    if (overlapValue < shortestOverlap)
+                    {
+                        shortestOverlap = overlapValue;
+                        shortestAxis = p1.Min < p2.Min ? currentAxis : -currentAxis;
+                    }
+                }
+                else
+                {
+                    //if on any axis is no overlap, then the collision shapes don't collide.
+                    result = SatIntersectionResult.Empty;
+                    return;
+                }
+            }
+
+            // if all axis collide (overlap > 0) then the separting distance is the smallest overlap with
+            result = new SatIntersectionResult
+            {
+                Intersects = true,
+                Separation = shortestAxis * shortestOverlap
+            };
+        }
+
+        /// <summary>
+        /// Checks for intersection to another bounding box and returning information about separtion.
+        /// </summary>
+        /// <param name="other">Bounding box to teset with.</param>
+        /// <returns>Result containing intersection result.</returns>
+        public SatIntersectionResult IntersectsWithSat(BoundingBox other)
+        {
+            SatIntersectionResult result;
+            IntersectsWithSat(other, out result);
+            return result;
+        }
+        
+        /// <summary>
+        /// Checks for intersection to a bounding frustum.
+        /// </summary>
+        /// <param name="frustum">Bounding frustum to check with.</param>
+        /// <returns>If they intersect.</returns>
         public bool Intersects(BoundingFrustum frustum)
         {
             return frustum.Intersects(this);
         }
 
+        /// <summary>
+        /// Checks for intersection to a bounding sphere.
+        /// </summary>
+        /// <param name="sphere">Bounding sphere to check with.</param>
+        /// <returns>If they intersect.</returns>
         public bool Intersects(BoundingSphere sphere)
         {
             if (sphere.Center.X - Min.X > sphere.Radius
@@ -415,11 +594,21 @@ namespace Microsoft.Xna.Framework
             return false;
         }
 
+        /// <summary>
+        /// Checks for intersection to a bounding sphere.
+        /// </summary>
+        /// <param name="sphere">Bounding sphere to check with.</param>
+        /// <param name="result">If they intersect.</param>
         public void Intersects(ref BoundingSphere sphere, out bool result)
         {
             result = Intersects(sphere);
         }
 
+        /// <summary>
+        /// Checks for an intersection to a plane.
+        /// </summary>
+        /// <param name="plane">Plane to check with.</param>
+        /// <returns>Intersection type.</returns>
         public PlaneIntersectionType Intersects(Plane plane)
         {
             PlaneIntersectionType result;
@@ -427,6 +616,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Checks for an intersection to a plane.
+        /// </summary>
+        /// <param name="plane">Plane to check with.</param>
+        /// <param name="result">Intersection type.</param>
         public void Intersects(ref Plane plane, out PlaneIntersectionType result)
         {
             // See http://zach.in.tu-clausthal.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
@@ -486,11 +680,21 @@ namespace Microsoft.Xna.Framework
             result = PlaneIntersectionType.Intersecting;
         }
 
+        /// <summary>
+        /// Checks for an intersection to a ray.
+        /// </summary>
+        /// <param name="ray">Plane to check with.</param>
+        /// <returns>Null when no intersection, otherwise returning float.</returns>
         public Nullable<float> Intersects(Ray ray)
         {
             return ray.Intersects(this);
         }
 
+        /// <summary>
+        /// Checks for an intersection to a ray.
+        /// </summary>
+        /// <param name="ray">Plane to check with.</param>
+        /// <param name="result">Null when no intersection, otherwise returning float.</param>
         public void Intersects(ref Ray ray, out Nullable<float> result)
         {
             result = Intersects(ray);
@@ -523,5 +727,33 @@ namespace Microsoft.Xna.Framework
         }
 
         #endregion Public Methods
+
+        #region Private Methods
+
+        private static Line1D GetProjectedPoints(BoundingBox boundingBox, Vector3 axis)
+        {
+            var points = boundingBox.GetCorners();
+            var axisNormalized = Vector3.Normalize(axis);
+
+            var min = Vector3.Dot(axisNormalized, points[0]);
+            var max = min;
+
+            for (var i = 1; i < points.Length; i++)
+            {
+                var projectedPoint = Vector3.Dot(axisNormalized, points[i]);
+                if (projectedPoint < min)
+                {
+                    min = projectedPoint;
+                }
+                else if (projectedPoint > max)
+                {
+                    max = projectedPoint;
+                }
+            }
+
+            return new Line1D(min, max);
+        }
+
+        #endregion
     }
 }
