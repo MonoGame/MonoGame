@@ -500,6 +500,12 @@ namespace MonoGame.Tools.Pipeline
 
         private void DoBuild(string commands)
         {
+            if(!Environment.Is64BitOperatingSystem)
+            {
+                View.OutputAppend("Build failed:  Content can only be compiled from a 64 bit OS.");
+                return;
+            }
+            
             try
             {
                 // Prepare the process.
