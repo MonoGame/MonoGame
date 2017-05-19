@@ -42,7 +42,7 @@ namespace MonoGame.Tools.Pipeline
                 var parser = new PipelineProjectParser(_con, _con._project);
                 _con.View.BeginTreeUpdate();
 
-                if (parser.AddContent(fullpath, true))
+                if (parser.AddContent(fullpath, null, true))
                 {
                     var item = _con._project.ContentItems.Last();
                     item.Observer = _con;

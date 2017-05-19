@@ -67,7 +67,7 @@ namespace MonoGame.Tools.Pipeline
                     }
 
                     var f = _files[i];
-                    if (!parser.AddContent(f, skipduplicate))
+                    if (!parser.AddContent(f, null, skipduplicate))
                         continue;
 
                     var item = _con._project.ContentItems.Last();

@@ -134,14 +134,22 @@ namespace MonoGame.Tools.Pipeline
 
         [CommandLineParameter(
             Name = "build",
-            ValueName = "sourceFile",
-            Description = "Build the content source file using the previously set switches and options.")]
-        public void OnBuild(string sourceFile)
-        {
-            AddContent(sourceFile, false);
+            ValueName = "sourceFile;assetName",
+            Description = "Build the content source file using the previously set switches and options. Optionally, give it the specified filename.")]
+        public void OnBuild(string sourceFileAssetName)
+        {            
+            var words = sourceFileAssetName.Split(';');
+
+            var sourceFile = words[0];
+            var assetName = string.Empty;
+
+            if (words.Length > 1)
+                assetName = words[1];
+
+            AddContent(sourceFile, assetName, false);
         }
 
-        public bool AddContent(string sourceFile, bool skipDuplicates)
+        public bool AddContent(string sourceFile, string assetName, bool skipDuplicates)
         {
             // Make sure the source file is relative to the project.
             var projectDir = ProjectDirectory + Path.DirectorySeparatorChar;
@@ -159,9 +167,13 @@ namespace MonoGame.Tools.Pipeline
                 _project.ContentItems.RemoveAt(previous);
             }
 
+            if (string.IsNullOrEmpty(assetName))
+                assetName = Path.GetFileNameWithoutExtension(sourceFile);
+
             // Create the item for processing later.
             var item = new ContentItem
             {
+                AssetName = assetName,
                 Observer = _observer,
                 BuildAction = BuildAction.Build,
                 OriginalPath = sourceFile,
@@ -179,13 +191,26 @@ namespace MonoGame.Tools.Pipeline
                 item.ProcessorParams.Add(pair.Key, pair.Value);
 
             return true;
-        }
+        }        
 
         [CommandLineParameter(
             Name = "copy",
-            ValueName = "sourceFile",
-            Description = "Copy the content source file verbatim to the output directory.")]
-        public void OnCopy(string sourceFile)
+            ValueName = "sourceFile;assetName",
+            Description = "Copy the content source file verbatim to the output directory. Optionally, give it the specified filename.")]
+        public void OnCopy(string sourceFileAssetName)
+        {
+            var words = sourceFileAssetName.Split(';');
+
+            var sourceFile = words[0];
+            var assetName = string.Empty;
+
+            if (words.Length > 1)
+                assetName = words[1];
+
+            AddCopy(sourceFile, assetName);
+        }
+
+        public void AddCopy(string sourceFile, string assetName)
         {
             // Make sure the source file is relative to the project.
             var projectDir = ProjectDirectory + Path.DirectorySeparatorChar;
@@ -197,9 +222,13 @@ namespace MonoGame.Tools.Pipeline
             if (previous != null)
                 _project.ContentItems.Remove(previous);
 
+            if (string.IsNullOrEmpty(assetName))
+                assetName = Path.GetFileNameWithoutExtension(sourceFile);
+
             // Create the item for processing later.
             var item = new ContentItem
             {
+                AssetName = assetName,
                 BuildAction = BuildAction.Copy,
                 OriginalPath = sourceFile,
                 ProcessorParams = new OpaqueDataDictionary(),
@@ -207,11 +236,7 @@ namespace MonoGame.Tools.Pipeline
             };
             _project.ContentItems.Add(item);
 
-            // Copy the current processor parameters blind as we
-            // will validate and remove invalid parameters during
-            // the build process later.
-            foreach (var pair in _processorParams)
-                item.ProcessorParams.Add(pair.Key, pair.Value);
+            _processorParams.Clear();
         }
 
         #endregion
@@ -300,7 +325,11 @@ namespace MonoGame.Tools.Pipeline
 
                 if (i.BuildAction == BuildAction.Copy)
                 {
-                    line = string.Format(lineFormat, "copy", i.OriginalPath);
+                    var str = i.AssetName.Equals(Path.GetFileNameWithoutExtension(i.OriginalPath))
+                                  ? i.OriginalPath
+                                  : string.Concat(i.OriginalPath, ';', i.AssetName);
+                    line = string.Format(lineFormat, "copy", str);
+
                     io.WriteLine(line);
                     io.WriteLine();
                 }
@@ -353,7 +382,10 @@ namespace MonoGame.Tools.Pipeline
                         }
                     }
 
-                    line = string.Format(lineFormat, "build", i.OriginalPath);
+                    var str = i.AssetName.Equals(Path.GetFileNameWithoutExtension(i.OriginalPath))
+                                  ? i.OriginalPath
+                                  : string.Concat(i.OriginalPath, ';', i.AssetName);
+                    line = string.Format(lineFormat, "build", str);
                     io.WriteLine(line);
                     io.WriteLine();
                 }
@@ -385,15 +417,18 @@ namespace MonoGame.Tools.Pipeline
                         }
                         else if (buildAction.Equals("Content") || buildAction.Equals("None"))
                         {
-                            string include, copyToOutputDirectory;
-                            ReadIncludeContent(io, out include, out copyToOutputDirectory);
+                            string include, name, copyToOutputDirectory;
+                            ReadIncludeContent(io, out include, out name, out copyToOutputDirectory);
 
                             if (!string.IsNullOrEmpty(copyToOutputDirectory) && !copyToOutputDirectory.Equals("Never"))
                             {
-                                var sourceFilePath = Path.GetDirectoryName(projectFilePath);
-                                sourceFilePath += "\\" + include;
+                                var sourceFileAssetName = Path.GetDirectoryName(projectFilePath);
+                                sourceFileAssetName += "\\" + include;
 
-                                OnCopy(sourceFilePath);
+                                if (!string.IsNullOrEmpty(name))
+                                    sourceFileAssetName += string.Concat(';', name);
+
+                                OnCopy(sourceFileAssetName);
                             }
                         }
                         else if (buildAction.Equals("Compile"))
@@ -410,10 +445,13 @@ namespace MonoGame.Tools.Pipeline
                                     AddProcessorParam(i);
                             }
 
-                            var sourceFilePath = Path.GetDirectoryName(projectFilePath);
-                            sourceFilePath += "\\" + include;
+                            var sourceFileAssetName = Path.GetDirectoryName(projectFilePath);
+                            sourceFileAssetName += "\\" + include;
 
-                            OnBuild(sourceFilePath);
+                            if (!string.IsNullOrEmpty(name))
+                                sourceFileAssetName += string.Concat(';', name);
+
+                            OnBuild(sourceFileAssetName);
                         }
                     }
                 }
@@ -448,10 +486,11 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        private void ReadIncludeContent(XmlReader io, out string include, out string copyToOutputDirectory)
+        private void ReadIncludeContent(XmlReader io, out string include, out string name, out string copyToOutputDirectory)
         {
-            copyToOutputDirectory = null;
             include = io.GetAttribute("Include").Unescape();
+            name = null;
+            copyToOutputDirectory = null;            
 
             if (!io.IsEmptyElement)
             {
@@ -464,6 +503,10 @@ namespace MonoGame.Tools.Pipeline
                     {
                         switch (io.LocalName)
                         {
+                            case "Name":
+                                io.Read();
+                                name = io.Value.Unescape();
+                                break;
                             case "CopyToOutputDirectory":
                                 io.Read();
                                 copyToOutputDirectory = io.Value.Unescape();
