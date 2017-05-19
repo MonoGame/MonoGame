@@ -160,18 +160,6 @@ namespace Microsoft.Xna.Framework
             Builtins.Eval("window.title = '" + title + "';");
         }
 
-        public override bool AllowUserResizing
-        {
-            get
-            {
-                return false;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
-        }
-
         public override Rectangle ClientBounds
         {
             get

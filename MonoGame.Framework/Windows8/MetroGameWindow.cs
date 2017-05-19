@@ -59,15 +59,6 @@ namespace Microsoft.Xna.Framework
 
         public override Rectangle ClientBounds { get { return _clientBounds; } }
 
-        public override bool AllowUserResizing
-        {
-            get { return false; }
-            set 
-            {
-                // You cannot resize a Metro window!
-            }
-        }
-
         public override DisplayOrientation CurrentOrientation
         {
             get { return _orientation; }
