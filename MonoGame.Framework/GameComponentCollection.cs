@@ -49,12 +49,12 @@ namespace Microsoft.Xna.Framework
 
         private void OnComponentAdded(GameComponentCollectionEventArgs eventArgs)
         {
-            EventHelper.Raise(this, ComponentAdded, eventArgs);
+            EventHelpers.Raise(this, ComponentAdded, eventArgs);
         }
 
         private void OnComponentRemoved(GameComponentCollectionEventArgs eventArgs)
         {
-            EventHelper.Raise(this, ComponentRemoved, eventArgs);
+            EventHelpers.Raise(this, ComponentRemoved, eventArgs);
         }
 
         protected override void RemoveItem(int index)

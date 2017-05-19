@@ -25,8 +25,7 @@ namespace Microsoft.Xna.Framework
                 if (_drawOrder != value)
                 {
                     _drawOrder = value;
-                    EventHelper.Raise(this, DrawOrderChanged, null);
-                    OnDrawOrderChanged(this, null);
+                    OnDrawOrderChanged(this, EventArgs.Empty);
                 }
             }
         }
@@ -39,7 +38,6 @@ namespace Microsoft.Xna.Framework
                 if (_visible != value)
                 {
                     _visible = value;
-                    EventHelper.Raise(this, VisibleChanged, EventArgs.Empty);
                     OnVisibleChanged(this, EventArgs.Empty);
                 }
             }
@@ -68,8 +66,14 @@ namespace Microsoft.Xna.Framework
 
         public virtual void Draw(GameTime gameTime) { }
 
-        protected virtual void OnVisibleChanged(object sender, EventArgs args) { }
+        protected virtual void OnVisibleChanged(object sender, EventArgs args)
+        {
+            EventHelpers.Raise(this, VisibleChanged, args);
+        }
 
-        protected virtual void OnDrawOrderChanged(object sender, EventArgs args) { }
+        protected virtual void OnDrawOrderChanged(object sender, EventArgs args)
+        {
+            EventHelpers.Raise(this, DrawOrderChanged, args);
+        }
     }
 }

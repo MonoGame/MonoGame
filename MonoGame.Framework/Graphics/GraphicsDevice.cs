@@ -541,9 +541,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 _isDisposed = true;
-
-                if (Disposing != null)
-                    Disposing(this, EventArgs.Empty);
+                EventHelpers.Raise(this, Disposing, EventArgs.Empty);
             }
         }
 
@@ -585,17 +583,13 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Reset()
         {
             PlatformValidatePresentationParameters(PresentationParameters);
-
-            if (DeviceResetting != null)
-                DeviceResetting(this, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceResetting, EventArgs.Empty);
 
             // Update the back buffer.
             OnPresentationChanged();
-
-            if (PresentationChanged != null)
-                PresentationChanged(this, EventArgs.Empty);
-            if (DeviceReset != null)
-                DeviceReset(this, EventArgs.Empty);
+            
+            EventHelpers.Raise(this, PresentationChanged, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
         }
 
         public void Reset(PresentationParameters presentationParameters)
@@ -613,8 +607,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal void OnDeviceResetting()
         {
-            if (DeviceResetting != null)
-                DeviceResetting(this, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceResetting, EventArgs.Empty);
 
             lock (_resourcesLock)
             {
@@ -636,8 +629,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal void OnDeviceReset()
         {
-            if (DeviceReset != null)
-                DeviceReset(this, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
         }
 
         public DisplayMode DisplayMode

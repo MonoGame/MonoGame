@@ -352,9 +352,7 @@ namespace Microsoft.Xna.Framework.Audio
                 //    cue.Dispose();
 
                 IsInUse = false;
-
-                if (Disposing != null)
-                    Disposing(this, EventArgs.Empty);
+                EventHelpers.Raise(this, Disposing, EventArgs.Empty);
             }
         }
     }

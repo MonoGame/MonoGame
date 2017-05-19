@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-            EventHelper.Raise(this, Disposed, EventArgs.Empty);
+            EventHelpers.Raise(this, Disposed, EventArgs.Empty);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -570,19 +570,19 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void OnExiting(object sender, EventArgs args)
         {
-            EventHelper.Raise(this, Exiting, args);
+            EventHelpers.Raise(this, Exiting, args);
         }
 		
 		protected virtual void OnActivated (object sender, EventArgs args)
 		{
 			AssertNotDisposed();
-            EventHelper.Raise(this, Activated, args);
+            EventHelpers.Raise(this, Activated, args);
 		}
 		
 		protected virtual void OnDeactivated (object sender, EventArgs args)
 		{
 			AssertNotDisposed();
-            EventHelper.Raise(this, Deactivated, args);
+            EventHelpers.Raise(this, Deactivated, args);
 		}
 
         #endregion Protected Methods
@@ -618,7 +618,7 @@ namespace Microsoft.Xna.Framework
         private void Platform_ApplicationViewChanged(object sender, ViewStateChangedEventArgs e)
         {
             AssertNotDisposed();
-            EventHelper.Raise(this, ApplicationViewChanged, e);
+            EventHelpers.Raise(this, ApplicationViewChanged, e);
         }
 #endif
 

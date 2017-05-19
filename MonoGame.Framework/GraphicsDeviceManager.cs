@@ -175,22 +175,22 @@ namespace Microsoft.Xna.Framework
 
         protected void OnDeviceDisposing(EventArgs e)
         {
-            EventHelper.Raise(this, DeviceDisposing, e);
+            EventHelpers.Raise(this, DeviceDisposing, e);
         }
 
         protected void OnDeviceResetting(EventArgs e)
         {
-            EventHelper.Raise(this, DeviceResetting, e);
+            EventHelpers.Raise(this, DeviceResetting, e);
         }
 
         internal void OnDeviceReset(EventArgs e)
         {
-            EventHelper.Raise(this, DeviceReset, e);
+            EventHelpers.Raise(this, DeviceReset, e);
         }
 
         internal void OnDeviceCreated(EventArgs e)
         {
-            EventHelper.Raise(this, DeviceCreated, e);
+            EventHelpers.Raise(this, DeviceCreated, e);
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace Microsoft.Xna.Framework
                     }
                 }
                 _disposed = true;
-                EventHelper.Raise(this, Disposed, EventArgs.Empty);
+                EventHelpers.Raise(this, Disposed, EventArgs.Empty);
             }
         }
 
@@ -325,7 +325,7 @@ namespace Microsoft.Xna.Framework
         private void DisposeGraphicsDevice()
         {
             _graphicsDevice.Dispose();
-            EventHelper.Raise(this, DeviceDisposing, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceDisposing, EventArgs.Empty);
             _graphicsDevice = null;
         }
 

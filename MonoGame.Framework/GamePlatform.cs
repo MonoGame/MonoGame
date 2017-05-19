@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework
                 if (_isActive != value)
                 {
                     _isActive = value;
-                    EventHelper.Raise(this, _isActive ? Activated : Deactivated, EventArgs.Empty);
+                    EventHelpers.Raise(this, _isActive ? Activated : Deactivated, EventArgs.Empty);
                 }
             }
         }
@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         protected void RaiseAsyncRunLoopEnded()
         {
-            EventHelper.Raise(this, AsyncRunLoopEnded, EventArgs.Empty);
+            EventHelpers.Raise(this, AsyncRunLoopEnded, EventArgs.Empty);
         }
 
         #endregion Events
