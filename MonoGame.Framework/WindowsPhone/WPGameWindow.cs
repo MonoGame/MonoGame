@@ -54,7 +54,6 @@ namespace MonoGame.Framework.WindowsPhone
     public class WindowsPhoneGameWindow : GameWindow
     {
         private DisplayOrientation _supportedOrientations;
-        private DisplayOrientation _orientation;
         private Rectangle _clientBounds;
         private Game _game;
 
@@ -84,11 +83,6 @@ namespace MonoGame.Framework.WindowsPhone
             }
         }
 
-        public override DisplayOrientation CurrentOrientation
-        {
-            get { return _orientation; }
-        }
-
         private static WindowsPhoneGamePlatform Platform { get { return Game.Instance.Platform as WindowsPhoneGamePlatform; } }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
@@ -102,7 +96,7 @@ namespace MonoGame.Framework.WindowsPhone
         {
             _game = game;
 
-            _orientation = ToOrientation(Page.Orientation);
+            CurrentOrientation = ToOrientation(Page.Orientation);
             Page.OrientationChanged += Page_OrientationChanged;
 
             Page.Loaded += delegate
@@ -197,7 +191,7 @@ namespace MonoGame.Framework.WindowsPhone
                 return;
 
             // Set the new orientation.
-            _orientation = orientation;
+            CurrentOrientation = orientation;
 
             // Call the user callback.
             OnOrientationChanged();

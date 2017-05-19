@@ -22,7 +22,6 @@ namespace Microsoft.Xna.Framework
     partial class UAPGameWindow : GameWindow
     {
         private DisplayOrientation _supportedOrientations;
-        private DisplayOrientation _orientation;
         private CoreWindow _coreWindow;
         private DisplayInformation _dinfo;
         private ApplicationView _appView;
@@ -65,11 +64,6 @@ namespace Microsoft.Xna.Framework
             {
                 // You cannot resize a Metro window!
             }
-        }
-
-        public override DisplayOrientation CurrentOrientation
-        {
-            get { return _orientation; }
         }
 
         private UAPGamePlatform Platform { get { return Game.Instance.Platform as UAPGamePlatform; } }
@@ -121,7 +115,7 @@ namespace Microsoft.Xna.Framework
             var minSize = new Windows.Foundation.Size(640 / _dinfo.RawPixelsPerViewPixel, 480 / _dinfo.RawPixelsPerViewPixel);
             _appView.SetPreferredMinSize(minSize);
 
-            _orientation = ToOrientation(_dinfo.CurrentOrientation);
+            CurrentOrientation = ToOrientation(_dinfo.CurrentOrientation);
             _dinfo.OrientationChanged += DisplayProperties_OrientationChanged;
             _swapChainPanel = inputElement as SwapChainPanel;
 
@@ -284,7 +278,7 @@ namespace Microsoft.Xna.Framework
                 _isOrientationChanged = false;
                 
                 // Set the new orientation.
-                _orientation = _newOrientation;
+                CurrentOrientation = _newOrientation;
 
                 // Call the user callback.
                 OnOrientationChanged();

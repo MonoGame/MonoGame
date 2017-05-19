@@ -102,14 +102,11 @@ namespace Microsoft.Xna.Framework {
                 // TODO: Calculate this only when dirty.
                 if (_viewController is iOSGameViewController)
                 {
-
-                    var currentOrientation = CurrentOrientation;
-
                     int width;
                     int height;
 
-                    if (currentOrientation == DisplayOrientation.LandscapeLeft || 
-                        currentOrientation == DisplayOrientation.LandscapeRight)
+                    if (CurrentOrientation == DisplayOrientation.LandscapeLeft || 
+                        CurrentOrientation == DisplayOrientation.LandscapeRight)
                     {
                         width = (int)Math.Max(bounds.Width, bounds.Height);
                         height = (int)Math.Min(bounds.Width, bounds.Height);
