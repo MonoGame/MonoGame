@@ -32,7 +32,6 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
     <file src="Windows\AnyCPU\Release\SharpDX.dll" target="lib\net45\SharpDX.dll" />
     <file src="Windows\AnyCPU\Release\SharpDX.DXGI.dll" target="lib\net45\SharpDX.DXGI.dll" />
     <file src="Windows\AnyCPU\Release\SharpDX.MediaFoundation.dll" target="lib\net45\SharpDX.MediaFoundation.dll" />
-    <file src="Windows\AnyCPU\Release\SharpDX.RawInput.dll" target="lib\net45\SharpDX.RawInput.dll" />
     <file src="Windows\AnyCPU\Release\SharpDX.XAudio2.dll" target="lib\net45\SharpDX.XAudio2.dll" />
     <file src="Windows\AnyCPU\Release\SharpDX.XInput.dll" target="lib\net45\SharpDX.XInput.dll" />
   </files>
