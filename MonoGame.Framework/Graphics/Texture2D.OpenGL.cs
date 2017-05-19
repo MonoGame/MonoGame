@@ -124,11 +124,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (mipmap)
                 {
 #if IOS || ANDROID
-				    GL.GenerateMipmap(TextureTarget.TextureCubeMap);
+				    GL.GenerateMipmap(TextureTarget.Texture2D);
 #else
                     GraphicsDevice.FramebufferHelper.Get().GenerateMipmap((int) glTarget);
                     // This updates the mipmaps after a change in the base texture
-                    GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, 1);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, 1);
 #endif
                 }
 
