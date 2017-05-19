@@ -62,6 +62,7 @@ namespace OpenAL
     {
         Pitch = 0x1003,
         Gain = 0x100A,
+        ReferenceDistance = 0x1020
     }
 
     public enum ALGetSourcei
@@ -354,7 +355,7 @@ namespace OpenAL
         public static extern void GetSource (int sourceId, ALGetSourcei i, out int state);
 
         public static ALSourceState GetSourceState(int sourceId) {
-            int state = (int)ALSourceState.Stopped;
+            int state;
             GetSource (sourceId, ALGetSourcei.SourceState, out state);
             return (ALSourceState)state;
         }
@@ -363,7 +364,13 @@ namespace OpenAL
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetListener3f")]
         public static extern void GetListener (ALListener3f param, out float value1, out float value2, out float value3);
 
-        public static void DistanceModel(ALDistanceModel model) { }
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alDistanceModel")]
+        public static extern void DistanceModel (ALDistanceModel model);
+
+        [CLSCompliant(false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alDopplerFactor")]
+        public static extern void DopplerFactor (float value);
 
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourceQueueBuffers")]

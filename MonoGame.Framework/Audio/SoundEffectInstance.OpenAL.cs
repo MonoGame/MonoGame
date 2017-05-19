@@ -90,7 +90,12 @@ namespace Microsoft.Xna.Framework.Audio
             AL.Source(SourceId, ALSource3f.Position, finalPos.X, finalPos.Y, finalPos.Z);
             ALHelper.CheckError("Failed to set source position.");
             AL.Source(SourceId, ALSource3f.Velocity, finalVel.X, finalVel.Y, finalVel.Z);
-            ALHelper.CheckError("Failed to Set source velocity.");
+            ALHelper.CheckError("Failed to set source velocity.");
+
+            AL.Source(SourceId, ALSourcef.ReferenceDistance, SoundEffect.DistanceScale);
+            ALHelper.CheckError("Failed to set source distance scale.");
+            AL.DopplerFactor(SoundEffect.DopplerScale);
+            ALHelper.CheckError("Failed to set Doppler scale.");
         }
 
         private void PlatformPause()
