@@ -142,6 +142,17 @@ namespace Microsoft.Xna.Framework
                     if (ev.Key.Repeat != 0 && char.IsControl (character)) {
                         return;
                     }
+
+                    // On this platform, SDL doesn't convert many character inputs into control inputs.
+                    // We detect them and pass them to text input here anyway.
+                    if (!char.IsControl (character) && (Keyboard.GetState().IsKeyDown(Keys.LeftControl) || Keyboard.GetState().IsKeyDown(Keys.RightControl)))
+                    {
+                        character = (char)(character % 32);
+                        if (ev.Key.Repeat != 0)
+                        {
+                            return;
+                        }
+                    }
 #endif
                     if (char.IsControl (character))
                         _view.CallTextInput (character, key);
