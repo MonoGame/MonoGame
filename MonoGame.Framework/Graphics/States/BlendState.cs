@@ -242,6 +242,19 @@ namespace Microsoft.Xna.Framework.Graphics
 	    {
 	        return new BlendState(this);
 	    }
-	}
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!IsDisposed)
+            {
+                for (int i = 0; i < _targetBlendState.Length; ++i)
+                    _targetBlendState[i] = null;
+#if DIRECTX
+                PlatformDispose();
+#endif
+            }
+            base.Dispose(disposing);
+        }
+    }
 }
 

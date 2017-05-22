@@ -26,10 +26,6 @@ namespace Microsoft.Xna.Framework.Graphics
             this.VertexCount = vertexCount;
             this.BufferUsage = bufferUsage;
 
-            // Make sure the graphics device is assigned in the vertex declaration.
-            if (vertexDeclaration.GraphicsDevice != graphicsDevice)
-                vertexDeclaration.GraphicsDevice = graphicsDevice;
-
             _isDynamic = dynamic;
 
             PlatformConstruct();
