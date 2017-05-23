@@ -154,7 +154,7 @@ namespace MonoGame.Framework
 
             Form.Activated += OnActivated;
             Form.Deactivate += OnDeactivate;
-            Form.ClientSizeChanged += OnClientSizeChanged;
+            Form.SizeChanged += OnSizeChanged;
             Form.ResizeEnd += OnResizeEnd;
 
             Form.KeyPress += OnKeyPress;
@@ -324,7 +324,7 @@ namespace MonoGame.Framework
                 Form.CenterOnPrimaryMonitor();
         }
 
-        private void OnClientSizeChanged(object sender, EventArgs eventArgs)
+        private void OnSizeChanged(object sender, EventArgs eventArgs)
         {
             OnClientSizeChanged();
         }
