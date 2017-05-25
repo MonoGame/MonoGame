@@ -144,6 +144,7 @@ namespace MonoGame.Framework
 
             // Capture mouse events.
             Form.MouseWheel += OnMouseScroll;
+            Form.MouseHorizontalWheel += OnMouseHorizontalScroll;
             Form.MouseEnter += OnMouseEnter;
             Form.MouseLeave += OnMouseLeave;            
 
@@ -220,6 +221,11 @@ namespace MonoGame.Framework
         private void OnMouseScroll(object sender, MouseEventArgs mouseEventArgs)
         {
             MouseState.ScrollWheelValue += mouseEventArgs.Delta;
+        }
+
+        private void OnMouseHorizontalScroll(object sender, HorizontalMouseWheelEventArgs mouseEventArgs)
+        {
+            MouseState.HorizontalScrollWheelValue += mouseEventArgs.Delta;
         }
 
         private void UpdateMouseState()

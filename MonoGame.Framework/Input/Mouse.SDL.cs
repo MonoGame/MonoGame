@@ -8,6 +8,7 @@ namespace Microsoft.Xna.Framework.Input
 {
     public static partial class Mouse
     {
+        internal static int ScrollX;
         internal static int ScrollY;
 
         private static IntPtr PlatformGetHandle()
@@ -32,6 +33,7 @@ namespace Microsoft.Xna.Framework.Input
                 window.MouseState.XButton1 = (state & Sdl.Mouse.Button.X1Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
                 window.MouseState.XButton2 = (state & Sdl.Mouse.Button.X2Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
 
+                window.MouseState.HorizontalScrollWheelValue = ScrollX;
                 window.MouseState.ScrollWheelValue = ScrollY;
             }
 
