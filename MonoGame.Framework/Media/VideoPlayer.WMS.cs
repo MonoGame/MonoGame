@@ -153,7 +153,10 @@ namespace Microsoft.Xna.Framework.Media
                 _volumeController.Dispose();
                 _volumeController = null;
             }
-            _clock.Dispose();
+            if (_clock != null)
+            {
+                _clock.Dispose();
+            }
             _clock = null;
         }
 
