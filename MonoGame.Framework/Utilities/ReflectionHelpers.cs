@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Utilities
 {
@@ -13,10 +11,10 @@ namespace Microsoft.Xna.Framework.Utilities
             {
                 throw new NullReferenceException("Must supply the targetType parameter");
             }
-#if WINRT
-            return targetType.GetTypeInfo().IsValueType;
+#if NET4
+            return targetType.IsValueType;    
 #else
-            return targetType.IsValueType;
+            return targetType.GetTypeInfo().IsValueType;
 #endif
         }
 
@@ -26,12 +24,27 @@ namespace Microsoft.Xna.Framework.Utilities
             {
                 throw new NullReferenceException("Must supply the targetType parameter");
             }
-#if WINRT
-            var type = targetType.GetTypeInfo().BaseType;
+#if NET4
+            return targetType.BaseType;
 #else
-            var type = targetType.BaseType;
+            return targetType.GetTypeInfo().BaseType;
 #endif
-            return type;
+        }
+
+        /// <summary>
+        /// Returns the Assembly of a Type
+        /// </summary>
+        public static Assembly GetAssembly(Type targetType)
+        {
+            if (targetType == null)
+            {
+                throw new NullReferenceException("Must supply the targetType parameter");
+            }
+#if NET4
+            return targetType.Assembly;
+#else
+            return targetType.GetTypeInfo().Assembly;
+#endif
         }
 
         /// <summary>
@@ -46,15 +59,24 @@ namespace Microsoft.Xna.Framework.Utilities
 
             if (t == typeof(object))
                 return false;
-#if WINRT
+#if NET4
+            if (t.IsClass && !t.IsAbstract)
+                return true;
+#else            
             var ti = t.GetTypeInfo();
             if (ti.IsClass && !ti.IsAbstract)
                 return true;
-#else
-            if (t.IsClass && !t.IsAbstract)
-                return true;
 #endif
             return false;
+        }
+
+        public static MethodInfo GetMethodInfo(Type type, string methodName)
+        {
+#if NET4
+            return type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+#else
+            return type.GetTypeInfo().GetDeclaredMethod(methodName);
+#endif
         }
 
         public static MethodInfo GetPropertyGetMethod(PropertyInfo property)
@@ -64,10 +86,10 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new NullReferenceException("Must supply the property parameter");
             }
 
-#if WINRT
-            return property.GetMethod;
-#else
+#if NET4
             return property.GetGetMethod();
+#else
+            return property.GetMethod;
 #endif
         }
 
@@ -78,10 +100,10 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new NullReferenceException("Must supply the property parameter");
             }
 
-#if WINRT
-            return property.SetMethod;
-#else
+#if NET4
             return property.GetSetMethod();
+#else
+            return property.SetMethod;
 #endif
         }
 
@@ -90,10 +112,10 @@ namespace Microsoft.Xna.Framework.Utilities
             if (member == null)
                 throw new NullReferenceException("Must supply the member parameter");
 
-#if WINRT
-            return member.GetCustomAttribute(typeof(T)) as T;
-#else
+#if NET4
             return Attribute.GetCustomAttribute(member, typeof(T)) as T;
+#else
+            return member.GetCustomAttribute(typeof(T)) as T;
 #endif
         }
 
@@ -139,12 +161,12 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new ArgumentNullException("type");
             if (objectType == null)
                 throw new ArgumentNullException("objectType");
-#if WINRT
-            if (type.GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo()))
-                return true;
-#else
+#if NET4
             if (type.IsAssignableFrom(objectType))
                 return true;
+#else
+            if (type.GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo()))
+                return true;            
 #endif
             return false;
         }
