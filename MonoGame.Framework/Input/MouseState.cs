@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework.Input
         ButtonState _middleButton;
         ButtonState _xButton1;
         ButtonState _xButton2;
+        int _horizontalScrollWheelValue;
 
         /// <summary>
         /// Initializes a new instance of the MouseState.
@@ -37,18 +38,17 @@ namespace Microsoft.Xna.Framework.Input
             ButtonState middleButton,
             ButtonState rightButton,
             ButtonState xButton1,
-            ButtonState xButton2) : this(
-                x,
-                y,
-                scrollWheel,
-                leftButton,
-                middleButton,
-                rightButton,
-                xButton1,
-                xButton2,
-                horizontalScrollWheel: 0
-            )
+            ButtonState xButton2)
         {
+            _x = x;
+            _y = y;
+            _scrollWheelValue = scrollWheel;
+            _leftButton = leftButton;
+            _middleButton = middleButton;
+            _rightButton = rightButton;
+            _xButton1 = xButton1;
+            _xButton2 = xButton2;
+            _horizontalScrollWheelValue = 0;
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Input
             _rightButton = rightButton;
             _xButton1 = xButton1;
             _xButton2 = xButton2;
-            HorizontalScrollWheelValue = horizontalScrollWheel;
+            _horizontalScrollWheelValue = horizontalScrollWheel;
         }
 		
         /// <summary>
@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.Input
                    left._middleButton == right._middleButton &&
                    left._rightButton == right._rightButton &&
                    left._scrollWheelValue == right._scrollWheelValue &&
-                   left.HorizontalScrollWheelValue == right.HorizontalScrollWheelValue &&
+                   left._horizontalScrollWheelValue == right._horizontalScrollWheelValue &&
                    left._xButton1 == right._xButton1 &&
                    left._xButton2 == right._xButton2;
 		}
@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework.Input
                 var hashCode = _x;
                 hashCode = (hashCode*397) ^ _y;
                 hashCode = (hashCode*397) ^ _scrollWheelValue;
-                hashCode = (hashCode*397) ^ HorizontalScrollWheelValue;
+                hashCode = (hashCode*397) ^ _horizontalScrollWheelValue;
                 hashCode = (hashCode*397) ^ (int) _leftButton;
                 hashCode = (hashCode*397) ^ (int) _rightButton;
                 hashCode = (hashCode*397) ^ (int) _middleButton;
@@ -223,7 +223,12 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Returns the cumulative horizontal scroll wheel value since the game start
         /// </summary>
-        public int HorizontalScrollWheelValue { get; internal set; }
+        public int HorizontalScrollWheelValue {
+            get {
+                return _horizontalScrollWheelValue;
+            }
+            internal set { _horizontalScrollWheelValue = value; }
+        }
 
         /// <summary>
         /// Gets state of the XButton1.

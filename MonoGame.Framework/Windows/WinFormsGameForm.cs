@@ -131,7 +131,7 @@ namespace Microsoft.Xna.Framework.Windows
                     break;
 
                 case WM_MOUSEHWHEEL:
-                    var delta = GetWheelDeltaWParam(m.WParam);
+                    var delta = (short)(((ulong)m.WParam >> 16) & 0xffff); ;
                     var handler = MouseHorizontalWheel;
 
                     if (handler != null)
@@ -152,16 +152,6 @@ namespace Microsoft.Xna.Framework.Windows
             }
 
             base.WndProc(ref m);
-        }
-
-        private static ushort HiWord(IntPtr word)
-        {
-            return (ushort)(((ulong)word >> 16) & 0xffff);
-        }
-
-        private static short GetWheelDeltaWParam(IntPtr wParam)
-        {
-            return (short)HiWord(wParam);
         }
     }
 }
