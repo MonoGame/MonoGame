@@ -431,9 +431,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 IsPrepared = false;
                 IsInUse = false;
-
-                if (Disposing != null)
-                    Disposing(this, EventArgs.Empty);
+                EventHelpers.Raise(this, Disposing, EventArgs.Empty);
             }
         }
     }

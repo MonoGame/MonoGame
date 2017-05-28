@@ -57,8 +57,7 @@ namespace Microsoft.Xna.Framework
         protected override void OnPause()
         {
             base.OnPause();
-            if (Paused != null)
-                Paused(this, EventArgs.Empty);
+            EventHelpers.Raise(this, Paused, EventArgs.Empty);
 
             if (_orientationListener.CanDetectOrientation())
                 _orientationListener.Disable();
@@ -68,8 +67,7 @@ namespace Microsoft.Xna.Framework
         protected override void OnResume()
         {
             base.OnResume();
-            if (Resumed != null)
-                Resumed(this, EventArgs.Empty);
+            EventHelpers.Raise(this, Resumed, EventArgs.Empty);
 
             if (Game != null)
             {

@@ -278,6 +278,7 @@
     <Compile Include="CurveTangent.cs" />
     <Compile Include="DisplayOrientation.cs" />
     <Compile Include="DrawableGameComponent.cs" />
+	<Compile Include="EventHelpers.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
 	<Compile Include="FrameworkResources.cs" />
     <Compile Include="GameComponentCollection.cs" />
