@@ -372,10 +372,19 @@
     </Compile>
 	<Compile Include="Audio\DynamicSoundEffectInstanceManager.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
+    <Compile Include="Audio\Microphone.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
+    </Compile>    
+    <Compile Include="Audio\MicrophoneState.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
+    </Compile>
     <Compile Include="Audio\MSADPCMToPCM.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,Web,tvOS</Platforms>
     </Compile>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Audio\NoMicrophoneException.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
+    </Compile>
     <Compile Include="Audio\OALSoundBuffer.cs">
       <Services>OpenALAudio</Services>
     </Compile>
