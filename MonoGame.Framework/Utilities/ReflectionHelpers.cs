@@ -11,10 +11,10 @@ namespace Microsoft.Xna.Framework.Utilities
             {
                 throw new NullReferenceException("Must supply the targetType parameter");
             }
-#if NET4
-            return targetType.IsValueType;    
-#else
+#if NET45            
             return targetType.GetTypeInfo().IsValueType;
+#else
+            return targetType.IsValueType;
 #endif
         }
 
@@ -24,10 +24,10 @@ namespace Microsoft.Xna.Framework.Utilities
             {
                 throw new NullReferenceException("Must supply the targetType parameter");
             }
-#if NET4
-            return targetType.BaseType;
-#else
+#if NET45            
             return targetType.GetTypeInfo().BaseType;
+#else
+            return targetType.BaseType;
 #endif
         }
 
@@ -40,10 +40,10 @@ namespace Microsoft.Xna.Framework.Utilities
             {
                 throw new NullReferenceException("Must supply the targetType parameter");
             }
-#if NET4
-            return targetType.Assembly;
-#else
+#if NET45            
             return targetType.GetTypeInfo().Assembly;
+#else
+            return targetType.Assembly;
 #endif
         }
 
@@ -59,12 +59,12 @@ namespace Microsoft.Xna.Framework.Utilities
 
             if (t == typeof(object))
                 return false;
-#if NET4
-            if (t.IsClass && !t.IsAbstract)
-                return true;
-#else            
+#if NET45            
             var ti = t.GetTypeInfo();
             if (ti.IsClass && !ti.IsAbstract)
+                return true;
+#else            
+            if (t.IsClass && !t.IsAbstract)
                 return true;
 #endif
             return false;
@@ -72,10 +72,10 @@ namespace Microsoft.Xna.Framework.Utilities
 
         public static MethodInfo GetMethodInfo(Type type, string methodName)
         {
-#if NET4
-            return type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
-#else
+#if NET45            
             return type.GetTypeInfo().GetDeclaredMethod(methodName);
+#else
+            return type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
 #endif
         }
 
@@ -86,10 +86,10 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new NullReferenceException("Must supply the property parameter");
             }
 
-#if NET4
-            return property.GetGetMethod();
-#else
+#if NET45            
             return property.GetMethod;
+#else
+            return property.GetGetMethod();
 #endif
         }
 
@@ -100,10 +100,10 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new NullReferenceException("Must supply the property parameter");
             }
 
-#if NET4
-            return property.GetSetMethod();
-#else
+#if NET45            
             return property.SetMethod;
+#else
+            return property.GetSetMethod();
 #endif
         }
 
@@ -112,10 +112,10 @@ namespace Microsoft.Xna.Framework.Utilities
             if (member == null)
                 throw new NullReferenceException("Must supply the member parameter");
 
-#if NET4
-            return Attribute.GetCustomAttribute(member, typeof(T)) as T;
-#else
+#if NET45            
             return member.GetCustomAttribute(typeof(T)) as T;
+#else
+            return Attribute.GetCustomAttribute(member, typeof(T)) as T;
 #endif
         }
 
@@ -161,12 +161,12 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new ArgumentNullException("type");
             if (objectType == null)
                 throw new ArgumentNullException("objectType");
-#if NET4
-            if (type.IsAssignableFrom(objectType))
+#if NET45
+            if (type.GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo()))
                 return true;
 #else
-            if (type.GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo()))
-                return true;            
+            if (type.IsAssignableFrom(objectType))
+                return true;     
 #endif
             return false;
         }
