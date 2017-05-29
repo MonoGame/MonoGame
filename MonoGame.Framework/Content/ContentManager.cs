@@ -19,21 +19,21 @@ namespace Microsoft.Xna.Framework.Content
 {
 	public partial class ContentManager : IDisposable
 	{
-        const byte ContentCompressedLzx = 0x80;
-        const byte ContentCompressedLz4 = 0x40;
+        protected const byte ContentCompressedLzx = 0x80;
+        protected const byte ContentCompressedLz4 = 0x40;
 
-		private string _rootDirectory = string.Empty;
-		private IServiceProvider serviceProvider;
-		private IGraphicsDeviceService graphicsDeviceService;
-        private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-		private List<IDisposable> disposableAssets = new List<IDisposable>();
-        private bool disposed;
-        private byte[] scratchBuffer;
+        protected string _rootDirectory = string.Empty;
+        protected IServiceProvider serviceProvider;
+        protected IGraphicsDeviceService graphicsDeviceService;
+        protected Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        protected List<IDisposable> disposableAssets = new List<IDisposable>();
+        protected bool disposed;
+        protected byte[] scratchBuffer;
 
-		private static object ContentManagerLock = new object();
-        private static List<WeakReference> ContentManagers = new List<WeakReference>();
+        protected static object ContentManagerLock = new object();
+        protected static List<WeakReference> ContentManagers = new List<WeakReference>();
 
-        private static readonly List<char> targetPlatformIdentifiers = new List<char>()
+        protected static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
             'w', // Windows (DirectX)
             'x', // Xbox360
@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal static void ReloadGraphicsContent()
+        public static void ReloadGraphicsContent()
         {
             lock (ContentManagerLock)
             {

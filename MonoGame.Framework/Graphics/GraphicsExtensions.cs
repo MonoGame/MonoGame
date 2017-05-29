@@ -36,7 +36,7 @@ using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    static class GraphicsExtensions
+    public static class GraphicsExtensions
     {
 #if OPENGL
         public static int OpenGLNumberOfElements(this VertexElementFormat elementFormat)

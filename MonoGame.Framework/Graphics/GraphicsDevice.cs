@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _currentRenderTargetCount;
         private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
 
-        internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
+        public GraphicsCapabilities GraphicsCapabilities { get; private set; }
 
         public TextureCollection VertexTextures { get; private set; }
 

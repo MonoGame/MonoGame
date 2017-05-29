@@ -11,7 +11,7 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Utilities
 {
-	internal class Lz4DecoderStream : Stream
+    public class Lz4DecoderStream : Stream
 	{
 		public Lz4DecoderStream()
 		{
