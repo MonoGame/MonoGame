@@ -105,7 +105,16 @@ namespace Microsoft.Xna.Framework.Content
 
             var sharedResources = new object[sharedResourceCount];
             for (var i = 0; i < sharedResourceCount; ++i)
-                sharedResources[i] = InnerReadObject<object>(null);
+            {
+                object existingInstance;
+                string key = assetName.Replace('\\', '/') +"_SharedResource_" + i;                
+                contentManager.loadedSharedResources.TryGetValue(key, out existingInstance);
+                
+                sharedResources[i] = InnerReadObject<object>(existingInstance);
+
+                if (existingInstance == null)
+                    contentManager.loadedSharedResources[key] = sharedResources[i];
+            }
 
             // Fixup shared resources by calling each registered action
             foreach (var fixup in sharedResourceFixups)

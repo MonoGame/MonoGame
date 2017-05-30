@@ -11,13 +11,16 @@ namespace Microsoft.Xna.Framework.Content
     {
         protected internal override VertexBuffer Read(ContentReader input, VertexBuffer existingInstance)
         {
+			var buffer = existingInstance;
+
             var declaration = input.ReadRawObject<VertexDeclaration>();
             var vertexCount = (int)input.ReadUInt32();
             int dataSize = vertexCount * declaration.VertexStride;
             byte[] data = input.ContentManager.GetScratchBuffer(dataSize);
             input.Read(data, 0, dataSize);
 
-            var buffer = new VertexBuffer(input.GraphicsDevice, declaration, vertexCount, BufferUsage.None);
+            if(buffer == null)
+                buffer = new VertexBuffer(input.GraphicsDevice, declaration, vertexCount, BufferUsage.None);
             buffer.SetData(data, 0, dataSize);
             return buffer;
         }

@@ -14,10 +14,14 @@ namespace Microsoft.Xna.Framework.Content
 
         protected internal override Effect Read(ContentReader input, Effect existingInstance)
         {
-            int dataSize = input.ReadInt32();
+            var effect = existingInstance;
+            
+            int dataSize = (int)input.ReadUInt32();
             byte[] data = input.ContentManager.GetScratchBuffer(dataSize);
             input.Read(data, 0, dataSize);
-            var effect = new Effect(input.GraphicsDevice, data, 0, dataSize);
+
+            if (effect == null)
+                effect = new Effect(input.GraphicsDevice, data, 0, dataSize);
             effect.Name = input.AssetName;
             return effect;
         }

@@ -26,6 +26,7 @@ namespace Microsoft.Xna.Framework.Content
 		private IServiceProvider serviceProvider;
 		private IGraphicsDeviceService graphicsDeviceService;
         private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        internal Dictionary<string, object> loadedSharedResources = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
         private byte[] scratchBuffer;
@@ -448,6 +449,7 @@ namespace Microsoft.Xna.Framework.Content
 		    }
 			disposableAssets.Clear();
 		    loadedAssets.Clear();
+		    loadedSharedResources.Clear();
 		}
 
 		public string RootDirectory
