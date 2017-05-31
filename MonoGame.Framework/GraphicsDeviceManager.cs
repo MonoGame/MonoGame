@@ -89,6 +89,7 @@ namespace Microsoft.Xna.Framework
 
             if (_game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
                 throw new ArgumentException("A graphics device manager is already registered.  The graphics device manager cannot be changed once it is set.");
+            _game.graphicsDeviceManager = this;
 
             _game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             _game.Services.AddService(typeof(IGraphicsDeviceService), this);

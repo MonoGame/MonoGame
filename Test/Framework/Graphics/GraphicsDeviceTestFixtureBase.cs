@@ -55,7 +55,7 @@ namespace MonoGame.Tests.Graphics
             gdm = new GraphicsDeviceManager(game);
             // some visual tests require a HiDef profile
             gdm.GraphicsProfile = GraphicsProfile.HiDef;
-            game.DoInitialize();
+            ((IGraphicsDeviceManager)game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
             gd = game.GraphicsDevice;
             content = game.Content;
 
