@@ -156,6 +156,8 @@ namespace OpenGL
         SampleAlphaToCoverage = 0x809E,
         SampleAlphaToOne = 0x809F,
         SampleCoverage = 0x80A0,
+        DebugOutputSynchronous = 0x8242,
+        DebugOutput = 0x92E0,
     }
 
     public enum VertexPointerType {
@@ -1069,6 +1071,26 @@ namespace OpenGL
             int stride, IntPtr data);
         public static VertexAttribPointerDelegate VertexAttribPointer;
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        delegate void DebugMessageCallbackProc(int source, int type, uint id, int severity, int length, IntPtr message, IntPtr userParam);
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [MonoNativeFunctionWrapper]
+        delegate void DebugMessageCallbackDelegate(DebugMessageCallbackProc callback, IntPtr userParam);
+        static DebugMessageCallbackDelegate DebugMessageCallback;
+
+        public delegate void ErrorDelegate(string message);
+        public static event ErrorDelegate OnError;
+
+#if DEBUG
+        static void DebugMessageCallbackHandler(int source, int type, uint id, int severity, int length, IntPtr message, IntPtr userParam)
+        {
+            var errorMessage = Marshal.PtrToStringAnsi(message);
+            System.Diagnostics.Debug.WriteLine(errorMessage);
+            if (OnError != null)
+                OnError(errorMessage);
+        }
+#endif
+
         public static int SwapInterval { get; set; }
 
         public static void LoadEntryPoints()
@@ -1208,6 +1230,20 @@ namespace OpenGL
             DeleteBuffers = (DeleteBuffersDelegate)LoadEntryPoint<DeleteBuffersDelegate>("glDeleteBuffers");
 
             VertexAttribPointer = (VertexAttribPointerDelegate)LoadEntryPoint<VertexAttribPointerDelegate>("glVertexAttribPointer");
+
+#if DEBUG
+            try
+            {
+                DebugMessageCallback = (DebugMessageCallbackDelegate)LoadEntryPoint<DebugMessageCallbackDelegate>("glDebugMessageCallback");
+                DebugMessageCallback(DebugMessageCallbackHandler, IntPtr.Zero);
+                Enable(EnableCap.DebugOutput);
+                Enable(EnableCap.DebugOutputSynchronous);
+            }
+            catch (EntryPointNotFoundException)
+            {
+                // Ignore the debug message callback if the entry point can not be found
+            }
+#endif
         }
 
         public static System.Delegate LoadEntryPoint<T>(string proc)
