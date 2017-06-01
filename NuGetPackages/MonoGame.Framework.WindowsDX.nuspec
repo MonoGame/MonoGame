@@ -16,9 +16,19 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
     <summary>This package provides you with MonoGame Framework that uses DirectX for rendering and works on Windows.</summary>
     <copyright>Copyright © 2009-2017 The MonoGame Team</copyright>
     <language>en-US</language>
-    <references>
-      <reference file="MonoGame.Framework.dll" />
-    </references>
+    <dependencies>
+        <group targetFramework=".NETFramework4.5">
+            <dependency id="SharpDX" version="3.0.0" />
+            <dependency id="SharpDX.Direct2D1" version="3.0.0" />
+            <dependency id="SharpDX.Direct3D11" version="3.0.0" />
+            <dependency id="SharpDX.DXGI" version="3.0.0" />
+            <dependency id="SharpDX.XAudio2" version="3.0.0" />
+            <dependency id="SharpDX.MediaFoundation" version="3.0.0" />
+            <dependency id="SharpDX.XInput" version="3.0.0" />
+            <dependency id="SharpDX.RawInput" version="3.0.0" />
+            <dependency id="SharpDX.Direct3D9" version="3.0.0" />
+        </group>
+    </dependencies>
   </metadata>
   <files>
     <file src="..\..\NuGetPackages\build\WindowsDX\MonoGame.Framework.WindowsDX.targets" target="build\MonoGame.Framework.WindowsDX.targets" />
@@ -26,14 +36,5 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
     <!-- C# Assemblies -->
     <file src="Windows\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />
     <file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net45\MonoGame.Framework.xml" />
-    <file src="Windows\AnyCPU\Release\SharpDX.Direct2D1.dll" target="lib\net45\SharpDX.Direct2D1.dll" />
-    <file src="Windows\AnyCPU\Release\SharpDX.Direct3D11.dll" target="lib\net45\SharpDX.Direct3D11.dll" />
-    <file src="Windows\AnyCPU\Release\SharpDX.Direct3D9.dll" target="lib\net45\SharpDX.Direct3D9.dll" />
-    <file src="Windows\AnyCPU\Release\SharpDX.dll" target="lib\net45\SharpDX.dll" />
-    <file src="Windows\AnyCPU\Release\SharpDX.DXGI.dll" target="lib\net45\SharpDX.DXGI.dll" />
-    <file src="Windows\AnyCPU\Release\SharpDX.MediaFoundation.dll" target="lib\net45\SharpDX.MediaFoundation.dll" />
-    <file src="Windows\AnyCPU\Release\SharpDX.RawInput.dll" target="lib\net45\SharpDX.RawInput.dll" />
-    <file src="Windows\AnyCPU\Release\SharpDX.XAudio2.dll" target="lib\net45\SharpDX.XAudio2.dll" />
-    <file src="Windows\AnyCPU\Release\SharpDX.XInput.dll" target="lib\net45\SharpDX.XInput.dll" />
   </files>
 </package>

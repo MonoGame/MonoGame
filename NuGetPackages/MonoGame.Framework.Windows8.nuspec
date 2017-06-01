@@ -16,9 +16,17 @@ This package provides you with MonoGame Framework that works on Windows 8 as a n
     <summary>This package provides you with MonoGame Framework that works on Windows 8 as a native store app.</summary>
     <copyright>Copyright © 2009-2017 The MonoGame Team</copyright>
     <language>en-US</language>
-    <references>
-      <reference file="MonoGame.Framework.dll" />
-    </references>		
+    <dependencies>
+        <group targetFramework=".NETCore0.0">
+            <dependency id="SharpDX" version="3.0.0" />
+            <dependency id="SharpDX.Direct2D1" version="3.0.0" />
+            <dependency id="SharpDX.Direct3D11" version="3.0.0" />
+            <dependency id="SharpDX.DXGI" version="3.0.0" />
+            <dependency id="SharpDX.XAudio2" version="3.0.0" />
+            <dependency id="SharpDX.MediaFoundation" version="3.0.0" />
+            <dependency id="SharpDX.XInput" version="3.0.0" />
+        </group>
+    </dependencies>	
   </metadata>
   <files>
     <file src="..\..\NuGetPackages\build\Windows8\MonoGame.Framework.Windows8.targets" target="build\MonoGame.Framework.Windows8.targets" />
@@ -28,12 +36,5 @@ This package provides you with MonoGame Framework that works on Windows 8 as a n
     <file src="Windows8\AnyCPU\Release\MonoGame.Framework.dll" target="lib\netcore\MonoGame.Framework.dll" />
     <file src="Windows8\AnyCPU\Release\MonoGame.Framework.xml" target="lib\netcore\MonoGame.Framework.xml" />
     <file src="Windows8\AnyCPU\Release\MonoGame.Framework.pri" target="lib\netcore\MonoGame.Framework.pri" />
-    <file src="Windows8\AnyCPU\Release\SharpDX.Direct2D1.dll" target="lib\netcore\SharpDX.Direct2D1.dll" />
-    <file src="Windows8\AnyCPU\Release\SharpDX.Direct3D11.dll" target="lib\netcore\SharpDX.Direct3D11.dll" />
-    <file src="Windows8\AnyCPU\Release\SharpDX.dll" target="lib\netcore\SharpDX.dll" />
-    <file src="Windows8\AnyCPU\Release\SharpDX.DXGI.dll" target="lib\netcore\SharpDX.DXGI.dll" />
-    <file src="Windows8\AnyCPU\Release\SharpDX.MediaFoundation.dll" target="lib\netcore\SharpDX.MediaFoundation.dll" />
-    <file src="Windows8\AnyCPU\Release\SharpDX.XAudio2.dll" target="lib\netcore\SharpDX.XAudio2.dll" />
-    <file src="Windows8\AnyCPU\Release\SharpDX.XInput.dll" target="lib\netcore\SharpDX.XInput.dll" />
   </files>
 </package>
