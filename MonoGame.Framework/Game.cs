@@ -441,12 +441,25 @@ namespace Microsoft.Xna.Framework
                 // NOTE: While sleep can be inaccurate in general it is 
                 // accurate enough for frame limiting purposes if some
                 // fluctuation is an acceptable result.
+                if (graphicsDeviceManager.SynchronizeWithVerticalRetrace)
+                {
+                    // NOTE: While sleep can be inaccurate in general it is 
+                    // accurate enough for frame limiting purposes if some
+                    // fluctuation is an acceptable result.
 #if WINRT
-                Task.Delay(sleepTime).Wait();
+                    Task.Delay(sleepTime).Wait();
 #else
-                System.Threading.Thread.Sleep(sleepTime);
+                    System.Threading.Thread.Sleep(sleepTime);
 #endif
-                goto RetryTick;
+                    goto RetryTick;
+                }
+                else
+                {
+                    // Draw until we have used up our time.
+                    DoDraw(_gameTime);
+
+                    goto RetryTick;
+                }
             }
 
             // Do not allow any update to take longer than our maximum.
