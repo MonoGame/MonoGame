@@ -55,7 +55,7 @@ namespace MonoGame.Tests.Graphics
             gdm = new GraphicsDeviceManager(game);
             // some visual tests require a HiDef profile
             gdm.GraphicsProfile = GraphicsProfile.HiDef;
-            ((IGraphicsDeviceManager) game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
+            ((IGraphicsDeviceManager)game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
             gd = game.GraphicsDevice;
             content = game.Content;
 
@@ -76,6 +76,10 @@ namespace MonoGame.Tests.Graphics
         public virtual void TearDown()
         {
             game.Dispose();
+            game = null;
+            gdm = null;
+            gd = null;
+            content = null;
 
             if (_framePrepared && !_framesChecked)
                 Assert.Fail("Initialized fixture for rendering but did not check frames.");

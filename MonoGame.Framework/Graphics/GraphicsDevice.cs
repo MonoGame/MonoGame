@@ -537,6 +537,25 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Clear the effect cache.
                     EffectCache.Clear();
 
+                    _blendState = null;
+                    _actualBlendState = null;
+                    _blendStateAdditive.Dispose();
+                    _blendStateAlphaBlend.Dispose();
+                    _blendStateNonPremultiplied.Dispose();
+                    _blendStateOpaque.Dispose();
+
+                    _depthStencilState = null;
+                    _actualDepthStencilState = null;
+                    _depthStencilStateDefault.Dispose();
+                    _depthStencilStateDepthRead.Dispose();
+                    _depthStencilStateNone.Dispose();
+
+                    _rasterizerState = null;
+                    _actualRasterizerState = null;
+                    _rasterizerStateCullClockwise.Dispose();
+                    _rasterizerStateCullCounterClockwise.Dispose();
+                    _rasterizerStateCullNone.Dispose();
+
                     PlatformDispose();
                 }
 
