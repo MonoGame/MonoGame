@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Audio
             duration = TimeSpan.Zero;
         }
 
-        private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleBits, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
         }
 
