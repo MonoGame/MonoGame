@@ -124,6 +124,8 @@ namespace Microsoft.Xna.Framework.Audio
 			byteRate = reader.ReadInt32();    // 12, byte_rate
 			blockAlignment = (int)reader.ReadInt16();  // 14, block_align
             int bits_per_sample = reader.ReadInt16(); // 16
+            if (byteRate == 0)
+                byteRate = (frequency * bits_per_sample / 8) * num_channels;
 
             // reads residual bytes
             if (format_chunk_size > 16)

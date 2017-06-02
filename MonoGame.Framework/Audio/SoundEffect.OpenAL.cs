@@ -61,7 +61,8 @@ namespace Microsoft.Xna.Framework.Audio
             int byteRate;
             buffer = AudioLoader.Load(stream, out format, out freq, out blockAlignment, out byteRate);
 
-            duration = TimeSpan.FromSeconds((float)buffer.Length / (float)byteRate);
+            int bytesPerChannel = ALHelper.IsStereoFormat(format) ? buffer.Length / 2 : buffer.Length;
+            duration = TimeSpan.FromSeconds((float)bytesPerChannel / (float)byteRate);
 
             int sampleAlignment = SampleAlignment(format, blockAlignment);
 

@@ -52,6 +52,15 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new InvalidOperationException(message + " (Reason: " + AL.GetErrorString(error) + ")");
             }
         }
+
+        public static bool IsStereoFormat(ALFormat format)
+        {
+            return (format == ALFormat.Stereo8
+                || format == ALFormat.Stereo16
+                || format == ALFormat.StereoFloat32
+                || format == ALFormat.StereoIma4
+                || format == ALFormat.StereoMSAdpcm);
+        }
     }
 
 	internal sealed class OpenALSoundController : IDisposable
