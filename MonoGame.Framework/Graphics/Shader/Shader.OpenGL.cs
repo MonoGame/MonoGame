@@ -127,12 +127,16 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed && _shaderHandle != -1)
             {
+                // Take a copy of the handle for use in the anonymous function and clear the class handle.
+                // This prevents any other disposal of the resource between now and the time the anonymous
+                // function is executed.
+                int handle = _shaderHandle;
                 Threading.BlockOnUIThread(() =>
                 {
-                    GL.DeleteShader(_shaderHandle);
+                    GL.DeleteShader(handle);
                     GraphicsExtensions.CheckGLError();
-                    _shaderHandle = -1;
                 });
+                _shaderHandle = -1;
             }
 
             base.Dispose(disposing);

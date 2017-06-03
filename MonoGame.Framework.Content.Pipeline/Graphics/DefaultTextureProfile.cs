@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        protected override void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool generateMipmaps, bool isSpriteFont)
+        protected override void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool isSpriteFont)
         {
             format = GetTextureFormatForPlatform(format, context.TargetPlatform);
 
@@ -118,23 +118,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             switch (format)
             {
                 case TextureProcessorOutputFormat.AtcCompressed:
-                    GraphicsUtil.CompressAti(content, generateMipmaps);
+                    GraphicsUtil.CompressAti(content);
                     break;
 
                 case TextureProcessorOutputFormat.Color16Bit:
-                    GraphicsUtil.CompressColor16Bit(content, generateMipmaps);
+                    GraphicsUtil.CompressColor16Bit(content);
                     break;
 
                 case TextureProcessorOutputFormat.DxtCompressed:
-                    GraphicsUtil.CompressDxt(context.TargetProfile, content, generateMipmaps, isSpriteFont);
+                    GraphicsUtil.CompressDxt(context.TargetProfile, content, isSpriteFont);
                     break;
 
                 case TextureProcessorOutputFormat.Etc1Compressed:
-                    GraphicsUtil.CompressEtc1(content, generateMipmaps);
+                    GraphicsUtil.CompressEtc1(content);
                     break;
 
                 case TextureProcessorOutputFormat.PvrCompressed:
-                    GraphicsUtil.CompressPvrtc(content, generateMipmaps, isSpriteFont);
+                    GraphicsUtil.CompressPvrtc(content, isSpriteFont);
                     break;
             }
         }
