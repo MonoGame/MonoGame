@@ -96,9 +96,18 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             var licenseInformation = CurrentApp.LicenseInformation;
             licenseInformation.LicenseChanged += () => isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+            isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+#elif WINDOWS_UAP
 
+            var contex = StoreContext.GetDefault(); //get contex
+            var task = Task.Run(async () =>
+            {
+                return await contex.GetAppLicenseAsync(); //run the get license task
+            });
+            StoreAppLicense licenseInformation = task.Result; //get the app license
             isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 #endif
+
         }
 
 		delegate string ShowKeyboardInputDelegate(
