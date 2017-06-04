@@ -29,8 +29,9 @@
         <topic id="Help_and_Support" name="Help and Support" filename="help_and_support.md"/>
     </topic>
     <topic id="Getting_Started" name="Getting Started" filename="getting_started.md"/>
-    <topic id="Tutorials" name="Tutorials" filename="tutorials.md"/>
-    
+    <topic id="Tutorials" name="Tutorials" filename="tutorials.md">
+        <topic id="Riemers_Tutorials_Introduction" name="Riemer's Tutorials — Introduction" filename="riemers_tutorial_intro.md"/>
+    </topic>
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
         <topic id="Using_The_Pipeline_Tool" name="Using The Pipeline Tool" filename="using_pipeline_tool.md"/>
         <topic id="Custom_Effects" name="Custom Effects" filename="custom_effects.md"/>
