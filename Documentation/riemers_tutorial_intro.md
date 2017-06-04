@@ -8,6 +8,8 @@ The XNA Tutorials are presented in series of tutorials. Instead of writing small
 
 At this moment, you can find 5 series of XNA Tutorials on this site: one series on 2D game programming and 4 series on 3D game programming. Let me show you the final screens of the 5 projects we create during the Tutorials:
 
+-----
+
 ![2D Series 1: Shooters!](images/riemers_intro_2D_series_1.jpg "2D Series 1: Shooters!")
 
 2D Series 1: Shooters!
@@ -35,5 +37,7 @@ At this moment, you can find 5 series of XNA Tutorials on this site: one series 
 ![3D Series 4: Advanced Terrain](images/riemers_intro_3D_series_4.jpg "3D Series 4: Advanced Terrain")
 
 3D Series 4: Advanced Terrain
+
+-----
 
 If you’re interested in beginning game programming in XNA, you can start with the 2D series. In this series, you’ll learn enough techniques to create almost any 2D game you can think of! This is a screenshot of the game we’ll create in this series:
