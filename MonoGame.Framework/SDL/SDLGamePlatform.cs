@@ -56,6 +56,10 @@ namespace Microsoft.Xna.Framework
             if (version >= 205 && CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
                 Sdl.SetHint("SDL_WINDOWS_DISABLE_THREAD_NAMING", "1");
 
+            Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
+            Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
+            Sdl.SetHint("SDL_HINT_XINPUT_ENABLED", "0");
+
             Sdl.Init((int)(
                 Sdl.InitFlags.Video |
                 Sdl.InitFlags.Joystick |
