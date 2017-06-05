@@ -121,7 +121,7 @@ namespace MonoGame.Tests.Framework
             //Test data ordering
             Assert.AreEqual(0xC7AD8F5C570A1EB8, new Rgba64(((float) 0x1EB8) / 0xffff, ((float) 0x570A) / 0xffff, ((float) 0x8F5C) / 0xffff, ((float) 0xC7AD) / 0xffff).PackedValue);
             Assert.AreEqual(0xC7AD8F5C570A1EB8, new Rgba64(0.12f, 0.34f, 0.56f, 0.78f).PackedValue);
-            Assert.AreEqual(0x73334CCC2666147B, new Rgba64(0.08f, 0.15f, 0.30f, 0.45f).PackedValue);
+            Assert.AreEqual(0x73334CCD2666147B, new Rgba64(0.08f, 0.15f, 0.30f, 0.45f).PackedValue);
         }
 
         [Test]
