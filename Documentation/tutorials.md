@@ -1,7 +1,7 @@
 Links to various tutorials and articles to help you get started with MonoGame.
 
 ### Riemer's Tutorials
- - [Introduction](riemers_tutorial_intro.md)
+ - [Introduction](Riemer/riemers_tutorial_intro.md)
 
 ### Pluralsight
  - [Cross Platform Game Development with MonoGame](http://pluralsight.com/training/courses/TableOfContents?courseName=monogame)
