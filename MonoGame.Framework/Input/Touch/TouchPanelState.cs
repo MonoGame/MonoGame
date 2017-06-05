@@ -43,7 +43,24 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The current timestamp that we use for setting the timestamp of new TouchLocations
         /// </summary>
-        internal static TimeSpan CurrentTimestamp { get; set; }
+        internal static TimeSpan CurrentTimestamp
+        {
+            get { return _currentTimestamp; }
+            set
+            {
+                if (_currentTimestamp != value)
+                {
+                    if (_currentTimestamp > _previousTimestamp)
+                        _previousTimestamp = _currentTimestamp;
+                    _currentTimestamp = value;
+                    // handle time rewinding
+                    if (_currentTimestamp < _previousTimestamp)
+                        _previousTimestamp = _currentTimestamp;
+                }
+            }
+        }
+        private static TimeSpan _currentTimestamp;
+        private static TimeSpan _previousTimestamp;
 
         /// <summary>
         /// The mapping between platform specific touch ids
@@ -144,6 +161,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 {
                     _touchState.RemoveAt(i);
                 }
+                // Remove forgotten-old touches
+                else if (touch.Timestamp < _previousTimestamp 
+                    && touch.State != TouchLocationState.Released
+                    && touch.State != TouchLocationState.Invalid)
+                    _touchState.RemoveAt(i);
             }
 
             var result = (_touchState.Count > 0) ? new TouchCollection(_touchState.ToArray()) : TouchCollection.Empty;
