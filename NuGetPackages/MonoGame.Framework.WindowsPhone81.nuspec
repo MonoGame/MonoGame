@@ -37,5 +37,9 @@ This package provides you with MonoGame Framework that works on Windows Phone 8.
     <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.dll" target="lib\wpa81/MonoGame.Framework.dll" />
     <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.xml" target="lib\wpa81/MonoGame.Framework.xml" />
     <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.pri" target="lib\wpa81/MonoGame.Framework.pri" />
+
+    <!-- Portable Libs -->		
+	<file src="Portable\AnyCPU\MonoGame.Framework.dll" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.dll" />
+	<file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.xml" />
   </files>
 </package>

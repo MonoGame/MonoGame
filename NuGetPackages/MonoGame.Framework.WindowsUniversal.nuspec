@@ -29,11 +29,16 @@ This package provides you with MonoGame Framework that works on Windows 10, Wind
         </dependencies>
     </metadata>
     <files>
-        <file src="..\..\NuGetPackages\build\WindowsUniversal\MonoGame.Framework.WindowsUniversal.targets" target="build\MonoGame.Framework.WindowsUniversal.targets" />
+		<!-- C# Assemblies -->
+		<file src="..\..\NuGetPackages\build\WindowsUniversal\MonoGame.Framework.WindowsUniversal.targets" target="build\MonoGame.Framework.WindowsUniversal.targets" />
         <file src="WindowsUniversal\AnyCPU\Release\Themes\generic.xbf" target="lib\netcore\MonoGame.Framework\Themes/generic.xbf" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.dll" target="lib\netcore\MonoGame.Framework.dll" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.pri" target="lib\netcore\MonoGame.Framework.pri" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xml" target="lib\netcore\MonoGame.Framework.xml" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xr.xml" target="lib\netcore\MonoGame.Framework/MonoGame.Framework.xr.xml" />
+
+		<!-- Portable Libs -->		
+	    <file src="Portable\AnyCPU\MonoGame.Framework.dll" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.dll" />
+		<file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.xml" />
     </files>
 </package>
