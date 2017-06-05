@@ -294,10 +294,10 @@ namespace Microsoft.Xna.Framework
 
         private int GetNumberOfCycle(float position)
         {
-            float cycle = (position - _keys[0].Position) / (_keys[_keys.Count - 1].Position - _keys[0].Position);
-            if (cycle < 0f)
-                cycle--;
-            return (int)cycle;
+            float cycle2 = (position - _keys[0].Position) / (_keys[_keys.Count - 1].Position - _keys[0].Position);
+            if (cycle2 < 0f)
+                cycle2--;
+            return (int)cycle2;
         }
 
         private float GetCurvePosition(float position)
