@@ -24,11 +24,15 @@ namespace MonoGame.Framework
     {
         internal WinFormsGameForm Form;
 
+		//Lock on _allWindows registry
         static private ReaderWriterLockSlim _allWindowsReaderWriterLockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+
+		//The actual list for which the aforementioned lock is required
         static private List<WinFormsGameWindow> _allWindows = new List<WinFormsGameWindow>();
 
         private WinFormsGamePlatform _platform;
 
+		//Define booleans for 4 binary properties of the window
         private bool _isResizable;
 
         private bool _isBorderless;
@@ -38,7 +42,7 @@ namespace MonoGame.Framework
         private bool _isMouseInBounds;
 
         // true if window position was moved either through code or by dragging/resizing the form
-        private bool _wasMoved;
+		private bool _wasMoved;
 
         #region Internal Properties
 
@@ -52,6 +56,7 @@ namespace MonoGame.Framework
 
         public override string ScreenDeviceName { get { return String.Empty; } }
 
+		//Returns a rectangle describing the position and size of the window on the screen
         public override Rectangle ClientBounds
         {
             get
@@ -67,19 +72,25 @@ namespace MonoGame.Framework
             get { return _isResizable; }
             set
             {
+				// If the new value is different, update resizability
                 if (_isResizable != value)
                 {
                     _isResizable = value;
                     Form.MaximizeBox = _isResizable;
                 }
+
+				// Otherwise, do nothing
                 else
                     return;
+				
                 if (_isBorderless)
                     return;
+
+				// Set border style based on the new resizability of the window
                 Form.FormBorderStyle = _isResizable ? FormBorderStyle.Sizable : FormBorderStyle.FixedSingle;
             }
         }
-
+			
         public override bool AllowAltF4
         {
              get { return base.AllowAltF4; }
@@ -114,12 +125,19 @@ namespace MonoGame.Framework
             get { return _isBorderless; }
             set
             {
+				// If the new value is different, update borderlessness
                 if (_isBorderless != value)
                     _isBorderless = value;
+				
+				// Otherwise, do nothing
                 else
                     return;
+
+				// If is borderless, should have no style
                 if (_isBorderless)
                     Form.FormBorderStyle = FormBorderStyle.None;
+
+				// If has border, set style based on resizability
                 else
                     Form.FormBorderStyle = _isResizable ? FormBorderStyle.Sizable : FormBorderStyle.FixedSingle;
             }
@@ -132,9 +150,11 @@ namespace MonoGame.Framework
             _platform = platform;
             Game = platform.Game;
 
+			// Create new form based on this game window, and set its size to in accordance with the graphcis device manager
             Form = new WinFormsGameForm(this);
             Form.ClientSize = new Size(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
 
+			// Set icon and title
             SetIcon();
             Title = Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
@@ -177,12 +197,16 @@ namespace MonoGame.Framework
             Dispose(false);
         }
 
+		// Make aware all other windows of this window's entry
         private void RegisterToAllWindows()
         {
+
+			// Acquire lock
             _allWindowsReaderWriterLockSlim.EnterWriteLock();
 
             try
             {
+				// Register with _allWindows
                 _allWindows.Add(this);
             }
             finally
@@ -191,12 +215,14 @@ namespace MonoGame.Framework
             }
         }
 
+		// Make aware all other windows of this window's departure
         private void UnregisterFromAllWindows()
         {
             _allWindowsReaderWriterLockSlim.EnterWriteLock();
 
             try
             {
+				// Discard current window from _allWindows
                 _allWindows.Remove(this);
             }
             finally
@@ -234,8 +260,10 @@ namespace MonoGame.Framework
             var withinClient = Form.ClientRectangle.Contains(clientPos);
             var buttons = Control.MouseButtons;
 
+			// Remember previous state
             var previousState = MouseState.LeftButton;
 
+			// Update MouseState values
             MouseState.X = clientPos.X;
             MouseState.Y = clientPos.Y;
             MouseState.LeftButton = (buttons & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
@@ -247,6 +275,7 @@ namespace MonoGame.Framework
             if (!_platform.IsActive || !withinClient)
                 return;
             
+			// Model touchState as Pressed, Moved, and Released
             TouchLocationState? touchState = null;
             if (MouseState.LeftButton == ButtonState.Pressed)
                 if (previousState == ButtonState.Released)
@@ -297,10 +326,14 @@ namespace MonoGame.Framework
             _wasMoved = true;
             if (Game.Window == this)
             {
+				// Get the graphics device manager
                 var manager = Game.graphicsDeviceManager;
+
+				// Do nothing if the Graphics Device is null
                 if (manager.GraphicsDevice == null)
                     return;
 
+				// Do nothing if the new size is the same as the old
                 var newSize = Form.ClientSize;
                 if (newSize.Width == manager.PreferredBackBufferWidth
                     && newSize.Height == manager.PreferredBackBufferHeight)
@@ -369,6 +402,8 @@ namespace MonoGame.Framework
 
         internal void UpdateWindows()
         {
+
+			// Acquire lock (Same one used to register/unregister windows)
             _allWindowsReaderWriterLockSlim.EnterReadLock();
 
             try
@@ -463,4 +498,3 @@ namespace MonoGame.Framework
         #endregion
     }
 }
-
