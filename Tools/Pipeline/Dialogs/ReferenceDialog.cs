@@ -10,7 +10,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class ReferenceDialog : DialogBase
+    partial class ReferenceDialog : Dialog<bool>
     {
         protected class RefItem
         {
@@ -99,6 +99,17 @@ namespace MonoGame.Tools.Pipeline
             
             foreach (var item in selectedItems)
                 _dataStore.Remove(item as RefItem);
+        }
+
+        private void ButtonOk_Click(object sender, EventArgs e)
+        {
+            Result = true;
+            Close();
+        }
+
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

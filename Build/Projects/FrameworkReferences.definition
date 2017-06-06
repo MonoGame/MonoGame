@@ -72,9 +72,6 @@
         Name="SharpDX.MediaFoundation"
         Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.MediaFoundation.dll" />
       <Binary
-        Name="SharpDX.RawInput"
-        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.RawInput.dll" />
-      <Binary
         Name="SharpDX.XAudio2"
         Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XAudio2.dll" />
       <Binary

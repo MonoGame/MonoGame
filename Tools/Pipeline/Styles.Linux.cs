@@ -209,25 +209,7 @@ namespace MonoGame.Tools.Pipeline
                 h.Control.ShowAll();
             });
 
-            Style.Add<DialogHandler>("HeaderBar", h =>
-            {
-                var title = h.Title;
-                var headerBar = Gtk3Wrapper.gtk_header_bar_new();
-                Gtk3Wrapper.gtk_window_set_titlebar(h.Control.Handle, headerBar);
-                h.Title = title;
-
-                if (h.AbortButton.Text == "Close")
-                {
-                    Gtk3Wrapper.gtk_header_bar_set_show_close_button(headerBar, true);
-                    return;
-                }
-
-                var defButton = (Gtk.Button)h.DefaultButton.ControlObject;
-                defButton.StyleContext.AddClass("suggested-action");
-
-                Gtk3Wrapper.gtk_header_bar_pack_end(headerBar, defButton.Handle);
-                Gtk3Wrapper.gtk_header_bar_pack_start(headerBar, ((Gtk.Button)h.AbortButton.ControlObject).Handle);
-            });
+            Style.Add<ButtonHandler>("Destuctive", h => h.Control.StyleContext.AddClass("destructive-action"));
 
             Style.Add<LabelHandler>("Wrap", h => h.Control.MaxWidthChars = 55);
 
@@ -235,25 +217,6 @@ namespace MonoGame.Tools.Pipeline
             {
                 h.Control.ToolbarStyle = Gtk.ToolbarStyle.Icons;
                 h.Control.IconSize = Gtk.IconSize.SmallToolbar;
-            });
-
-            Style.Add<TreeViewHandler>("Scroll", h =>
-            {
-                var treeView = h.Control.Child as Gtk.TreeView;
-
-                Gtk.TreeIter lastIter, iter;
-
-                if (treeView.Model.GetIterFirst(out iter))
-                {
-                    do
-                    {
-                        lastIter = iter;
-                    }
-                    while (treeView.Model.IterNext(ref iter));
-
-                    var path = treeView.Model.GetPath(lastIter);
-                    treeView.ScrollToCell(path, null, false, 0, 0);
-                }
             });
 
             Style.Add<DrawableHandler>("Stretch", h =>
@@ -277,43 +240,6 @@ namespace MonoGame.Tools.Pipeline
                      var al = h.Control.Allocation;
                      al.Width = parent.AllocatedWidth;
                      h.Control.SetAllocation(al);
-                };
-            });
-
-            Style.Add<TextBoxHandler>("OverrideSize", h =>
-            {
-                h.Control.WidthChars = 0;
-            });
-
-            Style.Add<ScrollableHandler>("BuildOutput", h =>
-            {
-                var child = ((((h.Control.Child as Gtk.Viewport).Child as Gtk.VBox).Children[0] as Gtk.HBox).Children[0] as Gtk.Alignment).Child;
-                var ok = false;
-
-                h.Control.SizeAllocated += delegate
-                {
-                    // Set Width of the Drawable
-                    var al = child.Allocation;
-                    al.Width = h.Control.AllocatedWidth - 2;
-                    if (BuildOutput.ReqWidth > al.Width)
-                        al.Width = BuildOutput.ReqWidth;
-                    child.SetAllocation(al);
-
-                    if (PipelineSettings.Default.AutoScrollBuildOutput)
-                    {
-                        // Scroll to bottom
-                        if (BuildOutput.Count == -1)
-                            ok = false;
-
-                        if (!ok)
-                        {
-                            var adj = h.Control.Vadjustment;
-                            adj.Value = adj.Upper - adj.PageSize;
-
-                            if (adj.Upper >= BuildOutput.Count && BuildOutput.Count != -1)
-                                ok = true;
-                        }
-                    }
                 };
             });
         }

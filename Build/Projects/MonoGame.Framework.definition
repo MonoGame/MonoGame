@@ -278,6 +278,7 @@
     <Compile Include="CurveTangent.cs" />
     <Compile Include="DisplayOrientation.cs" />
     <Compile Include="DrawableGameComponent.cs" />
+	<Compile Include="EventHelpers.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
 	<Compile Include="FrameworkResources.cs" />
     <Compile Include="GameComponentCollection.cs" />
@@ -413,6 +414,14 @@
     </Compile>
     <Compile Include="Audio\SoundEffectInstancePool.cs" />
     <Compile Include="Audio\SoundState.cs" />
+	<Compile Include="Audio\Microphone.cs" />
+	<Compile Include="Audio\Microphone.OpenAL.cs">
+      <Services>OpenALAudio</Services>
+    </Compile>
+	<Compile Include="Audio\Microphone.Default.cs">
+      <Services>XAudioAudio,WebAudio</Services>
+    </Compile>
+	<Compile Include="Audio\NoMicrophoneConnectedException.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Audio Xact-->
@@ -436,6 +445,9 @@
     <Compile Include="Audio\Xact\SoundBank.cs" />
     <Compile Include="Audio\Xact\VolumeEvent.cs" />
     <Compile Include="Audio\Xact\WaveBank.cs" />
+    <Compile Include="Audio\Xact\WaveBank.Default.cs">	
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS</Platforms>
+    </Compile>
     <Compile Include="Audio\Xact\XactClip.cs" />
     <Compile Include="Audio\Xact\XactHelpers.cs" />
     <Compile Include="Audio\Xact\XactSound.cs" />
@@ -1197,10 +1209,10 @@
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.Default.cs" >
-      <Platforms>Android,iOS,MacOS,Windows8,WindowsPhone81,WindowsUniversal,tvOS</Platforms>
+      <Platforms>Android,iOS,Windows8,WindowsPhone81,WindowsUniversal,tvOS</Platforms>
     </Compile>
     <Compile Include="Utilities\ReflectionHelpers.Legacy.cs" >
-      <Platforms>Angle,Linux,Windows,WindowsGL,WindowsPhone,Web</Platforms>
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsPhone,Web</Platforms>
     </Compile>
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
     <Compile Include="Utilities\LzxStream\LzxDecoderStream.cs" />

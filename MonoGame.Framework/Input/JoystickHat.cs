@@ -13,40 +13,62 @@ namespace Microsoft.Xna.Framework.Input
         /// Gets if joysticks hat "down" is pressed.
         /// </summary>
         /// <value><see cref="ButtonState.Pressed"/> if the button is pressed otherwise, <see cref="ButtonState.Released"/>.</value>
-        public ButtonState Down
-        {
-            get;
-            internal set;
-        }
+        public ButtonState Down { get; internal set; }
 
         /// <summary>
         /// Gets if joysticks hat "left" is pressed.
         /// </summary>
         /// <value><see cref="ButtonState.Pressed"/> if the button is pressed otherwise, <see cref="ButtonState.Released"/>.</value>
-        public ButtonState Left
-        {
-            get;
-            internal set;
-        }
+        public ButtonState Left { get; internal set; }
 
         /// <summary>
         /// Gets if joysticks hat "right" is pressed.
         /// </summary>
         /// <value><see cref="ButtonState.Pressed"/> if the button is pressed otherwise, <see cref="ButtonState.Released"/>.</value>
-        public ButtonState Right
-        {
-            get;
-            internal set;
-        }
+        public ButtonState Right { get; internal set; }
 
         /// <summary>
         /// Gets if joysticks hat "up" is pressed.
         /// </summary>
         /// <value><see cref="ButtonState.Pressed"/> if the button is pressed otherwise, <see cref="ButtonState.Released"/>.</value>
-        public ButtonState Up
+        public ButtonState Up { get; internal set; }
+
+        /// <summary>
+        /// Determines whether a specified instance of <see cref="Microsoft.Xna.Framework.Input.JoystickHat"/> is equal
+        /// to another specified <see cref="Microsoft.Xna.Framework.Input.JoystickHat"/>.
+        /// </summary>
+        /// <param name="left">The first <see cref="Microsoft.Xna.Framework.Input.JoystickHat"/> to compare.</param>
+        /// <param name="right">The second <see cref="Microsoft.Xna.Framework.Input.JoystickHat"/> to compare.</param>
+        /// <returns><c>true</c> if <c>left</c> and <c>right</c> are equal; otherwise, <c>false</c>.</returns>
+        public static bool operator ==(JoystickHat left, JoystickHat right)
         {
-            get;
-            internal set;
+            return (left.Down == right.Down) &&
+                (left.Left == right.Left) &&
+                (left.Right == right.Right) &&
+                (left.Up == right.Up);
+        }
+
+        /// <summary>
+        /// Determines whether a specified instance of <see cref="Microsoft.Xna.Framework.Input.JoystickHat"/> is not
+        /// equal to another specified <see cref="Microsoft.Xna.Framework.Input.JoystickHat"/>.
+        /// </summary>
+        /// <param name="left">The first <see cref="Microsoft.Xna.Framework.Input.JoystickHat"/> to compare.</param>
+        /// <param name="right">The second <see cref="Microsoft.Xna.Framework.Input.JoystickHat"/> to compare.</param>
+        /// <returns><c>true</c> if <c>left</c> and <c>right</c> are not equal; otherwise, <c>false</c>.</returns>
+        public static bool operator !=(JoystickHat left, JoystickHat right)
+        {
+            return !(left == right);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="object"/> is equal to the current <see cref="T:Microsoft.Xna.Framework.Input.JoystickHat"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="T:Microsoft.Xna.Framework.Input.JoystickHat"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="object"/> is equal to the current
+        /// <see cref="T:Microsoft.Xna.Framework.Input.JoystickHat"/>; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object obj)
+        {
+            return (obj is JoystickHat) && (this == (JoystickHat)obj);
         }
 
         /// <summary>

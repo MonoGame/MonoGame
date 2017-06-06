@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Linq;
 using System.Text;
 
 namespace Microsoft.Xna.Framework.Input
@@ -34,6 +35,44 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         /// <value>An array list of <see cref="JoystickHat"/> that indicate hat values.</value>
         public JoystickHat[] Hats{ get; internal set; }
+
+        /// <summary>
+        /// Determines whether a specified instance of <see cref="Microsoft.Xna.Framework.Input.JoystickState"/> is
+        /// equal to another specified <see cref="Microsoft.Xna.Framework.Input.JoystickState"/>.
+        /// </summary>
+        /// <param name="left">The first <see cref="Microsoft.Xna.Framework.Input.JoystickState"/> to compare.</param>
+        /// <param name="right">The second <see cref="Microsoft.Xna.Framework.Input.JoystickState"/> to compare.</param>
+        /// <returns><c>true</c> if <c>left</c> and <c>right</c> are equal; otherwise, <c>false</c>.</returns>
+        public static bool operator ==(JoystickState left, JoystickState right)
+        {
+            return left.IsConnected == right.IsConnected &&
+               left.Axes.SequenceEqual(right.Axes) &&
+               left.Buttons.SequenceEqual(right.Buttons) &&
+               left.Hats.SequenceEqual(right.Hats);
+        }
+
+        /// <summary>
+        /// Determines whether a specified instance of <see cref="Microsoft.Xna.Framework.Input.JoystickState"/> is not
+        /// equal to another specified <see cref="Microsoft.Xna.Framework.Input.JoystickState"/>.
+        /// </summary>
+        /// <param name="left">The first <see cref="Microsoft.Xna.Framework.Input.JoystickState"/> to compare.</param>
+        /// <param name="right">The second <see cref="Microsoft.Xna.Framework.Input.JoystickState"/> to compare.</param>
+        /// <returns><c>true</c> if <c>left</c> and <c>right</c> are not equal; otherwise, <c>false</c>.</returns>
+        public static bool operator !=(JoystickState left, JoystickState right)
+        {
+            return !(left == right);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="object"/> is equal to the current <see cref="T:Microsoft.Xna.Framework.Input.JoystickState"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="T:Microsoft.Xna.Framework.Input.JoystickState"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="object"/> is equal to the current
+        /// <see cref="T:Microsoft.Xna.Framework.Input.JoystickState"/>; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object obj)
+        {
+            return (obj is JoystickState) && (this == (JoystickState)obj);
+        }
 
         /// <summary>
         /// Serves as a hash function for a <see cref="T:Microsoft.Xna.Framework.Input.JoystickState"/> object.

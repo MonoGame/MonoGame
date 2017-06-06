@@ -135,7 +135,9 @@ namespace Microsoft.Xna.Framework.Audio
             var index = XactHelpers.Random.Next(_sounds.Length);
             _curSound = _sounds[index];
 
-            _curSound.Play(1.0f, _engine);
+            var volume = UpdateRpcCurves();
+
+            _curSound.Play(volume, _engine);
             _played = true;
             IsPrepared = false;
         }
@@ -253,14 +255,22 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void Update(float dt)
         {
-            if (_curSound != null)
-                _curSound.Update(dt);
+            if (_curSound == null)
+                return;
+
+            _curSound.Update(dt);
+
+            UpdateRpcCurves();
+        }
+
+        private float UpdateRpcCurves()
+        {
+            var volume = 1.0f;
 
             // Evaluate the runtime parameter controls.
             var rpcCurves = _curSound.RpcCurves;
             if (rpcCurves.Length > 0)
             {
-                var volume = 1.0f;
                 var pitch = 0.0f;
                 var reverbMix = 1.0f;
                 float? filterFrequency = null;
@@ -305,8 +315,12 @@ namespace Microsoft.Xna.Framework.Audio
                     }
                 }
 
+                pitch = MathHelper.Clamp(pitch, -1.0f, 1.0f);
+
                 _curSound.UpdateState(_engine, volume, pitch, reverbMix, filterFrequency, filterQFactor);
             }
+
+            return volume;
         }
         
         /// <summary>
@@ -338,9 +352,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 IsCreated = false;
                 IsPrepared = false;
-
-                if (Disposing != null)
-                    Disposing(this, EventArgs.Empty);
+                EventHelpers.Raise(this, Disposing, EventArgs.Empty);
             }
         }
     }

@@ -20,11 +20,11 @@ internal static class Sdl
         if (handle == IntPtr.Zero)
             return "";
 
-        var ptr = (byte*) handle;
+        var ptr = (byte*)handle;
         while (*ptr != 0)
             ptr++;
 
-        var bytes = new byte[ptr - (byte*) handle];
+        var bytes = new byte[ptr - (byte*)handle];
         Marshal.Copy(handle, bytes, 0, bytes.Length);
 
         return Encoding.UTF8.GetString(bytes);
@@ -759,9 +759,11 @@ internal static class Sdl
             public int Which;
         }
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl,
-            EntryPoint = "SDL_GameControllerAddMapping")]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerAddMapping")]
         public static extern int AddMapping(string mappingString);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerAddMappingsFromRW")]
+        public static extern int AddMappingFromRw(IntPtr rw, int freew);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerClose")]
         public static extern void Close(IntPtr gamecontroller);
@@ -792,6 +794,14 @@ internal static class Sdl
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_IsGameController")]
         public static extern byte IsGameController(int joystickIndex);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerMapping")]
+        private static extern IntPtr SDL_GameControllerMapping(IntPtr gamecontroller);
+
+        public static string GetMapping(IntPtr gamecontroller)
+        {
+            return GetString(SDL_GameControllerMapping(gamecontroller));
+        }
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerOpen")]
         private static extern IntPtr SDL_GameControllerOpen(int joystickIndex);

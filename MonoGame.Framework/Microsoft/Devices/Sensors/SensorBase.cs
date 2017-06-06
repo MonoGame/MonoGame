@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework;
 using System;
 
 namespace Microsoft.Devices.Sensors
@@ -24,10 +25,13 @@ namespace Microsoft.Devices.Sensors
 		    protected set
 		    {
 		        currentValue = value;
-                if (this.CurrentValueChanged != null)
+
+                var handler = CurrentValueChanged;
+
+                if (handler != null)
                 {
                     eventArgs.SensorReading = value;
-                    this.CurrentValueChanged(this, eventArgs);
+                    handler(this, eventArgs);
                 }
 		    }
 		}
@@ -40,8 +44,7 @@ namespace Microsoft.Devices.Sensors
 				if (this.timeBetweenUpdates != value)
 				{
 					this.timeBetweenUpdates = value;
-					if (this.TimeBetweenUpdatesChanged != null)
-						this.TimeBetweenUpdatesChanged(this, EventArgs.Empty);
+					EventHelpers.Raise(this, TimeBetweenUpdatesChanged, EventArgs.Empty);
 				}
 			}
 		}
