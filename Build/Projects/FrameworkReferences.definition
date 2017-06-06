@@ -17,9 +17,6 @@
   <Platform Type="Linux">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
-    <Service Name="MonoGame.Framework/OpenGLGraphics">
-      <Reference Include="System.Drawing" />
-    </Service>
   </Platform>
 
   <Platform Type="MacOS">
@@ -81,7 +78,6 @@
 
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
-      <Reference Include="System.Drawing" />
       <Reference Include="System.Web" />
       <Reference Include="System.Web.Services" />
       <Reference Include="System.Windows.Forms" />
@@ -122,7 +118,6 @@
 	
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
-      <Reference Include="System.Drawing" />
       <Reference Include="System.Web" />
       <Reference Include="System.Web.Services" />
       <Reference Include="System.Windows.Forms" />
@@ -186,7 +181,6 @@
 
   <Service Name="MonoGame.Framework/ANGLEGraphics">
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
