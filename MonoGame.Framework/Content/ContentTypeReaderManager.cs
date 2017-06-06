@@ -48,12 +48,7 @@ namespace Microsoft.Xna.Framework.Content
 		{
             _locker = new object();
             _contentReadersCache = new Dictionary<Type, ContentTypeReader>(255);
-
-#if WINRT
             _assemblyName = typeof(ContentTypeReaderManager).GetTypeInfo().Assembly.FullName;
-#else
-            _assemblyName = typeof(ContentTypeReaderManager).Assembly.FullName;
-#endif
         }
 
         public ContentTypeReader GetTypeReader(Type targetType)

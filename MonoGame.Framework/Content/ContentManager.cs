@@ -396,12 +396,8 @@ namespace Microsoft.Xna.Framework.Content
                 // linker to include the ReloadAsset function when AOT compiled.
                 if (asset.Key == null)
                     ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()));
-
-#if WINDOWS_STOREAPP || WINDOWS_UAP
-                var methodInfo = typeof(ContentManager).GetType().GetTypeInfo().GetDeclaredMethod("ReloadAsset");
-#else
-                var methodInfo = typeof(ContentManager).GetMethod("ReloadAsset", BindingFlags.NonPublic | BindingFlags.Instance);
-#endif
+                
+                var methodInfo = typeof(ContentManager).GetTypeInfo().GetDeclaredMethod("ReloadAsset");
                 var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
                 genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) }); 
             }
