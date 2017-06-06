@@ -714,6 +714,12 @@ namespace Microsoft.Xna.Framework
                 }
                 return (GraphicsDeviceManager)_graphicsDeviceManager;
             }
+            set
+            {
+                if (_graphicsDeviceManager != null)
+                    throw new InvalidOperationException("GraphicsDeviceManager already registered for this Game object");
+                _graphicsDeviceManager = value;
+            }
         }
 
         // NOTE: InitializeExistingComponents really should only be called once.

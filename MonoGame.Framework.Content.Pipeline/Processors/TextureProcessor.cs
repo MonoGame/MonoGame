@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     return input;
             }
 
-            if (ColorKeyEnabled || ResizeToPowerOfTwo || MakeSquare || PremultiplyAlpha)
+            if (ColorKeyEnabled || ResizeToPowerOfTwo || MakeSquare || PremultiplyAlpha || GenerateMipmaps)
             {
                 // Convert to floating point format for modifications. Keep the original format for conversion back later on if required.
                 var originalType = input.Faces[0][0].GetType();
@@ -59,6 +59,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     context.Logger.LogImportantMessage("Could not convert input texture for processing. " + ex.ToString());
                     throw ex; 
                 }
+
+                if (GenerateMipmaps)
+                    input.GenerateMipmaps(true);
 
                 for (int f = 0; f < input.Faces.Count; ++f)
                 {
@@ -113,7 +116,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             // Get the texture profile for the platform and let it convert the texture.
             var texProfile = TextureProfile.ForPlatform(context.TargetPlatform);
-            texProfile.ConvertTexture(context, input, TextureFormat, GenerateMipmaps, false);	
+            texProfile.ConvertTexture(context, input, TextureFormat, false);	
 
             return input;
         }
