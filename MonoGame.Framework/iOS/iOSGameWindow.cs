@@ -89,11 +89,6 @@ namespace Microsoft.Xna.Framework {
 
 		#region GameWindow Members
 
-		public override bool AllowUserResizing {
-			get { return false; }
-			set { /* Do nothing. */ }
-		}
-
 		public override Rectangle ClientBounds {
 			get {
 				var bounds = _viewController.View.Bounds;

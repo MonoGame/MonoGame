@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework {
 		#region Properties
 
 		[DefaultValue(false)]
-		public abstract bool AllowUserResizing { get; set; }
+        public virtual bool AllowUserResizing { get; set; }
 
 		public abstract Rectangle ClientBounds { get; }
 
