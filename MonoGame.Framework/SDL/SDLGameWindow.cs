@@ -54,11 +54,6 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        public override DisplayOrientation CurrentOrientation
-        {
-            get { return DisplayOrientation.Default; }
-        }
-
         public override IntPtr Handle
         {
             get { return _handle; }

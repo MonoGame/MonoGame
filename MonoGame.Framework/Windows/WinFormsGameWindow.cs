@@ -90,11 +90,6 @@ namespace MonoGame.Framework
              }
         }
 
-        public override DisplayOrientation CurrentOrientation
-        {
-            get { return DisplayOrientation.Default; }
-        }
-
         public override XnaPoint Position
         {
             get { return new XnaPoint(Form.Location.X, Form.Location.Y); }

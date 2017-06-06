@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework {
         public abstract Point Position { get; set; }
 #endif
 
-		public abstract DisplayOrientation CurrentOrientation { get; }
+        public virtual DisplayOrientation CurrentOrientation { get; protected set; }
 
 		public abstract IntPtr Handle { get; }
 

@@ -22,7 +22,6 @@ namespace Microsoft.Xna.Framework
     partial class MetroGameWindow : GameWindow
     {
         private DisplayOrientation _supportedOrientations;
-        private DisplayOrientation _orientation;
         private CoreWindow _coreWindow;
         private Rectangle _clientBounds;
 #if !WINDOWS_PHONE81
@@ -67,11 +66,6 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        public override DisplayOrientation CurrentOrientation
-        {
-            get { return _orientation; }
-        }
-
         private MetroGamePlatform Platform { get { return Game.Instance.Platform as MetroGamePlatform; } }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
@@ -113,7 +107,7 @@ namespace Microsoft.Xna.Framework
             _coreWindow = coreWindow;
             _inputEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
 
-            _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
+            CurrentOrientation = ToOrientation(DisplayProperties.CurrentOrientation);
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
 
             _coreWindow.SizeChanged += Window_SizeChanged;
@@ -280,7 +274,7 @@ namespace Microsoft.Xna.Framework
                 _isOrientationChanged = false;
 
                 // Set the new orientation.
-                _orientation = _newOrientation;
+                CurrentOrientation = _newOrientation;
 
                 // Call the user callback.
                 OnOrientationChanged();

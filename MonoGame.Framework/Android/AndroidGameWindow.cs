@@ -20,7 +20,6 @@ namespace Microsoft.Xna.Framework
         private readonly Game _game;
         private Rectangle _clientBounds;
         private DisplayOrientation _supportedOrientations = DisplayOrientation.Default;
-        private DisplayOrientation _currentOrientation;
 
         public override IntPtr Handle { get { return IntPtr.Zero; } }
 
@@ -211,23 +210,14 @@ namespace Microsoft.Xna.Framework
             ReversePortrait = 9,
             FullSensor = 10,
         }
-
-        public override DisplayOrientation CurrentOrientation
-        {
-            get
-            {
-                return _currentOrientation;
-            }
-        }
-
         
         private void SetDisplayOrientation(DisplayOrientation value)
         {
-            if (value != _currentOrientation)
+            if (value != CurrentOrientation)
             {
                 DisplayOrientation supported = GetEffectiveSupportedOrientations();
                 ScreenOrientation requestedOrientation = ScreenOrientation.Unspecified;
-                bool wasPortrait = _currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitDown;
+                bool wasPortrait = (CurrentOrientation == DisplayOrientation.Portrait || CurrentOrientation == DisplayOrientation.PortraitDown);
                 bool requestPortrait = false;
 
                 bool didOrientationChange = false;
@@ -239,7 +229,7 @@ namespace Microsoft.Xna.Framework
                     if ((supported & value) != 0)
                     {
                         didOrientationChange = true;
-                        _currentOrientation = value;
+                        CurrentOrientation = value;
                         switch (value)
                         {
                             case DisplayOrientation.LandscapeLeft:
@@ -268,7 +258,7 @@ namespace Microsoft.Xna.Framework
                         ((supported & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)) != 0))
                     {
                         didOrientationChange = true;
-                        _currentOrientation = DisplayOrientation.LandscapeLeft;
+                        CurrentOrientation = DisplayOrientation.LandscapeLeft;
                         requestedOrientation = ScreenOrientation.Landscape;
                         requestPortrait = false;
                     }
@@ -277,7 +267,7 @@ namespace Microsoft.Xna.Framework
                             ((supported & (DisplayOrientation.Portrait | DisplayOrientation.PortraitDown)) != 0))
                     {
                         didOrientationChange = true;
-                        _currentOrientation = DisplayOrientation.Portrait;
+                        CurrentOrientation = DisplayOrientation.Portrait;
                         requestedOrientation = ScreenOrientation.Portrait;
                         requestPortrait = true;
                     }
