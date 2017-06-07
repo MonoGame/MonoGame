@@ -11,7 +11,5 @@ namespace MonoGame.Tools.Pipeline
         string Location { get; }
 
         bool Exists { get; set; }
-        bool ExpandToThis { get; set; }
-        bool SelectThis { get; set; }
     }
 }

@@ -55,9 +55,9 @@ namespace MonoGame.Tools.Pipeline
         [Browsable(false)]
         public bool Exists { get; set; }
 
+        // UI state
         [Browsable(false)]
         public bool ExpandToThis { get; set; }
-
         [Browsable(false)]
         public bool SelectThis { get; set; }
 
