@@ -324,6 +324,7 @@
     <Compile Include="Quaternion.cs" />
     <Compile Include="Ray.cs" />
     <Compile Include="Rectangle.cs" />
+    <Compile Include="Circle.cs" />
     <Compile Include="ReusableItemList.cs" />
     <Compile Include="SharedGraphicsDeviceManager.cs">
       <Platforms>Windows8,WindowsPhone81</Platforms>
