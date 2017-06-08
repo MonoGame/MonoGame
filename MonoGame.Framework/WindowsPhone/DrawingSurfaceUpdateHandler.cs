@@ -68,9 +68,24 @@ namespace MonoGame.Framework.WindowsPhone
 		        SharpDX.Direct3D.FeatureLevel.Level_9_3
 	        };
 
-            // Create the Direct3D 11 API device object and a corresponding context.
-            using (var defaultDevice = new SharpDX.Direct3D11.Device(SharpDX.Direct3D.DriverType.Hardware, creationFlags, featureLevels))
-                _device = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+#if DEBUG
+            try
+            {
+#endif
+                // Create the Direct3D 11 API device object and a corresponding context.
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(SharpDX.Direct3D.DriverType.Hardware, creationFlags, featureLevels))
+                    _device = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+#if DEBUG
+            }
+            catch (SharpDXException)
+            {
+                // Try again without the debug flag.  This allows debug builds to run
+                // on machines that don't have the debug runtime installed.
+                creationFlags &= ~SharpDX.Direct3D11.DeviceCreationFlags.Debug;
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(SharpDX.Direct3D.DriverType.Hardware, creationFlags, featureLevels))
+                    _device = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+            }
+#endif
 
             // Get Direct3D 11.1 context
             _deviceContext = ToDispose(_device.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>());
