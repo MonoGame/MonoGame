@@ -116,6 +116,8 @@ namespace MonoGame.Framework.WindowsPhone
             if (page == null)
                 throw new NullReferenceException("The page parameter cannot be null!");
 
+            WindowsPhoneGameWindow.IsUsingDrawingSurfaceBackgroundGrid = (page.Content is DrawingSurfaceBackgroundGrid);
+
             UIElement drawingSurface = page.Content as DrawingSurfaceBackgroundGrid;
             
             MediaElement mediaElement = null;
