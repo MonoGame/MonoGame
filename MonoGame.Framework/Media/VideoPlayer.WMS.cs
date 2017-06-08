@@ -80,8 +80,6 @@ namespace Microsoft.Xna.Framework.Media
             public WorkQueueId WorkQueueId { get; private set; }
         }
 
-        private Texture2D _videoCache;
-
         private void PlatformInitialize()
         {
             // The GUID is specified in a GuidAttribute attached to the class
@@ -89,7 +87,6 @@ namespace Microsoft.Xna.Framework.Media
 
             MediaManagerState.CheckStartup();
             MediaFactory.CreateMediaSession(null, out _session);
-
         }
 
         private void CreateTexture()
@@ -115,7 +112,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             CreateTexture();
 
-            if (_currentVideo != null && State != MediaState.Stopped)
+            if (_currentVideo != null && State != MediaState.Stopped && State != MediaState.Paused)
             {
                 var sampleGrabber = _currentVideo.SampleGrabber;
                 var texData = sampleGrabber.TextureData;
@@ -181,15 +178,14 @@ namespace Microsoft.Xna.Framework.Media
             _session.SetTopology(SessionSetTopologyFlags.Immediate, _currentVideo.Topology);
 
             WaitForInternalStateChange(InternalState.Playing);
-
-            // Create cached texture
-            _videoCache = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
         }
 
         private void PlatformResume()
         {
             _internalState = InternalState.WaitingForSessionStart;
-            _session.Start(null, null);
+            // A variant is required for the second parameter of Start() otherwise it throws an invalid pointer error
+            var varStart = new Variant();
+            _session.Start(null, varStart);
             WaitForInternalStateChange(InternalState.Playing);
         }
 
