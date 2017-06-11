@@ -46,6 +46,8 @@ namespace MonoGame.Tests.Graphics {
             _texture3.Dispose();
             _effect.Dispose();
             _effect2.Dispose();
+
+            base.TearDown();
 	    }
 
         [Test]

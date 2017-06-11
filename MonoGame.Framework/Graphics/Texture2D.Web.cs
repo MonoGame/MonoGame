@@ -15,6 +15,11 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
+        private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount) where T : struct
+        {
+            throw new NotImplementedException();
+        }
+
         private void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             throw new NotImplementedException();

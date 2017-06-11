@@ -919,8 +919,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             SharpDX.Utilities.Dispose(ref _renderTargetView);
             SharpDX.Utilities.Dispose(ref _depthStencilView);
-            SharpDX.Utilities.Dispose(ref _d3dDevice);
-            SharpDX.Utilities.Dispose(ref _d3dContext);
 
             if (_userIndexBuffer16 != null)
                 _userIndexBuffer16.Dispose();
@@ -929,14 +927,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             foreach (var vb in _userVertexBuffers.Values)
                 vb.Dispose();
-				
+
+            SharpDX.Utilities.Dispose(ref _swapChain);
+
 #if WINDOWS_STOREAPP || WINDOWS_UAP
 
-            if (_swapChain != null)
-            {
-                _swapChain.Dispose();
-                _swapChain = null;
-            }
             if (_bitmapTarget != null)
             {
                 _bitmapTarget.Dispose();
@@ -970,8 +965,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #endif // WINDOWS_STOREAPP
+
+            SharpDX.Utilities.Dispose(ref _d3dContext);
+            SharpDX.Utilities.Dispose(ref _d3dDevice);
         }
-        
+
         private void PlatformPresent()
         {
 #if WINDOWS_STOREAPP || WINDOWS_UAP

@@ -121,6 +121,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.GetInteger((GetPName)GetParamName.MaxSamples, out _maxMultiSampleCount);
 #endif
+
+#if GLES || MONOMAC
+            SupportsInstancing = false;
+#else
+            SupportsInstancing = GL.VertexAttribDivisor != null;
+#endif
         }
 
     }

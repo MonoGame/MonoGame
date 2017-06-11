@@ -38,10 +38,43 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _mipmap;
         private SampleDescription _sampleDescription;
 
+        private SharpDX.Direct3D11.Texture2D _cachedStagingTexture;
+
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
             _shared = shared;
             _mipmap = mipmap;
+        }
+
+        private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount) where T : struct
+        {
+            int w, h;
+            GetSizeForLevel(Width, Height, level, out w, out h);
+            var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            // Use try..finally to make sure dataHandle is freed in case of an error
+            try
+            {
+                var startBytes = startIndex * elementSizeInByte;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                var region = new ResourceRegion();
+                region.Top = 0;
+                region.Front = 0;
+                region.Back = 1;
+                region.Bottom = h;
+                region.Left = 0;
+                region.Right = w;
+
+                // TODO: We need to deal with threaded contexts here!
+                var subresourceIndex = CalculateSubresourceIndex(0, level);
+                var d3dContext = GraphicsDevice._d3dContext;
+                lock (d3dContext)
+                    d3dContext.UpdateSubresource(GetTexture(), subresourceIndex, region, dataPtr, GetPitch(w), 0);
+            }
+            finally
+            {
+                dataHandle.Free();
+            }
         }
 
         private void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
@@ -85,77 +118,93 @@ namespace Microsoft.Xna.Framework.Graphics
             var levelWidth = Math.Max(width >> level, min);
             var levelHeight = Math.Max(height >> level, min);
 
-            var desc = new Texture2DDescription();
-            desc.Width = levelWidth;
-            desc.Height = levelHeight;
-            desc.MipLevels = 1;
-            desc.ArraySize = 1;
-            desc.Format = SharpDXHelper.ToFormat(_format);
-            desc.BindFlags = BindFlags.None;
-            desc.CpuAccessFlags = CpuAccessFlags.Read;
-            desc.SampleDescription = CreateSampleDescription();
-            desc.Usage = ResourceUsage.Staging;
-            desc.OptionFlags = ResourceOptionFlags.None;
+            if (_cachedStagingTexture == null)
+            {
+                var desc = new Texture2DDescription();
+                desc.Width = levelWidth;
+                desc.Height = levelHeight;
+                desc.MipLevels = 1;
+                desc.ArraySize = 1;
+                desc.Format = SharpDXHelper.ToFormat(_format);
+                desc.BindFlags = BindFlags.None;
+                desc.CpuAccessFlags = CpuAccessFlags.Read;
+                desc.SampleDescription.Count = 1;
+                desc.SampleDescription.Quality = 0;
+                desc.Usage = ResourceUsage.Staging;
+                desc.OptionFlags = ResourceOptionFlags.None;
 
-            // Save sampling description.
-            _sampleDescription = desc.SampleDescription;
+                // Save sampling description.
+                _sampleDescription = desc.SampleDescription;
+
+                _cachedStagingTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+            }
 
             var d3dContext = GraphicsDevice._d3dContext;
-            using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
+
+            lock (d3dContext)
             {
-                lock (d3dContext)
+                var subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
+
+                // Copy the data from the GPU to the staging texture.
+                var elementsInRow = rect.Width;
+                var rows = rect.Height;
+                var region = new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1);
+                d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, _cachedStagingTexture, 0);
+
+                // Copy the data to the array.
+                DataStream stream = null;
+                try
                 {
-                    var subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
+                    var databox = d3dContext.MapSubresource(_cachedStagingTexture, 0, MapMode.Read, MapFlags.None, out stream);
 
-                    // Copy the data from the GPU to the staging texture.
-                    var elementsInRow = rect.Width;
-                    var rows = rect.Height;
-                    var region = new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1);
-                    d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, stagingTex, 0);
-
-                    // Copy the data to the array.
-                    DataStream stream = null;
-                    try
+                    var elementSize = _format.GetSize();
+                    if (_format.IsCompressedFormat())
                     {
-                        var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);
-
-                        var elementSize = _format.GetSize();
-                        if (_format.IsCompressedFormat())
-                        {
-                            // for 4x4 block compression formats an element is one block, so elementsInRow
-                            // and number of rows are 1/4 of number of pixels in width and height of the rectangle
-                            elementsInRow /= 4;
-                            rows /= 4;
-                        }
-                        var rowSize = elementSize * elementsInRow;
-                        if (rowSize == databox.RowPitch)
-                            stream.ReadRange(data, startIndex, elementCount);
-                        else
-                        {
-                            // Some drivers may add pitch to rows.
-                            // We need to copy each row separatly and skip trailing zeros.
-                            stream.Seek(0, SeekOrigin.Begin);
-
-                            var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
-                            for (var row = 0; row < rows; row++)
-                            {
-                                int i;
-                                for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
-                                    data[i + startIndex] = stream.Read<T>();
-
-                                if (i >= elementCount)
-                                    break;
-
-                                stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
-                            }
-                        }
+                        // for 4x4 block compression formats an element is one block, so elementsInRow
+                        // and number of rows are 1/4 of number of pixels in width and height of the rectangle
+                        elementsInRow /= 4;
+                        rows /= 4;
                     }
-                    finally
+                    var rowSize = elementSize * elementsInRow;
+                    if (rowSize == databox.RowPitch)
+                        stream.ReadRange(data, startIndex, elementCount);
+                    else
                     {
-                        SharpDX.Utilities.Dispose(ref stream);
+                        // Some drivers may add pitch to rows.
+                        // We need to copy each row separatly and skip trailing zeros.
+                        stream.Seek(0, SeekOrigin.Begin);
+
+                        var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
+                        for (var row = 0; row < rows; row++)
+                        {
+                            int i;
+                            for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
+                                data[i + startIndex] = stream.Read<T>();
+
+                            if (i >= elementCount)
+                                break;
+
+                            stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
+                        }
                     }
                 }
+                finally
+                {
+                    SharpDX.Utilities.Dispose( ref stream);
+
+                    d3dContext.UnmapSubresource(_cachedStagingTexture, 0);
+                }
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                SharpDX.Utilities.Dispose(ref _cachedStagingTexture);
+            }
+
+            base.Dispose(disposing);
         }
 
         private int CalculateSubresourceIndex(int arraySlice, int level)
@@ -291,7 +340,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 #if !WINDOWS_PHONE
 
-        static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(BitmapSource bsource, GraphicsDevice device)
+        static unsafe SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(BitmapSource bsource, GraphicsDevice device)
         {
 
             Texture2DDescription desc;
@@ -310,6 +359,18 @@ namespace Microsoft.Xna.Framework.Graphics
             using (DataStream s = new DataStream(bsource.Size.Height * bsource.Size.Width * 4, true, true))
             {
                 bsource.CopyPixels(bsource.Size.Width * 4, s);
+
+                // XNA blacks out any pixels with an alpha of zero.
+                var data = (byte*)s.DataPointer;
+                for (var i = 0; i < s.Length; i+=4)
+                {
+                    if (data[i + 3] == 0)
+                    {
+                        data[i + 0] = 0;
+                        data[i + 1] = 0;
+                        data[i + 2] = 0;
+                    }
+                }
 
                 DataRectangle rect = new DataRectangle(s.DataPointer, bsource.Size.Width * 4);
 
@@ -335,7 +396,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             fconv.Initialize(
                 decoder.GetFrame(0),
-                PixelFormat.Format32bppPRGBA,
+                PixelFormat.Format32bppRGBA,
                 BitmapDitherType.None, null,
                 0.0, BitmapPaletteType.Custom);
 
