@@ -128,8 +128,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.Format = SharpDXHelper.ToFormat(_format);
                 desc.BindFlags = BindFlags.None;
                 desc.CpuAccessFlags = CpuAccessFlags.Read;
-                desc.SampleDescription.Count = 1;
-                desc.SampleDescription.Quality = 0;
+                desc.SampleDescription = CreateSampleDescription();
                 desc.Usage = ResourceUsage.Staging;
                 desc.OptionFlags = ResourceOptionFlags.None;
 
