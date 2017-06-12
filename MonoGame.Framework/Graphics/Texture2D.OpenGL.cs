@@ -5,8 +5,8 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Drawing;
 using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 using MonoGame.Utilities.Png;
 
 #if MONOMAC
@@ -59,7 +59,11 @@ using Android.Graphics;
 #endif
 #endif // OPENGL
 
-#if DESKTOPGL || MONOMAC || ANGLE
+#if MONOMAC || PLATFORM_MACOS_LEGACY || IOS
+using System.Drawing;
+#endif
+
+#if MONOMAC
 using System.Drawing.Imaging;
 #endif
 
@@ -317,31 +321,26 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
 #if DESKTOPGL || ANGLE
-            Bitmap image = (Bitmap)Bitmap.FromStream(stream);
-            try
+            var reader = new ImageReader();
+            int x, y, comp;
+            var data = reader.Read(stream, out x, out y, out comp, Imaging.STBI_rgb_alpha);
+
+            // XNA blacks out any pixels with an alpha of zero.
+            for (var i = 0; i < data.Length; i += 4)
             {
-                // Fix up the Image to match the expected format
-                image = (Bitmap)image.RGBToBGR();
-
-                var data = new byte[image.Width * image.Height * 4];
-
-                BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
-                    ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                if (bitmapData.Stride != image.Width * 4)
-                    throw new NotImplementedException();
-                Marshal.Copy(bitmapData.Scan0, data, 0, data.Length);
-                image.UnlockBits(bitmapData);
-
-                Texture2D texture = null;
-                texture = new Texture2D(graphicsDevice, image.Width, image.Height);
-                texture.SetData(data);
-
-                return texture;
+                if (data[i + 3] == 0)
+                {
+                    data[i + 0] = 0;
+                    data[i + 1] = 0;
+                    data[i + 2] = 0;
+                }
             }
-            finally
-            {
-                image.Dispose();
-            }
+
+            Texture2D texture = null;
+            texture = new Texture2D(graphicsDevice, x, y);
+            texture.SetData(data);
+
+            return texture;
 #endif
         }
 
@@ -494,8 +493,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
-#if DESKTOPGL || MONOMAC
-			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
+#if MONOMAC
+            SaveAsImage(stream, width, height, ImageFormat.Jpeg);
+#elif DESKTOPGL
+            SaveAsImage(stream, width, height, ImageWriterFormat.Jpg);
 #elif ANDROID
             SaveAsImage(stream, width, height, Bitmap.CompressFormat.Jpeg);
 #else
@@ -505,7 +506,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsPng(Stream stream, int width, int height)
         {
-#if ANDROID
+#if DESKTOPGL
+            SaveAsImage(stream, width, height, ImageWriterFormat.Png);
+#elif ANDROID
             SaveAsImage(stream, width, height, Bitmap.CompressFormat.Png);
 #else
             var pngWriter = new PngWriter();
@@ -513,8 +516,40 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if DESKTOPGL || MONOMAC
-        internal void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
+#if DESKTOPGL
+        internal void SaveAsImage(Stream stream, int width, int height, ImageWriterFormat format)
+        {
+	        if (stream == null)
+	        {
+		        throw new ArgumentNullException("stream", "'stream' cannot be null (Nothing in Visual Basic)");
+	        }
+	        if (width <= 0)
+	        {
+		        throw new ArgumentOutOfRangeException("width", width, "'width' cannot be less than or equal to zero");
+	        }
+	        if (height <= 0)
+	        {
+		        throw new ArgumentOutOfRangeException("height", height, "'height' cannot be less than or equal to zero");
+	        }
+	        byte[] data = null;
+	        try
+	        {
+		        data = new byte[width * height * 4];
+		        GetData(data);
+
+                var writer = new ImageWriter();
+                writer.Write(data, width, height, 4, format, stream);
+	        }
+	        finally
+	        {
+		        if (data != null)
+		        {
+			        data = null;
+		        }
+	        }
+        }
+#elif MONOMAC
+       internal void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
 		{
 			if (stream == null)
 			{
@@ -650,4 +685,3 @@ namespace Microsoft.Xna.Framework.Graphics
         }
     }
 }
-
