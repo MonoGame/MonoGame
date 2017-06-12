@@ -35,6 +35,7 @@
             <topic id="Riemers_Tutorials_2D_1" name="Starting Your Project" filename="Riemer\riemer_2D_1_starting_project.md"/>
             <topic id="Riemers_Tutorials_2D_2" name="Drawing a Background Image" filename="Riemer\riemer_2D_2_drawing_background.md"/>
             <topic id="Riemers_Tutorials_2D_3" name="Positioning Images on the Screen" filename="Riemer\riemer_2D_3_positioning_images.md"/>
+            <topic id="Riemers_Tutorials_2D_4" name="SpriteBatch Features" filename="Riemer\riemer_2D_4_spritebatch_features.md"/>
         </topic>
     </topic>
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
