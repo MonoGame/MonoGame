@@ -31,7 +31,9 @@
     <topic id="Getting_Started" name="Getting Started" filename="getting_started.md"/>
     <topic id="Tutorials" name="Tutorials" filename="tutorials.md">
         <topic id="Riemers_Tutorials_Introduction" name="Riemer's Tutorials — Introduction" filename="Riemer\riemer_intro.md"/>
-        <topic id="Riemers_Tutorials_2D" name="Riemer's Tutorials — 2D Series: Shooters" filename="Riemer\riemer_2D_intro.md"/>
+        <topic id="Riemers_Tutorials_2D" name="Riemer's Tutorials — 2D Series: Shooters" filename="Riemer\riemer_2D_intro.md">
+            <topic id="Riemers_Tutorials_2D_1" name="Starting Your Project" filename="Riemer\riemer_2D_1_starting_project.md"/>
+        </topic>
     </topic>
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
         <topic id="Using_The_Pipeline_Tool" name="Using The Pipeline Tool" filename="using_pipeline_tool.md"/>

@@ -7,8 +7,6 @@ The game we will create looks pretty simple, but don’t be mistaken: at the end
 
 Below I have listed some of the concepts you’ll learn in this series of tutorials:
 
-
-
 - Installing XNA and opening your first XNA project
 - Rendering 2D images to the screen
 - Scaling, rotating and positioning 2D images

@@ -12,7 +12,7 @@ At this moment, you can find 5 series of XNA Tutorials on this site: one series 
 
 ![2D Series 1: Shooters!](images/Riemer/riemers_intro_2D_series_1.jpg "2D Series 1: Shooters!")
 
-2D Series 1: Shooters!
+[2D Series 1: Shooters!](riemer_2D_intro.md)
 
 -----
 
