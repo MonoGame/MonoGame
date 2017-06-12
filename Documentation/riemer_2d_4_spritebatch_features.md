@@ -225,8 +225,8 @@ Our code:
                     if (player.IsAlive)
                     {
                         spriteBatch.Draw(carriageTexture, player.Position, null, player.Color, 0, new Vector2(0, carriageTexture.Height), playerScaling, SpriteEffects.None, 0);
+                    }
                 }
             }
         }
     }
-}
