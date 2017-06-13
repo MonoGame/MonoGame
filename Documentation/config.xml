@@ -41,6 +41,7 @@
             <topic id="Riemers_Tutorials_2D_07" name="Displaying Text" filename="riemer_2D_07_displaying_text.md"/>
             <topic id="Riemers_Tutorials_2D_08" name="Launching the Rocket" filename="riemer_2D_08_launching_rocket.md"/>
             <topic id="Riemers_Tutorials_2D_09" name="Moving the Rocket" filename="riemer_2D_09_moving_rocket.md"/>
+            <topic id="Riemers_Tutorials_2D_10" name="Smoke Trail" filename="riemer_2D_10_smoke_trail.md"/>
         </topic>
     </topic>
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
