@@ -42,6 +42,8 @@
             <topic id="Riemers_Tutorials_2D_08" name="Launching the Rocket" filename="riemer_2D_08_launching_rocket.md"/>
             <topic id="Riemers_Tutorials_2D_09" name="Moving the Rocket" filename="riemer_2D_09_moving_rocket.md"/>
             <topic id="Riemers_Tutorials_2D_10" name="Smoke Trail" filename="riemer_2D_10_smoke_trail.md"/>
+            <topic id="Riemers_Tutorials_2D_11" name="Programmatic Texture Creation" filename="riemer_2D_11_texture_creation.md"/>
+            <topic id="Riemers_Tutorials_2D_12" name="Random Terrain Generation" filename="riemer_2D_12_random_terrain_generation.md"/>
         </topic>
     </topic>
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
