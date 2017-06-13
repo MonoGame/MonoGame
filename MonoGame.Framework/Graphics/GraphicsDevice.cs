@@ -269,8 +269,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
-        private int GetClampedMultisampleCount(
-            int multiSampleCount)
+        internal int GetClampedMultisampleCount(int multiSampleCount)
         {
             if (multiSampleCount > 1)
             {
@@ -292,6 +291,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else return 0;
         }
+
         internal void Initialize()
         {
             PlatformInitialize();
