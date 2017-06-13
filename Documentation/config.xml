@@ -37,6 +37,7 @@
             <topic id="Riemers_Tutorials_2D_3" name="Positioning Images on the Screen" filename="riemer_2D_3_positioning_images.md"/>
             <topic id="Riemers_Tutorials_2D_4" name="SpriteBatch Features" filename="riemer_2D_4_spritebatch_features.md"/>
             <topic id="Riemers_Tutorials_2D_5" name="Rotation — Drawing the Cannon" filename="riemer_2D_5_rotation.md"/>
+            <topic id="Riemers_Tutorials_2D_6" name="Reading Keyboard Input" filename="riemer_2D_6_reading_keyboard_input.md"/>
         </topic>
     </topic>
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
