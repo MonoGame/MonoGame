@@ -32,15 +32,15 @@
     <topic id="Tutorials" name="Tutorials" filename="tutorials.md">
         <topic id="Riemers_Tutorials_Introduction" name="Riemer's Tutorials — Introduction" filename="riemer_intro.md"/>
         <topic id="Riemers_Tutorials_2D" name="Riemer's Tutorials — 2D Series: Shooters" filename="riemer_2D_intro.md">
-            <topic id="Riemers_Tutorials_2D_1" name="Starting Your Project" filename="riemer_2D_1_starting_project.md"/>
-            <topic id="Riemers_Tutorials_2D_2" name="Drawing a Background Image" filename="riemer_2D_2_drawing_background.md"/>
-            <topic id="Riemers_Tutorials_2D_3" name="Positioning Images on the Screen" filename="riemer_2D_3_positioning_images.md"/>
-            <topic id="Riemers_Tutorials_2D_4" name="SpriteBatch Features" filename="riemer_2D_4_spritebatch_features.md"/>
-            <topic id="Riemers_Tutorials_2D_5" name="Rotation — Drawing the Cannon" filename="riemer_2D_5_rotation.md"/>
-            <topic id="Riemers_Tutorials_2D_6" name="Reading Keyboard Input" filename="riemer_2D_6_reading_keyboard_input.md"/>
-            <topic id="Riemers_Tutorials_2D_7" name="Displaying Text" filename="riemer_2D_7_displaying_text.md"/>
-            <topic id="Riemers_Tutorials_2D_8" name="Launching the Rocket" filename="riemer_2D_8_launching_rocket.md"/>
-            <topic id="Riemers_Tutorials_2D_9" name="Moving the Rocket" filename="riemer_2D_9_moving_rocket.md"/>
+            <topic id="Riemers_Tutorials_2D_01" name="Starting Your Project" filename="riemer_2D_01_starting_project.md"/>
+            <topic id="Riemers_Tutorials_2D_02" name="Drawing a Background Image" filename="riemer_2D_02_drawing_background.md"/>
+            <topic id="Riemers_Tutorials_2D_03" name="Positioning Images on the Screen" filename="riemer_2D_03_positioning_images.md"/>
+            <topic id="Riemers_Tutorials_2D_04" name="SpriteBatch Features" filename="riemer_2D_04_spritebatch_features.md"/>
+            <topic id="Riemers_Tutorials_2D_05" name="Rotation — Drawing the Cannon" filename="riemer_2D_05_rotation.md"/>
+            <topic id="Riemers_Tutorials_2D_06" name="Reading Keyboard Input" filename="riemer_2D_06_reading_keyboard_input.md"/>
+            <topic id="Riemers_Tutorials_2D_07" name="Displaying Text" filename="riemer_2D_07_displaying_text.md"/>
+            <topic id="Riemers_Tutorials_2D_08" name="Launching the Rocket" filename="riemer_2D_08_launching_rocket.md"/>
+            <topic id="Riemers_Tutorials_2D_09" name="Moving the Rocket" filename="riemer_2D_09_moving_rocket.md"/>
         </topic>
     </topic>
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
