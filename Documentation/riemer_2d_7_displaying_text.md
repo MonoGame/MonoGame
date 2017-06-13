@@ -1,15 +1,15 @@
 ## Writing text to the screen in XNA
-In this chapter, we will learn how to render text to the screen so we can print the Power and Angle of the current player’s cannon.
+In this chapter, we will learn how to render text to the screen so we can print the Power and Angle of the current player's cannon.
 
-This has been made quite easy by XNA. First, we need to add a font to our project and bind it to a variable in our code, much like how we would add an image to a project. Then we can simply render it using the SpriteBatch. We even don’t need to create a separate SpriteBatch: we can simply use the SpriteBatch we’re using to render our terrain and cannons.
+This has been made quite easy by XNA. First, we need to add a font to our project and bind it to a variable in our code, much like how we would add an image to a project. Then we can simply render it using the SpriteBatch. We even don't need to create a separate SpriteBatch: we can simply use the SpriteBatch we're using to render our terrain and cannons.
 
-Let’s start by adding the font to our project. To do this, find the Content project in your Solution Explorer at the top-right of your screen, and right-click on it. From the drop-down list, select Add -> New Item, as shown in the image below.
+Let's start by adding the font to our project. To do this, find the Content project in your Solution Explorer at the top-right of your screen, and right-click on it. From the drop-down list, select Add -> New Item, as shown in the image below.
 
 ![Adding a new item](images/Riemer/2DSeries1/add_new_item.jpg "Adding a new item")
 
-In the dialog that opens, select “Sprite Font” and give it a name at the bottom: myFont.spritefont and click the Add button. You should see that the myFont.spritefont file has been added to the Content project of our project.
+In the dialog that opens, select "Sprite Font" and give it a name at the bottom: myFont.spritefont and click the Add button. You should see that the myFont.spritefont file has been added to the Content project of our project.
 
-Also, you will be presented with a weird looking text file in your main window. Luckily, there’s not too much we need to change here. __Find the FontName entry in the file, and change Segoe UI Mono to Arial__. This will define the font family, and you can choose any font installed on your system. To see which fonts are installed on your system, open the C:/Windows/Fonts folder. Note also that in this text file you can also change the size of your font. By default, the size is set to 14 points.
+Also, you will be presented with a weird looking text file in your main window. Luckily, there's not too much we need to change here. __Find the FontName entry in the file, and change Segoe UI Mono to Arial__. This will define the font family, and you can choose any font installed on your system. To see which fonts are installed on your system, open the C:/Windows/Fonts folder. Note also that in this text file you can also change the size of your font. By default, the size is set to 14 points.
 
 Next, go back to our Game1.cs file add this variable to the top of our code:
 
@@ -19,18 +19,18 @@ A Texture2D object can link to an image file, in the same way a SpriteFont objec
 
     font = Content.Load<SpriteFont> ("myFont");
 
-Find the analogy to loading an image: we’re also using the Content.Load method, specify which type of variable we’re loading here, together with the first part of the filename.
+Find the analogy to loading an image: we're also using the Content.Load method, specify which type of variable we're loading here, together with the first part of the filename.
 
-With the font loaded and the SpriteBatch already active, we’re ready to draw some text. Once again, we will not put this directly in our Draw method, but in a separate method:
+With the font loaded and the SpriteBatch already active, we're ready to draw some text. Once again, we will not put this directly in our Draw method, but in a separate method:
 
     private void DrawText()
     {
         spriteBatch.DrawString(font, "Cannon power: 100", new Vector2(20, 45), Color.White);
     }
 
-The line of code asks the SpriteBatch to render some text using our ‘font’ object. We specify the position, color and text, indicating the power of the cannon. This will be rendered 20 pixels to the right and 45 down from the top-left corner of the screen.
+The line of code asks the SpriteBatch to render some text using our 'font' object. We specify the position, color and text, indicating the power of the cannon. This will be rendered 20 pixels to the right and 45 down from the top-left corner of the screen.
 
-Don’t forget to call this method from within our Draw method:
+Don't forget to call this method from within our Draw method:
 
     protected override void Draw(GameTime gameTime)
     {
@@ -47,7 +47,7 @@ Don’t forget to call this method from within our Draw method:
 
 Now when you run this code, you will see the current Power indicated at the top-left corner!
 
-Obviously, the number printed to the screen does not correspond to the actual power when you change it, as we’ve defined it as a fixed number. Instead, change our DrawText method to this:
+Obviously, the number printed to the screen does not correspond to the actual power when you change it, as we've defined it as a fixed number. Instead, change our DrawText method to this:
 
     private void DrawText()
     {
@@ -59,7 +59,7 @@ Obviously, the number printed to the screen does not correspond to the actual po
 
 This looks up the data of the current player in our PlayerData array. From this data, we use both the Angle, Power and Color values while drawing the text to the screen.
 
-That’s it! When you run the code you should see the screen below. Try to change the angle or the power: the values printed on the screen should change accordingly.
+That's it! When you run the code you should see the screen below. Try to change the angle or the power: the values printed on the screen should change accordingly.
 
 ![Displaying text](images/Riemer/2DSeries1/displaying_text.jpg "Displaying text")
 

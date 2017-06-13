@@ -1,9 +1,9 @@
-## Rotation – Drawing the cannon
-We’ve almost covered all aspects about 2D rendering but one: rotation. In this chapter we will render our cannons on top of the carriages, according to the rotation angle stored in the PlayerData array.
+## Rotation — Drawing the cannon
+We've almost covered all aspects about 2D rendering but one: rotation. In this chapter we will render our cannons on top of the carriages, according to the rotation angle stored in the PlayerData array.
 
-You should already have imported the cannon image and linked them to the cannonTexture variable two chapters ago. Let’s discuss how we should rotate the cannons.
+You should already have imported the cannon image and linked them to the cannonTexture variable two chapters ago. Let's discuss how we should rotate the cannons.
 
-As mentioned in the previous chapters, by default XNA takes the top-left corner of the 2D image as origin. This is important for 2 reasons, of which we’ve covered the first one in the previous chapter:
+As mentioned in the previous chapters, by default XNA takes the top-left corner of the 2D image as origin. This is important for 2 reasons, of which we've covered the first one in the previous chapter:
 
 - XNA will position the image on the screen so the origin point is at the position you specify in the SpriteBatch.Draw method.
 - When you rotate the image, XNA rotates the image around its origin point. This is a direct consequence of the previous one: this way, the origin point stays at the position you specify, no matter what the rotation of the image is.
@@ -29,9 +29,9 @@ We need to specify 2 positions:
 - The new origin point of the cannon image
 - And the screen position indicating where this origin point should be positioned.
 
-The cannon image is an image of 70x20 pixels, so I chose (11,50) as origin point. Try to open the image and locate this position, you’ll see it is at the rotational center of the cannon. Note that this position needs to be defined at the original size of the image.
+The cannon image is an image of 70x20 pixels, so I chose (11,50) as origin point. Try to open the image and locate this position, you'll see it is at the rotational center of the cannon. Note that this position needs to be defined at the original size of the image.
 
-Next, we need to define where on the screen this cannon origin should be position. We want to position it 20 pixels to the right and 10 pixels up, relative to the player’s position, which was the top-left pixel of the carriage.
+Next, we need to define where on the screen this cannon origin should be position. We want to position it 20 pixels to the right and 10 pixels up, relative to the player's position, which was the top-left pixel of the carriage.
 
 Finally, we set the rotation angle different than 0. You should try some values for yourself, using the MathHelper.ToRadians() method. In the final line, we pick the angle and color stored in our PlayerData array.
 
@@ -39,7 +39,7 @@ Now when you run this code, all cannons should be pointing to the right as shown
 
 ![Cannons](images/Riemer/2DSeries1/cannons.jpg "Cannons")
 
-Next chapter we’ll learn how we can read in keyboard input, so we can adjust the angles while our program is running!
+Next chapter we'll learn how we can read in keyboard input, so we can adjust the angles while our program is running!
 
 The code so far:
 
