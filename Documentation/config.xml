@@ -49,6 +49,7 @@
             <topic id="Riemers_Tutorials_2D_15" name="2D Transformation Matrices" filename="riemer_2D_15_2d_transformation_matrices.md"/>
             <topic id="Riemers_Tutorials_2D_16" name="Putting Collision Detection into Practice" filename="riemer_2D_16_collision_detection_into_practice.md"/>
             <topic id="Riemers_Tutorials_2D_17" name="Particles" filename="riemer_2D_17_particles.md"/>
+            <topic id="Riemers_Tutorials_2D_18" name="Additive Alpha Blending" filename="riemer_2D_18_additive_alpha_blending.md"/>
         </topic>
     </topic>
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
