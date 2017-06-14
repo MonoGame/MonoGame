@@ -47,6 +47,7 @@
             <topic id="Riemers_Tutorials_2D_13" name="Texturing the Terrain" filename="riemer_2D_13_texture_to_color_array.md"/>
             <topic id="Riemers_Tutorials_2D_14" name="Collision Detection Overview" filename="riemer_2D_14_collision_detection_overview.md"/>
             <topic id="Riemers_Tutorials_2D_15" name="2D Transformation Matrices" filename="riemer_2D_15_2d_transformation_matrices.md"/>
+            <topic id="Riemers_Tutorials_2D_16" name="Putting Collision Detection into Practice" filename="riemer_2D_16_collision_detection_into_practice.md"/>
         </topic>
     </topic>
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
