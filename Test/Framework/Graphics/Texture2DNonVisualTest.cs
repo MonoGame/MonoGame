@@ -77,6 +77,56 @@ namespace MonoGame.Tests.Graphics
 #endif
         }
 
+        [TestCase]
+        public void FromStreamNotPremultiplied()
+        {
+            // XNA will not try to premultiply your image on
+            // load... this test verifies that this doesn't occur.
+
+            using (var stream = File.OpenRead("Assets/Textures/red_128.png"))
+            using (var texture = Texture2D.FromStream(gd, stream))
+            {
+                Assert.AreEqual(8, texture.Width);
+                Assert.AreEqual(8, texture.Height);
+                Assert.AreEqual(1, texture.LevelCount);
+                var pngData = new Color[8 * 8];
+                texture.GetData(pngData);
+
+                for (var i = 0; i < pngData.Length; i++)
+                {
+                    Assert.AreEqual(255,    pngData[i].R);
+                    Assert.AreEqual(0,      pngData[i].G);
+                    Assert.AreEqual(0,      pngData[i].B);
+                    Assert.AreEqual(128,    pngData[i].A);
+                }
+            }
+        }
+
+        [TestCase]
+        public void FromStreamBlackAlpha()
+        {
+            // XNA will make any pixel with an alpha value
+            // of 0 into black throwing out any color data.
+
+            using (var stream = File.OpenRead("Assets/Textures/blue_0.png"))
+            using (var texture = Texture2D.FromStream(gd, stream))
+            {
+                Assert.AreEqual(8, texture.Width);
+                Assert.AreEqual(8, texture.Height);
+                Assert.AreEqual(1, texture.LevelCount);
+                var pngData = new Color[8 * 8];
+                texture.GetData(pngData);
+
+                for (var i = 0; i < pngData.Length; i++)
+                {
+                    Assert.AreEqual(0, pngData[i].R);
+                    Assert.AreEqual(0, pngData[i].G);
+                    Assert.AreEqual(0, pngData[i].B);
+                    Assert.AreEqual(0, pngData[i].A);
+                }
+            }
+        }
+        
         [Test]
         public void ZeroSizeShouldFailTest()
         {

@@ -17,10 +17,13 @@ namespace Microsoft.Xna.Framework.Media
 
         private static Texture2D _retTexture;
 
+        private Texture2D _videoCache;
+
         private void PlatformInitialize()
         {
             // The GUID is specified in a GuidAttribute attached to the class
             AudioStreamVolumeGuid = Guid.Parse(((GuidAttribute)typeof(AudioStreamVolume).GetCustomAttributes(typeof(GuidAttribute), false)[0]).Value);
+
         }
 
         private Texture2D PlatformGetTexture()
@@ -37,23 +40,12 @@ namespace Microsoft.Xna.Framework.Media
             if (texData == null)
                 return null;
 
-            // TODO: This could likely be optimized if we held on to the SharpDX Surface/Texture data,
-            // and set it on an XNA one rather than constructing a new one every time this is called.
-            if (_retTexture == null || _retTexture.IsDisposed || _retTexture.Width != _currentVideo.Width ||
-                _retTexture.Height != _currentVideo.Height)
-            {
-                if (_retTexture != null && !_retTexture.IsDisposed)
-                {
-                    _retTexture.Dispose();
-                }
+            // NOTE: It's entirely possible that we could lose the d3d context and therefore lose this texture, but it's better than allocating a new texture each call!
+            _videoCache = _videoCache ?? new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
 
-                _retTexture = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
-
-            }
-
-            _retTexture.SetData(texData);
-
-            return _retTexture;
+            _videoCache.SetData(texData);
+            
+            return _videoCache;
         }
 
         private void PlatformGetState(ref MediaState result)
@@ -76,6 +68,9 @@ namespace Microsoft.Xna.Framework.Media
         {
             _currentVideo.SetVolume(_isMuted, _volume);
             _currentVideo.PlatformPlay();
+
+            // Create cached texture
+            _videoCache = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
         }
 
         private void PlatformResume()
@@ -116,7 +111,10 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformDispose(bool disposing)
         {
-            
+            if (_videoCache != null)
+            {
+                _videoCache.Dispose();
+            }
         }
     }
 }

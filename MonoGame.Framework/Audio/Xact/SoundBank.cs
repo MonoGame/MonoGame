@@ -116,8 +116,6 @@ namespace Microsoft.Xna.Framework.Audio
                     stream.Seek(complexCuesOffset, SeekOrigin.Begin);
                     for (int i = 0; i < numComplexCues; i++)
                     {
-                        //Cue cue;
-
                         byte flags = reader.ReadByte();
                         if (((flags >> 2) & 1) != 0)
                         {
@@ -348,13 +346,8 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (disposing)
             {
-                //foreach (var cue in _cues.Values)
-                //    cue.Dispose();
-
                 IsInUse = false;
-
-                if (Disposing != null)
-                    Disposing(this, EventArgs.Empty);
+                EventHelpers.Raise(this, Disposing, EventArgs.Empty);
             }
         }
     }

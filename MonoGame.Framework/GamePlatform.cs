@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework
                 if (_isActive != value)
                 {
                     _isActive = value;
-                    Raise(_isActive ? Activated : Deactivated, EventArgs.Empty);
+                    EventHelpers.Raise(this, _isActive ? Activated : Deactivated, EventArgs.Empty);
                 }
             }
         }
@@ -107,13 +107,6 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
 
-        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
-            where TEventArgs : EventArgs
-        {
-            if (handler != null)
-                handler(this, e);
-        }
-
         /// <summary>
         /// Raises the AsyncRunLoopEnded event.  This method must be called by
         /// derived classes when the asynchronous run loop they start has
@@ -121,7 +114,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         protected void RaiseAsyncRunLoopEnded()
         {
-            Raise(AsyncRunLoopEnded, EventArgs.Empty);
+            EventHelpers.Raise(this, AsyncRunLoopEnded, EventArgs.Empty);
         }
 
         #endregion Events

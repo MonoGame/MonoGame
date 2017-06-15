@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework
             // First call all the frame events... we do this
             // every frame regardless of the elapsed time.
             foreach (var timer in _frameTimers)
-                timer.FrameAction(timer, EventArgs.Empty);
+                EventHelpers.Raise(timer, timer.FrameAction, EventArgs.Empty);
 
             // Next do update events.
             var elapsed = _gameTimer.Elapsed;
@@ -175,7 +175,7 @@ namespace Microsoft.Xna.Framework
                     if (!timer._doDraw)
                         continue;
 
-                    timer.Draw(timer, timer._gameTime);
+                    EventHelpers.Raise(timer, timer.Draw, timer._gameTime);
 
                     doPresent = true;
                     timer._doDraw = false;
@@ -212,8 +212,7 @@ namespace Microsoft.Xna.Framework
                 _gameTime.ElapsedTime = UpdateInterval;
                 var stepCount = 0;
 
-                if (FrameAction != null)
-                    FrameAction(this, null);
+                EventHelpers.Raise(this, FrameAction, EventArgs.Empty);
 
                 // Perform as many full fixed length time steps as we can.
                 while (_accumulatedElapsedTime >= UpdateInterval)
@@ -221,9 +220,8 @@ namespace Microsoft.Xna.Framework
                     _gameTime.TotalTime += UpdateInterval;
                     _accumulatedElapsedTime -= UpdateInterval;
                     ++stepCount;
-
-                    if (Update != null)
-                        Update(this, _gameTime);
+                    
+                    EventHelpers.Raise(this, Update, _gameTime);
                 }
 
                 // Draw needs to know the total elapsed time
@@ -237,8 +235,7 @@ namespace Microsoft.Xna.Framework
                 _gameTime.TotalTime += _accumulatedElapsedTime;
                 _accumulatedElapsedTime = TimeSpan.Zero;
 
-                if (Update != null)
-                    Update(this, _gameTime);
+                EventHelpers.Raise(this, Update, _gameTime);
             }
 
             // Draw unless the update suppressed it.

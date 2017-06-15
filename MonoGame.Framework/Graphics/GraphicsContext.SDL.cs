@@ -45,7 +45,7 @@ namespace OpenGL
             catch (EntryPointNotFoundException)
             {
                 throw new PlatformNotSupportedException(
-                    "MonoGame requires OpenGL 3.0 compatible drivers, or either ARB_framebuffer_object or EXT_framebuffer_object extensions." +
+                    "MonoGame requires OpenGL 3.0 compatible drivers, or either ARB_framebuffer_object or EXT_framebuffer_object extensions. " +
                     "Try updating your graphics drivers.");
             }
         }
