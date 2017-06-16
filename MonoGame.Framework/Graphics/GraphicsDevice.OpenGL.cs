@@ -450,9 +450,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-
-			GL.Clear(bufferMask);
-            GraphicsExtensions.CheckGLError();
+            if (GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt) == FramebufferErrorCode.FramebufferComplete)
+            {
+                GL.Clear(bufferMask);
+                GraphicsExtensions.CheckGLError();
+            }
            		
             // Restore the previous render state.
 		    ScissorRectangle = prevScissorRect;
