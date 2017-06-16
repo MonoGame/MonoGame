@@ -75,7 +75,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                 GraphicsExtensions.CheckGLError();
             }
-
             GraphicsDevice.SetVertexAttributeArray(attrInfo.EnabledAttributes);
 		    GraphicsDevice._attribsDirty = true;
 		}

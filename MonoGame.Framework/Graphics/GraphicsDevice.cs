@@ -237,7 +237,7 @@ namespace Microsoft.Xna.Framework.Graphics
             VertexTextures = new TextureCollection(this, MaxVertexTextureSlots, true);
             VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, true);
 
-            Textures = new TextureCollection(this, MaxTextureSlots, false); 
+            Textures = new TextureCollection(this, MaxTextureSlots, false);
             SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, false);
 
             _blendStateAdditive = BlendState.Additive.Clone();
@@ -267,7 +267,8 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
-        internal int GetClampedMultisampleCount(int multiSampleCount)
+        private int GetClampedMultisampleCount(
+            int multiSampleCount)
         {
             if (multiSampleCount > 1)
             {
@@ -798,7 +799,7 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformResolveRenderTargets();
 
             // Clear the current bindings.
-			Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
+            Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
 
 #if IOS
 			// On iOS, tell OpenGL ES it can discard depth and stencil buffers.

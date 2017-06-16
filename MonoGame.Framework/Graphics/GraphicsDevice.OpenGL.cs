@@ -259,8 +259,6 @@ namespace Microsoft.Xna.Framework.Graphics
             (Context as IGraphicsContextInternal).LoadAll();
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 
-#endif
-#if WINDOWS || ANGLE
             // Provide the graphics context for background loading
             // Note: this context should use the same GraphicsMode,
             // major, minor version and flags parameters as the main

@@ -41,6 +41,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (sampler != null && texture != null && sampler != texture.glLastSamplerState)
                 {
+                    // TODO: Avoid doing this redundantly (see TextureCollection.SetTextures())
+                    // However, I suspect that rendering from the same texture with different sampling modes
+                    // is a relatively rare occurrence...
                     GL.ActiveTexture(TextureUnit.Texture0 + i);
                     GraphicsExtensions.CheckGLError();
 

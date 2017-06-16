@@ -40,7 +40,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 GL.Enable(EnableCap.CullFace);
                 GraphicsExtensions.CheckGLError();
-
                 GL.CullFace(CullFaceMode.Back);
                 GraphicsExtensions.CheckGLError();
 

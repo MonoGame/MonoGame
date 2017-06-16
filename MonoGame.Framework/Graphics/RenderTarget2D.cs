@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	        : base(graphicsDevice, width, height, mipMap, preferredFormat, SurfaceType.RenderTarget, shared, arraySize)
 	    {
             DepthStencilFormat = preferredDepthFormat;
-            MultiSampleCount = graphicsDevice.GetClampedMultisampleCount(preferredMultiSampleCount);
+            MultiSampleCount = preferredMultiSampleCount;
             RenderTargetUsage = usage;
 
             PlatformConstruct(graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage, shared);
