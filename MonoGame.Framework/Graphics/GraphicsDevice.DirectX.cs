@@ -671,6 +671,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext>();
+            
+            // Create a new instance of GraphicsDebug because we support it on Windows platforms.
+            _graphicsDebug = new GraphicsDebug(this);
         }
 
         internal void SetHardwareFullscreen()
