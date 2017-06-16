@@ -69,15 +69,9 @@ non-infringement.
 using System;
 using System.Runtime.InteropServices;
 
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.AppKit;
-using MonoMac.Foundation;
-using PointF = System.Drawing.PointF;
-#else
 using AppKit;
 using Foundation;
 using PointF = CoreGraphics.CGPoint;
-#endif
 
 namespace Microsoft.Xna.Framework {
 	partial class MacGamePlatform {

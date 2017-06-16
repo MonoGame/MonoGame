@@ -40,15 +40,9 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.AppKit;
-using MonoMac.Foundation;
-using RectF = System.Drawing.RectangleF;
-#else
 using AppKit;
 using Foundation;
 using RectF = CoreGraphics.CGRect;
-#endif
 
 /// <summary>
 /// Mac game window.

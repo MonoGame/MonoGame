@@ -45,15 +45,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.CoreAnimation;
-using MonoMac.Foundation;
-using MonoMac.ObjCRuntime;
-using MonoMac.OpenGL;
-using MonoMac.AppKit;
-using NSViewResizingMaskClass = MonoMac.AppKit.NSViewResizingMask;
-using RectF = System.Drawing.RectangleF;
-#else
 using CoreAnimation;
 using Foundation;
 using ObjCRuntime;
@@ -65,7 +56,6 @@ using NSViewResizingMaskClass = AppKit.NSViewResizingMask;
 using RectF = CoreGraphics.CGRect;
 using PointF = CoreGraphics.CGPoint;
 using SizeF = CoreGraphics.CGSize;
-#endif
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;

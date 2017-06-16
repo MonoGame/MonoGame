@@ -70,17 +70,10 @@ using System;
 using System.Drawing;
 using System.IO;
 
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.AppKit;
-using MonoMac.Foundation;
-using RectF = System.Drawing.RectangleF;
-using _float = System.Single;
-#else
 using AppKit;
 using Foundation;
 using RectF = CoreGraphics.CGRect;
 using _float = System.nfloat;
-#endif
 
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -519,11 +512,7 @@ namespace Microsoft.Xna.Framework
                     _owner.State = MacGamePlatform.RunState.Exited);
             }
 
-            #if PLATFORM_MACOS_LEGACY
-            public override bool ShouldZoom (NSWindow window, RectangleF newFrame)
-            #else
             public override bool ShouldZoom(NSWindow window, CoreGraphics.CGRect newFrame)
-            #endif
 			{
 				return _owner.AllowUserResizing;
 			}

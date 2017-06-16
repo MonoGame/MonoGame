@@ -7,15 +7,9 @@ using System.Diagnostics;
 
 #if OPENGL
 #if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-using GLPixelFormat = MonoMac.OpenGL.All;
-using PixelFormat = MonoMac.OpenGL.PixelFormat;
-#else
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
-#endif
 #elif DESKTOPGL
 using OpenGL;
 using GLPixelFormat = OpenGL.PixelFormat;

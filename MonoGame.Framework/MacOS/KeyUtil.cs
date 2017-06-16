@@ -30,11 +30,7 @@
 using System;
 using System.Linq;
 using System.Collections;
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.AppKit;
-#else
 using AppKit;
-#endif
 
 using Microsoft.Xna.Framework.Input;
 
@@ -88,23 +84,13 @@ namespace Microsoft.Xna.Framework
 			keyNames.Add (NSKey.LeftBracket, Keys.OemOpenBrackets);
 			keyNames.Add (NSKey.Minus, Keys.OemMinus);
 			keyNames.Add (NSKey.Mute, Keys.VolumeMute);
-#if PLATFORM_MACOS_LEGACY
-            keyNames.Add (NSKey.Next, Keys.MediaNextTrack);
-#endif
 			keyNames.Add (NSKey.Option, Keys.LeftAlt);
-#if PLATFORM_MACOS_LEGACY
-			keyNames.Add (NSKey.Pause, Keys.MediaPlayPause);
-			keyNames.Add (NSKey.Prev, Keys.MediaPreviousTrack);
-#endif
 			keyNames.Add (NSKey.Quote, Keys.OemQuotes);
 			keyNames.Add (NSKey.RightArrow, Keys.Right);
 			keyNames.Add (NSKey.RightBracket, Keys.OemCloseBrackets);
 			keyNames.Add (NSKey.RightControl, Keys.RightControl);
 			keyNames.Add (NSKey.RightOption, Keys.RightAlt);
 			keyNames.Add (NSKey.RightShift, Keys.RightShift);
-#if PLATFORM_MACOS_LEGACY
-			keyNames.Add (NSKey.ScrollLock, Keys.Scroll);
-#endif
 			keyNames.Add (NSKey.Semicolon, Keys.OemSemicolon);
 			keyNames.Add (NSKey.Slash, Keys.OemQuestion);
 			keyNames.Add (NSKey.UpArrow, Keys.Up);

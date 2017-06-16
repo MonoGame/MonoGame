@@ -4,19 +4,12 @@ using System.Linq;
 
 using System.Drawing;
 
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-using MonoMac.ObjCRuntime;
-using RectF = System.Drawing.RectangleF;
-#else
 using Foundation;
 using AppKit;
 using ObjCRuntime;
 using RectF = CoreGraphics.CGRect;
 using SizeF = CoreGraphics.CGSize;
 using PointF = CoreGraphics.CGPoint;
-#endif
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
@@ -201,7 +194,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			this.controller = controller;
 		}
 		
-        #if MONOMAC && !PLATFORM_MACOS_LEGACY
 		public override nint GetRowCount (NSTableView tableView)
 		{
 			return controller.gamerList.Count;
@@ -221,27 +213,6 @@ namespace Microsoft.Xna.Framework.GamerServices
                 controller.gamerList[(int)row].DisplayName = theObject.ToString();
             }
         }
-        #else
-        public override int GetRowCount (NSTableView tableView)
-        {
-            return controller.gamerList.Count;
-        }
-
-        public override NSObject GetObjectValue (NSTableView tableView, NSTableColumn tableColumn, int row)
-        {
-            return new NSString(controller.gamerList[row].Gamertag);
-        }
-
-        public override void SetObjectValue (NSTableView tableView, NSObject theObject, NSTableColumn tableColumn, int row)
-        {
-            var proposedValue = theObject.ToString();
-            if (proposedValue.Trim().Length > 0)
-            {
-                controller.gamerList[row].Gamertag = theObject.ToString();
-                controller.gamerList[row].DisplayName = theObject.ToString();
-            }
-        }
-        #endif
 	}
 	
 	[CLSCompliant(false)]
@@ -254,11 +225,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			this.controller = controller;
 		}
 
-#if MONOMAC && !PLATFORM_MACOS_LEGACY
 		public override bool ShouldSelectRow (NSTableView tableView, nint row)
-#else
-        public override bool ShouldSelectRow (NSTableView tableView, int row)
-#endif
 		{
             var profile = controller.gamerList[(int)row];
 			foreach (var gamer in Gamer.SignedInGamers) {
