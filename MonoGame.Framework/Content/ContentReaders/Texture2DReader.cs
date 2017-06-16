@@ -63,12 +63,13 @@ namespace Microsoft.Xna.Framework.Content
 					convertedFormat = SurfaceFormat.Color;
 					break;
 			}
-			
-            texture = existingInstance ?? new Texture2D(reader.GraphicsDevice, width, height, levelCountOutput > 1, convertedFormat);
+
 #if OPENGL
             Threading.BlockOnUIThread(() =>
             {
 #endif
+                texture = existingInstance ?? new Texture2D(reader.GraphicsDevice, width, height, levelCountOutput > 1, convertedFormat);
+
                 for (int level = 0; level < levelCount; level++)
 			    {
 				    var levelDataSizeInBytes = reader.ReadInt32();

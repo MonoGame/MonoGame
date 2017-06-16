@@ -41,12 +41,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (sampler != null && texture != null && sampler != texture.glLastSamplerState)
                 {
-                    if (device._lastTextureActive != i)
-                    {
-                        GL.ActiveTexture(TextureUnit.Texture0 + i);
-                        GraphicsExtensions.CheckGLError();
-                        device._lastTextureActive = i;
-                    }
+                    GL.ActiveTexture(TextureUnit.Texture0 + i);
+                    GraphicsExtensions.CheckGLError();
 
                     // NOTE: We don't have to bind the texture here because it is already bound in
                     // TextureCollection.SetTextures(). This, of course, assumes that SetTextures() is called

@@ -337,8 +337,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             Texture2D texture = null;
-            texture = new Texture2D(graphicsDevice, x, y);
-            texture.SetData(data);
+            Threading.BlockOnUIThread(() =>
+            {
+                texture = new Texture2D(graphicsDevice, x, y);
+                texture.SetData(data);
+            });
 
             return texture;
 #endif

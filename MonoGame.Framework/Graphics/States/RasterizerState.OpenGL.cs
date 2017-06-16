@@ -33,31 +33,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (CullMode == CullMode.None)
             {
-                if (force || device._lastCullMode != CullMode)
-                {
-                    GL.Disable(EnableCap.CullFace);
-                    GraphicsExtensions.CheckGLError();
-
-                    device._lastCullMode = CullMode;
-                }
+                GL.Disable(EnableCap.CullFace);
+                GraphicsExtensions.CheckGLError();
             }
             else
             {
-                if (force || device._lastCullMode != CullMode)
-                {
-                    GL.Enable(EnableCap.CullFace);
-                    GraphicsExtensions.CheckGLError();
+                GL.Enable(EnableCap.CullFace);
+                GraphicsExtensions.CheckGLError();
 
-                    device._lastCullMode = CullMode;
-                }
-
-                if (force || device._lastCullFaceMode != CullFaceMode.Back)
-                {
-                    GL.CullFace(CullFaceMode.Back);
-                    GraphicsExtensions.CheckGLError();
-
-                    device._lastCullFaceMode = CullFaceMode.Back;
-                }
+                GL.CullFace(CullFaceMode.Back);
+                GraphicsExtensions.CheckGLError();
 
                 FrontFaceDirection dir;
                 if (CullMode == CullMode.CullClockwiseFace)
@@ -75,13 +60,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         dir = FrontFaceDirection.Cw;
                 }
 
-                if (force || device._lastCullDirection != dir)
-                {
-                    GL.FrontFace(dir);
-                    GraphicsExtensions.CheckGLError();
-
-                    device._lastCullDirection = dir;
-                }
+                GL.FrontFace(dir);
+                GraphicsExtensions.CheckGLError();
             }
 
 #if MONOMAC || WINDOWS || DESKTOPGL
