@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework
 		FrameEventArgs renderEventArgs = new FrameEventArgs ();
 
 		[Export("initWithFrame:")]
-		public MacGameView (RectF frame) : this(frame, null)
+		public MacGameView (CGRect frame) : this(frame, null)
 		{
 		}
 
@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework
 		}
 
 		[Preserve (Conditional=true)]
-		public override void DrawRect (RectF dirtyRect)
+		public override void DrawRect (CGRect dirtyRect)
 		{
 			if (animating) {
 				if (displayLinkSupported) {
@@ -352,6 +352,13 @@ namespace Microsoft.Xna.Framework
 			get { throw new NotSupportedException ();}
 			set { throw new NotSupportedException ();}
 		}
+
+#if !XAMCORE_2_0
+		Icon INativeWindow.Icon {  
+			get { throw new NotSupportedException ();}
+			set { throw new NotSupportedException ();}		
+		}
+#endif
 
 		Size size;
 
