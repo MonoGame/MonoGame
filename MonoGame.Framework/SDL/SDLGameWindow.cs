@@ -16,11 +16,24 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<KeysEventArgs> TSKeyUp;
         public event EventHandler<KeysEventArgs> TSKeyDown;
 
+        private bool _createdWindow = false;
+
         public override bool AllowUserResizing
         {
             get { return !IsBorderless && _resizable; }
             set
             {
+                if (_resizable == value)
+                {
+                    return;
+                }
+
+                if (!_createdWindow)
+                {
+                    _resizable = value;
+                    return;
+                }
+
                 if (Sdl.Patch > 4)
                     Sdl.Window.SetResizable(_handle, value);
                 else
@@ -165,6 +178,8 @@ namespace Microsoft.Xna.Framework
             Sdl.Window.SetResizable(_handle, _resizable);
 
             SetCursorVisible(_mouseVisible);
+
+            _createdWindow = true;
         }
 
         ~SdlGameWindow()
