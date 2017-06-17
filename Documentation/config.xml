@@ -50,6 +50,7 @@
             <topic id="Riemers_Tutorials_2D_16" name="Putting Collision Detection into Practice" filename="riemer_2D_16_collision_detection_into_practice.md"/>
             <topic id="Riemers_Tutorials_2D_17" name="Particles" filename="riemer_2D_17_particles.md"/>
             <topic id="Riemers_Tutorials_2D_18" name="Additive Alpha Blending" filename="riemer_2D_18_additive_alpha_blending.md"/>
+            <topic id="Riemers_Tutorials_2D_19" name="Particle Engine" filename="riemer_2D_19_particle_engine.md"/>
         </topic>
     </topic>
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
