@@ -53,6 +53,7 @@
             <topic id="Riemers_Tutorials_2D_19" name="Particle Engine" filename="riemer_2D_19_particle_engine.md"/>
             <topic id="Riemers_Tutorials_2D_20" name="Adding Craters" filename="riemer_2D_20_adding_craters.md"/>
             <topic id="Riemers_Tutorials_2D_21" name="Playing Sound Effects" filename="riemer_2D_21_playing_sound_effects.md"/>
+            <topic id="Riemers_Tutorials_2D_22" name="Resolution Independency" filename="riemer_2D_22_resolution_independency.md"/>
         </topic>
     </topic>
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
