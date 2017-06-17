@@ -663,9 +663,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
                 GraphicsExtensions.CheckGLError();
                 // Set mipmap levels
-#if GLES
-                GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)0x813C, 0);
-#else
+#if !GLES
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, 0);
 #endif
                 GraphicsExtensions.CheckGLError();
