@@ -156,6 +156,8 @@ namespace OpenGL
         SampleAlphaToCoverage = 0x809E,
         SampleAlphaToOne = 0x809F,
         SampleCoverage = 0x80A0,
+        DebugOutputSynchronous = 0x8242,
+        DebugOutput = 0x92E0,
     }
 
     public enum VertexPointerType {
@@ -411,6 +413,7 @@ namespace OpenGL
 
     public enum TextureParameterName {
         TextureMaxAnisotropyExt = 0x84FE,
+        TextureBaseLevel = 0x813C,
         TextureMaxLevel = 0x813D,
         TextureMinFilter = 0x2801,
         TextureMagFilter = 0x2800,
@@ -562,9 +565,9 @@ namespace OpenGL
         public static EnableVertexAttribArrayDelegate EnableVertexAttribArray;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        public delegate void DisableVertexAttribArrayDelegte (int attrib);
-        public static DisableVertexAttribArrayDelegte DisableVertexAttribArray;
+        [MonoNativeFunctionWrapper]
+        public delegate void DisableVertexAttribArrayDelegate (int attrib);
+        public static DisableVertexAttribArrayDelegate DisableVertexAttribArray;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
@@ -1068,6 +1071,37 @@ namespace OpenGL
             int stride, IntPtr data);
         public static VertexAttribPointerDelegate VertexAttribPointer;
 
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [MonoNativeFunctionWrapper]
+        public delegate void DrawElementsInstancedDelegate(GLPrimitiveType primitiveType, int count, DrawElementsType elementType, 
+            IntPtr offset, int instanceCount);
+        public static DrawElementsInstancedDelegate DrawElementsInstanced;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [MonoNativeFunctionWrapper]
+        public delegate void VertexAttribDivisorDelegate(int location, int frequency);
+        public static VertexAttribDivisorDelegate VertexAttribDivisor;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        delegate void DebugMessageCallbackProc(int source, int type, uint id, int severity, int length, IntPtr message, IntPtr userParam);
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [MonoNativeFunctionWrapper]
+        delegate void DebugMessageCallbackDelegate(DebugMessageCallbackProc callback, IntPtr userParam);
+        static DebugMessageCallbackDelegate DebugMessageCallback;
+
+        public delegate void ErrorDelegate(string message);
+        public static event ErrorDelegate OnError;
+
+#if DEBUG
+        static void DebugMessageCallbackHandler(int source, int type, uint id, int severity, int length, IntPtr message, IntPtr userParam)
+        {
+            var errorMessage = Marshal.PtrToStringAnsi(message);
+            System.Diagnostics.Debug.WriteLine(errorMessage);
+            if (OnError != null)
+                OnError(errorMessage);
+        }
+#endif
+
         public static int SwapInterval { get; set; }
 
         public static void LoadEntryPoints()
@@ -1085,7 +1119,7 @@ namespace OpenGL
             TexParameteri = (TexParameterIntDelegate)LoadEntryPoint<TexParameterIntDelegate>("glTexParameteri");
 
             EnableVertexAttribArray = (EnableVertexAttribArrayDelegate)LoadEntryPoint<EnableVertexAttribArrayDelegate>("glEnableVertexAttribArray");
-            DisableVertexAttribArray = (DisableVertexAttribArrayDelegte)LoadEntryPoint<DisableVertexAttribArrayDelegte>("glDisableVertexAttribArray");
+            DisableVertexAttribArray = (DisableVertexAttribArrayDelegate)LoadEntryPoint<DisableVertexAttribArrayDelegate>("glDisableVertexAttribArray");
             //MakeCurrent = (MakeCurrentDelegate)LoadEntryPoint<MakeCurrentDelegate>("glMakeCurrent");
             GetIntegerv = (GetIntegerDelegate)LoadEntryPoint<GetIntegerDelegate>("glGetIntegerv");
             GetStringInternal = (GetStringDelegate)LoadEntryPoint<GetStringDelegate>("glGetString");
@@ -1207,6 +1241,32 @@ namespace OpenGL
             DeleteBuffers = (DeleteBuffersDelegate)LoadEntryPoint<DeleteBuffersDelegate>("glDeleteBuffers");
 
             VertexAttribPointer = (VertexAttribPointerDelegate)LoadEntryPoint<VertexAttribPointerDelegate>("glVertexAttribPointer");
+
+            // Instanced drawing requires GL 3.2 or up, if the either of the following entry points can not be loaded 
+            // this will get flagged by setting SupportsInstancing in GraphicsCapabilities to false.
+            try
+            {
+                DrawElementsInstanced = (DrawElementsInstancedDelegate)LoadEntryPoint<DrawElementsInstancedDelegate>("glDrawElementsInstanced");
+                VertexAttribDivisor = (VertexAttribDivisorDelegate)LoadEntryPoint<VertexAttribDivisorDelegate>("glVertexAttribDivisor");
+            }
+            catch (EntryPointNotFoundException)
+            {
+                // this will be detected in the initialization of GraphicsCapabilities
+            }
+
+#if DEBUG
+            try
+            {
+                DebugMessageCallback = (DebugMessageCallbackDelegate)LoadEntryPoint<DebugMessageCallbackDelegate>("glDebugMessageCallback");
+                DebugMessageCallback(DebugMessageCallbackHandler, IntPtr.Zero);
+                Enable(EnableCap.DebugOutput);
+                Enable(EnableCap.DebugOutputSynchronous);
+            }
+            catch (EntryPointNotFoundException)
+            {
+                // Ignore the debug message callback if the entry point can not be found
+            }
+#endif
         }
 
         public static System.Delegate LoadEntryPoint<T>(string proc)

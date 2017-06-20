@@ -641,9 +641,6 @@
     <Compile Include="Graphics\GraphicsResource.cs" />
     <Compile Include="Graphics\IGraphicsContext.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
-    <Compile Include="Graphics\ImageEx.cs">
-      <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone81,WindowsUniversal</Platforms>
-    </Compile>
     <Compile Include="Graphics\IRenderTarget.cs" />
     <Compile Include="Graphics\IWindowInfo.cs" />
     <Compile Include="Graphics\ModelBoneCollection.cs" />
@@ -1221,6 +1218,37 @@
     <Compile Include="Utilities\Png\PngReader.cs" />
     <Compile Include="Utilities\Png\PngWriter.cs" />
     <Compile Include="Utilities\ByteBufferPool.cs" />
+    <Compile Include="Utilities\Imaging\Stb.Image.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Utilities\Imaging\Stb.Image.Generated.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Utilities\Imaging\ImageReader.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Utilities\Imaging\Stb.ImageWrite.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Utilities\Imaging\Stb.ImageWrite.Generated.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Utilities\Imaging\ImageWriter.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Utilities\Imaging\Operations.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Utilities\Imaging\PinnedArray.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Utilities\Imaging\TinyJpeg.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Utilities\Imaging\TinyJpeg.Generated.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+	
 
 
     <!-- Android Platform -->

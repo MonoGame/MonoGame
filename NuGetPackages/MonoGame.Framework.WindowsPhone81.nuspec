@@ -16,9 +16,17 @@ This package provides you with MonoGame Framework that works on Windows Phone 8.
     <summary>This package provides you with MonoGame Framework that works on Windows Phone 8.1.</summary>
     <copyright>Copyright © 2009-2017 The MonoGame Team</copyright>
     <language>en-US</language>
-    <references>
-      <reference file="MonoGame.Framework.dll" />
-    </references>
+    <dependencies>
+        <group targetFramework="WindowsPhoneApp8.1">
+            <dependency id="SharpDX" version="3.0.0" />
+            <dependency id="SharpDX.Direct2D1" version="3.0.0" />
+            <dependency id="SharpDX.Direct3D11" version="3.0.0" />
+            <dependency id="SharpDX.DXGI" version="3.0.0" />
+            <dependency id="SharpDX.XAudio2" version="3.0.0" />
+            <dependency id="SharpDX.MediaFoundation" version="3.0.0" />
+            <dependency id="SharpDX.XInput" version="3.0.0" />
+        </group>
+    </dependencies>
   </metadata>
   <files>
     <file src="..\..\NuGetPackages\build\WindowsPhone81\MonoGame.Framework.WindowsPhone81.targets" target="build\MonoGame.Framework.WindowsPhone81.targets" />
@@ -29,11 +37,5 @@ This package provides you with MonoGame Framework that works on Windows Phone 8.
     <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.dll" target="lib\wpa81/MonoGame.Framework.dll" />
     <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.xml" target="lib\wpa81/MonoGame.Framework.xml" />
     <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.pri" target="lib\wpa81/MonoGame.Framework.pri" />
-    <file src="WindowsPhone81\AnyCPU\Release\SharpDX.Direct2D1.dll" target="lib\wpa81\SharpDX.Direct2D1.dll" />
-    <file src="WindowsPhone81\AnyCPU\Release\SharpDX.Direct3D11.dll" target="lib\wpa81\SharpDX.Direct3D11.dll" />
-    <file src="WindowsPhone81\AnyCPU\Release\SharpDX.dll" target="lib\wpa81\SharpDX.dll" />
-    <file src="WindowsPhone81\AnyCPU\Release\SharpDX.DXGI.dll" target="lib\wpa81\SharpDX.DXGI.dll" />
-    <file src="WindowsPhone81\AnyCPU\Release\SharpDX.MediaFoundation.dll" target="lib\wpa81\SharpDX.MediaFoundation.dll" />
-    <file src="WindowsPhone81\AnyCPU\Release\SharpDX.XAudio2.dll" target="lib\wpa81\SharpDX.XAudio2.dll" />
   </files>
 </package>

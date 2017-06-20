@@ -17,9 +17,6 @@
   <Platform Type="Linux">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
-    <Service Name="MonoGame.Framework/OpenGLGraphics">
-      <Reference Include="System.Drawing" />
-    </Service>
   </Platform>
 
   <Platform Type="MacOS">
@@ -72,9 +69,6 @@
         Name="SharpDX.MediaFoundation"
         Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.MediaFoundation.dll" />
       <Binary
-        Name="SharpDX.RawInput"
-        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.RawInput.dll" />
-      <Binary
         Name="SharpDX.XAudio2"
         Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XAudio2.dll" />
       <Binary
@@ -84,7 +78,6 @@
 
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
-      <Reference Include="System.Drawing" />
       <Reference Include="System.Web" />
       <Reference Include="System.Web.Services" />
       <Reference Include="System.Windows.Forms" />
@@ -125,7 +118,6 @@
 	
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
-      <Reference Include="System.Drawing" />
       <Reference Include="System.Web" />
       <Reference Include="System.Web.Services" />
       <Reference Include="System.Windows.Forms" />
@@ -189,7 +181,6 @@
 
   <Service Name="MonoGame.Framework/ANGLEGraphics">
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
