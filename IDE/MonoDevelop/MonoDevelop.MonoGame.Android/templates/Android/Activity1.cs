@@ -22,7 +22,8 @@ namespace ${Namespace}
 	           ConfigurationChanges = ConfigChanges.Orientation | 
 	                                  ConfigChanges.KeyboardHidden | 
 	                                  ConfigChanges.Keyboard |
-	                                  ConfigChanges.ScreenSize)]
+	                                  ConfigChanges.ScreenSize |
+                                      ConfigChanges.ScreenLayout)]
 	public class Activity1 : AndroidGameActivity
 	{
 		protected override void OnCreate (Bundle bundle)
