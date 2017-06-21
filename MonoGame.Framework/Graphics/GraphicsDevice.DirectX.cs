@@ -700,7 +700,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void ResizeTargets()
         {
             var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
-            var descr = new ModeDescription()
+            var descr = new ModeDescription
             {
                 Format = format,
 #if WINRT
@@ -717,9 +717,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void GetModeSwitchedSize(out int width, out int height)
         {
-            var output = _swapChain.ContainingOutput;
+            Output output;
+            if (_swapChain == null)
+            {
+                // get the primary output
+                using (var factory = new SharpDX.DXGI.Factory1())
+                using (var adapter = factory.GetAdapter1(0))
+                    output = adapter.Outputs[0];
+            }
+            else
+            {
+                output = _swapChain.ContainingOutput;
+            }
+
             var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
-            var target = new ModeDescription()
+            var target = new ModeDescription
             {
                 Format = format,
 #if WINRT
@@ -735,20 +747,13 @@ namespace Microsoft.Xna.Framework.Graphics
             output.GetClosestMatchingMode(_d3dDevice, target, out closest);
             width = closest.Width;
             height = closest.Height;
+            output.Dispose();
         }
 
         internal void GetDisplayResolution(out int width, out int height)
         {
-            if (_swapChain == null)
-            {
-                width = Adapter.CurrentDisplayMode.Width;
-                height = Adapter.CurrentDisplayMode.Height;
-            }
-            else
-            {
-                width = _swapChain.ContainingOutput.Description.DesktopBounds.Width;
-                height = _swapChain.ContainingOutput.Description.DesktopBounds.Height;
-            }
+            width = Adapter.CurrentDisplayMode.Width;
+            height = Adapter.CurrentDisplayMode.Height;
         }
 
         internal void CreateSizeDependentResources()
@@ -1007,6 +1012,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDispose()
         {
+            // make sure to release full screen or this might cause issues on exit
+            if (_swapChain.IsFullScreen)
+                _swapChain.SetFullscreenState(false, null);
+
             SharpDX.Utilities.Dispose(ref _renderTargetView);
             SharpDX.Utilities.Dispose(ref _depthStencilView);
 
