@@ -242,22 +242,41 @@ namespace MonoGame.Framework
             MouseState.MiddleButton = (buttons & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
             MouseState.RightButton = (buttons & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
 
-            // Don't process touch state if we're not active 
-            // and the mouse is within the client area.
-            if (!_platform.IsActive || !withinClient)
-                return;
-            
-            TouchLocationState? touchState = null;
-            if (MouseState.LeftButton == ButtonState.Pressed)
-                if (previousState == ButtonState.Released)
-                    touchState = TouchLocationState.Pressed;
-                else
-                    touchState = TouchLocationState.Moved;
-            else if (previousState == ButtonState.Pressed)
-                touchState = TouchLocationState.Released;
+            var was_down = previousState == ButtonState.Pressed;
+            var cur_down = MouseState.LeftButton == ButtonState.Pressed;
 
-            if (touchState.HasValue)
-                TouchPanelState.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
+            // Consider mouse touch point to be 'lost' if the cursor leaves the window
+            // or if the window is no longer focused.
+            //
+            // That is, if there was previously a mouse touch point, it becomes 'invalid'
+            // without going through the 'release' state.            
+            //
+
+            bool lost = false;
+            if (!_platform.IsActive || !withinClient)
+            {
+                TouchPanelState.AddEvent(0, TouchLocationState.Invalid, Vector2.Zero, true);                
+            }
+            else
+            {
+                TouchLocationState? touchState = null;
+                if (MouseState.LeftButton == ButtonState.Pressed)
+                {
+                    if (previousState == ButtonState.Released)
+                        touchState = TouchLocationState.Pressed;
+                    else
+                        touchState = TouchLocationState.Moved;
+                }
+                else if (previousState == ButtonState.Pressed)
+                {
+                    touchState = TouchLocationState.Released;
+                }
+
+                if (touchState.HasValue)
+                    TouchPanelState.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
+                else
+                    TouchPanelState.AddEvent(0, TouchLocationState.Invalid, Vector2.Zero, true);
+            }
         } 
 
         private void OnMouseEnter(object sender, EventArgs e)
