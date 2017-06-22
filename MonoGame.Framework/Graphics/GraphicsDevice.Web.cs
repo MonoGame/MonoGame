@@ -29,16 +29,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        private void GetModeSwitchedSize(out int width, out int height)
-        {
-            width = height = 0;
-        }
-
-        private void GetDisplayResolution(out int width, out int height)
-        {
-            width = height = 0;
-        }
-
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
             WebGL.gl.enable(WebGL.gl.DEPTH_TEST);

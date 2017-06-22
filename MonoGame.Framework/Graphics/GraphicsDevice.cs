@@ -222,18 +222,8 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsCapabilities = new GraphicsCapabilities();
             GraphicsCapabilities.Initialize(this);
 
-#if DIRECTX
-            if (PresentationParameters.IsFullScreen)
-            {
-                int newWidth, newHeight;
-                if (PresentationParameters.HardwareModeSwitch)
-                    GetModeSwitchedSize(out newWidth, out newHeight);
-                else
-                    GetDisplayResolution(out newWidth, out newHeight);
-
-                PresentationParameters.BackBufferWidth = newWidth;
-                PresentationParameters.BackBufferHeight = newHeight;
-            }
+#if WINDOWS || DESKTOPGL
+            CorrectBackBufferSize();
 #endif
 
             Initialize();
@@ -621,11 +611,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters);
 
-        public void Reset()
-        {
 #if WINDOWS || DESKTOPGL
+        private void CorrectBackBufferSize()
+        {
             // Window size can be modified when we're going full screen, we need to take that into account
-            // now so the back buffer has the right size.
+            // so the back buffer has the right size.
             if (PresentationParameters.IsFullScreen)
             {
                 int newWidth, newHeight;
@@ -646,6 +636,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (newHeight < PresentationParameters.BackBufferHeight)
                     PresentationParameters.BackBufferHeight = newHeight;
             }
+        }
+#endif
+
+        public void Reset()
+        {
+#if WINDOWS || DESKTOPGL
+            CorrectBackBufferSize();
 #endif
 
             PlatformValidatePresentationParameters(PresentationParameters);
