@@ -1198,5 +1198,29 @@ namespace Microsoft.Xna.Framework.Graphics
                 InstanceFrequency = instanceFrequency;
             }
         }
+
+        private void GetModeSwitchedSize(out int width, out int height)
+        {
+            var mode = new Sdl.Display.Mode
+            {
+                Width = PresentationParameters.BackBufferWidth,
+                Height = PresentationParameters.BackBufferHeight,
+                Format = 0,
+                RefreshRate = 0,
+                DriverData = IntPtr.Zero
+            };
+            Sdl.Display.Mode closest;
+            Sdl.Display.GetClosestDisplayMode(0, mode, out closest);
+            width = closest.Width;
+            height = closest.Height;
+        }
+
+        private void GetDisplayResolution(out int width, out int height)
+        {
+            Sdl.Display.Mode mode;
+            Sdl.Display.GetCurrentDisplayMode(0, out mode);
+            width = mode.Width;
+            height = mode.Height;
+        }
     }
 }

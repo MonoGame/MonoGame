@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework
             _view.SetCursorVisible(_game.IsMouseVisible);
         }
 
-        internal override void OnPresentationChanging(PresentationParameters pp)
+        internal override void OnPresentationChanged(PresentationParameters pp)
         {
             var displayIndex = Sdl.Window.GetDisplayIndex(Window.Handle);
             var displayName = Sdl.Display.GetDisplayName(displayIndex);
