@@ -37,6 +37,8 @@ namespace MonoGame.Framework
 
         private bool _isMouseInBounds;
 
+        private bool _isMouseTouchLocation;
+
         // true if window position was moved either through code or by dragging/resizing the form
         private bool _wasMoved;
 
@@ -242,22 +244,33 @@ namespace MonoGame.Framework
             MouseState.MiddleButton = (buttons & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
             MouseState.RightButton = (buttons & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
 
-            // Don't process touch state if we're not active 
-            // and the mouse is within the client area.
-            if (!_platform.IsActive || !withinClient)
-                return;
-            
-            TouchLocationState? touchState = null;
-            if (MouseState.LeftButton == ButtonState.Pressed)
-                if (previousState == ButtonState.Released)
-                    touchState = TouchLocationState.Pressed;
-                else
-                    touchState = TouchLocationState.Moved;
-            else if (previousState == ButtonState.Pressed)
-                touchState = TouchLocationState.Released;
+            // Process MouseTouchLocation state.
+            switch(_isMouseTouchLocation)
+            {
+                case false:
+                    var isMouseLeftButtonPressed = MouseState.LeftButton == ButtonState.Pressed && previousState == ButtonState.Released;
+                    // transition to MouseTouchLocation state.
+                    if(_platform.IsActive && _isMouseInBounds && isMouseLeftButtonPressed)
+                    {
+                        _isMouseTouchLocation = true;
+                        TouchPanelState.AddEvent(0, TouchLocationState.Pressed, new Vector2(MouseState.X, MouseState.Y), true);
+                    }
+                    break;
+                    
+                case true:
+                    // transition to !MouseTouchLocation state.
+                    if(MouseState.LeftButton == ButtonState.Released)
+                    {                        
+                        _isMouseTouchLocation = false;
+                        TouchPanelState.AddEvent(0, TouchLocationState.Released, new Vector2(MouseState.X, MouseState.Y), true);
+                        break;
+                    }
 
-            if (touchState.HasValue)
-                TouchPanelState.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
+                    // Update MouseTouchLocation
+                    TouchPanelState.AddEvent(0, TouchLocationState.Moved, new Vector2(MouseState.X, MouseState.Y), true);
+                    break;
+            }
+               
         } 
 
         private void OnMouseEnter(object sender, EventArgs e)
