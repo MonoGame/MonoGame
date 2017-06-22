@@ -636,6 +636,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 PresentationParameters.BackBufferWidth = newWidth;
                 PresentationParameters.BackBufferHeight = newHeight;
             }
+            else
+            {
+                int newWidth, newHeight;
+                GetDisplayResolution(out newWidth, out newHeight);
+                if (newWidth < PresentationParameters.BackBufferWidth)
+                    PresentationParameters.BackBufferWidth = newWidth;
+                if (newHeight < PresentationParameters.BackBufferHeight)
+                    PresentationParameters.BackBufferHeight = newHeight;
+            }
 
             PlatformValidatePresentationParameters(PresentationParameters);
 
