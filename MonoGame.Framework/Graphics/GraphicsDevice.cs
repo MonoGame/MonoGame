@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsCapabilities = new GraphicsCapabilities();
             GraphicsCapabilities.Initialize(this);
 
-#if WINDOWS || DESKTOPGL
+#if WINDOWS
             CorrectBackBufferSize();
 #endif
 
@@ -611,7 +611,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters);
 
-#if WINDOWS || DESKTOPGL
+#if WINDOWS
         private void CorrectBackBufferSize()
         {
             // Window size can be modified when we're going full screen, we need to take that into account
@@ -641,7 +641,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Reset()
         {
-#if WINDOWS || DESKTOPGL
+#if WINDOWS
             CorrectBackBufferSize();
 #endif
 
