@@ -512,7 +512,7 @@ namespace MonoGame.Framework
             }
         }
 
-        public void OnPresentationChanged(PresentationParameters pp)
+        internal void OnPresentationChanged(PresentationParameters pp)
         {
             var raiseClientSizeChanged = false;
             if (pp.IsFullScreen && pp.HardwareModeSwitch && IsFullScreen && HardwareModeSwitch)
