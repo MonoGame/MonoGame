@@ -623,6 +623,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Reset()
         {
+#if WINDOWS || DESKTOPGL
             // Window size can be modified when we're going full screen, we need to take that into account
             // now so the back buffer has the right size.
             if (PresentationParameters.IsFullScreen)
@@ -645,6 +646,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (newHeight < PresentationParameters.BackBufferHeight)
                     PresentationParameters.BackBufferHeight = newHeight;
             }
+#endif
 
             PlatformValidatePresentationParameters(PresentationParameters);
 
