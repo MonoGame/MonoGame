@@ -181,7 +181,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Access debugging APIs for the graphics subsystem.
         /// </summary>
-        public GraphicsDebug GraphicsDebug { get { return _graphicsDebug; } set { _graphicsDebug = value; } }
+        public GraphicsDebug GraphicsDebug { get { return _graphicsDebug; } }
 
         internal GraphicsDevice(GraphicsDeviceInformation gdi)
             : this(gdi.Adapter, gdi.GraphicsProfile, gdi.PresentationParameters)
@@ -242,6 +242,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport.MaxDepth = 1.0f;
 
             PlatformSetup();
+            
+            _graphicsDebug = new GraphicsDebug(this);
 
             VertexTextures = new TextureCollection(this, MaxVertexTextureSlots, true);
             VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, true);

@@ -3,20 +3,19 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using SharpDX.Direct3D11;
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDebug
     {
-        private readonly GraphicsDevice _device;
-        private readonly InfoQueue _infoQueue;
-        private readonly Queue<GraphicsDebugMessage> _cachedMessages;
+        private InfoQueue _infoQueue;
+        private Queue<GraphicsDebugMessage> _cachedMessages;
         private bool _hasPushedFilters = false;
 
-        public GraphicsDebug(GraphicsDevice device)
+        private void PlatformConstruct()
         {
-            _device = device;
             _infoQueue = _device._d3dDevice.QueryInterfaceOrNull<InfoQueue>();
             _cachedMessages = new Queue<GraphicsDebugMessage>();
 
@@ -77,6 +76,14 @@ namespace Microsoft.Xna.Framework.Graphics
             // No messages to grab from DirectX.
             message = null;
             return false;
+        }
+
+        private void PlatformDispose()
+        {
+            if (_infoQueue != null)
+            {
+                _infoQueue.Dispose();
+            }
         }
     }
 }

@@ -6,10 +6,18 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDebug
     {
+        private void PlatformConstruct()
+        {
+        }
+
         private bool PlatformTryDequeueMessage(out GraphicsDebugMessage message)
         {
             message = null;
             return false;
+        }
+
+        private void PlatformDispose()
+        {
         }
     }
 }
