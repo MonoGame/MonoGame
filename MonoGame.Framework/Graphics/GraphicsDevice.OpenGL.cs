@@ -178,11 +178,13 @@ namespace Microsoft.Xna.Framework.Graphics
             SetVertexAttributeArray(_newEnabledVertexAttributes);
         }
 
+#if DESKTOPGL
         private static void DebugMessageCallbackHandler(int source, int type, uint id, int severity, int length, IntPtr message, IntPtr userParam)
         {
             var errorMessage = Marshal.PtrToStringAnsi(message);
             Graphics.GraphicsDebug.PlatformAppendMessage(source, type, id, severity, length, errorMessage, userParam);
         }
+#endif
 
         private void PlatformSetup()
         {

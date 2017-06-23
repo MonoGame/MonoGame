@@ -38,6 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
+#if DESKTOPGL
         internal static void PlatformAppendMessage(int source, int type, uint id, int severity, int length, string errorMessage, IntPtr userParam)
         {
             _cachedMessages.Enqueue(new GraphicsDebugMessage
@@ -50,5 +51,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 UserdataPointer = userParam
             });
         }
+#endif
     }
 }
