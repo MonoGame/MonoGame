@@ -628,8 +628,11 @@
     <Compile Include="Graphics\GraphicsDebug.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
+    <Compile Include="Graphics\GraphicsDebug.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\GraphicsDebug.Default.cs">
-      <Services>OpenGLGraphics,WebGraphics,ANGLEGraphics</Services>
+      <Services>WebGraphics,ANGLEGraphics</Services>
     </Compile>
     <Compile Include="Graphics\GraphicsDebugMessage.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
