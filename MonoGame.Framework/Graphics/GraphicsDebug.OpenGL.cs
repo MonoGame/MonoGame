@@ -2,88 +2,53 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using SharpDX.Direct3D11;
-using System;
+using OpenGL;
 using System.Collections.Generic;
+using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDebug
     {
-        private InfoQueue _infoQueue;
-        private Queue<GraphicsDebugMessage> _cachedMessages;
-        private bool _hasPushedFilters = false;
+        private static Queue<GraphicsDebugMessage> _cachedMessages;
+
+        static GraphicsDebug()
+        {
+            _cachedMessages = new Queue<GraphicsDebugMessage>();
+        }
 
         private void PlatformConstruct()
         {
-            _infoQueue = _device._d3dDevice.QueryInterfaceOrNull<InfoQueue>();
-            _cachedMessages = new Queue<GraphicsDebugMessage>();
-
-            if (_infoQueue != null)
-            {
-                _infoQueue.PushEmptyRetrievalFilter();
-                _infoQueue.PushEmptyStorageFilter();
-                _hasPushedFilters = true;
-            }
         }
 
         private bool PlatformTryDequeueMessage(out GraphicsDebugMessage message)
         {
-            if (_infoQueue == null)
-            {
-                message = null;
-                return false;
-            }
-
-            if (!_hasPushedFilters)
-            {
-                _infoQueue.PushEmptyRetrievalFilter();
-                _infoQueue.PushEmptyStorageFilter();
-                _hasPushedFilters = true;
-            }
-
             if (_cachedMessages.Count > 0)
             {
                 message = _cachedMessages.Dequeue();
                 return true;
             }
 
-            if (_infoQueue.NumStoredMessagesAllowedByRetrievalFilter > 0)
-            {
-                // Grab all current messages and put them in the cached messages queue.
-                for (var i = 0; i < _infoQueue.NumStoredMessagesAllowedByRetrievalFilter; i++)
-                {
-                    var dxMessage = _infoQueue.GetMessage(i);
-                    _cachedMessages.Enqueue(new GraphicsDebugMessage
-                    {
-                        Message = dxMessage.Description,
-                        Id = (int)dxMessage.Id,
-                        IdName = dxMessage.Id.ToString(),
-                        Severity = dxMessage.Severity.ToString(),
-                        Category = dxMessage.Category.ToString()
-                    });
-                }
-
-                _infoQueue.ClearStoredMessages();
-            }
-            
-            if (_cachedMessages.Count > 0)
-            {
-                message = _cachedMessages.Dequeue();
-                return true;
-            }
-            
-            // No messages to grab from DirectX.
+            // No messages have been retrieved from OpenGL.
             message = null;
             return false;
         }
 
         private void PlatformDispose()
         {
-            if (_infoQueue != null)
+        }
+
+        internal static void PlatformAppendMessage(int source, int type, uint id, int severity, int length, string errorMessage, IntPtr userParam)
+        {
+            _cachedMessages.Enqueue(new GraphicsDebugMessage
             {
-                _infoQueue.Dispose();
-            }
+                Source = Enum.GetName(typeof(OpenGL.DebugSource), source),
+                Type = Enum.GetName(typeof(OpenGL.DebugType), type),
+                Id = id,
+                Severity = Enum.GetName(typeof(OpenGL.DebugSeverity), severity),
+                Message = errorMessage,
+                UserdataPointer = userParam
+            });
         }
     }
 }
