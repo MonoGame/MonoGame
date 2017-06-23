@@ -531,6 +531,13 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (disposing)
                 {
+                    // Dispose the graphics debug API.
+                    if (_graphicsDebug != null)
+                    {
+                        _graphicsDebug.Dispose();
+                        _graphicsDebug = null;
+                    }
+
                     // Dispose of all remaining graphics resources before disposing of the graphics device
                     lock (_resourcesLock)
                     {
