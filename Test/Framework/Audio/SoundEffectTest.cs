@@ -412,9 +412,9 @@ namespace MonoGame.Tests.Audio
 #if !XNA
         // XNA does not support 24-bit, 32-bit float, MS-ADPCM or IMA/ADPCM in SoundEffect.FromStream, but MonoGame does
 #if DIRECTX
-        [TestCase(@"Assets/Audio/blast_mono_44hz_adpcm_ms.wav")]
-        [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav")]
-        [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav")]
+        [TestCase(@"Assets/Audio/blast_mono_44hz_adpcm_ms.wav", 72020000)]
+        [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav", 72020000)]
+        [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav", 72020000)]
 #else
         [TestCase(@"Assets/Audio/tone_mono_44khz_imaadpcm.wav", 5000000)]
         [TestCase(@"Assets/Audio/tone_stereo_44khz_imaadpcm.wav", 5000000)]
