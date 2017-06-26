@@ -353,13 +353,6 @@ namespace Microsoft.Xna.Framework
 			set { throw new NotSupportedException ();}
 		}
 
-#if !XAMCORE_2_0
-		Icon INativeWindow.Icon {  
-			get { throw new NotSupportedException ();}
-			set { throw new NotSupportedException ();}		
-		}
-#endif
-
 		Size size;
 
 		public Size Size {
