@@ -350,19 +350,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			for (int i = 0; i < maxDrawBuffers; i++)
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
-
-#if MONOMAC
-			// Trying to discard contents on render target change causes us
-			// to try to clear during initialisation.
-			//
-			// On OS X 10.7 and above, this can cause a crash, since the window isn't ready yet,
-			// and those versions no longer allow drawing to an OpenGL context of a window
-			// that is still hidden.
-			//
-			// So on OS X in particular, we need to default to preserving contents.
-			PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
-#endif
-
             _extensions = GetGLExtensions();
         }
 
@@ -463,9 +450,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-
-			GL.Clear(bufferMask);
-            GraphicsExtensions.CheckGLError();
+#if MONOMAC
+            if (GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt) == FramebufferErrorCode.FramebufferComplete)
+            {
+#endif
+                GL.Clear(bufferMask);
+                GraphicsExtensions.CheckGLError();
+#if MONOMAC
+            }
+#endif
            		
             // Restore the previous render state.
 		    ScissorRectangle = prevScissorRect;

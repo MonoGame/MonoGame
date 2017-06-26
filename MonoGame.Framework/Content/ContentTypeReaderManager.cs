@@ -30,6 +30,7 @@ using System.Collections;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -48,12 +49,7 @@ namespace Microsoft.Xna.Framework.Content
 		{
             _locker = new object();
             _contentReadersCache = new Dictionary<Type, ContentTypeReader>(255);
-
-#if WINRT
-            _assemblyName = typeof(ContentTypeReaderManager).GetTypeInfo().Assembly.FullName;
-#else
-            _assemblyName = typeof(ContentTypeReaderManager).Assembly.FullName;
-#endif
+            _assemblyName = ReflectionHelpers.GetAssembly(typeof(ContentTypeReaderManager)).FullName;
         }
 
         public ContentTypeReader GetTypeReader(Type targetType)
