@@ -864,6 +864,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (var dxgiFactory = dxgiAdapter.GetParent<SharpDX.DXGI.Factory1>())
                 {
                     _swapChain = new SwapChain(dxgiFactory, dxgiDevice, desc);
+                    RefreshAdapter();
                     dxgiFactory.MakeWindowAssociation(PresentationParameters.DeviceWindowHandle, WindowAssociationFlags.IgnoreAll);
                     // To reduce latency, ensure that DXGI does not queue more than one frame at a time.
                     // Docs: https://msdn.microsoft.com/en-us/library/windows/desktop/ff471334(v=vs.85).aspx
@@ -921,7 +922,23 @@ namespace Microsoft.Xna.Framework.Graphics
             };
         }
 
-        
+        internal void RefreshAdapter()
+        {
+            if (_swapChain == null)
+                return;
+
+            using (var output = _swapChain.ContainingOutput)
+            {
+                foreach (var adapter in GraphicsAdapter.Adapters)
+                {
+                    if (adapter.DeviceName == output.Description.DeviceName)
+                    {
+                        Adapter = adapter;
+                        break;
+                    }
+                }
+            }
+        }
 
         internal void OnPresentationChanged()
         {

@@ -42,8 +42,6 @@ namespace MonoGame.Framework
         // true if window position was moved either through code or by dragging/resizing the form
         private bool _wasMoved;
 
-        private bool _raiseClientSizeChanged;
-
         #region Internal Properties
 
         internal Game Game { get; private set; }
@@ -350,7 +348,14 @@ namespace MonoGame.Framework
         {
             _wasMoved = true;
             if (Game.Window == this)
+            {
                 UpdateBackBufferSize();
+
+                // the display that the window is on might have changed, so we need to
+                // check and possibly update the Adapter of the GraphicsDevice
+                if (Game.GraphicsDevice != null)
+                    Game.GraphicsDevice.RefreshAdapter();
+            }
 
             OnClientSizeChanged();
         }

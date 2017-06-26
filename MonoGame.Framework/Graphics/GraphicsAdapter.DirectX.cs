@@ -121,7 +121,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if(UseReferenceDevice)
                 return true;
-
             switch(graphicsProfile)
             {
                 case GraphicsProfile.Reach:

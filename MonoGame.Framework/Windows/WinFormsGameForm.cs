@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework.Windows
         protected override void WndProc(ref Message m)
         {
             var state = TouchLocationState.Invalid;
-           
+
             switch (m.Msg)
             {
                 case WM_TABLET_QUERYSYSTEMGESTURESTA:
