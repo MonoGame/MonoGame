@@ -138,8 +138,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void ResolveSubresource()
         {
-            GraphicsDevice._d3dContext.ResolveSubresource(this._texture, 0, _resolvedTexture._texture, 0,
-                SharpDXHelper.ToFormat(_format));
+            lock (GraphicsDevice._d3dContext)
+            {
+                GraphicsDevice._d3dContext.ResolveSubresource(
+                    this._texture,
+                    0,
+                    _resolvedTexture._texture,
+                    0,
+                    SharpDXHelper.ToFormat(_format));
+            }
         }
 
         internal override Resource CreateTexture()
