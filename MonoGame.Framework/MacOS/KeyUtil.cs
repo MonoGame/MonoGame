@@ -158,14 +158,6 @@ namespace Microsoft.Xna.Framework
 		{
 			//Initialize ();
 			var nskey = Enum.ToObject (typeof(NSKey), theEvent.KeyCode);
-			if ((theEvent.ModifierFlags & NSEventModifierMask.FunctionKeyMask) > 0) {
-				var chars = theEvent.Characters.ToCharArray ();
-				var thekey = chars [0];
-				if (theEvent.KeyCode != (char)NSKey.ForwardDelete) {
-
-					nskey = (NSKey)Enum.ToObject (typeof(NSKey), thekey);
-				}
-			}
 
 			try {
 				var key = (Keys)keyNames [nskey];
