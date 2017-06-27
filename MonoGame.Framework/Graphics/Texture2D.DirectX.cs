@@ -30,11 +30,12 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D : Texture
     {
+        protected bool Shared { get { return _shared; } }
+        protected bool Mipmap { get { return _mipmap; } }
+        protected SampleDescription SampleDescription { get { return _sampleDescription; } }
+
         private bool _shared;
-
-        private bool _renderTarget;
         private bool _mipmap;
-
         private SampleDescription _sampleDescription;
 
         private SharpDX.Direct3D11.Texture2D _cachedStagingTexture;
@@ -42,8 +43,6 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
             _shared = shared;
-
-            _renderTarget = (type == SurfaceType.RenderTarget);
             _mipmap = mipmap;
         }
 
@@ -95,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 region.Left = rect.Left;
                 region.Right = rect.Right;
 
-                
+
                 // TODO: We need to deal with threaded contexts here!
                 var subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
                 var d3dContext = GraphicsDevice._d3dContext;
@@ -129,8 +128,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.Format = SharpDXHelper.ToFormat(_format);
                 desc.BindFlags = BindFlags.None;
                 desc.CpuAccessFlags = CpuAccessFlags.Read;
-                desc.SampleDescription.Count = 1;
-                desc.SampleDescription.Quality = 0;
+                desc.SampleDescription = CreateSampleDescription();
                 desc.Usage = ResourceUsage.Staging;
                 desc.OptionFlags = ResourceOptionFlags.None;
 
@@ -357,7 +355,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.SampleDescription.Count = 1;
             desc.SampleDescription.Quality = 0;
 
-            using(DataStream s = new DataStream(bsource.Size.Height * bsource.Size.Width * 4, true, true))
+            using (DataStream s = new DataStream(bsource.Size.Height * bsource.Size.Width * 4, true, true))
             {
                 bsource.CopyPixels(bsource.Size.Width * 4, s);
 
@@ -406,9 +404,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
-        internal override Resource CreateTexture()
-		{
-            // TODO: Move this to SetData() if we want to make Immutable textures!
+        protected internal virtual Texture2DDescription GetTexture2DDescription()
+        {
             var desc = new Texture2DDescription();
             desc.Width = width;
             desc.Height = height;
@@ -417,29 +414,29 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Format = SharpDXHelper.ToFormat(_format);
             desc.BindFlags = BindFlags.ShaderResource;
             desc.CpuAccessFlags = CpuAccessFlags.None;
-            desc.SampleDescription.Count = 1;
-            desc.SampleDescription.Quality = 0;
+            desc.SampleDescription = CreateSampleDescription();
             desc.Usage = ResourceUsage.Default;
             desc.OptionFlags = ResourceOptionFlags.None;
 
-            if (_renderTarget)
-            {
-                desc.BindFlags |= BindFlags.RenderTarget;
-                if (_mipmap)
-                {
-                    // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
-                    // because generation of mipmaps is not supported on the Xbox 360.
-                    // TODO: New method Texture.GenerateMipMaps() required.
-                    desc.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
-                }
-            }
             if (_shared)
                 desc.OptionFlags |= ResourceOptionFlags.Shared;
+
+            return desc;
+        }
+        internal override Resource CreateTexture()
+        {
+            // TODO: Move this to SetData() if we want to make Immutable textures!
+            var desc = GetTexture2DDescription();
 
             // Save sampling description.
             _sampleDescription = desc.SampleDescription;
 
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+        }
+
+        protected internal virtual SampleDescription CreateSampleDescription()
+        {
+            return new SampleDescription(1, 0);
         }
 
         internal SampleDescription GetTextureSampleDescription()
@@ -469,6 +466,6 @@ namespace Microsoft.Xna.Framework.Graphics
             });
 #endif
         }
-	}
+    }
 }
 
