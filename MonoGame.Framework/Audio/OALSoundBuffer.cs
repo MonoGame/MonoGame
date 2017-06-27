@@ -30,6 +30,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public OALSoundBuffer ()
 		{
+            AL.GetError();
             AL.GenBuffers(1, out openALDataBuffer);
             ALHelper.CheckError("Failed to generate OpenAL data buffer.");
 		}
@@ -52,7 +53,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int sampleAlignment = 0)
         {
-            if ((format == ALFormat.MonoMSAdpcm || format == ALFormat.StereoMSAdpcm) && !OpenALSoundController.GetInstance.SupportsADPCM)
+            if ((format == ALFormat.MonoMicrosoftAdpcm || format == ALFormat.StereoMicrosoftAdpcm) && !OpenALSoundController.GetInstance.SupportsADPCM)
                 throw new InvalidOperationException("MS-ADPCM is not supported by this OpenAL driver");
             if ((format == ALFormat.MonoIma4 || format == ALFormat.StereoIma4) && !OpenALSoundController.GetInstance.SupportsIma4)
                 throw new InvalidOperationException("IMA/ADPCM is not supported by this OpenAL driver");

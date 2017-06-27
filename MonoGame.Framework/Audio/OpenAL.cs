@@ -16,8 +16,8 @@ namespace OpenAL
         Stereo16 = 0x1103,
         MonoIma4 = 0x1300,
         StereoIma4 = 0x1301,
-        MonoMSAdpcm = 0x1302,
-        StereoMSAdpcm = 0x1303,
+        MonoMicrosoftAdpcm = 0x1302,
+        StereoMicrosoftAdpcm = 0x1303,
         MonoFloat32 = 0x10010,
         StereoFloat32 = 0x10011,
     }

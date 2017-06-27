@@ -33,33 +33,6 @@
   </Properties>
 
   <Files>
-    <!-- Dependencies -->
-    <None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
-      <Platforms>WindowsGL</Platforms>
-      <Link>SDL2.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
-      <Platforms>WindowsGL</Platforms>
-      <Link>soft_oal.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
-      <Platforms>Linux</Platforms>
-      <Link>x64\libSDL2-2.0.so.0</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
-      <Platforms>Linux</Platforms>
-      <Link>x64\libopenal.so.1</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-
-    <None Include="MonoGame.Tests.dll.config">
-      <Platforms>Linux</Platforms>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-
 
     <None Include="ReadMe.md" />
 

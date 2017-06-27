@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Audio
                 || format == ALFormat.Stereo16
                 || format == ALFormat.StereoFloat32
                 || format == ALFormat.StereoIma4
-                || format == ALFormat.StereoMSAdpcm);
+                || format == ALFormat.StereoMicrosoftAdpcm);
         }
     }
 

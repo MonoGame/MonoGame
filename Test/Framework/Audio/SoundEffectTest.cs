@@ -14,6 +14,13 @@ namespace MonoGame.Tests.Audio
 {
     public class SoundEffectTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            // Necessary to get audio initialised
+            FrameworkDispatcher.Update();
+        }
+
         [Test]
         public void Statics()
         {
@@ -416,8 +423,8 @@ namespace MonoGame.Tests.Audio
         [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav", 72020000)]
         [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav", 72020000)]
 #else
-        [TestCase(@"Assets/Audio/tone_mono_44khz_imaadpcm.wav", 5000000)]
-        [TestCase(@"Assets/Audio/tone_stereo_44khz_imaadpcm.wav", 5000000)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_imaadpcm.wav", 5560000)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_imaadpcm.wav", 5090000)]
 #endif
         [TestCase(@"Assets/Audio/tone_mono_44khz_msadpcm.wav", 5080000)]
         [TestCase(@"Assets/Audio/tone_stereo_44khz_msadpcm.wav", 5050000)]
@@ -484,8 +491,8 @@ namespace MonoGame.Tests.Audio
 #if !XNA
         // XNA does not support 32-bit float, MS-ADPCM or IMA/ADPCM in SoundEffect.FromStream, but MonoGame does
 #if !DIRECTX
-        [TestCase("tone_mono_44khz_imaadpcm", 5000000)]
-        [TestCase("tone_stereo_44khz_imaadpcm", 5000000)]
+        [TestCase("tone_mono_44khz_imaadpcm", 6010000)]
+        [TestCase("tone_stereo_44khz_imaadpcm", 5300000)]
 #endif
         [TestCase("tone_mono_44khz_float", 5000000)]
         [TestCase("tone_stereo_44khz_float", 5000000)]

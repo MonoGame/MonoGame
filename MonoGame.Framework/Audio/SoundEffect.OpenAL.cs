@@ -33,24 +33,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Public Constructors
 
-        // Converts block alignment in bytes to sample alignment, primarily for compressed formats
-        // Calculation of sample alignment from http://kcat.strangesoft.net/openal-extensions/SOFT_block_alignment.txt
-        int SampleAlignment(ALFormat format, int blockAlignment)
-        {
-            switch (format)
-            {
-                case ALFormat.MonoIma4:
-                    return (blockAlignment - 4) / 4 * 8 + 1;
-                case ALFormat.StereoIma4:
-                    return (blockAlignment / 2 - 4) / 4 * 8 + 1;
-                case ALFormat.MonoMSAdpcm:
-                    return (blockAlignment - 7) * 2 + 2;
-                case ALFormat.StereoMSAdpcm:
-                    return (blockAlignment / 2 - 7) * 2 + 2;
-            }
-            return 0;
-        }
-
         private void PlatformLoadAudioStream(Stream stream, out TimeSpan duration)
         {
             byte[] buffer;
@@ -58,17 +40,16 @@ namespace Microsoft.Xna.Framework.Audio
             ALFormat format;
             int freq;
             int blockAlignment;
-            int byteRate;
-            buffer = AudioLoader.Load(stream, out format, out freq, out blockAlignment, out byteRate);
+            int bitsPerSample;
+            int samplesPerBlock;
+            int sampleCount;
+            buffer = AudioLoader.Load(stream, out format, out freq, out blockAlignment, out bitsPerSample, out samplesPerBlock, out sampleCount);
 
-            int bytesPerChannel = ALHelper.IsStereoFormat(format) ? buffer.Length / 2 : buffer.Length;
-            duration = TimeSpan.FromSeconds((float)bytesPerChannel / (float)byteRate);
-
-            int sampleAlignment = SampleAlignment(format, blockAlignment);
+            duration = TimeSpan.FromSeconds((float)sampleCount / (float)freq);
 
             // bind buffer
             SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(buffer, format, buffer.Length, freq, sampleAlignment);
+            SoundBuffer.BindDataBuffer(buffer, format, buffer.Length, freq, samplesPerBlock);
         }
 
         private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleBits, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
@@ -92,17 +73,19 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformInitializeAdpcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int blockAlignment, int loopStart, int loopLength)
         {
             var format = AudioLoader.GetSoundFormat(2, (int)channels, 0);
-            int sampleAlignment = SampleAlignment(format, blockAlignment);
+            int sampleAlignment = AudioLoader.SampleAlignment(format, blockAlignment);
 
             // bind buffer
             SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate, sampleAlignment);
+            // Buffer length must be aligned with the block alignment
+            int alignedCount = count - (count % blockAlignment);
+            SoundBuffer.BindDataBuffer(buffer, format, alignedCount, sampleRate, sampleAlignment);
         }
 
         private void PlatformInitializeIma4(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int blockAlignment, int loopStart, int loopLength)
         {
             var format = AudioLoader.GetSoundFormat(17, (int)channels, 0);
-            int sampleAlignment = SampleAlignment(format, blockAlignment);
+            int sampleAlignment = AudioLoader.SampleAlignment(format, blockAlignment);
 
             // bind buffer
             SoundBuffer = new OALSoundBuffer();
@@ -151,7 +134,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (codec == MiniFormatTag.Adpcm)
             {
-                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, (blockAlignment + 16) * 2, loopStart, loopLength);
+                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, (blockAlignment + 16) * channels, loopStart, loopLength);
                 duration = TimeSpan.FromSeconds(SoundBuffer.Duration);
                 return;
             }
