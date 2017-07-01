@@ -461,12 +461,18 @@ namespace MonoGame.Framework
 
         internal void ChangeClientSize(Size clientBounds)
         {
+            var prevIsResizing = Form.IsResizing;
+            // make sure we don't see the events from this as a user resize
+            Form.IsResizing = true;
+
             if(this.Form.ClientSize != clientBounds)
                 this.Form.ClientSize = clientBounds;
 
             // if the window wasn't moved manually and it's resized, it should be centered
             if (!_wasMoved)
                 Form.CenterOnPrimaryMonitor();
+
+            Form.IsResizing = prevIsResizing;
         }
 
         [System.Security.SuppressUnmanagedCodeSecurity] // We won't use this maliciously

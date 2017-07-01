@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Windows
 
         public bool AllowAltF4 = true;
 
-        internal bool IsResizing { get; private set; }
+        internal bool IsResizing { get; set; }
 
         #region Events
 
