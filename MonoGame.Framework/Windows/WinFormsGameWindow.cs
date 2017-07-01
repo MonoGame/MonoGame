@@ -333,6 +333,11 @@ namespace MonoGame.Framework
             if (_switchingFullScreen || Form.IsResizing)
                 return;
 
+            // this event can be triggered when moving the window through Windows hotkeys
+            // in that case we should no longer center the window after resize
+            if (_lastFormState == Form.WindowState)
+                _wasMoved = true;
+
             if (Game.Window == this && Form.WindowState != FormWindowState.Minimized) {
                 // we may need to restore full screen when coming back from a minimized window
                 if (_lastFormState == FormWindowState.Minimized)
