@@ -717,7 +717,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void GetModeSwitchedSize(out int width, out int height)
         {
-            Output output;
+            Output output = null;
             if (_swapChain == null)
             {
                 // get the primary output
@@ -727,7 +727,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                output = _swapChain.ContainingOutput;
+                try
+                {
+                    output = _swapChain.ContainingOutput;
+                }
+                catch (SharpDXException) { /* ContainingOutput fails on a headless device */ }
             }
 
             var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
@@ -743,11 +747,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 Height = PresentationParameters.BackBufferHeight,
             };
 
-            ModeDescription closest;
-            output.GetClosestMatchingMode(_d3dDevice, target, out closest);
-            width = closest.Width;
-            height = closest.Height;
-            output.Dispose();
+            if (output == null)
+            {
+                width = PresentationParameters.BackBufferWidth;
+                height = PresentationParameters.BackBufferHeight;
+            }
+            else
+            {
+                ModeDescription closest;
+                output.GetClosestMatchingMode(_d3dDevice, target, out closest);
+                width = closest.Width;
+                height = closest.Height;
+                output.Dispose();
+            }
         }
 
         internal void GetDisplayResolution(out int width, out int height)
@@ -927,7 +939,14 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_swapChain == null)
                 return;
 
-            using (var output = _swapChain.ContainingOutput)
+            Output output = null;
+            try
+            {
+                output = _swapChain.ContainingOutput;
+            }
+            catch (SharpDXException) { /* ContainingOutput fails on a headless device */ }
+
+            if (output != null)
             {
                 foreach (var adapter in GraphicsAdapter.Adapters)
                 {
@@ -937,6 +956,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         break;
                     }
                 }
+
+                output.Dispose();
             }
         }
 
