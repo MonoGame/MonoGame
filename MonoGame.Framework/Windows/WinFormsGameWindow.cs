@@ -330,7 +330,7 @@ namespace MonoGame.Framework
 
         private void OnResize(object sender, EventArgs eventArgs)
         {
-            if (_switchingFullScreen || Form.WindowState == _lastFormState)
+            if (_switchingFullScreen || Form.IsResizing)
                 return;
 
             if (Game.Window == this && Form.WindowState != FormWindowState.Minimized) {

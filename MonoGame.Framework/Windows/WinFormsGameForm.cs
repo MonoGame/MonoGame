@@ -41,9 +41,14 @@ namespace Microsoft.Xna.Framework.Windows
         public const int WM_KEYDOWN = 0x0100;
         public const int WM_TABLET_QUERYSYSTEMGESTURESTA = (0x02C0 + 12);
 
+        public const int WM_ENTERSIZEMOVE = 0x0231;
+        public const int WM_EXITSIZEMOVE = 0x0232;
+
         public const int WM_SYSCOMMAND = 0x0112;
 
         public bool AllowAltF4 = true;
+
+        internal bool IsResizing { get; private set; }
 
         #region Events
 
@@ -128,14 +133,18 @@ namespace Microsoft.Xna.Framework.Windows
                 case WM_POINTERUPDATE:
                     state = TouchLocationState.Moved;
                     break;
-
                 case WM_MOUSEHWHEEL:
                     var delta = (short)(((ulong)m.WParam >> 16) & 0xffff); ;
                     var handler = MouseHorizontalWheel;
 
                     if (handler != null)
                         handler(this, new HorizontalMouseWheelEventArgs(delta));
-                    
+                    break;
+                case WM_ENTERSIZEMOVE:
+                    IsResizing = true;
+                    break;
+                case WM_EXITSIZEMOVE:
+                    IsResizing = false;
                     break;
             }
 
