@@ -36,5 +36,9 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     <file src="WindowsGL\AnyCPU\Release\x86\libSDL2-2.0.so.0" target="build\native\x86\libSDL2-2.0.so.0" />
     <file src="WindowsGL\AnyCPU\Release\x86\SDL2.dll" target="build\native\x86\SDL2.dll" />
     <file src="WindowsGL\AnyCPU\Release\x86\soft_oal.dll" target="build\native\x86\soft_oal.dll" />
+
+    <!-- Portable Libs -->		
+	<file src="Portable\AnyCPU\MonoGame.Framework.dll" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.dll" />
+	<file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.xml" />
   </files>
 </package>

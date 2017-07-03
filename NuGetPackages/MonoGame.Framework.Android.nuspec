@@ -23,5 +23,9 @@ This package provides you with MonoGame Framework that works on Android.</descri
     <!-- C# Assemblies -->
     <file src="Android\AnyCPU\Release\MonoGame.Framework.dll" target="lib\MonoAndroid\MonoGame.Framework.dll" />
     <file src="Android\AnyCPU\Release\MonoGame.Framework.xml" target="lib\MonoAndroid\MonoGame.Framework.xml" />
+
+    <!-- Portable Libs -->		
+	<file src="Portable\AnyCPU\MonoGame.Framework.dll" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.dll" />
+	<file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.xml" />
   </files>
 </package>

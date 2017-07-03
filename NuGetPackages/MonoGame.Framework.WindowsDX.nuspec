@@ -35,5 +35,9 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
     <!-- C# Assemblies -->
     <file src="Windows\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />
     <file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net45\MonoGame.Framework.xml" />
+
+    <!-- Portable Libs -->		
+	<file src="Portable\AnyCPU\MonoGame.Framework.dll" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.dll" />
+	<file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.xml" />
   </files>
 </package>
