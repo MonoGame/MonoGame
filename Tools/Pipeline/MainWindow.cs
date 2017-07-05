@@ -334,6 +334,9 @@ namespace MonoGame.Tools.Pipeline
                     OutputAppend("Cound not find mono. Please install the latest version from http://www.mono-project.com");
                 }
 
+                if (!Global.Linux)
+                    proc.StartInfo.EnvironmentVariables.Add("MONO_PATH", Path.GetDirectoryName(Path.GetFullPath(Path.Combine(monoLoc, ".."))));
+
                 proc.StartInfo.FileName = monoLoc;
 
                 if (PipelineController.Instance.LaunchDebugger)
