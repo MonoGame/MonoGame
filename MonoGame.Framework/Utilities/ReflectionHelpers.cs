@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Utilities
 {
@@ -13,7 +11,7 @@ namespace Microsoft.Xna.Framework.Utilities
             {
                 throw new NullReferenceException("Must supply the targetType parameter");
             }
-#if WINRT
+#if NET45            
             return targetType.GetTypeInfo().IsValueType;
 #else
             return targetType.IsValueType;
@@ -26,12 +24,27 @@ namespace Microsoft.Xna.Framework.Utilities
             {
                 throw new NullReferenceException("Must supply the targetType parameter");
             }
-#if WINRT
-            var type = targetType.GetTypeInfo().BaseType;
+#if NET45            
+            return targetType.GetTypeInfo().BaseType;
 #else
-            var type = targetType.BaseType;
+            return targetType.BaseType;
 #endif
-            return type;
+        }
+
+        /// <summary>
+        /// Returns the Assembly of a Type
+        /// </summary>
+        public static Assembly GetAssembly(Type targetType)
+        {
+            if (targetType == null)
+            {
+                throw new NullReferenceException("Must supply the targetType parameter");
+            }
+#if NET45            
+            return targetType.GetTypeInfo().Assembly;
+#else
+            return targetType.Assembly;
+#endif
         }
 
         /// <summary>
@@ -46,15 +59,24 @@ namespace Microsoft.Xna.Framework.Utilities
 
             if (t == typeof(object))
                 return false;
-#if WINRT
+#if NET45            
             var ti = t.GetTypeInfo();
             if (ti.IsClass && !ti.IsAbstract)
                 return true;
-#else
+#else            
             if (t.IsClass && !t.IsAbstract)
                 return true;
 #endif
             return false;
+        }
+
+        public static MethodInfo GetMethodInfo(Type type, string methodName)
+        {
+#if NET45            
+            return type.GetTypeInfo().GetDeclaredMethod(methodName);
+#else
+            return type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+#endif
         }
 
         public static MethodInfo GetPropertyGetMethod(PropertyInfo property)
@@ -64,7 +86,7 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new NullReferenceException("Must supply the property parameter");
             }
 
-#if WINRT
+#if NET45            
             return property.GetMethod;
 #else
             return property.GetGetMethod();
@@ -78,7 +100,7 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new NullReferenceException("Must supply the property parameter");
             }
 
-#if WINRT
+#if NET45            
             return property.SetMethod;
 #else
             return property.GetSetMethod();
@@ -90,7 +112,7 @@ namespace Microsoft.Xna.Framework.Utilities
             if (member == null)
                 throw new NullReferenceException("Must supply the member parameter");
 
-#if WINRT
+#if NET45            
             return member.GetCustomAttribute(typeof(T)) as T;
 #else
             return Attribute.GetCustomAttribute(member, typeof(T)) as T;
@@ -139,12 +161,12 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new ArgumentNullException("type");
             if (objectType == null)
                 throw new ArgumentNullException("objectType");
-#if WINRT
+#if NET45
             if (type.GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo()))
                 return true;
 #else
             if (type.IsAssignableFrom(objectType))
-                return true;
+                return true;     
 #endif
             return false;
         }

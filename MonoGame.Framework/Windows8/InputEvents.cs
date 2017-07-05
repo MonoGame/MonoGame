@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework
                         coreIndependentInputSource = ((SwapChainBackgroundPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
                     else
                         coreIndependentInputSource = ((SwapChainPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
-                                        
+
                     coreIndependentInputSource.PointerPressed += CoreWindow_PointerPressed;
                     coreIndependentInputSource.PointerMoved += CoreWindow_PointerMoved;
                     coreIndependentInputSource.PointerReleased += CoreWindow_PointerReleased;
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
 
             _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos, !isTouch);
-            
+
             if (!isTouch)
             {
                 // Mouse or stylus event.
@@ -252,11 +252,11 @@ namespace Microsoft.Xna.Framework
                 case Windows.System.VirtualKey.Shift:
                     // we can detect right shift by checking the scancode value.
                     // left shift is 0x2A, right shift is 0x36. IsExtendedKey is always false.
-                    return (keyStatus.ScanCode==0x36) ? Keys.RightShift : Keys.LeftShift;
+                    return (keyStatus.ScanCode == 0x36) ? Keys.RightShift : Keys.LeftShift;
                 // Note that the Alt key is now refered to as Menu.
                 // ALT key doesn't get fired by KeyUp/KeyDown events.
                 // One solution could be to check CoreWindow.GetKeyState(...) on every tick.
-                case Windows.System.VirtualKey.Menu:                    
+                case Windows.System.VirtualKey.Menu:
                     return Keys.LeftAlt;
 
                 default:
@@ -283,6 +283,10 @@ namespace Microsoft.Xna.Framework
             // If the window is resized then also 
             // drop any current key states.
             Keyboard.Clear();
+
+            // required of input can stop working if we change focus
+            Window.Current.CoreWindow.IsInputEnabled = true;
+            CoreWindow.GetForCurrentThread().IsInputEnabled = true;
         }
 
         private void CoreWindow_Activated(CoreWindow sender, WindowActivatedEventArgs args)
@@ -291,6 +295,10 @@ namespace Microsoft.Xna.Framework
             // receive key events for them while we are in the background
             if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
                 Keyboard.Clear();
+
+            // required of input can stop working if we change focus
+            Window.Current.CoreWindow.IsInputEnabled = true;
+            CoreWindow.GetForCurrentThread().IsInputEnabled = true;
         }
 
         private void CoreWindow_VisibilityChanged(CoreWindow sender, VisibilityChangedEventArgs args)
@@ -299,6 +307,10 @@ namespace Microsoft.Xna.Framework
             // receive key events for them while we are in the background
             if (!args.Visible)
                 Keyboard.Clear();
+
+            // required of input can stop working if we change focus
+            Window.Current.CoreWindow.IsInputEnabled = true;
+            CoreWindow.GetForCurrentThread().IsInputEnabled = true;
         }
     }
 }

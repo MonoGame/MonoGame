@@ -6,4 +6,4 @@
 	url = https://github.com/Mono-Game/MonoGame.Dependencies.git
 [submodule "ThirdParty/NVorbis"]
 	path = ThirdParty/NVorbis
-	url = https://github.com/ioctlLR/NVorbis.git
+url=https://github.com/MrHelmut/NVorbis.git

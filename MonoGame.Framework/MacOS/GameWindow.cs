@@ -230,9 +230,7 @@ namespace Microsoft.Xna.Framework
 		
 		protected virtual void OnClientSizeChanged (EventArgs e)
 		{
-			var h = ClientSizeChanged;
-			if (h != null)
-				h (this, e);
+			EventHelpers.Raise(this, ClientSizeChanged, e);
 		}
 		
 		protected override void OnTitleChanged (EventArgs e)
@@ -434,9 +432,7 @@ namespace Microsoft.Xna.Framework
 			internal set {
 				if (value != _currentOrientation) {
 					_currentOrientation = value;
-					if (OrientationChanged != null) {
-						OrientationChanged (this, EventArgs.Empty);
-					}
+					EventHelpers.Raise(this, OrientationChanged, EventArgs.Empty);
 				}
 			}
 		}
@@ -559,10 +555,7 @@ namespace Microsoft.Xna.Framework
 				throw new ArgumentNullException("e");
 			}
 			
-			if (TextInput != null) 
-			{
-				TextInput.Invoke(this, e);
-			}
+			EventHelpers.Raise(this, TextInput, e);
 		}
 		
 		/// <summary>

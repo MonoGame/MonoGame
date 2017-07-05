@@ -112,22 +112,26 @@ namespace Microsoft.Xna.Framework
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
             Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
-            using (
-                var stream =
-                    Assembly.GetEntryAssembly().GetManifestResourceStream(Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace + ".Icon.bmp") ??
-                    Assembly.GetEntryAssembly().GetManifestResourceStream("Icon.bmp") ??
-                    Assembly.GetExecutingAssembly().GetManifestResourceStream("MonoGame.bmp"))
+            // when running NUnit tests entry assembly can be null
+            if (Assembly.GetEntryAssembly() != null)
             {
-                if (stream != null)
-                    using (var br = new BinaryReader(stream))
-                    {
-                        try
+                using (
+                    var stream =
+                        Assembly.GetEntryAssembly().GetManifestResourceStream(Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace + ".Icon.bmp") ??
+                        Assembly.GetEntryAssembly().GetManifestResourceStream("Icon.bmp") ??
+                        Assembly.GetExecutingAssembly().GetManifestResourceStream("MonoGame.bmp"))
+                {
+                    if (stream != null)
+                        using (var br = new BinaryReader(stream))
                         {
-                            var src = Sdl.RwFromMem(br.ReadBytes((int)stream.Length), (int)stream.Length);
-                            _icon = Sdl.LoadBMP_RW(src, 1);
+                            try
+                            {
+                                var src = Sdl.RwFromMem(br.ReadBytes((int)stream.Length), (int)stream.Length);
+                                _icon = Sdl.LoadBMP_RW(src, 1);
+                            }
+                            catch { }
                         }
-                        catch { }
-                    }
+                }
             }
 
             _handle = Sdl.Window.Create("", _winx, _winy,

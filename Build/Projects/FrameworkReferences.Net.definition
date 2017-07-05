@@ -34,6 +34,7 @@
     <Reference Include="System.Core" />
     <Reference Include="mscorlib" />
     <Reference Include="Lidgren.Network" />
+    <Reference Include="OpenTK-1.0" />
   </Platform>
 
   <Platform Type="Windows">
