@@ -29,17 +29,7 @@ This package provides you with MonoGame Framework that works on all OpenGL based
 		<file src="iOS\iPhoneSimulator\Release\MonoGame.Framework.xml" target="lib\XamariniOS\MonoGame.Framework.xml" />
 
 		<!-- MacOS -->
-		<file src="..\..\NuGetPackages\build\MacOS\MonoGame.Framework.MacOS.targets" target="build\net40\MonoGame.Framework.MacOS.targets" />
-		<file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
-		<file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
-		<file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\net40\Tao.Sdl.dll" />
-		<file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
-		<file src="..\..\NuGetPackages\build\MacOS\MonoGame.Framework.MacOS.targets" target="build\net45\MonoGame.Framework.MacOS.targets" />
-		<file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />
-		<file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net45\MonoGame.Framework.xml" />
-		<file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\net45\Tao.Sdl.dll" />
-		<file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\net45\OpenTK.dll" />
-		<file src="..\..\NuGetPackages\build\MacOS\MonoGame.Framework.MacOS.targets" target="MonoMac\net40\MonoGame.Framework.MacOS.targets" />
+		<file src="..\..\NuGetPackages\build\MacOS\MonoGame.Framework.MacOS.targets" target="MonoMac\MonoMac\MonoGame.Framework.MacOS.targets" />
 		<file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\MonoMac\MonoGame.Framework.dll" />
 		<file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\MonoMac\MonoGame.Framework.xml" />
 		<file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\MonoMac\Tao.Sdl.dll" />
