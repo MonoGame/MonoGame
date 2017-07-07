@@ -1198,8 +1198,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        private void PlatformGetBackBufferData<T>(Rectangle rect, T[] data, int startIndex, int count) where T : struct
+        private void PlatformGetBackBufferData<T>(Rectangle? rectangle, T[] data, int startIndex, int count) where T : struct
         {
+            var rect = rectangle ?? new Rectangle(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
             var tSize = Marshal.SizeOf(typeof(T));
             var flippedY = PresentationParameters.BackBufferHeight - rect.Y - rect.Height;
             GL.ReadPixels(rect.X, flippedY, rect.Width, rect.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
