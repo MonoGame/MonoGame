@@ -265,9 +265,10 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+
         /// <summary>
         /// Indicates if this game is running with a fixed time between frames.
-        /// When set to <code>true</code> the time target time between frames is
+        /// When set to <code>true</code> the target time between frames is
         /// given by <see cref="TargetElapsedTime"/>.
         /// </summary>
         public bool IsFixedTimeStep
@@ -283,10 +284,11 @@ namespace Microsoft.Xna.Framework
             get { return _services; }
         }
 
+
         /// <summary>
         /// The <see cref="ContentManager"/> of this <see cref="Game"/>.
         /// </summary>
-        /// <exception cref="ArgumentNullException">The </exception>
+        /// <exception cref="ArgumentNullException">If Content is set to <code>null</code>.</exception>
         public ContentManager Content
         {
             get { return _content; }
