@@ -1320,21 +1320,22 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null)
                 throw new ArgumentNullException("data");
 
-            Rectangle rectangle;
+            int width, height;
             if (rect.HasValue)
             {
-                rectangle = rect.Value;
-
-                var width = PresentationParameters.BackBufferWidth;
-                var height = PresentationParameters.BackBufferHeight;
+                var rectangle = rect.Value;
+                width = rectangle.Width;
+                height = rectangle.Height;
 
                 if (rectangle.X < 0 || rectangle.Y < 0 || rectangle.Width <= 0 || rectangle.Height <= 0 ||
-                    rectangle.Right > width || rectangle.Top > height)
+                    rectangle.Right > PresentationParameters.BackBufferWidth || rectangle.Top > PresentationParameters.BackBufferHeight)
                     throw new ArgumentException("Rectangle must fit in BackBuffer dimensions");
             }
             else
-                rectangle = new Rectangle(0, 0, PresentationParameters.BackBufferWidth,
-                    PresentationParameters.BackBufferHeight);
+            {
+                width = PresentationParameters.BackBufferWidth;
+                height = PresentationParameters.BackBufferHeight;
+            }
 
             var tSize = ReflectionHelpers.SizeOf<T>.Get();
             var fSize = PresentationParameters.BackBufferFormat.GetSize();
@@ -1344,13 +1345,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("startIndex must be at least zero and smaller than data.Length.", "startIndex");
             if (data.Length < startIndex + elementCount)
                 throw new ArgumentException("The data array is too small.");
-            var dataByteSize = rectangle.Width * rectangle.Height * fSize;
+            var dataByteSize = width * height * fSize;
+
             if (elementCount * tSize != dataByteSize)
                 throw new ArgumentException(string.Format("elementCount is not the right size, " +
                                             "elementCount * sizeof(T) is {0}, but data size is {1} bytes.",
                                             elementCount * tSize, dataByteSize), "elementCount");
 
-            PlatformGetBackBufferData(rectangle, data, startIndex, elementCount);
+            PlatformGetBackBufferData(rect, data, startIndex, elementCount);
         }
 
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)

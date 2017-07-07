@@ -1481,7 +1481,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformGetBackBufferData<T>(Rectangle rect, T[] data, int startIndex, int count) where T : struct
+        private void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct
         {
             // TODO share code with Texture2D.GetData and do pooling for staging textures
             // first set up a staging texture
@@ -1490,11 +1490,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (var backBufferTexture = new SharpDX.Direct3D11.Texture2D(_renderTargetView.Resource.NativePointer))
 #else
             //You can't Map the BackBuffer surface, so we copy to another texture
-            using (var dxgiBackBuffer = _swapChain.GetBackBuffer<Surface>(0))
-            using (var backBufferTexture = dxgiBackBuffer.QueryInterface<SharpDX.Direct3D11.Texture2D>())
+            using (var backBufferTexture = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0))
 #endif
             {
                 var desc = backBufferTexture.Description;
+                desc.SampleDescription = new SampleDescription(1, 0);
                 desc.BindFlags = BindFlags.None;
                 desc.CpuAccessFlags = CpuAccessFlags.Read;
                 desc.Usage = ResourceUsage.Staging;
@@ -1505,16 +1505,36 @@ namespace Microsoft.Xna.Framework.Graphics
                     lock (_d3dContext)
                     {
                         // Copy the data from the GPU to the staging texture.
-#if WINDOWS_PHONE
-                            _d3dContext.CopySubresourceRegion(backBufferTexture, 0,
-                                new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1), stagingTex, 0);
-#else
-                        using (var backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0))
+                        // if MSAA is enabled we need to first copy to a resource without MSAA
+                        if (backBufferTexture.Description.SampleDescription.Count > 1)
                         {
-                            _d3dContext.CopySubresourceRegion(backBuffer, 0,
-                                new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1), stagingTex, 0);
+                            desc.Usage = ResourceUsage.Default;
+                            desc.CpuAccessFlags = CpuAccessFlags.None;
+                            using (var noMsTex = new SharpDX.Direct3D11.Texture2D(_d3dDevice, desc))
+                            {
+                                _d3dContext.ResolveSubresource(backBufferTexture, 0, noMsTex, 0, desc.Format);
+                                if (rect.HasValue)
+                                {
+                                    var r = rect.Value;
+                                    _d3dContext.CopySubresourceRegion(noMsTex, 0,
+                                        new ResourceRegion(r.Left, r.Top, 0, r.Right, r.Bottom, 1), stagingTex,
+                                        0);
+                                }
+                                else
+                                    _d3dContext.CopyResource(noMsTex, stagingTex);
+                            }
                         }
-#endif
+                        else
+                        {
+                            if (rect.HasValue)
+                            {
+                                var r = rect.Value;
+                                _d3dContext.CopySubresourceRegion(backBufferTexture, 0,
+                                    new ResourceRegion(r.Left, r.Top, 0, r.Right, r.Bottom, 1), stagingTex, 0);
+                            }
+                            else
+                                _d3dContext.CopyResource(backBufferTexture, stagingTex);
+                        }
 
                         // Copy the data to the array.
                         DataStream stream = null;
@@ -1522,8 +1542,17 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             var databox = _d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
 
-                            var elementsInRow = rect.Width;
-                            var rows = rect.Height;
+                            int elementsInRow, rows;
+                            if (rect.HasValue)
+                            {
+                                elementsInRow = rect.Value.Width;
+                                rows = rect.Value.Height;
+                            }
+                            else
+                            {
+                                elementsInRow = stagingTex.Description.Width;
+                                rows = stagingTex.Description.Height;
+                            }
                             var elementSize = format.GetSize();
                             var rowSize = elementSize * elementsInRow;
                             if (rowSize == databox.RowPitch)
