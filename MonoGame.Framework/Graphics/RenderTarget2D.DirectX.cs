@@ -138,9 +138,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void ResolveSubresource()
         {
-            lock (GraphicsDevice._d3dContext)
+            lock (GraphicsDevice.Context)
             {
-                GraphicsDevice._d3dContext.ResolveSubresource(
+                GraphicsDevice.Context._d3dContext.ResolveSubresource(
                     this._texture,
                     0,
                     _resolvedTexture._texture,
