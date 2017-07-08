@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+<package 
+    xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
     <metadata>
         <id>MonoGame.Framework.DX</id>
         <version>0.0.0.0</version>
@@ -56,14 +57,12 @@ This package also includes the Portable version of MonoGame for use in Bait and 
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.pri" target="lib\uap10.0\MonoGame.Framework.pri" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xml" target="lib\uap10.0\MonoGame.Framework.xml" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xr.xml" target="lib\uap10.0\MonoGame.Framework/MonoGame.Framework.xr.xml" />
-        
         <!-- Windows 8.1 -->
         <file src="..\..\NuGetPackages\build\Windows8\MonoGame.Framework.Windows8.targets" target="build\netcore451\MonoGame.Framework.Windows8.targets" />
         <file src="Windows8\AnyCPU\Release\Themes\Generic.xaml" target="lib\netcore451\MonoGame.Framework\Themes\Generic.xaml" />
         <file src="Windows8\AnyCPU\Release\MonoGame.Framework.dll" target="lib\netcore451\MonoGame.Framework.dll" />
         <file src="Windows8\AnyCPU\Release\MonoGame.Framework.xml" target="lib\netcore451\MonoGame.Framework.xml" />
         <file src="Windows8\AnyCPU\Release\MonoGame.Framework.pri" target="lib\netcore451\MonoGame.Framework.pri" />
-
         <!-- Windows Phone 8.1 -->
         <file src="..\..\NuGetPackages\build\WindowsPhone81\MonoGame.Framework.WindowsPhone81.targets" target="build\wpa81\MonoGame.Framework.WindowsPhone81.targets" />
         <file src="WindowsPhone81\AnyCPU\Release\Themes\generic.xbf" target="lib\wpa81\MonoGame.Framework\Themes\generic.xbf" />
@@ -71,12 +70,10 @@ This package also includes the Portable version of MonoGame for use in Bait and 
         <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.dll" target="lib\wpa81/MonoGame.Framework.dll" />
         <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.xml" target="lib\wpa81/MonoGame.Framework.xml" />
         <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.pri" target="lib\wpa81/MonoGame.Framework.pri" />
-
         <!-- Windows Desktop -->
         <file src="..\..\NuGetPackages\build\WindowsDX\MonoGame.Framework.WindowsDX.targets" target="build\net45\MonoGame.Framework.WindowsDX.targets" />
         <file src="Windows\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />
         <file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net45\MonoGame.Framework.xml" />
-
         <!-- Portable Assemblies -->
         <file src="Portable\AnyCPU\MonoGame.Framework.dll" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.dll" />
         <file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\portable-net45+win8+wpa81\MonoGame.Framework.xml" />
