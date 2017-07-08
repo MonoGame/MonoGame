@@ -49,6 +49,8 @@
       <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="Web">TRACE;WEB</Platform>
     </CustomDefinitions>
+	
+	<DefineNET4DetectionConstant>True</DefineNET4DetectionConstant>
 
     <FrameworkVersions>
 	  <Platform Name="Windows8">
@@ -633,6 +635,14 @@
     <Compile Include="Graphics\GraphicsContext.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
+    <Compile Include="Graphics\GraphicsDebug.cs" />
+    <Compile Include="Graphics\GraphicsDebug.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsDebug.Default.cs">
+      <Services>OpenGLGraphics,WebGraphics,ANGLEGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsDebugMessage.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="Graphics\GraphicsDevice.DirectX.cs">
       <Services>DirectXGraphics</Services>
