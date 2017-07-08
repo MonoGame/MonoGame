@@ -1433,6 +1433,9 @@
 
 
     <!-- Windows Desktop Platfom -->
+    <Compile Include="Windows\HorizontalMouseWheelEventArgs.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Windows\WinFormsGameForm.cs">
       <Platforms>Windows</Platforms>
     </Compile>
