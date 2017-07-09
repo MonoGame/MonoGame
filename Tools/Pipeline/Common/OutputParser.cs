@@ -19,6 +19,7 @@ namespace MonoGame.Tools.Pipeline
         BuildErrorContinue,
         BuildEnd,
         BuildTime,
+        BuildTerminated,
 
         Unknown
     }
@@ -96,7 +97,11 @@ namespace MonoGame.Tools.Pipeline
             BuildElapsedTime = null;
             ErrorMessage = null;
 
-            if (_reBuildBegin.IsMatch(line))
+            if (line == "Build terminated!")
+            {
+                State = OutputState.BuildTerminated;
+            }
+            else if (_reBuildBegin.IsMatch(line))
             {
                 State = OutputState.BuildBegin;
                 var m = _reBuildBegin.Match(line);

@@ -548,7 +548,7 @@ namespace MonoGame.Tools.Pipeline
                 
                 _buildProcess.Kill();
                 _buildProcess = null;
-                View.OutputAppend("Build terminated!" + Environment.NewLine);
+                View.OutputAppend("Build terminated!");
             }
         }
 
