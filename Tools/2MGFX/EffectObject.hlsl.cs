@@ -41,6 +41,14 @@ namespace TwoMGFX
                     null,
                     shaderInfo.FilePath);
 
+                // Apparently, there's a bug in SharpDX 4.0.1 in which invalid shaders
+                // don't report HasErrors == true, but the bytecode appears to be null.                
+                if (result.Bytecode == null)
+                {
+                    errorsAndWarnings += "ByteCode is NULL";
+                    throw new ShaderCompilerException();
+                }
+
                 // Store all the errors and warnings to log out later.
                 errorsAndWarnings += result.Message;
 
