@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Audio
                     var details = MasterVoice.VoiceDetails;
                     _reverbVoice = new SubmixVoice(Device, details.InputChannelCount, details.InputSampleRate);
 
-                    var reverb = new SharpDX.XAudio2.Fx.Reverb();
+                    var reverb = new SharpDX.XAudio2.Fx.Reverb(Device);
                     var desc = new EffectDescriptor(reverb);
                     desc.InitialState = true;
                     desc.OutputChannelCount = details.InputChannelCount;
@@ -130,16 +130,16 @@ namespace Microsoft.Xna.Framework.Audio
 
                 if (MasterVoice == null)
                 {
-                    // Let windows autodetect number of channels and sample rate.
-                    MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate, deviceId);
+                    // Let windows autodetect number of channels and sample rate.                    
+                    MasterVoice = new MasteringVoice(Device); // removed extra (unneeded?) paramaters to fix #5742
                 }
 
                 // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
 #if WINRT
                 Speakers = (Speakers)MasterVoice.ChannelMask;
 #else
-                var deviceDetails = Device.GetDeviceDetails(deviceId);
-                Speakers = deviceDetails.OutputFormat.ChannelMask;
+                // changed the way to retrieve speakers to fix #5742
+                Speakers = (Speakers)MasterVoice.ChannelMask;
 #endif
             }
             catch

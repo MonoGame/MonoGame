@@ -54,8 +54,14 @@
       <Reference Include="System.Windows.Forms" />
       <Reference Include="System.Xml" />
       <Binary
+        Name="SharpDX.Desktop"
+        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.Desktop.dll" />
+      <Binary
         Name="SharpDX"
         Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.dll" />
+      <Binary
+        Name="SharpDX.Mathematics"
+        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.Mathematics.dll" />
       <Binary
         Name="SharpDX.Direct2D1"
         Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.Direct2D1.dll" />
@@ -157,6 +163,9 @@
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.dll" />
     <Binary
+      Name="SharpDX.Mathematics"
+      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.Mathematics.dll" />
+    <Binary
       Name="SharpDX.Direct2D1"
       Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.Direct2D1.dll" />
     <Binary
@@ -171,6 +180,9 @@
     <Binary
       Name="SharpDX.XAudio2"
       Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.XAudio2.dll" />
+    <Binary
+      Name="SharpDX.XInput"
+      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.XInput.dll" />
   </Platform>
 	
   <Platform Type="Web">
