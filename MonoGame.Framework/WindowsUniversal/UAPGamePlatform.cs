@@ -31,6 +31,8 @@ namespace Microsoft.Xna.Framework
 
         internal static ApplicationExecutionState PreviousExecutionState { get; set; }
 
+        private static bool _backPressed = false;
+
         public UAPGamePlatform(Game game)
             : base(game)
         {
@@ -121,7 +123,7 @@ namespace Microsoft.Xna.Framework
             if (KeyboardInput.IsVisible)
                 KeyboardInput.Cancel(null);
             else
-                GamePad.Back = true;
+                _backPressed = true;
 
             e.Handled = true;
         }
@@ -137,8 +139,9 @@ namespace Microsoft.Xna.Framework
             {
                 while (true)
                 {
+                    GamePad.Back = _backPressed;
+                    _backPressed = false;
                     UAPGameWindow.Instance.Tick();
-                    GamePad.Back = false;
                 }
             });
             var tickWorker = ThreadPool.RunAsync(workItemHandler, WorkItemPriority.High, WorkItemOptions.TimeSliced);
