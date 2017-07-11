@@ -78,9 +78,6 @@ namespace Microsoft.Xna.Framework
             // Allow some optional per-platform construction to occur too.
             PlatformConstruct();
 
-#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
-            Platform.ViewStateChanged += Platform_ApplicationViewChanged;
-#endif
         }
 
         ~Game()
@@ -136,9 +133,7 @@ namespace Microsoft.Xna.Framework
                         Platform.Activated -= OnActivated;
                         Platform.Deactivated -= OnDeactivated;
                         _services.RemoveService(typeof(GamePlatform));
-#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
-                        Platform.ViewStateChanged -= Platform_ApplicationViewChanged;
-#endif
+
                         Platform.Dispose();
                         Platform = null;
                     }
@@ -312,11 +307,6 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Disposed;
         public event EventHandler<EventArgs> Exiting;
 
-#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
-        [CLSCompliant(false)]
-        public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
-#endif
-
 #if WINRT
         [CLSCompliant(false)]
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
@@ -326,7 +316,7 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
-#if IOS || WINDOWS_STOREAPP && !WINDOWS_PHONE81
+#if IOS
         [Obsolete("This platform's policy does not allow programmatically closing.", true)]
 #endif
         public void Exit()
@@ -620,14 +610,6 @@ namespace Microsoft.Xna.Framework
             EndRun();
 			DoExiting();
         }
-
-#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
-        private void Platform_ApplicationViewChanged(object sender, ViewStateChangedEventArgs e)
-        {
-            AssertNotDisposed();
-            EventHelpers.Raise(this, ApplicationViewChanged, e);
-        }
-#endif
 
         #endregion Event Handlers
 

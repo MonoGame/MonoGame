@@ -4,7 +4,7 @@
 
 using System;
 
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_UAP
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -96,11 +96,6 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return deviceWindowHandle; }
             set { deviceWindowHandle = value; }
         }
-
-#if WINDOWS_STOREAPP
-        [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
-#endif
 
 #if WINDOWS_UAP
         [CLSCompliant(false)]

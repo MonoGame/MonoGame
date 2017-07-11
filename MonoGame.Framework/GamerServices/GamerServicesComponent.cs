@@ -74,11 +74,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Net;
 #endregion Statements
 
-#if !WINDOWS_PHONE
 namespace Microsoft.Xna.Framework.GamerServices {
-#else
-namespace MonoGame.Xna.Framework.GamerServices {
-#endif
 
 	public class GamerServicesComponent : GameComponent {
 		private static LocalNetworkGamer lng;
@@ -88,19 +84,7 @@ namespace MonoGame.Xna.Framework.GamerServices {
 		public GamerServicesComponent(Game game)
 			: base(game)
 		{
-#if WINDOWS_PHONE
-            var assembly = game.GetType().Assembly;
-            if (assembly != null)
-            {
-                object[] objects = assembly.GetCustomAttributes(typeof(System.Runtime.InteropServices.GuidAttribute), false);
-                if (objects.Length > 0)
-                {
-                    MonoGamerPeer.applicationIdentifier = ((System.Runtime.InteropServices.GuidAttribute)objects[0]).Value;
-                }
-            }
-#endif
-			Guide.Initialise(game);
-			
+            Guide.Initialise(game);
 		}
 
 		public override void Update (GameTime gameTime)
