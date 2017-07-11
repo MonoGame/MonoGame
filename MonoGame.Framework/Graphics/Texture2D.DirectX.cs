@@ -390,6 +390,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return _sampleDescription;
         }
+
+        private void PlatformReload(Stream textureStream)
+        {
+        }
     }
 }
 
