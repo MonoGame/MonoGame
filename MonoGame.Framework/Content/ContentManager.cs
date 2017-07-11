@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 
-#if !WINRT
+#if !WINDOWS_UAP
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 #endif
@@ -287,7 +287,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("The content file was not found.", fileNotFound);
 			}
-#if !WINRT
+#if !WINDOWS_UAP
 			catch (DirectoryNotFoundException directoryNotFound)
 			{
 				throw new ContentLoadException("The directory was not found.", directoryNotFound);

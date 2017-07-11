@@ -42,7 +42,7 @@
       <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL;DESKTOPGL;SUPPORTS_EFX</Platform>
       <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL;SUPPORTS_EFX</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
-      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
+      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="Web">TRACE;WEB</Platform>
     </CustomDefinitions>
 	

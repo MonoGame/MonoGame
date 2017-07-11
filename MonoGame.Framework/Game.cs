@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-#if WINRT
+#if WINDOWS_UAP
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 #endif
@@ -307,7 +307,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Disposed;
         public event EventHandler<EventArgs> Exiting;
 
-#if WINRT
+#if WINDOWS_UAP
         [CLSCompliant(false)]
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 #endif
@@ -436,7 +436,7 @@ namespace Microsoft.Xna.Framework
                 // NOTE: While sleep can be inaccurate in general it is 
                 // accurate enough for frame limiting purposes if some
                 // fluctuation is an acceptable result.
-#if WINRT
+#if WINDOWS_UAP
                 Task.Delay(sleepTime).Wait();
 #else
                 System.Threading.Thread.Sleep(sleepTime);

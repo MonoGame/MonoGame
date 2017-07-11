@@ -43,7 +43,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Net
 {
-#if WINRT
+#if WINDOWS_UAP
     [DataContract]
 #else
     [Serializable]

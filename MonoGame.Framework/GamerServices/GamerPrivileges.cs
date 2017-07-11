@@ -44,7 +44,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-#if WINRT
+#if WINDOWS_UAP
     [DataContract]
 #else
     [Serializable]

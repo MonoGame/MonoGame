@@ -735,7 +735,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     ModeDescription =
                     {
                         Format = format,
-#if WINRT
+#if WINDOWS_UAP
                         Scaling = DisplayModeScaling.Stretched,
 #else
                         Scaling = DisplayModeScaling.Unspecified,
@@ -1140,7 +1140,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return renderTarget;
         }
 
-#if WINRT
+#if WINDOWS_UAP
         internal void ResetRenderTargets()
         {
             if (_d3dContext != null)

@@ -4,7 +4,7 @@
 
 using System;
 
-#if WINRT
+#if WINDOWS_UAP
 using Windows.UI.ViewManagement;
 #endif
 

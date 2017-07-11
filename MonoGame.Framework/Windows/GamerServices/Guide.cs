@@ -45,7 +45,7 @@ using MGXna_Framework = global::Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 
-#if WINRT
+#if WINDOWS_UAP
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Store;
@@ -277,7 +277,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				return;
 			}
 
-#if !WINRT && !(WINDOWS && DIRECTX)
+#if !WINDOWS_UAP && !(WINDOWS && DIRECTX)
             Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();            
 
             if (GamerServicesComponent.LocalNetworkGamer == null)

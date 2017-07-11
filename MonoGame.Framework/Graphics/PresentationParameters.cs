@@ -32,9 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private IntPtr deviceWindowHandle;
         private int multiSampleCount;
         private bool disposed;
-#if !WINRT || WINDOWS_UAP
         private bool isFullScreen;
-#endif
         private bool hardwareModeSwitch = true;
 
         #endregion Private Fields
@@ -118,19 +116,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			get
             {
-#if WINRT &&  !WINDOWS_UAP
-                // Always return true for Windows 8
-                return true;
-#else
 				 return isFullScreen;
-#endif
             }
             set
             {
-#if !WINRT || WINDOWS_UAP
-                // If we are not on windows 8 set the value otherwise ignore it.
                 isFullScreen = value;				
-#endif
 #if IOS && !TVOS
 				UIApplication.SharedApplication.StatusBarHidden = isFullScreen;
 #endif
