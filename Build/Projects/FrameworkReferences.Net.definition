@@ -43,21 +43,11 @@
     <Reference Include="Lidgren.Network" />
   </Platform>
 
-  <Platform Type="Windows8">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-  </Platform>
-
   <Platform Type="WindowsGL">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="Lidgren.Network" />
-  </Platform>
-
-  <Platform Type="WindowsPhone81">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
   </Platform>
   
   <Platform Type="WindowsUniversal">
