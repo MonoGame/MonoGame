@@ -341,7 +341,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         static unsafe SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(BitmapSource bsource, GraphicsDevice device)
         {
-
             Texture2DDescription desc;
             desc.Width = bsource.Size.Width;
             desc.Height = bsource.Size.Height;
