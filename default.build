@@ -210,7 +210,6 @@
   <!-- Create the installers... will fail if the code hasn't been built. -->
   <target name="build_installer" description="Build the installers." depends="_default">
     <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
-    <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2013/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2015/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2017/default.build" target="build" />
