@@ -496,10 +496,9 @@ namespace MonoGame.Tests.Audio
 #endif
         [TestCase("tone_mono_44khz_float", 5000000)]
         [TestCase("tone_stereo_44khz_float", 5000000)]
-        // ffmpeg is taking a 0.5s MS-ADPCM WAV and producing a 0.6s MS-ADPCM WAV. Not sure why.
         // XNA cannot seem to load our MS-ADPCM XNBs.
-        [TestCase("tone_mono_44khz_msadpcm", 6000000)]
-        [TestCase("tone_stereo_44khz_msadpcm", 5270000)]
+        [TestCase("tone_mono_44khz_msadpcm", 5070000)]
+        [TestCase("tone_stereo_44khz_msadpcm", 5040000)]
 #endif
         public void SoundEffectFromContent(string filename, long durationTicks)
         {
