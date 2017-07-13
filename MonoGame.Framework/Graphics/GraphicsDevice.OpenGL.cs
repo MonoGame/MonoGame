@@ -253,8 +253,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Context.MakeCurrent(windowInfo);
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
-
-            Context.MakeCurrent(windowInfo);
 #endif
             MaxTextureSlots = 16;
 
@@ -1240,6 +1238,9 @@ namespace Microsoft.Xna.Framework.Graphics
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 #endif
 
+            // TODO update GL context for new presentation parameters
+            //      we need to recreate the window if depth/back buffer format/ms count changed
+            Viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
             ApplyRenderTargets(null);
         }
 
