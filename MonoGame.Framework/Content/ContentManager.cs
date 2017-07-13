@@ -61,6 +61,7 @@ namespace Microsoft.Xna.Framework.Content
             'p', // PlayStationMobile
             'g', // Windows (OpenGL)
             'l', // Linux
+            'u', // Ouya
         };
 
 
