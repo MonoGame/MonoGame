@@ -436,13 +436,13 @@ namespace Microsoft.Xna.Framework.Audio
         void Activity_Paused(object sender, EventArgs e)
         {
             // Pause all currently playing sounds by pausing the mixer
-            Alc.DevicePauseSOFT(_device);
+            Alc.DevicePause(_device);
         }
 
         void Activity_Resumed(object sender, EventArgs e)
         {
             // Resume all sounds that were playing when the activity was paused
-            Alc.DeviceResumeSOFT(_device);
+            Alc.DeviceResume(_device);
         }
 #endif
     }

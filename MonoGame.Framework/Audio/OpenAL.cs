@@ -554,10 +554,10 @@ namespace OpenAL
 
 #if ANDROID
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcDevicePauseSOFT")]
-        public static extern void alcDevicePauseSOFT(IntPtr device);
+        public static extern void DevicePause(IntPtr device);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcDeviceResumeSOFT")]
-        public static extern void alcDeviceResumeSOFT(IntPtr device);
+        public static extern void DeviceResume(IntPtr device);
 #endif
     }
 
