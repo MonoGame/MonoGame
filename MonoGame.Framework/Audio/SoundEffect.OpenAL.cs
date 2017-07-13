@@ -10,11 +10,7 @@ using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
 using MonoMac.OpenAL;
 #elif OPENAL
-#if GLES || MONOMAC
-using OpenTK.Audio.OpenAL;
-#else 
 using OpenAL;
-#endif
 #if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;
@@ -39,22 +35,30 @@ namespace Microsoft.Xna.Framework.Audio
 
             ALFormat format;
             int freq;
+            int channels;
             int blockAlignment;
             int bitsPerSample;
             int samplesPerBlock;
             int sampleCount;
-            buffer = AudioLoader.Load(stream, out format, out freq, out blockAlignment, out bitsPerSample, out samplesPerBlock, out sampleCount);
+            buffer = AudioLoader.Load(stream, out format, out freq, out channels, out blockAlignment, out bitsPerSample, out samplesPerBlock, out sampleCount);
 
             duration = TimeSpan.FromSeconds((float)sampleCount / (float)freq);
 
-            // bind buffer
-            SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(buffer, format, buffer.Length, freq, samplesPerBlock);
+            PlatformInitializeBuffer(buffer, buffer.Length, format, channels, freq, blockAlignment, bitsPerSample, 0, 0);
         }
 
         private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleBits, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
-            var format = AudioLoader.GetSoundFormat(1, (int)channels, sampleBits);
+            if (sampleBits == 24)
+            {
+                // Convert 24-bit signed PCM to 16-bit signed PCM
+                buffer = AudioLoader.Convert24To16(buffer, offset, count);
+                offset = 0;
+                count = buffer.Length;
+                sampleBits = 16;
+            }
+
+            var format = AudioLoader.GetSoundFormat(AudioLoader.FormatPcm, (int)channels, sampleBits);
 
             // bind buffer
             SoundBuffer = new OALSoundBuffer();
@@ -63,7 +67,15 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformInitializeIeeeFloat(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
-            var format = AudioLoader.GetSoundFormat(3, (int)channels, 32);
+            if (!OpenALSoundController.GetInstance.SupportsIeee)
+            {
+                // If 32-bit IEEE float is not supported, convert to 16-bit signed PCM
+                buffer = AudioLoader.ConvertFloatTo16(buffer, offset, count);
+                PlatformInitializePcm(buffer, 0, buffer.Length, 16, sampleRate, channels, loopStart, loopLength);
+                return;
+            }
+
+            var format = AudioLoader.GetSoundFormat(AudioLoader.FormatIeee, (int)channels, 32);
 
             // bind buffer
             SoundBuffer = new OALSoundBuffer();
@@ -72,7 +84,15 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformInitializeAdpcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int blockAlignment, int loopStart, int loopLength)
         {
-            var format = AudioLoader.GetSoundFormat(2, (int)channels, 0);
+            if (!OpenALSoundController.GetInstance.SupportsAdpcm)
+            {
+                // If MS-ADPCM is not supported, convert to 16-bit signed PCM
+                buffer = AudioLoader.ConvertMsAdpcmToPcm(buffer, offset, count, (int)channels, blockAlignment);
+                PlatformInitializePcm(buffer, 0, buffer.Length, 16, sampleRate, channels, loopStart, loopLength);
+                return;
+            }
+
+            var format = AudioLoader.GetSoundFormat(AudioLoader.FormatMsAdpcm, (int)channels, 0);
             int sampleAlignment = AudioLoader.SampleAlignment(format, blockAlignment);
 
             // bind buffer
@@ -84,7 +104,15 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformInitializeIma4(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int blockAlignment, int loopStart, int loopLength)
         {
-            var format = AudioLoader.GetSoundFormat(17, (int)channels, 0);
+            if (!OpenALSoundController.GetInstance.SupportsIma4)
+            {
+                // If IMA/ADPCM is not supported, convert to 16-bit signed PCM
+                buffer = AudioLoader.ConvertIma4ToPcm(buffer, offset, count, (int)channels, blockAlignment);
+                PlatformInitializePcm(buffer, 0, buffer.Length, 16, sampleRate, channels, loopStart, loopLength);
+                return;
+            }
+
+            var format = AudioLoader.GetSoundFormat(AudioLoader.FormatIma4, (int)channels, 0);
             int sampleAlignment = AudioLoader.SampleAlignment(format, blockAlignment);
 
             // bind buffer
@@ -94,35 +122,36 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)
         {
-            var format = BitConverter.ToInt16(header, 0);
+            var wavFormat = BitConverter.ToInt16(header, 0);
             var channels = BitConverter.ToInt16(header, 2);
             var sampleRate = BitConverter.ToInt32(header, 4);
             var blockAlignment = BitConverter.ToInt16(header, 12);
             var bitsPerSample = BitConverter.ToInt16(header, 14);
 
-            // We may need to decode MSADPCM.
-            var supportsADPCM = OpenALSoundController.GetInstance.SupportsADPCM;
-            if (format == 2 && !supportsADPCM)
-            {
-                using (var reader = new BinaryReader(new MemoryStream(buffer, 0, bufferSize)))
-                {
-                    buffer = MSADPCMToPCM.MSADPCM_TO_PCM(reader, (short)channels, (short)blockAlignment);
-                    format = 1;
-                }
-            }
+            var format = AudioLoader.GetSoundFormat(wavFormat, channels, bitsPerSample);
+            PlatformInitializeBuffer(buffer, bufferSize, format, channels, sampleRate, blockAlignment, bitsPerSample, loopStart, loopLength);
+        }
 
+        private void PlatformInitializeBuffer(byte[] buffer, int bufferSize, ALFormat format, int channels, int sampleRate, int blockAlignment, int bitsPerSample, int loopStart, int loopLength)
+        {
             switch (format)
             {
-                case 1: // PCM
+                case ALFormat.Mono8:
+                case ALFormat.Mono16:
+                case ALFormat.Stereo8:
+                case ALFormat.Stereo16:
                     PlatformInitializePcm(buffer, 0, bufferSize, bitsPerSample, sampleRate, (AudioChannels)channels, loopStart, loopLength);
                     break;
-                case 2: // MS-ADPCM
+                case ALFormat.MonoMSAdpcm:
+                case ALFormat.StereoMSAdpcm:
                     PlatformInitializeAdpcm(buffer, 0, bufferSize, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
                     break;
-                case 3: // IEEE Float
+                case ALFormat.MonoFloat32:
+                case ALFormat.StereoFloat32:
                     PlatformInitializeIeeeFloat(buffer, 0, bufferSize, sampleRate, (AudioChannels)channels, loopStart, loopLength);
                     break;
-                case 17: // IMA/ADPCM
+                case ALFormat.MonoIma4:
+                case ALFormat.StereoIma4:
                     PlatformInitializeIma4(buffer, 0, bufferSize, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
                     break;
                 default:
@@ -155,7 +184,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
         {
-#if SUPPORTS_EFX
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
@@ -196,7 +224,6 @@ namespace Microsoft.Xna.Framework.Audio
             //efx.SetEffectParam (ReverbEffect, EfxEffectf.LowFrequencyReference, reverbSettings.RoomSizeFeet);
 
             efx.BindEffectToAuxiliarySlot (ReverbSlot, ReverbEffect);
-#endif
         }
 
 #region IDisposable Members
@@ -227,12 +254,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformShutdown()
         {
-#if SUPPORTS_EFX
-            if (ReverbEffect != 0) {
-                OpenALSoundController.Efx.DeleteAuxiliaryEffectSlot ((int)ReverbSlot);
-                OpenALSoundController.Efx.DeleteEffect ((int)ReverbEffect);
+            if (ReverbEffect != 0)
+            {
+                OpenALSoundController.Efx.DeleteAuxiliaryEffectSlot((int)ReverbSlot);
+                OpenALSoundController.Efx.DeleteEffect((int)ReverbEffect);
             }
-#endif
             OpenALSoundController.DestroyInstance();
         }
     }

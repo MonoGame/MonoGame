@@ -16,8 +16,8 @@ namespace OpenAL
         Stereo16 = 0x1103,
         MonoIma4 = 0x1300,
         StereoIma4 = 0x1301,
-        MonoMicrosoftAdpcm = 0x1302,
-        StereoMicrosoftAdpcm = 0x1303,
+        MonoMSAdpcm = 0x1302,
+        StereoMSAdpcm = 0x1303,
         MonoFloat32 = 0x10010,
         StereoFloat32 = 0x10011,
     }
@@ -189,7 +189,13 @@ namespace OpenAL
 
     public class AL
     {
+#if ANDROID
+        const string NativeLibName = "openal32.dll";
+#elif IOS
+        const string NativeLibName = "/System/Library/Frameworks/OpenAL.framework/OpenAL";
+#else
         public const string NativeLibName = "soft_oal.dll";
+#endif
 
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alEnable")]
@@ -447,7 +453,13 @@ namespace OpenAL
 
     public partial class Alc
     {
+#if ANDROID
+        const string NativeLibName = "openal32.dll";
+#elif IOS
+        const string NativeLibName = "/System/Library/Frameworks/OpenAL.framework/OpenAL";
+#else
         public const string NativeLibName = "soft_oal.dll";
+#endif
 
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCreateContext")]
@@ -488,7 +500,7 @@ namespace OpenAL
 
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcOpenDevice")]
-        public static extern IntPtr OpenDevice ([MarshalAs (UnmanagedType.LPStr)]  string device);
+        public static extern IntPtr OpenDevice ([In] [MarshalAs(UnmanagedType.LPStr)] string device);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCaptureOpenDevice")]
         internal static extern IntPtr alcCaptureOpenDevice([In()] [MarshalAs(UnmanagedType.LPStr)] string device, uint sampleRate, int format, int sampleSize);
@@ -530,6 +542,23 @@ namespace OpenAL
         {
             return GetString (device, (int)p);
         }
+#if IOS
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcSuspendContext")]
+        public static extern void SuspendContext(IntPtr context);
+
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcProcessContext")]
+        public static extern void ProcessContext(IntPtr context);
+#endif
+
+#if ANDROID
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcDevicePauseSOFT")]
+        public static extern void alcDevicePauseSOFT(IntPtr device);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcDeviceResumeSOFT")]
+        public static extern void alcDeviceResumeSOFT(IntPtr device);
+#endif
     }
 
     public class XRamExtension
@@ -596,8 +625,8 @@ namespace OpenAL
         private delegate void alGenEffectsDelegate (int n, out uint effect);
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alDeleteEffectsDelegate (int n, ref int effect);
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        private delegate bool alIsEffectDelegate (uint effect);
+        //[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        //private delegate bool alIsEffectDelegate (uint effect);
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alEffectfDelegate (uint effect, EfxEffectf param, float value);
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
@@ -624,7 +653,7 @@ namespace OpenAL
 
         private alGenEffectsDelegate alGenEffects;
         private alDeleteEffectsDelegate alDeleteEffects;
-        private alIsEffectDelegate alIsEffect;
+        //private alIsEffectDelegate alIsEffect;
         private alEffectfDelegate alEffectf;
         private alEffectiDelegate alEffecti;
         private alGenAuxiliaryEffectSlotsDelegate alGenAuxiliaryEffectSlots;
@@ -714,9 +743,9 @@ alEffecti (effect, EfxEffecti.FilterType, (int)EfxEffectType.Reverb);
             ALHelper.CheckError ("Failes to set " + param + " " + value);
         }
 
-        public void BindSourceToAuxiliarySlot (int SounceId, int slot, int slotnumber, int filter)
+        public void BindSourceToAuxiliarySlot (int SourceId, int slot, int slotnumber, int filter)
 		{
-            AL.Source (SounceId, ALSourcei.EfxAuxilarySendFilter, slot, slotnumber, filter);
+            AL.Source (SourceId, ALSourcei.EfxAuxilarySendFilter, slot, slotnumber, filter);
 		}
 
         public void Effect (uint effect, EfxEffectf param, float value)

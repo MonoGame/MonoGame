@@ -361,7 +361,7 @@
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\AudioLoader.cs">
-      <Platforms>Linux,WindowsGL,Angle,Android</Platforms>
+	  <Services>OpenALAudio</Services>
     </Compile>
 	<Compile Include="Audio\DynamicSoundEffectInstance.cs" />
 	<Compile Include="Audio\DynamicSoundEffectInstance.OpenAL.cs">
@@ -375,9 +375,6 @@
     </Compile>
 	<Compile Include="Audio\DynamicSoundEffectInstanceManager.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
-    <Compile Include="Audio\MSADPCMToPCM.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,Web,tvOS</Platforms>
-    </Compile>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Audio\OALSoundBuffer.cs">
       <Services>OpenALAudio</Services>
@@ -386,13 +383,10 @@
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Audio\OpenAL.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
+      <Services>OpenALAudio</Services>
     </Compile>
     <Compile Include="Audio\OpenALSoundController.cs">
       <Services>OpenALAudio</Services>
-    </Compile>
-    <Compile Include="Audio\OpenALSupport.cs">
-      <Platforms>iOS,MacOS,tvOS</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundEffect.OpenAL.cs">

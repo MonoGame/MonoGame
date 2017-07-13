@@ -144,9 +144,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     {
                         if ((_format.Format != 2 && _format.Format != 17) && _format.BlockAlign != riffAudioFormat.BlockAlign)
                             throw new InvalidOperationException("Calculated block align does not match RIFF " + _format.BlockAlign + " : " + riffAudioFormat.BlockAlign);
-                        if (_format.ChannelCount != riffAudioFormat.ChannelCount || _format.Format != riffAudioFormat.Format
-                            || _format.SampleRate != riffAudioFormat.SampleRate || _format.AverageBytesPerSecond != riffAudioFormat.AverageBytesPerSecond)
-                            throw new InvalidOperationException("Probed audio format does not match RIFF");
+                        if (_format.ChannelCount != riffAudioFormat.ChannelCount)
+                            throw new InvalidOperationException("Probed channel count does not match RIFF: " + _format.ChannelCount + ", " + riffAudioFormat.ChannelCount);
+                        if (_format.Format != riffAudioFormat.Format)
+                            throw new InvalidOperationException("Probed audio format does not match RIFF: " + _format.Format + ", " + riffAudioFormat.Format);
+                        if (_format.SampleRate != riffAudioFormat.SampleRate)
+                            throw new InvalidOperationException("Probed sample rate does not match RIFF: " + _format.SampleRate + ", " + riffAudioFormat.SampleRate);
                     }
 
                     _data = Array.AsReadOnly(stripped);

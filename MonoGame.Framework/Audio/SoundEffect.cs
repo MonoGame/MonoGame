@@ -182,9 +182,20 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Creates a new SoundEffect object based on the specified data stream.
         /// </summary>
-        /// <param name="stream">A stream containing the PCM wave data.</param>
+        /// <param name="stream">A stream containing the wave data.</param>
         /// <returns>A new SoundEffect object.</returns>
-        /// <remarks>The stream must point to the head of a valid PCM wave file in the RIFF bitstream format.</remarks>
+        /// <remarks>The stream must point to the head of a valid wave file in the RIFF bitstream format.  The formats supported are:
+        /// <list type="bullet">
+        /// <item>
+        /// <description>8-bit unsigned PCM</description>
+        /// <description>16-bit signed PCM</description>
+        /// <description>24-bit signed PCM</description>
+        /// <description>32-bit IEEE float PCM</description>
+        /// <description>MS-ADPCM 4-bit compressed</description>
+        /// <description>IMA/ADPCM (IMA4) 4-bit compressed</description>
+        /// </item>
+        /// </list>
+        /// </remarks>
         public static SoundEffect FromStream(Stream stream)
         {
             if (stream == null)
@@ -194,7 +205,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>
-        /// Returns the duration for 16bit PCM audio.
+        /// Returns the duration for 16-bit PCM audio.
         /// </summary>
         /// <param name="sizeInBytes">The length of the audio data in bytes.</param>
         /// <param name="sampleRate">Sample rate, in Hertz (Hz). Must be between 8000 Hz and 48000 Hz</param>
