@@ -41,6 +41,8 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
+                if (_handle == IntPtr.Zero)
+                    return new Point(_winx, _winy);
                 int x = 0, y = 0;
 
                 if (!IsFullScreen)
@@ -50,8 +52,13 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-                Sdl.Window.SetPosition(Handle, value.X, value.Y);
-                _wasMoved = true;
+                _winx = value.X;
+                _winy = value.Y;
+                if (Handle != IntPtr.Zero)
+                {
+                    Sdl.Window.SetPosition(Handle, value.X, value.Y);
+                    _wasMoved = true;
+                }
             }
         }
 
@@ -81,26 +88,35 @@ namespace Microsoft.Xna.Framework
         }
 
         public static GameWindow Instance;
-        public bool IsFullScreen;
+        public bool IsFullScreen { get; private set; }
 
-        internal readonly Game _game;
+        private readonly Game _game;
         private IntPtr _handle, _icon;
         private bool _disposed;
         private bool _resizable, _borderless, _willBeFullScreen, _mouseVisible, _hardwareSwitch;
         private string _screenDeviceName;
-        private int _width, _height;
+        private int _winx, _winy, _width, _height;
         private bool _wasMoved, _supressMoved;
 
         public SdlGameWindow(Game game)
         {
             _game = game;
-            _screenDeviceName = "";
-
             Instance = this;
 
-            _width = GraphicsDeviceManager.DefaultBackBufferWidth;
-            _height = GraphicsDeviceManager.DefaultBackBufferHeight;
+            Title = AssemblyHelper.GetDefaultWindowTitle();
 
+            Sdl.Rectangle bounds;
+            var display = GetMouseDisplay(out bounds);
+
+            if (display != -1)
+            {
+                _screenDeviceName = Sdl.Display.GetDisplayName(display);
+                var x = bounds.X + (bounds.Width - GraphicsDeviceManager.DefaultBackBufferWidth) / 2;
+                var y = bounds.Y + (bounds.Height - GraphicsDeviceManager.DefaultBackBufferHeight) / 2;
+                _winx = x;
+                _winy = y;
+            }
+            
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
             Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
@@ -125,35 +141,28 @@ namespace Microsoft.Xna.Framework
                         }
                 }
             }
-
-            _handle = Sdl.Window.Create("", 0, 0,
-                GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight,
-                Sdl.Window.State.Hidden);
         }
 
-        internal void CreateWindow()
+        internal void CreateWindow(PresentationParameters pp)
         {
-            var initflags =
-                Sdl.Window.State.OpenGL |
-                Sdl.Window.State.Hidden |
-                Sdl.Window.State.InputFocus |
-                Sdl.Window.State.MouseFocus;
-
             if (_handle != IntPtr.Zero)
                 Sdl.Window.Destroy(_handle);
 
-            var winx = Sdl.Window.PosCentered;
-            var winy = Sdl.Window.PosCentered;
+            _width = pp.BackBufferWidth;
+            _height = pp.BackBufferHeight;
 
-            // if we are on Linux, start on the current screen
-            if (CurrentPlatform.OS == OS.Linux)
-            {
-                winx |= GetMouseDisplay();
-                winy |= GetMouseDisplay();
-            }
+            var initflags =
+                Sdl.Window.State.OpenGL |
+                Sdl.Window.State.InputFocus |
+                Sdl.Window.State.MouseFocus;
 
-            _handle = Sdl.Window.Create(AssemblyHelper.GetDefaultWindowTitle(),
-                winx, winy, _width, _height, initflags);
+            if (pp.IsFullScreen)
+                initflags |= pp.HardwareModeSwitch ? Sdl.Window.State.Fullscreen : Sdl.Window.State.FullscreenDesktop;
+
+
+            _handle = Sdl.Window.Create(Title,
+                _winx, _winy,
+                _width, _height, initflags);
 
             if (_icon != IntPtr.Zero)
                 Sdl.Window.SetIcon(_handle, _icon);
@@ -169,26 +178,27 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
-        private static int GetMouseDisplay()
+        private static int GetMouseDisplay(out Sdl.Rectangle bounds)
         {
-            var rect = new Sdl.Rectangle();
-
             int x, y;
             Sdl.Mouse.GetGlobalState(out x, out y);
 
             var displayCount = Sdl.Display.GetNumVideoDisplays();
             for (var i = 0; i < displayCount; i++)
             {
+                Sdl.Rectangle rect;
                 Sdl.Display.GetBounds(i, out rect);
 
                 if (x >= rect.X && x < rect.X + rect.Width &&
                     y >= rect.Y && y < rect.Y + rect.Height)
                 {
+                    bounds = rect;
                     return i;
                 }
             }
 
-            return 0;
+            bounds = default(Sdl.Rectangle);
+            return -1;
         }
 
         public void SetCursorVisible(bool visible)
@@ -306,7 +316,8 @@ namespace Microsoft.Xna.Framework
 
         protected override void SetTitle(string title)
         {
-            Sdl.Window.SetTitle(_handle, title);
+            if (_handle != IntPtr.Zero)
+                Sdl.Window.SetTitle(_handle, title);
         }
 
         public void Dispose()

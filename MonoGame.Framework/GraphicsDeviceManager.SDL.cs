@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMajorVersion, 2);
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMinorVersion, 1);
 
-            ((SdlGameWindow)SdlGameWindow.Instance).CreateWindow();
+            ((SdlGameWindow)SdlGameWindow.Instance).CreateWindow(presentationParameters);
         }
     }
 }
