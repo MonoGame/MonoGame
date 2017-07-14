@@ -119,7 +119,7 @@ namespace Microsoft.Xna.Framework.Input
             ret.HasYButton = (buttons & GBF.Y) == GBF.Y;
 
             // analog controls
-            ret.HasRightTrigger = gamepad.LeftTrigger > 0;
+            ret.HasRightTrigger = gamepad.RightTrigger > 0;
             ret.HasRightXThumbStick = gamepad.RightThumbX != 0;
             ret.HasRightYThumbStick = gamepad.RightThumbY != 0;
             ret.HasLeftTrigger = gamepad.LeftTrigger > 0;
