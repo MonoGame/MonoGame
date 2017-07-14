@@ -500,6 +500,12 @@ namespace MonoGame.Tools.Pipeline
 
         private void DoBuild(string commands)
         {
+            Encoding encoding;
+            try {
+                encoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
+            } catch (NotSupportedException) {
+                encoding = Encoding.UTF8;
+            }
             try
             {
                 // Prepare the process.
@@ -509,7 +515,7 @@ namespace MonoGame.Tools.Pipeline
                 _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 _buildProcess.StartInfo.UseShellExecute = false;
                 _buildProcess.StartInfo.RedirectStandardOutput = true;
-                _buildProcess.StartInfo.StandardOutputEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
+                _buildProcess.StartInfo.StandardOutputEncoding = encoding;
                 _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
 
                 // Fire off the process.
