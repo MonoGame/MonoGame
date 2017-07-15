@@ -23,8 +23,6 @@ namespace MonoGame.Framework
         {
             _window = new WinFormsGameWindow(this);
 
-            Mouse.Window = _window.Form;
-
             Window = _window;
         }
 
