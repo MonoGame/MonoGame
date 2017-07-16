@@ -102,11 +102,26 @@ namespace Microsoft.Xna.Framework
             _width = GraphicsDeviceManager.DefaultBackBufferWidth;
             _height = GraphicsDeviceManager.DefaultBackBufferHeight;
 
-            if (Sdl.Patch >= 4)
+            // look for the primary display
+            var rect = new Sdl.Rectangle();
+            var displayCount = Sdl.Display.GetNumVideoDisplays();
+            for (var i = 0; i < displayCount; i++)
             {
-                var display = GetMouseDisplay();
-                _winx = display.X + display.Width / 2;
-                _winy = display.Y + display.Height / 2;
+                Sdl.Display.GetBounds(i, out rect);
+
+                if (rect.X == 0 && rect.Y == 0) // primary display is always 0,0 on SDL
+                {
+                    _winx = rect.X + rect.Width / 2;
+                    _winy = rect.Y + rect.Height / 2;
+                    break;
+                }
+                // if we didn't found the primary display, default to the display where the mouse cursor is 
+                if (i == displayCount - 1 && Sdl.Patch >= 4)
+                {
+                    var display = GetMouseDisplay();
+                    _winx = display.X + display.Width / 2;
+                    _winy = display.Y + display.Height / 2;
+                }
             }
             
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
