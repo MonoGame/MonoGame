@@ -84,8 +84,16 @@ namespace Microsoft.Xna.Framework.Audio
 
         public override void Play() 
         {
-            if (_wav != null && _wav.State != SoundState.Stopped)
-                _wav.Stop();
+            if (_wav != null)
+            {
+                if (_wav.State != SoundState.Stopped)
+                    _wav.Stop();
+                if (_streaming)
+                    _wav.Dispose();
+				else					
+					_wav._isXAct = false;					
+                _wav = null;
+            }
 
             Play(true);
         }
@@ -198,6 +206,8 @@ namespace Microsoft.Xna.Framework.Audio
                 _wav.Stop();
                 if (_streaming)
                     _wav.Dispose();
+				else
+                	_wav._isXAct = false;				
                 _wav = null;
             }
             _loopIndex = 0;
@@ -270,6 +280,8 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     if (_streaming)
                         _wav.Dispose();
+					else
+	                    _wav._isXAct = false;						
                     _wav = null;
                     _loopIndex = 0;
                 }
@@ -284,7 +296,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
 
-            return _wav != null && _wav.State != SoundState.Stopped;
+            return _wav != null;
         }
     }
 }

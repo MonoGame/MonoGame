@@ -154,9 +154,15 @@ namespace Microsoft.Xna.Framework.Audio
             } 
             else 
             {
-                if (_wave != null && _wave.State != SoundState.Stopped && _wave.IsLooped)
-                    _wave.Stop();
-                else
+                if (_wave != null)
+                {
+                    if (_streaming)
+                        _wave.Dispose();
+					else
+						_wave._isXAct = false;					
+                    _wave = null;
+                }
+
                     _wave = _soundBank.GetSoundEffectInstance(_waveBankIndex, _trackIndex, out _streaming);
 
                 if (_wave == null)
@@ -186,6 +192,8 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     if (_streaming)
                         _wave.Dispose();
+					else
+						_wave._isXAct = false;					
                     _wave = null;
                 }
             }
@@ -205,7 +213,9 @@ namespace Microsoft.Xna.Framework.Audio
                     _wave.Stop();
                     if (_streaming)
                         _wave.Dispose();
-                    _wave = null;
+ 					else
+						_wave._isXAct = false;					
+                   _wave = null;
                 }
             }
         }
@@ -224,6 +234,8 @@ namespace Microsoft.Xna.Framework.Audio
                     _wave.Stop();
                     if (_streaming)
                         _wave.Dispose();
+					else
+						_wave._isXAct = false;					
                     _wave = null;
                 }
             }
@@ -342,14 +354,20 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (_complexSound)
                 {
-                    foreach (var clip in _soundClips)
-                        if (clip.State == SoundState.Stopped)
-                            return true;
+                    var notStopped = false;
 
-                    return false;
+                    // All clips must be stopped for the sound to be stopped.
+                    foreach (var clip in _soundClips)
+                    {
+                        if (clip.State != SoundState.Stopped)
+                            notStopped = true;
+                    }
+
+                    return !notStopped;
                 }
 
-                return _wave == null || _wave.State == SoundState.Stopped;
+                // We null the wave when it it stopped.
+                return _wave == null;
             }
         }
 
