@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="2MGFX" Path="Tools/2MGFX" Type="Console" Platforms="Windows">
+<Project Name="2MGFX" Path="Tools/2MGFX" Type="Console" Platforms="Windows,Linux">
 
   <!-- Common assembly references -->
   <References>
@@ -22,6 +22,7 @@
 
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
+      <Platform Name="Linux">TRACE;LINUX</Platform>
     </CustomDefinitions>
 
   </Properties>
@@ -165,6 +166,9 @@
     </Compile>    
     <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs">
       <Link>MonoGame.Framework\Utilities\Hash.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Utilities\CurrentPlatform.cs">
+      <Link>MonoGame.Framework\Utilities\CurrentPlatform.cs</Link>
     </Compile>
     
     <!-- We also use a few types from the content pipeline. -->

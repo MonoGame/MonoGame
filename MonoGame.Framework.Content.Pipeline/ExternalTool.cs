@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -133,11 +134,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (File.Exists(fullName))
                     return fullName;
 
-#if WINDOWS
-                var fullExeName = string.Concat(fullName, ".exe");
+                var fullExeName = fullName;
+
+                if (CurrentPlatform.OS == OS.Windows)
+                    fullExeName += ".exe";
+                else if (CurrentPlatform.OS == OS.Linux)
+                    fullExeName += ".x64";
+                else if (CurrentPlatform.OS == OS.MacOSX)
+                    fullExeName += ".osx";
+
                 if (File.Exists(fullExeName))
                     return fullExeName;
-#endif
             }
 
             return null;

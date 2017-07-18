@@ -4,17 +4,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
-using SharpFont;
 using System.Runtime.InteropServices;
-using MonoGame.Framework.Content.Pipeline.Builder;
-using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
-#if WINDOWS
 using Microsoft.Win32;
-#endif
+using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using MonoGame.Framework.Content.Pipeline.Builder;
+using MonoGame.Utilities;
+using SharpFont;
+using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -37,53 +36,50 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             ContentProcessorContext context)
         {
             var output = new SpriteFontContent(input);
-
+            var directory = Path.GetDirectoryName(input.Identity.SourceFilename);
+            var directories = new List<string>();
 			var fontName = input.FontName;
 
-#if WINDOWS || LINUX
-#if WINDOWS
-			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
-		    var fontDirectory = Path.Combine(windowsfolder,"Fonts");
-			fontName = FindFontFileFromFontName (fontName, fontDirectory);
-#elif LINUX
-            fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
-#endif
-			if (string.IsNullOrWhiteSpace(fontName)) {
-				fontName = input.FontName;
-#endif
-				
-			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
+            directories.Add(directory);
+            directories.Add("/Library/Fonts");
 
-			List<string> directories = new List<string>();
-			directories.Add(directory);
-			directories.Add("/Library/Fonts");
-#if WINDOWS
-			directories.Add(fontDirectory);
-#endif
+            if (CurrentPlatform.OS == OS.Windows)
+            {
+                var windowsfolder = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                var fontDirectory = Path.Combine(windowsfolder, "Fonts");
+                fontName = WindowsFindFont(fontName, fontDirectory);
 
-			foreach( var dir in directories) {
-				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
-					fontName += ".ttf";
-					directory = dir;
-					break;
-				}
-				if (File.Exists (Path.Combine(dir,fontName+".ttc"))) {
-					fontName += ".ttc";
-					directory = dir;
-					break;
-				}
-				if (File.Exists(Path.Combine(dir,fontName+".otf"))) {
-					fontName += ".otf";
-					directory = dir;
-					break;
-				}
+                directories.Add(fontDirectory);
+            }
+            else if (CurrentPlatform.OS == OS.Linux)
+                fontName = LinuxFindFont(fontName, input.Style.ToString());
+            
+            if (string.IsNullOrWhiteSpace(fontName))
+                fontName = input.FontName;
+
+            foreach (var dir in directories)
+            {
+                if (File.Exists(Path.Combine(dir, fontName + ".ttf")))
+                {
+                    fontName += ".ttf";
+                    directory = dir;
+                    break;
+                }
+                if (File.Exists(Path.Combine(dir, fontName + ".ttc")))
+                {
+                    fontName += ".ttc";
+                    directory = dir;
+                    break;
+                }
+                if (File.Exists(Path.Combine(dir, fontName + ".otf")))
+                {
+                    fontName += ".otf";
+                    directory = dir;
+                    break;
+                }
             }
 
-            fontName = Path.Combine (directory, fontName);
-
-#if WINDOWS || LINUX
-			}
-#endif
+            fontName = Path.Combine(directory, fontName);
 
 			context.Logger.LogMessage ("Building Font {0}", fontName);
             
@@ -242,8 +238,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			return glyphs.ToArray();
 		}
 
-#if WINDOWS
-		string FindFontFileFromFontName (string fontName, string fontDirectory)
+		private string WindowsFindFont(string fontName, string fontDirectory)
 		{
 			var key = Registry.LocalMachine.OpenSubKey (@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts", false);
 			foreach (var font in key.GetValueNames ().OrderBy (x => x)) {
@@ -252,12 +247,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					return Path.IsPathRooted (fontPath) ? fontPath : Path.Combine (fontDirectory, fontPath);
 				}
 			}
-			return String.Empty;
+			return string.Empty;
 		}
-#endif
 
-#if LINUX
-        string FindFontFileFromFontName(string fontname, string style)
+        private string LinuxFindFont(string fontname, string style)
         {
             string s, e;
             ExternalTool.Run("/bin/bash", string.Format ("-c \"fc-match -f '%{{file}}:%{{family}}\\n' '{0}:style={1}'\"", fontname, style), out s, out e);
@@ -265,7 +258,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             var split = s.Split (':');
             if (split.Length < 2)
-                return String.Empty;
+                return string.Empty;
 
             //check font family, fontconfig might return a fallback
             if (split [1].Contains (",")) { //this file defines multiple family names
@@ -275,13 +268,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         return split [0];
                 }
                 //didn't find it
-                return String.Empty;
+                return string.Empty;
             } else {
                 if (split [1].ToLowerInvariant () != fontname.ToLowerInvariant ())
-                    return String.Empty;
+                    return string.Empty;
             }
             return split [0];
         }
-#endif
     }
 }
