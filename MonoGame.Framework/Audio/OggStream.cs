@@ -339,6 +339,8 @@ namespace Microsoft.Xna.Framework.Audio
         readonly Thread underlyingThread;
         volatile bool cancelled;
 
+        bool pendingFinish;
+
         public float UpdateRate { get; private set; }
         public int BufferSize { get; private set; }
 
@@ -361,6 +363,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             UpdateRate = updateRate;
             BufferSize = bufferSize;
+            pendingFinish = false;
 
             lock (singletonMutex)
             {
@@ -467,7 +470,7 @@ namespace Microsoft.Xna.Framework.Audio
                             tempBuffers = stream.alBufferIds.Skip(queued).ToArray();
 
                         int bufferFilled = 0;
-                        for (int i = 0; i < tempBuffers.Length; i++)
+                        for (int i = 0; i < tempBuffers.Length && !pendingFinish; i++)
                         {
                             finished |= FillBuffer(stream, tempBuffers[i]);
                             bufferFilled++;
@@ -481,17 +484,20 @@ namespace Microsoft.Xna.Framework.Audio
                                 }
                                 else
                                 {
-                                    lock (iterationMutex)
-                                        streams.Remove(stream);
-                                    i = tempBuffers.Length;
+                                    pendingFinish = true;
                                 }
-
-                                if (stream.FinishedAction != null)
-                                    stream.FinishedAction.Invoke();
                             }
                         }
 
-                        if (!finished && bufferFilled > 0) // queue only successfully filled buffers
+                        if (pendingFinish && queued == 0)
+                        {
+                            pendingFinish = false;
+                            lock (iterationMutex)
+                                streams.Remove(stream);
+                            if (stream.FinishedAction != null)
+                                stream.FinishedAction.Invoke();
+                        }
+                        else if (!finished && bufferFilled > 0) // queue only successfully filled buffers
                         {
                             AL.SourceQueueBuffers(stream.alSourceId, bufferFilled, tempBuffers);
                             ALHelper.CheckError("Failed to queue buffers.");
