@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Mathematics.Interop;
@@ -15,6 +14,7 @@ using SharpDX.DXGI;
 using Windows.UI.Xaml.Controls;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
+using System.Runtime.InteropServices;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
