@@ -492,6 +492,7 @@
     <Compile Include="Content\ContentReaders\ListReader.cs" />
     <Compile Include="Content\ContentReaders\MatrixReader.cs" />
     <Compile Include="Content\ContentReaders\ModelReader.cs" />
+    <Compile Include="Content\ContentReaders\MultiArrayReader.cs" />
     <Compile Include="Content\ContentReaders\NullableReader.cs" />
     <Compile Include="Content\ContentReaders\PlaneReader.cs" />
     <Compile Include="Content\ContentReaders\PointReader.cs" />

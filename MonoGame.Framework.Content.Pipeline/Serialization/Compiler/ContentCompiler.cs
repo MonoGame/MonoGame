@@ -76,10 +76,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 result = (ContentTypeWriter)Activator.CreateInstance(typeWriterType);
             else if (type.IsArray)
             {
-                if (type.GetArrayRank() != 1)
-                    throw new NotSupportedException("We don't support multidimensional arrays!");
+                var writerType = type.GetArrayRank() == 1 ? typeof(ArrayWriter<>) : typeof(MultiArrayWriter<>);
 
-                result = (ContentTypeWriter)Activator.CreateInstance(typeof(ArrayWriter<>).MakeGenericType(type.GetElementType()));
+                result = (ContentTypeWriter)Activator.CreateInstance(writerType.MakeGenericType(type.GetElementType()));
                 typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
             else if (type.IsEnum)

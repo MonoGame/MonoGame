@@ -338,6 +338,7 @@
     <Compile Include="Serialization\Compiler\ListWriter.cs" />
     <Compile Include="Serialization\Compiler\MatrixWriter.cs" />
     <Compile Include="Serialization\Compiler\ModelWriter.cs" />
+    <Compile Include="Serialization\Compiler\MultiArrayWriter.cs" />
     <Compile Include="Serialization\Compiler\NullableWriter.cs" />
     <Compile Include="Serialization\Compiler\PlaneWriter.cs" />
     <Compile Include="Serialization\Compiler\PointWriter.cs" />
