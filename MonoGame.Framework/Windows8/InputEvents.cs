@@ -216,13 +216,22 @@ namespace Microsoft.Xna.Framework
 
             var state = point.Properties;
 
-            Mouse.PrimaryWindow.MouseState = new MouseState(x, y,
-                Mouse.PrimaryWindow.MouseState.ScrollWheelValue + state.MouseWheelDelta,
+            int verticalScrollDelta = 0;
+            int horizontalScrollDelta = 0;
+
+            if (state.IsHorizontalMouseWheel)
+                horizontalScrollDelta = state.MouseWheelDelta;
+            else
+                verticalScrollDelta = state.MouseWheelDelta;
+
+            Mouse.PrimaryWindow.MouseState = new MouseState(x, y, 
+                Mouse.PrimaryWindow.MouseState.ScrollWheelValue + verticalScrollDelta,
                 state.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released,
                 state.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released,
                 state.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released,
                 state.IsXButton1Pressed ? ButtonState.Pressed : ButtonState.Released,
-                state.IsXButton2Pressed ? ButtonState.Pressed : ButtonState.Released);
+                state.IsXButton2Pressed ? ButtonState.Pressed : ButtonState.Released,
+                Mouse.PrimaryWindow.MouseState.HorizontalScrollWheelValue + horizontalScrollDelta);
         }
 
         public void UpdateState()

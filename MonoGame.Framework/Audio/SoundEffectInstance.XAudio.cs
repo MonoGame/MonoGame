@@ -6,6 +6,7 @@ using System;
 using SharpDX.XAudio2;
 using SharpDX.X3DAudio;
 using SharpDX.Multimedia;
+using SharpDX.Mathematics.Interop;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -33,7 +34,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
         {
             // If we have no voice then nothing to do.
-            if (_voice == null)
+            if (_voice == null || SoundEffect.MasterVoice == null)
                 return;
 
             // Convert from XNA Emitter to a SharpDX Emitter
@@ -69,10 +70,10 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.SetFrequencyRatio(dpsSettings.DopplerFactor);
         }
 
-        private SharpDX.X3DAudio.Emitter _dxEmitter;
-        private SharpDX.X3DAudio.Listener _dxListener;
+        private Emitter _dxEmitter;
+        private Listener _dxListener;
 
-        private SharpDX.X3DAudio.Emitter ToDXEmitter(AudioEmitter emitter)
+        private Emitter ToDXEmitter(AudioEmitter emitter)
         {
             // Pulling out Vector properties for efficiency.
             var pos = emitter.Position;
@@ -102,23 +103,15 @@ namespace Microsoft.Xna.Framework.Audio
             if (_dxEmitter == null)
                 _dxEmitter = new Emitter();
 
-#if WINDOWS_UAP
-            _dxEmitter.Position = new SharpDX.Mathematics.Interop.RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z };
-            _dxEmitter.Velocity =  new SharpDX.Mathematics.Interop.RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z };
-            _dxEmitter.OrientFront = new SharpDX.Mathematics.Interop.RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z };
-            _dxEmitter.OrientTop = new SharpDX.Mathematics.Interop.RawVector3 { X = up.X, Y = up.Y, Z = up.Z };
-            
-#else
-            _dxEmitter.Position = new SharpDX.Vector3(pos.X, pos.Y, pos.Z);
-            _dxEmitter.Velocity = new SharpDX.Vector3(vel.X, vel.Y, vel.Z);
-            _dxEmitter.OrientFront = new SharpDX.Vector3(forward.X, forward.Y, forward.Z);
-            _dxEmitter.OrientTop = new SharpDX.Vector3(up.X, up.Y, up.Z);
+            _dxEmitter.Position = new RawVector3(pos.X, pos.Y, pos.Z);
+            _dxEmitter.Velocity = new RawVector3(vel.X, vel.Y, vel.Z);
+            _dxEmitter.OrientFront = new RawVector3(forward.X, forward.Y, forward.Z);
+            _dxEmitter.OrientTop = new RawVector3(up.X, up.Y, up.Z);
             _dxEmitter.DopplerScaler = emitter.DopplerScale;
-#endif
             return _dxEmitter;
         }
 
-        private SharpDX.X3DAudio.Listener ToDXListener(AudioListener listener)
+        private Listener ToDXListener(AudioListener listener)
         {
             // Pulling out Vector properties for efficiency.
             var pos = listener.Position;
@@ -148,30 +141,23 @@ namespace Microsoft.Xna.Framework.Audio
             if (_dxListener == null)
                 _dxListener = new Listener();
 
-#if WINDOWS_UAP
-            _dxListener.Position = new SharpDX.Mathematics.Interop.RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z };
-            _dxListener.Velocity = new SharpDX.Mathematics.Interop.RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z };
-            _dxListener.OrientFront = new SharpDX.Mathematics.Interop.RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z };
-            _dxListener.OrientTop = new SharpDX.Mathematics.Interop.RawVector3 { X = up.X, Y = up.Y, Z = up.Z };
-#else
-            _dxListener.Position = new SharpDX.Vector3(pos.X, pos.Y, pos.Z);
-            _dxListener.Velocity = new SharpDX.Vector3(vel.X, vel.Y, vel.Z);
-            _dxListener.OrientFront = new SharpDX.Vector3(forward.X, forward.Y, forward.Z);
-            _dxListener.OrientTop = new SharpDX.Vector3(up.X, up.Y, up.Z);
-#endif
+            _dxListener.Position = new RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z };
+            _dxListener.Velocity = new RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z };
+            _dxListener.OrientFront = new RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z };
+            _dxListener.OrientTop = new RawVector3 { X = up.X, Y = up.Y, Z = up.Z };
             return _dxListener;
         }
 
         private void PlatformPause()
         {
-            if (_voice != null)
+            if (_voice != null && SoundEffect.MasterVoice != null)
                 _voice.Stop();
             _paused = true;
         }
 
         private void PlatformPlay()
         {
-            if (_voice != null)
+            if (_voice != null && SoundEffect.MasterVoice != null)
             {
                 // Choose the correct buffer depending on if we are looped.            
                 var buffer = _loop ? _effect._loopedBuffer : _effect._buffer;
@@ -191,7 +177,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformResume()
         {
-            if (_voice != null)
+            if (_voice != null && SoundEffect.MasterVoice != null)
             {
                 // Restart the sound if (and only if) it stopped playing
                 if (!_loop)
@@ -210,7 +196,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformStop(bool immediate)
         {
-            if (_voice != null)
+            if (_voice != null && SoundEffect.MasterVoice != null)
             {
                 if (immediate)
                 {
@@ -241,7 +227,7 @@ namespace Microsoft.Xna.Framework.Audio
             _pan = MathHelper.Clamp(value, -1.0f, 1.0f);
 
             // If we have no voice then nothing more to do.
-            if (_voice == null)
+            if (_voice == null || SoundEffect.MasterVoice == null)
                 return;
 
             UpdateOutputMatrix();
@@ -309,7 +295,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             _pitch = value;
 
-            if (_voice == null)
+            if (_voice == null || SoundEffect.MasterVoice == null)
                 return;
 
             // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
@@ -321,7 +307,7 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundState PlatformGetState()
         {
             // If no voice or no buffers queued the sound is stopped.
-            if (_voice == null || _voice.State.BuffersQueued == 0)
+            if (_voice == null || SoundEffect.MasterVoice == null || _voice.State.BuffersQueued == 0)
                 return SoundState.Stopped;
 
             // Because XAudio2 does not actually provide if a SourceVoice is Started / Stopped
@@ -334,7 +320,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetVolume(float value)
         {
-            if (_voice != null)
+            if (_voice != null && SoundEffect.MasterVoice != null)
                 _voice.SetVolume(value, XAudio2.CommitNow);
         }
 
@@ -344,7 +330,7 @@ namespace Microsoft.Xna.Framework.Audio
             _reverbMix = MathHelper.Clamp(mix, 0, 2);
 
             // If we have no voice then nothing more to do.
-            if (_voice == null)
+            if (_voice == null || SoundEffect.MasterVoice == null)
                 return;
 
             if (!(_reverbMix > 0.0f))
@@ -360,7 +346,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
         {
-            if (_voice == null)
+            if (_voice == null || SoundEffect.MasterVoice == null)
                 return;
 
             var filter = new FilterParameters 
@@ -374,7 +360,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformClearFilter()
         {
-            if (_voice == null)
+            if (_voice == null || SoundEffect.MasterVoice == null)
                 return;
 
             var filter = new FilterParameters { Frequency = 1.0f, OneOverQ = 1.0f, Type = FilterType.LowPassFilter };
@@ -388,7 +374,7 @@ namespace Microsoft.Xna.Framework.Audio
                 if (_reverb != null)
                     _reverb.Dispose();
 
-                if (_voice != null)
+                if (_voice != null && SoundEffect.MasterVoice != null)
                 {
                     _voice.DestroyVoice();
                     _voice.Dispose();

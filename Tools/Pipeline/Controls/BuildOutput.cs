@@ -182,7 +182,7 @@ namespace MonoGame.Tools.Pipeline
                     _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
                     break;
                 case OutputState.BuildEnd:
-                    if (_items[_items.Count - 1].Icon == _iconProcessing)
+                    if (_items.Count > 0 && _items[_items.Count - 1].Icon == _iconProcessing)
                         _items[_items.Count - 1].Icon = _iconSucceed;
 
                     _items.Add(new BuildItem
