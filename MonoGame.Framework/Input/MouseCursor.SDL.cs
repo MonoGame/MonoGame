@@ -34,9 +34,6 @@ namespace Microsoft.Xna.Framework.Input
 
         private static MouseCursor PlatformFromTexture2D(Texture2D texture, int originx, int originy)
         {
-            if (texture.Format != SurfaceFormat.Color && texture.Format != SurfaceFormat.ColorSRgb)
-                throw new ArgumentException("Only Color or ColorSrgb textures are accepted for mouse cursors", "texture");
-
             IntPtr surface = IntPtr.Zero;
             IntPtr handle = IntPtr.Zero;
             try
