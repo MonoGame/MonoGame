@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Input
             Sdl.Mouse.WarpInWindow(PrimaryWindow.Handle, x, y);
         }
 
-        public static void PlatformSetCursor(MouseCursor cursor)
+        private static void PlatformSetCursor(MouseCursor cursor)
         {
             Sdl.Mouse.SetCursor(cursor.Handle);
         }
