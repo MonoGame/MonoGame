@@ -22,7 +22,7 @@ You can create and edit documentation right from the web browser without needing
  - [Submit pull requests](https://help.github.com/articles/creating-a-pull-request/) early and often to merge your documentation changes.
 
 ## Style Guide
-Before you contribute any documentation you should learn a bit about what we expect out of the different types of documentation.
+Review the following expectations before contributing any documentation.
 
 ### Manuals, Guides, and Tutorials
 TODO!
