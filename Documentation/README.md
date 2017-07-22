@@ -4,12 +4,12 @@ THIS IS A WORK IN PROGRESS!
 This is the source for the [documentation published on MonoGame.net](http://www.monogame.net/documentation/).  It is rebuilt when the code changes and is published nightly to the website.
 
 ## General Rules
-First some general rules one should follow when contributing documentation to the MonoGame project.
+The following rules must be observed at all times when contributing documentation to the MonoGame project.
 
- - Write in a neutral technical tone at all times.
+ - Write in a neutral, technical tone.
  - Avoid humor, personal opinions, and colloquial language.
  - **Never** plagiarize any documentation from another source.
- - Automatic documentation tools are useless.
+ - Do not use automatic documentation tools as they are ineffective. 
 
 Breaking these rules can result in your contribution being rejected.
 
