@@ -129,12 +129,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.Format = SharpDXHelper.ToFormat(_format);
                 desc.BindFlags = BindFlags.None;
                 desc.CpuAccessFlags = CpuAccessFlags.Read;
-                desc.SampleDescription = CreateSampleDescription();
+                desc.SampleDescription = new SampleDescription(1, 0);
                 desc.Usage = ResourceUsage.Staging;
                 desc.OptionFlags = ResourceOptionFlags.None;
 
                 // Save sampling description.
-                _sampleDescription = desc.SampleDescription;
+                _sampleDescription = CreateSampleDescription();
 
                 _cachedStagingTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
             }

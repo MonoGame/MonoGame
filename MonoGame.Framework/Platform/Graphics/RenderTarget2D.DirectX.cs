@@ -111,8 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _renderTargetViews = null;
                 }
                 SharpDX.Utilities.Dispose(ref _depthStencilView);
-                if (_resolvedTexture != null)
-                    SharpDX.Utilities.Dispose(ref _resolvedTexture);
+                SharpDX.Utilities.Dispose(ref _resolvedTexture);
             }
 
             base.Dispose(disposing);
