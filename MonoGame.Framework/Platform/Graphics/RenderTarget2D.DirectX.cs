@@ -12,12 +12,17 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal RenderTargetView[] _renderTargetViews;
         internal DepthStencilView _depthStencilView;
-        private SharpDX.Direct3D11.Texture2D _resolvedTexture;
+        private SharpDX.Direct3D11.Texture2D _msTexture;
+
+        private SampleDescription _sampleDescription;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
         {
             _sampleDescription = GraphicsDevice.GetSupportedSampleDescription(SharpDXHelper.ToFormat(preferredFormat), preferredMultiSampleCount);
+            // set the actual multisample count, not the preferred value
+            MultiSampleCount = _sampleDescription.Count;
+
             GenerateIfRequired();
         }
 
@@ -26,6 +31,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_renderTargetViews != null)
                 return;
 
+            if (_texture == null)
+                _texture = CreateTexture();
+
             // Create a view interface on the rendertarget to use on bind.
             if (ArraySize > 1)
             {
@@ -33,7 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 for (var i = 0; i < ArraySize; i++)
                 {
                     var renderTargetViewDescription = new RenderTargetViewDescription();
-                    if (SampleDescription.Count > 1)
+                    if (MultiSampleCount > 1)
                     {
                         renderTargetViewDescription.Dimension = RenderTargetViewDimension.Texture2DMultisampledArray;
                         renderTargetViewDescription.Texture2DMSArray.ArraySize = 1;
@@ -47,13 +55,12 @@ namespace Microsoft.Xna.Framework.Graphics
                         renderTargetViewDescription.Texture2DArray.MipSlice = 0;
                     }
                     _renderTargetViews[i] = new RenderTargetView(
-                        GraphicsDevice._d3dDevice, GetTexture(),
-                        renderTargetViewDescription);
+                        GraphicsDevice._d3dDevice, _msTexture, renderTargetViewDescription);
                 }
             }
             else
             {
-                _renderTargetViews = new[] { new RenderTargetView(GraphicsDevice._d3dDevice, GetTexture()) };
+                _renderTargetViews = new[] { new RenderTargetView(GraphicsDevice._d3dDevice, _msTexture) };
             }
 
             // If we don't need a depth buffer then we're done.
@@ -64,7 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // match the texture's multisampling configuration.  Ignore whatever parameters
             // were provided and use the texture's configuration so that things are
             // guarenteed to work.
-            var multisampleDesc = SampleDescription;
+            var multisampleDesc = _sampleDescription;
 
             // Create a descriptor for the depth/stencil buffer.
             // Allocate a 2-D surface as the depth/stencil buffer.
@@ -85,7 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     new DepthStencilViewDescription()
                     {
                         Format = SharpDXHelper.ToFormat(DepthStencilFormat),
-                        Dimension = SampleDescription.Count > 1 ? DepthStencilViewDimension.Texture2DMultisampled : DepthStencilViewDimension.Texture2D
+                        Dimension = MultiSampleCount > 1 ? DepthStencilViewDimension.Texture2DMultisampled : DepthStencilViewDimension.Texture2D
                     });
             }
         }
@@ -112,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _renderTargetViews = null;
                 }
                 SharpDX.Utilities.Dispose(ref _depthStencilView);
-                SharpDX.Utilities.Dispose(ref _resolvedTexture);
+                SharpDX.Utilities.Dispose(ref _msTexture);
             }
 
             base.Dispose(disposing);
@@ -135,9 +142,9 @@ namespace Microsoft.Xna.Framework.Graphics
             lock (GraphicsDevice._d3dContext)
             {
                 GraphicsDevice._d3dContext.ResolveSubresource(
-                    this._texture,
+                    _msTexture,
                     0,
-                    _resolvedTexture,
+                    _texture,
                     0,
                     SharpDXHelper.ToFormat(_format));
             }
@@ -147,45 +154,33 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var rt = base.CreateTexture();
 
-            // MSAA RT needs another non-MSAA texture where it is resolved
-            if (SampleDescription.Count > 1)
+            // MSAA RT needs a non-MSAA texture where it is resolved
+            // we store that in _texture and create the multi sampled texture here if necessary
+            if (MultiSampleCount > 1)
             {
-                var descr = GetResolveTexture2DDescription();
-                _resolvedTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, descr);
+                var descr = GetMsTexture2DDescription();
+                _msTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, descr);
             }
 
             return rt;
         }
 
-        internal override Resource GetTextureForGetData()
-        {
-            if (_texture == null)
-                _texture = CreateTexture();
-            return _resolvedTexture;
-        }
-
-        protected override ShaderResourceView CreateShaderResourceView()
-        {
-            if (SampleDescription.Count > 1)
-                return new ShaderResourceView(GraphicsDevice._d3dDevice, _resolvedTexture);
-            return base.CreateShaderResourceView();
-        }
-
-        private Texture2DDescription GetResolveTexture2DDescription()
+        private Texture2DDescription GetMsTexture2DDescription()
         {
             var desc = base.GetTexture2DDescription();
             desc.BindFlags |= BindFlags.RenderTarget;
-            desc.SampleDescription = new SampleDescription(1, 0);
+            // the multi sampled texture can never be bound directly
+            desc.BindFlags &= ~BindFlags.ShaderResource;
+            desc.SampleDescription = _sampleDescription;
+            desc.MipLevels = 1;
             return desc;
         }
 
-        protected internal override Texture2DDescription GetTexture2DDescription()
+        internal override Texture2DDescription GetTexture2DDescription()
         {
             var desc = base.GetTexture2DDescription();
 
             desc.BindFlags |= BindFlags.RenderTarget;
-            if (desc.SampleDescription.Count > 1)
-                desc.BindFlags &= ~BindFlags.ShaderResource;
 
             if (Mipmap)
             {

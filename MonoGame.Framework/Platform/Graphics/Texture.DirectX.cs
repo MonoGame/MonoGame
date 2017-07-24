@@ -3,14 +3,15 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using SharpDX.Direct3D11;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public abstract partial class Texture
     {
-        internal SharpDX.Direct3D11.Resource _texture;
+        internal Resource _texture;
 
-        private SharpDX.Direct3D11.ShaderResourceView _resourceView;
+        private ShaderResourceView _resourceView;
 
         /// <summary>
         /// Gets the handle to a shared resource.
@@ -25,9 +26,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 return resource.SharedHandle;
         }
 
-        internal abstract SharpDX.Direct3D11.Resource CreateTexture();
+        internal abstract Resource CreateTexture();
 
-        internal SharpDX.Direct3D11.Resource GetTexture()
+        internal Resource GetTexture()
         {
             if (_texture == null)
                 _texture = CreateTexture();
@@ -35,22 +36,14 @@ namespace Microsoft.Xna.Framework.Graphics
             return _texture;
         }
 
-        internal virtual SharpDX.Direct3D11.Resource GetTextureForGetData()
-        {
-            return GetTexture();
-        }
-
-        internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
+        internal ShaderResourceView GetShaderResourceView()
         {
             if (_resourceView == null)
-                _resourceView = CreateShaderResourceView();
+            {
+                _resourceView = new ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
+            }
 
             return _resourceView;
-        }
-
-        protected virtual SharpDX.Direct3D11.ShaderResourceView CreateShaderResourceView()
-        {
-            return new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
         }
 
         private void PlatformGraphicsDeviceResetting()

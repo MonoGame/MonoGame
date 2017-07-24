@@ -24,13 +24,8 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 	    public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared, int arraySize)
-	        : base(graphicsDevice, width, height, mipMap, QuerySelectedFormat(graphicsDevice, preferredFormat), SurfaceType.RenderTarget, shared, arraySize)
+	        : this(graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage, SurfaceType.RenderTarget, shared, arraySize)
 	    {
-            DepthStencilFormat = preferredDepthFormat;
-            MultiSampleCount = graphicsDevice.GetClampedMultisampleCount(preferredMultiSampleCount);
-            RenderTargetUsage = usage;
-
-            PlatformConstruct(graphicsDevice, width, height, mipMap, preferredDepthFormat, preferredMultiSampleCount, usage, shared);
 	    }
         
         protected static SurfaceFormat QuerySelectedFormat(GraphicsDevice graphicsDevice, SurfaceFormat preferredFormat)
@@ -69,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Allows child class to specify the surface type, eg: a swap chain.
         /// </summary>        
-        protected RenderTarget2D(GraphicsDevice graphicsDevice,
+        internal RenderTarget2D(GraphicsDevice graphicsDevice,
                         int width,
                         int height,
                         bool mipMap,
@@ -77,13 +72,17 @@ namespace Microsoft.Xna.Framework.Graphics
                         DepthFormat depthFormat,
                         int preferredMultiSampleCount,
                         RenderTargetUsage usage,
-                        SurfaceType surfaceType)
-            : base(graphicsDevice, width, height, mipMap, format, surfaceType)
+                        SurfaceType surfaceType,
+                        bool shared = false,
+                        int arraySize = 1)
+            : base(graphicsDevice, width, height, mipMap, format, surfaceType, shared, arraySize)
         {
             DepthStencilFormat = depthFormat;
-            MultiSampleCount = preferredMultiSampleCount;
             RenderTargetUsage = usage;
-		}
+            MultiSampleCount = preferredMultiSampleCount;
+
+            PlatformConstruct(graphicsDevice, width, height, mipMap, format, depthFormat, preferredMultiSampleCount, usage, shared);
+        }
 
         protected internal override void GraphicsDeviceResetting()
         {
