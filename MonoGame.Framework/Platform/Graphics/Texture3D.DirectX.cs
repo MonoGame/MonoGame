@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        internal override SharpDX.Direct3D11.Resource CreateTexture()
+        internal override void CreateTexture()
         {
             var description = new Texture3DDescription
             {
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            return new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, description);
+            _texture = new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, description);
         }
 
 	    private void PlatformSetData<T>(int level,

@@ -4,7 +4,6 @@
 
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
-using Resource = SharpDX.Direct3D11.Resource;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -32,7 +31,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             if (_texture == null)
-                _texture = CreateTexture();
+                CreateTexture();
 
             var viewTex = MultiSampleCount > 1 ? _msTexture : _texture;
 
@@ -152,49 +151,31 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal override Resource CreateTexture()
+        internal override void CreateTexture()
         {
-            var rt = base.CreateTexture();
+            base.CreateTexture();
+            var desc = GetTexture2DDescription();
+            desc.BindFlags |= BindFlags.RenderTarget;
+            if (Mipmap)
+                desc.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
+
+            _texture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
 
             // MSAA RT needs a MSAA texture and a non-MSAA texture where it is resolved
             // we store the resolved texture in _texture and the multi sampled texture
             // in _msTexture when MSAA is enabled
             if (MultiSampleCount > 1)
             {
-                var descr = GetMsTexture2DDescription();
+                desc = GetTexture2DDescription();
+                desc.BindFlags |= BindFlags.RenderTarget;
+                // the multi sampled texture can never be bound directly
+                desc.BindFlags &= ~BindFlags.ShaderResource;
+                desc.SampleDescription = _sampleDescription;
+                // mip mapping is applied to the resolved texture, not the multisampled texture
+                desc.MipLevels = 1;
+                var descr = desc;
                 _msTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, descr);
             }
-
-            return rt;
-        }
-
-        private Texture2DDescription GetMsTexture2DDescription()
-        {
-            var desc = base.GetTexture2DDescription();
-            desc.BindFlags |= BindFlags.RenderTarget;
-            // the multi sampled texture can never be bound directly
-            desc.BindFlags &= ~BindFlags.ShaderResource;
-            desc.SampleDescription = _sampleDescription;
-            // mip mapping is applied to the resolved texture, not the multisampled texture
-            desc.MipLevels = 1;
-            return desc;
-        }
-
-        internal override Texture2DDescription GetTexture2DDescription()
-        {
-            var desc = base.GetTexture2DDescription();
-
-            desc.BindFlags |= BindFlags.RenderTarget;
-
-            if (Mipmap)
-            {
-                // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
-                // because generation of mipmaps is not supported on the Xbox 360.
-                // TODO: New method Texture.GenerateMipMaps() required.
-                desc.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
-            }
-
-            return desc;
         }
     }
 }

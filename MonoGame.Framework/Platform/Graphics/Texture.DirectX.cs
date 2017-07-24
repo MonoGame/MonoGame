@@ -26,12 +26,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 return resource.SharedHandle;
         }
 
-        internal abstract Resource CreateTexture();
+        internal abstract void CreateTexture();
 
         internal Resource GetTexture()
         {
             if (_texture == null)
-                _texture = CreateTexture();
+                CreateTexture();
 
             return _texture;
         }
@@ -39,9 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal ShaderResourceView GetShaderResourceView()
         {
             if (_resourceView == null)
-            {
                 _resourceView = new ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
-            }
 
             return _resourceView;
         }

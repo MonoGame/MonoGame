@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GetTexture();
         }
 
-        internal override SharpDX.Direct3D11.Resource CreateTexture()
+        internal override void CreateTexture()
         {
             var description = new Texture2DDescription
             {
@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     description.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
             }
 
-            return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, description);
+            _texture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, description);
         }
 
         private void PlatformGetData<T>(CubeMapFace cubeMapFace, int level, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
