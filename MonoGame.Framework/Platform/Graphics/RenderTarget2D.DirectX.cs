@@ -34,6 +34,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_texture == null)
                 _texture = CreateTexture();
 
+            var viewTex = MultiSampleCount > 1 ? _msTexture : _texture;
+
             // Create a view interface on the rendertarget to use on bind.
             if (ArraySize > 1)
             {
@@ -55,12 +57,12 @@ namespace Microsoft.Xna.Framework.Graphics
                         renderTargetViewDescription.Texture2DArray.MipSlice = 0;
                     }
                     _renderTargetViews[i] = new RenderTargetView(
-                        GraphicsDevice._d3dDevice, _msTexture, renderTargetViewDescription);
+                        GraphicsDevice._d3dDevice, viewTex, renderTargetViewDescription);
                 }
             }
             else
             {
-                _renderTargetViews = new[] { new RenderTargetView(GraphicsDevice._d3dDevice, _msTexture) };
+                _renderTargetViews = new[] { new RenderTargetView(GraphicsDevice._d3dDevice, viewTex) };
             }
 
             // If we don't need a depth buffer then we're done.
@@ -154,8 +156,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var rt = base.CreateTexture();
 
-            // MSAA RT needs a non-MSAA texture where it is resolved
-            // we store that in _texture and create the multi sampled texture here if necessary
+            // MSAA RT needs a MSAA texture and a non-MSAA texture where it is resolved
+            // we store the resolved texture in _texture and the multi sampled texture
+            // in _msTexture when MSAA is enabled
             if (MultiSampleCount > 1)
             {
                 var descr = GetMsTexture2DDescription();
@@ -172,6 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // the multi sampled texture can never be bound directly
             desc.BindFlags &= ~BindFlags.ShaderResource;
             desc.SampleDescription = _sampleDescription;
+            // mip mapping is applied to the resolved texture, not the multisampled texture
             desc.MipLevels = 1;
             return desc;
         }

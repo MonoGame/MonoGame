@@ -51,9 +51,6 @@ namespace MonoGame.Tests.Graphics
 
             // Remember original (frame capture) render target.
             var renderTargets = gd.GetRenderTargets();
-            RenderTarget2D originalRenderTarget = null;
-            if (renderTargets != null && renderTargets.Length > 0)
-                originalRenderTarget = renderTargets[0].RenderTarget as RenderTarget2D;
 
             var viewport = gd.Viewport;
             var renderTarget = new RenderTarget2D(
@@ -81,7 +78,7 @@ namespace MonoGame.Tests.Graphics
             }
             spriteBatch.End();
 
-            gd.SetRenderTarget(originalRenderTarget);
+            gd.SetRenderTargets(renderTargets);
 
             // Display all mip levels.
             gd.Clear(Color.CornflowerBlue);
