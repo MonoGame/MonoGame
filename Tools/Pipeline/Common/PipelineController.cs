@@ -500,6 +500,12 @@ namespace MonoGame.Tools.Pipeline
 
         private void DoBuild(string commands)
         {
+            Encoding encoding;
+            try {
+                encoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
+            } catch (NotSupportedException) {
+                encoding = Encoding.UTF8;
+            }
             try
             {
                 // Prepare the process.
@@ -509,7 +515,7 @@ namespace MonoGame.Tools.Pipeline
                 _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 _buildProcess.StartInfo.UseShellExecute = false;
                 _buildProcess.StartInfo.RedirectStandardOutput = true;
-                _buildProcess.StartInfo.StandardOutputEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
+                _buildProcess.StartInfo.StandardOutputEncoding = encoding;
                 _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
 
                 // Fire off the process.
@@ -548,7 +554,7 @@ namespace MonoGame.Tools.Pipeline
                 
                 _buildProcess.Kill();
                 _buildProcess = null;
-                View.OutputAppend("Build terminated!" + Environment.NewLine);
+                View.OutputAppend("Build terminated!");
             }
         }
 
@@ -866,9 +872,14 @@ namespace MonoGame.Tools.Pipeline
 
         public void Exclude(bool delete)
         {
-            if (delete && !View.ShowDeleteDialog(SelectedItems))
+            // We don't want to show a delete confirmation for any items outside the project folder
+            var filteredItems = new List<IProjectItem>(SelectedItems.Where(i => !i.OriginalPath.Contains("..")));
+
+            if (filteredItems.Count > 0 && delete && !View.ShowDeleteDialog(filteredItems))
                 return;
 
+            // Still need to pass all items to the Exclude action so it can remove them from the view.
+            // Filtering is done internally so it only deletes files in the project folder
             var action = new ExcludeAction(this, SelectedItems, delete);
             if(action.Do())
                 _actionStack.Add(action);

@@ -292,20 +292,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		protected virtual void OnSignedIn(SignedInEventArgs e)
 		{
-			 if (SignedIn != null) 
-			 {
-			    // Invokes the delegates. 
-			    SignedIn(this, e);
-			 }
+            EventHelpers.Raise(this, SignedIn, e);
 		}
 		
 		protected virtual void OnSignedOut(SignedOutEventArgs e)
 		{
-			 if (SignedOut != null) 
-			 {
-			    // Invokes the delegates. 
-			    SignedOut(this, e);
-			 }
+		    EventHelpers.Raise(this, SignedOut, e);
 		}
 
 		

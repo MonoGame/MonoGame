@@ -176,6 +176,13 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public GraphicsMetrics Metrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
 
+        private GraphicsDebug _graphicsDebug;
+
+        /// <summary>
+        /// Access debugging APIs for the graphics subsystem.
+        /// </summary>
+        public GraphicsDebug GraphicsDebug { get { return _graphicsDebug; } set { _graphicsDebug = value; } }
+
         internal GraphicsDevice(GraphicsDeviceInformation gdi)
             : this(gdi.Adapter, gdi.GraphicsProfile, gdi.PresentationParameters)
         {
@@ -269,8 +276,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
-        private int GetClampedMultisampleCount(
-            int multiSampleCount)
+        internal int GetClampedMultisampleCount(int multiSampleCount)
         {
             if (multiSampleCount > 1)
             {
@@ -292,6 +298,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else return 0;
         }
+
         internal void Initialize()
         {
             PlatformInitialize();
@@ -537,13 +544,30 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Clear the effect cache.
                     EffectCache.Clear();
 
+                    _blendState = null;
+                    _actualBlendState = null;
+                    _blendStateAdditive.Dispose();
+                    _blendStateAlphaBlend.Dispose();
+                    _blendStateNonPremultiplied.Dispose();
+                    _blendStateOpaque.Dispose();
+
+                    _depthStencilState = null;
+                    _actualDepthStencilState = null;
+                    _depthStencilStateDefault.Dispose();
+                    _depthStencilStateDepthRead.Dispose();
+                    _depthStencilStateNone.Dispose();
+
+                    _rasterizerState = null;
+                    _actualRasterizerState = null;
+                    _rasterizerStateCullClockwise.Dispose();
+                    _rasterizerStateCullCounterClockwise.Dispose();
+                    _rasterizerStateCullNone.Dispose();
+
                     PlatformDispose();
                 }
 
                 _isDisposed = true;
-
-                if (Disposing != null)
-                    Disposing(this, EventArgs.Empty);
+                EventHelpers.Raise(this, Disposing, EventArgs.Empty);
             }
         }
 
@@ -585,17 +609,13 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Reset()
         {
             PlatformValidatePresentationParameters(PresentationParameters);
-
-            if (DeviceResetting != null)
-                DeviceResetting(this, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceResetting, EventArgs.Empty);
 
             // Update the back buffer.
             OnPresentationChanged();
-
-            if (PresentationChanged != null)
-                PresentationChanged(this, EventArgs.Empty);
-            if (DeviceReset != null)
-                DeviceReset(this, EventArgs.Empty);
+            
+            EventHelpers.Raise(this, PresentationChanged, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
         }
 
         public void Reset(PresentationParameters presentationParameters)
@@ -613,8 +633,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal void OnDeviceResetting()
         {
-            if (DeviceResetting != null)
-                DeviceResetting(this, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceResetting, EventArgs.Empty);
 
             lock (_resourcesLock)
             {
@@ -636,8 +655,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal void OnDeviceReset()
         {
-            if (DeviceReset != null)
-                DeviceReset(this, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
         }
 
         public DisplayMode DisplayMode

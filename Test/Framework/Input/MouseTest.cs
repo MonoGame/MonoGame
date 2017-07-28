@@ -31,15 +31,40 @@ namespace MonoGame.Tests.Input
             Assert.AreEqual(state.RightButton, rightButton);
             Assert.AreEqual(state.XButton1, xButton1);
             Assert.AreEqual(state.XButton2, xButton2);
+            Assert.AreEqual(state.HorizontalScrollWheelValue, 0);
+        }
+
+        [Test]
+        [TestCase(0, 0, 0, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, 0)]
+        [TestCase(13, 22, 31, ButtonState.Pressed, ButtonState.Released, ButtonState.Pressed, ButtonState.Released, ButtonState.Pressed, 32)]
+        [TestCase(476, 585, 694, ButtonState.Released, ButtonState.Pressed, ButtonState.Pressed, ButtonState.Released, ButtonState.Released, 695)]
+        [TestCase(749, 858, 967, ButtonState.Pressed, ButtonState.Released, ButtonState.Released, ButtonState.Pressed, ButtonState.Released, 968)]
+        [TestCase(1, 2, 3, ButtonState.Pressed, ButtonState.Released, ButtonState.Released, ButtonState.Pressed, ButtonState.Pressed, 4)]
+        public void CtorWithHorizontalScroll(int x, int y, int scrollWheel, ButtonState leftButton, ButtonState middleButton, ButtonState rightButton, ButtonState xButton1, ButtonState xButton2, int horizontalScrollWheel)
+        {
+            var state = new MouseState(x, y, scrollWheel, leftButton, middleButton, rightButton, xButton1, xButton2, horizontalScrollWheel);
+
+            Assert.AreEqual(state.X, x);
+            Assert.AreEqual(state.Y, y);
+#if !XNA
+            Assert.AreEqual(state.Position, new Point(x, y));
+#endif
+            Assert.AreEqual(state.ScrollWheelValue, scrollWheel);
+            Assert.AreEqual(state.LeftButton, leftButton);
+            Assert.AreEqual(state.MiddleButton, middleButton);
+            Assert.AreEqual(state.RightButton, rightButton);
+            Assert.AreEqual(state.XButton1, xButton1);
+            Assert.AreEqual(state.XButton2, xButton2);
+            Assert.AreEqual(state.HorizontalScrollWheelValue, horizontalScrollWheel);
         }
 
 #if !XNA
-        [TestCase(0, 0, 0, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released)]
-        [TestCase(13, 22, 31, ButtonState.Pressed, ButtonState.Released, ButtonState.Pressed, ButtonState.Released, ButtonState.Pressed)]
-        [TestCase(476, 585, 694, ButtonState.Released, ButtonState.Pressed, ButtonState.Pressed, ButtonState.Released, ButtonState.Released)]
-        [TestCase(749, 858, 967, ButtonState.Pressed, ButtonState.Released, ButtonState.Released, ButtonState.Pressed, ButtonState.Released)]
-        [TestCase(1, 2, 3, ButtonState.Pressed, ButtonState.Released, ButtonState.Released, ButtonState.Pressed, ButtonState.Pressed)]
-        public void SetGet(int x, int y, int scrollWheel, ButtonState leftButton, ButtonState middleButton, ButtonState rightButton, ButtonState xButton1, ButtonState xButton2)
+        [TestCase(0, 0, 0, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, 0)]
+        [TestCase(13, 22, 31, ButtonState.Pressed, ButtonState.Released, ButtonState.Pressed, ButtonState.Released, ButtonState.Pressed, 32)]
+        [TestCase(476, 585, 694, ButtonState.Released, ButtonState.Pressed, ButtonState.Pressed, ButtonState.Released, ButtonState.Released, 695)]
+        [TestCase(749, 858, 967, ButtonState.Pressed, ButtonState.Released, ButtonState.Released, ButtonState.Pressed, ButtonState.Released, 968)]
+        [TestCase(1, 2, 3, ButtonState.Pressed, ButtonState.Released, ButtonState.Released, ButtonState.Pressed, ButtonState.Pressed, 4)]
+        public void SetGet(int x, int y, int scrollWheel, ButtonState leftButton, ButtonState middleButton, ButtonState rightButton, ButtonState xButton1, ButtonState xButton2, int horizontalScrollWheel)
         {
             var state = new MouseState
             {
@@ -50,7 +75,8 @@ namespace MonoGame.Tests.Input
                 MiddleButton = middleButton,
                 RightButton = rightButton,
                 XButton1 = xButton1,
-                XButton2 = xButton2
+                XButton2 = xButton2,
+                HorizontalScrollWheelValue = horizontalScrollWheel
             };
             Assert.AreEqual(state.X, x);
             Assert.AreEqual(state.Y, y);
@@ -60,8 +86,9 @@ namespace MonoGame.Tests.Input
             Assert.AreEqual(state.RightButton, rightButton);
             Assert.AreEqual(state.XButton1, xButton1);
             Assert.AreEqual(state.XButton2, xButton2);
+            Assert.AreEqual(state.HorizontalScrollWheelValue, horizontalScrollWheel);
 
-            var state2 = new MouseState(x, y, scrollWheel, leftButton, middleButton, rightButton, xButton1, xButton2) ;
+            var state2 = new MouseState(x, y, scrollWheel, leftButton, middleButton, rightButton, xButton1, xButton2, horizontalScrollWheel);
             Assert.AreEqual(state, state2);
             Assert.AreEqual(state.GetHashCode(), state2.GetHashCode());
         }

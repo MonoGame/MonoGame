@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,7 +36,7 @@ namespace Microsoft.Xna.Framework.Input
 
         public static void InitDatabase()
         {
-            using (var stream = typeof(GamePad).GetTypeInfo().Assembly.GetManifestResourceStream("gamecontrollerdb.txt"))
+            using (var stream = ReflectionHelpers.GetAssembly(typeof(GamePad)).GetManifestResourceStream("gamecontrollerdb.txt"))
             {
                 if (stream != null)
                 {

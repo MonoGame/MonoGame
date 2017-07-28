@@ -34,6 +34,7 @@ namespace Microsoft.Xna.Framework.Input
 #endif
 
         internal static GameWindow Window;
+        internal static float HorizontalScrollWheelValue;
         internal static float ScrollWheelValue;
 
         private static IntPtr PlatformGetHandle()
@@ -44,6 +45,7 @@ namespace Microsoft.Xna.Framework.Input
         private static MouseState PlatformGetState(GameWindow window)
         {
             //We need to maintain precision...
+            window.MouseState.HorizontalScrollWheelValue = (int)HorizontalScrollWheelValue;
             window.MouseState.ScrollWheelValue = (int)ScrollWheelValue;
 
             return window.MouseState;

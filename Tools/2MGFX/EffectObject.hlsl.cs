@@ -44,7 +44,7 @@ namespace TwoMGFX
                 // Store all the errors and warnings to log out later.
                 errorsAndWarnings += result.Message;
 
-                if (result.HasErrors)
+                if (result.Bytecode == null)
                     throw new ShaderCompilerException();
                 
                 shaderByteCode = result.Bytecode;

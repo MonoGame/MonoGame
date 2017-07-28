@@ -13,7 +13,6 @@ using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
 using OpenGL;
-using ExtTextureFilterAnisotropic = OpenGL.TextureParameterName;
 #elif GLES
 using OpenTK.Graphics.ES20;
 #endif
@@ -22,15 +21,15 @@ namespace Microsoft.Xna.Framework.Graphics
 {
   public partial class SamplerState
   {
-      private readonly float[] _openGLBorderColor = new float[4];
-
-#if GLES
-        private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)All.TextureMaxAnisotropyExt;
-        private const TextureParameterName TextureParameterNameTextureMaxLevel = (TextureParameterName)0x813D;
+#if !DESKTOPGL
+        internal const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)All.TextureMaxAnisotropyExt;
+        internal const TextureParameterName TextureParameterNameTextureMaxLevel = (TextureParameterName)0x813D;
 #else
-        private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt;
-        private const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
+        internal const TextureParameterName TextureParameterNameTextureMaxAnisotropy = TextureParameterName.TextureMaxAnisotropyExt;
+        internal const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
 #endif
+
+        private readonly float[] _openGLBorderColor = new float[4];
 
         internal void Activate(GraphicsDevice device, TextureTarget target, bool useMipmaps = false)
         {
@@ -190,6 +189,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterNameTextureMaxLevel, 1000);
                 }
+                GraphicsExtensions.CheckGLError();
             }
         }
 
