@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace OpenGL
 {
@@ -71,8 +72,9 @@ namespace OpenGL
         {
             if (_disposed)
                 return;
-            
-            Sdl.GL.DeleteContext(_context);
+
+            GraphicsDevice.DisposeContext(_context);
+            _context = IntPtr.Zero;
             _disposed = true;
         }
 

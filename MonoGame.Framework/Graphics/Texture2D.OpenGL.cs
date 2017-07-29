@@ -221,11 +221,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: check for for non renderable formats (formats that can't be attached to FBO)
 
             var framebufferId = 0;
-			#if (IOS || ANDROID)
+#if (IOS || ANDROID)
 			GL.GenFramebuffers(1, out framebufferId);
-			#else
+#else
             GL.GenFramebuffers(1, ref framebufferId);
-			#endif
+#endif
             GraphicsExtensions.CheckGLError();
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferId);
             GraphicsExtensions.CheckGLError();
@@ -234,8 +234,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.ReadPixels(rect.X, rect.Y, rect.Width, rect.Height, this.glFormat, this.glType, data);
             GraphicsExtensions.CheckGLError();
-            GL.DeleteFramebuffers(1, ref framebufferId);
-            GraphicsExtensions.CheckGLError();
+            GraphicsDevice.DisposeFramebuffer(framebufferId);
 #else
             var tSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
             GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
