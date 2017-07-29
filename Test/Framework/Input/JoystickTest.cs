@@ -9,9 +9,9 @@ namespace MonoGame.Tests.Input
 {
     public class JoystickTest
     {
-        [TestCase(new [] { 1f, -0.5f }, new [] { ButtonState.Pressed, ButtonState.Released }, true)]
-        [TestCase(new [] { -0.3f, -0.7f }, new [] { ButtonState.Pressed, ButtonState.Pressed }, false)]
-        public void TestState(float[] axes, ButtonState[] buttons, bool isConnected)
+        [TestCase(new [] { 12345, -12345 }, new [] { ButtonState.Pressed, ButtonState.Released }, true)]
+        [TestCase(new [] { -7324, -32000 }, new [] { ButtonState.Pressed, ButtonState.Pressed }, false)]
+        public void TestState(int[] axes, ButtonState[] buttons, bool isConnected)
         {
             var hats = new[]
             {

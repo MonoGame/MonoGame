@@ -176,12 +176,19 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public GraphicsMetrics Metrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
 
+        private GraphicsDebug _graphicsDebug;
+
+        /// <summary>
+        /// Access debugging APIs for the graphics subsystem.
+        /// </summary>
+        public GraphicsDebug GraphicsDebug { get { return _graphicsDebug; } set { _graphicsDebug = value; } }
+
         internal GraphicsDevice(GraphicsDeviceInformation gdi)
             : this(gdi.Adapter, gdi.GraphicsProfile, gdi.PresentationParameters)
         {
         }
 
-        internal GraphicsDevice ()
+        internal GraphicsDevice()
 		{
             PresentationParameters = new PresentationParameters();
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
@@ -269,10 +276,32 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
+        internal int GetClampedMultisampleCount(int multiSampleCount)
+        {
+            if (multiSampleCount > 1)
+            {
+                // Round down MultiSampleCount to the nearest power of two
+                // hack from http://stackoverflow.com/a/2681094
+                // Note: this will return an incorrect, but large value
+                // for very large numbers. That doesn't matter because
+                // the number will get clamped below anyway in this case.
+                var msc = multiSampleCount;
+                msc = msc | (msc >> 1);
+                msc = msc | (msc >> 2);
+                msc = msc | (msc >> 4);
+                msc -= (msc >> 1);
+                // and clamp it to what the device can handle
+                if (msc > GraphicsCapabilities.MaxMultiSampleCount)
+                    msc = GraphicsCapabilities.MaxMultiSampleCount;
+
+                return msc;
+            }
+            else return 0;
+        }
+
         internal void Initialize()
         {
             PlatformInitialize();
-            GraphicsCapabilities.InitializeAfterResources(this);
 
             // Force set the default render states.
             _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = true;
@@ -515,13 +544,30 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Clear the effect cache.
                     EffectCache.Clear();
 
+                    _blendState = null;
+                    _actualBlendState = null;
+                    _blendStateAdditive.Dispose();
+                    _blendStateAlphaBlend.Dispose();
+                    _blendStateNonPremultiplied.Dispose();
+                    _blendStateOpaque.Dispose();
+
+                    _depthStencilState = null;
+                    _actualDepthStencilState = null;
+                    _depthStencilStateDefault.Dispose();
+                    _depthStencilStateDepthRead.Dispose();
+                    _depthStencilStateNone.Dispose();
+
+                    _rasterizerState = null;
+                    _actualRasterizerState = null;
+                    _rasterizerStateCullClockwise.Dispose();
+                    _rasterizerStateCullCounterClockwise.Dispose();
+                    _rasterizerStateCullNone.Dispose();
+
                     PlatformDispose();
                 }
 
                 _isDisposed = true;
-
-                if (Disposing != null)
-                    Disposing(this, EventArgs.Empty);
+                EventHelpers.Raise(this, Disposing, EventArgs.Empty);
             }
         }
 
@@ -563,17 +609,13 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Reset()
         {
             PlatformValidatePresentationParameters(PresentationParameters);
-
-            if (DeviceResetting != null)
-                DeviceResetting(this, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceResetting, EventArgs.Empty);
 
             // Update the back buffer.
             OnPresentationChanged();
-
-            if (PresentationChanged != null)
-                PresentationChanged(this, EventArgs.Empty);
-            if (DeviceReset != null)
-                DeviceReset(this, EventArgs.Empty);
+            
+            EventHelpers.Raise(this, PresentationChanged, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
         }
 
         public void Reset(PresentationParameters presentationParameters)
@@ -591,8 +633,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal void OnDeviceResetting()
         {
-            if (DeviceResetting != null)
-                DeviceResetting(this, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceResetting, EventArgs.Empty);
 
             lock (_resourcesLock)
             {
@@ -614,8 +655,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal void OnDeviceReset()
         {
-            if (DeviceReset != null)
-                DeviceReset(this, EventArgs.Empty);
+            EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
         }
 
         public DisplayMode DisplayMode
@@ -1268,11 +1308,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             throw new NotSupportedException();
-        }
-
-        internal static GraphicsProfile GetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
-        {
-            return PlatformGetHighestSupportedGraphicsProfile(graphicsDevice);
         }
 
         // uniformly scales down the given rectangle by 10%

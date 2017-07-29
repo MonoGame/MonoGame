@@ -123,12 +123,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return result;
         }
 
-        public static void CompressPvrtc(TextureContent content, bool generateMipMaps, bool isSpriteFont)
+        public static void CompressPvrtc(TextureContent content, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
             if (isSpriteFont)
             {
-                CompressColor16Bit(content, generateMipMaps);
+                CompressColor16Bit(content);
                 return;
             }
 
@@ -147,12 +147,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Opaque)
-                Compress(typeof(PvrtcRgb4BitmapContent), content, generateMipMaps);
+                content.ConvertBitmapType(typeof(PvrtcRgb4BitmapContent));
             else
-                Compress(typeof(PvrtcRgba4BitmapContent), content, generateMipMaps);
+                content.ConvertBitmapType(typeof(PvrtcRgba4BitmapContent));
         }
 
-        public static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipMaps, bool isSpriteFont)
+        public static void CompressDxt(GraphicsProfile profile, TextureContent content, bool isSpriteFont)
         {
             var face = content.Faces[0][0];
 
@@ -166,34 +166,34 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var alphaRange = CalculateAlphaRange(face);
 
             if (isSpriteFont)
-                CompressFontDXT3(content, generateMipMaps);
+                CompressFontDXT3(content);
             else if (alphaRange == AlphaRange.Opaque)
-                Compress(typeof(Dxt1BitmapContent), content, generateMipMaps);
+                content.ConvertBitmapType(typeof(Dxt1BitmapContent));
             else if (alphaRange == AlphaRange.Cutout)
-                Compress(typeof(Dxt3BitmapContent), content, generateMipMaps);
+                content.ConvertBitmapType(typeof(Dxt3BitmapContent));
             else
-                Compress(typeof(Dxt5BitmapContent), content, generateMipMaps);
+                content.ConvertBitmapType(typeof(Dxt5BitmapContent));
         }
 
-        static public void CompressAti(TextureContent content, bool generateMipMaps)
+        static public void CompressAti(TextureContent content)
         {
 			var face = content.Faces[0][0];
 			var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Full)
-                Compress(typeof(AtcExplicitBitmapContent), content, generateMipMaps);
+                content.ConvertBitmapType(typeof(AtcExplicitBitmapContent));
             else
-                Compress(typeof(AtcInterpolatedBitmapContent), content, generateMipMaps);
+                content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
         }
 
-        static public void CompressEtc1(TextureContent content, bool generateMipMaps)
+        static public void CompressEtc1(TextureContent content)
         {
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
 
             // Use BGRA4444 for textures with non-opaque alpha values
             if (alphaRange != AlphaRange.Opaque)
-                Compress(typeof(PixelBitmapContent<Bgra4444>), content, generateMipMaps);
+                content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
             else
             {
                 // PVR SGX does not handle non-POT ETC1 textures.
@@ -201,81 +201,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // Since we already enforce POT for PVR and DXT in Reach, we will also enforce POT for ETC1
                 if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
                     throw new PipelineException("ETC1 compression require width and height must be powers of two due to hardware restrictions on some devices.");
-                Compress(typeof(Etc1BitmapContent), content, generateMipMaps);
+                content.ConvertBitmapType(typeof(Etc1BitmapContent));
             }
         }
 
-        static public void CompressColor16Bit(TextureContent content, bool generateMipMaps)
+        static public void CompressColor16Bit(TextureContent content)
         {
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Opaque)
-                Compress(typeof(PixelBitmapContent<Bgr565>), content, generateMipMaps);
+                content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
             else if (alphaRange == AlphaRange.Cutout)
-                Compress(typeof(PixelBitmapContent<Bgra5551>), content, generateMipMaps);
+                content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra5551>));
             else
-                Compress(typeof(PixelBitmapContent<Bgra4444>), content, generateMipMaps);
-        }
-
-        static void Compress(Type targetType, TextureContent content, bool generateMipMaps)
-        {
-            var wh = new object[2];
-            if (generateMipMaps)
-            {
-                for (int i = 0; i < content.Faces.Count; ++i)
-                {
-                    // Only generate mipmaps if there are none already
-                    if (content.Faces[i].Count == 1)
-                    {
-                        var src = content.Faces[i][0];
-                        var w = src.Width;
-                        var h = src.Height;
-
-                        content.Faces[i].Clear();
-                        wh[0] = w;
-                        wh[1] = h;
-                        var dest = (BitmapContent)Activator.CreateInstance(targetType, wh);
-                        BitmapContent.Copy(src, dest);
-                        content.Faces[i].Add(dest);
-                        while (w > 1 && h > 1)
-                        {
-                            if (w > 1)
-                                w = w >> 1;
-                            if (h > 1)
-                                h = h >> 1;
-                            wh[0] = w;
-                            wh[1] = h;
-                            dest = (BitmapContent)Activator.CreateInstance(targetType, wh);
-                            BitmapContent.Copy(src, dest);
-                            content.Faces[i].Add(dest);
-                        }
-                    }
-                    else
-                    {
-                        // Convert the existing mipmaps
-                        var chain = content.Faces[i];
-                        for (int j = 0; j < chain.Count; ++j)
-                        {
-                            var src = chain[j];
-                            wh[0] = src.Width;
-                            wh[1] = src.Height;
-                            var dest = (BitmapContent)Activator.CreateInstance(targetType, wh);
-                            BitmapContent.Copy(src, dest);
-                            chain[j] = dest;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                // Converts all existing faces and mipmaps
-                content.ConvertBitmapType(targetType);
-            }
+                content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
         }
 
         // Compress the greyscale font texture page using a specially-formulated DXT3 mode
-        static public unsafe void CompressFontDXT3(TextureContent content, bool generateMipmaps)
+        static public unsafe void CompressFontDXT3(TextureContent content)
         {
             if (content.Faces.Count > 1)
                 throw new PipelineException("Font textures should only have one face");

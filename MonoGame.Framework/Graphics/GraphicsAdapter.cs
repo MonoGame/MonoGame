@@ -78,6 +78,18 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public static DriverType UseDriverType { get; set; }
 
+        /// <summary>
+        /// Used to request the graphics device should be created with debugging
+        /// features enabled.
+        /// </summary>
+        /// <remarks>
+        /// Debugging is enabled by default in Debug builds of MonoGame, while it
+        /// is disabled in Release builds. This option can only be used to enable
+        /// debugging in Release builds (i.e. setting it to false will not disable
+        /// debugging in Debug builds).
+        /// </remarks>
+        public static bool UseDebugLayers { get; set; }
+
         public string Description { get; private set; }
 
         public int DeviceId { get; private set; }

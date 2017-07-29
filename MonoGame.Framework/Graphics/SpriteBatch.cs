@@ -111,7 +111,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <remarks>This command should be called after <see cref="Begin"/> and drawing commands.</remarks>
 		public void End ()
-		{	
+		{
+            if (!_beginCalled)
+                throw new InvalidOperationException("Begin must be called before calling End.");
+
 			_beginCalled = false;
 
 			if (_sortMode != SpriteSortMode.Immediate)

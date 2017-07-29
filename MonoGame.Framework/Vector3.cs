@@ -520,9 +520,14 @@ namespace Microsoft.Xna.Framework
         /// Gets the hash code of this <see cref="Vector3"/>.
         /// </summary>
         /// <returns>Hash code of this <see cref="Vector3"/>.</returns>
-        public override int GetHashCode()
-        {
-            return (int)(this.X + this.Y + this.Z);
+        public override int GetHashCode() {
+            unchecked
+            {
+                var hashCode = X.GetHashCode();
+                hashCode = (hashCode * 397) ^ Y.GetHashCode();
+                hashCode = (hashCode * 397) ^ Z.GetHashCode();
+                return hashCode;
+            }
         }
 
         /// <summary>

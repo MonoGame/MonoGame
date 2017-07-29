@@ -146,7 +146,10 @@ namespace Microsoft.Xna.Framework.Content
             // We need to have a reader at this point.
             var reader = manager.GetTypeReader(elementType);
             if (reader == null)
-                throw new ContentLoadException(string.Format("Content reader could not be found for {0} type.", elementType.FullName));
+                if (elementType == typeof(System.Array))
+                    reader = new ArrayReader<Array>();
+                else
+                    throw new ContentLoadException(string.Format("Content reader could not be found for {0} type.", elementType.FullName));
 
             // We use the construct delegate to pick the correct existing 
             // object to be the target of deserialization.

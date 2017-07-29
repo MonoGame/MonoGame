@@ -89,6 +89,7 @@ namespace Microsoft.Xna.Framework
 
             if (_game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
                 throw new ArgumentException("A graphics device manager is already registered.  The graphics device manager cannot be changed once it is set.");
+            _game.graphicsDeviceManager = this;
 
             _game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             _game.Services.AddService(typeof(IGraphicsDeviceService), this);
@@ -175,22 +176,22 @@ namespace Microsoft.Xna.Framework
 
         protected void OnDeviceDisposing(EventArgs e)
         {
-            Raise(DeviceDisposing, e);
+            EventHelpers.Raise(this, DeviceDisposing, e);
         }
 
         protected void OnDeviceResetting(EventArgs e)
         {
-            Raise(DeviceResetting, e);
+            EventHelpers.Raise(this, DeviceResetting, e);
         }
 
         internal void OnDeviceReset(EventArgs e)
         {
-            Raise(DeviceReset, e);
+            EventHelpers.Raise(this, DeviceReset, e);
         }
 
         internal void OnDeviceCreated(EventArgs e)
         {
-            Raise(DeviceCreated, e);
+            EventHelpers.Raise(this, DeviceCreated, e);
         }
 
         /// <summary>
@@ -202,47 +203,19 @@ namespace Microsoft.Xna.Framework
         {
             var gdi = new GraphicsDeviceInformation();
             PrepareGraphicsDeviceInformation(gdi);
+            var preparingDeviceSettingsHandler = PreparingDeviceSettings;
 
-            if (PreparingDeviceSettings != null)
+            if (preparingDeviceSettingsHandler != null)
             {
                 // this allows users to overwrite settings through the argument
                 var args = new PreparingDeviceSettingsEventArgs(gdi);
-                PreparingDeviceSettings(this, args);
+                preparingDeviceSettingsHandler(this, args);
 
                 if (gdi.PresentationParameters == null || gdi.Adapter == null)
                     throw new NullReferenceException("Members should not be set to null in PreparingDeviceSettingsEventArgs");
-
-                if (gdi.PresentationParameters.MultiSampleCount > 0)
-                {
-                    // Round down MultiSampleCount to the nearest power of two
-                    // hack from http://stackoverflow.com/a/2681094
-                    // Note: this will return an incorrect, but large value
-                    // for very large numbers. That doesn't matter because
-                    // the number will get clamped below anyway in this case.
-                    var msc = gdi.PresentationParameters.MultiSampleCount;
-                    msc = msc | (msc >> 1);
-                    msc = msc | (msc >> 2);
-                    msc = msc | (msc >> 4);
-                    msc -= (msc >> 1);
-
-                    if (GraphicsDevice != null)
-                    {
-                        // and clamp it to what the device can handle
-                        if (msc > GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount)
-                            msc = GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount;
-                    }
-                    gdi.PresentationParameters.MultiSampleCount = msc;
-                }
             }
 
             return gdi;
-        }
-
-        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
-            where TEventArgs : EventArgs
-        {
-            if (handler != null)
-                handler(this, e);
         }
 
         #endregion
@@ -268,8 +241,7 @@ namespace Microsoft.Xna.Framework
                     }
                 }
                 _disposed = true;
-                if (Disposed != null)
-                    Disposed(this, EventArgs.Empty);
+                EventHelpers.Raise(this, Disposed, EventArgs.Empty);
             }
         }
 
@@ -354,10 +326,7 @@ namespace Microsoft.Xna.Framework
         private void DisposeGraphicsDevice()
         {
             _graphicsDevice.Dispose();
-
-            if (DeviceDisposing != null)
-                DeviceDisposing(this, EventArgs.Empty);
-
+            EventHelpers.Raise(this, DeviceDisposing, EventArgs.Empty);
             _graphicsDevice = null;
         }
 

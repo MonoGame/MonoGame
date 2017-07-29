@@ -62,7 +62,6 @@ namespace MonoGame.Tools.Pipeline
                 setw++;
                 if (setw > 2)
                 {
-                    buildOutput.SetWidth();
                     propertyGridControl.SetWidth();
                     setw = 0;
                 }
@@ -233,13 +232,13 @@ namespace MonoGame.Tools.Pipeline
         public bool ShowDeleteDialog(List<IProjectItem> items)
         {
             var dialog = new DeleteDialog(PipelineController.Instance, items);
-            return dialog.Run(this) == DialogResult.Ok;
+            return dialog.ShowModal(this);
         }
 
         public bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname)
         {
             var dialog = new EditDialog(title, text, oldname, file);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             newname = dialog.Text;
 
@@ -276,7 +275,7 @@ namespace MonoGame.Tools.Pipeline
         public bool ChooseItemTemplate(string folder, out ContentItemTemplate template, out string name)
         {
             var dialog = new NewItemDialog(PipelineController.Instance.Templates.GetEnumerator(), folder);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             template = dialog.Selected;
             name = dialog.Name;
@@ -287,7 +286,7 @@ namespace MonoGame.Tools.Pipeline
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
             var dialog = new AddItemDialog(file, exists, FileType.File);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             action = dialog.Responce;
             applyforall = dialog.ApplyForAll;
@@ -300,7 +299,7 @@ namespace MonoGame.Tools.Pipeline
             var afd = new AddItemDialog(folder, exists, FileType.Folder);
             applyforall = false;
 
-            if (afd.Run(this) == DialogResult.Ok)
+            if (afd.ShowModal(this))
             {
                 action = afd.Responce;
                 return true;
@@ -408,6 +407,7 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItem.Enabled = info.OpenItem;
             cmdOpenItemWith.Enabled = info.OpenItemWith;
             cmdOpenItemLocation.Enabled = info.OpenItemLocation;
+            cmdOpenOutputItemLocation.Enabled = info.OpenOutputItemLocation;
             cmdCopyAssetPath.Enabled = info.CopyAssetPath;
             cmdRebuildItem.Enabled = info.RebuildItem;
 
@@ -424,6 +424,7 @@ namespace MonoGame.Tools.Pipeline
             AddContextMenu(cmAdd, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmOpenItemLocation, ref sep);
+            AddContextMenu(cmOpenOutputItemLocation, ref sep);
             AddContextMenu(cmCopyAssetPath, ref sep);
             AddContextMenu(cmRebuildItem, ref sep);
             AddSeparator(ref sep);
@@ -652,6 +653,28 @@ namespace MonoGame.Tools.Pipeline
         {
             if (PipelineController.Instance.SelectedItem != null)
                 Process.Start(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.Location));
+        }
+
+        private void CmdOpenOutputItemLocation_Executed(object sender, EventArgs e)
+        {
+            if (PipelineController.Instance.SelectedItem != null)
+            {
+                var dir = Path.Combine(
+                    PipelineController.Instance.ProjectItem.Location,
+                    PipelineController.Instance.ProjectOutputDir,
+                    PipelineController.Instance.SelectedItem.Location
+                );
+
+                dir = dir.Replace("$(Platform)", PipelineController.Instance.ProjectItem.Platform.ToString());
+                dir = dir.Replace("$(Configuration)", PipelineController.Instance.ProjectItem.Config);
+                dir = dir.Replace("$(Config)", PipelineController.Instance.ProjectItem.Config);
+                dir = dir.Replace("$(Profile)", PipelineController.Instance.ProjectItem.Profile.ToString());
+
+                if (Directory.Exists(dir))
+                    Process.Start(dir);
+                else
+                    ShowError("Directory Not Found", "The project output directory was not found, did you forget to build the project?");
+            }
         }
 
         private void CmdCopyAssetPath_Executed(object sender, EventArgs e)

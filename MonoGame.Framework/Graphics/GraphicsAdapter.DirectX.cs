@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using SharpDX.Direct3D;
-using SharpDX.DXGI;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -62,13 +61,8 @@ namespace Microsoft.Xna.Framework.Graphics
             adapter.SubSystemId = device.Description1.SubsystemId;
             adapter.MonitorHandle = monitor.Description.MonitorHandle;
 
-#if WINDOWS_UAP
             var desktopWidth = monitor.Description.DesktopBounds.Right - monitor.Description.DesktopBounds.Left;
             var desktopHeight = monitor.Description.DesktopBounds.Bottom - monitor.Description.DesktopBounds.Top;
-#else
-            var desktopWidth = monitor.Description.DesktopBounds.Width;
-            var desktopHeight = monitor.Description.DesktopBounds.Height;
-#endif
 
             var modes = new List<DisplayMode>();
 

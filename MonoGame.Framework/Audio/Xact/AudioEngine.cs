@@ -383,8 +383,8 @@ namespace Microsoft.Xna.Framework.Audio
             // TODO: Should we be forcing any active
             // audio cues to stop here?
 
-            if (disposing && Disposing != null)
-                Disposing(this, EventArgs.Empty);
+            if (disposing)
+                EventHelpers.Raise(this, Disposing, EventArgs.Empty);
         }
     }
 }

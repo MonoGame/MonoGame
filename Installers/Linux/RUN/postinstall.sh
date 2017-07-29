@@ -118,7 +118,7 @@ fi
 if [ "$MONODEVELOP" != "?????" ]
 then
 	echo "Installing MonoDevelop Addin..."
-	sudo -H -u $SUDO_USER bash -c "$MDTOOL setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack  > /dev/null"
+	sudo -H -u $USERNAME bash -c "$MDTOOL setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack  > /dev/null"
 fi
 
 # Monogame Pipeline terminal commands

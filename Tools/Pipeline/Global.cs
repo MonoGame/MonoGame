@@ -23,7 +23,7 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public static bool Linux { get; private set; }
-        public static bool UseHeaderBar { get; private set; }
+        public static bool UseHeaderBar { get; set; }
         public static bool Unix { get; private set; }
 
         private static Dictionary<string, Image> _files;
