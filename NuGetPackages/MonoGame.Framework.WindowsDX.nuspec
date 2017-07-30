@@ -18,14 +18,14 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
     <language>en-US</language>
     <dependencies>
         <group targetFramework=".NETFramework4.5">
-            <dependency id="SharpDX" version="2.6.3" />
-            <dependency id="SharpDX.Direct2D1" version="2.6.3" />
-            <dependency id="SharpDX.Direct3D11" version="2.6.3" />
-            <dependency id="SharpDX.DXGI" version="2.6.3" />
-            <dependency id="SharpDX.XAudio2" version="2.6.3" />
-            <dependency id="SharpDX.MediaFoundation" version="2.6.3" />
-            <dependency id="SharpDX.XInput" version="2.6.3" />
-            <dependency id="SharpDX.Direct3D9" version="2.6.3" />
+            <dependency id="SharpDX" version="3.1.1" />
+            <dependency id="SharpDX.Direct2D1" version="3.1.1" />
+            <dependency id="SharpDX.Direct3D11" version="3.1.1" />
+            <dependency id="SharpDX.DXGI" version="3.1.1" />
+            <dependency id="SharpDX.XAudio2" version="3.1.1" />
+            <dependency id="SharpDX.MediaFoundation" version="3.1.1" />
+            <dependency id="SharpDX.XInput" version="3.1.1" />
+            <dependency id="SharpDX.Direct3D9" version="3.1.1" />
         </group>
     </dependencies>
   </metadata>

@@ -196,6 +196,9 @@ namespace MonoGame.Tools.Pipeline
                     _items[_items.Count - 1].Text = text;
                     Count = _items.Count * 35 - 3;
                     break;
+                case OutputState.BuildTerminated:
+                    _items.Add(new BuildItem { Text = line, Icon = _iconEndFailed });
+                    break;
             }
 
             _setHeight = true;

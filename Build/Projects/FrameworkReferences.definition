@@ -55,25 +55,25 @@
       <Reference Include="System.Xml" />
       <Binary
         Name="SharpDX"
-        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.dll" />
       <Binary
         Name="SharpDX.Direct2D1"
-        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.Direct2D1.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.Direct2D1.dll" />
       <Binary
         Name="SharpDX.Direct3D11"
-        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.Direct3D11.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.Direct3D11.dll" />
       <Binary
         Name="SharpDX.DXGI"
-        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.DXGI.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.DXGI.dll" />
       <Binary
         Name="SharpDX.MediaFoundation"
-        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.MediaFoundation.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.MediaFoundation.dll" />
       <Binary
         Name="SharpDX.XAudio2"
-        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XAudio2.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.XAudio2.dll" />
       <Binary
         Name="SharpDX.XInput"
-        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XInput.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.XInput.dll" />
     </Service>
 
     <Service Name="MonoGame.Framework/OpenGLGraphics">
@@ -91,25 +91,25 @@
 	
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.dll" />
     <Binary
       Name="SharpDX.Direct2D1"
-      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.Direct2D1.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct2D1.dll" />
     <Binary
       Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.Direct3D11.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct3D11.dll" />
     <Binary
       Name="SharpDX.DXGI"
-      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.DXGI.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.DXGI.dll" />
     <Binary
       Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.MediaFoundation.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.MediaFoundation.dll" />
     <Binary
       Name="SharpDX.XAudio2"
-      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XAudio2.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.XAudio2.dll" />
     <Binary
       Name="SharpDX.XInput"
-      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XInput.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.XInput.dll" />
   </Platform>
 
   <Platform Type="WindowsGL">
@@ -131,46 +131,46 @@
 	
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.dll" />
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.Direct2D1.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct2D1.dll" />
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.DXGI.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.DXGI.dll" />
     <Binary
       Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.Direct3D11.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct3D11.dll" />
     <Binary
       Name="SharpDX.DXGI"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.DXGI.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.DXGI.dll" />
     <Binary
       Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.MediaFoundation.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.MediaFoundation.dll" />
     <Binary
       Name="SharpDX.XAudio2"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.XAudio2.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.XAudio2.dll" />
   </Platform>
 	
   <Platform Type="WindowsUniversal">
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.dll" />
     <Binary
       Name="SharpDX.Direct2D1"
-      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.Direct2D1.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct2D1.dll" />
     <Binary
       Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.Direct3D11.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct3D11.dll" />
     <Binary
       Name="SharpDX.DXGI"
-      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.DXGI.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.DXGI.dll" />
     <Binary
       Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.MediaFoundation.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.MediaFoundation.dll" />
     <Binary
       Name="SharpDX.XAudio2"
-      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.XAudio2.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.XAudio2.dll" />
   </Platform>
 	
   <Platform Type="Web">

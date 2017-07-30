@@ -4,27 +4,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
-using System.Linq;
-
 using SharpDX;
 using SharpDX.Direct3D;
-using SharpDX.Direct3D11;
+using SharpDX.Mathematics.Interop;
+using SharpDX.DXGI;
 
 #if WINDOWS_STOREAPP || WINDOWS_UAP
 using Windows.UI.Xaml.Controls;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
-using SharpDX.DXGI;
-#endif
-
-#if WINDOWS_UAP
-using SharpDX.Mathematics.Interop;
-#endif
-
-#if WINDOWS
-using SharpDX.DXGI;
+using System.Runtime.InteropServices;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -931,11 +921,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     foreach (var view in _currentRenderTargets)
                     {
                         if (view != null)
-#if WINDOWS_UAP
 							_d3dContext.ClearRenderTargetView(view, new RawColor4(color.X, color.Y, color.Z, color.W));
-#else
-                            _d3dContext.ClearRenderTargetView(view, new Color4(color.X, color.Y, color.Z, color.W));
-#endif
                     }
                 }
 
@@ -1059,7 +1045,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_d3dContext != null)
             {
-#if WINDOWS_UAP
 				var viewport = new RawViewportF
 				{
 					X = _viewport.X,
@@ -1069,9 +1054,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					MinDepth = _viewport.MinDepth,
 					MaxDepth = _viewport.MaxDepth
 				};
-#else
-                var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
-#endif
                 lock (_d3dContext)
                     _d3dContext.Rasterizer.SetViewport(viewport);
             }
@@ -1168,7 +1150,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 lock (_d3dContext)
                 {
-#if WINDOWS_UAP
 					var viewport = new RawViewportF
 					{
 						X = _viewport.X,
@@ -1178,11 +1159,6 @@ namespace Microsoft.Xna.Framework.Graphics
 						MinDepth = _viewport.MinDepth,
 						MaxDepth = _viewport.MaxDepth
 					};
-#else
-                    var viewport = new SharpDX.ViewportF( _viewport.X, _viewport.Y, 
-                                                          _viewport.Width, _viewport.Height, 
-                                                          _viewport.MinDepth, _viewport.MaxDepth);
-#endif
                     _d3dContext.Rasterizer.SetViewport(viewport);
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
                 }
@@ -1236,7 +1212,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-#if WINDOWS_UAP
         private SharpDX.Mathematics.Interop.RawColor4 GetBlendFactor()
         {
 			return new SharpDX.Mathematics.Interop.RawColor4(
@@ -1245,12 +1220,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					BlendFactor.B / 255.0f,
 					BlendFactor.A / 255.0f);
         }
-#else
-        private Color4 GetBlendFactor()
-        {
-			return BlendFactor.ToColor4();
-        }
-#endif
 
         internal void PlatformApplyState(bool applyShaders)
         {

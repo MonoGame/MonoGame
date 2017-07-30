@@ -492,6 +492,7 @@
     <Compile Include="Content\ContentReaders\ListReader.cs" />
     <Compile Include="Content\ContentReaders\MatrixReader.cs" />
     <Compile Include="Content\ContentReaders\ModelReader.cs" />
+    <Compile Include="Content\ContentReaders\MultiArrayReader.cs" />
     <Compile Include="Content\ContentReaders\NullableReader.cs" />
     <Compile Include="Content\ContentReaders\PlaneReader.cs" />
     <Compile Include="Content\ContentReaders\PointReader.cs" />
@@ -1058,8 +1059,11 @@
     <Compile Include="Input\MouseCursor.SDL.cs">
       <Platforms>Linux,WindowsGL</Platforms>
     </Compile>
+    <Compile Include="Input\MouseCursor.Windows.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Input\MouseCursor.Default.cs">
-      <ExcludePlatforms>Linux,WindowsGL</ExcludePlatforms>
+      <ExcludePlatforms>Linux,WindowsGL,Windows</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
@@ -1210,7 +1214,7 @@
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Utilities\CurrentPlatform.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
+      <Platforms>Windows,MacOS,WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Utilities\FileHelpers.cs" />
@@ -1412,7 +1416,7 @@
     <Compile Include="Windows8\MetroHelper.cs">
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Windows8\SharpDXHelper.cs">
+    <Compile Include="Windows\SharpDXHelper.cs">
       <Platforms>Windows8,Windows,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Windows8\XamlGame.cs">
