@@ -115,7 +115,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         }
                         break;
                     case ResourceType.Query:
+#if !GLES
                         GL.DeleteQueries(1, ref handle);
+#endif
                         break;
                     case ResourceType.Framebuffer:
                         GL.DeleteFramebuffers(1, ref handle);
