@@ -35,8 +35,9 @@ namespace Microsoft.Xna.Framework.Content
 
         private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
-            'w', // Windows (DirectX)
-            'x', // Xbox360
+            'w', // Windows (XNA & DirectX)
+            'x', // Xbox360 (XNA)
+            'm', // WindowsPhone7.0 (XNA)
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
