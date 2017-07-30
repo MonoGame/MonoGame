@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Input
 
         public static void PlatformSetCursor(MouseCursor cursor)
         {
-            Window.Cursor = cursor.Cursor;
+            _window.Cursor = cursor.Cursor;
         }
     }
 }
