@@ -1059,8 +1059,11 @@
     <Compile Include="Input\MouseCursor.SDL.cs">
       <Platforms>Linux,WindowsGL</Platforms>
     </Compile>
+    <Compile Include="Input\MouseCursor.Windows.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Input\MouseCursor.Default.cs">
-      <ExcludePlatforms>Linux,WindowsGL</ExcludePlatforms>
+      <ExcludePlatforms>Linux,WindowsGL,Windows</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
