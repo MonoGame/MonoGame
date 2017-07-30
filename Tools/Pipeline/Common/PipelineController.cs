@@ -257,13 +257,19 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
+            var errortext = "Failed to open the project due to an unknown error.";
+
             try
             {
                 _actionStack.Clear();
                 _project = new PipelineProject();
                 
                 var parser = new PipelineProjectParser(this, _project);
-                var errorCallback = new MGBuildParser.ErrorCallback((msg, args) => View.OutputAppend(string.Format(Path.GetFileName(projectFilePath) + ": " + msg, args)));
+                var errorCallback = new MGBuildParser.ErrorCallback((msg, args) =>
+                {
+                    errortext = string.Format(msg, args);
+                    throw new Exception();
+                });
                 parser.OpenProject(projectFilePath, errorCallback);
 
                 ResolveTypes();
@@ -278,7 +284,7 @@ namespace MonoGame.Tools.Pipeline
             }
             catch (Exception)
             {
-                View.ShowError("Open Project", "Failed to open project!");
+                View.ShowError("Error Opening Project", Path.GetFileName(projectFilePath) + ": " + errortext);
                 return;
             }
 
