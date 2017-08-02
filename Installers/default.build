@@ -80,6 +80,8 @@
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOSX" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Linux" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL/x86" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL/x64" />
       <!-- Copy the Files over for the framework -->
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Tools">
          <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
@@ -119,6 +121,16 @@
       </copy>
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL">
          <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL/x86">
+         <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release/x86">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL/x64">
+         <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release/x64">
                 <include name="*.*"/>
          </fileset>
       </copy>
