@@ -2,10 +2,35 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class GraphicsDebug
+    public partial class GraphicsDebug : IDisposable
     {
+        private readonly GraphicsDevice _device;
+        private bool _isDisposed = false;
+
+        /// <summary>
+        /// Constructs a new instance of <see cref="GraphicsDebug"/>, which provides debugging APIs
+        /// for the underlying graphics hardware.
+        /// </summary>
+        /// <param name="device">The associated graphics device.</param>
+        public GraphicsDebug(GraphicsDevice device)
+        {
+            _device = device;
+
+            PlatformConstruct();
+        }
+
+        /// <summary>
+        /// Whether this instance has already had <see cref="Dispose()"/> called on it.
+        /// </summary>
+        public bool IsDisposed
+        {
+            get { return _isDisposed; }
+        }
+
         /// <summary>
         /// Attempt to dequeue a debugging message from the graphics subsystem.
         /// </summary>
@@ -19,6 +44,27 @@ namespace Microsoft.Xna.Framework.Graphics
         public bool TryDequeueMessage(out GraphicsDebugMessage message)
         {
             return PlatformTryDequeueMessage(out message);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    PlatformDispose();
+                }
+
+                _isDisposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Disposes the resources associated with this <see cref="GraphicsDebug"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
         }
     }
 }

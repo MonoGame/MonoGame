@@ -178,6 +178,14 @@ namespace Microsoft.Xna.Framework.Graphics
             SetVertexAttributeArray(_newEnabledVertexAttributes);
         }
 
+#if DESKTOPGL
+        private static void DebugMessageCallbackHandler(int source, int type, uint id, int severity, int length, IntPtr message, IntPtr userParam)
+        {
+            var errorMessage = Marshal.PtrToStringAnsi(message);
+            Graphics.GraphicsDebug.PlatformAppendMessage(source, type, id, severity, length, errorMessage, userParam);
+        }
+#endif
+
         private void PlatformSetup()
         {
 #if DESKTOPGL || ANGLE
@@ -187,6 +195,30 @@ namespace Microsoft.Xna.Framework.Graphics
             if (Context == null || Context.IsDisposed)
             {
                 Context = GL.CreateContext(windowInfo);
+
+                var enableDebug = false;
+#if DEBUG
+                enableDebug = true;
+#endif
+
+                if (GraphicsAdapter.UseDebugLayers)
+                {
+                    enableDebug = true;
+                }
+
+                if (enableDebug && GL.DebugMessageCallback != null)
+                {
+                    try
+                    {
+                        GL.DebugMessageCallback(DebugMessageCallbackHandler, IntPtr.Zero);
+                        GL.Enable(EnableCap.DebugOutput);
+                        GL.Enable(EnableCap.DebugOutputSynchronous);
+                    }
+                    catch
+                    {
+                        // Debugging APIs are not available.
+                    }
+                }
             }
 
             Context.MakeCurrent(windowInfo);

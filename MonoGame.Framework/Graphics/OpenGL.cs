@@ -458,6 +458,37 @@ namespace OpenGL
         ClampToBorder = 0x812D,
     }
 
+    public enum DebugSource
+    {
+        API = 0x8246,
+        WindowSystem = 0x8247,
+        ShaderCompiler = 0x8248,
+        ThirdParty = 0x8249,
+        Application = 0x824A,
+        Other = 0x824B,
+    }
+
+    public enum DebugType
+    {
+        Error = 0x824C,
+        DeprecatedBehaviour = 0x824D,
+        UndefinedBehaviour = 0x824E,
+        Portability = 0x824F,
+        Performance = 0x8250,
+        Other = 0x8251,
+        Marker = 0x8268,
+        PushGroup = 0x8269,
+        PopGroup = 0x826A,
+    }
+
+    public enum DebugSeverity
+    {
+        High = 0x9146,
+        Medium = 0x9147,
+        Low = 0x9148,
+        Notification = 0x826B,
+    }
+
     public partial class ColorFormat {
         public ColorFormat(int r, int g, int b, int a)
         {
@@ -1083,24 +1114,15 @@ namespace OpenGL
         public static VertexAttribDivisorDelegate VertexAttribDivisor;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        delegate void DebugMessageCallbackProc(int source, int type, uint id, int severity, int length, IntPtr message, IntPtr userParam);
+        internal delegate void DebugMessageCallbackProc(int source, int type, uint id, int severity, int length, IntPtr message, IntPtr userParam);
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
-        delegate void DebugMessageCallbackDelegate(DebugMessageCallbackProc callback, IntPtr userParam);
-        static DebugMessageCallbackDelegate DebugMessageCallback;
+        internal delegate void DebugMessageCallbackDelegate(DebugMessageCallbackProc callback, IntPtr userParam);
+        internal static DebugMessageCallbackDelegate DebugMessageCallback;
 
         public delegate void ErrorDelegate(string message);
+        [Obsolete("Use the GraphicsDebug property on GraphicsDevice instead", true)]
         public static event ErrorDelegate OnError;
-
-#if DEBUG
-        static void DebugMessageCallbackHandler(int source, int type, uint id, int severity, int length, IntPtr message, IntPtr userParam)
-        {
-            var errorMessage = Marshal.PtrToStringAnsi(message);
-            System.Diagnostics.Debug.WriteLine(errorMessage);
-            if (OnError != null)
-                OnError(errorMessage);
-        }
-#endif
 
         public static int SwapInterval { get; set; }
 
@@ -1258,9 +1280,6 @@ namespace OpenGL
             try
             {
                 DebugMessageCallback = (DebugMessageCallbackDelegate)LoadEntryPoint<DebugMessageCallbackDelegate>("glDebugMessageCallback");
-                DebugMessageCallback(DebugMessageCallbackHandler, IntPtr.Zero);
-                Enable(EnableCap.DebugOutput);
-                Enable(EnableCap.DebugOutputSynchronous);
             }
             catch (EntryPointNotFoundException)
             {
