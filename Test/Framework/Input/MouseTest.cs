@@ -31,7 +31,9 @@ namespace MonoGame.Tests.Input
             Assert.AreEqual(state.RightButton, rightButton);
             Assert.AreEqual(state.XButton1, xButton1);
             Assert.AreEqual(state.XButton2, xButton2);
+#if !XNA
             Assert.AreEqual(state.HorizontalScrollWheelValue, 0);
+#endif
         }
 
         [Test]
@@ -42,7 +44,11 @@ namespace MonoGame.Tests.Input
         [TestCase(1, 2, 3, ButtonState.Pressed, ButtonState.Released, ButtonState.Released, ButtonState.Pressed, ButtonState.Pressed, 4)]
         public void CtorWithHorizontalScroll(int x, int y, int scrollWheel, ButtonState leftButton, ButtonState middleButton, ButtonState rightButton, ButtonState xButton1, ButtonState xButton2, int horizontalScrollWheel)
         {
+#if !XNA
             var state = new MouseState(x, y, scrollWheel, leftButton, middleButton, rightButton, xButton1, xButton2, horizontalScrollWheel);
+#else
+            var state = new MouseState(x, y, scrollWheel, leftButton, middleButton, rightButton, xButton1, xButton2);
+#endif
 
             Assert.AreEqual(state.X, x);
             Assert.AreEqual(state.Y, y);
@@ -55,7 +61,9 @@ namespace MonoGame.Tests.Input
             Assert.AreEqual(state.RightButton, rightButton);
             Assert.AreEqual(state.XButton1, xButton1);
             Assert.AreEqual(state.XButton2, xButton2);
+#if !XNA
             Assert.AreEqual(state.HorizontalScrollWheelValue, horizontalScrollWheel);
+#endif
         }
 
 #if !XNA
