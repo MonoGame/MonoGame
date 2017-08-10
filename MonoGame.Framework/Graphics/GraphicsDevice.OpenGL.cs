@@ -197,11 +197,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.BackgroundContext = GL.CreateContext(windowInfo);
                 Threading.WindowInfo = windowInfo;
                 Threading.BackgroundContext.MakeCurrent(null);
-            }*/
+            }
 
             Context.MakeCurrent(windowInfo);
 
-            /*GraphicsMode mode = GraphicsMode.Default;
+            GraphicsMode mode = GraphicsMode.Default;
             var wnd = OpenTK.Platform.Utilities.CreateSdl2WindowInfo(Game.Instance.Window.Handle);
 
             #if GLES
@@ -1181,6 +1181,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void OnPresentationChanged()
         {
+#if DESKTOPGL || ANGLE
+            Context.MakeCurrent(new WindowInfo(SdlGameWindow.Instance.Handle));
+            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
+#endif
+
             ApplyRenderTargets(null);
         }
 
