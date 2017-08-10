@@ -141,6 +141,7 @@
   <object class="GtkPopoverMenu" id="popovermenu1">
     <child>
       <object class="GtkBox">
+        <property name="width_request">130</property>
         <property name="visible">True</property>
         <property name="margin">10</property>
         <property name="orientation">vertical</property>
@@ -242,13 +243,6 @@
           <object class="GtkModelButton" id="clean_button">
             <property name="visible">True</property>
             <property name="text" translatable="yes">Clean</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkModelButton" id="debugmode_button">
-            <property name="visible">True</property>
-            <property name="text" translatable="yes">Debug Mode</property>
-            <property name="role">1</property>
           </object>
         </child>
       </object>

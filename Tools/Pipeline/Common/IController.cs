@@ -41,11 +41,6 @@ namespace MonoGame.Tools.Pipeline
         bool ProjectBuilding { get; }
 
         /// <summary>
-        /// Passes /launchdebugger option when launching MGCB.
-        /// </summary>
-        bool LaunchDebugger { get; set; }
-
-        /// <summary>
         /// The view this controller is attached to.
         /// </summary>
         IView View { get; }

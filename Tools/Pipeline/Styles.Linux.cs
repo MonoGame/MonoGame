@@ -148,7 +148,6 @@ namespace MonoGame.Tools.Pipeline
                 Connect(builder.GetObject("help_button").Handle, MainWindow.Instance.cmdHelp);
                 Connect(builder.GetObject("about_button").Handle, MainWindow.Instance.cmdAbout);
                 Connect(builder.GetObject("exit_button").Handle, MainWindow.Instance.cmdExit);
-                Connect(builder.GetObject("debugmode_button").Handle, MainWindow.Instance.cmdDebugMode);
 
                 MainWindow.Instance.cmdBuild.EnabledChanged += (sender, e) =>
                     separator.Visible = MainWindow.Instance.cmdBuild.Enabled || MainWindow.Instance.cmdCancelBuild.Enabled;
