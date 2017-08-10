@@ -128,7 +128,12 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (volume < 0)
                 throw new ArgumentException("The volume must be positive.");
-            
+
+            // Updating all the sounds in a category can be
+            // very expensive... so avoid it if we can.
+            if (_volume[0] == volume)
+                return;
+
             _volume[0] = volume;
 
             foreach (var sound in _sounds)
