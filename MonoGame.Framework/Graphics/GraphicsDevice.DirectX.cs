@@ -604,18 +604,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Windows requires BGRA support out of DX.
             var creationFlags = SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport;
-#if DEBUG
-            var enableDebugLayers = true;
-#else 
-            var enableDebugLayers = false;
-#endif
 
             if (GraphicsAdapter.UseDebugLayers)
-            {
-                enableDebugLayers = true;
-            }
-
-            if (enableDebugLayers)
             {
                 creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
             }
