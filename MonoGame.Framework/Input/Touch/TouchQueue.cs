@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
@@ -8,27 +8,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
     /// </summary>
     internal class TouchQueue
     {
-        private readonly List<TouchEvent> _queue = new List<TouchEvent>(); 
+        private readonly ConcurrentQueue<TouchEvent> _queue = new ConcurrentQueue<TouchEvent>();
 
         public void Enqueue(int id, TouchLocationState state, Vector2 pos, bool isMouse = false)
         {
-            lock (_queue)
-            {
-                _queue.Add(new TouchEvent(id, state, pos, isMouse));
-            }
+            _queue.Enqueue(new TouchEvent(id, state, pos, isMouse));
         }
 
         public void ProcessQueued()
         {
-            lock (_queue)
-            {
-                for (var i = 0; i < _queue.Count; i++)
-                {
-                    var ev = _queue[i];
-                    TouchPanel.AddEvent(ev.Id, ev.State, ev.Pos, ev.IsMouse);
-                }
-                _queue.Clear();
-            }
+            TouchEvent ev;
+            while (_queue.TryDequeue(out ev))                
+                TouchPanel.AddEvent(ev.Id, ev.State, ev.Pos, ev.IsMouse);
         }
 
         private struct TouchEvent

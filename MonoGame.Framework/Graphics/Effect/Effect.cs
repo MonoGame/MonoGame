@@ -187,9 +187,8 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Effect(this);
 		}
 
-        protected internal virtual bool OnApply()
+        protected internal virtual void OnApply()
         {
-            return false;
         }
 
         protected override void Dispose(bool disposing)

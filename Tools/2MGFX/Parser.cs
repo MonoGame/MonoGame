@@ -3929,14 +3929,43 @@ namespace TwoMGFX
             }
 
              // Concat Rule
-            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
-            n = node.CreateNode(tok, tok.ToString() );
-            node.Token.UpdateRange(tok);
-            node.Nodes.Add(n);
-            if (tok.Type != TokenType.Semicolon) {
-                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Semicolon.ToString(), 0x1001, tok));
-                return;
-            }
+            tok = scanner.LookAhead(TokenType.Semicolon, TokenType.Comma, TokenType.CloseParenthesis); // Choice Rule
+            switch (tok.Type)
+            { // Choice Rule
+                case TokenType.Semicolon:
+                    tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
+                    n = node.CreateNode(tok, tok.ToString() );
+                    node.Token.UpdateRange(tok);
+                    node.Nodes.Add(n);
+                    if (tok.Type != TokenType.Semicolon) {
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Semicolon.ToString(), 0x1001, tok));
+                        return;
+                    }
+                    break;
+                case TokenType.Comma:
+                    tok = scanner.Scan(TokenType.Comma); // Terminal Rule: Comma
+                    n = node.CreateNode(tok, tok.ToString() );
+                    node.Token.UpdateRange(tok);
+                    node.Nodes.Add(n);
+                    if (tok.Type != TokenType.Comma) {
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Comma.ToString(), 0x1001, tok));
+                        return;
+                    }
+                    break;
+                case TokenType.CloseParenthesis:
+                    tok = scanner.Scan(TokenType.CloseParenthesis); // Terminal Rule: CloseParenthesis
+                    n = node.CreateNode(tok, tok.ToString() );
+                    node.Token.UpdateRange(tok);
+                    node.Nodes.Add(n);
+                    if (tok.Type != TokenType.CloseParenthesis) {
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.CloseParenthesis.ToString(), 0x1001, tok));
+                        return;
+                    }
+                    break;
+                default:
+                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Semicolon, Comma, or CloseParenthesis.", 0x0002, tok));
+                    break;
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
         } // NonTerminalSymbol: Sampler_Declaration

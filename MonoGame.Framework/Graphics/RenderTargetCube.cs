@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
@@ -39,6 +41,9 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return size; }
         }
 
+		public bool IsContentLost { get { return false; } }
+		public event EventHandler<EventArgs> ContentLost;
+		
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderTargetCube"/> class.
         /// </summary>

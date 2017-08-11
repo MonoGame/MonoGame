@@ -141,6 +141,14 @@ namespace MonoGame.Tools.Pipeline
             AddContent(sourceFile, false);
         }
 
+        [CommandLineParameter(
+            Name = "launchDebugger",
+            ValueName = "sourceFile")]
+        public void OnDebug()
+        {
+            _project.LaunchDebugger = true;
+        }
+
         public bool AddContent(string sourceFile, bool skipDuplicates)
         {
             // Make sure the source file is relative to the project.
@@ -274,6 +282,9 @@ namespace MonoGame.Tools.Pipeline
 
             line = string.Format(lineFormat, "compress", _project.Compress);
             io.WriteLine(line);
+
+            if (_project.LaunchDebugger)
+                io.WriteLine("/launchdebugger");
 
             line = FormatDivider("References");
             io.WriteLine(line);

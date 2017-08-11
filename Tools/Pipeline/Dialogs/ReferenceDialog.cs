@@ -10,7 +10,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class ReferenceDialog : DialogBase
+    partial class ReferenceDialog : Dialog<bool>
     {
         protected class RefItem
         {
@@ -27,7 +27,7 @@ namespace MonoGame.Tools.Pipeline
         public List<string> References { get; private set; }
 
         private IController _controller;
-        private FileDialogFilter _dllFileFilter, _allFileFilter;
+        private FileFilter _dllFileFilter, _allFileFilter;
         private SelectableFilterCollection<RefItem> _dataStore;
 
         public ReferenceDialog(IController controller, string[] refs)
@@ -36,8 +36,8 @@ namespace MonoGame.Tools.Pipeline
 
             _controller = controller;
 
-            _dllFileFilter = new FileDialogFilter("Dll Files (*.dll)", new[] { ".dll" });
-            _allFileFilter = new FileDialogFilter("All Files (*.*)", new[] { ".*" });
+            _dllFileFilter = new FileFilter("Dll Files (*.dll)", new[] { ".dll" });
+            _allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
 
             var assemblyColumn = new GridColumn();
             assemblyColumn.HeaderText = "Assembly";
@@ -73,6 +73,12 @@ namespace MonoGame.Tools.Pipeline
             buttonRemove.Enabled = grid1.SelectedItems.ToList().Count > 0;
         }
 
+        private void Grid1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Keys.Delete)
+                ButtonRemove_Click(sender, e);
+        }
+
         private void ButtonAdd_Click(object sender, EventArgs e)
         {
             var dialog = new OpenFileDialog();
@@ -89,10 +95,21 @@ namespace MonoGame.Tools.Pipeline
 
         private void ButtonRemove_Click(object sender, EventArgs e)
         {
-            var selectedItems = grid1.SelectedItems;
-
+            var selectedItems = grid1.SelectedItems.ToArray();
+            
             foreach (var item in selectedItems)
                 _dataStore.Remove(item as RefItem);
+        }
+
+        private void ButtonOk_Click(object sender, EventArgs e)
+        {
+            Result = true;
+            Close();
+        }
+
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

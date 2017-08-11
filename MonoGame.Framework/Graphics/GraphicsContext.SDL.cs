@@ -3,7 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace OpenGL
 {
@@ -36,7 +36,6 @@ namespace OpenGL
                 return;
             
             SetWindowHandle(info);
-            Threading.BackgroundContext = Sdl.GL.CreateContext (_winHandle);
             _context = Sdl.GL.CreateContext(_winHandle);
 
             // GL entry points must be loaded after the GL context creation, otherwise some Windows drivers will return only GL 1.3 compatible functions
@@ -47,7 +46,7 @@ namespace OpenGL
             catch (EntryPointNotFoundException)
             {
                 throw new PlatformNotSupportedException(
-                    "MonoGame requires OpenGL 3.0 compatible drivers, or either ARB_framebuffer_object or EXT_framebuffer_object extensions." +
+                    "MonoGame requires OpenGL 3.0 compatible drivers, or either ARB_framebuffer_object or EXT_framebuffer_object extensions. " +
                     "Try updating your graphics drivers.");
             }
         }
@@ -73,8 +72,9 @@ namespace OpenGL
         {
             if (_disposed)
                 return;
-            
-            Sdl.GL.DeleteContext(_context);
+
+            GraphicsDevice.DisposeContext(_context);
+            _context = IntPtr.Zero;
             _disposed = true;
         }
 

@@ -6,15 +6,22 @@ using System;
 using SharpDX.XAudio2;
 using SharpDX.X3DAudio;
 using SharpDX.Multimedia;
+using SharpDX.Mathematics.Interop;
 
 namespace Microsoft.Xna.Framework.Audio
 {
     public partial class SoundEffectInstance : IDisposable
     {
+        private static float[] _defaultChannelAzimuths = new float[] { 0f, 0f };
+
         internal SourceVoice _voice;
         internal WaveFormat _format;
 
-        private static float[] _panMatrix;
+        private SharpDX.XAudio2.Fx.Reverb _reverb;
+
+        private static readonly float[] _outputMatrix = new float[16];
+
+        private float _reverbMix;
 
         private bool _paused;
         private bool _loop;
@@ -27,17 +34,24 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
         {
             // If we have no voice then nothing to do.
-            if (_voice == null)
+            if (_voice == null || SoundEffect.MasterVoice == null)
                 return;
 
             // Convert from XNA Emitter to a SharpDX Emitter
-            var e = emitter.ToEmitter();
+            var e = ToDXEmitter(emitter);
             e.CurveDistanceScaler = SoundEffect.DistanceScale;
             e.DopplerScaler = SoundEffect.DopplerScale;
             e.ChannelCount = _effect._format.Channels;
+            
+            //stereo channel
+            if (e.ChannelCount > 1)
+            {
+                e.ChannelRadius = 0;
+                e.ChannelAzimuths = _defaultChannelAzimuths;
+             }
 
             // Convert from XNA Listener to a SharpDX Listener
-            var l = listener.ToListener();
+            var l = ToDXListener(listener);
 
             // Number of channels in the sound being played.
             // Not actually sure if XNA supported 3D attenuation of sterio sounds, but X3DAudio does.
@@ -56,16 +70,94 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.SetFrequencyRatio(dpsSettings.DopplerFactor);
         }
 
+        private Emitter _dxEmitter;
+        private Listener _dxListener;
+
+        private Emitter ToDXEmitter(AudioEmitter emitter)
+        {
+            // Pulling out Vector properties for efficiency.
+            var pos = emitter.Position;
+            var vel = emitter.Velocity;
+            var forward = emitter.Forward;
+            var up = emitter.Up;
+
+            // From MSDN:
+            //  X3DAudio uses a left-handed Cartesian coordinate system, 
+            //  with values on the x-axis increasing from left to right, on the y-axis from bottom to top, 
+            //  and on the z-axis from near to far. 
+            //  Azimuths are measured clockwise from a given reference direction. 
+            //
+            // From MSDN:
+            //  The XNA Framework uses a right-handed coordinate system, 
+            //  with the positive z-axis pointing toward the observer when the positive x-axis is pointing to the right, 
+            //  and the positive y-axis is pointing up. 
+            //
+            // Programmer Notes:         
+            //  According to this description the z-axis (forward vector) is inverted between these two coordinate systems.
+            //  Therefore, we need to negate the z component of any position/velocity values, and negate any forward vectors.
+
+            forward *= -1.0f;
+            pos.Z *= -1.0f;
+            vel.Z *= -1.0f;
+
+            if (_dxEmitter == null)
+                _dxEmitter = new Emitter();
+
+            _dxEmitter.Position = new RawVector3(pos.X, pos.Y, pos.Z);
+            _dxEmitter.Velocity = new RawVector3(vel.X, vel.Y, vel.Z);
+            _dxEmitter.OrientFront = new RawVector3(forward.X, forward.Y, forward.Z);
+            _dxEmitter.OrientTop = new RawVector3(up.X, up.Y, up.Z);
+            _dxEmitter.DopplerScaler = emitter.DopplerScale;
+            return _dxEmitter;
+        }
+
+        private Listener ToDXListener(AudioListener listener)
+        {
+            // Pulling out Vector properties for efficiency.
+            var pos = listener.Position;
+            var vel = listener.Velocity;
+            var forward = listener.Forward;
+            var up = listener.Up;
+
+            // From MSDN:
+            //  X3DAudio uses a left-handed Cartesian coordinate system, 
+            //  with values on the x-axis increasing from left to right, on the y-axis from bottom to top, 
+            //  and on the z-axis from near to far. 
+            //  Azimuths are measured clockwise from a given reference direction. 
+            //
+            // From MSDN:
+            //  The XNA Framework uses a right-handed coordinate system, 
+            //  with the positive z-axis pointing toward the observer when the positive x-axis is pointing to the right, 
+            //  and the positive y-axis is pointing up. 
+            //
+            // Programmer Notes:         
+            //  According to this description the z-axis (forward vector) is inverted between these two coordinate systems.
+            //  Therefore, we need to negate the z component of any position/velocity values, and negate any forward vectors.
+
+            forward *= -1.0f;
+            pos.Z *= -1.0f;
+            vel.Z *= -1.0f;
+
+            if (_dxListener == null)
+                _dxListener = new Listener();
+
+            _dxListener.Position = new RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z };
+            _dxListener.Velocity = new RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z };
+            _dxListener.OrientFront = new RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z };
+            _dxListener.OrientTop = new RawVector3 { X = up.X, Y = up.Y, Z = up.Z };
+            return _dxListener;
+        }
+
         private void PlatformPause()
         {
-            if (_voice != null)
+            if (_voice != null && SoundEffect.MasterVoice != null)
                 _voice.Stop();
             _paused = true;
         }
 
         private void PlatformPlay()
         {
-            if (_voice != null)
+            if (_voice != null && SoundEffect.MasterVoice != null)
             {
                 // Choose the correct buffer depending on if we are looped.            
                 var buffer = _loop ? _effect._loopedBuffer : _effect._buffer;
@@ -85,7 +177,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformResume()
         {
-            if (_voice != null)
+            if (_voice != null && SoundEffect.MasterVoice != null)
             {
                 // Restart the sound if (and only if) it stopped playing
                 if (!_loop)
@@ -104,7 +196,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformStop(bool immediate)
         {
-            if (_voice != null)
+            if (_voice != null && SoundEffect.MasterVoice != null)
             {
                 if (immediate)
                 {
@@ -135,94 +227,75 @@ namespace Microsoft.Xna.Framework.Audio
             _pan = MathHelper.Clamp(value, -1.0f, 1.0f);
 
             // If we have no voice then nothing more to do.
-            if (_voice == null || _effect == null)
+            if (_voice == null || SoundEffect.MasterVoice == null)
                 return;
 
-            var srcChannelCount = _effect._format.Channels;
+            UpdateOutputMatrix();
+        }
+
+        internal void UpdateOutputMatrix()
+        {
+            var srcChannelCount = _voice.VoiceDetails.InputChannelCount;
             var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
 
-            if (_panMatrix == null || _panMatrix.Length < dstChannelCount)
-                _panMatrix = new float[Math.Max(dstChannelCount, 8)];
-
-            // Default to full volume for all channels/destinations   
-            for (var i = 0; i < _panMatrix.Length; i++)
-                _panMatrix[i] = 1.0f;
-
-            // From X3DAudio documentation:
-            /*
-                For submix and mastering voices, and for source voices without a channel mask or a channel mask of 0, 
-                   XAudio2 assumes default speaker positions according to the following table. 
-
-                Channels
-
-                Implicit Channel Positions
-
-                1 Always maps to FrontLeft and FrontRight at full scale in both speakers (special case for mono sounds) 
-                2 FrontLeft, FrontRight (basic stereo configuration) 
-                3 FrontLeft, FrontRight, LowFrequency (2.1 configuration) 
-                4 FrontLeft, FrontRight, BackLeft, BackRight (quadraphonic) 
-                5 FrontLeft, FrontRight, FrontCenter, SideLeft, SideRight (5.0 configuration) 
-                6 FrontLeft, FrontRight, FrontCenter, LowFrequency, SideLeft, SideRight (5.1 configuration) (see the following remarks) 
-                7 FrontLeft, FrontRight, FrontCenter, LowFrequency, SideLeft, SideRight, BackCenter (6.1 configuration) 
-                8 FrontLeft, FrontRight, FrontCenter, LowFrequency, BackLeft, BackRight, SideLeft, SideRight (7.1 configuration) 
-                9 or more No implicit positions (one-to-one mapping)                      
-             */
-
-            // Notes:
-            //
-            // Since XNA does not appear to expose any 'master' voice channel mask / speaker configuration,
-            // I assume the mappings listed above should be used.
-            //
-            // Assuming it is correct to pan all channels which have a left/right component.
-
-            var lVal = 1.0f - _pan;
-            var rVal = 1.0f + _pan;
-
-            switch (SoundEffect.Speakers)
+            // Set the pan on the correct channels based on the reverb mix.
+            if (!(_reverbMix > 0.0f))
+                _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, CalculateOutputMatrix(_pan, 1.0f, srcChannelCount));
+            else
             {
-                case Speakers.Stereo:
-                case Speakers.TwoPointOne:
-                case Speakers.Surround:
-                    _panMatrix[0] = lVal;
-                    _panMatrix[1] = rVal;
-                    break;
+                _voice.SetOutputMatrix(SoundEffect.ReverbVoice, srcChannelCount, dstChannelCount, CalculateOutputMatrix(_pan, _reverbMix, srcChannelCount));
+                _voice.SetOutputMatrix(SoundEffect.MasterVoice, srcChannelCount, dstChannelCount, CalculateOutputMatrix(_pan, 1.0f - Math.Min(_reverbMix, 1.0f), srcChannelCount));
+            }
+        }
 
-                case Speakers.Quad:
-                    _panMatrix[0] = _panMatrix[2] = lVal;
-                    _panMatrix[1] = _panMatrix[3] = rVal;
-                    break;
+        internal static float[] CalculateOutputMatrix(float pan, float scale, int inputChannels)
+        {
+            // XNA only ever outputs to the front left/right speakers (channels 0 and 1)
+            // Assumes there are at least 2 speaker channels to output to
 
-                case Speakers.FourPointOne:
-                    _panMatrix[0] = _panMatrix[3] = lVal;
-                    _panMatrix[1] = _panMatrix[4] = rVal;
-                    break;
+            // Clear all the channels.
+            var outputMatrix = _outputMatrix;
+            Array.Clear(outputMatrix, 0, outputMatrix.Length);
 
-                case Speakers.FivePointOne:
-                case Speakers.SevenPointOne:
-                case Speakers.FivePointOneSurround:
-                    _panMatrix[0] = _panMatrix[4] = lVal;
-                    _panMatrix[1] = _panMatrix[5] = rVal;
-                    break;
-
-                case Speakers.SevenPointOneSurround:
-                    _panMatrix[0] = _panMatrix[4] = _panMatrix[6] = lVal;
-                    _panMatrix[1] = _panMatrix[5] = _panMatrix[7] = rVal;
-                    break;
-
-                case Speakers.Mono:
-                default:
-                    // don't do any panning here   
-                    break;
+            if (inputChannels == 1) // Mono source
+            {
+                // Left/Right output levels:
+                //   Pan -1.0: L = 1.0, R = 0.0
+                //   Pan  0.0: L = 1.0, R = 1.0
+                //   Pan +1.0: L = 0.0, R = 1.0
+                outputMatrix[0] = (pan > 0f) ? ((1f - pan) * scale) : scale; // Front-left output
+                outputMatrix[1] = (pan < 0f) ? ((1f + pan) * scale) : scale; // Front-right output
+            }
+            else if (inputChannels == 2) // Stereo source
+            {
+                // Left/Right input (Li/Ri) mix for Left/Right outputs (Lo/Ro):
+                //   Pan -1.0: Lo = 0.5Li + 0.5Ri, Ro = 0.0Li + 0.0Ri
+                //   Pan  0.0: Lo = 1.0Li + 0.0Ri, Ro = 0.0Li + 1.0Ri
+                //   Pan +1.0: Lo = 0.0Li + 0.0Ri, Ro = 0.5Li + 0.5Ri
+                if (pan <= 0f)
+                {
+                    outputMatrix[0] = (1f + pan * 0.5f) * scale; // Front-left output, Left input
+                    outputMatrix[1] = (-pan * 0.5f) * scale; // Front-left output, Right input
+                    outputMatrix[2] = 0f; // Front-right output, Left input
+                    outputMatrix[3] = (1f + pan) * scale; // Front-right output, Right input
+                }
+                else
+                {
+                    outputMatrix[0] = (1f - pan) * scale; // Front-left output, Left input
+                    outputMatrix[1] = 0f; // Front-left output, Right input
+                    outputMatrix[2] = (pan * 0.5f) * scale; // Front-right output, Left input
+                    outputMatrix[3] = (1f - pan * 0.5f) * scale; // Front-right output, Right input
+                }
             }
 
-            _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, _panMatrix);
+            return outputMatrix;
         }
 
         private void PlatformSetPitch(float value)
         {
             _pitch = value;
 
-            if (_voice == null)
+            if (_voice == null || SoundEffect.MasterVoice == null)
                 return;
 
             // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
@@ -234,7 +307,7 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundState PlatformGetState()
         {
             // If no voice or no buffers queued the sound is stopped.
-            if (_voice == null || _voice.State.BuffersQueued == 0)
+            if (_voice == null || SoundEffect.MasterVoice == null || _voice.State.BuffersQueued == 0)
                 return SoundState.Stopped;
 
             // Because XAudio2 does not actually provide if a SourceVoice is Started / Stopped
@@ -247,15 +320,61 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetVolume(float value)
         {
-            if (_voice != null)
+            if (_voice != null && SoundEffect.MasterVoice != null)
                 _voice.SetVolume(value, XAudio2.CommitNow);
+        }
+
+        internal void PlatformSetReverbMix(float mix)
+        {
+            // At least for XACT we can't go over 2x the volume on the mix.
+            _reverbMix = MathHelper.Clamp(mix, 0, 2);
+
+            // If we have no voice then nothing more to do.
+            if (_voice == null || SoundEffect.MasterVoice == null)
+                return;
+
+            if (!(_reverbMix > 0.0f))
+                _voice.SetOutputVoices(new VoiceSendDescriptor(SoundEffect.MasterVoice));
+            else
+            {
+                _voice.SetOutputVoices( new VoiceSendDescriptor(SoundEffect.ReverbVoice), 
+                                        new VoiceSendDescriptor(SoundEffect.MasterVoice));
+            }
+
+            UpdateOutputMatrix();
+        }
+
+        internal void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
+        {
+            if (_voice == null || SoundEffect.MasterVoice == null)
+                return;
+
+            var filter = new FilterParameters 
+            {
+                Frequency = XAudio2.CutoffFrequencyToRadians(frequency, _voice.VoiceDetails.InputSampleRate), 
+                OneOverQ = 1.0f / filterQ, 
+                Type = (FilterType)mode 
+            };
+            _voice.SetFilterParameters(filter);
+        }
+
+        internal void PlatformClearFilter()
+        {
+            if (_voice == null || SoundEffect.MasterVoice == null)
+                return;
+
+            var filter = new FilterParameters { Frequency = 1.0f, OneOverQ = 1.0f, Type = FilterType.LowPassFilter };
+            _voice.SetFilterParameters(filter);            
         }
 
         private void PlatformDispose(bool disposing)
         {
             if (disposing)
             {
-                if (_voice != null)
+                if (_reverb != null)
+                    _reverb.Dispose();
+
+                if (_voice != null && SoundEffect.MasterVoice != null)
                 {
                     _voice.DestroyVoice();
                     _voice.Dispose();
@@ -263,6 +382,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
             _voice = null;
             _effect = null;
+            _reverb = null;
         }
     }
 }

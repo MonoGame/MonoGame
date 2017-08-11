@@ -67,6 +67,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
+        private void PlatformApplyBlend()
+        {
+        }
+
         internal void PlatformApplyState(bool applyShaders)
         {
         }
@@ -95,9 +99,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
         {
-            return GraphicsProfile.HiDef;
+            return new Rectangle(x, y, width, height);
+        }
+        
+        internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
+        {
+            presentationParameters.MultiSampleCount = 0;
+            quality = 0;
         }
     }
 }

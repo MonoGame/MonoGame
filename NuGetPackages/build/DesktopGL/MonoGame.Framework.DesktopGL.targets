@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MonoGamePlatform>DesktopGL</MonoGamePlatform>
+  </PropertyGroup>
+  <Target Name="CopyDesktopGLNative" AfterTargets="AfterBuild">
+    <ItemGroup>
+      <_main Include="$(MSBuildThisFileDirectory)\native\*.*" />
+      <_x86 Include="$(MSBuildThisFileDirectory)\native\x86\*.*" />
+      <_x64 Include="$(MSBuildThisFileDirectory)\native\x64\*.*" />
+    </ItemGroup>
+  
+    <Copy SourceFiles="@(_main)" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="@(_x86)" DestinationFolder="$(OutDir)\x86" />
+    <Copy SourceFiles="@(_x64)" DestinationFolder="$(OutDir)\x64" />
+  </Target>
+</Project>

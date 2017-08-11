@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Eto;
 using Eto.Forms;
@@ -86,8 +87,34 @@ namespace MonoGame.Tools.Pipeline
             };
         }
 
+        [GLib.ConnectBefore]
+        public static void TreeView_ButtonPressEvent(object o, Gtk.ButtonPressEventArgs args)
+        {
+            var treeview = o as Gtk.TreeView;
+
+            if (args.Event.Button == 3)
+            {
+                Gtk.TreeViewDropPosition pos;
+                Gtk.TreePath path;
+                Gtk.TreeIter iter;
+
+                if (treeview.GetDestRowAtPos((int)args.Event.X, (int)args.Event.Y, out path, out pos) && treeview.Model.GetIter(out iter, path))
+                {
+                    var paths = treeview.Selection.GetSelectedRows().ToList();
+                    if (paths.Contains(path))
+                        args.RetVal = true;
+                }
+            }
+        }
+
         public static void Load()
         {
+            Style.Add<ApplicationHandler>("PipelineTool", h =>
+            {
+                if (Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16)
+                    Global.UseHeaderBar = Gtk3Wrapper.gtk_application_prefers_app_menu(h.Control.Handle);
+            });
+
             Style.Add<FormHandler>("MainWindow", h =>
             {
                 if (!Global.UseHeaderBar)
@@ -118,8 +145,9 @@ namespace MonoGame.Tools.Pipeline
                 Connect(builder.GetObject("redo_button").Handle, MainWindow.Instance.cmdRedo);
                 Connect(builder.GetObject("close_button").Handle, MainWindow.Instance.cmdClose);
                 Connect(builder.GetObject("clean_button").Handle, MainWindow.Instance.cmdClean);
-                Connect(builder.GetObject("filteroutput_button").Handle, MainWindow.Instance.cmdFilterOutput);
-                Connect(builder.GetObject("debugmode_button").Handle, MainWindow.Instance.cmdDebugMode);
+                Connect(builder.GetObject("help_button").Handle, MainWindow.Instance.cmdHelp);
+                Connect(builder.GetObject("about_button").Handle, MainWindow.Instance.cmdAbout);
+                Connect(builder.GetObject("exit_button").Handle, MainWindow.Instance.cmdExit);
 
                 MainWindow.Instance.cmdBuild.EnabledChanged += (sender, e) =>
                     separator.Visible = MainWindow.Instance.cmdBuild.Enabled || MainWindow.Instance.cmdCancelBuild.Enabled;
@@ -180,25 +208,7 @@ namespace MonoGame.Tools.Pipeline
                 h.Control.ShowAll();
             });
 
-            Style.Add<DialogHandler>("HeaderBar", h =>
-            {
-                var title = h.Title;
-                var headerBar = Gtk3Wrapper.gtk_header_bar_new();
-                Gtk3Wrapper.gtk_window_set_titlebar(h.Control.Handle, headerBar);
-                h.Title = title;
-
-                if (h.AbortButton.Text == "Close")
-                {
-                    Gtk3Wrapper.gtk_header_bar_set_show_close_button(headerBar, true);
-                    return;
-                }
-
-                var defButton = (Gtk.Button)h.DefaultButton.ControlObject;
-                defButton.StyleContext.AddClass("suggested-action");
-
-                Gtk3Wrapper.gtk_header_bar_pack_end(headerBar, defButton.Handle);
-                Gtk3Wrapper.gtk_header_bar_pack_start(headerBar, ((Gtk.Button)h.AbortButton.ControlObject).Handle);
-            });
+            Style.Add<ButtonHandler>("Destuctive", h => h.Control.StyleContext.AddClass("destructive-action"));
 
             Style.Add<LabelHandler>("Wrap", h => h.Control.MaxWidthChars = 55);
 
@@ -206,25 +216,6 @@ namespace MonoGame.Tools.Pipeline
             {
                 h.Control.ToolbarStyle = Gtk.ToolbarStyle.Icons;
                 h.Control.IconSize = Gtk.IconSize.SmallToolbar;
-            });
-
-            Style.Add<TreeViewHandler>("Scroll", h =>
-            {
-                var treeView = h.Control.Child as Gtk.TreeView;
-
-                Gtk.TreeIter lastIter, iter;
-
-                if (treeView.Model.GetIterFirst(out iter))
-                {
-                    do
-                    {
-                        lastIter = iter;
-                    }
-                    while (treeView.Model.IterNext(ref iter));
-
-                    var path = treeView.Model.GetPath(lastIter);
-                    treeView.ScrollToCell(path, null, false, 0, 0);
-                }
             });
 
             Style.Add<DrawableHandler>("Stretch", h =>
@@ -249,17 +240,6 @@ namespace MonoGame.Tools.Pipeline
                      al.Width = parent.AllocatedWidth;
                      h.Control.SetAllocation(al);
                 };
-            });
-
-            Style.Add<DropDownHandler>("OverrideSize", h =>
-            {
-                var cell = (h.Control.Child as Gtk.ComboBox).Cells[0] as Gtk.CellRendererText;
-                cell.Ellipsize = Pango.EllipsizeMode.End;
-            });
-
-            Style.Add<TextBoxHandler>("OverrideSize", h =>
-            {
-                h.Control.WidthChars = 0;
             });
         }
     }

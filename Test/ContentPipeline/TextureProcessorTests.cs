@@ -69,7 +69,7 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-        public void Mipmap()
+        public void MipmapSquarePowerOfTwo()
         {
             var context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
 
@@ -82,7 +82,10 @@ namespace MonoGame.Tests.ContentPipeline
                 TextureFormat = TextureProcessorOutputFormat.Color
             };
 
-            var face = new PixelBitmapContent<Color>(8, 8);
+            var width = 8;
+            var height = 8;
+
+            var face = new PixelBitmapContent<Color>(width, height);
             Fill(face, Color.Red);
             var input = new Texture2DContent();
             input.Faces[0] = face;
@@ -96,9 +99,6 @@ namespace MonoGame.Tests.ContentPipeline
             var outChain = output.Faces[0];
             Assert.AreEqual(4, outChain.Count);
 
-            var width = 8;
-            var height = 8;
-
             foreach (var outFace in outChain)
             {
                 Assert.AreEqual(width, outFace.Width);
@@ -111,6 +111,100 @@ namespace MonoGame.Tests.ContentPipeline
 
                 width = width >> 1;
                 height = height >> 1;
+            }
+        }
+
+        [Test]
+        public void MipmapNonSquarePowerOfTwo()
+        {
+            var context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+
+            var processor = new TextureProcessor
+            {
+                ColorKeyEnabled = false,
+                GenerateMipmaps = true,
+                PremultiplyAlpha = false,
+                ResizeToPowerOfTwo = false,
+                TextureFormat = TextureProcessorOutputFormat.Color
+            };
+
+            var width = 16;
+            var height = 8;
+
+            var face = new PixelBitmapContent<Color>(width, height);
+            Fill(face, Color.Red);
+            var input = new Texture2DContent();
+            input.Faces[0] = face;
+
+            var output = processor.Process(input, context);
+
+            Assert.NotNull(output);
+            Assert.AreEqual(1, output.Faces.Count);
+
+            var outChain = output.Faces[0];
+            Assert.AreEqual(5, outChain.Count);
+
+            foreach (var outFace in outChain)
+            {
+                Assert.AreEqual(width, outFace.Width);
+                Assert.AreEqual(height, outFace.Height);
+
+                var bitmap = (PixelBitmapContent<Color>)outFace;
+                for (var y = 0; y < height; y++)
+                    for (var x = 0; x < width; x++)
+                        Assert.AreEqual(Color.Red, bitmap.GetPixel(x, y));
+
+                if (width > 1)
+                    width /= 2;
+                if (height > 1)
+                    height /= 2;
+            }
+        }
+
+        [Test]
+        public void MipmapNonSquareNonPowerOfTwo()
+        {
+            var context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+
+            var processor = new TextureProcessor
+            {
+                ColorKeyEnabled = false,
+                GenerateMipmaps = true,
+                PremultiplyAlpha = false,
+                ResizeToPowerOfTwo = false,
+                TextureFormat = TextureProcessorOutputFormat.Color
+            };
+
+            var width = 23;
+            var height = 5;
+
+            var face = new PixelBitmapContent<Color>(width, height);
+            Fill(face, Color.Red);
+            var input = new Texture2DContent();
+            input.Faces[0] = face;
+
+            var output = processor.Process(input, context);
+
+            Assert.NotNull(output);
+            Assert.AreEqual(1, output.Faces.Count);
+
+            var outChain = output.Faces[0];
+            Assert.AreEqual(5, outChain.Count);
+
+            foreach (var outFace in outChain)
+            {
+                Assert.AreEqual(width, outFace.Width);
+                Assert.AreEqual(height, outFace.Height);
+
+                var bitmap = (PixelBitmapContent<Color>)outFace;
+                for (var y = 0; y < height; y++)
+                    for (var x = 0; x < width; x++)
+                        Assert.AreEqual(Color.Red, bitmap.GetPixel(x, y));
+
+                if (width > 1)
+                    width /= 2;
+                if (height > 1)
+                    height /= 2;
             }
         }
 
@@ -157,7 +251,7 @@ namespace MonoGame.Tests.ContentPipeline
             var processor = new TextureProcessor
             {
                 ColorKeyEnabled = false,
-                GenerateMipmaps = false,
+                GenerateMipmaps = true,
                 PremultiplyAlpha = false,
                 ResizeToPowerOfTwo = false,
                 TextureFormat = TextureProcessorOutputFormat.Compressed
@@ -172,7 +266,7 @@ namespace MonoGame.Tests.ContentPipeline
 
             Assert.NotNull(output);
             Assert.AreEqual(1, output.Faces.Count);
-            Assert.AreEqual(1, output.Faces[0].Count);
+            Assert.AreEqual(5, output.Faces[0].Count);
 
             Assert.IsAssignableFrom<T>(output.Faces[0][0]);
         }

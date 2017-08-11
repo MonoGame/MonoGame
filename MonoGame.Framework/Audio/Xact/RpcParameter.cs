@@ -10,6 +10,7 @@ namespace Microsoft.Xna.Framework.Audio
         Pitch,
         ReverbSend,
         FilterFrequency,
-        FilterQFactor
+        FilterQFactor,
+        NumParameters,
     }
 }

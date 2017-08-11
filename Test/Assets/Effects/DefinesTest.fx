@@ -26,3 +26,7 @@ technique
 #if defined(INVALID_SYNTAX)
 Foo;
 #endif
+
+#if MACRO_DEFINE_TEST != 3
+Bar;
+#endif

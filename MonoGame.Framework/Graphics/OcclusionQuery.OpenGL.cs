@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     partial class OcclusionQuery
     {
-        private int glQueryId;
+        private int glQueryId = -1;
 
         private void PlatformConstruct()
         {
@@ -77,11 +77,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                Threading.BlockOnUIThread(() =>
+                if (glQueryId > -1)
                 {
-                    GL.DeleteQueries(1, ref glQueryId);
-                    GraphicsExtensions.CheckGLError();
-                });
+                    GraphicsDevice.DisposeQuery(glQueryId);
+                    glQueryId = -1;
+                }
             }
 
             base.Dispose(disposing);

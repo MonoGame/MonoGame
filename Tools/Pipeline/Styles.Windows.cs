@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Eto;
+using Eto.Wpf.Forms;
 using Eto.Wpf.Forms.Menu;
 using Eto.Wpf.Forms.ToolBar;
 

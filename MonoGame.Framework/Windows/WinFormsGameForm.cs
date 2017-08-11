@@ -32,6 +32,7 @@ namespace Microsoft.Xna.Framework.Windows
     internal class WinFormsGameForm : Form
     {
         GameWindow _window;
+        public const int WM_MOUSEHWHEEL = 0x020E;
         public const int WM_POINTERUP = 0x0247;
         public const int WM_POINTERDOWN = 0x0246;
         public const int WM_POINTERUPDATE = 0x0245;
@@ -42,9 +43,22 @@ namespace Microsoft.Xna.Framework.Windows
 
         public bool AllowAltF4 = true;
 
+        #region Events
+
+        public event EventHandler<HorizontalMouseWheelEventArgs> MouseHorizontalWheel;
+
+        #endregion
+
         public WinFormsGameForm(GameWindow window)
         {
             _window = window;
+        }
+
+        public void CenterOnPrimaryMonitor()
+        {
+             Location = new System.Drawing.Point(
+                 (Screen.PrimaryScreen.WorkingArea.Width  - Width ) / 2,
+                 (Screen.PrimaryScreen.WorkingArea.Height - Height) / 2);
         }
 
         [System.Security.Permissions.PermissionSet(System.Security.Permissions.SecurityAction.Demand, Name = "FullTrust")]
@@ -114,6 +128,15 @@ namespace Microsoft.Xna.Framework.Windows
                     break;
                 case WM_POINTERUPDATE:
                     state = TouchLocationState.Moved;
+                    break;
+
+                case WM_MOUSEHWHEEL:
+                    var delta = (short)(((ulong)m.WParam >> 16) & 0xffff); ;
+                    var handler = MouseHorizontalWheel;
+
+                    if (handler != null)
+                        handler(this, new HorizontalMouseWheelEventArgs(delta));
+                    
                     break;
             }
 

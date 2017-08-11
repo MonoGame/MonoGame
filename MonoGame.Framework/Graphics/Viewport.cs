@@ -144,17 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
 		public Rectangle TitleSafeArea 
 		{
-			get
-			{
-                // TODO : Possible change it for XBOX or PS4 
-
-                var iSafeStartX = x;
-                var iSafeStartY = y;
-                var iSafeWidth = width;
-                var iSafeHeight = height;
-
-                return new Rectangle(iSafeStartX, iSafeStartY, iSafeWidth, iSafeHeight);
-			}
+			get { return GraphicsDevice.GetTitleSafeArea(x, y, width, height); }
 		}
 
         /// <summary>

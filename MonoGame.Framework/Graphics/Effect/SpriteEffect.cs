@@ -59,16 +59,18 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override bool OnApply()
+        protected internal override void OnApply()
         {
             var viewport = GraphicsDevice.Viewport;
 
             var projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
-            var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+            var halfPixelOffset = Matrix.CreateTranslation(0, 0, 0);
+
+            if (SpriteBatch.NeedsHalfPixelOffset){
+                halfPixelOffset += Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+            }
 
             matrixParam.SetValue(halfPixelOffset * projection);
-
-            return false;
         }
 
 

@@ -10,7 +10,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class NewItemDialog : DialogBase
+    partial class NewItemDialog : Dialog<bool>
     {
         public string Name { get; private set; }
         public ContentItemTemplate Selected { get; private set; }
@@ -31,14 +31,8 @@ namespace MonoGame.Tools.Pipeline
             while (enums.MoveNext())
             {
                 var ret = new ImageListItem();
-                ret.Text = enums.Current.Label;
+                ret.Text = enums.Current.Label + " (" + Path.GetExtension(enums.Current.TemplateFile) + ")";
                 ret.Tag = enums.Current;
-                
-                try
-                {
-                    ret.Image = new Bitmap(new Bitmap(Path.Combine(Path.GetDirectoryName(enums.Current.TemplateFile), enums.Current.Icon)), 16, 16);
-                }
-                catch { }
 
                 list1.Items.Add(ret);
             }
@@ -91,6 +85,17 @@ namespace MonoGame.Tools.Pipeline
             Selected = (ContentItemTemplate)((ImageListItem)list1.SelectedValue).Tag;
             labelExt.Text = Path.GetExtension(Selected.TemplateFile);
             ReloadSensitive();
+        }
+
+        private void ButtonCreate_Click(object sender, EventArgs e)
+        {
+            Result = true;
+            Close();
+        }
+
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

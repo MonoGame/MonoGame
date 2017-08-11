@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Diagnostics;
 
 #if MONOMAC
 #if PLATFORM_MACOS_LEGACY
@@ -61,13 +62,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (compiled != (int)Bool.True)
             {
                 var log = GL.GetShaderInfoLog(_shaderHandle);
-                Console.WriteLine(log);
+                Debug.WriteLine(log);
 
-                if (GL.IsShader(_shaderHandle))
-                {
-                    GL.DeleteShader(_shaderHandle);
-                    GraphicsExtensions.CheckGLError();
-                }
+                GraphicsDevice.DisposeShader(_shaderHandle);
                 _shaderHandle = -1;
 
                 throw new InvalidOperationException("Shader Compilation Failed");
@@ -114,11 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_shaderHandle != -1)
             {
-                if (GL.IsShader(_shaderHandle))
-                {
-                    GL.DeleteShader(_shaderHandle);
-                    GraphicsExtensions.CheckGLError();
-                }
+                GraphicsDevice.DisposeShader(_shaderHandle);
                 _shaderHandle = -1;
             }
         }
@@ -127,12 +120,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed && _shaderHandle != -1)
             {
-                Threading.BlockOnUIThread(() =>
-                    {
-                        GL.DeleteShader(_shaderHandle);
-                        GraphicsExtensions.CheckGLError();
-                        _shaderHandle = -1;
-                    });
+                GraphicsDevice.DisposeShader(_shaderHandle);
+                _shaderHandle = -1;
             }
 
             base.Dispose(disposing);

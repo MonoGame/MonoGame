@@ -21,10 +21,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 return VertexDeclaration;
             }
         }
+
         public override int GetHashCode()
         {
-            // TODO: Fix get hashcode
-            return 0;
+            unchecked
+            {
+                return (Position.GetHashCode() * 397) ^ TextureCoordinate.GetHashCode();
+            }
         }
 
         public override string ToString()

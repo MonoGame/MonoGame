@@ -384,6 +384,33 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual("1024,5; 2048,75", converter.ConvertToString(null, otherCulture, new Vector2(1024.5f, 2048.75f)));
         }
 
+        [Test]
+        public void HashCode()
+        {
+            // Checking for overflows in hash calculation.
+            var max = new Vector2(float.MaxValue, float.MaxValue);
+            var min = new Vector2(float.MinValue, float.MinValue);
+            Assert.AreNotEqual(max.GetHashCode(), Vector2.Zero.GetHashCode());
+            Assert.AreNotEqual(min.GetHashCode(), Vector2.Zero.GetHashCode());
+
+            // Common values
+            var a = new Vector2(0f, 0f);
+            Assert.AreEqual(a.GetHashCode(), Vector2.Zero.GetHashCode());
+            Assert.AreNotEqual(a.GetHashCode(), Vector2.One.GetHashCode());
+
+            // Individual properties alter hash
+            var xa = new Vector2(2f, 1f);
+            var xb = new Vector2(3f, 1f);
+            var ya = new Vector2(1f, 2f);
+            var yb = new Vector2(1f, 3f);
+            Assert.AreNotEqual(xa.GetHashCode(), xb.GetHashCode(), "Different properties should change hash.");
+            Assert.AreNotEqual(ya.GetHashCode(), yb.GetHashCode(), "Different properties should change hash.");
+            Assert.AreNotEqual(xa.GetHashCode(), ya.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(xb.GetHashCode(), yb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(xa.GetHashCode(), yb.GetHashCode());
+            Assert.AreNotEqual(ya.GetHashCode(), xb.GetHashCode());
+        }
+
 #if !XNA
         [Test]
         public void ToPoint()

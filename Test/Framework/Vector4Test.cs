@@ -129,5 +129,43 @@ namespace MonoGame.Tests.Framework
         {
             StringAssert.IsMatch("{X:10 Y:20 Z:3.5 W:-100}", new Vector4(10, 20, 3.5f, -100).ToString());
         }
+
+        [Test]
+        public void HashCode() {
+            // Checking for overflows in hash calculation.
+            var max = new Vector4(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue);
+            var min = new Vector4(float.MinValue, float.MinValue, float.MinValue, float.MinValue);
+            Assert.AreNotEqual(max.GetHashCode(), Vector4.Zero.GetHashCode());
+            Assert.AreNotEqual(min.GetHashCode(), Vector4.Zero.GetHashCode());
+
+            // Common values
+            var a = new Vector4(0f, 0f, 0f, 0f);
+            Assert.AreEqual(a.GetHashCode(), Vector4.Zero.GetHashCode(), "Shouldn't do object id compare.");
+            Assert.AreNotEqual(a.GetHashCode(), Vector4.One.GetHashCode());
+
+            // Individual properties alter hash
+            var xa = new Vector4(2f, 1f, 1f, 1f);
+            var xb = new Vector4(3f, 1f, 1f, 1f);
+            var ya = new Vector4(1f, 2f, 1f, 1f);
+            var yb = new Vector4(1f, 3f, 1f, 1f);
+            var za = new Vector4(1f, 1f, 2f, 1f);
+            var zb = new Vector4(1f, 1f, 3f, 1f);
+            var wa = new Vector4(1f, 1f, 1f, 2f);
+            var wb = new Vector4(1f, 1f, 1f, 3f);
+            Assert.AreNotEqual(xa.GetHashCode(), xb.GetHashCode(), "Different properties should change hash.");
+            Assert.AreNotEqual(ya.GetHashCode(), yb.GetHashCode(), "Different properties should change hash.");
+            Assert.AreNotEqual(za.GetHashCode(), zb.GetHashCode(), "Different properties should change hash.");
+            Assert.AreNotEqual(wa.GetHashCode(), wb.GetHashCode(), "Different properties should change hash.");
+            Assert.AreNotEqual(xa.GetHashCode(), ya.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(xb.GetHashCode(), yb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(xb.GetHashCode(), zb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(yb.GetHashCode(), zb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(xb.GetHashCode(), wb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(yb.GetHashCode(), wb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(xa.GetHashCode(), yb.GetHashCode());
+            Assert.AreNotEqual(ya.GetHashCode(), xb.GetHashCode());
+            Assert.AreNotEqual(xa.GetHashCode(), zb.GetHashCode());
+            Assert.AreNotEqual(xa.GetHashCode(), wb.GetHashCode());
+        }
     }
 }

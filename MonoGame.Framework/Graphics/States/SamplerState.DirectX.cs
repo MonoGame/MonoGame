@@ -37,8 +37,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 				desc.BorderColor = BorderColor.ToColor4();
 #endif
-				desc.Filter = GetFilter(Filter, ComparisonFunction != CompareFunction.Never);
-                desc.MaximumAnisotropy = MaxAnisotropy;
+				desc.Filter = GetFilter(Filter, FilterMode);
+                desc.MaximumAnisotropy = Math.Min(MaxAnisotropy, device.GraphicsCapabilities.MaxTextureAnisotropy);
                 desc.MipLodBias = MipMapLevelOfDetailBias;
                 desc.ComparisonFunction = ComparisonFunction.ToComparison();
 
@@ -58,77 +58,78 @@ namespace Microsoft.Xna.Framework.Graphics
             return _state;
         }
 
-        private static SharpDX.Direct3D11.Filter GetFilter(TextureFilter filter, bool comparison)
+        private static SharpDX.Direct3D11.Filter GetFilter(TextureFilter filter, TextureFilterMode mode)
         {
-            if (comparison)
+            switch (mode)
             {
-                switch (filter)
-                {
-                    case TextureFilter.Anisotropic:
-                        return SharpDX.Direct3D11.Filter.ComparisonAnisotropic;
+                case TextureFilterMode.Comparison:
+                    switch (filter)
+                    {
+                        case TextureFilter.Anisotropic:
+                            return SharpDX.Direct3D11.Filter.ComparisonAnisotropic;
 
-                    case TextureFilter.Linear:
-                        return SharpDX.Direct3D11.Filter.ComparisonMinMagMipLinear;
+                        case TextureFilter.Linear:
+                            return SharpDX.Direct3D11.Filter.ComparisonMinMagMipLinear;
 
-                    case TextureFilter.LinearMipPoint:
-                        return SharpDX.Direct3D11.Filter.ComparisonMinMagLinearMipPoint;
+                        case TextureFilter.LinearMipPoint:
+                            return SharpDX.Direct3D11.Filter.ComparisonMinMagLinearMipPoint;
 
-                    case TextureFilter.MinLinearMagPointMipLinear:
-                        return SharpDX.Direct3D11.Filter.ComparisonMinLinearMagPointMipLinear;
+                        case TextureFilter.MinLinearMagPointMipLinear:
+                            return SharpDX.Direct3D11.Filter.ComparisonMinLinearMagPointMipLinear;
 
-                    case TextureFilter.MinLinearMagPointMipPoint:
-                        return SharpDX.Direct3D11.Filter.ComparisonMinLinearMagMipPoint;
+                        case TextureFilter.MinLinearMagPointMipPoint:
+                            return SharpDX.Direct3D11.Filter.ComparisonMinLinearMagMipPoint;
 
-                    case TextureFilter.MinPointMagLinearMipLinear:
-                        return SharpDX.Direct3D11.Filter.ComparisonMinPointMagMipLinear;
+                        case TextureFilter.MinPointMagLinearMipLinear:
+                            return SharpDX.Direct3D11.Filter.ComparisonMinPointMagMipLinear;
 
-                    case TextureFilter.MinPointMagLinearMipPoint:
-                        return SharpDX.Direct3D11.Filter.ComparisonMinPointMagLinearMipPoint;
+                        case TextureFilter.MinPointMagLinearMipPoint:
+                            return SharpDX.Direct3D11.Filter.ComparisonMinPointMagLinearMipPoint;
 
-                    case TextureFilter.Point:
-                        return SharpDX.Direct3D11.Filter.ComparisonMinMagMipPoint;
+                        case TextureFilter.Point:
+                            return SharpDX.Direct3D11.Filter.ComparisonMinMagMipPoint;
 
-                    case TextureFilter.PointMipLinear:
-                        return SharpDX.Direct3D11.Filter.ComparisonMinMagPointMipLinear;
+                        case TextureFilter.PointMipLinear:
+                            return SharpDX.Direct3D11.Filter.ComparisonMinMagPointMipLinear;
 
-                    default:
-                        throw new ArgumentException("Invalid texture filter!");
-                }
-            }
-            else
-            {
-                switch (filter)
-                {
-                    case TextureFilter.Anisotropic:
-                        return SharpDX.Direct3D11.Filter.Anisotropic;
+                        default:
+                            throw new ArgumentException("Invalid texture filter!");
+                    }
+                case TextureFilterMode.Default:
+                    switch (filter)
+                    {
+                        case TextureFilter.Anisotropic:
+                            return SharpDX.Direct3D11.Filter.Anisotropic;
 
-                    case TextureFilter.Linear:
-                        return SharpDX.Direct3D11.Filter.MinMagMipLinear;
+                        case TextureFilter.Linear:
+                            return SharpDX.Direct3D11.Filter.MinMagMipLinear;
 
-                    case TextureFilter.LinearMipPoint:
-                        return SharpDX.Direct3D11.Filter.MinMagLinearMipPoint;
+                        case TextureFilter.LinearMipPoint:
+                            return SharpDX.Direct3D11.Filter.MinMagLinearMipPoint;
 
-                    case TextureFilter.MinLinearMagPointMipLinear:
-                        return SharpDX.Direct3D11.Filter.MinLinearMagPointMipLinear;
+                        case TextureFilter.MinLinearMagPointMipLinear:
+                            return SharpDX.Direct3D11.Filter.MinLinearMagPointMipLinear;
 
-                    case TextureFilter.MinLinearMagPointMipPoint:
-                        return SharpDX.Direct3D11.Filter.MinLinearMagMipPoint;
+                        case TextureFilter.MinLinearMagPointMipPoint:
+                            return SharpDX.Direct3D11.Filter.MinLinearMagMipPoint;
 
-                    case TextureFilter.MinPointMagLinearMipLinear:
-                        return SharpDX.Direct3D11.Filter.MinPointMagMipLinear;
+                        case TextureFilter.MinPointMagLinearMipLinear:
+                            return SharpDX.Direct3D11.Filter.MinPointMagMipLinear;
 
-                    case TextureFilter.MinPointMagLinearMipPoint:
-                        return SharpDX.Direct3D11.Filter.MinPointMagLinearMipPoint;
+                        case TextureFilter.MinPointMagLinearMipPoint:
+                            return SharpDX.Direct3D11.Filter.MinPointMagLinearMipPoint;
 
-                    case TextureFilter.Point:
-                        return SharpDX.Direct3D11.Filter.MinMagMipPoint;
+                        case TextureFilter.Point:
+                            return SharpDX.Direct3D11.Filter.MinMagMipPoint;
 
-                    case TextureFilter.PointMipLinear:
-                        return SharpDX.Direct3D11.Filter.MinMagPointMipLinear;
+                        case TextureFilter.PointMipLinear:
+                            return SharpDX.Direct3D11.Filter.MinMagPointMipLinear;
 
-                    default:
-                        throw new ArgumentException("Invalid texture filter!");
-                }
+                        default:
+                            throw new ArgumentException("Invalid texture filter!");
+                    }
+                default:
+                    throw new ArgumentException("Invalid texture filter mode!");
             }
         }
 
@@ -153,11 +154,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        protected override void Dispose(bool disposing)
+        partial void PlatformDispose()
         {
-            if (disposing)
-                SharpDX.Utilities.Dispose(ref _state);
-            base.Dispose(disposing);
+            SharpDX.Utilities.Dispose(ref _state);
         }
     }
 }

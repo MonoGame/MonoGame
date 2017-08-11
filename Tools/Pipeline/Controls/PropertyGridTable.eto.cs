@@ -14,10 +14,10 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitializeComponent()
         {
-            BackgroundColor = PropInfo.BackColor;
+            BackgroundColor = DrawInfo.BackColor;
 
             pixel1 = new PixelLayout();
-            pixel1.BackgroundColor = PropInfo.BackColor;
+            pixel1.BackgroundColor = DrawInfo.BackColor;
 
             drawable = new Drawable();
             drawable.Height = 100;
@@ -28,12 +28,15 @@ namespace MonoGame.Tools.Pipeline
             pixel1.Style = "Stretch";
             drawable.Style = "Stretch";
 
+#if MONOMAC
+            drawable.Width = 10;
+#endif
+
             drawable.Paint += Drawable_Paint;
             drawable.MouseDown += Drawable_MouseDown;
             drawable.MouseUp += Drawable_MouseUp;
             drawable.MouseMove += Drawable_MouseMove;
             drawable.MouseLeave += Drawable_MouseLeave;
-            drawable.MouseDoubleClick += Drawable_MouseDoubleClick;
             SizeChanged += PropertyGridTable_SizeChanged;
         }
     }

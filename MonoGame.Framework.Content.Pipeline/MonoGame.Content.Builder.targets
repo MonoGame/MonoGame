@@ -26,8 +26,10 @@
       <MonoGameContentBuilderExe Condition="'$(MonoGameContentBuilderExe)' == ''">$(MSBuildThisFileDirectory)Tools\MGCB.exe</MonoGameContentBuilderExe>
       <MonoGameContentBuilderCmd>&quot;$(MonoGameContentBuilderExe)&quot;</MonoGameContentBuilderCmd>
       <MonoGameContentBuilderCmd Condition=" '$(OS)' != 'Windows_NT' ">$(MonoExe) $(MonoGameContentBuilderCmd)</MonoGameContentBuilderCmd>
-      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'">Resources\</PlatformResourcePrefix>
-      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'Android'">Assets\</PlatformResourcePrefix>
+
+      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'MacOSX'">$(MonoMacResourcePrefix)\</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'iOS'">$(IPhoneResourcePrefix)\</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'Android'">$(MonoAndroidAssetsPrefix)\</PlatformResourcePrefix>
       <PlatformResourcePrefix Condition="'$(PlatformResourcePrefix)' == ''"></PlatformResourcePrefix>
       <Header>/platform:$(MonoGamePlatform) </Header>
     </PropertyGroup>
@@ -41,7 +43,7 @@
       </ContentReferences>
     </ItemGroup>
 
-    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsStoreApp, WindowsPhone8, MacOSX, iOS, Linux, DesktopGL, RaspberryPi, Android, Ouya, NativeClient, PlayStation4, or PlayStationMobile."
+    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsStoreApp, WindowsPhone8, MacOSX, iOS, Linux, DesktopGL, RaspberryPi, Android, NativeClient, PlayStation4, or PlayStationMobile."
        Condition="	'$(MonoGamePlatform)' != 'Windows' And
 			'$(MonoGamePlatform)' != 'iOS' And       
 			'$(MonoGamePlatform)' != 'Android' And       
@@ -50,11 +52,12 @@
 			'$(MonoGamePlatform)' != 'MacOSX' And       
 			'$(MonoGamePlatform)' != 'WindowsStoreApp' And       
 			'$(MonoGamePlatform)' != 'NativeClient' And       
-			'$(MonoGamePlatform)' != 'Ouya' And       
 			'$(MonoGamePlatform)' != 'PlayStationMobile' And       
 			'$(MonoGamePlatform)' != 'WindowsPhone8' And       
 			'$(MonoGamePlatform)' != 'RaspberryPi' And       
 			'$(MonoGamePlatform)' != 'PlayStation4' And       
+			'$(MonoGamePlatform)' != 'PSVita' And       
+			'$(MonoGamePlatform)' != 'XboxOne' And       
 			'$(MonoGamePlatform)' != 'WindowsGL'" />
 
     <Error

@@ -11,8 +11,7 @@ namespace MonoGame.Tools.Pipeline
     {
         public static void Load()
         {
-        	
+            
         }
     }
 }
-

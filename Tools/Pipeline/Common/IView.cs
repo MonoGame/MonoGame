@@ -77,5 +77,7 @@ namespace MonoGame.Tools.Pipeline
         void UpdateCommands(MenuInfo info);
 
         void UpdateRecentList(List<string> recentList);
+
+        void SetClipboard(string text);
     }
 }

@@ -7,18 +7,20 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
+    [CellAttribute(typeof(string), Name = "IntermediateDir")]
+    [CellAttribute(typeof(string), Name = "OutputDir")]
     public class CellPath : CellBase
     {
-        public CellPath(string category, string name, object value, EventHandler eventHandler) : base(category, name, value, eventHandler)
+        public override void OnCreate()
         {
-            if (value == null)
+            if (Value == null)
                 Value = "";
         }
 
         public override void Edit(PixelLayout control)
         {
             var dialog = new PathDialog(PipelineController.Instance, Value.ToString());
-            if (dialog.Run(control) == DialogResult.Ok && _eventHandler != null)
+            if (dialog.ShowModal(control) && _eventHandler != null)
                 _eventHandler(dialog.Path, EventArgs.Empty);
         }
     }

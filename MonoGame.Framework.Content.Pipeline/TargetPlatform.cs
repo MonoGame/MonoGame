@@ -24,11 +24,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         Xbox360,
 
-        /// <summary>
-        /// Windows Phone
-        /// </summary>
-        WindowsPhone,
-
         // MonoGame-specific platforms listed below
 
         /// <summary>
@@ -90,6 +85,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Sony PlayStation4
         /// </summary>
         PlayStation4,
+
+        /// <summary>
+        /// PlayStation Vita
+        /// </summary>
+        PSVita,
+       
+        /// <summary>
+        /// Xbox One
+        /// </summary>
+        XboxOne,
+
+        /// <summary>
+        /// Nintendo Switch
+        /// </summary>
+        Switch,
     }
 
 

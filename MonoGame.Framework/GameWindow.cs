@@ -120,10 +120,9 @@ namespace Microsoft.Xna.Framework {
 		{
 		}
 
-		protected void OnClientSizeChanged ()
+		internal void OnClientSizeChanged ()
 		{
-			if (ClientSizeChanged != null)
-				ClientSizeChanged (this, EventArgs.Empty);
+            EventHelpers.Raise(this, ClientSizeChanged, EventArgs.Empty);
 		}
 
 		protected void OnDeactivated ()
@@ -132,8 +131,7 @@ namespace Microsoft.Xna.Framework {
          
 		protected void OnOrientationChanged ()
 		{
-			if (OrientationChanged != null)
-				OrientationChanged (this, EventArgs.Empty);
+            EventHelpers.Raise(this, OrientationChanged, EventArgs.Empty);
 		}
 
 		protected void OnPaint ()
@@ -142,15 +140,13 @@ namespace Microsoft.Xna.Framework {
 
 		protected void OnScreenDeviceNameChanged ()
 		{
-			if (ScreenDeviceNameChanged != null)
-				ScreenDeviceNameChanged (this, EventArgs.Empty);
+            EventHelpers.Raise(this, ScreenDeviceNameChanged, EventArgs.Empty);
 		}
 
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
 		protected void OnTextInput(object sender, TextInputEventArgs e)
 		{
-			if (TextInput != null)
-				TextInput(sender, e);
+            EventHelpers.Raise(this, TextInput, e);
 		}
 #endif
 

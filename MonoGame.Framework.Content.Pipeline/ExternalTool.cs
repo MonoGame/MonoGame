@@ -114,6 +114,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </remarks>
         private static string FindCommand(string command)
         {
+            // Expand any environment variables.
+            command = Environment.ExpandEnvironmentVariables(command);
+
             // If we have a full path just pass it through.
             if (File.Exists(command))
                 return command;
@@ -138,6 +141,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Safely deletes the file if it exists.
+        /// </summary>
+        /// <param name="filePath">The path to the file to delete.</param>
+        public static void DeleteFile(string filePath)
+        {
+            try
+            {
+                File.Delete(filePath);
+            }
+            catch (Exception)
+            {                    
+            }
         }
     }
 }

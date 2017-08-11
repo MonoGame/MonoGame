@@ -6,8 +6,9 @@ using System;
 using System.IO;
 using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
+using Microsoft.Xna.Framework;
 
-namespace MonoGame.Tests.Framework.Audio
+namespace MonoGame.Tests.Audio
 {
     [TestFixture]
     public class XactTests
@@ -19,6 +20,8 @@ namespace MonoGame.Tests.Framework.Audio
         [SetUp]
         public void Setup()
         {
+            // Necessary to get audio initialised
+            FrameworkDispatcher.Update();
             _audioEngine = new AudioEngine(@"Assets\Audio\Win\Tests.xgs");
             _waveBank = new WaveBank(_audioEngine, @"Assets\Audio\Win\Tests.xwb");
             _soundBank = new SoundBank(_audioEngine, @"Assets\Audio\Win\Tests.xsb");
@@ -183,6 +186,20 @@ namespace MonoGame.Tests.Framework.Audio
             Assert.False(cue.IsDisposed);
 
             // Make sure the initial state is correct.
+            Assert.False(cue.IsCreated);
+            Assert.False(cue.IsPreparing);
+            Assert.True(cue.IsPrepared);
+            Assert.False(cue.IsPlaying);
+            Assert.False(cue.IsPaused);
+            Assert.False(cue.IsStopped);
+            Assert.False(cue.IsStopping);
+
+            cue.Play ();
+            cue.Stop (AudioStopOptions.Immediate);
+
+            cue = _soundBank.GetCue ("blast_mono");
+
+            // Make sure the initial state is reset
             Assert.False(cue.IsCreated);
             Assert.False(cue.IsPreparing);
             Assert.True(cue.IsPrepared);

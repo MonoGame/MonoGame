@@ -21,9 +21,9 @@ namespace Microsoft.Xna.Framework.Content
             // Int32	Loop length	In bytes (length must be format block aligned)
             // Int32	Duration	In milliseconds
 
-            // WAVEFORMATEX structure...
+            // The header containss the WAVEFORMATEX header structure
+            // defined as the following...
             //
-            //typedef struct {
             //  WORD  wFormatTag;       // byte[0]  +2
             //  WORD  nChannels;        // byte[2]  +2
             //  DWORD nSamplesPerSec;   // byte[4]  +4
@@ -31,25 +31,26 @@ namespace Microsoft.Xna.Framework.Content
             //  WORD  nBlockAlign;      // byte[12] +2
             //  WORD  wBitsPerSample;   // byte[14] +2
             //  WORD  cbSize;           // byte[16] +2
-            //} WAVEFORMATEX;
-            
-            var header = input.ReadBytes(input.ReadInt32());
-            var data = input.ReadBytes(input.ReadInt32());
+            //
+            // We let the sound effect deal with parsing this based
+            // on what format the audio data actually is.
+
+		    var headerSize = input.ReadInt32();
+            var header = input.ReadBytes(headerSize);
+
+            // Read the audio data buffer.
+            var dataSize = input.ReadInt32();
+            var data = input.ContentManager.GetScratchBuffer(dataSize);
+            input.Read(data, 0, dataSize);
+
             var loopStart = input.ReadInt32();
             var loopLength = input.ReadInt32();
             var durationMs = input.ReadInt32();
 
-            var format = (int)BitConverter.ToUInt16(header, 0);
-            var channels = BitConverter.ToUInt16(header, 2);
-            var sampleRate = (int)BitConverter.ToUInt16(header, 4);
-            //var avgBPS = (int)BitConverter.ToUInt16(header, 8);
-            var blockAlignment = (int)BitConverter.ToUInt16(header, 12);
-            //var bps = (int)BitConverter.ToUInt16(header, 14);
-            // used to be calculated based on bps. This works for ADPCM, too
-            TimeSpan duration = TimeSpan.FromSeconds((float)loopLength / sampleRate);
+            // Create the effect.
+            var effect = new SoundEffect(header, data, dataSize, durationMs, loopStart, loopLength);
 
-            // Initialize the effect.
-            var effect = new SoundEffect(data, format, sampleRate, channels, blockAlignment, durationMs, loopStart, loopLength);
+            // Store the original asset name for debugging later.
             effect.Name = input.AssetName;
 
             return effect;

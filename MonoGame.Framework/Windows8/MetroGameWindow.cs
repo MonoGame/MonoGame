@@ -5,7 +5,6 @@
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -29,7 +28,16 @@ namespace Microsoft.Xna.Framework
 #if !WINDOWS_PHONE81
         private ApplicationViewState _currentViewState;
 #endif
-        private InputEvents _windowEvents;
+
+        private object _eventLocker = new object();
+        
+        private InputEvents _inputEvents;
+        private bool _isSizeChanged = false;
+        private Rectangle _newClientBounds;
+        private bool _isOrientationChanged = false;
+        private DisplayOrientation _newOrientation;
+        private bool _isFocusChanged = false;
+        private CoreWindowActivationState _newActivationState;
 
 
         private Vector2 _backBufferScale;
@@ -103,7 +111,7 @@ namespace Microsoft.Xna.Framework
         public void Initialize(CoreWindow coreWindow, UIElement inputElement, TouchQueue touchQueue)
         {
             _coreWindow = coreWindow;
-            _windowEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
+            _inputEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
 
             _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
@@ -123,10 +131,24 @@ namespace Microsoft.Xna.Framework
 
         private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
         {
-            if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
-                Platform.IsActive = false;
-            else
-                Platform.IsActive = true;
+            lock (_eventLocker)
+            {
+                _isFocusChanged = true;
+                _newActivationState = args.WindowActivationState;
+            }
+        }
+
+        private void UpdateFocus()
+        {
+            lock (_eventLocker)
+            {
+                _isFocusChanged = false;
+
+                if (_newActivationState == CoreWindowActivationState.Deactivated)
+                    Platform.IsActive = false;
+                else
+                    Platform.IsActive = true;
+            }
         }
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
@@ -146,53 +168,70 @@ namespace Microsoft.Xna.Framework
 
         private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
-            var manager = Game.graphicsDeviceManager;
-
-            // If we haven't calculated the back buffer scale then do it now.
-            if (_backBufferScale == Vector2.Zero)
+            lock (_eventLocker)
             {
-                // Make sure the scale is calculated in terms of the same orientation as the preferred back buffer
-                float clientWidth;
-                float clientHeight;
-                if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
-                {
-                    clientWidth = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
-                    clientHeight = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
-                }
-                else
-                {
-                    clientWidth = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
-                    clientHeight = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
-                }
-                _backBufferScale = new Vector2( manager.PreferredBackBufferWidth / clientWidth, 
-                                                manager.PreferredBackBufferHeight / clientHeight);
+                _isSizeChanged = true;
+                var dpi = DisplayProperties.LogicalDpi;
+                var pwidth = (int)Math.Round(args.Size.Width * dpi / 96.0);
+                var pheight = (int)Math.Round(args.Size.Height * dpi / 96.0);
+                _newClientBounds = new Rectangle(0, 0, pwidth, pheight);
             }
+        }
 
-            // Set the new client bounds.
-            SetClientBounds(args.Size.Width, args.Size.Height);
+        private void UpdateSize()
+        {
+            lock (_eventLocker)
+            {
+                _isSizeChanged = false;
 
-            // Set the default new back buffer size and viewport, but this
-            // can be overloaded by the two events below.
+                var manager = Game.graphicsDeviceManager;
+
+                // If we haven't calculated the back buffer scale then do it now.
+                if (_backBufferScale == Vector2.Zero)
+                {
+                    // Make sure the scale is calculated in terms of the same orientation as the preferred back buffer
+                    float clientWidth;
+                    float clientHeight;
+                    if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
+                    {
+                        clientWidth = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
+                        clientHeight = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
+                    }
+                    else
+                    {
+                        clientWidth = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
+                        clientHeight = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
+                    }
+                    _backBufferScale = new Vector2( manager.PreferredBackBufferWidth / clientWidth, 
+                                                    manager.PreferredBackBufferHeight / clientHeight);
+                }
+
+                // Set the new client bounds.
+                _clientBounds = _newClientBounds;
+
+                // Set the default new back buffer size and viewport, but this
+                // can be overloaded by the two events below.
             
-            var newWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
-            var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
-            manager.PreferredBackBufferWidth = newWidth;
-            manager.PreferredBackBufferHeight = newHeight;
-            if(manager.GraphicsDevice!=null)
-            manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
+                var newWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
+                var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
+                manager.PreferredBackBufferWidth = newWidth;
+                manager.PreferredBackBufferHeight = newHeight;
+                if(manager.GraphicsDevice!=null)
+                    manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);
 
-            // If we have a valid client bounds then 
-            // update the graphics device.
-            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-                manager.ApplyChanges();
+                // If we have a valid client bounds then 
+                // update the graphics device.
+                if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+                    manager.ApplyChanges();
 
-            // Set the new view state which will trigger the 
-            // Game.ApplicationViewChanged event and signal
-            // the client size changed event.
+                // Set the new view state which will trigger the 
+                // Game.ApplicationViewChanged event and signal
+                // the client size changed event.
 #if !WINDOWS_PHONE81
-            Platform.ViewState = ApplicationView.Value;
+                Platform.ViewState = ApplicationView.Value;
 #endif
-            OnClientSizeChanged();
+                OnClientSizeChanged();
+            }
         }
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
@@ -227,15 +266,29 @@ namespace Microsoft.Xna.Framework
 
         private void DisplayProperties_OrientationChanged(object sender)
         {
-            // Set the new orientation.
-            _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
+            lock (_eventLocker)
+            {
+                _isOrientationChanged = true;
+                _newOrientation = ToOrientation(DisplayProperties.CurrentOrientation);
+            }
+        }
 
-            // Call the user callback.
-            OnOrientationChanged();
+        private void UpdateOrientation()
+        {
+            lock (_eventLocker)
+            {
+                _isOrientationChanged = false;
 
-            // If we have a valid client bounds then update the graphics device.
-            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-                Game.graphicsDeviceManager.ApplyChanges();
+                // Set the new orientation.
+                _orientation = _newOrientation;
+
+                // Call the user callback.
+                OnOrientationChanged();
+
+                // If we have a valid client bounds then update the graphics device.
+                if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+                    Game.graphicsDeviceManager.ApplyChanges();
+            }
         }
 
         protected override void SetTitle(string title)
@@ -249,10 +302,13 @@ namespace Microsoft.Xna.Framework
             if ( _coreWindow == null )
                 return;
 
-            if (visible)
-                _coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
-            else
-                _coreWindow.PointerCursor = null;
+            var asyncResult = _coreWindow.Dispatcher.RunIdleAsync( (e) =>
+            {            
+                if (visible)
+                    _coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
+                else
+                    _coreWindow.PointerCursor = null;
+            });
         }
 
         internal void RunLoop()
@@ -278,10 +334,27 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        void ProcessWindowEvents()
+        {
+            // Update input
+            _inputEvents.UpdateState();
+
+            // Update size
+            if (_isSizeChanged)
+                UpdateSize();
+
+            // Update orientation
+            if (_isOrientationChanged)
+                UpdateOrientation();
+
+            if (_isFocusChanged)
+                UpdateFocus();
+        }
+
         internal void Tick()
         {
             // Update state based on window events.
-            _windowEvents.UpdateState();
+            ProcessWindowEvents();
 
             // Update and render the game.
             if (Game != null)

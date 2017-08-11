@@ -8,15 +8,16 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
+    [CellAttribute(typeof(Microsoft.Xna.Framework.Color))]
     public class CellColor : CellBase
     {
-        private readonly Color color;
+        private Color color;
 
-        public CellColor(string category, string name, object value, EventHandler eventHandler) : base(category, name, value, eventHandler)
+        public override void OnCreate()
         {
-            if (value != null)
+            if (Value != null)
             {
-                var tmp = (Microsoft.Xna.Framework.Color)value;
+                var tmp = (Microsoft.Xna.Framework.Color)Value;
                 color = new Color(tmp.R / 255f, tmp.G / 255f, tmp.B / 255f, tmp.A / 255f);
             }
             else
