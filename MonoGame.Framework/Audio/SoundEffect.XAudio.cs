@@ -167,9 +167,9 @@ namespace Microsoft.Xna.Framework.Audio
             return DataStream.Create(data, true, false);
         }
 
-        private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleBits, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
-            CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
+            CreateBuffers(  new WaveFormat(sampleRate, sampleBits, (int)channels),
                             ToDataStream(offset, buffer, count),
                             loopStart, 
                             loopLength);
@@ -181,12 +181,15 @@ namespace Microsoft.Xna.Framework.Audio
             var channels = BitConverter.ToInt16(header, 2);
             var sampleRate = BitConverter.ToInt32(header, 4);
             var blockAlignment = BitConverter.ToInt16(header, 12);
+            var sampleBits = BitConverter.ToInt16(header, 14);
 
             WaveFormat waveFormat;
             if (format == 1)
-                waveFormat = new WaveFormat(sampleRate, channels);
+                waveFormat = new WaveFormat(sampleRate, sampleBits, channels);
             else if (format == 2)
                 waveFormat = new WaveFormatAdpcm(sampleRate, channels, blockAlignment);
+            else if (format == 3)
+                waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, channels);
             else
                 throw new NotSupportedException("Unsupported wave format!");
 
@@ -213,18 +216,39 @@ namespace Microsoft.Xna.Framework.Audio
             throw new NotSupportedException("Unsupported sound format!");
         }
 
-        private void PlatformLoadAudioStream(Stream s, out TimeSpan duration)
+        private void PlatformLoadAudioStream(Stream stream, out TimeSpan duration)
         {
-            var soundStream = new SoundStream(s);
-            if (soundStream.Format.Encoding != WaveFormatEncoding.Pcm)
-                throw new ArgumentException("Ensure that the specified stream contains valid PCM mono or stereo wave data.");
+            SoundStream soundStream = null;
+            try
+            {
+                soundStream = new SoundStream(stream);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new ArgumentException("Ensure that the specified stream contains valid PCM or IEEE Float wave data.", ex);
+            }
 
             var dataStream = soundStream.ToDataStream();
-            var sampleCount = (int)(dataStream.Length / ((soundStream.Format.Channels * soundStream.Format.BitsPerSample) / 8));
+            int sampleCount = 0;
+            switch (soundStream.Format.Encoding)
+            {
+                case WaveFormatEncoding.Adpcm:
+                    {
+                        var samplesPerBlock = (soundStream.Format.BlockAlign / soundStream.Format.Channels - 7) * 2 + 2;
+                        sampleCount = ((int)dataStream.Length / soundStream.Format.BlockAlign) * samplesPerBlock;
+                    }
+                    break;
+                case WaveFormatEncoding.Pcm:
+                case WaveFormatEncoding.IeeeFloat:
+                    sampleCount = (int)(dataStream.Length / ((soundStream.Format.Channels * soundStream.Format.BitsPerSample) / 8));
+                    break;
+                default:
+                    throw new ArgumentException("Ensure that the specified stream contains valid PCM, MS-ADPCM or IEEE Float wave data.");
+            }
 
             CreateBuffers(soundStream.Format, dataStream, 0, sampleCount);
 
-            duration = TimeSpan.FromSeconds((float)sampleCount / soundStream.Format.SampleRate);
+            duration = TimeSpan.FromSeconds((float)sampleCount / (float)soundStream.Format.SampleRate);
         }
 
         private void CreateBuffers(WaveFormat format, DataStream dataStream, int loopStart, int loopLength)

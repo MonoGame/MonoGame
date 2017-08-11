@@ -161,7 +161,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] {"\n", "\r", Environment.NewLine},
                                                                       StringSplitOptions.RemoveEmptyEntries);
 
-            var errorOrWarning = new Regex(@"(.*)\(([0-9,]*)\)\s*:\s*(.*)", RegexOptions.Compiled);
+            var errorOrWarning = new Regex(@"(.*)\(([0-9]*(,[0-9]+(-[0-9]+)?)?)\)\s*:\s*(.*)", RegexOptions.Compiled);
             ContentIdentity identity = null;
             var allErrorsAndWarnings = string.Empty;
 

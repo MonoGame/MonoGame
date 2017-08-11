@@ -143,6 +143,7 @@ namespace MonoGame.Framework
             Form.StartPosition = FormStartPosition.Manual;
 
             // Capture mouse events.
+            Mouse.WindowHandle = Form.Handle;
             Form.MouseWheel += OnMouseScroll;
             Form.MouseHorizontalWheel += OnMouseHorizontalScroll;
             Form.MouseEnter += OnMouseEnter;
@@ -447,7 +448,7 @@ namespace MonoGame.Framework
             }
             _platform = null;
             Game = null;
-            Mouse.Window = null;
+            Mouse.WindowHandle = IntPtr.Zero;
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)

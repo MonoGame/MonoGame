@@ -33,33 +33,6 @@
   </Properties>
 
   <Files>
-    <!-- Dependencies -->
-    <None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
-      <Platforms>WindowsGL</Platforms>
-      <Link>SDL2.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
-      <Platforms>WindowsGL</Platforms>
-      <Link>soft_oal.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
-      <Platforms>Linux</Platforms>
-      <Link>x64\libSDL2-2.0.so.0</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
-      <Platforms>Linux</Platforms>
-      <Link>x64\libopenal.so.1</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-
-    <None Include="MonoGame.Tests.dll.config">
-      <Platforms>Linux</Platforms>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-
 
     <None Include="ReadMe.md" />
 
@@ -347,6 +320,72 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Audio\rock_loop_stereo_44hz_adpcm_ms.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_8bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_16bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_16bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_24bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_float.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_float.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_imaadpcm.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_imaadpcm.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_msadpcm.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_msadpcm.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_8bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_16bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_16bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_24bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_float.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_float.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_imaadpcm.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_imaadpcm.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_msadpcm.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_msadpcm.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 

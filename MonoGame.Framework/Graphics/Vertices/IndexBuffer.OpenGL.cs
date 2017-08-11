@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class IndexBuffer
     {
-		internal uint ibo;	
+		internal int ibo;	
 
         private void PlatformConstruct(IndexElementSize indexElementSize, int indexCount)
         {
@@ -152,13 +152,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                Threading.BlockOnUIThread(() =>
-                {
-                    GL.DeleteBuffers(1, ref ibo);
-                    GraphicsExtensions.CheckGLError();
-                });
+                GraphicsDevice.DisposeBuffer(ibo);
             }
-
             base.Dispose(disposing);
         }
 	}

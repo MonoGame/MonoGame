@@ -139,7 +139,7 @@ chmod +x /usr/bin/mgcb
 # MonoGame icon
 mkdir -p /usr/share/icons/hicolor/scalable/mimetypes
 cp $DIR/Main/monogame.svg /usr/share/icons/hicolor/scalable/mimetypes/monogame.svg
-gtk-update-icon-cache /usr/share/icons/hicolor/ -f
+gtk-update-icon-cache /usr/share/icons/hicolor/ -f &> /dev/null
 
 # Application launcher
 cat > /usr/share/applications/MonogamePipeline.desktop <<'endmsg'

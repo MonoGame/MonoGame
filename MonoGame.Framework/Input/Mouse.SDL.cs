@@ -11,9 +11,13 @@ namespace Microsoft.Xna.Framework.Input
         internal static int ScrollX;
         internal static int ScrollY;
 
-        private static IntPtr PlatformGetHandle()
+        private static IntPtr PlatformGetWindowHandle()
         {
             return PrimaryWindow.Handle;
+        }
+        
+        private static void PlatformSetWindowHandle(IntPtr windowHandle)
+        {
         }
 
         private static MouseState PlatformGetState(GameWindow window)

@@ -108,6 +108,7 @@ namespace Microsoft.Xna.Framework
                 SdlRunLoop();
                 Game.Tick();
                 Threading.Run();
+                GraphicsDevice.DisposeContexts();
 
                 if (_isExiting > 0)
                     break;
@@ -228,6 +229,7 @@ namespace Microsoft.Xna.Framework
         {
             if (Game.GraphicsDevice != null)
                 Game.GraphicsDevice.Present();
+
         }
 
         protected override void Dispose(bool disposing)

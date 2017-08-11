@@ -48,8 +48,6 @@ namespace MonoGame.Tools.Pipeline
             get { return _templateItems; }
         }
 
-        public bool LaunchDebugger { get; set; }
-
         public PipelineProject ProjectItem
         {
             get
@@ -257,13 +255,19 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
+            var errortext = "Failed to open the project due to an unknown error.";
+
             try
             {
                 _actionStack.Clear();
                 _project = new PipelineProject();
                 
                 var parser = new PipelineProjectParser(this, _project);
-                var errorCallback = new MGBuildParser.ErrorCallback((msg, args) => View.OutputAppend(string.Format(Path.GetFileName(projectFilePath) + ": " + msg, args)));
+                var errorCallback = new MGBuildParser.ErrorCallback((msg, args) =>
+                {
+                    errortext = string.Format(msg, args);
+                    throw new Exception();
+                });
                 parser.OpenProject(projectFilePath, errorCallback);
 
                 ResolveTypes();
@@ -278,7 +282,7 @@ namespace MonoGame.Tools.Pipeline
             }
             catch (Exception)
             {
-                View.ShowError("Open Project", "Failed to open project!");
+                View.ShowError("Error Opening Project", Path.GetFileName(projectFilePath) + ": " + errortext);
                 return;
             }
 
@@ -387,8 +391,6 @@ namespace MonoGame.Tools.Pipeline
         public void Build(bool rebuild)
         {
             var commands = string.Format("/@:\"{0}\" {1}", _project.OriginalPath, rebuild ? "/rebuild" : string.Empty);
-            if (LaunchDebugger)
-                commands += " /launchdebugger";
             BuildCommand(commands);
         }
 
@@ -442,9 +444,6 @@ namespace MonoGame.Tools.Pipeline
 
             // Run the build the command.
             var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
-            if (LaunchDebugger)
-                commands += " /launchdebugger";
-
             BuildCommand(commands);
 
             // Cleanup the temp file once we're done.
@@ -477,8 +476,6 @@ namespace MonoGame.Tools.Pipeline
             View.OutputClear();
 
             var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
-            if (LaunchDebugger)
-                commands += " /launchdebugger";
 
             _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
             _buildTask.ContinueWith((e) => View.Invoke(UpdateMenu));

@@ -93,6 +93,29 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(0, devLostCount);
         }
 
+        [Test]
+        public void ResetDoesNotClearState()
+        {
+            gd.RasterizerState = RasterizerState.CullNone;
+            gd.BlendState = BlendState.NonPremultiplied;
+            gd.DepthStencilState = DepthStencilState.None;
+            gd.SamplerStates[0] = SamplerState.PointClamp;
+            var vbb = new VertexBufferBinding(new VertexBuffer(gd, VertexPositionColor.VertexDeclaration, 5, BufferUsage.WriteOnly));
+            gd.SetVertexBuffers(vbb);
+
+            gd.Reset();
+
+            Assert.AreEqual(RasterizerState.CullNone, gd.RasterizerState);
+            Assert.AreEqual(BlendState.NonPremultiplied, gd.BlendState);
+            Assert.AreEqual(DepthStencilState.None, gd.DepthStencilState);
+            Assert.AreEqual(SamplerState.PointClamp, gd.SamplerStates[0]);
+            // TODO GetVertexBuffers is not implemented in MG
+#if XNA
+            Assert.AreEqual(vbb, gd.GetVertexBuffers()[0]);
+#endif
+            vbb.VertexBuffer.Dispose();
+        }
+
         // TODO Make sure dynamic graphics resources are notified when graphics device is lost
         [Test, Ignore]
         public void ContentLostResources()

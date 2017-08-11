@@ -59,7 +59,13 @@ namespace Microsoft.Xna.Framework.Graphics
     internal class ShaderProgramCache : IDisposable
     {
         private readonly Dictionary<int, ShaderProgram> _programCache = new Dictionary<int, ShaderProgram>();
+        GraphicsDevice _graphicsDevice;
         bool disposed;
+
+        public ShaderProgramCache(GraphicsDevice graphicsDevice)
+        {
+            _graphicsDevice = graphicsDevice;
+        }
 
         ~ShaderProgramCache()
         {
@@ -73,15 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             foreach (var pair in _programCache)
             {
-                if (GL.IsProgram(pair.Value.Program))
-                {
-#if MONOMAC
-                    GL.DeleteProgram(pair.Value.Program, null);
-#else
-                    GL.DeleteProgram(pair.Value.Program);
-#endif
-                    GraphicsExtensions.CheckGLError();
-                }
+                _graphicsDevice.DisposeProgram(pair.Value.Program);
             }
             _programCache.Clear();
         }
@@ -138,11 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Console.WriteLine(log);
                 GL.DetachShader(program, vertexShader.GetShaderHandle());
                 GL.DetachShader(program, pixelShader.GetShaderHandle());
-#if MONOMAC
-                GL.DeleteProgram(1, ref program);
-#else
-                GL.DeleteProgram(program);
-#endif
+                _graphicsDevice.DisposeProgram(program);
                 throw new InvalidOperationException("Unable to link effect program");
             }
 

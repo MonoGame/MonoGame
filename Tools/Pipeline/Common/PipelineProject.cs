@@ -33,6 +33,8 @@ namespace MonoGame.Tools.Pipeline
 
         public bool Compress { get; set; }
 
+        public bool LaunchDebugger { get; set; }
+
         #region IPipelineItem
 
         [Category("Common")]
