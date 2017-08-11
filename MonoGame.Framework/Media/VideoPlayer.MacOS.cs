@@ -3,15 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.Foundation;
-using MonoMac.QTKit;
-using RectF = System.Drawing.RectangleF;
-#else
 using Foundation;
 using QTKit;
 using RectF = CoreGraphics.CGRect;
-#endif
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Media

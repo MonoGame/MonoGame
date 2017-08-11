@@ -7,13 +7,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 #if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.AppKit;
-using MonoMac.Foundation;
-#else
 using AppKit;
 using Foundation;
-#endif
 #elif IOS
 using UIKit;
 #elif ANDROID

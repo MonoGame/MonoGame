@@ -5,12 +5,7 @@
 using System;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Utilities;
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-using GLPixelFormat = MonoMac.OpenGL.All;
-using Bool = MonoMac.OpenGL.Boolean;
-#endif
-#if (MONOMAC && !PLATFORM_MACOS_LEGACY)
+#if MONOMAC
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
 using PixelInternalFormat = OpenTK.Graphics.OpenGL.PixelFormat;

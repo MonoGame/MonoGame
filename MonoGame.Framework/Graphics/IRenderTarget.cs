@@ -41,10 +41,7 @@ using SharpDX.Direct3D11;
 #endif
 
 #if OPENGL
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#endif
-#if (MONOMAC && !PLATFORM_MACOS_LEGACY)
+#if MONOMAC
 using OpenTK.Graphics.OpenGL;
 #endif
 #if GLES
