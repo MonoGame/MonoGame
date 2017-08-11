@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
     public partial class VertexBuffer
     {
 		//internal uint vao;
-		internal uint vbo;
+		internal int vbo;
 
         private void PlatformConstruct()
         {
@@ -187,16 +187,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                Threading.BlockOnUIThread(() =>
-                {
-                    if (!IsDisposed)
-                    {
-                        GL.DeleteBuffers(1, ref vbo);
-                        GraphicsExtensions.CheckGLError();
-                        base.Dispose(disposing);
-                    }
-                });
+                GraphicsDevice.DisposeBuffer(vbo);
             }
+            base.Dispose(disposing);
         }
     }
 }

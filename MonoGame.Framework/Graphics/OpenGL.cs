@@ -691,7 +691,7 @@ namespace OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
-        public delegate void BindBufferDelegate(BufferTarget target, uint buffer);
+        public delegate void BindBufferDelegate(BufferTarget target, int buffer);
         public static BindBufferDelegate BindBuffer;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -838,7 +838,7 @@ namespace OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
-        public unsafe delegate void ShaderSourceDelegate(uint shaderId, int count, IntPtr code, int* length);
+        public unsafe delegate void ShaderSourceDelegate(int shaderId, int count, IntPtr code, int* length);
         public static ShaderSourceDelegate ShaderSourceInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -848,12 +848,12 @@ namespace OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
-        public unsafe delegate void GetShaderDelegate(uint shaderId, uint parameter, int* value);
+        public unsafe delegate void GetShaderDelegate(int shaderId, int parameter, int* value);
         public static GetShaderDelegate GetShaderiv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
-        public delegate void GetShaderInfoLogDelegate(uint shader, int bufSize, IntPtr length, StringBuilder infoLog);
+        public delegate void GetShaderInfoLogDelegate(int shader, int bufSize, IntPtr length, StringBuilder infoLog);
         public static GetShaderInfoLogDelegate GetShaderInfoLogInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -903,12 +903,12 @@ namespace OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
-        public unsafe delegate void GetProgramDelegate(int programId, uint name, int* linked);
+        public unsafe delegate void GetProgramDelegate(int programId, int name, int* linked);
         public static GetProgramDelegate GetProgramiv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
-        public delegate void GetProgramInfoLogDelegate(uint program, int bufSize, IntPtr length, StringBuilder infoLog);
+        public delegate void GetProgramInfoLogDelegate(int program, int bufSize, IntPtr length, StringBuilder infoLog);
         public static GetProgramInfoLogDelegate GetProgramInfoLogInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -1035,7 +1035,7 @@ namespace OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
-        public delegate void GenBuffersDelegate(int count, out uint buffer);
+        public delegate void GenBuffersDelegate(int count, out int buffer);
         public static GenBuffersDelegate GenBuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -1061,7 +1061,7 @@ namespace OpenGL
         [CLSCompliant (false)]
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
-        public delegate void DeleteBuffersDelegate (int count, [In] [Out] ref uint buffer);
+        public delegate void DeleteBuffersDelegate (int count, [In] [Out] ref int buffer);
         [CLSCompliant (false)]
         public static DeleteBuffersDelegate DeleteBuffers;
 
@@ -1083,7 +1083,7 @@ namespace OpenGL
         public static VertexAttribDivisorDelegate VertexAttribDivisor;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        delegate void DebugMessageCallbackProc(int source, int type, uint id, int severity, int length, IntPtr message, IntPtr userParam);
+        delegate void DebugMessageCallbackProc(int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam);
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         delegate void DebugMessageCallbackDelegate(DebugMessageCallbackProc callback, IntPtr userParam);
@@ -1093,7 +1093,7 @@ namespace OpenGL
         public static event ErrorDelegate OnError;
 
 #if DEBUG
-        static void DebugMessageCallbackHandler(int source, int type, uint id, int severity, int length, IntPtr message, IntPtr userParam)
+        static void DebugMessageCallbackHandler(int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam)
         {
             var errorMessage = Marshal.PtrToStringAnsi(message);
             System.Diagnostics.Debug.WriteLine(errorMessage);
@@ -1352,7 +1352,7 @@ namespace OpenGL
             int length = 0;
             GetProgram(programId, GetProgramParameterName.LogLength, out length);
             var sb = new StringBuilder();
-            GetProgramInfoLogInternal ((uint)programId, length, IntPtr.Zero, sb);
+            GetProgramInfoLogInternal (programId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
             
@@ -1360,7 +1360,7 @@ namespace OpenGL
             int length = 0;
             GetShader(shaderId, ShaderParameter.LogLength, out length);
             var sb = new StringBuilder();
-            GetShaderInfoLogInternal ((uint)shaderId, length, IntPtr.Zero, sb);
+            GetShaderInfoLogInternal (shaderId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
             
@@ -1368,7 +1368,7 @@ namespace OpenGL
         {
             int length = code.Length;
             IntPtr intPtr = MarshalStringArrayToPtr (new string[] { code });
-            ShaderSourceInternal((uint)shaderId, 1, intPtr, &length);
+            ShaderSourceInternal(shaderId, 1, intPtr, &length);
             FreeStringArrayPtr(intPtr, 1);
         }
 
@@ -1376,7 +1376,7 @@ namespace OpenGL
         {
             fixed (int* ptr = &result)
             {
-                GetShaderiv((uint)shaderId, (uint)name, ptr);
+                GetShaderiv(shaderId, (int)name, ptr);
             }
         }
 
@@ -1384,7 +1384,7 @@ namespace OpenGL
         {
             fixed (int* ptr = &result)
             {
-                GetProgramiv((int)programId, (uint)name, ptr);
+                GetProgramiv(programId, (int)name, ptr);
             }
         }
 

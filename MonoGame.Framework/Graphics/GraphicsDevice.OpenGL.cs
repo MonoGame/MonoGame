@@ -45,11 +45,96 @@ namespace Microsoft.Xna.Framework.Graphics
         private DrawBuffersEnum[] _drawBuffers;
 #endif
 
-        static List<Action> disposeActions = new List<Action>();
-        static object disposeActionsLock = new object();
+        enum ResourceType
+        {
+            Texture,
+            Buffer,
+            Shader,
+            Program,
+            Query,
+            Framebuffer
+        }
 
-        private readonly ShaderProgramCache _programCache = new ShaderProgramCache();
+        struct ResourceHandle
+        {
+            public ResourceType type;
+            public int handle;
 
+            public static ResourceHandle Texture(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Texture, handle = handle };
+            }
+
+            public static ResourceHandle Buffer(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Buffer, handle = handle };
+            }
+
+            public static ResourceHandle Shader(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Shader, handle = handle };
+            }
+
+            public static ResourceHandle Program(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Program, handle = handle };
+            }
+
+            public static ResourceHandle Query(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Query, handle = handle };
+            }
+
+            public static ResourceHandle Framebuffer(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Framebuffer, handle = handle };
+            }
+
+            public void Free()
+            {
+                switch (type)
+                {
+                    case ResourceType.Texture:
+                        GL.DeleteTextures(1, ref handle);
+                        break;
+                    case ResourceType.Buffer:
+                        GL.DeleteBuffers(1, ref handle);
+                        break;
+                    case ResourceType.Shader:
+                        if (GL.IsShader(handle))
+                            GL.DeleteShader(handle);
+                        break;
+                    case ResourceType.Program:
+                        if (GL.IsProgram(handle))
+                        {
+#if MONOMAC
+                            GL.DeleteProgram(1, ref handle);
+#else
+                            GL.DeleteProgram(handle);
+#endif
+                        }
+                        break;
+                    case ResourceType.Query:
+#if !GLES
+                        GL.DeleteQueries(1, ref handle);
+#endif
+                        break;
+                    case ResourceType.Framebuffer:
+                        GL.DeleteFramebuffers(1, ref handle);
+                        break;
+                }
+                GraphicsExtensions.CheckGLError();
+            }
+        }
+
+        List<ResourceHandle> _disposeThisFrame = new List<ResourceHandle>();
+        List<ResourceHandle> _disposeNextFrame = new List<ResourceHandle>();
+        object _disposeActionsLock = new object();
+
+        static List<IntPtr> _disposeContexts = new List<IntPtr>();
+        static object _disposeContextsLock = new object();
+
+        private ShaderProgramCache _programCache;
         private ShaderProgram _shaderProgram = null;
 
         static readonly float[] _posFixup = new float[4];
@@ -181,6 +266,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformSetup()
         {
 #if DESKTOPGL || ANGLE
+            _programCache = new ShaderProgramCache(this);
 
             var windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
 
@@ -471,36 +557,98 @@ namespace Microsoft.Xna.Framework.Graphics
             // Free all the cached shader programs.
             _programCache.Dispose();
 
-            GraphicsDevice.AddDisposeAction(() =>
-                                            {
 #if DESKTOPGL || ANGLE
-                Context.Dispose();
-                Context = null;
+            Context.Dispose();
+            Context = null;
 #endif
-            });
         }
 
-        /// <summary>
-        /// Adds a dispose action to the list of pending dispose actions. These are executed at the end of each call to Present().
-        /// This allows GL resources to be disposed from other threads, such as the finalizer.
-        /// </summary>
-        /// <param name="disposeAction">The action to execute for the dispose.</param>
-        static private void AddDisposeAction(Action disposeAction)
+        internal void DisposeTexture(int handle)
         {
-            if (disposeAction == null)
-                throw new ArgumentNullException("disposeAction");
-            if (Threading.IsOnUIThread())
+            if (!_isDisposed)
             {
-                disposeAction();
-            }
-            else
-            {
-                lock (disposeActionsLock)
+                lock (_disposeActionsLock)
                 {
-                    disposeActions.Add(disposeAction);
+                    _disposeNextFrame.Add(ResourceHandle.Texture(handle));
                 }
             }
         }
+
+        internal void DisposeBuffer(int handle)
+        {
+            if (!_isDisposed)
+            {
+                lock (_disposeActionsLock)
+                {
+                    _disposeNextFrame.Add(ResourceHandle.Buffer(handle));
+                }
+            }
+        }
+
+        internal void DisposeShader(int handle)
+        {
+            if (!_isDisposed)
+            {
+                lock (_disposeActionsLock)
+                {
+                    _disposeNextFrame.Add(ResourceHandle.Shader(handle));
+                }
+            }
+        }
+
+        internal void DisposeProgram(int handle)
+        {
+            if (!_isDisposed)
+            {
+                lock (_disposeActionsLock)
+                {
+                    _disposeNextFrame.Add(ResourceHandle.Program(handle));
+                }
+            }
+        }
+
+        internal void DisposeQuery(int handle)
+        {
+            if (!_isDisposed)
+            {
+                lock (_disposeActionsLock)
+                {
+                    _disposeNextFrame.Add(ResourceHandle.Query(handle));
+                }
+            }
+        }
+
+        internal void DisposeFramebuffer(int handle)
+        {
+            if (!_isDisposed)
+            {
+                lock (_disposeActionsLock)
+                {
+                    _disposeNextFrame.Add(ResourceHandle.Framebuffer(handle));
+                }
+            }
+        }
+
+#if DESKTOPGL || ANGLE
+        static internal void DisposeContext(IntPtr resource)
+        {
+            lock (_disposeContextsLock)
+            {
+                _disposeContexts.Add(resource);
+            }
+        }
+
+        static internal void DisposeContexts()
+        {
+            lock (_disposeContextsLock)
+            {
+                int count = _disposeContexts.Count;
+                for (int i = 0; i < count; ++i)
+                    Sdl.GL.DeleteContext(_disposeContexts[i]);
+                _disposeContexts.Clear();
+            }
+        }
+#endif
 
         public void PlatformPresent()
         {
@@ -510,14 +658,17 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             // Dispose of any GL resources that were disposed in another thread
-            lock (disposeActionsLock)
+            int count = _disposeThisFrame.Count;
+            for (int i = 0; i < count; ++i)
+                _disposeThisFrame[i].Free();
+            _disposeThisFrame.Clear();
+
+            lock (_disposeActionsLock)
             {
-                if (disposeActions.Count > 0)
-                {
-                    foreach (var action in disposeActions)
-                        action();
-                    disposeActions.Clear();
-                }
+                // Swap lists so resources added during this draw will be released after the next draw
+                var temp = _disposeThisFrame;
+                _disposeThisFrame = _disposeNextFrame;
+                _disposeNextFrame = temp;
             }
         }
 

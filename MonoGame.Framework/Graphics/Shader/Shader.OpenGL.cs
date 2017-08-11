@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Diagnostics;
 
 #if MONOMAC
 #if PLATFORM_MACOS_LEGACY
@@ -61,13 +62,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (compiled != (int)Bool.True)
             {
                 var log = GL.GetShaderInfoLog(_shaderHandle);
-                Console.WriteLine(log);
+                Debug.WriteLine(log);
 
-                if (GL.IsShader(_shaderHandle))
-                {
-                    GL.DeleteShader(_shaderHandle);
-                    GraphicsExtensions.CheckGLError();
-                }
+                GraphicsDevice.DisposeShader(_shaderHandle);
                 _shaderHandle = -1;
 
                 throw new InvalidOperationException("Shader Compilation Failed");
@@ -114,11 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_shaderHandle != -1)
             {
-                if (GL.IsShader(_shaderHandle))
-                {
-                    GL.DeleteShader(_shaderHandle);
-                    GraphicsExtensions.CheckGLError();
-                }
+                GraphicsDevice.DisposeShader(_shaderHandle);
                 _shaderHandle = -1;
             }
         }
@@ -127,15 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed && _shaderHandle != -1)
             {
-                // Take a copy of the handle for use in the anonymous function and clear the class handle.
-                // This prevents any other disposal of the resource between now and the time the anonymous
-                // function is executed.
-                int handle = _shaderHandle;
-                Threading.BlockOnUIThread(() =>
-                {
-                    GL.DeleteShader(handle);
-                    GraphicsExtensions.CheckGLError();
-                });
+                GraphicsDevice.DisposeShader(_shaderHandle);
                 _shaderHandle = -1;
             }
 
