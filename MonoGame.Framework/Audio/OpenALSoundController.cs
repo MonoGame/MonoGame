@@ -3,25 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
+#if WINDOWS
 using MonoGame.Utilities;
-
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenAL;
-#endif
-#if MONOMAC && !PLATFORM_MACOS_LEGACY
-using OpenTK.Audio.OpenAL;
-using OpenTK.Audio;
 #endif
 
-#if GLES
-using OpenTK.Audio.OpenAL;
-using OpenTK;
-#endif
-
-#if DESKTOPGL
 using OpenAL;
-#endif
-using OpenGL;
 
 #if ANDROID
 using System.Globalization;
@@ -41,7 +27,7 @@ namespace Microsoft.Xna.Framework.Audio
     {
         [System.Diagnostics.Conditional("DEBUG")]
         [System.Diagnostics.DebuggerHidden]
-        public static void CheckError(string message = "", params object[] args)
+        internal static void CheckError(string message = "", params object[] args)
         {
             ALError error;
             if ((error = AL.GetError()) != ALError.NoError)
@@ -52,25 +38,41 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new InvalidOperationException(message + " (Reason: " + AL.GetErrorString(error) + ")");
             }
         }
+
+        public static bool IsStereoFormat(ALFormat format)
+        {
+            return (format == ALFormat.Stereo8
+                || format == ALFormat.Stereo16
+                || format == ALFormat.StereoFloat32
+                || format == ALFormat.StereoIma4
+                || format == ALFormat.StereoMSAdpcm);
+        }
     }
 
-	internal sealed class OpenALSoundController : IDisposable
+    internal static class AlcHelper
+    {
+        [System.Diagnostics.Conditional("DEBUG")]
+        [System.Diagnostics.DebuggerHidden]
+        internal static void CheckError(string message = "", params object[] args)
+        {
+            AlcError error;
+            if ((error = Alc.GetError()) != AlcError.NoError)
+            {
+                if (args != null && args.Length > 0)
+                    message = String.Format(message, args);
+
+                throw new InvalidOperationException(message + " (Reason: " + error.ToString() + ")");
+            }
+        }
+    }
+
+    internal sealed class OpenALSoundController : IDisposable
     {
         private static OpenALSoundController _instance = null;
-#if SUPPORTS_EFX
         private static EffectsExtension _efx = null;
-#endif
         private IntPtr _device;
-#if !DESKTOPGL
-        ContextHandle _context;
-        ContextHandle NullContext = ContextHandle.Zero;
-#else
         private IntPtr _context;
         IntPtr NullContext = IntPtr.Zero;
-#endif
-        //int outputSource;
-        //int[] buffers;
-        private AlcError _lastOpenALError;
         private int[] allSourcesArray;
 #if DESKTOPGL || ANGLE
 
@@ -93,9 +95,7 @@ namespace Microsoft.Xna.Framework.Audio
         internal const int MAX_NUMBER_OF_SOURCES = 32;
 
 #endif
-#if MONOMAC || IOS
-        private const double PREFERRED_MIX_RATE = 44100;
-#elif ANDROID
+#if ANDROID
         private const int DEFAULT_FREQUENCY = 48000;
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
@@ -105,7 +105,10 @@ namespace Microsoft.Xna.Framework.Audio
         private List<int> availableSourcesCollection;
         private List<int> inUseSourcesCollection;
         bool _isDisposed;
-        public bool SupportsADPCM = false;
+        public bool SupportsIma4 { get; private set; }
+        public bool SupportsAdpcm { get; private set; }
+        public bool SupportsEfx { get; private set; }
+        public bool SupportsIeee { get; private set; }
 
         /// <summary>
         /// Sets up the hardware resources used by the controller.
@@ -131,11 +134,10 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.GenSources(allSourcesArray);
             ALHelper.CheckError("Failed to generate sources.");
             Filter = 0;
-#if SUPPORTS_EFX
-            if (Efx.IsInitialized) {
-                Filter = Efx.GenFilter ();
+            if (Efx.IsInitialized)
+            {
+                Filter = Efx.GenFilter();
             }
-#endif
             availableSourcesCollection = new List<int>(allSourcesArray);
 			inUseSourcesCollection = new List<int>();
 		}
@@ -154,16 +156,10 @@ namespace Microsoft.Xna.Framework.Audio
         /// <returns>True if the sound controller was setup, and false if not.</returns>
         private bool OpenSoundController()
         {
-#if MONOMAC
-			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
-#endif
-
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
-#if DESKTOPGL
                 EffectsExtension.device = _device;
-#endif
             }
             catch (DllNotFoundException ex)
             {
@@ -174,7 +170,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new NoAudioHardwareException("OpenAL device could not be initialized.", ex);
             }
 
-            CheckALError("Could not open AL device");
+            AlcHelper.CheckError("Could not open OpenAL device");
 
             if (_device != IntPtr.Zero)
             {
@@ -227,8 +223,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                     // If 4.4 or higher, then we don't need to double buffer on the application side.
                     // See http://stackoverflow.com/a/15006327
-                    // Use the explicit value rather than a constant as the 4.2 SDK (the build SDK) does not define a constant for 4.4.
-                    if ((int)Android.OS.Build.VERSION.SdkInt >= 19)
+                    if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Kitkat)
                     {
                         updateBuffers = 1;
                     }
@@ -253,10 +248,11 @@ namespace Microsoft.Xna.Framework.Audio
                 };
 #elif IOS
                 EventHandler<AVAudioSessionInterruptionEventArgs> handler = delegate(object sender, AVAudioSessionInterruptionEventArgs e) {
-                    switch (e.InterruptionType) {
+                    switch (e.InterruptionType)
+                    {
                         case AVAudioSessionInterruptionType.Began:
                             AVAudioSession.SharedInstance().SetActive(false);
-                            Alc.MakeContextCurrent(ContextHandle.Zero);
+                            Alc.MakeContextCurrent(IntPtr.Zero);
                             Alc.SuspendContext(_context);
                             break;
                         case AVAudioSessionInterruptionType.Ended:
@@ -278,36 +274,44 @@ namespace Microsoft.Xna.Framework.Audio
                 _oggstreamer = new OggStreamer();
 #endif
 
-                CheckALError("Could not create AL context");
+                AlcHelper.CheckError("Could not create OpenAL context");
 
                 if (_context != NullContext)
                 {
                     Alc.MakeContextCurrent(_context);
-                    CheckALError("Could not make AL context current");
-                    SupportsADPCM = AL.IsExtensionPresent ("AL_SOFT_MSADPCM");
-                    return (true);
+                    AlcHelper.CheckError("Could not make OpenAL context current");
+                    SupportsIma4 = AL.IsExtensionPresent("AL_EXT_IMA4");
+                    SupportsAdpcm = AL.IsExtensionPresent("AL_SOFT_MSADPCM");
+                    SupportsEfx = AL.IsExtensionPresent("AL_EXT_EFX");
+                    SupportsIeee = AL.IsExtensionPresent("AL_EXT_float32");
+                    return true;
                 }
             }
-            return (false);
+            return false;
         }
 
-		public static OpenALSoundController GetInstance {
-			get {
+		public static OpenALSoundController GetInstance
+        {
+			get
+            {
 				if (_instance == null)
 					_instance = new OpenALSoundController();
 				return _instance;
 			}
 		}
-#if SUPPORTS_EFX
-        public static EffectsExtension Efx {
-            get {
+
+        public static EffectsExtension Efx
+        {
+            get
+            {
                 if (_efx == null)
-                    _efx = new EffectsExtension ();
+                    _efx = new EffectsExtension();
                 return _efx;
             }
         }
-#endif
-        public int Filter {
+
+        public int Filter
+        {
             get; private set;
         }
 
@@ -319,29 +323,6 @@ namespace Microsoft.Xna.Framework.Audio
                 _instance = null;
             }
         }
-
-
-        /// <summary>
-        /// Checks the error state of the OpenAL driver. If a value that is not AlcError.NoError
-        /// is returned, then the operation message and the error code is thrown in an Exception.
-        /// </summary>
-        /// <param name="operation">the operation message</param>
-		public void CheckALError (string operation)
-		{
-			_lastOpenALError = Alc.GetError (_device);
-
-			if (_lastOpenALError == AlcError.NoError)
-				return;			
-
-            CleanUpOpenAL();
-
-			string errorFmt = "OpenAL Error: {0}";
-
-            throw new NoAudioHardwareException(String.Format("{0} - {1}",
-                            operation,
-                            //string.Format (errorFmt, Alc.GetString (_device, _lastOpenALError))));
-                            string.Format(errorFmt, _lastOpenALError)));
-		}
 
         /// <summary>
         /// Destroys the AL context and closes the device, when they exist.
@@ -390,10 +371,10 @@ namespace Microsoft.Xna.Framework.Audio
                         AL.DeleteSource(allSourcesArray[i]);
                         ALHelper.CheckError("Failed to delete source.");
                     }
-#if SUPPORTS_EFX
+
                     if (Filter != 0 && Efx.IsInitialized)
-                        Efx.DeleteFilter (Filter);
-#endif
+                        Efx.DeleteFilter(Filter);
+
                     Microphone.StopMicrophones();
                     CleanUpOpenAL();                    
                 }
@@ -452,46 +433,17 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
 #if ANDROID
-        const string Lib = "openal32.dll";
-        const CallingConvention Style = CallingConvention.Cdecl;
-
-        [DllImport(Lib, EntryPoint = "alcDevicePauseSOFT", ExactSpelling = true, CallingConvention = Style)]
-        unsafe static extern void alcDevicePauseSOFT(IntPtr device);
-
-        [DllImport(Lib, EntryPoint = "alcDeviceResumeSOFT", ExactSpelling = true, CallingConvention = Style)]
-        unsafe static extern void alcDeviceResumeSOFT(IntPtr device);
-
         void Activity_Paused(object sender, EventArgs e)
         {
-            // Pause all currently playing sounds. The internal pause count in OALSoundBuffer
-            // will take care of sounds that were already paused.
-            //            lock (playingSourcesCollection)
-            //            {
-            //                foreach (var source in playingSourcesCollection)
-            //                    source.Pause();
-            //            }
-            alcDevicePauseSOFT(_device);
+            // Pause all currently playing sounds by pausing the mixer
+            Alc.DevicePause(_device);
         }
 
         void Activity_Resumed(object sender, EventArgs e)
         {
-            // Resume all sounds that were playing when the activity was paused. The internal
-            // pause count in OALSoundBuffer will take care of sounds that were previously paused.
-            //            lock (playingSourcesCollection)
-            //            {
-            //                foreach (var source in playingSourcesCollection)
-            //                    source.Resume();
-            //            }
-            alcDeviceResumeSOFT(_device);
+            // Resume all sounds that were playing when the activity was paused
+            Alc.DeviceResume(_device);
         }
-#endif
-
-#if MONOMAC
-		public const string OpenALLibrary = "/System/Library/Frameworks/OpenAL.framework/OpenAL";
-
-		[DllImport(OpenALLibrary, EntryPoint = "alcMacOSXMixerOutputRate")]
-		static extern void alcMacOSXMixerOutputRate (double rate); // caution
 #endif
     }
 }
-

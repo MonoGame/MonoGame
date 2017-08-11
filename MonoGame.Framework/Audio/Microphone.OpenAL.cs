@@ -11,12 +11,7 @@ using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
 using MonoMac.OpenAL;
 #elif OPENAL
-#if GLES || MONOMAC
-using OpenTK.Audio;
-using OpenTK.Audio.OpenAL;
-#else
 using OpenAL;
-#endif
 #if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;
@@ -60,7 +55,7 @@ namespace Microsoft.Xna.Framework.Audio
             // default device
             string defaultDevice = Alc.GetString(IntPtr.Zero, AlcGetString.CaptureDefaultDeviceSpecifier);
 
-#if DESKTOPGL
+#if true //DESKTOPGL
             // enumarating capture devices
             IntPtr deviceList = Alc.alGetString(IntPtr.Zero, (int)AlcGetString.CaptureDeviceSpecifier);
             // we need to marshal a string array

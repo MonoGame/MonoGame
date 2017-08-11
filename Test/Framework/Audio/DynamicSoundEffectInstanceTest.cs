@@ -15,10 +15,9 @@ namespace MonoGame.Tests.Audio
         [SetUp]
         public void SetUp()
         {
+            // Necessary to get audio initialised
             FrameworkDispatcher.Update();
         }
-        
-
 
         [Test]
         public void BufferNeeded_DuringPlayback()

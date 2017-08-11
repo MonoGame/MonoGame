@@ -190,7 +190,7 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 case ConversionFormat.Pcm:
                     if (bitsPerSample == 32)
-                        return -2;
+                        return 3;
                     return 1;
                 case ConversionFormat.Adpcm:
                     return 2;
@@ -267,7 +267,42 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 2, 12059, 11026, 4, 140)]
         [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 2, 8744, 7995, 4, 140)]
 
-        public void Convert(string sourceFile, ConversionFormat format, ConversionQuality quality, int channels, int averageBytesPerSecond, int sampleRate, int bitsPerSample, int blockAlign)
+        // 32bit IEEE Float PCM Mono
+        [TestCase(@"Assets/Audio/tone_mono_44khz_float.wav", ConversionFormat.Pcm, ConversionQuality.Best, 1, 176400, 44100, 32, 4)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_float.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 1, 44100, 44100, 4, 70)]
+
+        // 32bit IEEE Float PCM Stereo
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_float.wav", ConversionFormat.Pcm, ConversionQuality.Best, 2, 352800, 44100, 32, 8)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_float.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 2, 44100, 44100, 4, 140)]
+
+#if XNA
+        // XNA passes 24-bit through as 24-bit in high quality, but cannot convert 24-bit to ADPCM
+        // 24bit PCM Mono
+        [TestCase(@"Assets/Audio/tone_mono_44khz_24bit.wav", ConversionFormat.Pcm, ConversionQuality.Best, 1, 132300, 44100, 24, 3)]
+
+        // 24bit PCM Stereo
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_24bit.wav", ConversionFormat.Pcm, ConversionQuality.Best, 2, 264600, 44100, 24, 6)]
+#else
+        // MonoGame converts 24-bit sounds to 16-bit
+        // 24bit PCM Mono
+        [TestCase(@"Assets/Audio/tone_mono_44khz_24bit.wav", ConversionFormat.Pcm, ConversionQuality.Best, 1, 88200, 44100, 16, 2)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_24bit.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 1, 44100, 44100, 4, 70)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_24bit.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 1, 44100, 44100, 4, 70)]
+
+        // 24bit PCM Stereo
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_24bit.wav", ConversionFormat.Pcm, ConversionQuality.Best, 2, 176400, 44100, 16, 4)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_24bit.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 2, 44100, 44100, 4, 140)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_24bit.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 2, 44100, 44100, 4, 140)]
+
+        // XNA cannot convert 32-bit float to low quality ADPCM, so include these tests here
+        // 32bit IEEE Float PCM Mono
+        [TestCase(@"Assets/Audio/tone_mono_44khz_float.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 1, 44100, 44100, 4, 70)]
+
+        // 32bit IEEE Float PCM Stereo
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_float.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 2, 44100, 44100, 4, 140)]
+#endif
+
+        public void ConvertAudio(string sourceFile, ConversionFormat format, ConversionQuality quality, int channels, int averageBytesPerSecond, int sampleRate, int bitsPerSample, int blockAlign)
         {
             var content = new AudioContent(sourceFile, AudioFileType.Wav);
             content.ConvertFormat(format, quality, null);
