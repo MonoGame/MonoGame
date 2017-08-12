@@ -17,7 +17,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public class Game : IDisposable
+    public partial class Game : IDisposable
     {
         private GameComponentCollection _components;
         private GameServiceContainer _services;
@@ -55,7 +55,9 @@ namespace Microsoft.Xna.Framework
 
         private bool _shouldExit;
         private bool _suppressDraw;
-        
+
+        partial void PlatformConstruct();       
+
         public Game()
         {
             _instance = this;
@@ -72,6 +74,9 @@ namespace Microsoft.Xna.Framework
 
             // Calling Update() for first time initializes some systems
             FrameworkDispatcher.Update();
+
+            // Allow some optional per-platform construction to occur too.
+            PlatformConstruct();
 
 #if WINDOWS_STOREAPP && !WINDOWS_PHONE81
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
