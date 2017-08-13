@@ -34,7 +34,7 @@
 
   <Files>
 
-    <None Include="ReadMe.md" />
+    <None Include="README.md" />
 
     <Compile Include="Properties\AssemblyInfo.cs" />
 
