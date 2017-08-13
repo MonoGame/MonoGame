@@ -387,6 +387,7 @@ namespace OpenGL
 
     public enum PixelStoreParameter {
         UnpackAlignment = 0x0CF5,
+        PackAlignment = 0x0D05,
     }
 
     public enum GLStencilFunction {
