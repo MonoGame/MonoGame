@@ -654,9 +654,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Get the default glyph here once.
             SpriteFont.Glyph? defaultGlyph = null;
             if (spriteFont.DefaultCharacter.HasValue)
-                defaultGlyph = spriteFont.Glyphs[spriteFont.DefaultCharacter.Value];
-
-            var currentGlyph = SpriteFont.Glyph.Empty;
+                defaultGlyph = spriteFont.TryGetGlyph(spriteFont.DefaultCharacter.Value);
+            
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
@@ -674,14 +673,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     firstGlyphOfLine = true;
                     continue;
                 }
-
-                if (!spriteFont.Glyphs.TryGetValue(c, out currentGlyph))
-                {
-                    if (!defaultGlyph.HasValue)
-                        throw new ArgumentException(SpriteFont.Errors.TextContainsUnresolvableCharacters, "text");
-
-                    currentGlyph = defaultGlyph.Value;
-                }
+ 
+                var currentGlyph = spriteFont.GetGlyphOrDefault(c, defaultGlyph);
 
                 // The first character on a line might have a negative left side bearing.
                 // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
@@ -831,9 +824,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Get the default glyph here once.
             SpriteFont.Glyph? defaultGlyph = null;
             if (spriteFont.DefaultCharacter.HasValue)
-                defaultGlyph = spriteFont.Glyphs[spriteFont.DefaultCharacter.Value];
-
-            var currentGlyph = SpriteFont.Glyph.Empty;
+                defaultGlyph = spriteFont.TryGetGlyph(spriteFont.DefaultCharacter.Value);
+            
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
@@ -852,13 +844,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
                 }
 
-                if (!spriteFont.Glyphs.TryGetValue(c, out currentGlyph))
-                {
-                    if (!defaultGlyph.HasValue)
-                        throw new ArgumentException(SpriteFont.Errors.TextContainsUnresolvableCharacters, "text");
-
-                    currentGlyph = defaultGlyph.Value;
-                }
+                var currentGlyph = spriteFont.GetGlyphOrDefault(c, defaultGlyph);
 
                 // The first character on a line might have a negative left side bearing.
                 // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
@@ -957,9 +943,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Get the default glyph here once.
             SpriteFont.Glyph? defaultGlyph = null;
             if (spriteFont.DefaultCharacter.HasValue)
-                defaultGlyph = spriteFont.Glyphs[spriteFont.DefaultCharacter.Value];
-
-            var currentGlyph = SpriteFont.Glyph.Empty;
+                defaultGlyph = spriteFont.TryGetGlyph(spriteFont.DefaultCharacter.Value);
+            
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
@@ -978,13 +963,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
                 }
 
-                if (!spriteFont.Glyphs.TryGetValue(c, out currentGlyph))
-                {
-                    if (!defaultGlyph.HasValue)
-                        throw new ArgumentException(SpriteFont.Errors.TextContainsUnresolvableCharacters, "text");
-
-                    currentGlyph = defaultGlyph.Value;
-                }
+                var currentGlyph = spriteFont.GetGlyphOrDefault(c, defaultGlyph);
 
                 // The first character on a line might have a negative left side bearing.
                 // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
@@ -1133,9 +1112,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Get the default glyph here once.
             SpriteFont.Glyph? defaultGlyph = null;
             if (spriteFont.DefaultCharacter.HasValue)
-                defaultGlyph = spriteFont.Glyphs[spriteFont.DefaultCharacter.Value];
-
-            var currentGlyph = SpriteFont.Glyph.Empty;
+                defaultGlyph = spriteFont.TryGetGlyph(spriteFont.DefaultCharacter.Value);
+            
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
@@ -1154,13 +1132,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
                 }
 
-                if (!spriteFont.Glyphs.TryGetValue(c, out currentGlyph))
-                {
-                    if (!defaultGlyph.HasValue)
-                        throw new ArgumentException(SpriteFont.Errors.TextContainsUnresolvableCharacters, "text");
-
-                    currentGlyph = defaultGlyph.Value;
-                }
+                var currentGlyph = spriteFont.GetGlyphOrDefault(c, defaultGlyph);
 
                 // The first character on a line might have a negative left side bearing.
                 // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,

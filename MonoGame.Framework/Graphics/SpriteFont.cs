@@ -147,14 +147,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
             // Get the default glyph here once.
-            Glyph? defaultGlyph = null;
-            if ( DefaultCharacter.HasValue )
-                defaultGlyph = _glyphs[DefaultCharacter.Value];
+            SpriteFont.Glyph? defaultGlyph = null;
+            if (DefaultCharacter.HasValue)
+                defaultGlyph = TryGetGlyph(DefaultCharacter.Value);
 
 			var width = 0.0f;
 			var finalLineHeight = (float)LineSpacing;
-
-            var currentGlyph = Glyph.Empty;
+            
 			var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
@@ -175,13 +174,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
                 }
 
-                if (!_glyphs.TryGetValue(c, out currentGlyph))
-                {
-                    if (!defaultGlyph.HasValue)
-                        throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
-
-                    currentGlyph = defaultGlyph.Value;
-                }
+                var currentGlyph = GetGlyphOrDefault(c, defaultGlyph);
 
                 // The first character on a line might have a negative left side bearing.
                 // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
@@ -209,6 +202,29 @@ namespace Microsoft.Xna.Framework.Graphics
             size.Y = offset.Y + finalLineHeight;
 		}
 
+        internal Glyph? TryGetGlyph(char c)
+        {   
+            Glyph glyph;
+            if (!_glyphs.TryGetValue(c, out glyph))
+                return null;
+            else
+                return glyph;
+        }
+
+        internal Glyph GetGlyphOrDefault(char c, Glyph? defaultGlyph)
+        {
+            Glyph currentGlyph;
+            if (!_glyphs.TryGetValue(c, out currentGlyph))
+            {
+                if (!defaultGlyph.HasValue)
+                    throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
+
+                return defaultGlyph.Value;
+            }
+            else
+                return currentGlyph;
+        }
+        
         internal struct CharacterSource 
         {
 			private readonly string _string;
