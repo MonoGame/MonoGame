@@ -537,7 +537,9 @@ namespace Microsoft.Xna.Framework
         protected virtual void Initialize()
         {
             // TODO: This should be removed once all platforms use the new GraphicsDeviceManager
+#if !(WINDOWS && DIRECTX)
             applyChanges(graphicsDeviceManager);
+#endif
 
             // According to the information given on MSDN (see link below), all
             // GameComponents in Components at the time Initialize() is called
@@ -635,17 +637,15 @@ namespace Microsoft.Xna.Framework
         //        break entirely the possibility that additional platforms could
         //        be added by third parties without changing MonoGame itself.
 
+#if !(WINDOWS && DIRECTX)
         internal void applyChanges(GraphicsDeviceManager manager)
         {
 			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
-
-#if !(WINDOWS && DIRECTX)
 
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
                 Platform.EnterFullScreen();
             else
                 Platform.ExitFullScreen();
-#endif
             var viewport = new Viewport(0, 0,
 			                            GraphicsDevice.PresentationParameters.BackBufferWidth,
 			                            GraphicsDevice.PresentationParameters.BackBufferHeight);
@@ -653,6 +653,7 @@ namespace Microsoft.Xna.Framework
             GraphicsDevice.Viewport = viewport;
 			Platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
         }
+#endif
 
         internal void DoUpdate(GameTime gameTime)
         {

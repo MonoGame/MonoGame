@@ -122,7 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
 
-        internal event EventHandler<EventArgs> PresentationChanged;
+        internal event EventHandler<PresentationEventArgs> PresentationChanged;
 
         private int _maxVertexBufferSlots;
         internal int MaxTextureSlots;
@@ -221,6 +221,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities();
             GraphicsCapabilities.Initialize(this);
+
+#if WINDOWS
+            CorrectBackBufferSize();
+#endif
+
             Initialize();
         }
 
@@ -606,17 +611,41 @@ namespace Microsoft.Xna.Framework.Graphics
 
         partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters);
 
+#if WINDOWS
+        private void CorrectBackBufferSize()
+        {
+            // Window size can be modified when we're going full screen, we need to take that into account
+            // so the back buffer has the right size.
+            if (PresentationParameters.IsFullScreen)
+            {
+                int newWidth, newHeight;
+                if (PresentationParameters.HardwareModeSwitch)
+                    GetModeSwitchedSize(out newWidth, out newHeight);
+                else
+                    GetDisplayResolution(out newWidth, out newHeight);
+
+                PresentationParameters.BackBufferWidth = newWidth;
+                PresentationParameters.BackBufferHeight = newHeight;
+            }
+        }
+#endif
+
         public void Reset()
         {
+#if WINDOWS
+            CorrectBackBufferSize();
+#endif
+
             PlatformValidatePresentationParameters(PresentationParameters);
+
             EventHelpers.Raise(this, DeviceResetting, EventArgs.Empty);
 
             // Update the back buffer.
             OnPresentationChanged();
             
-            EventHelpers.Raise(this, PresentationChanged, EventArgs.Empty);
+            EventHelpers.Raise(this, PresentationChanged, new PresentationEventArgs(PresentationParameters));
             EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
-        }
+       }
 
         public void Reset(PresentationParameters presentationParameters)
         {

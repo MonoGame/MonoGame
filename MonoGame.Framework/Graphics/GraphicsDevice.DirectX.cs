@@ -674,8 +674,78 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetHardwareFullscreen()
         {
-            // This force to switch to fullscreen mode when hardware mode enabled(working in WindowsDX mode).
-            _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen, null);
+            _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen && PresentationParameters.HardwareModeSwitch, null);
+        }
+
+        internal void ResizeTargets()
+        {
+            var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
+            var descr = new ModeDescription
+            {
+                Format = format,
+#if WINRT
+                Scaling = DisplayModeScaling.Stretched,
+#else
+                Scaling = DisplayModeScaling.Unspecified,
+#endif
+                Width = PresentationParameters.BackBufferWidth,
+                Height = PresentationParameters.BackBufferHeight,
+            };
+
+            _swapChain.ResizeTarget(ref descr);
+        }
+
+        internal void GetModeSwitchedSize(out int width, out int height)
+        {
+            Output output = null;
+            if (_swapChain == null)
+            {
+                // get the primary output
+                using (var factory = new SharpDX.DXGI.Factory1())
+                using (var adapter = factory.GetAdapter1(0))
+                    output = adapter.Outputs[0];
+            }
+            else
+            {
+                try
+                {
+                    output = _swapChain.ContainingOutput;
+                }
+                catch (SharpDXException) { /* ContainingOutput fails on a headless device */ }
+            }
+
+            var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
+            var target = new ModeDescription
+            {
+                Format = format,
+#if WINRT
+                Scaling = DisplayModeScaling.Stretched,
+#else
+                Scaling = DisplayModeScaling.Unspecified,
+#endif
+                Width = PresentationParameters.BackBufferWidth,
+                Height = PresentationParameters.BackBufferHeight,
+            };
+
+            if (output == null)
+            {
+                width = PresentationParameters.BackBufferWidth;
+                height = PresentationParameters.BackBufferHeight;
+            }
+            else
+            {
+                ModeDescription closest;
+                output.GetClosestMatchingMode(_d3dDevice, target, out closest);
+                width = closest.Width;
+                height = closest.Height;
+                output.Dispose();
+            }
+        }
+
+        internal void GetDisplayResolution(out int width, out int height)
+        {
+            width = Adapter.CurrentDisplayMode.Width;
+            height = Adapter.CurrentDisplayMode.Height;
         }
 
         internal void CreateSizeDependentResources()
@@ -773,7 +843,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                     BufferCount = 2,
                     SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters.PresentationInterval),
-                    IsWindowed = true
+                    IsWindowed = true,
+                    Flags = SwapChainFlags.AllowModeSwitch
                 };
 
                 // Once the desired swap chain description is configured, it must be created on the same adapter as our D3D Device
@@ -785,6 +856,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (var dxgiFactory = dxgiAdapter.GetParent<SharpDX.DXGI.Factory1>())
                 {
                     _swapChain = new SwapChain(dxgiFactory, dxgiDevice, desc);
+                    RefreshAdapter();
                     dxgiFactory.MakeWindowAssociation(PresentationParameters.DeviceWindowHandle, WindowAssociationFlags.IgnoreAll);
                     // To reduce latency, ensure that DXGI does not queue more than one frame at a time.
                     // Docs: https://msdn.microsoft.com/en-us/library/windows/desktop/ff471334(v=vs.85).aspx
@@ -842,7 +914,32 @@ namespace Microsoft.Xna.Framework.Graphics
             };
         }
 
-        
+        internal void RefreshAdapter()
+        {
+            if (_swapChain == null)
+                return;
+
+            Output output = null;
+            try
+            {
+                output = _swapChain.ContainingOutput;
+            }
+            catch (SharpDXException) { /* ContainingOutput fails on a headless device */ }
+
+            if (output != null)
+            {
+                foreach (var adapter in GraphicsAdapter.Adapters)
+                {
+                    if (adapter.DeviceName == output.Description.DeviceName)
+                    {
+                        Adapter = adapter;
+                        break;
+                    }
+                }
+
+                output.Dispose();
+            }
+        }
 
         internal void OnPresentationChanged()
         {
@@ -929,6 +1026,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDispose()
         {
+            // make sure to release full screen or this might cause issues on exit
+            if (_swapChain.IsFullScreen)
+                _swapChain.SetFullscreenState(false, null);
+
             SharpDX.Utilities.Dispose(ref _renderTargetView);
             SharpDX.Utilities.Dispose(ref _depthStencilView);
 

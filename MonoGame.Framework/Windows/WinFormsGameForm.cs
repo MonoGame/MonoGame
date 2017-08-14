@@ -5,6 +5,7 @@
 using System;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input.Touch;
+using MonoGame.Framework;
 
 
 namespace Microsoft.Xna.Framework.Windows
@@ -31,7 +32,8 @@ namespace Microsoft.Xna.Framework.Windows
     [System.ComponentModel.DesignerCategory("Code")]
     internal class WinFormsGameForm : Form
     {
-        GameWindow _window;
+        private readonly WinFormsGameWindow _window;
+
         public const int WM_MOUSEHWHEEL = 0x020E;
         public const int WM_POINTERUP = 0x0247;
         public const int WM_POINTERDOWN = 0x0246;
@@ -39,9 +41,14 @@ namespace Microsoft.Xna.Framework.Windows
         public const int WM_KEYDOWN = 0x0100;
         public const int WM_TABLET_QUERYSYSTEMGESTURESTA = (0x02C0 + 12);
 
+        public const int WM_ENTERSIZEMOVE = 0x0231;
+        public const int WM_EXITSIZEMOVE = 0x0232;
+
         public const int WM_SYSCOMMAND = 0x0112;
 
         public bool AllowAltF4 = true;
+
+        internal bool IsResizing { get; set; }
 
         #region Events
 
@@ -49,7 +56,7 @@ namespace Microsoft.Xna.Framework.Windows
 
         #endregion
 
-        public WinFormsGameForm(GameWindow window)
+        public WinFormsGameForm(WinFormsGameWindow window)
         {
             _window = window;
         }
@@ -65,7 +72,7 @@ namespace Microsoft.Xna.Framework.Windows
         protected override void WndProc(ref Message m)
         {
             var state = TouchLocationState.Invalid;
-           
+
             switch (m.Msg)
             {
                 case WM_TABLET_QUERYSYSTEMGESTURESTA:
@@ -89,15 +96,12 @@ namespace Microsoft.Xna.Framework.Windows
                     switch (m.WParam.ToInt32())
                     {
                         case 0x5B:  // Left Windows Key
+                        case 0x5C: // Right Windows Key
 
-                            if (this.WindowState == FormWindowState.Maximized)
-                            {
+                            if (_window.IsFullScreen && _window.HardwareModeSwitch)
                                 this.WindowState = FormWindowState.Minimized;
-                            }
  		 
                             break;
-                        case 0x5C: // Right Windows Key
-                            goto case 0x5B;
                     }
                     break;
 #endif
@@ -129,14 +133,18 @@ namespace Microsoft.Xna.Framework.Windows
                 case WM_POINTERUPDATE:
                     state = TouchLocationState.Moved;
                     break;
-
                 case WM_MOUSEHWHEEL:
                     var delta = (short)(((ulong)m.WParam >> 16) & 0xffff); ;
                     var handler = MouseHorizontalWheel;
 
                     if (handler != null)
                         handler(this, new HorizontalMouseWheelEventArgs(delta));
-                    
+                    break;
+                case WM_ENTERSIZEMOVE:
+                    IsResizing = true;
+                    break;
+                case WM_EXITSIZEMOVE:
+                    IsResizing = false;
                     break;
             }
 
