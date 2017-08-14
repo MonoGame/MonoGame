@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly Dictionary<char, Glyph> _glyphsDictionary;
         private readonly Glyph[] _glyphs;
-        private readonly Dictionary<char, int> _glyphsMap;
+        private readonly CharacterRegion[] _regions;
 		
 		private readonly Texture2D _texture;
         
@@ -53,8 +53,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			DefaultCharacter = defaultCharacter;
 
             _glyphsDictionary = new Dictionary<char, Glyph>(characters.Count, CharComparer.Default);
-            _glyphsMap = new Dictionary<char, int>(characters.Count, CharComparer.Default);
             _glyphs = new Glyph[characters.Count];
+            var regions = new Stack<CharacterRegion>();
 
 			for (var i = 0; i < characters.Count; i++) 
             {
@@ -73,8 +73,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 _glyphsDictionary.Add (glyph.Character, glyph);
 
                 _glyphs[i] = glyph;
-                _glyphsMap.Add(characters[i], i);
+
+                if(regions.Count ==0 || regions.Peek().End +1 !=characters[i])
+                {
+                    // Start a new region
+                    regions.Push(new CharacterRegion(characters[i], i));
+                } 
+                else
+                {
+                    var currentRegion = regions.Pop();
+                    // include character in currentRegion
+                    currentRegion.End++;
+                    regions.Push(currentRegion);
+                }
 			}
+
+            _regions = regions.ToArray();
+            Array.Reverse(_regions);
+
 		}
 
         /// <summary>
@@ -209,9 +225,43 @@ namespace Microsoft.Xna.Framework.Graphics
             size.Y = offset.Y + finalLineHeight;
 		}
 
+        private int GetRegionIndex(char c)
+        {            
+            var l = 0;
+            var r = _regions.Length - 1;
+
+            while (l <= r)
+            {
+                var m = (l + r) >> 1;
+                if (_regions[m].End < c)
+                {
+                    l = m + 1;
+                }
+                else if (_regions[m].Start > c)
+                {
+                    r = m;
+                    if (l == r) return l;
+                }
+                else
+                {
+                    return m;
+                }
+            }
+
+            return -1;
+        }
+
         internal bool TryGetGlyphIndex(char c, out int index)
         {   
-            return _glyphsMap.TryGetValue(c, out index);
+            var regionIdx = GetRegionIndex(c);
+            if (regionIdx == -1)
+            {
+                index = -1;
+                return false;
+            }
+
+            index = _regions[regionIdx].StartIndex + (c - _regions[regionIdx].Start);
+            return true;
         }
 
         internal Glyph? TryGetGlyph(char c)
@@ -310,5 +360,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 return "CharacterIndex=" + Character + ", Glyph=" + BoundsInTexture + ", Cropping=" + Cropping + ", Kerning=" + LeftSideBearing + "," + Width + "," + RightSideBearing;
 			}
 		}
+
+        private struct CharacterRegion
+        {
+            public char Start;
+            public char End;
+            public int StartIndex;
+
+            public CharacterRegion(char start, int startIndex)
+            {
+                this.Start = start;                
+                this.End = start;
+                this.StartIndex = startIndex;
+            }
+        }
 	}
 }
