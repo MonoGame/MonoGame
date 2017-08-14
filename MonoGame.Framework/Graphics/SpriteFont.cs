@@ -19,11 +19,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				"Text contains characters that cannot be resolved by this SpriteFont.";
 		}
 
-		private readonly Dictionary<char, Glyph> _glyphs;
+        private readonly Dictionary<char, Glyph> _glyphsDictionary;
+        private readonly Glyph[] _glyphs;
+        private readonly Dictionary<char, int> _glyphsMap;
 		
 		private readonly Texture2D _texture;
         
-		internal Dictionary<char, Glyph> Glyphs { get { return _glyphs; } }
+		internal Glyph[] Glyphs { get { return _glyphs; } }
 
 		class CharComparer: IEqualityComparer<char>
 		{
@@ -50,7 +52,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			Spacing = spacing;
 			DefaultCharacter = defaultCharacter;
 
-			_glyphs = new Dictionary<char, Glyph>(characters.Count, CharComparer.Default);
+            _glyphsDictionary = new Dictionary<char, Glyph>(characters.Count, CharComparer.Default);
+            _glyphsMap = new Dictionary<char, int>(characters.Count, CharComparer.Default);
+            _glyphs = new Glyph[characters.Count];
 
 			for (var i = 0; i < characters.Count; i++) 
             {
@@ -66,7 +70,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     WidthIncludingBearings = kerning[i].X + kerning[i].Y + kerning[i].Z
 				};
-				_glyphs.Add (glyph.Character, glyph);
+                _glyphsDictionary.Add (glyph.Character, glyph);
+
+                _glyphs[i] = glyph;
+                _glyphsMap.Add(characters[i], i);
 			}
 		}
 
@@ -83,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Can be used to calculate character bounds when implementing custom SpriteFont rendering.</remarks>
         public Dictionary<char, Glyph> GetGlyphs()
         {
-            return new Dictionary<char, Glyph>(_glyphs, _glyphs.Comparer);
+            return new Dictionary<char, Glyph>(_glyphsDictionary, _glyphsDictionary.Comparer);
         }
 
 		/// <summary>
@@ -202,19 +209,24 @@ namespace Microsoft.Xna.Framework.Graphics
             size.Y = offset.Y + finalLineHeight;
 		}
 
+        internal bool TryGetGlyphIndex(char c, out int index)
+        {   
+            return _glyphsMap.TryGetValue(c, out index);
+        }
+
         internal Glyph? TryGetGlyph(char c)
         {   
-            Glyph glyph;
-            if (!_glyphs.TryGetValue(c, out glyph))
+            int glyphIdx;
+            if (!TryGetGlyphIndex(c, out glyphIdx))
                 return null;
             else
-                return glyph;
+                return _glyphs[glyphIdx];
         }
 
         internal Glyph GetGlyphOrDefault(char c, Glyph? defaultGlyph)
         {
-            Glyph currentGlyph;
-            if (!_glyphs.TryGetValue(c, out currentGlyph))
+            int glyphIdx;
+            if (!TryGetGlyphIndex(c, out glyphIdx))
             {
                 if (!defaultGlyph.HasValue)
                     throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
@@ -222,7 +234,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return defaultGlyph.Value;
             }
             else
-                return currentGlyph;
+                return _glyphs[glyphIdx];
         }
         
         internal struct CharacterSource 
