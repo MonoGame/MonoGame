@@ -779,8 +779,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (flippedVert || flippedHorz)
             {
-                var source = new SpriteFont.CharacterSource(text);
-                var size = spriteFont.MeasureString(ref source);
+                var size = spriteFont.MeasureString(text);
 
                 if (flippedHorz)
                 {
@@ -1060,8 +1059,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (flippedVert || flippedHorz)
             {
-                var source = new SpriteFont.CharacterSource(text);
-                var size = spriteFont.MeasureString(ref source);
+                var size = spriteFont.MeasureString(text);
 
                 if (flippedHorz)
                 {

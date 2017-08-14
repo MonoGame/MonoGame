@@ -194,7 +194,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return MeasureString(ref source);
 		}
 
-		internal unsafe Vector2 MeasureString(ref CharacterSource text)
+		private unsafe Vector2 MeasureString(ref CharacterSource text)
 		{
 			if (text.Length == 0)
             {
@@ -308,7 +308,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return glyphIdx;
         }
         
-        internal struct CharacterSource 
+        private struct CharacterSource 
         {
 			private readonly string _string;
 			private readonly StringBuilder _builder;
