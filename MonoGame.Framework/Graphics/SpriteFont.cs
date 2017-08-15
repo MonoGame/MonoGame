@@ -161,7 +161,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return size;
 		}
 
-		internal void MeasureString(ref CharacterSource text, out Vector2 size)
+		internal unsafe void MeasureString(ref CharacterSource text, out Vector2 size)
 		{
 			if (text.Length == 0)
             {
@@ -180,6 +180,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
+            fixed (Glyph* pGlyphs = Glyphs)
             for (var i = 0; i < text.Length; ++i)
             {
                 var c = text[i];
@@ -198,28 +199,28 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 var currentGlyphIndex = GetGlyphIndexOrDefault(c, defaultGlyphIndex);
-                var currentGlyph = Glyphs[currentGlyphIndex];
+                var pCurrentGlyph = pGlyphs + currentGlyphIndex;
 
                 // The first character on a line might have a negative left side bearing.
                 // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
                 //  so that text does not hang off the left side of its rectangle.
                 if (firstGlyphOfLine) {
-                    offset.X = Math.Max(currentGlyph.LeftSideBearing, 0);
+                    offset.X = Math.Max(pCurrentGlyph->LeftSideBearing, 0);
                     firstGlyphOfLine = false;
                 } else {
-                    offset.X += Spacing + currentGlyph.LeftSideBearing;
+                    offset.X += Spacing + pCurrentGlyph->LeftSideBearing;
                 }
 
-                offset.X += currentGlyph.Width;
+                offset.X += pCurrentGlyph->Width;
 
-                var proposedWidth = offset.X + Math.Max(currentGlyph.RightSideBearing, 0);
+                var proposedWidth = offset.X + Math.Max(pCurrentGlyph->RightSideBearing, 0);
                 if (proposedWidth > width)
                     width = proposedWidth;
 
-                offset.X += currentGlyph.RightSideBearing;
+                offset.X += pCurrentGlyph->RightSideBearing;
 
-                if (currentGlyph.Cropping.Height > finalLineHeight)
-                    finalLineHeight = currentGlyph.Cropping.Height;
+                if (pCurrentGlyph->Cropping.Height > finalLineHeight)
+                    finalLineHeight = pCurrentGlyph->Cropping.Height;
             }
 
             size.X = width;
