@@ -9,24 +9,54 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
     public struct GraphicsMetrics
     {
-        internal ulong _spriteCount;
-        internal ulong _drawCount;
-        internal ulong _primitiveCount;
+        internal long _clearCount;
+        internal long _drawCount;
+        internal long _pixelShaderCount;
+        internal long _primitiveCount;
+        internal long _spriteCount;
+        internal long _targetCount;
+        internal long _textureCount;
+        internal long _vertexShaderCount;
 
         /// <summary>
-        /// The count of sprites and text characters rendered via <see cref="SpriteBatch"/>.
+        /// Number of times Clear was called.
         /// </summary>
-        public ulong SpriteCount { get { return _spriteCount; } }
+        public long ClearCount { get { return _clearCount; } }
 
         /// <summary>
-        /// The count of draw calls.
+        /// Number of times Draw was called.
         /// </summary>
-        public ulong DrawCount { get { return _drawCount; } }
+        public long DrawCount { get { return _drawCount; } }
 
         /// <summary>
-        /// The count of rendered primitives.
+        /// Number of times the pixel shader was changed on the GPU.
         /// </summary>
-        public ulong PrimitiveCount { get { return _primitiveCount; } }
+        public long PixelShaderCount { get { return _pixelShaderCount; } }
+
+        /// <summary>
+        /// Number of rendered primitives.
+        /// </summary>
+        public long PrimitiveCount { get { return _primitiveCount; } }
+
+        /// <summary>
+        /// Number of sprites and text characters rendered via <see cref="SpriteBatch"/>.
+        /// </summary>
+        public long SpriteCount { get { return _spriteCount; } }
+
+        /// <summary>
+        /// Number of times a target was changed on the GPU.
+        /// </summary>
+        public long TargetCount {get { return _targetCount; } }
+
+        /// <summary>
+        /// Number of times a texture was changed on the GPU.
+        /// </summary>
+        public long TextureCount { get { return _textureCount; } }
+
+        /// <summary>
+        /// Number of times the vertex shader was changed on the GPU.
+        /// </summary>
+        public long VertexShaderCount { get { return _vertexShaderCount; } }
 
         /// <summary>
         /// Returns the difference between two sets of metrics.
@@ -38,9 +68,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new GraphicsMetrics()
             {
-                _spriteCount = value1._spriteCount - value2._spriteCount,
+                _clearCount = value1._clearCount - value2._clearCount,
                 _drawCount = value1._drawCount - value2._drawCount,
-                _primitiveCount = value1._primitiveCount - value2._primitiveCount
+                _pixelShaderCount = value1._pixelShaderCount - value2._pixelShaderCount,
+                _primitiveCount = value1._primitiveCount - value2._primitiveCount,
+                _spriteCount = value1._spriteCount - value2._spriteCount,
+                _targetCount = value1._targetCount - value2._targetCount,
+                _textureCount = value1._textureCount - value2._textureCount,
+                _vertexShaderCount = value1._vertexShaderCount - value2._vertexShaderCount
             };
         }
 
@@ -54,9 +89,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new GraphicsMetrics()
             {
-                _spriteCount = value1._spriteCount + value2._spriteCount,
+                _clearCount =  value1._clearCount + value2._clearCount,
                 _drawCount = value1._drawCount + value2._drawCount,
-                _primitiveCount = value1._primitiveCount + value2._primitiveCount
+                _pixelShaderCount = value1._pixelShaderCount + value2._pixelShaderCount,
+                _primitiveCount = value1._primitiveCount + value2._primitiveCount,
+                _spriteCount = value1._spriteCount + value2._spriteCount,
+                _targetCount = value1._targetCount + value2._targetCount,
+                _textureCount = value1._textureCount + value2._textureCount,
+                _vertexShaderCount = value1._vertexShaderCount + value2._vertexShaderCount
             };
         }
     }

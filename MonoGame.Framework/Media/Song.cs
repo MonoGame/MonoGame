@@ -13,7 +13,6 @@ namespace Microsoft.Xna.Framework.Media
 		private int _playCount = 0;
         private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
-
         /// <summary>
         /// Gets the Album on which the Song appears.
         /// </summary>
@@ -39,6 +38,11 @@ namespace Microsoft.Xna.Framework.Media
         public Genre Genre
         {
             get { return PlatformGetGenre(); }
+        }
+        
+        public bool IsDisposed
+        {
+            get { return disposed; }
         }
 
 #if ANDROID || OPENAL || WEB || IOS
@@ -70,18 +74,17 @@ namespace Microsoft.Xna.Framework.Media
 			get { return _name; }
 		}
 
+        /// <summary>
+        /// Returns a song that can be played via <see cref="MediaPlayer"/>.
+        /// </summary>
+        /// <param name="name">The name for the song. See <see cref="Song.Name"/>.</param>
+        /// <param name="uri">The path to the song file.</param>
+        /// <returns></returns>
         public static Song FromUri(string name, Uri uri)
         {
-            if (!uri.IsAbsoluteUri)
-            {
-                var song = new Song(uri.OriginalString);
-                song._name = name;
-                return song;
-            }
-            else
-            {
-                throw new NotImplementedException("Loading songs from an absolute path is not implemented");
-            }
+            var song = new Song(uri.OriginalString);
+            song._name = name;
+            return song;
         }
 		
 		public void Dispose()

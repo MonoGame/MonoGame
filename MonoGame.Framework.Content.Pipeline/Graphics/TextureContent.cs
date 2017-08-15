@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// <summary>
     /// Provides a base class for all texture objects.
     /// </summary>
-    public abstract class TextureContent : ContentItem, IDisposable
+    public abstract class TextureContent : ContentItem
     {
         MipmapChainCollection faces;
 
@@ -93,10 +93,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var faceType = faceBitmap.GetType();
                 int width = faceBitmap.Width;
                 int height = faceBitmap.Height;
-                while (width > 1 && height > 1)
+                while (width > 1 || height > 1)
                 {
-                    width /= 2;
-                    height /= 2;
+                    if (width > 1)
+                        width /= 2;
+                    if (height > 1)
+                        height /= 2;
 
                     var mip = (BitmapContent)Activator.CreateInstance(faceType, new object[] { width, height });
                     BitmapContent.Copy(faceBitmap, mip);
@@ -110,9 +112,5 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="targetProfile">The profile identifier that defines the capabilities of the device.</param>
         public abstract void Validate(GraphicsProfile? targetProfile);
-
-        public virtual void Dispose()
-        {
-        }
     }
 }

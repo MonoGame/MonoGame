@@ -106,7 +106,7 @@ namespace Microsoft.Devices.Sensors
                 if (data.MagneticField.Accuracy == CMMagneticFieldCalibrationAccuracy.Uncalibrated)
                 {
                     if (this.calibrate == false)
-                        this.Calibrate(this, new CalibrationEventArgs());
+                        EventHelpers.Raise(this, Calibrate, new CalibrationEventArgs());
                     this.calibrate = true;
                 }
                 else if (this.calibrate == true)

@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class BlendState
     {
-        SharpDX.Direct3D11.BlendState _state;
+        private SharpDX.Direct3D11.BlendState _state;
 
         protected internal override void GraphicsDeviceResetting()
         {
@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
             base.GraphicsDeviceResetting();
         }
 
-        internal void PlatformApplyState(GraphicsDevice device)
+        internal SharpDX.Direct3D11.BlendState GetDxState(GraphicsDevice device)
         {
             if (_state == null)
             {
@@ -38,27 +38,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
 
-			// NOTE: We make the assumption here that the caller has
-			// locked the d3dContext for us to use.
-
 			// Apply the state!
-#if WINDOWS_UAP
-			device._d3dContext.OutputMerger.SetBlendState(_state,
-				new SharpDX.Mathematics.Interop.RawColor4(
-					_blendFactor.R / 255.0f,
-					_blendFactor.G / 255.0f,
-					_blendFactor.B / 255.0f,
-					_blendFactor.A / 255.0f));
-#else
-			device._d3dContext.OutputMerger.SetBlendState(_state, _blendFactor.ToColor4());
-#endif
-		}
+			return _state;
+        }
 
-        protected override void Dispose(bool disposing)
+        partial void PlatformDispose()
         {
-            if (disposing)
-                SharpDX.Utilities.Dispose(ref _state);
-            base.Dispose(disposing);
+            SharpDX.Utilities.Dispose(ref _state);
         }
     }
 }

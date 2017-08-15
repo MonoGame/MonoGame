@@ -8,9 +8,11 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Windows.Devices.Input;
 using Windows.Graphics.Display;
+using Windows.System.Threading;
 using Windows.UI.Core;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
 namespace Microsoft.Xna.Framework
@@ -18,7 +20,9 @@ namespace Microsoft.Xna.Framework
     internal class InputEvents
     {
         private readonly TouchQueue _touchQueue;
-        private readonly List<Keys> _keys = new List<Keys>();
+
+        // To convert from DIPs (device independent pixels) to actual screen resolution pixels.
+        private static float _currentDipFactor;
 
         public InputEvents(CoreWindow window, UIElement inputElement, TouchQueue touchQueue)
         {
@@ -31,6 +35,32 @@ namespace Microsoft.Xna.Framework
             window.VisibilityChanged += CoreWindow_VisibilityChanged;
             window.Activated += CoreWindow_Activated;
             window.SizeChanged += CoreWindow_SizeChanged;
+
+            DisplayInformation.GetForCurrentView().DpiChanged += InputEvents_DpiChanged;
+            _currentDipFactor = DisplayInformation.GetForCurrentView().LogicalDpi / 96.0f;
+
+            if (inputElement is SwapChainPanel || inputElement is SwapChainBackgroundPanel)
+            {
+                // Create a thread to precess input events.
+                var workItemHandler = new WorkItemHandler((action) =>
+                {
+                    var inputDevices = CoreInputDeviceTypes.Mouse | CoreInputDeviceTypes.Pen | CoreInputDeviceTypes.Touch;
+
+                    CoreIndependentInputSource coreIndependentInputSource;
+                    if (inputElement is SwapChainBackgroundPanel)
+                        coreIndependentInputSource = ((SwapChainBackgroundPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
+                    else
+                        coreIndependentInputSource = ((SwapChainPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
+
+                    coreIndependentInputSource.PointerPressed += CoreWindow_PointerPressed;
+                    coreIndependentInputSource.PointerMoved += CoreWindow_PointerMoved;
+                    coreIndependentInputSource.PointerReleased += CoreWindow_PointerReleased;
+                    coreIndependentInputSource.PointerWheelChanged += CoreWindow_PointerWheelChanged;
+
+                    coreIndependentInputSource.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
+                });
+                var inputWorker = ThreadPool.RunAsync(workItemHandler, WorkItemPriority.High, WorkItemOptions.TimeSliced);
+            }
 
             if (inputElement != null)
             {
@@ -50,6 +80,11 @@ namespace Microsoft.Xna.Framework
                 window.PointerMoved += CoreWindow_PointerMoved;
                 window.PointerWheelChanged += CoreWindow_PointerWheelChanged;
             }
+        }
+
+        private void InputEvents_DpiChanged(DisplayInformation sender, object args)
+        {
+            _currentDipFactor = DisplayInformation.GetForCurrentView().LogicalDpi / 96.0f;
         }
 
         #region UIElement Events
@@ -119,14 +154,12 @@ namespace Microsoft.Xna.Framework
 
         private void PointerPressed(PointerPoint pointerPoint, UIElement target, Pointer pointer)
         {
-            // To convert from DIPs (device independent pixels) to screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
+            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * _currentDipFactor;
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
 
             _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos, !isTouch);
-            
+
             if (!isTouch)
             {
                 // Mouse or stylus event.
@@ -140,9 +173,7 @@ namespace Microsoft.Xna.Framework
 
         private void PointerMoved(PointerPoint pointerPoint)
         {
-            // To convert from DIPs (device independent pixels) to actual screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
+            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * _currentDipFactor;
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
             var touchIsDown = pointerPoint.IsInContact;
@@ -161,9 +192,7 @@ namespace Microsoft.Xna.Framework
 
         private void PointerReleased(PointerPoint pointerPoint, UIElement target, Pointer pointer)
         {
-            // To convert from DIPs (device independent pixels) to screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
+            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * _currentDipFactor;
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
 
@@ -182,25 +211,33 @@ namespace Microsoft.Xna.Framework
 
         private static void UpdateMouse(PointerPoint point)
         {
-            // To convert from DIPs (device independent pixels) to screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            var x = (int)(point.Position.X * dipFactor);
-            var y = (int)(point.Position.Y * dipFactor);
+            var x = (int)(point.Position.X * _currentDipFactor);
+            var y = (int)(point.Position.Y * _currentDipFactor);
 
             var state = point.Properties;
 
-            Mouse.PrimaryWindow.MouseState.X = x;
-            Mouse.PrimaryWindow.MouseState.Y = y;
-            Mouse.PrimaryWindow.MouseState.ScrollWheelValue += state.MouseWheelDelta;
-            Mouse.PrimaryWindow.MouseState.LeftButton = state.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-            Mouse.PrimaryWindow.MouseState.RightButton = state.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-            Mouse.PrimaryWindow.MouseState.MiddleButton = state.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+            int verticalScrollDelta = 0;
+            int horizontalScrollDelta = 0;
+
+            if (state.IsHorizontalMouseWheel)
+                horizontalScrollDelta = state.MouseWheelDelta;
+            else
+                verticalScrollDelta = state.MouseWheelDelta;
+
+            Mouse.PrimaryWindow.MouseState = new MouseState(x, y, 
+                Mouse.PrimaryWindow.MouseState.ScrollWheelValue + verticalScrollDelta,
+                state.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released,
+                state.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released,
+                state.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released,
+                state.IsXButton1Pressed ? ButtonState.Pressed : ButtonState.Released,
+                state.IsXButton2Pressed ? ButtonState.Pressed : ButtonState.Released,
+                Mouse.PrimaryWindow.MouseState.HorizontalScrollWheelValue + horizontalScrollDelta);
         }
 
         public void UpdateState()
         {
             // Update the keyboard state.
-            Keyboard.SetKeys(_keys);
+            Keyboard.UpdateState();
         }
 
         private static Keys KeyTranslate(Windows.System.VirtualKey inkey, CorePhysicalKeyStatus keyStatus)
@@ -215,11 +252,11 @@ namespace Microsoft.Xna.Framework
                 case Windows.System.VirtualKey.Shift:
                     // we can detect right shift by checking the scancode value.
                     // left shift is 0x2A, right shift is 0x36. IsExtendedKey is always false.
-                    return (keyStatus.ScanCode==0x36) ? Keys.RightShift : Keys.LeftShift;
+                    return (keyStatus.ScanCode == 0x36) ? Keys.RightShift : Keys.LeftShift;
                 // Note that the Alt key is now refered to as Menu.
                 // ALT key doesn't get fired by KeyUp/KeyDown events.
                 // One solution could be to check CoreWindow.GetKeyState(...) on every tick.
-                case Windows.System.VirtualKey.Menu:                    
+                case Windows.System.VirtualKey.Menu:
                     return Keys.LeftAlt;
 
                 default:
@@ -231,23 +268,25 @@ namespace Microsoft.Xna.Framework
         {
             var xnaKey = KeyTranslate(args.VirtualKey, args.KeyStatus);
 
-            if (_keys.Contains(xnaKey))
-                _keys.Remove(xnaKey);
+            Keyboard.ClearKey(xnaKey);
         }
 
         private void CoreWindow_KeyDown(object sender, KeyEventArgs args)
         {
             var xnaKey = KeyTranslate(args.VirtualKey, args.KeyStatus);
 
-            if (!_keys.Contains(xnaKey))
-                _keys.Add(xnaKey);
+            Keyboard.SetKey(xnaKey);
         }
 
         private void CoreWindow_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
             // If the window is resized then also 
             // drop any current key states.
-            _keys.Clear();
+            Keyboard.Clear();
+
+            // required of input can stop working if we change focus
+            Window.Current.CoreWindow.IsInputEnabled = true;
+            CoreWindow.GetForCurrentThread().IsInputEnabled = true;
         }
 
         private void CoreWindow_Activated(CoreWindow sender, WindowActivatedEventArgs args)
@@ -255,7 +294,11 @@ namespace Microsoft.Xna.Framework
             // Forget about the held keys when we lose focus as we don't
             // receive key events for them while we are in the background
             if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
-                _keys.Clear();
+                Keyboard.Clear();
+
+            // required of input can stop working if we change focus
+            Window.Current.CoreWindow.IsInputEnabled = true;
+            CoreWindow.GetForCurrentThread().IsInputEnabled = true;
         }
 
         private void CoreWindow_VisibilityChanged(CoreWindow sender, VisibilityChangedEventArgs args)
@@ -263,7 +306,11 @@ namespace Microsoft.Xna.Framework
             // Forget about the held keys when we disappear as we don't
             // receive key events for them while we are in the background
             if (!args.Visible)
-                _keys.Clear();
+                Keyboard.Clear();
+
+            // required of input can stop working if we change focus
+            Window.Current.CoreWindow.IsInputEnabled = true;
+            CoreWindow.GetForCurrentThread().IsInputEnabled = true;
         }
     }
 }

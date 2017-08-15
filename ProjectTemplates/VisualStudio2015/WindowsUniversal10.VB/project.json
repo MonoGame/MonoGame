@@ -1,0 +1,22 @@
+﻿{
+  "dependencies": {
+    "Microsoft.ApplicationInsights": "1.2.3",
+    "Microsoft.ApplicationInsights.PersistenceChannel": "1.2.3",
+    "Microsoft.ApplicationInsights.WindowsApps": "1.1.1",
+    "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+    "MonoGame.Framework.WindowsUAP": "3.4.0.459",
+    "SharpDX.Direct2D1": "3.0.1",
+    "SharpDX.Direct3D11": "3.0.1"
+  },
+  "frameworks": {
+    "uap10.0": {}
+  },
+  "runtimes": {
+    "win10-arm": {},
+    "win10-arm-aot": {},
+    "win10-x86": {},
+    "win10-x86-aot": {},
+    "win10-x64": {},
+    "win10-x64-aot": {}
+  }
+}

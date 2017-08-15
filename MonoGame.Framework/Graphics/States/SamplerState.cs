@@ -35,6 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _maxAnisotropy;
         private int _maxMipLevel;
         private float _mipMapLevelOfDetailBias;
+        private TextureFilterMode _filterMode;
         private CompareFunction _comparisonFunction;
 
         public TextureAddressMode AddressU
@@ -117,6 +118,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// When using comparison sampling, also set <see cref="FilterMode"/> to <see cref="TextureFilterMode.Comparison"/>.
+        /// </summary>
         public CompareFunction ComparisonFunction
         {
             get { return _comparisonFunction; }
@@ -124,6 +128,16 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 ThrowIfBound();
                 _comparisonFunction = value;
+            }
+        }
+
+        public TextureFilterMode FilterMode
+        {
+            get { return _filterMode; }
+            set
+            {
+                ThrowIfBound();
+                _filterMode = value;
             }
         }
 
@@ -155,6 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
             MaxMipLevel = 0;
             MipMapLevelOfDetailBias = 0.0f;
             ComparisonFunction = CompareFunction.Never;
+            FilterMode = TextureFilterMode.Default;
         }
 
         private SamplerState(string name, TextureFilter filter, TextureAddressMode addressMode)
@@ -180,11 +195,23 @@ namespace Microsoft.Xna.Framework.Graphics
             _maxMipLevel = cloneSource._maxMipLevel;
             _mipMapLevelOfDetailBias = cloneSource._mipMapLevelOfDetailBias;
             _comparisonFunction = cloneSource._comparisonFunction;
+            _filterMode = cloneSource._filterMode;
         }
 
         internal SamplerState Clone()
         {
             return new SamplerState(this);
+        }
+
+        partial void PlatformDispose();
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!IsDisposed)
+            {
+                PlatformDispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

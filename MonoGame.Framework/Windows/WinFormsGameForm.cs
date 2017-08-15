@@ -1,6 +1,11 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input.Touch;
+using MonoGame.Framework;
 
 
 namespace Microsoft.Xna.Framework.Windows
@@ -27,27 +32,47 @@ namespace Microsoft.Xna.Framework.Windows
     [System.ComponentModel.DesignerCategory("Code")]
     internal class WinFormsGameForm : Form
     {
-        GameWindow _window;
+        private readonly WinFormsGameWindow _window;
+
+        public const int WM_MOUSEHWHEEL = 0x020E;
         public const int WM_POINTERUP = 0x0247;
         public const int WM_POINTERDOWN = 0x0246;
         public const int WM_POINTERUPDATE = 0x0245;
         public const int WM_KEYDOWN = 0x0100;
         public const int WM_TABLET_QUERYSYSTEMGESTURESTA = (0x02C0 + 12);
 
+        public const int WM_ENTERSIZEMOVE = 0x0231;
+        public const int WM_EXITSIZEMOVE = 0x0232;
+
         public const int WM_SYSCOMMAND = 0x0112;
 
         public bool AllowAltF4 = true;
 
-        public WinFormsGameForm(GameWindow window)
+        internal bool IsResizing { get; set; }
+
+        #region Events
+
+        public event EventHandler<HorizontalMouseWheelEventArgs> MouseHorizontalWheel;
+
+        #endregion
+
+        public WinFormsGameForm(WinFormsGameWindow window)
         {
             _window = window;
+        }
+
+        public void CenterOnPrimaryMonitor()
+        {
+             Location = new System.Drawing.Point(
+                 (Screen.PrimaryScreen.WorkingArea.Width  - Width ) / 2,
+                 (Screen.PrimaryScreen.WorkingArea.Height - Height) / 2);
         }
 
         [System.Security.Permissions.PermissionSet(System.Security.Permissions.SecurityAction.Demand, Name = "FullTrust")]
         protected override void WndProc(ref Message m)
         {
             var state = TouchLocationState.Invalid;
-           
+
             switch (m.Msg)
             {
                 case WM_TABLET_QUERYSYSTEMGESTURESTA:
@@ -71,15 +96,12 @@ namespace Microsoft.Xna.Framework.Windows
                     switch (m.WParam.ToInt32())
                     {
                         case 0x5B:  // Left Windows Key
+                        case 0x5C: // Right Windows Key
 
-                            if (this.WindowState == FormWindowState.Maximized)
-                            {
+                            if (_window.IsFullScreen && _window.HardwareModeSwitch)
                                 this.WindowState = FormWindowState.Minimized;
-                            }
  		 
                             break;
-                        case 0x5C: // Right Windows Key
-                            goto case 0x5B;
                     }
                     break;
 #endif
@@ -110,6 +132,19 @@ namespace Microsoft.Xna.Framework.Windows
                     break;
                 case WM_POINTERUPDATE:
                     state = TouchLocationState.Moved;
+                    break;
+                case WM_MOUSEHWHEEL:
+                    var delta = (short)(((ulong)m.WParam >> 16) & 0xffff); ;
+                    var handler = MouseHorizontalWheel;
+
+                    if (handler != null)
+                        handler(this, new HorizontalMouseWheelEventArgs(delta));
+                    break;
+                case WM_ENTERSIZEMOVE:
+                    IsResizing = true;
+                    break;
+                case WM_EXITSIZEMOVE:
+                    IsResizing = false;
                     break;
             }
 

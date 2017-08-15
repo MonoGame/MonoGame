@@ -89,7 +89,6 @@ namespace Microsoft.Xna.Framework
         private iOSGameViewController _viewController;
         private UIWindow _mainWindow;
         private List<NSObject> _applicationObservers;
-		private OpenALSoundController soundControllerInstance = null;
         private CADisplayLink _displayLink;
 
         public iOSGamePlatform(Game game) :
@@ -98,14 +97,23 @@ namespace Microsoft.Xna.Framework
             game.Services.AddService(typeof(iOSGamePlatform), this);
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
-			soundControllerInstance = OpenALSoundController.GetInstance;
+            try
+            {
+                OpenALSoundController soundControllerInstance = OpenALSoundController.GetInstance;
+            }
+            catch (DllNotFoundException ex)
+            {
+                throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
+            }
 
             //This also runs the TitleContainer static constructor, ensuring it is done on the main thread
             Directory.SetCurrentDirectory(TitleContainer.Location);
 
             _applicationObservers = new List<NSObject>();
 
+            #if !TVOS
             UIApplication.SharedApplication.SetStatusBarHidden(true, UIStatusBarAnimation.Fade);
+            #endif
 
             // Create a full-screen window
             _mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);
@@ -242,9 +250,6 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-    		// Update our OpenAL sound buffer pools
-    		soundControllerInstance.Update();
-
             if (IsPlayingVideo)
                 return false;
 
@@ -298,6 +303,9 @@ namespace Microsoft.Xna.Framework
         private void Application_DidBecomeActive(NSNotification notification)
         {
             IsActive = true;
+            #if TVOS
+            _viewController.ControllerUserInteractionEnabled = false;
+            #endif
             //TouchPanel.Reset();
         }
 
@@ -317,10 +325,23 @@ namespace Microsoft.Xna.Framework
 
         #endregion Notification Handling
 
+        #region Helper Property
+
+        private DisplayOrientation CurrentOrientation {
+            get {
+                #if TVOS
+                return DisplayOrientation.LandscapeLeft;
+                #else
+                return OrientationConverter.ToDisplayOrientation(_viewController.InterfaceOrientation);
+                #endif
+            }
+        }
+
+        #endregion
+
 		private void ViewController_InterfaceOrientationChanged (object sender, EventArgs e)
 		{
-			var orientation = OrientationConverter.ToDisplayOrientation (
-				_viewController.InterfaceOrientation);
+			var orientation = CurrentOrientation;
 
 			// FIXME: The presentation parameters for the GraphicsDevice should
 			//        be managed by the GraphicsDevice itself.  Not by

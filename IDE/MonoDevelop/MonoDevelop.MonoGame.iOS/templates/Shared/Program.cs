@@ -5,7 +5,7 @@ using System.Linq;
 #if MONOMAC
 using MonoMac.AppKit;
 using MonoMac.Foundation;
-#elif __IOS__
+#elif __IOS__ || __TVOS__
 using Foundation;
 using UIKit;
 #endif
@@ -14,7 +14,7 @@ using UIKit;
 
 namespace ${Namespace}
 {
-	#if __IOS__
+	#if __IOS__ || __TVOS__
 	[Register("AppDelegate")]
 	class Program : UIApplicationDelegate
 	#else
@@ -32,7 +32,7 @@ namespace ${Namespace}
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-		#if !MONOMAC && !__IOS__		 
+		#if !MONOMAC && !__IOS__ &&  !__TVOS__		 
         [STAThread]
 		#endif
 		static void Main(string[] args)
@@ -44,14 +44,14 @@ namespace ${Namespace}
 				NSApplication.SharedApplication.Delegate = new AppDelegate();
 				NSApplication.Main(args);
 			}
-			#elif __IOS__
+			#elif __IOS__ || __TVOS__
 			UIApplication.Main(args, null, "AppDelegate");
 			#else
 			RunGame();
 			#endif
         }
 
-		#if __IOS__
+		#if __IOS__ || __TVOS__
 		public override void FinishedLaunching(UIApplication app)
 		{
 			RunGame();
