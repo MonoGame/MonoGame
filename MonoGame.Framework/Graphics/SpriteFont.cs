@@ -170,9 +170,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
             // Get the default glyph here once.
-            SpriteFont.Glyph? defaultGlyph = null;
+            int defaultGlyphIndex = -1;
             if (DefaultCharacter.HasValue)
-                defaultGlyph = TryGetGlyph(DefaultCharacter.Value);
+                TryGetGlyphIndex(DefaultCharacter.Value, out defaultGlyphIndex);
 
 			var width = 0.0f;
 			var finalLineHeight = (float)LineSpacing;
@@ -197,7 +197,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
                 }
 
-                var currentGlyph = GetGlyphOrDefault(c, defaultGlyph);
+                var currentGlyphIndex = GetGlyphIndexOrDefault(c, defaultGlyphIndex);
+                var currentGlyph = Glyphs[currentGlyphIndex];
 
                 // The first character on a line might have a negative left side bearing.
                 // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
@@ -264,27 +265,18 @@ namespace Microsoft.Xna.Framework.Graphics
             return true;
         }
 
-        internal Glyph? TryGetGlyph(char c)
-        {   
-            int glyphIdx;
-            if (!TryGetGlyphIndex(c, out glyphIdx))
-                return null;
-            else
-                return _glyphs[glyphIdx];
-        }
-
-        internal Glyph GetGlyphOrDefault(char c, Glyph? defaultGlyph)
+        internal int GetGlyphIndexOrDefault(char c, int defaultGlyphIndex)
         {
             int glyphIdx;
             if (!TryGetGlyphIndex(c, out glyphIdx))
             {
-                if (!defaultGlyph.HasValue)
+                if (defaultGlyphIndex == -1)
                     throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
 
-                return defaultGlyph.Value;
+                return defaultGlyphIndex;
             }
             else
-                return _glyphs[glyphIdx];
+                return glyphIdx;
         }
         
         internal struct CharacterSource 
