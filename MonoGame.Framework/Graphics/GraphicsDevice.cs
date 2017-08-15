@@ -222,10 +222,6 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsCapabilities = new GraphicsCapabilities();
             GraphicsCapabilities.Initialize(this);
 
-#if WINDOWS
-            CorrectBackBufferSize();
-#endif
-
             Initialize();
         }
 
@@ -609,34 +605,11 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         */
 
-        partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters);
-
-#if WINDOWS
-        private void CorrectBackBufferSize()
-        {
-            // Window size can be modified when we're going full screen, we need to take that into account
-            // so the back buffer has the right size.
-            if (PresentationParameters.IsFullScreen)
-            {
-                int newWidth, newHeight;
-                if (PresentationParameters.HardwareModeSwitch)
-                    GetModeSwitchedSize(out newWidth, out newHeight);
-                else
-                    GetDisplayResolution(out newWidth, out newHeight);
-
-                PresentationParameters.BackBufferWidth = newWidth;
-                PresentationParameters.BackBufferHeight = newHeight;
-            }
-        }
-#endif
+        partial void PlatformReset();
 
         public void Reset()
         {
-#if WINDOWS
-            CorrectBackBufferSize();
-#endif
-
-            PlatformValidatePresentationParameters(PresentationParameters);
+            PlatformReset();
 
             EventHelpers.Raise(this, DeviceResetting, EventArgs.Empty);
 
