@@ -265,9 +265,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
-#if DESKTOPGL || ANGLE
             _programCache = new ShaderProgramCache(this);
-
+#if DESKTOPGL || ANGLE
             var windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
 
             if (Context == null || Context.IsDisposed)
