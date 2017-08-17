@@ -369,7 +369,7 @@ namespace MonoGame.Framework
         private void UpdateBackBufferSize()
         {
             var manager = Game.graphicsDeviceManager;
-            if (manager.GraphicsDevice == null)
+            if (manager == null || manager.GraphicsDevice == null)
                 return;
 
             var newSize = Form.ClientSize;
