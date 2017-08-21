@@ -88,10 +88,10 @@
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
 
 
-    <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.Link)' != ''" AdditionalMetadata="ContentOutputDir=$([System.String]::Copy('%(ContentReferences.Link)').Replace('%(Filename)%(Extension)', ''))">
+    <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.Link)' != '' And '%(ContentReferences.FullPath)' != ''" AdditionalMetadata="ContentOutputDir=$([System.String]::Copy('%(ContentReferences.Link)').Replace('%(Filename)%(Extension)', ''))">
       <Output TaskParameter="Include" ItemName="ExtraContent" />
     </CreateItem>
-    <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.Link)' == ''" AdditionalMetadata="ContentOutputDir=%(ContentReferences.RelativeDir)">
+    <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.Link)' == '' And '%(ContentReferences.FullPath)' != ''" AdditionalMetadata="ContentOutputDir=%(ContentReferences.RelativeDir)">
       <Output TaskParameter="Include" ItemName="ExtraContent" />
 
     </CreateItem>
