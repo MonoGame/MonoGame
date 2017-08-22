@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework
 
             _width = GraphicsDeviceManager.DefaultBackBufferWidth;
             _height = GraphicsDeviceManager.DefaultBackBufferHeight;
-            
+
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
             Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
@@ -218,6 +218,8 @@ namespace Microsoft.Xna.Framework
                 Sdl.Window.SetFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
                 _hardwareSwitch = _game.graphicsDeviceManager.HardwareModeSwitch;
             }
+            // If going to exclusive full-screen mode, force the window to minimize on focus loss
+            Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", _willBeFullScreen && _hardwareSwitch ? "1" : "0");
 
             if (!_willBeFullScreen || _game.graphicsDeviceManager.HardwareModeSwitch)
             {
