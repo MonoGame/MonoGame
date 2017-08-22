@@ -96,24 +96,6 @@ ln -s "$IDIR" "/opt/MonoGameSDK"
 chmod +x "$IDIR/Tools/ffmpeg"
 chmod +x "$IDIR/Tools/ffprobe"
 
-# Rider stuff
-if type "rider" > /dev/null 2>&1
-then
-	echo "Installing Rider files..."
-	
-	FINDCOMMAND=$(type -a rider)
-	COMMAND=$(echo $FINDCOMMAND| cut -d' ' -f 3)
-	
-	FINDRIDER=$(cat $COMMAND | grep "RUN_PATH")
-	RIDER=$(echo $FINDRIDER| cut -d"'" -f 2)
-	
-	RIDERDIR=$(dirname $(dirname $RIDER))
-	RXBUILD="$RIDERDIR/lib/ReSharperHost/linux-x64/mono/lib/mono/xbuild/MonoGame"
-	
-	mkdir -p "$RXBUILD"
-	ln -s "$IDIR" "$RXBUILD/v3.0"
-fi
-
 # MonoDevelop addin
 if [ "$MONODEVELOP" != "?????" ]
 then
