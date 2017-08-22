@@ -43,7 +43,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 if (CurrentPlatform.OS == OS.Windows)
                     directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts"));
                 else if (CurrentPlatform.OS == OS.MacOSX)
+                {
+                    directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Library", "Fonts"));
                     directories.Add("/Library/Fonts");
+                }
 
                 foreach (var dir in directories)
                 {
@@ -53,6 +56,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         if (File.Exists(fontFile))
                             break;
                     }
+                    if (File.Exists(fontFile))
+                        break;
                 }
             }
 
