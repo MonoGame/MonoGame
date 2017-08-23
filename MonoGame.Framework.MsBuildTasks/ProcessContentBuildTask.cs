@@ -14,8 +14,6 @@ namespace MonoGame.Framework.MsBuildTasks
         private static readonly char[] PathSperators = new char[] { '/', '\\' };
 
         private System.Collections.Concurrent.ConcurrentBag<ITaskItem> _content;
-        //private System.Collections.Concurrent.ConcurrentBag<ITaskItem> _androidAssets;
-        //private System.Collections.Concurrent.ConcurrentBag<ITaskItem> _bundleResources;
 
 
         public IBuildEngine BuildEngine { get; set; }
@@ -25,17 +23,8 @@ namespace MonoGame.Framework.MsBuildTasks
         [Output]
         public ITaskItem[] ExtraContent { get; set; }
 
-        //[Output]
-        //public ITaskItem[] ExtraAndroidAssets { get; set; }
-
-        //[Output]
-        //public ITaskItem[] ExtraBundleResources { get; set; }
-
         [Required]
         public string ProjectDirectory { get; set; }
-
-        //[Required]
-        //public string MonoExePath { get; set; }
 
         [Required]
         public string MgcbExePath { get; set; }
@@ -45,7 +34,6 @@ namespace MonoGame.Framework.MsBuildTasks
 
         [Required]
         public string Platform { get; set; }
-
 
         public string PlatformResourcePrefix { get; set; }
 
@@ -100,7 +88,6 @@ namespace MonoGame.Framework.MsBuildTasks
 
                 });
                 tasks.Add(task);
-                // tasks.Add(new Tuple<ITaskItem, Task>(contentReference, task));
                 task.Start();
             }
 
@@ -122,9 +109,6 @@ namespace MonoGame.Framework.MsBuildTasks
                 item.SetMetadata("ContentOutputDir", outputDirectoryInfo.FullName);
                 item.SetMetadata("RelativeContentOutputDir", relativeDir);
 
-                // We add RecursiveDir metadata, as if the directory portion of the file paths was resolved using a glob include, from the outputdir root.
-                // i.e include="$(outputDir)/**/*
-
                 if (string.IsNullOrWhiteSpace(fileInfo.FullName))
                 {
                     return;
@@ -135,74 +119,28 @@ namespace MonoGame.Framework.MsBuildTasks
                     return;
                 }
 
-                var relativePath = fileInfo.FullName.Remove(0, outputDirectoryInfo.FullName.Length).TrimStart(PathSperators);
-                item.SetMetadata("RecursiveDir", relativePath);
+                // We add RecursiveDir metadata, as if the directory portion of the file paths was resolved using a glob include, from the outputdir root.
+                // i.e include="$(outputDir)/**/*
+                var recursiveDir = fileInfo.FullName.Remove(0, outputDirectoryInfo.FullName.Length).TrimStart(PathSperators);
+                item.SetMetadata("RecursiveDir", recursiveDir);
 
-                if(string.IsNullOrWhiteSpace(link))
+                if (string.IsNullOrWhiteSpace(link))
                 {
-                    var linkPath = string.Format("{0}{1}{2}", PlatformResourcePrefix, relativeDir, relativePath);
+                    var linkPath = string.Format("{0}{1}{2}", PlatformResourcePrefix, relativeDir, recursiveDir);
                     item.SetMetadata("Link", linkPath);
                 }
                 else
                 {
                     var linkRoot = Path.GetDirectoryName(link);
-                    var linkPath = string.Format("{0}\\{1}", linkRoot, relativePath).TrimStart(PathSperators);
+                    var linkPath = string.Format("{0}\\{1}", linkRoot, recursiveDir).TrimStart(PathSperators);
                     item.SetMetadata("Link", linkPath);
                 }
-               
+
                 item.SetMetadata("CopyToOutputDirectory", "PreserveNewest");
-
-           //     switch (Platform)
-           //     {
-           //         case "Android":
-           //             break;
-           //         case "MacOSX":
-           //         case "iOS":
-           //             break;
-           //         default:
-           //             _content.
-
-           //     }
-
-           //           < Output TaskParameter = "Include" ItemName = "Content" Condition = "'$(MonoGamePlatform)' != 'Android' And '$(MonoGamePlatform)' != 'iOS' And '$(MonoGamePlatform)' != 'MacOSX'" />
-
-
-           //< Output TaskParameter = "Include" ItemName = "BundleResource" Condition = "'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'" />
-
-
-                //< Output TaskParameter = "Include" ItemName = "AndroidAsset" Condition = "'$(MonoGamePlatform)' == 'Android'" />
-
-
-
-                               // % (ExtraContent.RecursiveDir)
-
-                               //todo: add following:
-                               //RecursiveDir
-                               //filename
-                               //extension
-
-                               items.Add(item);
+                items.Add(item);
             });
             return items;
-            //var link = contentReference.GetMetadata("Link");
-            //if (string.IsNullOrWhiteSpace(link))
-            //{
-            //    var item = new TaskItem()
-            //     var fileName = fileName
-            //    var path = link.Replace("",)
-            //            }
 
-            //              < CreateItem Include = "%(ContentReferences.ContentOutputDir)\**\*.*" Condition = "'%(ContentReferences.Link)' != '' And '%(ContentReferences.FullPath)' != ''" AdditionalMetadata = "ContentOutputDir=$([System.String]::Copy('%(ContentReferences.Link)').Replace('%(Filename)%(Extension)', ''))" >
-
-            //< Output TaskParameter = "Include" ItemName = "ExtraContent" />
-
-            // </ CreateItem >
-
-            // < CreateItem Include = "%(ContentReferences.ContentOutputDir)\**\*.*" Condition = "'%(ContentReferences.Link)' == '' And '%(ContentReferences.FullPath)' != ''" AdditionalMetadata = "ContentOutputDir=%(ContentReferences.RelativeDir)" >
-
-            //        < Output TaskParameter = "Include" ItemName = "ExtraContent" />
-
-            //         </ CreateItem >
         }
 
         private string GetWorkingDir(ITaskItem contentReference)
@@ -233,8 +171,6 @@ namespace MonoGame.Framework.MsBuildTasks
 
         public void RunContentBuilderExecutable(string workingDir, string commandLineArguments, Action<string> outputValidator)
         {
-            //  var netFx = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
-
             if (!File.Exists(MgcbExePath))
             {
                 // log error?
