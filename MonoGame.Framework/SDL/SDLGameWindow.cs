@@ -218,8 +218,11 @@ namespace Microsoft.Xna.Framework
                 Sdl.Window.SetFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
                 _hardwareSwitch = _game.graphicsDeviceManager.HardwareModeSwitch;
             }
-            // If going to exclusive full-screen mode, force the window to minimize on focus loss
-            Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", _willBeFullScreen && _hardwareSwitch ? "1" : "0");
+            // If going to exclusive full-screen mode, force the window to minimize on focus loss (Windows only)
+            if (CurrentPlatform.OS == OS.Windows)
+            {
+                Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", _willBeFullScreen && _hardwareSwitch ? "1" : "0");
+            }
 
             if (!_willBeFullScreen || _game.graphicsDeviceManager.HardwareModeSwitch)
             {
