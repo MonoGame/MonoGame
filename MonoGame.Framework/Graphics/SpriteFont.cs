@@ -228,43 +228,48 @@ namespace Microsoft.Xna.Framework.Graphics
             size.X = width;
             size.Y = offset.Y + finalLineHeight;
 		}
-
-        private int GetRegionIndex(char c)
-        {            
-            var l = 0;
-            var r = _regions.Length - 1;
-
-            while (l <= r)
+        
+        internal unsafe bool TryGetGlyphIndex(char c, out int index)
+        {
+            fixed (CharacterRegion* pRegions = _regions)
             {
-                var m = (l + r) >> 1;
-                if (_regions[m].End < c)
+                // Get region Index 
+                int regionIdx = -1;
+                var l = 0;
+                var r = _regions.Length - 1;
+                while (l <= r)
                 {
-                    l = m + 1;
+                    var m = (l + r) >> 1;                    
+                    Debug.Assert(m >= 0 && m < _regions.Length, "Index was outside the bounds of the array.");
+                    if (pRegions[m].End < c)
+                    {
+                        l = m + 1;
+                    }
+                    else if (pRegions[m].Start > c)
+                    {
+                        r = m;
+                        if (l == r)
+                        {
+                            regionIdx = l;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        regionIdx = m;
+                        break;
+                    }
                 }
-                else if (_regions[m].Start > c)
+
+                if (regionIdx == -1)
                 {
-                    r = m;
-                    if (l == r) return l;
+                    index = -1;
+                    return false;
                 }
-                else
-                {
-                    return m;
-                }
+
+                index = pRegions[regionIdx].StartIndex + (c - pRegions[regionIdx].Start);
             }
 
-            return -1;
-        }
-
-        internal bool TryGetGlyphIndex(char c, out int index)
-        {   
-            var regionIdx = GetRegionIndex(c);
-            if (regionIdx == -1)
-            {
-                index = -1;
-                return false;
-            }
-
-            index = _regions[regionIdx].StartIndex + (c - _regions[regionIdx].Start);
             return true;
         }
 
