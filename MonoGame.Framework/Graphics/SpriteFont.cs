@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Text;
 
 namespace Microsoft.Xna.Framework.Graphics 
@@ -199,6 +200,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 var currentGlyphIndex = GetGlyphIndexOrDefault(c, defaultGlyphIndex);
+                Debug.Assert(currentGlyphIndex >= 0 && currentGlyphIndex < Glyphs.Length, "currentGlyphIndex was outside the bounds of the array.");
                 var pCurrentGlyph = pGlyphs + currentGlyphIndex;
 
                 // The first character on a line might have a negative left side bearing.
