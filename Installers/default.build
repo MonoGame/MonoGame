@@ -185,6 +185,11 @@ fi
                 <include name="*.*"/>
          </fileset>
       </copy>
+      <copy todir="Linux/tmp_run/MonoGameSDK/Assemblies/Android">
+         <fileset basedir="../MonoGame.Framework/bin/Android/AnyCPU/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
       <copy todir="Linux/tmp_run">
         <fileset basedir="Linux/RUN"/>
       </copy>
