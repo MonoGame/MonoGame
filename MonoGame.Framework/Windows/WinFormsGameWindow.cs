@@ -221,6 +221,9 @@ namespace MonoGame.Framework
 
         private void OnDeactivate(object sender, EventArgs eventArgs)
         {
+            // If in exclusive mode full-screen, force it out of exclusive mode and minimize the window
+            if (IsFullScreen && _platform.Game.GraphicsDevice.PresentationParameters.HardwareModeSwitch)
+                MinimizeFullScreen();
             _platform.IsActive = false;
             Keyboard.SetActive(false);
         }
@@ -591,11 +594,30 @@ namespace MonoGame.Framework
         {
             _switchingFullScreen = true;
 
-            _platform.Game.GraphicsDevice.SetHardwareFullscreen();
+            _platform.Game.GraphicsDevice.ClearHardwareFullscreen();
 
             IsBorderless = false;
             Form.WindowState = FormWindowState.Normal;
             _lastFormState = FormWindowState.Normal;
+            Form.Location = _locationBeforeFullScreen;
+            IsFullScreen = false;
+
+            // Windows does not always correctly redraw the desktop when exiting soft full screen, so force a redraw
+            if (!HardwareModeSwitch)
+                RedrawWindow(IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, 1);
+
+            _switchingFullScreen = false;
+        }
+
+        private void MinimizeFullScreen()
+        {
+            _switchingFullScreen = true;
+
+            _platform.Game.GraphicsDevice.ClearHardwareFullscreen();
+
+            IsBorderless = false;
+            Form.WindowState = FormWindowState.Minimized;
+            _lastFormState = FormWindowState.Minimized;
             Form.Location = _locationBeforeFullScreen;
             IsFullScreen = false;
 

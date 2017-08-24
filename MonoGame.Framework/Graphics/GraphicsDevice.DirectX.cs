@@ -677,6 +677,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen && PresentationParameters.HardwareModeSwitch, null);
         }
 
+        internal void ClearHardwareFullscreen()
+        {
+            _swapChain.SetFullscreenState(false, null);
+        }
+
         internal void ResizeTargets()
         {
             var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
