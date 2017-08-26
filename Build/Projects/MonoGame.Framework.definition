@@ -598,13 +598,16 @@
     </Compile>
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs">
-      <ExcludePlatforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS,Web</ExcludePlatforms>
+      <ExcludePlatforms>Android,Angle,iOS,MacOS,tvOS,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\GraphicsAdapter.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
+    <Compile Include="Graphics\GraphicsAdapter.SDL.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
+    </Compile>
     <Compile Include="Graphics\GraphicsAdapter.Legacy.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS,Web</Platforms>
+      <Platforms>Android,Angle,iOS,MacOS,tvOS,Web</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\GraphicsCapabilities.DirectX.cs">
