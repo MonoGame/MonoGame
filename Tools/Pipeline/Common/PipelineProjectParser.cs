@@ -298,7 +298,11 @@ namespace MonoGame.Tools.Pipeline
             line = FormatDivider("Content");
             io.WriteLine(line);
 
-            foreach (var i in _project.ContentItems)
+            // Sort the items alphabetically to ensure a consistent output
+            // and better mergability of the resulting MGCB file.
+            var sortedItems = _project.ContentItems.OrderBy(c => c.OriginalPath, StringComparer.InvariantCulture);
+
+            foreach (var i in sortedItems)
             {
                 // Reject any items that don't pass the filter.              
                 if (filterItem != null && filterItem(i))
