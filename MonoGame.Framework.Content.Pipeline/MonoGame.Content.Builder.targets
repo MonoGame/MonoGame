@@ -42,7 +42,7 @@
         <Output TaskParameter="Include" ItemName="ContentReferences" />
     </CreateItem>
     <CreateItem Include="@(MonoGameContentReference)" Condition=" '%(RelativeDir)' == '%(RootDir)%(Directory)'"
-            AdditionalMetadata="ContentPath=$([System.IO.Directory]::GetParent('%(RelativeDir)'))">
+            AdditionalMetadata="ContentPath=$([System.String]::Copy('%(RelativeDir)').TrimEnd('\').TrimEnd('/'))">
         <Output TaskParameter="Include" ItemName="SharedProjectContentReferences" />
     </CreateItem>
     <CreateItem Include="@(SharedProjectContentReferences)"
