@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Utilities;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
@@ -1563,7 +1563,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 // We need to copy each row separately and skip trailing zeroes.
                                 stream.Seek(0, SeekOrigin.Begin);
 
-                                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                                var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
                                 for (var row = 0; row < rows; row++)
                                 {
                                     int i;
