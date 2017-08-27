@@ -44,10 +44,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 					Glyphs = glyphList;
 
 					// Store the font height.
-					LineSpacing = face.Size.Metrics.Height >> 6;
+					LineSpacing = face.Size.Metrics.Height.Value >> 6;
 
 					// The height used to calculate the Y offset for each character.
-					YOffsetMin = -face.Size.Metrics.Ascender >> 6;
+					YOffsetMin = -face.Size.Metrics.Ascender.Value >> 6;
 			}
             finally
             {
@@ -131,8 +131,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             if (glyphBitmap == null) 
 			{
-				var gHA = face.Glyph.Metrics.HorizontalAdvance >> 6;
-				var gVA = face.Size.Metrics.Height >> 6;
+				var gHA = face.Glyph.Metrics.HorizontalAdvance.Value >> 6;
+				var gVA = face.Size.Metrics.Height.Value >> 6;
 
 				gHA = gHA > 0 ? gHA : gVA;
 				gVA = gVA > 0 ? gVA : gHA;
@@ -142,16 +142,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 			// not sure about this at all
 			var abc = new ABCFloat ();
-			abc.A = face.Glyph.Metrics.HorizontalBearingX >> 6;
-			abc.B = face.Glyph.Metrics.Width >> 6;
-			abc.C = (face.Glyph.Metrics.HorizontalAdvance >> 6) - (abc.A + abc.B);
+			abc.A = face.Glyph.Metrics.HorizontalBearingX.Value >> 6;
+			abc.B = face.Glyph.Metrics.Width.Value >> 6;
+			abc.C = (face.Glyph.Metrics.HorizontalAdvance.Value >> 6) - (abc.A + abc.B);
 
 			// Construct the output Glyph object.
 			return new Glyph(character, glyphBitmap)
 			{
-				XOffset = -(face.Glyph.Advance.X >> 6),
-				XAdvance = face.Glyph.Metrics.HorizontalAdvance >> 6,
-                YOffset = -(face.Glyph.Metrics.HorizontalBearingY >> 6),
+				XOffset = -(face.Glyph.Advance.X.Value >> 6),
+				XAdvance = face.Glyph.Metrics.HorizontalAdvance.Value >> 6,
+				YOffset = -(face.Glyph.Metrics.HorizontalBearingY.Value >> 6),
 				CharacterWidths = abc
 			};
 		}
