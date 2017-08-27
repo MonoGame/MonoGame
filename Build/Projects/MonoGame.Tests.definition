@@ -33,6 +33,107 @@
   </Properties>
 
   <Files>
+    <!-- Dependencies -->
+    <None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
+      <Platforms>WindowsGL</Platforms>
+      <Link>SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
+      <Platforms>WindowsGL</Platforms>
+      <Link>soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
+      <Platforms>Linux</Platforms>
+      <Link>x64\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
+      <Platforms>Linux</Platforms>
+      <Link>x64\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib"  Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libSDL2-2.0.0.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib"  Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libopenal.1.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>ffprobe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>ffmpeg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvtt.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libnvtt.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libnvcore.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvimage.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libnvimage.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvmath.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libnvmath.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>Nvidia.TextureTools.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>Nvidia.TextureTools.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>FreeImageNET.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll.config" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>FreeImageNET.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libfreeimage.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>PVRTexLibNET.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>PVRTexLibNET.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libPVRTexLibWrapper.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <None Include="README.md" />
 
