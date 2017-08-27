@@ -220,6 +220,10 @@
       <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Debug" />
       <test assemblyname="Test\bin\Windows\AnyCPU\Debug\MonoGameTests.exe" />
     </nunit2>
+    <nunit2 if="${is == 'MacOS'}">
+      <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Linux\AnyCPU\Debug" />
+      <test assemblyname="Test\bin\Linux\AnyCPU\Debug\MonoGameTests.exe" />
+    </nunit2>
   </target>
 
 
