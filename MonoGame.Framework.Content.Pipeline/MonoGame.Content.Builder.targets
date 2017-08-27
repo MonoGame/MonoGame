@@ -94,11 +94,11 @@
           Command="$(MonoGameContentBuilderCmd) /@:&quot;%(ContentReferences.FullPath)&quot; $(Header) /outputDir:&quot;%(ContentReferences.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReferences.ContentIntermediateOutputDir)&quot; /quiet"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
 
-    <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.Link)' != ''"
+    <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.Link)' != '' And '%(ContentReferences.FullPath)' != ''"
             AdditionalMetadata="ContentOutputDir=$([System.String]::Copy('%(ContentReferences.Link)').Replace('%(Filename)%(Extension)', ''))">
       <Output TaskParameter="Include" ItemName="ExtraContent" />
     </CreateItem>
-    <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.Link)' == '' And '%(ContentReferences.ContentPath)' == ''"
+    <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.Link)' == '' And '%(ContentReferences.FullPath)' != '' And '%(ContentReferences.ContentPath)' == ''"
             AdditionalMetadata="ContentOutputDir=%(ContentReferences.RelativeDir)">
       <Output TaskParameter="Include" ItemName="ExtraContent" />
     </CreateItem>
