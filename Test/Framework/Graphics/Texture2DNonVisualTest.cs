@@ -18,9 +18,9 @@ namespace MonoGame.Tests.Graphics
 
 #if !XNA
         [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
-        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
 #if !DESKTOPGL
         // not supported
+        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
         [TestCase("Assets/Textures/LogoOnly_64px.dds")]
 #endif
 #endif
@@ -41,10 +41,10 @@ namespace MonoGame.Tests.Graphics
                 System.Drawing.GraphicsUnit gu = System.Drawing.GraphicsUnit.Pixel;
                 System.Drawing.RectangleF rf = bitmap.GetBounds(ref gu);
                 Rectangle rt = _texture.Bounds;
-                Assert.AreEqual((int) rf.Bottom, rt.Bottom);
-                Assert.AreEqual((int) rf.Left, rt.Left);
-                Assert.AreEqual((int) rf.Right, rt.Right);
-                Assert.AreEqual((int) rf.Top, rt.Top);
+                Assert.AreEqual((int)rf.Bottom, rt.Bottom);
+                Assert.AreEqual((int)rf.Left, rt.Left);
+                Assert.AreEqual((int)rf.Right, rt.Right);
+                Assert.AreEqual((int)rf.Top, rt.Top);
                 bitmap.Dispose();
             }//The dds file test case can't be checked with System.Drawing because it does not understand this format
             catch { }
@@ -57,7 +57,9 @@ namespace MonoGame.Tests.Graphics
                 [TestCase("Assets/Textures/LogoOnly_64px.dds")]
                 [TestCase("Assets/Textures/LogoOnly_64px.tif")]
 #endif
+#if !DESKTOPGL
         [TestCase("Assets/Textures/LogoOnly_64px.tga")]
+#endif
         [TestCase("Assets/Textures/SampleCube64DXT1Mips.dds")]
         public void FromStreamShouldFailTest(string filename)
         {
