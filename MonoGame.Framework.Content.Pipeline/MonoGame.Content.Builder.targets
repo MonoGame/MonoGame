@@ -26,8 +26,9 @@
       <MonoGameContentBuilderExe Condition="'$(MonoGameContentBuilderExe)' == ''">$(MSBuildThisFileDirectory)Tools\MGCB.exe</MonoGameContentBuilderExe>
       <MonoGameContentBuilderCmd>&quot;$(MonoGameContentBuilderExe)&quot;</MonoGameContentBuilderCmd>
       <MonoGameContentBuilderCmd Condition=" '$(OS)' != 'Windows_NT' ">$(MonoExe) $(MonoGameContentBuilderCmd)</MonoGameContentBuilderCmd>
-      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'">Resources\</PlatformResourcePrefix>
-      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'Android'">Assets\</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'MacOSX'">$(MonoMacResourcePrefix)\</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'iOS'">$(IPhoneResourcePrefix)\</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'Android'">$(MonoAndroidAssetsPrefix)\</PlatformResourcePrefix>
       <PlatformResourcePrefix Condition="'$(PlatformResourcePrefix)' == ''"></PlatformResourcePrefix>
       <Header>/platform:$(MonoGamePlatform) </Header>
     </PropertyGroup>
@@ -35,21 +36,17 @@
     <!-- Get all Mono Game Content References and store them in a list -->
     <!-- We do this here so we are compatible with xbuild -->
 
-	<Message Text="Identity= %(MonoGameContentReference.Identity)" />
-	<Message Text="FullPath= %(MonoGameContentReference.FullPath)" />
-	<Message Text="Directory= %(MonoGameContentReference.Directory)" />
-	<Message Text="RelativeDir= %(MonoGameContentReference.RelativeDir)" />
     <CreateItem Include="@(MonoGameContentReference)"
-			Condition=" '%(RelativeDir)' != '%(RootDir)%(Directory)'"
+             Condition=" '%(RelativeDir)' != '%(RootDir)%(Directory)'"
             AdditionalMetadata="ContentOutputDir=$(ProjectDir)%(RelativeDir)bin\$(MonoGamePlatform)\%(Filename);ContentIntermediateOutputDir=$(ProjectDir)%(RelativeDir)obj\$(MonoGamePlatform)\%(Filename)">
         <Output TaskParameter="Include" ItemName="ContentReferences" />
     </CreateItem>
-	<CreateItem Include="@(MonoGameContentReference)" Condition=" '%(RelativeDir)' == '%(RootDir)%(Directory)'"
+    <CreateItem Include="@(MonoGameContentReference)" Condition=" '%(RelativeDir)' == '%(RootDir)%(Directory)'"
             AdditionalMetadata="ContentPath=$([System.IO.Directory]::GetParent('%(RelativeDir)'))">
-		<Output TaskParameter="Include" ItemName="SharedProjectContentReferences" />
-	</CreateItem>
+        <Output TaskParameter="Include" ItemName="SharedProjectContentReferences" />
+    </CreateItem>
     <CreateItem Include="@(SharedProjectContentReferences)"
-			AdditionalMetadata="ContentOutputDir=%(ContentPath)\bin\$(MonoGamePlatform)\$([System.IO.Path]::GetFileName('%(ContentPath)'));ContentIntermediateOutputDir=obj\$(MonoGamePlatform)\$([System.IO.Path]::GetFileName('%(ContentPath)'))">
+            AdditionalMetadata="ContentOutputDir=%(ContentPath)\bin\$(MonoGamePlatform)\$([System.IO.Path]::GetFileName('%(ContentPath)'));ContentIntermediateOutputDir=obj\$(MonoGamePlatform)\$([System.IO.Path]::GetFileName('%(ContentPath)'))">
         <Output TaskParameter="Include" ItemName="ContentReferences" />
     </CreateItem>
 
@@ -96,28 +93,18 @@
           Command="$(MonoGameContentBuilderCmd) /@:&quot;%(ContentReferences.FullPath)&quot; $(Header) /outputDir:&quot;%(ContentReferences.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReferences.ContentIntermediateOutputDir)&quot; /quiet"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
 
-	<Message Text="Identity= %(ContentReferences.Identity)" Condition="'%(ContentReferences.RelativeDir)' == '%(ContentReferences.RootDir)%(ContentReferences.Directory)'"/>
-	<Message Text="FullPath= %(ContentReferences.FullPath)" Condition="'%(ContentReferences.RelativeDir)' == '%(ContentReferences.RootDir)%(ContentReferences.Directory)'"/>
-	<Message Text="Directory= %(ContentReferences.Directory)" Condition="'%(ContentReferences.RelativeDir)' == '%(ContentReferences.RootDir)%(ContentReferences.Directory)'"/>
-	<Message Text="ContentOutputDir= %(ContentReferences.ContentOutputDir)" Condition="'%(ContentReferences.RelativeDir)' == '%(ContentReferences.RootDir)%(ContentReferences.Directory)'"/>
-	<Message Text="ContentIntermediateOutputDir= %(ContentReferences.ContentIntermediateOutputDir)" Condition="'%(ContentReferences.RelativeDir)' == '%(ContentReferences.RootDir)%(ContentReferences.Directory)'"/>
-	<Message Text="Link= %(ContentReferences.Link)" Condition="'%(ContentReferences.RelativeDir)' == '%(ContentReferences.RootDir)%(ContentReferences.Directory)'"/>
-	<Message Text="RelativeDir= %(ContentReferences.RelativeDir)" Condition="'%(ContentReferences.RelativeDir)' == '%(ContentReferences.RootDir)%(ContentReferences.Directory)'"/>
-		
     <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.Link)' != ''"
-			AdditionalMetadata="ContentOutputDir=$([System.String]::Copy('%(ContentReferences.Link)').Replace('%(Filename)%(Extension)', ''))">
+            AdditionalMetadata="ContentOutputDir=$([System.String]::Copy('%(ContentReferences.Link)').Replace('%(Filename)%(Extension)', ''))">
       <Output TaskParameter="Include" ItemName="ExtraContent" />
     </CreateItem>
     <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.Link)' == '' And '%(ContentReferences.ContentPath)' == ''"
-			AdditionalMetadata="ContentOutputDir=%(ContentReferences.RelativeDir)">
+            AdditionalMetadata="ContentOutputDir=%(ContentReferences.RelativeDir)">
       <Output TaskParameter="Include" ItemName="ExtraContent" />
     </CreateItem>
     <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.ContentPath)' != ''"
-			AdditionalMetadata="ContentOutputDir=$([System.IO.Path]::GetFileName('%(ContentReferences.ContentPath)'))\">
+            AdditionalMetadata="ContentOutputDir=$([System.IO.Path]::GetFileName('%(ContentReferences.ContentPath)'))\">
       <Output TaskParameter="Include" ItemName="ExtraContent" />
     </CreateItem>
-    <Message Text="ExtraContent.FullPath = %(ExtraContent.FullPath)" />
-	 <Message Text="ExtraContent.ContentOutputDir = %(ExtraContent.ContentOutputDir)" />
   </Target>
 
   <Target Name="BuildContent" DependsOnTargets="Prepare;RunContentBuilder"
