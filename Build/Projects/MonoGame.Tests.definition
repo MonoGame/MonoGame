@@ -68,12 +68,12 @@
     <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
       <Link>ffprobe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
       <Link>ffmpeg</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvtt.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
