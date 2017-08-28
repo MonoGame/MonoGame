@@ -22,6 +22,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly Glyph[] _glyphs;
         private readonly CharacterRegion[] _regions;
+        private char? _defaultCharacter;
+        private int _defaultGlyphIndex = -1;
 		
 		private readonly Texture2D _texture;
         
@@ -50,7 +52,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			_texture = texture;
 			LineSpacing = lineSpacing;
 			Spacing = spacing;
-			DefaultCharacter = defaultCharacter;
 
             _glyphs = new Glyph[characters.Count];
             var regions = new Stack<CharacterRegion>();
@@ -87,6 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _regions = regions.ToArray();
             Array.Reverse(_regions);
 
+			DefaultCharacter = defaultCharacter;
 		}
 
         /// <summary>
@@ -117,7 +119,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// Gets or sets the character that will be substituted when a
 		/// given character is not included in the font.
 		/// </summary>
-		public char? DefaultCharacter { get; set; }
+		public char? DefaultCharacter
+        {
+            get { return _defaultCharacter; }
+            set
+            {
+                _defaultCharacter = value;
+                // Get the default glyph index here once.
+                if (_defaultCharacter.HasValue)
+                    TryGetGlyphIndex(_defaultCharacter.Value, out _defaultGlyphIndex);
+                else
+                    _defaultGlyphIndex = -1;
+            }
+        }
 
 		/// <summary>
 		/// Gets or sets the line spacing (the distance from baseline
@@ -168,11 +182,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				return;
 			}
 
-            // Get the default glyph here once.
-            int defaultGlyphIndex = -1;
-            if (DefaultCharacter.HasValue)
-                TryGetGlyphIndex(DefaultCharacter.Value, out defaultGlyphIndex);
-
 			var width = 0.0f;
 			var finalLineHeight = (float)LineSpacing;
             
@@ -197,7 +206,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
                 }
 
-                var currentGlyphIndex = GetGlyphIndexOrDefault(c, defaultGlyphIndex);
+                var currentGlyphIndex = GetGlyphIndexOrDefault(c);
                 Debug.Assert(currentGlyphIndex >= 0 && currentGlyphIndex < Glyphs.Length, "currentGlyphIndex was outside the bounds of the array.");
                 var pCurrentGlyph = pGlyphs + currentGlyphIndex;
 
@@ -271,15 +280,15 @@ namespace Microsoft.Xna.Framework.Graphics
             return true;
         }
 
-        internal int GetGlyphIndexOrDefault(char c, int defaultGlyphIndex)
+        internal int GetGlyphIndexOrDefault(char c)
         {
             int glyphIdx;
             if (!TryGetGlyphIndex(c, out glyphIdx))
             {
-                if (defaultGlyphIndex == -1)
+                if (_defaultGlyphIndex == -1)
                     throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
 
-                return defaultGlyphIndex;
+                return _defaultGlyphIndex;
             }
             else
                 return glyphIdx;
