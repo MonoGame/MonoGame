@@ -18,6 +18,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			public const string TextContainsUnresolvableCharacters =
 				"Text contains characters that cannot be resolved by this SpriteFont.";
+			public const string UnresolvableCharacter =
+				"Character cannot be resolved by this SpriteFont.";
 		}
 
         private readonly Glyph[] _glyphs;
@@ -123,13 +125,17 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get { return _defaultCharacter; }
             set
-            {
-                _defaultCharacter = value;
+            {   
                 // Get the default glyph index here once.
-                if (_defaultCharacter.HasValue)
-                    TryGetGlyphIndex(_defaultCharacter.Value, out _defaultGlyphIndex);
+                if (value.HasValue)
+                {
+                    if(!TryGetGlyphIndex(value.Value, out _defaultGlyphIndex))
+                        throw new ArgumentException(Errors.UnresolvableCharacter);
+                }
                 else
                     _defaultGlyphIndex = -1;
+
+                _defaultCharacter = value;
             }
         }
 
