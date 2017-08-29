@@ -133,6 +133,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformInitialize()
         {
+#if WINDOWS
+            CorrectBackBufferSize();
+#endif
 #if !WINDOWS_PHONE
             CreateSizeDependentResources();
 #endif
@@ -567,16 +570,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
-        partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters)
+        partial void PlatformReset()
         {
+#if WINDOWS
+            CorrectBackBufferSize();
+#endif
+
 #if WINDOWS_UAP
-            if (presentationParameters.SwapChainPanel == null)
+            if (PresentationParameters.SwapChainPanel == null)
                 throw new ArgumentException("PresentationParameters.SwapChainPanel must not be null.");
 #elif WINDOWS_STOREAPP
-            if (presentationParameters.DeviceWindowHandle == IntPtr.Zero && presentationParameters.SwapChainBackgroundPanel == null)
+            if (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainBackgroundPanel == null)
                 throw new ArgumentException("PresentationParameters.DeviceWindowHandle or PresentationParameters.SwapChainBackgroundPanel must be not null.");
 #else
-            if (presentationParameters.DeviceWindowHandle == IntPtr.Zero)
+            if (PresentationParameters.DeviceWindowHandle == IntPtr.Zero)
                 throw new ArgumentException("PresentationParameters.DeviceWindowHandle must not be null.");
 #endif
         }
@@ -590,6 +597,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 #if WINDOWS
+
+        private void CorrectBackBufferSize()
+        {
+            // Window size can be modified when we're going full screen, we need to take that into account
+            // so the back buffer has the right size.
+            if (PresentationParameters.IsFullScreen)
+            {
+                int newWidth, newHeight;
+                if (PresentationParameters.HardwareModeSwitch)
+                    GetModeSwitchedSize(out newWidth, out newHeight);
+                else
+                    GetDisplayResolution(out newWidth, out newHeight);
+
+                PresentationParameters.BackBufferWidth = newWidth;
+                PresentationParameters.BackBufferHeight = newHeight;
+            }
+        }
 
         /// <summary>
         /// Create graphics device specific resources.
