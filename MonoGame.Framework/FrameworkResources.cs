@@ -9,6 +9,8 @@ namespace Microsoft.Xna.Framework
         #region Error strings
 
         internal const string ResourceCreationWhenDeviceIsNull = "The GraphicsDevice must not be null when creating new resources.";
+        internal const string GraphicsDeviceManagerNotRegistered = "This GraphicsDeviceManager has not been registered in the Game.Services container.";
+        internal const string CouldNotFindCompatibleGraphicsDevice = "Could not find a graphics device compatible with the current device preferences.";
 
         #endregion
     }

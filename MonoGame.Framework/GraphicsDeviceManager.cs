@@ -5,6 +5,7 @@
 using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework
 {
@@ -290,10 +291,85 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Finds the best device configuration that is compatible with the current device preferences.
+        /// </summary>
+        /// <param name="anySuitableDevice">If true, the best device configuration can be selected from any
+        /// available adaptor. If false, only the current adaptor is used.</param>
+        /// <returns>The best device configuration that could be found.</returns>
+        protected virtual GraphicsDeviceInformation FindBestDevice(bool anySuitableDevice)
+        {
+            // Create a list of available devices
+            var devices = new List<GraphicsDeviceInformation>();
+            if (anySuitableDevice)
+            {
+                foreach (var adapter in GraphicsAdapter.Adapters)
+                {
+                    AddModes(adapter, devices);
+                }
+            }
+            else
+            {
+                var adapter = GraphicsAdapter.DefaultAdapter;
+                AddModes(adapter, devices);
+            }
+
+            // Rank them to get the most preferred device first
+            RankDevices(devices);
+
+            // No devices left in the list?
+            if (devices.Count == 0)
+            {
+                throw new NoSuitableGraphicsDeviceException(FrameworkResources.CouldNotFindCompatibleGraphicsDevice);
+            }
+
+            // The first device in the list is the most suitable
+            return devices[0];
+        }
+
+        // Add all modes supported by an adapter to the list
+        void AddModes(GraphicsAdapter adapter, List<GraphicsDeviceInformation> devices)
+        {
+            foreach (var mode in adapter.SupportedDisplayModes)
+            {
+                var gdi = new GraphicsDeviceInformation()
+                {
+                    Adapter = adapter,
+                    GraphicsProfile = GraphicsProfile,
+                    PresentationParameters = new PresentationParameters()
+                    {
+                        BackBufferFormat = mode.Format,
+                        BackBufferHeight = mode.Height,
+                        BackBufferWidth = mode.Width
+                    }
+                };
+                devices.Add(gdi);
+            }
+        }
+
+        /// <summary>
+        /// Orders the supplied devices based on the current preferences.
+        /// </summary>
+        /// <param name="foundDevices">The list of devices to rank.</param>
+        /// <remarks>
+        /// The list of devices is sorted so that devices earlier in the list are preferred over devices
+        /// later in the list. Devices may be removed from the list if they do not satisfy the criteria.
+        /// </remarks>
+        protected virtual void RankDevices(List<GraphicsDeviceInformation> foundDevices)
+        {
+
+        }
+
+        /// <summary>
         /// Applies any pending property changes to the graphics device.
         /// </summary>
         public void ApplyChanges()
         {
+            // The GraphicsDeviceManager must be registered with the Game.Services container
+            if (this != _game.Services.GetService<IGraphicsDeviceManager>())
+            {
+                throw new InvalidOperationException(FrameworkResources.GraphicsDeviceManagerNotRegistered);
+            }
+
             // If the device hasn't been created then create it now.
             if (_graphicsDevice == null)
                 CreateDevice();
@@ -308,13 +384,13 @@ namespace Microsoft.Xna.Framework
             // Allow for optional platform specific behavior.
             PlatformApplyChanges();
 
-            // populates a gdi with settings in this gdm and allows users to override them with
-            // PrepareDeviceSettings event this information should be applied to the GraphicsDevice
+            // Populates a GraphicsDeviceInformation with settings in this GraphicsDeviceManager and allows users to
+            // override them with PrepareDeviceSettings event. This information should be applied to the GraphicsDevice
             var gdi = DoPreparingDeviceSettings();
 
             if (gdi.GraphicsProfile != GraphicsDevice.GraphicsProfile)
             {
-                // if the GraphicsProfile changed we need to create a new GraphicsDevice
+                // If the GraphicsProfile changed we need to create a new GraphicsDevice
                 DisposeGraphicsDevice();
                 CreateDevice(gdi);
                 return;
