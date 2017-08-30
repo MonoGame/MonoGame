@@ -356,7 +356,18 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                     roundedWidth, roundedHeight);
 #endif
-                dataByteSize = roundedWidth * roundedHeight * fSize / (blockWidth * blockHeight);
+                if (Format == SurfaceFormat.RgbPvrtc2Bpp || Format == SurfaceFormat.RgbaPvrtc2Bpp)
+                {
+                    dataByteSize = (Math.Max(checkedRect.Width, 16) * Math.Max(checkedRect.Height, 8) * 2 + 7) / 8;
+                }
+                else if (Format == SurfaceFormat.RgbPvrtc4Bpp || Format == SurfaceFormat.RgbaPvrtc4Bpp)
+                {
+                    dataByteSize = (Math.Max(checkedRect.Width, 8) * Math.Max(checkedRect.Height, 8) * 4 + 7) / 8;
+                }
+                else
+                {
+                    dataByteSize = roundedWidth * roundedHeight * fSize / (blockWidth * blockHeight);
+                }
             }
             else
             {
