@@ -818,18 +818,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Dxt1a:
                 case SurfaceFormat.RgbPvrtc2Bpp:
                 case SurfaceFormat.RgbaPvrtc2Bpp:
+                case SurfaceFormat.RgbPvrtc4Bpp:
+                case SurfaceFormat.RgbaPvrtc4Bpp:
                 case SurfaceFormat.RgbEtc1:
-                    // One texel in DXT1, PVRTC 2bpp and ETC1 is a minimum 4x4 block, which is 8 bytes
+                    // One texel in DXT1, PVRTC (2bpp and 4bpp) and ETC1 is a minimum 4x4 block (8x4 for PVRTC 2bpp), which is 8 bytes
                     return 8;
                 case SurfaceFormat.Dxt3:
                 case SurfaceFormat.Dxt3SRgb:
                 case SurfaceFormat.Dxt5:
                 case SurfaceFormat.Dxt5SRgb:
-                case SurfaceFormat.RgbPvrtc4Bpp:
-                case SurfaceFormat.RgbaPvrtc4Bpp:
                 case SurfaceFormat.RgbaAtcExplicitAlpha:
                 case SurfaceFormat.RgbaAtcInterpolatedAlpha:
-                    // One texel in DXT3, DXT5 and PVRTC 4bpp is a minimum 4x4 block, which is 16 bytes
+                    // One texel in DXT3 and DXT5 is a minimum 4x4 block, which is 16 bytes
                     return 16;
                 case SurfaceFormat.Alpha8:
                     return 1;
@@ -905,6 +905,37 @@ namespace Microsoft.Xna.Framework.Graphics
             return 0;
         }
 
+        public static void GetBlockSize(this SurfaceFormat surfaceFormat, out int width, out int height)
+        {
+            switch (surfaceFormat)
+            {
+                case SurfaceFormat.RgbPvrtc2Bpp:
+                case SurfaceFormat.RgbaPvrtc2Bpp:
+                    width = 8;
+                    height = 4;
+                    break;
+                case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt1SRgb:
+                case SurfaceFormat.Dxt1a:
+                case SurfaceFormat.Dxt3:
+                case SurfaceFormat.Dxt3SRgb:
+                case SurfaceFormat.Dxt5:
+                case SurfaceFormat.Dxt5SRgb:
+                case SurfaceFormat.RgbPvrtc4Bpp:
+                case SurfaceFormat.RgbaPvrtc4Bpp:
+                case SurfaceFormat.RgbEtc1:
+                case SurfaceFormat.RgbaAtcExplicitAlpha:
+                case SurfaceFormat.RgbaAtcInterpolatedAlpha:
+                    width = 4;
+                    height = 4;
+                    break;
+                default:
+                    width = 1;
+                    height = 1;
+                    break;
+            }
+        }
+
 #if OPENGL
 
         public static int GetBoundTexture2D()
@@ -949,7 +980,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 #endif
-    }
+            }
 
     internal class MonoGameGLException : Exception
     {
