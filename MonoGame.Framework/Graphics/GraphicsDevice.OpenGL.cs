@@ -214,7 +214,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (!_attribsDirty &&
                     _bufferBindingInfos[slot].VertexOffset == offset &&
                     ReferenceEquals(_bufferBindingInfos[slot].AttributeInfo, attrInfo) &&
-                    _bufferBindingInfos[slot].InstanceFrequency == vertexBufferBinding.InstanceFrequency)
+                    _bufferBindingInfos[slot].InstanceFrequency == vertexBufferBinding.InstanceFrequency &&
+                    _bufferBindingInfos[slot].Vbo == vertexBufferBinding.VertexBuffer.vbo)
                     continue;
 
                 bindingsChanged = true;
@@ -247,6 +248,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _bufferBindingInfos[slot].VertexOffset = offset;
                 _bufferBindingInfos[slot].AttributeInfo = attrInfo;
                 _bufferBindingInfos[slot].InstanceFrequency = vertexBufferBinding.InstanceFrequency;
+                _bufferBindingInfos[slot].Vbo = vertexBufferBinding.VertexBuffer.vbo;
             }
 
             _attribsDirty = false;
@@ -470,7 +472,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _bufferBindingInfos = new BufferBindingInfo[_maxVertexBufferSlots];
             for (int i = 0; i < _bufferBindingInfos.Length; i++)
-                _bufferBindingInfos[i] = new BufferBindingInfo(null, IntPtr.Zero, 0);
+                _bufferBindingInfos[i] = new BufferBindingInfo(null, IntPtr.Zero, 0, -1);
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
@@ -1345,12 +1347,14 @@ namespace Microsoft.Xna.Framework.Graphics
             public VertexDeclaration.VertexDeclarationAttributeInfo AttributeInfo;
             public IntPtr VertexOffset;
             public int InstanceFrequency;
+            public int Vbo;
 
-            public BufferBindingInfo(VertexDeclaration.VertexDeclarationAttributeInfo attributeInfo, IntPtr vertexOffset, int instanceFrequency)
+            public BufferBindingInfo(VertexDeclaration.VertexDeclarationAttributeInfo attributeInfo, IntPtr vertexOffset, int instanceFrequency, int vbo)
             {
                 AttributeInfo = attributeInfo;
                 VertexOffset = vertexOffset;
                 InstanceFrequency = instanceFrequency;
+                Vbo = vbo;
             }
         }
 
