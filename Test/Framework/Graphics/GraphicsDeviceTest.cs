@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
+using OpenGL;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -754,5 +755,33 @@ namespace MonoGame.Tests.Graphics
             rt.Dispose();
         }
 
+#if DESKTOPGL
+        [Test]
+        public void DifferentVboGetsSet()
+        {
+            var vb1 = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 6, BufferUsage.None);
+            var vb2 = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 8, BufferUsage.None);
+
+            var se = new SpriteEffect(gd);
+            se.CurrentTechnique.Passes[0].Apply();
+
+            gd.SetVertexBuffer(vb1);
+            gd.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
+
+            int vbo;
+            GL.GetInteger(GetPName.ArrayBufferBinding, out vbo);
+            Assert.AreEqual(vb1.vbo, vbo);
+
+            gd.SetVertexBuffer(vb2);
+            gd.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
+
+            GL.GetInteger(GetPName.ArrayBufferBinding, out vbo);
+            Assert.AreEqual(vb2.vbo, vbo);
+
+            se.Dispose();
+            vb1.Dispose();
+            vb2.Dispose();
+        }
+#endif
     }
 }
