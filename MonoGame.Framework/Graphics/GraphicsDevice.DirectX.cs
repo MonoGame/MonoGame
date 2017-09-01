@@ -369,11 +369,11 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var asyncResult = PresentationParameters.SwapChainPanel.Dispatcher.RunIdleAsync( (e) =>
                 {   
-                var inverseScale = new RawMatrix3x2();
-                inverseScale.M11 = 1.0f / PresentationParameters.SwapChainPanel.CompositionScaleX;
-                inverseScale.M22 = 1.0f / PresentationParameters.SwapChainPanel.CompositionScaleY;
+                var scale = new RawMatrix3x2();
+                scale.M11 = (float)PresentationParameters.SwapChainPanel.ActualWidth  / PresentationParameters.BackBufferWidth;
+                scale.M22 = (float)PresentationParameters.SwapChainPanel.ActualHeight / PresentationParameters.BackBufferHeight;
                 using (var swapChain2 = _swapChain.QueryInterface<SwapChain2>())
-                    swapChain2.MatrixTransform = inverseScale;
+                    swapChain2.MatrixTransform = scale;
                 });
             }
 
