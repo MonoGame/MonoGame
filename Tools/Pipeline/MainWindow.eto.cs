@@ -17,7 +17,7 @@ namespace MonoGame.Tools.Pipeline
         public Command cmdBuild, cmdRebuild, cmdClean, cmdCancelBuild;
         public Command cmdHelp, cmdAbout;
         public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdOpenOutputItemLocation, cmdCopyAssetPath, cmdRebuildItem;
-        
+
         ToolBar toolbar;
         ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuView, menuBuild, menuHelp;
         ToolItem toolBuild, toolRebuild, toolClean, toolCancelBuild;
@@ -257,7 +257,7 @@ namespace MonoGame.Tools.Pipeline
             Menu.IncludeSystemItems = MenuBarSystemItems.None;
 
             menuFile = new ButtonMenuItem();
-            menuFile.Text = "File";
+            menuFile.Text = "&File";
             menuFile.Items.Add(cmdNew);
             menuFile.Items.Add(cmdOpen);
 
@@ -274,7 +274,7 @@ namespace MonoGame.Tools.Pipeline
             Menu.Items.Add(menuFile);
 
             menuEdit = new ButtonMenuItem();
-            menuEdit.Text = "Edit";
+            menuEdit.Text = "&Edit";
             menuEdit.Items.Add(cmdUndo);
             menuEdit.Items.Add(cmdRedo);
             menuEdit.Items.Add(new SeparatorMenuItem());
@@ -297,11 +297,11 @@ namespace MonoGame.Tools.Pipeline
             // View Commands
 
             menuView = new ButtonMenuItem();
-            menuView.Text = "View";
+            menuView.Text = "&View";
             Menu.Items.Add(menuView);
 
             menuBuild = new ButtonMenuItem();
-            menuBuild.Text = "Build";
+            menuBuild.Text = "&Build";
             menuBuild.Items.Add(cmdBuild);
             menuBuild.Items.Add(cmdRebuild);
             menuBuild.Items.Add(cmdClean);
@@ -309,7 +309,7 @@ namespace MonoGame.Tools.Pipeline
             Menu.Items.Add(menuBuild);
 
             menuHelp = new ButtonMenuItem();
-            menuHelp.Text = "Help";
+            menuHelp.Text = "&Help";
             menuHelp.Items.Add(cmdHelp);
             Menu.Items.Add(menuHelp);
 
