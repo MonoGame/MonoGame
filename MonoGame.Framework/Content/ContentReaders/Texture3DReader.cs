@@ -39,6 +39,8 @@ namespace Microsoft.Xna.Framework.Content
                     width = Math.Max(width >> 1, 1);
                     height = Math.Max(height >> 1, 1);
                     depth = Math.Max(depth >> 1, 1);
+
+                    reader.ContentManager.ReturnScratchBuffer(data);
                 }
 #if OPENGL
             });

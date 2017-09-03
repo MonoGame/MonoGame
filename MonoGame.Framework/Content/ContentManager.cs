@@ -28,10 +28,10 @@ namespace Microsoft.Xna.Framework.Content
         private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
-        private byte[] scratchBuffer;
 
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
+        private static ByteBufferPool _scratchBufferPool = new ByteBufferPool();
 
         private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
@@ -191,7 +191,6 @@ namespace Microsoft.Xna.Framework.Content
                     Unload();
                 }
 
-                scratchBuffer = null;
 				disposed = true;
 			}
 		}
@@ -482,11 +481,14 @@ namespace Microsoft.Xna.Framework.Content
 		}
 
         internal byte[] GetScratchBuffer(int size)
-        {            
+        {
             size = Math.Max(size, 1024 * 1024);
-            if (scratchBuffer == null || scratchBuffer.Length < size)
-                scratchBuffer = new byte[size];
-            return scratchBuffer;
+            return _scratchBufferPool.Get(size);
         }
-	}
+
+        internal void ReturnScratchBuffer(byte[] buffer)
+        {
+            _scratchBufferPool.Return(buffer);
+        }
+    }
 }

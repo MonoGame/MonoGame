@@ -35,6 +35,7 @@ namespace Microsoft.Xna.Framework.Content
                         byte[] faceData = reader.ContentManager.GetScratchBuffer(faceSize);
                         reader.Read(faceData, 0, faceSize);
                         textureCube.SetData<byte>((CubeMapFace)face, i, null, faceData, 0, faceSize);
+                        reader.ContentManager.ReturnScratchBuffer(faceData);
                     }
                 }
 #if OPENGL

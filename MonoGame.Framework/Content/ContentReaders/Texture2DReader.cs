@@ -170,6 +170,7 @@ namespace Microsoft.Xna.Framework.Content
 				    }
 				
                     texture.SetData(level, null, levelData, 0, levelDataSizeInBytes);
+                    reader.ContentManager.ReturnScratchBuffer(levelData);
 			    }
 #if OPENGL
             });

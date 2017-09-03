@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework.Content
             byte[] data = input.ContentManager.GetScratchBuffer(dataSize);
             input.Read(data, 0, dataSize);
             var effect = new Effect(input.GetGraphicsDevice(), data, 0, dataSize);
+            input.ContentManager.ReturnScratchBuffer(data);
             effect.Name = input.AssetName;
             return effect;
         }

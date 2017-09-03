@@ -53,6 +53,8 @@ namespace Microsoft.Xna.Framework.Content
             // Store the original asset name for debugging later.
             effect.Name = input.AssetName;
 
+            input.ContentManager.ReturnScratchBuffer(data);
+
             return effect;
         }
 	}
