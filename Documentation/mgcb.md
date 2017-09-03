@@ -179,8 +179,8 @@ by `msbuild` to run your own targest.
 <Target Name="MyBeforeTarget" BeforeTargets="BuildContent">
    <Message Text="MyBeforeTarget Ran"/>
 </Target>
-<Target Name="MyBeforeTarget" AfterTargets="BuildContent">
-   <Message Text="MyBeforeTarget Ran"/>
+<Target Name="MyAfterTarget" AfterTargets="BuildContent">
+   <Message Text="MyAfterTarget Ran"/>
 </Target>
 ``` 
 
