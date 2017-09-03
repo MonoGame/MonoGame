@@ -75,9 +75,7 @@
 
   <PropertyGroup>
     <BuildDependsOn>
-      $(BeforeBuildContent);
       BuildContent;
-      $(AfterBuildContent);
       $(BuildDependsOn);
     </BuildDependsOn>
   </PropertyGroup>
