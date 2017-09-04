@@ -10,6 +10,7 @@
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MonoGame.Tests.References" />
     <Reference Include="MGCB" />
+    <Reference Include="MonoGame.Build.Tasks" />
   </References>
 
   <Properties>

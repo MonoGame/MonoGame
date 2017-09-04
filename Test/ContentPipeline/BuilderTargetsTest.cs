@@ -26,7 +26,7 @@ namespace MonoGame.Tests.ContentPipeline
             }
             return buildTool;
         }
-        bool RunBuild (string buildTool, string projectFile, params string[] parameters)
+        bool RunBuild(string buildTool, string projectFile, params string[] parameters)
         {
             var root = Path.GetDirectoryName(typeof(BuilderTargetsTest).Assembly.Location);
             var psi = new ProcessStartInfo(FindBuildTool(buildTool))
@@ -49,7 +49,7 @@ namespace MonoGame.Tests.ContentPipeline
 
         [Test]
         [TestCaseSource("BuilderTargetsBuildTools")]
-        public void BuildSimpleProject (string buildTool)
+        public void BuildSimpleProject(string buildTool)
         {
             if (buildTool == "xbuild" && Environment.OSVersion.Platform == PlatformID.Win32NT)
                 Assert.Ignore("Skipping xbuild tests on windows");
@@ -65,7 +65,6 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(true, result, "Content Build should have succeeded.");
             var contentFont = Path.Combine(outputPath, "DesktopGL", "Content", "ContentFont.xnb");
             Assert.IsTrue(File.Exists(contentFont), "'" + contentFont + "' should exist.");
- 
         }
     }
 }
