@@ -8,13 +8,32 @@ namespace MonoGame.Tests.ContentPipeline
     [TestFixture]
     public class BuilderTargetsTest
     {
-        bool RunBuild (string buildTool, string projectFile, params string[] parameters)
+        string[] msBuildFolders = new string[]
+        {
+            Path.Combine ("MSBuild", "15.0", "Bin", "MSBuild.exe"),
+            Path.Combine ("MSBuild", "14.0", "Bin", "MSBuild.exe"),
+        };
+        string FindBuildTool(string buildTool)
+        {
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT && buildTool == "msbuild")
+            {
+                var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+                foreach (var path in msBuildFolders)
+                {
+                    if (File.Exists(Path.Combine(programFiles, path)))
+                        return Path.Combine(programFiles, path);
+                }
+            }
+            return buildTool;
+        }
+        bool RunBuild(string buildTool, string projectFile, params string[] parameters)
         {
             var root = Path.GetDirectoryName(typeof(BuilderTargetsTest).Assembly.Location);
-            var psi = new ProcessStartInfo(buildTool)
+            var psi = new ProcessStartInfo(FindBuildTool(buildTool))
             {
-                Arguments = projectFile + " /t:BuildContent " + string.Join(" ", parameters),
+                Arguments = projectFile + " /t:BuildContent " + string.Join(" ", parameters) + " /noconsolelogger \"/flp1:LogFile=build.log;Encoding=UTF-8;Verbosity=Diagnostic\"",
                 WorkingDirectory = root,
+                UseShellExecute = true,
             };
             using (var process = Process.Start(psi))
             {
@@ -30,7 +49,7 @@ namespace MonoGame.Tests.ContentPipeline
 
         [Test]
         [TestCaseSource("BuilderTargetsBuildTools")]
-        public void BuildSimpleProject (string buildTool)
+        public void BuildSimpleProject(string buildTool)
         {
             if (buildTool == "xbuild" && Environment.OSVersion.Platform == PlatformID.Win32NT)
                 Assert.Ignore("Skipping xbuild tests on windows");
@@ -46,7 +65,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(true, result, "Content Build should have succeeded.");
             var contentFont = Path.Combine(outputPath, "DesktopGL", "Content", "ContentFont.xnb");
             Assert.IsTrue(File.Exists(contentFont), "'" + contentFont + "' should exist.");
- 
+
         }
     }
 }
