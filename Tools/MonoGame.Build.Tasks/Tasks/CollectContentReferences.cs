@@ -46,10 +46,13 @@ namespace MonoGame.Build.Tasks
                 {
                     contentFolder = Path.GetFileName(Path.GetDirectoryName(relative));
                 }
+                var outputPath = Path.GetFileNameWithoutExtension(fp);
+                if (!outputPath.EndsWith(contentFolder, StringComparison.OrdinalIgnoreCase))
+                    outputPath = Path.Combine(outputPath, contentFolder);
                 metaData.Add("ContentDirectory", !string.IsNullOrEmpty(contentFolder) ? contentFolder + Path.DirectorySeparatorChar : "");
                 metaData.Add("RelativeFullPath", !string.IsNullOrEmpty(relative) ? Path.GetFullPath(relative) : "");
-                metaData.Add("ContentOutputDir", Path.Combine("bin", MonoGamePlatform, Path.GetFileNameWithoutExtension(fp), contentFolder));
-                metaData.Add("ContentIntermediateOutputDir", Path.Combine("obj", MonoGamePlatform, Path.GetFileNameWithoutExtension(fp), contentFolder));
+                metaData.Add("ContentOutputDir", Path.Combine("bin", MonoGamePlatform, outputPath));
+                metaData.Add("ContentIntermediateOutputDir", Path.Combine("obj", MonoGamePlatform, outputPath));
                 output.Add(new TaskItem(fp, metaData));
             }
             Output = output.ToArray();
