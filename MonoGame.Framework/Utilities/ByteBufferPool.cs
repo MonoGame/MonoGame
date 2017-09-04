@@ -36,6 +36,8 @@ namespace MonoGame.Utilities
 
                 if (index == -1)
                 {
+                    if (_freeBuffers.Count > 0)
+                        _freeBuffers.RemoveAt(0);
                     result = new byte[size];
                 }
                 else
