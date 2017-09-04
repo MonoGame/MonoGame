@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Content
                 for (int level = 0; level < levelCount; level++)
 			    {
 				    var levelDataSizeInBytes = reader.ReadInt32();
-                    var levelData = reader.ContentManager.GetScratchBuffer(levelDataSizeInBytes);
+                    var levelData = ContentManager.ScratchBufferPool.Get(levelDataSizeInBytes);
                     reader.Read(levelData, 0, levelDataSizeInBytes);
                     int levelWidth = Math.Max(width >> level, 1);
                     int levelHeight = Math.Max(height >> level, 1);
@@ -170,7 +170,7 @@ namespace Microsoft.Xna.Framework.Content
 				    }
 				
                     texture.SetData(level, null, levelData, 0, levelDataSizeInBytes);
-                    reader.ContentManager.ReturnScratchBuffer(levelData);
+                    ContentManager.ScratchBufferPool.Return(levelData);
 			    }
 #if OPENGL
             });

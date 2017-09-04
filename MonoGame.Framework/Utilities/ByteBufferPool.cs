@@ -4,6 +4,9 @@ namespace MonoGame.Utilities
 {
     internal class ByteBufferPool
     {
+        private readonly int _minBufferSize;
+        private readonly int _maxBuffers;
+
         public int FreeAmount
         {
             get { return _freeBuffers.Count; }
@@ -11,8 +14,10 @@ namespace MonoGame.Utilities
 
         private readonly List<byte[]> _freeBuffers;
 
-        public ByteBufferPool()
+        public ByteBufferPool(int minBufferSize = 0, int maxBuffers = int.MaxValue)
         {
+            _minBufferSize = minBufferSize;
+            _maxBuffers = maxBuffers;
             _freeBuffers = new List<byte[]>();
         }
 
@@ -21,6 +26,9 @@ namespace MonoGame.Utilities
         /// </summary>
         public byte[] Get(int size)
         {
+            if (size < _minBufferSize)
+                size = _minBufferSize;
+
             byte[] result;
             lock (_freeBuffers)
             {
@@ -46,6 +54,8 @@ namespace MonoGame.Utilities
         {
             lock (_freeBuffers)
             {
+                if (FreeAmount >= _maxBuffers)
+                    return;
                 var index = FirstLargerThan(buffer.Length);
                 if (index == -1)
                     _freeBuffers.Add(buffer);

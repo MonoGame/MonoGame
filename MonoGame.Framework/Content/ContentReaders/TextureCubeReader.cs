@@ -32,10 +32,10 @@ namespace Microsoft.Xna.Framework.Content
                     for (int i = 0; i < levels; i++)
                     {
                         int faceSize = reader.ReadInt32();
-                        byte[] faceData = reader.ContentManager.GetScratchBuffer(faceSize);
+                        byte[] faceData = ContentManager.ScratchBufferPool.Get(faceSize);
                         reader.Read(faceData, 0, faceSize);
                         textureCube.SetData<byte>((CubeMapFace)face, i, null, faceData, 0, faceSize);
-                        reader.ContentManager.ReturnScratchBuffer(faceData);
+                        ContentManager.ScratchBufferPool.Return(faceData);
                     }
                 }
 #if OPENGL

@@ -31,7 +31,8 @@ namespace Microsoft.Xna.Framework.Content
 
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
-        private static ByteBufferPool _scratchBufferPool = new ByteBufferPool();
+
+        internal static readonly ByteBufferPool ScratchBufferPool = new ByteBufferPool(1024 * 1024, Environment.ProcessorCount);
 
         private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
@@ -479,16 +480,5 @@ namespace Microsoft.Xna.Framework.Content
 				return this.serviceProvider;
 			}
 		}
-
-        internal byte[] GetScratchBuffer(int size)
-        {
-            size = Math.Max(size, 1024 * 1024);
-            return _scratchBufferPool.Get(size);
-        }
-
-        internal void ReturnScratchBuffer(byte[] buffer)
-        {
-            _scratchBufferPool.Return(buffer);
-        }
     }
 }

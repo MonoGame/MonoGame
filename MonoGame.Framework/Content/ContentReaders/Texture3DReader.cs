@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Content
                 for (int i = 0; i < levelCount; i++)
                 {
                     int dataSize = reader.ReadInt32();
-                    byte[] data = reader.ContentManager.GetScratchBuffer(dataSize);
+                    byte[] data = ContentManager.ScratchBufferPool.Get(dataSize);
                     reader.Read(data, 0, dataSize);
                     texture.SetData(i, 0, 0, width, height, 0, depth, data, 0, dataSize);
 
@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Content
                     height = Math.Max(height >> 1, 1);
                     depth = Math.Max(depth >> 1, 1);
 
-                    reader.ContentManager.ReturnScratchBuffer(data);
+                    ContentManager.ScratchBufferPool.Return(data);
                 }
 #if OPENGL
             });

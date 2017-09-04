@@ -21,10 +21,10 @@ namespace Microsoft.Xna.Framework.Content
                     dataSize / (sixteenBits ? 2 : 4), BufferUsage.None);
             }
 
-            byte[] data = input.ContentManager.GetScratchBuffer(dataSize);
+            byte[] data = ContentManager.ScratchBufferPool.Get(dataSize);
             input.Read(data, 0, dataSize);
             indexBuffer.SetData(data, 0, dataSize);
-            input.ContentManager.ReturnScratchBuffer(data);
+            ContentManager.ScratchBufferPool.Return(data);
 
             return indexBuffer;
         }
