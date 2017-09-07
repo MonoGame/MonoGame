@@ -273,6 +273,7 @@ namespace OpenGL
     }
 
     public enum GetPName : int {
+        ArrayBufferBinding = 0x8894,
         MaxTextureImageUnits = 0x8872, 
         MaxVertexAttribs = 0x8869, 
         MaxTextureSize = 0x0D33,
