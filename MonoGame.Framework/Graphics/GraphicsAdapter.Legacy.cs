@@ -120,6 +120,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public bool IsDefaultAdapter { get; internal set; }
+
         public static GraphicsAdapter DefaultAdapter
         {
             get { return Adapters[0]; }
@@ -144,6 +146,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                     _adapters = new ReadOnlyCollection<GraphicsAdapter>(new[] { new GraphicsAdapter() });
 #endif
+                    // Assume first adapter is the default
+                    _adapters[0].IsDefaultAdapter = true;
                 }
 
                 return _adapters;
