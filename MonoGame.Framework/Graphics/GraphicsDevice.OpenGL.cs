@@ -18,7 +18,7 @@ using GLPrimitiveType = OpenTK.Graphics.OpenGL.BeginMode;
 #endif
 
 #if DESKTOPGL
-using OpenGL;
+using MonoGame.OpenGL;
 #endif
 
 #if ANGLE

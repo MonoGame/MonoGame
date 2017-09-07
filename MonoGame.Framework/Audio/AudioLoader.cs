@@ -4,7 +4,7 @@
 
 using System;
 using System.IO;
-using OpenAL;
+using MonoGame.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {

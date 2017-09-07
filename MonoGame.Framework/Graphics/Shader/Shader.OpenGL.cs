@@ -15,7 +15,7 @@ using OpenTK.Graphics.OpenGL;
 using Bool = OpenTK.Graphics.OpenGL.Boolean;
 #endif
 #elif DESKTOPGL
-using OpenGL;
+using MonoGame.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using Bool = OpenTK.Graphics.ES20.All;

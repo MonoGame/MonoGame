@@ -18,8 +18,8 @@ using OpenTK.Graphics.ES20;
 using GetParamName = OpenTK.Graphics.ES20.All;
 using GetPName = OpenTK.Graphics.ES20.GetPName;
 #else
-using OpenGL;
-using GetParamName = OpenGL.GetPName;
+using MonoGame.OpenGL;
+using GetParamName = MonoGame.OpenGL.GetPName;
 #endif
 #endif
 

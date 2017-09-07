@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using MonoGame.Utilities;
 #endif
 
-using OpenAL;
+using MonoGame.OpenAL;
 
 #if ANDROID
 using System.Globalization;

@@ -42,9 +42,9 @@ using PixelInternalFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #endif
 
 #if DESKTOPGL
-using OpenGL;
-using GLPixelFormat = OpenGL.PixelFormat;
-using PixelFormat = OpenGL.PixelFormat;
+using MonoGame.OpenGL;
+using GLPixelFormat = MonoGame.OpenGL.PixelFormat;
+using PixelFormat = MonoGame.OpenGL.PixelFormat;
 #endif
 
 #if GLES

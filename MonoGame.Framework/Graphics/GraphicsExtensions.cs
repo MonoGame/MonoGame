@@ -17,9 +17,9 @@ using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #endif
 #elif DESKTOPGL
-using OpenGL;
-using GLPixelFormat = OpenGL.PixelFormat;
-using PixelFormat = OpenGL.PixelFormat;
+using MonoGame.OpenGL;
+using GLPixelFormat = MonoGame.OpenGL.PixelFormat;
+using PixelFormat = MonoGame.OpenGL.PixelFormat;
 #elif GLES
 #if ANGLE
 using OpenTK.Graphics;
