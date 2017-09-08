@@ -14,7 +14,7 @@ using GetProgramParameterName = OpenTK.Graphics.OpenGL.ProgramParameter;
 using Bool = OpenTK.Graphics.OpenGL.Boolean;
 #endif
 #elif DESKTOPGL
-using OpenGL;
+using MonoGame.OpenGL;
 #elif WINRT
 
 #else

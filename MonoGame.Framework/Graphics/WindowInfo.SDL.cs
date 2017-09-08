@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace OpenGL
+namespace MonoGame.OpenGL
 {
-    public class WindowInfo : IWindowInfo
+    internal class WindowInfo : IWindowInfo
     {
         public IntPtr Handle { get; private set; }
 

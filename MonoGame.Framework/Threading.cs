@@ -16,7 +16,7 @@ using OpenTK.Graphics.ES11;
 using OpenTK.Graphics.ES20;
 #endif
 #elif DESKTOPGL || ANGLE
-using OpenGL;
+using MonoGame.OpenGL;
 #endif
 #if WINDOWS_PHONE
 using System.Windows;

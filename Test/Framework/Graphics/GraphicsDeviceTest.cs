@@ -9,7 +9,9 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
-using OpenGL;
+#if DESKTOPGL
+using MonoGame.OpenGL;
+#endif
 
 namespace MonoGame.Tests.Graphics
 {
