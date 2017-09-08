@@ -122,7 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
 
-        internal event EventHandler<EventArgs> PresentationChanged;
+        internal event EventHandler<PresentationEventArgs> PresentationChanged;
 
         private int _maxVertexBufferSlots;
         internal int MaxTextureSlots;
@@ -221,6 +221,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities();
             GraphicsCapabilities.Initialize(this);
+
             Initialize();
         }
 
@@ -604,19 +605,20 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         */
 
-        partial void PlatformValidatePresentationParameters(PresentationParameters presentationParameters);
+        partial void PlatformReset();
 
         public void Reset()
         {
-            PlatformValidatePresentationParameters(PresentationParameters);
+            PlatformReset();
+
             EventHelpers.Raise(this, DeviceResetting, EventArgs.Empty);
 
             // Update the back buffer.
             OnPresentationChanged();
             
-            EventHelpers.Raise(this, PresentationChanged, EventArgs.Empty);
+            EventHelpers.Raise(this, PresentationChanged, new PresentationEventArgs(PresentationParameters));
             EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
-        }
+       }
 
         public void Reset(PresentationParameters presentationParameters)
         {

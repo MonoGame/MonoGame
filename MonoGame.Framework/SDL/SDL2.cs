@@ -395,6 +395,14 @@ internal static class Sdl
             GetError(SDL_GetDisplayMode(displayIndex, modeIndex, out mode));
         }
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetClosestDisplayMode")]
+        private static extern int SDL_GetClosestDisplayMode(int displayIndex, Mode mode, out Mode closest);
+
+        public static void GetClosestDisplayMode(int displayIndex, Mode mode, out Mode closest)
+        {
+            GetError(SDL_GetClosestDisplayMode(displayIndex, mode, out closest));
+        }
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetDisplayName")]
         private static extern IntPtr SDL_GetDisplayName(int index);
 
@@ -419,8 +427,7 @@ internal static class Sdl
             return GetError(SDL_GetNumVideoDisplays());
         }
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowDisplayIndex")
-        ]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowDisplayIndex")]
         private static extern int SDL_GetWindowDisplayIndex(IntPtr window);
 
         public static int GetWindowDisplayIndex(IntPtr window)

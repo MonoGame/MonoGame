@@ -1,11 +1,12 @@
 ﻿using System;
 
-namespace OpenGL
+namespace MonoGame.OpenGL
 {
     // Required to allow platforms other than iOS use the same code.
     // just don't include this on iOS
     [AttributeUsage (AttributeTargets.Delegate)]
-    public sealed class MonoNativeFunctionWrapper : Attribute {
+    internal sealed class MonoNativeFunctionWrapper : Attribute
+    {
     }
 }
 

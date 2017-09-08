@@ -12,7 +12,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
-using OpenGL;
+using MonoGame.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
 #endif

@@ -708,5 +708,23 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+        [Test]
+        public void GetDataRowPitch()
+        {
+            const int w = 5;
+            const int h = 4;
+            const int size = w * h;
+            var tex = new Texture2D(gd, w, h, false, SurfaceFormat.Bgr565);
+            var data = new short[size];
+            for (var i = 0; i < data.Length; i++)
+                data[i] = (short) i;
+            tex.SetData(data);
+            var getData = new short[size];
+            tex.GetData(data);
+            for (var i = 0; i < getData.Length; i++)
+                Assert.AreEqual((short) i, data[i]);
+
+            tex.Dispose();
+        }
     }
 }

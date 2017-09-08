@@ -4,9 +4,9 @@
 
 using System;
 
-namespace OpenGL
+namespace MonoGame.OpenGL
 {
-    public interface IWindowInfo
+    internal interface IWindowInfo
     {
         IntPtr Handle { get; }
     }

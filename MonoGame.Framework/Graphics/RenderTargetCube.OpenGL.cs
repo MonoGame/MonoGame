@@ -12,7 +12,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Graphics.ES20;
 #endif
 #if DESKTOPGL
-using OpenGL;
+using MonoGame.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

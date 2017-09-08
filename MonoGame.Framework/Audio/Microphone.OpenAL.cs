@@ -11,7 +11,7 @@ using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
 using MonoMac.OpenAL;
 #elif OPENAL
-using OpenAL;
+using MonoGame.OpenAL;
 #if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;

@@ -287,5 +287,22 @@ namespace MonoGame.Tests.Graphics
             vb.Dispose();
         }
 #endif
+
+        [Test]
+        public void SetDataRowPitch()
+        {
+            PrepareFrameCapture();
+
+            var t = content.Load<Texture2D>(Paths.Texture("Logo_65x64_16bit"));
+            var sb = new SpriteBatch(gd);
+            sb.Begin();
+            sb.Draw(t, new Rectangle(100, 100, 300, 300), null, Color.White);
+            sb.End();
+
+            t.Dispose();
+            sb.Dispose();
+
+            CheckFrames();
+        }
     }
 }

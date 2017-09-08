@@ -50,7 +50,7 @@ using OpenTK.Graphics.OpenGL;
 #if GLES
 using OpenTK.Graphics.ES20;
 #else
-using OpenGL;
+using MonoGame.OpenGL;
 #endif
 #endif
 

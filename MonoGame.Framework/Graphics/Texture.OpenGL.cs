@@ -9,7 +9,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 #if DESKTOPGL
-using OpenGL;
+using MonoGame.OpenGL;
 #endif
 #if GLES
 using OpenTK.Graphics.ES20;

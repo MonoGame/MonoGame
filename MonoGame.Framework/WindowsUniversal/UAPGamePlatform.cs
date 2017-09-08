@@ -184,11 +184,9 @@ namespace Microsoft.Xna.Framework
             UAPGameWindow.Instance.AppView.ExitFullScreenMode();
         }
 
-        internal override void OnPresentationChanged()
+        internal override void OnPresentationChanged(PresentationParameters pp)
         {
-            var presentationParameters = Game.GraphicsDevice.PresentationParameters;
-
-            if (presentationParameters.IsFullScreen)
+            if (pp.IsFullScreen)
                 EnterFullScreen();
             else
                 ExitFullScreen();
