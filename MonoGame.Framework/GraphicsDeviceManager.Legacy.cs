@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
@@ -169,6 +170,180 @@ namespace Microsoft.Xna.Framework
         }
 
         #endregion
+
+        /// <summary>
+        /// Finds the best device configuration that is compatible with the current device preferences.
+        /// </summary>
+        /// <param name="anySuitableDevice">If true, the best device configuration can be selected from any
+        /// available adaptor. If false, only the current adaptor is used.</param>
+        /// <returns>The best device configuration that could be found.</returns>
+        protected virtual GraphicsDeviceInformation FindBestDevice(bool anySuitableDevice)
+        {
+            // Create a list of available devices
+            var devices = new List<GraphicsDeviceInformation>();
+            if (anySuitableDevice)
+            {
+                foreach (var adapter in GraphicsAdapter.Adapters)
+                {
+                    if (adapter.IsProfileSupported(GraphicsProfile))
+                        AddModes(adapter, devices);
+                }
+            }
+            else
+            {
+                var adapter = GraphicsAdapter.DefaultAdapter;
+                if (adapter.IsProfileSupported(GraphicsProfile))
+                    AddModes(adapter, devices);
+            }
+
+            // Rank them to get the most preferred device first
+            RankDevices(devices);
+
+            // No devices left in the list?
+            if (devices.Count == 0)
+            {
+                throw new NoSuitableGraphicsDeviceException(FrameworkResources.CouldNotFindCompatibleGraphicsDevice);
+            }
+
+            // The first device in the list is the most suitable
+            return devices[0];
+        }
+
+        // Add all modes supported by an adapter to the list
+        void AddModes(GraphicsAdapter adapter, List<GraphicsDeviceInformation> devices)
+        {
+            int multiSampleCount = 0;
+            if (_preferMultiSampling)
+            {
+                // Always initialize MultiSampleCount to the maximum. If users want to overwrite
+                // this they have to respond to the PreparingDeviceSettingsEvent and modify
+                // args.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount
+                multiSampleCount = GraphicsDevice != null ? GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount : 32;
+            }
+
+            if (IsFullScreen)
+            {
+                // Fullscreen mode adds every supported display mode by each adaptor
+                foreach (var mode in adapter.SupportedDisplayModes)
+                {
+                    var gdi = new GraphicsDeviceInformation()
+                    {
+                        Adapter = adapter,
+                        GraphicsProfile = GraphicsProfile,
+                        PresentationParameters = new PresentationParameters()
+                        {
+                            BackBufferFormat = mode.Format,
+                            BackBufferHeight = mode.Height,
+                            BackBufferWidth = mode.Width,
+                            DepthStencilFormat = PreferredDepthStencilFormat,
+                            IsFullScreen = IsFullScreen,
+                            HardwareModeSwitch = _hardwareModeSwitch,
+                            PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.One : PresentInterval.Immediate,
+                            DisplayOrientation = _game.Window.CurrentOrientation,
+                            DeviceWindowHandle = _game.Window.Handle,
+                            MultiSampleCount = multiSampleCount
+                        }
+                    };
+                    devices.Add(gdi);
+                }
+            }
+            else
+            {
+                // Windowed mode only adds an entry for the requested window size
+                var gdi = new GraphicsDeviceInformation()
+                {
+                    Adapter = adapter,
+                    GraphicsProfile = GraphicsProfile,
+                    PresentationParameters = new PresentationParameters()
+                    {
+                        BackBufferFormat = PreferredBackBufferFormat,
+                        BackBufferHeight = PreferredBackBufferHeight,
+                        BackBufferWidth = PreferredBackBufferWidth,
+                        DepthStencilFormat = PreferredDepthStencilFormat,
+                        IsFullScreen = IsFullScreen,
+                        HardwareModeSwitch = _hardwareModeSwitch,
+                        PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.One : PresentInterval.Immediate,
+                        DisplayOrientation = _game.Window.CurrentOrientation,
+                        DeviceWindowHandle = _game.Window.Handle,
+                        MultiSampleCount = multiSampleCount
+                    }
+                };
+                devices.Add(gdi);
+            }
+        }
+
+        int CompareGraphicsDeviceInformation(GraphicsDeviceInformation left, GraphicsDeviceInformation right)
+        {
+            var leftPP = left.PresentationParameters;
+            var rightPP = right.PresentationParameters;
+            var leftAdapter = left.Adapter;
+            var rightAdapter = right.Adapter;
+
+            // Prefer a higher graphics profile
+            if (left.GraphicsProfile != right.GraphicsProfile)
+                return left.GraphicsProfile > right.GraphicsProfile ? -1 : 1;
+
+            // Prefer windowed/fullscreen based on IsFullScreen
+            if (leftPP.IsFullScreen != rightPP.IsFullScreen)
+                return IsFullScreen == leftPP.IsFullScreen ? -1 : 1;
+
+            // BackBufferFormat
+            if (leftPP.BackBufferFormat != rightPP.BackBufferFormat)
+            {
+                var preferredSize = PreferredBackBufferFormat.GetSize();
+                var leftRank = leftPP.BackBufferFormat.GetSize() == preferredSize ? 0 : 1;
+                var rightRank = rightPP.BackBufferFormat.GetSize() == preferredSize ? 0 : 1;
+                if (leftRank != rightRank)
+                    return leftRank < rightRank ? -1 : 1;
+            }
+
+            // MultiSampleCount
+            if (leftPP.MultiSampleCount != rightPP.MultiSampleCount)
+                return leftPP.MultiSampleCount > rightPP.MultiSampleCount ? -1 : 1;
+
+            // Resolution
+            int leftWidthDiff = Math.Abs(leftPP.BackBufferWidth - PreferredBackBufferWidth);
+            int leftHeightDiff = Math.Abs(leftPP.BackBufferHeight - PreferredBackBufferHeight);
+            int rightWidthDiff = Math.Abs(rightPP.BackBufferWidth - PreferredBackBufferWidth);
+            int rightHeightDiff = Math.Abs(rightPP.BackBufferHeight - PreferredBackBufferHeight);
+            if (leftHeightDiff != rightHeightDiff)
+                return leftHeightDiff < rightHeightDiff ? -1 : 1;
+            if (leftWidthDiff != rightWidthDiff)
+                return leftWidthDiff < rightWidthDiff ? -1 : 1;
+
+            // Aspect ratio
+            var targetAspectRatio = (float)PreferredBackBufferWidth / (float)PreferredBackBufferHeight;
+            var leftAspectRatio = (float)leftPP.BackBufferWidth / (float)leftPP.BackBufferHeight;
+            var rightAspectRatio = (float)rightPP.BackBufferWidth / (float)rightPP.BackBufferHeight;
+            if (Math.Abs(leftAspectRatio - rightAspectRatio) > 0.1f)
+                return Math.Abs(leftAspectRatio - targetAspectRatio) < Math.Abs(rightAspectRatio - targetAspectRatio) ? -1 : 1;
+
+            // Default adapter first
+            if (leftAdapter.IsDefaultAdapter != rightAdapter.IsDefaultAdapter)
+                return leftAdapter.IsDefaultAdapter ? -1 : 1;
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Orders the supplied devices based on the current preferences.
+        /// </summary>
+        /// <param name="foundDevices">The list of devices to rank.</param>
+        /// <remarks>
+        /// The list of devices is sorted so that devices earlier in the list are preferred over devices
+        /// later in the list. Devices may be removed from the list if they do not satisfy the criteria.
+        /// </remarks>
+        protected virtual void RankDevices(List<GraphicsDeviceInformation> foundDevices)
+        {
+            // Filter out any unsuitable graphics profiles. Hopefully there shouldn't be many to remove
+            for (int i = foundDevices.Count - 1; i >= 0; --i)
+            {
+                if (foundDevices[i].GraphicsProfile > GraphicsProfile)
+                    foundDevices.RemoveAt(i);
+            }
+
+            foundDevices.Sort(CompareGraphicsDeviceInformation);
+        }
 
         public void ApplyChanges()
         {
@@ -376,10 +551,7 @@ namespace Microsoft.Xna.Framework
 
             if (preparingDeviceSettingsHandler != null)
             {
-                GraphicsDeviceInformation gdi = new GraphicsDeviceInformation();
-                gdi.GraphicsProfile = GraphicsProfile; // Microsoft defaults this to Reach.
-                gdi.Adapter = GraphicsAdapter.DefaultAdapter;
-                gdi.PresentationParameters = presentationParameters;
+                var gdi = FindBestDevice(true);
                 PreparingDeviceSettingsEventArgs pe = new PreparingDeviceSettingsEventArgs(gdi);
                 preparingDeviceSettingsHandler(this, pe);
                 presentationParameters = pe.GraphicsDeviceInformation.PresentationParameters;
