@@ -19,7 +19,7 @@ using OpenTK.Graphics.ES20;
 using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
 #if DESKTOPGL
-using OpenGL;
+using MonoGame.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

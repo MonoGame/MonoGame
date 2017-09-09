@@ -13,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using NVorbis;
-using OpenAL;
+using MonoGame.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {

@@ -17,9 +17,9 @@ using PixelInternalFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 using Bool = OpenTK.Graphics.OpenGL.Boolean;
 #endif
 #if DESKTOPGL
-using OpenGL;
-using GLPixelFormat = OpenGL.PixelFormat;
-using PixelFormat = OpenGL.PixelFormat;
+using MonoGame.OpenGL;
+using GLPixelFormat = MonoGame.OpenGL.PixelFormat;
+using PixelFormat = MonoGame.OpenGL.PixelFormat;
 #endif
 #if GLES
 using OpenTK.Graphics.ES20;

@@ -6,11 +6,11 @@
 #if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 #else
-using OpenGL;
+using MonoGame.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
-using OpenGL;
+using MonoGame.OpenGL;
 using System;
 using System.Collections.Generic;
 #elif GLES

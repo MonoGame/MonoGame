@@ -651,11 +651,6 @@ namespace Microsoft.Xna.Framework.Graphics
             
             float sortKey = (_sortMode == SpriteSortMode.Texture) ? spriteFont.Texture.SortingKey : 0;
 
-            // Get the default glyph here once.
-            int defaultGlyphIndex = -1;
-            if (spriteFont.DefaultCharacter.HasValue)
-                spriteFont.TryGetGlyphIndex(spriteFont.DefaultCharacter.Value, out defaultGlyphIndex);
-            
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
@@ -675,7 +670,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
                 }
  
-                var currentGlyphIndex = spriteFont.GetGlyphIndexOrDefault(c, defaultGlyphIndex);
+                var currentGlyphIndex = spriteFont.GetGlyphIndexOrDefault(c);
                 var pCurrentGlyph = pGlyphs + currentGlyphIndex;
 
                 // The first character on a line might have a negative left side bearing.
@@ -823,11 +818,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 transformation.M42 = (((flipAdjustment.X - origin.X) * transformation.M12) + (flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y; 
             }
 
-            // Get the default glyph here once.
-            int defaultGlyphIndex = -1;
-            if (spriteFont.DefaultCharacter.HasValue)
-                spriteFont.TryGetGlyphIndex(spriteFont.DefaultCharacter.Value, out defaultGlyphIndex);
-            
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
@@ -847,7 +837,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
                 }
 
-                var currentGlyphIndex = spriteFont.GetGlyphIndexOrDefault(c, defaultGlyphIndex);
+                var currentGlyphIndex = spriteFont.GetGlyphIndexOrDefault(c);
                 var pCurrentGlyph = pGlyphs + currentGlyphIndex;
 
                 // The first character on a line might have a negative left side bearing.
@@ -944,11 +934,6 @@ namespace Microsoft.Xna.Framework.Graphics
             
             float sortKey =  (_sortMode == SpriteSortMode.Texture) ? spriteFont.Texture.SortingKey : 0;
 
-            // Get the default glyph here once.
-            int defaultGlyphIndex = -1;
-            if (spriteFont.DefaultCharacter.HasValue)
-                spriteFont.TryGetGlyphIndex(spriteFont.DefaultCharacter.Value, out defaultGlyphIndex);
-            
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
@@ -968,7 +953,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
                 }
 
-                var currentGlyphIndex = spriteFont.GetGlyphIndexOrDefault(c, defaultGlyphIndex);
+                var currentGlyphIndex = spriteFont.GetGlyphIndexOrDefault(c);
                 var pCurrentGlyph = pGlyphs + currentGlyphIndex;
 
                 // The first character on a line might have a negative left side bearing.
@@ -1115,11 +1100,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 transformation.M42 = (((flipAdjustment.X - origin.X) * transformation.M12) + (flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y; 
             }
 
-            // Get the default glyph here once.
-            int defaultGlyphIndex = -1;
-            if (spriteFont.DefaultCharacter.HasValue)
-                spriteFont.TryGetGlyphIndex(spriteFont.DefaultCharacter.Value, out defaultGlyphIndex);
-            
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
@@ -1139,7 +1119,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
                 }
 
-                var currentGlyphIndex = spriteFont.GetGlyphIndexOrDefault(c, defaultGlyphIndex);
+                var currentGlyphIndex = spriteFont.GetGlyphIndexOrDefault(c);
                 var pCurrentGlyph = pGlyphs + currentGlyphIndex;
 
                 // The first character on a line might have a negative left side bearing.

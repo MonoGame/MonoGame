@@ -5,9 +5,9 @@
 using System;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace OpenGL
+namespace MonoGame.OpenGL
 {
-    public class GraphicsContext : IGraphicsContext, IDisposable
+    internal class GraphicsContext : IGraphicsContext, IDisposable
     {
         private IntPtr _context;
         private IntPtr _winHandle;
