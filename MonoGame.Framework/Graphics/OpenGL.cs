@@ -745,7 +745,7 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
         internal delegate void ScissorDelegate (int x, int y, int width, int height);
-        internal static ScissorDelegate Scissor;
+       internal static ScissorDelegate Scissor;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
