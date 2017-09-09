@@ -93,7 +93,7 @@ You should end up with a .spritefont file like this
     <CharacterRegions>
       <CharacterRegion>
         <Start>&#32;</Start>
-        <End>&#126;</End>
+        <End>&#32;</End>
       </CharacterRegion>
     </CharacterRegions>
     <ResourceFiles>
@@ -120,7 +120,7 @@ SpriteFont.
 
 # Other Localized assets
 
-Note all localized assets will be fonts. In certain situtions you might need to swap out an entire texture or spritesheet.
+Not all localized assets will be fonts. In certain situtions you might need to swap out an entire texture or spritesheet.
 For these cases a new method has been added to the ContentManager, LoadLocalized. The idea behind this method is that it will
 look for localized files BEFORE loading the default one. 
 
@@ -144,4 +144,5 @@ These values are retrieved from
 	CultureInfo.CurrentCulture.TwoLetterISOLanguageName     // eg. "en"
 ```
 
-which are part of the System.Globalization namespace.
+which are part of the System.Globalization namespace. On a side not you can also use the `LoadLocalized` to load language 
+specific SpriteFonts. They just need to be named in the same way as we have described above.
