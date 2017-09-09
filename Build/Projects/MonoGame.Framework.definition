@@ -1338,14 +1338,6 @@
       <Platforms>tvOS</Platforms>
     </Compile>
 
-    <!-- Windows 8 Platform -->
-    <Compile Include="WindowsUniversal\InputEvents.cs">
-      <Platforms>WindowsUniversal</Platforms>
-    </Compile>
-   <Compile Include="Windows\SharpDXHelper.cs">
-      <Platforms>Windows,WindowsUniversal</Platforms>
-    </Compile>
-
 
     <!-- Windows UAP Platform -->
     <Compile Include="WindowsUniversal\UAPGamePlatform.cs">
@@ -1357,6 +1349,15 @@
     <Compile Include="WindowsUniversal\XamlGame.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
+    <Compile Include="WindowsUniversal\InputEvents.cs">
+      <Platforms>WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="WindowsUniversal\InputEvents.cs">
+      <Platforms>WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="Windows\SharpDXHelper.cs">
+      <Platforms>Windows,WindowsUniversal</Platforms>
+     </Compile>
 
 
     <!-- Windows Desktop Platfom -->
