@@ -144,5 +144,5 @@ These values are retrieved from
 	CultureInfo.CurrentCulture.TwoLetterISOLanguageName     // eg. "en"
 ```
 
-which are part of the System.Globalization namespace. On a side not you can also use the `LoadLocalized` to load language 
+which are part of the System.Globalization namespace. On a side note you can also use the `LoadLocalized` to load language 
 specific SpriteFonts. They just need to be named in the same way as we have described above.
