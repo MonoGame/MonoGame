@@ -24,6 +24,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="MonoGame.Build.Tasks" />
 
 	<!-- Platform specific and special references! -->
     <Reference Include="Framework.Content.Pipeline.References" />
