@@ -8,6 +8,7 @@
 #endregion
 
 #region Using Statements
+using System.ComponentModel;
 using System.IO;
 using System.Xml;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -29,9 +30,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// efficient than if we tried to include the entire CJK character region.
     /// </summary>
     [ContentProcessor]
-    class LocalizedFontProcessor : ContentProcessor<LocalizedFontDescription,
+    public class LocalizedFontProcessor : ContentProcessor<LocalizedFontDescription,
                                                     SpriteFontContent>
     {
+        [DefaultValue(true)]
+        public virtual bool PremultiplyAlpha { get; set; }
+
+        [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
+        public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
+
+        public LocalizedFontProcessor ()
+        {
+              PremultiplyAlpha = true;
+              TextureFormat = TextureProcessorOutputFormat.Compressed;
+        }
+
         /// <summary>
         /// Converts a font description into SpriteFont format.
         /// </summary>
@@ -41,7 +54,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             // Scan each .resx file in turn.
             foreach (string resourceFile in input.ResourceFiles)
             {
-                string absolutePath = Path.GetFullPath(resourceFile);
+                string absolutePath = Path.GetFullPath(resourceFile.Replace ('\\', Path.DirectorySeparatorChar).Replace ('/', Path.DirectorySeparatorChar));
 
                 // Make sure the .resx file really does exist.
                 if (!File.Exists(absolutePath))
@@ -62,7 +75,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     // Scan each character of the string.
                     foreach (char usedCharacter in resourceString)
                     {
-                        input.Characters.Add(usedCharacter);
+                        if (!input.Characters.Contains (usedCharacter))
+                            input.Characters.Add(usedCharacter);
                     }
                 }
 
@@ -70,10 +84,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 context.AddDependency(absolutePath);
             }
 
+            var parameters = new OpaqueDataDictionary ();
+            parameters.Add ("PremultiplyAlpha", PremultiplyAlpha);
+            parameters.Add ("TextureFormat", TextureFormat);
             // After adding the necessary characters, we can use the built in
             // FontDescriptionProcessor to do the hard work of building the font for us.
             return context.Convert<FontDescription,
-                                   SpriteFontContent>(input, "FontDescriptionProcessor");
+                SpriteFontContent>(input, "FontDescriptionProcessor", parameters);
         }
     }
 }

@@ -334,6 +334,12 @@
     <Content Include="Templates\SpriteFont.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Templates\LocalizedSpriteFont.spritefont">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\LocalizedSpriteFont.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <BundleResource Include="Resources\App.icns">
       <Platforms>MacOS</Platforms>

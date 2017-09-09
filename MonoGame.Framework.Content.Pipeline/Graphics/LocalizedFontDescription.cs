@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// custom font description class, deriving from the built in FontDescription
     /// type, and adding a new property to store the resource filenames.
     /// </summary>
-    class LocalizedFontDescription : FontDescription
+    public class LocalizedFontDescription : FontDescription
     {
         /// <summary>
         /// Constructor.

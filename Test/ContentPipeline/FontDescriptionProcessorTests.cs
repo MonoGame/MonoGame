@@ -49,6 +49,64 @@ namespace MonoGame.Tests.ContentPipeline
 
         [Test]
         [TestCaseSource("textureFormats")]
+        public void BuildLocalizedFont (TargetPlatform platform, TextureProcessorOutputFormat format)
+        {
+            var context = new TestProcessorContext(platform, "Localized.xnb");
+            var processor = new LocalizedFontProcessor()
+            {
+                TextureFormat = format,
+                PremultiplyAlpha = true,
+            };
+
+            LocalizedFontDescription fontDescription = null;
+            using (var fs = File.OpenRead(Path.Combine("Assets", "Fonts", "Localized.spritefont")))
+            using (var input = XmlReader.Create(new StreamReader(fs)))
+                fontDescription = IntermediateSerializer.Deserialize<LocalizedFontDescription>(input, "");
+            fontDescription.Identity = new ContentIdentity("Localized.spritefont");
+
+            var output = processor.Process(fontDescription, context);
+            Assert.IsNotNull(output, "output should not be null");
+            Assert.IsNotNull(output.Texture, "output.Texture should not be null");
+            var textureType = output.Texture.Faces[0][0].GetType();
+            switch (format)
+            {
+                case TextureProcessorOutputFormat.Color:
+                    Assert.IsTrue(textureType == typeof(PixelBitmapContent<Color>));
+                    break;
+                case TextureProcessorOutputFormat.Color16Bit:
+                    Assert.IsTrue(textureType == typeof(PixelBitmapContent<Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565>));
+                    break;
+                case TextureProcessorOutputFormat.Compressed:
+                    switch (platform)
+                    {
+                        case TargetPlatform.Windows:
+                        case TargetPlatform.DesktopGL:
+                            Assert.IsTrue(textureType == typeof(Dxt3BitmapContent));
+                            break;
+                        case TargetPlatform.iOS:
+                            Assert.IsTrue(textureType == typeof(PixelBitmapContent<Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444>));
+                            break;
+                        case TargetPlatform.Android:
+                            Assert.IsTrue(textureType == typeof(PixelBitmapContent<Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444>));
+                            break;
+                    }
+                    break;
+                case TextureProcessorOutputFormat.PvrCompressed:
+                    // because the font is not power of 2 we should use Brga4444
+                    Assert.IsTrue(textureType == typeof(PixelBitmapContent<Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444>));
+                    break;
+                case TextureProcessorOutputFormat.Etc1Compressed:
+                    // because the font has Alpha we should use Brga4444
+                    Assert.IsTrue(textureType == typeof(PixelBitmapContent<Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444>));
+                    break;
+                default:
+                    Assert.Fail("Test not written for " + format);
+                    break;
+            }
+        }
+
+        [Test]
+        [TestCaseSource("textureFormats")]
         public void BuildFontFromDescription (TargetPlatform platform, TextureProcessorOutputFormat format)
         {
             var context = new TestProcessorContext(platform, "Arial.xnb");
