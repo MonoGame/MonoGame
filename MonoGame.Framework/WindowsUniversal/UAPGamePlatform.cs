@@ -97,8 +97,6 @@ namespace Microsoft.Xna.Framework
                 }
             }
 
-            SystemNavigationManager.GetForCurrentView().BackRequested += BackRequested;
-
             CoreApplication.Suspending += this.CoreApplication_Suspending;
 
             Game.PreviousExecutionState = PreviousExecutionState;
@@ -115,17 +113,6 @@ namespace Microsoft.Xna.Framework
             get { return GameRunBehavior.Synchronous; }
         }
 
-        private static void BackRequested(object sender, BackRequestedEventArgs e)
-        {
-            // We need to manually hide the keyboard input UI when the back button is pressed
-            if (KeyboardInput.IsVisible)
-                KeyboardInput.Cancel(null);
-            else
-                GamePad.Back = true;
-
-            e.Handled = true;
-        }
-
         public override void RunLoop()
         {
             UAPGameWindow.Instance.RunLoop();
@@ -138,7 +125,6 @@ namespace Microsoft.Xna.Framework
                 while (true)
                 {
                     UAPGameWindow.Instance.Tick();
-                    GamePad.Back = false;
                 }
             });
             var tickWorker = ThreadPool.RunAsync(workItemHandler, WorkItemPriority.High, WorkItemOptions.TimeSliced);
