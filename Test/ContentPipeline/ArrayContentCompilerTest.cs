@@ -147,7 +147,7 @@ namespace MonoGame.Tests.ContentPipeline
                     foreach (var compress in CompressContents)
                         using (var xnbStream = new MemoryStream())
                         {
-                            Compiler.Compile(xnbStream, data, TargetPlatform.Windows, GraphicsProfile.HiDef, compress, "", "");
+                            Compiler.Compile(xnbStream, data, platform, gfxProfile, compress, "", "");
                             using (var content = new TestContentManager(xnbStream))
                             {
                                 var result = content.Load<T>("foo");
