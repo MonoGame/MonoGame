@@ -3,15 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.Foundation;
-using MonoMac.QTKit;
-using RectF = System.Drawing.RectangleF;
-#else
 using Foundation;
 using QTKit;
 using RectF = CoreGraphics.CGRect;
-#endif
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Media
@@ -19,7 +13,6 @@ namespace Microsoft.Xna.Framework.Media
     public sealed partial class VideoPlayer : IDisposable
     {
         private Game _game;
-        private MacGamePlatform _platform;
 
         // TODO Needed to bind OpenGL to Quicktime private QTVisualContextRef  textureContext;
         // TODO Needed to grab frame as a texture private CVOpenGLTextureRef  currentFrame;
@@ -27,7 +20,6 @@ namespace Microsoft.Xna.Framework.Media
         private void PlatformInitialize()
         {
             _game = Game.Instance;
-            _platform = (MacGamePlatform)_game.Services.GetService(typeof(MacGamePlatform));
         }
 
         private Texture2D PlatformGetTexture()
@@ -66,7 +58,7 @@ namespace Microsoft.Xna.Framework.Media
 
             // TODO when Xamarin implement the relevant functions var theError = QTOpenGLTextureContextCreate( null, null, _game.Window.PixelFormat, _game.Window.OpenGLContext, out textureContext);
 
-            _game.Window.AddSubview(_currentVideo.MovieView);
+            //_game.Window.AddSubview(_currentVideo.MovieView);
 
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString("QTMovieDidEndNotification"), (notification) =>
             {
@@ -82,7 +74,7 @@ namespace Microsoft.Xna.Framework.Media
 
             // FIXME: I'm not crazy about keeping track of IsPlayingVideo in MacGamePlatform, but where else can
             //        this concept be expressed?
-            _platform.IsPlayingVideo = true;
+            //_platform.IsPlayingVideo = true;
         }
 
         private void PlatformStop()
@@ -94,7 +86,7 @@ namespace Microsoft.Xna.Framework.Media
             
             // FIXME: I'm not crazy about keeping track of IsPlayingVideo in MacGamePlatform, but where else can
             //        this concept be expressed?
-            _platform.IsPlayingVideo = false;
+            //_platform.IsPlayingVideo = false;
             movieView.RemoveFromSuperview();
         }
 

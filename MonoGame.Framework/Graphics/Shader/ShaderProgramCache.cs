@@ -2,28 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-using GetProgramParameterName = MonoMac.OpenGL.ProgramParameter;
-using Bool = MonoMac.OpenGL.Boolean;
-#else
-using OpenTK.Graphics.OpenGL;
-using GetProgramParameterName = OpenTK.Graphics.OpenGL.ProgramParameter;
-using Bool = OpenTK.Graphics.OpenGL.Boolean;
-#endif
-#elif DESKTOPGL
 using MonoGame.OpenGL;
-#elif WINRT
-
-#else
-using OpenTK.Graphics.ES20;
-#if IOS || ANDROID
-using GetProgramParameterName = OpenTK.Graphics.ES20.ProgramParameter;
-using Bool = OpenTK.Graphics.ES20.All;
-#endif
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {

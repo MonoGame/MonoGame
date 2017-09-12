@@ -14,9 +14,7 @@ namespace Microsoft.Xna.Framework
     {
         internal static GamePlatform PlatformCreate(Game game)
         {
-#if MONOMAC
-            return new MacGamePlatform(game);
-#elif DESKTOPGL || ANGLE
+#if DESKTOPGL || ANGLE
             return new SdlGamePlatform(game);
 #elif WINDOWS && DIRECTX
             return new MonoGame.Framework.WinFormsGamePlatform(game);

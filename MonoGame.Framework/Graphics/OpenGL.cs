@@ -8,7 +8,7 @@ using System.Text;
 using System.Runtime.CompilerServices;
 
 
-#if __IOS__
+#if __IOS__ || __TVOS__ || MONOMAC
 using ObjCRuntime;
 #endif
 
@@ -127,6 +127,10 @@ namespace MonoGame.OpenGL
         DepthComponent16 = 0x81a5,
         DepthComponent24 = 0x81a6,
         Depth24Stencil8 = 0x88F0,
+        // GLES Values
+        DepthComponent24Oes = 0x81A6,
+        Depth24Stencil8Oes = 0x88F0,
+        StencilIndex8 = 0x8D48,
     }
 
     internal enum EnableCap : int
@@ -593,8 +597,13 @@ namespace MonoGame.OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
-        internal delegate void DepthRangeDelegate (double min, double max);
-        internal static DepthRangeDelegate DepthRange;
+        internal delegate void DepthRangedDelegate (double min, double max);
+        internal static DepthRangedDelegate DepthRanged;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void DepthRangefDelegate(float min, float max);
+        internal static DepthRangefDelegate DepthRangef;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
@@ -691,6 +700,12 @@ namespace MonoGame.OpenGL
         internal delegate void ScissorDelegate(int x, int y, int width, int height);
         internal static ScissorDelegate Scissor;
 
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        public delegate void ReadPixelsDelegate (int x, int y, int width, int height, PixelFormat format, PixelType type, IntPtr data);
+        public static ReadPixelsDelegate glReadPixels;
+
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
         internal delegate void BindBufferDelegate(BufferTarget target, int buffer);
@@ -743,6 +758,11 @@ namespace MonoGame.OpenGL
         internal static DeleteFramebuffersDelegate DeleteFramebuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
+        [MonoNativeFunctionWrapper]
+        public delegate void InvalidateFramebufferDelegate(FramebufferTarget target, int numAttachments, FramebufferAttachment[] attachments);
+        public static InvalidateFramebufferDelegate InvalidateFramebuffer;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
         internal delegate void FramebufferTexture2DDelegate(FramebufferTarget target, FramebufferAttachment attachement,
             TextureTarget textureTarget, int texture, int level );
@@ -753,6 +773,12 @@ namespace MonoGame.OpenGL
         internal delegate void FramebufferRenderbufferDelegate (FramebufferTarget target, FramebufferAttachment attachement,
             RenderbufferTarget renderBufferTarget, int buffer);
         internal static FramebufferRenderbufferDelegate FramebufferRenderbuffer;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        public delegate void RenderbufferStorageDelegate (RenderbufferTarget target, RenderbufferStorage storage, int width, int hegiht);
+        public static RenderbufferStorageDelegate RenderbufferStorage;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]       
@@ -1112,6 +1138,9 @@ namespace MonoGame.OpenGL
                 Viewport = (ViewportDelegate)LoadEntryPoint<ViewportDelegate>("glViewport");
             if (Scissor == null)
                 Scissor = (ScissorDelegate)LoadEntryPoint<ScissorDelegate>("glScissor");
+            if (MakeCurrent == null)
+                MakeCurrent = (MakeCurrentDelegate)LoadEntryPoint<MakeCurrentDelegate>("glMakeCurrent", throwIfNotFound: false);
+
             GetError = (GetErrorDelegate)LoadEntryPoint<GetErrorDelegate>("glGetError");
 
             TexParameterf = (TexParameterFloatDelegate)LoadEntryPoint<TexParameterFloatDelegate>("glTexParameterf");
@@ -1120,11 +1149,11 @@ namespace MonoGame.OpenGL
 
             EnableVertexAttribArray = (EnableVertexAttribArrayDelegate)LoadEntryPoint<EnableVertexAttribArrayDelegate>("glEnableVertexAttribArray");
             DisableVertexAttribArray = (DisableVertexAttribArrayDelegate)LoadEntryPoint<DisableVertexAttribArrayDelegate>("glDisableVertexAttribArray");
-            //MakeCurrent = (MakeCurrentDelegate)LoadEntryPoint<MakeCurrentDelegate>("glMakeCurrent");
             GetIntegerv = (GetIntegerDelegate)LoadEntryPoint<GetIntegerDelegate>("glGetIntegerv");
             GetStringInternal = (GetStringDelegate)LoadEntryPoint<GetStringDelegate>("glGetString");
             ClearDepth = (ClearDepthDelegate)LoadEntryPoint<ClearDepthDelegate>("glClearDepth");
-            DepthRange = (DepthRangeDelegate)LoadEntryPoint<DepthRangeDelegate>("glDepthRange");
+            DepthRanged = (DepthRangedDelegate)LoadEntryPoint<DepthRangedDelegate>("glDepthRange");
+            DepthRangef = (DepthRangefDelegate)LoadEntryPoint<DepthRangefDelegate>("glDepthRangef");
             Clear = (ClearDelegate)LoadEntryPoint<ClearDelegate>("glClear");
             ClearColor = (ClearColorDelegate)LoadEntryPoint<ClearColorDelegate>("glClearColor");
             ClearStencil = (ClearStencilDelegate)LoadEntryPoint<ClearStencilDelegate>("glClearStencil");
@@ -1145,9 +1174,12 @@ namespace MonoGame.OpenGL
             DrawArrays = (DrawArraysDelegate)LoadEntryPoint<DrawArraysDelegate>("glDrawArrays");
             Uniform1i = (Uniform1iDelegate)LoadEntryPoint<Uniform1iDelegate>("glUniform1i");
             Uniform4fv = (Uniform4fvDelegate)LoadEntryPoint<Uniform4fvDelegate>("glUniform4fv");
+            glReadPixels = (ReadPixelsDelegate)LoadEntryPoint<ReadPixelsDelegate> ("glReadPixels");
 
             ReadBuffer = (ReadBufferDelegate)LoadEntryPoint<ReadBufferDelegate>("glReadBuffer");
             DrawBuffer = (DrawBufferDelegate)LoadEntryPoint<DrawBufferDelegate>("glDrawBuffer");
+
+            RenderbufferStorage = (RenderbufferStorageDelegate)LoadEntryPoint<RenderbufferStorageDelegate> ("glRenderbufferStorage");
 
             // these are only in GL 3.0 or ARB_framebuffer_object, if they fail to load (and only if they do), we need to check if EXT_framebuffer_object is present as a fallback
             try
@@ -1185,7 +1217,9 @@ namespace MonoGame.OpenGL
             GenQueries = (GenQueriesDelegate)LoadEntryPoint<GenQueriesDelegate>("glGenQueries");
             BeginQuery = (BeginQueryDelegate)LoadEntryPoint<BeginQueryDelegate>("glBeginQuery");
             EndQuery = (EndQueryDelegate)LoadEntryPoint<EndQueryDelegate>("glEndQuery");
-            GetQueryObject = (GetQueryObjectDelegate)LoadEntryPoint<GetQueryObjectDelegate>("glGetQueryObjectiv");
+            GetQueryObject = (GetQueryObjectDelegate)LoadEntryPoint<GetQueryObjectDelegate>("glGetQueryObjectivARB");
+            if (GetQueryObject == null)
+                GetQueryObject = (GetQueryObjectDelegate)LoadEntryPoint<GetQueryObjectDelegate>("glGetQueryObjectiv");
             DeleteQueries = (DeleteQueriesDelegate)LoadEntryPoint<DeleteQueriesDelegate>("glDeleteQueries");
 
             ActiveTexture = (ActiveTextureDelegate)LoadEntryPoint<ActiveTextureDelegate>("glActiveTexture");
@@ -1258,20 +1292,39 @@ namespace MonoGame.OpenGL
             try
             {
                 DebugMessageCallback = (DebugMessageCallbackDelegate)LoadEntryPoint<DebugMessageCallbackDelegate>("glDebugMessageCallback");
-                DebugMessageCallback(DebugMessageCallbackHandler, IntPtr.Zero);
-                Enable(EnableCap.DebugOutput);
-                Enable(EnableCap.DebugOutputSynchronous);
+                if (DebugMessageCallback != null)
+                {
+                    DebugMessageCallback(DebugMessageCallbackHandler, IntPtr.Zero);
+                    Enable(EnableCap.DebugOutput);
+                    Enable(EnableCap.DebugOutputSynchronous);
+                }
             }
             catch (EntryPointNotFoundException)
             {
                 // Ignore the debug message callback if the entry point can not be found
             }
 #endif
+            if (BoundApi == RenderApi.ES)
+            {
+                InvalidateFramebuffer = (InvalidateFramebufferDelegate)LoadEntryPoint<InvalidateFramebufferDelegate>("glDiscardFramebufferEXT");
+            }
         }
 
-        internal static System.Delegate LoadEntryPoint<T>(string proc)
+        internal static System.Delegate LoadEntryPoint<T>(string proc, bool throwIfNotFound = true)
         {
-            return Marshal.GetDelegateForFunctionPointer(EntryPointHelper.GetAddress(proc), typeof(T));
+            try
+            {
+                var addr = EntryPointHelper.GetAddress(proc);
+                if (addr == IntPtr.Zero)
+                    return null;
+                return Marshal.GetDelegateForFunctionPointer(addr, typeof(T));
+            }
+            catch (EntryPointNotFoundException)
+            {
+                if (throwIfNotFound)
+                    throw;
+                return null;
+            }
         }
 
         static partial void LoadPlatformEntryPoints();
@@ -1282,6 +1335,14 @@ namespace MonoGame.OpenGL
         }
 
         /* Helper Functions */
+
+        internal static void DepthRange(float min, float max)
+        {
+            if (BoundApi == RenderApi.ES)
+                DepthRangef(min, max);
+            else
+                DepthRanged(min, max);
+        }
 
         internal static void Uniform1 (int location, int value) {
             Uniform1i(location, value);
@@ -1444,6 +1505,16 @@ namespace MonoGame.OpenGL
             finally
             {
                 pixelsPtr.Free();
+            }
+        }
+
+        public static unsafe void ReadPixels<T> (int x, int y, int width, int height, PixelFormat format, PixelType type, [In][Out] T[] data)
+        {
+            GCHandle pixels_ptr = GCHandle.Alloc (data, GCHandleType.Pinned);
+            try {
+                glReadPixels (x, y, width,height, format, type, (IntPtr)pixels_ptr.AddrOfPinnedObject ());
+            } finally {
+                pixels_ptr.Free ();
             }
         }
     }

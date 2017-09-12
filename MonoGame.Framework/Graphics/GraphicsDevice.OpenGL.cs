@@ -7,29 +7,10 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-using GLPrimitiveType = MonoMac.OpenGL.BeginMode;
-#else
-using OpenTK.Graphics.OpenGL;
-using GLPrimitiveType = OpenTK.Graphics.OpenGL.BeginMode;
-#endif
-#endif
-
-#if DESKTOPGL
-using MonoGame.OpenGL;
-#endif
-
 #if ANGLE
 using OpenTK.Graphics;
-#endif
-
-#if GLES
-using OpenTK.Graphics.ES20;
-using FramebufferAttachment = OpenTK.Graphics.ES20.All;
-using RenderbufferStorage = OpenTK.Graphics.ES20.All;
-using GLPrimitiveType = OpenTK.Graphics.ES20.BeginMode;
+#else
+using MonoGame.OpenGL;
 #endif
 
 
@@ -107,11 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     case ResourceType.Program:
                         if (GL.IsProgram(handle))
                         {
-#if MONOMAC
-                            GL.DeleteProgram(1, ref handle);
-#else
                             GL.DeleteProgram(handle);
-#endif
                         }
                         break;
                     case ResourceType.Query:
@@ -149,7 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glMajorVersion = 0;
         internal int glMinorVersion = 0;
         internal int glFramebuffer = 0;
-        internal int MaxVertexAttributes;        
+        internal int MaxVertexAttributes;
         internal List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
 
@@ -279,86 +256,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Context.MakeCurrent(windowInfo);
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 
-            /*if (Threading.BackgroundContext == null)
-            {
-                Threading.BackgroundContext = GL.CreateContext(windowInfo);
-                Threading.WindowInfo = windowInfo;
-                Threading.BackgroundContext.MakeCurrent(null);
-            }
-
             Context.MakeCurrent(windowInfo);
-
-            GraphicsMode mode = GraphicsMode.Default;
-            var wnd = OpenTK.Platform.Utilities.CreateSdl2WindowInfo(Game.Instance.Window.Handle);
-
-            #if GLES
-            // Create an OpenGL ES 2.0 context
-            var flags = GraphicsContextFlags.Embedded;
-            int major = 2;
-            int minor = 0;
-            #else
-            // Create an OpenGL compatibility context
-            var flags = GraphicsContextFlags.Default;
-            int major = 1;
-            int minor = 0;
-            #endif
-
-            if (Context == null || Context.IsDisposed)
-            {
-                var color = PresentationParameters.BackBufferFormat.GetColorFormat();
-                var depth =
-                    PresentationParameters.DepthStencilFormat == DepthFormat.None ? 0 :
-                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth16 ? 16 :
-                    24;
-                var stencil =
-                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth24Stencil8 ? 8 :
-                    0;
-
-                var samples = 0;
-                if (Game.Instance.graphicsDeviceManager.PreferMultiSampling)
-                {
-                    // Use a default of 4x samples if PreferMultiSampling is enabled
-                    // without explicitly setting the desired MultiSampleCount.
-                    if (PresentationParameters.MultiSampleCount == 0)
-                    {
-                        PresentationParameters.MultiSampleCount = 4;
-                    }
-
-                    samples = PresentationParameters.MultiSampleCount;
-                }
-
-                mode = new GraphicsMode(color, depth, stencil, samples);
-                try
-                {
-                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
-                }
-                catch (Exception e)
-                {
-                    Game.Instance.Log("Failed to create OpenGL context, retrying. Error: " +
-                        e.ToString());
-                    major = 1;
-                    minor = 0;
-                    flags = GraphicsContextFlags.Default;
-                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
-                }
-            }
-            Context.MakeCurrent(wnd);
-            (Context as IGraphicsContextInternal).LoadAll();
-            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
-
-            // Provide the graphics context for background loading
-            // Note: this context should use the same GraphicsMode,
-            // major, minor version and flags parameters as the main
-            // context. Otherwise, context sharing will very likely fail.
-            if (Threading.BackgroundContext == null)
-            {
-                Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
-                Threading.WindowInfo = wnd;
-                Threading.BackgroundContext.MakeCurrent(null);
-            }
-            Context.MakeCurrent(wnd);*/
-
-
 #endif
 
             MaxTextureSlots = 16;
@@ -761,11 +659,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 this.framebufferHelper.GenRenderbuffer(out color);
                 this.framebufferHelper.BindRenderbuffer(color);
-#if GLES
-                this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)RenderbufferStorage.Rgba8Oes, width, height);
-#else
                 this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)RenderbufferStorage.Rgba8, width, height);
-#endif
             }
 
             if (preferredDepthFormat != DepthFormat.None)
