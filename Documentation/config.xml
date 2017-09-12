@@ -35,6 +35,7 @@
         <topic id="Using_The_Pipeline_Tool" name="Using The Pipeline Tool" filename="using_pipeline_tool.md"/>
         <topic id="Custom_Effects" name="Custom Effects" filename="custom_effects.md"/>
         <topic id="Using_TrueType_Fonts" name="Using TrueType Fonts" filename="adding_ttf_fonts.md"/>
+    <topic id="Localization" name="Localization" filename="localization.md" />
     </topic>
 
     <topic id="Tools" name="Tools" filename="tools.md">

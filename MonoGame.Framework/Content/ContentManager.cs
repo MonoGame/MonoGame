@@ -9,6 +9,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework.Utilities;
 using Microsoft.Xna.Framework.Graphics;
+using System.Globalization;
 
 #if !WINRT
 using Microsoft.Xna.Framework.Audio;
@@ -194,6 +195,29 @@ namespace Microsoft.Xna.Framework.Content
 				disposed = true;
 			}
 		}
+
+        public virtual T LoadLocalized<T> (string assetName)
+        {
+            string [] cultureNames =
+            {
+                CultureInfo.CurrentCulture.Name,                        // eg. "en-US"
+                CultureInfo.CurrentCulture.TwoLetterISOLanguageName     // eg. "en"
+            };
+
+            // Look first for a specialized language-country version of the asset,
+            // then if that fails, loop back around to see if we can find one that
+            // specifies just the language without the country part.
+            foreach (string cultureName in cultureNames) {
+                string localizedAssetName = assetName + '.' + cultureName;
+
+                try {
+                    return Load<T> (localizedAssetName);
+                } catch (ContentLoadException) { }
+            }
+
+            // If we didn't find any localized asset, fall back to the default name.
+            return Load<T> (assetName);
+        }
 
 		public virtual T Load<T>(string assetName)
 		{
