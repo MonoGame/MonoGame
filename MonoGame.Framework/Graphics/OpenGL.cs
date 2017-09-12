@@ -353,6 +353,7 @@ namespace MonoGame.OpenGL
         Rg16ui = 0x823A,
         Rgba16ui = 0x8D76,
         Rgb10A2ui = 0x906F,
+        Rgba16 = 0x805B,
         // PVRTC
         CompressedRgbPvrtc2Bppv1Img = 0x8C01,
         CompressedRgbPvrtc4Bppv1Img = 0x8C00,
