@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // TODO: Add a name to parameter lookup table.
 				foreach (var parameter in _parameters) 
                 {
-					if (parameter.Name == name) 
+					if (parameter.Name == name || parameter.Name == name+"Sampler") 
 						return parameter;
 				}
 
