@@ -157,10 +157,10 @@
       </if>
     </if>
     <if test="${os == 'MacOS'}">
-      <if test="${file::exists('/Developer/MonoAndroid/usr/bin/mandroid')}">
+      <if test="${file::exists('/Developer/MonoAndroid/usr/bin/mandroid') or file::exists('/Library/Frameworks/Xamarin.Android.framework/Commands/generator')}">
         <exec program="mono" commandline="Protobuild.exe -generate Android" />
-	<exec program="xbuild" commandline="MonoGame.Framework.Android.sln /t:Clean /p:Configuration=Release" />
-	<exec program="xbuild" commandline="MonoGame.Framework.Android.sln /t:Build /p:Configuration=Release" />
+        <exec program="xbuild" commandline="MonoGame.Framework.Android.sln /t:Clean /p:Configuration=Release" />
+        <exec program="xbuild" commandline="MonoGame.Framework.Android.sln /t:Build /p:Configuration=Release" />
       </if>
     </if>
   </target>

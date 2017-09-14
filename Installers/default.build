@@ -169,6 +169,8 @@ fi
       <delete dir="./root"/>
       <delete file="./distribution.xml"/>
       <delete file="./MacOS/Resources/LICENSE.html"/>
+      <exec program="shasum" workingdir="." commandline=" -a 256 MonoGame.pkg" output="MonoGame.pkg.sha" />
+      <exec program="shasum" workingdir="." commandline=" -a 256 Pipeline.MacOS.pkg" output="Pipeline.MacOS.pkg.sha" />
     </if>
 
 
@@ -207,6 +209,7 @@ fi
         <arg value="./postinstall.sh"/>
       </exec>
       <delete dir="Linux/tmp_run" failonerror="false"/>
+      <exec program="shasum" workingdir="Linux/" commandline=" -a 256 monogame-sdk.run" output="monogame-sdk.run.sha" />
     </if>
 
   </target>
