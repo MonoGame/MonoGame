@@ -1352,9 +1352,6 @@
     <Compile Include="WindowsUniversal\InputEvents.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="WindowsUniversal\InputEvents.cs">
-      <Platforms>WindowsUniversal</Platforms>
-    </Compile>
     <Compile Include="Windows\SharpDXHelper.cs">
       <Platforms>Windows,WindowsUniversal</Platforms>
      </Compile>
