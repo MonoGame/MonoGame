@@ -69,6 +69,12 @@ namespace MonoGame.Tests.Graphics
             Assert.That(cube.Effects[0], Is.EqualTo(newEffect));
         }
 
+        [Test]
+        public void LoadModelBuiltWithCustomProcessor()
+        {
+            model = content.Load<Model>(Paths.Model("Car"));
+        }
+
 #if !XNA // Tests below are valid for Monogame only because of manual model creation.
 
         [Test]
