@@ -244,8 +244,8 @@
     </Compile>
 
 
-    <!-- Windows 8 Platform -->
-    <Compile Include="Windows8\GamerServices\SignedInGamer.cs">
+    <!-- Windows Universal Platform -->
+    <Compile Include="WindowsUniversal\GamerServices\SignedInGamer.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
 
