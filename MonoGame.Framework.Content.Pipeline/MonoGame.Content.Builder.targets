@@ -98,6 +98,7 @@
   </Target>
 
   <Target Name="BuildContent" DependsOnTargets="Prepare;RunContentBuilder"
+          Condition=" '@(MonoGameContentReference)' != '' "
           Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)">
 
     <CreateItem Include="%(ExtraContent.FullPath)"
