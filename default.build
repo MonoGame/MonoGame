@@ -165,6 +165,9 @@
     </if>
   </target>
 
+  <target name="build_windows8" />
+  <target name="build_windowsphone81" />
+
   <target name="build_windows10" description="Build Windows 10 UAP" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsXaml\v14.0\Microsoft.Windows.UI.Xaml.CSharp.targets')}">
