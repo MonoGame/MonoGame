@@ -4,6 +4,8 @@ using NUnit.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -12,6 +14,11 @@ namespace MonoGame.Tests.ContentPipeline
     {
         public class CustomModelProcessor : ModelProcessor
         {
+            public CustomModelProcessor()
+            {
+                GenerateTangentFrames = false;
+            }
+
             public override ModelContent Process(
             NodeContent input, ContentProcessorContext context)
             {
@@ -90,6 +97,9 @@ namespace MonoGame.Tests.ContentPipeline
             var c = new TestImporterContext("obj", "bin");
             var node = importer.Import(Path.Combine("Assets", "Models", "Car.x"), c);
             var model = processor.Process(node, context);
+            var _compiler = new ContentCompiler();
+            using (var stream = new FileStream(Path.Combine("bin", "Car.xnb"), FileMode.Create, FileAccess.Write, FileShare.None))
+                _compiler.Compile(stream, model, TargetPlatform.DesktopGL, GraphicsProfile.HiDef, false, Path.Combine("Assets", "Models"), ".");
         }
     }
 }

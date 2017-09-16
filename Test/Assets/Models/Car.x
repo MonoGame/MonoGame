@@ -39,7 +39,7 @@ Material Standard_19 {
  0.000000;0.000000;0.000000;;
 
  EffectInstance {
-  "..\\shaders\\ReflectionSimpleGlass.fx";
+  "..\\Effects\\ReflectionSimpleGlass.fx";
 
   EffectParamDWord {
    "lightDir";
@@ -87,7 +87,7 @@ Material Standard_19 {
 
   EffectParamString {
    "reflectionCubeTexture";
-   "..\\textures\\SkyCubeMap.dds";
+   "..\\Textures\\SkyCubeMap.dds";
   }
 
   EffectParamDWord {
@@ -104,7 +104,7 @@ Material Material__803_lackSub0 {
  0.000000;0.000000;0.000000;;
 
  EffectInstance {
-  "..\\shaders\\NormalMapping.fx";
+  "..\\Effects\\NormalMapping.fx";
 
   EffectParamDWord {
    "lightDir";
@@ -146,22 +146,22 @@ Material Material__803_lackSub0 {
 
   EffectParamString {
    "diffuseTexture";
-   "..\\textures\\RacerCar.tga";
+   "..\\Textures\\RacerCar.tga";
   }
 
   EffectParamString {
    "normalTexture";
-   "..\\textures\\RacerCarNormal.tga";
+   "..\\Textures\\RacerCarNormal.tga";
   }
 
   EffectParamString {
    "reflectionCubeTexture";
-   "..\\textures\\SkyCubeMap.dds";
+   "..\\Textures\\SkyCubeMap.dds";
   }
 
   EffectParamString {
    "NormalizeCubeTexture";
-   "..\\textures\\NormalizeCubeMap.dds";
+   "..\\Textures\\NormalizeCubeMap.dds";
   }
 
   EffectParamFloats {
@@ -193,7 +193,7 @@ Material Material__803_gummiSub1 {
  0.000000;0.000000;0.000000;;
 
  EffectInstance {
-  "..\\shaders\\NormalMapping.fx";
+  "..\\Effects\\NormalMapping.fx";
 
   EffectParamDWord {
    "lightDir";
@@ -235,22 +235,22 @@ Material Material__803_gummiSub1 {
 
   EffectParamString {
    "diffuseTexture";
-   "..\\textures\\RacerCar.tga";
+   "..\\Textures\\RacerCar.tga";
   }
 
   EffectParamString {
    "normalTexture";
-   "..\\textures\\RacerCarNormal.tga";
+   "..\\Textures\\RacerCarNormal.tga";
   }
 
   EffectParamString {
    "reflectionCubeTexture";
-   "..\\textures\\SkyCubeMap.dds";
+   "..\\Textures\\SkyCubeMap.dds";
   }
 
   EffectParamString {
    "NormalizeCubeTexture";
-   "..\\textures\\NormalizeCubeMap.dds";
+   "..\\Textures\\NormalizeCubeMap.dds";
   }
 
   EffectParamFloats {
@@ -282,7 +282,7 @@ Material Material__803_chromeSub2 {
  0.000000;0.000000;0.000000;;
 
  EffectInstance {
-  "..\\shaders\\NormalMapping.fx";
+  "..\\Effects\\NormalMapping.fx";
 
   EffectParamDWord {
    "lightDir";
@@ -324,22 +324,22 @@ Material Material__803_chromeSub2 {
 
   EffectParamString {
    "diffuseTexture";
-   "..\\textures\\RacerCar.tga";
+   "..\\Textures\\RacerCar.tga";
   }
 
   EffectParamString {
    "normalTexture";
-   "..\\textures\\RacerCarNormal.tga";
+   "..\\Textures\\RacerCarNormal.tga";
   }
 
   EffectParamString {
    "reflectionCubeTexture";
-   "..\\textures\\SkyCubeMap.dds";
+   "..\\Textures\\SkyCubeMap.dds";
   }
 
   EffectParamString {
    "NormalizeCubeTexture";
-   "..\\textures\\NormalizeCubeMap.dds";
+   "..\\Textures\\NormalizeCubeMap.dds";
   }
 
   EffectParamFloats {
@@ -371,7 +371,7 @@ Material Material__815_gummiSub0 {
  0.000000;0.000000;0.000000;;
 
  EffectInstance {
-  "..\\shaders\\NormalMapping.fx";
+  "..\\Effects\\NormalMapping.fx";
 
   EffectParamDWord {
    "lightDir";
@@ -413,22 +413,22 @@ Material Material__815_gummiSub0 {
 
   EffectParamString {
    "diffuseTexture";
-   "..\\textures\\RacerCar.tga";
+   "..\\Textures\\RacerCar.tga";
   }
 
   EffectParamString {
    "normalTexture";
-   "..\\textures\\RacerCarNormal.tga";
+   "..\\Textures\\RacerCarNormal.tga";
   }
 
   EffectParamString {
    "reflectionCubeTexture";
-   "..\\textures\\SkyCubeMap.dds";
+   "..\\Textures\\SkyCubeMap.dds";
   }
 
   EffectParamString {
    "NormalizeCubeTexture";
-   "..\\textures\\NormalizeCubeMap.dds";
+   "..\\Textures\\NormalizeCubeMap.dds";
   }
 
   EffectParamFloats {
@@ -460,7 +460,7 @@ Material Material__815_chromeSub1 {
  0.000000;0.000000;0.000000;;
 
  EffectInstance {
-  "..\\shaders\\NormalMapping.fx";
+  "..\\Effects\\NormalMapping.fx";
 
   EffectParamDWord {
    "lightDir";
@@ -502,22 +502,22 @@ Material Material__815_chromeSub1 {
 
   EffectParamString {
    "diffuseTexture";
-   "..\\textures\\RacerCar.tga";
+   "..\\Textures\\RacerCar.tga";
   }
 
   EffectParamString {
    "normalTexture";
-   "..\\textures\\RacerCarNormal.tga";
+   "..\\Textures\\RacerCarNormal.tga";
   }
 
   EffectParamString {
    "reflectionCubeTexture";
-   "..\\textures\\SkyCubeMap.dds";
+   "..\\Textures\\SkyCubeMap.dds";
   }
 
   EffectParamString {
    "NormalizeCubeTexture";
-   "..\\textures\\NormalizeCubeMap.dds";
+   "..\\Textures\\NormalizeCubeMap.dds";
   }
 
   EffectParamFloats {

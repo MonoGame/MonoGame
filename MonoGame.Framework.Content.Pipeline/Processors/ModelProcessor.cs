@@ -23,6 +23,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         private bool _generateMipmaps = true;
         private bool _premultiplyTextureAlpha = true;
         private bool _premultiplyVertexColors = true;
+        private bool _generateTangentFrames = false; 
         private float _scale = 1.0f;
         private TextureProcessorOutputFormat _textureFormat = TextureProcessorOutputFormat.Compressed;
 
@@ -50,7 +51,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             set { _generateMipmaps = value; }
         }
 
-        public virtual bool GenerateTangentFrames { get; set; }
+        [DefaultValue(false)]
+        public virtual bool GenerateTangentFrames {
+            get { return _generateTangentFrames; }
+            set {_generateTangentFrames = value; }
+        }
 
         [DefaultValue(true)]
         public virtual bool PremultiplyTextureAlpha
