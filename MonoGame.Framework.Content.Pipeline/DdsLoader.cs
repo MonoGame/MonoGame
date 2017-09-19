@@ -334,6 +334,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     {
                         var content = CreateBitmapContent(format, w, h);
                         var byteCount = GetBitmapSize(format, w, h);
+                        // A 24-bit format is slightly different
+                        if (header.ddspf.dwRgbBitCount == 24)
+                            byteCount = 3 * w * h;
                         var bytes = reader.ReadBytes(byteCount);
                         if (rbSwap)
                         {
