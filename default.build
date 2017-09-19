@@ -36,9 +36,6 @@
   <!-- Shortcut for building all valid target platforms -->
   <target name="build_code" description="Build all the projects.">
     <call target="build_windows"/>
-    <call target="build_windows8" />
-    <call target="build_windowsphone" />
-    <call target="build_windowsphone81" />
     <call target="build_windows10" />
     <call target="build_web" />
     <call target="build_linux"/>
@@ -168,27 +165,8 @@
     </if>
   </target>
 
-  <target name="build_windows8" description="Build Windows 8" depends="_prebuild">
-    <if test="${os == 'Win32NT'}">
-      <exec program="Protobuild" commandline="-generate Windows8" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Build /p:Configuration=Release" />
-    </if>
-  </target>
-
-  <target name="build_windowsphone" description="Build Windows Phone" depends="_prebuild">
-
-  </target>
-
-  <target name="build_windowsphone81" description="Build Windows Phone 8.1" depends="_prebuild">
-    <if test="${os == 'Win32NT'}">
-      <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsPhone\v8.1\Microsoft.Cpp.WindowsPhone.8.1.targets')}">
-        <exec program="Protobuild" commandline="-generate WindowsPhone81" />
-        <exec program="${msbuild12dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsPhone81.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
-        <exec program="${msbuild12dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsPhone81.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
-      </if>
-    </if>
-  </target>
+  <target name="build_windows8" />
+  <target name="build_windowsphone81" />
 
   <target name="build_windows10" description="Build Windows 10 UAP" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
@@ -235,7 +213,6 @@
   <!-- Create the installers... will fail if the code hasn't been built. -->
   <target name="build_installer" description="Build the installers." depends="_default">
     <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
-    <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2013/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2015/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2017/default.build" target="build" />

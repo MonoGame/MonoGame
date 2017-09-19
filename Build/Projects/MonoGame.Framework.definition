@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS,PSVita,XBoxOne,Switch">
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Windows,WindowsGL,WindowsUniversal,Web,tvOS,PSVita,XBoxOne,Switch">
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
     for backwards compatibility with existing users of MonoGame, and are not
@@ -14,9 +14,7 @@
   	<Platform Name="Linux">35253CE1-C864-4CD3-8249-4D1319748E8F</Platform>
   	<Platform Name="MacOS">36C538E6-C32A-4A8D-A39C-566173D7118E</Platform>
   	<Platform Name="Windows">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
-  	<Platform Name="Windows8">0518563C-ACCA-4A14-8C5D-DDBE93E2605F</Platform>
   	<Platform Name="WindowsGL">6D75E618-19CA-4C51-9546-F10965FBC0B8</Platform>
-    <Platform Name="WindowsPhone81">6522B7E9-25A5-4250-B164-42CC2C4ECCAD</Platform>
     <Platform Name="WindowsUniversal">09C41A48-7BF3-4A46-9EB8-CE95B4C27CA9</Platform>
   </ProjectGuids>
 
@@ -44,18 +42,13 @@
       <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL;DESKTOPGL;SUPPORTS_EFX</Platform>
       <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL;SUPPORTS_EFX</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
-      <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
-      <Platform Name="WindowsPhone81">TRACE;WINRT;WINDOWS_PHONE81;DIRECTX;WINDOWS_STOREAPP</Platform>
-      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
+      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="Web">TRACE;WEB</Platform>
     </CustomDefinitions>
 	
 	<DefineNET4DetectionConstant>True</DefineNET4DetectionConstant>
 
     <FrameworkVersions>
-	  <Platform Name="Windows8">
-	    <Version>v4.5.1</Version>
-	  </Platform>
 	  <Platform Name="Android">
             <Version>v4.4</Version>
           </Platform>
@@ -71,7 +64,7 @@
       <Platforms>iOS,WindowsGL,Android,tvOS</Platforms>
     </Uses>
     <Uses Name="DirectXGraphics">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>WindowsUniversal</Platforms>
     </Uses>
     <Uses Name="WebGraphics">
       <Platforms>Web</Platforms>
@@ -108,7 +101,7 @@
       <Requires>OpenALAudio,_GLCompatible</Requires>
     </Service>
     <Service Name="DirectXGraphics">
-      <Platforms>Windows,Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Windows,WindowsUniversal</Platforms>
       <Conflicts>ANGLEGraphics,OpenGLGraphics,WebGraphics</Conflicts>
       <Requires>XAudioAudio</Requires>
     </Service>
@@ -124,7 +117,7 @@
       <Conflicts>XAudioAudio,WebAudio</Conflicts>
     </Service>
     <Service Name="XAudioAudio">
-      <Platforms>Windows,Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Windows,WindowsUniversal</Platforms>
       <Conflicts>OpenALAudio,WebAudio</Conflicts>
     </Service>
     <Service Name="WebAudio">
@@ -168,12 +161,6 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.Windows.cs">
         <Platforms>Windows</Platforms>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.WindowsPhone.cs">
-        <Platforms>WindowsPhone81</Platforms>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.WindowsStore.cs">
-        <Platforms>Windows8</Platforms>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.UniversalWindowsPlatform.cs">
         <Platforms>WindowsUniversal</Platforms>
@@ -279,20 +266,14 @@
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="GamePlatform.Desktop.cs">
-      <Platforms>Angle,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsUniversal</Platforms>
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="GamePlatform.Mobile.cs">
-      <Platforms>Android,iOS,WindowsPhone81,Web,tvOS</Platforms>
+      <Platforms>Android,iOS,Web,tvOS</Platforms>
     </Compile>
     <Compile Include="GameRunBehavior.cs" />
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />
-    <Compile Include="GameTimer.cs">
-      <Platforms>Windows8,WindowsPhone81</Platforms>
-    </Compile>
-    <Compile Include="GameTimerEventArgs.cs">
-      <Platforms>Windows8,WindowsPhone81</Platforms>
-    </Compile>
     <Compile Include="GameUpdateRequiredException.cs" />
     <Compile Include="GameWindow.cs">
 	</Compile>
@@ -316,9 +297,6 @@
     <Compile Include="Ray.cs" />
     <Compile Include="Rectangle.cs" />
     <Compile Include="ReusableItemList.cs" />
-    <Compile Include="SharedGraphicsDeviceManager.cs">
-      <Platforms>Windows8,WindowsPhone81</Platforms>
-    </Compile>
     <Compile Include="TextInputEventArgs.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
     </Compile>
@@ -336,7 +314,7 @@
       <Platforms>iOS,tvOS</Platforms>
     </Compile>
     <Compile Include="TitleContainer.WinRT.cs">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
@@ -431,7 +409,7 @@
     <Compile Include="Audio\Xact\VolumeEvent.cs" />
     <Compile Include="Audio\Xact\WaveBank.cs" />
     <Compile Include="Audio\Xact\WaveBank.Default.cs">	
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows,WindowsGL,WindowsUniversal,Web,tvOS</Platforms>
     </Compile>
     <Compile Include="Audio\Xact\XactClip.cs" />
     <Compile Include="Audio\Xact\XactHelpers.cs" />
@@ -535,13 +513,13 @@
     <Compile Include="Graphics\DeviceNotResetException.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
     <Compile Include="GraphicsDeviceManager.cs">
-		<Platforms>Windows,WindowsGL,Linux,Windows8,WindowsPhone81,WindowsUniversal,Web,MacOS</Platforms>
+		<Platforms>Windows,WindowsGL,Linux,WindowsUniversal,Web,MacOS</Platforms>
     </Compile>
     <Compile Include="GraphicsDeviceManager.SDL.cs">
       <Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
     <Compile Include="GraphicsDeviceManager.WinRT.cs">
-		<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+		<Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="GraphicsDeviceManager.Legacy.cs">
 		<Platforms>Android,Angle,iOS,tvOS</Platforms>
@@ -942,9 +920,6 @@
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
-    <Compile Include="Input\GamePad.Default.cs">
-      <Platforms>WindowsPhone81</Platforms>
-    </Compile>
     <Compile Include="Input\GamePad.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
@@ -961,7 +936,7 @@
       <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.XInput.cs">
-      <Platforms>Windows8,Windows</Platforms>
+      <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.UWP.cs">
       <Platforms>WindowsUniversal</Platforms>
@@ -979,7 +954,7 @@
     <Compile Include="Input\JoystickHat.cs" />
     <Compile Include="Input\JoystickState.cs" />
     <Compile Include="Input\Joystick.Default.cs">
-      <Platforms>Angle,Android,Windows8,Windows,WindowsPhone81,WindowsUniversal,iOS,tvOS</Platforms>
+      <Platforms>Angle,Android,Windows,WindowsUniversal,iOS,tvOS</Platforms>
     </Compile>
     <Compile Include="Input\Joystick.SDL.cs">
       <Platforms>Linux,WindowsGL,MacOS</Platforms>
@@ -991,7 +966,7 @@
 		<ExcludePlatforms>Android</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\Keyboard.Default.cs">
-		<ExcludePlatforms>Android,Windows8,WindowsPhone81,WindowsUniversal,Windows,WindowsGL,Linux,MacOS</ExcludePlatforms>
+		<ExcludePlatforms>Android,WindowsUniversal,Windows,WindowsGL,Linux,MacOS</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\Keyboard.SDL.cs">
 		<Platforms>WindowsGL,Linux,MacOS</Platforms>
@@ -1000,10 +975,10 @@
 		<Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Input\Keyboard.WinRT.cs">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.cs">
-      <Platforms>Android,iOS,Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Android,iOS,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.Android.cs">
       <Platforms>Android</Platforms>
@@ -1012,13 +987,13 @@
       <Platforms>iOS</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.WinRT.cs">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="Input\MessageBox.cs">
-      <Platforms>Android,iOS,Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Android,iOS,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\MessageBox.Android.cs">
       <Platforms>Android</Platforms>
@@ -1027,7 +1002,7 @@
       <Platforms>iOS</Platforms>
     </Compile>
     <Compile Include="Input\MessageBox.WinRT.cs">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\Mouse.SDL.cs">
@@ -1059,11 +1034,11 @@
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanelState.cs" />
     <Compile Include="Input\Touch\TouchQueue.cs">
-			<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+			<Platforms>WindowsUniversal</Platforms>
 	</Compile>
 
     <Page Include="Themes\generic.xaml">
-			<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+			<Platforms>WindowsUniversal</Platforms>
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
     </Page>
@@ -1075,7 +1050,7 @@
     <Compile Include="Media\Genre.cs" />
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaLibrary.Default.cs">
-      <ExcludePlatforms>iOS,Windows8,Android,WindowsPhone81,WindowsUniversal</ExcludePlatforms>
+      <ExcludePlatforms>iOS,Android,WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\MediaLibrary.Android.cs">
       <Platforms>Android</Platforms>
@@ -1084,14 +1059,14 @@
       <Platforms>iOS</Platforms>
     </Compile>
     <Compile Include="Media\MediaLibrary.WinRT.cs">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Media\MediaManagerState.cs">
       <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\MediaPlayer.WME.cs">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Media\MediaPlayer.WMS.cs">
       <Platforms>Windows</Platforms>
@@ -1104,7 +1079,7 @@
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\MusicProperties.cs">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Media\PlaylistCollection.cs" />
     <Compile Include="Media\Playlist.cs" />
@@ -1126,7 +1101,7 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\Song.WinRT.cs">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
@@ -1151,7 +1126,7 @@
         <Platforms>iOS</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.WME.cs">
-        <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+        <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.MacOS.cs">
         <Platforms>MacOS</Platforms>
@@ -1204,10 +1179,10 @@
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.Default.cs" >
-      <Platforms>Android,iOS,Windows8,WindowsPhone81,WindowsUniversal,tvOS</Platforms>
+      <Platforms>Android,iOS,WindowsUniversal,tvOS</Platforms>
     </Compile>
     <Compile Include="Utilities\ReflectionHelpers.Legacy.cs" >
-      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsPhone,Web</Platforms>
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,Web</Platforms>
     </Compile>
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
     <Compile Include="Utilities\LzxStream\LzxDecoderStream.cs" />
@@ -1363,32 +1338,6 @@
       <Platforms>tvOS</Platforms>
     </Compile>
 
-    <!-- Windows 8 Platform -->
-    <Compile Include="Windows8\GameFrameworkViewSource.cs">
-      <Platforms>Windows8</Platforms>
-    </Compile>
-    <Compile Include="Windows8\InputEvents.cs">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
-    </Compile>
-    <Compile Include="Windows8\MetroFrameworkView.cs">
-      <Platforms>Windows8</Platforms>
-    </Compile>
-    <Compile Include="Windows8\MetroGamePlatform.cs">
-      <Platforms>Windows8,WindowsPhone81</Platforms>
-    </Compile>
-    <Compile Include="Windows8\MetroGameWindow.cs">
-      <Platforms>Windows8,WindowsPhone81</Platforms>
-    </Compile>
-    <Compile Include="Windows8\MetroHelper.cs">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
-    </Compile>
-    <Compile Include="Windows\SharpDXHelper.cs">
-      <Platforms>Windows8,Windows,WindowsPhone81,WindowsUniversal</Platforms>
-    </Compile>
-    <Compile Include="Windows8\XamlGame.cs">
-      <Platforms>Windows8,WindowsPhone81</Platforms>
-    </Compile>
-
 
     <!-- Windows UAP Platform -->
     <Compile Include="WindowsUniversal\UAPGamePlatform.cs">
@@ -1400,6 +1349,12 @@
     <Compile Include="WindowsUniversal\XamlGame.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
+    <Compile Include="WindowsUniversal\InputEvents.cs">
+      <Platforms>WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="Windows\SharpDXHelper.cs">
+      <Platforms>Windows,WindowsUniversal</Platforms>
+     </Compile>
 
 
     <!-- Windows Desktop Platfom -->
