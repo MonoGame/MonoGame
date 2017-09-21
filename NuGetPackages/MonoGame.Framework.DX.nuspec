@@ -20,41 +20,32 @@ This package also includes the Portable version of MonoGame for use in Bait and 
         <language>en-US</language>
         <dependencies>
             <group targetFramework="UAP10.0">
-                <dependency id="SharpDX" version="3.1.1" />
-                <dependency id="SharpDX.Direct2D1" version="3.1.1" />
-                <dependency id="SharpDX.Direct3D11" version="3.1.1" />
-                <dependency id="SharpDX.DXGI" version="3.1.1" />
-                <dependency id="SharpDX.XAudio2" version="3.1.1" />
-                <dependency id="SharpDX.MediaFoundation" version="3.1.1" />
-                <dependency id="SharpDX.XInput" version="3.1.1" />
+                <dependency id="SharpDX" version="4.0.1" />
+                <dependency id="SharpDX.Direct2D1" version="4.0.1" />
+                <dependency id="SharpDX.Direct3D11" version="4.0.1" />
+                <dependency id="SharpDX.DXGI" version="4.0.1" />
+                <dependency id="SharpDX.XAudio2" version="4.0.1" />
+                <dependency id="SharpDX.MediaFoundation" version="4.0.1" />
+                <dependency id="SharpDX.XInput" version="4.0.1" />
             </group>
 			<group targetFramework=".NETCore4.5.1">
-                <dependency id="SharpDX" version="3.1.1" />
-                <dependency id="SharpDX.Direct2D1" version="3.1.1" />
-                <dependency id="SharpDX.Direct3D11" version="3.1.1" />
-                <dependency id="SharpDX.DXGI" version="3.1.1" />
-                <dependency id="SharpDX.XAudio2" version="3.1.1" />
-                <dependency id="SharpDX.MediaFoundation" version="3.1.1" />
-                <dependency id="SharpDX.XInput" version="3.1.1" />
-            </group>
-            <group targetFramework="WindowsPhoneApp8.1">
-                <dependency id="SharpDX" version="3.1.1" />
-                <dependency id="SharpDX.Direct2D1" version="3.1.1" />
-                <dependency id="SharpDX.Direct3D11" version="3.1.1" />
-                <dependency id="SharpDX.DXGI" version="3.1.1" />
-                <dependency id="SharpDX.XAudio2" version="3.1.1" />
-                <dependency id="SharpDX.MediaFoundation" version="3.1.1" />
-                <dependency id="SharpDX.XInput" version="3.1.1" />
+                <dependency id="SharpDX" version="4.0.1" />
+                <dependency id="SharpDX.Direct2D1" version="4.0.1" />
+                <dependency id="SharpDX.Direct3D11" version="4.0.1" />
+                <dependency id="SharpDX.DXGI" version="4.0.1" />
+                <dependency id="SharpDX.XAudio2" version="4.0.1" />
+                <dependency id="SharpDX.MediaFoundation" version="4.0.1" />
+                <dependency id="SharpDX.XInput" version="4.0.1" />
             </group>
             <group targetFramework=".NETFramework4.5">
-                <dependency id="SharpDX" version="3.1.1" />
-                <dependency id="SharpDX.Direct2D1" version="3.1.1" />
-                <dependency id="SharpDX.Direct3D11" version="3.1.1" />
-                <dependency id="SharpDX.DXGI" version="3.1.1" />
-                <dependency id="SharpDX.XAudio2" version="3.1.1" />
-                <dependency id="SharpDX.MediaFoundation" version="3.1.1" />
-                <dependency id="SharpDX.XInput" version="3.1.1" />
-                <dependency id="SharpDX.Direct3D9" version="3.1.1" />
+                <dependency id="SharpDX" version="4.0.1" />
+                <dependency id="SharpDX.Direct2D1" version="4.0.1" />
+                <dependency id="SharpDX.Direct3D11" version="4.0.1" />
+                <dependency id="SharpDX.DXGI" version="4.0.1" />
+                <dependency id="SharpDX.XAudio2" version="4.0.1" />
+                <dependency id="SharpDX.MediaFoundation" version="4.0.1" />
+                <dependency id="SharpDX.XInput" version="4.0.1" />
+                <dependency id="SharpDX.Direct3D9" version="4.0.1" />
             </group>
         </dependencies>
     </metadata>
@@ -66,19 +57,6 @@ This package also includes the Portable version of MonoGame for use in Bait and 
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.pri" target="lib\uap10.0\MonoGame.Framework.pri" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xml" target="lib\uap10.0\MonoGame.Framework.xml" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xr.xml" target="lib\uap10.0\MonoGame.Framework/MonoGame.Framework.xr.xml" />
-        <!-- Windows 8.1 -->
-        <file src="..\..\NuGetPackages\build\Windows8\MonoGame.Framework.Windows8.targets" target="build\netcore451\MonoGame.Framework.Windows8.targets" />
-        <file src="Windows8\AnyCPU\Release\Themes\Generic.xaml" target="lib\netcore451\MonoGame.Framework\Themes\Generic.xaml" />
-        <file src="Windows8\AnyCPU\Release\MonoGame.Framework.dll" target="lib\netcore451\MonoGame.Framework.dll" />
-        <file src="Windows8\AnyCPU\Release\MonoGame.Framework.xml" target="lib\netcore451\MonoGame.Framework.xml" />
-        <file src="Windows8\AnyCPU\Release\MonoGame.Framework.pri" target="lib\netcore451\MonoGame.Framework.pri" />
-        <!-- Windows Phone 8.1 -->
-        <file src="..\..\NuGetPackages\build\WindowsPhone81\MonoGame.Framework.WindowsPhone81.targets" target="build\wpa81\MonoGame.Framework.WindowsPhone81.targets" />
-        <file src="WindowsPhone81\AnyCPU\Release\Themes\generic.xbf" target="lib\wpa81\MonoGame.Framework\Themes\generic.xbf" />
-        <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.xr.xml" target="lib\wpa81\MonoGame.Framework\MonoGame.Framework.xr.xml" />
-        <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.dll" target="lib\wpa81/MonoGame.Framework.dll" />
-        <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.xml" target="lib\wpa81/MonoGame.Framework.xml" />
-        <file src="WindowsPhone81\AnyCPU\Release\MonoGame.Framework.pri" target="lib\wpa81/MonoGame.Framework.pri" />
         <!-- Windows Desktop -->
         <file src="..\..\NuGetPackages\build\WindowsDX\MonoGame.Framework.WindowsDX.targets" target="build\net45\MonoGame.Framework.WindowsDX.targets" />
         <file src="Windows\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />
