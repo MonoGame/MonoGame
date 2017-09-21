@@ -206,6 +206,12 @@
     </nunit2>
 
     <if test="${os == 'MacOS'}">
+      <copy todir="Test/bin/Linux/AnyCPU/Debug">
+        <fileset basedir="ThirdParty/Dependencies/ffmpeg/MacOS/"> 
+          <include name="ffmpeg"/> 
+          <include name="ffprobe"/> 
+        </fileset>
+      </copy>
       <exec program="chmod" commandline=" u+x Test/bin/Linux/AnyCPU/Debug/ffmpeg" />
       <exec program="chmod" commandline=" u+x Test/bin/Linux/AnyCPU/Debug/ffprobe" />
       <nunit2>
