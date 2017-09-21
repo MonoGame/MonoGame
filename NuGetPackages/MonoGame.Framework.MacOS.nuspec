@@ -23,19 +23,15 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     <!-- C# Assemblies -->
     <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
     <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
-    <file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\net40\Tao.Sdl.dll" />
-    <file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
     <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />
     <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net45\MonoGame.Framework.xml" />
-    <file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\net45\Tao.Sdl.dll" />
-    <file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\net45\OpenTK.dll" />
     <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\MonoMac\MonoGame.Framework.dll" />
     <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\MonoMac\MonoGame.Framework.xml" />
-    <file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\MonoMac\Tao.Sdl.dll" />
-    <file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\MonoMac\OpenTK.dll" />
     <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\XamarinMac\MonoGame.Framework.dll" />
     <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\XamarinMac\MonoGame.Framework.xml" />
-    <file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\XamarinMac\Tao.Sdl.dll" />
-    <file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\XamarinMac\OpenTK.dll" />
+        <!-- Native Libs -->
+    <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll.config" target="build\native\MonoGame.Framework.dll.config" />
+    <file src="MacOS\AnyCPU\Release\libopenal.1.dylib" target="build\native\libopenal.1.dylib" />
+    <file src="MacOS\AnyCPU\Release\libSDL2-2.0.0.dylib" target="build\native\libSDL2-2.0.0.dylib" />
   </files>
 </package>

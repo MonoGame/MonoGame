@@ -3,4 +3,10 @@
   <PropertyGroup>
     <MonoGamePlatform>MacOSX</MonoGamePlatform>
   </PropertyGroup>
+  <Target Name="CopyDesktopGLNative" AfterTargets="AfterBuild">
+    <ItemGroup>
+      <_main Include="$(MSBuildThisFileDirectory)\native\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_main)" DestinationFolder="$(OutDir)" />
+  </Target>
 </Project>
