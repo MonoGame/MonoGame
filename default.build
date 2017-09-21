@@ -199,14 +199,21 @@
 
   <!-- Run the unit tests... will fail if the code hasn't been built. -->
   <target name="run_tests" description="Run all the tests" depends="_default">
+
     <nunit2 if="${os == 'Win32NT'}">
       <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Debug" />
       <test assemblyname="Test\bin\Windows\AnyCPU\Debug\MonoGameTests.exe" />
     </nunit2>
-    <nunit2 if="${os == 'MacOS'}">
-      <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test/bin/Linux/AnyCPU/Debug" />
-      <test assemblyname="Test/bin/Linux/AnyCPU/Debug/MonoGameTests.exe" />
-    </nunit2>
+
+    <if test="${os == 'MacOS'}">
+      <exec program="chmod" commandline=" u+x Test/bin/Linux/AnyCPU/Debug/ffmpeg" />
+      <exec program="chmod" commandline=" u+x Test/bin/Linux/AnyCPU/Debug/ffprobe" />
+      <nunit2>
+        <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test/bin/Linux/AnyCPU/Debug" />
+        <test assemblyname="Test/bin/Linux/AnyCPU/Debug/MonoGameTests.exe" />
+      </nunit2>
+    </if>
+
   </target>
 
 
