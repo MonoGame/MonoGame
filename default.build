@@ -117,13 +117,9 @@
         reason need the Mac ffmpeg binaries to be able to run the 
         Linux unit tests on a Mac system.
       -->
-      <copy todir="Test/bin/Linux/AnyCPU/Debug">
-        <fileset basedir="ThirdParty/Dependencies/ffmpeg/MacOS/"> 
-          <include name="ffmpeg"/> 
-          <include name="ffprobe"/> 
-        </fileset>
-      </copy>
-
+      <copy file="ThirdParty/Dependencies/ffmpeg/MacOS/ffmpeg" tofile="Test/bin/Linux/AnyCPU/Debug/ffmpeg" overwrite="true"/>
+      <copy file="ThirdParty/Dependencies/ffmpeg/MacOS/ffprobe" tofile="Test/bin/Linux/AnyCPU/Debug/ffprobe" overwrite="true"/>
+      
     </if>
   </target>
 
