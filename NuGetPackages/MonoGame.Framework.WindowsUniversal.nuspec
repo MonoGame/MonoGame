@@ -18,13 +18,13 @@ This package provides you with MonoGame Framework that works on Windows 10, Wind
         <language>en-US</language>
         <dependencies>
             <group targetFramework=".NETCore0.0">
-                <dependency id="SharpDX" version="3.1.1" />
-                <dependency id="SharpDX.Direct2D1" version="3.1.1" />
-                <dependency id="SharpDX.Direct3D11" version="3.1.1" />
-                <dependency id="SharpDX.DXGI" version="3.1.1" />
-                <dependency id="SharpDX.XAudio2" version="3.1.1" />
-                <dependency id="SharpDX.MediaFoundation" version="3.1.1" />
-                <dependency id="SharpDX.XInput" version="3.1.1" />
+                <dependency id="SharpDX" version="4.0.1" />
+                <dependency id="SharpDX.Direct2D1" version="4.0.1" />
+                <dependency id="SharpDX.Direct3D11" version="4.0.1" />
+                <dependency id="SharpDX.DXGI" version="4.0.1" />
+                <dependency id="SharpDX.XAudio2" version="4.0.1" />
+                <dependency id="SharpDX.MediaFoundation" version="4.0.1" />
+                <dependency id="SharpDX.XInput" version="4.0.1" />
             </group>
         </dependencies>
     </metadata>
