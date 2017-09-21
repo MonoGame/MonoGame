@@ -5,10 +5,11 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Security;
+using Android.Opengl;
 
-namespace OpenGL
+namespace MonoGame.OpenGL
 {
-    public partial class GL
+    internal partial class GL
     {
 		// internal for Android is not used on other platforms
 		// it allows us to use either GLES or Full GL (if the GPU supports it)
@@ -17,17 +18,20 @@ namespace OpenGL
 
         static partial void LoadPlatformEntryPoints()
         {
-            BindAPI = (BindAPIDelegate)Marshal.GetDelegateForFunctionPointer (EntryPointHelper.GetAddress ("eglBindAPI"), typeof(BindAPIDelegate));
-			var supportsFullGL = BindAPI (RenderApi.GL);
+            var ptr = EntryPointHelper.GetAddress("eglBindAPI");
+            if (ptr != IntPtr.Zero)
+                BindAPI = (BindAPIDelegate)Marshal.GetDelegateForFunctionPointer (ptr, typeof(BindAPIDelegate));
+            var supportsFullGL = ptr != IntPtr.Zero && BindAPI (RenderApi.GL);
 			if (!supportsFullGL) {
-				BindAPI (RenderApi.ES);
+                if (ptr != IntPtr.Zero)
+				    BindAPI (RenderApi.ES);
 				BoundApi = RenderApi.ES;
 			}
         }
 
         private static IGraphicsContext PlatformCreateContext (IWindowInfo info)
         {
-            return new GraphicsContext(info);
+            return null;//new GraphicsContext(info);
         }
     }
 
@@ -39,7 +43,7 @@ namespace OpenGL
 	
 		public static IntPtr GetAddress(String function)
 		{
-			if (GL.BoundApi == GL.RenderApi.ES && libES2 != IntPtr.Zero)
+            if (GL.BoundApi == GL.RenderApi.ES && libES2 != IntPtr.Zero)
 			{
 				return DL.Symbol(libES2, function);
 			}
@@ -62,7 +66,7 @@ namespace OpenGL
 			Local = 0x0000,
 		}
 
-		const string lib = "/system/lib/libdl.so";
+		const string lib = "dl";
 
 		[DllImport(lib, EntryPoint = "dlopen")]
 		internal static extern IntPtr Open(string filename, DLOpenFlags flags = DLOpenFlags.Lazy);

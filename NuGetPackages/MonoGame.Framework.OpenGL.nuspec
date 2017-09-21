@@ -31,13 +31,9 @@ This package provides you with MonoGame Framework that works on all OpenGL based
         <file src="..\..\NuGetPackages\build\MacOS\MonoGame.Framework.MacOS.targets" target="MonoMac\MonoMac\MonoGame.Framework.MacOS.targets" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\MonoMac\MonoGame.Framework.dll" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\MonoMac\MonoGame.Framework.xml" />
-        <file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\MonoMac\Tao.Sdl.dll" />
-        <file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\MonoMac\OpenTK.dll" />
         <file src="..\..\NuGetPackages\build\MacOS\MonoGame.Framework.MacOS.targets" target="build\XamarinMac\MonoGame.Framework.MacOS.targets" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\XamarinMac\MonoGame.Framework.dll" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\XamarinMac\MonoGame.Framework.xml" />
-        <file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\XamarinMac\Tao.Sdl.dll" />
-        <file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\XamarinMac\OpenTK.dll" />
         <!-- Cross-Platform GL -->
         <file src="..\..\NuGetPackages\build\DesktopGL\MonoGame.Framework.DesktopGL.targets" target="build\net45\MonoGame.Framework.DesktopGL.targets" />
         <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />

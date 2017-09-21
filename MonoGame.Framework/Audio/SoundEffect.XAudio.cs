@@ -14,17 +14,8 @@ namespace Microsoft.Xna.Framework.Audio
 {
     partial class SoundEffect
     {
-#if WINDOWS || (WINRT && !WINDOWS_PHONE)
-
         // These platforms are only limited by memory.
         internal const int MAX_PLAYING_INSTANCES = int.MaxValue;
-
-#elif WINDOWS_PHONE
-
-        // Reference: http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.audio.instanceplaylimitexception.aspx
-        internal const int MAX_PLAYING_INSTANCES = 64;
-
-#endif
 
         #region Static Fields & Properties
 
@@ -106,7 +97,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (Device == null)
                 {
-#if !WINRT && DEBUG
+#if !WINDOWS_UAP && DEBUG
                     try
                     {
                         //Fails if the XAudio2 SDK is not installed
@@ -122,7 +113,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
 
                 // Just use the default device.
-#if WINRT
+#if WINDOWS_UAP
                 string deviceId = null;
 #else
                 const int deviceId = 0;
@@ -135,7 +126,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
 
                 // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
-#if WINRT
+#if WINDOWS_UAP
                 Speakers = (Speakers)MasterVoice.ChannelMask;
 #else
                 Speakers = Device.Version == XAudio2Version.Version27 ?

@@ -4,17 +4,11 @@
 
 using System;
 
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_UAP
 using Windows.UI.Xaml.Controls;
 #endif
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.AppKit;
-#else
-using AppKit;
-#endif
-#elif IOS
+#if IOS
 using UIKit;
 using Microsoft.Xna.Framework.Input.Touch;
 #endif
@@ -38,9 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private IntPtr deviceWindowHandle;
         private int multiSampleCount;
         private bool disposed;
-#if !WINRT || WINDOWS_UAP
         private bool isFullScreen;
-#endif
         private bool hardwareModeSwitch = true;
 
         #endregion Private Fields
@@ -103,11 +95,6 @@ namespace Microsoft.Xna.Framework.Graphics
             set { deviceWindowHandle = value; }
         }
 
-#if WINDOWS_STOREAPP
-        [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
-#endif
-
 #if WINDOWS_UAP
         [CLSCompliant(false)]
         public SwapChainPanel SwapChainPanel { get; set; }
@@ -129,19 +116,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			get
             {
-#if WINRT &&  !WINDOWS_UAP
-                // Always return true for Windows 8
-                return true;
-#else
 				 return isFullScreen;
-#endif
             }
             set
             {
-#if !WINRT || WINDOWS_UAP
-                // If we are not on windows 8 set the value otherwise ignore it.
                 isFullScreen = value;				
-#endif
 #if IOS && !TVOS
 				UIApplication.SharedApplication.StatusBarHidden = isFullScreen;
 #endif
