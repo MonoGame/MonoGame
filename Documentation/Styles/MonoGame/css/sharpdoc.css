@@ -378,17 +378,6 @@
 	background-image:url("../images/android.png");
 }
 
-.sharpdoc div.icon.ouya
-{
-	background-image:url("../images/ouya.png");
-}
-
-.sharpdoc div.icon.psm
-{
-	background-image:url("../images/psm.png");
-}
-
-
 .sharpdoc .content .section .members table {
     table-layout:fixed;    
     width:100%;

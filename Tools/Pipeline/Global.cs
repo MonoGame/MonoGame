@@ -3,34 +3,56 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Eto.Drawing;
-using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
     static partial class Global
     {
+        public static string NotAllowedCharacters
+        {
+            get
+            {
+                if (Unix)
+                    return Linux ? "/" : ":";
+
+                return "/?<>\\:*|\"";
+            }
+        }
+
         public static bool Linux { get; private set; }
-        public static bool UseHeaderBar { get; private set; }
+        public static bool UseHeaderBar { get; set; }
         public static bool Unix { get; private set; }
+
+        private static Dictionary<string, Image> _files;
+        private static Image _fileMissing, _folder, _folderMissing;
+
+#if WINDOWS || LINUX
+        private static Dictionary<string, Xwt.Drawing.Image> _xwtFiles;
+        private static Xwt.Drawing.Image _xwtFileMissing, _xwtFolder, _xwtFolderMissing;
+#endif
 
         static Global()
         {
             Unix = Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX;
 
+            _files = new Dictionary<string, Image>();
+            _files.Add(".", Bitmap.FromResource("TreeView.File.png"));
+            _fileMissing = Bitmap.FromResource("TreeView.FileMissing.png");
+            _folder = Bitmap.FromResource("TreeView.Folder.png");
+            _folderMissing = Bitmap.FromResource("TreeView.FolderMissing.png");
+
+#if WINDOWS || LINUX
+            _xwtFiles = new Dictionary<string, Xwt.Drawing.Image>();
+            _xwtFiles.Add(".", Xwt.Drawing.Image.FromResource("TreeView.File.png"));
+            _xwtFileMissing = Xwt.Drawing.Image.FromResource("TreeView.FileMissing.png");
+            _xwtFolder = Xwt.Drawing.Image.FromResource("TreeView.Folder.png");
+            _xwtFolderMissing = Xwt.Drawing.Image.FromResource("TreeView.FolderMissing.png");
+#endif
+
             PlatformInit();
-        }
-
-        public static string NotAllowedCharacters
-        {
-            get
-            {
-                if (Global.Unix)
-                    return Global.Linux ? "/" : ":";
-
-                return "/?<>\\:*|\"";
-            }
         }
 
         public static bool CheckString(string s)
@@ -44,69 +66,65 @@ namespace MonoGame.Tools.Pipeline
             return true;
         }
 
-        public static void ShowOpenWithDialog(string filePath)
-        {
-            try
-            {
-                PlatformShowOpenWithDialog(filePath);
-            }
-            catch
-            {
-                MainWindow.Instance.ShowError("Error", "The current platform does not have this dialog implemented.");
-            }
-        }
-
         public static Image GetEtoDirectoryIcon(bool exists)
         {
-#if WINDOWS || LINUX
-            try
-            {
-                return ToEtoImage(PlatformGetDirectoryIcon(exists));
-            }
-            catch { }
-#endif
-
-            return exists ? Bitmap.FromResource("TreeView.Folder.png") : Bitmap.FromResource("TreeView.FolderMissing.png");
+            return exists ? _folder : _folderMissing;
         }
 
         public static Image GetEtoFileIcon(string path, bool exists)
         {
-#if WINDOWS || LINUX
+            if (!exists)
+                return _fileMissing;
+            
+            var ext = Path.GetExtension(path);
+            if (_files.ContainsKey(ext))
+                return _files[ext];
+
+            Image icon;
+
             try
             {
-                return ToEtoImage(PlatformGetFileIcon(path, exists));
+                icon = ToEtoImage(PlatformGetFileIcon(path));
             }
-            catch { }
-#endif
+            catch
+            {
+                icon = _files["."];
+            }
 
-            return exists ? Bitmap.FromResource("TreeView.File.png") : Bitmap.FromResource("TreeView.FileMissing.png");
+            _files.Add(ext, icon);
+            return icon;
         }
 
+#if WINDOWS || LINUX
         public static Xwt.Drawing.Image GetXwtDirectoryIcon(bool exists)
         {
-#if WINDOWS || LINUX
-            try
-            {
-                return ToXwtImage(PlatformGetDirectoryIcon(exists));
-            }
-            catch { }
-#endif
-
-            return exists ? Xwt.Drawing.Image.FromResource("TreeView.Folder.png") : Xwt.Drawing.Image.FromResource("TreeView.FolderMissing.png");
+            return exists ? _xwtFolder : _xwtFolderMissing;
         }
 
         public static Xwt.Drawing.Image GetXwtFileIcon(string path, bool exists)
         {
-#if WINDOWS || LINUX
+            if (!exists)
+                return _xwtFileMissing;
+
+            var ext = Path.GetExtension(path);
+            if (_xwtFiles.ContainsKey(ext))
+                return _xwtFiles[ext];
+
+            Xwt.Drawing.Image icon;
+
             try
             {
-                return ToXwtImage(PlatformGetFileIcon(path, exists));
+                icon = ToXwtImage(PlatformGetFileIcon(path));
             }
-            catch { }
-#endif
+            catch
+            {
+                icon = _xwtFiles["."];
+            }
 
-            return exists ? Xwt.Drawing.Image.FromResource("TreeView.File.png") : Xwt.Drawing.Image.FromResource("TreeView.FileMissing.png");
+            _xwtFiles.Add(ext, icon);
+            return icon;
         }
+#endif
 
         public static Image GetEtoIcon(string resource)
         {
@@ -120,6 +138,7 @@ namespace MonoGame.Tools.Pipeline
             return Icon.FromResource(resource);
         }
 
+#if WINDOWS || LINUX
         public static Xwt.Drawing.Image GetXwtIcon(string resource)
         {
 #if LINUX
@@ -131,6 +150,7 @@ namespace MonoGame.Tools.Pipeline
             
             return Xwt.Drawing.Image.FromResource(resource);
         }
+#endif
     }
 }
 

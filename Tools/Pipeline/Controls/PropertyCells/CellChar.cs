@@ -47,7 +47,6 @@ namespace MonoGame.Tools.Pipeline
                 _eventHandler((char)num, EventArgs.Empty);
             };
 
-            editText.EnabledChanged += (sender, e) => OnKill.Invoke();
             editText.KeyDown += (sender, e) =>
             {
                 if (e.Key == Keys.Enter)

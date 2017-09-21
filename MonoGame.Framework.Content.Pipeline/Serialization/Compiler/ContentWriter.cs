@@ -43,7 +43,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             'w', // Windows (DirectX)
             'x', // Xbox360
-            'm', // WindowsPhone
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
@@ -56,6 +55,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'P', // PlayStation4
             'v', // PSVita
             'O', // XboxOne
+            'S', // Nintendo Switch
         };
 
         /// <summary>

@@ -1788,7 +1788,7 @@ namespace Microsoft.Xna.Framework
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
         }
 	
-	/// <summary>
+        /// <summary>
         /// Gets or sets packed value of this <see cref="Color"/>.
         /// </summary>
         [CLSCompliant(false)]

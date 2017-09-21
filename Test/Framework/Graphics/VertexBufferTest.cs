@@ -159,19 +159,25 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
-        //[TestCase(true)]
-        [TestCase(false, 1, -1, false, typeof(ArgumentOutOfRangeException))]
-        [TestCase(false, 0, 0, false, typeof(ArgumentOutOfRangeException))]
-        [TestCase(false, 80, 0, true, null)]
-        [TestCase(false, 80, 1, true, null)]
-        [TestCase(false, 1, 2, true, null)]
-        [TestCase(false, 1, 40, true, null)]
-        [TestCase(false, 2, 40, true, null)]
-        [TestCase(false, 2, 80, false, typeof(InvalidOperationException))]
-        [TestCase(false, 1, 80, true, null)]
-        [TestCase(false, 1, 81, true, null)]
-        [TestCase(false, 2, 81, false, typeof(InvalidOperationException))]
-        public void SetDataWithElementCountAndVertexStride(bool dynamic, int elementCount, int vertexStride, bool shouldSucceed, Type expectedExceptionType)
+        [TestCase(false, 1, -1, typeof(ArgumentOutOfRangeException))]
+        [TestCase(false, 0, 0, typeof(ArgumentOutOfRangeException))]
+        [TestCase(false, 80, 0, null)]
+        [TestCase(false, 80, 1, null)]
+        [TestCase(false, 1, 2, null)]
+        [TestCase(false, 1, 40, null)]
+        [TestCase(false, 2, 40, null)]
+        [TestCase(false, 2, 80, typeof(InvalidOperationException))]
+        [TestCase(false, 1, 80, null)]
+        [TestCase(false, 4, 12, null)]
+#if XNA
+        [TestCase(false, 1, 81, null)]
+        [TestCase(false, 2, 81, typeof(InvalidOperationException))]
+#else
+        // We throw when the vertex stride is too large
+        [TestCase(false, 1, 81, typeof(ArgumentOutOfRangeException))]
+        [TestCase(false, 2, 81, typeof(ArgumentOutOfRangeException))]
+#endif
+        public void SetDataWithElementCountAndVertexStride(bool dynamic, int elementCount, int vertexStride, Type expectedExceptionType)
         {
             var vertexBuffer = (dynamic)
                 ? new DynamicVertexBuffer(gd, typeof(VertexPositionTexture), savedData.Length,
@@ -180,7 +186,7 @@ namespace MonoGame.Tests.Graphics
                     BufferUsage.None);
             var savedDataBytes = ArrayUtil.ConvertFrom(savedData);
 
-            if (!shouldSucceed)
+            if (expectedExceptionType != null)
                 Assert.Throws(expectedExceptionType, () => vertexBuffer.SetData(0, savedDataBytes, 0, elementCount, vertexStride));
             else
             {
@@ -194,6 +200,47 @@ namespace MonoGame.Tests.Graphics
             }
 
             vertexBuffer.Dispose();
+        }
+
+        [Test]
+        public void BetterGetSetDataVertexStrideTest()
+        {
+            const int size = 5;
+            var data = new VertexPositionTexture[size];
+            for (var i = 0; i < data.Length; i++)
+            {
+                data[i] = new VertexPositionTexture(
+                    new Vector3(i * 3, i * 3 + 1, i * 3 + 2),
+                    new Vector2(i * 2 / (float) 10, (i * 2 + 1) / (float) 10));
+            }
+
+            var vb = new VertexBuffer(gd, VertexPositionTexture.VertexDeclaration, data.Length, BufferUsage.None);
+            vb.SetData(data);
+
+            var textureCoords = new Vector2[2 * size + 1];
+            textureCoords[0] = new Vector2(-42, 42);
+            vb.GetData(3 * 4, textureCoords, 1, size, 20);
+
+            // first one should not be overwritten
+            Assert.AreEqual(new Vector2(-42, 42), textureCoords[0]);
+            for (var i = 0; i < size; i++)
+            {
+                var index = i + 1;
+                var expected = new Vector2(i * 2 / (float) 10, (i * 2 + 1) / (float) 10);
+                Assert.AreEqual(expected, textureCoords[index]);
+            }
+
+            vb.SetData(3 * 4, textureCoords, 1, size, 20);
+            vb.GetData(3 * 4, textureCoords, 1, size, 20);
+
+            // first one should not be overwritten
+            Assert.AreEqual(new Vector2(-42, 42), textureCoords[0]);
+            for (var i = 0; i < size; i++)
+            {
+                var index = i + 1;
+                var expected = new Vector2(i * 2 / (float) 10, (i * 2 + 1) / (float) 10);
+                Assert.AreEqual(expected, textureCoords[index]);
+            }
         }
 
         //[TestCase(true)]
@@ -356,6 +403,10 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        // TODO we should figure out if there's a way to check this in OpenGL
+        [Ignore]
+#endif
         public void ShouldThrowHelpfulExceptionWhenVertexFormatDoesNotMatchShader()
         {
             var vertexBuffer = new VertexBuffer(

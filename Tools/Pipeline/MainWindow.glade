@@ -18,7 +18,7 @@
   <object class="GtkImage" id="build_image">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="icon_name">emblem-system-symbolic</property>
+    <property name="icon_name">applications-system-symbolic</property>
   </object>
   <object class="GtkImage" id="rebuild_image">
     <property name="visible">True</property>
@@ -28,7 +28,7 @@
   <object class="GtkImage" id="cancel_image">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="icon_name">media-playback-stop-symbolic</property>
+    <property name="icon_name">process-stop-symbolic</property>
   </object>
   <object class="GtkImage" id="new_image">
     <property name="visible">True</property>
@@ -141,6 +141,7 @@
   <object class="GtkPopoverMenu" id="popovermenu1">
     <child>
       <object class="GtkBox">
+        <property name="width_request">130</property>
         <property name="visible">True</property>
         <property name="margin">10</property>
         <property name="orientation">vertical</property>
@@ -193,6 +194,33 @@
             <property name="text" translatable="yes">Close</property>
           </object>
         </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="margin_top">3</property>
+            <property name="margin_bottom">3</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="help_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">Help</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="about_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">About</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="exit_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">Quit</property>
+          </object>
+        </child>
       </object>
       <packing>
         <property name="submenu">main</property>
@@ -215,13 +243,6 @@
           <object class="GtkModelButton" id="clean_button">
             <property name="visible">True</property>
             <property name="text" translatable="yes">Clean</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkModelButton" id="debugmode_button">
-            <property name="visible">True</property>
-            <property name="text" translatable="yes">Debug Mode</property>
-            <property name="role">1</property>
           </object>
         </child>
       </object>

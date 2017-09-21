@@ -44,7 +44,9 @@ namespace Microsoft.Xna.Framework.Content
     {
         protected internal override BoundingBox Read(ContentReader input, BoundingBox existingInstance)
         {
-            var result = new BoundingBox( input.ReadVector3(), input.ReadVector3() );
+            var min = input.ReadVector3();
+            var max = input.ReadVector3();
+            var result = new BoundingBox(min, max);
             return result;
         }
     }

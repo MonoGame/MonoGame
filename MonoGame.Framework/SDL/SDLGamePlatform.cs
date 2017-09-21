@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Utilities;
 
@@ -46,21 +47,14 @@ namespace Microsoft.Xna.Framework
             Sdl.Minor = sversion.Minor;
             Sdl.Patch = sversion.Patch;
 
-            try
-            {
-                // HACK: The current development version of SDL
-                // returns 2.0.4, to check SDL version we simply
-                // need to try and execute a function that's only
-                // available in the newer version of it.
-                Sdl.Window.SetResizable(IntPtr.Zero, false);
-                Sdl.Patch = 5;
-            }
-            catch { }
-
             var version = 100 * Sdl.Major + 10 * Sdl.Minor + Sdl.Patch;
 
             if (version <= 204)
                 Debug.WriteLine ("Please use SDL 2.0.5 or higher.");
+
+            // Needed so VS can debug the project on Windows
+            if (version >= 205 && CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
+                Sdl.SetHint("SDL_WINDOWS_DISABLE_THREAD_NAMING", "1");
 
             Sdl.Init((int)(
                 Sdl.InitFlags.Video |
@@ -71,6 +65,7 @@ namespace Microsoft.Xna.Framework
 
             Sdl.DisableScreenSaver();
 
+            GamePad.InitDatabase();
             Window = _view = new SdlGameWindow(_game);
 
             try
@@ -85,8 +80,6 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize ()
         {
-            GamePad.InitDatabase();
-            _view.CreateWindow();
             SdlRunLoop();
 
             base.BeforeInitialize ();
@@ -97,15 +90,24 @@ namespace Microsoft.Xna.Framework
             _view.SetCursorVisible(_game.IsMouseVisible);
         }
 
+        internal override void OnPresentationChanged(PresentationParameters pp)
+        {
+            var displayIndex = Sdl.Window.GetDisplayIndex(Window.Handle);
+            var displayName = Sdl.Display.GetDisplayName(displayIndex);
+            BeginScreenDeviceChange(pp.IsFullScreen);
+            EndScreenDeviceChange(displayName, pp.BackBufferWidth, pp.BackBufferHeight);
+        }
+
         public override void RunLoop()
         {
             Sdl.Window.Show(Window.Handle);
 
             while (true)
             {
-                Threading.Run();
                 SdlRunLoop();
                 Game.Tick();
+                Threading.Run();
+                GraphicsDevice.DisposeContexts();
 
                 if (_isExiting > 0)
                     break;
@@ -125,9 +127,12 @@ namespace Microsoft.Xna.Framework
                 else if (ev.Type == Sdl.EventType.ControllerDeviceRemoved)
                     GamePad.RemoveDevice(ev.ControllerDevice.Which);
                 else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
-                    Joystick.RemoveDevice(ev.JoystickDevice.Which);                
-                else if (ev.Type == Sdl.EventType.MouseWheel)
-                    Mouse.ScrollY += ev.Wheel.Y * 120;
+                    Joystick.RemoveDevice(ev.JoystickDevice.Which);
+                else if (ev.Type == Sdl.EventType.MouseWheel) {
+                    const int wheelDelta = 120;
+                    Mouse.ScrollY += ev.Wheel.Y * wheelDelta;
+                    Mouse.ScrollX += ev.Wheel.X * wheelDelta;
+                }
                 else if (ev.Type == Sdl.EventType.KeyDown) {
                     var key = KeyboardUtil.ToXna (ev.Key.Keysym.Sym);
                     if (!_keys.Contains (key))
@@ -170,6 +175,8 @@ namespace Microsoft.Xna.Framework
                         IsActive = true;
                     else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
                         IsActive = false;
+                    else if (ev.Window.EventID == Sdl.Window.EventId.Moved)
+                        _view.Moved();
                 }
             }
         }
@@ -221,6 +228,7 @@ namespace Microsoft.Xna.Framework
         {
             if (Game.GraphicsDevice != null)
                 Game.GraphicsDevice.Present();
+
         }
 
         protected override void Dispose(bool disposing)

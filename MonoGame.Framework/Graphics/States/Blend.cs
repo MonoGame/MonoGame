@@ -58,11 +58,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
 		InverseDestinationAlpha,
 	    /// <summary>
-        /// Each component of the color is multiplied by a constant in the <see cref="GraphicsDevice.BlendFactor"/>.
+        /// Each component of the color is multiplied by a constant in the <see cref="P:Microsoft.Xna.Framework.Graphics.GraphicsDevice.BlendFactor"/>.
 	    /// </summary>
 		BlendFactor,
         /// <summary>
-        /// Each component of the color is multiplied by a inversed constant in the <see cref="GraphicsDevice.BlendFactor"/>.
+        /// Each component of the color is multiplied by a inversed constant in the <see cref="P:Microsoft.Xna.Framework.Graphics.GraphicsDevice.BlendFactor"/>.
         /// </summary>
 		InverseBlendFactor,
         /// <summary>

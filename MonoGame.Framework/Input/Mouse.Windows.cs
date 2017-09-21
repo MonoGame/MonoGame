@@ -14,11 +14,16 @@ namespace Microsoft.Xna.Framework.Input
         [return: MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
         private static extern bool SetCursorPos(int X, int Y);
 
-        internal static Form Window;
+        private static Control _window;
 
-        private static IntPtr PlatformGetHandle()
+        private static IntPtr PlatformGetWindowHandle()
         {
-            return PrimaryWindow.Handle;
+            return _window.Handle;
+        }
+
+        private static void PlatformSetWindowHandle(IntPtr windowHandle)
+        {
+            _window = Control.FromHandle(windowHandle);
         }
 
         private static MouseState PlatformGetState(GameWindow window)
@@ -31,13 +36,13 @@ namespace Microsoft.Xna.Framework.Input
             PrimaryWindow.MouseState.X = x;
             PrimaryWindow.MouseState.Y = y;
             
-            var pt = Window.PointToScreen(new System.Drawing.Point(x, y));
+            var pt = _window.PointToScreen(new System.Drawing.Point(x, y));
             SetCursorPos(pt.X, pt.Y);
         }
 
         public static void PlatformSetCursor(MouseCursor cursor)
         {
-
+            _window.Cursor = cursor.Cursor;
         }
     }
 }

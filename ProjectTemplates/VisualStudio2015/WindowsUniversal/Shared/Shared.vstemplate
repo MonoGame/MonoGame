@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+	<TemplateData>
+		<Name>$ext_safeprojectname$.Shared</Name>
+		<ProjectType>CSharp</ProjectType>
+		<TargetPlatformName>Windows</TargetPlatformName>
+		<CreateInPlace>true</CreateInPlace>
+		<CreateNewFolder>true</CreateNewFolder>
+		<LocationField>Enabled</LocationField>
+		<DefaultName>App</DefaultName>
+		<Hidden>true</Hidden>
+	</TemplateData>
+ 	<TemplateContent>
+		<Project File="Shared.Application.shproj" ReplaceParameters="true">
+			<ProjectItem ReplaceParameters="true" TargetFileName="Shared.Application.Shared.projitems">Shared.Application.Shared.projitems</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="App.xaml">Shared.App.xaml</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="App.xaml.cs">Shared.App.xaml.cs</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="GamePage.xaml">GamePage.xaml</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="GamePage.xaml.cs">GamePage.xaml.cs</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="Game1.cs">Game1.cs</ProjectItem>
+			<Folder Name="Content" TargetFolderName="Content">
+				<ProjectItem ReplaceParameters="true" TargetFileName="Content.mgcb">Content.mgcb</ProjectItem>
+			</Folder>
+	  </Project>
+	</TemplateContent>
+</VSTemplate>

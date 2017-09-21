@@ -17,14 +17,15 @@ namespace MonoGame.Tools.Pipeline
             editText.Style = "OverrideSize";
             editText.Width = _lastRec.Width;
             editText.Height = _lastRec.Height;
-            editText.Text = Value.ToString();
+            editText.Text = (Value == null) ? "" : Value.ToString();
 
             control.Add(editText, _lastRec.X, _lastRec.Y);
 
             editText.Focus();
             editText.CaretIndex = editText.Text.Length;
-
-            OnKill += delegate {
+            
+            OnKill += delegate
+            {
                 OnKill = null;
 
                 if (_eventHandler == null)
@@ -33,7 +34,6 @@ namespace MonoGame.Tools.Pipeline
                 _eventHandler(editText.Text, EventArgs.Empty);
             };
 
-            editText.EnabledChanged += (sender, e) => OnKill.Invoke();
             editText.KeyDown += (sender, e) =>
             {
                 if (e.Key == Keys.Enter)

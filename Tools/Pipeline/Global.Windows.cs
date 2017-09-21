@@ -4,28 +4,34 @@
 
 using System;
 using Eto.Drawing;
-using Eto.Forms;
 using Eto.Wpf.Drawing;
 using System.IO;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Microsoft.Win32;
 using System.Windows.Media.Imaging;
-using System.Windows.Media;
 
 namespace MonoGame.Tools.Pipeline
 {
     static partial class Global
     {
-        public static bool IsWindows10 { get; set; }
-
         [DllImport("Shell32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         private static extern int ExtractIconExW(string sFile, int iIndex, out IntPtr piLargeVersion, out IntPtr piSmallVersion, int amountIcons);
 
         private static void PlatformInit()
         {
-            var reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
-            IsWindows10 = (reg.GetValue("ProductName") as string).StartsWith("Windows 10");
+            var file = ExtractIcon(0).ToBitmap();
+            var fileMissing = ExtractIcon(271).ToBitmap();
+            var folder = ExtractIcon(4).ToBitmap();
+            var folderMissing = ExtractIcon(234).ToBitmap();
+
+            _files["."] = ToEtoImage(file);
+            _fileMissing = ToEtoImage(fileMissing);
+            _folder = ToEtoImage(folder);
+            _folderMissing = ToEtoImage(folderMissing);
+
+            _xwtFiles["."] = ToXwtImage(file);
+            _xwtFileMissing = ToXwtImage(fileMissing);
+            _xwtFolder = ToXwtImage(folder);
+            _xwtFolderMissing = ToXwtImage(folderMissing);
         }
 
         public static System.Drawing.Icon ExtractIcon(int number)
@@ -37,37 +43,9 @@ namespace MonoGame.Tools.Pipeline
             return System.Drawing.Icon.FromHandle(large);
         }
 
-        private static System.Drawing.Bitmap PlatformGetDirectoryIcon(bool exists)
+        private static System.Drawing.Bitmap PlatformGetFileIcon(string path)
         {
-            System.Drawing.Bitmap icon;
-
-            if (exists)
-                icon = ExtractIcon(4).ToBitmap();
-            else
-                icon = ExtractIcon(234).ToBitmap();
-
-            return icon;
-        }
-
-        private static System.Drawing.Bitmap PlatformGetFileIcon(string path, bool exists)
-        {
-            System.Drawing.Bitmap icon;
-
-            if (exists)
-            {
-                try
-                {
-                    icon = System.Drawing.Icon.ExtractAssociatedIcon(path).ToBitmap();
-                }
-                catch
-                {
-                    icon = ExtractIcon(0).ToBitmap();
-                }
-            }
-            else
-                icon = ExtractIcon(271).ToBitmap();
-
-            return icon;
+            return System.Drawing.Icon.ExtractAssociatedIcon(path).ToBitmap();
         }
 
         private static Bitmap ToEtoImage(System.Drawing.Bitmap bitmap)
@@ -100,12 +78,6 @@ namespace MonoGame.Tools.Pipeline
             }
            
             return ret.Scale(0.5);
-        }
-
-        private static void PlatformShowOpenWithDialog(string filePath)
-        {
-            var args = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "shell32.dll");
-            Process.Start("rundll32.exe", args + ",OpenAs_RunDLL " + filePath);
         }
     }
 }

@@ -25,7 +25,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="Lidgren.Network" />
-    <Reference Include="OpenTK" />
   </Platform>
 
   <Platform Type="Android">
@@ -34,17 +33,7 @@
     <Reference Include="System.Core" />
     <Reference Include="mscorlib" />
     <Reference Include="Lidgren.Network" />
-  </Platform>
-
-  <Platform Type="Ouya">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Core" />
-    <Reference Include="mscorlib" />
-    <Reference Include="Lidgren.Network" />
-    <Binary
-      Name="Ouya.Console.Api"
-      Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
+    <Reference Include="OpenTK-1.0" />
   </Platform>
 
   <Platform Type="Windows">
@@ -54,32 +43,11 @@
     <Reference Include="Lidgren.Network" />
   </Platform>
 
-  <Platform Type="Windows8">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-  </Platform>
-
   <Platform Type="WindowsGL">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="Lidgren.Network" />
-  </Platform>
-
-  <Platform Type="WindowsPhone">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="Microsoft.Xna.Framework.GamerServices">
-      <Alias Platform="WindowsPhone">MicrosoftXnaGamerServices</Alias>
-    </Reference>
-    <Reference Include="Microsoft.Xna.Framework">
-      <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
-    </Reference>
-  </Platform>
-  
-  <Platform Type="WindowsPhone81">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
   </Platform>
   
   <Platform Type="WindowsUniversal">

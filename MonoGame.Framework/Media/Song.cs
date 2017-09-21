@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Media
         public Album Album
         {
             get { return PlatformGetAlbum(); }
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_UAP
             internal set { PlatformSetAlbum(value); }
 #endif
         }
@@ -74,18 +74,17 @@ namespace Microsoft.Xna.Framework.Media
 			get { return _name; }
 		}
 
+        /// <summary>
+        /// Returns a song that can be played via <see cref="MediaPlayer"/>.
+        /// </summary>
+        /// <param name="name">The name for the song. See <see cref="Song.Name"/>.</param>
+        /// <param name="uri">The path to the song file.</param>
+        /// <returns></returns>
         public static Song FromUri(string name, Uri uri)
         {
-            if (!uri.IsAbsoluteUri)
-            {
-                var song = new Song(uri.OriginalString);
-                song._name = name;
-                return song;
-            }
-            else
-            {
-                throw new NotImplementedException("Loading songs from an absolute path is not implemented");
-            }
+            var song = new Song(uri.OriginalString);
+            song._name = name;
+            return song;
         }
 		
 		public void Dispose()

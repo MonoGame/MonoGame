@@ -19,7 +19,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     platform == TargetPlatform.NativeClient ||
                     platform == TargetPlatform.RaspberryPi ||
                     platform == TargetPlatform.Windows ||
-                    platform == TargetPlatform.WindowsPhone ||
                     platform == TargetPlatform.WindowsPhone8 ||
                     platform == TargetPlatform.WindowsStoreApp ||
                     platform == TargetPlatform.iOS;
@@ -109,7 +108,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        protected override void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool generateMipmaps, bool sharpAlpha)
+        protected override void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool isSpriteFont)
         {
             format = GetTextureFormatForPlatform(format, context.TargetPlatform);
 
@@ -119,23 +118,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             switch (format)
             {
                 case TextureProcessorOutputFormat.AtcCompressed:
-                    GraphicsUtil.CompressAti(content, generateMipmaps);
+                    GraphicsUtil.CompressAti(content);
                     break;
 
                 case TextureProcessorOutputFormat.Color16Bit:
-                    GraphicsUtil.CompressColor16Bit(content, generateMipmaps);
+                    GraphicsUtil.CompressColor16Bit(content);
                     break;
 
                 case TextureProcessorOutputFormat.DxtCompressed:
-                    GraphicsUtil.CompressDxt(context.TargetProfile, content, generateMipmaps, sharpAlpha);
+                    GraphicsUtil.CompressDxt(context.TargetProfile, content, isSpriteFont);
                     break;
 
                 case TextureProcessorOutputFormat.Etc1Compressed:
-                    GraphicsUtil.CompressEtc1(content, generateMipmaps);
+                    GraphicsUtil.CompressEtc1(content);
                     break;
 
                 case TextureProcessorOutputFormat.PvrCompressed:
-                    GraphicsUtil.CompressPvrtc(content, generateMipmaps);
+                    GraphicsUtil.CompressPvrtc(content, isSpriteFont);
                     break;
             }
         }

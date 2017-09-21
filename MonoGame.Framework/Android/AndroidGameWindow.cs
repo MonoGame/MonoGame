@@ -7,11 +7,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Views;
 using Microsoft.Xna.Framework.Input.Touch;
-using OpenTK;
-
-#if OUYA
-using Microsoft.Xna.Framework.Input;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework
 {
@@ -53,29 +49,20 @@ namespace Microsoft.Xna.Framework
 
             GameView.RequestFocus();
             GameView.FocusableInTouchMode = true;
-
-#if OUYA
-            GamePad.Initialize();
-#endif
         }
 
         #region AndroidGameView Methods
 
-        private void OnRenderFrame(object sender, FrameEventArgs frameEventArgs)
+        private void OnRenderFrame(object sender, MonoGameAndroidGameView.FrameEventArgs frameEventArgs)
         {
-            if (GameView.GraphicsContext == null || GameView.GraphicsContext.IsDisposed)
-                return;
-
-            if (!GameView.GraphicsContext.IsCurrent)
-                GameView.MakeCurrent();
+            GameView.MakeCurrent();
 
             Threading.Run();
         }
 
-        private void OnUpdateFrame(object sender, FrameEventArgs frameEventArgs)
+        private void OnUpdateFrame(object sender, MonoGameAndroidGameView.FrameEventArgs frameEventArgs)
         {
-            if (!GameView.GraphicsContext.IsCurrent)
-                GameView.MakeCurrent();
+            GameView.MakeCurrent();
 
             Threading.Run();
 
@@ -163,23 +150,23 @@ namespace Microsoft.Xna.Framework
                 _game.graphicsDeviceManager.ApplyChanges();
         }
 
-        public override string ScreenDeviceName 
+        public override string ScreenDeviceName
         {
-            get 
+            get
             {
-                throw new NotImplementedException ();
+                throw new NotImplementedException();
             }
         }
-   
 
-        public override Rectangle ClientBounds 
+
+        public override Rectangle ClientBounds
         {
-            get 
+            get
             {
                 return _clientBounds;
             }
         }
-        
+
         internal void ChangeClientBounds(Rectangle bounds)
         {
             if (bounds != _clientBounds)
@@ -189,13 +176,13 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        public override bool AllowUserResizing 
+        public override bool AllowUserResizing
         {
-            get 
+            get
             {
                 return false;
             }
-            set 
+            set
             {
                 // Do nothing; Ignore rather than raising an exception
             }
@@ -300,8 +287,6 @@ namespace Microsoft.Xna.Framework
                         TouchPanelState.ReleaseAllTouches();
                     }
 
-                    Game.Activity.RequestedOrientation = requestedOrientation;
-
                     OnOrientationChanged();
                 }
             }
@@ -330,4 +315,3 @@ namespace Microsoft.Xna.Framework
         }
     }
 }
-

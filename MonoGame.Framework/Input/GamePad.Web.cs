@@ -32,10 +32,10 @@ namespace Microsoft.Xna.Framework.Input
         {
             var jcap = Joystick.GetCapabilities(index);
 
-            if (!GamePadCache.ContainsKey(jcap.Id))
-                GamePadCache.Add(jcap.Id, Configurations.ContainsKey(jcap.Id) ? new GamepadTranslator(Configurations[jcap.Id]) : new GamepadTranslator(""));
+            if (!GamePadCache.ContainsKey(jcap.Identifier))
+                GamePadCache.Add(jcap.Identifier, Configurations.ContainsKey(jcap.Identifier) ? new GamepadTranslator(Configurations[jcap.Identifier]) : new GamepadTranslator(""));
 
-            var gpc = GamePadCache[jcap.Id];
+            var gpc = GamePadCache[jcap.Identifier];
 
             return new GamePadCapabilities 
             {
@@ -78,10 +78,10 @@ namespace Microsoft.Xna.Framework.Input
 
                 var jstate = Joystick.GetState(index);
 
-                if (!GamePadCache.ContainsKey(jcap.Id))
-                    GamePadCache.Add(jcap.Id, Configurations.ContainsKey(jcap.Id) ? new GamepadTranslator(Configurations[jcap.Id]) : new GamepadTranslator(""));
+                if (!GamePadCache.ContainsKey(jcap.Identifier))
+                    GamePadCache.Add(jcap.Identifier, Configurations.ContainsKey(jcap.Identifier) ? new GamepadTranslator(Configurations[jcap.Identifier]) : new GamepadTranslator(""));
 
-                var gpc = GamePadCache[jcap.Id];
+                var gpc = GamePadCache[jcap.Identifier];
 
                 Buttons buttons = 
                     (gpc.ButtonPressed("a", jstate) ? Buttons.A : 0) |

@@ -2,28 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-using GetProgramParameterName = MonoMac.OpenGL.ProgramParameter;
-using Bool = MonoMac.OpenGL.Boolean;
-#else
-using OpenTK.Graphics.OpenGL;
-using GetProgramParameterName = OpenTK.Graphics.OpenGL.ProgramParameter;
-using Bool = OpenTK.Graphics.OpenGL.Boolean;
-#endif
-#elif DESKTOPGL
-using OpenGL;
-#elif WINRT
-
-#else
-using OpenTK.Graphics.ES20;
-#if IOS || ANDROID
-using GetProgramParameterName = OpenTK.Graphics.ES20.ProgramParameter;
-using Bool = OpenTK.Graphics.ES20.All;
-#endif
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -59,7 +38,13 @@ namespace Microsoft.Xna.Framework.Graphics
     internal class ShaderProgramCache : IDisposable
     {
         private readonly Dictionary<int, ShaderProgram> _programCache = new Dictionary<int, ShaderProgram>();
+        GraphicsDevice _graphicsDevice;
         bool disposed;
+
+        public ShaderProgramCache(GraphicsDevice graphicsDevice)
+        {
+            _graphicsDevice = graphicsDevice;
+        }
 
         ~ShaderProgramCache()
         {
@@ -73,15 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             foreach (var pair in _programCache)
             {
-                if (GL.IsProgram(pair.Value.Program))
-                {
-#if MONOMAC
-                    GL.DeleteProgram(pair.Value.Program, null);
-#else
-                    GL.DeleteProgram(pair.Value.Program);
-#endif
-                    GraphicsExtensions.CheckGLError();
-                }
+                _graphicsDevice.DisposeProgram(pair.Value.Program);
             }
             _programCache.Clear();
         }
@@ -138,11 +115,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Console.WriteLine(log);
                 GL.DetachShader(program, vertexShader.GetShaderHandle());
                 GL.DetachShader(program, pixelShader.GetShaderHandle());
-#if MONOMAC
-                GL.DeleteProgram(1, ref program);
-#else
-                GL.DeleteProgram(program);
-#endif
+                _graphicsDevice.DisposeProgram(program);
                 throw new InvalidOperationException("Unable to link effect program");
             }
 

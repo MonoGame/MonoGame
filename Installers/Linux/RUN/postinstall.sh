@@ -9,15 +9,15 @@ echodep()
 	do
 		line="$line."
 	done
+	
+	echo -ne "$line"
     
 	if eval "$2"
 	then
-		line="$line\e[32m[Found]\e[0m"
+		echo -e "\e[32m[Found]\e[0m"
 	else
-		line="$line\e[31m[Not Found]\e[0m"
+		echo -e "\e[31m[Not Found]\e[0m"
 	fi
-	
-	echo -e "$line"
 }
 
 # Check installation priviledge
@@ -25,6 +25,45 @@ if [ "$(id -u)" != "0" ]; then
 	echo "Please make sure you are running this installer with sudo or as root." 1>&2
 	exit 1
 fi
+
+DIR=$(pwd)
+IDIR="/usr/lib/mono/xbuild/MonoGame/v3.0"
+
+# Find MonoDevelop
+MDTOOL="?????"
+
+if type "monodevelop" > /dev/null 2>&1
+then
+	if eval "monodevelop --help | grep 'MonoDevelop 6' > /dev/null 2>&1"
+	then
+		MDTOOL="mdtool"
+	fi
+fi
+
+if type "monodevelop-stable" > /dev/null 2>&1
+then
+	if eval "monodevelop-stable --help | grep 'MonoDevelop 6' > /dev/null 2>&1"
+	then
+		MDTOOL="mdtool-stable"
+	fi
+fi
+
+# Show dependency list
+echo "Dependencies:"
+echodep "mono-runtime" "type 'mono' > /dev/null 2>&1"
+echodep "gtk-sharp3" "type 'gacutil' > /dev/null 2>&1 && gacutil /l gtk-sharp | grep -q 3.0.0.0"
+echo ""
+echo "Optional Dependencies:"
+echodep "MonoDevelop 6" "$MDTOOL > /dev/null 2>&1"
+echodep "Rider" "type 'rider' > /dev/null 2>&1"
+echodep "referenceassemblies-pcl / mono-pcl" "test -d /usr/lib/mono/xbuild/Microsoft/Portable"
+echodep "ttf-mscorefonts-installer / mscore-fonts" "fc-list | grep -q Arial"
+echo ""
+read -p "Continue (Y, n): " choice2
+case "$choice2" in 
+	n|N ) exit ;;
+	*) ;;
+esac
 
 # Check previous versions
 if type "mgcb" > /dev/null 2>&1
@@ -44,27 +83,6 @@ then
 	fi
 fi
 
-DIR=$(pwd)
-IDIR="/usr/lib/mono/xbuild/MonoGame/v3.0"
-
-# Show dependency list
-echo "Dependencies:"
-echodep "mono-runtime" "type 'mono' > /dev/null 2>&1"
-echodep "libopenal" "ldconfig -p | grep -q libopenal"
-echodep "gtk-sharp3" "type 'gacutil' > /dev/null 2>&1 && gacutil /l gtk-sharp | grep -q 3.0.0.0"
-echo ""
-echo "Optional Dependencies:"
-echodep "monodevelop" "type 'mdtool' > /dev/null 2>&1"
-echodep "rider" "type 'rider' > /dev/null 2>&1"
-echodep "referenceassemblies-pcl / mono-pcl" "test -d /usr/lib/mono/xbuild/Microsoft/Portable"
-echodep "ttf-mscorefonts-installer / mscore-fonts" "fc-list | grep -q Arial"
-echo ""
-read -p "Continue (Y, n): " choice2
-case "$choice2" in 
-	n|N ) exit ;;
-	*) ;;
-esac
-
 # MonoGame SDK installation
 echo "Installing MonoGame SDK..."
 
@@ -78,29 +96,11 @@ ln -s "$IDIR" "/opt/MonoGameSDK"
 chmod +x "$IDIR/Tools/ffmpeg"
 chmod +x "$IDIR/Tools/ffprobe"
 
-# Rider stuff
-if type "rider" > /dev/null 2>&1
-then
-	echo "Installing Rider files..."
-	
-	FINDCOMMAND=$(type -a rider)
-	COMMAND=$(echo $FINDCOMMAND| cut -d' ' -f 3)
-	
-	FINDRIDER=$(cat $COMMAND | grep "RUN_PATH")
-	RIDER=$(echo $FINDRIDER| cut -d"'" -f 2)
-	
-	RIDERDIR=$(dirname $(dirname $RIDER))
-	RXBUILD="$RIDERDIR/lib/ReSharperHost/linux-x64/mono/lib/mono/xbuild/MonoGame"
-	
-	mkdir -p "$RXBUILD"
-	ln -s "$IDIR" "$RXBUILD/v3.0"
-fi
-
 # MonoDevelop addin
-if type "mdtool" > /dev/null 2>&1
+if [ "$MONODEVELOP" != "?????" ]
 then
 	echo "Installing MonoDevelop Addin..."
-	sudo -H -u $SUDO_USER bash -c "mdtool setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack  > /dev/null"
+	sudo -H -u $USERNAME bash -c "$MDTOOL setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack  > /dev/null"
 fi
 
 # Monogame Pipeline terminal commands
@@ -121,7 +121,7 @@ chmod +x /usr/bin/mgcb
 # MonoGame icon
 mkdir -p /usr/share/icons/hicolor/scalable/mimetypes
 cp $DIR/Main/monogame.svg /usr/share/icons/hicolor/scalable/mimetypes/monogame.svg
-gtk-update-icon-cache /usr/share/icons/hicolor/ -f
+gtk-update-icon-cache /usr/share/icons/hicolor/ -f &> /dev/null
 
 # Application launcher
 cat > /usr/share/applications/MonogamePipeline.desktop <<'endmsg'

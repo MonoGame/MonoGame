@@ -3,19 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenAL;
-#endif
-#if MONOMAC && !PLATFORM_MACOS_LEGACY
-using OpenTK.Audio.OpenAL;
-#endif
-#if GLES
-using OpenTK.Audio.OpenAL;
-#endif
-#if DESKTOPGL
-using OpenAL;
-#endif
+using MonoGame.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -23,14 +11,12 @@ namespace Microsoft.Xna.Framework.Audio
     {
 		internal SoundState SoundState = SoundState.Stopped;
 		private bool _looped = false;
-		private float _alVolume = 1;
+		private float _alVolume = 1f;
 
 		internal int SourceId;
         private float reverb = 0f;
         bool applyFilter = false;
-#if SUPPORTS_EFX
         EfxFilterType filterType;
-#endif
         float filterQ;
         float frequency;
         int pauseCount;
@@ -71,6 +57,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
         {
+            if (!HasSourceId)
+                return;
             // get AL's listener position
             float x, y, z;
             AL.GetListener(ALListener3f.Position, out x, out y, out z);
@@ -90,18 +78,18 @@ namespace Microsoft.Xna.Framework.Audio
             AL.Source(SourceId, ALSource3f.Position, finalPos.X, finalPos.Y, finalPos.Z);
             ALHelper.CheckError("Failed to set source position.");
             AL.Source(SourceId, ALSource3f.Velocity, finalVel.X, finalVel.Y, finalVel.Z);
-            ALHelper.CheckError("Failed to Set source velocity.");
+            ALHelper.CheckError("Failed to set source velocity.");
+
+            AL.Source(SourceId, ALSourcef.ReferenceDistance, SoundEffect.DistanceScale);
+            ALHelper.CheckError("Failed to set source distance scale.");
+            AL.DopplerFactor(SoundEffect.DopplerScale);
+            ALHelper.CheckError("Failed to set Doppler scale.");
         }
 
         private void PlatformPause()
         {
             if (!HasSourceId || SoundState != SoundState.Playing)
                 return;
-
-            if (!controller.CheckInitState())
-            {
-                return;
-            }
 
             if (pauseCount == 0)
             {
@@ -114,7 +102,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformPlay()
         {
-
             SourceId = 0;
             HasSourceId = false;
             SourceId = controller.ReserveSource();
@@ -128,14 +115,19 @@ namespace Microsoft.Xna.Framework.Audio
             if (!HasSourceId)
 				return;
 
-			// Distance Model
+            AL.Source(SourceId, ALSourcei.SourceRelative, 1);
+            ALHelper.CheckError("Failed set source relative.");
+            // Distance Model
 			AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
             ALHelper.CheckError("Failed set source distance.");
 			// Pan
-			AL.Source (SourceId, ALSource3f.Position, _pan, 0, 0.1f);
+			AL.Source (SourceId, ALSource3f.Position, _pan, 0f, 0f);
+            ALHelper.CheckError("Failed to set source pan.");
+            // Velocity
+			AL.Source (SourceId, ALSource3f.Velocity, 0f, 0f, 0f);
             ALHelper.CheckError("Failed to set source pan.");
 			// Volume
-			AL.Source (SourceId, ALSourcef.Gain, _alVolume);
+            AL.Source(SourceId, ALSourcef.Gain, _alVolume);
             ALHelper.CheckError("Failed to set source volume.");
 			// Looping
 			AL.Source (SourceId, ALSourceb.Looping, IsLooped);
@@ -143,13 +135,12 @@ namespace Microsoft.Xna.Framework.Audio
 			// Pitch
 			AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
             ALHelper.CheckError("Failed to set source pitch.");
-#if SUPPORTS_EFX
+
             ApplyReverb ();
             ApplyFilter ();
-#endif
+
             AL.SourcePlay(SourceId);
             ALHelper.CheckError("Failed to play source.");
-
 
             SoundState = SoundState.Playing;
         }
@@ -164,10 +155,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (SoundState == SoundState.Paused)
             {
-                if (!controller.CheckInitState())
-                {
-                    return;
-                }
                 --pauseCount;
                 if (pauseCount == 0)
                 {
@@ -182,21 +169,18 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (HasSourceId)
             {
-                if (!controller.CheckInitState())
-                {
-                    return;
-                }
                 AL.SourceStop(SourceId);
                 ALHelper.CheckError("Failed to stop source.");
 
-#if SUPPORTS_EFX
-                // Reset the SendFilter to 0 if we are NOT using revert since 
-                // sources are recyled
-                OpenALSoundController.Efx.BindSourceToAuxiliarySlot (SourceId, 0, 0, 0);
-                ALHelper.CheckError ("Failed to unset reverb.");
-                AL.Source (SourceId, ALSourcei.EfxDirectFilter, 0);
-                ALHelper.CheckError ("Failed to unset filter.");
-#endif
+                // Reset the SendFilter to 0 if we are NOT using reverb since 
+                // sources are recycled
+                if (OpenALSoundController.GetInstance.SupportsEfx)
+                {
+                    OpenALSoundController.Efx.BindSourceToAuxiliarySlot(SourceId, 0, 0, 0);
+                    ALHelper.CheckError("Failed to unset reverb.");
+                    AL.Source(SourceId, ALSourcei.EfxDirectFilter, 0);
+                    ALHelper.CheckError("Failed to unset filter.");
+                }
                 AL.Source(SourceId, ALSourcei.Buffer, 0);
                 ALHelper.CheckError("Failed to free source from buffer.");
 
@@ -279,64 +263,64 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformSetReverbMix(float mix)
         {
-#if SUPPORTS_EFX
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
             reverb = mix;
-            if (State == SoundState.Playing) {
-                ApplyReverb ();
+            if (State == SoundState.Playing)
+            {
+                ApplyReverb();
                 reverb = 0f;
             }
-#endif
         }
 
-#if SUPPORTS_EFX
-        void ApplyReverb ()
+        void ApplyReverb()
         {
-            if (reverb > 0f && SoundEffect.ReverbSlot != 0) {
-                OpenALSoundController.Efx.BindSourceToAuxiliarySlot (SourceId, (int)SoundEffect.ReverbSlot, 0, 0);
-                ALHelper.CheckError ("Failed to set reverb.");
+            if (reverb > 0f && SoundEffect.ReverbSlot != 0)
+            {
+                OpenALSoundController.Efx.BindSourceToAuxiliarySlot(SourceId, (int)SoundEffect.ReverbSlot, 0, 0);
+                ALHelper.CheckError("Failed to set reverb.");
             }
         }
 
-        void ApplyFilter ()
+        void ApplyFilter()
         {
-            if (applyFilter && controller.Filter > 0) {
+            if (applyFilter && controller.Filter > 0)
+            {
                 var freq = frequency / 20000f;
                 var lf = 1.0f - freq;
                 var efx = OpenALSoundController.Efx;
-                efx.Filter (controller.Filter, EfxFilteri.FilterType, (int)filterType);
-                ALHelper.CheckError ("Failed to set filter.");
-                switch (filterType) {
+                efx.Filter(controller.Filter, EfxFilteri.FilterType, (int)filterType);
+                ALHelper.CheckError("Failed to set filter.");
+                switch (filterType)
+                {
                 case EfxFilterType.Lowpass:
-                    efx.Filter (controller.Filter, EfxFilterf.LowpassGainHF, freq);
-                    ALHelper.CheckError ("Failed to set LowpassGainHF.");
+                    efx.Filter(controller.Filter, EfxFilterf.LowpassGainHF, freq);
+                    ALHelper.CheckError("Failed to set LowpassGainHF.");
                     break;
                 case EfxFilterType.Highpass:
-                    efx.Filter (controller.Filter, EfxFilterf.HighpassGainLF, freq);
-                    ALHelper.CheckError ("Failed to set HighpassGainLF.");
+                    efx.Filter(controller.Filter, EfxFilterf.HighpassGainLF, freq);
+                    ALHelper.CheckError("Failed to set HighpassGainLF.");
                     break;
                 case EfxFilterType.Bandpass:
-                    efx.Filter (controller.Filter, EfxFilterf.BandpassGainHF, freq);
-                    ALHelper.CheckError ("Failed to set BandpassGainHF.");
-                    efx.Filter (controller.Filter, EfxFilterf.BandpassGainLF, lf);
-                    ALHelper.CheckError ("Failed to set BandpassGainLF.");
+                    efx.Filter(controller.Filter, EfxFilterf.BandpassGainHF, freq);
+                    ALHelper.CheckError("Failed to set BandpassGainHF.");
+                    efx.Filter(controller.Filter, EfxFilterf.BandpassGainLF, lf);
+                    ALHelper.CheckError("Failed to set BandpassGainLF.");
                     break;
                 }
-                AL.Source (SourceId, ALSourcei.EfxDirectFilter, controller.Filter);
-                ALHelper.CheckError ("Failed to set DirectFilter.");
+                AL.Source(SourceId, ALSourcei.EfxDirectFilter, controller.Filter);
+                ALHelper.CheckError("Failed to set DirectFilter.");
             }
         }
-#endif
 
         internal void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
         {
-#if SUPPORTS_EFX
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
             applyFilter = true;
-            switch (mode) {
+            switch (mode)
+            {
             case FilterMode.BandPass:
                 filterType = EfxFilterType.Bandpass;
                 break;
@@ -349,21 +333,19 @@ namespace Microsoft.Xna.Framework.Audio
             }
             this.filterQ = filterQ;
             this.frequency = frequency;
-            if (State == SoundState.Playing) {
-                ApplyFilter ();
+            if (State == SoundState.Playing)
+            {
+                ApplyFilter();
                 applyFilter = false;
             }
-#endif
         }
 
         internal void PlatformClearFilter()
         {
-#if SUPPORTS_EFX
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
             applyFilter = false;
-#endif
         }
 
         private void PlatformDispose(bool disposing)

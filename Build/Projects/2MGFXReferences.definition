@@ -4,10 +4,10 @@
   <Platform Type="Windows">
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.dll" />
     <Binary
       Name="SharpDX.D3DCompiler"
-      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.D3DCompiler.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.D3DCompiler.dll" />
     <Binary
       Name="CppNet"
       Path="ThirdParty/Dependencies/CppNet/CppNet.dll" />

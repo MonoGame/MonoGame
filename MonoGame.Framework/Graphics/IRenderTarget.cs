@@ -41,19 +41,8 @@ using SharpDX.Direct3D11;
 #endif
 
 #if OPENGL
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
+using MonoGame.OpenGL;
 #endif
-#if (MONOMAC && !PLATFORM_MACOS_LEGACY)
-using OpenTK.Graphics.OpenGL;
-#endif
-#if GLES
-using OpenTK.Graphics.ES20;
-#else
-using OpenGL;
-#endif
-#endif
-
 
 namespace Microsoft.Xna.Framework.Graphics
 {

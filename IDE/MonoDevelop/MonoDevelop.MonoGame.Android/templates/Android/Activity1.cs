@@ -8,10 +8,6 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 
-#if OUYA
-using Ouya.Console.Api;
-#endif
-
 using Microsoft.Xna.Framework;
 
 namespace ${Namespace}
@@ -22,14 +18,12 @@ namespace ${Namespace}
 	           Theme = "@style/Theme.Splash",
                AlwaysRetainTaskState=true,
 	           LaunchMode=LaunchMode.SingleInstance,
+			   ScreenOrientation = ScreenOrientation.FullUser,
 	           ConfigurationChanges = ConfigChanges.Orientation | 
 	                                  ConfigChanges.KeyboardHidden | 
 	                                  ConfigChanges.Keyboard |
-	                                  ConfigChanges.ScreenSize)]
-	#if OUYA
-	[IntentFilter(new[] { Intent.ActionMain }
-		, Categories = new[] { Intent.CategoryLauncher, OuyaIntent.CategoryGame })]
-	#endif
+	                                  ConfigChanges.ScreenSize |
+                                      ConfigChanges.ScreenLayout)]
 	public class Activity1 : AndroidGameActivity
 	{
 		protected override void OnCreate (Bundle bundle)

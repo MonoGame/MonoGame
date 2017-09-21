@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 foreach (var outfile in shaderInfo.AdditionalOutputFiles)
                     context.AddOutputFile(outfile);
             }
-            catch (ShaderCompilerException ex)
+            catch (ShaderCompilerException)
             {
                 // This will log any warnings and errors and throw.
                 ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input, context);
@@ -161,7 +161,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] {"\n", "\r", Environment.NewLine},
                                                                       StringSplitOptions.RemoveEmptyEntries);
 
-            var errorOrWarning = new Regex(@"(.*)\(([0-9,]*)\)\s*:\s*(.*)", RegexOptions.Compiled);
+            var errorOrWarning = new Regex(@"(.*)\(([0-9]*(,[0-9]+(-[0-9]+)?)?)\)\s*:\s*(.*)", RegexOptions.Compiled);
             ContentIdentity identity = null;
             var allErrorsAndWarnings = string.Empty;
 

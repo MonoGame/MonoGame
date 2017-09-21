@@ -94,6 +94,8 @@
     <Compile Include="ContentPipeline\FontDescriptionTests.cs" />
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs" />
     <Compile Include="ContentPipeline\IntermediateSerializerTest.cs" />
+    <Compile Include="ContentPipeline\MeshBuilderTests.cs" />
+    <Compile Include="ContentPipeline\MeshHelperTest.cs" />
     <Compile Include="ContentPipeline\ModelProcessorTests.cs" />
     <Compile Include="ContentPipeline\Mp3ImporterTests.cs" />
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs" />
@@ -117,6 +119,7 @@
     <Compile Include="Framework\CurveKeyTest.cs" />
     <Compile Include="Framework\CurveTest.cs" />
     <Compile Include="Framework\EnumConformingTest.cs" />
+    <Compile Include="Framework\FrameworkDispatcherTest.cs" />
     <Compile Include="Framework\GameComponentTest.cs" />
     <Compile Include="Framework\Graphics\DepthStencilStateTest.cs" />
     <Compile Include="Framework\Graphics\EffectTest.cs" />
@@ -125,6 +128,7 @@
     <Compile Include="Framework\Graphics\GraphicsDeviceTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsDeviceTestFixtureBase.cs" />
     <Compile Include="Framework\Graphics\MiscellaneousTests.cs" />
+    <Compile Include="Framework\Graphics\ModelTest.cs" />
     <Compile Include="Framework\Graphics\OcclusionQueryTest.cs" />
     <Compile Include="Framework\Graphics\RasterizerStateTest.cs" />
     <Compile Include="Framework\Graphics\RenderTarget2DTest.cs" />
@@ -291,19 +295,28 @@
     <Content Include="Assets\Audio\rock_loop_stereo_44hz_adpcm_ms.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\CustomSpriteBatchEffect.fx">
+    <Content Include="Assets\Audio\tone_mono_44khz_16bit.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\Instancing.fx">
+    <Content Include="Assets\Audio\tone_mono_44khz_24bit.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\ParserTest.fx">
+    <Content Include="Assets\Audio\tone_mono_44khz_8bit.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\Include.fxh">
+    <Content Include="Assets\Audio\tone_mono_44khz_float.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\VertexTextureEffect.fx">
+    <Content Include="Assets\Audio\tone_stereo_44khz_16bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_24bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_float.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\BlendState\VisualTests.png">
@@ -397,6 +410,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\TexturedQuad_lighting_False_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Model\ShouldDrawSampleModel.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_-0.0004f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_-1.0f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_1.0f_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestCullMode_CullClockwiseFace_.png">
@@ -555,6 +580,15 @@
     <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_Immediate_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_viewport_changing_Deferred_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_viewport_changing_Immediate_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Draw_with_LayerDepth.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -573,7 +607,16 @@
     <Content Include="Assets\ReferenceImages\SpriteFont\Hullabaloo2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ReferenceImages\SpriteFont\Multiline.png">
+    <Content Include="Assets\ReferenceImages\SpriteFont\Multiline_CarriageReturn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Multiline_Newline.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Multiline_noNewline.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Multiline_verbatimString.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\SpriteFont\Origins_rotated.png">
@@ -601,6 +644,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\tests.xsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\blue_0.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Textures\lines-128.xnb">
@@ -640,6 +686,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Textures\LogoOnly_64px.tif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\red_128.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Textures\SampleCube64DXT1Mips.dds">
@@ -802,6 +851,30 @@
     <Content Include="Assets\Audio\Win\Tests.xwb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_16bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_8bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_msadpcm.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_16bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_8bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_msadpcm.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Assets\Effects\XNA\CustomSpriteBatchEffect.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Effects\XNA\Instancing.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Assets\Fonts\JingJing.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -817,6 +890,21 @@
     <None Include="Assets\Fonts\SegoeKeycaps.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="Assets\Models\BlenderDefaultCube.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Assets\Textures\random_16px_dxt.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Textures\random_16px_dxt_alpha.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Textures\SampleCube64DXT1Mips.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

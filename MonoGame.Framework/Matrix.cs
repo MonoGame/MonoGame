@@ -357,17 +357,6 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Rotation stored in this matrix.
-        /// </summary>
-        public Quaternion Rotation
-        {
-            get
-            {
-                return Quaternion.CreateFromRotationMatrix(this);
-            }
-        }
-
-        /// <summary>
         /// Position stored in this matrix.
         /// </summary>
         public Vector3 Translation
@@ -381,23 +370,6 @@ namespace Microsoft.Xna.Framework
                 this.M41 = value.X;
                 this.M42 = value.Y;
                 this.M43 = value.Z;
-            }
-        }
-
-        /// <summary>
-        /// Scale stored in this matrix.
-        /// </summary>
-        public Vector3 Scale
-        {
-            get
-            {
-                return new Vector3(this.M11, this.M22, this.M33);
-            }
-            set
-            {
-                this.M11 = value.X;
-                this.M22 = value.Y;
-                this.M33 = value.Z;
             }
         }
 

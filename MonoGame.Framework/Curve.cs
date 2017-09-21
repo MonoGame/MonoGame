@@ -17,9 +17,9 @@ namespace Microsoft.Xna.Framework
     {
         #region Private Fields
 
-        private CurveKeyCollection _keys;
-        private CurveLoopType _postLoop;
         private CurveLoopType _preLoop;
+        private CurveLoopType _postLoop;
+        private CurveKeyCollection _keys;
 
         #endregion
 
@@ -35,12 +35,13 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// The collection of curve keys.
+        /// Defines how to handle weighting values that are less than the first control point in the curve.
         /// </summary>
         [DataMember]
-        public CurveKeyCollection Keys
+        public CurveLoopType PreLoop
         {
-            get { return this._keys; }
+            get { return this._preLoop; }
+            set { this._preLoop = value; }
         }
 
         /// <summary>
@@ -54,13 +55,12 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Defines how to handle weighting values that are less than the first control point in the curve.
+        /// The collection of curve keys.
         /// </summary>
         [DataMember]
-        public CurveLoopType PreLoop
+        public CurveKeyCollection Keys
         {
-            get { return this._preLoop; }
-            set { this._preLoop = value; }
+            get { return this._keys; }
         }
 
         #endregion

@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Input
             return (element & mask) != 0;
         }
 
-        void InternalSetKey(Keys key)
+        internal void InternalSetKey(Keys key)
         {
             uint mask = (uint)1 << (((int)key) & 0x1f);
             switch (((int)key) >> 5)
@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Input
             }
         }
 
-        void InternalClearKey(Keys key)
+        internal void InternalClearKey(Keys key)
         {
             uint mask = (uint)1 << (((int)key) & 0x1f);
             switch (((int)key) >> 5)
@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Input
             }
         }
 
-        void InternalClearAllKeys()
+        internal void InternalClearAllKeys()
         {
             keys0 = 0;
             keys1 = 0;

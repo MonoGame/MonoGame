@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -51,7 +55,7 @@ namespace MonoGame.Tests.Graphics
             gdm = new GraphicsDeviceManager(game);
             // some visual tests require a HiDef profile
             gdm.GraphicsProfile = GraphicsProfile.HiDef;
-            ((IGraphicsDeviceManager) game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
+            ((IGraphicsDeviceManager)game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
             gd = game.GraphicsDevice;
             content = game.Content;
 
@@ -72,6 +76,10 @@ namespace MonoGame.Tests.Graphics
         public virtual void TearDown()
         {
             game.Dispose();
+            game = null;
+            gdm = null;
+            gd = null;
+            content = null;
 
             if (_framePrepared && !_framesChecked)
                 Assert.Fail("Initialized fixture for rendering but did not check frames.");

@@ -35,6 +35,7 @@
         <topic id="Using_The_Pipeline_Tool" name="Using The Pipeline Tool" filename="using_pipeline_tool.md"/>
         <topic id="Custom_Effects" name="Custom Effects" filename="custom_effects.md"/>
         <topic id="Using_TrueType_Fonts" name="Using TrueType Fonts" filename="adding_ttf_fonts.md"/>
+    <topic id="Localization" name="Localization" filename="localization.md" />
     </topic>
 
     <topic id="Tools" name="Tools" filename="tools.md">
@@ -84,17 +85,6 @@
     <source>..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.dll</source>
   </group>
 
-  <!-- Windows 8 Store -->
-  <group api="win8metro|Windows 8 Store">
-    <searchdir>C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral</searchdir>
-    <source>..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.dll</source>
-  </group>
-
-  <!-- Windows Phone 8 -->
-  <group api="wp8|Windows Phone 8">    
-    <source>..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll</source>
-  </group>
-
   <!-- Web -->
   <group api="web|Web">    
     <source>..\MonoGame.Framework\bin\Web\AnyCPU\Release\MonoGame.Framework.dll</source>
@@ -111,13 +101,6 @@
   <!--
   <group api="android|Android">    
     <source>..\MonoGame.Framework\bin\Android\AnyCPU\Release\MonoGame.Framework.dll</source>
-  </group>
-  -->
-
-  <!-- Ouya -->
-  <!--
-  <group api="ouya|OUYA">    
-    <source>..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\MonoGame.Framework.dll</source>
   </group>
   -->
 

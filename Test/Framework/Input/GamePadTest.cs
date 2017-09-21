@@ -54,13 +54,7 @@ namespace MonoGame.Tests.Input
             Assert.AreEqual(right, pad.Right);
 
 #if !XNA
-            var pad2 = new GamePadDPad
-            {
-                Up = up,
-                Down = down,
-                Left = left,
-                Right = right
-            };
+            var pad2 = new GamePadDPad(up, down, left, right);
 
             Assert.AreEqual(pad, pad2);
             Assert.AreEqual(pad.GetHashCode(), pad2.GetHashCode());
@@ -89,11 +83,7 @@ namespace MonoGame.Tests.Input
             Assert.AreEqual(MathHelper.Clamp(right, 0f, 1f), triggers.Right);
 
 #if !XNA
-            var triggers2 = new GamePadTriggers
-            {
-                Left = left,
-                Right = right
-            };
+            var triggers2 = new GamePadTriggers(left, right);
             Assert.AreEqual(triggers, triggers2);
             Assert.AreEqual(triggers.GetHashCode(), triggers2.GetHashCode());
 #endif
@@ -297,7 +287,7 @@ namespace MonoGame.Tests.Input
 
 #if !XNA
             var gamePadButtons = state.Buttons;
-            Assert.AreEqual(joinedButtons, gamePadButtons.buttons);
+            Assert.AreEqual(joinedButtons, gamePadButtons._buttons);
 #endif
 
             // all buttons except for thumbstick position buttons and triggers (they're not controlled via buttons here)

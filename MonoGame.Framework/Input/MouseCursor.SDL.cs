@@ -4,8 +4,8 @@
 
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -34,21 +34,26 @@ namespace Microsoft.Xna.Framework.Input
 
         private static MouseCursor PlatformFromTexture2D(Texture2D texture, int originx, int originy)
         {
-            IntPtr handle;
-
-            var stream = new MemoryStream();
-            texture.SaveAsImage(stream, texture.Width, texture.Height, ImageFormat.Bmp);
-            stream.Position = 0;
-
-            using (var br = new BinaryReader(stream))
+            IntPtr surface = IntPtr.Zero;
+            IntPtr handle = IntPtr.Zero;
+            try
             {
-                var src = Sdl.RwFromMem(br.ReadBytes((int) stream.Length), (int) stream.Length);
-                var surface = Sdl.LoadBMP_RW(src, 1);
+                var bytes = new byte[texture.Width * texture.Height * 4];
+                texture.GetData(bytes);
+                surface = Sdl.CreateRGBSurfaceFrom(bytes, texture.Width, texture.Height, 32, texture.Width * 4, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+                if (surface == IntPtr.Zero)
+                    throw new InvalidOperationException("Failed to create surface for mouse cursor: " + Sdl.GetError());
+
                 handle = Sdl.Mouse.CreateColorCursor(surface, originx, originy);
-                Sdl.FreeSurface(surface);
+                if (handle == IntPtr.Zero)
+                    throw new InvalidOperationException("Failed to set surface for mouse cursor: " + Sdl.GetError());
+            }
+            finally
+            {
+                if (surface != IntPtr.Zero)
+                    Sdl.FreeSurface(surface);
             }
 
-            stream.Dispose();
             return new MouseCursor(handle);
         }
 

@@ -187,7 +187,14 @@ namespace Microsoft.Xna.Framework
         /// <returns>Hash code of this <see cref="Point"/>.</returns>
         public override int GetHashCode()
         {
-            return X ^ Y;
+            unchecked
+            {
+                var hash = 17;
+                hash = hash * 23 + X.GetHashCode();
+                hash = hash * 23 + Y.GetHashCode();
+                return hash;
+            }
+
         }
 
         /// <summary>

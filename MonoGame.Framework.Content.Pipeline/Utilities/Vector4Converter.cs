@@ -24,24 +24,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
         Vector4 IVector4Converter<byte>.ToVector4(byte value)
         {
             var f = (float)value / (float)byte.MaxValue;
-            return new Vector4(f, f, f, f);
+            return new Vector4(f, 0f, 0f, 1f);
         }
 
         Vector4 IVector4Converter<short>.ToVector4(short value)
         {
             var f = (float)value / (float)short.MaxValue;
-            return new Vector4(f, f, f, f);
+            return new Vector4(f, 0f, 0f, 1f);
         }
 
         Vector4 IVector4Converter<int>.ToVector4(int value)
         {
             var f = (float)value / (float)int.MaxValue;
-            return new Vector4(f, f, f, f);
+            return new Vector4(f, 0f, 0f, 1f);
         }
 
         Vector4 IVector4Converter<float>.ToVector4(float value)
         {
-            return new Vector4(value, value, value, value);
+            return new Vector4(value, 0f, 0f, 1f);
         }
 
         Vector4 IVector4Converter<Color>.ToVector4(Color value)
