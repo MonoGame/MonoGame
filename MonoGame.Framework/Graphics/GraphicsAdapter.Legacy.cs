@@ -12,6 +12,9 @@ using UIKit;
 using Android.Views;
 using Android.Runtime;
 #endif
+#if DESKTOPGL || ANGLE || GLES
+using MonoGame.OpenGL;
+#endif
 
 // NOTE: This is the legacy graphics adapter implementation
 // which should no longer be updated.  All new development
@@ -362,6 +365,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 case GraphicsProfile.HiDef:
                     bool result = true;
                     // TODO: check adapter capabilities...
+#if ANDROID
+                    int maxTextureSize;
+                    GL.GetInteger(GetPName.MaxTextureSize, out maxTextureSize);                    
+                    if (maxTextureSize < 4096)
+                        result = false;
+#endif
                     return result;
                 default:
                     throw new InvalidOperationException();
