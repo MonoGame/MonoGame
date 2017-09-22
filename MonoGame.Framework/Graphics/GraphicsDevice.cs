@@ -1297,6 +1297,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Draw geometry with data from multiple bound vertex streams at different frequencies.</remarks>
         public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
         {
+            if (this.GraphicsProfile == GraphicsProfile.Reach)
+                throw new NotSupportedException("Reach profile does not support Instancing.");
+
             if (_vertexShader == null)
                 throw new InvalidOperationException("Vertex shader must be set before calling DrawInstancedPrimitives.");
 
