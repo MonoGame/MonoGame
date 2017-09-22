@@ -196,6 +196,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 featureLevels.Add(FeatureLevel.Level_11_0);
                 featureLevels.Add(FeatureLevel.Level_10_1);
                 featureLevels.Add(FeatureLevel.Level_10_0);
+                featureLevels.Add(FeatureLevel.Level_9_3);
             }
             featureLevels.Add(FeatureLevel.Level_9_3);
             featureLevels.Add(FeatureLevel.Level_9_2);
@@ -520,6 +521,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 featureLevels.Add(FeatureLevel.Level_11_0);
                 featureLevels.Add(FeatureLevel.Level_10_1);
                 featureLevels.Add(FeatureLevel.Level_10_0);
+                featureLevels.Add(FeatureLevel.Level_9_3);
             }
 
             // We can not give featureLevels for granted in GraphicsProfile.Reach

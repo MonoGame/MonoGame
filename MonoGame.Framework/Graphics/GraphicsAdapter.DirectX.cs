@@ -120,7 +120,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 case GraphicsProfile.Reach:
                     return SharpDX.Direct3D11.Device.IsSupportedFeatureLevel(_adapter, FeatureLevel.Level_9_1);
                 case GraphicsProfile.HiDef:
-                    return SharpDX.Direct3D11.Device.IsSupportedFeatureLevel(_adapter, FeatureLevel.Level_10_0);
+                    // Some DX10 adapters don't implement feature level 9.3. In that case we upgrade to DX10.
+                    return SharpDX.Direct3D11.Device.IsSupportedFeatureLevel(_adapter, FeatureLevel.Level_9_3)
+                        || SharpDX.Direct3D11.Device.IsSupportedFeatureLevel(_adapter, FeatureLevel.Level_10_0);
                 default:
                     throw new InvalidOperationException();
             }
