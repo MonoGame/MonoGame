@@ -44,9 +44,21 @@
       <Platform Name="WindowsGL">TRACE;WINDOWS;OPENGL;OPENAL;NET;DESKTOPGL</Platform>
       <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>		
     </CustomDefinitions>
-	
   </Properties>
 
+  <Dependencies>
+    <Uses Name="DesktopGL">
+      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+    </Uses>
+  </Dependencies>
+
+  <Services>
+    <Service Name="DesktopGL">
+      <RemoveDefine>WINDOWS,MACOS,LINUX</RemoveDefine>
+      <Platforms>WindowsGL,MacOS,Linux</Platforms>
+    </Service>
+  </Services>
+	
   <Files>
 
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -216,33 +228,14 @@
     
     <!-- DesktopGL Platform -->
     <Compile Include="DesktopGL\GamerServices\Guide.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="DesktopGL\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="DesktopGL\GamerServices\SignedInGamer.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
+      <Platforms>WindowsGL,MacOS,Linux</Platforms>
     </Compile>
-
-
-    <!-- MacOS Platform -->
-    <Compile Include="MacOS\GamerServices\Guide.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\GamerServices\MonoGameLocalGamerProfile.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\GamerServices\SignedInGamer.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\GamerServices\SigninController.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-
 
     <!-- Windows Universal Platform -->
     <Compile Include="WindowsUniversal\GamerServices\SignedInGamer.cs">
