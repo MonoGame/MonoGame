@@ -1126,9 +1126,6 @@
     <Compile Include="Media\Video.IOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="Media\Video.MacOS.cs">
-        <Platforms>MacOS</Platforms>
-    </Compile>
     <Compile Include="Media\Video.Android.cs">
         <Platforms>Android</Platforms>
     </Compile>
@@ -1143,9 +1140,6 @@
     </Compile>
     <Compile Include="Media\VideoPlayer.WME.cs">
         <Platforms>WindowsUniversal</Platforms>
-    </Compile>
-    <Compile Include="Media\VideoPlayer.MacOS.cs">
-        <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.Android.cs">
         <Platforms>Android</Platforms>
