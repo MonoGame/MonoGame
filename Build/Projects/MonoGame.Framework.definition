@@ -35,14 +35,14 @@
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
 
     <CustomDefinitions>
-      <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL;OPENAL</Platform>
-      <Platform Name="iOS">IOS;GLES;OPENGL;OPENAL</Platform>
-      <Platform Name="tvOS">IOS;TVOS;GLES;OPENGL;OPENAL</Platform>
-      <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL;DESKTOPGL;SUPPORTS_EFX</Platform>
-      <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL;DESKTOPGL;SUPPORTS_EFX</Platform>
-      <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL;SUPPORTS_EFX</Platform>
-      <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
-      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
+      <Platform Name="Android">TRACE;ANDROID;GLES</Platform>
+      <Platform Name="iOS">IOS;GLES</Platform>
+      <Platform Name="tvOS">IOS;TVOS;GLES</Platform>
+      <Platform Name="Linux">TRACE;LINUX;SUPPORTS_EFX</Platform>
+      <Platform Name="MacOS">MACOS;SUPPORTS_EFX</Platform>
+      <Platform Name="WindowsGL">TRACE;WINDOWS;SUPPORTS_EFX</Platform>
+      <Platform Name="Windows">TRACE;WINDOWS;WINDOWS_MEDIA_SESSION</Platform>
+      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="Web">TRACE;WEB</Platform>
     </CustomDefinitions>
 	
@@ -57,11 +57,15 @@
   </Properties>
 
   <Dependencies>
+    <Uses Name="DesktopGL">
+      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+    </Uses>
+
     <Uses Name="ANGLEGraphics">
       <Platforms>Angle</Platforms>
     </Uses>
     <Uses Name="OpenGLGraphics">
-      <Platforms>iOS,WindowsGL,Android,tvOS</Platforms>
+      <Platforms>Android,iOS,tvOS</Platforms>
     </Uses>
     <Uses Name="DirectXGraphics">
       <Platforms>WindowsUniversal</Platforms>
@@ -69,38 +73,46 @@
     <Uses Name="WebGraphics">
       <Platforms>Web</Platforms>
     </Uses>
+
+    <Uses Name="OpenALAudio">
+      <Platforms>Android,iOS</Platforms>
+    </Uses>
+
     <Uses Name="_XNADesignProvided">
       <Platforms>Windows,WindowsGL,Linux,MacOS</Platforms>
     </Uses>
-    <Uses Name="NVorbis">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Uses>
+
     <Recommends Name="DirectXGraphics">
       <Platforms>Windows</Platforms>
-    </Recommends>
-    <Recommends Name="OpenGLGraphics">
-      <Platforms>Linux,MacOS</Platforms>
     </Recommends>
   </Dependencies>
 
   <Services>
+    <!-- Sets of API's -->
+    <Service Name="DesktopGL">
+      <AddDefine>DESKTOPGL</AddDefine>
+      <RemoveDefine>WINDOWS,MACOS,LINUX</RemoveDefine>
+      <Platforms>WindowsGL,MacOS,Linux</Platforms>
+      <Requires>OpenGLGraphics,OpenALAudio,SDLWindowing,NVorbis</Requires>
+    </Service>
 
     <!-- Graphics APIs -->
     <Service Name="ANGLEGraphics">
-      <RemoveDefine>DIRECTX;WINDOWS_MEDIA_SESSION;WINDOWS;MONOMAC;LINUX</RemoveDefine>
+      <RemoveDefine>WINDOWS_MEDIA_SESSION;WINDOWS;MONOMAC;LINUX</RemoveDefine>
       <AddDefine>OPENGL;OPENAL;GLES;ANGLE</AddDefine>
       <Platforms>Windows,MacOS,Linux,Angle</Platforms>
       <Conflicts>OpenGLGraphics,DirectXGraphics,WebGraphics</Conflicts>
       <Requires>OpenALAudio,_GLCompatible</Requires>
     </Service>
     <Service Name="OpenGLGraphics">
-      <RemoveDefine>DIRECTX;WINDOWS_MEDIA_SESSION</RemoveDefine>
-      <AddDefine>OPENGL;OPENAL</AddDefine>
+      <RemoveDefine>WINDOWS_MEDIA_SESSION</RemoveDefine>
+      <AddDefine>OPENGL</AddDefine>
       <Platforms>iOS,MacOS,Linux,Windows,WindowsGL,Android,tvOS</Platforms>
       <Conflicts>ANGLEGraphics,DirectXGraphics,WebGraphics</Conflicts>
-      <Requires>OpenALAudio,_GLCompatible</Requires>
+      <Requires>_GLCompatible</Requires>
     </Service>
     <Service Name="DirectXGraphics">
+      <AddDefine>DIRECTX</AddDefine>
       <Platforms>Windows,WindowsUniversal</Platforms>
       <Conflicts>ANGLEGraphics,OpenGLGraphics,WebGraphics</Conflicts>
       <Requires>XAudioAudio</Requires>
@@ -113,6 +125,7 @@
 
     <!-- Audio APIs -->
     <Service Name="OpenALAudio">
+      <AddDefine>OPENAL</AddDefine>
       <Platforms>Angle,iOS,Linux,Windows,WindowsGL,MacOS,Android,tvOS</Platforms>
       <Conflicts>XAudioAudio,WebAudio</Conflicts>
     </Service>
@@ -126,6 +139,12 @@
     </Service>
     <Service Name="NVorbis">
       <Platforms>WindowsGL,Linux,MacOS</Platforms>
+    </Service>
+
+    <!-- Windowing APIs -->
+    <Service Name="SDLWindowing" >
+      <Platforms>WindowsGL,MacOS,Linux</Platforms>
+      <Requires>OpenGLGraphics</Requires>
     </Service>
 
     <!-- Base supporting features -->
@@ -145,13 +164,10 @@
         <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.DesktopGL.cs">
-        <Platforms>WindowsGL,Linux</Platforms>
+        <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.iOS.cs">
         <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.Mac.cs">
-        <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.Angle.cs">
         <Platforms>Angle</Platforms>
@@ -170,58 +186,58 @@
     </Compile>
 
     <None Include="..\ThirdParty\Dependencies\MonoGame.Framework.dll.config">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
       <Link>MonoGame.Framework.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	
     <None Include="..\ThirdParty\Dependencies\SDL\Windows\x86\SDL2.dll">
-	  <Platforms>WindowsGL,Linux</Platforms>
+	  <Services>SDLWindowing</Services>
       <Link>x86\SDL2.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	<None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
-	  <Platforms>WindowsGL,Linux</Platforms>
+	  <Services>SDLWindowing</Services>
       <Link>x64\SDL2.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	<None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll">
-	  <Platforms>WindowsGL,Linux</Platforms>
+      <Services>DesktopGL</Services>
       <Link>x86\soft_oal.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	<None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
-	  <Platforms>WindowsGL,Linux</Platforms>
+      <Services>DesktopGL</Services>
       <Link>x64\soft_oal.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\SDL\Linux\x86\libSDL2-2.0.so.0">
-	  <Platforms>WindowsGL,Linux</Platforms>
+	  <Services>SDLWindowing</Services>
       <Link>x86\libSDL2-2.0.so.0</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	<None Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
-	  <Platforms>WindowsGL,Linux</Platforms>
+	  <Services>SDLWindowing</Services>
       <Link>x64\libSDL2-2.0.so.0</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	<None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x86\libopenal.so.1">
-	  <Platforms>WindowsGL,Linux</Platforms>
+      <Services>DesktopGL</Services>
       <Link>x86\libopenal.so.1</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	<None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
-	  <Platforms>WindowsGL,Linux</Platforms>
+      <Services>DesktopGL</Services>
       <Link>x64\libopenal.so.1</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	<None Include="..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib">
-	  <Platforms>WindowsGL,Linux,MacOS</Platforms>
+	  <Services>SDLWindowing</Services>
       <Link>libSDL2-2.0.0.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 	<None Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib">
-	  <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>DesktopGL</Services>
       <Link>libopenal.1.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -347,7 +363,7 @@
       <Services>OpenALAudio</Services>
     </Compile>
 	<Compile Include="Audio\OggStream.cs">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>NVorbis</Services>
     </Compile>
     <Compile Include="Audio\OpenAL.cs">
       <Services>OpenALAudio</Services>
@@ -516,7 +532,7 @@
 		<Platforms>Windows,WindowsGL,Linux,WindowsUniversal,Web,MacOS</Platforms>
     </Compile>
     <Compile Include="GraphicsDeviceManager.SDL.cs">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     <Compile Include="GraphicsDeviceManager.WinRT.cs">
 		<Platforms>WindowsUniversal</Platforms>
@@ -584,7 +600,7 @@
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\GraphicsContext.SDL.cs">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     <Compile Include="Graphics\GraphicsDebug.cs" />
     <Compile Include="Graphics\GraphicsDebug.DirectX.cs">
@@ -638,16 +654,16 @@
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\OpenGL.cs">
-      <Platforms>WindowsGL,Linux,iOS,MacOS,Android,Ouya,tvOS</Platforms>
+      <Services>OpenGLGraphics</Services>
     </Compile>
     <Compile Include="Graphics\OpenGL.Common.cs">
-      <Platforms>WindowsGL,Linux,Android,Ouya</Platforms>
+      <Platforms>WindowsGL,Linux,Android</Platforms>
     </Compile>
     <Compile Include="Graphics\OpenGL.SDL.cs">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     <Compile Include="Graphics\OpenGL.Android.cs">
-      <Platforms>Android,Ouya</Platforms>
+      <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Graphics\OpenGL.iOS.cs">
       <Platforms>iOS,tvOS</Platforms>
@@ -913,7 +929,7 @@
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Graphics\WindowInfo.SDL.cs">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     
     <!-- Microsoft.Xna.Framework.Input -->
@@ -930,7 +946,7 @@
       <Platforms>tvOS</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.SDL.cs">
-      <Platforms>Linux,WindowsGL,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     <Compile Include="Input\GamePad.Web.cs">
       <Platforms>Web</Platforms>
@@ -957,7 +973,7 @@
       <Platforms>Angle,Android,Windows,WindowsUniversal,iOS,tvOS</Platforms>
     </Compile>
     <Compile Include="Input\Joystick.SDL.cs">
-      <Platforms>Linux,WindowsGL,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     <Compile Include="Input\Joystick.Web.cs">
       <Platforms>Web</Platforms>
@@ -969,7 +985,7 @@
 		<ExcludePlatforms>Android,WindowsUniversal,Windows,WindowsGL,Linux,MacOS</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\Keyboard.SDL.cs">
-		<Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     <Compile Include="Input\Keyboard.Windows.cs">
 		<Platforms>Windows</Platforms>
@@ -1006,7 +1022,7 @@
     </Compile>
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\Mouse.SDL.cs">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     <Compile Include="Input\Mouse.Windows.cs">
       <Platforms>Windows</Platforms>
@@ -1016,7 +1032,7 @@
     </Compile>
     <Compile Include="Input\MouseCursor.cs" />
     <Compile Include="Input\MouseCursor.SDL.cs">
-      <Platforms>Linux,WindowsGL,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     <Compile Include="Input\MouseCursor.Windows.cs">
       <Platforms>Windows</Platforms>
@@ -1095,7 +1111,7 @@
         <Platforms>iOS,tvOS</Platforms>
     </Compile>
     <Compile Include="Media\Song.NVorbis.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>NVorbis</Services>
     </Compile>
     <Compile Include="Media\Song.WMS.cs">
         <Platforms>Windows</Platforms>
@@ -1192,34 +1208,34 @@
     <Compile Include="Utilities\Png\PngWriter.cs" />
     <Compile Include="Utilities\ByteBufferPool.cs" />
     <Compile Include="Utilities\Imaging\Stb.Image.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="Utilities\Imaging\Stb.Image.Generated.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="Utilities\Imaging\ImageReader.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="Utilities\Imaging\Stb.ImageWrite.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="Utilities\Imaging\Stb.ImageWrite.Generated.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="Utilities\Imaging\ImageWriter.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="Utilities\Imaging\Operations.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="Utilities\Imaging\PinnedArray.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="Utilities\Imaging\TinyJpeg.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="Utilities\Imaging\TinyJpeg.Generated.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
 	
 
@@ -1268,23 +1284,23 @@
 
     <!-- Common Desktop Platform -->
     <Compile Include="SDL\SDLGamePlatform.cs">
-      <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     <Compile Include="SDL\SDLGameWindow.cs">
-      <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     <Compile Include="SDL\SDL2.cs">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
     <Compile Include="Input\KeyboardUtil.SDL.cs">
-      <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </Compile>
 	 <EmbeddedResource Include="MonoGame.bmp">
       <LogicalName>MonoGame.bmp</LogicalName>
-      <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
     </EmbeddedResource>
 	 <EmbeddedResource Include="SDL\gamecontrollerdb.txt">
-      <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
+      <Services>SDLWindowing</Services>
       <LogicalName>gamecontrollerdb.txt</LogicalName>
     </EmbeddedResource>
 
@@ -1353,7 +1369,7 @@
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Windows\SharpDXHelper.cs">
-      <Platforms>Windows,WindowsUniversal</Platforms>
+      <Services>DirectXGraphics,XAudioAudio</Services>
      </Compile>
 
 
