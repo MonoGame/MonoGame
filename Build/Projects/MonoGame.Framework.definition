@@ -657,7 +657,7 @@
       <Services>OpenGLGraphics</Services>
     </Compile>
     <Compile Include="Graphics\OpenGL.Common.cs">
-      <Platforms>WindowsGL,Linux,Android</Platforms>
+      <Platforms>WindowsGL,Linux,MacOS,Android</Platforms>
     </Compile>
     <Compile Include="Graphics\OpenGL.SDL.cs">
       <Services>SDLWindowing</Services>
