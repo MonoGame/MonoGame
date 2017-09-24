@@ -303,19 +303,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 int faceCount = 1;
                 int mipMapCount = (int)(header.dwCaps.HasFlag(DdsCaps.MipMap) ? header.dwMipMapCount : 1);
-                if (header.dwCaps.HasFlag(DdsCaps.Complex))
+                if (header.dwCaps2.HasFlag(DdsCaps2.Cubemap))
                 {
-                    if (header.dwCaps2.HasFlag(DdsCaps2.Cubemap))
-                    {
-                        if (!header.dwCaps2.HasFlag(DdsCaps2.CubemapAllFaces))
-                            throw new ContentLoadException("Incomplete cubemap in DDS file");
-                        faceCount = 6;
-                        output = new TextureCubeContent() { Identity = identity };
-                    }
-                    else
-                    {
-                        output = new Texture2DContent() { Identity = identity };
-                    }
+                    if (!header.dwCaps2.HasFlag(DdsCaps2.CubemapAllFaces))
+                        throw new ContentLoadException("Incomplete cubemap in DDS file");
+                    faceCount = 6;
+                    output = new TextureCubeContent() { Identity = identity };
                 }
                 else
                 {
