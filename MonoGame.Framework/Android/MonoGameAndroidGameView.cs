@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
@@ -39,7 +38,7 @@ namespace Microsoft.Xna.Framework
 
         bool disposed = false;
         ISurfaceHolder mHolder;
-        Size size;
+        System.Drawing.Size size;
 
         ManualResetEvent _waitForPausedStateProcessed = new ManualResetEvent(false);
         ManualResetEvent _waitForResumedStateProcessed = new ManualResetEvent(false);
@@ -1105,7 +1104,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>The size of the current view.</summary>
         /// <value>A <see cref="T:System.Drawing.Size" /> which is the size of the current view.</value>
         /// <exception cref="T:System.ObjectDisposed">The instance has been disposed</exception>
-        public virtual Size Size
+        public virtual System.Drawing.Size Size
         {
             get
             {
