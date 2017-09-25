@@ -455,7 +455,7 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs"/>
     <Compile Include="Content\ContentReaders\VideoReader.cs">
-      <ExcludePlatforms>Angle,Linux,WindowsGL,MacOS,Web,tvOS</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,WindowsGL,Web,tvOS</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerCollectionItemNameAttribute.cs" />
@@ -1070,10 +1070,13 @@
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
-      <ExcludePlatforms>Angle,Linux,WindowsGL,MacOS,Web,tvOS</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,WindowsGL,Web,tvOS</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\Video.IOS.cs">
         <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Media\Video.MacOS.cs">
+        <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="Media\Video.Android.cs">
         <Platforms>Android</Platforms>
@@ -1082,13 +1085,16 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.cs">
-      <ExcludePlatforms>Angle,Linux,WindowsGL,MacOS,Web,tvOS</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,WindowsGL,Web,tvOS</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.IOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.WME.cs">
         <Platforms>WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.MacOS.cs">
+        <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.Android.cs">
         <Platforms>Android</Platforms>
