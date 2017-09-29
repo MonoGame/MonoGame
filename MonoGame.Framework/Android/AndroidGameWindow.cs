@@ -40,8 +40,7 @@ namespace Microsoft.Xna.Framework
 
         private void Initialize(Context context)
         {
-            _clientBounds = new Rectangle(0, 0, context.Resources.DisplayMetrics.WidthPixels, context.Resources.DisplayMetrics.HeightPixels);
-
+            
             GameView = new MonoGameAndroidGameView(context, this, _game);
             GameView.RenderOnUIThread = Game.Activity.RenderOnUIThread;
             GameView.RenderFrame += OnRenderFrame;
@@ -49,6 +48,9 @@ namespace Microsoft.Xna.Framework
 
             GameView.RequestFocus();
             GameView.FocusableInTouchMode = true;
+
+            _clientBounds = new Rectangle(0, 0, GameView.Width, GameView.Height);
+
         }
 
         #region AndroidGameView Methods
