@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
+using System.IO;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -241,6 +243,114 @@ namespace MonoGame.Tests.ContentPipeline
             for (var y = 0; y < outFace.Height; y++)
                 for (var x = 0; x < outFace.Width; x++)
                     Assert.AreEqual(Color.Red, outFace.GetPixel(x, y));
+        }
+
+        static object[] textureFormats = new object[] {
+            new object[] {
+                TargetPlatform.DesktopGL,
+                TextureProcessorOutputFormat.Color,
+                SurfaceFormat.Dxt1,
+            },
+            new object[] {
+                TargetPlatform.DesktopGL,
+                TextureProcessorOutputFormat.Color16Bit,
+                SurfaceFormat.Dxt1,
+            },
+            new object[] {
+                TargetPlatform.DesktopGL,
+                TextureProcessorOutputFormat.Compressed,
+                SurfaceFormat.Dxt1,
+            },
+            new object[] {
+                TargetPlatform.Android,
+                TextureProcessorOutputFormat.Etc1Compressed,
+                SurfaceFormat.Dxt1,
+            },
+            new object[] {
+                TargetPlatform.iOS,
+                TextureProcessorOutputFormat.PvrCompressed,
+                SurfaceFormat.Dxt1,
+            },
+            new object[] {
+                TargetPlatform.iOS,
+                TextureProcessorOutputFormat.Compressed,
+                SurfaceFormat.Dxt1,
+            },
+            new object[] {
+                TargetPlatform.Android,
+                TextureProcessorOutputFormat.Compressed,
+                SurfaceFormat.Dxt1,
+            },
+            new object[] {
+                TargetPlatform.Windows,
+                TextureProcessorOutputFormat.Compressed,
+                SurfaceFormat.Dxt1,
+            },
+        };
+
+        [Test]
+        [TestCaseSource("textureFormats")]
+        public void CubeMapTest(TargetPlatform platform, TextureProcessorOutputFormat format, SurfaceFormat expectedFormat)
+        {
+            var context = new TestProcessorContext(platform, "dummy.xnb");
+
+            var processor = new TextureProcessor
+            {
+                ColorKeyEnabled = false,
+                GenerateMipmaps = false,
+                PremultiplyAlpha = false,
+                ResizeToPowerOfTwo = false,
+                TextureFormat = format,
+            };
+            var importer = new TextureImporter();
+            var c = new TestImporterContext("obj", "bin");
+            var textureContent = importer.Import(Path.Combine("Assets", "Textures", "SkyCubeMap.dds"), c);
+            Assert.IsNotNull(textureContent);
+            var texture = processor.Process(textureContent, context);
+            Assert.IsNotNull(texture);
+            Assert.AreEqual(6, texture.Faces.Count());
+            foreach (var face in texture.Faces) {
+                Assert.AreEqual(1, face.Count);
+                var content = (Dxt1BitmapContent)face[0];
+                Assert.AreEqual(512, content.Width);
+                Assert.AreEqual(512, content.Height);
+                SurfaceFormat surfaceFormat;
+                Assert.IsTrue(content.TryGetFormat(out surfaceFormat));
+                Assert.AreEqual(expectedFormat, surfaceFormat);
+            }
+        }
+
+        [Test]
+        [TestCaseSource("textureFormats")]
+        public void NormalizeCubeMapDDS(TargetPlatform platform, TextureProcessorOutputFormat format, SurfaceFormat expectedFormat)
+        {
+            var context = new TestProcessorContext(platform, "dummy.xnb");
+
+            var processor = new TextureProcessor
+            {
+                ColorKeyEnabled = false,
+                GenerateMipmaps = false,
+                PremultiplyAlpha = false,
+                ResizeToPowerOfTwo = false,
+                TextureFormat = format,
+            };
+            var importer = new TextureImporter();
+            var c = new TestImporterContext("obj", "bin");
+            var textureContent = importer.Import(Path.Combine("Assets", "Textures", "NormalizeCubeMap.dds"), c);
+            Assert.IsNotNull(textureContent);
+            var texture = processor.Process(textureContent, context);
+            Assert.IsNotNull(texture);
+            Assert.AreEqual(6, texture.Faces.Count());
+            foreach (var face in texture.Faces)
+            {
+                Assert.AreEqual(1, face.Count);
+                var content = (Dxt1BitmapContent)face[0];
+                Assert.AreEqual(512, content.Width);
+                Assert.AreEqual(512, content.Height);
+                SurfaceFormat surfaceFormat;
+                Assert.IsTrue(content.TryGetFormat(out surfaceFormat));
+                Assert.AreEqual(expectedFormat, surfaceFormat);
+            }
         }
 
 #if !XNA

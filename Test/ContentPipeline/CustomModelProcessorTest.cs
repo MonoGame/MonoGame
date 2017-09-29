@@ -14,11 +14,6 @@ namespace MonoGame.Tests.ContentPipeline
     {
         public class CustomModelProcessor : ModelProcessor
         {
-            public CustomModelProcessor()
-            {
-                GenerateTangentFrames = false;
-            }
-
             public override ModelContent Process(
             NodeContent input, ContentProcessorContext context)
             {
@@ -96,10 +91,17 @@ namespace MonoGame.Tests.ContentPipeline
             Directory.CreateDirectory("obj");
             var c = new TestImporterContext("obj", "bin");
             var node = importer.Import(Path.Combine("Assets", "Models", "Car.x"), c);
+            Assert.IsNotNull(node);
+            Assert.AreEqual(6, node.Children.Count);
             var model = processor.Process(node, context);
+            Assert.IsNotNull(model);
+            Assert.IsNotNull(model.Root);
+            Assert.IsNotNull(model.Meshes);
+            Assert.AreEqual(6, model.Meshes.Count);
             var _compiler = new ContentCompiler();
             using (var stream = new FileStream(Path.Combine("bin", "Car.xnb"), FileMode.Create, FileAccess.Write, FileShare.None))
                 _compiler.Compile(stream, model, TargetPlatform.DesktopGL, GraphicsProfile.HiDef, false, Path.Combine("Assets", "Models"), ".");
+            Assert.IsTrue(File.Exists(Path.Combine("bin", "Car.xnb")));
         }
     }
 }
