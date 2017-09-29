@@ -37,7 +37,7 @@
         <exec program="" workingdir="Windows" basedir="">
               <arg value="" />
         </exec>
-        <echo append="false" file="Windows/header.nsh">
+        <echo append="false" file="Windows/hash.bat">
 @ECHO OFF
 FOR /f "tokens=*" %%i IN ('@certutil -hashfile %1 %2 ^| find /v "hash of file" ^| find /v "CertUtil"') DO SET r=%%i
 SET r=%r: =%
