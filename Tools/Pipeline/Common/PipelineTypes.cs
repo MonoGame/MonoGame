@@ -262,10 +262,13 @@ namespace MonoGame.Tools.Pipeline
                     baseType = baseType.BaseType;
 
                 var outputType = baseType.GetGenericArguments()[0];
+                var name = item.Attribute.DisplayName;
+                if (string.IsNullOrEmpty(name))
+                    name = item.GetType().Name;
                 var desc = new ImporterTypeDescription()
                     {
                         TypeName = item.Type.Name,
-                        DisplayName = item.Attribute.DisplayName,
+                        DisplayName = name,
                         DefaultProcessor = item.Attribute.DefaultProcessor,                        
                         FileExtensions = item.Attribute.FileExtensions,   
                         OutputType = outputType,
