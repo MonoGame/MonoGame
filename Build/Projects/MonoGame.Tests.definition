@@ -762,6 +762,9 @@
     <Content Include="Assets\ReferenceImages\ScissorRectangle\Draw_with_render_target_change.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\ScissorRectangle\Draw_with_scissor_rect.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\Shader\Shader__Bevels__.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
