@@ -45,24 +45,29 @@ namespace MGCB
                 }
             }
 
-            // Print a startup message.            
-            var buildStarted = DateTime.Now;
-            if (!content.Quiet)
-                Console.WriteLine("Build started {0}\n", buildStarted);
-
-            // Let the content build.
-            int successCount, errorCount;
-            content.Build(out successCount, out errorCount);
-
-            // Print the finishing info.
-            if (!content.Quiet)
+            if (content.HasWork)
             {
-                Console.WriteLine("\nBuild {0} succeeded, {1} failed.\n", successCount, errorCount);
-                Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
+                // Print a startup message.            
+                var buildStarted = DateTime.Now;
+                if (!content.Quiet)
+                    Console.WriteLine("Build started {0}\n", buildStarted);
+
+                // Let the content build.
+                int successCount, errorCount;
+                content.Build(out successCount, out errorCount);
+
+                // Print the finishing info.
+                if (!content.Quiet)
+                {
+                    Console.WriteLine("\nBuild {0} succeeded, {1} failed.\n", successCount, errorCount);
+                    Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
+                }
+
+                // Return the error count.
+                return errorCount;
             }
 
-            // Return the error count.
-            return errorCount;
+            return 0;
         }
     }
 }
