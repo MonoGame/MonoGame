@@ -11,10 +11,12 @@ function _mgcbcomplete()
                                MacOSX WindowsStoreApp NativeClient \
                                PlayStationMobile WindowsPhone8 RaspberryPi \
                                PlayStation4 PSVita XboxOne Switch" -- ${cur#*=}))
+      compopt +o nospace
       return 0;
       ;;
     "--profile="* | "-p="* | "/profile="* | "/p="*)
       COMPREPLY=($(compgen -W "Reach HiDef" -- ${cur#*=}))
+      compopt +o nospace
       return 0;
       ;;
     "--build="* | "--outputDir="* | "--intermediateDir="* | \
