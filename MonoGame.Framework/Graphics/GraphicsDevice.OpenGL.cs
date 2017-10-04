@@ -1001,7 +1001,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	        {
                 var scissorRect = _scissorRectangle;
                 if (!IsRenderTargetBound)
-                    scissorRect.Y = _viewport.Height - scissorRect.Y - scissorRect.Height;
+                    scissorRect.Y = PresentationParameters.BackBufferHeight - (scissorRect.Y + scissorRect.Height);
                 GL.Scissor(scissorRect.X, scissorRect.Y, scissorRect.Width, scissorRect.Height);
                 GraphicsExtensions.CheckGLError();
 	            _scissorRectangleDirty = false;
