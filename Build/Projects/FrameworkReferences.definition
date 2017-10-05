@@ -61,7 +61,7 @@
         Path="ThirdParty/Dependencies/SharpDX/net45/SharpDX.MediaFoundation.dll" />
       <Binary
         Name="SharpDX.XAudio2"
-        Path="ThirdParty/Dependencies/SharpDX/SharpDX.XAudio2.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/net45/SharpDX.XAudio2.dll" />
       <Binary
         Name="SharpDX.XInput"
         Path="ThirdParty/Dependencies/SharpDX/SharpDX.XInput.dll" />
