@@ -176,11 +176,7 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice == null)
                 return;
 
-#if WINDOWS_PHONE
-            _graphicsDevice.GraphicsProfile = GraphicsProfile;
-            // Display orientation is always portrait on WP8
-            _graphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
-#elif WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
 
             // TODO:  Does this need to occur here?
             _game.Window.SetSupportedOrientations(_supportedOrientations);
@@ -336,9 +332,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             presentationParameters.IsFullScreen = false;
 
-#if WINDOWS_PHONE
-			// Nothing to do!
-#elif WINDOWS_UAP
+#if WINDOWS_UAP
 			presentationParameters.DeviceWindowHandle = IntPtr.Zero;
 			presentationParameters.SwapChainPanel = this.SwapChainPanel;
 #elif WINDOWS_STOREAPP
