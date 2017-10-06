@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="box">The <see cref="BoundingBox"/> to test for intersection.</param>
         /// <returns>
-        /// The distance along the ray of the intsersection or <code>null</code> if this
+        /// The distance along the ray of the intersection or <code>null</code> if this
         /// <see cref="Ray"/> does not intersect the <see cref="BoundingBox"/>.
         /// </returns>
         public float? Intersects(BoundingBox box)
@@ -182,7 +182,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="box">The <see cref="BoundingBox"/> to test for intersection.</param>
         /// <param name="result">
-        /// The distance along the ray of the intsersection or <code>null</code> if this
+        /// The distance along the ray of the intersection or <code>null</code> if this
         /// <see cref="Ray"/> does not intersect the <see cref="BoundingBox"/>.
         /// </param>
         public void Intersects(ref BoundingBox box, out float? result)
@@ -207,7 +207,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="sphere">The <see cref="BoundingBox"/> to test for intersection.</param>
         /// <returns>
-        /// The distance along the ray of the intsersection or <code>null</code> if this
+        /// The distance along the ray of the intersection or <code>null</code> if this
         /// <see cref="Ray"/> does not intersect the <see cref="BoundingSphere"/>.
         /// </returns>
         public float? Intersects(BoundingSphere sphere)
@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="plane">The <see cref="Plane"/> to test for intersection.</param>
         /// <returns>
-        /// The distance along the ray of the intsersection or <code>null</code> if this
+        /// The distance along the ray of the intersection or <code>null</code> if this
         /// <see cref="Ray"/> does not intersect the <see cref="Plane"/>.
         /// </returns>
         public float? Intersects(Plane plane)
@@ -237,7 +237,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="plane">The <see cref="Plane"/> to test for intersection.</param>
         /// <param name="result">
-        /// The distance along the ray of the intsersection or <code>null</code> if this
+        /// The distance along the ray of the intersection or <code>null</code> if this
         /// <see cref="Ray"/> does not intersect the <see cref="Plane"/>.
         /// </param>
         public void Intersects(ref Plane plane, out float? result)
@@ -268,7 +268,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="sphere">The <see cref="BoundingBox"/> to test for intersection.</param>
         /// <param name="result">
-        /// The distance along the ray of the intsersection or <code>null</code> if this
+        /// The distance along the ray of the intersection or <code>null</code> if this
         /// <see cref="Ray"/> does not intersect the <see cref="BoundingSphere"/>.
         /// </param>
         public void Intersects(ref BoundingSphere sphere, out float? result)
