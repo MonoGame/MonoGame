@@ -18,14 +18,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
 using System.Runtime.InteropServices;
-using SharpDX.DXGI;
-
-using SharpDX.Mathematics.Interop;
 #endif
 
-#if WINDOWS
-using SharpDX.DXGI;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -1486,12 +1480,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO share code with Texture2D.GetData and do pooling for staging textures
             // first set up a staging texture
             const SurfaceFormat format = SurfaceFormat.Color;
-#if WINDOWS_PHONE
-                using (var backBufferTexture = new SharpDX.Direct3D11.Texture2D(_renderTargetView.Resource.NativePointer))
-#else
             //You can't Map the BackBuffer surface, so we copy to another texture
             using (var backBufferTexture = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0))
-#endif
             {
                 var desc = backBufferTexture.Description;
                 desc.SampleDescription = new SampleDescription(1, 0);
