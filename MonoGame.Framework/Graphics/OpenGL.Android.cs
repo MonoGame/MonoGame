@@ -18,7 +18,8 @@ namespace MonoGame.OpenGL
 
         static partial void LoadPlatformEntryPoints()
         {
-            var ptr = EntryPointHelper.GetAddress("eglBindAPI");
+            Android.Util.Log.Verbose("GL", "Loading Entry Points");
+            var ptr = EntryPointHelper.GetAddress("eglBindAPI", throwIfNotFound: false);
             if (ptr != IntPtr.Zero)
                 BindAPI = (BindAPIDelegate)Marshal.GetDelegateForFunctionPointer (ptr, typeof(BindAPIDelegate));
             var supportsFullGL = ptr != IntPtr.Zero && BindAPI (RenderApi.GL);
@@ -27,6 +28,7 @@ namespace MonoGame.OpenGL
 				    BindAPI (RenderApi.ES);
 				BoundApi = RenderApi.ES;
 			}
+            Android.Util.Log.Verbose("GL", "Bound {0}", BoundApi);
         }
 
         private static IGraphicsContext PlatformCreateContext (IWindowInfo info)
@@ -39,19 +41,28 @@ namespace MonoGame.OpenGL
 		
 		static IntPtr libES1 = DL.Open("libGLESv1_CM.so");
 		static IntPtr libES2 = DL.Open("libGLESv2.so");
+        static IntPtr libES3 = DL.Open("libGLESv3.so");
 		static IntPtr libGL = DL.Open("libGL.so");
 	
-		public static IntPtr GetAddress(String function)
+        public static IntPtr GetAddress(String function, bool throwIfNotFound = true)
 		{
+            IntPtr result = IntPtr.Zero;
+            if (GL.BoundApi == GL.RenderApi.ES && libES3 != IntPtr.Zero)
+            {
+                result = DL.Symbol(libES3, function);
+            }
             if (GL.BoundApi == GL.RenderApi.ES && libES2 != IntPtr.Zero)
 			{
-				return DL.Symbol(libES2, function);
+                result = DL.Symbol(libES2, function);
 			}
 			else if (GL.BoundApi == GL.RenderApi.GL && libGL != IntPtr.Zero)
 			{
-				return DL.Symbol(libGL, function);
+				result = DL.Symbol(libGL, function);
 			}
-			return IntPtr.Zero;
+            Android.Util.Log.Verbose("GL", "{0} was {1}", function, (result != IntPtr.Zero) ? "Found" : "No Found");
+            if (result == IntPtr.Zero && throwIfNotFound)
+                throw new EntryPointNotFoundException(string.Format("EntryPoint {0} not found", function));
+            return result;
 		}
 	}
 	
