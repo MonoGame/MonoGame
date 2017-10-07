@@ -285,9 +285,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 string version = GL.GetString(StringName.Version);
 
-#if ANDROID
-                Android.Util.Log.Verbose("GraphicsDevice", version);
-#endif 
                 if (string.IsNullOrEmpty(version))
                     throw new NoSuitableGraphicsDeviceException("Unable to retrieve OpenGL version");
 
