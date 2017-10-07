@@ -32,11 +32,7 @@ namespace Microsoft.Xna.Framework
 
         static Threading()
         {
-#if WINDOWS_STOREAPP
-            mainThreadId = Environment.CurrentManagedThreadId;
-#else
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
-#endif
         }
 #if ANDROID
         internal static void ResetThread (int id)
@@ -50,11 +46,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>true if the code is currently running on the UI thread.</returns>
         public static bool IsOnUIThread()
         {
-#if WINDOWS_STOREAPP
-            return (mainThreadId == Environment.CurrentManagedThreadId);
-#else
             return mainThreadId == Thread.CurrentThread.ManagedThreadId;
-#endif
         }
 
         /// <summary>

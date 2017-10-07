@@ -6,7 +6,7 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_UAP
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -176,7 +176,7 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice == null)
                 return;
 
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_UAP
 
             // TODO:  Does this need to occur here?
             _game.Window.SetSupportedOrientations(_supportedOrientations);
@@ -335,19 +335,6 @@ namespace Microsoft.Xna.Framework
 #if WINDOWS_UAP
 			presentationParameters.DeviceWindowHandle = IntPtr.Zero;
 			presentationParameters.SwapChainPanel = this.SwapChainPanel;
-#elif WINDOWS_STOREAPP
-			// The graphics device can use a XAML panel or a window
-			// to created the default swapchain target.
-            if (this.SwapChainBackgroundPanel != null)
-            {
-                presentationParameters.DeviceWindowHandle = IntPtr.Zero;
-                presentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
-            }
-            else
-            {
-                presentationParameters.DeviceWindowHandle = _game.Window.Handle;
-                presentationParameters.SwapChainBackgroundPanel = null;
-            }
 #else
             presentationParameters.DeviceWindowHandle = _game.Window.Handle;
 #endif
@@ -407,10 +394,6 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-#if WINDOWS_STOREAPP
-        [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
-#endif
 
 #if WINDOWS_UAP
         [CLSCompliant(false)]
