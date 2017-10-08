@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 8;
+            public const int MGFXVersion = 9;
 
             public int Signature;
             public int Version;
@@ -385,7 +385,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private static EffectParameterCollection ReadParameters(BinaryReader reader)
 		{
-			var count = (int)reader.ReadByte();			
+			var count = reader.ReadInt16();
             if (count == 0)
                 return EffectParameterCollection.Empty;
 

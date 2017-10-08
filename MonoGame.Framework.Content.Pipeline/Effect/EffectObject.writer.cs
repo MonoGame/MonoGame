@@ -12,7 +12,7 @@ namespace MonoGame.Effect
 	{
 
         private const string Header = "MGFX";
-        private const int Version = 8;
+        private const int Version = 9;
 
         /// <summary>
         /// Writes the effect for loading later.
@@ -140,7 +140,7 @@ namespace MonoGame.Effect
 
         private static void WriteParameters(BinaryWriter writer, d3dx_parameter[] parameters, int count)
         {
-            writer.Write((byte)count);
+            writer.Write((short) count);
             for (var i = 0; i < count; i++)
                 WriteParameter(writer, parameters[i]);
         }
