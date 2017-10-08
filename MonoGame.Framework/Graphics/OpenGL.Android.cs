@@ -3,9 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security;
 using Android.Opengl;
+using Javax.Microedition.Khronos.Egl;
 
 namespace MonoGame.OpenGL
 {
@@ -37,13 +39,50 @@ namespace MonoGame.OpenGL
         }
     }
 
+    struct GLESVersion
+    {
+        const int EglContextClientVersion = 0x3098;
+        const int EglContextMinorVersion = 0x30fb;
+
+        public int Major;
+        public int Minor;
+
+        internal int[] GetAttributes()
+        {
+            int minor = Minor > -1 ? EglContextMinorVersion : EGL10.EglNone;
+            return new int[] { EglContextClientVersion, Major, minor, Minor, EGL10.EglNone };
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}.{1}", Major, Minor == -1 ? 0 : Minor);
+        }
+
+        internal static IEnumerable<GLESVersion> GetSupportedGLESVersions()
+        {
+            if (EntryPointHelper.libES3 != IntPtr.Zero)
+            {
+                yield return new GLESVersion { Major = 3, Minor = 2 };
+                yield return new GLESVersion { Major = 3, Minor = 1 };
+                yield return new GLESVersion { Major = 3, Minor = 0 };
+            }
+            if (EntryPointHelper.libES2 != IntPtr.Zero)
+            {
+                // We pass -1 becuase when requesting a GLES 2.0 context we 
+                // dont provide the Minor version.
+                yield return new GLESVersion { Major = 2, Minor = -1 };
+            }
+            yield return new GLESVersion();
+        }
+    }
+
 	internal static class EntryPointHelper {
 		
-		static IntPtr libES1 = DL.Open("libGLESv1_CM.so");
-		static IntPtr libES2 = DL.Open("libGLESv2.so");
-        static IntPtr libES3 = DL.Open("libGLESv3.so");
-		static IntPtr libGL = DL.Open("libGL.so");
-	
+		internal static IntPtr libES1 = DL.Open("libGLESv1_CM.so");
+        internal static IntPtr libES2 = DL.Open("libGLESv2.so");
+        internal static IntPtr libES3 = DL.Open("libGLESv3.so");
+        internal static IntPtr libGL = DL.Open("libGL.so");
+
         public static IntPtr GetAddress(String function, bool throwIfNotFound = true)
 		{
             IntPtr result = IntPtr.Zero;

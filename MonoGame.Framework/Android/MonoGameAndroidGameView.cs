@@ -67,9 +67,6 @@ namespace Microsoft.Xna.Framework
         private readonly AndroidGameWindow _gameWindow;
         private readonly Game _game;
 
-        const int EglContextClientVersion = 0x3098;
-        const int EglContextCMinorVersion = 0x30fb;
-
         // Events that are triggered on the game thread
         public static event EventHandler OnPauseGameThread;
         public static event EventHandler OnResumeGameThread;
@@ -889,6 +886,8 @@ namespace Microsoft.Xna.Framework
                     configs.Add(new SurfaceConfig() { Red = 5, Green = 6, Blue = 5, Depth = 16 });
                     configs.Add(new SurfaceConfig() { Depth = 16 });
                 }
+                configs.Add(new SurfaceConfig() { Red = 8, Green = 8, Blue = 8, Alpha = 8 });
+                configs.Add(new SurfaceConfig() { Red = 5, Green = 6, Blue = 5 });
             }
             else
             {
@@ -916,7 +915,8 @@ namespace Microsoft.Xna.Framework
             {
                 Log.Verbose("AndroidGameView", string.Format("Checking Config : {0}", config));
                 found = egl.EglChooseConfig(eglDisplay, config.ToConfigAttribs(), results, 1, numConfigs);
-                if (!found || numConfigs[0] == 0)
+                Log.Verbose("AndroidGameView", "EglChooseConfig returned {0} and {1}", found, numConfigs[0]);
+                if (!found || numConfigs[0] <= 0)
                 {
                     Log.Verbose("AndroidGameView", "Config not supported");
                     continue;
@@ -925,33 +925,28 @@ namespace Microsoft.Xna.Framework
                 break;
             }
 
-            if (!found || numConfigs[0] == 0)
+            if (!found || numConfigs[0] <= 0)
                 throw new Exception("No valid EGL configs found" + GetErrorAsString());
-            eglConfig = results[0];
-
-            int[] contextAttribs = new int[] { EglContextClientVersion, 3, EglContextCMinorVersion, 1, EGL10.EglNone };
-            eglContext = egl.EglCreateContext(eglDisplay, eglConfig, EGL10.EglNoContext, contextAttribs);
-            if (eglContext == null || eglContext == EGL10.EglNoContext)
-            {
-                Log.Verbose("AndroidGameView", "GLES 3.1 Not Supported.");
-                contextAttribs[1] = 3;
-                contextAttribs[3] = 0;
-                eglContext = egl.EglCreateContext(eglDisplay, eglConfig, EGL10.EglNoContext, contextAttribs);
+            var createdVersion = new MonoGame.OpenGL.GLESVersion();
+            foreach (var v in MonoGame.OpenGL.GLESVersion.GetSupportedGLESVersions ()) {
+                Log.Verbose("AndroidGameView", "Creating GLES {0} Context", v);
+                eglContext = egl.EglCreateContext(eglDisplay, results[0], EGL10.EglNoContext, v.GetAttributes());
                 if (eglContext == null || eglContext == EGL10.EglNoContext)
                 {
-                    Log.Verbose("AndroidGameView", "GLES 3.0 Not Supported.");
-                    contextAttribs[1] = 2;
-                    contextAttribs[2] = EGL10.EglNone;
-                    eglContext = egl.EglCreateContext(eglDisplay, eglConfig, EGL10.EglNoContext, contextAttribs);
-                    if (eglContext == null || eglContext == EGL10.EglNoContext)
-                    {
-                        eglContext = null;
-                        throw new Exception("Could not create EGL context" + GetErrorAsString());
-                    }
+                    Log.Verbose("AndroidGameView", string.Format("GLES {0} Not Supported. {1}", v, GetErrorAsString()));
+                    eglContext = EGL10.EglNoContext;
+                    continue;
                 }
+                createdVersion = v;
+                break;
             }
-            Log.Verbose("AndroidGameView", "Created GLES {0}.{1} Context", contextAttribs[1], contextAttribs[3]);
-
+            if (eglContext == null || eglContext == EGL10.EglNoContext)
+            {
+                eglContext = null;
+                throw new Exception("Could not create EGL context" + GetErrorAsString());
+            }
+            Log.Verbose("AndroidGameView", "Created GLES {0} Context", createdVersion);
+            eglConfig = results[0];
             glContextAvailable = true;
         }
 
@@ -1261,8 +1256,15 @@ namespace Microsoft.Xna.Framework
             public BackgroundContext(MonoGameAndroidGameView view)
             {
                 this.view = view;
-                int[] contextAttribs = new int[] { EglContextClientVersion, 2, EGL10.EglNone };
-                eglContext = view.egl.EglCreateContext(view.eglDisplay, view.eglConfig, view.eglContext, contextAttribs);
+                foreach (var v in MonoGame.OpenGL.GLESVersion.GetSupportedGLESVersions())
+                {
+                    eglContext = view.egl.EglCreateContext(view.eglDisplay, view.eglConfig, EGL10.EglNoContext, v.GetAttributes());
+                    if (eglContext == null || eglContext == EGL10.EglNoContext)
+                    {
+                        continue;
+                    }
+                    break;
+                }
                 if (eglContext == null || eglContext == EGL10.EglNoContext)
                 {
                     eglContext = null;
