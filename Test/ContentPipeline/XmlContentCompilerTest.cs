@@ -38,8 +38,8 @@ namespace MonoGame.Tests.ContentPipeline
             readonly Dictionary<string, string> _dictionary = new Dictionary<string, string>();
             public string this[string key]
             {
-                get => _dictionary.TryGetValue(key, out string value) ? value : null;
-                set => _dictionary[key] = value;
+                get {  return _dictionary.TryGetValue(key, out string value) ? value : null; }
+                set { _dictionary[key] = value; }
             }
         }
     }
