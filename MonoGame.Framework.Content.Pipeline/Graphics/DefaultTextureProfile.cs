@@ -118,23 +118,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             switch (format)
             {
                 case TextureProcessorOutputFormat.AtcCompressed:
-                    GraphicsUtil.CompressAti(content);
+                    GraphicsUtil.CompressAti(context, content, isSpriteFont);
                     break;
 
                 case TextureProcessorOutputFormat.Color16Bit:
-                    GraphicsUtil.CompressColor16Bit(content);
+                    GraphicsUtil.CompressColor16Bit(context, content);
                     break;
 
                 case TextureProcessorOutputFormat.DxtCompressed:
-                    GraphicsUtil.CompressDxt(context.TargetProfile, content, isSpriteFont);
+                    GraphicsUtil.CompressDxt(context, content, isSpriteFont);
                     break;
 
                 case TextureProcessorOutputFormat.Etc1Compressed:
-                    GraphicsUtil.CompressEtc1(content);
+                    GraphicsUtil.CompressEtc1(context, content, isSpriteFont);
                     break;
 
                 case TextureProcessorOutputFormat.PvrCompressed:
-                    GraphicsUtil.CompressPvrtc(content, isSpriteFont);
+                    GraphicsUtil.CompressPvrtc(context, content, isSpriteFont);
                     break;
             }
         }

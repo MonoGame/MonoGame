@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Handle this common compression format.
             if (format == TextureProcessorOutputFormat.Color16Bit)
             {
-                GraphicsUtil.CompressColor16Bit(content);
+                GraphicsUtil.CompressColor16Bit(context, content);
                 return;
             }
 
