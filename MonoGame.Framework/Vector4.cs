@@ -529,7 +529,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The length of this <see cref="Vector4"/>.</returns>
         public float Length()
         {
-            float result = DistanceSquared(this, zero);
+            float result = this.LengthSquared();
             return (float)Math.Sqrt(result);
         }
 
@@ -539,7 +539,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The squared length of this <see cref="Vector4"/>.</returns>
         public float LengthSquared()
         {
-            return DistanceSquared(this, zero);
+            return (X * X) + (Y * Y) + (Z * Z) + (W * W);
         }
 
         /// <summary>
@@ -765,7 +765,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector4 Normalize(Vector4 value)
         {
-            float factor = DistanceSquared(value, zero);
+            float factor = value.LengthSquared();
             factor = 1f / (float)Math.Sqrt(factor);
 
             return new Vector4(value.X*factor,value.Y*factor,value.Z*factor,value.W*factor);
@@ -778,7 +778,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Unit vector as an output parameter.</param>
         public static void Normalize(ref Vector4 value, out Vector4 result)
         {
-            float factor = DistanceSquared(value, zero);
+            float factor = value.LengthSquared();
             factor = 1f / (float)Math.Sqrt(factor);
 
             result.W = value.W * factor;
