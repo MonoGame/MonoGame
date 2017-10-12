@@ -660,9 +660,17 @@ namespace Microsoft.Xna.Framework
             {
                 UpdateFrameInternal(updateEventArgs);
             }
-            catch (Content.ContentLoadException)
+            catch (Content.ContentLoadException ex)
             {
-                // ignore it..
+                if (RenderOnUIThread)
+                    throw ex;
+                else
+                {
+                    Game.Activity.RunOnUiThread (() =>
+                    {
+                        throw ex;
+                    });
+                }
             }
 
             prevUpdateTime = curUpdateTime;
