@@ -127,7 +127,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glMinorVersion = 0;
         internal int glFramebuffer = 0;
         internal int MaxVertexAttributes;
-        internal List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
 
         // Keeps track of last applied state to avoid redundant OpenGL calls
@@ -146,7 +145,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get
             {
                 if (_vertexShader == null && _pixelShader == null)
-                        throw new InvalidOperationException("There is no shader bound!");
+                    throw new InvalidOperationException("There is no shader bound!");
                 if (_vertexShader == null)
                     return _pixelShader.HashKey;
                 if (_pixelShader == null)
@@ -157,7 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetVertexAttributeArray(bool[] attrs)
         {
-            for(var x = 0; x < attrs.Length; x++)
+            for (var x = 0; x < attrs.Length; x++)
             {
                 if (attrs[x] && !_enabledVertexAttributes.Contains(x))
                 {
@@ -211,7 +210,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         element.VertexAttribPointerType,
                         element.Normalized,
                         vertexStride,
-                        (IntPtr) (offset.ToInt64() + element.Offset));
+                        (IntPtr)(offset.ToInt64() + element.Offset));
 
 #if !(GLES || MONOMAC)
                     // only set the divisor if instancing is supported
@@ -263,7 +262,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
-                        
+
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
@@ -290,7 +289,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new NoSuitableGraphicsDeviceException("Unable to retrieve OpenGL version");
 
                 string[] versionSplit = version.Split(' ');
-                if(versionSplit.Length > 2 && versionSplit[0].Equals("OpenGL") && versionSplit[1].Equals("ES"))
+                if (versionSplit.Length > 2 && versionSplit[0].Equals("OpenGL") && versionSplit[1].Equals("ES"))
                 {
                     glMajorVersion = Convert.ToInt32(versionSplit[2].Substring(0, 1));
                     glMinorVersion = Convert.ToInt32(versionSplit[2].Substring(2, 1));
@@ -308,7 +307,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 glMinorVersion = 1;
             }
 #else
-            try
+                try
             {
                 string version = GL.GetString(StringName.Version);
 
@@ -335,19 +334,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			for (int i = 0; i < maxDrawBuffers; i++)
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
-            _extensions = GetGLExtensions();
-        }
-
-        List<string> GetGLExtensions()
-        {
-            // Setup extensions.
-            List<string> extensions = new List<string>();
-            var extstring = GL.GetString(StringName.Extensions);
-            GraphicsExtensions.CheckGLError();
-            if (!string.IsNullOrEmpty(extstring))
-                extensions.AddRange(extstring.Split(' '));
-
-            return extensions;
         }
 
         private void PlatformInitialize()
