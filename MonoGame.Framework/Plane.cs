@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework
             Vector3 ac = c - a;
 
             Vector3 cross = Vector3.Cross(ab, ac);
-            Normal = Vector3.Normalize(cross);
+            Vector3.Normalize(ref cross, out Normal);
             D = -(Vector3.Dot(Normal, a));
         }
 
