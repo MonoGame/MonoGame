@@ -1382,7 +1382,6 @@ namespace Microsoft.Xna.Framework
         {
             Plane plane;
             Plane.Normalize(ref value, out plane);
-            value.Normalize();
             float x = plane.Normal.X;
             float y = plane.Normal.Y;
             float z = plane.Normal.Z;
