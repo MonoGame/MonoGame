@@ -568,8 +568,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The length of this <see cref="Vector3"/>.</returns>
         public float Length()
         {
-            float result = this.LengthSquared();
-            return (float)Math.Sqrt(result);
+            return (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z));
         }
 
         /// <summary>
@@ -781,7 +780,11 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Normalize()
         {
-            Normalize(ref this, out this);
+            float factor = (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z));
+            factor = 1f / factor;
+            X *= factor;
+            Y *= factor;
+            Z *= factor;
         }
 
         /// <summary>
@@ -791,7 +794,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector3 Normalize(Vector3 value)
         {
-            float factor = value.Length();
+            float factor = (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z));
             factor = 1f / factor;
             return new Vector3(value.X * factor, value.Y * factor, value.Z * factor);
         }
@@ -803,7 +806,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Unit vector as an output parameter.</param>
         public static void Normalize(ref Vector3 value, out Vector3 result)
         {
-            float factor = value.Length();
+            float factor = (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z));
             factor = 1f / factor;
             result.X = value.X * factor;
             result.Y = value.Y * factor;
