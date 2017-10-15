@@ -248,7 +248,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         */
 
-#if DIRECTX && !WINDOWS_PHONE
+#if DIRECTX
         private static readonly Dictionary<SharpDX.DXGI.Format, SurfaceFormat> FormatTranslations = new Dictionary<SharpDX.DXGI.Format, SurfaceFormat>
             {
                 { SharpDX.DXGI.Format.R8G8B8A8_UNorm, SurfaceFormat.Color },
@@ -287,7 +287,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         if (!modes.Contains(displayMode))
                             modes.Add(displayMode);
                     }
-#elif DIRECTX && !WINDOWS_PHONE
+#elif DIRECTX
                     var dxgiFactory = new SharpDX.DXGI.Factory1();
                     var adapter = dxgiFactory.GetAdapter(0);
                     var output = adapter.Outputs[0];
