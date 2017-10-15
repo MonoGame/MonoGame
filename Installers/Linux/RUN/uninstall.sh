@@ -21,3 +21,9 @@ rm -rf /usr/share/applications/Monogame\ Pipeline.desktop
 rm -rf /usr/lib/mono/xbuild/MonoGame
 rm -rf /opt/MonoGameSDK
 
+# Remove man pages
+IFS=':' read -r -a ARRAY <<< "$(manpath)"
+for MANPATH in "${ARRAY[@]}"
+do
+	rm -rf "$MANPATH/man1/mgcb.1.gz"
+done
