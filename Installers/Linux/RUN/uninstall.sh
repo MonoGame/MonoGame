@@ -10,6 +10,7 @@ fi
 rm -f /usr/bin/monogame-pipeline-tool
 rm -f /usr/bin/monogame-uninstall
 rm -f /usr/bin/mgcb
+rm -f /etc/bash_completion.d/mgcb
 
 #remove application icon
 rm -rf /usr/share/icons/gnome/scalable/mimetypes/monogame.svg
