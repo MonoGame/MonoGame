@@ -102,9 +102,8 @@
       <LogicalName>MainWindow.glade</LogicalName>
       <Platforms>Linux</Platforms>
     </EmbeddedResource>
-    <EmbeddedResource Include="MainWindow.AppMenu.glade">
-      <DependentUpon>MainWindow.cs</DependentUpon>
-      <LogicalName>MainWindow.AppMenu.glade</LogicalName>
+    <EmbeddedResource Include="AppMenu.glade">
+      <LogicalName>AppMenu.glade</LogicalName>
       <Platforms>Linux</Platforms>
     </EmbeddedResource>
 	<Compile Include="Global.Linux.cs">

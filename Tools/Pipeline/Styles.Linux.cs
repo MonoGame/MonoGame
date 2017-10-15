@@ -187,7 +187,7 @@ namespace MonoGame.Tools.Pipeline
                     Global.UseHeaderBar = Gtk3Wrapper.gtk_application_prefers_app_menu(h.Control.Handle);
                 
                 if (Global.UseHeaderBar)
-                    Gtk3Wrapper.gtk_application_set_app_menu(h.Control.Handle, (new Gtk.Builder("MainWindow.AppMenu.glade")).GetObject("appmenu").Handle);
+                    Gtk3Wrapper.gtk_application_set_app_menu(h.Control.Handle, (new Gtk.Builder("AppMenu.glade")).GetObject("appmenu").Handle);
             });
 
             Style.Add<FormHandler>("MainWindow", h =>
