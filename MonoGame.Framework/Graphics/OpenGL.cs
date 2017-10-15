@@ -760,8 +760,8 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate void ReadPixelsDelegate (int x, int y, int width, int height, PixelFormat format, PixelType type, IntPtr data);
-        public static ReadPixelsDelegate glReadPixels;
+        internal delegate void ReadPixelsDelegate (int x, int y, int width, int height, PixelFormat format, PixelType type, IntPtr data);
+        internal static ReadPixelsDelegate ReadPixelsInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
@@ -1239,7 +1239,7 @@ namespace MonoGame.OpenGL
             DrawArrays = (DrawArraysDelegate)LoadEntryPoint<DrawArraysDelegate> ("glDrawArrays");
             Uniform1i = (Uniform1iDelegate)LoadEntryPoint<Uniform1iDelegate> ("glUniform1i");
             Uniform4fv = (Uniform4fvDelegate)LoadEntryPoint<Uniform4fvDelegate> ("glUniform4fv");
-            glReadPixels = (ReadPixelsDelegate)LoadEntryPoint<ReadPixelsDelegate> ("glReadPixels");
+            ReadPixelsInternal = (ReadPixelsDelegate)LoadEntryPoint<ReadPixelsDelegate>("glReadPixels");
 
             ReadBuffer = (ReadBufferDelegate)LoadEntryPoint<ReadBufferDelegate> ("glReadBuffer");
             DrawBuffer = (DrawBufferDelegate)LoadEntryPoint<DrawBufferDelegate> ("glDrawBuffer");
@@ -1325,7 +1325,7 @@ namespace MonoGame.OpenGL
 
             VertexAttribPointer = (VertexAttribPointerDelegate)LoadEntryPoint<VertexAttribPointerDelegate> ("glVertexAttribPointer");
 
-            // Instanced drawing requires GL 3.2 or up, if the either of the following entry points can not be loaded 
+            // Instanced drawing requires GL 3.2 or up, if the either of the following entry points can not be loaded
             // this will get flagged by setting SupportsInstancing in GraphicsCapabilities to false.
             try {
                 DrawElementsInstanced = (DrawElementsInstancedDelegate)LoadEntryPoint<DrawElementsInstancedDelegate> ("glDrawElementsInstanced");
@@ -1639,13 +1639,16 @@ namespace MonoGame.OpenGL
             }
         }
 
-        public static unsafe void ReadPixels<T> (int x, int y, int width, int height, PixelFormat format, PixelType type, [In][Out] T[] data)
+        public static void ReadPixels<T>(int x, int y, int width, int height, PixelFormat format, PixelType type, T[] data)
         {
-            GCHandle pixels_ptr = GCHandle.Alloc (data, GCHandleType.Pinned);
-            try {
-                glReadPixels (x, y, width,height, format, type, (IntPtr)pixels_ptr.AddrOfPinnedObject ());
-            } finally {
-                pixels_ptr.Free ();
+            var dataPtr = GCHandle.Alloc(data, GCHandleType.Pinned);
+            try
+            {
+                ReadPixelsInternal(x, y, width, height, format, type, dataPtr.AddrOfPinnedObject());
+            }
+            finally
+            {
+                dataPtr.Free();
             }
         }
     }
