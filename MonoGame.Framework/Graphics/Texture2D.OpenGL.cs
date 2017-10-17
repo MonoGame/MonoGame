@@ -256,7 +256,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
+        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
             var reader = new ImageReader();
             int width, height, channels;
@@ -282,7 +282,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             Texture2D texture = null;
-            texture = new Texture2D(graphicsDevice, x, y);
+            texture = new Texture2D(graphicsDevice, width, height);
             texture.SetData(data);
 
             return texture;
