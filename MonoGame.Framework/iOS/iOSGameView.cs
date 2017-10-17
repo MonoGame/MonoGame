@@ -178,13 +178,13 @@ namespace Microsoft.Xna.Framework {
 
 			try {
                 __renderbuffergraphicsContext = GL.CreateContext (null);
-                //new GraphicsContext (null, null, 2, 0, GraphicsContextFlags.Embedded);
-				_glapi = new Gles20Api ();
+                //new GraphicsContext (null, null, 2, 0, GraphicsContextFlags.Embedded)
             } catch (Exception ex) {
                 throw new Exception ("Device not Supported. GLES 2.0 or above is required!");
 			}
 
 			this.MakeCurrent();
+            _glapi = new Gles20Api();
 		}
 
 		private void DestroyContext ()

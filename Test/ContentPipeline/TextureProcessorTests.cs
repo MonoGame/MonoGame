@@ -244,7 +244,7 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
 #if !XNA
-        void CompressDefault<T>(TargetPlatform platform, Color color)
+        void CompressDefault<T>(TargetPlatform platform, Color color, int width = 16, int height = 16)
         {
             var context = new TestProcessorContext(platform, "dummy.xnb");
 
@@ -257,7 +257,7 @@ namespace MonoGame.Tests.ContentPipeline
                 TextureFormat = TextureProcessorOutputFormat.Compressed
             };
 
-            var face = new PixelBitmapContent<Color>(16, 16);
+            var face = new PixelBitmapContent<Color>(width, height);
             Fill(face, color);
             var input = new Texture2DContent();
             input.Faces[0] = face;
@@ -265,10 +265,10 @@ namespace MonoGame.Tests.ContentPipeline
             var output = processor.Process(input, context);
 
             Assert.NotNull(output);
-            Assert.AreEqual(1, output.Faces.Count);
-            Assert.AreEqual(5, output.Faces[0].Count);
+            Assert.AreEqual(1, output.Faces.Count, "Expected number of faces");
+            Assert.AreEqual(5, output.Faces[0].Count, "Expected number of mipmaps");
 
-            Assert.IsAssignableFrom<T>(output.Faces[0][0]);
+            Assert.IsAssignableFrom<T>(output.Faces[0][0], "Incorrect pixel format");
         }
 
         [Test]
@@ -290,27 +290,99 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-        public void CompressDefaultiOSOpaque()
+        public void CompressDefaultiOSOpaqueSquarePOT()
         {
-            CompressDefault<PvrtcRgb4BitmapContent>(TargetPlatform.iOS, Color.Red);
+            CompressDefault<PvrtcRgb4BitmapContent>(TargetPlatform.iOS, Color.Red, 16, 16);
         }
 
         [Test]
-        public void CompressDefaultiOSAlpha()
+        public void CompressDefaultiOSOpaqueSquareNPOT()
+        {
+            CompressDefault<PixelBitmapContent<Bgr565>>(TargetPlatform.iOS, Color.Red, 24, 24);
+        }
+
+        [Test]
+        public void CompressDefaultiOSOpaqueNonSquarePOT()
+        {
+            CompressDefault<PixelBitmapContent<Bgr565>>(TargetPlatform.iOS, Color.Red, 8, 16);
+        }
+
+        [Test]
+        public void CompressDefaultiOSOpaqueNonSquareNPOT()
+        {
+            CompressDefault<PixelBitmapContent<Bgr565>>(TargetPlatform.iOS, Color.Red, 24, 16);
+        }
+
+        [Test]
+        public void CompressDefaultiOSAlphaSquarePOT()
         {
             CompressDefault<PvrtcRgba4BitmapContent>(TargetPlatform.iOS, Color.Red * 0.5f);
         }
 
         [Test]
-        public void CompressDefaultAndroidOpaque()
+        public void CompressDefaultiOSAlphaSquareNPOT()
         {
-            CompressDefault<Etc1BitmapContent>(TargetPlatform.Android, Color.Red);
+            CompressDefault<PixelBitmapContent<Bgra4444>>(TargetPlatform.iOS, Color.Red * 0.5f, 24, 24);
         }
 
         [Test]
-        public void CompressDefaultAndroidAlpha()
+        public void CompressDefaultiOSAlphaNonSquarePOT()
+        {
+            CompressDefault<PixelBitmapContent<Bgra4444>>(TargetPlatform.iOS, Color.Red * 0.5f, 8, 16);
+        }
+
+        [Test]
+        public void CompressDefaultiOSAlphaNonSquareNPOT()
+        {
+            CompressDefault<PixelBitmapContent<Bgra4444>>(TargetPlatform.iOS, Color.Red * 0.5f, 24, 16);
+        }
+
+        [Test]
+        public void CompressDefaultAndroidOpaqueSquarePOT()
+        {
+            CompressDefault<Etc1BitmapContent>(TargetPlatform.Android, Color.Red, 16, 16);
+        }
+
+        [Test]
+        public void CompressDefaultAndroidOpaqueSquareNPOT()
+        {
+            CompressDefault<PixelBitmapContent<Bgr565>>(TargetPlatform.Android, Color.Red, 24, 24);
+        }
+
+        [Test]
+        public void CompressDefaultAndroidOpaqueNonSquarePOT()
+        {
+            CompressDefault<Etc1BitmapContent>(TargetPlatform.Android, Color.Red, 8, 16);
+        }
+
+        [Test]
+        public void CompressDefaultAndroidOpaqueNonSquareNPOT()
+        {
+            CompressDefault<PixelBitmapContent<Bgr565>>(TargetPlatform.Android, Color.Red, 24, 16);
+        }
+
+        [Test]
+        public void CompressDefaultAndroidAlphaSquarePOT()
         {
             CompressDefault<PixelBitmapContent<Bgra4444>>(TargetPlatform.Android, Color.Red * 0.5f);
+        }
+
+        [Test]
+        public void CompressDefaultAndroidAlphaSquareNPOT()
+        {
+            CompressDefault<PixelBitmapContent<Bgra4444>>(TargetPlatform.Android, Color.Red * 0.5f, 24, 24);
+        }
+
+        [Test]
+        public void CompressDefaultAndroidAlphaNonSquarePOT()
+        {
+            CompressDefault<PixelBitmapContent<Bgra4444>>(TargetPlatform.Android, Color.Red * 0.5f, 8, 16);
+        }
+
+        [Test]
+        public void CompressDefaultAndroidAlphaNonSquareNPOT()
+        {
+            CompressDefault<PixelBitmapContent<Bgra4444>>(TargetPlatform.Android, Color.Red * 0.5f, 24, 16);
         }
 #endif
     }

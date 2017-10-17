@@ -57,7 +57,7 @@
   </WizardExtension>
   <WizardData>
     <packages repository="registry" keyName="NETCoreSDK" isPreunzipped="true">
-      <package id="Microsoft.NETCore.UniversalWindowsPlatform" version="5.1.0" skipAssemblyReferences="false" />
+      <package id="Microsoft.NETCore.UniversalWindowsPlatform" version="5.4.0" skipAssemblyReferences="false" />
     </packages>
   </WizardData>
 </VSTemplate>
