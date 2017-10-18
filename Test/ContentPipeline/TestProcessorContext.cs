@@ -49,6 +49,11 @@ namespace MonoGame.Tests.ContentPipeline
             get { throw new NotImplementedException(); }
         }
 
+        public override ContentIdentity SourceIdentity
+        {
+            get { throw new NotImplementedException(); }
+        }
+
         public override TargetPlatform TargetPlatform
         {
             get { return _targetPlatform; }
