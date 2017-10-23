@@ -129,13 +129,17 @@ namespace Microsoft.Xna.Framework
                     if (!_keys.Contains(key))
                         _keys.Add(key);
                     char character = (char)ev.Key.Keysym.Sym;
-                    if (char.IsControl(character))
-                        _view.CallTextInput(character, key);
+                    if (KeysHelper.IsKey((int)key))
+                        _view.CallKeyDown(key);
+                    if (char.IsControl (character))
+                        _view.CallTextInput (character, key);
                 }
                 else if (ev.Type == Sdl.EventType.KeyUp)
                 {
                     var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
                     _keys.Remove(key);
+                    if (KeysHelper.IsKey((int)key))
+                        _view.CallKeyUp(key);
                 }
                 else if (ev.Type == Sdl.EventType.TextInput)
                 {

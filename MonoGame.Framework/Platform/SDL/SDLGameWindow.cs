@@ -305,6 +305,16 @@ namespace Microsoft.Xna.Framework
             OnTextInput(this, new TextInputEventArgs(c, key));
         }
 
+        public void CallKeyDown(Keys key)
+        {
+            OnKeyDown(this, new InputKeyEventArgs(key));
+        }
+
+        public void CallKeyUp(Keys key)
+        {
+            OnKeyUp(this, new InputKeyEventArgs(key));
+        }
+
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
             // Nothing to do here
