@@ -104,6 +104,15 @@ namespace Microsoft.Xna.Framework {
 		public event EventHandler<TextInputEventArgs> TextInput;
 
         internal bool IsTextInputHandled { get { return TextInput != null; } }
+
+        /// <summary>
+        /// Buffered keyboard KeyDown event.
+        /// </summary>
+		public event EventHandler<InputKeyEventArgs> KeyDown;
+	    /// <summary>
+	    /// Buffered keyboard KeyUp event.
+	    /// </summary>
+		public event EventHandler<InputKeyEventArgs> KeyUp;
 #endif
 
 		#endregion Events
@@ -150,9 +159,17 @@ namespace Microsoft.Xna.Framework {
 		{
             EventHelpers.Raise(this, TextInput, e);
 		}
+	    protected void OnKeyDown(object sender, InputKeyEventArgs e)
+	    {
+	        EventHelpers.Raise(this, KeyDown, e);
+	    }
+	    protected void OnKeyUp(object sender, InputKeyEventArgs e)
+	    {
+	        EventHelpers.Raise(this, KeyUp, e);
+	    }
 #endif
 
-		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
+        protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 		protected abstract void SetTitle (string title);
 
 #if DIRECTX && WINDOWS

@@ -128,6 +128,8 @@ namespace Microsoft.Xna.Framework
 
             _coreWindow.Closed += Window_Closed;
             _coreWindow.Activated += Window_FocusChanged;
+            _coreWindow.CharacterReceived += Window_CharacterReceived;
+            _coreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
 
             if (Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
                 Windows.Phone.UI.Input.HardwareButtons.BackPressed += this.HardwareButtons_BackPressed;
@@ -214,6 +216,39 @@ namespace Microsoft.Xna.Framework
                 // the client size changed event.
                 OnClientSizeChanged();
             }
+        }
+
+        private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
+        {
+            _textQueue.Enqueue((char)args.KeyCode);
+        }
+
+        private void Dispatcher_AcceleratorKeyActivated(CoreDispatcher sender, AcceleratorKeyEventArgs args)
+        {
+            // NOTE: Dispatcher event is used becuase KeyDown event doesn't handle Alt key
+            var key = InputEvents.KeyTranslate(args.VirtualKey, args.KeyStatus);
+            switch (args.EventType)
+            {
+                case CoreAcceleratorKeyEventType.KeyDown:
+                case CoreAcceleratorKeyEventType.SystemKeyDown:
+                    if (KeysHelper.IsKey((int)key))
+                        OnKeyDown(sender, new InputKeyEventArgs(key));
+                    break;
+                case CoreAcceleratorKeyEventType.KeyUp:
+                case CoreAcceleratorKeyEventType.SystemKeyUp:
+                    if (KeysHelper.IsKey((int)key))
+                        OnKeyUp(sender, new InputKeyEventArgs(key));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void UpdateTextInput()
+        {
+            char ch;
+            while (_textQueue.TryDequeue(out ch))
+                OnTextInput(_coreWindow, new TextInputEventArgs(ch));
         }
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)

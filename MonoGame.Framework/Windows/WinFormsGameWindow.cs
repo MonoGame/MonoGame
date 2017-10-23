@@ -343,6 +343,36 @@ namespace MonoGame.Framework
             OnTextInput(sender, new TextInputEventArgs(e.KeyChar, key));
         }
 
+        internal void CallOnKeyDown(Microsoft.Xna.Framework.Input.Keys key)
+        {
+            OnKeyDown(this, new InputKeyEventArgs(key));
+        }
+
+        internal void CallOnKeyUp(Microsoft.Xna.Framework.Input.Keys key)
+        {
+            OnKeyUp(this, new InputKeyEventArgs(key));
+        }
+
+        internal static Microsoft.Xna.Framework.Input.Keys KeyEventTranslate(KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                // WinForms does not distinguish between left/right keys
+                // We have to check for special keys such as control/shift/alt/ etc
+                case System.Windows.Forms.Keys.ControlKey:
+                    return Microsoft.Xna.Framework.Input.Keys.LeftControl;
+                case System.Windows.Forms.Keys.ShiftKey:
+                    return Microsoft.Xna.Framework.Input.Keys.LeftShift;
+                // Note that the Alt key is now refered to as Menu.
+                case System.Windows.Forms.Keys.Menu:
+                case System.Windows.Forms.Keys.Alt:
+                    return Microsoft.Xna.Framework.Input.Keys.LeftAlt;
+
+                default:
+                    return (Microsoft.Xna.Framework.Input.Keys)e.KeyCode;
+            }
+        }
+
         internal void Initialize(int width, int height)
         {
             ChangeClientSize(new Size(width, height));
