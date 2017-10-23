@@ -168,6 +168,21 @@ internal static class Sdl
         EventType minType,
         EventType maxType);
 
+    [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CreateRGBSurfaceFrom")]
+    private static extern IntPtr SDL_CreateRGBSurfaceFrom(IntPtr pixels, int width, int height, int depth, int pitch, uint rMask, uint gMask, uint bMask, uint aMask);
+    public static IntPtr CreateRGBSurfaceFrom(byte[] pixels, int width, int height, int depth, int pitch, uint rMask, uint gMask, uint bMask, uint aMask)
+    {
+        var handle = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+        try
+        {
+            return SDL_CreateRGBSurfaceFrom(handle.AddrOfPinnedObject(), width, height, depth, pitch, rMask, gMask, bMask, aMask);
+        }
+        finally
+        {
+            handle.Free();
+        }
+    }
+
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_FreeSurface")]
     public static extern void FreeSurface(IntPtr surface);
 
@@ -285,6 +300,28 @@ internal static class Sdl
             public int Data2;
         }
 
+        public enum SysWMType
+        {
+            Unknow,
+            Windows,
+            X11,
+            Directfb,
+            Cocoa,
+            UiKit,
+            Wayland,
+            Mir,
+            WinRt,
+            Android
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SDL_SysWMinfo
+        {
+            public Version version;
+            public SysWMType subsystem;
+            public IntPtr window;
+        }
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CreateWindow")]
         private static extern IntPtr SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
 
@@ -342,6 +379,9 @@ internal static class Sdl
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_ShowWindow")]
         public static extern void Show(IntPtr window);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowWMInfo")]
+        public static extern bool GetWindowWMInfo(IntPtr window, ref SDL_SysWMinfo sysWMinfo);
     }
 
     public static class Display
@@ -380,6 +420,14 @@ internal static class Sdl
             GetError(SDL_GetDisplayMode(displayIndex, modeIndex, out mode));
         }
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetClosestDisplayMode")]
+        private static extern int SDL_GetClosestDisplayMode(int displayIndex, Mode mode, out Mode closest);
+
+        public static void GetClosestDisplayMode(int displayIndex, Mode mode, out Mode closest)
+        {
+            GetError(SDL_GetClosestDisplayMode(displayIndex, mode, out closest));
+        }
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetDisplayName")]
         private static extern IntPtr SDL_GetDisplayName(int index);
 
@@ -404,8 +452,7 @@ internal static class Sdl
             return GetError(SDL_GetNumVideoDisplays());
         }
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowDisplayIndex")
-        ]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowDisplayIndex")]
         private static extern int SDL_GetWindowDisplayIndex(IntPtr window);
 
         public static int GetWindowDisplayIndex(IntPtr window)
@@ -634,11 +681,11 @@ internal static class Sdl
         [Flags]
         public enum Hat : byte
         {
-            Centered,
-            Up,
-            Right,
-            Down,
-            Left,
+            Centered = 0,
+            Up = 1 << 0,
+            Right = 1 << 1,
+            Down = 1 << 2,
+            Left = 1 << 3
         }
 
         [StructLayout(LayoutKind.Sequential)]

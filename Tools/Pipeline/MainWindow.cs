@@ -94,9 +94,6 @@ namespace MonoGame.Tools.Pipeline
         {
             PipelineController.Instance.OnProjectLoaded += () => projectControl.ExpandBase();
 
-            cmdDebugMode.Checked = PipelineSettings.Default.DebugMode;
-            CmdDebugMode_Executed(this, EventArgs.Empty);
-
             foreach (var control in _pads)
                 control.LoadSettings();
 
@@ -336,7 +333,7 @@ namespace MonoGame.Tools.Pipeline
 
                 proc.StartInfo.FileName = monoLoc;
 
-                if (PipelineController.Instance.LaunchDebugger)
+                if (PipelineController.Instance.ProjectItem.LaunchDebugger)
                 {
                     var port = Environment.GetEnvironmentVariable("MONO_DEBUGGER_PORT");
                     port = !string.IsNullOrEmpty(port) ? port : "55555";
@@ -599,12 +596,6 @@ namespace MonoGame.Tools.Pipeline
         private void CmdCancelBuild_Executed(object sender, EventArgs e)
         {
             PipelineController.Instance.CancelBuild();
-        }
-
-        private void CmdDebugMode_Executed(object sender, EventArgs e)
-        {
-            PipelineSettings.Default.DebugMode = cmdDebugMode.Checked;
-            PipelineController.Instance.LaunchDebugger = cmdDebugMode.Checked;
         }
 
         private void CmdHelp_Executed(object sender, EventArgs e)

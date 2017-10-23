@@ -78,6 +78,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public static DriverType UseDriverType { get; set; }
 
+        /// <summary>
+        /// Used to request the graphics device should be created with debugging
+        /// features enabled.
+        /// </summary>
+        public static bool UseDebugLayers { get; set; }
+
         public string Description { get; private set; }
 
         public int DeviceId { get; private set; }

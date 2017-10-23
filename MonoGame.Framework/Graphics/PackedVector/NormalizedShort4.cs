@@ -66,16 +66,17 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static ulong PackInFour(float vectorX, float vectorY, float vectorZ, float vectorW)
 		{
-			const float maxPos = 0x7FFF;
-            const float minNeg = -maxPos;
+			const long mask = 0xFFFF;
+            const long maxPos = 0x7FFF;
+            const long minNeg = -maxPos;
 
 			// clamp the value between min and max values
-            var word4 = ((ulong)MathHelper.Clamp((float)Math.Round(vectorX * maxPos), minNeg, maxPos) & 0xFFFF) << 0x00;
-            var word3 = ((ulong)MathHelper.Clamp((float)Math.Round(vectorY * maxPos), minNeg, maxPos) & 0xFFFF) << 0x10;
-            var word2 = ((ulong)MathHelper.Clamp((float)Math.Round(vectorZ * maxPos), minNeg, maxPos) & 0xFFFF) << 0x20;
-            var word1 = ((ulong)MathHelper.Clamp((float)Math.Round(vectorW * maxPos), minNeg, maxPos) & 0xFFFF) << 0x30;
+            var word4 = (ulong)((int)Math.Round(MathHelper.Clamp(vectorX * maxPos, minNeg, maxPos)) & mask);
+            var word3 = (ulong)((int)Math.Round(MathHelper.Clamp(vectorY * maxPos, minNeg, maxPos)) & mask) << 0x10;
+            var word2 = (ulong)((int)Math.Round(MathHelper.Clamp(vectorZ * maxPos, minNeg, maxPos)) & mask) << 0x20;
+            var word1 = (ulong)((int)Math.Round(MathHelper.Clamp(vectorW * maxPos, minNeg, maxPos)) & mask) << 0x30;
 
-			return ( word4 | word3 | word2 | word1 );
+			return (word4 | word3 | word2 | word1);
 		}
 
 		void IPackedVector.PackFromVector4 (Vector4 vector)

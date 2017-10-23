@@ -8,11 +8,16 @@ namespace Microsoft.Xna.Framework.Input
 {
     public static partial class Mouse
     {
+        internal static int ScrollX;
         internal static int ScrollY;
 
-        private static IntPtr PlatformGetHandle()
+        private static IntPtr PlatformGetWindowHandle()
         {
             return PrimaryWindow.Handle;
+        }
+        
+        private static void PlatformSetWindowHandle(IntPtr windowHandle)
+        {
         }
 
         private static MouseState PlatformGetState(GameWindow window)
@@ -32,6 +37,7 @@ namespace Microsoft.Xna.Framework.Input
                 window.MouseState.XButton1 = (state & Sdl.Mouse.Button.X1Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
                 window.MouseState.XButton2 = (state & Sdl.Mouse.Button.X2Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
 
+                window.MouseState.HorizontalScrollWheelValue = ScrollX;
                 window.MouseState.ScrollWheelValue = ScrollY;
             }
 
@@ -58,7 +64,7 @@ namespace Microsoft.Xna.Framework.Input
             Sdl.Mouse.WarpInWindow(PrimaryWindow.Handle, x, y);
         }
 
-        public static void PlatformSetCursor(MouseCursor cursor)
+        private static void PlatformSetCursor(MouseCursor cursor)
         {
             Sdl.Mouse.SetCursor(cursor.Handle);
         }

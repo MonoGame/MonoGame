@@ -7,31 +7,11 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-using GLPrimitiveType = MonoMac.OpenGL.BeginMode;
-#else
-using OpenTK.Graphics.OpenGL;
-using GLPrimitiveType = OpenTK.Graphics.OpenGL.BeginMode;
-#endif
-#endif
-
-#if DESKTOPGL
-using OpenGL;
-#endif
-
 #if ANGLE
 using OpenTK.Graphics;
+#else
+using MonoGame.OpenGL;
 #endif
-
-#if GLES
-using OpenTK.Graphics.ES20;
-using FramebufferAttachment = OpenTK.Graphics.ES20.All;
-using RenderbufferStorage = OpenTK.Graphics.ES20.All;
-using GLPrimitiveType = OpenTK.Graphics.ES20.BeginMode;
-#endif
-
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -45,11 +25,92 @@ namespace Microsoft.Xna.Framework.Graphics
         private DrawBuffersEnum[] _drawBuffers;
 #endif
 
-        static List<Action> disposeActions = new List<Action>();
-        static object disposeActionsLock = new object();
+        enum ResourceType
+        {
+            Texture,
+            Buffer,
+            Shader,
+            Program,
+            Query,
+            Framebuffer
+        }
 
-        private readonly ShaderProgramCache _programCache = new ShaderProgramCache();
+        struct ResourceHandle
+        {
+            public ResourceType type;
+            public int handle;
 
+            public static ResourceHandle Texture(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Texture, handle = handle };
+            }
+
+            public static ResourceHandle Buffer(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Buffer, handle = handle };
+            }
+
+            public static ResourceHandle Shader(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Shader, handle = handle };
+            }
+
+            public static ResourceHandle Program(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Program, handle = handle };
+            }
+
+            public static ResourceHandle Query(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Query, handle = handle };
+            }
+
+            public static ResourceHandle Framebuffer(int handle)
+            {
+                return new ResourceHandle() { type = ResourceType.Framebuffer, handle = handle };
+            }
+
+            public void Free()
+            {
+                switch (type)
+                {
+                    case ResourceType.Texture:
+                        GL.DeleteTextures(1, ref handle);
+                        break;
+                    case ResourceType.Buffer:
+                        GL.DeleteBuffers(1, ref handle);
+                        break;
+                    case ResourceType.Shader:
+                        if (GL.IsShader(handle))
+                            GL.DeleteShader(handle);
+                        break;
+                    case ResourceType.Program:
+                        if (GL.IsProgram(handle))
+                        {
+                            GL.DeleteProgram(handle);
+                        }
+                        break;
+                    case ResourceType.Query:
+#if !GLES
+                        GL.DeleteQueries(1, ref handle);
+#endif
+                        break;
+                    case ResourceType.Framebuffer:
+                        GL.DeleteFramebuffers(1, ref handle);
+                        break;
+                }
+                GraphicsExtensions.CheckGLError();
+            }
+        }
+
+        List<ResourceHandle> _disposeThisFrame = new List<ResourceHandle>();
+        List<ResourceHandle> _disposeNextFrame = new List<ResourceHandle>();
+        object _disposeActionsLock = new object();
+
+        static List<IntPtr> _disposeContexts = new List<IntPtr>();
+        static object _disposeContextsLock = new object();
+
+        private ShaderProgramCache _programCache;
         private ShaderProgram _shaderProgram = null;
 
         static readonly float[] _posFixup = new float[4];
@@ -64,8 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glMajorVersion = 0;
         internal int glMinorVersion = 0;
         internal int glFramebuffer = 0;
-        internal int MaxVertexAttributes;        
-        internal List<string> _extensions = new List<string>();
+        internal int MaxVertexAttributes;
         internal int _maxTextureSize = 0;
 
         // Keeps track of last applied state to avoid redundant OpenGL calls
@@ -84,7 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get
             {
                 if (_vertexShader == null && _pixelShader == null)
-                        throw new InvalidOperationException("There is no shader bound!");
+                    throw new InvalidOperationException("There is no shader bound!");
                 if (_vertexShader == null)
                     return _pixelShader.HashKey;
                 if (_pixelShader == null)
@@ -95,7 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetVertexAttributeArray(bool[] attrs)
         {
-            for(var x = 0; x < attrs.Length; x++)
+            for (var x = 0; x < attrs.Length; x++)
             {
                 if (attrs[x] && !_enabledVertexAttributes.Contains(x))
                 {
@@ -129,7 +189,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (!_attribsDirty &&
                     _bufferBindingInfos[slot].VertexOffset == offset &&
                     ReferenceEquals(_bufferBindingInfos[slot].AttributeInfo, attrInfo) &&
-                    _bufferBindingInfos[slot].InstanceFrequency == vertexBufferBinding.InstanceFrequency)
+                    _bufferBindingInfos[slot].InstanceFrequency == vertexBufferBinding.InstanceFrequency &&
+                    _bufferBindingInfos[slot].Vbo == vertexBufferBinding.VertexBuffer.vbo)
                     continue;
 
                 bindingsChanged = true;
@@ -148,7 +209,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         element.VertexAttribPointerType,
                         element.Normalized,
                         vertexStride,
-                        (IntPtr) (offset.ToInt64() + element.Offset));
+                        (IntPtr)(offset.ToInt64() + element.Offset));
 
 #if !(GLES || MONOMAC)
                     // only set the divisor if instancing is supported
@@ -162,6 +223,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _bufferBindingInfos[slot].VertexOffset = offset;
                 _bufferBindingInfos[slot].AttributeInfo = attrInfo;
                 _bufferBindingInfos[slot].InstanceFrequency = vertexBufferBinding.InstanceFrequency;
+                _bufferBindingInfos[slot].Vbo = vertexBufferBinding.VertexBuffer.vbo;
             }
 
             _attribsDirty = false;
@@ -180,8 +242,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
+            _programCache = new ShaderProgramCache(this);
 #if DESKTOPGL || ANGLE
-
             var windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
 
             if (Context == null || Context.IsDisposed)
@@ -192,93 +254,13 @@ namespace Microsoft.Xna.Framework.Graphics
             Context.MakeCurrent(windowInfo);
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 
-            /*if (Threading.BackgroundContext == null)
-            {
-                Threading.BackgroundContext = GL.CreateContext(windowInfo);
-                Threading.WindowInfo = windowInfo;
-                Threading.BackgroundContext.MakeCurrent(null);
-            }*/
-
             Context.MakeCurrent(windowInfo);
-
-            /*GraphicsMode mode = GraphicsMode.Default;
-            var wnd = OpenTK.Platform.Utilities.CreateSdl2WindowInfo(Game.Instance.Window.Handle);
-
-            #if GLES
-            // Create an OpenGL ES 2.0 context
-            var flags = GraphicsContextFlags.Embedded;
-            int major = 2;
-            int minor = 0;
-            #else
-            // Create an OpenGL compatibility context
-            var flags = GraphicsContextFlags.Default;
-            int major = 1;
-            int minor = 0;
-            #endif
-
-            if (Context == null || Context.IsDisposed)
-            {
-                var color = PresentationParameters.BackBufferFormat.GetColorFormat();
-                var depth =
-                    PresentationParameters.DepthStencilFormat == DepthFormat.None ? 0 :
-                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth16 ? 16 :
-                    24;
-                var stencil =
-                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth24Stencil8 ? 8 :
-                    0;
-
-                var samples = 0;
-                if (Game.Instance.graphicsDeviceManager.PreferMultiSampling)
-                {
-                    // Use a default of 4x samples if PreferMultiSampling is enabled
-                    // without explicitly setting the desired MultiSampleCount.
-                    if (PresentationParameters.MultiSampleCount == 0)
-                    {
-                        PresentationParameters.MultiSampleCount = 4;
-                    }
-
-                    samples = PresentationParameters.MultiSampleCount;
-                }
-
-                mode = new GraphicsMode(color, depth, stencil, samples);
-                try
-                {
-                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
-                }
-                catch (Exception e)
-                {
-                    Game.Instance.Log("Failed to create OpenGL context, retrying. Error: " +
-                        e.ToString());
-                    major = 1;
-                    minor = 0;
-                    flags = GraphicsContextFlags.Default;
-                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
-                }
-            }
-            Context.MakeCurrent(wnd);
-            (Context as IGraphicsContextInternal).LoadAll();
-            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
-
-            // Provide the graphics context for background loading
-            // Note: this context should use the same GraphicsMode,
-            // major, minor version and flags parameters as the main
-            // context. Otherwise, context sharing will very likely fail.
-            if (Threading.BackgroundContext == null)
-            {
-                Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
-                Threading.WindowInfo = wnd;
-                Threading.BackgroundContext.MakeCurrent(null);
-            }
-            Context.MakeCurrent(wnd);*/
-
-
 #endif
-
             MaxTextureSlots = 16;
 
             GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
-                        
+
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
@@ -305,7 +287,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new NoSuitableGraphicsDeviceException("Unable to retrieve OpenGL version");
 
                 string[] versionSplit = version.Split(' ');
-                if(versionSplit.Length > 2 && versionSplit[0].Equals("OpenGL") && versionSplit[1].Equals("ES"))
+                if (versionSplit.Length > 2 && versionSplit[0].Equals("OpenGL") && versionSplit[1].Equals("ES"))
                 {
                     glMajorVersion = Convert.ToInt32(versionSplit[2].Substring(0, 1));
                     glMinorVersion = Convert.ToInt32(versionSplit[2].Substring(2, 1));
@@ -323,7 +305,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 glMinorVersion = 1;
             }
 #else
-            try
+                try
             {
                 string version = GL.GetString(StringName.Version);
 
@@ -350,19 +332,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			for (int i = 0; i < maxDrawBuffers; i++)
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
-            _extensions = GetGLExtensions();
-        }
-
-        List<string> GetGLExtensions()
-        {
-            // Setup extensions.
-            List<string> extensions = new List<string>();
-            var extstring = GL.GetString(StringName.Extensions);
-            GraphicsExtensions.CheckGLError();
-            if (!string.IsNullOrEmpty(extstring))
-                extensions.AddRange(extstring.Split(' '));
-
-            return extensions;
         }
 
         private void PlatformInitialize()
@@ -385,7 +354,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _bufferBindingInfos = new BufferBindingInfo[_maxVertexBufferSlots];
             for (int i = 0; i < _bufferBindingInfos.Length; i++)
-                _bufferBindingInfos[i] = new BufferBindingInfo(null, IntPtr.Zero, 0);
+                _bufferBindingInfos[i] = new BufferBindingInfo(null, IntPtr.Zero, 0, -1);
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
@@ -471,36 +440,98 @@ namespace Microsoft.Xna.Framework.Graphics
             // Free all the cached shader programs.
             _programCache.Dispose();
 
-            GraphicsDevice.AddDisposeAction(() =>
-                                            {
 #if DESKTOPGL || ANGLE
-                Context.Dispose();
-                Context = null;
+            Context.Dispose();
+            Context = null;
 #endif
-            });
         }
 
-        /// <summary>
-        /// Adds a dispose action to the list of pending dispose actions. These are executed at the end of each call to Present().
-        /// This allows GL resources to be disposed from other threads, such as the finalizer.
-        /// </summary>
-        /// <param name="disposeAction">The action to execute for the dispose.</param>
-        static private void AddDisposeAction(Action disposeAction)
+        internal void DisposeTexture(int handle)
         {
-            if (disposeAction == null)
-                throw new ArgumentNullException("disposeAction");
-            if (Threading.IsOnUIThread())
+            if (!_isDisposed)
             {
-                disposeAction();
-            }
-            else
-            {
-                lock (disposeActionsLock)
+                lock (_disposeActionsLock)
                 {
-                    disposeActions.Add(disposeAction);
+                    _disposeNextFrame.Add(ResourceHandle.Texture(handle));
                 }
             }
         }
+
+        internal void DisposeBuffer(int handle)
+        {
+            if (!_isDisposed)
+            {
+                lock (_disposeActionsLock)
+                {
+                    _disposeNextFrame.Add(ResourceHandle.Buffer(handle));
+                }
+            }
+        }
+
+        internal void DisposeShader(int handle)
+        {
+            if (!_isDisposed)
+            {
+                lock (_disposeActionsLock)
+                {
+                    _disposeNextFrame.Add(ResourceHandle.Shader(handle));
+                }
+            }
+        }
+
+        internal void DisposeProgram(int handle)
+        {
+            if (!_isDisposed)
+            {
+                lock (_disposeActionsLock)
+                {
+                    _disposeNextFrame.Add(ResourceHandle.Program(handle));
+                }
+            }
+        }
+
+        internal void DisposeQuery(int handle)
+        {
+            if (!_isDisposed)
+            {
+                lock (_disposeActionsLock)
+                {
+                    _disposeNextFrame.Add(ResourceHandle.Query(handle));
+                }
+            }
+        }
+
+        internal void DisposeFramebuffer(int handle)
+        {
+            if (!_isDisposed)
+            {
+                lock (_disposeActionsLock)
+                {
+                    _disposeNextFrame.Add(ResourceHandle.Framebuffer(handle));
+                }
+            }
+        }
+
+#if DESKTOPGL || ANGLE
+        static internal void DisposeContext(IntPtr resource)
+        {
+            lock (_disposeContextsLock)
+            {
+                _disposeContexts.Add(resource);
+            }
+        }
+
+        static internal void DisposeContexts()
+        {
+            lock (_disposeContextsLock)
+            {
+                int count = _disposeContexts.Count;
+                for (int i = 0; i < count; ++i)
+                    Sdl.GL.DeleteContext(_disposeContexts[i]);
+                _disposeContexts.Clear();
+            }
+        }
+#endif
 
         public void PlatformPresent()
         {
@@ -510,14 +541,17 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             // Dispose of any GL resources that were disposed in another thread
-            lock (disposeActionsLock)
+            int count = _disposeThisFrame.Count;
+            for (int i = 0; i < count; ++i)
+                _disposeThisFrame[i].Free();
+            _disposeThisFrame.Clear();
+
+            lock (_disposeActionsLock)
             {
-                if (disposeActions.Count > 0)
-                {
-                    foreach (var action in disposeActions)
-                        action();
-                    disposeActions.Clear();
-                }
+                // Swap lists so resources added during this draw will be released after the next draw
+                var temp = _disposeThisFrame;
+                _disposeThisFrame = _disposeNextFrame;
+                _disposeNextFrame = temp;
             }
         }
 
@@ -609,11 +643,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 this.framebufferHelper.GenRenderbuffer(out color);
                 this.framebufferHelper.BindRenderbuffer(color);
-#if GLES
-                this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)RenderbufferStorage.Rgba8Oes, width, height);
-#else
                 this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)RenderbufferStorage.Rgba8, width, height);
-#endif
             }
 
             if (preferredDepthFormat != DepthFormat.None)
@@ -955,7 +985,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	        {
                 var scissorRect = _scissorRectangle;
                 if (!IsRenderTargetBound)
-                    scissorRect.Y = _viewport.Height - scissorRect.Y - scissorRect.Height;
+                    scissorRect.Y = PresentationParameters.BackBufferHeight - (scissorRect.Y + scissorRect.Height);
                 GL.Scissor(scissorRect.X, scissorRect.Y, scissorRect.Width, scissorRect.Height);
                 GraphicsExtensions.CheckGLError();
 	            _scissorRectangleDirty = false;
@@ -1168,6 +1198,30 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        private void PlatformGetBackBufferData<T>(Rectangle? rectangle, T[] data, int startIndex, int count) where T : struct
+        {
+            var rect = rectangle ?? new Rectangle(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+            var tSize = Marshal.SizeOf(typeof(T));
+            var flippedY = PresentationParameters.BackBufferHeight - rect.Y - rect.Height;
+            GL.ReadPixels(rect.X, flippedY, rect.Width, rect.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
+
+            // buffer is returned upside down, so we swap the rows around when copying over
+            var rowSize = rect.Width*PresentationParameters.BackBufferFormat.GetSize() / tSize;
+            var row = new T[rowSize];
+            for (var dy = 0; dy < rect.Height/2; dy++)
+            {
+                var topRow = startIndex + dy*rowSize;
+                var bottomRow = startIndex + (rect.Height - dy - 1)*rowSize;
+                // copy the bottom row to buffer
+                Array.Copy(data, bottomRow, row, 0, rowSize);
+                // copy top row to bottom row
+                Array.Copy(data, topRow, data, bottomRow, rowSize);
+                // copy buffer to top row
+                Array.Copy(row, 0, data, topRow, rowSize);
+                count -= rowSize;
+            }
+        }
+
         private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
         {
             return new Rectangle(x, y, width, height);
@@ -1181,6 +1235,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void OnPresentationChanged()
         {
+#if DESKTOPGL || ANGLE
+            Context.MakeCurrent(new WindowInfo(SdlGameWindow.Instance.Handle));
+            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
+#endif
+
             ApplyRenderTargets(null);
         }
 
@@ -1190,13 +1249,41 @@ namespace Microsoft.Xna.Framework.Graphics
             public VertexDeclaration.VertexDeclarationAttributeInfo AttributeInfo;
             public IntPtr VertexOffset;
             public int InstanceFrequency;
+            public int Vbo;
 
-            public BufferBindingInfo(VertexDeclaration.VertexDeclarationAttributeInfo attributeInfo, IntPtr vertexOffset, int instanceFrequency)
+            public BufferBindingInfo(VertexDeclaration.VertexDeclarationAttributeInfo attributeInfo, IntPtr vertexOffset, int instanceFrequency, int vbo)
             {
                 AttributeInfo = attributeInfo;
                 VertexOffset = vertexOffset;
                 InstanceFrequency = instanceFrequency;
+                Vbo = vbo;
             }
         }
+
+#if DESKTOPGL
+        private void GetModeSwitchedSize(out int width, out int height)
+        {
+            var mode = new Sdl.Display.Mode
+            {
+                Width = PresentationParameters.BackBufferWidth,
+                Height = PresentationParameters.BackBufferHeight,
+                Format = 0,
+                RefreshRate = 0,
+                DriverData = IntPtr.Zero
+            };
+            Sdl.Display.Mode closest;
+            Sdl.Display.GetClosestDisplayMode(0, mode, out closest);
+            width = closest.Width;
+            height = closest.Height;
+        }
+
+        private void GetDisplayResolution(out int width, out int height)
+        {
+            Sdl.Display.Mode mode;
+            Sdl.Display.GetCurrentDisplayMode(0, out mode);
+            width = mode.Width;
+            height = mode.Height;
+        }
+#endif
     }
 }

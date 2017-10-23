@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
@@ -246,11 +247,12 @@ namespace Microsoft.Xna.Framework
         protected virtual void OnIsMouseVisibleChanged() {}
 
         /// <summary>
-        /// Used by the GraphicsDeviceManager to update the platform window
-        /// after the graphics device has changed the presentation.
+        /// Called by the GraphicsDeviceManager to notify the platform
+        /// that the presentation parameters have changed.
         /// </summary>
-        internal virtual void OnPresentationChanged()
-        {            
+        /// <param name="pp">The new presentation parameters.</param>
+        internal virtual void OnPresentationChanged(PresentationParameters pp)
+        {
         }
 
         #endregion Methods

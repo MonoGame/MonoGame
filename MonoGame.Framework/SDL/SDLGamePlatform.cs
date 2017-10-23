@@ -90,11 +90,10 @@ namespace Microsoft.Xna.Framework
             _view.SetCursorVisible(_game.IsMouseVisible);
         }
 
-        internal override void OnPresentationChanged()
+        internal override void OnPresentationChanged(PresentationParameters pp)
         {
             var displayIndex = Sdl.Window.GetDisplayIndex(Window.Handle);
             var displayName = Sdl.Display.GetDisplayName(displayIndex);
-            var pp = _game.GraphicsDevice.PresentationParameters;
             BeginScreenDeviceChange(pp.IsFullScreen);
             EndScreenDeviceChange(displayName, pp.BackBufferWidth, pp.BackBufferHeight);
         }
@@ -108,6 +107,7 @@ namespace Microsoft.Xna.Framework
                 SdlRunLoop();
                 Game.Tick();
                 Threading.Run();
+                GraphicsDevice.DisposeContexts();
 
                 if (_isExiting > 0)
                     break;
@@ -127,9 +127,12 @@ namespace Microsoft.Xna.Framework
                 else if (ev.Type == Sdl.EventType.ControllerDeviceRemoved)
                     GamePad.RemoveDevice(ev.ControllerDevice.Which);
                 else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
-                    Joystick.RemoveDevice(ev.JoystickDevice.Which);                
-                else if (ev.Type == Sdl.EventType.MouseWheel)
-                    Mouse.ScrollY += ev.Wheel.Y * 120;
+                    Joystick.RemoveDevice(ev.JoystickDevice.Which);
+                else if (ev.Type == Sdl.EventType.MouseWheel) {
+                    const int wheelDelta = 120;
+                    Mouse.ScrollY += ev.Wheel.Y * wheelDelta;
+                    Mouse.ScrollX += ev.Wheel.X * wheelDelta;
+                }
                 else if (ev.Type == Sdl.EventType.KeyDown) {
                     var key = KeyboardUtil.ToXna (ev.Key.Keysym.Sym);
                     if (!_keys.Contains (key))
@@ -248,6 +251,7 @@ namespace Microsoft.Xna.Framework
         {
             if (Game.GraphicsDevice != null)
                 Game.GraphicsDevice.Present();
+
         }
 
         protected override void Dispose(bool disposing)

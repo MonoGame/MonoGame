@@ -578,5 +578,12 @@ But the answer was still '42'.
                 _spriteBatch.DrawString (_defaultFont, text, Vector2.Zero, Color.Violet));
             _spriteBatch.End ();
 		}
+
+        [Test]
+		public void Throws_when_setting_unavailable_DefaultCharacter ()
+		{
+            Assert.Throws<ArgumentException> (() =>
+                _defaultFont.DefaultCharacter = 'ñ');
+		}
 	}
 }

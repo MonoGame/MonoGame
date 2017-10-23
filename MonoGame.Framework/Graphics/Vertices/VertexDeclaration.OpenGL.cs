@@ -4,19 +4,7 @@
 
 using System;
 using System.Collections.Generic;
-
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#endif
-#if (MONOMAC && !PLATFORM_MACOS_LEGACY)
-using OpenTK.Graphics.OpenGL;
-#endif
-#if DESKTOPGL
-using OpenGL;
-#endif
-#if GLES
-using OpenTK.Graphics.ES20;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {

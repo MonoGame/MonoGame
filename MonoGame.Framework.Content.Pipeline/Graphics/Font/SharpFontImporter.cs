@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			{
 				XOffset = -(face.Glyph.Advance.X >> 6),
 				XAdvance = face.Glyph.Metrics.HorizontalAdvance >> 6,
-                YOffset = -(face.Glyph.Metrics.HorizontalBearingY >> 6),
+				YOffset = -(face.Glyph.Metrics.HorizontalBearingY >> 6),
 				CharacterWidths = abc
 			};
 		}

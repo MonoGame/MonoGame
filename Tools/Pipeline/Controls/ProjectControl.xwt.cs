@@ -9,6 +9,7 @@ using System.Linq;
 using Xwt;
 using Xwt.Drawing;
 using Eto.Forms;
+using System.Diagnostics;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -71,8 +72,8 @@ namespace MonoGame.Tools.Pipeline
 
         private void TreeView_RowActivated(object sender, TreeViewRowEventArgs e)
         {
-            if (PipelineController.Instance.ProjectOpen)
-                _contextMenu.Show(_etoView);
+            if (PipelineController.Instance.SelectedItem is ContentItem)
+                Process.Start(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath));
         }
 
         private void TreeView_DragOver(object sender, DragOverEventArgs e)

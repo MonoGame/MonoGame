@@ -123,12 +123,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return result;
         }
 
-        public static void CompressPvrtc(TextureContent content, bool isSpriteFont)
+        public static void CompressPvrtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
             if (isSpriteFont)
             {
-                CompressColor16Bit(content);
+                CompressColor16Bit(context, content);
                 return;
             }
 
@@ -136,11 +136,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var width = content.Faces[0][0].Height;
             var height = content.Faces[0][0].Width;
 
-			if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height))
-				throw new PipelineException("PVR compression requires width and height must be powers of two.");
-
-			if (width != height)
-				throw new PipelineException("PVR compression requires square textures.");
+			if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height) || (width != height))
+            {
+                context.Logger.LogWarning(null, content.Identity, "PVR compression requires width and height to be powers of two and equal. Falling back to 16-bit color.");
+                CompressColor16Bit(context, content);
+                return;
+            }
 
             var face = content.Faces[0][0];
 
@@ -152,11 +153,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(PvrtcRgba4BitmapContent));
         }
 
-        public static void CompressDxt(GraphicsProfile profile, TextureContent content, bool isSpriteFont)
+        public static void CompressDxt(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             var face = content.Faces[0][0];
 
-            if (profile == GraphicsProfile.Reach)
+            if (context.TargetProfile == GraphicsProfile.Reach)
             {
                 if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
                     throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");                
@@ -175,9 +176,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(Dxt5BitmapContent));
         }
 
-        static public void CompressAti(TextureContent content)
+        static public void CompressAti(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
-			var face = content.Faces[0][0];
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            var face = content.Faces[0][0];
 			var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Full)
@@ -186,8 +194,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
         }
 
-        static public void CompressEtc1(TextureContent content)
+        static public void CompressEtc1(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
 
@@ -200,12 +215,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // https://code.google.com/p/libgdx/issues/detail?id=1310
                 // Since we already enforce POT for PVR and DXT in Reach, we will also enforce POT for ETC1
                 if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
-                    throw new PipelineException("ETC1 compression require width and height must be powers of two due to hardware restrictions on some devices.");
-                content.ConvertBitmapType(typeof(Etc1BitmapContent));
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC1 compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
+                }
+                else
+                    content.ConvertBitmapType(typeof(Etc1BitmapContent));
             }
         }
 
-        static public void CompressColor16Bit(TextureContent content)
+        static public void CompressColor16Bit(ContentProcessorContext context, TextureContent content)
         {
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);

@@ -19,7 +19,8 @@ namespace MonoGame.Tests.Framework
             Assert.Throws<ArgumentNullException>(() => TitleContainer.OpenStream(""));
             Assert.Throws<FileNotFoundException>(() => TitleContainer.OpenStream(" "));
             Assert.Throws<FileNotFoundException>(() => TitleContainer.OpenStream("notfound"));
-            Assert.Throws<ArgumentException>(() => TitleContainer.OpenStream(@"C:\\"));
+            // under mono we get a FileNotFoundException for this path.
+            Assert.Throws(Is.TypeOf<ArgumentException>().Or.TypeOf<FileNotFoundException>(), () => TitleContainer.OpenStream(@"C:\\"));
 
             // TODO: This always fails on XNA... even though it shouldn't.  I suspect 
             // this is because internally XNA uses the entry/active assembly as the

@@ -15,12 +15,14 @@ namespace MonoGame.Tests.Audio
         [SetUp]
         public void SetUp()
         {
+            // Necessary to get audio initialised
             FrameworkDispatcher.Update();
         }
-        
-
 
         [Test]
+#if DESKTOPGL
+        [Ignore("Intermetent failure on first run of test. Needs investigating")]
+#endif
         public void BufferNeeded_DuringPlayback()
         {
             // XNA raises the event every time a buffer is consumed and there are less than two left.

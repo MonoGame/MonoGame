@@ -4,18 +4,7 @@
 
 using System;
 using System.Collections.Generic;
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenAL;
-#endif
-#if MONOMAC && !PLATFORM_MACOS_LEGACY
-using OpenTK.Audio.OpenAL;
-#endif
-#if GLES
-using OpenTK.Audio.OpenAL;
-#endif
-#if DESKTOPGL
-using OpenAL;
-#endif
+using MonoGame.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -103,7 +92,6 @@ namespace Microsoft.Xna.Framework.Audio
             AL.SourceQueueBuffer(SourceId, oalBuffer.OpenALDataBuffer);
             ALHelper.CheckError();
             _queuedBuffers.Enqueue(oalBuffer);
-
 
             // If the source has run out of buffers, restart it
             var sourceState = AL.GetSourceState(SourceId);

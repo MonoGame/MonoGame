@@ -18,9 +18,9 @@ namespace MonoGame.Tests.Graphics
 
 #if !XNA
         [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
-        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
 #if !DESKTOPGL
         // not supported
+        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
         [TestCase("Assets/Textures/LogoOnly_64px.dds")]
 #endif
 #endif
@@ -41,10 +41,10 @@ namespace MonoGame.Tests.Graphics
                 System.Drawing.GraphicsUnit gu = System.Drawing.GraphicsUnit.Pixel;
                 System.Drawing.RectangleF rf = bitmap.GetBounds(ref gu);
                 Rectangle rt = _texture.Bounds;
-                Assert.AreEqual((int) rf.Bottom, rt.Bottom);
-                Assert.AreEqual((int) rf.Left, rt.Left);
-                Assert.AreEqual((int) rf.Right, rt.Right);
-                Assert.AreEqual((int) rf.Top, rt.Top);
+                Assert.AreEqual((int)rf.Bottom, rt.Bottom);
+                Assert.AreEqual((int)rf.Left, rt.Left);
+                Assert.AreEqual((int)rf.Right, rt.Right);
+                Assert.AreEqual((int)rf.Top, rt.Top);
                 bitmap.Dispose();
             }//The dds file test case can't be checked with System.Drawing because it does not understand this format
             catch { }
@@ -57,7 +57,9 @@ namespace MonoGame.Tests.Graphics
                 [TestCase("Assets/Textures/LogoOnly_64px.dds")]
                 [TestCase("Assets/Textures/LogoOnly_64px.tif")]
 #endif
+#if !DESKTOPGL
         [TestCase("Assets/Textures/LogoOnly_64px.tga")]
+#endif
         [TestCase("Assets/Textures/SampleCube64DXT1Mips.dds")]
         public void FromStreamShouldFailTest(string filename)
         {
@@ -708,5 +710,23 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+        [Test]
+        public void GetDataRowPitch()
+        {
+            const int w = 5;
+            const int h = 4;
+            const int size = w * h;
+            var tex = new Texture2D(gd, w, h, false, SurfaceFormat.Bgr565);
+            var data = new short[size];
+            for (var i = 0; i < data.Length; i++)
+                data[i] = (short) i;
+            tex.SetData(data);
+            var getData = new short[size];
+            tex.GetData(data);
+            for (var i = 0; i < getData.Length; i++)
+                Assert.AreEqual((short) i, data[i]);
+
+            tex.Dispose();
+        }
     }
 }

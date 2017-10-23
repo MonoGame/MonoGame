@@ -96,24 +96,6 @@ ln -s "$IDIR" "/opt/MonoGameSDK"
 chmod +x "$IDIR/Tools/ffmpeg"
 chmod +x "$IDIR/Tools/ffprobe"
 
-# Rider stuff
-if type "rider" > /dev/null 2>&1
-then
-	echo "Installing Rider files..."
-	
-	FINDCOMMAND=$(type -a rider)
-	COMMAND=$(echo $FINDCOMMAND| cut -d' ' -f 3)
-	
-	FINDRIDER=$(cat $COMMAND | grep "RUN_PATH")
-	RIDER=$(echo $FINDRIDER| cut -d"'" -f 2)
-	
-	RIDERDIR=$(dirname $(dirname $RIDER))
-	RXBUILD="$RIDERDIR/lib/ReSharperHost/linux-x64/mono/lib/mono/xbuild/MonoGame"
-	
-	mkdir -p "$RXBUILD"
-	ln -s "$IDIR" "$RXBUILD/v3.0"
-fi
-
 # MonoDevelop addin
 if [ "$MONODEVELOP" != "?????" ]
 then
@@ -135,11 +117,12 @@ cat > /usr/bin/mgcb <<'endmsg'
 mono /usr/lib/mono/xbuild/MonoGame/v3.0/Tools/MGCB.exe "$@"
 endmsg
 chmod +x /usr/bin/mgcb
+cp "$DIR/Main/mgcbcomplete" "/etc/bash_completion.d/mgcb"
 
 # MonoGame icon
 mkdir -p /usr/share/icons/hicolor/scalable/mimetypes
 cp $DIR/Main/monogame.svg /usr/share/icons/hicolor/scalable/mimetypes/monogame.svg
-gtk-update-icon-cache /usr/share/icons/hicolor/ -f
+gtk-update-icon-cache /usr/share/icons/hicolor/ -f &> /dev/null
 
 # Application launcher
 cat > /usr/share/applications/MonogamePipeline.desktop <<'endmsg'
@@ -158,6 +141,19 @@ Type=Application
 MimeType=text/mgcb;
 Categories=Development;
 endmsg
+
+# Man pages
+echo "Installing man pages..."
+IFS=':' read -r -a ARRAY <<< "$(manpath)"
+for MANPATH in "${ARRAY[@]}"
+do
+	if [ -d "$MANPATH/man1" ]
+	then
+		cp "$DIR/Main/mgcb.1" "$MANPATH/man1/mgcb.1"
+		gzip "$MANPATH/man1/mgcb.1"
+    	break
+    fi
+done
 
 # Mimetype
 echo "Adding mimetype..."

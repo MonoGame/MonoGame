@@ -10,6 +10,7 @@ fi
 rm -f /usr/bin/monogame-pipeline-tool
 rm -f /usr/bin/monogame-uninstall
 rm -f /usr/bin/mgcb
+rm -f /etc/bash_completion.d/mgcb
 
 #remove application icon
 rm -rf /usr/share/icons/gnome/scalable/mimetypes/monogame.svg
@@ -21,3 +22,9 @@ rm -rf /usr/share/applications/Monogame\ Pipeline.desktop
 rm -rf /usr/lib/mono/xbuild/MonoGame
 rm -rf /opt/MonoGameSDK
 
+# Remove man pages
+IFS=':' read -r -a ARRAY <<< "$(manpath)"
+for MANPATH in "${ARRAY[@]}"
+do
+	rm -rf "$MANPATH/man1/mgcb.1.gz"
+done

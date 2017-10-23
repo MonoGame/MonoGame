@@ -122,7 +122,7 @@ namespace Microsoft.Xna.Framework.Media
             MediaFactory.CreateTopology(out _topology);
             for (var i = 0; i < presDesc.StreamDescriptorCount; i++)
             {
-                Bool selected;
+                SharpDX.Mathematics.Interop.RawBool selected;
                 StreamDescriptor desc;
                 presDesc.GetStreamDescriptorByIndex(i, out selected, out desc);
 
