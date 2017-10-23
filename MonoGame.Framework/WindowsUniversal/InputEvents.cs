@@ -240,7 +240,7 @@ namespace Microsoft.Xna.Framework
             Keyboard.UpdateState();
         }
 
-        private static Keys KeyTranslate(Windows.System.VirtualKey inkey, CorePhysicalKeyStatus keyStatus)
+        internal static Keys KeyTranslate(Windows.System.VirtualKey inkey, CorePhysicalKeyStatus keyStatus)
         {
             switch (inkey)
             {

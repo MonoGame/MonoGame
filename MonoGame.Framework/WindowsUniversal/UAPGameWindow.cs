@@ -131,6 +131,7 @@ namespace Microsoft.Xna.Framework
             _coreWindow.Closed += Window_Closed;
             _coreWindow.Activated += Window_FocusChanged;
             _coreWindow.CharacterReceived += Window_CharacterReceived;
+            _coreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
 
             SystemNavigationManager.GetForCurrentView().BackRequested += BackRequested;
 
@@ -214,6 +215,27 @@ namespace Microsoft.Xna.Framework
         private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
         {
             _textQueue.Enqueue((char)args.KeyCode);
+        }
+
+        private void Dispatcher_AcceleratorKeyActivated(CoreDispatcher sender, AcceleratorKeyEventArgs args)
+        {
+            // NOTE: Dispatcher event is used becuase KeyDown event doesn't handle Alt key
+            var key = InputEvents.KeyTranslate(args.VirtualKey, args.KeyStatus);
+            switch (args.EventType)
+            {
+                case CoreAcceleratorKeyEventType.KeyDown:
+                case CoreAcceleratorKeyEventType.SystemKeyDown:
+                    if (KeysHelper.IsKey((int)key))
+                        OnKeyDown(sender, new InputKeyEventArgs(key));
+                    break;
+                case CoreAcceleratorKeyEventType.KeyUp:
+                case CoreAcceleratorKeyEventType.SystemKeyUp:
+                    if (KeysHelper.IsKey((int)key))
+                        OnKeyUp(sender, new InputKeyEventArgs(key));
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void UpdateTextInput()

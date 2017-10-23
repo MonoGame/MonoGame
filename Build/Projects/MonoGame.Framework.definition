@@ -280,6 +280,9 @@
     <Compile Include="IDrawable.cs" />
     <Compile Include="IGameComponent.cs" />
     <Compile Include="IGraphicsDeviceManager.cs" />
+    <Compile Include="InputKeyEventArgs.cs">
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
+    </Compile>
     <Compile Include="IUpdateable.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="MathHelper.cs" />
@@ -991,6 +994,9 @@
     </Compile>
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
+    <Compile Include="Input\KeysHelper.cs">
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
+    </Compile>
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="Input\MessageBox.cs">
       <Platforms>Android,iOS,WindowsUniversal</Platforms>
