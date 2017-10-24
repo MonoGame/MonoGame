@@ -189,9 +189,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (desc.SampleDescription.Count > 1)
                 desc.BindFlags &= ~BindFlags.ShaderResource;
 
-            if (Mipmap)
+            if (Mipmap && desc.SampleDescription.Count == 1)
             {
-                // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
+                // Note: XNA 4 does not have a method Texture.GenerateMipMaps()
                 // because generation of mipmaps is not supported on the Xbox 360.
                 // TODO: New method Texture.GenerateMipMaps() required.
                 desc.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;

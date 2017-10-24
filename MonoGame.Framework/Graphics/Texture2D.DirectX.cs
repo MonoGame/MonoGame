@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformGetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             // Create a temp staging resource for copying the data.
-            // 
+            //
             // TODO: We should probably be pooling these staging resources
             // and not creating a new one each time.
             //
@@ -211,7 +211,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotSupportedException("stream must support seek operations");
 
             // For reference this implementation was ultimately found through this post:
-            // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
+            // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro
             Texture2D toReturn = null;
             SharpDX.WIC.BitmapDecoder decoder;
 
@@ -356,7 +356,6 @@ namespace Microsoft.Xna.Framework.Graphics
             var desc = new Texture2DDescription();
             desc.Width = width;
             desc.Height = height;
-            desc.MipLevels = _levelCount;
             desc.ArraySize = ArraySize;
             desc.Format = SharpDXHelper.ToFormat(_format);
             desc.BindFlags = BindFlags.ShaderResource;
@@ -364,6 +363,8 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.SampleDescription = CreateSampleDescription();
             desc.Usage = ResourceUsage.Default;
             desc.OptionFlags = ResourceOptionFlags.None;
+
+            desc.MipLevels = desc.SampleDescription.Count > 1 ? 1 : _levelCount;
 
             if (_shared)
                 desc.OptionFlags |= ResourceOptionFlags.Shared;
