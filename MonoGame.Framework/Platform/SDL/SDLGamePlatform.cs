@@ -131,8 +131,8 @@ namespace Microsoft.Xna.Framework
                     char character = (char)ev.Key.Keysym.Sym;
                     if (KeysHelper.IsKey((int)key))
                         _view.CallKeyDown(key);
-                    if (char.IsControl (character))
-                        _view.CallTextInput (character, key);
+                    if (char.IsControl(character))
+                        _view.CallTextInput(character, key);
                 }
                 else if (ev.Type == Sdl.EventType.KeyUp)
                 {
