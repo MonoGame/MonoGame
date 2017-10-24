@@ -1194,6 +1194,11 @@ namespace Microsoft.Xna.Framework
         private EGLContext eglContext;
         private EGLSurface eglSurface;
 
+        internal SurfaceConfig SurConfig
+        {
+            get { return SurfaceConfig.FromEGLConfig(eglConfig, egl, eglDisplay); }
+        }
+
         /// <summary>The visibility of the window. Always returns true.</summary>
         /// <value></value>
         /// <exception cref="T:System.ObjectDisposed">The instance has been disposed</exception>

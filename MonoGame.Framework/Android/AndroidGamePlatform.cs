@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Android.Renderscripts;
 using Android.Views;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
@@ -96,11 +97,12 @@ namespace Microsoft.Xna.Framework
 
             base.BeforeInitialize();
 
-            Game.GraphicsDevice.PresentationParameters.DepthStencilFormat = _gameWindow.GameView.GraphicsMode.Stencil == 8
+            MonoGameAndroidGameView.SurfaceConfig surfaceConfig = _gameWindow.GameView.SurConfig;
+            Game.GraphicsDevice.PresentationParameters.DepthStencilFormat = surfaceConfig.Stencil == 8
                 ? DepthFormat.Depth24Stencil8
-                : _gameWindow.GameView.GraphicsMode.Depth == 24
+                : surfaceConfig.Depth == 24
                 ? DepthFormat.Depth24
-                : _gameWindow.GameView.GraphicsMode.Depth == 16
+                : surfaceConfig.Depth == 16
                 ? DepthFormat.Depth16
                 : DepthFormat.None;
 
