@@ -239,6 +239,12 @@ namespace Microsoft.Xna.Framework.Graphics
             PresentationParameters.MultiSampleCount =
                 GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
 
+            // Force V-Sync On for UAP
+#if WINDOWS_UAP
+            // TODO: Add V-Sync off support for UWP https://msdn.microsoft.com/en-us/library/windows/desktop/mt742104.aspx
+            PresentationParameters.PresentationInterval = PresentInterval.One;
+#endif
+
             _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null, 
                                                 (SharpDX.Direct3D11.RenderTargetView)null);  
 
