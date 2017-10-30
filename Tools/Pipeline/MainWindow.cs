@@ -678,6 +678,12 @@ namespace MonoGame.Tools.Pipeline
             PipelineController.Instance.RebuildItems();
         }
 
+        private void AutoRebuildCheckMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            PipelineController.Instance.EnableAutoBuild = autoRebuildCheckMenuItem.Checked;
+
+
+        }
         #endregion
 
     }

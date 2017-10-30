@@ -993,6 +993,8 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CanRedo { get { return _actionStack.CanRedo; } }
 
+        public bool EnableAutoBuild { get; internal set; }
+
         public void Undo()
         {
             _actionStack.Undo();

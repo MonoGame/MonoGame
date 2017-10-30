@@ -3,7 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace MonoGame.Tools.Pipeline
@@ -26,32 +28,94 @@ namespace MonoGame.Tools.Pipeline
             public void Run()
             {
                 Stop();
-
+                exit = false;
                 _thread = new Thread(new ThreadStart(ExistsThread));
                 _thread.Start();
+
+
+            }
+
+            Dictionary<string, FileSystemWatcher> watchers = new Dictionary<string, FileSystemWatcher>();
+
+            public void UpdateWatchers(string[] locations)
+            {
+                foreach (var l in locations)
+                {
+                    if (!watchers.ContainsKey(l))
+                    {
+                        var watcher = new FileSystemWatcher();
+                        watcher.NotifyFilter = NotifyFilters.LastWrite;
+                        watcher.Filter = "*.*";
+                        watcher.Changed += File_Changed;
+                        watcher.Path = l;
+                        watcher.IncludeSubdirectories = false;
+                        watcher.EnableRaisingEvents = true;
+                        watchers.Add(l, watcher);
+                    }
+                }
+                var watchersToRemove = watchers.Keys.Where(k => !locations.Contains(k)).ToArray();
+
+                foreach (var r in watchersToRemove)
+                {
+                    FileSystemWatcher w;
+                    if (watchers.TryGetValue(r, out w))
+                    {
+                        w.EnableRaisingEvents = false;
+                        w.Dispose();
+                        watchers.Remove(r);
+                    }
+                }
+            }
+
+            HashSet<ContentItem> modifiedItems = new HashSet<ContentItem>();
+            private void File_Changed(object sender, FileSystemEventArgs e)
+            {
+                var modifiedItem = _controller._project.ContentItems.FirstOrDefault(item => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, item.Location, item.Name)).Equals(e.FullPath));
+
+                if (modifiedItem != null)
+                    modifiedItems.Add(modifiedItem);
+
+
             }
 
             public void Stop()
             {
                 if (_thread == null)
                     return;
-                
-                _thread.Abort();
+
+                exit = true;
+                _thread.Join();
                 _thread = null;
+
+                UpdateWatchers(new string[0]);
             }
+
+            volatile bool exit = false;
 
             private void ExistsThread()
             {
-                while (true)
+                while (!exit)
                 {
                     // Can't lock without major code modifications
                     try
                     {
                         var items = _controller._project.ContentItems.ToArray();
+                        var folders = items.Select(s => Path.Combine(_controller.ProjectLocation, s.Location)).Distinct().ToArray();
+                        UpdateWatchers(folders);
+
+                        if (modifiedItems.Count != 0)
+                        {
+                            modifiedItems.Clear();
+                            if (_controller.EnableAutoBuild)
+                                _controller.Build(false);
+                        }
+
+
 
                         foreach (var item in items)
                         {
-                            Thread.Sleep(100);
+                            if (exit) return;
+                            else Thread.Sleep(10);
 
                             if (item.Exists == File.Exists(_controller.GetFullPath(item.OriginalPath)))
                                 continue;
@@ -64,9 +128,14 @@ namespace MonoGame.Tools.Pipeline
                     {
                         return;
                     }
-                    catch 
+                    catch
                     {
                     }
+                    finally
+                    {
+                        Thread.Sleep(100);
+                    }
+
                 }
             }
 
