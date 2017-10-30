@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal FramebufferHelper(GraphicsDevice graphicsDevice)
             {
-                this.SupportsBlitFramebuffer = GL.BlitFramebuffer != null;
+                this.SupportsBlitFramebuffer = GL.BlitFramebuffer != null && GL.DrawBuffer != null && GL.ReadBuffer != null;
                 this.SupportsInvalidateFramebuffer = GL.InvalidateFramebuffer != null;
             }
 
