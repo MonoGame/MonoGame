@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
@@ -17,9 +18,26 @@ namespace TwoMGFX
         private TextureAddressMode _addressV;
         private TextureAddressMode _addressW;
 
+        private Color _borderColor;
+
         private int _maxAnisotropy;
         private int _maxMipLevel;
         private float _mipMapLevelOfDetailBias;
+
+        public SamplerStateInfo()
+        {
+            // NOTE: These match the defaults of SamplerState.
+            _minFilter = TextureFilterType.Linear;
+            _magFilter = TextureFilterType.Linear;
+            _mipFilter = TextureFilterType.Linear;
+            _addressU = TextureAddressMode.Wrap;
+            _addressV = TextureAddressMode.Wrap;
+            _addressW = TextureAddressMode.Wrap;
+            _borderColor = Color.White;
+            _maxAnisotropy = 4;
+            _maxMipLevel = 0;
+            _mipMapLevelOfDetailBias = 0.0f;
+        }
 
         public string Name { get; set; }
 
@@ -88,6 +106,15 @@ namespace TwoMGFX
             }
         }
 
+        public Color BorderColor
+        {
+            set
+            {
+                _borderColor = value;
+                _dirty = true;
+            }
+        }
+
         public int MaxAnisotropy
         {
             set
@@ -124,6 +151,8 @@ namespace TwoMGFX
             _state.AddressU = _addressU;
             _state.AddressV = _addressV;
             _state.AddressW = _addressW;
+
+            _state.BorderColor = _borderColor;
 
             _state.MaxAnisotropy = _maxAnisotropy;
             _state.MaxMipLevel = _maxMipLevel;

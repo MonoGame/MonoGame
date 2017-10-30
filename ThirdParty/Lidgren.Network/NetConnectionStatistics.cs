@@ -170,7 +170,7 @@ namespace Lidgren.Network
 
 			if (m_resentMessagesDueToDelay > 0)
 				bdr.AppendLine("Resent messages (delay): " + m_resentMessagesDueToDelay);
-			if (m_resentMessagesDueToDelay > 0)
+			if (m_resentMessagesDueToHole > 0)
 				bdr.AppendLine("Resent messages (holes): " + m_resentMessagesDueToHole);
 
 			int numUnsent = 0;

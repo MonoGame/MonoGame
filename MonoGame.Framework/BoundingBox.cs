@@ -214,16 +214,11 @@ namespace Microsoft.Xna.Framework
                 || point.Z > this.Max.Z)
             {
                 result = ContainmentType.Disjoint;
-            }//or if point is on box because coordonate of point is lesser or equal
-            else if (point.X == this.Min.X
-                || point.X == this.Max.X
-                || point.Y == this.Min.Y
-                || point.Y == this.Max.Y
-                || point.Z == this.Min.Z
-                || point.Z == this.Max.Z)
-                result = ContainmentType.Intersects;
+            }
             else
+            {
                 result = ContainmentType.Contains;
+            }
         }
 
         private static readonly Vector3 MaxVector3 = new Vector3(float.MaxValue);
@@ -472,14 +467,16 @@ namespace Microsoft.Xna.Framework
                 negativeVertex.Z = Max.Z;
             }
 
-            var distance = Vector3.Dot(plane.Normal, negativeVertex) + plane.D;
+            // Inline Vector3.Dot(plane.Normal, negativeVertex) + plane.D;
+            var distance = plane.Normal.X * negativeVertex.X + plane.Normal.Y * negativeVertex.Y + plane.Normal.Z * negativeVertex.Z + plane.D;
             if (distance > 0)
             {
                 result = PlaneIntersectionType.Front;
                 return;
             }
 
-            distance = Vector3.Dot(plane.Normal, positiveVertex) + plane.D;
+            // Inline Vector3.Dot(plane.Normal, positiveVertex) + plane.D;
+            distance = plane.Normal.X * positiveVertex.X + plane.Normal.Y * positiveVertex.Y + plane.Normal.Z * positiveVertex.Z + plane.D;
             if (distance < 0)
             {
                 result = PlaneIntersectionType.Back;

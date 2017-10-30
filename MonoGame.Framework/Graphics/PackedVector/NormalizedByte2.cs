@@ -1,3 +1,8 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+
 using System;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
@@ -36,7 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             set
             {
                 _packed = value;
-            } 
+            }
         }
 
         public override bool Equals(object obj)
@@ -62,8 +67,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static ushort Pack(float x, float y)
         {
-            var byte2 = (((ushort)(MathHelper.Clamp(x, -1.0f, 1.0f) * 127.0f)) << 0) & 0x00FF;
-            var byte1 = (((ushort)(MathHelper.Clamp(y, -1.0f, 1.0f) * 127.0f)) << 8) & 0xFF00;
+            var byte2 = (((ushort) Math.Round(MathHelper.Clamp(x, -1.0f, 1.0f) * 127.0f)) & 0xFF) << 0;
+            var byte1 = (((ushort) Math.Round(MathHelper.Clamp(y, -1.0f, 1.0f) * 127.0f)) & 0xFF) << 8;
 
             return (ushort)(byte2 | byte1);
         }
@@ -77,12 +82,12 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         {
             return new Vector4(ToVector2(), 0.0f, 1.0f);
         }
-    
+
         public Vector2 ToVector2()
         {
             return new Vector2(
-                ((sbyte)(_packed & 0xFF)) / 127.0f,
-                ((sbyte)((_packed >> 8) & 0xFF)) / 127.0f);
+                ((sbyte) ((_packed >> 0) & 0xFF)) / 127.0f,
+                ((sbyte) ((_packed >> 8) & 0xFF)) / 127.0f);
         }
     }
 }

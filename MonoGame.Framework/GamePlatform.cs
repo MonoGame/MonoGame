@@ -2,52 +2,29 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using System;
 
-#if WINRT
-using Windows.UI.ViewManagement;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-    abstract class GamePlatform : IDisposable
+    abstract partial class GamePlatform : IDisposable
     {
         #region Fields
 
         protected TimeSpan _inactiveSleepTime = TimeSpan.FromMilliseconds(20.0);
         protected bool _needsToResetElapsedTime = false;
         bool disposed;
+        protected bool InFullScreenMode = false;
         protected bool IsDisposed { get { return disposed; } }
 
         #endregion
 
         #region Construction/Destruction
-        public static GamePlatform Create(Game game)
-        {
-#if IOS
-            return new iOSGamePlatform(game);
-#elif MONOMAC
-            return new MacGamePlatform(game);
-#elif (WINDOWS && OPENGL) || LINUX || ANGLE
-            return new OpenTKGamePlatform(game);
-#elif ANDROID
-            return new AndroidGamePlatform(game);
-#elif PSM
-			return new PSSGamePlatform(game);
-#elif WINDOWS && DIRECTX
-            return new MonoGame.Framework.WinFormsGamePlatform(game);
-#elif WINDOWS_PHONE
-            return new MonoGame.Framework.WindowsPhone.WindowsPhoneGamePlatform(game);
-#elif WINRT
-            return new MetroGamePlatform(game);
-#elif WEB
-            return new WebGamePlatform(game);
-#endif
-        }
 
-        protected GamePlatform(Game game)
+		protected GamePlatform(Game game)
         {
             if (game == null)
                 throw new ArgumentNullException("game");
@@ -86,7 +63,7 @@ namespace Microsoft.Xna.Framework
                 if (_isActive != value)
                 {
                     _isActive = value;
-                    Raise(_isActive ? Activated : Deactivated, EventArgs.Empty);
+                    EventHelpers.Raise(this, _isActive ? Activated : Deactivated, EventArgs.Empty);
                 }
             }
         }
@@ -105,37 +82,6 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
-        private ApplicationViewState _viewState;
-        public ApplicationViewState ViewState
-        {
-            get { return _viewState; }
-            set
-            {
-                if (_viewState == value)
-                    return;
-
-                Raise(ViewStateChanged, new ViewStateChangedEventArgs(value));
-
-                _viewState = value;
-            }
-        }
-#endif
-
-#if PSM
-        private PSSGameWindow _window;
-        public PSSGameWindow Window
-        {
-            get { return _window; }
-            protected set
-            {
-                if (_window == null)
-                    TouchPanel.PrimaryWindow = value;
-
-                _window = value;
-            }
-        }
-#else
         private GameWindow _window;
         public GameWindow Window
         {
@@ -153,7 +99,6 @@ namespace Microsoft.Xna.Framework
                 _window = value;
             }
         }
-#endif
 
         #endregion
 
@@ -163,17 +108,6 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
 
-#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
-        public event EventHandler<ViewStateChangedEventArgs> ViewStateChanged;
-#endif
-
-        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
-            where TEventArgs : EventArgs
-        {
-            if (handler != null)
-                handler(this, e);
-        }
-
         /// <summary>
         /// Raises the AsyncRunLoopEnded event.  This method must be called by
         /// derived classes when the asynchronous run loop they start has
@@ -181,7 +115,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         protected void RaiseAsyncRunLoopEnded()
         {
-            Raise(AsyncRunLoopEnded, EventArgs.Empty);
+            EventHelpers.Raise(this, AsyncRunLoopEnded, EventArgs.Empty);
         }
 
         #endregion Events
@@ -197,11 +131,6 @@ namespace Microsoft.Xna.Framework
         public virtual void BeforeInitialize()
         {
             IsActive = true;
-            if (this.Game.GraphicsDevice == null) 
-            {
-                var graphicsDeviceManager = Game.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			   
-                graphicsDeviceManager.CreateDevice();
-            }
         }
 
         /// <summary>
@@ -313,7 +242,18 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public virtual void ResetElapsedTime() {}
 
+        public virtual void Present() { }
+
         protected virtual void OnIsMouseVisibleChanged() {}
+
+        /// <summary>
+        /// Called by the GraphicsDeviceManager to notify the platform
+        /// that the presentation parameters have changed.
+        /// </summary>
+        /// <param name="pp">The new presentation parameters.</param>
+        internal virtual void OnPresentationChanged(PresentationParameters pp)
+        {
+        }
 
         #endregion Methods
 
@@ -333,6 +273,9 @@ namespace Microsoft.Xna.Framework
         {
             if (!disposed)
             {
+                Mouse.PrimaryWindow = null;
+                TouchPanel.PrimaryWindow = null;
+
                 disposed = true;
             }
         }
@@ -348,8 +291,6 @@ namespace Microsoft.Xna.Framework
 			
 
         #endregion
-
-        public virtual void Present() {}
     }
 }
 

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<Template>
+	<TemplateConfiguration>
+		<_Name>MonoGame Mac Application (Xamarin.Mac)</_Name>
+		<Category>monogame/app/games</Category>
+		<Icon>monogame-project</Icon>
+		<LanguageName>C#</LanguageName>
+		<_Description>Creates a MonoGame Application for Mac OS. This application uses Xamarin.Mac and is suitable for the Apple Store.</_Description>
+	</TemplateConfiguration>
+	
+	<Actions>
+		<Open filename = "Game1.cs"/>
+	</Actions>
+	
+	<Combine name = "${ProjectName}" directory = ".">
+		<Options>
+			<StartupProject>${ProjectName}</StartupProject>
+		</Options>
+		
+		<Project name = "${ProjectName}" directory = "." type = "XamMac2">
+			<Options TargetFrameworkVersion="v4.5" />
+			<References>
+				<Reference type="Gac" refto="System" />
+				<Reference type="Gac" refto="System.Xml" />
+				<Reference type="Gac" refto="System.Core" />
+				<Reference type="Gac" refto="System.Xml.Linq" />
+				<Reference type="Gac" refto="System.Drawing" />
+				<Reference type="Gac" refto="Xamarin.Mac"/>
+				<Reference type="Package" refto="MonoGame.Framework" />
+			</References>
+			<Files>
+				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
+				<File name="Main.cs" AddStandardHeader="True" src="Mac/XamMac2Program.cs" />
+				<File name="Info.plist" AddStandardHeader="False" src="Mac/MacInfo.plist" />
+				<RawFile name="Icon.ico" src="Common/Icon.ico" BuildAction="EmbeddedResource"/>
+				<Directory name="Content">
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
+				</Directory>
+				<Directory name="Properties">
+					<File name="AssemblyInfo.cs" AddStandardHeader="True" src="Common/AssemblyInfo.cs" />
+				</Directory>
+				<ContentFile>
+					<File name="MonoGame.Framework.dll.config" src="Common/MonoGame.Framework.dll.config" CopyToOutputDirectory="PreserveNewest" />
+				</ContentFile>
+				<RawFile name="libopenal.1.dylib" src="libs/libopenal.1.dylib" BuildAction="NativeReference" />
+				<RawFile name="libSDL2-2.0.0.dylib" src="libs/libSDL2-2.0.0.dylib" BuildAction="NativeReference" />
+			</Files>
+		</Project>
+	</Combine>
+</Template>

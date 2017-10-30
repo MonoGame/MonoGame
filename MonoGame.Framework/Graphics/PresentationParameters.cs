@@ -1,59 +1,21 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_UAP
 using Windows.UI.Xaml.Controls;
 #endif
 
-#if MONOMAC
-using MonoMac.AppKit;
-#elif IOS
-using MonoTouch.UIKit;
+#if IOS
+using UIKit;
 using Microsoft.Xna.Framework.Input.Touch;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class PresentationParameters : IDisposable
+    public class PresentationParameters
     {
         #region Constants
 
@@ -70,106 +32,142 @@ namespace Microsoft.Xna.Framework.Graphics
         private IntPtr deviceWindowHandle;
         private int multiSampleCount;
         private bool disposed;
-#if !WINRT
         private bool isFullScreen;
-#endif
+        private bool hardwareModeSwitch = true;
 
         #endregion Private Fields
 
         #region Constructors
 
+        /// <summary>
+        /// Create a <see cref="PresentationParameters"/> instance with default values for all properties.
+        /// </summary>
         public PresentationParameters()
         {
             Clear();
-        }
-
-        ~PresentationParameters()
-        {
-            Dispose(false);
         }
 
         #endregion Constructors
 
         #region Properties
 
+        /// <summary>
+        /// Get or set the format of the back buffer.
+        /// </summary>
         public SurfaceFormat BackBufferFormat
         {
             get { return backBufferFormat; }
             set { backBufferFormat = value; }
         }
 
+        /// <summary>
+        /// Get or set the height of the back buffer.
+        /// </summary>
         public int BackBufferHeight
         {
             get { return backBufferHeight; }
             set { backBufferHeight = value; }
         }
 
+        /// <summary>
+        /// Get or set the width of the back buffer.
+        /// </summary>
         public int BackBufferWidth
         {
             get { return backBufferWidth; }
             set { backBufferWidth = value; }
         }
 
+        /// <summary>
+        /// Get the bounds of the back buffer.
+        /// </summary>
         public Rectangle Bounds 
         {
             get { return new Rectangle(0, 0, backBufferWidth, backBufferHeight); }
         }
 
+        /// <summary>
+        /// Get or set the handle of the window that will present the back buffer.
+        /// </summary>
         public IntPtr DeviceWindowHandle
         {
             get { return deviceWindowHandle; }
             set { deviceWindowHandle = value; }
         }
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_UAP
         [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
+        public SwapChainPanel SwapChainPanel { get; set; }
 #endif
 
-        public DepthFormat DepthStencilFormat
+        /// <summary>
+        /// Get or set the depth stencil format for the back buffer.
+        /// </summary>
+		public DepthFormat DepthStencilFormat
         {
             get { return depthStencilFormat; }
             set { depthStencilFormat = value; }
         }
 
+        /// <summary>
+        /// Get or set a value indicating if we are in full screen mode.
+        /// </summary>
         public bool IsFullScreen
         {
 			get
             {
-#if WINRT
-                // Always return true for Windows 8
-                return true;
-#else
 				 return isFullScreen;
-#endif
             }
             set
             {
-#if !WINRT
-                // If we are not on windows 8 set the value otherwise ignore it.
-				isFullScreen = value;				
-#endif
-#if IOS
+                isFullScreen = value;				
+#if IOS && !TVOS
 				UIApplication.SharedApplication.StatusBarHidden = isFullScreen;
 #endif
 
 			}
         }
 		
+        /// <summary>
+        /// If <code>true</code> the <see cref="GraphicsDevice"/> will do a mode switch
+        /// when going to full screen mode. If <code>false</code> it will instead do a
+        /// soft full screen by maximizing the window and making it borderless.
+        /// </summary>
+        public bool HardwareModeSwitch
+        {
+            get { return hardwareModeSwitch; }
+            set { hardwareModeSwitch = value; }
+        }
+
+        /// <summary>
+        /// Get or set the multisample count for the back buffer.
+        /// </summary>
         public int MultiSampleCount
         {
             get { return multiSampleCount; }
             set { multiSampleCount = value; }
         }
 		
+        /// <summary>
+        /// Get or set the presentation interval.
+        /// </summary>
         public PresentInterval PresentationInterval { get; set; }
 
+        /// <summary>
+        /// Get or set the display orientation.
+        /// </summary>
 		public DisplayOrientation DisplayOrientation 
 		{ 
 			get; 
 			set; 
 		}
 		
+        /// <summary>
+        /// Get or set the RenderTargetUsage for the back buffer.
+        /// Determines if the back buffer is cleared when it is set as the
+        /// render target by the <see cref="GraphicsDevice"/>.
+        /// <see cref="GraphicsDevice"/> target.
+        /// </summary>
 		public RenderTargetUsage RenderTargetUsage { get; set; }
 
         #endregion Properties
@@ -177,6 +175,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Methods
 
+        /// <summary>
+        /// Reset all properties to their default values.
+        /// </summary>
         public void Clear()
         {
             backBufferFormat = SurfaceFormat.Color;
@@ -185,7 +186,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			var width = (int)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
 			var height = (int)(UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale);
 			
-			// Flip the dimentions if we need to.
+			// Flip the dimensions if we need to.
 			if (TouchPanel.DisplayOrientation == DisplayOrientation.LandscapeLeft ||
 			    TouchPanel.DisplayOrientation == DisplayOrientation.LandscapeRight)
 			{
@@ -200,7 +201,7 @@ namespace Microsoft.Xna.Framework.Graphics
             backBufferHeight = GraphicsDeviceManager.DefaultBackBufferHeight;     
 #endif
             deviceWindowHandle = IntPtr.Zero;
-#if IOS
+#if IOS && !TVOS
 			isFullScreen = UIApplication.SharedApplication.StatusBarHidden;
 #else
             // isFullScreen = false;
@@ -211,6 +212,10 @@ namespace Microsoft.Xna.Framework.Graphics
             DisplayOrientation = Microsoft.Xna.Framework.DisplayOrientation.Default;
         }
 
+        /// <summary>
+        /// Create a copy of this <see cref="PresentationParameters"/> instance.
+        /// </summary>
+        /// <returns></returns>
         public PresentationParameters Clone()
         {
             PresentationParameters clone = new PresentationParameters();
@@ -218,32 +223,14 @@ namespace Microsoft.Xna.Framework.Graphics
             clone.backBufferHeight = this.backBufferHeight;
             clone.backBufferWidth = this.backBufferWidth;
             clone.deviceWindowHandle = this.deviceWindowHandle;
-            clone.disposed = this.disposed;
-            clone.IsFullScreen = this.IsFullScreen;
             clone.depthStencilFormat = this.depthStencilFormat;
+            clone.IsFullScreen = this.IsFullScreen;
+            clone.HardwareModeSwitch = this.HardwareModeSwitch;
             clone.multiSampleCount = this.multiSampleCount;
             clone.PresentationInterval = this.PresentationInterval;
             clone.DisplayOrientation = this.DisplayOrientation;
+            clone.RenderTargetUsage = this.RenderTargetUsage;
             return clone;
-        }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                disposed = true;
-                if (disposing)
-                {
-                    // Dispose managed resources
-                }
-                // Dispose unmanaged resources
-            }
         }
 
         #endregion Methods

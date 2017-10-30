@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>MonoGame.Framework.DesktopGL</id>
+    <version>0.0.0.0</version>
+    <title>MonoGame.Framework.DesktopGL</title>
+    <authors>MonoGame Team</authors>
+    <owners>MonoGame Team</owners>
+    <licenseUrl>https://github.com/mono/MonoGame/blob/develop/LICENSE.txt</licenseUrl>
+    <projectUrl>http://monogame.net/</projectUrl>
+    <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
+
+This package provides you with MonoGame Framework that uses OpenGL for rendering and works on Windows, Linux and MacOS.</description>
+    <summary>This package provides you with MonoGame Framework that uses OpenGL for rendering and works on Windows, Linux and MacOS.</summary>
+    <copyright>Copyright © 2009-2017 The MonoGame Team</copyright>
+    <language>en-US</language>
+  </metadata>
+  <files>
+    <file src="..\..\NuGetPackages\build\DesktopGL\MonoGame.Framework.DesktopGL.targets" target="build\MonoGame.Framework.DesktopGL.targets" />
+    
+    <!-- C# Assemblies -->
+    <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />
+    <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net45\MonoGame.Framework.xml" />
+    
+    <!-- Native Libs -->
+    <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll.config" target="build\native\MonoGame.Framework.dll.config" />
+    <file src="WindowsGL\AnyCPU\Release\libopenal.1.dylib" target="build\native\libopenal.1.dylib" />
+    <file src="WindowsGL\AnyCPU\Release\libSDL2-2.0.0.dylib" target="build\native\libSDL2-2.0.0.dylib" />
+    <file src="WindowsGL\AnyCPU\Release\x64\libopenal.so.1" target="build\native\x64\libopenal.so.1" />
+    <file src="WindowsGL\AnyCPU\Release\x64\libSDL2-2.0.so.0" target="build\native\x64\libSDL2-2.0.so.0" />
+    <file src="WindowsGL\AnyCPU\Release\x64\SDL2.dll" target="build\native\x64\SDL2.dll" />
+    <file src="WindowsGL\AnyCPU\Release\x64\soft_oal.dll" target="build\native\x64\soft_oal.dll" />
+    <file src="WindowsGL\AnyCPU\Release\x86\libopenal.so.1" target="build\native\x86\libopenal.so.1" />
+    <file src="WindowsGL\AnyCPU\Release\x86\libSDL2-2.0.so.0" target="build\native\x86\libSDL2-2.0.so.0" />
+    <file src="WindowsGL\AnyCPU\Release\x86\SDL2.dll" target="build\native\x86\SDL2.dll" />
+    <file src="WindowsGL\AnyCPU\Release\x86\soft_oal.dll" target="build\native\x86\soft_oal.dll" />
+  </files>
+</package>

@@ -41,8 +41,13 @@ purpose and non-infringement.
 #region Statement
 ﻿using System;
 
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.Foundation;
 using MonoMac.AppKit;
+#else
+using Foundation;
+using AppKit;
+#endif
 
 #endregion Statement
 
@@ -281,18 +286,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		protected virtual void OnSignedIn (SignedInEventArgs e)
 		{
-			if (SignedIn != null) {
-				// Invokes the delegates. 
-				SignedIn (this, e);
-			}
-		}
+            EventHelpers.Raise(this, SignedIn, e);
+        }
 
 		protected virtual void OnSignedOut (SignedOutEventArgs e)
 		{
-			if (SignedOut != null) {
-				// Invokes the delegates. 
-				SignedOut (this, e);
-			}
+            EventHelpers.Raise(this, SignedOut, e);
 		}
 
 		#region Events

@@ -59,6 +59,18 @@ namespace Microsoft.Xna.Framework.Audio
         {
         }
 
+        internal void PlatformSetReverbMix(float mix)
+        {
+        }
+
+        internal void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
+        {
+        }
+
+        internal void PlatformClearFilter()
+        {
+        }
+
         private void PlatformDispose(bool disposing)
         {
         }

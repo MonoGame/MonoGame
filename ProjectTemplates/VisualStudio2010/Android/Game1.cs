@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework.Input;
 namespace $safeprojectname$
 {
     /// <summary>
-    /// This is the main type for your game
+    /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class Game1 : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -50,7 +50,7 @@ namespace $safeprojectname$
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
+        /// game-specific content.
         /// </summary>
         protected override void UnloadContent()
         {

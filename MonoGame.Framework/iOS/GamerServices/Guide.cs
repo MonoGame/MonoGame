@@ -73,11 +73,10 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
-using MonoTouch.Foundation;
-using MonoTouch.GameKit;
-using MonoTouch.UIKit;
+using Foundation;
+using GameKit;
+using UIKit;
 using Microsoft.Xna.Framework.Net;
-using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework.GamerServices
@@ -161,8 +160,6 @@ namespace Microsoft.Xna.Framework.GamerServices
         private static UIWindow _window;
         private static UIViewController _gameViewController;
 
-        private static double osVersion = 0.0f;
-
         [CLSCompliant(false)]
         public static GKMatch Match { get; private set; }
 
@@ -175,15 +172,6 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             if (!_isInitialised)
             {
-                var osVersionString = UIDevice.CurrentDevice.SystemVersion;
-                if (osVersionString.Contains(".") && osVersionString.IndexOf(".") != osVersionString.LastIndexOf("."))
-                {
-                    var parts = osVersionString.Split(char.Parse("."));
-                    osVersionString = parts[0] + "." + parts[1];
-                }
-
-                osVersion = double.Parse(osVersionString, System.Globalization.CultureInfo.InvariantCulture);
-
                 _window = (UIWindow)game.Services.GetService(typeof(UIWindow));
                 if (_window == null)
                     throw new InvalidOperationException(
@@ -305,13 +293,13 @@ namespace Microsoft.Xna.Framework.GamerServices
             return (result.AsyncState as ShowKeyboardInputDelegate).EndInvoke(result);
         }
 
-        delegate Nullable<int> ShowMessageBoxDelegate(
-            string title, string text, IEnumerable<string> buttons, int focusButton, MessageBoxIcon icon);
+        delegate Nullable<nint> ShowMessageBoxDelegate(
+            string title, string text, IEnumerable<string> buttons, nint focusButton, MessageBoxIcon icon);
 
-        private static Nullable<int> ShowMessageBox(
-            string title, string text, IEnumerable<string> buttons, int focusButton, MessageBoxIcon icon)
+        private static Nullable<nint> ShowMessageBox(
+            string title, string text, IEnumerable<string> buttons, nint focusButton, MessageBoxIcon icon)
         {
-            Nullable<int> result = null;
+            Nullable<nint> result = null;
 
             IsVisible = true;
             EventWaitHandle waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
@@ -339,7 +327,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         }
 
         public static IAsyncResult BeginShowMessageBox(
-            PlayerIndex player, string title, string text, IEnumerable<string> buttons, int focusButton,
+            PlayerIndex player, string title, string text, IEnumerable<string> buttons, nint focusButton,
             MessageBoxIcon icon, AsyncCallback callback, Object state)
         {
             if (IsVisible)
@@ -360,7 +348,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             return BeginShowMessageBox(PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
         }
 
-        public static Nullable<int> EndShowMessageBox(IAsyncResult result)
+        public static Nullable<nint> EndShowMessageBox(IAsyncResult result)
         {
             return (result.AsyncState as ShowMessageBoxDelegate).EndInvoke(result);
         }
@@ -422,7 +410,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                 prevGestures = TouchPanel.EnabledGestures;
                 TouchPanel.EnabledGestures = GestureType.None;
 
-                if (osVersion < 6.0d)
+                if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0))
                 {
                     // Show view controller the old way for iOS 5 and older
                     if (guideViewController == null)
@@ -449,11 +437,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         private static void HideViewController(UIViewController viewController)
         {
-            if (osVersion < 6.0d)
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0))
             {
 #pragma warning disable 618
                 // Disable DismissModalViewControllerAnimated warning, still need to support iOS 5 and older
-                viewController.DismissModalViewControllerAnimated(true);
+				viewController.DismissModalViewController(true);
 #pragma warning restore 618
             }
             else
@@ -472,7 +460,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             if ((Gamer.SignedInGamers.Count > 0) && (Gamer.SignedInGamers[0].IsSignedInToLive))
             {
-                if (osVersion < 6.0d)
+                if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0))
                 {
                     // GKLeaderboardViewController for iOS 5 and older
                     var leaderboardController = new GKLeaderboardViewController();
@@ -510,7 +498,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             if ((Gamer.SignedInGamers.Count > 0) && (Gamer.SignedInGamers[0].IsSignedInToLive))
             {
-                if (osVersion < 6.0d)
+                if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0))
                 {
                     // GKAchievementViewController for iOS 5 and older
                     var achievementController = new GKAchievementViewController();
@@ -547,10 +535,10 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             AssertInitialised();
 
-            if (MonoTouch.Twitter.TWTweetComposeViewController.CanSendTweet)
+            if (Twitter.TWTweetComposeViewController.CanSendTweet)
             {
-                var tweetController = new MonoTouch.Twitter.TWTweetComposeViewController();
-                tweetController.SetCompletionHandler((MonoTouch.Twitter.TWTweetComposeViewControllerResult r) =>
+                var tweetController = new Twitter.TWTweetComposeViewController();
+                tweetController.SetCompletionHandler((Twitter.TWTweetComposeViewControllerResult r) =>
                 {
                     HideViewController(tweetController);
                 });
@@ -654,16 +642,6 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             //ShowMatchMaker(minPlayers, maxPlayers, null); // Setting playersToInvite to null causes the game to crash (tested on iOS 5+)
             ShowMatchMaker(minPlayers, maxPlayers, new string[] { });
-        }
-
-        public static IAsyncResult BeginShowStorageDeviceSelector(AsyncCallback callback, Object state)
-        {
-            return null;
-        }
-
-        public static StorageDevice EndShowStorageDeviceSelector(IAsyncResult result)
-        {
-            return null;
         }
     }
 }

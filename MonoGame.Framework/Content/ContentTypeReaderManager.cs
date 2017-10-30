@@ -30,6 +30,7 @@ using System.Collections;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -48,16 +49,14 @@ namespace Microsoft.Xna.Framework.Content
 		{
             _locker = new object();
             _contentReadersCache = new Dictionary<Type, ContentTypeReader>(255);
-
-#if WINRT
-            _assemblyName = typeof(ContentTypeReaderManager).GetTypeInfo().Assembly.FullName;
-#else
-            _assemblyName = Assembly.GetExecutingAssembly().FullName;
-#endif
+            _assemblyName = ReflectionHelpers.GetAssembly(typeof(ContentTypeReaderManager)).FullName;
         }
 
         public ContentTypeReader GetTypeReader(Type targetType)
         {
+            if (targetType.IsArray && targetType.GetArrayRank() > 1)
+                targetType = typeof(Array);
+
             ContentTypeReader reader;
             if (_contentReaders.TryGetValue(targetType, out reader))
                 return reader;
@@ -115,10 +114,12 @@ namespace Microsoft.Xna.Framework.Content
 				var hExternalReferenceReader = new ExternalReferenceReader();
                 var hSoundEffectReader = new SoundEffectReader();
                 var hSongReader = new SongReader();
+                var hModelReader = new ModelReader();
+                var hInt32Reader = new Int32Reader();
 
                 // At the moment the Video class doesn't exist
                 // on all platforms... Allow it to compile anyway.
-#if ANDROID || IOS || MONOMAC || (WINDOWS && !OPENGL) || (WINRT && !WINDOWS_PHONE)
+#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL) || WINDOWS_UAP
                 var hVideoReader = new VideoReader();
 #endif
             }
@@ -192,7 +193,8 @@ namespace Microsoft.Xna.Framework.Content
 
                     var targetType = contentReaders[i].TargetType;
                     if (targetType != null)
-                      _contentReaders.Add(targetType, contentReaders[i]);
+                        if (!_contentReaders.ContainsKey(targetType))
+                            _contentReaders.Add(targetType, contentReaders[i]);
 
                     // I think the next 4 bytes refer to the "Version" of the type reader,
                     // although it always seems to be zero

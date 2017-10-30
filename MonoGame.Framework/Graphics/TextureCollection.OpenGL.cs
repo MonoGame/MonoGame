@@ -2,15 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
-using OpenTK.Graphics.ES20;
-using TextureUnit = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -60,6 +52,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     _targets[i] = tex.glTarget;
                     GL.BindTexture(tex.glTarget, tex.glTexture);
                     GraphicsExtensions.CheckGLError();
+
+                    unchecked
+                    {
+                        _graphicsDevice._graphicsMetrics._textureCount++;
+                    }
                 }
 
                 _dirty &= ~mask;

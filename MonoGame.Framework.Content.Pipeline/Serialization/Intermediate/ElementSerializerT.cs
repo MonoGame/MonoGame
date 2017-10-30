@@ -5,15 +5,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     abstract class ElementSerializer<T> : ContentTypeSerializer<T>
     {
-        private static readonly char [] _seperators = { ' ', '\t' };
-
-        private const string _writeSeperator = " ";
-
         private readonly int _elementCount;
 
         protected ElementSerializer(string xmlTypeName, int elementCount) :
@@ -31,20 +28,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal abstract void Serialize(T value, List<string> results);
 
-        private static string[] ReadElements(IntermediateReader input)
-        {
-            var str = input.Xml.ReadString();
-
-            var elements = str.Split(_seperators, StringSplitOptions.RemoveEmptyEntries);
-            if (elements.Length == 0)
-                elements = new[] { str };
-
-            return elements;
-        }
+        
 
         protected internal void Deserialize(IntermediateReader input, List<T> results)
         {
-            var elements = ReadElements(input);
+            var elements = PackedElementsHelper.ReadElements(input);
                             
             for (var index = 0; index < elements.Length;)
             {
@@ -58,7 +46,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override T Deserialize(IntermediateReader input, ContentSerializerAttribute format, T existingInstance)
         {
-            var elements = ReadElements(input);
+            var elements = PackedElementsHelper.ReadElements(input);
 
             if (elements.Length < _elementCount)
                 ThrowElementCountException();
@@ -72,7 +60,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             var elements = new List<string>();
             for (var i = 0; i < values.Count; i++)
                 Serialize(values[i], elements);
-            var str = string.Join(_writeSeperator, elements);
+            var str = PackedElementsHelper.JoinElements(elements);
             output.Xml.WriteString(str);
         }
 
@@ -80,7 +68,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         {
             var elements = new List<string>();
             Serialize(value, elements);
-            var str = string.Join(_writeSeperator, elements);
+            var str = PackedElementsHelper.JoinElements(elements);
             output.Xml.WriteString(str);
         }
     }

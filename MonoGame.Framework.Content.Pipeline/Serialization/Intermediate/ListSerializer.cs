@@ -27,6 +27,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             _itemSerializer = serializer.GetTypeSerializer(typeof(T));
         }
 
+        public override bool ObjectIsEmpty(List<T> value)
+        {
+            return value.Count == 0;
+        }
+
+        protected internal override void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, List<T> value)
+        {
+            foreach (var item in value)
+                callback(_itemSerializer, item);
+        }
+
         protected internal override List<T> Deserialize(IntermediateReader input, ContentSerializerAttribute format, List<T> existingInstance)
         {
             var result = existingInstance ?? new List<T>();
@@ -53,7 +64,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void Serialize(IntermediateWriter output, List<T> value, ContentSerializerAttribute format)
         {
-            throw new NotImplementedException();
+            var elementSerializer = _itemSerializer as ElementSerializer<T>;
+            if (elementSerializer != null)
+                elementSerializer.Serialize(output, value);
+            else
+            {
+                // Create the item serializer attribute.
+                var itemFormat = new ContentSerializerAttribute();
+                itemFormat.ElementName = format.CollectionItemName;
+
+                // Read all the items.
+                foreach (var item in value)
+                    output.WriteObject(item, itemFormat, _itemSerializer);
+            }
         }
     }
 }

@@ -3,12 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-
-#if MONOMAC
-using MonoMac.OpenAL;
-#else
-using OpenTK.Audio.OpenAL;
-#endif
+using MonoGame.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -17,27 +12,12 @@ namespace Microsoft.Xna.Framework.Audio
 		int openALDataBuffer;
 		ALFormat openALFormat;
 		int dataSize;
-		int sampleRate;
-		private int _sourceId;
         bool _isDisposed;
-        internal int _pauseCount;
 
-		public OALSoundBuffer ()
+		public OALSoundBuffer()
 		{
-            try
-            {
-                var alError = AL.GetError();
-                AL.GenBuffers(1, out openALDataBuffer);
-                alError = AL.GetError();
-                if (alError != ALError.NoError)
-                {
-                    Console.WriteLine("Failed to generate OpenAL data buffer: ", AL.GetErrorString(alError));
-                }
-            }
-            catch (DllNotFoundException e)
-            {
-                throw new NoAudioHardwareException("OpenAL drivers could not be found.", e);
-            }
+            AL.GenBuffers(1, out openALDataBuffer);
+            ALHelper.CheckError("Failed to generate OpenAL data buffer.");
 		}
 
         ~OALSoundBuffer()
@@ -45,64 +25,49 @@ namespace Microsoft.Xna.Framework.Audio
             Dispose(false);
         }
 
-		public int OpenALDataBuffer {
-			get {
+		public int OpenALDataBuffer
+        {
+			get
+            {
 				return openALDataBuffer;
 			}
 		}
 
-		public double Duration {
+		public double Duration
+        {
 			get;
 			set;
 		}
 
-        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate)
+        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int sampleAlignment = 0)
         {
+            if ((format == ALFormat.MonoMSAdpcm || format == ALFormat.StereoMSAdpcm) && !OpenALSoundController.GetInstance.SupportsAdpcm)
+                throw new InvalidOperationException("MS-ADPCM is not supported by this OpenAL driver");
+            if ((format == ALFormat.MonoIma4 || format == ALFormat.StereoIma4) && !OpenALSoundController.GetInstance.SupportsIma4)
+                throw new InvalidOperationException("IMA/ADPCM is not supported by this OpenAL driver");
+
             openALFormat = format;
             dataSize = size;
-            this.sampleRate = sampleRate;
-            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, dataSize, this.sampleRate);
+            int unpackedSize = 0;
+
+            if (sampleAlignment > 0)
+            {
+                AL.Bufferi(openALDataBuffer, ALBufferi.UnpackBlockAlignmentSoft, sampleAlignment);
+                ALHelper.CheckError("Failed to fill buffer.");
+            }
+
+            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, size, sampleRate);
+            ALHelper.CheckError("Failed to fill buffer.");
 
             int bits, channels;
-
+            Duration = -1;
             AL.GetBuffer(openALDataBuffer, ALGetBufferi.Bits, out bits);
-            ALError alError = AL.GetError();
-            if (alError != ALError.NoError)
-            {
-                Console.WriteLine("Failed to get buffer bits: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
-                Duration = -1;
-            }
-            else
-            {
-                AL.GetBuffer(openALDataBuffer, ALGetBufferi.Channels, out channels);
-
-                alError = AL.GetError();
-                if (alError != ALError.NoError)
-                {
-                    Console.WriteLine("Failed to get buffer bits: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
-                    Duration = -1;
-                }
-                else
-                {
-                    Duration = (float)(size / ((bits / 8) * channels)) / (float)sampleRate;
-                }
-            }
-            //Console.WriteLine("Duration: " + Duration + " / size: " + size + " bits: " + bits + " channels: " + channels + " rate: " + sampleRate);
-
-        }
-
-        public void Pause()
-        {
-            if (_pauseCount == 0)
-                AL.SourcePause(_sourceId);
-            ++_pauseCount;
-        }
-
-        public void Resume()
-        {
-            --_pauseCount;
-            if (_pauseCount == 0)
-                AL.SourcePlay(_sourceId);
+            ALHelper.CheckError("Failed to get buffer bits");
+            AL.GetBuffer(openALDataBuffer, ALGetBufferi.Channels, out channels);
+            ALHelper.CheckError("Failed to get buffer channels");
+            AL.GetBuffer(openALDataBuffer, ALGetBufferi.Size, out unpackedSize);
+            ALHelper.CheckError("Failed to get buffer size");
+            Duration = (float)(unpackedSize / ((bits / 8) * channels)) / (float)sampleRate;
         }
 
 		public void Dispose()
@@ -122,37 +87,13 @@ namespace Microsoft.Xna.Framework.Audio
                 // Release unmanaged resources
                 if (AL.IsBuffer(openALDataBuffer))
                 {
+                    ALHelper.CheckError("Failed to fetch buffer state.");
                     AL.DeleteBuffers(1, ref openALDataBuffer);
+                    ALHelper.CheckError("Failed to delete buffer.");
                 }
 
                 _isDisposed = true;
             }
         }
-
-		public int SourceId
-		{
-			get {
-				return _sourceId;
-			}
-
-			set {
-				_sourceId = value;
-				if (Reserved != null)
-					Reserved(this, EventArgs.Empty);
-
-			}
-		}
-
-		public void RecycleSoundBuffer()
-		{
-			if (Recycled != null)
-				Recycled(this, EventArgs.Empty);
-		}
-
-		#region Events
-		public event EventHandler<EventArgs> Reserved;
-		public event EventHandler<EventArgs> Recycled;
-		#endregion
 	}
 }
-

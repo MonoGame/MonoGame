@@ -1,205 +1,136 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
-
-using Microsoft.Xna.Framework;
-using System;
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 namespace Microsoft.Xna.Framework.Input
 {
+    /// <summary>
+    /// A struct that represents the current stick (thumbstick) states for the controller.
+    /// </summary>
     public struct GamePadThumbSticks
     {
-        public enum GateType
-        {
-            None,
-            Round,
-            Square
-        };
-        public static GateType Gate = GateType.Round;
+#if DIRECTX && !WINDOWS_UAP
+        // XInput Xbox 360 Controller dead zones
+        // Dead zones are slighty different between left and right sticks, this may come from Microsoft usability tests
+        private const float leftThumbDeadZone = SharpDX.XInput.Gamepad.LeftThumbDeadZone / (float)short.MaxValue;
+        private const float rightThumbDeadZone = SharpDX.XInput.Gamepad.RightThumbDeadZone / (float)short.MaxValue;
+#else
+        // Default & SDL Xbox 360 Controller dead zones
+        // Based on the XInput constants
+        private const float leftThumbDeadZone = 0.24f;
+        private const float rightThumbDeadZone = 0.265f;
+#endif
 
-        Vector2 left;
-        Vector2 right;
+        internal readonly Buttons _virtualButtons;
+        private readonly Vector2 _left, _right;
 
+        /// <summary>
+        /// Gets a value indicating the position of the left stick (thumbstick). 
+        /// </summary>
+        /// <value>A <see cref="Vector2"/> indicating the current position of the left stick (thumbstick).</value>
         public Vector2 Left
         {
-        	get
-            {
-                return left;
-            }
-        	internal set
-            {
-        		switch (Gate)
-                {
-        		case GateType.None:
-        			left = value;
-        			break;
-        		case GateType.Round:
-        			if (value.LengthSquared () > 1f)
-        				left = Vector2.Normalize (value);
-        			else
-        				left = value;
-        			break;
-                    case GateType.Square:
-                        left = new Vector2(MathHelper.Clamp(value.X, -1f, 1f), MathHelper.Clamp(value.Y, -1f, 1f));
-                        break;
-                    default:
-                        left = Vector2.Zero;
-                        break;
-                }
-            }
+            get { return _left; }
         }
+
+        /// <summary>
+        /// Gets a value indicating the position of the right stick (thumbstick). 
+        /// </summary>
+        /// <value>A <see cref="Vector2"/> indicating the current position of the right stick (thumbstick).</value>
         public Vector2 Right
         {
-        	get
-            {
-                return right;
-            }
-        	internal set
-            {
-        		switch (Gate)
-                {
-        		case GateType.None:
-        			right = value;
-        			break;
-        		case GateType.Round:
-        			if (value.LengthSquared () > 1f)
-        				right = Vector2.Normalize (value);
-        			else
-        				right = value;
-        			break;
-                    case GateType.Square:
-                        right = new Vector2(MathHelper.Clamp(value.X, -1f, 1f), MathHelper.Clamp(value.Y, -1f, 1f));
-                        break;
-                    default:
-                        right = Vector2.Zero;
-                        break;
-                }
-            }
+            get { return _right; }
         }
 
-		public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition):this()
-		{
-			Left = leftPosition;
-			Right = rightPosition;
-		}
+        public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition)
+            : this(leftPosition, rightPosition, GamePadDeadZone.None)
+        {
+            
+        }
 
-        internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone deadZoneMode):this()
+        internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone deadZoneMode) : this()
         {
             // XNA applies dead zones before rounding/clamping values. The public ctor does not allow this because the dead zone must be known before
-            left = leftPosition;
-            right = rightPosition;
-            ApplyDeadZone(deadZoneMode);
-            Left = left;
-            Right = right;
-        }
 
-        private void ApplyDeadZone(GamePadDeadZone dz)
-        {
-#if DIRECTX && !WINDOWS_PHONE && !WINDOWS_PHONE81
-            // XInput Xbox 360 Controller dead zones
-            // Dead zones are slighty different between left and right sticks, this may come from Microsoft usability tests
-            const float leftThumbDeadZone = SharpDX.XInput.Gamepad.LeftThumbDeadZone / (float)short.MaxValue;
-            const float rightThumbDeadZone = SharpDX.XInput.Gamepad.RightThumbDeadZone / (float)short.MaxValue;
-#elif OUYA
-            // OUYA dead zones should
-            // They are a bit larger to accomodate OUYA Gamepad (but will also affect Xbox 360 controllers plugged to an OUYA)
-            const float leftThumbDeadZone = 0.3f;
-            const float rightThumbDeadZone = 0.3f;
-#elif PSM
-            // PlayStation Vita
-            // These values are arbitrary and still need empirical testing
-            const float leftThumbDeadZone = 0.25f;
-            const float rightThumbDeadZone = 0.25f;
-#else
-            // Default & SDL Xbox 360 Controller dead zones
-            // Based on the XInput constants
-            const float leftThumbDeadZone = 0.24f;
-            const float rightThumbDeadZone = 0.265f;
-#endif
-            switch (dz)
+            // Apply dead zone
+            switch (deadZoneMode)
             {
                 case GamePadDeadZone.None:
+                    _left = leftPosition;
+                    _right = rightPosition;
                     break;
                 case GamePadDeadZone.IndependentAxes:
-                    if (Math.Abs(left.X) < leftThumbDeadZone)
-                        left.X = 0f;
-                    if (Math.Abs(left.Y) < leftThumbDeadZone)
-                        left.Y = 0f;
-                    if (Math.Abs(right.X) < rightThumbDeadZone)
-                        right.X = 0f;
-                    if (Math.Abs(right.Y) < rightThumbDeadZone)
-                        right.Y = 0f;
+                    _left = ExcludeIndependentAxesDeadZone(leftPosition, leftThumbDeadZone);
+                    _right = ExcludeIndependentAxesDeadZone(rightPosition, rightThumbDeadZone);
                     break;
                 case GamePadDeadZone.Circular:
-                    if (left.LengthSquared() < leftThumbDeadZone * leftThumbDeadZone)
-                        left = Vector2.Zero;
-                    if (right.LengthSquared() < rightThumbDeadZone * rightThumbDeadZone)
-                        right = Vector2.Zero;
+                    _left = ExcludeCircularDeadZone(leftPosition, leftThumbDeadZone);
+                    _right = ExcludeCircularDeadZone(rightPosition, rightThumbDeadZone);
                     break;
             }
 
-            // excluding deadZone from the final output range
-             if (dz != GamePadDeadZone.None)
-             {
-                 if (left.X < -leftThumbDeadZone)
-                     left.X = left.X + leftThumbDeadZone;
-                 else if (left.X > leftThumbDeadZone)
-                     left.X = left.X - leftThumbDeadZone;
-                 if (left.Y < -leftThumbDeadZone)
-                     left.Y = left.Y + leftThumbDeadZone;
-                 else if (left.Y > leftThumbDeadZone)
-                     left.Y = left.Y - leftThumbDeadZone;
-
-                 if (right.X < -rightThumbDeadZone)
-                     right.X = right.X + rightThumbDeadZone;
-                 else if (right.X > rightThumbDeadZone)
-                     right.X = right.X - rightThumbDeadZone;
-                 if (right.Y < -rightThumbDeadZone)
-                     right.Y = right.Y + rightThumbDeadZone;
-                 else if (right.Y > rightThumbDeadZone)
-                     right.Y = right.Y - rightThumbDeadZone;
-
-                 left.X = left.X / (1.0f - leftThumbDeadZone);
-                 left.Y = left.Y / (1.0f - leftThumbDeadZone);
-                 right.X = right.X / (1.0f - rightThumbDeadZone);
-                 right.Y = right.Y / (1.0f - rightThumbDeadZone);
+            // Apply clamp
+            if (deadZoneMode == GamePadDeadZone.Circular)
+            {
+                if (_left.LengthSquared() > 1f)
+                    _left.Normalize();
+                if (_right.LengthSquared() > 1f)
+                    _right.Normalize();
             }
+            else
+            {
+                _left = new Vector2(MathHelper.Clamp(Left.X, -1f, 1f), MathHelper.Clamp(Left.Y, -1f, 1f));
+                _right = new Vector2(MathHelper.Clamp(Right.X, -1f, 1f), MathHelper.Clamp(Right.Y, -1f, 1f));
+            }
+
+            // VirtualButtons should always behave like deadzone is IndependentAxes. 
+            // This is consistent with XNA behaviour and generally most convenient (e.g. for menu navigation)
+            _virtualButtons = 0;
+
+            if (leftPosition.X < -leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickLeft;
+            else if (leftPosition.X > leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickRight;
+
+            if (leftPosition.Y < -leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickDown;
+            else if (leftPosition.Y > leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickUp;
+
+            if (rightPosition.X < -rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickLeft;
+            else if (rightPosition.X > rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickRight;
+
+            if (rightPosition.Y < -rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickDown;
+            else if (rightPosition.Y > rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickUp;
+        }
+
+        private Vector2 ExcludeIndependentAxesDeadZone(Vector2 value, float deadZone)
+        {
+            return new Vector2(ExcludeAxisDeadZone(value.X, deadZone), ExcludeAxisDeadZone(value.Y, deadZone));
+        }
+
+        private float ExcludeAxisDeadZone(float value, float deadZone)
+        {
+            if (value < -deadZone)
+                value += deadZone;
+            else if (value > deadZone)
+                value -= deadZone;
+            else
+                return 0f;
+            return value / (1f - deadZone);
+        }
+
+        private Vector2 ExcludeCircularDeadZone(Vector2 value, float deadZone)
+        {
+            var originalLength = value.Length();
+            if (originalLength <= deadZone)
+                return Vector2.Zero;
+            var newLength = (originalLength - deadZone) / (1f - deadZone);
+            return value * (newLength / originalLength);
         }
 
         /// <summary>
@@ -210,8 +141,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.</returns>
         public static bool operator ==(GamePadThumbSticks left, GamePadThumbSticks right)
         {
-            return (left.left == right.left)
-                && (left.right == right.right);
+            return (left.Left == right.Left) && (left.Right == right.Right);
         }
 
         /// <summary>
@@ -235,9 +165,26 @@ namespace Microsoft.Xna.Framework.Input
             return (obj is GamePadThumbSticks) && (this == (GamePadThumbSticks)obj);
         }
 
-        public override int GetHashCode ()
+        /// <summary>
+        /// Serves as a hash function for a <see cref="T:Microsoft.Xna.Framework.Input.GamePadThumbSticks"/> object.
+        /// </summary>
+        /// <returns>A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a
+        /// hash table.</returns>
+        public override int GetHashCode()
         {
-            return this.Left.GetHashCode () + 37 * this.Right.GetHashCode ();
+            unchecked
+            {
+                return (Left.GetHashCode() * 397) ^ Right.GetHashCode();
+            }
+        }
+
+        /// <summary>
+        /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Microsoft.Xna.Framework.Input.GamePadThumbSticks"/>.
+        /// </summary>
+        /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Microsoft.Xna.Framework.Input.GamePadThumbSticks"/>.</returns>
+        public override string ToString()
+        {
+            return "[GamePadThumbSticks: Left=" + Left + ", Right=" + Right + "]";
         }
     }
 }

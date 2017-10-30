@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -25,7 +26,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return result;
         }
 
-        public static int Run(string command, string arguments, out string stdout, out string stderr)
+        public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null)
         {
             // This particular case is likely to be the most common and thus
             // warrants its own specific error message rather than falling
@@ -33,6 +34,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var fullPath = FindCommand(command);
             if (string.IsNullOrEmpty(fullPath))
                 throw new Exception(string.Format("Couldn't locate external tool '{0}'.", command));
+
+            // We can't reference ref or out parameters from within
+            // lambdas (for the thread functions), so we have to store
+            // the data in a temporary variable and then assign these
+            // variables to the out parameters.
+            var stdoutTemp = string.Empty;
+            var stderrTemp = string.Empty;
 
             var processInfo = new ProcessStartInfo
             {
@@ -44,6 +52,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
+                RedirectStandardInput = true,
             };
 
             using (var process = new Process())
@@ -52,10 +61,46 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 process.Start();
 
-                stdout = process.StandardOutput.ReadToEnd();
-                stderr = process.StandardError.ReadToEnd();
+                // We have to run these in threads, because using ReadToEnd
+                // on one stream can deadlock if the other stream's buffer is
+                // full.
+                var stdoutThread = new Thread(new ThreadStart(() =>
+                {
+                    var memory = new MemoryStream();
+                    process.StandardOutput.BaseStream.CopyTo(memory);
+                    var bytes = new byte[memory.Position];
+                    memory.Seek(0, SeekOrigin.Begin);
+                    memory.Read(bytes, 0, bytes.Length);
+                    stdoutTemp = System.Text.Encoding.ASCII.GetString(bytes);
+                }));
+                var stderrThread = new Thread(new ThreadStart(() =>
+                {
+                    var memory = new MemoryStream();
+                    process.StandardError.BaseStream.CopyTo(memory);
+                    var bytes = new byte[memory.Position];
+                    memory.Seek(0, SeekOrigin.Begin);
+                    memory.Read(bytes, 0, bytes.Length);
+                    stderrTemp = System.Text.Encoding.ASCII.GetString(bytes);
+                }));
+
+                stdoutThread.Start();
+                stderrThread.Start();
+
+                if (stdin != null)
+                {
+                    process.StandardInput.Write(System.Text.Encoding.ASCII.GetBytes(stdin));
+                }
+
+                // Make sure interactive prompts don't block.
+                process.StandardInput.Close();
 
                 process.WaitForExit();
+
+                stdoutThread.Join();
+                stderrThread.Join();
+
+                stdout = stdoutTemp;
+                stderr = stderrTemp;
 
                 return process.ExitCode;
             }
@@ -69,6 +114,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </remarks>
         private static string FindCommand(string command)
         {
+            // Expand any environment variables.
+            command = Environment.ExpandEnvironmentVariables(command);
+
             // If we have a full path just pass it through.
             if (File.Exists(command))
                 return command;
@@ -93,6 +141,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Safely deletes the file if it exists.
+        /// </summary>
+        /// <param name="filePath">The path to the file to delete.</param>
+        public static void DeleteFile(string filePath)
+        {
+            try
+            {
+                File.Delete(filePath);
+            }
+            catch (Exception)
+            {                    
+            }
         }
     }
 }

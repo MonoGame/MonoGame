@@ -2,19 +2,15 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if WINDOWS_PHONE
-extern alias MicrosoftXnaFramework;
-using MsAlbum = MicrosoftXnaFramework::Microsoft.Xna.Framework.Media.Album;
-#endif
 using System;
 using System.IO;
-#if WINDOWS_STOREAPP
+#if WINDOWS_UAP
 using Windows.Storage.FileProperties;
 #elif IOS
 using System.Drawing;
-using MonoTouch.CoreGraphics;
-using MonoTouch.MediaPlayer;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using MediaPlayer;
+using UIKit;
 #elif ANDROID
 using Android.Graphics;
 using Android.Provider;
@@ -24,31 +20,23 @@ namespace Microsoft.Xna.Framework.Media
 {
     public sealed class Album : IDisposable
     {
-#if WINDOWS_PHONE
-        private MsAlbum album;
-#else
         private Artist artist;
         private Genre genre;
         private string album;
         private SongCollection songCollection;
-#if WINDOWS_STOREAPP
+#if WINDOWS_UAP
         private StorageItemThumbnail thumbnail;
-#elif IOS
+#elif IOS && !TVOS
         private MPMediaItemArtwork thumbnail;
 #elif ANDROID
         private Android.Net.Uri thumbnail;
-#endif
 #endif
 
         public Artist Artist
         {
             get
             {
-#if WINDOWS_PHONE
-                return album.Artist;
-#else
                 return this.artist;
-#endif
             }
         }
 
@@ -59,11 +47,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-#if WINDOWS_PHONE
-                return album.Duration;
-#else
                 return TimeSpan.Zero; // Not implemented
-#endif
             }
         }
 
@@ -74,11 +58,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-#if WINDOWS_PHONE
-                return album.Genre;
-#else
                 return this.genre;
-#endif
             }
         }
 
@@ -89,11 +69,9 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-#if WINDOWS_PHONE
-                return this.album.HasArt;
-#elif WINDOWS_STOREAPP
+#if WINDOWS_UAP
                 return this.thumbnail != null;
-#elif IOS
+#elif IOS && !TVOS
                 // If album art is missing the bounds will be: Infinity, Infinity, 0, 0
                 return this.thumbnail != null && this.thumbnail.Bounds.Width != 0;
 #elif ANDROID
@@ -111,11 +89,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-#if WINDOWS_PHONE
-                return album.IsDisposed;
-#else
                 return false;
-#endif
             }
         }
 
@@ -126,11 +100,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-#if WINDOWS_PHONE
-                return album.Name;
-#else
                 return this.album;
-#endif
             }
         }
 
@@ -141,39 +111,24 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-#if WINDOWS_PHONE
-                return new SongCollection(album.Songs);
-#else
                 return this.songCollection;
-#endif
             }
         }
 
-#if WINDOWS_PHONE
-        public static explicit operator Album(MsAlbum album)
-        {
-            return new Album(album);
-        }
-
-        private Album(MsAlbum album)
-        {
-            this.album = album;
-        }
-#else
-        private Album(SongCollection songCollection, string name, Artist artist, Genre genre)
+       private Album(SongCollection songCollection, string name, Artist artist, Genre genre)
         {
             this.songCollection = songCollection;
             this.album = name;
             this.artist = artist;
             this.genre = genre;
         }
-#if WINDOWS_STOREAPP
+#if WINDOWS_UAP
         internal Album(SongCollection songCollection, string name, Artist artist, Genre genre, StorageItemThumbnail thumbnail)
             : this(songCollection, name, artist, genre)
         {
             this.thumbnail = thumbnail;
         }
-#elif IOS
+#elif IOS && !TVOS
         internal Album(SongCollection songCollection, string name, Artist artist, Genre genre, MPMediaItemArtwork thumbnail)
             : this(songCollection, name, artist, genre)
         {
@@ -186,22 +141,19 @@ namespace Microsoft.Xna.Framework.Media
             this.thumbnail = thumbnail;
         }
 #endif
-#endif
 
         /// <summary>
         /// Immediately releases the unmanaged resources used by this object.
         /// </summary>
         public void Dispose()
         {
-#if WINDOWS_PHONE
-            this.album.Dispose();
-#elif WINDOWS_STOREAPP
+#if WINDOWS_UAP
             if (this.thumbnail != null)
                 this.thumbnail.Dispose();
 #endif
         }
         
-#if IOS
+#if IOS && !TVOS
         [CLSCompliant(false)]
         public UIImage GetAlbumArt(int width = 0, int height = 0)
         {
@@ -210,7 +162,7 @@ namespace Microsoft.Xna.Framework.Media
             if (height == 0)
                 height = (int)this.thumbnail.Bounds.Height;
 
-            return this.thumbnail.ImageWithSize(new SizeF(width, height)); // The result is usually a bit bigger than the requested size
+			return this.thumbnail.ImageWithSize(new CGSize(width, height));
         }
 #elif ANDROID
         [CLSCompliant(false)]
@@ -230,9 +182,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public Stream GetAlbumArt()
         {
-#if WINDOWS_PHONE
-            return this.album.GetAlbumArt();
-#elif WINDOWS_STOREAPP
+#if WINDOWS_UAP
             if (this.HasArt)
                 return this.thumbnail.AsStream();
             return null;
@@ -242,7 +192,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 #endif
 
-#if IOS
+#if IOS && !TVOS
         [CLSCompliant(false)]
         public UIImage GetThumbnail()
         {
@@ -260,9 +210,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public Stream GetThumbnail()
         {
-#if WINDOWS_PHONE
-            return this.album.GetThumbnail();
-#elif WINDOWS_STOREAPP
+#if WINDOWS_UAP
             if (this.HasArt)
                 return this.thumbnail.AsStream();
 

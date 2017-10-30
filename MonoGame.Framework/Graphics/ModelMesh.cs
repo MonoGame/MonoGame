@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		//
 		// Summary:
 		//     Gets a collection of effects associated with this mesh.
-		public ModelEffectCollection Effects { get; set; }
+		public ModelEffectCollection Effects { get; internal set; }
 		//
 		// Summary:
 		//     Gets the ModelMeshPart objects that make up this mesh. Each part of a mesh
@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     for (int j = 0; j < effect.CurrentTechnique.Passes.Count; j++)
                     {
 						effect.CurrentTechnique.Passes[j].Apply ();
-						this.graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, part.VertexOffset, 0, part.NumVertices, part.StartIndex, part.PrimitiveCount);
+						graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, part.VertexOffset, part.StartIndex, part.PrimitiveCount);
 					}
 				}
 			}

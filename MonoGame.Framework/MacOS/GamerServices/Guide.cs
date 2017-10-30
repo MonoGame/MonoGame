@@ -47,7 +47,6 @@ using System.Threading;
 using System.Runtime.Remoting.Messaging;
 
 using Microsoft.Xna.Framework.Net;
-using Microsoft.Xna.Framework.Storage;
 
 #endregion Using clause
 
@@ -201,11 +200,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			if (isVisible)
 				return;
 			isVisible = true;
-			// We clear the key cache state here to prevent any extraneous keys from
-			// corrupting the key states from the time we call the method
-			// to the time it is actually shown.  This seems to be caused because
-			// we are interrupting the normal flow the game update logic.
-			Window.ClearKeyCacheState();
 			
 			MonoGameGamerServicesHelper.ShowSigninSheet();
 			
@@ -229,16 +223,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			if ((Gamer.SignedInGamers.Count > 0) && (Gamer.SignedInGamers [0].IsSignedInToLive)) {
 
 			}
-		}
-
-		public static IAsyncResult BeginShowStorageDeviceSelector (AsyncCallback callback, object state)
-		{
-			return null;
-		}
-
-		public static StorageDevice EndShowStorageDeviceSelector (IAsyncResult result)
-		{
-			return null;
 		}
 
 		#region Properties

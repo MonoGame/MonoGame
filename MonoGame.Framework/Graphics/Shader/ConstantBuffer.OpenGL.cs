@@ -3,14 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
-using OpenTK.Graphics.ES20;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {

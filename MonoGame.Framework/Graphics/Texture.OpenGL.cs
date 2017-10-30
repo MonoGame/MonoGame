@@ -2,18 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
-using OpenTK.Graphics.ES20;
-using PixelFormat = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using TextureUnit = OpenTK.Graphics.ES20.All;
-using PixelInternalFormat = OpenTK.Graphics.ES20.All;
-using PixelType = OpenTK.Graphics.ES20.All;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -48,12 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (glTexture > 0)
             {
-                int texture = glTexture;
-                Threading.BlockOnUIThread(() =>
-                {
-                    GL.DeleteTextures(1, ref texture);
-                    GraphicsExtensions.CheckGLError();
-                });
+                GraphicsDevice.DisposeTexture(glTexture);
             }
             glTexture = -1;
         }

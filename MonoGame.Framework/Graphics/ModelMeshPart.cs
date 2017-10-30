@@ -38,7 +38,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Set the new effect.
                 _effect = value;
-                parent.Effects.Add(value);
+                
+                if (_effect != null && !parent.Effects.Contains(_effect))                
+                    parent.Effects.Add(_effect);
             }
         }
 

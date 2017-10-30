@@ -4,19 +4,8 @@
 
 using System;
 using System.IO;
-
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
-using System.Text;
-using OpenTK.Graphics.ES20;
-using ShaderType = OpenTK.Graphics.ES20.All;
-using ShaderParameter = OpenTK.Graphics.ES20.All;
-using TextureUnit = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-#endif
+using System.Diagnostics;
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -28,31 +17,16 @@ namespace Microsoft.Xna.Framework.Graphics
         // We keep this around for recompiling on context lost and debugging.
         private string _glslCode;
 
-        private struct Attribute
+        private static int PlatformProfile()
         {
-            public VertexElementUsage usage;
-            public int index;
-            public string name;
-            public int location;
+            return 0;
         }
 
-        private Attribute[] _attributes;
-
-        private void PlatformConstruct(BinaryReader reader, bool isVertexShader, byte[] shaderBytecode)
+        private void PlatformConstruct(bool isVertexShader, byte[] shaderBytecode)
         {
             _glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
 
             HashKey = MonoGame.Utilities.Hash.ComputeHash(shaderBytecode);
-
-            var attributeCount = (int)reader.ReadByte();
-            _attributes = new Attribute[attributeCount];
-            for (var a = 0; a < attributeCount; a++)
-            {
-                _attributes[a].name = reader.ReadString();
-                _attributes[a].usage = (VertexElementUsage)reader.ReadByte();
-                _attributes[a].index = reader.ReadByte();
-                reader.ReadInt16(); //format, unused
-            }
         }
 
         internal int GetShaderHandle()
@@ -64,46 +38,19 @@ namespace Microsoft.Xna.Framework.Graphics
             //
             _shaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
             GraphicsExtensions.CheckGLError();
-#if GLES
-			GL.ShaderSource(_shaderHandle, 1, new string[] { _glslCode }, (int[])null);
-#else
             GL.ShaderSource(_shaderHandle, _glslCode);
-#endif
             GraphicsExtensions.CheckGLError();
             GL.CompileShader(_shaderHandle);
             GraphicsExtensions.CheckGLError();
-
-            var compiled = 0;
-#if GLES && !ANGLE && !ANDROID
-			GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, ref compiled);
-#else
+            int compiled = 0;
             GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out compiled);
-#endif
             GraphicsExtensions.CheckGLError();
-            if (compiled == (int)All.False)
+            if (compiled != (int)Bool.True)
             {
-#if GLES && !ANGLE && !ANDROID
-                string log = "";
-                int length = 0;
-				GL.GetShader(_shaderHandle, ShaderParameter.InfoLogLength, ref length);
-                GraphicsExtensions.CheckGLError();
-                if (length > 0)
-                {
-                    var logBuilder = new StringBuilder(length);
-					GL.GetShaderInfoLog(_shaderHandle, length, ref length, logBuilder);
-                    GraphicsExtensions.CheckGLError();
-                    log = logBuilder.ToString();
-                }
-#else
                 var log = GL.GetShaderInfoLog(_shaderHandle);
-#endif
-                Console.WriteLine(log);
+                Debug.WriteLine(log);
 
-                if (GL.IsShader(_shaderHandle))
-                {
-                    GL.DeleteShader(_shaderHandle);
-                    GraphicsExtensions.CheckGLError();
-                }
+                GraphicsDevice.DisposeShader(_shaderHandle);
                 _shaderHandle = -1;
 
                 throw new InvalidOperationException("Shader Compilation Failed");
@@ -114,19 +61,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void GetVertexAttributeLocations(int program)
         {
-            for (int i = 0; i < _attributes.Length; ++i)
+            for (int i = 0; i < Attributes.Length; ++i)
             {
-                _attributes[i].location = GL.GetAttribLocation(program, _attributes[i].name);
+                Attributes[i].location = GL.GetAttribLocation(program, Attributes[i].name);
                 GraphicsExtensions.CheckGLError();
             }
         }
 
         internal int GetAttribLocation(VertexElementUsage usage, int index)
         {
-            for (int i = 0; i < _attributes.Length; ++i)
+            for (int i = 0; i < Attributes.Length; ++i)
             {
-                if ((_attributes[i].usage == usage) && (_attributes[i].index == index))
-                    return _attributes[i].location;
+                if ((Attributes[i].usage == usage) && (Attributes[i].index == index))
+                    return Attributes[i].location;
             }
             return -1;
         }
@@ -150,31 +97,17 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_shaderHandle != -1)
             {
-                if (GL.IsShader(_shaderHandle))
-                {
-                    GL.DeleteShader(_shaderHandle);
-                    GraphicsExtensions.CheckGLError();
-                }
+                GraphicsDevice.DisposeShader(_shaderHandle);
                 _shaderHandle = -1;
             }
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (!IsDisposed)
+            if (!IsDisposed && _shaderHandle != -1)
             {
-                Threading.BlockOnUIThread(() =>
-                {
-                    if (_shaderHandle != -1)
-                    {
-                        if (GL.IsShader(_shaderHandle))
-                        {
-                            GL.DeleteShader(_shaderHandle);
-                            GraphicsExtensions.CheckGLError();
-                        }
-                        _shaderHandle = -1;
-                    }
-                });
+                GraphicsDevice.DisposeShader(_shaderHandle);
+                _shaderHandle = -1;
             }
 
             base.Dispose(disposing);

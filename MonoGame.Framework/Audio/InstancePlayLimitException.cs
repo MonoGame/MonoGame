@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Audio
     /// Most platforms have a hard limit on how many sounds can be played simultaneously. This exception is thrown when that limit is exceeded.
     /// </remarks>
     [DataContract]
-#if WINRT
+#if WINDOWS_UAP
     public sealed class InstancePlayLimitException : Exception
 #else
     public sealed class InstancePlayLimitException : ExternalException

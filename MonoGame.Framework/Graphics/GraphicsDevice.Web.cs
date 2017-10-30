@@ -18,17 +18,23 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private void PlatformSetup()
         {
-            JSAPIAccess.Instance.GraphicsDevicePlatformSetup();
+            
         }
 
         private void PlatformInitialize()
         {
         }
 
+        internal void OnPresentationChanged()
+        {
+        }
+
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-            // TODO: This is just a test at the moment.
-            JSAPIAccess.Instance.GraphicsDevicePlatformClear();
+            WebGL.gl.enable(WebGL.gl.DEPTH_TEST);
+            WebGL.gl.depthFunc(WebGL.gl.LEQUAL);
+            WebGL.gl.clearColor(color.X, color.Y, color.Z, color.W);
+            WebGL.gl.clear(WebGL.gl.COLOR_BUFFER_BIT | WebGL.gl.DEPTH_BUFFER_BIT);
         }
 
         private void PlatformDispose()
@@ -56,6 +62,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return null;
         }
+		
+        internal void PlatformBeginApplyState()
+        {
+        }
+
+        private void PlatformApplyBlend()
+        {
+        }
 
         internal void PlatformApplyState(bool applyShaders)
         {
@@ -77,13 +91,28 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
         }
 
-        private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
         {
-            return GraphicsProfile.HiDef;
+        }
+
+        private void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct
+        {
+            throw new NotImplementedException();
+        }
+
+        private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
+        {
+            return new Rectangle(x, y, width, height);
+        }
+        
+        internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
+        {
+            presentationParameters.MultiSampleCount = 0;
+            quality = 0;
         }
     }
 }

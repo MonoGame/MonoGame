@@ -5,23 +5,30 @@ using SharpDX;
 using SharpDX.MediaFoundation;
 using SharpDX.Win32;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class VideoPlayer : IDisposable
     {
         private static MediaSession _session;
-        private static SimpleAudioVolume _volumeController;
+        private static AudioStreamVolume _volumeController;
         private static PresentationClock _clock;
 
         // HACK: Need SharpDX to fix this.
-        private static readonly Guid MRPolicyVolumeService = Guid.Parse("1abaa2ac-9d3b-47c6-ab48-c59506de784d");
-        private static readonly Guid SimpleAudioVolumeGuid = Guid.Parse("089EDF13-CF71-4338-8D13-9E569DBDC319");
+        private static Guid AudioStreamVolumeGuid;
 
         private static Callback _callback;
 
         private class Callback : IAsyncCallback
         {
+            private VideoPlayer _player;
+
+            public Callback(VideoPlayer player)
+            {
+                _player = player;
+            }
+
             public void Dispose()
             {
             }
@@ -33,6 +40,9 @@ namespace Microsoft.Xna.Framework.Media
 
                 // Trigger an "on Video Ended" event here if needed
 
+                if (ev.TypeInfo == MediaEventTypes.SessionTopologyStatus && ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
+                    _player.OnTopologyReady();
+
                 _session.BeginGetEvent(this, null);
             }
 
@@ -40,10 +50,16 @@ namespace Microsoft.Xna.Framework.Media
             public WorkQueueId WorkQueueId { get; private set; }
         }
 
+        private Texture2D _videoCache;
+
         private void PlatformInitialize()
         {
+            // The GUID is specified in a GuidAttribute attached to the class
+            AudioStreamVolumeGuid = Guid.Parse(((GuidAttribute)typeof(AudioStreamVolume).GetCustomAttributes(typeof(GuidAttribute), false)[0]).Value);
+
             MediaManagerState.CheckStartup();
             MediaFactory.CreateMediaSession(null, out _session);
+
         }
 
         private Texture2D PlatformGetTexture()
@@ -55,13 +71,13 @@ namespace Microsoft.Xna.Framework.Media
             if (texData == null)
                 return null;
 
-            // TODO: This could likely be optimized if we held on to the SharpDX Surface/Texture data,
-            // and set it on an XNA one rather than constructing a new one every time this is called.
-            var retTex = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
+            // NOTE: It's entirely possible that we could lose the d3d context and therefore lose this texture, but it's better than allocating a new texture each call!
+            if (_videoCache == null)
+                _videoCache = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
+
+            _videoCache.SetData(texData);
             
-            retTex.SetData(texData);
-            
-            return retTex;
+            return _videoCache;
         }
 
         private void PlatformGetState(ref MediaState result)
@@ -97,62 +113,38 @@ namespace Microsoft.Xna.Framework.Media
             if (State != MediaState.Stopped)
             {
                 _session.Stop();
-                _volumeController.Dispose();
+                _session.ClearTopologies();
+                _session.Close();
+                if (_volumeController != null)
+                {
+                    _volumeController.Dispose();
+                    _volumeController = null;
+                }
                 _clock.Dispose();
             }
-
-            // Set the new song.
-            _session.SetTopology(0, _currentVideo.Topology);
-
-            _volumeController = CppObject.FromPointer<SimpleAudioVolume>(GetVolumeObj(_session));
-            _volumeController.Mute = IsMuted;
-            _volumeController.MasterVolume = _volume;
-
-            // Get the clock.
-            _clock = _session.Clock.QueryInterface<PresentationClock>();
 
             //create the callback if it hasn't been created yet
             if (_callback == null)
             {
-                _callback = new Callback();
+                _callback = new Callback(this);
                 _session.BeginGetEvent(_callback, null);
             }
+
+            // Set the new song.
+            _session.SetTopology(SessionSetTopologyFlags.Immediate, _currentVideo.Topology);
+
+            // Get the clock.
+            _clock = _session.Clock.QueryInterface<PresentationClock>();
 
             // Start playing.
             var varStart = new Variant();
             _session.Start(null, varStart);
-        }
 
-        internal static IntPtr GetVolumeObj(MediaSession session)
-        {
-            // Get the volume interface - shared between MediaPlayer and VideoPlayer
-            const int retries = 10;
-            const int sleepTimeFactor = 50;
-
-            var volumeObj = (IntPtr)0;
-
-            //See https://github.com/mono/MonoGame/issues/2620
-            //MediaFactory.GetService throws a SharpDX exception for unknown reasons. it appears retrying will solve the problem but there
-            //is no specific number of times, nor pause that works. So we will retry N times with an increasing Sleep between each one
-            //before finally throwing the error we saw in the first place.
-            for (int i = 0; i < retries; i++)
-            {
-                try
-                {
-                    MediaFactory.GetService(session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
-                    break;
-                }
-                catch (SharpDXException)
-                {
-                    if (i == retries - 1)
-                    {
-                        throw;
-                    }
-                    Debug.WriteLine("MediaFactory.GetService failed({0}) sleeping for {1} ms", i + 1, i*sleepTimeFactor);
-                    Thread.Sleep(i*sleepTimeFactor); //Sleep for longer and longer times
-                }
-            }
-            return volumeObj;
+            // we need to dispose of the old texture if we have one
+            if (_videoCache != null)
+                _videoCache.Dispose();
+            // Create cached texture
+            _videoCache = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
         }
 
         private void PlatformResume()
@@ -162,7 +154,34 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformStop()
         {
+            _session.ClearTopologies();
             _session.Stop();
+            _session.Close();
+            if (_volumeController != null)
+            {
+                _volumeController.Dispose();
+                _volumeController = null;
+            }
+            if (_clock != null)
+            {
+                _clock.Dispose();
+            }
+            _clock = null;
+        }
+
+        private void SetChannelVolumes()
+        {
+            if (_volumeController != null && !_volumeController.IsDisposed)
+            {
+                float volume = _volume;
+                if (IsMuted)
+                    volume = 0.0f;
+
+                for (int i = 0; i < _volumeController.ChannelCount; i++)
+                {
+                    _volumeController.SetChannelVolume(i, volume);
+                }
+            }
         }
 
         private void PlatformSetVolume()
@@ -170,7 +189,7 @@ namespace Microsoft.Xna.Framework.Media
             if (_volumeController == null)
                 return;
 
-            _volumeController.MasterVolume = _volume;
+            SetChannelVolumes();
         }
 
         private void PlatformSetIsLooped()
@@ -183,7 +202,7 @@ namespace Microsoft.Xna.Framework.Media
             if (_volumeController == null)
                 return;
 
-            _volumeController.Mute = _isMuted;
+            SetChannelVolumes();
         }
 
         private TimeSpan PlatformGetPlayPosition()
@@ -193,6 +212,23 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformDispose(bool disposing)
         {
+            if (_videoCache != null)
+            {
+                _videoCache.Dispose();
+            }
+        }
+
+        private void OnTopologyReady()
+        {
+            if (_session.IsDisposed)
+                return;
+
+            // Get the volume interface.
+            IntPtr volumeObjectPtr;
+            MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObjectPtr);
+            _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
+
+            SetChannelVolumes();
         }
     }
 }

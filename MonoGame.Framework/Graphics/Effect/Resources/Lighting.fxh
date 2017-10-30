@@ -33,7 +33,7 @@ ColorPair ComputeLights(float3 eyeVector, float3 worldNormal, uniform int numLig
     float3 dotL = mul(-lightDirections, worldNormal);
     float3 dotH = mul(halfVectors, worldNormal);
     
-    float3 zeroL = step(0, dotL);
+    float3 zeroL = step(float3(0,0,0), dotL);
 
     float3 diffuse  = zeroL * dotL;
     float3 specular = pow(max(dotH, 0) * zeroL, SpecularPower);

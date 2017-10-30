@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.IO;
 
 namespace TwoMGFX
@@ -7,9 +11,15 @@ namespace TwoMGFX
     {
         public static int Main(string[] args)
         {
+            if (!Environment.Is64BitProcess && Environment.OSVersion.Platform != PlatformID.Unix)
+            {
+                Console.Error.WriteLine("The MonoGame content tools only work on a 64bit OS.");
+                return -1;
+            }
+
             var options = new Options();
-            var parser = new Utilities.CommandLineParser(options);
-            parser.Title = "2MGFX - Converts Microsoft FX files to a compiled MonoGame Effect.";
+            var parser = new CommandLineParser(options);
+            parser.Title = "2MGFX - The MonoGame Effect compiler.";
 
             if (!parser.ParseCommandLine(args))
                 return 1;
@@ -30,7 +40,7 @@ namespace TwoMGFX
             ShaderInfo shaderInfo;
             try
             {
-                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
+                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options, new ConsoleEffectCompilerOutput());
             }
             catch (Exception ex)
             {
@@ -92,6 +102,19 @@ namespace TwoMGFX
             // We finished succesfully.
             Console.WriteLine("Compiled '{0}' to '{1}'.", options.SourceFile, options.OutputFile);
             return 0;
+        }
+
+        private class ConsoleEffectCompilerOutput : IEffectCompilerOutput
+        {
+            public void WriteWarning(string file, int line, int column, string message)
+            {
+                Console.WriteLine("Warning: {0}({1},{2}): {3}" , file, line, column, message);
+            }
+
+            public void WriteError(string file, int line, int column, string message)
+            {
+                throw new Exception(string.Format("Error: {0}({1},{2}): {3}", file, line, column, message));
+            }
         }
     }
 }

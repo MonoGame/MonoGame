@@ -78,8 +78,8 @@ namespace Microsoft.Xna.Framework.Media
                                         false,
                                         SurfaceFormat.Bgra32, 
                                         Texture2D.SurfaceType.RenderTarget);
-    
-            var region = new SharpDX.Rectangle(0, 0, _currentVideo.Width, _currentVideo.Height);
+
+			var region = new SharpDX.Mathematics.Interop.RawRectangle(0, 0, _currentVideo.Width, _currentVideo.Height);
             _mediaEngine.TransferVideoFrame(_lastFrame._texture, null, region, null);
 
             return _lastFrame;

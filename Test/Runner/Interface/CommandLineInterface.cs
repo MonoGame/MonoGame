@@ -121,7 +121,7 @@ namespace MonoGame.Tests
 				resultWriter.SaveTestResult (result);
 
 				if (_runOptions.PerformXslTransform) {
-					var transform = new XslTransform ();
+					var transform = new XslCompiledTransform();
 					transform.Load (_runOptions.XslTransformPath);
 					transform.Transform (_runOptions.XmlResultsPath, _runOptions.TransformedResultsPath);
 				}

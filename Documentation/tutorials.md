@@ -12,7 +12,9 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [Part 5: Animating the Player/Ship and Creating a Parallaxing Background](http://blogs.msdn.com/b/tarawalker/archive/2013/04/12/windows-8-game-development-using-c-xna-and-monogame-3-0-building-a-shooter-game-walkthrough-part-5-animating-the-player-ship-and-creating-a-parallaxing-background.aspx)
  - [Part 6: Creating Enemies and Detecting Collisions](http://blogs.msdn.com/b/tarawalker/archive/2013/08/26/windows-8-game-development-using-c-xna-and-monogame-3-0-building-a-shooter-game-walkthrough-part-6-creating-enemies-and-detecting-collisions.aspx)
  - [Part 7: Creating Projectiles and Detecting Collisions](http://chrisongames.blogspot.com/2014/12/windows-8-game-development-using-c-xna.html)
-
+ - [Part 8: Creating Explosions using Sprite Animations](http://chrisongames.blogspot.com/2015/02/windows-8-game-development-using-c-xna.html)
+ - [Part 9: Adding Sound Effects and Game Music](http://chrisongames.blogspot.com/2015/12/windows-810-game-development-using-c.html)
+ 
 ### Nokia
  - [XNA Games On Windows Phone 8 with MonoGame](http://www.developer.nokia.com/Community/Wiki/XNA_Games_On_Windows_Phone_8_with_Monogame) ([in Portugese](http://www.developer.nokia.com/Community/Wiki/XNA_Jogos_no_Windows_Phone_8_com_Monogame))
  - [MonoGame on Windows Phone 8 Post-Processing Your Game](http://www.developer.nokia.com/Community/Wiki/MonoGame_on_Windows_Phone_8_Post-Processing_Your_Game)
@@ -33,7 +35,6 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [BMFont rendering with MonoGame](http://www.craftworkgames.com/blog/tutorial-bmfont-rendering-with-monogame/)
  - [RB Whitaker's MonoGame Tutorials](http://rbwhitaker.wikidot.com/monogame-tutorials)
  - [RB Whitaker's XNA Tutorials including sharers, 2D, 3D, Game loops, advancted topics](http://rbwhitaker.wikidot.com/xna-tutorials)
- - [Another list of tutorials from the MonoGame github](https://github.com/mono/MonoGame/wiki/Tutorials)
  - [Setting window position tutorial](http://projectdrake.net/blog/?p=176)
  - [Using Spine with MonoGame - by Randolph Burt (Randeroo)](http://randolphburt.co.uk/2013/03/30/dragons-and-dancing-crabs/)
  - [Mac porting series](http://benkane.wordpress.com/2012/01/20/the-great-porting-adventure-day-8/)
@@ -45,6 +46,8 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [MonoGame "Hello World" on Mac OS X and Xamarin Studio](http://jaquadro.com/2013/09/monogame-hello-world-on-mac-os-x-and-xamarin-studio/)
  - [Solving Resolution Independent Rendering And 2D Camera Using Monogame](http://blog.roboblob.com/2013/07/27/solving-resolution-independent-rendering-and-2d-camera-using-monogame/)
  - [XNA is Dead; Long Live the New XNA, MonoGame](http://www.codemag.com/Article/1411081)
+ - [Make Santa Jump - Making an endless runner game in F# using MonoGame](http://timjones.tw/blog/archive/2014/12/28/make-santa-jump-game-in-fsharp-using-monogame)
+ - [Running MonoGame on Android Wear] (http://crossplatform.io/running-monogame-on-android-wear/)
  
 ## Video Tutorials
 

@@ -45,11 +45,27 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.CoreAnimation;
 using MonoMac.Foundation;
 using MonoMac.ObjCRuntime;
 using MonoMac.OpenGL;
 using MonoMac.AppKit;
+using NSViewResizingMaskClass = MonoMac.AppKit.NSViewResizingMask;
+using RectF = System.Drawing.RectangleF;
+#else
+using CoreAnimation;
+using Foundation;
+using ObjCRuntime;
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Platform.MacOS;
+using AppKit;
+using NSViewResizingMaskClass = AppKit.NSViewResizingMask;
+using RectF = CoreGraphics.CGRect;
+using PointF = CoreGraphics.CGPoint;
+using SizeF = CoreGraphics.CGSize;
+#endif
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -71,14 +87,14 @@ namespace Microsoft.Xna.Framework
 		private NSTrackingArea _trackingArea;
 		private bool _needsToResetElapsedTime = false;
 
-		public static Func<Game, RectangleF, GameWindow> CreateWindowDelegate 
+        public static Func<Game, RectF, GameWindow> CreateWindowDelegate 
 		{
 			get;
 			set;
 		}
 
 		#region GameWindow Methods
-		public GameWindow(Game game, RectangleF frame) : base (frame)
+        public GameWindow(Game game, RectF frame) : base (frame)
 		{
             if (game == null)
                 throw new ArgumentNullException("game");
@@ -88,12 +104,12 @@ namespace Microsoft.Xna.Framework
 
 			//LayerRetainsBacking = false; 
 			//LayerColorFormat	= EAGLColorFormat.RGBA8;
-			this.AutoresizingMask = MonoMac.AppKit.NSViewResizingMask.HeightSizable
-					| MonoMac.AppKit.NSViewResizingMask.MaxXMargin 
-					| MonoMac.AppKit.NSViewResizingMask.MinYMargin
-					| MonoMac.AppKit.NSViewResizingMask.WidthSizable;
+            this.AutoresizingMask = NSViewResizingMaskClass.HeightSizable
+                | NSViewResizingMaskClass.MaxXMargin 
+                | NSViewResizingMaskClass.MinYMargin
+                | NSViewResizingMaskClass.WidthSizable;
 			
-			RectangleF rect = NSScreen.MainScreen.Frame;
+            var rect = NSScreen.MainScreen.Frame;
 			
 			clientBounds = new Rectangle (0,0,(int)rect.Width,(int)rect.Height);
 
@@ -103,7 +119,7 @@ namespace Microsoft.Xna.Framework
 			Mouse.Window = this;
 		}
 
-		public GameWindow(Game game, RectangleF frame, NSOpenGLContext context) :
+        public GameWindow(Game game, RectF frame, NSOpenGLContext context) :
             this(game, frame)
 		{
 		}
@@ -111,12 +127,12 @@ namespace Microsoft.Xna.Framework
 		[Export("initWithFrame:")]
 		public GameWindow () : base (NSScreen.MainScreen.Frame)
 		{
-			this.AutoresizingMask = MonoMac.AppKit.NSViewResizingMask.HeightSizable
-					| MonoMac.AppKit.NSViewResizingMask.MaxXMargin 
-					| MonoMac.AppKit.NSViewResizingMask.MinYMargin
-					| MonoMac.AppKit.NSViewResizingMask.WidthSizable;
+            this.AutoresizingMask = NSViewResizingMaskClass.HeightSizable
+                | NSViewResizingMaskClass.MaxXMargin 
+                | NSViewResizingMaskClass.MinYMargin
+                | NSViewResizingMaskClass.WidthSizable;
 
-			RectangleF rect = NSScreen.MainScreen.Frame;
+			var rect = NSScreen.MainScreen.Frame;
 			clientBounds = new Rectangle (0,0,(int)rect.Width,(int)rect.Height);
 
 			// Enable multi-touch
@@ -214,9 +230,7 @@ namespace Microsoft.Xna.Framework
 		
 		protected virtual void OnClientSizeChanged (EventArgs e)
 		{
-			var h = ClientSizeChanged;
-			if (h != null)
-				h (this, e);
+			EventHelpers.Raise(this, ClientSizeChanged, e);
 		}
 		
 		protected override void OnTitleChanged (EventArgs e)
@@ -418,9 +432,7 @@ namespace Microsoft.Xna.Framework
 			internal set {
 				if (value != _currentOrientation) {
 					_currentOrientation = value;
-					if (OrientationChanged != null) {
-						OrientationChanged (this, EventArgs.Empty);
-					}
+					EventHelpers.Raise(this, OrientationChanged, EventArgs.Empty);
 				}
 			}
 		}
@@ -543,10 +555,7 @@ namespace Microsoft.Xna.Framework
 				throw new ArgumentNullException("e");
 			}
 			
-			if (TextInput != null) 
-			{
-				TextInput.Invoke(this, e);
-			}
+			EventHelpers.Raise(this, TextInput, e);
 		}
 		
 		/// <summary>
@@ -684,21 +693,27 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc); 
 			switch (theEvent.Type) 
 			{ 
-			case NSEventType.ScrollWheel: 
-				if (theEvent.ScrollingDeltaY != 0) 
-				{ 
-					if (theEvent.ScrollingDeltaY > 0) 
-					{ 
-						Mouse.ScrollWheelValue += (theEvent.ScrollingDeltaY * 0.1f + 0.09f) * 1200; 
-					} 
-					else 
-					{ 
-						Mouse.ScrollWheelValue += (theEvent.ScrollingDeltaY * 0.1f - 0.09f) * 1200; 
-					} 
-				} 
+			case NSEventType.ScrollWheel:
+                Mouse.HorizontalScrollWheelValue += CalculateScrollWheelValue(theEvent.ScrollingDeltaX);
+                Mouse.ScrollWheelValue += CalculateScrollWheelValue(theEvent.ScrollingDeltaY);
 				break; 
 			} 
 		}
+
+        private static float CalculateScrollWheelValue(nfloat delta)
+        {
+            var scrollWheelValue = 0.0f;
+
+            if (delta != 0)
+            {
+                if (delta > 0)
+                    scrollWheelValue += (float)(delta * 0.1f + 0.09f) * 1200;
+                else
+                    scrollWheelValue += (float)(delta * 0.1f - 0.09f) * 1200;
+            }
+
+            return scrollWheelValue;
+        }
 
 		public override void MouseMoved (NSEvent theEvent)
 		{

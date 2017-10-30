@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>MonoGame.Framework.WindowsDX</id>
+    <version>0.0.0.0</version>
+    <title>MonoGame.Framework.WindowsDX</title>
+    <authors>MonoGame Team</authors>
+    <owners>MonoGame Team</owners>
+    <licenseUrl>https://github.com/mono/MonoGame/blob/develop/LICENSE.txt</licenseUrl>
+    <projectUrl>http://monogame.net/</projectUrl>
+    <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
+
+This package provides you with MonoGame Framework that uses DirectX for rendering and works on Windows.</description>
+    <summary>This package provides you with MonoGame Framework that uses DirectX for rendering and works on Windows.</summary>
+    <copyright>Copyright © 2009-2017 The MonoGame Team</copyright>
+    <language>en-US</language>
+    <dependencies>
+        <group targetFramework=".NETFramework4.5">
+            <dependency id="SharpDX" version="4.0.1" />
+            <dependency id="SharpDX.Direct2D1" version="4.0.1" />
+            <dependency id="SharpDX.Direct3D11" version="4.0.1" />
+            <dependency id="SharpDX.DXGI" version="4.0.1" />
+            <dependency id="SharpDX.XAudio2" version="4.0.1" />
+            <dependency id="SharpDX.MediaFoundation" version="4.0.1" />
+            <dependency id="SharpDX.XInput" version="4.0.1" />
+            <dependency id="SharpDX.Direct3D9" version="4.0.1" />
+        </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\..\NuGetPackages\build\WindowsDX\MonoGame.Framework.WindowsDX.targets" target="build\MonoGame.Framework.WindowsDX.targets" />
+    
+    <!-- C# Assemblies -->
+    <file src="Windows\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />
+    <file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net45\MonoGame.Framework.xml" />
+  </files>
+</package>

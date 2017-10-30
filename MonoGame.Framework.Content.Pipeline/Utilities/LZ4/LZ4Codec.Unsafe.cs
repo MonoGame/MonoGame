@@ -27,10 +27,10 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 
-namespace LZ4n
+namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities.LZ4
 {
 	/// <summary>Unsafe LZ4 codec.</summary>
-	public static partial class LZ4Codec
+	internal static partial class LZ4Codec
 	{
 		/// <summary>Copies block of memory.</summary>
 		/// <param name="src">The source.</param>

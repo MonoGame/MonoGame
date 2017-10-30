@@ -54,39 +54,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
 
-            switch (context.TargetPlatform)
-            {
-                case TargetPlatform.Windows:
-                case TargetPlatform.WindowsPhone8:
-                case TargetPlatform.WindowsStoreApp:
-                    options.Profile = ShaderProfile.DirectX_11;
-                    break;
-                case TargetPlatform.WindowsGL:
-                case TargetPlatform.iOS:
-                case TargetPlatform.Android:
-                case TargetPlatform.Linux:
-                case TargetPlatform.MacOSX:
-                case TargetPlatform.Ouya:
-                case TargetPlatform.RaspberryPi:
-                    options.Profile = ShaderProfile.OpenGL;
-                    break;
-                default:
-                    throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
-            }
+            options.Profile = ShaderProfile.ForPlatform(context.TargetPlatform.ToString());
+            if (options.Profile == null)
+                throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
 
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
+            options.Defines = Defines;
             options.OutputFile = context.OutputFilename;
 
             // Parse the MGFX file expanding includes, macros, and returning the techniques.
             ShaderInfo shaderInfo;
             try
             {
-                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
+                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options, 
+                    new ContentPipelineEffectCompilerOutput(context));
 
                 // Add the include dependencies so that if they change
                 // it will trigger a rebuild of this effect.
                 foreach (var dep in shaderInfo.Dependencies)
                     context.AddDependency(dep);
+            }
+            catch (InvalidContentException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -106,7 +96,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 foreach (var outfile in shaderInfo.AdditionalOutputFiles)
                     context.AddOutputFile(outfile);
             }
-            catch (ShaderCompilerException ex)
+            catch (ShaderCompilerException)
             {
                 // This will log any warnings and errors and throw.
                 ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input, context);
@@ -138,13 +128,40 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #endif
         }
 
+#if WINDOWS
+        private class ContentPipelineEffectCompilerOutput : IEffectCompilerOutput
+        {
+            private readonly ContentProcessorContext _context;
+
+            public ContentPipelineEffectCompilerOutput(ContentProcessorContext context)
+            {
+                _context = context;
+            }
+
+            public void WriteWarning(string file, int line, int column, string message)
+            {
+                _context.Logger.LogWarning(null, CreateContentIdentity(file, line, column), message);
+            }
+
+            public void WriteError(string file, int line, int column, string message)
+            {
+                throw new InvalidContentException(message, CreateContentIdentity(file, line, column));
+            }
+
+            private static ContentIdentity CreateContentIdentity(string file, int line, int column)
+            {
+                return new ContentIdentity(file, null, line + "," + column);
+            }
+        }
+#endif
+
         private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
         {
             // Split the errors and warnings into individual lines.
             var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] {"\n", "\r", Environment.NewLine},
                                                                       StringSplitOptions.RemoveEmptyEntries);
 
-            var errorOrWarning = new Regex(@"(.*)\(([0-9,]*)\)\s*:\s*(.*)", RegexOptions.Compiled);
+            var errorOrWarning = new Regex(@"(.*)\(([0-9]*(,[0-9]+(-[0-9]+)?)?)\)\s*:\s*(.*)", RegexOptions.Compiled);
             ContentIdentity identity = null;
             var allErrorsAndWarnings = string.Empty;
 
@@ -183,7 +200,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     if (identity == null)
                     {
                         identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
-                        allErrorsAndWarnings = message + Environment.NewLine;
+                        allErrorsAndWarnings = errorsAndWarningArray[i] + Environment.NewLine;
                     }
                     else
                         allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;

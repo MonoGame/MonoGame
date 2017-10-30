@@ -21,9 +21,9 @@ namespace Microsoft.Xna.Framework {
         /// <summary>
         /// Gets or sets a bool that enables usage of Alt+F4 for window closing on desktop platforms. Value is true by default.
         /// </summary>
-        public virtual bool AllowAltF4 { get { return _allowAltF4; } set { _allowAltF4 = value; } } 
+        public virtual bool AllowAltF4 { get { return _allowAltF4; } set { _allowAltF4 = value; } }
 
-#if WINDOWS && DIRECTX
+#if (WINDOWS && !WINDOWS_UAP) || DESKTOPGL
         /// <summary>
         /// The location of this window on the desktop, eg: global coordinate space
         /// which stretches across all screens.
@@ -38,7 +38,14 @@ namespace Microsoft.Xna.Framework {
 		public abstract string ScreenDeviceName { get; }
 
 		private string _title;
-		public string Title {
+        /// <summary>
+        /// Gets or sets the title of the game window.
+        /// </summary>
+        /// <remarks>
+        /// For Windows 8 and Windows 10 UWP this has no effect. For these platforms the title should be
+        /// set by using the DisplayName property found in the app manifest file.
+        /// </remarks>
+        public string Title {
 			get { return _title; }
 			set {
 				if (_title != value) {
@@ -82,7 +89,7 @@ namespace Microsoft.Xna.Framework {
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
 
         /// <summary>
 		/// Use this event to retrieve text for objects like textbox's.
@@ -113,10 +120,9 @@ namespace Microsoft.Xna.Framework {
 		{
 		}
 
-		protected void OnClientSizeChanged ()
+		internal void OnClientSizeChanged ()
 		{
-			if (ClientSizeChanged != null)
-				ClientSizeChanged (this, EventArgs.Empty);
+            EventHelpers.Raise(this, ClientSizeChanged, EventArgs.Empty);
 		}
 
 		protected void OnDeactivated ()
@@ -125,8 +131,7 @@ namespace Microsoft.Xna.Framework {
          
 		protected void OnOrientationChanged ()
 		{
-			if (OrientationChanged != null)
-				OrientationChanged (this, EventArgs.Empty);
+            EventHelpers.Raise(this, OrientationChanged, EventArgs.Empty);
 		}
 
 		protected void OnPaint ()
@@ -135,15 +140,13 @@ namespace Microsoft.Xna.Framework {
 
 		protected void OnScreenDeviceNameChanged ()
 		{
-			if (ScreenDeviceNameChanged != null)
-				ScreenDeviceNameChanged (this, EventArgs.Empty);
+            EventHelpers.Raise(this, ScreenDeviceNameChanged, EventArgs.Empty);
 		}
 
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
 		protected void OnTextInput(object sender, TextInputEventArgs e)
 		{
-			if (TextInput != null)
-				TextInput(sender, e);
+            EventHelpers.Raise(this, TextInput, e);
 		}
 #endif
 

@@ -47,6 +47,66 @@ namespace MonoGame.Tests {
         }
     }
 
+    public class ByteComparer : IEqualityComparer<byte>
+    {
+        static public ByteComparer Equal = new ByteComparer();
+
+        private ByteComparer()
+        {
+        }
+
+        public bool Equals(byte x, byte y)
+        {
+            return x == y;
+        }
+
+        public int GetHashCode(byte obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ColorComparer : IEqualityComparer<Color>
+    {
+        static public ColorComparer Equal = new ColorComparer();
+
+        private ColorComparer()
+        {
+        }
+
+        public bool Equals(Color x, Color y)
+        {
+            return x == y;
+        }
+
+        public int GetHashCode(Color obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class FloatComparer : IEqualityComparer<float>
+    {
+        static public FloatComparer Epsilon = new FloatComparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private FloatComparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(float x, float y)
+        {
+            return Math.Abs(x - y) < _epsilon;
+        }
+
+        public int GetHashCode(float obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class BoundingSphereComparer : IEqualityComparer<BoundingSphere>
     {
         static public BoundingSphereComparer Epsilon = new BoundingSphereComparer(0.000001f);
@@ -72,6 +132,102 @@ namespace MonoGame.Tests {
         }
     }
 
+    public class Vector2Comparer : IEqualityComparer<Vector2>
+    {
+        static public Vector2Comparer Epsilon = new Vector2Comparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private Vector2Comparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Vector2 x, Vector2 y)
+        {
+            return Math.Abs(x.X - y.X) < _epsilon &&
+                   Math.Abs(x.Y - y.Y) < _epsilon;
+        }
+
+        public int GetHashCode(Vector2 obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class Vector3Comparer : IEqualityComparer<Vector3>
+    {
+        static public Vector3Comparer Epsilon = new Vector3Comparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private Vector3Comparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Vector3 x, Vector3 y)
+        {
+            return Math.Abs(x.X - y.X) < _epsilon &&
+                   Math.Abs(x.Y - y.Y) < _epsilon &&
+                   Math.Abs(x.Z - y.Z) < _epsilon;
+        }
+
+        public int GetHashCode(Vector3 obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class Vector4Comparer : IEqualityComparer<Vector4>
+    {
+        static public Vector4Comparer Epsilon = new Vector4Comparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private Vector4Comparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Vector4 x, Vector4 y)
+        {
+            return Math.Abs(x.X - y.X) < _epsilon &&
+                   Math.Abs(x.Y - y.Y) < _epsilon &&
+                   Math.Abs(x.Z - y.Z) < _epsilon &&
+                   Math.Abs(x.W - y.W) < _epsilon;
+        }
+
+        public int GetHashCode(Vector4 obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class QuaternionComparer : IEqualityComparer<Quaternion>
+    {
+        static public QuaternionComparer Epsilon = new QuaternionComparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private QuaternionComparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Quaternion x, Quaternion y)
+        {
+            return Math.Abs(x.X - y.X) < _epsilon &&
+                   Math.Abs(x.Y - y.Y) < _epsilon &&
+                   Math.Abs(x.Z - y.Z) < _epsilon &&
+                   Math.Abs(x.W - y.W) < _epsilon;
+        }
+
+        public int GetHashCode(Quaternion obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class PlaneComparer : IEqualityComparer<Plane>
     {
         static public PlaneComparer Epsilon = new PlaneComparer(0.000001f);
@@ -115,18 +271,35 @@ namespace MonoGame.Tests {
 
             return dest;
         }
+
+        public static byte[] ConvertFrom<T>(T[] source) where T : struct
+        {
+            var sizeOfSource = Marshal.SizeOf(typeof(T));
+            var count = source.Length;
+            var dest = new byte[sizeOfSource * count];
+
+            var pinned = GCHandle.Alloc(dest, GCHandleType.Pinned);
+            var pointer = pinned.AddrOfPinnedObject();
+
+            for (var i = 0; i < count; i++, pointer += sizeOfSource)
+                Marshal.StructureToPtr(source[i], pointer, true);
+
+            pinned.Free();
+
+            return dest;
+        }
     }
 
-	static class MathUtility 
+	static class MathUtility
     {
 		public static void MinMax (int a, int b, out int min, out int max)
 		{
-			if (a > b) 
+			if (a > b)
             {
 				min = b;
 				max = a;
-			} 
-            else 
+			}
+            else
             {
 				min = a;
 				max = b;
@@ -134,10 +307,11 @@ namespace MonoGame.Tests {
 		}
 	}
 
-	static class Paths 
+	static class Paths
     {
 		private const string AssetFolder = "Assets";
-		private static readonly string FontFolder = Path.Combine (AssetFolder, "Fonts");
+        private static readonly string AudioFolder = Path.Combine(AssetFolder, "Audio");
+        private static readonly string FontFolder = Path.Combine(AssetFolder, "Fonts");
 		private static readonly string ReferenceImageFolder = Path.Combine (AssetFolder, "ReferenceImages");
 		private static readonly string TextureFolder = Path.Combine (AssetFolder, "Textures");
 		private static readonly string EffectFolder = Path.Combine (AssetFolder, "Effects");
@@ -151,29 +325,51 @@ namespace MonoGame.Tests {
 			return Combine (AssetFolder, pathParts);
 		}
 
-		public static string Font (params string [] pathParts)
+        public static string Audio(params string[] pathParts)
+        {
+            return Combine(AudioFolder, pathParts);
+        }
+
+        public static string Font(params string[] pathParts)
 		{
 			return Combine (FontFolder, pathParts);
 		}
 
-		public static string Texture (params string [] pathParths)
+		public static string Texture (params string [] pathParts)
 		{
-			return Combine (TextureFolder, pathParths);
+			return Combine (TextureFolder, pathParts);
 		}
 
-		public static string Effect (params string [] pathParths)
-		{
-			return Combine (EffectFolder, pathParths);
-		}
-
-		public static string Model (params string [] pathParths)
-		{
-			return Combine (ModelFolder, pathParths);
-		}
-
-        public static string Xml(params string[] pathParths)
+        public static string RawEffect(params string[] pathParts)
         {
-            return Combine(XmlFolder, pathParths);
+            return Combine(EffectFolder, pathParts) + ".fx";
+        }
+
+		public static string CompiledEffect (params string [] pathParts)
+		{
+		    string type;
+#if XNA
+            type = "XNA";
+#elif DIRECTX
+            type = "DirectX";
+#elif DESKTOPGL
+            type = "OpenGL";
+#else
+            throw new Exception("Make sure the effect path is set up correctly for this platform!");
+#endif
+			var path = Combine(type, pathParts);
+		    return Combine(EffectFolder, path);
+
+		}
+
+		public static string Model (params string [] pathParts)
+		{
+			return Combine (ModelFolder, pathParts);
+		}
+
+        public static string Xml(params string[] pathParts)
+        {
+            return Combine(XmlFolder, pathParts);
         }
 
 		public static string ReferenceImage (params string [] pathParts)
@@ -192,7 +388,7 @@ namespace MonoGame.Tests {
 		}
 
 
-		private static string Combine (string head, string [] tail)
+		private static string Combine (string head, params string [] tail)
 		{
 			return Path.Combine (head, Path.Combine (tail));
 		}
@@ -203,5 +399,4 @@ namespace MonoGame.Tests {
 			Directory.SetCurrentDirectory(directory);
 		}
 	}
-
 }
