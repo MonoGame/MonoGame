@@ -5,21 +5,7 @@
 using System;
 using System.IO;
 using System.Diagnostics;
-
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-using Bool = MonoMac.OpenGL.Boolean;
-#else
-using OpenTK.Graphics.OpenGL;
-using Bool = OpenTK.Graphics.OpenGL.Boolean;
-#endif
-#elif DESKTOPGL
-using OpenGL;
-#elif GLES
-using OpenTK.Graphics.ES20;
-using Bool = OpenTK.Graphics.ES20.All;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {

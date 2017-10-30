@@ -105,6 +105,20 @@ namespace MonoGame.Tests.ContentPipeline
                 return A.GetHashCode() ^ B.GetHashCode();
             }
         }
+        class TestDataContainer
+        {
+            public Microsoft.Xna.Framework.Rectangle[,] Array2D { get; set; }
+            public Microsoft.Xna.Framework.Rectangle[,,] Array3D { get; set; }
+
+            public TestDataContainer DeepClone()
+            {
+                return new TestDataContainer
+                {
+                    Array2D = (Microsoft.Xna.Framework.Rectangle[,])Array2D.Clone(),
+                    Array3D = (Microsoft.Xna.Framework.Rectangle[,,])Array3D.Clone()
+                };
+            }
+        }
 
         static readonly IReadOnlyCollection<TargetPlatform> Platforms = new[]
         {
@@ -147,7 +161,7 @@ namespace MonoGame.Tests.ContentPipeline
                     foreach (var compress in CompressContents)
                         using (var xnbStream = new MemoryStream())
                         {
-                            Compiler.Compile(xnbStream, data, TargetPlatform.Windows, GraphicsProfile.HiDef, compress, "", "");
+                            Compiler.Compile(xnbStream, data, platform, gfxProfile, compress, "", "");
                             using (var content = new TestContentManager(xnbStream))
                             {
                                 var result = content.Load<T>("foo");
@@ -211,6 +225,50 @@ namespace MonoGame.Tests.ContentPipeline
                     for (int y = 0; y < expected.GetLength(1); y++)
                         for (int x = 0; x < expected.GetLength(0); x++)
                             Assert.AreEqual(expected[x, y, z], result[x, y, z]);
+            });
+        }
+
+        [Test]
+        public void RoundTripArrayContainer()
+        {
+            var expected = new TestDataContainer
+            {
+                Array2D = new Microsoft.Xna.Framework.Rectangle[3, 2],
+                Array3D = new Microsoft.Xna.Framework.Rectangle[3, 4, 2]
+            };
+            for (int y = 0; y < expected.Array2D.GetLength(1); y++)
+                for (int x = 0; x < expected.Array2D.GetLength(0); x++)
+                    expected.Array2D[x, y] = new Microsoft.Xna.Framework.Rectangle(x, y, -x, -y);
+
+            for (int z = 0; z < expected.Array3D.GetLength(2); z++)
+                for (int y = 0; y < expected.Array3D.GetLength(1); y++)
+                    for (int x = 0; x < expected.Array3D.GetLength(0); x++)
+                        expected.Array3D[x, y, z] = new Microsoft.Xna.Framework.Rectangle(x, y, z, -z);
+
+            CompileAndLoadAssets(expected.DeepClone(), result =>
+            {
+                Assert.IsNotNull(result.Array3D);
+                Assert.IsInstanceOf<Microsoft.Xna.Framework.Rectangle[,,]>(result.Array3D);
+                Assert.AreEqual(result.Array3D.Rank, 3);
+
+                for (int i = 0; i < result.Array3D.Rank; i++)
+                    Assert.AreEqual(expected.Array3D.GetLength(i), result.Array3D.GetLength(i));
+
+                for (int z = 0; z < expected.Array3D.GetLength(2); z++)
+                    for (int y = 0; y < expected.Array3D.GetLength(1); y++)
+                        for (int x = 0; x < expected.Array3D.GetLength(0); x++)
+                            Assert.AreEqual(expected.Array3D[x, y, z], result.Array3D[x, y, z]);
+
+                Assert.IsNotNull(result.Array2D);
+                Assert.IsInstanceOf<Microsoft.Xna.Framework.Rectangle[,]>(result.Array2D);
+                Assert.AreEqual(result.Array2D.Rank, 2);
+
+                for (int i = 0; i < result.Array2D.Rank; i++)
+                    Assert.AreEqual(expected.Array2D.GetLength(i), result.Array2D.GetLength(i));
+
+                for (int y = 0; y < expected.Array2D.GetLength(1); y++)
+                    for (int x = 0; x < expected.Array2D.GetLength(0); x++)
+                        Assert.AreEqual(expected.Array2D[x, y], result.Array2D[x, y]);
             });
         }
 

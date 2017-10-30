@@ -10,16 +10,9 @@ using Microsoft.Xna.Framework.Graphics;
 #if IOS
 using Foundation;
 using OpenGLES;
-#if ES11
-using OpenTK.Graphics.ES11;
-#else
-using OpenTK.Graphics.ES20;
 #endif
-#elif DESKTOPGL || ANGLE
-using OpenGL;
-#endif
-#if WINDOWS_PHONE
-using System.Windows;
+#if DESKTOPGL || ANGLE || GLES
+using MonoGame.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework
@@ -28,9 +21,7 @@ namespace Microsoft.Xna.Framework
     {
         public const int kMaxWaitForUIThread = 750; // In milliseconds
 
-#if !WINDOWS_PHONE
         static int mainThreadId;
-#endif
 
 #if ANDROID || WINDOWS || DESKTOPGL || ANGLE
         static List<Action> actions = new List<Action>();
@@ -39,30 +30,23 @@ namespace Microsoft.Xna.Framework
         public static EAGLContext BackgroundContext;
 #endif
 
-#if !WINDOWS_PHONE
         static Threading()
         {
-#if WINDOWS_STOREAPP
-            mainThreadId = Environment.CurrentManagedThreadId;
-#else
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
-#endif
+        }
+#if ANDROID
+        internal static void ResetThread (int id)
+        {
+            mainThreadId = id;
         }
 #endif
-
         /// <summary>
         /// Checks if the code is currently running on the UI thread.
         /// </summary>
         /// <returns>true if the code is currently running on the UI thread.</returns>
         public static bool IsOnUIThread()
         {
-#if WINDOWS_PHONE
-            return Deployment.Current.Dispatcher.CheckAccess();
-#elif WINDOWS_STOREAPP
-            return (mainThreadId == Environment.CurrentManagedThreadId);
-#else
             return mainThreadId == Thread.CurrentThread.ManagedThreadId;
-#endif
         }
 
         /// <summary>
@@ -75,36 +59,6 @@ namespace Microsoft.Xna.Framework
                 throw new InvalidOperationException("Operation not called on UI thread.");
         }
 
-#if WINDOWS_PHONE
-        internal static void RunOnUIThread(Action action)
-        {
-            RunOnContainerThread(Deployment.Current.Dispatcher, action);
-        }
-        
-        internal static void RunOnContainerThread(System.Windows.Threading.Dispatcher target, Action action)
-        {
-            target.BeginInvoke(action);
-        }
-
-        internal static void BlockOnContainerThread(System.Windows.Threading.Dispatcher target, Action action)
-        {
-            if (target.CheckAccess())
-            {
-                action();
-            }
-            else
-            {
-                EventWaitHandle wait = new AutoResetEvent(false);
-                target.BeginInvoke(() =>
-                {
-                    action();
-                    wait.Set();
-                });
-                wait.WaitOne(kMaxWaitForUIThread);
-            }
-        }
-#endif
-
         /// <summary>
         /// Runs the given action on the UI thread and blocks the current thread while the action is running.
         /// If the current thread is the UI thread, the action will run immediately.
@@ -115,25 +69,13 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action");
 
-#if (DIRECTX && !WINDOWS_PHONE) || PSM
+#if DIRECTX || PSM
             action();
 #else
             // If we are already on the UI thread, just call the action and be done with it
             if (IsOnUIThread())
             {
-#if WINDOWS_PHONE
-                try
-                {
-                    action();
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    // Need to be on a different thread
-                    BlockOnContainerThread(Deployment.Current.Dispatcher, action);
-                }
-#else
                 action();
-#endif
                 return;
             }
 
@@ -149,19 +91,9 @@ namespace Microsoft.Xna.Framework
                 GL.Flush();
                 GraphicsExtensions.CheckGLError();
             }
-#elif WINDOWS_PHONE
-            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
 #else
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-            MonoMac.AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
-#else
-            AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
-#endif
-#else
             Add(() =>
-#endif
             {
 #if ANDROID
                 //if (!Game.Instance.Window.GraphicsContext.IsCurrent)

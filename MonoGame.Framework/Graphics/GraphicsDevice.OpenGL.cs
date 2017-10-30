@@ -7,31 +7,11 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-using GLPrimitiveType = MonoMac.OpenGL.BeginMode;
-#else
-using OpenTK.Graphics.OpenGL;
-using GLPrimitiveType = OpenTK.Graphics.OpenGL.BeginMode;
-#endif
-#endif
-
-#if DESKTOPGL
-using OpenGL;
-#endif
-
 #if ANGLE
 using OpenTK.Graphics;
+#else
+using MonoGame.OpenGL;
 #endif
-
-#if GLES
-using OpenTK.Graphics.ES20;
-using FramebufferAttachment = OpenTK.Graphics.ES20.All;
-using RenderbufferStorage = OpenTK.Graphics.ES20.All;
-using GLPrimitiveType = OpenTK.Graphics.ES20.BeginMode;
-#endif
-
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -107,11 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     case ResourceType.Program:
                         if (GL.IsProgram(handle))
                         {
-#if MONOMAC
-                            GL.DeleteProgram(1, ref handle);
-#else
                             GL.DeleteProgram(handle);
-#endif
                         }
                         break;
                     case ResourceType.Query:
@@ -149,8 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glMajorVersion = 0;
         internal int glMinorVersion = 0;
         internal int glFramebuffer = 0;
-        internal int MaxVertexAttributes;        
-        internal List<string> _extensions = new List<string>();
+        internal int MaxVertexAttributes;
         internal int _maxTextureSize = 0;
 
         // Keeps track of last applied state to avoid redundant OpenGL calls
@@ -169,7 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get
             {
                 if (_vertexShader == null && _pixelShader == null)
-                        throw new InvalidOperationException("There is no shader bound!");
+                    throw new InvalidOperationException("There is no shader bound!");
                 if (_vertexShader == null)
                     return _pixelShader.HashKey;
                 if (_pixelShader == null)
@@ -180,7 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetVertexAttributeArray(bool[] attrs)
         {
-            for(var x = 0; x < attrs.Length; x++)
+            for (var x = 0; x < attrs.Length; x++)
             {
                 if (attrs[x] && !_enabledVertexAttributes.Contains(x))
                 {
@@ -214,7 +189,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (!_attribsDirty &&
                     _bufferBindingInfos[slot].VertexOffset == offset &&
                     ReferenceEquals(_bufferBindingInfos[slot].AttributeInfo, attrInfo) &&
-                    _bufferBindingInfos[slot].InstanceFrequency == vertexBufferBinding.InstanceFrequency)
+                    _bufferBindingInfos[slot].InstanceFrequency == vertexBufferBinding.InstanceFrequency &&
+                    _bufferBindingInfos[slot].Vbo == vertexBufferBinding.VertexBuffer.vbo)
                     continue;
 
                 bindingsChanged = true;
@@ -233,7 +209,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         element.VertexAttribPointerType,
                         element.Normalized,
                         vertexStride,
-                        (IntPtr) (offset.ToInt64() + element.Offset));
+                        (IntPtr)(offset.ToInt64() + element.Offset));
 
 #if !(GLES || MONOMAC)
                     // only set the divisor if instancing is supported
@@ -247,6 +223,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _bufferBindingInfos[slot].VertexOffset = offset;
                 _bufferBindingInfos[slot].AttributeInfo = attrInfo;
                 _bufferBindingInfos[slot].InstanceFrequency = vertexBufferBinding.InstanceFrequency;
+                _bufferBindingInfos[slot].Vbo = vertexBufferBinding.VertexBuffer.vbo;
             }
 
             _attribsDirty = false;
@@ -277,93 +254,13 @@ namespace Microsoft.Xna.Framework.Graphics
             Context.MakeCurrent(windowInfo);
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 
-            /*if (Threading.BackgroundContext == null)
-            {
-                Threading.BackgroundContext = GL.CreateContext(windowInfo);
-                Threading.WindowInfo = windowInfo;
-                Threading.BackgroundContext.MakeCurrent(null);
-            }
-
             Context.MakeCurrent(windowInfo);
-
-            GraphicsMode mode = GraphicsMode.Default;
-            var wnd = OpenTK.Platform.Utilities.CreateSdl2WindowInfo(Game.Instance.Window.Handle);
-
-            #if GLES
-            // Create an OpenGL ES 2.0 context
-            var flags = GraphicsContextFlags.Embedded;
-            int major = 2;
-            int minor = 0;
-            #else
-            // Create an OpenGL compatibility context
-            var flags = GraphicsContextFlags.Default;
-            int major = 1;
-            int minor = 0;
-            #endif
-
-            if (Context == null || Context.IsDisposed)
-            {
-                var color = PresentationParameters.BackBufferFormat.GetColorFormat();
-                var depth =
-                    PresentationParameters.DepthStencilFormat == DepthFormat.None ? 0 :
-                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth16 ? 16 :
-                    24;
-                var stencil =
-                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth24Stencil8 ? 8 :
-                    0;
-
-                var samples = 0;
-                if (Game.Instance.graphicsDeviceManager.PreferMultiSampling)
-                {
-                    // Use a default of 4x samples if PreferMultiSampling is enabled
-                    // without explicitly setting the desired MultiSampleCount.
-                    if (PresentationParameters.MultiSampleCount == 0)
-                    {
-                        PresentationParameters.MultiSampleCount = 4;
-                    }
-
-                    samples = PresentationParameters.MultiSampleCount;
-                }
-
-                mode = new GraphicsMode(color, depth, stencil, samples);
-                try
-                {
-                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
-                }
-                catch (Exception e)
-                {
-                    Game.Instance.Log("Failed to create OpenGL context, retrying. Error: " +
-                        e.ToString());
-                    major = 1;
-                    minor = 0;
-                    flags = GraphicsContextFlags.Default;
-                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
-                }
-            }
-            Context.MakeCurrent(wnd);
-            (Context as IGraphicsContextInternal).LoadAll();
-            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
-
-            // Provide the graphics context for background loading
-            // Note: this context should use the same GraphicsMode,
-            // major, minor version and flags parameters as the main
-            // context. Otherwise, context sharing will very likely fail.
-            if (Threading.BackgroundContext == null)
-            {
-                Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
-                Threading.WindowInfo = wnd;
-                Threading.BackgroundContext.MakeCurrent(null);
-            }
-            Context.MakeCurrent(wnd);*/
-
-
 #endif
-
             MaxTextureSlots = 16;
 
             GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
-                        
+
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
@@ -390,7 +287,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new NoSuitableGraphicsDeviceException("Unable to retrieve OpenGL version");
 
                 string[] versionSplit = version.Split(' ');
-                if(versionSplit.Length > 2 && versionSplit[0].Equals("OpenGL") && versionSplit[1].Equals("ES"))
+                if (versionSplit.Length > 2 && versionSplit[0].Equals("OpenGL") && versionSplit[1].Equals("ES"))
                 {
                     glMajorVersion = Convert.ToInt32(versionSplit[2].Substring(0, 1));
                     glMinorVersion = Convert.ToInt32(versionSplit[2].Substring(2, 1));
@@ -408,7 +305,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 glMinorVersion = 1;
             }
 #else
-            try
+                try
             {
                 string version = GL.GetString(StringName.Version);
 
@@ -435,19 +332,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			for (int i = 0; i < maxDrawBuffers; i++)
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
-            _extensions = GetGLExtensions();
-        }
-
-        List<string> GetGLExtensions()
-        {
-            // Setup extensions.
-            List<string> extensions = new List<string>();
-            var extstring = GL.GetString(StringName.Extensions);
-            GraphicsExtensions.CheckGLError();
-            if (!string.IsNullOrEmpty(extstring))
-                extensions.AddRange(extstring.Split(' '));
-
-            return extensions;
         }
 
         private void PlatformInitialize()
@@ -470,7 +354,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _bufferBindingInfos = new BufferBindingInfo[_maxVertexBufferSlots];
             for (int i = 0; i < _bufferBindingInfos.Length; i++)
-                _bufferBindingInfos[i] = new BufferBindingInfo(null, IntPtr.Zero, 0);
+                _bufferBindingInfos[i] = new BufferBindingInfo(null, IntPtr.Zero, 0, -1);
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
@@ -759,11 +643,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 this.framebufferHelper.GenRenderbuffer(out color);
                 this.framebufferHelper.BindRenderbuffer(color);
-#if GLES
-                this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)RenderbufferStorage.Rgba8Oes, width, height);
-#else
                 this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)RenderbufferStorage.Rgba8, width, height);
-#endif
             }
 
             if (preferredDepthFormat != DepthFormat.None)
@@ -1105,7 +985,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	        {
                 var scissorRect = _scissorRectangle;
                 if (!IsRenderTargetBound)
-                    scissorRect.Y = _viewport.Height - scissorRect.Y - scissorRect.Height;
+                    scissorRect.Y = PresentationParameters.BackBufferHeight - (scissorRect.Y + scissorRect.Height);
                 GL.Scissor(scissorRect.X, scissorRect.Y, scissorRect.Width, scissorRect.Height);
                 GraphicsExtensions.CheckGLError();
 	            _scissorRectangleDirty = false;
@@ -1318,6 +1198,30 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        private void PlatformGetBackBufferData<T>(Rectangle? rectangle, T[] data, int startIndex, int count) where T : struct
+        {
+            var rect = rectangle ?? new Rectangle(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+            var tSize = Marshal.SizeOf(typeof(T));
+            var flippedY = PresentationParameters.BackBufferHeight - rect.Y - rect.Height;
+            GL.ReadPixels(rect.X, flippedY, rect.Width, rect.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
+
+            // buffer is returned upside down, so we swap the rows around when copying over
+            var rowSize = rect.Width*PresentationParameters.BackBufferFormat.GetSize() / tSize;
+            var row = new T[rowSize];
+            for (var dy = 0; dy < rect.Height/2; dy++)
+            {
+                var topRow = startIndex + dy*rowSize;
+                var bottomRow = startIndex + (rect.Height - dy - 1)*rowSize;
+                // copy the bottom row to buffer
+                Array.Copy(data, bottomRow, row, 0, rowSize);
+                // copy top row to bottom row
+                Array.Copy(data, topRow, data, bottomRow, rowSize);
+                // copy buffer to top row
+                Array.Copy(row, 0, data, topRow, rowSize);
+                count -= rowSize;
+            }
+        }
+
         private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
         {
             return new Rectangle(x, y, width, height);
@@ -1345,12 +1249,14 @@ namespace Microsoft.Xna.Framework.Graphics
             public VertexDeclaration.VertexDeclarationAttributeInfo AttributeInfo;
             public IntPtr VertexOffset;
             public int InstanceFrequency;
+            public int Vbo;
 
-            public BufferBindingInfo(VertexDeclaration.VertexDeclarationAttributeInfo attributeInfo, IntPtr vertexOffset, int instanceFrequency)
+            public BufferBindingInfo(VertexDeclaration.VertexDeclarationAttributeInfo attributeInfo, IntPtr vertexOffset, int instanceFrequency, int vbo)
             {
                 AttributeInfo = attributeInfo;
                 VertexOffset = vertexOffset;
                 InstanceFrequency = instanceFrequency;
+                Vbo = vbo;
             }
         }
 

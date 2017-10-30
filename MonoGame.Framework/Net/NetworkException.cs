@@ -44,7 +44,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework.Net
 {
 
-#if WINRT || WINDOWS_PHONE
+#if WINDOWS_UAP
     [DataContract]
 #else
     [Serializable]

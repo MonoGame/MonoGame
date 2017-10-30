@@ -117,6 +117,7 @@ cat > /usr/bin/mgcb <<'endmsg'
 mono /usr/lib/mono/xbuild/MonoGame/v3.0/Tools/MGCB.exe "$@"
 endmsg
 chmod +x /usr/bin/mgcb
+cp "$DIR/Main/mgcbcomplete" "/etc/bash_completion.d/mgcb"
 
 # MonoGame icon
 mkdir -p /usr/share/icons/hicolor/scalable/mimetypes
@@ -140,6 +141,19 @@ Type=Application
 MimeType=text/mgcb;
 Categories=Development;
 endmsg
+
+# Man pages
+echo "Installing man pages..."
+IFS=':' read -r -a ARRAY <<< "$(manpath)"
+for MANPATH in "${ARRAY[@]}"
+do
+	if [ -d "$MANPATH/man1" ]
+	then
+		cp "$DIR/Main/mgcb.1" "$MANPATH/man1/mgcb.1"
+		gzip "$MANPATH/man1/mgcb.1"
+    	break
+    fi
+done
 
 # Mimetype
 echo "Adding mimetype..."

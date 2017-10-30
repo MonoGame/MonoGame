@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
-#if WINDOWS
 using MonoGame.Utilities;
-#endif
-
-using OpenAL;
+using MonoGame.OpenAL;
+using MonoGame.OpenGL;
 
 #if ANDROID
 using System.Globalization;
@@ -77,11 +75,6 @@ namespace Microsoft.Xna.Framework.Audio
 #if DESKTOPGL || ANGLE
 
         // MacOS & Linux shares a limit of 256.
-        internal const int MAX_NUMBER_OF_SOURCES = 256;
-
-#elif MONOMAC
-
-        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
         internal const int MAX_NUMBER_OF_SOURCES = 256;
 
 #elif IOS
@@ -176,8 +169,8 @@ namespace Microsoft.Xna.Framework.Audio
             {
 #if ANDROID
                 // Attach activity event handlers so we can pause and resume all playing sounds
-                AndroidGameActivity.Paused += Activity_Paused;
-                AndroidGameActivity.Resumed += Activity_Resumed;
+                MonoGameAndroidGameView.OnPauseGameThread += Activity_Paused;
+                MonoGameAndroidGameView.OnResumeGameThread += Activity_Resumed;
 
                 // Query the device for the ideal frequency and update buffer size so
                 // we can get the low latency sound path.

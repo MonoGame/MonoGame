@@ -28,6 +28,8 @@ namespace MonoGame.Tools.Pipeline
 
     static partial class Global
     {
+        public static IntPtr ApplicationHandle;
+        
         private static IconTheme _theme;
 
         private static void PlatformInit()

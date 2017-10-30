@@ -9,6 +9,8 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MonoGame.Tests.References" />
+    <Reference Include="MGCB" />
+    <Reference Include="MonoGame.Build.Tasks" />
   </References>
 
   <Properties>
@@ -67,12 +69,12 @@
     <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
       <Link>ffprobe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
       <Link>ffmpeg</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvtt.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
@@ -281,7 +283,9 @@
     <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
 
-
+    <Compile Include="ContentPipeline\BuilderTargetsTest.cs">
+      <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\ArrayContentCompilerTest.cs">
       <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
@@ -650,6 +654,12 @@
     <Content Include="Assets\ReferenceImages\GraphicsDevice\Clear-7.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\GetBackBufferData__X_100 Y_100 Width_250 Height_250__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\GetBackBufferData_null_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\Colored3DCube.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -756,6 +766,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\ScissorRectangle\Draw_with_render_target_change.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\ScissorRectangle\Draw_with_scissor_rect.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Shader\Shader__Bevels__.png">
@@ -1086,6 +1099,12 @@
     <Content Include="Assets\Textures\Surge.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Fonts\Localized.spritefont">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\Strings.resx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\Effects\DirectX\Bevels.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1301,6 +1320,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Textures\red_128.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="..\MonoGame.Framework.Content.Pipeline\MonoGame.Content.Builder.targets">
+      <Link>MonoGame.Content.Builder.targets</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Projects\BuildSimpleProject.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Projects\Content\Content.mgcb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Projects\Content\ContentFont.spritefont">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 

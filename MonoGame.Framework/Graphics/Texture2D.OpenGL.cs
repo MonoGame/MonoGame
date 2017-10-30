@@ -9,63 +9,22 @@ using Microsoft.Xna.Framework.Utilities;
 using MonoGame.Utilities;
 using MonoGame.Utilities.Png;
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.AppKit;
-using MonoMac.CoreGraphics;
-using MonoMac.Foundation;
-#else
-using AppKit;
-using CoreGraphics;
-using Foundation;
-#endif
-#endif
-
 #if IOS
 using UIKit;
 using CoreGraphics;
 using Foundation;
+using System.Drawing;
 #endif
 
 #if OPENGL
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-using GLPixelFormat = MonoMac.OpenGL.All;
-using PixelFormat = MonoMac.OpenGL.PixelFormat;
-#else
-using OpenTK.Graphics.OpenGL;
-using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
-using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
-using PixelInternalFormat = OpenTK.Graphics.OpenGL.PixelFormat;
-#endif
-#endif
-
-#if DESKTOPGL
-using OpenGL;
-using GLPixelFormat = OpenGL.PixelFormat;
-using PixelFormat = OpenGL.PixelFormat;
-#endif
-
-#if GLES
-using OpenTK.Graphics.ES20;
-using GLPixelFormat = OpenTK.Graphics.ES20.All;
-using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;
-using PixelInternalFormat = OpenTK.Graphics.ES20.PixelFormat;
-#endif
+using MonoGame.OpenGL;
+using GLPixelFormat = MonoGame.OpenGL.PixelFormat;
+using PixelFormat = MonoGame.OpenGL.PixelFormat;
 
 #if ANDROID
 using Android.Graphics;
 #endif
 #endif // OPENGL
-
-#if MONOMAC || PLATFORM_MACOS_LEGACY || IOS
-using System.Drawing;
-#endif
-
-#if MONOMAC
-using System.Drawing.Imaging;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -243,15 +202,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: check for for non renderable formats (formats that can't be attached to FBO)
 
             var framebufferId = 0;
-#if (IOS || ANDROID)
-			GL.GenFramebuffers(1, out framebufferId);
-#else
-            GL.GenFramebuffers(1, ref framebufferId);
-#endif
+            GL.GenFramebuffers(1, out framebufferId);
             GraphicsExtensions.CheckGLError();
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferId);
             GraphicsExtensions.CheckGLError();
-            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferSlot.ColorAttachment0, TextureTarget.Texture2D, this.glTexture, 0);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, this.glTexture, 0);
             GraphicsExtensions.CheckGLError();
 
             GL.ReadPixels(rect.X, rect.Y, rect.Width, rect.Height, this.glFormat, this.glType, data);
@@ -268,14 +223,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var pixelToT = Format.GetSize() / tSizeInByte;
                 var tFullWidth = Math.Max(this.width >> level, 1) / 4 * pixelToT;
                 var temp = new T[Math.Max(this.height >> level, 1) / 4 * tFullWidth];
-#if MONOMAC
-                var tempHandle = GCHandle.Alloc(temp, GCHandleType.Pinned);
-                var ptr = tempHandle.AddrOfPinnedObject();
-                GL.GetCompressedTexImage(TextureTarget.Texture2D, level, ptr);
-                tempHandle.Free();
-#else
                 GL.GetCompressedTexImage(TextureTarget.Texture2D, level, temp);
-#endif
                 GraphicsExtensions.CheckGLError();
 
                 var rowCount = rect.Height / 4;
@@ -310,25 +258,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-#if IOS || MONOMAC
-
 #if IOS
 			using (var uiImage = UIImage.LoadFromData(NSData.FromStream(stream)))
-#elif MONOMAC
-			using (var nsImage = NSImage.FromStream (stream))
-#endif
 			{
-#if IOS
 				var cgImage = uiImage.CGImage;
-#elif MONOMAC
-#if PLATFORM_MACOS_LEGACY
-				var rectangle = RectangleF.Empty;
-#else
-                var rectangle = CGRect.Empty;
-#endif
-                var cgImage = nsImage.AsCGImage (ref rectangle, null, null);
-#endif
-
 			    return PlatformFromStream(graphicsDevice, cgImage);
 			}
 #endif
@@ -411,20 +344,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
-#if MONOMAC
-        public static Texture2D FromStream(GraphicsDevice graphicsDevice, NSImage nsImage)
-        {
-#if PLATFORM_MACOS_LEGACY
-            var rectangle = RectangleF.Empty;
-#else
-            var rectangle = CGRect.Empty;
-#endif
-		    var cgImage = nsImage.AsCGImage (ref rectangle, null, null);
-            return PlatformFromStream(graphicsDevice, cgImage);
-        }
-#endif
-
-#if IOS || MONOMAC
+#if IOS
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, CGImage cgImage)
         {
 			var width = cgImage.Width;
@@ -434,11 +354,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var colorSpace = CGColorSpace.CreateDeviceRGB();
             var bitmapContext = new CGBitmapContext(data, width, height, 8, width * 4, colorSpace, CGBitmapFlags.PremultipliedLast);
-#if PLATFORM_MACOS_LEGACY || IOS
             bitmapContext.DrawImage(new RectangleF(0, 0, width, height), cgImage);
-#else
-            bitmapContext.DrawImage(new CGRect(0, 0, width, height), cgImage);
-#endif
             bitmapContext.Dispose();
             colorSpace.Dispose();
 
@@ -518,9 +434,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
-#if MONOMAC
-            SaveAsImage(stream, width, height, ImageFormat.Jpeg);
-#elif DESKTOPGL
+#if DESKTOPGL
             SaveAsImage(stream, width, height, ImageWriterFormat.Jpg);
 #elif ANDROID
             SaveAsImage(stream, width, height, Bitmap.CompressFormat.Jpeg);
@@ -573,63 +487,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		        }
 	        }
         }
-#elif MONOMAC
-       internal void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
-		{
-			if (stream == null)
-			{
-				throw new ArgumentNullException("stream", "'stream' cannot be null (Nothing in Visual Basic)");
-			}
-			if (width <= 0)
-			{
-				throw new ArgumentOutOfRangeException("width", width, "'width' cannot be less than or equal to zero");
-			}
-			if (height <= 0)
-			{
-				throw new ArgumentOutOfRangeException("height", height, "'height' cannot be less than or equal to zero");
-			}
-			if (format == null)
-			{
-				throw new ArgumentNullException("format", "'format' cannot be null (Nothing in Visual Basic)");
-			}
-
-			byte[] data = null;
-			GCHandle? handle = null;
-			Bitmap bitmap = null;
-			try
-			{
-				data = new byte[width * height * 4];
-				handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-				GetData(data);
-
-				// internal structure is BGR while bitmap expects RGB
-				for(int i = 0; i < data.Length; i += 4)
-				{
-					byte temp = data[i + 0];
-					data[i + 0] = data[i + 2];
-					data[i + 2] = temp;
-				}
-
-				bitmap = new Bitmap(width, height, width * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, handle.Value.AddrOfPinnedObject());
-
-				bitmap.Save(stream, format);
-			}
-			finally
-			{
-				if (bitmap != null)
-				{
-					bitmap.Dispose();
-				}
-				if (handle.HasValue)
-				{
-					handle.Value.Free();
-				}
-				if (data != null)
-				{
-					data = null;
-				}
-			}
-		}
 #elif ANDROID
         private void SaveAsImage(Stream stream, int width, int height, Bitmap.CompressFormat format)
         {
