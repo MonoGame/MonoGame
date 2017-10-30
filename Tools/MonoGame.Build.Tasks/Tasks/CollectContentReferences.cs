@@ -36,6 +36,12 @@ namespace MonoGame.Build.Tasks
                 var relative = content.GetMetadata("RelativeDir").NormalisePath();
                 var fp = content.GetMetadata("FullPath").NormalisePath();
                 var link = content.GetMetadata("Link").NormalisePath();
+                var contentOutputDir = content.GetMetadata("ContentOutputDir");
+                if (contentOutputDir != null)
+                    contentOutputDir = contentOutputDir.NormalisePath();
+                var contentIntermediateOutputDir = content.GetMetadata("ContentIntermediateOutputDir");
+                if (contentIntermediateOutputDir != null)
+                    contentIntermediateOutputDir = contentIntermediateOutputDir.NormalisePath();
                 var metaData = new Dictionary<string, string>();
                 var contentFolder = String.Empty;
                 if (!string.IsNullOrEmpty(link))
@@ -51,8 +57,14 @@ namespace MonoGame.Build.Tasks
                     outputPath = Path.Combine(outputPath, contentFolder);
                 metaData.Add("ContentDirectory", !string.IsNullOrEmpty(contentFolder) ? contentFolder + Path.DirectorySeparatorChar : "");
                 metaData.Add("RelativeFullPath", !string.IsNullOrEmpty(relative) ? Path.GetFullPath(relative) : "");
-                metaData.Add("ContentOutputDir", Path.Combine("bin", MonoGamePlatform, outputPath));
-                metaData.Add("ContentIntermediateOutputDir", Path.Combine("obj", MonoGamePlatform, outputPath));
+                metaData.Add("ContentOutputDir", !string.IsNullOrEmpty(contentOutputDir)
+                    ? contentOutputDir
+                    : Path.Combine("bin", MonoGamePlatform, outputPath)
+                );
+                metaData.Add("ContentIntermediateOutputDir", !string.IsNullOrEmpty(contentIntermediateOutputDir)
+                    ? contentIntermediateOutputDir
+                    : Path.Combine("obj", MonoGamePlatform, outputPath)
+                );
                 output.Add(new TaskItem(fp, metaData));
             }
             Output = output.ToArray();
