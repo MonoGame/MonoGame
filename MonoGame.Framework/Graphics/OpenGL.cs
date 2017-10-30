@@ -74,7 +74,7 @@ namespace MonoGame.OpenGL
         QueryResult = 0x8866,
     }
 
-    internal enum GenerateMipmapTarget
+    public enum GenerateMipmapTarget
     {
         Texture1D = 0x0DE0,
         Texture2D = 0x0DE1,
@@ -129,20 +129,20 @@ namespace MonoGame.OpenGL
         ElementArrayBuffer = 0x8893,
     }
 
-    internal enum RenderbufferTarget
+    public enum RenderbufferTarget
     {
         Renderbuffer = 0x8D41,
         RenderbufferExt = 0x8D41,
     }
 
-    internal enum FramebufferTarget
+    public enum FramebufferTarget
     {
         Framebuffer = 0x8D40,
         FramebufferExt = 0x8D40,
         ReadFramebuffer = 0x8CA8,
     }
 
-    internal enum RenderbufferStorage
+    public enum RenderbufferStorage
     {
         Rgba8 = 0x8058,
         DepthComponent16 = 0x81a5,
@@ -322,13 +322,15 @@ namespace MonoGame.OpenGL
         MaxSamples = 0x8D57,
     }
 
-    internal enum StringName
+    public enum StringName
     {
         Extensions = 0x1F03,
+        Renderer = 0x1F01,
+        Vendor = 0x1F00,
         Version = 0x1F02,
     }
 
-    internal enum FramebufferAttachment
+    public enum FramebufferAttachment
     {
         ColorAttachment0 = 0x8CE0,
         ColorAttachment0Ext = 0x8CE0,
@@ -360,12 +362,12 @@ namespace MonoGame.OpenGL
         NoError = 0,
     }
 
-    internal enum TextureUnit
+    public enum TextureUnit
     {
         Texture0 = 0x84C0,
     }
 
-    internal enum TextureTarget
+    public enum TextureTarget
     {
         Texture2D = 0x0DE1,
         Texture3D = 0x806F,
@@ -415,7 +417,7 @@ namespace MonoGame.OpenGL
 
     }
 
-    internal enum PixelFormat
+    public enum PixelFormat
     {
         Rgba = 0x1908,
         Rgb = 0x1907,
@@ -425,7 +427,7 @@ namespace MonoGame.OpenGL
         Rg = 0x8227,
     }
 
-    internal enum PixelType
+    public enum PixelType
     {
         UnsignedByte = 0x1401,
         UnsignedShort565 = 0x8363,
@@ -537,7 +539,7 @@ namespace MonoGame.OpenGL
         internal int A { get; private set; }
     }
 
-    internal partial class GL
+    public partial class GL
     {
         internal enum RenderApi
         {
@@ -599,8 +601,8 @@ namespace MonoGame.OpenGL
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
             [MonoNativeFunctionWrapper]
-            internal delegate void GenerateMipmapDelegate (GenerateMipmapTarget target);
-            internal static GenerateMipmapDelegate GenerateMipmap;
+            public delegate void GenerateMipmapDelegate (GenerateMipmapTarget target);
+            public static GenerateMipmapDelegate GenerateMipmap;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
             [MonoNativeFunctionWrapper]
@@ -699,8 +701,8 @@ namespace MonoGame.OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        internal delegate void BindTextureDelegate (TextureTarget target, int id);
-        internal static BindTextureDelegate BindTexture;
+        public delegate void BindTextureDelegate (TextureTarget target, int id);
+        public static BindTextureDelegate BindTexture;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
@@ -845,8 +847,8 @@ namespace MonoGame.OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        internal delegate void GenerateMipmapDelegate (GenerateMipmapTarget target);
-        internal static GenerateMipmapDelegate GenerateMipmap;
+        public delegate void GenerateMipmapDelegate (GenerateMipmapTarget target);
+        public static GenerateMipmapDelegate GenerateMipmap;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
@@ -919,8 +921,8 @@ namespace MonoGame.OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        internal delegate void ActiveTextureDelegate (TextureUnit textureUnit);
-        internal static ActiveTextureDelegate ActiveTexture;
+        public delegate void ActiveTextureDelegate (TextureUnit textureUnit);
+        public static ActiveTextureDelegate ActiveTexture;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
@@ -1483,7 +1485,7 @@ namespace MonoGame.OpenGL
             Uniform4fv(location, size, value);
         }
 
-        internal unsafe static string GetString (StringName name)
+        public unsafe static string GetString (StringName name)
         {
             return Marshal.PtrToStringAnsi (GetStringInternal (name));
         }

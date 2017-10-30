@@ -11,7 +11,7 @@ using Javax.Microedition.Khronos.Egl;
 
 namespace MonoGame.OpenGL
 {
-    internal partial class GL
+    public partial class GL
     {
 		// internal for Android is not used on other platforms
 		// it allows us to use either GLES or Full GL (if the GPU supports it)
