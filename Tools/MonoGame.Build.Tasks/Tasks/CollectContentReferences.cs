@@ -37,10 +37,10 @@ namespace MonoGame.Build.Tasks
                 var fp = content.GetMetadata("FullPath").NormalisePath();
                 var link = content.GetMetadata("Link").NormalisePath();
                 var contentOutputDir = content.GetMetadata("ContentOutputDir");
-                if (contentOutputDir != null)
+                if (!string.IsNullOrEmpty(contentOutputDir))
                     contentOutputDir = contentOutputDir.NormalisePath();
                 var contentIntermediateOutputDir = content.GetMetadata("ContentIntermediateOutputDir");
-                if (contentIntermediateOutputDir != null)
+                if (!string.IsNullOrEmpty(contentIntermediateOutputDir))
                     contentIntermediateOutputDir = contentIntermediateOutputDir.NormalisePath();
                 var metaData = new Dictionary<string, string>();
                 var contentFolder = String.Empty;
