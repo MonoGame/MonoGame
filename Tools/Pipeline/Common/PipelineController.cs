@@ -401,7 +401,7 @@ namespace MonoGame.Tools.Pipeline
                     yield return item;
         }
 
-        public void RebuildItems()
+        public void RebuildSelectedItems()
         {
             var items = new List<IProjectItem>();
 
@@ -429,6 +429,11 @@ namespace MonoGame.Tools.Pipeline
                         items.Add(subitem);
             }
 
+            BuildItems(items, true);
+        }
+
+        public void BuildItems(IEnumerable<IProjectItem> contentItems, bool rebuild = false)
+        {
             // Create a unique file within the same folder as
             // the normal project to store this incremental build.
             var uniqueName = Guid.NewGuid().ToString();
@@ -439,11 +444,11 @@ namespace MonoGame.Tools.Pipeline
             using (var io = File.CreateText(tempPath))
             {
                 var parser = new PipelineProjectParser(this, _project);
-                parser.SaveProject(io, (i) => !items.Contains(i));
+                parser.SaveProject(io, (i) => !contentItems.Contains(i));
             }
 
             // Run the build the command.
-            var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
+            var commands = string.Format("/@:\"{0}\" {1}/incremental", tempPath, rebuild ? "/rebuild " : "");
             BuildCommand(commands);
 
             // Cleanup the temp file once we're done.

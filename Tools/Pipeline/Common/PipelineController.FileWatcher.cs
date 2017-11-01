@@ -67,15 +67,13 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            HashSet<ContentItem> modifiedItems = new HashSet<ContentItem>();
+            System.Collections.Concurrent.BlockingCollection<ContentItem> modifiedItemCollection = new System.Collections.Concurrent.BlockingCollection<ContentItem>();
             private void File_Changed(object sender, FileSystemEventArgs e)
             {
                 var modifiedItem = _controller._project.ContentItems.FirstOrDefault(item => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, item.Location, item.Name)).Equals(e.FullPath));
 
-                if (modifiedItem != null)
-                    modifiedItems.Add(modifiedItem);
-
-
+                if (modifiedItem != null && !modifiedItemCollection.Contains(modifiedItem))
+                    modifiedItemCollection.Add(modifiedItem);
             }
 
             public void Stop()
@@ -103,11 +101,15 @@ namespace MonoGame.Tools.Pipeline
                         var folders = items.Select(s => Path.Combine(_controller.ProjectLocation, s.Location)).Distinct().ToArray();
                         UpdateWatchers(folders);
 
-                        if (modifiedItems.Count != 0)
+                        if (modifiedItemCollection.Count != 0 && !_controller.ProjectBuilding)
                         {
-                            modifiedItems.Clear();
+                            List<IProjectItem> itemsToBuild = new List<IProjectItem>();
+                            ContentItem item;
+                            while (modifiedItemCollection.TryTake(out item))
+                                itemsToBuild.Add(item);
+                       
                             if (_controller.EnableAutoBuild)
-                                _controller.Build(false);
+                                _view.Invoke(() => _controller.BuildItems(itemsToBuild, false));
                         }
 
 
@@ -128,12 +130,13 @@ namespace MonoGame.Tools.Pipeline
                     {
                         return;
                     }
-                    catch
+                    catch(Exception ex)
                     {
+
                     }
                     finally
                     {
-                        Thread.Sleep(100);
+                        Thread.Sleep(500);
                     }
 
                 }

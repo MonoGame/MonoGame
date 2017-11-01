@@ -675,7 +675,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdRebuildItem_Executed(object sender, EventArgs e)
         {
-            PipelineController.Instance.RebuildItems();
+            PipelineController.Instance.RebuildSelectedItems();
         }
 
         private void AutoRebuildCheckMenuItem_CheckedChanged(object sender, EventArgs e)
