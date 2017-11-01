@@ -37,7 +37,7 @@ namespace MonoGame.Tools.Pipeline
 
             Dictionary<string, FileSystemWatcher> watchers = new Dictionary<string, FileSystemWatcher>();
 
-            public void UpdateWatchers(string[] locations)
+            private void updateWatchers(string[] locations)
             {
                 foreach (var l in locations)
                 {
@@ -85,7 +85,8 @@ namespace MonoGame.Tools.Pipeline
                 _thread.Join();
                 _thread = null;
 
-                UpdateWatchers(new string[0]);
+                //dispose all watchers
+                updateWatchers(new string[0]);
             }
 
             volatile bool exit = false;
@@ -98,15 +99,22 @@ namespace MonoGame.Tools.Pipeline
                     try
                     {
                         var items = _controller._project.ContentItems.ToArray();
-                        var folders = items.Select(s => Path.Combine(_controller.ProjectLocation, s.Location)).Distinct().ToArray();
-                        UpdateWatchers(folders);
+                        var folders = items.Select(s => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, s.Location))).Distinct().ToArray();
+                        updateWatchers(folders);
 
                         if (modifiedItemCollection.Count != 0 && !_controller.ProjectBuilding)
                         {
                             List<IProjectItem> itemsToBuild = new List<IProjectItem>();
                             ContentItem item;
                             while (modifiedItemCollection.TryTake(out item))
-                                itemsToBuild.Add(item);
+                            {
+                               var path = item.OriginalPath;
+                                if (isFileInUse(path))
+                                    itemsToBuild.Add(item);
+                                else //if another process is still writing the file, let's enqueue the item back
+                                    modifiedItemCollection.Add(item);
+                            }
+                                
                        
                             if (_controller.EnableAutoBuild)
                                 _view.Invoke(() => _controller.BuildItems(itemsToBuild, false));
@@ -141,6 +149,24 @@ namespace MonoGame.Tools.Pipeline
 
                 }
             }
+
+
+            bool isFileInUse(String filename)
+            {
+                try
+                {
+                    using (Stream stream = new FileStream(filename, FileMode.Open))
+                    {
+                        stream.Close();
+                        return false;
+                    }
+                }
+                catch
+                {
+                    return true;
+                }
+            }
+
 
             public void Dispose()
             {

@@ -120,6 +120,7 @@ namespace MonoGame.Tools.Pipeline
             UpdateMenu();
 
             view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
+            EnableAutoBuild = PipelineSettings.Default.AutoBuild;
         }
 
         public static PipelineController Create(IView view)
@@ -279,6 +280,7 @@ namespace MonoGame.Tools.Pipeline
                 PipelineSettings.Default.StartupProject = projectFilePath;
                 PipelineSettings.Default.Save();
                 View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
+              
             }
             catch (Exception)
             {
