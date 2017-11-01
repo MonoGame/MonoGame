@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -14,8 +15,6 @@ namespace MonoGame.Tools.Pipeline
     {
         private class FileWatcher : IDisposable
         {
-            Thread _thread;
-
             PipelineController _controller;
             IView _view;
 
@@ -23,37 +22,38 @@ namespace MonoGame.Tools.Pipeline
             {
                 _controller = controller;
                 _view = view;
-            }
-
-            public void Run()
-            {
-                Stop();
-                exit = false;
-                _thread = new Thread(new ThreadStart(ExistsThread));
-                _thread.Start();
-
-
+                checkModificationTimer = new System.Timers.Timer(500);
+                checkModificationTimer.Elapsed += _buildModified;
             }
 
             Dictionary<string, FileSystemWatcher> watchers = new Dictionary<string, FileSystemWatcher>();
 
-            private void updateWatchers(string[] locations)
+            void updateWatchers()
             {
-                foreach (var l in locations)
+                if (_controller._project == null)
+                    return;
+
+                var items = _controller._project.ContentItems.ToArray();
+                var folders = items.Select(s => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, s.Location))).Distinct().ToArray();
+
+
+                foreach (var l in folders)
                 {
                     if (!watchers.ContainsKey(l))
                     {
                         var watcher = new FileSystemWatcher();
-                        watcher.NotifyFilter = NotifyFilters.LastWrite;
+                        watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.Attributes;
                         watcher.Filter = "*.*";
                         watcher.Changed += File_Changed;
+                        watcher.Deleted += File_Removed;
+                        watcher.Renamed += File_Removed;
                         watcher.Path = l;
                         watcher.IncludeSubdirectories = false;
                         watcher.EnableRaisingEvents = true;
                         watchers.Add(l, watcher);
                     }
                 }
-                var watchersToRemove = watchers.Keys.Where(k => !locations.Contains(k)).ToArray();
+                var watchersToRemove = watchers.Keys.Where(k => !folders.Contains(k)).ToArray();
 
                 foreach (var r in watchersToRemove)
                 {
@@ -67,110 +67,107 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            System.Collections.Concurrent.BlockingCollection<ContentItem> modifiedItemCollection = new System.Collections.Concurrent.BlockingCollection<ContentItem>();
+            private void File_Removed(object sender, FileSystemEventArgs e)
+            {
+                var deletedItem = _controller._project.ContentItems.FirstOrDefault(item => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, item.Location, item.Name)).Equals(e.FullPath));
+                if (deletedItem != null)
+                {
+                    deletedItem.Exists = false;
+                    _view.Invoke(() => _view.UpdateTreeItem(deletedItem));
+                }
+            }
+
+            System.Collections.Concurrent.BlockingCollection<IProjectItem> modifiedItemCollection = new System.Collections.Concurrent.BlockingCollection<IProjectItem>();
+
             private void File_Changed(object sender, FileSystemEventArgs e)
             {
                 var modifiedItem = _controller._project.ContentItems.FirstOrDefault(item => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, item.Location, item.Name)).Equals(e.FullPath));
 
-                if (modifiedItem != null && !modifiedItemCollection.Contains(modifiedItem))
-                    modifiedItemCollection.Add(modifiedItem);
+                if (_controller.EnableAutoBuild && modifiedItem != null && !modifiedItemCollection.Contains(modifiedItem))
+                        modifiedItemCollection.Add(modifiedItem);
+
+                if(modifiedItem != null && modifiedItem.Exists == false)
+                {
+                    modifiedItem.Exists = true;
+                    _view.Invoke(() => _view.UpdateTreeItem(modifiedItem));
+                }
+            }
+
+            private void _buildModified(object sender, System.Timers.ElapsedEventArgs e)
+            {
+                checkModificationTimer.Stop();
+                updateWatchers();
+
+                if (modifiedItemCollection.Count != 0 && !_controller.ProjectBuilding)
+                {
+                    List<IProjectItem> itemList = new List<IProjectItem>();
+                    IProjectItem item;
+                    while (modifiedItemCollection.TryTake(out item))
+                        itemList.Add(item);
+
+                    //check if another process is still writing the file, let's enqueue the item back
+                    foreach (var itm in itemList.ToArray())
+                    {
+                        var path = Path.GetFullPath(Path.Combine(_controller.ProjectLocation, itm.Location, itm.Name));
+                        if (IsFileLocked(path))
+                        {
+                            itemList.Remove(itm);
+                            modifiedItemCollection.Add(itm);
+                        }
+
+                    }
+                    var finalList = itemList.Distinct().ToArray();
+
+                    if (finalList.Length > 0)
+                        _view.Invoke(() => _controller.BuildItems(finalList, false));
+                }
+                checkModificationTimer.Start();
+            }
+
+            protected virtual bool IsFileLocked(string file)
+            {
+                FileStream stream = null;
+
+                try
+                {
+                    stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.None);
+                }
+                catch (IOException)
+                {
+                    return true;
+                }
+                finally
+                {
+                    if (stream != null)
+                        stream.Close();
+                }
+
+                return false;
+            }
+
+            System.Timers.Timer checkModificationTimer;
+
+            public void Start()
+            {
+                if (!checkModificationTimer.Enabled)
+                    checkModificationTimer.Start();
             }
 
             public void Stop()
             {
-                if (_thread == null)
-                    return;
-
-                exit = true;
-                _thread.Join();
-                _thread = null;
-
-                //dispose all watchers
-                updateWatchers(new string[0]);
+                if (checkModificationTimer.Enabled)
+                    checkModificationTimer.Stop();
             }
-
-            volatile bool exit = false;
-
-            private void ExistsThread()
-            {
-                while (!exit)
-                {
-                    // Can't lock without major code modifications
-                    try
-                    {
-                        var items = _controller._project.ContentItems.ToArray();
-                        var folders = items.Select(s => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, s.Location))).Distinct().ToArray();
-                        updateWatchers(folders);
-
-                        if (modifiedItemCollection.Count != 0 && !_controller.ProjectBuilding)
-                        {
-                            List<IProjectItem> itemsToBuild = new List<IProjectItem>();
-                            ContentItem item;
-                            while (modifiedItemCollection.TryTake(out item))
-                            {
-                               var path = item.OriginalPath;
-                                if (isFileInUse(path))
-                                    itemsToBuild.Add(item);
-                                else //if another process is still writing the file, let's enqueue the item back
-                                    modifiedItemCollection.Add(item);
-                            }
-                                
-                       
-                            if (_controller.EnableAutoBuild)
-                                _view.Invoke(() => _controller.BuildItems(itemsToBuild, false));
-                        }
-
-
-
-                        foreach (var item in items)
-                        {
-                            if (exit) return;
-                            else Thread.Sleep(10);
-
-                            if (item.Exists == File.Exists(_controller.GetFullPath(item.OriginalPath)))
-                                continue;
-
-                            item.Exists = !item.Exists;
-                            _view.Invoke(() => _view.UpdateTreeItem(item));
-                        }
-                    }
-                    catch (ThreadAbortException ex)
-                    {
-                        return;
-                    }
-                    catch(Exception ex)
-                    {
-
-                    }
-                    finally
-                    {
-                        Thread.Sleep(500);
-                    }
-
-                }
-            }
-
-
-            bool isFileInUse(String filename)
-            {
-                try
-                {
-                    using (Stream stream = new FileStream(filename, FileMode.Open))
-                    {
-                        stream.Close();
-                        return false;
-                    }
-                }
-                catch
-                {
-                    return true;
-                }
-            }
-
 
             public void Dispose()
             {
-                Stop();
+                checkModificationTimer.Dispose();
+                checkModificationTimer = null;
+                foreach (var w in this.watchers.ToArray())
+                {
+                    this.watchers.Remove(w.Key);
+                    w.Value.Dispose();
+                }
             }
         }
     }

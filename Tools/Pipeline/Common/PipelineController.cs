@@ -294,7 +294,7 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
 
-            _watcher.Run();
+            _watcher.Start();
 
             UpdateMenu();
         }
@@ -316,7 +316,7 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
-            _watcher.Stop();
+          //  _watcher.Stop();
 
             ProjectOpen = false;
             ProjectDirty = false;
@@ -621,7 +621,7 @@ namespace MonoGame.Tools.Pipeline
 
             if (ret)
             {
-                _watcher.Stop();
+                _watcher.Dispose();
                 PipelineSettings.Default.Save();
             }
 
