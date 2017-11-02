@@ -157,14 +157,14 @@ namespace MonoGame.Tools.Pipeline
                                 if (modifiedItem != null && modifiedItem.Item1.Exists == false)
                                 {
                                     modifiedItem.Item1.Exists = true;
-                                    _view.Invoke(() => _view.UpdateTreeItem(modifiedItem.Item1));
+                                     _view.UpdateTreeItem(modifiedItem.Item1);
                                 }
                             }
 
                             var finalList = modifiedItems.Distinct().ToArray();
 
                             if (finalList.Length > 0)
-                                _view.Invoke(() => _controller.BuildItems(finalList, false));
+                                _controller.BuildItems(finalList, false);
                         }
                     });
 
