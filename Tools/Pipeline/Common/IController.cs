@@ -81,7 +81,7 @@ namespace MonoGame.Tools.Pipeline
         
         void Build(bool rebuild);
 
-        void RebuildItems();
+        void RebuildSelectedItems();
 
         void Clean();
 

@@ -74,6 +74,8 @@ namespace MonoGame.Tools.Pipeline
             _mgcbFileFilter = new FileFilter("MonoGame Content Build Project (*.mgcb)", new[] { ".mgcb" });
             _allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
             _xnaFileFilter = new FileFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
+
+
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -486,6 +488,8 @@ namespace MonoGame.Tools.Pipeline
                 clearItem.Click += (sender, e) => PipelineController.Instance.ClearRecentList();
                 menuRecent.Items.Add(clearItem);
             }
+
+            autoRebuildCheckMenuItem.Checked = PipelineSettings.Default.AutoBuild;
         }
 
         public void SetClipboard(string text)
@@ -675,9 +679,16 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdRebuildItem_Executed(object sender, EventArgs e)
         {
-            PipelineController.Instance.RebuildItems();
+            PipelineController.Instance.RebuildSelectedItems();
         }
 
+        private void AutoRebuildCheckMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            PipelineController.Instance.EnableAutoBuild = autoRebuildCheckMenuItem.Checked;
+            PipelineSettings.Default.AutoBuild = autoRebuildCheckMenuItem.Checked;
+            PipelineSettings.Default.Save();
+
+        }
         #endregion
 
     }

@@ -23,6 +23,7 @@ namespace MonoGame.Tools.Pipeline
         public int HSeparator, VSeparator;
         public bool Maximized, PropertyGroupSort;
         public bool FilterOutput, FilterShowSkipped, FilterShowSuccessful, FilterShowCleaned, AutoScrollBuildOutput;
+        public bool AutoBuild;
 
         static PipelineSettings()
         {
