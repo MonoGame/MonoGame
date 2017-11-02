@@ -16,8 +16,18 @@ namespace Microsoft.Xna.Framework
         partial void PlatformPreparePresentationParameters(PresentationParameters presentationParameters)
         {
 
-            presentationParameters.DeviceWindowHandle = IntPtr.Zero;
-            presentationParameters.SwapChainPanel = this.SwapChainPanel;
+            // The graphics device can use a XAML panel or a window
+            // to created the default swapchain target.
+            if (SwapChainPanel != null)
+            {
+                presentationParameters.DeviceWindowHandle = IntPtr.Zero;
+                presentationParameters.SwapChainPanel = this.SwapChainPanel;
+           }
+            else
+            {
+                presentationParameters.DeviceWindowHandle = _game.Window.Handle;
+                presentationParameters.SwapChainPanel = null;
+            }
         }
     }
 }

@@ -1340,6 +1340,12 @@
 
 
     <!-- Windows UAP Platform -->
+    <Compile Include="WindowsUniversal\GameFrameworkViewSource.cs">
+      <Platforms>WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="WindowsUniversal\UAPFrameworkView.cs">
+      <Platforms>WindowsUniversal</Platforms>
+    </Compile>
     <Compile Include="WindowsUniversal\UAPGamePlatform.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>

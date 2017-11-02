@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
-    <Name>MonoGame Windows 10 Universal Project</Name>
-    <Description>A MonoGame game project for Windows 10 UWP.</Description>
+    <Name>MonoGame Windows 10 Universal (XAML) Project</Name>
+    <Description>A MonoGame game project for Windows 10 UWP using XAML controls.</Description>
     <Icon>__TemplateIcon.png</Icon>
     <PreviewImage>__PreviewImage.png</PreviewImage>
     <TemplateID>MonoGame.CS.WinRT.UAPGame</TemplateID>
