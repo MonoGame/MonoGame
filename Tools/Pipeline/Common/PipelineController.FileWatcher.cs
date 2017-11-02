@@ -13,7 +13,7 @@ namespace MonoGame.Tools.Pipeline
 {
     public partial class PipelineController
     {
-        private class FileWatcher : IDisposable
+        private class FileWatcher
         {
             PipelineController _controller;
             IView _view;
@@ -22,106 +22,154 @@ namespace MonoGame.Tools.Pipeline
             {
                 _controller = controller;
                 _view = view;
-                checkModificationTimer = new System.Timers.Timer(500);
-                checkModificationTimer.Elapsed += _buildModified;
             }
 
-            Dictionary<string, FileSystemWatcher> watchers = new Dictionary<string, FileSystemWatcher>();
-
-            void updateWatchers()
+            Dictionary<string, FileSystemWatcher> externalWatchers = new Dictionary<string, FileSystemWatcher>();
+            FileSystemWatcher projectWatcher = null;
+            public void UpdateWatchers()
             {
                 if (_controller._project == null)
-                    return;
-
-                var items = _controller._project.ContentItems.ToArray();
-                var folders = items.Select(s => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, s.Location))).Distinct().ToArray();
-
-
-                foreach (var l in folders)
                 {
-                    if (!watchers.ContainsKey(l))
-                    {
-                        var watcher = new FileSystemWatcher();
-                        watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.Attributes;
-                        watcher.Filter = "*.*";
-                        watcher.Changed += File_Changed;
-                        watcher.Deleted += File_Removed;
-                        watcher.Renamed += File_Removed;
-                        watcher.Path = l;
-                        watcher.IncludeSubdirectories = false;
-                        watcher.EnableRaisingEvents = true;
-                        watchers.Add(l, watcher);
-                    }
+                    DisposeWatchers();
+                    return;
                 }
-                var watchersToRemove = watchers.Keys.Where(k => !folders.Contains(k)).ToArray();
+
+                if (projectWatcher == null)
+                {
+                    projectWatcher = createFileWatcher(_controller.ProjectLocation, true);
+                }
+                else if (!projectWatcher.Path.Equals(_controller.ProjectLocation))
+                {
+                    disposeWatcher(projectWatcher);
+                    projectWatcher = createFileWatcher(_controller.ProjectLocation, true);
+                }
+
+                var externalFolders = _controller._project.ContentItems
+                    .Select(itm => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, itm.Location)))
+                    .Where(w => !w.StartsWith(_controller.ProjectLocation)).Distinct().ToArray();
+
+
+                foreach (var f in externalFolders)
+                    if (!externalWatchers.ContainsKey(f))
+                        externalWatchers.Add(f, createFileWatcher(f, false));
+
+
+                var watchersToRemove = externalWatchers.Keys.Where(k => !externalFolders.Contains(k)).ToArray();
 
                 foreach (var r in watchersToRemove)
                 {
                     FileSystemWatcher w;
-                    if (watchers.TryGetValue(r, out w))
+                    if (externalWatchers.TryGetValue(r, out w))
                     {
-                        w.EnableRaisingEvents = false;
-                        w.Dispose();
-                        watchers.Remove(r);
+                        disposeWatcher(w);
+                        externalWatchers.Remove(r);
                     }
                 }
+            }
+
+            private void disposeWatcher(FileSystemWatcher w)
+            {
+                w.EnableRaisingEvents = false;
+                w.Changed -= File_Changed;
+                w.Renamed -= File_Removed;
+                w.Deleted -= File_Removed;
+                w.Dispose();
+            }
+
+            private FileSystemWatcher createFileWatcher(string path, bool includeSubdirectories)
+            {
+                var watcher = new FileSystemWatcher();
+                watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.Attributes;
+                watcher.Filter = "*.*";
+                watcher.Changed += File_Changed;
+                watcher.Deleted += File_Removed;
+                watcher.Renamed += File_Removed;
+                watcher.Path = path;
+                watcher.IncludeSubdirectories = includeSubdirectories;
+                watcher.EnableRaisingEvents = true;
+                return watcher;
             }
 
             private void File_Removed(object sender, FileSystemEventArgs e)
             {
-                var deletedItem = _controller._project.ContentItems.FirstOrDefault(item => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, item.Location, item.Name)).Equals(e.FullPath));
-                if (deletedItem != null)
+                _view.Invoke(() =>
                 {
-                    deletedItem.Exists = false;
-                    _view.Invoke(() => _view.UpdateTreeItem(deletedItem));
-                }
+                    var deletedItem = _controller._project.ContentItems.FirstOrDefault(item => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, item.Location, item.Name)).Equals(e.FullPath));
+                    if (deletedItem != null)
+                    {
+                        deletedItem.Exists = false;
+                        _view.UpdateTreeItem(deletedItem);
+                    }
+                });
             }
 
-            System.Collections.Concurrent.BlockingCollection<IProjectItem> modifiedItemCollection = new System.Collections.Concurrent.BlockingCollection<IProjectItem>();
+            System.Collections.Concurrent.ConcurrentQueue<FileSystemEventArgs> modifiedItemCollection = new System.Collections.Concurrent.ConcurrentQueue<FileSystemEventArgs>();
+            private Task scheduledBuildTask;
 
             private void File_Changed(object sender, FileSystemEventArgs e)
             {
-                var modifiedItem = _controller._project.ContentItems.FirstOrDefault(item => Path.GetFullPath(Path.Combine(_controller.ProjectLocation, item.Location, item.Name)).Equals(e.FullPath));
-
-                if (_controller.EnableAutoBuild && modifiedItem != null && !modifiedItemCollection.Contains(modifiedItem))
-                        modifiedItemCollection.Add(modifiedItem);
-
-                if(modifiedItem != null && modifiedItem.Exists == false)
+                if (_controller.EnableAutoBuild)
                 {
-                    modifiedItem.Exists = true;
-                    _view.Invoke(() => _view.UpdateTreeItem(modifiedItem));
+
+
+                    modifiedItemCollection.Enqueue(e);
+
+                    if (this.scheduledBuildTask == null)
+                        scheduleBuild();
                 }
             }
 
-            private void _buildModified(object sender, System.Timers.ElapsedEventArgs e)
+            private void scheduleBuild(int delayms = 500)
             {
-                checkModificationTimer.Stop();
-                updateWatchers();
+                this.scheduledBuildTask = Task.Delay(delayms);
 
-                if (modifiedItemCollection.Count != 0 && !_controller.ProjectBuilding)
+                scheduledBuildTask.ContinueWith(t =>
                 {
-                    List<IProjectItem> itemList = new List<IProjectItem>();
-                    IProjectItem item;
-                    while (modifiedItemCollection.TryTake(out item))
-                        itemList.Add(item);
+                    this.scheduledBuildTask = null;
+                    //already dequeued
+                    if (modifiedItemCollection.Count == 0)
+                        return;
 
-                    //check if another process is still writing the file, let's enqueue the item back
-                    foreach (var itm in itemList.ToArray())
+                    //if project is currently building and modifiedItem are present, schedule a new build task
+                    if (_controller.ProjectBuilding)
                     {
-                        var path = Path.GetFullPath(Path.Combine(_controller.ProjectLocation, itm.Location, itm.Name));
-                        if (IsFileLocked(path))
-                        {
-                            itemList.Remove(itm);
-                            modifiedItemCollection.Add(itm);
-                        }
-
+                        scheduleBuild(1500);
+                        return;
                     }
-                    var finalList = itemList.Distinct().ToArray();
 
-                    if (finalList.Length > 0)
-                        _view.Invoke(() => _controller.BuildItems(finalList, false));
-                }
-                checkModificationTimer.Start();
+                    _view.Invoke(() =>
+                    {
+
+                        if (modifiedItemCollection.Count > 0)
+                        {
+                            List<IProjectItem> modifiedItems = new List<IProjectItem>();
+                            FileSystemEventArgs ev;
+
+                            while (modifiedItemCollection.TryDequeue(out ev))
+                            {
+                                var modifiedItem = _controller._project.ContentItems
+                                .Select(itm => Tuple.Create(itm, Path.GetFullPath(Path.Combine(_controller.ProjectLocation, itm.Location, itm.Name))))
+                                .FirstOrDefault(f => f.Item2.Equals(ev.FullPath));
+
+                                if (modifiedItem != null && !modifiedItems.Contains(modifiedItem.Item1) && !IsFileLocked(modifiedItem.Item2))
+                                    modifiedItems.Add(modifiedItem.Item1);
+
+                                if (modifiedItem != null && modifiedItem.Item1.Exists == false)
+                                {
+                                    modifiedItem.Item1.Exists = true;
+                                    _view.Invoke(() => _view.UpdateTreeItem(modifiedItem.Item1));
+                                }
+                            }
+
+                            var finalList = modifiedItems.Distinct().ToArray();
+
+                            if (finalList.Length > 0)
+                                _view.Invoke(() => _controller.BuildItems(finalList, false));
+                        }
+                    });
+
+
+                });
             }
 
             protected virtual bool IsFileLocked(string file)
@@ -145,28 +193,18 @@ namespace MonoGame.Tools.Pipeline
                 return false;
             }
 
-            System.Timers.Timer checkModificationTimer;
-
-            public void Start()
+            public void DisposeWatchers()
             {
-                if (!checkModificationTimer.Enabled)
-                    checkModificationTimer.Start();
-            }
-
-            public void Stop()
-            {
-                if (checkModificationTimer.Enabled)
-                    checkModificationTimer.Stop();
-            }
-
-            public void Dispose()
-            {
-                checkModificationTimer.Dispose();
-                checkModificationTimer = null;
-                foreach (var w in this.watchers.ToArray())
+                if (projectWatcher != null)
                 {
-                    this.watchers.Remove(w.Key);
-                    w.Value.Dispose();
+                    disposeWatcher(projectWatcher);
+                    projectWatcher = null;
+                }
+
+                foreach (var w in this.externalWatchers.ToArray())
+                {
+                    this.externalWatchers.Remove(w.Key);
+                    disposeWatcher(w.Value);
                 }
             }
         }

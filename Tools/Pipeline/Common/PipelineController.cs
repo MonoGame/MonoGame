@@ -186,6 +186,8 @@ namespace MonoGame.Tools.Pipeline
                 OnProjectLoaded();
             
             UpdateMenu();
+
+            _watcher.UpdateWatchers();
         }
 
         public void ImportProject()
@@ -294,9 +296,8 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
 
-            _watcher.Start();
-
             UpdateMenu();
+            _watcher.UpdateWatchers();
         }
 
         public void ClearRecentList()
@@ -329,6 +330,8 @@ namespace MonoGame.Tools.Pipeline
 
             UpdateTree();
             UpdateMenu();
+
+            _watcher.DisposeWatchers();
         }
 
         public bool MoveProject(string newname)
@@ -356,7 +359,7 @@ namespace MonoGame.Tools.Pipeline
                 return false;
             }
             View.SetTreeRoot(_project);
-
+            _watcher.UpdateWatchers();
             return true;
         }
         
@@ -621,7 +624,7 @@ namespace MonoGame.Tools.Pipeline
 
             if (ret)
             {
-                _watcher.Dispose();
+                _watcher.DisposeWatchers();
                 PipelineSettings.Default.Save();
             }
 
@@ -719,6 +722,8 @@ namespace MonoGame.Tools.Pipeline
             {
                 View.ShowError("Error While Copying Files", "An error occurred while the files were being copied, aborting.");
             }
+
+            _watcher.UpdateWatchers();
         }
 
         public void IncludeFolder()
@@ -816,6 +821,8 @@ namespace MonoGame.Tools.Pipeline
             {
                 View.ShowError("Error While Copying Files", "An error occurred while the directories were being copied, aborting.");
             }
+
+            _watcher.UpdateWatchers();
         }
 
         private static void DirectoryCopy(string sourceDirName, string destDirName)
@@ -838,6 +845,8 @@ namespace MonoGame.Tools.Pipeline
                 string temppath = Path.Combine(destDirName, subdir.Name);
                 DirectoryCopy(subdir.FullName, temppath);
             }
+
+          
         }
 
         public void Move (string[] paths, string[] newnames, FileType[] types)
@@ -845,6 +854,8 @@ namespace MonoGame.Tools.Pipeline
             var action = new MoveAction(this, paths, newnames, types);
             if(action.Do())
                 _actionStack.Add(action);
+
+            _watcher.UpdateWatchers();
         }
         
         private List<string> GetFiles(string folder)
@@ -889,6 +900,7 @@ namespace MonoGame.Tools.Pipeline
                 _actionStack.Add(action);
 
             UpdateMenu();
+            _watcher.UpdateWatchers();
         }
 
         public void NewItem()
@@ -904,6 +916,8 @@ namespace MonoGame.Tools.Pipeline
             var action = new NewAction(this, name, path, template);
             if(action.Do())
                 _actionStack.Add(action);
+
+            _watcher.UpdateWatchers();
         }
 
         public void NewFolder()
