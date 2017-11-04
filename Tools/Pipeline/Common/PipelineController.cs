@@ -120,6 +120,7 @@ namespace MonoGame.Tools.Pipeline
             UpdateMenu();
 
             view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
+            EnableAutoBuild = PipelineSettings.Default.AutoBuild;
         }
 
         public static PipelineController Create(IView view)
@@ -185,6 +186,8 @@ namespace MonoGame.Tools.Pipeline
                 OnProjectLoaded();
             
             UpdateMenu();
+
+            _watcher.UpdateWatchers();
         }
 
         public void ImportProject()
@@ -279,6 +282,7 @@ namespace MonoGame.Tools.Pipeline
                 PipelineSettings.Default.StartupProject = projectFilePath;
                 PipelineSettings.Default.Save();
                 View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
+              
             }
             catch (Exception)
             {
@@ -292,9 +296,8 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
 
-            _watcher.Run();
-
             UpdateMenu();
+            _watcher.UpdateWatchers();
         }
 
         public void ClearRecentList()
@@ -314,7 +317,7 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
-            _watcher.Stop();
+          //  _watcher.Stop();
 
             ProjectOpen = false;
             ProjectDirty = false;
@@ -327,6 +330,8 @@ namespace MonoGame.Tools.Pipeline
 
             UpdateTree();
             UpdateMenu();
+
+            _watcher.DisposeWatchers();
         }
 
         public bool MoveProject(string newname)
@@ -354,7 +359,7 @@ namespace MonoGame.Tools.Pipeline
                 return false;
             }
             View.SetTreeRoot(_project);
-
+            _watcher.UpdateWatchers();
             return true;
         }
         
@@ -401,7 +406,7 @@ namespace MonoGame.Tools.Pipeline
                     yield return item;
         }
 
-        public void RebuildItems()
+        public void RebuildSelectedItems()
         {
             var items = new List<IProjectItem>();
 
@@ -429,6 +434,11 @@ namespace MonoGame.Tools.Pipeline
                         items.Add(subitem);
             }
 
+            BuildItems(items, true);
+        }
+
+        public void BuildItems(IEnumerable<IProjectItem> contentItems, bool rebuild = false)
+        {
             // Create a unique file within the same folder as
             // the normal project to store this incremental build.
             var uniqueName = Guid.NewGuid().ToString();
@@ -439,11 +449,11 @@ namespace MonoGame.Tools.Pipeline
             using (var io = File.CreateText(tempPath))
             {
                 var parser = new PipelineProjectParser(this, _project);
-                parser.SaveProject(io, (i) => !items.Contains(i));
+                parser.SaveProject(io, (i) => !contentItems.Contains(i));
             }
 
             // Run the build the command.
-            var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
+            var commands = string.Format("/@:\"{0}\" {1}/incremental", tempPath, rebuild ? "/rebuild " : "");
             BuildCommand(commands);
 
             // Cleanup the temp file once we're done.
@@ -614,7 +624,7 @@ namespace MonoGame.Tools.Pipeline
 
             if (ret)
             {
-                _watcher.Stop();
+                _watcher.DisposeWatchers();
                 PipelineSettings.Default.Save();
             }
 
@@ -712,6 +722,8 @@ namespace MonoGame.Tools.Pipeline
             {
                 View.ShowError("Error While Copying Files", "An error occurred while the files were being copied, aborting.");
             }
+
+            _watcher.UpdateWatchers();
         }
 
         public void IncludeFolder()
@@ -809,6 +821,8 @@ namespace MonoGame.Tools.Pipeline
             {
                 View.ShowError("Error While Copying Files", "An error occurred while the directories were being copied, aborting.");
             }
+
+            _watcher.UpdateWatchers();
         }
 
         private static void DirectoryCopy(string sourceDirName, string destDirName)
@@ -831,6 +845,8 @@ namespace MonoGame.Tools.Pipeline
                 string temppath = Path.Combine(destDirName, subdir.Name);
                 DirectoryCopy(subdir.FullName, temppath);
             }
+
+          
         }
 
         public void Move (string[] paths, string[] newnames, FileType[] types)
@@ -838,6 +854,8 @@ namespace MonoGame.Tools.Pipeline
             var action = new MoveAction(this, paths, newnames, types);
             if(action.Do())
                 _actionStack.Add(action);
+
+            _watcher.UpdateWatchers();
         }
         
         private List<string> GetFiles(string folder)
@@ -882,6 +900,7 @@ namespace MonoGame.Tools.Pipeline
                 _actionStack.Add(action);
 
             UpdateMenu();
+            _watcher.UpdateWatchers();
         }
 
         public void NewItem()
@@ -897,6 +916,8 @@ namespace MonoGame.Tools.Pipeline
             var action = new NewAction(this, name, path, template);
             if(action.Do())
                 _actionStack.Add(action);
+
+            _watcher.UpdateWatchers();
         }
 
         public void NewFolder()
@@ -992,6 +1013,8 @@ namespace MonoGame.Tools.Pipeline
         public bool CanUndo { get { return _actionStack.CanUndo; } }
 
         public bool CanRedo { get { return _actionStack.CanRedo; } }
+
+        public bool EnableAutoBuild { get; internal set; }
 
         public void Undo()
         {
