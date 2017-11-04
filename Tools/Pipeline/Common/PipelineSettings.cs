@@ -23,12 +23,13 @@ namespace MonoGame.Tools.Pipeline
         public int HSeparator, VSeparator;
         public bool Maximized, PropertyGroupSort;
         public bool FilterOutput, FilterShowSkipped, FilterShowSuccessful, FilterShowCleaned, AutoScrollBuildOutput;
+        public bool AutoBuild;
 
         static PipelineSettings()
         {
             Default = new PipelineSettings();
         }
-        
+
         public PipelineSettings()
         {
             ProjectHistory = new List<string>();
@@ -57,12 +58,12 @@ namespace MonoGame.Tools.Pipeline
             ProjectHistory.Remove(cleanFile);
             ProjectHistory.Add(cleanFile);
         }
-        
+
         public void RemoveProjectHistory(string file)
         {
             var cleanFile = file.Trim();
             ProjectHistory.Remove(cleanFile);
-        }   
+        }
 
         public void Clear()
         {
@@ -90,14 +91,15 @@ namespace MonoGame.Tools.Pipeline
                         serializer.Serialize(writer, this);
                     }
                 }
-            } catch { }
+            }
+            catch { }
         }
 
         public void Load()
-		{
+        {
             if (!_isoStoreInit)
                 return;
-            
+
             try
             {
                 if (_isoStore.FileExists(SettingsPath))

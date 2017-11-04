@@ -78,10 +78,10 @@ namespace MonoGame.Tools.Pipeline
         void CloseProject();
 
         bool SaveProject(bool saveAs);
-        
+
         void Build(bool rebuild);
 
-        void RebuildItems();
+        void RebuildSelectedItems();
 
         void Clean();
 
@@ -106,7 +106,7 @@ namespace MonoGame.Tools.Pipeline
         void Rename();
 
         void Move(string[] paths, string[] newpaths, FileType[] types);
-        
+
         void AddAction(IProjectAction action);
 
         void SelectionChanged(List<IProjectItem> items);
