@@ -57,7 +57,7 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            #if MONOMAC
+#if MONOMAC
             splitterVertical.PositionChanged += delegate {
                 setw++;
                 if (setw > 2)
@@ -66,7 +66,7 @@ namespace MonoGame.Tools.Pipeline
                     setw = 0;
                 }
             };
-            #endif
+#endif
 
             _contextMenu = new ContextMenu();
             projectControl.SetContextMenu(_contextMenu);
@@ -74,6 +74,8 @@ namespace MonoGame.Tools.Pipeline
             _mgcbFileFilter = new FileFilter("MonoGame Content Build Project (*.mgcb)", new[] { ".mgcb" });
             _allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
             _xnaFileFilter = new FileFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
+
+
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -130,7 +132,7 @@ namespace MonoGame.Tools.Pipeline
                 filePath = dialog.FileName;
                 if (dialog.CurrentFilter == _mgcbFileFilter && !filePath.EndsWith(".mgcb"))
                     filePath += ".mgcb";
-                
+
                 return true;
             }
 
@@ -208,7 +210,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void EndTreeUpdate()
         {
-            
+
         }
 
         public void UpdateProperties()
@@ -486,6 +488,8 @@ namespace MonoGame.Tools.Pipeline
                 clearItem.Click += (sender, e) => PipelineController.Instance.ClearRecentList();
                 menuRecent.Items.Add(clearItem);
             }
+
+            autoRebuildCheckMenuItem.Checked = PipelineSettings.Default.AutoBuild;
         }
 
         public void SetClipboard(string text)
@@ -611,8 +615,8 @@ namespace MonoGame.Tools.Pipeline
             adialog.Website = new Uri("http://www.monogame.net/");
 
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LICENSE.txt"))
-                using (var reader = new StreamReader(stream))
-                    adialog.License = reader.ReadToEnd();
+            using (var reader = new StreamReader(stream))
+                adialog.License = reader.ReadToEnd();
 
             adialog.ShowDialog(this);
         }
@@ -675,9 +679,16 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdRebuildItem_Executed(object sender, EventArgs e)
         {
-            PipelineController.Instance.RebuildItems();
+            PipelineController.Instance.RebuildSelectedItems();
         }
 
+        private void AutoRebuildCheckMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            PipelineController.Instance.EnableAutoBuild = autoRebuildCheckMenuItem.Checked;
+            PipelineSettings.Default.AutoBuild = autoRebuildCheckMenuItem.Checked;
+            PipelineSettings.Default.Save();
+
+        }
         #endregion
 
     }
