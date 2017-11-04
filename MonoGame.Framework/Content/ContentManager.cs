@@ -471,7 +471,54 @@ namespace Microsoft.Xna.Framework.Content
 		    loadedAssets.Clear();
 		}
 
-		public string RootDirectory
+        /// <summary>
+        /// Dispose and unload the supplied asset from the ContentManager. 
+        /// </summary>
+        /// <remarks>Use the overload UnloadAsset(string assetKey) for better performance.</remarks>
+        public virtual bool UnloadAsset<T>(T asset) where T: class
+        {
+            //since the instance is supplied, we have to iterate the loadedAssets Dictionary to find the key.
+            foreach (var kv in loadedAssets)
+            {
+                if(object.ReferenceEquals(kv.Value, asset))
+                {
+                    // Look for disposable assets.
+                    var disposable = asset as IDisposable;
+                    if (disposable != null)
+                    {
+                        disposableAssets.Remove(disposable);
+                        disposable.Dispose();
+                    }
+                    loadedAssets.Remove(kv.Key);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Dispose and unload the supplied asset from the ContentManager. 
+        /// </summary>
+        public virtual bool UnloadAsset(string assetKey)
+        {
+            object asset;
+            if(loadedAssets.TryGetValue(assetKey, out asset))
+            {
+                var disposable = asset as IDisposable;
+                if(disposable != null)
+                {
+                    disposableAssets.Remove(disposable);
+                    disposable.Dispose();
+                }
+                loadedAssets.Remove(assetKey);
+                return true;
+            }
+
+            return false;
+        }
+
+        public string RootDirectory
 		{
 			get
 			{
