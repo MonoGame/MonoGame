@@ -992,7 +992,7 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeysEventArgs.cs">
-      <Platforms>Windows8,Windows,WindowsGL,WindowsPhone,Angle,Linux</Platforms>
+      <Platforms>Windows8,Windows,WindowsGL,WindowsPhone,Angle,Linux,MacOS</Platforms>
     </Compile>
     <Compile Include="Input\KeyState.cs" />    
     <Compile Include="Input\MessageBox.cs">

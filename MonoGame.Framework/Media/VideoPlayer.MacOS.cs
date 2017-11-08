@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Media
         }
     }
 
-    internal class NSSDLWindow : AppKit.NSWindow
+    public class NSSDLWindow : AppKit.NSWindow
     {
         public NSSDLWindow(IntPtr handle) : base(handle)
         {

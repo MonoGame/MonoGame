@@ -122,7 +122,8 @@ namespace Microsoft.Xna.Framework
             Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
             // when running NUnit tests entry assembly can be null
-            if (Assembly.GetEntryAssembly() != null)
+            // Don't force our icon on macOS; let it be OS-determined from the .app.
+            if (Assembly.GetEntryAssembly() != null && CurrentPlatform.OS != OS.MacOSX)
             {
                 using (
                     var stream =

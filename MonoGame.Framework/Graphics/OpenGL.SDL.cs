@@ -8,7 +8,7 @@ using System.Security;
 
 namespace MonoGame.OpenGL
 {
-    internal partial class GL
+    public partial class GL
     {
         static partial void LoadPlatformEntryPoints()
         {
