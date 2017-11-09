@@ -95,7 +95,7 @@ public static class Sdl
 
         Last = 0xFFFF
     }
-    
+
     public enum EventAction
     {
         AddEvent = 0x0,
@@ -163,7 +163,7 @@ public static class Sdl
     public static extern int PeepEvents(
         [Out()] [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 1)]
         Event[] events,
-        int numevents, 
+        int numevents,
         EventAction action,
         EventType minType,
         EventType maxType);
@@ -413,6 +413,15 @@ public static class Sdl
         public static void GetCurrentDisplayMode(int displayIndex, out Mode mode)
         {
             GetError(SDL_GetCurrentDisplayMode(displayIndex, out mode));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetDesktopDisplayMode")
+        ]
+        private static extern int SDL_GetDesktopDisplayMode(int displayIndex, out Mode mode);
+
+        public static void GetDesktopDisplayMode(int displayIndex, out Mode mode)
+        {
+            GetError(SDL_GetDesktopDisplayMode(displayIndex, out mode));
         }
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetDisplayMode")]
@@ -911,7 +920,7 @@ public static class Sdl
         {
             GetError(SDL_HapticNewEffect(haptic, ref effect));
         }
-        
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticOpen")]
         public static extern IntPtr Open(int device_index);
 
