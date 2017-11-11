@@ -48,6 +48,9 @@ namespace MonoGame.Framework
                 throw new NullReferenceException("You must create the GraphicsDeviceManager in the Game constructor!");
             game.graphicsDeviceManager.SwapChainPanel = swapChainPanel;
 
+            // Register the CoreWindow with the services registry
+            game.Services.AddService(typeof(CoreWindow), window);
+
             // Start running the game.
             game.Run(GameRunBehavior.Asynchronous);
 
