@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Audio
                 var memStream = new MemoryStream();
                 stream.CopyTo(memStream);
                 memStream.Seek(0, SeekOrigin.Begin);
-                stream.Close();
+                stream.Dispose();
                 stream = memStream;
             }
 
