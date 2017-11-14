@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             _audioengine = audioEngine;
 
-            using (var stream = AudioEngine.OpenStream(fileName))
+            using (var stream = AudioEngine.OpenStream(fileName, true))
             using (var reader = new BinaryReader(stream))
             {
                 // Thanks to Liandril for "xactxtract" for some of the offsets.
