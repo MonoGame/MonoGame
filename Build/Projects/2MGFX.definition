@@ -166,6 +166,7 @@
     <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs">
       <Link>MonoGame.Framework\Utilities\Hash.cs</Link>
     </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Utilities\CurrentPlatform.cs" />
     
     <!-- We also use a few types from the content pipeline. -->
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs">
