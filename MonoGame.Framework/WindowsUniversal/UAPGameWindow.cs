@@ -135,6 +135,13 @@ namespace Microsoft.Xna.Framework
             SetViewBounds(_appView.VisibleBounds.Width, _appView.VisibleBounds.Height);
 
             SetCursor(false);
+
+        }
+
+        internal void RegisterCoreWindowService()
+        {
+            // Register the CoreWindow with the services registry
+            Game.Services.AddService(typeof(CoreWindow), _coreWindow);
         }
 
         private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
