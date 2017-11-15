@@ -307,7 +307,12 @@ namespace MGCB
                     var file = arg.Substring(3);
                     var commands = File.ReadAllLines(file);
                     var offset = 0;
-                    lines.Insert(0, string.Format("# Begin:{0} ", file));
+
+                    lines.Insert(offset, string.Format("# Begin:{0} ", file));
+                    offset++;
+
+                    var tempwd = Directory.GetCurrentDirectory();
+                    lines.Insert(offset, "/workingDir=" + Path.GetDirectoryName(file));
                     offset++;
 
                     for (var j = 0; j < commands.Length; j++)
@@ -321,6 +326,9 @@ namespace MGCB
                         lines.Insert(offset, line);
                         offset++;
                     }
+
+                    lines.Insert(offset, "/workingDir=" + tempwd);
+                    offset++;
 
                     lines.Insert(offset, string.Format("# End:{0}", file));
 
