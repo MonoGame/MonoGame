@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.OpenGL;
 using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework
@@ -98,6 +99,10 @@ namespace Microsoft.Xna.Framework
         private int _winx, _winy, _width, _height;
         private bool _wasMoved, _supressMoved;
 
+        private ColorFormat _surfaceFormat;
+        private DepthFormat _depthStencilFormat;
+        private int _multisampleCount;
+
         public SdlGameWindow(Game game)
         {
             _game = game;
@@ -143,6 +148,19 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        internal bool CheckRecreateWindow(PresentationParameters pp)
+        {
+            if (_handle == IntPtr.Zero ||
+                _surfaceFormat != pp.BackBufferFormat.GetColorFormat() ||
+                _depthStencilFormat != pp.DepthStencilFormat ||
+                _multisampleCount != pp.MultiSampleCount)
+            {
+                CreateWindow(pp);
+                return true;
+            }
+            return false;
+        }
+
         internal void CreateWindow(PresentationParameters pp)
         {
             if (_handle != IntPtr.Zero)
@@ -150,6 +168,10 @@ namespace Microsoft.Xna.Framework
 
             _width = pp.BackBufferWidth;
             _height = pp.BackBufferHeight;
+
+            _surfaceFormat = pp.BackBufferFormat.GetColorFormat();
+            _depthStencilFormat = pp.DepthStencilFormat;
+            _multisampleCount = pp.MultiSampleCount;
 
             var initflags =
                 Sdl.Window.State.OpenGL |
@@ -246,19 +268,23 @@ namespace Microsoft.Xna.Framework
                 _height = displayRect.Height;
             }
 
-            var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), 0);
-            var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), 0);
 
+            int centerX, centerY;
             if (IsFullScreen && !_willBeFullScreen)
             {
                 // We need to get the display information again in case
                 // the resolution of it was changed.
-                Sdl.Display.GetBounds (displayIndex, out displayRect);
+                Sdl.Display.GetBounds(displayIndex, out displayRect);
 
                 // This centering only occurs when exiting fullscreen
                 // so it should center the window on the current display.
                 centerX = displayRect.X + displayRect.Width / 2 - clientWidth / 2;
                 centerY = displayRect.Y + displayRect.Height / 2 - clientHeight / 2;
+            }
+            else
+            {
+                centerX = Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), 0);
+                centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), 0);
             }
 
             // If this window is resizable, there is a bug in SDL 2.0.4 where

@@ -324,6 +324,7 @@ namespace Microsoft.Xna.Framework
                 // if the GraphicsProfile changed we need to create a new GraphicsDevice
                 DisposeGraphicsDevice();
                 CreateDevice(gdi);
+                OnPresentationChanged(this, new PresentationEventArgs(gdi.PresentationParameters));
                 return;
             }
 

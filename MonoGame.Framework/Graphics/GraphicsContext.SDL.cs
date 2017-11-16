@@ -73,7 +73,7 @@ namespace MonoGame.OpenGL
             Sdl.GL.SwapWindow(_winHandle);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (_disposed)
                 return;
@@ -89,6 +89,31 @@ namespace MonoGame.OpenGL
                 _winHandle = IntPtr.Zero;
             else
                 _winHandle = info.Handle;
+        }
+
+        public static GraphicsContext CreateDummy()
+        {
+            return Dummy.Create();
+        }
+
+        private class Dummy : GraphicsContext
+        {
+            private Dummy(IntPtr windowHandle) : base(new WindowInfo(windowHandle))
+            {
+            }
+
+            public static GraphicsContext Create()
+            {
+                var handle = Sdl.Window.Create(string.Empty, 0, 0, 1, 1,
+                    Sdl.Window.State.OpenGL | Sdl.Window.State.Hidden);
+                return new Dummy(handle);
+            }
+
+            public override void Dispose()
+            {
+                base.Dispose();
+                Sdl.Window.Destroy(_winHandle);
+            }
         }
     }
 }
