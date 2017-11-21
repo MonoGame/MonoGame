@@ -20,7 +20,7 @@ Your game content is managed from this external tool. You can add content to you
 - **Edit > Add > Existing Item...** menu button
 - **right-click > Add > Existing Item...** context menu
 
-In our case let's user the **Add Existing Item** toolbar button.
+In our case let's use the **Add Existing Item** toolbar button.
 
 ![Add Content](images/getting_started/3_add_content.png)
 
