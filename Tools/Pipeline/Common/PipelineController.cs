@@ -149,6 +149,7 @@ namespace MonoGame.Tools.Pipeline
             View.BeginTreeUpdate();
             View.UpdateTreeItem(contentItem);
             View.EndTreeUpdate();
+            contentItem.UpdateExternalDependencies(this.ProjectItem);
         }
 
         public void NewProject()
@@ -457,8 +458,19 @@ namespace MonoGame.Tools.Pipeline
             var commands = string.Format("/@:\"{0}\" {1}/incremental", tempPath, rebuild ? "/rebuild " : "");
             BuildCommand(commands);
 
-            // Cleanup the temp file once we're done.
-            _buildTask.ContinueWith((e) => File.Delete(tempPath));
+            // Cleanup the temp file and update external dependencies once we're done.
+            _buildTask.ContinueWith((e) =>
+            {
+                File.Delete(tempPath);
+                foreach(var c in contentItems)
+                {
+                    ContentItem itm = c as ContentItem;
+                    if(itm != null)
+                    {
+                        itm.UpdateExternalDependencies(ProjectItem);
+                    }
+                }
+            });
         }
 
         private void BuildCommand(string commands)

@@ -179,7 +179,7 @@ namespace MonoGame.Tools.Pipeline
                 Exists = File.Exists(projectDir + sourceFile)
             };
             _project.ContentItems.Add(item);
-
+            item.UpdateExternalDependencies(_project);
             // Copy the current processor parameters blind as we
             // will validate and remove invalid parameters during
             // the build process later.
@@ -213,6 +213,7 @@ namespace MonoGame.Tools.Pipeline
                 ProcessorParams = new OpaqueDataDictionary(),
                 Exists = File.Exists(projectDir + sourceFile)
             };
+            item.UpdateExternalDependencies(_project);
             _project.ContentItems.Add(item);
 
             // Copy the current processor parameters blind as we

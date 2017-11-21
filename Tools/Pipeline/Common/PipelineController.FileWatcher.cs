@@ -145,22 +145,21 @@ namespace MonoGame.Tools.Pipeline
                             List<IProjectItem> modifiedItems = new List<IProjectItem>();
                             FileSystemEventArgs ev;
 
+                         
                             while (fileChangedList.TryDequeue(out ev))
                             {
                                 //selecting ContentItem matching the file
-                                var item = _controller._project.ContentItems
-                                .Select(itm => Tuple.Create(itm, Path.GetFullPath(Path.Combine(_controller.ProjectLocation, itm.Location, itm.Name))))
-                                .FirstOrDefault(f => f.Item2.Equals(ev.FullPath));
+                                var item = _controller._project.ContentItems.FirstOrDefault(f => f.OriginalDependencies.Contains(ev.FullPath));
 
-                                //
+                                
 
-                                if (item != null && !modifiedItems.Contains(item.Item1) && !IsFileLocked(item.Item2))
-                                    modifiedItems.Add(item.Item1);
+                                if (item != null && !modifiedItems.Contains(item))
+                                    modifiedItems.Add(item);
 
-                                if (item != null && item.Item1.Exists == false)
+                                if (item != null && item.Exists == false)
                                 {
-                                    item.Item1.Exists = true;
-                                    _view.UpdateTreeItem(item.Item1);
+                                    item.Exists = true;
+                                    _view.UpdateTreeItem(item);
                                 }
                             }
 
