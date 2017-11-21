@@ -2,7 +2,7 @@ MonoGame is an Open Source implementation of the Microsoft XNA 4 Framework. Our 
 The currently supported platforms are as follows.
 
  * Desktop PCs
-   * Windows 10 Store Apps
+   * Windows 10 Store Apps (UWP)
    * Windows Win32 (OpenGL & DirectX)
    * Linux (OpenGL)
    * Mac OS X (OpenGL)
