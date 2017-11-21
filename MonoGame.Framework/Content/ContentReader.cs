@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal object ReadAsset<T>()
+        public object ReadAsset<T>()
         {
             InitializeTypeReaders();
 
@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
-        internal object ReadAsset<T>(T existingInstance)
+        public object ReadAsset<T>(T existingInstance)
         {
             InitializeTypeReaders();
 

@@ -24,11 +24,11 @@ namespace Microsoft.Xna.Framework.Content
         const byte ContentCompressedLz4 = 0x40;
 
 		private string _rootDirectory = string.Empty;
-		private IServiceProvider serviceProvider;
-		private IGraphicsDeviceService graphicsDeviceService;
-        private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-		private List<IDisposable> disposableAssets = new List<IDisposable>();
-        private bool disposed;
+		protected IServiceProvider serviceProvider;
+		protected IGraphicsDeviceService graphicsDeviceService;
+        protected Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+		protected List<IDisposable> disposableAssets = new List<IDisposable>();
+        protected bool disposed;
         private byte[] scratchBuffer;
 
 		private static object ContentManagerLock = new object();
@@ -341,7 +341,7 @@ namespace Microsoft.Xna.Framework.Content
 			return (T)result;
 		}
 
-        private ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
+        protected ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
         {
             // The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
             byte x = xnbReader.ReadByte();
