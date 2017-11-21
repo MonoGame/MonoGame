@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Content
 		protected IServiceProvider serviceProvider;
 		protected IGraphicsDeviceService graphicsDeviceService;
         protected Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-		private List<IDisposable> disposableAssets = new List<IDisposable>();
+		protected List<IDisposable> disposableAssets = new List<IDisposable>();
         protected bool disposed;
         private byte[] scratchBuffer;
 
