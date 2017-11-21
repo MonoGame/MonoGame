@@ -39,6 +39,8 @@ namespace MonoGame.Tools.Pipeline
         MenuItem cmOpenItem, cmOpenItemWith, cmOpenItemLocation, cmOpenOutputItemLocation, cmCopyAssetPath, cmRebuildItem, cmExclude, cmRename, cmDelete;
         ButtonMenuItem cmAdd;
 
+        CheckMenuItem autoRebuildCheckMenuItem;
+
         ProjectControl projectControl;
         PropertyGridControl propertyGridControl;
         BuildOutput buildOutput;
@@ -120,6 +122,7 @@ namespace MonoGame.Tools.Pipeline
             cmdCopyAssetPath.Executed += CmdCopyAssetPath_Executed;
             cmdRebuildItem.Executed += CmdRebuildItem_Executed;
         }
+
 
         private void InitalizeCommands()
         {
@@ -263,6 +266,8 @@ namespace MonoGame.Tools.Pipeline
             cmdRebuildItem = new Command();
             cmdRebuildItem.Image = Global.GetEtoIcon("Commands.Rebuild.png");
             cmdRebuildItem.MenuText = "Rebuild";
+
+
         }
 
         private void InitalizeMenu()
@@ -313,12 +318,21 @@ namespace MonoGame.Tools.Pipeline
             menuView.Text = "&View";
             Menu.Items.Add(menuView);
 
+
+
+
             menuBuild = new ButtonMenuItem();
             menuBuild.Text = "&Build";
+
+            autoRebuildCheckMenuItem = new CheckMenuItem();
+            autoRebuildCheckMenuItem.Text = "Auto Build On Change";
+            autoRebuildCheckMenuItem.CheckedChanged += AutoRebuildCheckMenuItem_CheckedChanged;
             menuBuild.Items.Add(cmdBuild);
             menuBuild.Items.Add(cmdRebuild);
             menuBuild.Items.Add(cmdClean);
             menuBuild.Items.Add(cmdCancelBuild);
+            menuBuild.Items.Add(autoRebuildCheckMenuItem);
+
             Menu.Items.Add(menuBuild);
 
             menuHelp = new ButtonMenuItem();
@@ -329,6 +343,7 @@ namespace MonoGame.Tools.Pipeline
             Menu.QuitItem = cmdExit;
             Menu.AboutItem = cmdAbout;
         }
+
 
         private void InitalizeContextMenu()
         {
@@ -376,6 +391,7 @@ namespace MonoGame.Tools.Pipeline
             ToolBar.Items.Add(toolRebuild);
             ToolBar.Items.Add(toolClean);
             toolbar.Items.Add(toolCancelBuild);
+
         }
     }
 }

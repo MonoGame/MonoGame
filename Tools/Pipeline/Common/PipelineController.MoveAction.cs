@@ -117,7 +117,7 @@ namespace MonoGame.Tools.Pipeline
 
                 item.OriginalPath = newpath;
                 item.ResolveTypes();
-
+                item.UpdateExternalDependencies(_con.ProjectItem);
                 _con._project.ContentItems.Add(item);
                 _con.View.AddTreeItem(item);
             }

@@ -6,6 +6,10 @@ using System.ComponentModel;
 using System.Globalization;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
+using MonoGame.Framework.Content.Pipeline.Builder;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -18,7 +22,7 @@ namespace MonoGame.Tools.Pipeline
     public class ContentItem : IProjectItem
     {
         public IContentItemObserver Observer;
-        
+
         public string ImporterName;
         public string ProcessorName;
         public OpaqueDataDictionary ProcessorParams;
@@ -27,6 +31,57 @@ namespace MonoGame.Tools.Pipeline
         private ProcessorTypeDescription _processor;
         private BuildAction _buildAction;
 
+
+        internal void UpdateExternalDependencies(PipelineProject project)
+        {
+            List<string> assetDependencies = new List<string>();
+
+            var projectRoot = project.Location;//.Replace('\\', '/');
+
+
+            var mainAssetFile = Path.GetFullPath(Path.Combine(project.Location, Location, Name));
+            assetDependencies.Add(mainAssetFile);
+
+            var outputDir = Path.GetFullPath(Path.Combine(projectRoot, project.OutputDir));
+            string mgContentFile = Path.Combine(projectRoot, "obj", Location, string.Concat(Path.GetFileNameWithoutExtension(OriginalPath), ".mgcontent"));
+            if (File.Exists(mgContentFile))
+            {
+                //load build event 
+                PipelineBuildEvent _buildEvent = PipelineBuildEvent.Load(mgContentFile);
+                var externalXnbs = _buildEvent.BuildAsset.Select(s => Path.GetFullPath(s));
+
+                //find mgcontent files that belong to the external references
+                foreach (var p in externalXnbs)
+                {
+                    var mgcontent = Path.Combine(Path.GetDirectoryName(p), string.Concat(Path.GetFileNameWithoutExtension(p), ".mgcontent"));
+
+                    if (!File.Exists(mgcontent))
+                    {
+                        if (p.StartsWith(outputDir))
+                            mgcontent = Path.Combine(projectRoot, "obj", p.Substring(outputDir.Length).Trim('\\'));
+                        else
+                            mgcontent = Path.Combine(projectRoot, "obj", p.Substring(projectRoot.Length).Trim('\\'));
+                        
+
+                        mgcontent = Path.Combine(Path.GetDirectoryName(mgcontent), string.Concat(Path.GetFileNameWithoutExtension(mgcontent), ".mgcontent"));
+
+                    }
+
+                    if (File.Exists(mgcontent))
+                    {
+                        string originalAsset = PipelineBuildEvent.Load(mgcontent).SourceFile;
+
+                        if (!string.IsNullOrEmpty(originalAsset))
+                            assetDependencies.Add(Path.GetFullPath(originalAsset));
+                    }
+                }
+
+            }
+
+            this.OriginalDependencies = assetDependencies.ToArray();
+
+        }
+
         #region IProjectItem
 
         [Browsable(false)]
@@ -34,8 +89,8 @@ namespace MonoGame.Tools.Pipeline
 
         [Category("Common")]
         [Description("The file name of this item.")]
-        public string Name 
-        { 
+        public string Name
+        {
             get
             {
                 return System.IO.Path.GetFileName(OriginalPath);
@@ -94,7 +149,7 @@ namespace MonoGame.Tools.Pipeline
                     return;
 
                 _importer = value;
-                ImporterName = _importer.TypeName;                
+                ImporterName = _importer.TypeName;
 
                 // Validate that our processor can accept input content of the type output by the new importer.
                 if ((_processor == null || _processor.InputType != _importer.OutputType) && _processor != PipelineTypes.MissingProcessor)
@@ -119,10 +174,10 @@ namespace MonoGame.Tools.Pipeline
             {
                 if (_processor == value)
                     return;
-                
+
                 _processor = value;
                 ProcessorName = _processor.TypeName;
-                
+
                 // When the processor changes reset our parameters
                 // to the default for the processor type.
                 ProcessorParams.Clear();
@@ -140,6 +195,8 @@ namespace MonoGame.Tools.Pipeline
                 // only showing valid processors in the drop-down (eg, within ProcessConverter).
             }
         }
+
+        public string[] OriginalDependencies { get; private set; }
 
         public void ResolveTypes()
         {
@@ -195,7 +252,7 @@ namespace MonoGame.Tools.Pipeline
                     }
                 }
             }
-        }        
+        }
 
         public override string ToString()
         {
