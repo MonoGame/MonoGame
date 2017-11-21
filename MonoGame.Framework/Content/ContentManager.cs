@@ -475,6 +475,7 @@ namespace Microsoft.Xna.Framework.Content
         /// Dispose and unload the supplied asset from the ContentManager. 
         /// </summary>
         /// <remarks>Use the overload UnloadAsset(string assetKey) for better performance.</remarks>
+        /// <returns>A boolean indicating whether or not the asset was found and unloaded</returns>
         public virtual bool UnloadAsset<T>(T asset) where T: class
         {
             //since the instance is supplied, we have to iterate the loadedAssets Dictionary to find the key.
@@ -500,6 +501,7 @@ namespace Microsoft.Xna.Framework.Content
         /// <summary>
         /// Dispose and unload the supplied asset from the ContentManager. 
         /// </summary>
+        /// <returns>A boolean indicating whether or not the asset was found and unloaded</returns>
         public virtual bool UnloadAsset(string assetKey)
         {
             object asset;
