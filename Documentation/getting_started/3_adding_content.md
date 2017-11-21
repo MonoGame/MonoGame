@@ -15,11 +15,12 @@ You should now see a MonoGame Pipeline Tool window open up. In case it didn't ge
 ![MonoGame Pipeline Tool](images/getting_started/3_pipeline_tool.png)
 
 Your game content is managed from this external tool. You can add content to your game in one of the following ways:
- - **Add Existing Item** toolbar button
- - **Edit > Add > Existing Item...** menu button
- - **right-click > Add > Existing Item...** context menu
- 
-In our case lets user the **Add Existing Item** toolbar button.
+
+- **Add Existing Item** toolbar button
+- **Edit > Add > Existing Item...** menu button
+- **right-click > Add > Existing Item...** context menu
+
+In our case let's use the **Add Existing Item** toolbar button.
 
 ![Add Content](images/getting_started/3_add_content.png)
 
@@ -37,7 +38,7 @@ Now that we have added the content, it's time to load it. First declare a new va
 public class Game1 : Game
 {
     Texture2D textureBall;
-    
+
     GraphicsDeviceManager graphics;
 ```
 
@@ -49,23 +50,23 @@ protected override void LoadContent()
     // Create a new SpriteBatch, which can be used to draw textures.
     spriteBatch = new SpriteBatch(GraphicsDevice);
 
-    //TODO: use this.Content to load your game content here
+    // TODO: use this.Content to load your game content here
     textureBall = Content.Load<Texture2D>("ball");
 }
 ```
 
-And finally, find the Draw method, and lets draw the ball onto the screen:
+And finally, find the Draw method, and let's draw the ball onto the screen:
 
 ```csharp
 protected override void Draw(GameTime gameTime)
 {
     graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
-    //TODO: Add your drawing code here
+    // TODO: Add your drawing code here
     spriteBatch.Begin();
     spriteBatch.Draw(textureBall, new Vector2(0, 0), Color.White);
     spriteBatch.End();
-    
+
     base.Draw(gameTime);
 }
 ```
