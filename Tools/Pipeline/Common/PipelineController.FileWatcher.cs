@@ -103,7 +103,7 @@ namespace MonoGame.Tools.Pipeline
                 });
             }
 
-            System.Collections.Concurrent.ConcurrentQueue<FileSystemEventArgs> modifiedItemCollection = new System.Collections.Concurrent.ConcurrentQueue<FileSystemEventArgs>();
+            System.Collections.Concurrent.ConcurrentQueue<FileSystemEventArgs> fileChangedList = new System.Collections.Concurrent.ConcurrentQueue<FileSystemEventArgs>();
             private Task scheduledBuildTask;
 
             private void File_Changed(object sender, FileSystemEventArgs e)
@@ -112,7 +112,7 @@ namespace MonoGame.Tools.Pipeline
                 {
 
 
-                    modifiedItemCollection.Enqueue(e);
+                    fileChangedList.Enqueue(e);
 
                     if (this.scheduledBuildTask == null)
                         scheduleBuild();
@@ -127,7 +127,7 @@ namespace MonoGame.Tools.Pipeline
                 {
                     this.scheduledBuildTask = null;
                     //already dequeued
-                    if (modifiedItemCollection.Count == 0)
+                    if (fileChangedList.Count == 0)
                         return;
 
                     //if project is currently building and modifiedItem are present, schedule a new build task
@@ -140,24 +140,27 @@ namespace MonoGame.Tools.Pipeline
                     _view.Invoke(() =>
                     {
 
-                        if (modifiedItemCollection.Count > 0)
+                        if (fileChangedList.Count > 0)
                         {
                             List<IProjectItem> modifiedItems = new List<IProjectItem>();
                             FileSystemEventArgs ev;
 
-                            while (modifiedItemCollection.TryDequeue(out ev))
+                            while (fileChangedList.TryDequeue(out ev))
                             {
-                                var modifiedItem = _controller._project.ContentItems
+                                //selecting ContentItem matching the file
+                                var item = _controller._project.ContentItems
                                 .Select(itm => Tuple.Create(itm, Path.GetFullPath(Path.Combine(_controller.ProjectLocation, itm.Location, itm.Name))))
                                 .FirstOrDefault(f => f.Item2.Equals(ev.FullPath));
 
-                                if (modifiedItem != null && !modifiedItems.Contains(modifiedItem.Item1) && !IsFileLocked(modifiedItem.Item2))
-                                    modifiedItems.Add(modifiedItem.Item1);
+                                //
 
-                                if (modifiedItem != null && modifiedItem.Item1.Exists == false)
+                                if (item != null && !modifiedItems.Contains(item.Item1) && !IsFileLocked(item.Item2))
+                                    modifiedItems.Add(item.Item1);
+
+                                if (item != null && item.Item1.Exists == false)
                                 {
-                                    modifiedItem.Item1.Exists = true;
-                                    _view.UpdateTreeItem(modifiedItem.Item1);
+                                    item.Item1.Exists = true;
+                                    _view.UpdateTreeItem(item.Item1);
                                 }
                             }
 
