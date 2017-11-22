@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Input
 
         private static IntPtr PlatformGetWindowHandle()
         {
-            return _window.Handle;
+            return (_window == null) ? IntPtr.Zero : _window.Handle;
         }
 
         private static void PlatformSetWindowHandle(IntPtr windowHandle)
