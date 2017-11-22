@@ -365,7 +365,11 @@ namespace MGCB
                         ShowError("Unknown option '{0}'", arg[i].ToString());
                         break;
                     }
+
+                    ParseArgument("/" + name);
                 }
+
+                return true;
             }
 
             // Not a flag, parse argument
