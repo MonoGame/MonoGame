@@ -2,4 +2,33 @@
 <ExtensionModel>
 	<Runtime>
 	</Runtime>
+	<Extension path="/MonoDevelop/Ide/ProjectTemplateCategories">
+		<Category id="monogame" _name="MonoGame" icon="md-monogame-project" insertbefore="other">
+			<Category id="app" _name="App">
+				<Category id="general" _name="General" />
+			</Category>
+			<Category id="library" _name="Library">
+				<Category id="general" _name="General" />
+			</Category>
+		</Category>
+	</Extension>
+	<Extension path="/MonoDevelop/Ide/Templates">
+		<!--
+			Use the same Template/@id for both the 1.x and 2.0 templates to prevent duplicate items
+			in the recent templates list in the New Project dialog.
+		-->
+		<Condition id="DotNetCoreSdkInstalled" sdkVersion="1.*">
+		<Template
+			id="Microsoft.Common.Console.CSharp"
+			_overrideName="MonoGame Solution/Project"
+			_overrideDescription="Creates a new MonoGame project or solution."
+			path="Templates/MonoGame.Templates.0.0.1.nupkg"
+			icon="md-monogame-project"
+			imageId="md-monogame-project"
+			supportedParameters="CreateAndroidProject;CreateiOSProject;CreateUWPProject;CreateWindowsProject;CreateDesktopProject;CreateSharedProject;CreateNetStandardProject;NoCodeSharing"
+			wizard="MonoDevelop.DotNetCore.ProjectTemplateWizard"
+			condition="UseNetCore1x=true"
+			category="monogame/app/general"/>
+		</Condition>
+	</Extension>
 </ExtensionModel>

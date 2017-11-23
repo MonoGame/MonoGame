@@ -5,4 +5,7 @@
   <ItemGroup>
     <PackageReference Include="MonoDevelop.Addins" Version="0.4.1" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TemplateWizard\TemplateWizard.csproj" />
+  </ItemGroup>
 </Project>
