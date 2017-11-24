@@ -30,6 +30,11 @@ namespace MonoGame.Tools.Pipeline
         #region CommandLineParameters
         
         [CommandLineParameter(
+            Name = "workingDir",
+            ValueName = "directoryPath")]
+        public string WorkingDir { set { } }
+        
+        [CommandLineParameter(
             Name = "outputDir",
             ValueName = "directoryPath",
             Description = "The directory where all content is written.")]
