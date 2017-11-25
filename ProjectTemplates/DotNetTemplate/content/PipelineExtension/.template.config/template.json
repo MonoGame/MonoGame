@@ -1,0 +1,19 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame Pipeline Extension",
+    "groupIdentity": "MonoGame.BlankApp.Pipeline",
+    "identity": "MonoGame.Pipeline.Extension.CSharp",
+    "shortName": "monogame-pipeline-extension",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.csproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true"
+}

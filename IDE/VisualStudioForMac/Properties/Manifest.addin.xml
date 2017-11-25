@@ -41,6 +41,18 @@
 			imageId="md-monogame-project"
 			category="monogame/app/general"/>
 		<Template
+			id="MonoGame.BlankApp.MacOS.CSharp"
+			path="Templates/MonoGame.Templates.nupkg"
+			icon="md-monogame-project"
+			imageId="md-monogame-project"
+			category="monogame/app/general"/>
+		<Template
+			id="MonoGame.BlankApp.tvOS.CSharp"
+			path="Templates/MonoGame.Templates.nupkg"
+			icon="md-monogame-project"
+			imageId="md-monogame-project"
+			category="monogame/app/general"/>
+		<Template
 			id="MonoGame.BlankApp.Shared.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-project"
@@ -48,6 +60,12 @@
 			category="monogame/library/general"/>
 		<Template
 			id="MonoGame.BlankApp.NetStandard.CSharp"
+			path="Templates/MonoGame.Templates.nupkg"
+			icon="md-monogame-project"
+			imageId="md-monogame-project"
+			category="monogame/library/general"/>
+		<Template
+			id="MonoGame.Pipeline.Extension.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-project"

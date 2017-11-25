@@ -15,4 +15,9 @@
     <PackageReference Include="NuGet.Build.Packaging" Version="0.2.0" PrivateAssets="All" />
     <PackageFile Include="content\**\*" Exclude="content\**\.DS_Store;content\**\bin;content\**\obj" PackagePath="%(RelativeDir)%(Filename)%(Extension)" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="content\BlankApp.tvOS\.template.config\" />
+    <Folder Include="content\PipelineExtension\.template.config\" />
+    <Folder Include="content\BlankApp.MacOS\.template.config\" />
+  </ItemGroup>
 </Project>
