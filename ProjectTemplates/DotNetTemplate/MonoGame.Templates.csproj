@@ -3,8 +3,8 @@
   <PropertyGroup>
     <Description>Project templates for MonoDevelop extensions</Description>
     <PackageId>MonoGame.Templates</PackageId>
-    <PackageVersion>0.1.2</PackageVersion>
-    <Authors>Mikayla Hutchinson</Authors>
+    <PackageVersion>0.0.1</PackageVersion>
+    <Authors>@MonoGameTeam</Authors>
     <TargetFramework>net461</TargetFramework>
     <EnableDefaultItems>False</EnableDefaultItems>
     <PackOnBuild>true</PackOnBuild>
