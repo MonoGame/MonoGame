@@ -1,0 +1,19 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame NetStandard Library",
+    "groupIdentity": "MonoGame.BlankApp.NetStandard",
+	"identity": "MonoGame.BlankApp.NetStandard.CSharp",
+    "shortName": "monogame-metstandard-blank",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.csproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true"
+}

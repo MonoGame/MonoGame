@@ -29,7 +29,7 @@ using Mono.Addins.Description;
 
 [assembly: Addin(
     "MonoGame_IDE_VisualStudioForMac",
-    Namespace = "MonoGame_IDE_VisualStudioForMac",
+    Namespace = "MonoDevelop",
     Version = "1.0"
 )]
 
@@ -37,3 +37,5 @@ using Mono.Addins.Description;
 [assembly: AddinCategory("Game Development")]
 [assembly: AddinDescription("VisualStudio for Mac extension for MonoGame")]
 [assembly: AddinAuthor("@MonoGameTeam")]
+//[assembly: AddinDependency("Core", MonoDevelop.BuildInfo.Version)]
+//[assembly: AddinDependency("Ide", MonoDevelop.BuildInfo.Version)]

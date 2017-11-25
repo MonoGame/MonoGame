@@ -12,23 +12,51 @@
 			</Category>
 		</Category>
 	</Extension>
+	<Extension path="/MonoDevelop/Ide/ProjectTemplateWizards">
+        <Class id="MonoGame.IDE.VisualStudioForMac.TemplateWizard" class="MonoGame.IDE.VisualStudioForMac.MonoGameTemplateWizard" />
+    </Extension>
 	<Extension path="/MonoDevelop/Ide/Templates">
-		<!--
-			Use the same Template/@id for both the 1.x and 2.0 templates to prevent duplicate items
-			in the recent templates list in the New Project dialog.
-		-->
-		<Condition id="DotNetCoreSdkInstalled" sdkVersion="1.*">
 		<Template
-			id="Microsoft.Common.Console.CSharp"
-			_overrideName="MonoGame Solution/Project"
-			_overrideDescription="Creates a new MonoGame project or solution."
-			path="Templates/MonoGame.Templates.0.0.1.nupkg"
+			id="MonoGame.BlankApp.DesktopGL.CSharp"
+			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-project"
-			supportedParameters="CreateAndroidProject;CreateiOSProject;CreateUWPProject;CreateWindowsProject;CreateDesktopProject;CreateSharedProject;CreateNetStandardProject;NoCodeSharing"
-			wizard="MonoDevelop.DotNetCore.ProjectTemplateWizard"
-			condition="UseNetCore1x=true"
 			category="monogame/app/general"/>
-		</Condition>
+		<Template
+			id="MonoGame.BlankApp.iOS.CSharp"
+			path="Templates/MonoGame.Templates.nupkg"
+			icon="md-monogame-project"
+			imageId="md-monogame-project"
+			category="monogame/app/general"/>
+		<Template
+			id="MonoGame.BlankApp.Android.CSharp"
+			path="Templates/MonoGame.Templates.nupkg"
+			icon="md-monogame-project"
+			imageId="md-monogame-project"
+			category="monogame/app/general"/>
+		<Template
+			id="MonoGame.BlankApp.Windows.CSharp"
+			path="Templates/MonoGame.Templates.nupkg"
+			icon="md-monogame-project"
+			imageId="md-monogame-project"
+			category="monogame/app/general"/>
+		<Template
+			id="MonoGame.BlankApp.Shared.CSharp"
+			path="Templates/MonoGame.Templates.nupkg"
+			icon="md-monogame-project"
+			imageId="md-monogame-project"
+			category="monogame/library/general"/>
+		<Template
+			id="MonoGame.BlankApp.NetStandard.CSharp"
+			path="Templates/MonoGame.Templates.nupkg"
+			icon="md-monogame-project"
+			imageId="md-monogame-project"
+			category="monogame/library/general"/>
+	</Extension>
+	<Extension path="/MonoDevelop/Ide/TemplateImages">
+		<Image id="md-monogame-project" resource="monogame-project-32.png" />
+	</Extension>
+	<Extension path="/MonoDevelop/Core/StockIcons">
+		<StockIcon stockid="md-monogame-project" resource="monogame-project-32.png" size="Dnd" />
 	</Extension>
 </ExtensionModel>

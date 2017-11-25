@@ -1,0 +1,19 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame Shared Project",
+    "groupIdentity": "MonoGame.BlankApp.Shared",
+    "identity": "MonoGame.BlankApp.Shared.CSharp",
+    "shortName": "monogame-shared-blank",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.shproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true"
+}

@@ -8,7 +8,7 @@ namespace TemplateWizard
 	public enum CodeSharing {
 			None, // Why?
 			SharedProject,
-			PortableClassLibrary,
+			NetStandardLibrary,
 		}
 
 	public enum ReferenceVia {

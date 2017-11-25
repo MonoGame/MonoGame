@@ -1,11 +1,38 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
+    <AssemblySearchPaths>$(AssemblySearchPaths);{GAC}</AssemblySearchPaths>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="MonoDevelop.Addins" Version="0.4.1" />
+    <PackageReference Include="Eto.Forms" Version="2.3.0" />
+    <PackageReference Include="Eto.Platform.Gtk" Version="2.3.0" />
+    <PackageReference Include="Eto.Platform.XamMac2" Version="2.3.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TemplateWizard\TemplateWizard.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Templates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="monogame-project-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="monogame-project-32.png">
+      <LogicalName>monogame-project-32.png</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AddinFile Include="..\..\ProjectTemplates\DotNetTemplate\bin\MonoGame.Templates.nupkg">
+      <Link>Templates\MonoGame.Templates.nupkg</Link>
+    </AddinFile>
   </ItemGroup>
 </Project>
