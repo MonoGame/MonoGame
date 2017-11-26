@@ -42,10 +42,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>Current state of the mouse.</returns>
         public static MouseState GetState()
         {
-            if (PrimaryWindow != null)
-                return GetState(PrimaryWindow);
-
-            return _defaultState;
+            return PlatformGetState();
         }
 
         /// <summary>

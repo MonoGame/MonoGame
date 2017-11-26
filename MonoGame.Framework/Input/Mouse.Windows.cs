@@ -31,6 +31,14 @@ namespace Microsoft.Xna.Framework.Input
             return window.MouseState;
         }
 
+        private static MouseState PlatformGetState()
+        {
+            if (PrimaryWindow != null)
+                return PlatformGetState(PrimaryWindow);
+
+            return _defaultState;
+        }
+
         private static void PlatformSetPosition(int x, int y)
         {
             PrimaryWindow.MouseState.X = x;
