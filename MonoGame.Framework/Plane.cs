@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework
     }
 	
     /// <summary>
-    /// A plane in 3d space.
+    /// A plane in 3d space, represented by its normal away from the origin and its negative distance from the origin, D.
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework
         #region Public Fields
 
         /// <summary>
-        /// The distance of the <see cref="Plane"/> to the origin.
+        /// The negative distance of the <see cref="Plane"/> to the origin.
         /// </summary>
         [DataMember]
         public float D;
