@@ -138,7 +138,7 @@ namespace MonoGame.Framework
             Game = platform.Game;
 
             Form = new WinFormsGameForm(this);
-            Form.ClientSize = new Size(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
+            ChangeClientSize(new Size(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight));
 
             SetIcon();
             Title = Utilities.AssemblyHelper.GetDefaultWindowTitle();
@@ -162,8 +162,6 @@ namespace MonoGame.Framework
             Form.KeyPress += OnKeyPress;
 
             RegisterToAllWindows();
-
-            Form.CenterOnPrimaryMonitor();
         }
 
         [DllImport("shell32.dll", CharSet = CharSet.Auto, BestFitMapping = false)]
@@ -312,16 +310,13 @@ namespace MonoGame.Framework
 
         internal void Initialize(int width, int height)
         {
-            Form.ClientSize = new Size(width, height);
-            if (!_wasMoved)
-                Form.CenterOnPrimaryMonitor();
+            ChangeClientSize(new Size(width, height));
         }
 
         internal void Initialize(PresentationParameters pp)
         {
-            Form.ClientSize = new Size(pp.BackBufferWidth, pp.BackBufferHeight);
-            if (!_wasMoved)
-                Form.CenterOnPrimaryMonitor();
+            ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
+
             if (pp.IsFullScreen)
             {
                 EnterFullScreen(pp);
