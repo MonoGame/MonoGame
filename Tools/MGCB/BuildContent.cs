@@ -9,7 +9,7 @@ using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder;
-
+using System.Text.RegularExpressions;
 
 namespace MGCB
 {
@@ -38,6 +38,16 @@ namespace MGCB
         {
             get { throw new InvalidOperationException(); }
             set { throw new InvalidOperationException(); }
+        }
+
+        [CommandLineParameter(
+            Name = "exclude",
+            Flag = "e",
+            ValueName = "regex",
+            Description = "Extra regex rules for excluding files getting built when specifying a directory.")]
+        public void Exclude(string regex)
+        {
+            _excludeRules.Add(new Regex(regex, RegexOptions.Compiled));
         }
 
         [CommandLineParameter(
@@ -154,36 +164,45 @@ namespace MGCB
         [CommandLineParameter(
             Name = "build",
             Flag = "b",
-            ValueName = "sourceFile",
-            Description = "Build the content source file using the previously set switches and options.")]
-        public void OnBuild(string sourceFile)
+            ValueName = "filePath",
+            Description = "Builds the content file(s) using the previously set switches and options.")]
+        public void OnBuild(string filePath)
         {
             // Make sure the source file is absolute.
-            if (!Path.IsPathRooted(sourceFile))
-                sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
+            if (!Path.IsPathRooted(filePath))
+                filePath = Path.Combine(Directory.GetCurrentDirectory(), filePath);
 
-            sourceFile = PathHelper.Normalize(sourceFile);
+            filePath = PathHelper.Normalize(filePath);
 
-            // Remove duplicates... keep this new one.
-            var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
-            if (previous != -1)
-                _content.RemoveAt(previous);
-
-            // Create the item for processing later.
-            var item = new ContentItem
+            if (Directory.Exists(filePath))
             {
-                SourceFile = sourceFile, 
-                Importer = Importer, 
-                Processor = _processor,
-                ProcessorParams = new OpaqueDataDictionary()
-            };
-            _content.Add(item);
+                // If its a directory, process all the files in that directory.
+                ProcessDirectory(filePath);
+                _excludeRules.Clear();
+            }
+            else
+            {
+                // Remove duplicates... keep this new one.
+                var previous = _content.FindIndex(e => string.Equals(e.SourceFile, filePath, StringComparison.InvariantCultureIgnoreCase));
+                if (previous != -1)
+                    _content.RemoveAt(previous);
 
-            // Copy the current processor parameters blind as we
-            // will validate and remove invalid parameters during
-            // the build process later.
-            foreach (var pair in _processorParams)
-                item.ProcessorParams.Add(pair.Key, pair.Value);
+                // Create the item for processing later.
+                var item = new ContentItem
+                {
+                    SourceFile = filePath,
+                    Importer = Importer,
+                    Processor = _processor,
+                    ProcessorParams = new OpaqueDataDictionary()
+                };
+                _content.Add(item);
+
+                // Copy the current processor parameters blind as we
+                // will validate and remove invalid parameters during
+                // the build process later.
+                foreach (var pair in _processorParams)
+                    item.ProcessorParams.Add(pair.Key, pair.Value);
+            }
         }
 
         [CommandLineParameter(
@@ -222,6 +241,8 @@ namespace MGCB
 
         private readonly List<string> _copyItems = new List<string>();
 
+        private readonly List<Regex> _excludeRules = new List<Regex>();
+
         private PipelineManager _manager;
 
         public bool HasWork
@@ -238,6 +259,28 @@ namespace MGCB
                 .Replace("$(Configuration)", Config)
                 .Replace("$(Config)", Config)
                 .Replace("$(Profile)", this.Profile.ToString());
+        }
+
+        private void ProcessDirectory(string dir)
+        {
+            foreach (var d in Directory.GetDirectories(dir))
+                ProcessDirectory(d);
+
+            foreach (var f in Directory.GetFiles(dir))
+            {
+                var ok = true;
+                foreach (var reg in _excludeRules)
+                {
+                    if (reg.IsMatch(f))
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+
+                if (ok)
+                    OnBuild(f);
+            }
         }
 
         public void Build(out int successCount, out int errorCount)

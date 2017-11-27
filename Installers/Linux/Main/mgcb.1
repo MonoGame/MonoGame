@@ -23,12 +23,8 @@ Automatically selects either --build or --@ option, depending on the file extens
 Read a text response file with additional command line options and switches.
 
 .TP
-.BR \-a ", " \-\-autoinclude =\fIDIRECTORY\fR
-Auto-includes all the files in the specified directory.
-
-.TP
-.BR \-b ", " \-\-build =\fISOURCEFILE\fR
-Build the content source file using the previously set switches and options.
+.BR \-b ", " \-\-build =\fIFILEPATH\fR
+Builds the content file(s) using the previously set switches and options.
 
 .TP
 .BR \-c ", " \-\-clean
@@ -48,7 +44,7 @@ Copy the content source file verbatim to the output directory.
 
 .TP
 .BR \-e ", " \-\-exclude =\fIREGEX\fR
-Extra regex rules for excluding files from autoinclude command.
+Extra regex rules for excluding files getting built when specifying a directory.
 
 .TP
 .BR \-h ", " \-\-help
