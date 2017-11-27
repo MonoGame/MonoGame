@@ -56,6 +56,12 @@
 			imageId="md-monogame-project"
 			category="monogame/library/general"/>
 		<Template
+			id="MonoGame.BlankApp.Portable.CSharp"
+			path="Templates/MonoGame.Templates.nupkg"
+			icon="md-monogame-project"
+			imageId="md-monogame-project"
+			category="monogame/library/general"/>
+		<Template
 			id="MonoGame.BlankApp.NetStandard.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-project"
