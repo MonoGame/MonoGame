@@ -1,0 +1,19 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame Portable Library",
+    "groupIdentity": "MonoGame.BlankApp.Portable",
+    "identity": "MonoGame.BlankApp.Portable.CSharp",
+    "shortName": "monogame-portable-blank",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.csproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true"
+}

@@ -21,10 +21,34 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="monogame-project-32.png" />
+    <None Remove="monogame-android.png" />
+    <None Remove="monogame-desktopgl.png" />
+    <None Remove="monogame-ios.png" />
+    <None Remove="monogame-preview.png" />
+    <None Remove="monogame-shared.png" />
+    <None Remove="monogame-windows.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="monogame-project-32.png">
       <LogicalName>monogame-project-32.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-android.png">
+      <LogicalName>monogame-android.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-desktopgl.png">
+      <LogicalName>monogame-desktopgl.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-ios.png">
+      <LogicalName>monogame-ios.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-preview.png">
+      <LogicalName>monogame-preview.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-shared.png">
+      <LogicalName>monogame-shared.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-windows.png">
+      <LogicalName>monogame-windows.png</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
