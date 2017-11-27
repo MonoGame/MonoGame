@@ -17,9 +17,6 @@
     <PackageReference Include="Eto.Platform.XamMac2" Version="2.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TemplateWizard\TemplateWizard.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Templates\" />
   </ItemGroup>
   <ItemGroup>

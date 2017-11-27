@@ -12,9 +12,6 @@
 			</Category>
 		</Category>
 	</Extension>
-	<Extension path="/MonoDevelop/Ide/ProjectTemplateWizards">
-        <Class id="MonoGame.IDE.VisualStudioForMac.TemplateWizard" class="MonoGame.IDE.VisualStudioForMac.MonoGameTemplateWizard" />
-    </Extension>
 	<Extension path="/MonoDevelop/Ide/Templates">
 		<Template
 			id="MonoGame.BlankApp.DesktopGL.CSharp"
