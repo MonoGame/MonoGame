@@ -759,7 +759,6 @@ namespace MonoGame.OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         internal delegate void ReadPixelsDelegate (int x, int y, int width, int height, PixelFormat format, PixelType type, IntPtr data);
         internal static ReadPixelsDelegate ReadPixelsInternal;
 
@@ -839,7 +838,6 @@ namespace MonoGame.OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         public delegate void RenderbufferStorageDelegate (RenderbufferTarget target, RenderbufferStorage storage, int width, int hegiht);
         public static RenderbufferStorageDelegate RenderbufferStorage;
 
