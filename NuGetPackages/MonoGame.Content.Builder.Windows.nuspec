@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>MonoGame.Content.Builder.Windows</id>
+    <version>3.7.0.0</version>
+    <title>MonoGame.Content.Builder.Windows</title>
+    <authors>cra0zy</authors>
+    <owners>cra0zy</owners>
+    <licenseUrl>https://github.com/mono/MonoGame/blob/develop/LICENSE.txt</licenseUrl>
+    <projectUrl>http://monogame.net/</projectUrl>
+    <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
+
+This package provides you with MonoGame Framework Content Builder tools for Windows.
+
+This package is currently unofficial.</description>
+    <summary>This package provides you with MonoGame Framework Content Builder tools.</summary>
+    <copyright>Copyright © 2009-2017 The MonoGame Team</copyright>
+    <language>en-US</language>
+  </metadata>
+  <files>
+    <file src="../Tools/MGCB/bin/Windows/AnyCPU/Release/**/*" target="build" />
+  </files>
+</package>
