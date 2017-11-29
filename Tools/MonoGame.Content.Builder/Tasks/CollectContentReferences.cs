@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace MonoGame.Build.Tasks
+namespace MSBuildTasks
 {
     public static class StringExt
     {

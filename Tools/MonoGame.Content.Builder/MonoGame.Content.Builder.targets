@@ -1,0 +1,96 @@
+<!--
+  MonoGame - Copyright (C) The MonoGame Team
+  This file is subject to the terms and conditions defined in
+  file 'LICENSE.txt', which is part of this source code package.
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Add MonoGameContentReference to item type selection in Visual Studio -->
+  <ItemGroup>
+    <AvailableItemName Include="MonoGameContentReference" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- This disables the IDE feature that skips executing msbuild in some build situations. -->
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+
+    <!-- Select correct MSBuild task assembly. -->
+    <MGTaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' ">netstandard2.0</MGTaskFolder>
+    <MGTaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net46</MGTaskFolder>
+    <MGTaskAssembly>$(MSBuildThisFileDirectory)..\tasks\$(MGTaskFolder)\MonoGame.Content.Builder.dll</MGTaskAssembly>
+  </PropertyGroup>
+
+  <UsingTask TaskName="MSBuildTasks.GetMGCBTask" AssemblyFile="$(MGTaskAssembly)" />
+  <UsingTask TaskName="MSBuildTasks.CollectContentReferences" AssemblyFile="$(MGTaskAssembly)" />
+
+  <Target Name="Prepare">
+    <PropertyGroup>
+      <!-- Extra per platform folders that content needs to go to -->
+      <PlatformResourcePrefix Condition=" '$(MonoGamePlatform)' == 'MacOSX' ">$(MonoMacResourcePrefix)</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition=" '$(MonoGamePlatform)' == 'iOS' ">$(IPhoneResourcePrefix)</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition=" '$(MonoGamePlatform)' == 'Android' ">$(MonoAndroidAssetsPrefix)</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition=" '$(PlatformResourcePrefix)' != '' And !HasTrailingSlash('$(PlatformResourcePrefix)') ">$(PlatformResourcePrefix)\</PlatformResourcePrefix>
+
+      <PlatformResourceFolder Condition=" '$(MonoGamePlatform)' == 'Android' ">AndroidAsset</PlatformResourceFolder>
+      <PlatformResourceFolder Condition=" '$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS' ">BundleResource</PlatformResourceFolder>
+      <PlatformResourceFolder Condition=" '$(PlatformResourceFolder)' == '' ">Content</PlatformResourceFolder>
+      
+      <!-- Default MGCB arguments -->
+      <MgcbArguments Condition="'$(MgcbArguments)' == ''">/quiet</MgcbArguments>
+    </PropertyGroup>
+
+    <!-- Check and fetch MGCB -->
+    <!-- This is only done in case we are running from NuGet -->
+    <GetMGCBTask MgcbPath="$(MgcbPath)">
+      <Output TaskParameter="MGCBCommandPath" PropertyName="MgcbCommand"/>
+    </GetMGCBTask>
+
+    <!-- Get all MonoGame Content References and store them in a list -->
+    <!-- We do this here so we are compatible with xbuild -->
+    <CollectContentReferences ContentReferences="@(MonoGameContentReference)" MonoGamePlatform="$(MonoGamePlatform)">
+      <Output TaskParameter="Output" ItemName="ContentReferences"/>
+    </CollectContentReferences>
+
+    <!-- Do some error checking -->
+    <Error Condition=" '$(MonoGamePlatform)' == '' " Text="The MonoGamePlatform property was not defined in the project!" />
+    <Warning Condition=" '%(ContentReferences.FullPath)' == '' " Text="No Content References Found. Please make sure your .mgcb file has a build action of MonoGameContentReference" />
+
+    <!-- Prepare output directories -->
+    <MakeDir Directories="%(ContentReferences.ContentOutputDir)"/>
+    <MakeDir Directories="%(ContentReferences.ContentIntermediateOutputDir)"/>
+  </Target>
+
+  <PropertyGroup>
+    <BuildDependsOn>
+      BuildContent;
+      $(BuildDependsOn);
+    </BuildDependsOn>
+  </PropertyGroup>
+
+  <Target Name="RunContentBuilder">
+    
+    <Exec Condition=" '%(ContentReferences.FullPath)' != '' "
+          Command="$(MgcbCommand) /@:&quot;%(ContentReferences.FullPath)&quot; /platform:$(MonoGamePlatform) $(MgcbArguments) /outputDir:&quot;%(ContentReferences.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReferences.ContentIntermediateOutputDir)&quot;"
+          WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
+      
+    <CreateItem Include="%(ContentReferences.RelativeFullPath)%(ContentReferences.ContentOutputDir)\**\*.*"
+                AdditionalMetadata="ContentOutputDir=%(ContentReferences.ContentDirectory)">
+                  
+      <Output TaskParameter="Include" ItemName="ExtraContent" />
+    </CreateItem>
+  </Target>
+
+  <Target Name="BuildContent" DependsOnTargets="Prepare;RunContentBuilder"
+          Condition=" '@(MonoGameContentReference)' != '' "
+          Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)">
+
+    <CreateItem Condition="'%(ExtraContent.Filename)' != ''"
+                Include="%(ExtraContent.FullPath)"
+                AdditionalMetadata="Link=$(PlatformResourcePrefix)%(ExtraContent.ContentOutputDir)%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension);CopyToOutputDirectory=PreserveNewest">
+      
+      <Output TaskParameter="Include" ItemName="$(PlatformResourceFolder)" />
+    </CreateItem>
+  </Target>
+
+</Project>

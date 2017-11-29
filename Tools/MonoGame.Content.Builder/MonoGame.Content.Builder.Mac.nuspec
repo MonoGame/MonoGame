@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>MonoGame.Content.Builder.Mac</id>
+    <version>0.0.0.0</version>
+    <title>MonoGame.Content.Builder.Mac</title>
+    <authors>MonoGame Team</authors>
+    <owners>MonoGame Team</owners>
+    <licenseUrl>https://github.com/mono/MonoGame/blob/develop/LICENSE.txt</licenseUrl>
+    <projectUrl>http://monogame.net/</projectUrl>
+    <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>DO NOT REFERENCE THIS PACKAGE BY HAND. Instead reference MonoGame.Content.Builder which will automatically download this package if needed.</description>
+    <copyright>Copyright © 2009-2017 The MonoGame Team</copyright>
+    <language>en-US</language>
+  </metadata>
+  <files>
+    <file src="..\MGCB\bin\MacOS\AnyCPU\Release\**\*" exclude="..\..\Tools\MGCB\bin\MacOS\AnyCPU\Release\MGCB.app\**\*" target="build" />
+  </files>
+</package>

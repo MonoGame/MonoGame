@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+    <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
+    <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>
+    <PackageProjectUrl>http://www.monogame.net/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MonoGame/MonoGame</RepositoryUrl>
+    <Description>This package provides the MonoGame Content Builder project integration.</Description>
+    <PackageTags>monogame;mgcb;content;builder</PackageTags>
+    <Version>0.0.0.0</Version>
+    <Authors>MonoGame Team</Authors>
+    <PackageId>MonoGame.Content.Builder</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="MonoGame.Content.Builder.targets" PackagePath="build\MonoGame.Content.Builder.targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Framework" Version="15.1.1012" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.1.1012" />
+    
+    <PackageReference Update="@(PackageReference)" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>

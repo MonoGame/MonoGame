@@ -80,7 +80,6 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   SetOutPath ${MSBuildInstallDir}
   File '..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Content.Builder.targets'
   File '..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Common.props'
-  File '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Build.Tasks.dll'
 
   ; Install the MonoGame tools to a single shared folder.
   SetOutPath ${MSBuildInstallDir}\Tools
