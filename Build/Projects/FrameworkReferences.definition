@@ -46,7 +46,7 @@
       <Reference Include="System.Xml" />
       <Binary
         Name="SharpDX"
-        Path="ThirdParty/Dependencies/SharpDX/SharpDX.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/net40/SharpDX.dll" />
       <Binary
         Name="SharpDX.Direct2D1"
         Path="ThirdParty/Dependencies/SharpDX/SharpDX.Direct2D1.dll" />
@@ -58,13 +58,13 @@
         Path="ThirdParty/Dependencies/SharpDX/SharpDX.DXGI.dll" />
       <Binary
         Name="SharpDX.MediaFoundation"
-        Path="ThirdParty/Dependencies/SharpDX/net45/SharpDX.MediaFoundation.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/net40/SharpDX.MediaFoundation.dll" />
       <Binary
         Name="SharpDX.XAudio2"
-        Path="ThirdParty/Dependencies/SharpDX/net45/SharpDX.XAudio2.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/net40/SharpDX.XAudio2.dll" />
       <Binary
         Name="SharpDX.XInput"
-        Path="ThirdParty/Dependencies/SharpDX/SharpDX.XInput.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/net40/SharpDX.XInput.dll" />
     </Service>
 
     <Service Name="MonoGame.Framework/OpenGLGraphics">
@@ -92,7 +92,7 @@
   <Platform Type="WindowsUniversal">
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/SharpDX.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/uap10.0/SharpDX.dll" />
     <Binary
       Name="SharpDX.Direct2D1"
       Path="ThirdParty/Dependencies/SharpDX/SharpDX.Direct2D1.dll" />
@@ -104,10 +104,10 @@
       Path="ThirdParty/Dependencies/SharpDX/SharpDX.DXGI.dll" />
     <Binary
       Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Dependencies/SharpDX/SharpDX.MediaFoundation.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/uap10.0/SharpDX.MediaFoundation.dll" />
     <Binary
       Name="SharpDX.XAudio2"
-      Path="ThirdParty/Dependencies/SharpDX/SharpDX.XAudio2.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/uap10.0/SharpDX.XAudio2.dll" />
   </Platform>
 	
   <Platform Type="Web">
