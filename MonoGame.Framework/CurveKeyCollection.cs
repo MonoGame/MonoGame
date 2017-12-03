@@ -20,6 +20,7 @@ namespace Microsoft.Xna.Framework
         #region Private Fields
 
         private readonly List<CurveKey> _keys;
+        private readonly IComparer<CurveKey> _keyPositionComparer = Comparer<CurveKey>.Create((x, y) => x.Position.CompareTo(y.Position));
 
         #endregion
 
@@ -176,6 +177,25 @@ namespace Microsoft.Xna.Framework
         public int IndexOf(CurveKey item)
         {
             return _keys.IndexOf(item);
+        }
+
+        /// <summary>
+        /// Searches for the key with the lowest position greater than or equal to the specified position.
+        /// </summary>
+        /// <param name="position">Position to search for.</param>
+        /// <returns>The lowest index of the matching keys or, if the last element's position is less than the specified position, <c>Count</c>. </returns>
+        public int IndexAtPosition(float position)
+        {
+            int index = _keys.BinarySearch(new CurveKey(position, 0), _keyPositionComparer);
+            
+            //If position doesn't exist in list, return the key with the closest larger position
+            if (index < 0)
+                return ~index;
+            
+            //If several matching keys exist, return the first one
+            while (index - 1 >= 0 && _keys[index - 1].Position == position)
+                index--;
+            return index;
         }
 
         /// <summary>
