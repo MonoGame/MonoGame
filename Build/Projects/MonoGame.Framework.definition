@@ -322,7 +322,7 @@
     <Compile Include="IPlatformBackButton.cs">
       <Platforms>tvOS</Platforms>
     </Compile>
-    <Compile Include="Utilities\TupleDeconstruction.cs" />
+    <Compile Include="Utilities\Deconstruction.cs" />
 
     <!-- Microsoft.Xna.Framework.Audio -->
     <Compile Include="Audio\AudioChannels.cs" />
