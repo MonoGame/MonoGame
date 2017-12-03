@@ -1,4 +1,10 @@
-﻿namespace Microsoft.Xna.Framework.Utilities
+﻿// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using Microsoft.Xna.Framework;
+
+namespace MonoGame.Framework
 {
     public static class Extensions
     {
@@ -19,6 +25,14 @@
             r = c.R;
             g = c.G;
             b = c.B;
+        }
+
+        public static void Deconstruct(this Color c, out float r, out float g, out float b, out float a)
+        {
+            r = c.R;
+            g = c.G;
+            b = c.B;
+            a = c.A;
         }
 
         public static void Deconstruct(this Plane p, out Vector3 normal, out float d)
