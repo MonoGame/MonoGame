@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace MonoGame.Framework
 {
-    public static class Extensions
+    public static class Deconstructions
     {
         public static void Deconstruct(this BoundingBox bb, out Vector3 min, out Vector3 max)
         {
