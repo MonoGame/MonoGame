@@ -1146,6 +1146,17 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// Deconstruction method for <see cref="Vector2"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void Deconstruct(out float x, out float y)
+        {
+            x = X;
+            y = Y;
+        }
+
         #endregion
     }
 }

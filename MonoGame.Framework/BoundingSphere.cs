@@ -598,6 +598,17 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
+        /// <summary>
+        /// Deconstruction method for <see cref="BoundingSphere"/>.
+        /// </summary>
+        /// <param name="center"></param>
+        /// <param name="radius"></param>
+        public void Deconstruct(out Vector3 center, out float radius)
+        {
+            center = Center;
+            radius = Radius;
+        }
+
         #endregion
 
         #region Operators
