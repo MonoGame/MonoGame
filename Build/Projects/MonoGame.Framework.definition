@@ -322,7 +322,6 @@
     <Compile Include="IPlatformBackButton.cs">
       <Platforms>tvOS</Platforms>
     </Compile>
-    <Compile Include="Utilities\Deconstructions.cs" />
 
     <!-- Microsoft.Xna.Framework.Audio -->
     <Compile Include="Audio\AudioChannels.cs" />
