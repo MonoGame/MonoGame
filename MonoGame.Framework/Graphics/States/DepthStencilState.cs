@@ -254,16 +254,21 @@ namespace Microsoft.Xna.Framework.Graphics
             _twoSidedStencilMode = cloneSource._twoSidedStencilMode;
 	    }
 
-        public static readonly DepthStencilState Default;
-        public static readonly DepthStencilState DepthRead;
-        public static readonly DepthStencilState None;
+        public static DepthStencilState Default;
+        public static DepthStencilState DepthRead;
+        public static DepthStencilState None;
 
 		static DepthStencilState ()
 		{
-		    Default = new DepthStencilState("DepthStencilState.Default", true, true);
-			DepthRead = new DepthStencilState("DepthStencilState.DepthRead", true, false);
-		    None = new DepthStencilState("DepthStencilState.None", false, false);
+		    Recreate();
 		}
+
+        public static void Recreate()
+        {
+            Default = new DepthStencilState("DepthStencilState.Default", true, true);
+            DepthRead = new DepthStencilState("DepthStencilState.DepthRead", true, false);
+            None = new DepthStencilState("DepthStencilState.None", false, false);
+        }
 
         internal DepthStencilState Clone()
         {

@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Windows;
+using SharpDX;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Point = System.Drawing.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
@@ -157,7 +158,7 @@ namespace MonoGame.Framework
             Form.MouseWheel += OnMouseScroll;
             Form.MouseHorizontalWheel += OnMouseHorizontalScroll;
             Form.MouseEnter += OnMouseEnter;
-            Form.MouseLeave += OnMouseLeave;            
+            Form.MouseLeave += OnMouseLeave;
 
             Form.Activated += OnActivated;
             Form.Deactivate += OnDeactivate;
@@ -289,10 +290,10 @@ namespace MonoGame.Framework
             MouseState.MiddleButton = (buttons & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
             MouseState.RightButton = (buttons & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
 
-            // Don't process touch state if we're not active 
+            // Don't process touch state if we're not active
             // and the mouse is within the client area.
             if (!_platform.IsActive || !withinClient)
-            {                
+            {
                 if (MouseState.LeftButton == ButtonState.Pressed)
                 {
                     // Release mouse TouchLocation
@@ -302,7 +303,7 @@ namespace MonoGame.Framework
                 }
                 return;
             }
-            
+
             TouchLocationState? touchState = null;
             if (MouseState.LeftButton == ButtonState.Pressed)
                 if (previousState == ButtonState.Released)
@@ -377,7 +378,30 @@ namespace MonoGame.Framework
                 // we may need to restore full screen when coming back from a minimized window
                 if (_lastFormState == FormWindowState.Minimized)
                     _platform.Game.GraphicsDevice.SetHardwareFullscreen();
-                UpdateBackBufferSize();
+
+                try
+                {
+                    UpdateBackBufferSize();
+                }
+                catch (SharpDXException e)
+                {
+                    // The GPU is suspended; this means we should try to recreate the device entirely. If this fails, just return.
+                    if (e.ResultCode.Code == -2005270523 || e.ResultCode.Code == -2005270525)
+                    {
+                        try
+                        {
+                            Game.GraphicsDevice?.Recreate();
+                        }
+                        catch (SharpDXException)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
             }
 
             _lastFormState = Form.WindowState;
@@ -389,12 +413,34 @@ namespace MonoGame.Framework
             _wasMoved = true;
             if (Game.Window == this)
             {
-                UpdateBackBufferSize();
+                try
+                {
+                    UpdateBackBufferSize();
 
-                // the display that the window is on might have changed, so we need to
-                // check and possibly update the Adapter of the GraphicsDevice
-                if (Game.GraphicsDevice != null)
-                    Game.GraphicsDevice.RefreshAdapter();
+                    // the display that the window is on might have changed, so we need to
+                    // check and possibly update the Adapter of the GraphicsDevice
+                    if (Game.GraphicsDevice != null)
+                        Game.GraphicsDevice.RefreshAdapter();
+                }
+                catch (SharpDXException e)
+                {
+                    // The GPU is suspended; this means we should try to recreate the device entirely. If this fails, just return.
+                    if (e.ResultCode.Code == -2005270523 || e.ResultCode.Code == -2005270525)
+                    {
+                        try
+                        {
+                            Game.GraphicsDevice?.Recreate();
+                        }
+                        catch (SharpDXException)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
             }
 
             OnClientSizeChanged();
@@ -452,8 +498,8 @@ namespace MonoGame.Framework
                 }
             }
 
-            // We need to remove the WM_QUIT message in the message 
-            // pump as it will keep us from restarting on this 
+            // We need to remove the WM_QUIT message in the message
+            // pump as it will keep us from restarting on this
             // same thread.
             //
             // This is critical for some NUnit runners which
@@ -465,7 +511,7 @@ namespace MonoGame.Framework
                     break;
 
                 Thread.Sleep(100);
-            } 
+            }
             while (PeekMessage(out msg, IntPtr.Zero, 0, 1 << 5, 1));
         }
 
@@ -533,7 +579,7 @@ namespace MonoGame.Framework
             {
                 if (Form != null)
                 {
-                    UnregisterFromAllWindows(); 
+                    UnregisterFromAllWindows();
                     Form.Dispose();
                     Form = null;
                 }

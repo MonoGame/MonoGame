@@ -105,9 +105,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("You cannot modify the rasterizer state after it has been bound to the graphics device!");
         }
 
-	    public static readonly RasterizerState CullClockwise;
-        public static readonly RasterizerState CullCounterClockwise;
-        public static readonly RasterizerState CullNone;
+	    public static RasterizerState CullClockwise;
+        public static RasterizerState CullCounterClockwise;
+        public static RasterizerState CullNone;
 
         public RasterizerState()
 		{
@@ -142,10 +142,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		static RasterizerState ()
 		{
-		    CullClockwise = new RasterizerState("RasterizerState.CullClockwise", CullMode.CullClockwiseFace);
-		    CullCounterClockwise = new RasterizerState("RasterizerState.CullCounterClockwise", CullMode.CullCounterClockwiseFace);
-		    CullNone = new RasterizerState("RasterizerState.CullNone", CullMode.None);
+		    Recreate();
 		}
+
+	    public static void Recreate()
+	    {
+	        CullClockwise = new RasterizerState("RasterizerState.CullClockwise", CullMode.CullClockwiseFace);
+	        CullCounterClockwise = new RasterizerState("RasterizerState.CullCounterClockwise", CullMode.CullCounterClockwiseFace);
+	        CullNone = new RasterizerState("RasterizerState.CullNone", CullMode.None);
+	    }
 
 	    internal RasterizerState Clone()
 	    {

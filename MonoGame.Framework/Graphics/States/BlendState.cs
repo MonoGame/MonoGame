@@ -186,10 +186,10 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        public static readonly BlendState Additive;
-        public static readonly BlendState AlphaBlend;
-        public static readonly BlendState NonPremultiplied;
-        public static readonly BlendState Opaque;
+        public static BlendState Additive;
+        public static BlendState AlphaBlend;
+        public static BlendState NonPremultiplied;
+        public static BlendState Opaque;
 
         public BlendState()
         {
@@ -232,11 +232,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
         static BlendState()
         {
-            Additive = new BlendState("BlendState.Additive", Blend.SourceAlpha, Blend.One);
-            AlphaBlend = new BlendState("BlendState.AlphaBlend", Blend.One, Blend.InverseSourceAlpha);
-            NonPremultiplied = new BlendState("BlendState.NonPremultiplied", Blend.SourceAlpha, Blend.InverseSourceAlpha);
-            Opaque = new BlendState("BlendState.Opaque", Blend.One, Blend.Zero);
-		}
+            Recreate();
+        }
+
+	    public static void Recreate()
+	    {
+	        Additive = new BlendState("BlendState.Additive", Blend.SourceAlpha, Blend.One);
+	        AlphaBlend = new BlendState("BlendState.AlphaBlend", Blend.One, Blend.InverseSourceAlpha);
+	        NonPremultiplied = new BlendState("BlendState.NonPremultiplied", Blend.SourceAlpha, Blend.InverseSourceAlpha);
+	        Opaque = new BlendState("BlendState.Opaque", Blend.One, Blend.Zero);
+	    }
 
 	    internal BlendState Clone()
 	    {

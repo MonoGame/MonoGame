@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
-            // Assume the window client size as the default back 
+            // Assume the window client size as the default back
             // buffer resolution in the landscape orientation.
             var clientBounds = _game.Window.ClientBounds;
             if (clientBounds.Width >= clientBounds.Height)
@@ -134,6 +134,7 @@ namespace Microsoft.Xna.Framework
             // hook up reset events
             GraphicsDevice.DeviceReset     += (sender, args) => OnDeviceReset(args);
             GraphicsDevice.DeviceResetting += (sender, args) => OnDeviceResetting(args);
+            GraphicsDevice.DeviceRecreated += (sender, args) => OnDeviceRecreated(args);
 
             // update the touchpanel display size when the graphicsdevice is reset
             _graphicsDevice.DeviceReset += UpdateTouchPanel;
@@ -171,6 +172,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> DeviceDisposing;
         public event EventHandler<EventArgs> DeviceReset;
         public event EventHandler<EventArgs> DeviceResetting;
+        public event EventHandler<EventArgs> DeviceRecreated;
         public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
         public event EventHandler<EventArgs> Disposed;
 
@@ -192,6 +194,11 @@ namespace Microsoft.Xna.Framework
         internal void OnDeviceCreated(EventArgs e)
         {
             EventHelpers.Raise(this, DeviceCreated, e);
+        }
+
+        internal void OnDeviceRecreated(EventArgs e)
+        {
+            EventHelpers.Raise(this, DeviceRecreated, e);
         }
 
         /// <summary>
