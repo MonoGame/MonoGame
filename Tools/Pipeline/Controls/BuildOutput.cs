@@ -82,7 +82,7 @@ namespace MonoGame.Tools.Pipeline
             if (_cmdFilterOutput.Checked)
                 drawable.Paint -= Drawable_Paint;
 
-            panel.Content = _cmdFilterOutput.Checked ? (Control)scrollable1 : textArea;
+            panel.Content = _cmdFilterOutput.Checked ? (Control)scrollable : textArea;
             PipelineSettings.Default.FilterOutput = _cmdFilterOutput.Checked;
 
             if (_cmdFilterOutput.Checked)
@@ -117,7 +117,7 @@ namespace MonoGame.Tools.Pipeline
         public void ClearOutput()
         {
             drawable.Width = _reqWidth = 0;
-            scrollable1.ScrollPosition = new Point(0, 0);
+            scrollable.ScrollPosition = new Point(0, 0);
             textArea.Text = "";
             _items.Clear();
             drawable.Invalidate();
@@ -240,7 +240,7 @@ namespace MonoGame.Tools.Pipeline
                 _tryScroll = false;
 
                 if (PipelineSettings.Default.AutoScrollBuildOutput)
-                    scrollable1.ScrollPosition = new Point(0, drawable.Height + 10 - scrollable1.Height);
+                    scrollable.ScrollPosition = new Point(0, drawable.Height + 10 - scrollable.Height);
             }
         }
 
@@ -279,7 +279,7 @@ namespace MonoGame.Tools.Pipeline
                     continue;
 
                 // Check if the item is in the visible rectangle
-                if (y + item.Height >= scrollable1.ScrollPosition.Y && y < scrollable1.ScrollPosition.Y + scrollable1.Height)
+                if (y + item.Height >= scrollPosition.Y && y < scrollPosition.Y + scrollable.Height)
                 {
                     // Check if the item is selected
                     if (MouseLocation.Y > y && MouseLocation.Y < y + item.Height)
