@@ -22,7 +22,6 @@
     <Reference Include="System.Runtime.Serialization" />
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
-      <Reference Include="System.Drawing" />
     </Service>
   </Platform>
 
