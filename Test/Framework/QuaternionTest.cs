@@ -163,7 +163,9 @@ namespace MonoGame.Tests.Framework
         {
             Quaternion quaternion = new Quaternion(float.MinValue, float.MaxValue, float.MinValue, float.MaxValue);
 
-            quaternion.Deconstruct(out var x, out var y, out var z, out var w);
+            float x, y, z, w;
+
+            quaternion.Deconstruct(out x, out y, out z, out w);
 
             Assert.AreEqual(x, quaternion.X);
             Assert.AreEqual(y, quaternion.Y);
