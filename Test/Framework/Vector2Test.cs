@@ -430,7 +430,9 @@ namespace MonoGame.Tests.Framework
         {
             Vector2 vector2 = new Vector2(float.MinValue, float.MaxValue);
 
-            vector2.Deconstruct(out var x, out var y);
+            float x, y;
+
+            vector2.Deconstruct(out x, out y);
 
             Assert.AreEqual(x, vector2.X);
             Assert.AreEqual(y, vector2.Y);

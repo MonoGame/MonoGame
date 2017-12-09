@@ -82,7 +82,10 @@ namespace MonoGame.Tests.Framework
         {
             Plane plane = new Plane(new Vector3(255, 255, 255), float.MaxValue);
 
-            plane.Deconstruct(out var normal, out var d);
+            Vector3 normal;
+            float d;
+
+            plane.Deconstruct(out normal, out d);
 
             Assert.AreEqual(normal, plane.Normal);
             Assert.AreEqual(d, plane.D);

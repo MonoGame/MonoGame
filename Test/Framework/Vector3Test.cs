@@ -114,7 +114,9 @@ namespace MonoGame.Tests.Framework
         {
             Vector3 vector3 = new Vector3(float.MinValue, float.MaxValue, float.MinValue);
 
-            vector3.Deconstruct(out var x, out var y, out var z);
+            float x, y, z;
+
+            vector3.Deconstruct(out x, out y, out z);
 
             Assert.AreEqual(x, vector3.X);
             Assert.AreEqual(y, vector3.Y);

@@ -171,7 +171,9 @@ namespace MonoGame.Tests.Framework
         {
             BoundingBox boundingBox = new BoundingBox(new Vector3(255, 255, 255), new Vector3(0, 0, 0));
 
-            boundingBox.Deconstruct(out var min, out var max);
+            Vector3 min, max;
+
+            boundingBox.Deconstruct(out min, out max);
 
             Assert.AreEqual(min, boundingBox.Min);
             Assert.AreEqual(max, boundingBox.Max);
@@ -182,7 +184,10 @@ namespace MonoGame.Tests.Framework
         {
             BoundingSphere boundingSphere = new BoundingSphere(new Vector3(255, 255, 255), float.MaxValue);
 
-            boundingSphere.Deconstruct(out var center, out var radius);
+            Vector3 center;
+            float radius;
+
+            boundingSphere.Deconstruct(out center, out radius);
 
             Assert.AreEqual(center, boundingSphere.Center);
             Assert.AreEqual(radius, boundingSphere.Radius);
