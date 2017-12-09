@@ -178,7 +178,7 @@ namespace MonoGame.Tests.Framework
         public void Deconstruct()
         {
             Color color = new Color(255, 255, 255);
-            var (r, g, b) = color;
+            color.Deconstruct(out var r, out var g, out var b);
 
             Assert.AreEqual(r, color.R);
             Assert.AreEqual(g, color.G);
@@ -186,7 +186,7 @@ namespace MonoGame.Tests.Framework
 
             Color color2 = new Color(255, 255, 255, 255);
 
-            var (r2, g2, b2, a2) = color2;
+            color2.Deconstruct(out var r2, out var g2, out var b2, out var a2);
 
             Assert.AreEqual(r2, color2.R);
             Assert.AreEqual(g2, color2.G);

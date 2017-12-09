@@ -51,7 +51,8 @@ namespace MonoGame.Tests.Framework
         public void Deconstruct()
         {
             Ray ray = new Ray(Vector3.Backward, Vector3.Right);
-            var (direction, position) = ray;
+
+            ray.Deconstruct(out var direction, out var position);
 
             Assert.AreEqual(direction, ray.Direction);
             Assert.AreEqual(position, ray.Position);

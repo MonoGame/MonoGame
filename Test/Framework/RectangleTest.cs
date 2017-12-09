@@ -260,7 +260,8 @@ namespace MonoGame.Tests.Framework
         public void Deconstruct()
         {
             Rectangle rectangle = new Rectangle(int.MinValue, int.MaxValue, int.MinValue, int.MaxValue);
-            var (x, y, width, height) = rectangle;
+
+            rectangle.Deconstruct(out var x, out var y, out var width, out var height);
 
             Assert.AreEqual(x, rectangle.X);
             Assert.AreEqual(y, rectangle.Y);
