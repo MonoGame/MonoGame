@@ -165,5 +165,25 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(0.0f, value);
             Assert.AreEqual(null, value2);
         }
+
+        [Test]
+        public void BoundingBoxDeconstruct()
+        {
+            BoundingBox boundingBox = new BoundingBox(new Vector3(255, 255, 255), new Vector3(0, 0, 0));
+            var (min, max) = boundingBox;
+
+            Assert.AreEqual(min, boundingBox.Min);
+            Assert.AreEqual(max, boundingBox.Max);
+        }
+
+        [Test]
+        public void BoundingSphereDeconstruct()
+        {
+            BoundingSphere boundingSphere = new BoundingSphere(new Vector3(255, 255, 255), float.MaxValue);
+            var (center, radius) = boundingSphere;
+
+            Assert.AreEqual(center, boundingSphere.Center);
+            Assert.AreEqual(radius, boundingSphere.Radius);
+        }
     }
 }

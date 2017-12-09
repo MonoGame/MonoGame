@@ -46,5 +46,15 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(0.0f, new Ray(center, Vector3.UnitZ).Intersects(box));
             Assert.AreEqual(0.0f, new Ray(center, -Vector3.UnitZ).Intersects(box));
         }
+
+        [Test]
+        public void Deconstruct()
+        {
+            Ray ray = new Ray(Vector3.Backward, Vector3.Right);
+            var (direction, position) = ray;
+
+            Assert.AreEqual(direction, ray.Direction);
+            Assert.AreEqual(position, ray.Position);
+        }
     }
 }
