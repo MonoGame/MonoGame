@@ -185,6 +185,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             BitmapContent.Copy(sourceBitmap, colorBitmap);
 
             var sourceData = colorBitmap.GetPixelData();
+
             /*
             var dataSize = Squish.GetStorageRequirements(colorBitmap.Width, colorBitmap.Height, targetFormat);
             var data = new byte[dataSize];
@@ -193,6 +194,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             SetPixelData(data);
             */
 
+            // Small hack here. NVTT wants 8bit data in BGRA. Flip the B and R channels
+            // again here.
+            GraphicsUtil.BGRAtoRGBA(sourceData);
+
+            var sourceTexture = new TextureSquish.Bitmap(sourceData, sourceBitmap.Width, sourceBitmap.Height);
+
+            // set quality
+            var compressionFlags = TextureSquish.CompressionMode.ColourIterativeClusterFit;
+
+            // use multithreading for faster compression
+            compressionFlags |= TextureSquish.CompressionMode.UseParallelProcessing;
+
+            // set Dxt mode
+            if (outputFormat == Format.DXT1) compressionFlags |= TextureSquish.CompressionMode.Dxt1;
+            if (outputFormat == Format.DXT3) compressionFlags |= TextureSquish.CompressionMode.Dxt3;
+            if (outputFormat == Format.DXT5) compressionFlags |= TextureSquish.CompressionMode.Dxt5;
+
+            // premultiply color by alpha
+            if (outputFormat != Format.DXT1) compressionFlags |= TextureSquish.CompressionMode.WeightColourByAlpha;
+
+            var data = sourceTexture.Compress(compressionFlags);
+            this.SetPixelData(data);
+            
+            /*
             var dxtCompressor = new Compressor();
             var inputOptions = new InputOptions();
             if (outputFormat != Format.DXT1)           
@@ -229,6 +254,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 dataHandle.Free ();
             }
+            */
+
             return true;
         }
 
