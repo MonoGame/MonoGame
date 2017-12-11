@@ -192,11 +192,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var metric = new float[] { 1.0f, 1.0f, 1.0f };
             Squish.CompressImage(sourceData, colorBitmap.Width, colorBitmap.Height, data, targetFormat, metric);
             SetPixelData(data);
-            */
-
-            // Small hack here. NVTT wants 8bit data in BGRA. Flip the B and R channels
-            // again here.
-            GraphicsUtil.BGRAtoRGBA(sourceData);
+            */            
 
             var sourceTexture = new TextureSquish.Bitmap(sourceData, sourceBitmap.Width, sourceBitmap.Height);
 
@@ -209,52 +205,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // set Dxt mode
             if (outputFormat == Format.DXT1) compressionFlags |= TextureSquish.CompressionMode.Dxt1;
             if (outputFormat == Format.DXT3) compressionFlags |= TextureSquish.CompressionMode.Dxt3;
-            if (outputFormat == Format.DXT5) compressionFlags |= TextureSquish.CompressionMode.Dxt5;
-
-            // premultiply color by alpha
-            if (outputFormat != Format.DXT1) compressionFlags |= TextureSquish.CompressionMode.WeightColourByAlpha;
+            if (outputFormat == Format.DXT5) compressionFlags |= TextureSquish.CompressionMode.Dxt5;            
 
             var data = sourceTexture.Compress(compressionFlags);
-            this.SetPixelData(data);
-            
-            /*
-            var dxtCompressor = new Compressor();
-            var inputOptions = new InputOptions();
-            if (outputFormat != Format.DXT1)           
-                inputOptions.SetAlphaMode(AlphaMode.Premultiplied);
-            else
-                inputOptions.SetAlphaMode(AlphaMode.None);
-            inputOptions.SetTextureLayout(TextureType.Texture2D, colorBitmap.Width, colorBitmap.Height, 1);
-
-            // Small hack here. NVTT wants 8bit data in BGRA. Flip the B and R channels
-            // again here.
-            GraphicsUtil.BGRAtoRGBA(sourceData);
-            var dataHandle = GCHandle.Alloc(sourceData, GCHandleType.Pinned);
-            try
-            {
-                var dataPtr = dataHandle.AddrOfPinnedObject();
-
-                inputOptions.SetMipmapData(dataPtr, colorBitmap.Width, colorBitmap.Height, 1, 0, 0);
-                inputOptions.SetMipmapGeneration(false);
-                inputOptions.SetGamma(1.0f, 1.0f);
-                
-                var compressionOptions = new CompressionOptions();
-                compressionOptions.SetFormat(outputFormat);
-                compressionOptions.SetQuality(Quality.Normal);
-
-                var outputOptions = new OutputOptions();
-                outputOptions.SetOutputHeader(false);
-
-                using (var handler = new DxtDataHandler(this, outputOptions))
-                {                    
-                    dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
-                }
-            }
-            finally
-            {
-                dataHandle.Free ();
-            }
-            */
+            this.SetPixelData(data);            
 
             return true;
         }
