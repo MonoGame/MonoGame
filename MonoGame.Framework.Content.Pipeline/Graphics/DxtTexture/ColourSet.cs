@@ -87,11 +87,11 @@ namespace TextureSquish
                 m_weights[i] = (float)Math.Sqrt(m_weights[i]);
         }
 
-        public int Count => m_count;
-        public Vec3[] Points => m_points;
-        public float[] Weights => m_weights;
+        public int Count { get { return m_count; } }
+        public Vec3[] Points { get { return m_points; } }
+        public float[] Weights { get { return m_weights; } }
 
-        public bool IsTransparent => m_transparent;
+        public bool IsTransparent { get { return m_transparent; } }
 
         public void RemapIndices(Byte[] source, Byte[] target)
         {

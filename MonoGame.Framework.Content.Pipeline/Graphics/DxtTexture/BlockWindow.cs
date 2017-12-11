@@ -22,7 +22,7 @@ namespace TextureSquish
 
         public int Offset { get; set; }
 
-        public int ByteLength => _BytesPerBlock;
+        public int ByteLength { get { return _BytesPerBlock; } }
 
         public Byte this[int index]
         {

@@ -32,10 +32,10 @@ namespace TextureSquish
         private readonly int _Width;
         private readonly int _Height;
 
-        public int Width => _Width;
-        public int Height => _Height;
+        public int Width { get { return _Width; } }
+        public int Height { get { return _Height; } }
 
-        public Byte[] Data => _Data;
+        public Byte[] Data { get { return _Data; } }
 
         public UInt32 this[int x, int y]
         {
