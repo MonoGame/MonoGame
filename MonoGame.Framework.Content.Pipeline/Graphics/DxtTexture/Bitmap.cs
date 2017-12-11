@@ -202,6 +202,8 @@ namespace TextureSquish
             // if the number of chunks to process is not very large, we better skip parallel processing
             if (block_width * block_height < 16) flags &= ~CompressionMode.UseParallelProcessing;
 
+            
+
             if ((flags & CompressionMode.UseParallelProcessing) != 0)
             {
                 System.Threading.Tasks.Parallel.For
@@ -218,9 +220,11 @@ namespace TextureSquish
                             // build the 4x4 block of pixels
                             var sourceRgba = new Byte[16 * 4];
 
+                            int mask;
+
                             for (int x = 0; x < block_width; x++)
                             {
-                                srcImage.CopyBlockTo(x*4, y*4, sourceRgba, out int mask);
+                                srcImage.CopyBlockTo(x*4, y*4, sourceRgba, out mask);
 
                                 // compress it into the output
                                 block.CompressMasked(sourceRgba, mask, flags);
@@ -239,12 +243,15 @@ namespace TextureSquish
                 // build the 4x4 block of pixels
                 var sourceRgba = new Byte[16 * 4];
 
+                int mask;
+
                 // loop over blocks
                 for (int y = 0; y < block_height; ++y)
                 {
                     for (int x = 0; x < block_width; ++x)
                     {
-                        srcImage.CopyBlockTo(x*4, y*4, sourceRgba, out int mask);
+                        
+                        srcImage.CopyBlockTo(x*4, y*4, sourceRgba, out mask);
 
                         // compress it into the output
                         block.CompressMasked(sourceRgba, mask, flags);
