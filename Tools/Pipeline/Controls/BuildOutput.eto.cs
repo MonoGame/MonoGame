@@ -13,7 +13,6 @@ namespace MonoGame.Tools.Pipeline
         TextArea textArea;
         Scrollable scrollable;
         Drawable drawable;
-        Eto.Drawing.Point scrollPosition;
 
         private void InitializeComponent()
         {
@@ -32,8 +31,6 @@ namespace MonoGame.Tools.Pipeline
             drawable = new Drawable();
             scrollable.Content = drawable;
 
-            scrollable.Scroll += Scrollable1_Scroll1;
-
             panel.Content = textArea;
             CreateContent(panel);
 
@@ -44,11 +41,6 @@ namespace MonoGame.Tools.Pipeline
             drawable.Paint += Drawable_Paint;
             scrollable.SizeChanged += Scrollable1_SizeChanged;
             scrollable.Scroll += Scrollable1_Scroll;
-        }
-
-        private void Scrollable1_Scroll1(object sender, ScrollEventArgs e)
-        {
-            scrollPosition = scrollable.ScrollPosition;
         }
     }
 }
