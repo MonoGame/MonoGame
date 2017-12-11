@@ -154,27 +154,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            //SquishFlags targetFormat = SquishFlags.ColourClusterFit;
-            Format outputFormat = Format.DXT1;
+            // set squish format
+            TextureSquish.CompressionMode outputFormat = TextureSquish.CompressionMode.Dxt1;
             switch (format)
             {
                 case SurfaceFormat.Dxt1:
-                    outputFormat = Format.DXT1;
+                    outputFormat = TextureSquish.CompressionMode.Dxt1;
                     break;
                 case SurfaceFormat.Dxt1SRgb:
-                    outputFormat = Format.DXT1;
+                    outputFormat = TextureSquish.CompressionMode.Dxt1;
                     break;
                 case SurfaceFormat.Dxt3:
-                    outputFormat = Format.DXT3;
+                    outputFormat = TextureSquish.CompressionMode.Dxt3;
                     break;
                 case SurfaceFormat.Dxt3SRgb:
-                    outputFormat = Format.DXT3;
+                    outputFormat = TextureSquish.CompressionMode.Dxt3;
                     break;
                 case SurfaceFormat.Dxt5:
-                    outputFormat = Format.DXT5;
+                    outputFormat = TextureSquish.CompressionMode.Dxt5;
                     break;
                 case SurfaceFormat.Dxt5SRgb:
-                    outputFormat = Format.DXT5;
+                    outputFormat = TextureSquish.CompressionMode.Dxt5;
                     break;
                 default:
                     return false;
@@ -182,32 +182,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // libsquish requires RGBA8888
             var colorBitmap = new PixelBitmapContent<Color>(sourceBitmap.Width, sourceBitmap.Height);
-            BitmapContent.Copy(sourceBitmap, colorBitmap);
+            BitmapContent.Copy(sourceBitmap, colorBitmap);            
 
-            var sourceData = colorBitmap.GetPixelData();
-
-            /*
-            var dataSize = Squish.GetStorageRequirements(colorBitmap.Width, colorBitmap.Height, targetFormat);
-            var data = new byte[dataSize];
-            var metric = new float[] { 1.0f, 1.0f, 1.0f };
-            Squish.CompressImage(sourceData, colorBitmap.Width, colorBitmap.Height, data, targetFormat, metric);
-            SetPixelData(data);
-            */            
-
-            var sourceTexture = new TextureSquish.Bitmap(sourceData, sourceBitmap.Width, sourceBitmap.Height);
+            var sourceTexture = new TextureSquish.Bitmap(colorBitmap.GetPixelData(), sourceBitmap.Width, sourceBitmap.Height);            
 
             // set quality
-            var compressionFlags = TextureSquish.CompressionMode.ColourIterativeClusterFit;
+            outputFormat |= TextureSquish.CompressionMode.ColourIterativeClusterFit;
 
             // use multithreading for faster compression
-            compressionFlags |= TextureSquish.CompressionMode.UseParallelProcessing;
+            outputFormat |= TextureSquish.CompressionMode.UseParallelProcessing;            
 
-            // set Dxt mode
-            if (outputFormat == Format.DXT1) compressionFlags |= TextureSquish.CompressionMode.Dxt1;
-            if (outputFormat == Format.DXT3) compressionFlags |= TextureSquish.CompressionMode.Dxt3;
-            if (outputFormat == Format.DXT5) compressionFlags |= TextureSquish.CompressionMode.Dxt5;            
-
-            var data = sourceTexture.Compress(compressionFlags);
+            var data = sourceTexture.Compress(outputFormat);
             this.SetPixelData(data);            
 
             return true;
