@@ -8,8 +8,8 @@ namespace TextureSquish
     {
         public Bitmap(int width, int height)
         {
-            if (width <= 0) throw new ArgumentOutOfRangeException(nameof(width));
-            if (height <= 0) throw new ArgumentOutOfRangeException(nameof(height));
+            if (width <= 0) throw new ArgumentOutOfRangeException("width");
+            if (height <= 0) throw new ArgumentOutOfRangeException("height");
 
             _Width = width;
             _Height = height;
@@ -18,10 +18,10 @@ namespace TextureSquish
 
         public Bitmap(Byte[] rgba, int width, int height)
         {
-            if (rgba == null) throw new ArgumentNullException(nameof(rgba));
-            if (width <= 0) throw new ArgumentOutOfRangeException(nameof(width));
-            if (height <= 0) throw new ArgumentOutOfRangeException(nameof(height));
-            if (rgba.Length < (width * height * 4)) throw new ArgumentException(nameof(rgba));
+            if (rgba == null) throw new ArgumentNullException("rgba");
+            if (width <= 0) throw new ArgumentOutOfRangeException("width");
+            if (height <= 0) throw new ArgumentOutOfRangeException("height");
+            if (rgba.Length < (width * height * 4)) throw new ArgumentException("rgba");
 
             _Data = rgba;
             _Width = width;

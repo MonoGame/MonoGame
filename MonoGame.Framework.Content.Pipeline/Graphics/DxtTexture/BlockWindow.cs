@@ -542,7 +542,7 @@ namespace TextureSquish
         /// <param name="flags">Compression flags.</param>
         public void CompressMasked(Byte[] rgba, int mask, CompressionMode flags)
         {
-            System.Diagnostics.Debug.Assert(rgba != null && rgba.Length == 64, nameof(rgba));
+            System.Diagnostics.Debug.Assert(rgba != null && rgba.Length == 64, "rgba");
 
             // fix any bad flags
             flags = flags.FixFlags();
@@ -592,7 +592,7 @@ namespace TextureSquish
         /// <param name="flags">Compression flags.</param>
         public void Decompress(Byte[] rgba, CompressionMode flags)
         {
-            System.Diagnostics.Debug.Assert(rgba != null && rgba.Length == 64, nameof(rgba));
+            System.Diagnostics.Debug.Assert(rgba != null && rgba.Length == 64, "rgba");
 
             // fix any bad flags
             flags = flags.FixFlags();
