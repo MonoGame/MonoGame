@@ -4,90 +4,9 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
-using PVRTexLibNET;
-using Nvidia.TextureTools;
-using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    class DxtDataHandler: IDisposable
-    {
-        private BitmapContent _content;
-        byte[] _buffer;
-        int _offset;
-        
-        GCHandle delegateHandleBeginImage;
-        GCHandle delegateHandleWriteData;
-
-        public OutputOptions.WriteDataDelegate WriteData { get; private set; }
-        public OutputOptions.ImageDelegate BeginImage { get; private set; }
-
-        public DxtDataHandler(BitmapContent content, OutputOptions outputOptions)
-        {
-            _content = content;
-
-            WriteData = new OutputOptions.WriteDataDelegate(WriteDataInternal);
-            BeginImage = new OutputOptions.ImageDelegate(BeginImageInternal);
-
-            // Keep the delegate from being re-located or collected by the garbage collector.
-            delegateHandleBeginImage = GCHandle.Alloc(BeginImage);
-            delegateHandleWriteData = GCHandle.Alloc(WriteData);
-
-            outputOptions.SetOutputHandler(BeginImage, WriteData);
-        }
-
-        ~DxtDataHandler()
-        {
-           Dispose(false);
-        }
-
-        void BeginImageInternal(int size, int width, int height, int depth, int face, int miplevel)
-        {
-            _buffer = new byte[size];
-            _offset = 0;
-        }
-
-        bool WriteDataInternal(IntPtr data, int length)
-        {
-            Marshal.Copy(data, _buffer, _offset, length);
-            _offset += length;
-            if (_offset == _buffer.Length)
-                _content.SetPixelData(_buffer);
-            return true;
-        }
-
-        #region IDisposable Support
-        private bool disposed = false;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    // Release managed objects
-                    // ...
-                }
-
-                // Release native objects
-                delegateHandleBeginImage.Free();
-                delegateHandleWriteData.Free();
-
-                disposed = true;
-            }
-        }
-        
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion
-    }
-
     public abstract class DxtBitmapContent : BitmapContent
     {
         internal byte[] _bitmapData;
