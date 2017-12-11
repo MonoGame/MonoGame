@@ -21,7 +21,7 @@ namespace MonoGame.Tools.Pipeline
         private CheckCommand _cmdFilterOutput, _cmdAutoScroll, _cmdShowSkipped, _cmdShowSuccessful, _cmdShowCleaned;
         private Image _iconInformation, _iconFail, _iconProcessing, _iconSkip, _iconSucceed, _iconSucceedWithWarnings, _iconStart, _iconEndSucceed, _iconEndFailed;
         private BuildItem _selectedItem;
-        Eto.Drawing.Point _scrollPosition;
+        private Eto.Drawing.Point _scrollPosition;
 
         public BuildOutput()
         {
