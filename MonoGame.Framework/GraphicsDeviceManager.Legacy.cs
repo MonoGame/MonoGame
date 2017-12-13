@@ -116,6 +116,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> DeviceDisposing;
         public event EventHandler<EventArgs> DeviceReset;
         public event EventHandler<EventArgs> DeviceResetting;
+        public event EventHandler<EventArgs> DeviceRecreated;
         public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
 
         // FIXME: Why does the GraphicsDeviceManager not know enough about the
@@ -144,6 +145,13 @@ namespace Microsoft.Xna.Framework
         internal void OnDeviceCreated(EventArgs e)
         {
             EventHelpers.Raise(this, DeviceCreated, e);
+        }
+
+        // FIXME: Why does the GraphicsDeviceManager not know enough about the
+        //        GraphicsDevice to raise these events without help?
+        internal void OnDeviceRecreated(EventArgs e)
+        {
+            EventHelpers.Raise(this, DeviceRecreated, e);
         }
 
         #endregion

@@ -662,6 +662,15 @@ namespace Microsoft.Xna.Framework.Graphics
             EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// Trigger the DeviceRecreated event to allow games to be notified of a device recreation (fully lost content).
+        /// Currently internal to allow the various platforms to send the event at the appropriate time.
+        /// </summary>
+        internal void OnDeviceRecreated()
+        {
+            EventHelpers.Raise(this, DeviceRecreated, EventArgs.Empty);
+        }
+
         public DisplayMode DisplayMode
         {
             get
