@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
-namespace TwoMGFX
+namespace TwoMGFX.TPGParser
 {
     #region Scanner
 

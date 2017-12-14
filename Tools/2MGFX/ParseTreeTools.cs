@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Xna.Framework;
 
-namespace TwoMGFX
+namespace TwoMGFX.TPGParser
 {
 	public static class ParseTreeTools
 	{

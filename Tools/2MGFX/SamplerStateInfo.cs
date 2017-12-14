@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace TwoMGFX
+namespace TwoMGFX.TPGParser
 {
     public class SamplerStateInfo
     {
