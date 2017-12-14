@@ -201,6 +201,7 @@
     <Compile Include="ShaderProfile.cs" />
     <Compile Include="ShaderProfile.OpenGL.cs" />
     <Compile Include="ShaderProfile.DirectX.cs" />
+    <Compile Include="ShaderResult.cs" />
     <Compile Include="TechniqueInfo.cs" />
     <Compile Include="TextureFilterType.cs" />
 

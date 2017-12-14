@@ -296,6 +296,10 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderProfile.DirectX.cs</Link>
     </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderResult.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ShaderResult.cs</Link>
+    </Compile>
     <Compile Include="..\Tools\2MGFX\TechniqueInfo.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\TechniqueInfo.cs</Link>
