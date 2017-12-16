@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal">
+<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Windows,WindowsGL,WindowsUniversal">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
@@ -14,9 +14,7 @@
 	<Platform Name="Linux">1B738549-0449-4504-B978-7BFC347E3F3C</Platform>
 	<Platform Name="MacOS">1294038B-66C2-4359-AFE9-EA06A758CA94</Platform>
 	<Platform Name="Windows">87A71215-7CAC-4B80-9D43-1700DECFB828</Platform>
-	<Platform Name="Windows8">A65B8326-1DDD-4E5D-8130-E74F70919E81</Platform>
 	<Platform Name="WindowsGL">6D6009F4-0AFB-4806-89D7-7945F20270F5</Platform>
-    <Platform Name="WindowsPhone81">423e2b58-4fbb-4a5d-8a86-1188f2889523</Platform>
     <Platform Name="WindowsUniversal">9CE2FA93-3D41-4025-B228-3D9D81F19BE0</Platform>
   </ProjectGuids>
 
@@ -43,18 +41,10 @@
       <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL;NET;DESKTOPGL</Platform>
       <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL;NET</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION;NET</Platform>
-      <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE;NET</Platform>
       <Platform Name="WindowsGL">TRACE;WINDOWS;OPENGL;OPENAL;NET;DESKTOPGL</Platform>
-      <Platform Name="WindowsPhone81">TRACE;WINRT;WINDOWS_PHONE81;DIRECTX;WINDOWS_STOREAPP</Platform>
       <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>		
     </CustomDefinitions>
 	
-    <FrameworkVersions>
-	  <Platform Name="Windows8">
-	    <Version>v4.5.1</Version>
-	  </Platform>
-    </FrameworkVersions>
-
   </Properties>
 
   <Files>
@@ -97,94 +87,94 @@
  
     <!-- Microsoft.Xna.Framework.Net -->
     <Compile Include="Net\AvailableNetworkSessionCollection.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\AvailableNetworkSession.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandEvent.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandEventType.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandGamerJoined.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandGamerLeft.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandGamerStateChange.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandReceiveData.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandSendData.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandSessionStateChange.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\GamerStates.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\ICommand.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\LocalNetworkGamer.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\MonoGamerPeer.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkException.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkGamer.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkMachine.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkMessageType.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkNotAvailableException.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSession.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionEndReason.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionJoinError.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionJoinException.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionProperties.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionState.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionType.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\PacketReader.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\PacketWriter.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\QualityOfService.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\SendDataOptions.cs">
-      <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
 
     <!-- Android Platform -->
@@ -254,14 +244,14 @@
     </Compile>
 
 
-    <!-- Windows 8 Platform -->
-    <Compile Include="Windows8\GamerServices\SignedInGamer.cs">
-      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+    <!-- Windows Universal Platform -->
+    <Compile Include="WindowsUniversal\GamerServices\SignedInGamer.cs">
+      <Platforms>WindowsUniversal</Platforms>
     </Compile>
 
     <!-- Windows Desktop Platform -->
     <Compile Include="Windows\GamerServices\Guide.cs">
-      <Platforms>Windows8,Windows,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Windows,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Windows\GamerServices\MonoGameGamerServicesHelper.cs">
       <Platforms>Windows</Platforms>

@@ -54,6 +54,9 @@ namespace Microsoft.Xna.Framework.Content
 
         public ContentTypeReader GetTypeReader(Type targetType)
         {
+            if (targetType.IsArray && targetType.GetArrayRank() > 1)
+                targetType = typeof(Array);
+
             ContentTypeReader reader;
             if (_contentReaders.TryGetValue(targetType, out reader))
                 return reader;
@@ -116,7 +119,7 @@ namespace Microsoft.Xna.Framework.Content
 
                 // At the moment the Video class doesn't exist
                 // on all platforms... Allow it to compile anyway.
-#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL) || (WINRT && !WINDOWS_PHONE)
+#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL) || WINDOWS_UAP
                 var hVideoReader = new VideoReader();
 #endif
             }
@@ -190,7 +193,8 @@ namespace Microsoft.Xna.Framework.Content
 
                     var targetType = contentReaders[i].TargetType;
                     if (targetType != null)
-                      _contentReaders.Add(targetType, contentReaders[i]);
+                        if (!_contentReaders.ContainsKey(targetType))
+                            _contentReaders.Add(targetType, contentReaders[i]);
 
                     // I think the next 4 bytes refer to the "Version" of the type reader,
                     // although it always seems to be zero

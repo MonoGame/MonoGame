@@ -300,6 +300,28 @@ internal static class Sdl
             public int Data2;
         }
 
+        public enum SysWMType
+        {
+            Unknow,
+            Windows,
+            X11,
+            Directfb,
+            Cocoa,
+            UiKit,
+            Wayland,
+            Mir,
+            WinRt,
+            Android
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SDL_SysWMinfo
+        {
+            public Version version;
+            public SysWMType subsystem;
+            public IntPtr window;
+        }
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CreateWindow")]
         private static extern IntPtr SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
 
@@ -357,6 +379,9 @@ internal static class Sdl
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_ShowWindow")]
         public static extern void Show(IntPtr window);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowWMInfo")]
+        public static extern bool GetWindowWMInfo(IntPtr window, ref SDL_SysWMinfo sysWMinfo);
     }
 
     public static class Display

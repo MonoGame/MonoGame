@@ -648,7 +648,7 @@ namespace TwoMGFX
         }
 
 
-        static public EffectObject CompileEffect(ShaderInfo shaderInfo, out string errorsAndWarnings)
+        static public EffectObject CompileEffect(ShaderResult shaderResult, out string errorsAndWarnings)
         {
             var effect = new EffectObject();
             errorsAndWarnings = string.Empty;
@@ -659,6 +659,7 @@ namespace TwoMGFX
 
             // Go thru the techniques and that will find all the 
             // shaders and constant buffers.
+            var shaderInfo = shaderResult.ShaderInfo;
             effect.Techniques = new d3dx_technique[shaderInfo.Techniques.Count];
             for (var t = 0; t < shaderInfo.Techniques.Count; t++)
             {
@@ -683,18 +684,18 @@ namespace TwoMGFX
                     pass.state_count = 0;
                     var tempstate = new d3dx_state[2];
 
-                    shaderInfo.Profile.ValidateShaderModels(pinfo);
+                    shaderResult.Profile.ValidateShaderModels(pinfo);
 
                     if (!string.IsNullOrEmpty(pinfo.psFunction))
                     {
                         pass.state_count += 1;
-                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderInfo, pinfo.psFunction, pinfo.psModel, false, ref errorsAndWarnings);
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.psFunction, pinfo.psModel, false, ref errorsAndWarnings);
                     }
 
                     if (!string.IsNullOrEmpty(pinfo.vsFunction))
                     {
                         pass.state_count += 1;
-                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderInfo, pinfo.vsFunction, pinfo.vsModel, true, ref errorsAndWarnings);
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.vsFunction, pinfo.vsModel, true, ref errorsAndWarnings);
                     }
 
                     pass.states = new d3dx_state[pass.state_count];
@@ -792,10 +793,10 @@ namespace TwoMGFX
         }
 
 
-        private d3dx_state CreateShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader, ref string errorsAndWarnings)
+        private d3dx_state CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader, ref string errorsAndWarnings)
         {
             // Compile and create the shader.
-            var shaderData = shaderInfo.Profile.CreateShader(shaderInfo, shaderFunction, shaderProfile, isVertexShader, this, ref errorsAndWarnings);
+            var shaderData = shaderResult.Profile.CreateShader(shaderResult, shaderFunction, shaderProfile, isVertexShader, this, ref errorsAndWarnings);
 
             var state = new d3dx_state();
             state.index = 0;

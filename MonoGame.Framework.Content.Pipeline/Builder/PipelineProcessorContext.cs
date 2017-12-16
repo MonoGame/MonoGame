@@ -34,6 +34,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public override ContentBuildLogger Logger { get { return _manager.Logger; } }
 
+        public override ContentIdentity SourceIdentity { get { return new ContentIdentity(_pipelineEvent.SourceFile); } }
+
         public override void AddDependency(string filename)
         {
             _pipelineEvent.Dependencies.AddUnique(filename);

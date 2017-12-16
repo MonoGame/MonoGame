@@ -11,6 +11,7 @@ using System.Reflection;
 using Assimp;
 using Assimp.Unmanaged;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -224,17 +225,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
             _context = context;
-#if LINUX
-			var targetDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
 
-			try
-			{
-				AssimpLibrary.Instance.LoadLibrary(
-					Path.Combine(targetDir, "libassimp.so"), 
-					Path.Combine(targetDir, "libassimp.so"));
-			}
-			catch { }
-#endif
+            if (CurrentPlatform.OS == OS.Linux)
+            {
+                var targetDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+
+                try
+                {
+                    AssimpLibrary.Instance.LoadLibrary(
+                        Path.Combine(targetDir, "libassimp.so"),
+                        Path.Combine(targetDir, "libassimp.so"));
+                }
+                catch { }
+            }
 
             _identity = new ContentIdentity(filename, string.IsNullOrEmpty(ImporterName) ? GetType().Name : ImporterName);
 

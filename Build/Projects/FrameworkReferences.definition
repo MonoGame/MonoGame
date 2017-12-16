@@ -5,14 +5,12 @@
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="OpenTK-1.0" />
   </Platform>
   <Platform Type="tvOS">
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="OpenTK-1.0" />
   </Platform>
   <Platform Type="Linux">
     <Reference Include="System" />
@@ -25,12 +23,6 @@
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
       <Reference Include="System.Drawing" />
-      <Binary
-        Name="Tao.Sdl"
-        Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
-      <Binary
-        Name="OpenTK"
-        Path="ThirdParty/Dependencies/OpenTK.dll" />
     </Service>
   </Platform>
 
@@ -38,7 +30,6 @@
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="mscorlib" />
-    <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />
   </Platform>
 
@@ -55,25 +46,25 @@
       <Reference Include="System.Xml" />
       <Binary
         Name="SharpDX"
-        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/net40/SharpDX.dll" />
       <Binary
         Name="SharpDX.Direct2D1"
-        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.Direct2D1.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/SharpDX.Direct2D1.dll" />
       <Binary
         Name="SharpDX.Direct3D11"
-        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.Direct3D11.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/SharpDX.Direct3D11.dll" />
       <Binary
         Name="SharpDX.DXGI"
-        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.DXGI.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/SharpDX.DXGI.dll" />
       <Binary
         Name="SharpDX.MediaFoundation"
-        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.MediaFoundation.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/net40/SharpDX.MediaFoundation.dll" />
       <Binary
         Name="SharpDX.XAudio2"
-        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.XAudio2.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/net40/SharpDX.XAudio2.dll" />
       <Binary
         Name="SharpDX.XInput"
-        Path="ThirdParty/Dependencies/SharpDX/Desktop/SharpDX.XInput.dll" />
+        Path="ThirdParty/Dependencies/SharpDX/net40/SharpDX.XInput.dll" />
     </Service>
 
     <Service Name="MonoGame.Framework/OpenGLGraphics">
@@ -83,33 +74,6 @@
       <Reference Include="System.Windows.Forms" />
       <Reference Include="System.Xml" />
     </Service>
-  </Platform>
-
-  <Platform Type="Windows8">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-	
-    <Binary
-      Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.dll" />
-    <Binary
-      Name="SharpDX.Direct2D1"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct2D1.dll" />
-    <Binary
-      Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct3D11.dll" />
-    <Binary
-      Name="SharpDX.DXGI"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.DXGI.dll" />
-    <Binary
-      Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.MediaFoundation.dll" />
-    <Binary
-      Name="SharpDX.XAudio2"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.XAudio2.dll" />
-    <Binary
-      Name="SharpDX.XInput"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.XInput.dll" />
   </Platform>
 
   <Platform Type="WindowsGL">
@@ -125,52 +89,25 @@
     </Service>
   </Platform>
 
-  <Platform Type="WindowsPhone81">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-	
-    <Binary
-      Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.dll" />
-    <Binary
-      Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct2D1.dll" />
-    <Binary
-      Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.DXGI.dll" />
-    <Binary
-      Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct3D11.dll" />
-    <Binary
-      Name="SharpDX.DXGI"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.DXGI.dll" />
-    <Binary
-      Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.MediaFoundation.dll" />
-    <Binary
-      Name="SharpDX.XAudio2"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.XAudio2.dll" />
-  </Platform>
-	
   <Platform Type="WindowsUniversal">
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/uap10.0/SharpDX.dll" />
     <Binary
       Name="SharpDX.Direct2D1"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct2D1.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/SharpDX.Direct2D1.dll" />
     <Binary
       Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.Direct3D11.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/SharpDX.Direct3D11.dll" />
     <Binary
       Name="SharpDX.DXGI"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.DXGI.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/SharpDX.DXGI.dll" />
     <Binary
       Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.MediaFoundation.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/uap10.0/SharpDX.MediaFoundation.dll" />
     <Binary
       Name="SharpDX.XAudio2"
-      Path="ThirdParty/Dependencies/SharpDX/StoreApp/SharpDX.XAudio2.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/uap10.0/SharpDX.XAudio2.dll" />
   </Platform>
 	
   <Platform Type="Web">

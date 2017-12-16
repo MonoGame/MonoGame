@@ -44,11 +44,11 @@ namespace TwoMGFX
             }
         }
 
-        internal override ShaderData CreateShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings)
+        internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings)
         {
             // For now GLSL is only supported via translation
             // using MojoShader which works from HLSL bytecode.
-            var bytecode = EffectObject.CompileHLSL(shaderInfo, shaderFunction, shaderProfile, ref errorsAndWarnings);
+            var bytecode = EffectObject.CompileHLSL(shaderResult, shaderFunction, shaderProfile, ref errorsAndWarnings);
 
             // First look to see if we already created this same shader.
             foreach (var shader in effect.Shaders)
@@ -57,7 +57,8 @@ namespace TwoMGFX
                     return shader;
             }
 
-            var shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
+            var shaderInfo = shaderResult.ShaderInfo;
+            var shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);
             effect.Shaders.Add(shaderData);
 
             return shaderData;

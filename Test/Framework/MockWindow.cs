@@ -18,7 +18,7 @@ namespace MonoGame.Tests.Framework
         }
 
         // TODO: Make this common so that all platforms have it!
-#if (WINDOWS && !WINRT) || LINUX
+#if (WINDOWS && !WINDOWS_UAP) || LINUX
         public override Point Position { get; set; }
 #endif
 

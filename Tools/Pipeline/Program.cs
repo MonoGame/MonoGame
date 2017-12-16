@@ -29,6 +29,10 @@ namespace MonoGame.Tools.Pipeline
             var win = new MainWindow();
             var controller = PipelineController.Create(win);
 
+#if LINUX
+            Gtk3Wrapper.gtk_application_add_window(Global.ApplicationHandle, win.NativeHandle);
+#endif
+
             string project = null;
 
             if (Global.Unix && !Global.Linux)

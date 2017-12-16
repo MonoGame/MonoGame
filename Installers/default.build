@@ -94,6 +94,11 @@
                 <include name="MonoGame.Common.props"/>
          </fileset>
       </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}">
+         <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
+                <include name="MonoGame.Build.Tasks.dll"/>
+         </fileset>
+      </copy>
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS">
          <fileset basedir="../MonoGame.Framework/bin/iOS/iPhoneSimulator/Release">
                 <include name="*.*"/>
@@ -177,6 +182,7 @@ fi
       <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="Linux/tmp_run/Main/MonoDevelop.MonoGame.mpack" overwrite="true"/>
       <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets" tofile="Linux/tmp_run/MonoGameSDK/MonoGame.Content.Builder.targets"/>
       <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Common.props" tofile="Linux/tmp_run/MonoGameSDK/MonoGame.Common.props"/>
+      <copy file="../Tools/Pipeline/bin/Linux/AnyCPU/Release/MonoGame.Build.Tasks.dll" tofile="Linux/tmp_run/MonoGameSDK/MonoGame.Build.Tasks.dll"/>
       <copy todir="Linux/tmp_run/MonoGameSDK/Tools">
         <fileset basedir="../Tools/Pipeline/bin/Linux/AnyCPU/Release"/>
       </copy>

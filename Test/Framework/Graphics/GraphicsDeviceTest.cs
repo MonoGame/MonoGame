@@ -785,5 +785,48 @@ namespace MonoGame.Tests.Graphics
             vb2.Dispose();
         }
 #endif
+
+        private static Rectangle?[] BackBufferRects()
+        {
+            return new Rectangle?[]
+            {
+                null,
+                new Rectangle(100, 100, 250, 250),
+            };
+        }
+
+        [TestCaseSource("BackBufferRects")]
+        public void GetBackBufferData(Rectangle? rectangle)
+        {
+            gd.Clear(Color.CornflowerBlue);
+
+            Rectangle rect;
+            if (rectangle == null)
+                rect = gd.Viewport.Bounds;
+            else
+                rect = rectangle.Value;
+
+            var tex = content.Load<Texture2D>(Paths.Texture("Surge"));
+            var sb = new SpriteBatch(gd);
+
+            sb.Begin();
+            sb.Draw(tex, new Rectangle(150, 150, 300, 300), Color.White);
+            sb.End();
+
+            var buffer = new Color[rect.Width * rect.Height];
+            gd.GetBackBufferData(rect, buffer, 0, rect.Width * rect.Height);
+
+            var backbufferTex = new Texture2D(gd, rect.Width, rect.Height);
+            backbufferTex.SetData(buffer);
+
+            PrepareFrameCapture();
+            gd.Clear(Color.Red);
+
+            sb.Begin();
+            sb.Draw(backbufferTex, rect, Color.White);
+            sb.End();
+
+            CheckFrames();
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework
                 case PresentInterval.One:
                 case PresentInterval.Two:
                 default:
-#if WINRT
+#if WINDOWS_UAP
                     effect = SharpDX.DXGI.SwapEffect.FlipSequential;
 #else
                     effect = SharpDX.DXGI.SwapEffect.Discard;
@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework
                 case SurfaceFormat.Bgra5551:
                     return SharpDX.DXGI.Format.B5G5R5A1_UNorm;
                 case SurfaceFormat.Bgra4444:
-#if WINRT
+#if WINDOWS_UAP
                     return SharpDX.DXGI.Format.B4G4R4A4_UNorm;
 #else
                     return (SharpDX.DXGI.Format)115;
