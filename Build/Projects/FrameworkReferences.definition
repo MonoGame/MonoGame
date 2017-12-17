@@ -15,6 +15,16 @@
   <Platform Type="Linux">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
+
+    <Service Name="MonoGame.Framework/OpenALAudio">
+      <NativeBinary Path="ThirdParty/Dependencies/openal-soft/Linux/x86/libopenal.so.1" Anchor="x86" />
+      <NativeBinary Path="ThirdParty/Dependencies/openal-soft/Linux/x64/libopenal.so.1" Anchor="x64" />
+    </Service>
+
+    <Service Name="MonoGame.Framework/SDLWindowing">
+      <NativeBinary Path="ThirdParty/Dependencies/SDL/Linux/x86/libSDL2-2.0.so.0" Anchor="x86" />
+      <NativeBinary Path="ThirdParty/Dependencies/SDL/Linux/x64/libSDL2-2.0.so.0" Anchor="x64" />
+    </Service>
   </Platform>
 
   <Platform Type="MacOS">
@@ -23,6 +33,14 @@
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
       <Reference Include="System.Drawing" />
+    </Service>
+
+    <Service Name="MonoGame.Framework/OpenALAudio">
+      <NativeBinary Include="ThirdParty/Dependencies/openal-soft/MacOS/Universal/libopenal.1.dylib" />
+    </Service>
+
+    <Service Name="MonoGame.Framework/SDLWindowing">
+      <NativeBinary Include="ThirdParty/Dependencies/SDL/MacOS/Universal/libSDL2-2.0.0.dylib" />
     </Service>
   </Platform>
 
@@ -74,6 +92,16 @@
       <Reference Include="System.Windows.Forms" />
       <Reference Include="System.Xml" />
     </Service>
+
+    <Service Name="MonoGame.Framework/OpenALAudio">
+      <NativeBinary Path="ThirdParty/Dependencies/openal-soft/Windows/x86/soft_oal.dll" />
+      <NativeBinary Path="ThirdParty/Dependencies/openal-soft/Windows/x64/soft_oal.dll" />
+    </Service>
+
+    <Service Name="MonoGame.Framework/SDLWindowing">
+      <NativeBinary Path="ThirdParty/Dependencies/SDL/Windows/x86/SDL2.dll" />
+      <NativeBinary Path="ThirdParty/Dependencies/SDL/Windows/x64/SDL2.dll" />
+    </Service>
   </Platform>
 
   <Platform Type="WindowsGL">
@@ -86,6 +114,16 @@
       <Reference Include="System.Web.Services" />
       <Reference Include="System.Windows.Forms" />
       <Reference Include="System.Xml" />
+    </Service>
+
+    <Service Name="MonoGame.Framework/OpenALAudio">
+      <NativeBinary Path="ThirdParty/Dependencies/openal-soft/Windows/x86/soft_oal.dll" Anchor="x86" />
+      <NativeBinary Path="ThirdParty/Dependencies/openal-soft/Windows/x64/soft_oal.dll" Anchor="x64" />
+    </Service>
+
+    <Service Name="MonoGame.Framework/SDLWindowing">
+      <NativeBinary Path="ThirdParty/Dependencies/SDL/Windows/x86/SDL2.dll" Anchor="x86" />
+      <NativeBinary Path="ThirdParty/Dependencies/SDL/Windows/x64/SDL2.dll" Anchor="x64" />
     </Service>
   </Platform>
 
@@ -122,6 +160,22 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+  </Service>
+
+
+  <!-- DesktopGL builds should be able to run on all desktop platforms, so we include all native binaries -->
+  <Service Name="MonoGame.Framework/DesktopGL">
+    <NativeBinary Path="ThirdParty/Dependencies/SDL/Windows/x86/SDL2.dll" Anchor="x86" />
+    <NativeBinary Path="ThirdParty/Dependencies/SDL/Windows/x64/SDL2.dll" Anchor="x64" />
+    <NativeBinary Path="ThirdParty/Dependencies/SDL/Linux/x86/libSDL2-2.0.so.0" Anchor="x86" />
+    <NativeBinary Path="ThirdParty/Dependencies/SDL/Linux/x64/libSDL2-2.0.so.0" Anchor="x64" />
+    <NativeBinary Path="ThirdParty/Dependencies/SDL/MacOS/Universal/libSDL2-2.0.0.dylib" />
+
+    <NativeBinary Path="ThirdParty/Dependencies/openal-soft/Windows/x86/soft_oal.dll" Anchor="x86" />
+    <NativeBinary Path="ThirdParty/Dependencies/openal-soft/Windows/x64/soft_oal.dll" Anchor="x64" />
+    <NativeBinary Path="ThirdParty/Dependencies/openal-soft/Linux/x86/libopenal.so.1" Anchor="x86" />
+    <NativeBinary Path="ThirdParty/Dependencies/openal-soft/Linux/x64/libopenal.so.1" Anchor="x64" />
+    <NativeBinary Path="ThirdParty/Dependencies/openal-soft/MacOS/Universal/libopenal.1.dylib" />
   </Service>
 
 </ExternalProject>

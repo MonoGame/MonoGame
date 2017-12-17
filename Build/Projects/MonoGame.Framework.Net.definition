@@ -44,9 +44,8 @@
       <Platform Name="WindowsGL">TRACE;WINDOWS;OPENGL;OPENAL;NET;DESKTOPGL</Platform>
       <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>		
     </CustomDefinitions>
-	
   </Properties>
-
+	
   <Files>
 
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -225,11 +224,10 @@
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
 
-
     <!-- MacOS Platform -->
     <Compile Include="MacOS\GamerServices\Guide.cs">
       <Platforms>MacOS</Platforms>
-    </Compile>
+     </Compile>
     <Compile Include="MacOS\GamerServices\MonoGameGamerServicesHelper.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
@@ -242,7 +240,6 @@
     <Compile Include="MacOS\GamerServices\SigninController.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
-
 
     <!-- Windows Universal Platform -->
     <Compile Include="WindowsUniversal\GamerServices\SignedInGamer.cs">
