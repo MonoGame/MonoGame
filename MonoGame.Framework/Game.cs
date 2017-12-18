@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework
         private GameComponentCollection _components;
         private GameServiceContainer _services;
         private ContentManager _content;
-        internal GamePlatform Platform;
+        public GamePlatform Platform;
 
         private SortingFilteringCollection<IDrawable> _drawables =
             new SortingFilteringCollection<IDrawable>(
