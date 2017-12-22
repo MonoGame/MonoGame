@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             if (!File.Exists(fontFile))
-                throw new FileNotFoundException("Cound not find \"" + input.FontName + "\" font file.");
+                throw new FileNotFoundException("Could not find \"" + input.FontName + "\" font file.");
 
 			context.Logger.LogMessage ("Building Font {0}", fontFile);
             
