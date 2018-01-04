@@ -1097,7 +1097,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 // DeviceRemoved exception
                 if (ex.ResultCode.Code == -2005270523 || ex.ResultCode.Code == -2005270525)
                 {
-                    Recreate();
+                    try
+                    {
+                        Recreate();
+                    }
+                    catch (SharpDXException)
+                    {
+                        return;
+                    }
                 }
             }
 #endif
