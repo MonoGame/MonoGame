@@ -17,7 +17,7 @@ using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework
 {
-    internal class Threading
+    public class Threading
     {
         public const int kMaxWaitForUIThread = 750; // In milliseconds
 

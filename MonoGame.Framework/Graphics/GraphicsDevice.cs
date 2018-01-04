@@ -824,12 +824,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if IOS
 			// On iOS, tell OpenGL ES it can discard depth and stencil buffers.
-			OpenTK.Graphics.ES20.GL.Ext.DiscardFramebuffer(
-				OpenTK.Graphics.ES20.All.Framebuffer, 2,
-				new OpenTK.Graphics.ES20.All[]
+            MonoGame.OpenGL.GL.InvalidateFramebuffer(
+                MonoGame.OpenGL.FramebufferTarget.Framebuffer, 2,
+                new MonoGame.OpenGL.FramebufferAttachment[]
 				{
-					OpenTK.Graphics.ES20.All.DepthAttachment,
-					OpenTK.Graphics.ES20.All.StencilAttachment,
+                MonoGame.OpenGL.FramebufferAttachment.DepthAttachment,
+                MonoGame.OpenGL.FramebufferAttachment.StencilAttachment,
 				});
 #endif
 

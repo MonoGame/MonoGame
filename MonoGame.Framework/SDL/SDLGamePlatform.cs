@@ -14,7 +14,7 @@ using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
-    internal class SdlGamePlatform : GamePlatform
+    public class SdlGamePlatform : GamePlatform
     {
         public override GameRunBehavior DefaultRunBehavior
         {
@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private void SdlRunLoop()
+        public void SdlRunLoop()
         {
             Sdl.Event ev;
 

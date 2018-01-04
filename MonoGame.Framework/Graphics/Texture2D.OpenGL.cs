@@ -279,24 +279,25 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
 #if DESKTOPGL || ANGLE
-            var reader = new ImageReader();
-            int x, y, comp;
-            var data = reader.Read(stream, out x, out y, out comp, Imaging.STBI_rgb_alpha);
-
-            // XNA blacks out any pixels with an alpha of zero.
-            for (var i = 0; i < data.Length; i += 4)
-            {
-                if (data[i + 3] == 0)
-                {
-                    data[i + 0] = 0;
-                    data[i + 1] = 0;
-                    data[i + 2] = 0;
-                }
-            }
-
             Texture2D texture = null;
             Threading.BlockOnUIThread(() =>
             {
+                // We have to do this on the UI thread because Imaging uses a non-threadsafe malloc implementation.
+                var reader = new ImageReader();
+                int x, y, comp;
+                var data = reader.Read(stream, out x, out y, out comp, Imaging.STBI_rgb_alpha);
+
+                // XNA blacks out any pixels with an alpha of zero.
+                for (var i = 0; i < data.Length; i += 4)
+                {
+                    if (data[i + 3] == 0)
+                    {
+                        data[i + 0] = 0;
+                        data[i + 1] = 0;
+                        data[i + 2] = 0;
+                    }
+                }
+
                 texture = new Texture2D(graphicsDevice, x, y);
                 texture.SetData(data);
             });

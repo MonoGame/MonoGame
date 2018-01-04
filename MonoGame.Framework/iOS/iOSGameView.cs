@@ -333,8 +333,8 @@ namespace Microsoft.Xna.Framework {
             AssertNotDisposed ();
             AssertValidContext ();
 
-			var discard = new All[]{ All.DepthAttachment, All.StencilAttachment };
-			GL.Ext.DiscardFramebuffer(All.Framebuffer, discard.Length, discard);
+            var discard = new FramebufferAttachment[]{ FramebufferAttachment.DepthAttachment, FramebufferAttachment.StencilAttachment };
+            GL.InvalidateFramebuffer(FramebufferTarget.Framebuffer, discard.Length, discard);
 
 			this.MakeCurrent();
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this._colorbuffer);
