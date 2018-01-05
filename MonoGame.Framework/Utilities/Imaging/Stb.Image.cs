@@ -55,7 +55,7 @@ namespace MonoGame.Utilities
             public stbi__context s;
             public readonly PinnedArray<stbi__huffman> huff_dc = new PinnedArray<stbi__huffman>(4);
             public readonly PinnedArray<stbi__huffman> huff_ac = new PinnedArray<stbi__huffman>(4);
-            public readonly PinnedArray<byte>[] dequant;
+            public readonly PinnedArray<ushort>[] dequant;
 
             public readonly PinnedArray<short>[] fast_ac;
 
@@ -78,6 +78,8 @@ namespace MonoGame.Utilities
             public int succ_high;
             public int succ_low;
             public int eob_run;
+            public int jfif;
+            public int app14_color_transform; // Adobe APP14 tag
             public int rgb;
 
             public int scan_n;
@@ -108,10 +110,10 @@ namespace MonoGame.Utilities
                     fast_ac[i] = new PinnedArray<short>(1 << STBI__ZFAST_BITS);
                 }
 
-                dequant = new PinnedArray<byte>[4];
+                dequant = new PinnedArray<ushort>[4];
                 for (var i = 0; i < dequant.Length; ++i)
                 {
-                    dequant[i] = new PinnedArray<byte>(64);
+                    dequant[i] = new PinnedArray<ushort>(64);
                 }
             }
         };
