@@ -1522,9 +1522,13 @@ namespace MonoGame.OpenGL
             if (intPtr == IntPtr.Zero) {
                 throw new OutOfMemoryException ();
             }
-            fixed (char* chars = str + RuntimeHelpers.OffsetToStringData / 2) {
-                int bytes = Encoding.ASCII.GetBytes (chars, str.Length, (byte*)((void*)intPtr), num);
-                Marshal.WriteByte (intPtr, bytes, 0);
+
+            // Must NOT use fixed(char* c = str) because it crashes on some device for some unknown reason!
+            byte[] strSafeBytes = Encoding.Unicode.GetBytes(str);
+            fixed (byte* strRawBytes = strSafeBytes)
+            {
+                int bytes = Encoding.ASCII.GetBytes((char*)strRawBytes, str.Length, (byte*)((void*)intPtr), num);
+                Marshal.WriteByte(intPtr, bytes, 0);
                 return intPtr;
             }
         }
