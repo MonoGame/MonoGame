@@ -56,4 +56,21 @@
       <Link>Templates\MonoGame.Templates.nupkg</Link>
     </AddinFile>
   </ItemGroup>
+  <Target Name="_GenerateAddinInfo" BeforeTargets="CoreCompile">
+     <ItemGroup>
+       <AddinInfo Include="using System%3B" />
+       <AddinInfo Include="using Mono.Addins%3B" />
+       <AddinInfo Include="using Mono.Addins.Description%3B" />
+       <AddinInfo Include="[assembly: Addin(&quot;MonoGame_IDE_VisualStudioForMac&quot;,Namespace = &quot;MonoDevelop&quot;,Version = &quot;$(BUILD_NUMBER)&quot;)]" />
+       <AddinInfo Include="[assembly: AddinName(&quot;MonoGame Extension&quot;)]" />
+       <AddinInfo Include="[assembly: AddinCategory(&quot;Game Development&quot;)]" />
+       <AddinInfo Include="[assembly: AddinDescription(&quot;VisualStudio for Mac extension for MonoGame&quot;)]" />
+       <AddinInfo Include="[assembly: AddinAuthor(&quot;@MonoGameTeam&quot;)]" />
+     </ItemGroup>
+     <WriteLinesToFile
+        File="Properties\AddinInfo.cs"
+        Lines="@(AddinInfo)"
+        Overwrite="true"
+     />
+  </Target>
 </Project>
