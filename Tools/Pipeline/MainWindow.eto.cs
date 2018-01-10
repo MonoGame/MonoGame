@@ -11,6 +11,21 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow
     {
+        /// <summary>
+        /// Pipeline menu bar.
+        /// Required to Stop Eto Forms adding System Menu Items on MacOS
+        /// This is because `IncludeSystemItems` defaults to `All` 
+        /// and the menus are populated in the constructor.
+        /// </summary>
+        class PipelineMenuBar : MenuBar
+        {
+            public PipelineMenuBar()
+            {
+                Style = "MenuBar";
+                IncludeSystemItems = MenuBarSystemItems.None;
+            }
+        }
+
         public Command cmdNew, cmdOpen, cmdClose, cmdImport, cmdSave, cmdSaveAs, cmdExit;
         public Command cmdUndo, cmdRedo, cmdAdd, cmdExclude, cmdRename, cmdDelete;
         public Command cmdNewItem, cmdNewFolder, cmdExistingItem, cmdExistingFolder;
@@ -252,9 +267,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitalizeMenu()
         {
-            Menu = new MenuBar();
-            Menu.Style = "MenuBar";
-            Menu.IncludeSystemItems = MenuBarSystemItems.None;
+            Menu = new PipelineMenuBar();
 
             menuFile = new ButtonMenuItem();
             menuFile.Text = "&File";

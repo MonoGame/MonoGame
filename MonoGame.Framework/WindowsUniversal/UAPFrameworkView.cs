@@ -82,9 +82,6 @@ namespace Microsoft.Xna.Framework
         {
             // Initialize the singleton window.
             UAPGameWindow.Instance.Initialize(window, null, UAPGamePlatform.TouchQueue);
-
-			// Register the CoreWindow with the services registry
-			_game.Services.AddService (typeof(CoreWindow), window);
         }
 
         public void Uninitialize()
