@@ -49,10 +49,12 @@ namespace MonoGame.Tests.ContentPipeline
             get { throw new NotImplementedException(); }
         }
 
+#if !XNA
         public override ContentIdentity SourceIdentity
         {
             get { throw new NotImplementedException(); }
         }
+#endif
 
         public override TargetPlatform TargetPlatform
         {
