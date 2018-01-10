@@ -439,5 +439,90 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(3 * iterations, geom.Indices.Count);
             Assert.AreEqual(6, geom.Vertices.VertexCount);
         }
+
+        [Test]
+        public void RemoveVertices()
+        {
+            MeshContent output;
+            
+            output = CreateBasicMesh(material1);
+            Assert.Throws<ArgumentOutOfRangeException>(() => output.Geometry[0].Vertices.RemoveAt(-1));
+            Assert.AreEqual(3, output.Geometry[0].Vertices.VertexCount);
+            Assert.Throws<ArgumentOutOfRangeException>(() => output.Geometry[0].Vertices.RemoveAt(3));
+            Assert.AreEqual(3, output.Geometry[0].Vertices.VertexCount);
+            Assert.Throws<ArgumentOutOfRangeException>(() => output.Geometry[0].Vertices.RemoveRange(-1,1));
+            Assert.AreEqual(3, output.Geometry[0].Vertices.VertexCount);
+            Assert.Throws<ArgumentOutOfRangeException>(() => output.Geometry[0].Vertices.RemoveRange(0,-1));
+            Assert.AreEqual(3, output.Geometry[0].Vertices.VertexCount);
+            Assert.Throws<ArgumentOutOfRangeException>(() => output.Geometry[0].Vertices.RemoveRange(0,4));
+            Assert.AreEqual(3, output.Geometry[0].Vertices.VertexCount);
+            Assert.Throws<ArgumentOutOfRangeException>(() => output.Geometry[0].Vertices.RemoveRange(3, 1));
+            Assert.AreEqual(3, output.Geometry[0].Vertices.VertexCount);
+            Assert.Throws<ArgumentOutOfRangeException>(() => output.Geometry[0].Vertices.RemoveRange(4, 0));
+            Assert.AreEqual(3, output.Geometry[0].Vertices.VertexCount);
+
+            // NOTE: XNA seems to have a bug where you can specifiy one pased
+            // the last index when removing a range of zero.  We fixed this in MG.
+#if !XNA
+            Assert.Throws<ArgumentOutOfRangeException>(() => output.Geometry[0].Vertices.RemoveRange(3, 0));
+            Assert.AreEqual(3, output.Geometry[0].Vertices.VertexCount);
+#endif
+
+            // RemoveAt(1)
+            output = CreateBasicMesh(material1);
+            output.Geometry[0].Vertices.RemoveAt(1);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.VertexCount);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.Positions.Count);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.PositionIndices.Count);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.Channels[0].Count);
+            Assert.AreEqual(new Vector3(0, 0, 0), output.Geometry[0].Vertices.Positions[0]);
+            Assert.AreEqual(new Vector3(1, 1, 1), output.Geometry[0].Vertices.Positions[1]);
+            Assert.AreEqual(0, output.Geometry[0].Vertices.PositionIndices[0]);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.PositionIndices[1]);
+
+            // RemoveRange(0, 0)
+            output = CreateBasicMesh(material1);
+            output.Geometry[0].Vertices.RemoveRange(0, 0);
+            Assert.AreEqual(3, output.Geometry[0].Vertices.VertexCount);
+            Assert.AreEqual(3, output.Geometry[0].Vertices.Positions.Count);
+            Assert.AreEqual(3, output.Geometry[0].Vertices.PositionIndices.Count);
+            Assert.AreEqual(3, output.Geometry[0].Vertices.Channels[0].Count);
+            Assert.AreEqual(new Vector3(0, 0, 0), output.Geometry[0].Vertices.Positions[0]);
+            Assert.AreEqual(new Vector3(1, 0, 0), output.Geometry[0].Vertices.Positions[1]);
+            Assert.AreEqual(new Vector3(1, 1, 1), output.Geometry[0].Vertices.Positions[2]);
+            Assert.AreEqual(0, output.Geometry[0].Vertices.PositionIndices[0]);
+            Assert.AreEqual(1, output.Geometry[0].Vertices.PositionIndices[1]);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.PositionIndices[2]);
+
+            // RemoveRange(0, 1)
+            output = CreateBasicMesh(material1);
+            output.Geometry[0].Vertices.RemoveRange(0, 1);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.VertexCount);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.Positions.Count);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.PositionIndices.Count);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.Channels[0].Count);
+            Assert.AreEqual(new Vector3(1, 0, 0), output.Geometry[0].Vertices.Positions[0]);
+            Assert.AreEqual(new Vector3(1, 1, 1), output.Geometry[0].Vertices.Positions[1]);
+            Assert.AreEqual(1, output.Geometry[0].Vertices.PositionIndices[0]);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.PositionIndices[1]);
+
+            // RemoveRange(1, 2)
+            output = CreateBasicMesh(material1);
+            output.Geometry[0].Vertices.RemoveRange(1, 2);
+            Assert.AreEqual(1, output.Geometry[0].Vertices.VertexCount);
+            Assert.AreEqual(1, output.Geometry[0].Vertices.Positions.Count);
+            Assert.AreEqual(1, output.Geometry[0].Vertices.PositionIndices.Count);
+            Assert.AreEqual(1, output.Geometry[0].Vertices.Channels[0].Count);
+            Assert.AreEqual(new Vector3(0, 0, 0), output.Geometry[0].Vertices.Positions[0]);
+            Assert.AreEqual(0, output.Geometry[0].Vertices.PositionIndices[0]);
+
+            // RemoveRange(0, 3)
+            output = CreateBasicMesh(material1);
+            output.Geometry[0].Vertices.RemoveRange(0, 3);
+            Assert.AreEqual(0, output.Geometry[0].Vertices.VertexCount);
+            Assert.AreEqual(0, output.Geometry[0].Vertices.Positions.Count);
+            Assert.AreEqual(0, output.Geometry[0].Vertices.PositionIndices.Count);
+            Assert.AreEqual(0, output.Geometry[0].Vertices.Channels[0].Count);
+        }
     }
 }
