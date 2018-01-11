@@ -99,6 +99,7 @@ namespace Microsoft.Xna.Framework.Content
                 var hMatrixReader = new MatrixReader();
                 var hBasicEffectReader = new BasicEffectReader();
                 var hVertexBufferReader = new VertexBufferReader();
+                var hEffectReader = new EffectReader();
                 var hAlphaTestEffectReader = new AlphaTestEffectReader();
                 var hEnumSpriteEffectsReader = new EnumReader<Graphics.SpriteEffects>();
                 var hArrayFloatReader = new ArrayReader<float>();
@@ -113,6 +114,7 @@ namespace Microsoft.Xna.Framework.Content
                 var hSongReader = new SongReader();
                 var hModelReader = new ModelReader();
                 var hInt32Reader = new Int32Reader();
+                var hSingleReader = new SingleReader();
 
                 // At the moment the Video class doesn't exist
                 // on all platforms... Allow it to compile anyway.
