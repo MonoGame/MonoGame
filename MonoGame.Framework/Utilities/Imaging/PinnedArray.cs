@@ -5,8 +5,16 @@ namespace MonoGame.Utilities
 {
     internal abstract unsafe class Pointer : IDisposable
     {
+        protected static long _allocatedTotal;
+        protected static object _lock = new object();
+
         public abstract long Size { get; }
         public abstract void* Ptr { get; }
+
+        public static long AllocatedTotal
+        {
+            get { return _allocatedTotal; }
+        }
 
         public abstract void Dispose();
 
@@ -86,9 +94,9 @@ namespace MonoGame.Utilities
                 _size = 0;
             }
 
-            lock (Operations._lock)
+            lock (_lock)
             {
-                Operations._allocatedTotal += _size;
+                _allocatedTotal += _size;
             }
         }
 
@@ -116,9 +124,9 @@ namespace MonoGame.Utilities
                 return;
             }
 
-            lock (Operations._lock)
+            lock (_lock)
             {
-                Operations._allocatedTotal -= Size;
+                _allocatedTotal -= Size;
             }
 
             if (Data != null)
