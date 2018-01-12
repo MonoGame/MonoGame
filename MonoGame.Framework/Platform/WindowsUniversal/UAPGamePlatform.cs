@@ -31,6 +31,11 @@ namespace Microsoft.Xna.Framework
 
         internal static ApplicationExecutionState PreviousExecutionState { get; set; }
 
+        public override GamePlatformType GamePlatformType
+        {
+            get { return GamePlatformType.WindowsUniversal; }
+        }
+
         public UAPGamePlatform(Game game)
             : base(game)
         {

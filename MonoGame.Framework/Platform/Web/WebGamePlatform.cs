@@ -25,6 +25,11 @@ namespace Microsoft.Xna.Framework
     {
         private WebGameWindow _view;
 
+        public override GamePlatformType GamePlatformType
+        {
+            get { return GamePlatformType.Web; }
+        }
+
         public WebGamePlatform(Game game)
             : base(game)
         {

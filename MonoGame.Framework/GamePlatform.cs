@@ -7,7 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
-
 namespace Microsoft.Xna.Framework
 {
     abstract partial class GamePlatform : IDisposable
@@ -99,6 +98,8 @@ namespace Microsoft.Xna.Framework
                 _window = value;
             }
         }
+
+        public abstract GamePlatformType GamePlatformType { get; }
 
         #endregion
 
