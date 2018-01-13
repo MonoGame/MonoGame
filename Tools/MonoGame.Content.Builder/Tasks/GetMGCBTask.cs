@@ -16,6 +16,7 @@ namespace MSBuildTasks
         {
             // Not to self, rewrite this file, it literally checks for no errors...
             // and you know, add some progress printing...
+            // and replace the OS detection
 
             Log.LogMessage(MessageImportance.Normal, "[GetMGCBTask] Start");
 
@@ -27,6 +28,9 @@ namespace MSBuildTasks
             if (!Directory.Exists(mgcbdir))
             {
                 var os = Environment.OSVersion.Platform == PlatformID.Unix ? "Linux" : "Windows";
+
+                if (os == "Linux" && Directory.Exists("/Applications"))
+                    os = "Mac";
 
                 if (!File.Exists(mgcbzip))
                 {
@@ -47,3 +51,4 @@ namespace MSBuildTasks
         }
     }
 }
+
