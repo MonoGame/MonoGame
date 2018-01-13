@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>MonoGame.Content.Builder</id>
+    <id>MonoGame.Content.Builder.Mac</id>
     <version>3.7.0.3</version>
-    <title>MonoGame.Content.Builder</title>
+    <title>MonoGame.Content.Builder.Mac</title>
     <authors>cra0zy</authors>
     <owners>cra0zy</owners>
     <licenseUrl>https://github.com/mono/MonoGame/blob/develop/LICENSE.txt</licenseUrl>
@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
 
-This package provides you with MonoGame Framework Content Builder tools.
+This package provides you with MonoGame Framework Content Builder tools for Linux.
 
 This package is currently unofficial.</description>
     <summary>This package provides you with MonoGame Framework Content Builder tools.</summary>
@@ -20,7 +20,6 @@ This package is currently unofficial.</description>
     <language>en-US</language>
   </metadata>
   <files>
-    <file src="build\MGCB\*" target="build" />
-    <file src="../Tools/MonoGame.Content.Builder/bin/Release/**/*" target="tasks" />
+    <file src="../Tools/MGCB/bin/Mac/AnyCPU/Release/**/*" target="build" />
   </files>
 </package>
