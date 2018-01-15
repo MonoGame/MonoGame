@@ -30,6 +30,7 @@ namespace MonoGame.Tools.Pipeline
         public Command cmdUndo, cmdRedo, cmdAdd, cmdExclude, cmdRename, cmdDelete;
         public Command cmdNewItem, cmdNewFolder, cmdExistingItem, cmdExistingFolder;
         public Command cmdBuild, cmdRebuild, cmdClean, cmdCancelBuild;
+        public CheckCommand cmdDebugMode;
         public Command cmdHelp, cmdAbout;
         public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdOpenOutputItemLocation, cmdCopyAssetPath, cmdRebuildItem;
 
@@ -109,6 +110,7 @@ namespace MonoGame.Tools.Pipeline
             cmdRebuild.Executed += CmdRebuild_Executed;
             cmdClean.Executed += CmdClean_Executed;
             cmdCancelBuild.Executed += CmdCancelBuild_Executed;
+            cmdDebugMode.Executed += CmdDebugMode_Executed;
 
             cmdHelp.Executed += CmdHelp_Executed;
             cmdAbout.Executed += CmdAbout_Executed;
@@ -232,6 +234,9 @@ namespace MonoGame.Tools.Pipeline
             cmdCancelBuild.ToolTip = "Cancel Build";
             cmdCancelBuild.Image = Global.GetEtoIcon("Commands.CancelBuild.png");
 
+            cmdDebugMode = new CheckCommand();
+            cmdDebugMode.MenuText = "Debug Mode";
+
             // Help Commands
 
             cmdHelp = new Command();
@@ -319,6 +324,8 @@ namespace MonoGame.Tools.Pipeline
             menuBuild.Items.Add(cmdRebuild);
             menuBuild.Items.Add(cmdClean);
             menuBuild.Items.Add(cmdCancelBuild);
+            menuBuild.Items.Add(new SeparatorMenuItem());
+            menuBuild.Items.Add(cmdDebugMode);
             Menu.Items.Add(menuBuild);
 
             menuHelp = new ButtonMenuItem();
