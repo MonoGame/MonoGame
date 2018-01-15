@@ -94,6 +94,9 @@ namespace MonoGame.Tools.Pipeline
         {
             PipelineController.Instance.OnProjectLoaded += () => projectControl.ExpandBase();
 
+            cmdMultithreadMode.Checked = PipelineSettings.Default.MultithreadMode; 
+            CmdMultithreadMode_Executed(this, EventArgs.Empty); 
+
             foreach (var control in _pads)
                 control.LoadSettings();
 
@@ -596,6 +599,11 @@ namespace MonoGame.Tools.Pipeline
         private void CmdCancelBuild_Executed(object sender, EventArgs e)
         {
             PipelineController.Instance.CancelBuild();
+        }
+
+        private void CmdMultithreadMode_Executed(object sender, EventArgs e)
+        {
+            PipelineSettings.Default.MultithreadMode = cmdMultithreadMode.Checked;
         }
 
         private void CmdHelp_Executed(object sender, EventArgs e)

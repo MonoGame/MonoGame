@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder;
@@ -20,6 +21,11 @@ namespace MGCB
             Flag = "d",
             Description = "Wait for debugger to attach before building content.")]
         public bool LaunchDebugger = false;
+
+        [CommandLineParameter(
+            Name = "multithreadMode",
+            Description = "Multithread Mode (experimental).")]
+        public bool MultithreadMode = false;
 
         [CommandLineParameter(
             Name = "quiet",
@@ -314,47 +320,157 @@ namespace MGCB
                 }
             }
 
-            foreach (var c in _content)
+            if (!MultithreadMode) // single thread
             {
-                try
+                foreach (var c in _content)
                 {
-                    _manager.BuildContent(c.SourceFile,
-                                          null,
-                                          c.Importer,
-                                          c.Processor,
-                                          c.ProcessorParams);
-
-                    newContent.SourceFiles.Add(c.SourceFile);
-
-                    ++successCount;
-                }
-                catch (InvalidContentException ex)
-                {
-                    var message = string.Empty;
-                    if (ex.ContentIdentity != null && !string.IsNullOrEmpty(ex.ContentIdentity.SourceFilename))
+                    try
                     {
-                        message = ex.ContentIdentity.SourceFilename;
-                        if (!string.IsNullOrEmpty(ex.ContentIdentity.FragmentIdentifier))
-                            message += "(" + ex.ContentIdentity.FragmentIdentifier + ")";
-                        message += ": ";
+                        _manager.BuildContent(_manager.Logger,
+                                              c.SourceFile,
+                                              null,
+                                              c.Importer,
+                                              c.Processor,
+                                              c.ProcessorParams);
+
+                        newContent.SourceFiles.Add(c.SourceFile);
+
+                        ++successCount;
                     }
-                    message += ex.Message;
-                    Console.WriteLine(message);
-                    ++errorCount;
+                    catch (InvalidContentException ex)
+                    {
+                        var message = string.Empty;
+                        if (ex.ContentIdentity != null && !string.IsNullOrEmpty(ex.ContentIdentity.SourceFilename))
+                        {
+                            message = ex.ContentIdentity.SourceFilename;
+                            if (!string.IsNullOrEmpty(ex.ContentIdentity.FragmentIdentifier))
+                                message += "(" + ex.ContentIdentity.FragmentIdentifier + ")";
+                            message += ": ";
+                        }
+                        message += ex.Message;
+                        Console.WriteLine(message);
+                        ++errorCount;
+                    }
+                    catch (PipelineException ex)
+                    {
+                        Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
+                        if (ex.InnerException != null)
+                            Console.Error.WriteLine(ex.InnerException.ToString());
+                        ++errorCount;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
+                        if (ex.InnerException != null)
+                            Console.Error.WriteLine(ex.InnerException.ToString());
+                        ++errorCount;
+                    }
                 }
-                catch (PipelineException ex)
+            }
+            else // multithread
+            {
+                var buildTaskQueue = new Queue<Task<PipelineBuildEvent>>();
+                var activeBuildTasks = new List<Task<PipelineBuildEvent>>();
+                bool firstTask = true;
+
+                int ci = 0;
+                while (ci < _content.Count || activeBuildTasks.Count > 0 || buildTaskQueue.Count > 0)
                 {
-                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
-                    if (ex.InnerException != null)
-                        Console.Error.WriteLine(ex.InnerException.ToString());
-                    ++errorCount;
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
-                    if (ex.InnerException != null)
-                        Console.Error.WriteLine(ex.InnerException.ToString());
-                    ++errorCount;
+                    // Create build tasks.
+                    while (activeBuildTasks.Count < Environment.ProcessorCount && ci < _content.Count)
+                    {
+                        BuildAsyncState buildState = new BuildAsyncState()
+                        {
+                            SourceFile = _content[ci].SourceFile,
+                            Importer = _content[ci].Importer,
+                            Processor = _content[ci].Processor,
+                            ProcessorParams = _content[ci].ProcessorParams,
+                            Logger = new ConsoleAsyncLogger(_manager.Logger),
+                        };
+                        buildState.Logger.Immediate = firstTask;
+
+                        var task = Task.Factory.StartNew<PipelineBuildEvent>((stateobj) =>
+                        {
+                            var state = stateobj as BuildAsyncState;
+                            return _manager.BuildContent(state.Logger,
+                                                  state.SourceFile,
+                                                  null,
+                                                  state.Importer,
+                                                  state.Processor,
+                                                  state.ProcessorParams);
+                        }, buildState, TaskCreationOptions.PreferFairness);
+                        buildTaskQueue.Enqueue(task);
+                        activeBuildTasks.Add(task);
+                        firstTask = false;
+                        ci++;
+                    }
+
+                    if (buildTaskQueue.Count > 0)
+                    {
+                        // Get task at the top of the queue.
+                        var topTask = buildTaskQueue.Peek();
+                        var topBuildState = topTask.AsyncState as BuildAsyncState;
+                        topBuildState.Logger.Immediate = true;
+
+                        // Remove task from queue if completed.
+                        if (topTask.IsCompleted || topTask.IsCanceled || topTask.IsFaulted)
+                        {
+                            buildTaskQueue.Dequeue();
+                            //flash log
+                            topBuildState.Logger.Flush();
+
+                            if (topTask.IsFaulted)
+                            {
+                                if (topTask.Exception.InnerException is InvalidContentException)
+                                {
+                                    InvalidContentException ex = topTask.Exception.InnerException as InvalidContentException;
+                                    var message = string.Empty;
+                                    if (ex.ContentIdentity != null && !string.IsNullOrEmpty(ex.ContentIdentity.SourceFilename))
+                                    {
+                                        message = ex.ContentIdentity.SourceFilename;
+                                        if (!string.IsNullOrEmpty(ex.ContentIdentity.FragmentIdentifier))
+                                            message += "(" + ex.ContentIdentity.FragmentIdentifier + ")";
+                                        message += ": ";
+                                    }
+                                    message += ex.Message;
+                                    Console.WriteLine(message);
+                                    ++errorCount;
+                                }
+                                else
+                                {
+                                    Exception ex = topTask.Exception.InnerException;
+                                    Console.Error.WriteLine("{0}: error: {1}", topBuildState.SourceFile, ex.Message);
+                                    if (ex.InnerException != null)
+                                        Console.Error.WriteLine(ex.InnerException.ToString());
+                                    ++errorCount;
+                                }
+                            }
+                            else if (topTask.IsCanceled)
+                            {
+                                // ?
+                            }
+
+                            continue;
+                        }
+                    }
+
+                    Task.WaitAny(activeBuildTasks.ToArray());
+
+                    // Remove completed tasks.
+                    for (int i = activeBuildTasks.Count - 1; i >= 0; i--)
+                    {
+                        var task = activeBuildTasks[i];
+                        if (task.IsCompleted || task.IsCanceled || task.IsFaulted)
+                        {
+                            activeBuildTasks.RemoveAt(i);
+                            if (task.IsCompleted)
+                            {
+                                var buildState = task.AsyncState as BuildAsyncState;
+                                newContent.SourceFiles.Add(buildState.SourceFile);
+                                ++successCount;
+                            }
+                        }
+                    }
                 }
             }
 

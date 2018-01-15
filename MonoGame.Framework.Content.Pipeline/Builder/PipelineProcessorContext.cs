@@ -32,7 +32,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public override OpaqueDataDictionary Parameters { get { return _pipelineEvent.Parameters; } }
 
-        public override ContentBuildLogger Logger { get { return _manager.Logger; } }
+        public override ContentBuildLogger Logger { get { return _pipelineEvent.Logger; } }
 
         public override ContentIdentity SourceIdentity { get { return new ContentIdentity(_pipelineEvent.SourceFile); } }
 
@@ -51,7 +51,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                                                             OpaqueDataDictionary processorParameters)
         {
             var processor = _manager.CreateProcessor(processorName, processorParameters);
-            var processContext = new PipelineProcessorContext(_manager, new PipelineBuildEvent { Parameters = processorParameters } );
+            var processContext = new PipelineProcessorContext(_manager, new PipelineBuildEvent { Parameters = processorParameters, Logger = this.Logger } );
             var processedObject = processor.Process(input, processContext);
            
             // Add its dependencies and built assets to ours.
@@ -98,10 +98,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                                                                                 string assetName)
         {
             if (string.IsNullOrEmpty(assetName))
-                assetName = _manager.GetAssetName(sourceAsset.Filename, importerName, processorName, processorParameters);
+                assetName = _manager.GetAssetName(Logger, sourceAsset.Filename, importerName, processorName, processorParameters);
 
             // Build the content.
-            var buildEvent = _manager.BuildContent(sourceAsset.Filename, assetName, importerName, processorName, processorParameters);
+            var buildEvent = _manager.BuildContent(Logger, sourceAsset.Filename, assetName, importerName, processorName, processorParameters);
 
             // Record that we built this dependent asset.
             _pipelineEvent.BuildAsset.AddUnique(buildEvent.DestFile);

@@ -68,6 +68,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         [XmlIgnore]
         public OpaqueDataDictionary Parameters { get; set; }
 
+        [XmlIgnore]
+        public ContentBuildLogger Logger { get; set; }
+
         public class Pair
         {
             public string Key { get; set; }
