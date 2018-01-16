@@ -31,8 +31,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             BeginImage = new OutputOptions.ImageDelegate(BeginImageInternal);
 
             // Keep the delegate from being re-located or collected by the garbage collector.
-            delegateHandleBeginImage = GCHandle.Alloc(BeginImage);
-            delegateHandleWriteData = GCHandle.Alloc(WriteData);
+            delegateHandleBeginImage = GCHandle.Alloc(BeginImage, GCHandleType.Pinned);
+            delegateHandleWriteData = GCHandle.Alloc(WriteData, GCHandleType.Pinned);
 
             outputOptions.SetOutputHandler(BeginImage, WriteData);
         }
