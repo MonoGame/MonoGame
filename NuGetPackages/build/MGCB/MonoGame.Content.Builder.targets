@@ -16,7 +16,7 @@
 
     <!-- Select correct MSBuild task assembly. -->
     <MGTaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' ">netstandard2.0</MGTaskFolder>
-    <MGTaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net45</MGTaskFolder>
+    <MGTaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net46</MGTaskFolder>
     <MGTaskAssembly>$(MSBuildThisFileDirectory)..\tasks\$(MGTaskFolder)\MonoGame.Content.Builder.dll</MGTaskAssembly>
   </PropertyGroup>
 
