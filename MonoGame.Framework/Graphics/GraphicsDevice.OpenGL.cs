@@ -949,16 +949,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[3] *= -1.0f;
             }
 
-#if GLES || MONOMAC
-            fixed (float* floatPtr = _posFixup)
-            {
-                GL.Uniform4(posFixupLoc, 1, floatPtr);
-            }
-#else
             var handle = GCHandle.Alloc(_posFixup, GCHandleType.Pinned);
             GL.Uniform4(posFixupLoc, 1, (byte*) handle.AddrOfPinnedObject());
             handle.Free();
-#endif
 
             GraphicsExtensions.CheckGLError();
         }
