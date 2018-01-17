@@ -44,7 +44,7 @@ namespace TwoMGFX
         {
             // TODO check if we already created this shader in the dict
             var shaderInfo = shaderResult.ShaderInfo;
-            var shaderType = isVertexShader ? ShaderType.Vertex : ShaderType.Fragment;
+            var shaderStage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
 
             // TODO: depending on platform and version this can be GLES 2.0 or 3.0
             var optimizer = new GLSLOptimizer(Target.OpenGL);
@@ -59,7 +59,7 @@ namespace TwoMGFX
             var token = nameNode.Token;
 
             // make sure we don't have any illegal syntax
-            var text = string.Copy(shaderInfo.FileContent);
+            var text = string.Copy(shaderResult.FileContent);
             // TODO this is really, really inefficient...
             try
             {

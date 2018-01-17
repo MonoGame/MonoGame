@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             var profile = ShaderProfile.ForPlatform(context.TargetPlatform.ToString());
             if (profile == null)
-                throw new InvalidContentException($"{context.TargetPlatform} effects are not supported.", input.Identity);
+                throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
 
             options.Profile = profile;
 

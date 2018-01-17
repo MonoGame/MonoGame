@@ -24,8 +24,6 @@ namespace TwoMGFX
 
         public ShaderProfile Profile { get; private set; }
 
-        public SourceShadingLanguage Language { get; private set; }
-
         public bool Debug { get; private set; }
 
 
@@ -72,7 +70,7 @@ namespace TwoMGFX
 			// all #includes and macros.
             var fullPath = Path.GetFullPath(filePath);
             var dependencies = new List<string>();
-            var newFile = Preprocessor.Preprocess(effectSource, fullPath, macros, dependencies, output);
+            var newFile = Preprocessor.Preprocess(effectSource, fullPath, macros, dependencies, output, options.Profile);
 
             // Parse the resulting file for techniques and passes.
             var tree = new Parser(new Scanner(), options.Profile).Parse(newFile, fullPath);
@@ -121,11 +119,6 @@ namespace TwoMGFX
                 throw new Exception("The effect must contain at least one technique and pass!");
 
             result.Profile = options.Profile;
-
-            result.Language = shaderInfo.Techniques[0].Passes[0].psModel.StartsWith("glsl") ? 
-                SourceShadingLanguage.Glsl : 
-                SourceShadingLanguage.Hlsl;
-
             result.Debug = options.Debug;
 
             return result;
