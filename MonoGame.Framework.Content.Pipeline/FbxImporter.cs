@@ -14,11 +14,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     {
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
-            var importer = new OpenAssetImporter
-            {
-                ImporterName = "FbxImporter",
-            };
-
+            var importer = new OpenAssetImporter("FbxImporter", true);
             return importer.Import(filename, context);
         }
     }
