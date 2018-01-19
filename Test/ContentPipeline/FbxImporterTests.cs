@@ -222,17 +222,7 @@ namespace MonoGame.Tests.ContentPipeline
             foreach (var c in animationContent.Channels.Values)
                 Assert.Greater(c.Count, 0);
 
-            // TODO: This is an error of 58ms in MG.
-            //
-            //  - Is this a bug in our FbxImporer?
-            //  - A limitation of AssImp?
-            //  - Conversion bug from FBX 6.1.0 to FBX 7.1.0?
-            //  - Does this difference really matter?
-#if XNA
             Assert.AreEqual(12670000, animationContent.Duration.Ticks);
-#else
-            Assert.AreEqual(12080000, animationContent.Duration.Ticks);
-#endif
 
             // TODO: XNA assigns the identity to null on all NodeContent
             // other than the one returned from the importer.
