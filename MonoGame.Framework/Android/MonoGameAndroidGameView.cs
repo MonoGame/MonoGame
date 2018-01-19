@@ -1073,6 +1073,12 @@ namespace Microsoft.Xna.Framework
 
         protected void ContextSetInternal()
         {
+            // We do this regardless of whether this is the first run to avoid trouble due to states being bound to device already.
+            // This might be able to happen due to persisted state during an activity restart which retains the process.
+            BlendState.Recreate();
+            DepthStencilState.Recreate();
+            RasterizerState.Recreate();
+
             if (lostglContext)
             {
                 if (_game.GraphicsDevice != null)
@@ -1082,11 +1088,6 @@ namespace Microsoft.Xna.Framework
                     // Dispose our old default content loader.
                     Game.Instance.Content.Dispose();
                     Game.Instance.Content = new ContentManager(Game.Instance.Services);
-
-                    // Avoid trouble due to states being bound to device already.
-                    BlendState.Recreate();
-                    DepthStencilState.Recreate();
-                    RasterizerState.Recreate();
 
                     // DeviceReset events
                     _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
@@ -1098,6 +1099,7 @@ namespace Microsoft.Xna.Framework
                     _game.graphicsDeviceManager.OnDeviceRecreated(EventArgs.Empty);
                 }
             }
+
             OnContextSet(EventArgs.Empty);
         }
 
