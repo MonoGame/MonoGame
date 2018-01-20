@@ -300,7 +300,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     //PostProcessSteps.FixInFacingNormals |
                     //PostProcessSteps.GenerateNormals |
                     //PostProcessSteps.GenerateSmoothNormals |
-                    //PostProcessSteps.GenerateUVCoords |
+                    //PostProcessSteps.GenerateUVCoords | // Might be needed... find test case
                     //PostProcessSteps.LimitBoneWeights |
                     //PostProcessSteps.MakeLeftHanded |     // Not necessary, XNA is right-handed.
                     //PostProcessSteps.OptimizeGraph |      // Will eliminate helper nodes
@@ -318,9 +318,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 // Create _materials.
                 if (_xnaCompatible)
-                    ImportMaterials();
+                    ImportXnaMaterials();
                 else
-                    ImportAssImpMaterials();  
+                    ImportMaterials();  
 
                 ImportNodes();      // Create _pivots and _rootNode (incl. children).
                 ImportSkeleton();   // Create skeleton (incl. animations) and add to _rootNode.
@@ -344,7 +344,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Converts all Assimp <see cref="Material"/>s to standard XNA compatible <see cref="MaterialContent"/>s.
         /// </summary>
-        private void ImportMaterials()
+        private void ImportXnaMaterials()
         {
             _materials = new List<MaterialContent>();
             foreach (var aiMaterial in _scene.Materials)
@@ -397,8 +397,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             if (!_xnaCompatible)
             {
                 texture.OpaqueData.Add("Operation", textureSlot.Operation.ToString());
-                texture.OpaqueData.Add("WrapModeU", textureSlot.WrapModeU.ToString());
-                texture.OpaqueData.Add("WrapModeV", textureSlot.WrapModeV.ToString());
+                texture.OpaqueData.Add("AddressU", textureSlot.WrapModeU.ToString());
+                texture.OpaqueData.Add("AddressV", textureSlot.WrapModeU.ToString());
                 texture.OpaqueData.Add("Mapping", textureSlot.Mapping.ToString());
             }
 
@@ -406,14 +406,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }            
 
         /// <summary>
-        /// Returns all the Assimp <see cref="Material"/> features as <see cref="MaterialContent"/>.
+        /// Returns all the Assimp <see cref="Material"/> features as a <see cref="MaterialContent"/>.
         /// </summary>
-        private void ImportAssImpMaterials()
+        private void ImportMaterials()
         {
             _materials = new List<MaterialContent>();
             foreach (var aiMaterial in _scene.Materials)
             {
-                // TODO: Should we create a special AssetImporterMaterial?
+                // TODO: Should we create a special AssImpMaterial?
 
                 var material = new MaterialContent
                 {
@@ -424,9 +424,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 var slots = aiMaterial.GetAllMaterialTextures();
                 foreach (var tex in slots)
                 {
-                    var name = tex.TextureType.ToString();
-                    if (tex.TextureIndex != 0)
-                        name += tex.TextureIndex;
+                    string name;
+
+                    // Force the XNA naming standard for diffuse textures
+                    // which allows the material to work with the stock
+                    // model processor.
+                    if (tex.TextureType == TextureType.Diffuse)
+                        name = BasicMaterialContent.TextureKey;
+                    else
+                        name = tex.TextureType.ToString();
+
+                    // We might have multiple textures of the same type so number
+                    // them starting with 2 like in DualTextureMaterialContent.
+                    if (tex.TextureIndex > 0)
+                        name += (tex.TextureIndex + 1);
+
                     material.Textures.Add(name, ImportTextureContentRef(tex));
                 }
 
@@ -435,17 +447,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (aiMaterial.HasBumpScaling)
                     material.OpaqueData.Add("BumpScaling", aiMaterial.BumpScaling);
                 if (aiMaterial.HasColorAmbient)
-                    material.OpaqueData.Add("ColorAmbient", ToXna(aiMaterial.ColorAmbient));
+                    material.OpaqueData.Add("AmbientColor", ToXna(aiMaterial.ColorAmbient));
                 if (aiMaterial.HasColorDiffuse)
-                    material.OpaqueData.Add("ColorDiffuse", ToXna(aiMaterial.ColorDiffuse));
+                    material.OpaqueData.Add("DiffuseColor", ToXna(aiMaterial.ColorDiffuse));
                 if (aiMaterial.HasColorEmissive)
-                    material.OpaqueData.Add("ColorEmissive", ToXna(aiMaterial.ColorEmissive));
+                    material.OpaqueData.Add("EmissiveColor", ToXna(aiMaterial.ColorEmissive));
                 if (aiMaterial.HasColorReflective)
-                    material.OpaqueData.Add("ColorReflective", ToXna(aiMaterial.ColorReflective));
+                    material.OpaqueData.Add("ReflectiveColor", ToXna(aiMaterial.ColorReflective));
                 if (aiMaterial.HasColorSpecular)
-                    material.OpaqueData.Add("ColorSpecular", ToXna(aiMaterial.ColorSpecular));
+                    material.OpaqueData.Add("SpecularColor", ToXna(aiMaterial.ColorSpecular));
                 if (aiMaterial.HasColorTransparent)
-                    material.OpaqueData.Add("ColorTransparent", ToXna(aiMaterial.ColorTransparent));
+                    material.OpaqueData.Add("TransparentColor", ToXna(aiMaterial.ColorTransparent));
                 if (aiMaterial.HasOpacity)
                     material.OpaqueData.Add("Opacity", aiMaterial.Opacity);
                 if (aiMaterial.HasReflectivity)
