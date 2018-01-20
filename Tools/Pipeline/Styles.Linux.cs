@@ -104,7 +104,6 @@ namespace MonoGame.Tools.Pipeline
     {
         private static IntPtr _actionGroup;
         private static Gtk.Widget _popovermenu1, _popovermenu2;
-        private static Gtk.RadioButton _mainbutton;
         private static Gtk.Widget _buttonbox, _cancelbox, _separator;
 
         [GLib.ConnectBefore]
@@ -154,17 +153,6 @@ namespace MonoGame.Tools.Pipeline
             })), (IntPtr)GCHandle.Alloc(cmd), IntPtr.Zero);
 
             Gtk3Wrapper.gtk_accel_group_connect(_actionGroup, key, modifier, Gtk.AccelFlags.Mask, cclosure);
-        }
-
-        private static void RejectActive(IntPtr handle)
-        {
-            var rb = new Gtk.RadioButton(handle);
-            rb.JoinGroup(_mainbutton);
-            rb.Toggled += (sender, e) => 
-            {
-                if (rb.Active)
-                    _mainbutton.Active = true;
-            };
         }
 
         private static void ReloadBuildbox()
@@ -217,6 +205,16 @@ namespace MonoGame.Tools.Pipeline
                 Connect("clean", MainWindow.Instance.cmdClean);
                 Connect("cancel", MainWindow.Instance.cmdCancelBuild);
 
+                var widget = new ModalButton(builder.GetObject("button_debug").Handle);
+                widget.Active = MainWindow.Instance.cmdDebugMode.Checked;
+                widget.Clicked += (e, sender) =>
+                {
+                    var newstate = !PipelineSettings.Default.DebugMode;
+
+                    widget.Active = newstate;
+                    PipelineSettings.Default.DebugMode = newstate;
+                };
+
                 _actionGroup = Gtk3Wrapper.gtk_accel_group_new();
 
                 Connect(MainWindow.Instance.cmdNew, Gdk.Key.N, Gdk.ModifierType.ControlMask);
@@ -235,11 +233,6 @@ namespace MonoGame.Tools.Pipeline
 
                 Gtk3Wrapper.gtk_window_set_titlebar(h.Control.Handle, headerBar.Handle);
                 Gtk3Wrapper.gtk_header_bar_set_show_close_button(headerBar.Handle, true);
-
-                _mainbutton = new Gtk.RadioButton("");
-                RejectActive(builder.GetObject("build_button").Handle);
-                RejectActive(builder.GetObject("rebuild_button").Handle);
-                RejectActive(builder.GetObject("clean_button").Handle);
 
                 _buttonbox = new Gtk.Widget(builder.GetObject("build_buttonbox").Handle);
                 _cancelbox = new Gtk.Widget(builder.GetObject("cancel_button").Handle);
