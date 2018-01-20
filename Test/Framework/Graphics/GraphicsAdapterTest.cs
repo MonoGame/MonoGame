@@ -121,6 +121,27 @@ namespace MonoGame.Tests.Graphics
         [TestCase(GraphicsProfile.HiDef, SurfaceFormat.NormalizedByte2, SurfaceFormat.Color, false)]
         [TestCase(GraphicsProfile.Reach, SurfaceFormat.NormalizedByte4, SurfaceFormat.Color, false)]
         [TestCase(GraphicsProfile.HiDef, SurfaceFormat.NormalizedByte4, SurfaceFormat.Color, false)]
+        // non-Reach formats
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.HalfSingle, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.HalfSingle, SurfaceFormat.HalfSingle, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.HalfVector2, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.HalfVector2, SurfaceFormat.HalfVector2, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.HalfVector4, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.HalfVector4, SurfaceFormat.HalfVector4, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.HdrBlendable, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.HdrBlendable, SurfaceFormat.HdrBlendable, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Rg32, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Rg32, SurfaceFormat.Rg32, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Rgba1010102, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Rgba1010102, SurfaceFormat.Rgba1010102, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Rgba64, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Rgba64, SurfaceFormat.Rgba64, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Single, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Single, SurfaceFormat.Single, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Vector2, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Vector2, SurfaceFormat.Vector2, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Vector4, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Vector4, SurfaceFormat.Vector4, true)]
         public static void QueryRenderTargetFormat_preferredSurface(GraphicsProfile graphicsProfile, SurfaceFormat preferredSurfaceFormat, SurfaceFormat expectedSurfaceFormat, bool expectedIsSupported)
         {
             var adapter = GraphicsAdapter.DefaultAdapter;

@@ -172,6 +172,48 @@ namespace MonoGame.Tests.Graphics
             tx.Dispose();
         }
 
+        [TestCase(SurfaceFormat.Color, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Rgba1010102, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Rg32, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Rgba64, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Alpha8, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Single, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Vector2, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Vector4, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.HalfSingle, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.HalfVector2, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.HalfVector4, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.HdrBlendable, SurfaceFormat.Color)]
+        public void RenderTarget2DSurface(SurfaceFormat preferredFormat, SurfaceFormat expectedFallbackFormat)
+        {
+            CheckProfile();
+
+            RenderTarget2D tx = new RenderTarget2D(_gd, 16, 16, false, preferredFormat, DepthFormat.None);
+            Assert.AreEqual(tx.Format, expectedFallbackFormat);
+            tx.Dispose();
+        }
+
+        [TestCase(SurfaceFormat.Color, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Rgba1010102, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Rg32, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Rgba64, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Alpha8, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Single, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Vector2, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Vector4, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.HalfSingle, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.HalfVector2, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.HalfVector4, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.HdrBlendable, SurfaceFormat.Color)]
+        public void RenderTargetCubeSurface(SurfaceFormat preferredFormat, SurfaceFormat expectedFallbackFormat)
+        {
+            CheckProfile();
+
+            RenderTargetCube tx = new RenderTargetCube(_gd, 16, false, preferredFormat, DepthFormat.None);
+            Assert.AreEqual(tx.Format, expectedFallbackFormat);
+            tx.Dispose();
+        }
+
         [TestCase("DrawPrimitives", 0, MaxPrimitives)]
         [TestCase("DrawPrimitives", 3, MaxPrimitives)]
         [TestCase("DrawPrimitives", 0, MaxPrimitives+1, ExpectedException = typeof(NotSupportedException))]
