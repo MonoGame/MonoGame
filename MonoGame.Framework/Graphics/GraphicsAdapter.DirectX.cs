@@ -125,5 +125,87 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new InvalidOperationException();
             }
         }
+
+        static int NextLowestPowerOf2(int x)
+        {
+            x = x | (x >> 1);
+            x = x | (x >> 2);
+            x = x | (x >> 4);
+            x = x | (x >> 8);
+            x = x | (x >> 16);
+            return x - (x >> 1);
+        }
+
+        bool PlatformQueryBackBufferFormat(
+            GraphicsProfile graphicsProfile,
+            SurfaceFormat format,
+            DepthFormat depthFormat,
+            int multiSampleCount,
+            out SurfaceFormat selectedFormat,
+            out DepthFormat selectedDepthFormat,
+            out int selectedMultiSampleCount)
+        {
+            selectedFormat = format;
+            selectedDepthFormat = depthFormat;
+
+            // 16-bit formats are not supported for displays
+            // https://msdn.microsoft.com/en-us/library/windows/desktop/ff471325(v=vs.85).aspx
+            switch (format)
+            {
+                case SurfaceFormat.Color:
+                case SurfaceFormat.Rgba1010102:
+                    break;
+
+                default:
+                    selectedFormat = SurfaceFormat.Color;
+                    break;
+            }
+
+            // Direct3D 11 does not support a 24-bit only depth buffer. It has the D24S8 format.
+            if (depthFormat == DepthFormat.Depth24)
+                selectedDepthFormat = DepthFormat.Depth24Stencil8;
+
+            // Set to a power of two less than or equal to 8
+            selectedMultiSampleCount = NextLowestPowerOf2(multiSampleCount);
+            if (selectedMultiSampleCount > 8)
+                selectedMultiSampleCount = 8;
+
+            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
+        }
+
+        bool PlatformQueryRenderTargetFormat(
+            GraphicsProfile graphicsProfile,
+            SurfaceFormat format,
+            DepthFormat depthFormat,
+            int multiSampleCount,
+            out SurfaceFormat selectedFormat,
+            out DepthFormat selectedDepthFormat,
+            out int selectedMultiSampleCount)
+        {
+            selectedFormat = format;
+            selectedDepthFormat = depthFormat;
+
+            // 16-bit formats are not supported until DXGI 1.2 (Direct3D 11.1)
+            // https://msdn.microsoft.com/en-us/library/windows/desktop/ff471325(v=vs.85).aspx
+            switch (format)
+            {
+                case SurfaceFormat.Bgr565:
+                case SurfaceFormat.Bgra4444:
+                case SurfaceFormat.Bgra5551:
+                    selectedFormat = SurfaceFormat.Color;
+                    break;
+            }
+
+            // Direct3D 11 does not support a 24-bit only depth buffer. It has the D24S8 format.
+            if (depthFormat == DepthFormat.Depth24)
+                selectedDepthFormat = DepthFormat.Depth24Stencil8;
+
+            // Set to a power of two less than or equal to 8
+            selectedMultiSampleCount = NextLowestPowerOf2(multiSampleCount);
+            if (selectedMultiSampleCount > 8)
+                selectedMultiSampleCount = 8;
+
+            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
+        }
     }
 }

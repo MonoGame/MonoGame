@@ -26,7 +26,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		public RenderTarget3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, depth, mipMap, preferredFormat, true)
 		{
-			DepthStencilFormat = preferredDepthFormat;
+            graphicsDevice.Adapter.QueryRenderTargetFormat(graphicsDevice.GraphicsProfile, preferredFormat, preferredDepthFormat, preferredMultiSampleCount,
+                out preferredFormat, out preferredDepthFormat, out preferredMultiSampleCount);
+            DepthStencilFormat = preferredDepthFormat;
 			MultiSampleCount = preferredMultiSampleCount;
 			RenderTargetUsage = usage;
 

@@ -375,5 +375,68 @@ namespace Microsoft.Xna.Framework.Graphics
         private const int HORZRES = 8;
         private const int VERTRES = 10;
 #endif
+
+        static int NextLowestPowerOf2(int x)
+        {
+            x = x | (x >> 1);
+            x = x | (x >> 2);
+            x = x | (x >> 4);
+            x = x | (x >> 8);
+            x = x | (x >> 16);
+            return x - (x >> 1);
+        }
+
+        public bool QueryBackBufferFormat(
+            GraphicsProfile graphicsProfile,
+            SurfaceFormat format,
+            DepthFormat depthFormat,
+            int multiSampleCount,
+            out SurfaceFormat selectedFormat,
+            out DepthFormat selectedDepthFormat,
+            out int selectedMultiSampleCount)
+        {
+            selectedFormat = format;
+            selectedDepthFormat = depthFormat;
+
+            // Back buffer support for Color, Rgba1010102 and Bgr565 only
+            switch (format)
+            {
+                case SurfaceFormat.Color:
+                case SurfaceFormat.Rgba1010102:
+                case SurfaceFormat.Bgr565:
+                    break;
+
+                default:
+                    selectedFormat = SurfaceFormat.Color;
+                    break;
+            }
+
+            // Set to a power of two less than or equal to 8
+            selectedMultiSampleCount = NextLowestPowerOf2(multiSampleCount);
+            if (selectedMultiSampleCount > 8)
+                selectedMultiSampleCount = 8;
+
+            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
+        }
+
+        public bool QueryRenderTargetFormat(
+            GraphicsProfile graphicsProfile,
+            SurfaceFormat format,
+            DepthFormat depthFormat,
+            int multiSampleCount,
+            out SurfaceFormat selectedFormat,
+            out DepthFormat selectedDepthFormat,
+            out int selectedMultiSampleCount)
+        {
+            selectedFormat = format;
+            selectedDepthFormat = depthFormat;
+
+            // Set to a power of two less than or equal to 8
+            selectedMultiSampleCount = NextLowestPowerOf2(multiSampleCount);
+            if (selectedMultiSampleCount > 8)
+                selectedMultiSampleCount = 8;
+
+            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
+        }
     }
 }
