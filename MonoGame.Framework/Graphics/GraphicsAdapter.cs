@@ -150,6 +150,35 @@ namespace Microsoft.Xna.Framework.Graphics
             selectedDepthFormat = depthFormat;
             selectedMultiSampleCount = multiSampleCount;
 
+            // fallback for unsupported renderTarget surface formats.
+            if (selectedFormat == SurfaceFormat.Alpha8 ||
+                selectedFormat == SurfaceFormat.NormalizedByte2 ||
+                selectedFormat == SurfaceFormat.NormalizedByte4 ||
+                selectedFormat == SurfaceFormat.Dxt1 ||
+                selectedFormat == SurfaceFormat.Dxt3 ||
+                selectedFormat == SurfaceFormat.Dxt5 ||
+                selectedFormat == SurfaceFormat.Dxt1a ||
+                selectedFormat == SurfaceFormat.Dxt1SRgb ||
+                selectedFormat == SurfaceFormat.Dxt3SRgb ||
+                selectedFormat == SurfaceFormat.Dxt5SRgb)
+                selectedFormat = SurfaceFormat.Color;
+
+            // fallback for unsupported renderTarget surface formats on Reach profile.
+            if (graphicsProfile == GraphicsProfile.Reach)
+            {
+                if (selectedFormat == SurfaceFormat.HalfSingle ||
+                   selectedFormat == SurfaceFormat.HalfVector2 ||
+                   selectedFormat == SurfaceFormat.HalfVector4 ||
+                   selectedFormat == SurfaceFormat.HdrBlendable ||
+                   selectedFormat == SurfaceFormat.Rg32 ||
+                   selectedFormat == SurfaceFormat.Rgba1010102 ||
+                   selectedFormat == SurfaceFormat.Rgba64 ||
+                   selectedFormat == SurfaceFormat.Single ||
+                   selectedFormat == SurfaceFormat.Vector2 ||
+                   selectedFormat == SurfaceFormat.Vector4)
+                    selectedFormat = SurfaceFormat.Color;
+            }
+            
             return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
 		}
 
