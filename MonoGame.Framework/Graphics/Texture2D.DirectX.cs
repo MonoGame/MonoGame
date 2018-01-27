@@ -44,6 +44,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             int w, h;
             GetSizeForLevel(Width, Height, level, out w, out h);
+
+            // For DXT compressed formats the width and height must be
+            // a multiple of 4 for the complete mip level to be set.
+            if (_format.IsCompressedFormat())
+            {
+                w = (w + 3) & ~3;
+                h = (h + 3) & ~3;
+            }
+
             var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             // Use try..finally to make sure dataHandle is freed in case of an error
