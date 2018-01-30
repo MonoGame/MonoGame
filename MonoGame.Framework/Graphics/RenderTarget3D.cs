@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (preferredDepthFormat == DepthFormat.None)
                 return;
 
-            PlatformConstruct(graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage);
+            PlatformConstruct(graphicsDevice, width, height, mipMap, preferredDepthFormat, preferredMultiSampleCount, usage);
         }
 
 		public RenderTarget3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
