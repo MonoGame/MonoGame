@@ -50,8 +50,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                if (_lookupDictionary.TryGetValue(name, out int i))
-                    return _parameters[i];
+                int index;
+                if (_lookupDictionary.TryGetValue(name, out index))
+                    return _parameters[index];
                 return null;
 			}
         }
