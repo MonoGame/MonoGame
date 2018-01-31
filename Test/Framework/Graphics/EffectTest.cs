@@ -107,9 +107,6 @@ namespace MonoGame.Tests.Graphics
         {
             // This relies on the parameters permanently being on the same index.
             // Should be no problem except when adding parameters.
-            var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-            game.GraphicsDevice.Textures[0] = texture;
-
             var effect = new BasicEffect(game.GraphicsDevice);
             effect.TextureEnabled = true;
             effect.Texture = null;
@@ -119,7 +116,6 @@ namespace MonoGame.Tests.Graphics
             Assert.That(effect.Parameters[0].GetValueVector3().Equals(Color.HotPink.ToVector3()));
             Assert.That(effect.Parameters[14].GetValueVector3().Equals(Color.Honeydew.ToVector3()));
             
-            texture.Dispose();
             effect.Dispose();
         }
     }
