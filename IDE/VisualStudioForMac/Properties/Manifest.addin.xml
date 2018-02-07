@@ -84,6 +84,7 @@
 		<Image id="md-monogame-preview-project" resource="monogame-preview.png" />
 	</Extension>
 	<Extension path="/MonoDevelop/Core/StockIcons">
+		<StockIcon stockid="md-monogame-project" resource="monogame-project-32.png" size="Dnd" />
 		<StockIcon stockid="md-monogame-icon-project" resource="monogame-project-32.png" size="Dnd" />
 		<StockIcon stockid="md-monogame-android-project" resource="monogame-android.png" size="Dnd" />
 		<StockIcon stockid="md-monogame-ios-project" resource="monogame-ios.png" size="Dnd" />
