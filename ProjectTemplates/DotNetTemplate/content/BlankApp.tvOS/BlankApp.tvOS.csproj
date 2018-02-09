@@ -7,8 +7,8 @@
     <ProjectGuid>{1F773957-AC74-404D-9F23-FD09C6978844}</ProjectGuid>
     <ProjectTypeGuids>{06FA79CB-D6CD-4721-BB4B-1BD202089C55};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <RootNamespace>BlankApp.tvOS</RootNamespace>
-    <AssemblyName>BlankApp.tvOS</AssemblyName>
+    <RootNamespace>BlankApp</RootNamespace>
+    <AssemblyName>BlankApp</AssemblyName>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <MonoGamePlatform>iOS</MonoGamePlatform>
   </PropertyGroup>

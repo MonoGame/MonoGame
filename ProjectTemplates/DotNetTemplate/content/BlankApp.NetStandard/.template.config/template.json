@@ -16,4 +16,5 @@
                       ], 
     "sourceName": "BlankApp", 
     "preferNameDirectory" : "true"
+    "description": "A MonoGame NetStandard project. Can be used to share game code between platforms."
 }

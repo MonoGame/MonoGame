@@ -16,4 +16,5 @@
                       ], 
     "sourceName": "BlankApp", 
     "preferNameDirectory" : "true"
+    "description": "A MonoGame game project for Windows using DirectX."
 }

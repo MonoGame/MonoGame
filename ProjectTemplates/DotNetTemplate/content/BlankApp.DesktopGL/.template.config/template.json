@@ -15,5 +15,6 @@
                         },
                       ], 
     "sourceName": "BlankApp", 
-    "preferNameDirectory" : "true"
+    "preferNameDirectory" : "true",
+    "description": "A MonoGame game project for Windows, Mac and Linux using OpenGL."
 }

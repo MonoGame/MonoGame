@@ -7,9 +7,9 @@
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProjectGuid>{CA7AB65C-57DE-412C-AF42-E7E6EDDF2D5F}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>BlankApp.iOS</RootNamespace>
+    <RootNamespace>BlankApp</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>BlankApp.iOS</AssemblyName>
+    <AssemblyName>BlankApp</AssemblyName>
     <MonoGamePlatform>iOS</MonoGamePlatform>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">

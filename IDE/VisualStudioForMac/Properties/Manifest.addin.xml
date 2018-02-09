@@ -17,65 +17,67 @@
 			id="MonoGame.BlankApp.DesktopGL.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-desktopgl-project"
-			imageId="md-monogame-preview-project"
+			imageId="md-monogame-template"
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.iOS.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-ios-project"
-			imageId="md-monogame-preview-project"
+			imageId="md-monogame-template"
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.Android.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-android-project"
-			imageId="md-monogame-preview-project"
+			imageId="md-monogame-template"
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.Windows.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-windows-project"
-			imageId="md-monogame-preview-project"
+			imageId="md-monogame-template"
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.MacOS.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-project"
-			imageId="md-monogame-project"
+			imageId="md-monogame-template"
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.tvOS.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-project"
-			imageId="md-monogame-project"
+			imageId="md-monogame-template"
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.Shared.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-shared-project"
-			imageId="md-monogame-preview-project"
+			imageId="md-monogame-template"
 			category="monogame/library/general"/>
 		<Template
 			id="MonoGame.BlankApp.Portable.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-shared-project"
-			imageId="md-monogame-preview-project"
+			imageId="md-monogame-template"
 			category="monogame/library/general"/>
 		<Template
 			id="MonoGame.BlankApp.NetStandard.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-shared-project"
-			imageId="md-monogame-preview-project"
+			imageId="md-monogame-template"
 			category="monogame/library/general"/>
 		<Template
 			id="MonoGame.Pipeline.Extension.CSharp"
 			path="Templates/MonoGame.Templates.nupkg"
 			icon="md-monogame-shared-project"
-			imageId="md-monogame-preview-project"
+			imageId="md-monogame-template"
 			category="monogame/library/general"/>
 	</Extension>
 	<Extension path="/MonoDevelop/Ide/TemplateImages">
 		<Image id="md-monogame-project" resource="monogame-project-32.png" />
+		<Image id="md-monogame-icon-project" resource="monogame-project-32.png" />
+		<Image id="md-monogame-template" resource="project-monogame-template.png" />
 		<Image id="md-monogame-android-project" resource="monogame-android.png" />
 		<Image id="md-monogame-ios-project" resource="monogame-ios.png" />
 		<Image id="md-monogame-desktopgl-project" resource="monogame-desktopgl.png" />
@@ -84,8 +86,9 @@
 		<Image id="md-monogame-preview-project" resource="monogame-preview.png" />
 	</Extension>
 	<Extension path="/MonoDevelop/Core/StockIcons">
-		<StockIcon stockid="md-monogame-project" resource="monogame-project-32.png" size="Dnd" />
-		<StockIcon stockid="md-monogame-icon-project" resource="monogame-project-32.png" size="Dnd" />
+		<StockIcon stockid="md-monogame-project" resource="project-monogame-32.png" size="Dnd" />
+		<StockIcon stockid="md-monogame-template" resource="project-monogame-template.png" size="Dnd" />
+		<StockIcon stockid="md-monogame-icon-project" resource="project-monogame-32.png" size="Dnd" />
 		<StockIcon stockid="md-monogame-android-project" resource="monogame-android.png" size="Dnd" />
 		<StockIcon stockid="md-monogame-ios-project" resource="monogame-ios.png" size="Dnd" />
 		<StockIcon stockid="md-monogame-desktopgl-project" resource="monogame-desktopgl.png" size="Dnd" />

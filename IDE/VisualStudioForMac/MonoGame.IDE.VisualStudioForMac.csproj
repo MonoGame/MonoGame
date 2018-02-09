@@ -27,6 +27,18 @@
     <None Remove="monogame-preview.png" />
     <None Remove="monogame-shared.png" />
     <None Remove="monogame-windows.png" />
+    <None Remove="project-monogame-32.png" />
+    <None Remove="project-monogame-32%402x.png" />
+    <None Remove="project-monogame-32~dark.png" />
+    <None Remove="project-monogame-32~dark%402x.png" />
+    <None Remove="project-monogame-32~dark~sel.png" />
+    <None Remove="project-monogame-32~dark~sel%402x.png" />
+    <None Remove="project-monogame-32~sel.png" />
+    <None Remove="project-monogame-32~sel%402x.png" />
+    <None Remove="project-monogame-template.png" />
+    <None Remove="project-monogame-template%402x.png" />
+    <None Remove="project-monogame-template~dark.png" />
+    <None Remove="project-monogame-template~dark%402x.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="monogame-project-32.png">
@@ -50,6 +62,18 @@
     <EmbeddedResource Include="monogame-windows.png">
       <LogicalName>monogame-windows.png</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32.png" />
+    <EmbeddedResource Include="project-monogame-32%402x.png" />
+    <EmbeddedResource Include="project-monogame-32~dark.png" />
+    <EmbeddedResource Include="project-monogame-32~dark%402x.png" />
+    <EmbeddedResource Include="project-monogame-32~dark~sel.png" />
+    <EmbeddedResource Include="project-monogame-32~dark~sel%402x.png" />
+    <EmbeddedResource Include="project-monogame-32~sel.png" />
+    <EmbeddedResource Include="project-monogame-32~sel%402x.png" />
+    <EmbeddedResource Include="project-monogame-template.png" />
+    <EmbeddedResource Include="project-monogame-template%402x.png" />
+    <EmbeddedResource Include="project-monogame-template~dark.png" />
+    <EmbeddedResource Include="project-monogame-template~dark%402x.png" />
   </ItemGroup>
   <ItemGroup>
     <AddinFile Include="..\..\ProjectTemplates\DotNetTemplate\bin\MonoGame.Templates.nupkg">
@@ -71,10 +95,6 @@
        <AddinInfo Include="[assembly: AddinDescription(&quot;VisualStudio for Mac extension for MonoGame&quot;)]" />
        <AddinInfo Include="[assembly: AddinAuthor(&quot;@MonoGameTeam&quot;)]" />
      </ItemGroup>
-     <WriteLinesToFile
-        File="Properties\AddinInfo.cs"
-        Lines="@(AddinInfo)"
-        Overwrite="true"
-     />
+     <WriteLinesToFile File="Properties\AddinInfo.cs" Lines="@(AddinInfo)" Overwrite="true" />
   </Target>
 </Project>
