@@ -62,18 +62,42 @@
     <EmbeddedResource Include="monogame-windows.png">
       <LogicalName>monogame-windows.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="project-monogame-32.png" />
-    <EmbeddedResource Include="project-monogame-32%402x.png" />
-    <EmbeddedResource Include="project-monogame-32~dark.png" />
-    <EmbeddedResource Include="project-monogame-32~dark%402x.png" />
-    <EmbeddedResource Include="project-monogame-32~dark~sel.png" />
-    <EmbeddedResource Include="project-monogame-32~dark~sel%402x.png" />
-    <EmbeddedResource Include="project-monogame-32~sel.png" />
-    <EmbeddedResource Include="project-monogame-32~sel%402x.png" />
-    <EmbeddedResource Include="project-monogame-template.png" />
-    <EmbeddedResource Include="project-monogame-template%402x.png" />
-    <EmbeddedResource Include="project-monogame-template~dark.png" />
-    <EmbeddedResource Include="project-monogame-template~dark%402x.png" />
+    <EmbeddedResource Include="project-monogame-32.png">
+      <LogicalName>project-monogame-32.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32%402x.png">
+      <LogicalName>project-monogame-32@2x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~dark.png">
+      <LogicalName>project-monogame-32@~dark.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~dark%402x.png">
+      <LogicalName>project-monogame-32~dark%402x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~dark~sel.png">
+      <LogicalName>project-monogame-32~dark~sel.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~dark~sel%402x.png">
+      <LogicalName>project-monogame-32~dark~sel%402x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~sel.png">
+      <LogicalName>project-monogame-32~sel.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~sel%402x.png">
+      <LogicalName>project-monogame-32~sel%402x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-template.png">
+      <LogicalName>project-monogame-template.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-template%402x.png">
+      <LogicalName>project-monogame-template%402x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-template~dark.png">
+      <LogicalName>project-monogame-template~dark.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-template~dark%402x.png">
+      <LogicalName>project-monogame-template~dark%402x.png</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <AddinFile Include="..\..\ProjectTemplates\DotNetTemplate\bin\MonoGame.Templates.nupkg">
