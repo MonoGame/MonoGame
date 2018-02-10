@@ -126,8 +126,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        /*
-		public bool QueryRenderTargetFormat(
+        /// <summary>
+        /// Queries for support of the requested render target format on the adaptor.
+        /// </summary>
+        /// <param name="graphicsProfile">The graphics profile.</param>
+        /// <param name="format">The requested surface format.</param>
+        /// <param name="depthFormat">The requested depth stencil format.</param>
+        /// <param name="multiSampleCount">The requested multisample count.</param>
+        /// <param name="selectedFormat">Set to the best format supported by the adaptor for the requested surface format.</param>
+        /// <param name="selectedDepthFormat">Set to the best format supported by the adaptor for the requested depth stencil format.</param>
+        /// <param name="selectedMultiSampleCount">Set to the best count supported by the adaptor for the requested multisample count.</param>
+        /// <returns>True if the requested format is supported by the adaptor. False if one or more of the values was changed.</returns>
+ 		public bool QueryRenderTargetFormat(
 			GraphicsProfile graphicsProfile,
 			SurfaceFormat format,
 			DepthFormat depthFormat,
@@ -136,9 +146,41 @@ namespace Microsoft.Xna.Framework.Graphics
 			out DepthFormat selectedDepthFormat,
 			out int selectedMultiSampleCount)
 		{
-			throw new NotImplementedException();
+			selectedFormat = format;
+            selectedDepthFormat = depthFormat;
+            selectedMultiSampleCount = multiSampleCount;
+
+            // fallback for unsupported renderTarget surface formats.
+            if (selectedFormat == SurfaceFormat.Alpha8 ||
+                selectedFormat == SurfaceFormat.NormalizedByte2 ||
+                selectedFormat == SurfaceFormat.NormalizedByte4 ||
+                selectedFormat == SurfaceFormat.Dxt1 ||
+                selectedFormat == SurfaceFormat.Dxt3 ||
+                selectedFormat == SurfaceFormat.Dxt5 ||
+                selectedFormat == SurfaceFormat.Dxt1a ||
+                selectedFormat == SurfaceFormat.Dxt1SRgb ||
+                selectedFormat == SurfaceFormat.Dxt3SRgb ||
+                selectedFormat == SurfaceFormat.Dxt5SRgb)
+                selectedFormat = SurfaceFormat.Color;
+
+            // fallback for unsupported renderTarget surface formats on Reach profile.
+            if (graphicsProfile == GraphicsProfile.Reach)
+            {
+                if (selectedFormat == SurfaceFormat.HalfSingle ||
+                   selectedFormat == SurfaceFormat.HalfVector2 ||
+                   selectedFormat == SurfaceFormat.HalfVector4 ||
+                   selectedFormat == SurfaceFormat.HdrBlendable ||
+                   selectedFormat == SurfaceFormat.Rg32 ||
+                   selectedFormat == SurfaceFormat.Rgba1010102 ||
+                   selectedFormat == SurfaceFormat.Rgba64 ||
+                   selectedFormat == SurfaceFormat.Single ||
+                   selectedFormat == SurfaceFormat.Vector2 ||
+                   selectedFormat == SurfaceFormat.Vector4)
+                    selectedFormat = SurfaceFormat.Color;
+            }
+            
+            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
 		}
-        */
 
         public bool IsProfileSupported(GraphicsProfile graphicsProfile)
         {

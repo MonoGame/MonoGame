@@ -95,6 +95,58 @@ namespace MonoGame.Tests.Graphics
             Assert.IsTrue(adapter.IsDefaultAdapter);
             Assert.Contains(adapter, GraphicsAdapter.Adapters);
         }
+
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Color, SurfaceFormat.Color, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Color, SurfaceFormat.Color, true)]
+        // unsupported formats
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Alpha8, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt1, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt3, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt5, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.NormalizedByte2, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.NormalizedByte4, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Alpha8, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt1, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt3, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt5, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.NormalizedByte2, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.NormalizedByte4, SurfaceFormat.Color, false)]
+        // non-Reach formats
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.HalfSingle, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.HalfVector2, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.HalfVector4, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.HdrBlendable, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Rg32, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Rgba1010102, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Rgba64, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Single, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Vector2, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Vector4, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.HalfSingle, SurfaceFormat.HalfSingle, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.HalfVector2, SurfaceFormat.HalfVector2, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.HalfVector4, SurfaceFormat.HalfVector4, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.HdrBlendable, SurfaceFormat.HdrBlendable, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Rg32, SurfaceFormat.Rg32, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Rgba1010102, SurfaceFormat.Rgba1010102, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Rgba64, SurfaceFormat.Rgba64, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Single, SurfaceFormat.Single, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Vector2, SurfaceFormat.Vector2, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Vector4, SurfaceFormat.Vector4, true)]
+        public static void QueryRenderTargetFormat_preferredSurface(GraphicsProfile graphicsProfile, SurfaceFormat preferredSurfaceFormat, SurfaceFormat expectedSurfaceFormat, bool expectedIsSupported)
+        {
+            var adapter = GraphicsAdapter.DefaultAdapter;
+
+            SurfaceFormat selectedFormat;
+            DepthFormat selectedDepthFormat;
+            int selectedMultiSampleCount;
+            bool isSupported = adapter.QueryRenderTargetFormat(graphicsProfile, preferredSurfaceFormat, DepthFormat.None, 0,
+                out selectedFormat, out selectedDepthFormat, out selectedMultiSampleCount);
+
+            Assert.AreEqual(isSupported, expectedIsSupported);
+            Assert.AreEqual(selectedFormat, expectedSurfaceFormat);
+            Assert.AreEqual(selectedDepthFormat, DepthFormat.None);
+            Assert.AreEqual(selectedMultiSampleCount, 0);
+        }
     }
 }
 
