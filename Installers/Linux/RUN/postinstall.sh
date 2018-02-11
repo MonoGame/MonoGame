@@ -29,9 +29,6 @@ fi
 DIR=$(pwd)
 IDIR="/usr/lib/mono/xbuild/MonoGame/v3.0"
 
-# Find MonoDevelop
-MDTOOL="?????"
-
 if type "monodevelop" > /dev/null 2>&1
 then
 	if eval "monodevelop --help | grep 'MonoDevelop 6' > /dev/null 2>&1"
@@ -97,7 +94,7 @@ chmod +x "$IDIR/Tools/ffmpeg"
 chmod +x "$IDIR/Tools/ffprobe"
 
 # MonoDevelop addin
-if [ "$MONODEVELOP" != "?????" ]
+if [ ! -z "$MDTOOL" ]
 then
 	echo "Installing MonoDevelop Addin..."
 	sudo -H -u $USERNAME bash -c "$MDTOOL setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack  > /dev/null"
