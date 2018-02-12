@@ -104,5 +104,26 @@ namespace MonoGame.Tests.Graphics
             spriteBatch.Dispose();
             renderTarget.Dispose();
         }
+        
+        [TestCase(SurfaceFormat.Color, SurfaceFormat.Color)]
+        // unsupported renderTarget formats
+        [TestCase(SurfaceFormat.Alpha8, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt1, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt3, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt5, SurfaceFormat.Color)]
+#if !XNA        
+        [TestCase(SurfaceFormat.Dxt1a, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt1SRgb, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt3SRgb, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt5SRgb, SurfaceFormat.Color)]
+#endif
+        [TestCase(SurfaceFormat.NormalizedByte2, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.NormalizedByte4, SurfaceFormat.Color)]
+        public void PreferredSurfaceFormatTest(SurfaceFormat preferredSurfaceFormat, SurfaceFormat expectedSurfaceFormat)
+        {                    
+            var renderTarget = new RenderTarget2D(gd, 16, 16, false, preferredSurfaceFormat, DepthFormat.None);
+                    
+            Assert.AreEqual(renderTarget.Format, expectedSurfaceFormat);
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private RenderTarget2D _resolvedTexture;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
-            SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
+            DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
         {
             GenerateIfRequired();
         }
