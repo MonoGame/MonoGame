@@ -260,12 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     else if (pRegions[m].Start > c)
                     {
-                        r = m;
-                        if (l == r)
-                        {
-                            regionIdx = l;
-                            break;
-                        }
+                        r = m - 1;
                     }
                     else
                     {
