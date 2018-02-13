@@ -52,24 +52,28 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly IDictionary<Keycode, Keys> KeyMap = LoadKeyMap();
 
-        internal static void KeyDown(Keycode keyCode)
+        internal static bool KeyDown(Keycode keyCode)
         {
             Keys key;
-            if (KeyMap.TryGetValue(keyCode, out key))
+            if (KeyMap.TryGetValue(keyCode, out key) && key != Keys.None)
             {
                 if (!keys.Contains(key))
                     keys.Add(key);
+                return true;
             }
+            return false;
         }
 
-        internal static void KeyUp(Keycode keyCode)
+        internal static bool KeyUp(Keycode keyCode)
         {
             Keys key;
-            if (KeyMap.TryGetValue(keyCode, out key))
+            if (KeyMap.TryGetValue(keyCode, out key) && key != Keys.None)
             {
                 if (keys.Contains(key))
                     keys.Remove(key);
+                return true;
             }
+            return false;
         }
 
         private static IDictionary<Keycode, Keys> LoadKeyMap()
@@ -120,18 +124,60 @@ namespace Microsoft.Xna.Framework.Input
 			maps[Keycode.W] = Keys.W;
 			maps[Keycode.X] = Keys.X;
             maps[Keycode.Y] = Keys.Y;
-            maps[Keycode.C] = Keys.Z;
-			maps[Keycode.Back] = Keys.Escape;
+            maps[Keycode.Z] = Keys.Z;
+            maps[Keycode.Space] = Keys.Space;
+			maps[Keycode.Escape] = Keys.Escape;
             maps[Keycode.Back] = Keys.Back;
             maps[Keycode.Home] = Keys.Home;
             maps[Keycode.Enter] = Keys.Enter;
             maps[Keycode.Period] = Keys.OemPeriod;
             maps[Keycode.Comma] = Keys.OemComma;
-            // TODO: put in all the other mappings
             maps[Keycode.Menu] = Keys.Help;
             maps[Keycode.Search] = Keys.BrowserSearch;
             maps[Keycode.VolumeUp] = Keys.VolumeUp;
             maps[Keycode.VolumeDown] = Keys.VolumeDown;
+            maps[Keycode.MediaPause] = Keys.Pause;
+            maps[Keycode.MediaPlayPause] = Keys.MediaPlayPause;
+            maps[Keycode.MediaStop] = Keys.MediaStop;
+            maps[Keycode.MediaNext] = Keys.MediaNextTrack;
+            maps[Keycode.MediaPrevious] = Keys.MediaPreviousTrack;
+            maps[Keycode.Mute] = Keys.VolumeMute;
+            maps[Keycode.AltLeft] = Keys.LeftAlt;
+            maps[Keycode.AltRight] = Keys.RightAlt;
+            maps[Keycode.ShiftLeft] = Keys.LeftShift;
+            maps[Keycode.ShiftRight] = Keys.RightShift;
+            maps[Keycode.Tab] = Keys.Tab;
+            maps[Keycode.Del] = Keys.Delete;
+            maps[Keycode.Minus] = Keys.OemMinus;
+            maps[Keycode.LeftBracket] = Keys.OemOpenBrackets;
+            maps[Keycode.RightBracket] = Keys.OemCloseBrackets;
+            maps[Keycode.Backslash] = Keys.OemBackslash;
+            maps[Keycode.Semicolon] = Keys.OemSemicolon;
+            maps[Keycode.PageUp] = Keys.PageUp;
+            maps[Keycode.PageDown] = Keys.PageDown;
+            maps[Keycode.CtrlLeft] = Keys.LeftControl;
+            maps[Keycode.CtrlRight] = Keys.RightControl;
+            maps[Keycode.CapsLock] = Keys.CapsLock;
+            maps[Keycode.ScrollLock] = Keys.Scroll;
+            maps[Keycode.NumLock] = Keys.NumLock;
+            maps[Keycode.Insert] = Keys.Insert;
+            maps[Keycode.F1] = Keys.F1;
+            maps[Keycode.F2] = Keys.F2;
+            maps[Keycode.F3] = Keys.F3;
+            maps[Keycode.F4] = Keys.F4;
+            maps[Keycode.F5] = Keys.F5;
+            maps[Keycode.F6] = Keys.F6;
+            maps[Keycode.F7] = Keys.F7;
+            maps[Keycode.F8] = Keys.F8;
+            maps[Keycode.F9] = Keys.F9;
+            maps[Keycode.F10] = Keys.F10;
+            maps[Keycode.F11] = Keys.F11;
+            maps[Keycode.F12] = Keys.F12;
+            maps[Keycode.NumpadDivide] = Keys.Divide;
+            maps[Keycode.NumpadMultiply] = Keys.Multiply;
+            maps[Keycode.NumpadSubtract] = Keys.Subtract;
+            maps[Keycode.NumpadAdd] = Keys.Add;
+
             return maps;
         }
 
