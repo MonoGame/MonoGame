@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Input
             maps[Keycode.DpadRight] = Keys.Right;
             maps[Keycode.DpadUp] = Keys.Up;
             maps[Keycode.DpadDown] = Keys.Down;
-			maps[Keycode.DpadCenter] = Keys.Enter;
+            maps[Keycode.DpadCenter] = Keys.Enter;
             maps[Keycode.Num0] = Keys.D0;
             maps[Keycode.Num1] = Keys.D1;
             maps[Keycode.Num2] = Keys.D2;
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Input
             maps[Keycode.Num7] = Keys.D7;
             maps[Keycode.Num8] = Keys.D8;
             maps[Keycode.Num9] = Keys.D9;
-			maps[Keycode.A] = Keys.A;
+            maps[Keycode.A] = Keys.A;
             maps[Keycode.B] = Keys.B;
             maps[Keycode.C] = Keys.C;
             maps[Keycode.D] = Keys.D;
@@ -121,12 +121,12 @@ namespace Microsoft.Xna.Framework.Input
             maps[Keycode.T] = Keys.T;
             maps[Keycode.U] = Keys.U;
             maps[Keycode.V] = Keys.V;
-			maps[Keycode.W] = Keys.W;
-			maps[Keycode.X] = Keys.X;
+            maps[Keycode.W] = Keys.W;
+            maps[Keycode.X] = Keys.X;
             maps[Keycode.Y] = Keys.Y;
             maps[Keycode.Z] = Keys.Z;
             maps[Keycode.Space] = Keys.Space;
-			maps[Keycode.Escape] = Keys.Escape;
+            maps[Keycode.Escape] = Keys.Escape;
             maps[Keycode.Back] = Keys.Back;
             maps[Keycode.Home] = Keys.Home;
             maps[Keycode.Enter] = Keys.Enter;
