@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
  <mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
-   <mime-type type="text/mgcb">  
+   <mime-type type="text/x-mgcb">  
      <comment>MonoGame Pipeline Project</comment>
      <generic-icon name="monogame"/>
      <icon name="monogame"/>

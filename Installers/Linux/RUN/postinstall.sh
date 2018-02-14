@@ -146,15 +146,17 @@ for MANPATH in "${ARRAY[@]}"
 do
 	if [ -d "$MANPATH/man1" ]
 	then
-		cp "$DIR/Main/mgcb.1" "$MANPATH/man1/mgcb.1"
-		gzip "$MANPATH/man1/mgcb.1"
+		cp -f "$DIR/Main/mgcb.1" "$MANPATH/man1/mgcb.1"
+		gzip -f "$MANPATH/man1/mgcb.1"
     	break
     fi
 done
 
 # Mimetype
 echo "Adding mimetype..."
-xdg-mime install $DIR/Main/mgcb.xml --novendor > /dev/null
+touch mgcb.xml
+xdg-mime uninstall mgcb.xml
+xdg-mime install $DIR/Main/x-mgcb.xml > /dev/null
 xdg-mime default "MonogamePipeline.desktop" text/mgcb
 
 # Uninstall script
