@@ -29,9 +29,6 @@ fi
 DIR=$(pwd)
 IDIR="/usr/lib/mono/xbuild/MonoGame/v3.0"
 
-# Find MonoDevelop
-MDTOOL="?????"
-
 if type "monodevelop" > /dev/null 2>&1
 then
 	if eval "monodevelop --help | grep 'MonoDevelop 6' > /dev/null 2>&1"
@@ -97,7 +94,7 @@ chmod +x "$IDIR/Tools/ffmpeg"
 chmod +x "$IDIR/Tools/ffprobe"
 
 # MonoDevelop addin
-if [ "$MONODEVELOP" != "?????" ]
+if [ ! -z "$MDTOOL" ]
 then
 	echo "Installing MonoDevelop Addin..."
 	sudo -H -u $USERNAME bash -c "$MDTOOL setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack  > /dev/null"
@@ -149,15 +146,17 @@ for MANPATH in "${ARRAY[@]}"
 do
 	if [ -d "$MANPATH/man1" ]
 	then
-		cp "$DIR/Main/mgcb.1" "$MANPATH/man1/mgcb.1"
-		gzip "$MANPATH/man1/mgcb.1"
+		cp -f "$DIR/Main/mgcb.1" "$MANPATH/man1/mgcb.1"
+		gzip -f "$MANPATH/man1/mgcb.1"
     	break
     fi
 done
 
 # Mimetype
 echo "Adding mimetype..."
-xdg-mime install $DIR/Main/mgcb.xml --novendor > /dev/null
+touch mgcb.xml
+xdg-mime uninstall mgcb.xml
+xdg-mime install $DIR/Main/x-mgcb.xml > /dev/null
 xdg-mime default "MonogamePipeline.desktop" text/mgcb
 
 # Uninstall script

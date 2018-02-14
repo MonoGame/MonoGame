@@ -1,24 +1,28 @@
 #!/bin/bash
 
-#check removale priviledge
+# Check removale priviledge
 if [ "$(id -u)" != "0" ]; then
 	echo "Please make sure you are running this uninstaller with sudo or as root." 1>&2
 	exit 1
 fi
 
-#remove terminal commands for mgcb and pipeline tool
+# Remove terminal commands for mgcb and pipeline tool
 rm -f /usr/bin/monogame-pipeline-tool
 rm -f /usr/bin/monogame-uninstall
 rm -f /usr/bin/mgcb
 rm -f /etc/bash_completion.d/mgcb
 
-#remove application icon
+# Remove application icon
 rm -rf /usr/share/icons/gnome/scalable/mimetypes/monogame.svg
 
-#remove pipeline tool application launcher
+# Remove pipeline tool application launcher
 rm -rf /usr/share/applications/Monogame\ Pipeline.desktop
 
-#remove MonoGame SDK
+# Remove mgcb mimetype
+touch /opt/MonoGameSDK/x-mgcb.xml
+xdg-mime uninstall /opt/MonoGameSDK/x-mgcb.xml
+
+# Remove MonoGame SDK
 rm -rf /usr/lib/mono/xbuild/MonoGame
 rm -rf /opt/MonoGameSDK
 
