@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>MonoGame.Content.Builder.Mac</id>
-    <version>3.7.0.3</version>
+    <version>3.7.0.7</version>
     <title>MonoGame.Content.Builder.Mac</title>
     <authors>cra0zy</authors>
     <owners>cra0zy</owners>
@@ -20,6 +20,6 @@ This package is currently unofficial.</description>
     <language>en-US</language>
   </metadata>
   <files>
-    <file src="../Tools/MGCB/bin/Mac/AnyCPU/Release/**/*" target="build" />
+    <file src="../Tools/MGCB/bin/MacOS/AnyCPU/Release/**/*" exclude="../Tools/MGCB/bin/MacOS/AnyCPU/Release/MGCB.app/**/*" target="build" />
   </files>
 </package>

@@ -24,7 +24,7 @@
   <UsingTask TaskName="MSBuildTasks.CollectContentReferences" AssemblyFile="$(MGTaskAssembly)" />
 
   <Target Name="Prepare">
-    <GetMGCBTask Version="3.7.0.3" />
+    <GetMGCBTask Version="3.7.0.7" />
     <PropertyGroup>
       <!-- El Capitan Support -->
       <MonoExe Condition=" '$(OS)' != 'Windows_NT' And Exists ('/Library/Frameworks/Mono.framework/Versions/Current/bin/mono') ">/Library/Frameworks/Mono.framework/Versions/Current/bin/mono</MonoExe>

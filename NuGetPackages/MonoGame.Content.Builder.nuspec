@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>MonoGame.Content.Builder</id>
-    <version>3.7.0.4</version>
+    <version>3.7.0.7</version>
     <title>MonoGame.Content.Builder</title>
     <authors>cra0zy</authors>
     <owners>cra0zy</owners>
