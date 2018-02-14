@@ -521,6 +521,8 @@ namespace MonoGame.Tools.Pipeline
                 _buildProcess.StartInfo.StandardOutputEncoding = encoding;
                 _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
 
+                View.OutputAppend(string.Format("Working Directory: {0} ", _buildProcess.StartInfo.WorkingDirectory));
+                View.OutputAppend(string.Format("Running: {0} {1}", _buildProcess.StartInfo.FileName, _buildProcess.StartInfo.Arguments));
                 // Fire off the process.
                 _buildProcess.Start();
                 _buildProcess.BeginOutputReadLine();
