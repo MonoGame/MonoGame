@@ -26,6 +26,7 @@ namespace MonoGame.Tools.Pipeline
         private ContextMenu _contextMenu;
         private FileFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
         private string[] monoLocations = {
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mono"),
             "/usr/bin/mono",
             "/usr/local/bin/mono",
             "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono"
@@ -322,7 +323,10 @@ namespace MonoGame.Tools.Pipeline
                 foreach (var path in monoLocations)
                 {
                     if (File.Exists(path))
+                    {
                         monoLoc = path;
+                        break;
+                    }
                 }
 
                 if (string.IsNullOrEmpty(monoLoc))
@@ -330,6 +334,8 @@ namespace MonoGame.Tools.Pipeline
                     monoLoc = "mono";
                     OutputAppend("Cound not find mono. Please install the latest version from http://www.mono-project.com");
                 }
+
+                OutputAppend("Found mono at " + monoLoc);
 
                 proc.StartInfo.FileName = monoLoc;
 

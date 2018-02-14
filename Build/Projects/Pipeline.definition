@@ -358,6 +358,16 @@
       <Platforms>MacOS</Platforms>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib">
+      <Platforms>MacOS</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>libfreeimage.dylib</Link>
+    </Content>
+    <Content Include="/Library/Frameworks/Mono.framework/Commands/mono">
+      <Platforms>MacOS</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>mono</Link>
+    </Content>
   </Files>
 
 </Project>
