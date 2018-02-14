@@ -4,6 +4,7 @@
 chmod +x /Applications/Pipeline.app/Contents/MacOS/Pipeline   
 chmod +x /Applications/Pipeline.app/Contents/MonoBundle/ffmpeg
 chmod +x /Applications/Pipeline.app/Contents/MonoBundle/ffprobe
+chmod +x /Applications/Pipeline.app/Contents/MonoBundle/mono
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -v -f /Applications/Pipeline.app
 
 #mgcb terminal command
