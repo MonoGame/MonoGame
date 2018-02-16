@@ -329,7 +329,7 @@ namespace MonoGame.Tools.Pipeline
                 if (string.IsNullOrEmpty(monoLoc))
                 {
                     monoLoc = "mono";
-                    OutputAppend("Cound not find mono. Please install the latest version from http://www.mono-project.com");
+                    OutputAppend("Could not find mono. Please install the latest version from http://www.mono-project.com");
                 }
 
                 proc.StartInfo.FileName = monoLoc;
