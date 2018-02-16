@@ -10,9 +10,23 @@ namespace Microsoft.Xna.Framework.Input
 {
     public static partial class Mouse
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct POINTSTRUCT
+        {
+            public int X;
+            public int Y;
+        }
+
         [DllImportAttribute("user32.dll", EntryPoint = "SetCursorPos")]
         [return: MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
         private static extern bool SetCursorPos(int X, int Y);
+
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        [return: MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        internal static extern bool GetCursorPos(out POINTSTRUCT pt);
+        
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        internal static extern int MapWindowPoints(HandleRef hWndFrom, HandleRef hWndTo, out POINTSTRUCT pt, int cPoints);
 
         private static Control _window;
         private static MouseInputWnd _mouseInputWnd = new MouseInputWnd();
@@ -41,8 +55,10 @@ namespace Microsoft.Xna.Framework.Input
         {
             if (_window != null)
             {
-                var screenPos = Control.MousePosition;
-                var clientPos = _window.PointToClient(screenPos);
+                POINTSTRUCT pos;
+                GetCursorPos(out pos);
+                MapWindowPoints(new HandleRef(null, IntPtr.Zero), new HandleRef(_window, WindowHandle), out pos, 1);
+                var clientPos = new System.Drawing.Point(pos.X, pos.Y);
                 var buttons = Control.MouseButtons;
                 
                 return new MouseState(
