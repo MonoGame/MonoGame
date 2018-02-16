@@ -164,8 +164,22 @@ namespace MonoGame.Framework
             RegisterToAllWindows();
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct POINTSTRUCT
+        {
+            public int X;
+            public int Y;
+        }
+
         [DllImport("shell32.dll", CharSet = CharSet.Auto, BestFitMapping = false)]
         private static extern IntPtr ExtractIcon(IntPtr hInst, string exeFileName, int iconIndex);
+        
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        [return: MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        internal static extern bool GetCursorPos(out POINTSTRUCT pt);
+        
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        internal static extern int MapWindowPoints(HandleRef hWndFrom, HandleRef hWndTo, out POINTSTRUCT pt, int cPoints);
 
         private void SetIcon()
         {
@@ -244,7 +258,10 @@ namespace MonoGame.Framework
             if (!Form.Visible)
                 return;
 
-            var clientPos = Form.PointToClient(Control.MousePosition);
+            POINTSTRUCT pos;
+            GetCursorPos(out pos);
+            MapWindowPoints(new HandleRef(null, IntPtr.Zero), new HandleRef(Form, Form.Handle), out pos, 1);
+            var clientPos = new System.Drawing.Point(pos.X, pos.Y);
             var withinClient = Form.ClientRectangle.Contains(clientPos);
             var buttons = Control.MouseButtons;
 
