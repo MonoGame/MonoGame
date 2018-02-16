@@ -87,17 +87,21 @@ namespace Microsoft.Xna.Framework.Graphics
                     WidthIncludingBearings = kerning[i].X + kerning[i].Y + kerning[i].Z
 				};
                 
-                if(regions.Count ==0 || regions.Peek().End +1 !=characters[i])
+                if(regions.Count == 0 || characters[i] > (regions.Peek().End+1))
                 {
                     // Start a new region
                     regions.Push(new CharacterRegion(characters[i], i));
                 } 
-                else
+                else if(characters[i] == (regions.Peek().End+1))
                 {
                     var currentRegion = regions.Pop();
                     // include character in currentRegion
                     currentRegion.End++;
                     regions.Push(currentRegion);
+                }
+                else // characters[i] < (regions.Peek().End+1)
+                {
+                    throw new InvalidOperationException("Invalid SpriteFont. Character map must be in ascending order.");
                 }
 			}
 
