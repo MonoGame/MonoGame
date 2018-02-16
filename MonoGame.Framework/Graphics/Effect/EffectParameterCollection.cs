@@ -15,7 +15,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _indexLookup = new Dictionary<string, int>(_parameters.Length);
             for (int i = 0; i < _parameters.Length; i++)
             {
-                _indexLookup.Add(_parameters[i].Name, i);
+                string name = _parameters[i].Name;
+                if(!string.IsNullOrWhiteSpace(name))
+                    _indexLookup.Add(name, i);
             }
         }
 
