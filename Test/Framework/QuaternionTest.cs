@@ -157,5 +157,20 @@ namespace MonoGame.Tests.Framework
             q.Normalize();
             Compare(expected, q);
         }
+
+        [Test]
+        public void Deconstruct()
+        {
+            Quaternion quaternion = new Quaternion(float.MinValue, float.MaxValue, float.MinValue, float.MaxValue);
+
+            float x, y, z, w;
+
+            quaternion.Deconstruct(out x, out y, out z, out w);
+
+            Assert.AreEqual(x, quaternion.X);
+            Assert.AreEqual(y, quaternion.Y);
+            Assert.AreEqual(z, quaternion.Z);
+            Assert.AreEqual(w, quaternion.W);
+        }
     }
 }

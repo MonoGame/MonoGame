@@ -1132,6 +1132,21 @@ namespace Microsoft.Xna.Framework
             return "{X:" + X + " Y:" + Y + " Z:" + Z + " W:" + W + "}";
         }
 
+        /// <summary>
+        /// Deconstruction method for <see cref="Vector4"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="w"></param>
+        public void Deconstruct(out float x, out float y, out float z, out float w)
+        {
+            x = X;
+            y = Y;
+            z = Z;
+            w = W;
+        }
+
         #endregion
 
         #region Operators
