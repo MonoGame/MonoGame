@@ -259,12 +259,12 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Deconstruction method for <see cref="Ray"/>.
         /// </summary>
-        /// <param name="direction"></param>
-        /// <param name="position"></param>
-        public void Deconstruct(out Vector3 direction, out Vector3 position)
+        /// <param name="position">Receives the start position of the ray.</param>
+        /// <param name="direction">Receives the direction of the ray.</param>
+        public void Deconstruct(out Vector3 position, out Vector3 direction)
         {
-            direction = Direction;
             position = Position;
+            direction = Direction;
         }
 
         #endregion
