@@ -9,5 +9,11 @@ then
 	CONSOLE_USER=$(stat -f '%Su' /dev/console)
 	sudo -u $CONSOLE_USER /Applications/Visual\ Studio.app/Contents/MacOS/vstool setup install /tmp/MonoDevelop.MonoGame_IDE_VisualStudioForMac_*.mpack -y
 fi
-sudo rm /tmp/MonoDevelop.MonoGame_*.mpack
-sudo rm /tmp/MonoDevelop.MonoGame_IDE_VisualStudioForMac_*.mpack
+if [ -f "/tmp/MonoDevelop.MonoGame_*.mpack" ]
+then
+	sudo rm /tmp/MonoDevelop.MonoGame_*.mpack
+fi
+if [ -f "/tmp/MonoDevelop.MonoGame_IDE_VisualStudioForMac_*.mpack" ]
+then
+	sudo rm /tmp/MonoDevelop.MonoGame_IDE_VisualStudioForMac_*.mpack
+fi
