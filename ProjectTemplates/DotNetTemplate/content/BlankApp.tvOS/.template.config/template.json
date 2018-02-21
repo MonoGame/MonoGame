@@ -4,7 +4,7 @@
     "name": "MonoGame tvOS Application",
     "groupIdentity": "MonoGame.BlankApp.tvOS",
     "identity": "MonoGame.BlankApp.tvOS.CSharp",
-    "shortName": "monogame-tvos-blank",
+    "shortName": "mgtvos",
     "tags": {
         "language": "C#",
         "type": "project"

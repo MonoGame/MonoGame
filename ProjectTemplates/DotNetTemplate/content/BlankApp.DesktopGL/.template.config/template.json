@@ -4,7 +4,7 @@
     "name": "MonoGame Cross Platform Desktop Application",
     "groupIdentity": "MonoGame.BlankApp.DesktopGL",
     "identity": "MonoGame.BlankApp.DesktopGL.CSharp",
-    "shortName": "monogame-desktopgl-blank",
+    "shortName": "mgdesktopgl",
     "tags": {
         "language": "C#",
         "type": "project"

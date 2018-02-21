@@ -4,7 +4,7 @@
     "name": "MonoGame Pipeline Extension",
     "groupIdentity": "MonoGame.BlankApp.Pipeline",
     "identity": "MonoGame.Pipeline.Extension.CSharp",
-    "shortName": "monogame-pipeline-extension",
+    "shortName": "mgpipelineext",
     "tags": {
         "language": "C#",
         "type": "project"

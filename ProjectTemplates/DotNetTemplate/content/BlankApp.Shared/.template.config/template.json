@@ -4,7 +4,7 @@
     "name": "MonoGame Shared Project",
     "groupIdentity": "MonoGame.BlankApp.Shared",
     "identity": "MonoGame.BlankApp.Shared.CSharp",
-    "shortName": "monogame-shared-blank",
+    "shortName": "mgsharedproj",
     "tags": {
         "language": "C#",
         "type": "project"

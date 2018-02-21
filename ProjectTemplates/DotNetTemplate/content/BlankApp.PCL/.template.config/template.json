@@ -4,7 +4,7 @@
     "name": "MonoGame Portable Library",
     "groupIdentity": "MonoGame.BlankApp.Portable",
     "identity": "MonoGame.BlankApp.Portable.CSharp",
-    "shortName": "monogame-portable-blank",
+    "shortName": "mgpcllib",
     "tags": {
         "language": "C#",
         "type": "project"

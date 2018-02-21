@@ -4,7 +4,7 @@
     "name": "MonoGame Mac Application",
     "groupIdentity": "MonoGame.BlankApp.MacOS",
 	"identity": "MonoGame.BlankApp.MacOS.CSharp",
-    "shortName": "monogame-macos-blank",
+    "shortName": "mgmacos",
     "tags": {
         "language": "C#",
         "type": "project"

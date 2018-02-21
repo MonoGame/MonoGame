@@ -4,7 +4,7 @@
     "name": "MonoGame Windows Application",
     "groupIdentity": "MonoGame.BlankApp.Windows",
     "identity": "MonoGame.BlankApp.Windows.CSharp",
-    "shortName": "monogame-windows-blank",
+    "shortName": "mgwindows",
     "tags": {
         "language": "C#",
         "type": "project"

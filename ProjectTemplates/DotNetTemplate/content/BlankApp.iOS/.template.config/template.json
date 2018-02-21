@@ -4,7 +4,7 @@
     "name": "MonoGame iPhone/iPad Application",
     "groupIdentity": "MonoGame.BlankApp.iOS",
     "identity": "MonoGame.BlankApp.iOS.CSharp",
-    "shortName": "monogame-ios-blank",
+    "shortName": "mgios",
     "tags": {
         "language": "C#",
         "type": "project"

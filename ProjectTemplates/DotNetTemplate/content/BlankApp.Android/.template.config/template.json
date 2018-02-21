@@ -4,7 +4,7 @@
     "name": "MonoGame Android Application",
     "groupIdentity": "MonoGame.BlankApp.Android",
     "identity": "MonoGame.BlankApp.Android.CSharp",
-    "shortName": "monogame-android-blank",
+    "shortName": "mgandroid",
     "tags": {
         "language": "C#",
         "type": "project"

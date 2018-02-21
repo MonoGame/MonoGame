@@ -4,7 +4,7 @@
     "name": "MonoGame NetStandard Library",
     "groupIdentity": "MonoGame.BlankApp.NetStandard",
 	"identity": "MonoGame.BlankApp.NetStandard.CSharp",
-    "shortName": "monogame-metstandard-blank",
+    "shortName": "mgnetstandardlib",
     "tags": {
         "language": "C#",
         "type": "project"
