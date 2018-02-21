@@ -782,7 +782,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     this.framebufferHelper.BindFramebuffer(glResolveFramebuffer);
                     for (var i = 0; i < this._currentRenderTargetCount; ++i)
                     {
-                        this.framebufferHelper.FramebufferTexture2D((int)(FramebufferAttachment.ColorAttachment0 + i), (int) renderTarget.GetFramebufferTarget(renderTargetBinding), renderTarget.GLTexture);
+                        var rt = this._currentRenderTargetBindings[i].RenderTarget as IRenderTarget;
+                        this.framebufferHelper.FramebufferTexture2D((int)(FramebufferAttachment.ColorAttachment0 + i), (int) rt.GetFramebufferTarget(renderTargetBinding), rt.GLTexture);
                     }
                     this.glResolveFramebuffers.Add((RenderTargetBinding[])this._currentRenderTargetBindings.Clone(), glResolveFramebuffer);
                 }
