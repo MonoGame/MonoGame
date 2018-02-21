@@ -6,7 +6,6 @@
   <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
   <property name="msbuild12dir" value="C:\Program Files (x86)\MSBuild\12.0\Bin" />
   <property name="msbuild14dir" value="C:\Program Files (x86)\MSBuild\14.0\Bin" />
-  <property name="msbuild15dir" value="C:\Program Files (x86)\MSBuild\15.0\Bin" />
   
   <!-- Helper default target. -->
   <target   name="build" 
@@ -174,9 +173,15 @@
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsXaml\v14.0\Microsoft.Windows.UI.Xaml.CSharp.targets')}">
         <exec program="Protobuild" commandline="-generate WindowsUniversal" />
 
-        <exec program="${msbuild15dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Restore /p:Configuration=Release /p:Platform="Any CPU"' />
-        <exec program="${msbuild15dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
-        <exec program="${msbuild15dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
+        <!--
+            Currently MSBuild doesn't restore the nuget packages like buiding from the
+            IDE does.  So we have to do it ourselves using the recommended work around.
+        -->
+        <exec program="${nuget3path}\nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.WindowsUniversal.project.json -NonInteractive' />
+        <exec program="${nuget3path}\nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.Net.WindowsUniversal.project.json -NonInteractive' />
+
+        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
 
       </if>
     </if>

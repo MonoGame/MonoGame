@@ -3,8 +3,19 @@
 	<description>Default Ion Automated Build script</description>
 	<property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
 
-	<target name="build" description="Build Nuget Templates">
-		<exec program="msbuild" commandline=" MonoGame.Templates.csproj /t:Clean /p:Configuration=Release" />
-        <exec program="msbuild" commandline=" MonoGame.Templates.csproj /t:Build /p:Configuration=Release" />
+	<target name="checkos" description="check the operating system">
+		<property name="os" value="${operating-system::get-platform(environment::get-operating-system())}"/>
+		<if test="${os == 'Unix'}">
+		<if test="${directory::exists('/Applications') and directory::exists('/Library')}">
+			<property name="os" value="MacOS"/>
+		</if>
+		</if>
+		<echo message="Detected : ${os}"/>
 	</target>
+	<target name="build" description="Build Nuget Templates" depends="checkos">
+		<if test="${os == 'MacOS'}">
+			<exec program="msbuild" commandline=" MonoGame.Templates.csproj /t:Clean /p:Configuration=Release" />
+			<exec program="msbuild" commandline=" MonoGame.Templates.csproj /t:Build /p:Configuration=Release" />
+		</if>
+</target>
 </project>
