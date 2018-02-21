@@ -21,6 +21,6 @@ This package is currently unofficial.</description>
   </metadata>
   <files>
     <file src="build\MGCB\*" target="build" />
-    <file src="../Tools/MonoGame.Content.Builder/bin/Release/**/*" target="tasks" />
+    <file src="..\Tools\MonoGame.Content.Builder\bin\Release\**\*" target="tasks" />
   </files>
 </package>

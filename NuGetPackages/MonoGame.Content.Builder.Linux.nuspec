@@ -20,6 +20,6 @@ This package is currently unofficial.</description>
     <language>en-US</language>
   </metadata>
   <files>
-    <file src="../Tools/MGCB/bin/Linux/AnyCPU/Release/**/*" target="build" />
+    <file src="..\Tools\MGCB\bin\Linux\AnyCPU\Release\**\*" target="build" />
   </files>
 </package>
