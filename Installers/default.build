@@ -51,7 +51,7 @@
       <mkdir dir="root/tmp" />
       <!-- Build Addin .pkg -->
       <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="./root/tmp/MonoDevelop.MonoGame_${buildNumber}.mpack" overwrite="true"/>
-      <copy file="../IDE/VisualStudioForMac/bin/Debug/net461/MonoDevelop.MonoGame_IDE_VisualStudioForMac_${buildNumber}.mpack" tofile="/root/tmp/MonoDevelop.MonoGame_IDE_VisualStudioForMac_${buildNumber}.mpack" overwrite="true"/>
+      <copy file="../IDE/VisualStudioForMac/bin/Debug/net461/MonoDevelop.MonoGame_IDE_VisualStudioForMac_${buildNumber}.mpack" tofile="./root/tmp/MonoDevelop.MonoGame_IDE_VisualStudioForMac_${buildNumber}.mpack" overwrite="true"/>
       <copy todir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle">
          <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
              <include name="ff*"/>
