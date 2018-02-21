@@ -4,7 +4,7 @@
 	<property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
 
 	<target name="build" description="Build Nuget Templates">
-		<exec program="msbuild " commandline="MonoGame.Templates.csproj /t:Clean /p:Configuration=Release" />
-        <exec program="msbuild " commandline="MonoGame.Templates.csproj /t:Build /p:Configuration=Release" />
+		<exec program="msbuild" commandline=" MonoGame.Templates.csproj /t:Clean /p:Configuration=Release" />
+        <exec program="msbuild" commandline=" MonoGame.Templates.csproj /t:Build /p:Configuration=Release" />
 	</target>
 </project>
