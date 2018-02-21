@@ -15,6 +15,6 @@
                         },
                       ], 
     "sourceName": "BlankApp", 
-    "preferNameDirectory" : "true"
+    "preferNameDirectory" : "true",
     "description": "A MonoGame Content Pipeline Extension project."
 }
