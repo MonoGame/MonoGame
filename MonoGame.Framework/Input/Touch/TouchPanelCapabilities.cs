@@ -45,6 +45,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     if (pointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch)
                         isConnected = true;
                 }
+#elif DESKTOPGL
+                maximumTouchCount = 10;
+                isConnected = Sdl.Touch.SDL_GetNumTouchDevices() > 0;
 #elif WINDOWS
                 maximumTouchCount = GetSystemMetrics(SM_MAXIMUMTOUCHES);
                 isConnected = (maximumTouchCount > 0);
@@ -87,7 +90,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
+#if DESKTOPGL
+                // SDL_GetNumTouchDevices only returns > 0 once a device has been used.
+                // So we cannot rely on the value at startup :/
+                return Sdl.Touch.SDL_GetNumTouchDevices() > 0;
+#else
                 return isConnected;
+#endif
             }
         }
 

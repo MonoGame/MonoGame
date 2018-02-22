@@ -124,6 +124,8 @@ internal static class Sdl
         public Joystick.DeviceEvent JoystickDevice;
         [FieldOffset(0)]
         public GameController.DeviceEvent ControllerDevice;
+        [FieldOffset(0)]
+        public Touch.TouchFingerEvent Touch;
     }
 
     public struct Rectangle
@@ -986,5 +988,43 @@ internal static class Sdl
         {
             GetError(SDL_HapticUpdateEffect(haptic, effect, ref data));
         }
+    }
+
+    public static class Touch
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public struct TouchFingerEvent
+        {
+            public EventType Type;
+            public uint TimeStamp;
+            public long TouchId;
+            public long FingerId;
+            public float X;
+            public float Y;
+            public float DX;
+            public float DY;
+            public float Presure;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Finger
+        {
+            public long FingerId; 
+            public float X;
+            public float Y;
+            public float Pressure;
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetNumTouchDevices")]
+        public static extern int SDL_GetNumTouchDevices();
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetTouchDevice")]
+        public static extern long SDL_GetTouchDevice(int index);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetNumTouchFingers")]
+        public static extern int SDL_GetNumTouchFingers(long touchID);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetTouchFinger")]
+        public static extern IntPtr SDL_GetTouchFinger(long touchID, int index);
     }
 }

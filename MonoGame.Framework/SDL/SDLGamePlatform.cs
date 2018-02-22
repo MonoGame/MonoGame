@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Utilities;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
@@ -117,6 +118,7 @@ namespace Microsoft.Xna.Framework
         private void SdlRunLoop()
         {
             Sdl.Event ev;
+            Vector2 position = Vector2.Zero;
 
             while (Sdl.PollEvent(out ev) == 1)
             {
@@ -152,6 +154,24 @@ namespace Microsoft.Xna.Framework
                 {
                     var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
                     _keys.Remove(key);
+                }
+                else if (ev.Type == Sdl.EventType.FingerDown)
+                {
+                    position.X = ev.Touch.X;
+                    position.Y = ev.Touch.Y;
+                    TouchPanel.AddEvent((int)ev.Touch.TouchId, TouchLocationState.Pressed, position);
+                }
+                else if (ev.Type == Sdl.EventType.FingerUp)
+                {
+                    position.X = ev.Touch.X;
+                    position.Y = ev.Touch.Y;
+                    TouchPanel.AddEvent((int)ev.Touch.TouchId, TouchLocationState.Released, position);
+                }
+                else if (ev.Type == Sdl.EventType.FingerMotion)
+                {
+                    position.X = ev.Touch.X;
+                    position.Y = ev.Touch.Y;
+                    TouchPanel.AddEvent((int)ev.Touch.TouchId, TouchLocationState.Moved, position);
                 }
                 else if (ev.Type == Sdl.EventType.TextInput)
                 {
