@@ -39,6 +39,14 @@
     <None Remove="project-monogame-template%402x.png" />
     <None Remove="project-monogame-template~dark.png" />
     <None Remove="project-monogame-template~dark%402x.png" />
+    <None Remove="monogame-16.png" />
+    <None Remove="monogame-16%402x.png" />
+    <None Remove="monogame-16~dark.png" />
+    <None Remove="monogame-16~dark%402x.png" />
+    <None Remove="monogame-16~dark~sel.png" />
+    <None Remove="monogame-16~dark~sel%402x.png" />
+    <None Remove="monogame-16~sel.png" />
+    <None Remove="monogame-16~sel%402x.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="monogame-project-32.png">
@@ -97,6 +105,30 @@
     </EmbeddedResource>
     <EmbeddedResource Include="project-monogame-template~dark%402x.png">
       <LogicalName>project-monogame-template~dark%402x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16.png">
+      <LogicalName>monogame-16.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16%402x.png">
+      <LogicalName>monogame-16@2x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~dark.png">
+      <LogicalName>monogame-16~dark.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~dark%402x.png">
+      <LogicalName>monogame-16~dark@2x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~dark~sel.png">
+      <LogicalName>monogame-16~dark~sel.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~dark~sel%402x.png">
+      <LogicalName>monogame-16~dark~sel@2x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~sel.png">
+      <LogicalName>monogame-16~sel.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~sel%402x.png">
+      <LogicalName>monogame-16~sel@2x.png</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
