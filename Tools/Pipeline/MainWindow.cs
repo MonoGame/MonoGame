@@ -28,7 +28,8 @@ namespace MonoGame.Tools.Pipeline
         private string[] monoLocations = {
             "/usr/bin/mono",
             "/usr/local/bin/mono",
-            "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono"
+            "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mono"),
         };
 
         int setw = 0;
@@ -323,7 +324,10 @@ namespace MonoGame.Tools.Pipeline
                 foreach (var path in monoLocations)
                 {
                     if (File.Exists(path))
+                    {
                         monoLoc = path;
+                        break;
+                    }
                 }
 
                 if (string.IsNullOrEmpty(monoLoc))

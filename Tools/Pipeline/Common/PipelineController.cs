@@ -30,7 +30,7 @@ namespace MonoGame.Tools.Pipeline
 
         private static readonly string [] _mgcbSearchPaths = new []       
         {
-            "",
+            "/Library/Frameworks/MonoGame.framework/Current/Tools",
 #if DEBUG
             "../../../../../MGCB/bin/Windows/AnyCPU/Debug",
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../MGCB/bin/Windows/AnyCPU/Debug"),
@@ -41,6 +41,7 @@ namespace MonoGame.Tools.Pipeline
             "../MGCB",
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../MGCB"),
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+            "",
         };
 
         public IEnumerable<ContentItemTemplate> Templates
@@ -511,6 +512,7 @@ namespace MonoGame.Tools.Pipeline
             } catch (NotSupportedException) {
                 encoding = Encoding.UTF8;
             }
+            var currentDir = Environment.CurrentDirectory;
             try
             {
                 // Prepare the process.
@@ -524,6 +526,7 @@ namespace MonoGame.Tools.Pipeline
                 _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
 
                 // Fire off the process.
+                Environment.CurrentDirectory = _buildProcess.StartInfo.WorkingDirectory;
                 _buildProcess.Start();
                 _buildProcess.BeginOutputReadLine();
                 _buildProcess.WaitForExit();
@@ -539,6 +542,9 @@ namespace MonoGame.Tools.Pipeline
                     View.OutputAppend("Build failed:" + Environment.NewLine);
                     View.OutputAppend(ex.ToString());
                 }
+            }
+            finally {
+                Environment.CurrentDirectory = currentDir;
             }
 
             // Clear the process pointer, so that cancel
