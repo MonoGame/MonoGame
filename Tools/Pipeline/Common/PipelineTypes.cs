@@ -170,6 +170,7 @@ namespace MonoGame.Tools.Pipeline
 
         private static List<ImporterInfo> _importers;
         private static List<ProcessorInfo> _processors;
+        private static List<FileSystemWatcher> _watchers;
 
         public static ImporterTypeDescription[] Importers { get; private set; }
         public static ProcessorTypeDescription[] Processors { get; private set; }
@@ -225,6 +226,8 @@ namespace MonoGame.Tools.Pipeline
                 DisplayName = "",
                 Properties = new ProcessorTypeDescription.ProcessorPropertyCollection(new ProcessorTypeDescription.Property[0]),
             };
+
+            _watchers = new List<FileSystemWatcher>();
         }
 
         public static void Load(PipelineProject project)
@@ -336,7 +339,11 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public static void Unload()
-        {            
+        {
+            foreach (var watch in _watchers)
+                watch.Dispose();
+            _watchers.Clear();
+
             _importers = null;
             Importers = null;
          
@@ -444,13 +451,34 @@ namespace MonoGame.Tools.Pipeline
 #endif
             }
 
+            foreach (var watch in _watchers)
+                watch.Dispose();
+            _watchers.Clear();
+
             foreach (var path in assemblyPaths)
             {
                 try
-                {                    
-                    var a = Assembly.LoadFrom(path);
+                {
+                    var a = Assembly.Load(File.ReadAllBytes(path));
                     var types = a.GetTypes();
                     ProcessTypes(types);
+
+                    var watch = new FileSystemWatcher();
+                    watch.Path = Path.GetDirectoryName(path);
+                    watch.EnableRaisingEvents = true;
+                    watch.Filter = Path.GetFileName(path);
+                    watch.Changed += (sender, e) =>
+                    {
+                        if (Path.GetFileName(path) == e.Name)
+                            PipelineController.Instance.OnReferencesModified();
+                    };
+                    watch.Created += (sender, e) =>
+                    {
+                        if (Path.GetFileName(path) == e.Name)
+                            PipelineController.Instance.OnReferencesModified();
+                    };
+
+                    _watchers.Add(watch);
                 }
                 catch 
                 {
