@@ -3,7 +3,7 @@
 	<Runtime>
 	</Runtime>
 	<Extension path="/MonoDevelop/Ide/ProjectTemplateCategories">
-		<Category id="monogame" _name="MonoGame" icon="md-monogame-icon-project" insertbefore="other">
+		<Category id="monogame" _name="MonoGame" icon="md-monogame-icon-project-16" insertbefore="other">
 			<Category id="app" _name="App">
 				<Category id="general" _name="General" />
 			</Category>
@@ -96,6 +96,7 @@
 		<Image id="md-monogame-preview-project" resource="monogame-preview.png" />
 	</Extension>
 	<Extension path="/MonoDevelop/Core/StockIcons">
+		<StockIcon stockid="monogame-project-icon-16" resource="monogame-project-16.png" size="Dnd" />
 		<StockIcon stockid="monogame-project-icon" resource="monogame-project-32.png" size="Dnd" />
 		<StockIcon stockid="md-monogame-project" resource="project-monogame-32.png" size="Dnd" />
 		<StockIcon stockid="md-monogame-template" resource="project-monogame-template.png" size="Dnd" />
