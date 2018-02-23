@@ -81,11 +81,6 @@ namespace MonoGame.Tools.Pipeline
         {
             e.Cancel = !PipelineController.Instance.Exit();
 
-#if WINDOWS || LINUX
-            if (!e.Cancel)
-                Xwt.Application.Exit();
-#endif
-
             base.OnClosing(e);
         }
 
