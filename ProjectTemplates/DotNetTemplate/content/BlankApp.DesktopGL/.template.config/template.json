@@ -1,0 +1,20 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame Cross Platform Desktop Application",
+    "groupIdentity": "MonoGame.BlankApp.DesktopGL",
+    "identity": "MonoGame.BlankApp.DesktopGL.CSharp",
+    "shortName": "mgdesktopgl",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.Desktop.csproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true",
+    "description": "A MonoGame game project for Windows, Mac and Linux using OpenGL."
+}
