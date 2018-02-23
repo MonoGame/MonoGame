@@ -466,7 +466,7 @@ namespace MonoGame.Tools.Pipeline
                     var watch = new FileSystemWatcher();
                     watch.Path = Path.GetDirectoryName(path);
                     watch.EnableRaisingEvents = true;
-                    watch.Filter = "*.*";
+                    watch.Filter = Path.GetFileName(path);
                     watch.Changed += (sender, e) =>
                     {
                         if (Path.GetFileName(path) == e.Name)
