@@ -20,18 +20,13 @@ namespace MonoGame.Tools.Pipeline
             Linux = true;
             _theme = IconTheme.Default;
 
-            var iconMissing = _theme.LoadIcon("dialog-error", 16, 0);
-            var file = _theme.LoadIcon("text-x-generic", 16, 0);
-            var fileMissing = file.Copy();
-            iconMissing.Composite(fileMissing, 8, 8, 8, 8, 8, 8, 0.5, 0.5, Gdk.InterpType.Tiles, 255);
-            var folder = _theme.LoadIcon("folder", 16, 0);
-            var folderMissing = folder.Copy();
-            iconMissing.Composite(folderMissing, 8, 8, 8, 8, 8, 8, 0.5, 0.5, Gdk.InterpType.Tiles, 255);
+            var linkIcon = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, 16, 16);
+            linkIcon.Fill(0x00000000);
+            _theme.LoadIcon("emblem-symbolic-link", 16, 0).Composite(linkIcon, 8, 8, 8, 8, 8, 8, 0.5, 0.5, Gdk.InterpType.Tiles, 255);
 
-            _files["."] = ToEtoImage(file);
-            _fileMissing = ToEtoImage(fileMissing);
-            _folder = ToEtoImage(folder);
-            _folderMissing = ToEtoImage(folderMissing);
+            _files["0."] = ToEtoImage(_theme.LoadIcon("text-x-generic", 16, 0));
+            _folder = ToEtoImage(_theme.LoadIcon("folder", 16, 0));
+            _link = ToEtoImage(linkIcon);
         }
 
         private static Gdk.Pixbuf PlatformGetFileIcon(string path)
@@ -53,13 +48,10 @@ namespace MonoGame.Tools.Pipeline
                 catch { }
             }
 
-            if (icon == null)
-                throw new Exception();
-
             return icon;
         }
 
-        private static Eto.Drawing.Image ToEtoImage(Gdk.Pixbuf icon)
+        private static Bitmap ToEtoImage(Gdk.Pixbuf icon)
         {
             return new Bitmap(new BitmapHandler(icon));
         }

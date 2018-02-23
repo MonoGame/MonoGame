@@ -188,11 +188,10 @@ namespace MonoGame.Tools.Pipeline
                 Observer = _observer,
                 BuildAction = BuildAction.Build,
                 OriginalPath = sourceFile,
-                DestinationPath = link,
+                DestinationPath = string.IsNullOrEmpty(link) ? sourceFile : link,
                 ImporterName = Importer,
                 ProcessorName = Processor,
-                ProcessorParams = new OpaqueDataDictionary(),
-                Exists = File.Exists(projectDir + sourceFile)
+                ProcessorParams = new OpaqueDataDictionary()
             };
             _project.ContentItems.Add(item);
 
@@ -226,8 +225,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 BuildAction = BuildAction.Copy,
                 OriginalPath = sourceFile,
-                ProcessorParams = new OpaqueDataDictionary(),
-                Exists = File.Exists(projectDir + sourceFile)
+                ProcessorParams = new OpaqueDataDictionary()
             };
             _project.ContentItems.Add(item);
 
@@ -385,10 +383,8 @@ namespace MonoGame.Tools.Pipeline
                     }
 
                     string buildValue = i.OriginalPath;
-                    if(!string.IsNullOrEmpty(i.DestinationPath))
-                    {
+                    if (i.OriginalPath != i.DestinationPath)
                         buildValue += ";" + i.DestinationPath;
-                    }
                     line = string.Format(lineFormat, "build", buildValue);
                     io.WriteLine(line);
                     io.WriteLine();
