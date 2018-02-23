@@ -5,7 +5,7 @@
 		<Category>monogame/app/games</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
-		<_Description>Creates a MonoGame Application for the iPhone/iPad and Android which uses a Shared Project to shared common code.</_Description>
+		<_Description>Creates a MonoGame Application for the iPhone/iPad and Android which uses a Shared Project to share common code.</_Description>
 	</TemplateConfiguration>
 	
 	<Actions>
