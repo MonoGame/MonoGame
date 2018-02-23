@@ -64,7 +64,7 @@ namespace MonoGame.Utilities
 
                 if (result == null)
                 {
-                    throw new Exception(Imaging.LastError);
+                    throw new InvalidOperationException(Imaging.LastError);
                 }
 
                 // Convert to array

@@ -18,15 +18,15 @@ namespace MonoGame.Tests.Graphics
 
 #if !XNA
         [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
-#if !DESKTOPGL
-        // not supported
-        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
-        [TestCase("Assets/Textures/LogoOnly_64px.dds")]
-#endif
+        [TestCase("Assets/Textures/LogoOnly_64px.tga")]
 #endif
         [TestCase("Assets/Textures/LogoOnly_64px.gif")]
         [TestCase("Assets/Textures/LogoOnly_64px.jpg")]
         [TestCase("Assets/Textures/LogoOnly_64px.png")]
+        [TestCase("Assets/Textures/1bit.png")]
+        [TestCase("Assets/Textures/8bit.png")]
+        [TestCase("Assets/Textures/24bit.png")]
+        [TestCase("Assets/Textures/32bit.png")]
         public void FromStreamShouldWorkTest(string filename)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))
@@ -53,13 +53,11 @@ namespace MonoGame.Tests.Graphics
         }
 
 #if XNA
-                [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
-                [TestCase("Assets/Textures/LogoOnly_64px.dds")]
-                [TestCase("Assets/Textures/LogoOnly_64px.tif")]
+        [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
 #endif
-#if !DESKTOPGL
-        [TestCase("Assets/Textures/LogoOnly_64px.tga")]
-#endif
+        // not supported
+        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
+        [TestCase("Assets/Textures/LogoOnly_64px.dds")]
         [TestCase("Assets/Textures/SampleCube64DXT1Mips.dds")]
         public void FromStreamShouldFailTest(string filename)
         {
