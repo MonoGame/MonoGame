@@ -98,13 +98,13 @@
     </if>
     <if test="${os == 'Unix'}">
       <exec program="mono" commandline="Protobuild.exe -generate Linux" />
-      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Linux.sln" />
-      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Linux.sln" />
+      <exec program="msbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Linux.sln" />
+      <exec program="msbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Linux.sln" />
     </if>
     <if test="${os == 'MacOS'}">
       <exec program="mono" commandline="Protobuild.exe -generate Linux" />
-      <exec program="xbuild" commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Release" />
-      <exec program="xbuild" commandline="MonoGame.Framework.Linux.sln /t:Build /p:Configuration=Release" />
+      <exec program="msbuild" commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild" commandline="MonoGame.Framework.Linux.sln /t:Build /p:Configuration=Release" />
     </if>
   </target>
 
