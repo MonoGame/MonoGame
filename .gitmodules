@@ -1,6 +1,3 @@
-[submodule "ThirdParty/Kickstart"]
-	path = ThirdParty/Kickstart
-	url = https://github.com/OutOfOrder/MonoKickstart.git
 [submodule "ThirdParty/Dependencies"]
 	path = ThirdParty/Dependencies
 	url = https://github.com/Mono-Game/MonoGame.Dependencies.git
