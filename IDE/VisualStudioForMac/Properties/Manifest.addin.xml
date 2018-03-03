@@ -15,70 +15,70 @@
 	<Extension path="/MonoDevelop/Ide/Templates">
 		<Template
 			id="MonoGame.BlankApp.DesktopGL.CSharp"
-			path="Templates/MonoGame.Templates.nupkg"
+			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame game project for Windows, Mac and Linux using OpenGL."
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.iOS.CSharp"
-			path="Templates/MonoGame.Templates.nupkg"
+			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame game project for iOS using OpenGL."
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.Android.CSharp"
-			path="Templates/MonoGame.Templates.nupkg"
+			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame game project for Android using OpenGL."
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.Windows.CSharp"
-			path="Templates/MonoGame.Templates.nupkg"
+			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame game project for Windows using DirectX."
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.MacOS.CSharp"
-			path="Templates/MonoGame.Templates.nupkg"
+			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame game project for MacOS using OpenGL. This project is suitable for releasing on the Mac AppStore."
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.tvOS.CSharp"
-			path="Templates/MonoGame.Templates.nupkg"
+			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame game project for tvOS using OpenGL."
 			category="monogame/app/general"/>
 		<Template
 			id="MonoGame.BlankApp.Shared.CSharp"
-			path="Templates/MonoGame.Templates.nupkg"
+			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame Shared project. Use this project to share game code between platforms."
 			category="monogame/library/general"/>
 		<Template
 			id="MonoGame.BlankApp.Portable.CSharp"
-			path="Templates/MonoGame.Templates.nupkg"
+			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame Portable Class Library project. Use this project to share game code between platforms."
 			category="monogame/library/general"/>
 		<Template
 			id="MonoGame.BlankApp.NetStandard.CSharp"
-			path="Templates/MonoGame.Templates.nupkg"
+			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame NetStandard project. Use this project to share game code between platforms."
 			category="monogame/library/general"/>
 		<Template
 			id="MonoGame.Pipeline.Extension.CSharp"
-			path="Templates/MonoGame.Templates.nupkg"
+			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame Content Pipeline Extensions project. Use this to extend the MonoGame Content Pipleine with your own Importers or Processors."

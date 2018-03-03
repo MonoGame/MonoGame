@@ -132,8 +132,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <AddinFile Include="..\..\ProjectTemplates\DotNetTemplate\bin\MonoGame.Templates.nupkg">
-      <Link>Templates\MonoGame.Templates.nupkg</Link>
+    <AddinFile Include="..\..\ProjectTemplates\DotNetTemplate\MonoGame.Templates.CSharp\bin\MonoGame.Templates.CSharp.nupkg">
+      <Link>Templates\MonoGame.Templates.CSharp.nupkg</Link>
     </AddinFile>
   </ItemGroup>
   <Target Name="_GenerateAddinInfo" BeforeTargets="CoreCompile">
