@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private RenderTargetView[] _renderTargetViews;
         private DepthStencilView _depthStencilView;
 
-        private void PlatformConstruct(GraphicsDevice graphicsDevice, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+        private void PlatformConstruct(GraphicsDevice graphicsDevice, bool mipMap, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
         {
             // Create one render target view per cube map face.
             _renderTargetViews = new RenderTargetView[6];
@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var renderTargetViewDescription = new RenderTargetViewDescription
                 {
                     Dimension = RenderTargetViewDimension.Texture2DArray,
-                    Format = SharpDXHelper.ToFormat(preferredFormat),
+                    Format = SharpDXHelper.ToFormat(this.Format),
                     Texture2DArray =
                     {
                         ArraySize = 1,

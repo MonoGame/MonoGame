@@ -138,7 +138,7 @@ namespace MonoGame.Framework
             Game = platform.Game;
 
             Form = new WinFormsGameForm(this);
-            Form.ClientSize = new Size(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
+            ChangeClientSize(new Size(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight));
 
             SetIcon();
             Title = Utilities.AssemblyHelper.GetDefaultWindowTitle();
@@ -162,12 +162,24 @@ namespace MonoGame.Framework
             Form.KeyPress += OnKeyPress;
 
             RegisterToAllWindows();
+        }
 
-            Form.CenterOnPrimaryMonitor();
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct POINTSTRUCT
+        {
+            public int X;
+            public int Y;
         }
 
         [DllImport("shell32.dll", CharSet = CharSet.Auto, BestFitMapping = false)]
         private static extern IntPtr ExtractIcon(IntPtr hInst, string exeFileName, int iconIndex);
+        
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        [return: MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        internal static extern bool GetCursorPos(out POINTSTRUCT pt);
+        
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        internal static extern int MapWindowPoints(HandleRef hWndFrom, HandleRef hWndTo, out POINTSTRUCT pt, int cPoints);
 
         private void SetIcon()
         {
@@ -246,7 +258,10 @@ namespace MonoGame.Framework
             if (!Form.Visible)
                 return;
 
-            var clientPos = Form.PointToClient(Control.MousePosition);
+            POINTSTRUCT pos;
+            GetCursorPos(out pos);
+            MapWindowPoints(new HandleRef(null, IntPtr.Zero), new HandleRef(Form, Form.Handle), out pos, 1);
+            var clientPos = new System.Drawing.Point(pos.X, pos.Y);
             var withinClient = Form.ClientRectangle.Contains(clientPos);
             var buttons = Control.MouseButtons;
 
@@ -312,16 +327,13 @@ namespace MonoGame.Framework
 
         internal void Initialize(int width, int height)
         {
-            Form.ClientSize = new Size(width, height);
-            if (!_wasMoved)
-                Form.CenterOnPrimaryMonitor();
+            ChangeClientSize(new Size(width, height));
         }
 
         internal void Initialize(PresentationParameters pp)
         {
-            Form.ClientSize = new Size(pp.BackBufferWidth, pp.BackBufferHeight);
-            if (!_wasMoved)
-                Form.CenterOnPrimaryMonitor();
+            ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
+
             if (pp.IsFullScreen)
             {
                 EnterFullScreen(pp);

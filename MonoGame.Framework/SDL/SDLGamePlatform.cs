@@ -128,18 +128,25 @@ namespace Microsoft.Xna.Framework
                     GamePad.RemoveDevice(ev.ControllerDevice.Which);
                 else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
                     Joystick.RemoveDevice(ev.JoystickDevice.Which);
-                else if (ev.Type == Sdl.EventType.MouseWheel) {
+                else if (ev.Type == Sdl.EventType.MouseWheel)
+                {
                     const int wheelDelta = 120;
                     Mouse.ScrollY += ev.Wheel.Y * wheelDelta;
                     Mouse.ScrollX += ev.Wheel.X * wheelDelta;
                 }
-                else if (ev.Type == Sdl.EventType.KeyDown) {
-                    var key = KeyboardUtil.ToXna (ev.Key.Keysym.Sym);
-                    if (!_keys.Contains (key))
-                        _keys.Add (key);
+                else if (ev.Type == Sdl.EventType.MouseMotion)
+                {
+                    Window.MouseState.X = ev.Motion.X;
+                    Window.MouseState.Y = ev.Motion.Y;
+                }
+                else if (ev.Type == Sdl.EventType.KeyDown)
+                {
+                    var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+                    if (!_keys.Contains(key))
+                        _keys.Add(key);
                     char character = (char)ev.Key.Keysym.Sym;
-                    if (char.IsControl (character))
-                        _view.CallTextInput (character, key);
+                    if (char.IsControl(character))
+                        _view.CallTextInput(character, key);
                 }
                 else if (ev.Type == Sdl.EventType.KeyUp)
                 {

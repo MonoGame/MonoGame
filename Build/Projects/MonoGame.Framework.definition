@@ -1191,36 +1191,15 @@
     <Compile Include="Utilities\Png\PngReader.cs" />
     <Compile Include="Utilities\Png\PngWriter.cs" />
     <Compile Include="Utilities\ByteBufferPool.cs" />
-    <Compile Include="Utilities\Imaging\Stb.Image.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\Stb.Image.Generated.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\ImageReader.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\Stb.ImageWrite.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\Stb.ImageWrite.Generated.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\ImageWriter.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\Operations.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\PinnedArray.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\TinyJpeg.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\TinyJpeg.Generated.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
+    <Compile Include="Utilities\Imaging\Stb.Image.cs" />
+    <Compile Include="Utilities\Imaging\Stb.Image.Generated.cs" />
+    <Compile Include="Utilities\Imaging\ImageReader.cs" />
+    <Compile Include="Utilities\Imaging\Stb.ImageWrite.cs" />
+    <Compile Include="Utilities\Imaging\Stb.ImageWrite.Generated.cs" />
+    <Compile Include="Utilities\Imaging\ImageWriter.cs" />
+    <Compile Include="Utilities\Imaging\Operations.cs" />
+    <Compile Include="Utilities\Imaging\PinnedArray.cs" />
+
 	
 
 
@@ -1340,6 +1319,12 @@
 
 
     <!-- Windows UAP Platform -->
+    <Compile Include="WindowsUniversal\GameFrameworkViewSource.cs">
+      <Platforms>WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="WindowsUniversal\UAPFrameworkView.cs">
+      <Platforms>WindowsUniversal</Platforms>
+    </Compile>
     <Compile Include="WindowsUniversal\UAPGamePlatform.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>

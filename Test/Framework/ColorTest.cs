@@ -52,7 +52,7 @@ namespace MonoGame.Tests.Framework
             Assert.That(color.A, Is.EqualTo(32));
         }
 #endif
-        
+
         [Test]
         public void FromNonPremultiplied_Int()
         {
@@ -172,6 +172,31 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(color2, Color.Lerp(color2, color1, 0.0f));
             Assert.AreEqual(color1, Color.Lerp(color2, color1, 1.0f));
             Assert.AreEqual(half, Color.Lerp(color2, color1, 0.5f));
+        }
+
+        [Test]
+        public void Deconstruct()
+        {
+            Color color = new Color(255, 255, 255);
+
+            float r, g, b;
+
+            color.Deconstruct(out r, out g, out b);
+
+            Assert.AreEqual(r, color.R);
+            Assert.AreEqual(g, color.G);
+            Assert.AreEqual(b, color.B);
+
+            Color color2 = new Color(255, 255, 255, 255);
+
+            float r2, g2, b2, a2;
+
+            color2.Deconstruct(out r2, out g2, out b2, out a2);
+
+            Assert.AreEqual(r2, color2.R);
+            Assert.AreEqual(g2, color2.G);
+            Assert.AreEqual(b2, color2.B);
+            Assert.AreEqual(a2, color2.A);
         }
     }
 }

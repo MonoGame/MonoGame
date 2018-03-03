@@ -23,16 +23,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             public static FramebufferHelper Create(GraphicsDevice gd)
             {
-                if (gd.GraphicsCapabilities.SupportsFramebufferObjectARB)
+                if (gd.GraphicsCapabilities.SupportsFramebufferObjectARB || gd.GraphicsCapabilities.SupportsFramebufferObjectEXT)
                 {
                     _instance = new FramebufferHelper(gd);
                 }
-#if !(GLES)
-                else if (gd.GraphicsCapabilities.SupportsFramebufferObjectEXT)
-                {
-                    _instance = new FramebufferHelperEXT(gd);
-                }
-#endif
                 else
                 {
                     throw new PlatformNotSupportedException(
@@ -56,8 +50,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal FramebufferHelper(GraphicsDevice graphicsDevice)
             {
-                this.SupportsBlitFramebuffer = true;
-                this.SupportsInvalidateFramebuffer = false;
+                this.SupportsBlitFramebuffer = GL.BlitFramebuffer != null;
+                this.SupportsInvalidateFramebuffer = GL.InvalidateFramebuffer != null;
             }
 
             internal virtual void GenRenderbuffer(out int renderbuffer)
@@ -80,7 +74,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal virtual void RenderbufferStorageMultisample(int samples, int internalFormat, int width, int height)
             {
-                GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, samples, (RenderbufferStorage)internalFormat, width, height);
+                if (samples > 0 && GL.RenderbufferStorageMultisample != null)
+                    GL.RenderbufferStorageMultisample(RenderbufferTarget.RenderbufferExt, samples, (RenderbufferStorage)internalFormat, width, height);
+                else
+                    GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, (RenderbufferStorage)internalFormat, width, height);
                 GraphicsExtensions.CheckGLError();
             }
 
@@ -102,14 +99,22 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
             }
 
+            static readonly FramebufferAttachment [] FramebufferAttachements = {
+                FramebufferAttachment.ColorAttachment0,
+                FramebufferAttachment.DepthAttachment,
+                FramebufferAttachment.StencilAttachment,
+            };
+
             internal virtual void InvalidateDrawFramebuffer()
             {
                 Debug.Assert(this.SupportsInvalidateFramebuffer);
+                GL.InvalidateFramebuffer (FramebufferTarget.Framebuffer, 3, FramebufferAttachements);
             }
 
             internal virtual void InvalidateReadFramebuffer()
             {
                 Debug.Assert(this.SupportsInvalidateFramebuffer);
+                GL.InvalidateFramebuffer(FramebufferTarget.Framebuffer, 3, FramebufferAttachements);
             }
 
             internal virtual void DeleteFramebuffer(int framebuffer)
@@ -160,107 +165,6 @@ namespace Microsoft.Xna.Framework.Graphics
                         case FramebufferErrorCode.FramebufferIncompleteAttachment: message = "Not all framebuffer attachment points are framebuffer attachment complete."; break;
                         case FramebufferErrorCode.FramebufferIncompleteMissingAttachment: message = "No images are attached to the framebuffer."; break;
                         case FramebufferErrorCode.FramebufferUnsupported: message = "The combination of internal formats of the attached images violates an implementation-dependent set of restrictions."; break;
-                        case FramebufferErrorCode.FramebufferIncompleteMultisample: message = "Not all attached images have the same number of samples."; break;
-                    }
-                    throw new InvalidOperationException(message);
-                }
-            }
-        }
-
-        internal sealed class FramebufferHelperEXT : FramebufferHelper
-        {
-            internal FramebufferHelperEXT(GraphicsDevice graphicsDevice)
-                : base(graphicsDevice)
-            {
-            }
-
-            internal override void GenRenderbuffer(out int id)
-            {
-                GL.Ext.GenRenderbuffers(1, out id);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void BindRenderbuffer(int id)
-            {
-                GL.Ext.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, id);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void DeleteRenderbuffer(int id)
-            {
-                GL.Ext.DeleteRenderbuffers(1, ref id);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void RenderbufferStorageMultisample(int samples, int internalFormat, int width, int height)
-            {
-                GL.Ext.RenderbufferStorageMultisample(RenderbufferTarget.RenderbufferExt, samples, (RenderbufferStorage)internalFormat, width, height);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void GenFramebuffer(out int id)
-            {
-                GL.Ext.GenFramebuffers(1, out id);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void BindFramebuffer(int id)
-            {
-                GL.Ext.BindFramebuffer(FramebufferTarget.Framebuffer, id);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void BindReadFramebuffer(int readFramebuffer)
-            {
-                GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, readFramebuffer);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void DeleteFramebuffer(int id)
-            {
-                GL.Ext.DeleteFramebuffers(1, ref id);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void FramebufferTexture2D(int attachement, int target, int texture, int level = 0, int samples = 0)
-            {
-                GL.Ext.FramebufferTexture2D(FramebufferTarget.FramebufferExt, (FramebufferAttachment)attachement, (TextureTarget)target, texture, level);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void FramebufferRenderbuffer(int attachement, int renderbuffer, int level = 0)
-            {
-                GL.Ext.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, (FramebufferAttachment)attachement, RenderbufferTarget.Renderbuffer, renderbuffer);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void GenerateMipmap(int target)
-            {
-                GL.Ext.GenerateMipmap((GenerateMipmapTarget)target);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void BlitFramebuffer(int iColorAttachment, int width, int height)
-            {
-                GL.ReadBuffer(ReadBufferMode.ColorAttachment0 + iColorAttachment);
-                GraphicsExtensions.CheckGLError();
-                GL.DrawBuffer(DrawBufferMode.ColorAttachment0 + iColorAttachment);
-                GraphicsExtensions.CheckGLError();
-                GL.Ext.BlitFramebuffer(0, 0, width, height, 0, 0, width, height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
-                GraphicsExtensions.CheckGLError();
-            }
-
-            internal override void CheckFramebufferStatus()
-            {
-                var status = GL.Ext.CheckFramebufferStatus(FramebufferTarget.FramebufferExt);
-                if (status != FramebufferErrorCode.FramebufferComplete)
-                {
-                    string message = "Framebuffer Incomplete.";
-                    switch (status)
-                    {
-                        case FramebufferErrorCode.FramebufferIncompleteAttachmentExt: message = "Not all framebuffer attachment points are framebuffer attachment complete."; break;
-                        case FramebufferErrorCode.FramebufferIncompleteMissingAttachmentExt: message = "No images are attached to the framebuffer."; break;
-                        case FramebufferErrorCode.FramebufferUnsupportedExt: message = "The combination of internal formats of the attached images violates an implementation-dependent set of restrictions."; break;
                         case FramebufferErrorCode.FramebufferIncompleteMultisample: message = "Not all attached images have the same number of samples."; break;
                     }
                     throw new InvalidOperationException(message);

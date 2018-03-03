@@ -11,13 +11,29 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow
     {
+        /// <summary>
+        /// Pipeline menu bar.
+        /// Required to Stop Eto Forms adding System Menu Items on MacOS
+        /// This is because `IncludeSystemItems` defaults to `All` 
+        /// and the menus are populated in the constructor.
+        /// </summary>
+        class PipelineMenuBar : MenuBar
+        {
+            public PipelineMenuBar()
+            {
+                Style = "MenuBar";
+                IncludeSystemItems = MenuBarSystemItems.None;
+            }
+        }
+
         public Command cmdNew, cmdOpen, cmdClose, cmdImport, cmdSave, cmdSaveAs, cmdExit;
         public Command cmdUndo, cmdRedo, cmdAdd, cmdExclude, cmdRename, cmdDelete;
         public Command cmdNewItem, cmdNewFolder, cmdExistingItem, cmdExistingFolder;
         public Command cmdBuild, cmdRebuild, cmdClean, cmdCancelBuild;
+        public CheckCommand cmdDebugMode;
         public Command cmdHelp, cmdAbout;
         public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdOpenOutputItemLocation, cmdCopyAssetPath, cmdRebuildItem;
-        
+
         ToolBar toolbar;
         ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuView, menuBuild, menuHelp;
         ToolItem toolBuild, toolRebuild, toolClean, toolCancelBuild;
@@ -94,6 +110,7 @@ namespace MonoGame.Tools.Pipeline
             cmdRebuild.Executed += CmdRebuild_Executed;
             cmdClean.Executed += CmdClean_Executed;
             cmdCancelBuild.Executed += CmdCancelBuild_Executed;
+            cmdDebugMode.Executed += CmdDebugMode_Executed;
 
             cmdHelp.Executed += CmdHelp_Executed;
             cmdAbout.Executed += CmdAbout_Executed;
@@ -217,6 +234,9 @@ namespace MonoGame.Tools.Pipeline
             cmdCancelBuild.ToolTip = "Cancel Build";
             cmdCancelBuild.Image = Global.GetEtoIcon("Commands.CancelBuild.png");
 
+            cmdDebugMode = new CheckCommand();
+            cmdDebugMode.MenuText = "Debug Mode";
+
             // Help Commands
 
             cmdHelp = new Command();
@@ -252,12 +272,10 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitalizeMenu()
         {
-            Menu = new MenuBar();
-            Menu.Style = "MenuBar";
-            Menu.IncludeSystemItems = MenuBarSystemItems.None;
+            Menu = new PipelineMenuBar();
 
             menuFile = new ButtonMenuItem();
-            menuFile.Text = "File";
+            menuFile.Text = "&File";
             menuFile.Items.Add(cmdNew);
             menuFile.Items.Add(cmdOpen);
 
@@ -274,7 +292,7 @@ namespace MonoGame.Tools.Pipeline
             Menu.Items.Add(menuFile);
 
             menuEdit = new ButtonMenuItem();
-            menuEdit.Text = "Edit";
+            menuEdit.Text = "&Edit";
             menuEdit.Items.Add(cmdUndo);
             menuEdit.Items.Add(cmdRedo);
             menuEdit.Items.Add(new SeparatorMenuItem());
@@ -297,19 +315,21 @@ namespace MonoGame.Tools.Pipeline
             // View Commands
 
             menuView = new ButtonMenuItem();
-            menuView.Text = "View";
+            menuView.Text = "&View";
             Menu.Items.Add(menuView);
 
             menuBuild = new ButtonMenuItem();
-            menuBuild.Text = "Build";
+            menuBuild.Text = "&Build";
             menuBuild.Items.Add(cmdBuild);
             menuBuild.Items.Add(cmdRebuild);
             menuBuild.Items.Add(cmdClean);
             menuBuild.Items.Add(cmdCancelBuild);
+            menuBuild.Items.Add(new SeparatorMenuItem());
+            menuBuild.Items.Add(cmdDebugMode);
             Menu.Items.Add(menuBuild);
 
             menuHelp = new ButtonMenuItem();
-            menuHelp.Text = "Help";
+            menuHelp.Text = "&Help";
             menuHelp.Items.Add(cmdHelp);
             Menu.Items.Add(menuHelp);
 

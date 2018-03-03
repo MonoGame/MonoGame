@@ -5,6 +5,7 @@
 using System;
 using Android.Content;
 using Android.Content.PM;
+using Android.OS;
 using Android.Views;
 using Microsoft.Xna.Framework.Input.Touch;
 using MonoGame.OpenGL;
@@ -33,15 +34,30 @@ namespace Microsoft.Xna.Framework
         public AndroidGameWindow(AndroidGameActivity activity, Game game)
         {
             _game = game;
-            Initialize(activity);
+
+            Point size;
+            if (Build.VERSION.SdkInt < BuildVersionCodes.JellyBean)
+            {
+                size.X = activity.Resources.DisplayMetrics.WidthPixels;
+                size.Y = activity.Resources.DisplayMetrics.HeightPixels;
+            }
+            else
+            {
+                Android.Graphics.Point p = new Android.Graphics.Point();
+                activity.WindowManager.DefaultDisplay.GetRealSize(p);
+                size.X = p.X;
+                size.Y = p.Y;
+            }
+
+            Initialize(activity, size);
 
             game.Services.AddService(typeof(View), GameView);
         }
 
-        private void Initialize(Context context)
+        private void Initialize(Context context, Point size)
         {
-            _clientBounds = new Rectangle(0, 0, context.Resources.DisplayMetrics.WidthPixels, context.Resources.DisplayMetrics.HeightPixels);
-
+            _clientBounds = new Rectangle(0, 0, size.X, size.Y);
+            
             GameView = new MonoGameAndroidGameView(context, this, _game);
             GameView.RenderOnUIThread = Game.Activity.RenderOnUIThread;
             GameView.RenderFrame += OnRenderFrame;

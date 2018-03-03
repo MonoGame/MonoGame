@@ -6,7 +6,8 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Runtime.CompilerServices;
-
+using System.Collections.Generic;
+using System.Diagnostics;
 
 #if __IOS__ || __TVOS__ || MONOMAC
 using ObjCRuntime;
@@ -14,55 +15,67 @@ using ObjCRuntime;
 
 namespace MonoGame.OpenGL
 {
-    internal enum BufferAccess {
+    internal enum BufferAccess
+    {
         ReadOnly = 0x88B8,
     }
 
-    internal enum BufferUsageHint {
+    internal enum BufferUsageHint
+    {
         StreamDraw = 0x88E0,
         StaticDraw = 0x88E4,
     }
 
-    internal enum StencilFace {
-        Front = 0x0404, 
+    internal enum StencilFace
+    {
+        Front = 0x0404,
         Back = 0x0405,
     }
-    internal enum DrawBuffersEnum {
+    internal enum DrawBuffersEnum
+    {
         UnsignedShort,
         UnsignedInt,
     }
 
-    internal enum ShaderType {
+    internal enum ShaderType
+    {
         VertexShader = 0x8B31,
         FragmentShader = 0x8B30,
     }
 
-    internal enum ShaderParameter {
+    internal enum ShaderParameter
+    {
         LogLength = 0x8B84,
         CompileStatus = 0x8B81,
         SourceLength = 0x8B88,
     }
 
-    internal enum GetProgramParameterName {
+    internal enum GetProgramParameterName
+    {
         LogLength = 0x8B84,
         LinkStatus = 0x8B82,
     }
 
-    internal enum DrawElementsType {
+    internal enum DrawElementsType
+    {
         UnsignedShort = 0x1403,
         UnsignedInt = 0x1405,
     }
 
-    internal enum QueryTarget {
+    internal enum QueryTarget
+    {
         SamplesPassed = 0x8914,
+        SamplesPassedExt = 0x8C2F,
     }
 
-    internal enum GetQueryObjectParam {
+    internal enum GetQueryObjectParam
+    {
         QueryResultAvailable = 0x8867,
         QueryResult = 0x8866,
     }
 
-    internal enum GenerateMipmapTarget {
+    internal enum GenerateMipmapTarget
+    {
         Texture1D = 0x0DE0,
         Texture2D = 0x0DE1,
         Texture3D = 0x806F,
@@ -70,22 +83,26 @@ namespace MonoGame.OpenGL
         Texture1DArray = 0x8C18,
         Texture2DArray = 0x8C1A,
         Texture2DMultisample = 0x9100,
-        Texture2DMultisampleArray = 0x9102, 
+        Texture2DMultisampleArray = 0x9102,
     }
 
-    internal enum BlitFramebufferFilter {
+    internal enum BlitFramebufferFilter
+    {
         Nearest = 0x2600,
     }
 
-    internal enum ReadBufferMode {
+    internal enum ReadBufferMode
+    {
         ColorAttachment0 = 0x8CE0,
     }
 
-    internal enum DrawBufferMode {
+    internal enum DrawBufferMode
+    {
         ColorAttachment0 = 0x8CE0,
     }
 
-    internal enum FramebufferErrorCode {
+    internal enum FramebufferErrorCode
+    {
         FramebufferUndefined = 0x8219,
         FramebufferComplete = 0x8CD5,
         FramebufferCompleteExt = 0x8CD5,
@@ -106,23 +123,27 @@ namespace MonoGame.OpenGL
         FramebufferIncompleteLayerCount = 0x8DA9,
     }
 
-    internal enum BufferTarget {
+    internal enum BufferTarget
+    {
         ArrayBuffer = 0x8892,
         ElementArrayBuffer = 0x8893,
     }
 
-    internal enum RenderbufferTarget {
+    internal enum RenderbufferTarget
+    {
         Renderbuffer = 0x8D41,
         RenderbufferExt = 0x8D41,
     }
 
-    internal enum FramebufferTarget {
+    internal enum FramebufferTarget
+    {
         Framebuffer = 0x8D40,
         FramebufferExt = 0x8D40,
         ReadFramebuffer = 0x8CA8,
     }
 
-    internal enum RenderbufferStorage {
+    internal enum RenderbufferStorage
+    {
         Rgba8 = 0x8058,
         DepthComponent16 = 0x81a5,
         DepthComponent24 = 0x81a6,
@@ -164,38 +185,45 @@ namespace MonoGame.OpenGL
         DebugOutput = 0x92E0,
     }
 
-    internal enum VertexPointerType {
+    internal enum VertexPointerType
+    {
         Float = 0x1406,
         Short = 0x1402,
     }
 
-    internal enum VertexAttribPointerType {
+    internal enum VertexAttribPointerType
+    {
         Float = 0x1406,
         Short = 0x1402,
         UnsignedByte = 0x1401,
         HalfFloat = 0x140B,
     }
 
-    internal enum CullFaceMode {
-        Back = 0x0405, 
+    internal enum CullFaceMode
+    {
+        Back = 0x0405,
         Front = 0x0404,
     }
 
-    internal enum FrontFaceDirection {
+    internal enum FrontFaceDirection
+    {
         Cw = 0x0900,
         Ccw = 0x0901,
     }
 
-    internal enum MaterialFace {
+    internal enum MaterialFace
+    {
         FrontAndBack = 0x0408,
     }
 
-    internal enum PolygonMode {
+    internal enum PolygonMode
+    {
         Fill = 0x1B02,
         Line = 0x1B01,
     }
 
-    internal enum ColorPointerType {
+    internal enum ColorPointerType
+    {
         Float = 0x1406,
         Short = 0x1402,
         UnsignedShort = 0x1403,
@@ -203,7 +231,8 @@ namespace MonoGame.OpenGL
         HalfFloat = 0x140B,
     }
 
-    internal enum NormalPointerType {
+    internal enum NormalPointerType
+    {
         Byte = 0x1400,
         Float = 0x1406,
         Short = 0x1402,
@@ -212,7 +241,8 @@ namespace MonoGame.OpenGL
         HalfFloat = 0x140B,
     }
 
-    internal enum TexCoordPointerType {
+    internal enum TexCoordPointerType
+    {
         Byte = 0x1400,
         Float = 0x1406,
         Short = 0x1402,
@@ -221,7 +251,8 @@ namespace MonoGame.OpenGL
         HalfFloat = 0x140B,
     }
 
-    internal enum BlendEquationMode {
+    internal enum BlendEquationMode
+    {
         FuncAdd = 0x8006,
         Max = 0x8008,  // ios MaxExt
         Min = 0x8007,  // ios MinExt
@@ -229,7 +260,8 @@ namespace MonoGame.OpenGL
         FuncSubtract = 0x800A,
     }
 
-    internal enum BlendingFactorSrc {
+    internal enum BlendingFactorSrc
+    {
         Zero = 0,
         SrcColor = 0x0300,
         OneMinusSrcColor = 0x0301,
@@ -247,7 +279,8 @@ namespace MonoGame.OpenGL
         One = 1,
     }
 
-    internal enum BlendingFactorDest {
+    internal enum BlendingFactorDest
+    {
         Zero = 0,
         SrcColor = 0x0300,
         OneMinusSrcColor = 0x0301,
@@ -265,7 +298,8 @@ namespace MonoGame.OpenGL
         One = 1,
     }
 
-    internal enum DepthFunction {
+    internal enum DepthFunction
+    {
         Always = 0x0207,
         Equal = 0x0202,
         Greater = 0x0204,
@@ -276,10 +310,11 @@ namespace MonoGame.OpenGL
         Notequal = 0x0205,
     }
 
-    internal enum GetPName : int {
+    internal enum GetPName : int
+    {
         ArrayBufferBinding = 0x8894,
-        MaxTextureImageUnits = 0x8872, 
-        MaxVertexAttribs = 0x8869, 
+        MaxTextureImageUnits = 0x8872,
+        MaxVertexAttribs = 0x8869,
         MaxTextureSize = 0x0D33,
         MaxDrawBuffers = 0x8824,
         TextureBinding2D = 0x8069,
@@ -287,19 +322,25 @@ namespace MonoGame.OpenGL
         MaxSamples = 0x8D57,
     }
 
-    internal enum StringName { 
-        Extensions = 0x1F03, 
+    internal enum StringName
+    {
+        Extensions = 0x1F03,
         Version = 0x1F02,
     }
 
-    internal enum FramebufferAttachment {
+    internal enum FramebufferAttachment
+    {
         ColorAttachment0 = 0x8CE0,
         ColorAttachment0Ext = 0x8CE0,
         DepthAttachment = 0x8D00,
         StencilAttachment = 0x8D20,
+        ColorAttachmentExt = 0x1800,
+        DepthAttachementExt = 0x1801,
+        StencilAttachmentExt = 0x1802,
     }
 
-    internal enum GLPrimitiveType {
+    internal enum GLPrimitiveType
+    {
         Lines = 0x0001,
         LineStrip = 0x0003,
         Triangles = 0x0004,
@@ -314,15 +355,18 @@ namespace MonoGame.OpenGL
         ColorBufferBit = 0x00004000,
     }
 
-    internal enum ErrorCode {
+    internal enum ErrorCode
+    {
         NoError = 0,
     }
 
-    internal enum TextureUnit {
+    internal enum TextureUnit
+    {
         Texture0 = 0x84C0,
     }
 
-    internal enum TextureTarget {
+    internal enum TextureTarget
+    {
         Texture2D = 0x0DE1,
         Texture3D = 0x806F,
         TextureCubeMap = 0x8513,
@@ -334,7 +378,8 @@ namespace MonoGame.OpenGL
         TextureCubeMapNegativeZ = 0x851A,
     }
 
-    internal enum PixelInternalFormat {
+    internal enum PixelInternalFormat
+    {
         Rgba = 0x1908,
         Rgb = 0x1907,
         Rgba4 = 0x8056,
@@ -370,7 +415,8 @@ namespace MonoGame.OpenGL
 
     }
 
-    internal enum PixelFormat {
+    internal enum PixelFormat
+    {
         Rgba = 0x1908,
         Rgb = 0x1907,
         Luminance = 0x1909,
@@ -379,7 +425,8 @@ namespace MonoGame.OpenGL
         Rg = 0x8227,
     }
 
-    internal enum PixelType {
+    internal enum PixelType
+    {
         UnsignedByte = 0x1401,
         UnsignedShort565 = 0x8363,
         UnsignedShort4444 = 0x8033,
@@ -391,12 +438,14 @@ namespace MonoGame.OpenGL
         UnsignedInt1010102 = 0x8036,
     }
 
-    internal enum PixelStoreParameter {
+    internal enum PixelStoreParameter
+    {
         UnpackAlignment = 0x0CF5,
         PackAlignment = 0x0D05,
     }
 
-    internal enum GLStencilFunction {
+    internal enum GLStencilFunction
+    {
         Always = 0x0207,
         Equal = 0x0202,
         Greater = 0x0204,
@@ -407,7 +456,8 @@ namespace MonoGame.OpenGL
         Notequal = 0x0205,
     }
 
-    internal enum StencilOp {
+    internal enum StencilOp
+    {
         Keep = 0x1E00,
         DecrWrap = 0x8508,
         Decr = 0x1E03,
@@ -418,7 +468,8 @@ namespace MonoGame.OpenGL
         Zero = 0,
     }
 
-    internal enum TextureParameterName {
+    internal enum TextureParameterName
+    {
         TextureMaxAnisotropyExt = 0x84FE,
         TextureBaseLevel = 0x813C,
         TextureMaxLevel = 0x813D,
@@ -433,12 +484,14 @@ namespace MonoGame.OpenGL
         GenerateMipmap = 0x8191,
     }
 
-    internal enum Bool {
+    internal enum Bool
+    {
         True = 1,
         False = 0,
     }
 
-    internal enum TextureMinFilter {
+    internal enum TextureMinFilter
+    {
         LinearMipmapNearest = 0x2701,
         NearestMipmapLinear = 0x2702,
         LinearMipmapLinear = 0x2703,
@@ -447,17 +500,20 @@ namespace MonoGame.OpenGL
         Nearest = 0x2600,
     }
 
-    internal enum TextureMagFilter {
+    internal enum TextureMagFilter
+    {
         Linear = 0x2601,
         Nearest = 0x2600,
     }
 
-    internal enum TextureCompareMode {
+    internal enum TextureCompareMode
+    {
         CompareRefToTexture = 0x884E,
         None = 0,
     }
 
-    internal enum TextureWrapMode {
+    internal enum TextureWrapMode
+    {
         ClampToEdge = 0x812F,
         Repeat = 0x2901,
         MirroredRepeat = 0x8370,
@@ -465,8 +521,9 @@ namespace MonoGame.OpenGL
         ClampToBorder = 0x812D,
     }
 
-    internal partial class ColorFormat {
-        internal ColorFormat(int r, int g, int b, int a)
+    internal partial class ColorFormat
+    {
+        internal ColorFormat (int r, int g, int b, int a)
         {
             R = r;
             G = g;
@@ -493,60 +550,60 @@ namespace MonoGame.OpenGL
         internal partial class Ext
         {
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate void GenRenderbuffersDelegate (int count, out int buffer);
             internal static GenRenderbuffersDelegate GenRenderbuffers;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate void BindRenderbufferDelegate (RenderbufferTarget target, int buffer);
             internal static BindRenderbufferDelegate BindRenderbuffer;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate void DeleteRenderbuffersDelegate (int count, ref int buffer);
             internal static DeleteRenderbuffersDelegate DeleteRenderbuffers;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate void RenderbufferStorageMultisampleDelegate (RenderbufferTarget target, int sampleCount,
                 RenderbufferStorage storage, int width, int height);
             internal static RenderbufferStorageMultisampleDelegate RenderbufferStorageMultisample;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate void GenFramebuffersDelegate (int count, out int buffer);
             internal static GenFramebuffersDelegate GenFramebuffers;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate void BindFramebufferDelegate (FramebufferTarget target, int buffer);
             internal static BindFramebufferDelegate BindFramebuffer;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate void DeleteFramebuffersDelegate (int count, ref int buffer);
             internal static DeleteFramebuffersDelegate DeleteFramebuffers;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate void FramebufferTexture2DDelegate (FramebufferTarget target, FramebufferAttachment attachement,
                 TextureTarget textureTarget, int texture, int level);
             internal static FramebufferTexture2DDelegate FramebufferTexture2D;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate void FramebufferRenderbufferDelegate (FramebufferTarget target, FramebufferAttachment attachement,
                 RenderbufferTarget renderBufferTarget, int buffer);
             internal static FramebufferRenderbufferDelegate FramebufferRenderbuffer;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate void GenerateMipmapDelegate (GenerateMipmapTarget target);
             internal static GenerateMipmapDelegate GenerateMipmap;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate void BlitFramebufferDelegate (int srcX0,
                 int srcY0,
                 int srcX1,
@@ -560,243 +617,247 @@ namespace MonoGame.OpenGL
             internal static BlitFramebufferDelegate BlitFramebuffer;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]           
+            [MonoNativeFunctionWrapper]
             internal delegate FramebufferErrorCode CheckFramebufferStatusDelegate (FramebufferTarget target);
             internal static CheckFramebufferStatusDelegate CheckFramebufferStatus;
         }
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void EnableVertexAttribArrayDelegate (int attrib);
         internal static EnableVertexAttribArrayDelegate EnableVertexAttribArray;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
         internal delegate void DisableVertexAttribArrayDelegate (int attrib);
         internal static DisableVertexAttribArrayDelegate DisableVertexAttribArray;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void MakeCurrentDelegate(IntPtr window);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void MakeCurrentDelegate (IntPtr window);
         internal static MakeCurrentDelegate MakeCurrent;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal unsafe delegate void GetIntegerDelegate(int param, [Out] int* data);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal unsafe delegate void GetIntegerDelegate (int param, [Out] int* data);
         internal static GetIntegerDelegate GetIntegerv;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate IntPtr GetStringDelegate(StringName param);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate IntPtr GetStringDelegate (StringName param);
         internal static GetStringDelegate GetStringInternal;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void ClearDepthDelegate (float depth);
         internal static ClearDepthDelegate ClearDepth;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void DepthRangedDelegate (double min, double max);
         internal static DepthRangedDelegate DepthRanged;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        internal delegate void DepthRangefDelegate(float min, float max);
+        internal delegate void DepthRangefDelegate (float min, float max);
         internal static DepthRangefDelegate DepthRangef;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void ClearDelegate(ClearBufferMask mask);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void ClearDelegate (ClearBufferMask mask);
         internal static ClearDelegate Clear;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void ClearColorDelegate(float red,float green,float blue,float alpha);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void ClearColorDelegate (float red, float green, float blue, float alpha);
         internal static ClearColorDelegate ClearColor;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void ClearStencilDelegate(int stencil);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void ClearStencilDelegate (int stencil);
         internal static ClearStencilDelegate ClearStencil;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void ViewportDelegate(int x, int y, int w, int h);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void ViewportDelegate (int x, int y, int w, int h);
         internal static ViewportDelegate Viewport;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate ErrorCode GetErrorDelegate();
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate ErrorCode GetErrorDelegate ();
         internal static GetErrorDelegate GetError;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void FlushDelegate();
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void FlushDelegate ();
         internal static FlushDelegate Flush;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void GenTexturesDelegte (int count, [Out] out int id);
         internal static GenTexturesDelegte GenTextures;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void BindTextureDelegate(TextureTarget target, int id);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void BindTextureDelegate (TextureTarget target, int id);
         internal static BindTextureDelegate BindTexture;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate int EnableDelegate (EnableCap cap);
         internal static EnableDelegate Enable;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate int DisableDelegate (EnableCap cap);
         internal static DisableDelegate Disable;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void CullFaceDelegate(CullFaceMode mode);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void CullFaceDelegate (CullFaceMode mode);
         internal static CullFaceDelegate CullFace;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void FrontFaceDelegate(FrontFaceDirection direction);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void FrontFaceDelegate (FrontFaceDirection direction);
         internal static FrontFaceDelegate FrontFace;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void PolygonModeDelegate (MaterialFace face, PolygonMode mode);
         internal static PolygonModeDelegate PolygonMode;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void PolygonOffsetDelegate (float slopeScaleDepthBias, float depthbias);
         internal static PolygonOffsetDelegate PolygonOffset;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void DrawBuffersDelegate (int count, DrawBuffersEnum[] buffers);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void DrawBuffersDelegate (int count, DrawBuffersEnum [] buffers);
         internal static DrawBuffersDelegate DrawBuffers;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void UseProgramDelegate(int program);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void UseProgramDelegate (int program);
         internal static UseProgramDelegate UseProgram;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal unsafe delegate void Uniform4fvDelegate (int location, int size, float* values);
         internal static Uniform4fvDelegate Uniform4fv;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void Uniform1iDelegate (int location, int value);
         internal static Uniform1iDelegate Uniform1i;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void ScissorDelegate(int x, int y, int width, int height);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void ScissorDelegate (int x, int y, int width, int height);
         internal static ScissorDelegate Scissor;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate void ReadPixelsDelegate (int x, int y, int width, int height, PixelFormat format, PixelType type, IntPtr data);
-        public static ReadPixelsDelegate glReadPixels;
+        internal delegate void ReadPixelsDelegate (int x, int y, int width, int height, PixelFormat format, PixelType type, IntPtr data);
+        internal static ReadPixelsDelegate ReadPixelsInternal;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void BindBufferDelegate(BufferTarget target, int buffer);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void BindBufferDelegate (BufferTarget target, int buffer);
         internal static BindBufferDelegate BindBuffer;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void DrawElementsDelegate (GLPrimitiveType primitiveType, int count, DrawElementsType elementType, IntPtr offset);
         internal static DrawElementsDelegate DrawElements;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void DrawArraysDelegate (GLPrimitiveType primitiveType, int offset, int count);
         internal static DrawArraysDelegate DrawArrays;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void GenRenderbuffersDelegate(int count, [Out] out int buffer);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void GenRenderbuffersDelegate (int count, [Out] out int buffer);
         internal static GenRenderbuffersDelegate GenRenderbuffers;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void BindRenderbufferDelegate (RenderbufferTarget target, int buffer);
         internal static BindRenderbufferDelegate BindRenderbuffer;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void DeleteRenderbuffersDelegate(int count, [In] [Out] ref int buffer);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void DeleteRenderbuffersDelegate (int count, [In] [Out] ref int buffer);
         internal static DeleteRenderbuffersDelegate DeleteRenderbuffers;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void RenderbufferStorageMultisampleDelegate(RenderbufferTarget target, int sampleCount, 
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void RenderbufferStorageMultisampleDelegate (RenderbufferTarget target, int sampleCount,
             RenderbufferStorage storage, int width, int height);
         internal static RenderbufferStorageMultisampleDelegate RenderbufferStorageMultisample;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void GenFramebuffersDelegate(int count, out int buffer);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void GenFramebuffersDelegate (int count, out int buffer);
         internal static GenFramebuffersDelegate GenFramebuffers;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void BindFramebufferDelegate (FramebufferTarget target, int buffer);
         internal static BindFramebufferDelegate BindFramebuffer;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void DeleteFramebuffersDelegate(int count, ref int buffer);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void DeleteFramebuffersDelegate (int count, ref int buffer);
         internal static DeleteFramebuffersDelegate DeleteFramebuffers;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        public delegate void InvalidateFramebufferDelegate(FramebufferTarget target, int numAttachments, FramebufferAttachment[] attachments);
+        public delegate void InvalidateFramebufferDelegate (FramebufferTarget target, int numAttachments, FramebufferAttachment [] attachments);
         public static InvalidateFramebufferDelegate InvalidateFramebuffer;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void FramebufferTexture2DDelegate(FramebufferTarget target, FramebufferAttachment attachement,
-            TextureTarget textureTarget, int texture, int level );
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void FramebufferTexture2DDelegate (FramebufferTarget target, FramebufferAttachment attachement,
+            TextureTarget textureTarget, int texture, int level);
         internal static FramebufferTexture2DDelegate FramebufferTexture2D;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void FramebufferTexture2DMultiSampleDelegate (FramebufferTarget target, FramebufferAttachment attachement,
+            TextureTarget textureTarget, int texture, int level, int samples);
+        internal static FramebufferTexture2DMultiSampleDelegate FramebufferTexture2DMultiSample;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void FramebufferRenderbufferDelegate (FramebufferTarget target, FramebufferAttachment attachement,
             RenderbufferTarget renderBufferTarget, int buffer);
         internal static FramebufferRenderbufferDelegate FramebufferRenderbuffer;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         public delegate void RenderbufferStorageDelegate (RenderbufferTarget target, RenderbufferStorage storage, int width, int hegiht);
         public static RenderbufferStorageDelegate RenderbufferStorage;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void GenerateMipmapDelegate (GenerateMipmapTarget target);
         internal static GenerateMipmapDelegate GenerateMipmap;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void ReadBufferDelegate (ReadBufferMode buffer);
         internal static ReadBufferDelegate ReadBuffer;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void DrawBufferDelegate (DrawBufferMode buffer);
         internal static DrawBufferDelegate DrawBuffer;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void BlitFramebufferDelegate (int srcX0,
             int srcY0,
             int srcX1,
@@ -809,313 +870,313 @@ namespace MonoGame.OpenGL
             BlitFramebufferFilter filter);
         internal static BlitFramebufferDelegate BlitFramebuffer;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate FramebufferErrorCode CheckFramebufferStatusDelegate (FramebufferTarget target);
         internal static CheckFramebufferStatusDelegate CheckFramebufferStatus;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void TexParameterFloatDelegate (TextureTarget target, TextureParameterName name, float value);
         internal static TexParameterFloatDelegate TexParameterf;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal unsafe delegate void TexParameterFloatArrayDelegate (TextureTarget target, TextureParameterName name, float* values);
         internal static TexParameterFloatArrayDelegate TexParameterfv;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void TexParameterIntDelegate (TextureTarget target, TextureParameterName name, int value);
         internal static TexParameterIntDelegate TexParameteri;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void GenQueriesDelegate (int count, [Out] out int queryId);
         internal static GenQueriesDelegate GenQueries;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void BeginQueryDelegate (QueryTarget target, int queryId);
         internal static BeginQueryDelegate BeginQuery;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void EndQueryDelegate (QueryTarget target);
         internal static EndQueryDelegate EndQuery;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void GetQueryObjectDelegate(int queryId, GetQueryObjectParam getparam, [Out] out int ready);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void GetQueryObjectDelegate (int queryId, GetQueryObjectParam getparam, [Out] out int ready);
         internal static GetQueryObjectDelegate GetQueryObject;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void DeleteQueriesDelegate(int count, [In] [Out] ref int queryId);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void DeleteQueriesDelegate (int count, [In] [Out] ref int queryId);
         internal static DeleteQueriesDelegate DeleteQueries;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void ActiveTextureDelegate (TextureUnit textureUnit);
         internal static ActiveTextureDelegate ActiveTexture;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate int CreateShaderDelegate (ShaderType type);
         internal static CreateShaderDelegate CreateShader;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal unsafe delegate void ShaderSourceDelegate(int shaderId, int count, IntPtr code, int* length);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal unsafe delegate void ShaderSourceDelegate (int shaderId, int count, IntPtr code, int* length);
         internal static ShaderSourceDelegate ShaderSourceInternal;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void CompileShaderDelegate (int shaderId);
         internal static CompileShaderDelegate CompileShader;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal unsafe delegate void GetShaderDelegate(int shaderId, int parameter, int* value);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal unsafe delegate void GetShaderDelegate (int shaderId, int parameter, int* value);
         internal static GetShaderDelegate GetShaderiv;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void GetShaderInfoLogDelegate(int shader, int bufSize, IntPtr length, StringBuilder infoLog);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void GetShaderInfoLogDelegate (int shader, int bufSize, IntPtr length, StringBuilder infoLog);
         internal static GetShaderInfoLogDelegate GetShaderInfoLogInternal;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate bool IsShaderDelegate(int shaderId);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate bool IsShaderDelegate (int shaderId);
         internal static IsShaderDelegate IsShader;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void DeleteShaderDelegate (int shaderId);
         internal static DeleteShaderDelegate DeleteShader;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate int GetAttribLocationDelegate(int programId, string name);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate int GetAttribLocationDelegate (int programId, string name);
         internal static GetAttribLocationDelegate GetAttribLocation;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate int GetUniformLocationDelegate(int programId, string name);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate int GetUniformLocationDelegate (int programId, string name);
         internal static GetUniformLocationDelegate GetUniformLocation;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate bool IsProgramDelegate (int programId);
         internal static IsProgramDelegate IsProgram;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void DeleteProgramDelegate (int programId);
         internal static DeleteProgramDelegate DeleteProgram;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate int CreateProgramDelegate();
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate int CreateProgramDelegate ();
         internal static CreateProgramDelegate CreateProgram;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void AttachShaderDelegate (int programId, int shaderId);
         internal static AttachShaderDelegate AttachShader;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void LinkProgramDelegate(int programId);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void LinkProgramDelegate (int programId);
         internal static LinkProgramDelegate LinkProgram;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal unsafe delegate void GetProgramDelegate(int programId, int name, int* linked);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal unsafe delegate void GetProgramDelegate (int programId, int name, int* linked);
         internal static GetProgramDelegate GetProgramiv;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void GetProgramInfoLogDelegate(int program, int bufSize, IntPtr length, StringBuilder infoLog);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void GetProgramInfoLogDelegate (int program, int bufSize, IntPtr length, StringBuilder infoLog);
         internal static GetProgramInfoLogDelegate GetProgramInfoLogInternal;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void DetachShaderDelegate(int programId, int shaderId);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void DetachShaderDelegate (int programId, int shaderId);
         internal static DetachShaderDelegate DetachShader;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void BlendColorDelegate(float r, float g, float b, float a);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void BlendColorDelegate (float r, float g, float b, float a);
         internal static BlendColorDelegate BlendColor;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void BlendEquationSeparateDelegate(BlendEquationMode colorMode, BlendEquationMode alphaMode);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void BlendEquationSeparateDelegate (BlendEquationMode colorMode, BlendEquationMode alphaMode);
         internal static BlendEquationSeparateDelegate BlendEquationSeparate;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void BlendFuncSeparateDelegate(BlendingFactorSrc colorSrc, BlendingFactorDest colorDst,
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void BlendFuncSeparateDelegate (BlendingFactorSrc colorSrc, BlendingFactorDest colorDst,
             BlendingFactorSrc alphaSrc, BlendingFactorDest alphaDst);
         internal static BlendFuncSeparateDelegate BlendFuncSeparate;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void ColorMaskDelegate(bool r, bool g, bool b, bool a);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void ColorMaskDelegate (bool r, bool g, bool b, bool a);
         internal static ColorMaskDelegate ColorMask;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void DepthFuncDelegate(DepthFunction function);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void DepthFuncDelegate (DepthFunction function);
         internal static DepthFuncDelegate DepthFunc;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void DepthMaskDelegate (bool enabled);
         internal static DepthMaskDelegate DepthMask;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void StencilFuncSeparateDelegate (StencilFace face, GLStencilFunction function, int referenceStencil, int mask);
         internal static StencilFuncSeparateDelegate StencilFuncSeparate;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void StencilOpSeparateDelegate(StencilFace face, StencilOp stencilfail, StencilOp depthFail, StencilOp pass);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void StencilOpSeparateDelegate (StencilFace face, StencilOp stencilfail, StencilOp depthFail, StencilOp pass);
         internal static StencilOpSeparateDelegate StencilOpSeparate;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void StencilFuncDelegate(GLStencilFunction function, int referenceStencil, int mask);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void StencilFuncDelegate (GLStencilFunction function, int referenceStencil, int mask);
         internal static StencilFuncDelegate StencilFunc;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void StencilOpDelegate (StencilOp stencilfail, StencilOp depthFail, StencilOp pass);
         internal static StencilOpDelegate StencilOp;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void StencilMaskDelegate(int mask);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void StencilMaskDelegate (int mask);
         internal static StencilMaskDelegate StencilMask;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void CompressedTexImage2DDelegate(TextureTarget target, int level, PixelInternalFormat internalFormat,
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void CompressedTexImage2DDelegate (TextureTarget target, int level, PixelInternalFormat internalFormat,
             int width, int height, int border, int size, IntPtr data);
         internal static CompressedTexImage2DDelegate CompressedTexImage2D;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void TexImage2DDelegate(TextureTarget target,int level, PixelInternalFormat internalFormat,
-            int width, int height, int border,PixelFormat format, PixelType pixelType, IntPtr data);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void TexImage2DDelegate (TextureTarget target, int level, PixelInternalFormat internalFormat,
+            int width, int height, int border, PixelFormat format, PixelType pixelType, IntPtr data);
         internal static TexImage2DDelegate TexImage2D;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void CompressedTexSubImage2DDelegate (TextureTarget target, int level,
             int x, int y, int width, int height, PixelInternalFormat format, int size, IntPtr data);
         internal static CompressedTexSubImage2DDelegate CompressedTexSubImage2D;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void TexSubImage2DDelegate (TextureTarget target, int level,
             int x, int y, int width, int height, PixelFormat format, PixelType pixelType, IntPtr data);
         internal static TexSubImage2DDelegate TexSubImage2D;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void PixelStoreDelegate (PixelStoreParameter parameter, int size);
         internal static PixelStoreDelegate PixelStore;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void FinishDelegate();
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void FinishDelegate ();
         internal static FinishDelegate Finish;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void GetTexImageDelegate(TextureTarget target, int level, PixelFormat format, PixelType type, [Out] IntPtr pixels);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void GetTexImageDelegate (TextureTarget target, int level, PixelFormat format, PixelType type, [Out] IntPtr pixels);
         internal static GetTexImageDelegate GetTexImageInternal;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void GetCompressedTexImageDelegate(TextureTarget target, int level, [Out] IntPtr pixels);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void GetCompressedTexImageDelegate (TextureTarget target, int level, [Out] IntPtr pixels);
         internal static GetCompressedTexImageDelegate GetCompressedTexImageInternal;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void TexImage3DDelegate(TextureTarget target,int level, PixelInternalFormat internalFormat,
-            int width, int height, int depth, int border,PixelFormat format, PixelType pixelType, IntPtr data);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void TexImage3DDelegate (TextureTarget target, int level, PixelInternalFormat internalFormat,
+            int width, int height, int depth, int border, PixelFormat format, PixelType pixelType, IntPtr data);
         internal static TexImage3DDelegate TexImage3D;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void TexSubImage3DDelegate (TextureTarget target, int level,
             int x, int y, int z, int width, int height, int depth, PixelFormat format, PixelType pixelType, IntPtr data);
         internal static TexSubImage3DDelegate TexSubImage3D;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void DeleteTexturesDelegate(int count, ref int id);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void DeleteTexturesDelegate (int count, ref int id);
         internal static DeleteTexturesDelegate DeleteTextures;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void GenBuffersDelegate(int count, out int buffer);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void GenBuffersDelegate (int count, out int buffer);
         internal static GenBuffersDelegate GenBuffers;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void BufferDataDelegate(BufferTarget target, IntPtr size, IntPtr n, BufferUsageHint usage);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void BufferDataDelegate (BufferTarget target, IntPtr size, IntPtr n, BufferUsageHint usage);
         internal static BufferDataDelegate BufferData;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate IntPtr MapBufferDelegate(BufferTarget target, BufferAccess access);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate IntPtr MapBufferDelegate (BufferTarget target, BufferAccess access);
         internal static MapBufferDelegate MapBuffer;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void UnmapBufferDelegate(BufferTarget target);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void UnmapBufferDelegate (BufferTarget target);
         internal static UnmapBufferDelegate UnmapBuffer;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void BufferSubDataDelegate (BufferTarget target, IntPtr offset, IntPtr size, IntPtr data);
         internal static BufferSubDataDelegate BufferSubData;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
         internal delegate void DeleteBuffersDelegate (int count, [In] [Out] ref int buffer);
         internal static DeleteBuffersDelegate DeleteBuffers;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]       
-        internal delegate void VertexAttribPointerDelegate(int location, int elementCount, VertexAttribPointerType type, bool normalize,
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void VertexAttribPointerDelegate (int location, int elementCount, VertexAttribPointerType type, bool normalize,
             int stride, IntPtr data);
         internal static VertexAttribPointerDelegate VertexAttribPointer;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        internal delegate void DrawElementsInstancedDelegate(GLPrimitiveType primitiveType, int count, DrawElementsType elementType, 
+        internal delegate void DrawElementsInstancedDelegate (GLPrimitiveType primitiveType, int count, DrawElementsType elementType,
             IntPtr offset, int instanceCount);
         internal static DrawElementsInstancedDelegate DrawElementsInstanced;
 
-        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        internal delegate void VertexAttribDivisorDelegate(int location, int frequency);
+        internal delegate void VertexAttribDivisorDelegate (int location, int frequency);
         internal static VertexAttribDivisorDelegate VertexAttribDivisor;
 
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        delegate void DebugMessageCallbackProc(int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam);
-        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer (CallingConvention.StdCall)]
+        delegate void DebugMessageCallbackProc (int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam);
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        delegate void DebugMessageCallbackDelegate(DebugMessageCallbackProc callback, IntPtr userParam);
+        delegate void DebugMessageCallbackDelegate (DebugMessageCallbackProc callback, IntPtr userParam);
         static DebugMessageCallbackDelegate DebugMessageCallback;
 
-        internal delegate void ErrorDelegate(string message);
+        internal delegate void ErrorDelegate (string message);
         internal static event ErrorDelegate OnError;
 
 #if DEBUG
@@ -1130,168 +1191,151 @@ namespace MonoGame.OpenGL
 
         internal static int SwapInterval { get; set; }
 
-        internal static void LoadEntryPoints()
+        internal static void LoadEntryPoints ()
         {
             LoadPlatformEntryPoints ();
 
             if (Viewport == null)
-                Viewport = (ViewportDelegate)LoadEntryPoint<ViewportDelegate>("glViewport");
+                Viewport = LoadEntryPoint<ViewportDelegate> ("glViewport");
             if (Scissor == null)
-                Scissor = (ScissorDelegate)LoadEntryPoint<ScissorDelegate>("glScissor");
+                Scissor = LoadEntryPoint<ScissorDelegate> ("glScissor");
             if (MakeCurrent == null)
-                MakeCurrent = (MakeCurrentDelegate)LoadEntryPoint<MakeCurrentDelegate>("glMakeCurrent", throwIfNotFound: false);
+                MakeCurrent = LoadEntryPoint<MakeCurrentDelegate> ("glMakeCurrent", throwIfNotFound: false);
 
-            GetError = (GetErrorDelegate)LoadEntryPoint<GetErrorDelegate>("glGetError");
+            GetError = LoadEntryPoint<GetErrorDelegate> ("glGetError");
 
-            TexParameterf = (TexParameterFloatDelegate)LoadEntryPoint<TexParameterFloatDelegate>("glTexParameterf");
-            TexParameterfv = (TexParameterFloatArrayDelegate)LoadEntryPoint<TexParameterFloatArrayDelegate>("glTexParameterfv");
-            TexParameteri = (TexParameterIntDelegate)LoadEntryPoint<TexParameterIntDelegate>("glTexParameteri");
+            TexParameterf = LoadEntryPoint<TexParameterFloatDelegate> ("glTexParameterf");
+            TexParameterfv = LoadEntryPoint<TexParameterFloatArrayDelegate> ("glTexParameterfv");
+            TexParameteri = LoadEntryPoint<TexParameterIntDelegate> ("glTexParameteri");
 
-            EnableVertexAttribArray = (EnableVertexAttribArrayDelegate)LoadEntryPoint<EnableVertexAttribArrayDelegate>("glEnableVertexAttribArray");
-            DisableVertexAttribArray = (DisableVertexAttribArrayDelegate)LoadEntryPoint<DisableVertexAttribArrayDelegate>("glDisableVertexAttribArray");
-            GetIntegerv = (GetIntegerDelegate)LoadEntryPoint<GetIntegerDelegate>("glGetIntegerv");
-            GetStringInternal = (GetStringDelegate)LoadEntryPoint<GetStringDelegate>("glGetString");
-            ClearDepth = (ClearDepthDelegate)LoadEntryPoint<ClearDepthDelegate>("glClearDepth");
-            DepthRanged = (DepthRangedDelegate)LoadEntryPoint<DepthRangedDelegate>("glDepthRange");
-            DepthRangef = (DepthRangefDelegate)LoadEntryPoint<DepthRangefDelegate>("glDepthRangef");
-            Clear = (ClearDelegate)LoadEntryPoint<ClearDelegate>("glClear");
-            ClearColor = (ClearColorDelegate)LoadEntryPoint<ClearColorDelegate>("glClearColor");
-            ClearStencil = (ClearStencilDelegate)LoadEntryPoint<ClearStencilDelegate>("glClearStencil");
-            Flush = (FlushDelegate)LoadEntryPoint<FlushDelegate>("glFlush");
-            GenTextures = (GenTexturesDelegte)LoadEntryPoint<GenTexturesDelegte>("glGenTextures");
-            BindTexture = (BindTextureDelegate)LoadEntryPoint<BindTextureDelegate>("glBindTexture");
+            EnableVertexAttribArray = LoadEntryPoint<EnableVertexAttribArrayDelegate> ("glEnableVertexAttribArray");
+            DisableVertexAttribArray = LoadEntryPoint<DisableVertexAttribArrayDelegate> ("glDisableVertexAttribArray");
+            GetIntegerv = LoadEntryPoint<GetIntegerDelegate> ("glGetIntegerv");
+            GetStringInternal = LoadEntryPoint<GetStringDelegate> ("glGetString");
+            ClearDepth = LoadEntryPoint<ClearDepthDelegate> ("glClearDepth");
+            if (ClearDepth == null)
+                ClearDepth = LoadEntryPoint<ClearDepthDelegate> ("glClearDepthf");
+            DepthRanged = LoadEntryPoint<DepthRangedDelegate> ("glDepthRange");
+            DepthRangef = LoadEntryPoint<DepthRangefDelegate> ("glDepthRangef");
+            Clear = LoadEntryPoint<ClearDelegate> ("glClear");
+            ClearColor = LoadEntryPoint<ClearColorDelegate> ("glClearColor");
+            ClearStencil = LoadEntryPoint<ClearStencilDelegate> ("glClearStencil");
+            Flush = LoadEntryPoint<FlushDelegate> ("glFlush");
+            GenTextures = LoadEntryPoint<GenTexturesDelegte> ("glGenTextures");
+            BindTexture = LoadEntryPoint<BindTextureDelegate> ("glBindTexture");
 
-            Enable = (EnableDelegate)LoadEntryPoint<EnableDelegate>("glEnable");
-            Disable = (DisableDelegate)LoadEntryPoint<DisableDelegate>("glDisable");
-            CullFace = (CullFaceDelegate)LoadEntryPoint<CullFaceDelegate>("glCullFace");
-            FrontFace = (FrontFaceDelegate)LoadEntryPoint<FrontFaceDelegate>("glFrontFace");
-            PolygonMode = (PolygonModeDelegate)LoadEntryPoint<PolygonModeDelegate>("glPolygonMode");
-            PolygonOffset = (PolygonOffsetDelegate)LoadEntryPoint<PolygonOffsetDelegate>("glPolygonOffset");
+            Enable = LoadEntryPoint<EnableDelegate> ("glEnable");
+            Disable = LoadEntryPoint<DisableDelegate> ("glDisable");
+            CullFace = LoadEntryPoint<CullFaceDelegate> ("glCullFace");
+            FrontFace = LoadEntryPoint<FrontFaceDelegate> ("glFrontFace");
+            PolygonMode = LoadEntryPoint<PolygonModeDelegate> ("glPolygonMode");
+            PolygonOffset = LoadEntryPoint<PolygonOffsetDelegate> ("glPolygonOffset");
 
-            BindBuffer = (BindBufferDelegate)LoadEntryPoint<BindBufferDelegate>("glBindBuffer");
-            DrawBuffers = (DrawBuffersDelegate)LoadEntryPoint<DrawBuffersDelegate>("glDrawBuffers");
-            DrawElements = (DrawElementsDelegate)LoadEntryPoint<DrawElementsDelegate>("glDrawElements");
-            DrawArrays = (DrawArraysDelegate)LoadEntryPoint<DrawArraysDelegate>("glDrawArrays");
-            Uniform1i = (Uniform1iDelegate)LoadEntryPoint<Uniform1iDelegate>("glUniform1i");
-            Uniform4fv = (Uniform4fvDelegate)LoadEntryPoint<Uniform4fvDelegate>("glUniform4fv");
-            glReadPixels = (ReadPixelsDelegate)LoadEntryPoint<ReadPixelsDelegate> ("glReadPixels");
+            BindBuffer = LoadEntryPoint<BindBufferDelegate> ("glBindBuffer");
+            DrawBuffers = LoadEntryPoint<DrawBuffersDelegate> ("glDrawBuffers");
+            DrawElements = LoadEntryPoint<DrawElementsDelegate> ("glDrawElements");
+            DrawArrays = LoadEntryPoint<DrawArraysDelegate> ("glDrawArrays");
+            Uniform1i = LoadEntryPoint<Uniform1iDelegate> ("glUniform1i");
+            Uniform4fv = LoadEntryPoint<Uniform4fvDelegate> ("glUniform4fv");
+            ReadPixelsInternal = LoadEntryPoint<ReadPixelsDelegate>("glReadPixels");
 
-            ReadBuffer = (ReadBufferDelegate)LoadEntryPoint<ReadBufferDelegate>("glReadBuffer");
-            DrawBuffer = (DrawBufferDelegate)LoadEntryPoint<DrawBufferDelegate>("glDrawBuffer");
+            ReadBuffer = LoadEntryPoint<ReadBufferDelegate> ("glReadBuffer");
+            DrawBuffer = LoadEntryPoint<DrawBufferDelegate> ("glDrawBuffer");
 
-            RenderbufferStorage = (RenderbufferStorageDelegate)LoadEntryPoint<RenderbufferStorageDelegate> ("glRenderbufferStorage");
+            RenderbufferStorage = LoadEntryPoint<RenderbufferStorageDelegate> ("glRenderbufferStorage");
 
-            // these are only in GL 3.0 or ARB_framebuffer_object, if they fail to load (and only if they do), we need to check if EXT_framebuffer_object is present as a fallback
-            try
-            {
-                GenRenderbuffers = (GenRenderbuffersDelegate)LoadEntryPoint<GenRenderbuffersDelegate>("glGenRenderbuffers");
-                BindRenderbuffer = (BindRenderbufferDelegate)LoadEntryPoint<BindRenderbufferDelegate>("glBindRenderbuffer");
-                DeleteRenderbuffers = (DeleteRenderbuffersDelegate)LoadEntryPoint<DeleteRenderbuffersDelegate>("glDeleteRenderbuffers");
-                GenFramebuffers = (GenFramebuffersDelegate)LoadEntryPoint<GenFramebuffersDelegate>("glGenFramebuffers");
-                BindFramebuffer = (BindFramebufferDelegate)LoadEntryPoint<BindFramebufferDelegate>("glBindFramebuffer");
-                DeleteFramebuffers = (DeleteFramebuffersDelegate)LoadEntryPoint<DeleteFramebuffersDelegate>("glDeleteFramebuffers");
-                FramebufferTexture2D = (FramebufferTexture2DDelegate)LoadEntryPoint<FramebufferTexture2DDelegate>("glFramebufferTexture2D");
-                FramebufferRenderbuffer = (FramebufferRenderbufferDelegate)LoadEntryPoint<FramebufferRenderbufferDelegate>("glFramebufferRenderbuffer");
-                RenderbufferStorageMultisample = (RenderbufferStorageMultisampleDelegate)LoadEntryPoint<RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisample");
-                GenerateMipmap = (GenerateMipmapDelegate)LoadEntryPoint<GenerateMipmapDelegate>("glGenerateMipmap");
-                BlitFramebuffer = (BlitFramebufferDelegate)LoadEntryPoint<BlitFramebufferDelegate>("glBlitFramebuffer");
-                CheckFramebufferStatus = (CheckFramebufferStatusDelegate)LoadEntryPoint<CheckFramebufferStatusDelegate>("glCheckFramebufferStatus");
-            }
-            catch (EntryPointNotFoundException)
-            {
-                // then only we check for EXT_framebuffer_object
-                Ext.GenRenderbuffers = (Ext.GenRenderbuffersDelegate)LoadEntryPoint<Ext.GenRenderbuffersDelegate>("glGenRenderbuffersEXT");
-                Ext.BindRenderbuffer = (Ext.BindRenderbufferDelegate)LoadEntryPoint<Ext.BindRenderbufferDelegate>("glBindRenderbufferEXT");
-                Ext.DeleteRenderbuffers = (Ext.DeleteRenderbuffersDelegate)LoadEntryPoint<Ext.DeleteRenderbuffersDelegate>("glDeleteRenderbuffersEXT");
-                Ext.GenFramebuffers = (Ext.GenFramebuffersDelegate)LoadEntryPoint<Ext.GenFramebuffersDelegate>("glGenFramebuffersEXT");
-                Ext.BindFramebuffer = (Ext.BindFramebufferDelegate)LoadEntryPoint<Ext.BindFramebufferDelegate>("glBindFramebufferEXT");
-                Ext.DeleteFramebuffers = (Ext.DeleteFramebuffersDelegate)LoadEntryPoint<Ext.DeleteFramebuffersDelegate>("glDeleteFramebuffersEXT");
-                Ext.FramebufferTexture2D = (Ext.FramebufferTexture2DDelegate)LoadEntryPoint<Ext.FramebufferTexture2DDelegate>("glFramebufferTexture2DEXT");
-                Ext.FramebufferRenderbuffer = (Ext.FramebufferRenderbufferDelegate)LoadEntryPoint<Ext.FramebufferRenderbufferDelegate>("glFramebufferRenderbufferEXT");
-                Ext.RenderbufferStorageMultisample = (Ext.RenderbufferStorageMultisampleDelegate)LoadEntryPoint<Ext.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleEXT");
-                Ext.GenerateMipmap = (Ext.GenerateMipmapDelegate)LoadEntryPoint<Ext.GenerateMipmapDelegate>("glGenerateMipmapEXT");
-                Ext.BlitFramebuffer = (Ext.BlitFramebufferDelegate)LoadEntryPoint<Ext.BlitFramebufferDelegate>("glBlitFramebufferEXT");
-                Ext.CheckFramebufferStatus = (Ext.CheckFramebufferStatusDelegate)LoadEntryPoint<Ext.CheckFramebufferStatusDelegate>("glCheckFramebufferStatusEXT");
-            }
+            // Render Target Support. These might be null if they are not supported
+            // see GraphicsDevice.OpenGL.FramebufferHelper.cs for handling other extensions.
+            GenRenderbuffers = LoadEntryPoint<GenRenderbuffersDelegate> ("glGenRenderbuffers");
+            BindRenderbuffer = LoadEntryPoint<BindRenderbufferDelegate> ("glBindRenderbuffer");
+            DeleteRenderbuffers = LoadEntryPoint<DeleteRenderbuffersDelegate> ("glDeleteRenderbuffers");
+            GenFramebuffers = LoadEntryPoint<GenFramebuffersDelegate> ("glGenFramebuffers");
+            BindFramebuffer = LoadEntryPoint<BindFramebufferDelegate> ("glBindFramebuffer");
+            DeleteFramebuffers = LoadEntryPoint<DeleteFramebuffersDelegate> ("glDeleteFramebuffers");
+            FramebufferTexture2D = LoadEntryPoint<FramebufferTexture2DDelegate> ("glFramebufferTexture2D");
+            FramebufferRenderbuffer = LoadEntryPoint<FramebufferRenderbufferDelegate> ("glFramebufferRenderbuffer");
+            RenderbufferStorageMultisample = LoadEntryPoint<RenderbufferStorageMultisampleDelegate> ("glRenderbufferStorageMultisample");
+            GenerateMipmap = LoadEntryPoint<GenerateMipmapDelegate> ("glGenerateMipmap");
+            BlitFramebuffer = LoadEntryPoint<BlitFramebufferDelegate> ("glBlitFramebuffer");
+            CheckFramebufferStatus = LoadEntryPoint<CheckFramebufferStatusDelegate> ("glCheckFramebufferStatus");
 
-            GenQueries = (GenQueriesDelegate)LoadEntryPoint<GenQueriesDelegate>("glGenQueries");
-            BeginQuery = (BeginQueryDelegate)LoadEntryPoint<BeginQueryDelegate>("glBeginQuery");
-            EndQuery = (EndQueryDelegate)LoadEntryPoint<EndQueryDelegate>("glEndQuery");
-            GetQueryObject = (GetQueryObjectDelegate)LoadEntryPoint<GetQueryObjectDelegate>("glGetQueryObjectivARB");
+            GenQueries = LoadEntryPoint<GenQueriesDelegate> ("glGenQueries");
+            BeginQuery = LoadEntryPoint<BeginQueryDelegate> ("glBeginQuery");
+            EndQuery = LoadEntryPoint<EndQueryDelegate> ("glEndQuery");
+            GetQueryObject = LoadEntryPoint<GetQueryObjectDelegate>("glGetQueryObjectuiv");
             if (GetQueryObject == null)
-                GetQueryObject = (GetQueryObjectDelegate)LoadEntryPoint<GetQueryObjectDelegate>("glGetQueryObjectiv");
-            DeleteQueries = (DeleteQueriesDelegate)LoadEntryPoint<DeleteQueriesDelegate>("glDeleteQueries");
+                GetQueryObject = LoadEntryPoint<GetQueryObjectDelegate> ("glGetQueryObjectivARB");
+            if (GetQueryObject == null)
+                GetQueryObject = LoadEntryPoint<GetQueryObjectDelegate> ("glGetQueryObjectiv");
+            DeleteQueries = LoadEntryPoint<DeleteQueriesDelegate> ("glDeleteQueries");
 
-            ActiveTexture = (ActiveTextureDelegate)LoadEntryPoint<ActiveTextureDelegate>("glActiveTexture");
-            CreateShader = (CreateShaderDelegate)LoadEntryPoint<CreateShaderDelegate>("glCreateShader");
-            ShaderSourceInternal = (ShaderSourceDelegate)LoadEntryPoint<ShaderSourceDelegate>("glShaderSource");
-            CompileShader = (CompileShaderDelegate)LoadEntryPoint<CompileShaderDelegate>("glCompileShader");
-            GetShaderiv = (GetShaderDelegate)LoadEntryPoint<GetShaderDelegate>("glGetShaderiv");
-            GetShaderInfoLogInternal = (GetShaderInfoLogDelegate)LoadEntryPoint<GetShaderInfoLogDelegate>("glGetShaderInfoLog");
-            IsShader = (IsShaderDelegate)LoadEntryPoint<IsShaderDelegate>("glIsShader");
-            DeleteShader = (DeleteShaderDelegate)LoadEntryPoint<DeleteShaderDelegate>("glDeleteShader");
-            GetAttribLocation = (GetAttribLocationDelegate)LoadEntryPoint<GetAttribLocationDelegate>("glGetAttribLocation");
-            GetUniformLocation = (GetUniformLocationDelegate)LoadEntryPoint<GetUniformLocationDelegate>("glGetUniformLocation");
+            ActiveTexture = LoadEntryPoint<ActiveTextureDelegate> ("glActiveTexture");
+            CreateShader = LoadEntryPoint<CreateShaderDelegate> ("glCreateShader");
+            ShaderSourceInternal = LoadEntryPoint<ShaderSourceDelegate> ("glShaderSource");
+            CompileShader = LoadEntryPoint<CompileShaderDelegate> ("glCompileShader");
+            GetShaderiv = LoadEntryPoint<GetShaderDelegate> ("glGetShaderiv");
+            GetShaderInfoLogInternal = LoadEntryPoint<GetShaderInfoLogDelegate> ("glGetShaderInfoLog");
+            IsShader = LoadEntryPoint<IsShaderDelegate> ("glIsShader");
+            DeleteShader = LoadEntryPoint<DeleteShaderDelegate> ("glDeleteShader");
+            GetAttribLocation = LoadEntryPoint<GetAttribLocationDelegate> ("glGetAttribLocation");
+            GetUniformLocation = LoadEntryPoint<GetUniformLocationDelegate> ("glGetUniformLocation");
 
-            IsProgram = (IsProgramDelegate)LoadEntryPoint<IsProgramDelegate>("glIsProgram");
-            DeleteProgram = (DeleteProgramDelegate)LoadEntryPoint<DeleteProgramDelegate>("glDeleteProgram");
-            CreateProgram = (CreateProgramDelegate)LoadEntryPoint<CreateProgramDelegate>("glCreateProgram");
-            AttachShader = (AttachShaderDelegate)LoadEntryPoint<AttachShaderDelegate>("glAttachShader");
-            UseProgram = (UseProgramDelegate)LoadEntryPoint<UseProgramDelegate>("glUseProgram");
-            LinkProgram = (LinkProgramDelegate)LoadEntryPoint<LinkProgramDelegate>("glLinkProgram");
-            GetProgramiv = (GetProgramDelegate)LoadEntryPoint<GetProgramDelegate>("glGetProgramiv");
-            GetProgramInfoLogInternal = (GetProgramInfoLogDelegate)LoadEntryPoint<GetProgramInfoLogDelegate>("glGetProgramInfoLog");
-            DetachShader = (DetachShaderDelegate)LoadEntryPoint<DetachShaderDelegate>("glDetachShader");
+            IsProgram = LoadEntryPoint<IsProgramDelegate> ("glIsProgram");
+            DeleteProgram = LoadEntryPoint<DeleteProgramDelegate> ("glDeleteProgram");
+            CreateProgram = LoadEntryPoint<CreateProgramDelegate> ("glCreateProgram");
+            AttachShader = LoadEntryPoint<AttachShaderDelegate> ("glAttachShader");
+            UseProgram = LoadEntryPoint<UseProgramDelegate> ("glUseProgram");
+            LinkProgram = LoadEntryPoint<LinkProgramDelegate> ("glLinkProgram");
+            GetProgramiv = LoadEntryPoint<GetProgramDelegate> ("glGetProgramiv");
+            GetProgramInfoLogInternal = LoadEntryPoint<GetProgramInfoLogDelegate> ("glGetProgramInfoLog");
+            DetachShader = LoadEntryPoint<DetachShaderDelegate> ("glDetachShader");
 
-            BlendColor = (BlendColorDelegate)LoadEntryPoint<BlendColorDelegate>("glBlendColor");
-            BlendEquationSeparate = (BlendEquationSeparateDelegate)LoadEntryPoint<BlendEquationSeparateDelegate>("glBlendEquationSeparate");
-            BlendFuncSeparate = (BlendFuncSeparateDelegate)LoadEntryPoint<BlendFuncSeparateDelegate>("glBlendFuncSeparate");
-            ColorMask = (ColorMaskDelegate)LoadEntryPoint<ColorMaskDelegate>("glColorMask");
-            DepthFunc = (DepthFuncDelegate)LoadEntryPoint<DepthFuncDelegate>("glDepthFunc");
-            DepthMask = (DepthMaskDelegate)LoadEntryPoint<DepthMaskDelegate>("glDepthMask");
-            StencilFuncSeparate = (StencilFuncSeparateDelegate)LoadEntryPoint<StencilFuncSeparateDelegate>("glStencilFuncSeparate");
-            StencilOpSeparate = (StencilOpSeparateDelegate)LoadEntryPoint<StencilOpSeparateDelegate>("glStencilOpSeparate");
-            StencilFunc = (StencilFuncDelegate)LoadEntryPoint<StencilFuncDelegate>("glStencilFunc");
-            StencilOp = (StencilOpDelegate)LoadEntryPoint<StencilOpDelegate>("glStencilOp");
-            StencilMask = (StencilMaskDelegate)LoadEntryPoint<StencilMaskDelegate>("glStencilMask");
+            BlendColor = LoadEntryPoint<BlendColorDelegate> ("glBlendColor");
+            BlendEquationSeparate = LoadEntryPoint<BlendEquationSeparateDelegate> ("glBlendEquationSeparate");
+            BlendFuncSeparate = LoadEntryPoint<BlendFuncSeparateDelegate> ("glBlendFuncSeparate");
+            ColorMask = LoadEntryPoint<ColorMaskDelegate> ("glColorMask");
+            DepthFunc = LoadEntryPoint<DepthFuncDelegate> ("glDepthFunc");
+            DepthMask = LoadEntryPoint<DepthMaskDelegate> ("glDepthMask");
+            StencilFuncSeparate = LoadEntryPoint<StencilFuncSeparateDelegate> ("glStencilFuncSeparate");
+            StencilOpSeparate = LoadEntryPoint<StencilOpSeparateDelegate> ("glStencilOpSeparate");
+            StencilFunc = LoadEntryPoint<StencilFuncDelegate> ("glStencilFunc");
+            StencilOp = LoadEntryPoint<StencilOpDelegate> ("glStencilOp");
+            StencilMask = LoadEntryPoint<StencilMaskDelegate> ("glStencilMask");
 
-            CompressedTexImage2D = (CompressedTexImage2DDelegate)LoadEntryPoint<CompressedTexImage2DDelegate>("glCompressedTexImage2D");
-            TexImage2D = (TexImage2DDelegate)LoadEntryPoint<TexImage2DDelegate>("glTexImage2D");
-            CompressedTexSubImage2D = (CompressedTexSubImage2DDelegate)LoadEntryPoint<CompressedTexSubImage2DDelegate>("glCompressedTexSubImage2D");
-            TexSubImage2D = (TexSubImage2DDelegate)LoadEntryPoint<TexSubImage2DDelegate>("glTexSubImage2D");
-            PixelStore = (PixelStoreDelegate)LoadEntryPoint<PixelStoreDelegate>("glPixelStorei");
-            Finish = (FinishDelegate)LoadEntryPoint<FinishDelegate>("glFinish");
-            GetTexImageInternal = (GetTexImageDelegate)LoadEntryPoint<GetTexImageDelegate>("glGetTexImage");
-            GetCompressedTexImageInternal = (GetCompressedTexImageDelegate)LoadEntryPoint<GetCompressedTexImageDelegate>("glGetCompressedTexImage");
-            TexImage3D = (TexImage3DDelegate)LoadEntryPoint<TexImage3DDelegate>("glTexImage3D");
-            TexSubImage3D = (TexSubImage3DDelegate)LoadEntryPoint<TexSubImage3DDelegate>("glTexSubImage3D");
-            DeleteTextures = (DeleteTexturesDelegate)LoadEntryPoint<DeleteTexturesDelegate>("glDeleteTextures");
+            CompressedTexImage2D = LoadEntryPoint<CompressedTexImage2DDelegate> ("glCompressedTexImage2D");
+            TexImage2D = LoadEntryPoint<TexImage2DDelegate> ("glTexImage2D");
+            CompressedTexSubImage2D = LoadEntryPoint<CompressedTexSubImage2DDelegate> ("glCompressedTexSubImage2D");
+            TexSubImage2D = LoadEntryPoint<TexSubImage2DDelegate> ("glTexSubImage2D");
+            PixelStore = LoadEntryPoint<PixelStoreDelegate> ("glPixelStorei");
+            Finish = LoadEntryPoint<FinishDelegate> ("glFinish");
+            GetTexImageInternal = LoadEntryPoint<GetTexImageDelegate> ("glGetTexImage");
+            GetCompressedTexImageInternal = LoadEntryPoint<GetCompressedTexImageDelegate> ("glGetCompressedTexImage");
+            TexImage3D = LoadEntryPoint<TexImage3DDelegate> ("glTexImage3D");
+            TexSubImage3D = LoadEntryPoint<TexSubImage3DDelegate> ("glTexSubImage3D");
+            DeleteTextures = LoadEntryPoint<DeleteTexturesDelegate> ("glDeleteTextures");
 
-            GenBuffers = (GenBuffersDelegate)LoadEntryPoint<GenBuffersDelegate>("glGenBuffers");
-            BufferData = (BufferDataDelegate)LoadEntryPoint<BufferDataDelegate>("glBufferData");
-            MapBuffer = (MapBufferDelegate)LoadEntryPoint<MapBufferDelegate>("glMapBuffer");
-            UnmapBuffer = (UnmapBufferDelegate)LoadEntryPoint<UnmapBufferDelegate>("glUnmapBuffer");
-            BufferSubData = (BufferSubDataDelegate)LoadEntryPoint<BufferSubDataDelegate>("glBufferSubData");
-            DeleteBuffers = (DeleteBuffersDelegate)LoadEntryPoint<DeleteBuffersDelegate>("glDeleteBuffers");
+            GenBuffers = LoadEntryPoint<GenBuffersDelegate> ("glGenBuffers");
+            BufferData = LoadEntryPoint<BufferDataDelegate> ("glBufferData");
+            MapBuffer = LoadEntryPoint<MapBufferDelegate> ("glMapBuffer");
+            UnmapBuffer = LoadEntryPoint<UnmapBufferDelegate> ("glUnmapBuffer");
+            BufferSubData = LoadEntryPoint<BufferSubDataDelegate> ("glBufferSubData");
+            DeleteBuffers = LoadEntryPoint<DeleteBuffersDelegate> ("glDeleteBuffers");
 
-            VertexAttribPointer = (VertexAttribPointerDelegate)LoadEntryPoint<VertexAttribPointerDelegate>("glVertexAttribPointer");
+            VertexAttribPointer = LoadEntryPoint<VertexAttribPointerDelegate> ("glVertexAttribPointer");
 
-            // Instanced drawing requires GL 3.2 or up, if the either of the following entry points can not be loaded 
+            // Instanced drawing requires GL 3.2 or up, if the either of the following entry points can not be loaded
             // this will get flagged by setting SupportsInstancing in GraphicsCapabilities to false.
-            try
-            {
-                DrawElementsInstanced = (DrawElementsInstancedDelegate)LoadEntryPoint<DrawElementsInstancedDelegate>("glDrawElementsInstanced");
-                VertexAttribDivisor = (VertexAttribDivisorDelegate)LoadEntryPoint<VertexAttribDivisorDelegate>("glVertexAttribDivisor");
-            }
-            catch (EntryPointNotFoundException)
-            {
+            try {
+                DrawElementsInstanced = LoadEntryPoint<DrawElementsInstancedDelegate> ("glDrawElementsInstanced");
+                VertexAttribDivisor = LoadEntryPoint<VertexAttribDivisorDelegate> ("glVertexAttribDivisor");
+            } catch (EntryPointNotFoundException) {
                 // this will be detected in the initialization of GraphicsCapabilities
             }
 
 #if DEBUG
             try
             {
-                DebugMessageCallback = (DebugMessageCallbackDelegate)LoadEntryPoint<DebugMessageCallbackDelegate>("glDebugMessageCallback");
+                DebugMessageCallback = LoadEntryPoint<DebugMessageCallbackDelegate>("glDebugMessageCallback");
                 if (DebugMessageCallback != null)
                 {
                     DebugMessageCallback(DebugMessageCallbackHandler, IntPtr.Zero);
@@ -1304,20 +1348,105 @@ namespace MonoGame.OpenGL
                 // Ignore the debug message callback if the entry point can not be found
             }
 #endif
-            if (BoundApi == RenderApi.ES)
+            if (BoundApi == RenderApi.ES) {
+                InvalidateFramebuffer = LoadEntryPoint<InvalidateFramebufferDelegate> ("glDiscardFramebufferEXT");
+            }
+
+            LoadExtensions ();
+        }
+
+        internal static List<string> Extensions = new List<string> ();
+
+        //[Conditional("DEBUG")]
+        //[DebuggerHidden]
+        static void LogExtensions()
+        {
+#if __ANDROID__
+            Android.Util.Log.Verbose("GL","Supported Extensions");
+            foreach (var ext in Extensions)
+                Android.Util.Log.Verbose("GL", "   " + ext);
+#endif 
+        }
+
+        internal static void LoadExtensions()
+        {
+            string extstring = GL.GetString(StringName.Extensions);
+            var error = GL.GetError();
+            if (!string.IsNullOrEmpty(extstring) && error == ErrorCode.NoError)
+                Extensions.AddRange(extstring.Split(' '));
+
+            LogExtensions();
+            // now load Extensions :)
+            if (GL.RenderbufferStorageMultisample == null)
             {
-                InvalidateFramebuffer = (InvalidateFramebufferDelegate)LoadEntryPoint<InvalidateFramebufferDelegate>("glDiscardFramebufferEXT");
+                if (Extensions.Contains("GL_EXT_framebuffer_object"))
+                {
+                    GL.LoadFrameBufferObjectEXTEntryPoints();
+                }
+                else if (Extensions.Contains("GL_APPLE_framebuffer_multisample"))
+                {
+                    GL.RenderbufferStorageMultisample = GL.LoadEntryPoint<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleAPPLE");
+                    GL.BlitFramebuffer = GL.LoadEntryPoint<GL.BlitFramebufferDelegate>("glResolveMultisampleFramebufferAPPLE");
+                }
+                else if (Extensions.Contains("GL_EXT_multisampled_render_to_texture"))
+                {
+                    GL.RenderbufferStorageMultisample = GL.LoadEntryPoint<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleEXT");
+                    GL.FramebufferTexture2DMultiSample = GL.LoadEntryPoint<GL.FramebufferTexture2DMultiSampleDelegate>("glFramebufferTexture2DMultisampleEXT");
+
+                }
+                else if (Extensions.Contains("GL_IMG_multisampled_render_to_texture"))
+                {
+                    GL.RenderbufferStorageMultisample = GL.LoadEntryPoint<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleIMG");
+                    GL.FramebufferTexture2DMultiSample = GL.LoadEntryPoint<GL.FramebufferTexture2DMultiSampleDelegate>("glFramebufferTexture2DMultisampleIMG");
+                }
+                else if (Extensions.Contains("GL_NV_framebuffer_multisample"))
+                {
+                    GL.RenderbufferStorageMultisample = GL.LoadEntryPoint<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleNV");
+                    GL.BlitFramebuffer = GL.LoadEntryPoint<GL.BlitFramebufferDelegate>("glBlitFramebufferNV");
+                }
             }
         }
 
-        internal static System.Delegate LoadEntryPoint<T>(string proc, bool throwIfNotFound = true)
+        internal static void LoadFrameBufferObjectARBEntryPoints()
+        {
+            GenRenderbuffers = LoadEntryPoint<GenRenderbuffersDelegate>("glGenRenderbuffers");
+            BindRenderbuffer = LoadEntryPoint<BindRenderbufferDelegate>("glBindRenderbuffer");
+            DeleteRenderbuffers = LoadEntryPoint<DeleteRenderbuffersDelegate>("glDeleteRenderbuffers");
+            GenFramebuffers = LoadEntryPoint<GenFramebuffersDelegate>("glGenFramebuffers");
+            BindFramebuffer = LoadEntryPoint<BindFramebufferDelegate>("glBindFramebuffer");
+            DeleteFramebuffers = LoadEntryPoint<DeleteFramebuffersDelegate>("glDeleteFramebuffers");
+            FramebufferTexture2D = LoadEntryPoint<FramebufferTexture2DDelegate>("glFramebufferTexture2D");
+            FramebufferRenderbuffer = LoadEntryPoint<FramebufferRenderbufferDelegate>("glFramebufferRenderbuffer");
+            RenderbufferStorageMultisample = LoadEntryPoint<RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisample");
+            GenerateMipmap = LoadEntryPoint<GenerateMipmapDelegate>("glGenerateMipmap");
+            BlitFramebuffer = LoadEntryPoint<BlitFramebufferDelegate>("glBlitFramebuffer");
+            CheckFramebufferStatus = LoadEntryPoint<CheckFramebufferStatusDelegate>("glCheckFramebufferStatus");
+        }
+
+        internal static void LoadFrameBufferObjectEXTEntryPoints()
+        {
+            GenRenderbuffers = LoadEntryPoint<GenRenderbuffersDelegate>("glGenRenderbuffersEXT");
+            BindRenderbuffer = LoadEntryPoint<BindRenderbufferDelegate>("glBindRenderbufferEXT");
+            DeleteRenderbuffers = LoadEntryPoint<DeleteRenderbuffersDelegate>("glDeleteRenderbuffersEXT");
+            GenFramebuffers = LoadEntryPoint<GenFramebuffersDelegate>("glGenFramebuffersEXT");
+            BindFramebuffer = LoadEntryPoint<BindFramebufferDelegate>("glBindFramebufferEXT");
+            DeleteFramebuffers = LoadEntryPoint<DeleteFramebuffersDelegate>("glDeleteFramebuffersEXT");
+            FramebufferTexture2D = LoadEntryPoint<FramebufferTexture2DDelegate>("glFramebufferTexture2DEXT");
+            FramebufferRenderbuffer = LoadEntryPoint<FramebufferRenderbufferDelegate>("glFramebufferRenderbufferEXT");
+            RenderbufferStorageMultisample = LoadEntryPoint<RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleEXT");
+            GenerateMipmap = LoadEntryPoint<GenerateMipmapDelegate>("glGenerateMipmapEXT");
+            BlitFramebuffer = LoadEntryPoint<BlitFramebufferDelegate>("glBlitFramebufferEXT");
+            CheckFramebufferStatus = LoadEntryPoint<CheckFramebufferStatusDelegate>("glCheckFramebufferStatusEXT");
+        }
+
+        internal static T LoadEntryPoint<T>(string proc, bool throwIfNotFound = false) where T:class
         {
             try
             {
                 var addr = EntryPointHelper.GetAddress(proc);
                 if (addr == IntPtr.Zero)
                     return null;
-                return Marshal.GetDelegateForFunctionPointer(addr, typeof(T));
+                return (T)(object)Marshal.GetDelegateForFunctionPointer(addr, typeof(T));
             }
             catch (EntryPointNotFoundException)
             {
@@ -1508,13 +1637,16 @@ namespace MonoGame.OpenGL
             }
         }
 
-        public static unsafe void ReadPixels<T> (int x, int y, int width, int height, PixelFormat format, PixelType type, [In][Out] T[] data)
+        public static void ReadPixels<T>(int x, int y, int width, int height, PixelFormat format, PixelType type, T[] data)
         {
-            GCHandle pixels_ptr = GCHandle.Alloc (data, GCHandleType.Pinned);
-            try {
-                glReadPixels (x, y, width,height, format, type, (IntPtr)pixels_ptr.AddrOfPinnedObject ());
-            } finally {
-                pixels_ptr.Free ();
+            var dataPtr = GCHandle.Alloc(data, GCHandleType.Pinned);
+            try
+            {
+                ReadPixelsInternal(x, y, width, height, format, type, dataPtr.AddrOfPinnedObject());
+            }
+            finally
+            {
+                dataPtr.Free();
             }
         }
     }
