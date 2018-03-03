@@ -249,6 +249,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
+            if (filename == null)
+                throw new ArgumentNullException("filename");
+            if (context == null)
+                throw new ArgumentNullException("context");
+
             _context = context;
 
             if (CurrentPlatform.OS == OS.Linux)
