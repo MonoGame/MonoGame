@@ -383,7 +383,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     material.SpecularColor = ToXna(aiMaterial.ColorSpecular);
 
                 if (aiMaterial.HasShininessStrength)
-                    material.SpecularPower = aiMaterial.ShininessStrength;
+                    material.SpecularPower = aiMaterial.Shininess;
                 
                 _materials.Add(material);
             }
