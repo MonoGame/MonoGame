@@ -9,7 +9,6 @@
   <DisableSynchronisation>true</DisableSynchronisation>
   <GenerateNuGetRepositories>false</GenerateNuGetRepositories>
   <Packages>
-    <Package Uri="https-git://github.com/OutOfOrder/MonoKickstart.git" Folder="ThirdParty/Kickstart" GitRef="master" />
     <Package Uri="https-git://github.com/MonoGame/MonoGame.Dependencies.git" Folder="ThirdParty/Dependencies" GitRef="master" />
     <Package Uri="https-git://github.com/ioctlLR/NVorbis.git" Folder="ThirdParty/NVorbis" GitRef="master" />
   </Packages>
