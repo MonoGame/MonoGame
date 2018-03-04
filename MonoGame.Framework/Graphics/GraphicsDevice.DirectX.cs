@@ -558,17 +558,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
             }
 
-            // Pass the preferred feature levels based on the
-            // target profile that may have been set by the user.
-            var featureLevels = new List<FeatureLevel>();
-            if (GraphicsProfile == GraphicsProfile.HiDef)
-            {
-                // Cut it down to just asking for level 9_3; this is all we need.
-                // The high feature level requests otherwise cause us problems,
-                // as even some cards which ought to detect as supporting them don't.
-                featureLevels.Add(FeatureLevel.Level_9_3);
-            }
-
             // We can not give featureLevels for granted in GraphicsProfile.Reach
             FeatureLevel supportedFeatureLevel = 0;
             try
@@ -578,6 +567,22 @@ namespace Microsoft.Xna.Framework.Graphics
             catch (SharpDX.SharpDXException)
             {
                 // if GetSupportedFeatureLevel() fails, do not crash the initialization. Program can run without this.
+            }
+            var featureLevels = new List<FeatureLevel>();
+
+            // We need to add 10.0 where available for 8k textures, in order to have 8k textures and
+            // support extremely wide screens.
+            if (supportedFeatureLevel >= FeatureLevel.Level_10_0)
+                featureLevels.Add(FeatureLevel.Level_10_0);
+
+            // Pass the preferred feature levels based on the
+            // target profile that may have been set by the user.
+            if (GraphicsProfile == GraphicsProfile.HiDef)
+            {
+                // Cut it down to just asking for level 9_3; this is all we need.
+                // The high feature level requests otherwise cause us problems,
+                // as even some cards which ought to detect as supporting them don't.
+                featureLevels.Add(FeatureLevel.Level_9_3);
             }
 
             if (GraphicsProfile != GraphicsProfile.HiDef && supportedFeatureLevel >= FeatureLevel.Level_9_3)
