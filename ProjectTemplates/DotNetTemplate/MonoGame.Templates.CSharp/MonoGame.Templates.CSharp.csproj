@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>Project templates for MonoDevelop extensions</Description>
-    <PackageId>MonoGame.Templates</PackageId>
+    <Description>A set of C# templates written for the MonoGame framework.</Description>
+    <PackageId>MonoGame.Templates.CSharp</PackageId>
     <PackageVersion>0.0.1</PackageVersion>
     <Authors>@MonoGameTeam</Authors>
+    <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>
+    <PackageProjectUrl>http://monogame.net/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MonoGame/MonoGame</RepositoryUrl>
     <TargetFramework>net461</TargetFramework>
     <EnableDefaultItems>False</EnableDefaultItems>
     <PackOnBuild>true</PackOnBuild>
