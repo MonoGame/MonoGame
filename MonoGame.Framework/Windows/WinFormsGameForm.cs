@@ -12,10 +12,10 @@ using MonoGame.Framework;
 namespace Microsoft.Xna.Framework.Windows
 {
     internal static class MessageExtensions
-    {     
+    {
         public static int GetPointerId(this Message msg)
         {
-            unchecked { return (short)msg.WParam; } 
+            return (short)((long)msg.WParam & 65535);
         }
 
         public static System.Drawing.Point GetPointerLocation(this Message msg)
@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Windows
             {
                 case WM_TABLET_QUERYSYSTEMGESTURESTA:
                     {
-                        // This disables the windows touch helpers, popups, and 
+                        // This disables the windows touch helpers, popups, and
                         // guides that get in the way of touch gameplay.
                         const int flags = 0x00000001 | // TABLET_DISABLE_PRESSANDHOLD
                                           0x00000008 | // TABLET_DISABLE_PENTAPFEEDBACK
@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Windows
                                           0x00000200 | // TABLET_DISABLE_TOUCHUIFORCEOFF
                                           0x00008000 | // TABLET_DISABLE_TOUCHSWITCH
                                           0x00010000 | // TABLET_DISABLE_FLICKS
-                                          0x00080000 | // TABLET_DISABLE_SMOOTHSCROLLING 
+                                          0x00080000 | // TABLET_DISABLE_SMOOTHSCROLLING
                                           0x00100000; // TABLET_DISABLE_FLICKFALLBACKKEYS
                         m.Result = new IntPtr(flags);
                         return;
@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework.Windows
 
                             if (_window.IsFullScreen && _window.HardwareModeSwitch)
                                 this.WindowState = FormWindowState.Minimized;
- 		 
+
                             break;
                     }
                     break;
