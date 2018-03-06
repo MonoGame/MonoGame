@@ -335,6 +335,9 @@
     <Compile Include="ContentPipeline\OggImporterTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\OpenAssetImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
@@ -1208,6 +1211,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Models\enemy_0.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Box.blend">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Models\BlenderDefaultCube.xnb">

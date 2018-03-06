@@ -222,7 +222,22 @@ namespace MonoGame.Tests.ContentPipeline
             foreach (var c in animationContent.Channels.Values)
                 Assert.Greater(c.Count, 0);
 
+            // I think in this case the old XNA FBX importer was bugged and
+            // returned a bigger animation duration that is correct.  Looking
+            // at the content of the FBX ascii i can see the math is:
+            // 
+            //  (57732697500 - 1924423250) / 46186158000 = 1.208 seconds
+            //
+            // Which is the correct result and what our FBX importer returns.
+            // I highly suspect that XNA was wrong.
+            //
+            // https://github.com/assimp/assimp/issues/1720
+            //
+#if XNA
             Assert.AreEqual(12670000, animationContent.Duration.Ticks);
+#else
+            Assert.AreEqual(12080000, animationContent.Duration.Ticks);            
+#endif
 
             // TODO: XNA assigns the identity to null on all NodeContent
             // other than the one returned from the importer.
