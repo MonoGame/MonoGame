@@ -95,6 +95,13 @@ namespace Microsoft.Xna.Framework
             var displayIndex = Sdl.Window.GetDisplayIndex(Window.Handle);
             var displayName = Sdl.Display.GetDisplayName(displayIndex);
             BeginScreenDeviceChange(pp.IsFullScreen);
+            if (_view.CheckRecreateWindow(pp))
+            {
+                // TODO create a new graphics context for the new window
+                throw new NotSupportedException("Changing the multisample count, surface format, depth or stencil buffer size" +
+                                                " of the backbuffer at runtime requires recreating the window under OpenGL. This" +
+                                                " is currently not implemented in MonoGame.");
+            }
             EndScreenDeviceChange(displayName, pp.BackBufferWidth, pp.BackBufferHeight);
         }
 

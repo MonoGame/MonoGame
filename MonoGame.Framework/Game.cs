@@ -527,7 +527,7 @@ namespace Microsoft.Xna.Framework
         protected virtual void Initialize()
         {
             // TODO: This should be removed once all platforms use the new GraphicsDeviceManager
-#if !(WINDOWS && DIRECTX)
+#if !DESKTOPGL
             applyChanges(graphicsDeviceManager);
 #endif
 
@@ -618,8 +618,7 @@ namespace Microsoft.Xna.Framework
         // FIXME: We should work toward eliminating internal methods.  They
         //        break entirely the possibility that additional platforms could
         //        be added by third parties without changing MonoGame itself.
-
-#if !(WINDOWS && DIRECTX)
+#if !DESKTOPGL
         internal void applyChanges(GraphicsDeviceManager manager)
         {
 			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);

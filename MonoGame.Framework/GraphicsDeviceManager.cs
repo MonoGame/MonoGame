@@ -63,6 +63,9 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
+            // TODO We should get rid of this, the window size should be intialized to the back buffer size
+            //      not the other way around. At least for desktop platforms.
+#if !DESKTOPGL
             // Assume the window client size as the default back 
             // buffer resolution in the landscape orientation.
             var clientBounds = _game.Window.ClientBounds;
@@ -76,6 +79,10 @@ namespace Microsoft.Xna.Framework
                 _preferredBackBufferWidth = clientBounds.Height;
                 _preferredBackBufferHeight = clientBounds.Width;
             }
+#else
+            _preferredBackBufferWidth = DefaultBackBufferWidth;
+            _preferredBackBufferHeight = DefaultBackBufferHeight;
+#endif
 
             // Default to windowed mode... this is ignored on platforms that don't support it.
             _wantFullScreen = false;
@@ -317,6 +324,7 @@ namespace Microsoft.Xna.Framework
                 // if the GraphicsProfile changed we need to create a new GraphicsDevice
                 DisposeGraphicsDevice();
                 CreateDevice(gdi);
+                OnPresentationChanged(this, new PresentationEventArgs(gdi.PresentationParameters));
                 return;
             }
 
