@@ -13,7 +13,7 @@ namespace MonoGame.Tools.Pipeline
     public partial class ProjectControl : Pad
     {
         private TreeGridView _treeView;
-        private Bitmap _iconRoot;
+        private Image _iconRoot;
         private TreeGridItem _treeBase, _treeRoot;
         private bool _rootExists;
         private ContextMenu _contextMenu;
@@ -28,7 +28,7 @@ namespace MonoGame.Tools.Pipeline
             _treeView.DataStore = _treeBase = new TreeGridItem();
             CreateContent(_treeView);
 
-            _iconRoot = Bitmap.FromResource("TreeView.Root.png");
+            _iconRoot = Bitmap.FromResource("TreeView.Root.png").WithSize(16, 16);
 
             _treeView.SelectionChanged += TreeView_SelectedItemChanged;
         }
