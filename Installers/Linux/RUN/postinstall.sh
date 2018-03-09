@@ -29,32 +29,9 @@ fi
 DIR=$(pwd)
 IDIR="/usr/lib/mono/xbuild/MonoGame/v3.0"
 
-if type "monodevelop" > /dev/null 2>&1
-then
-	if eval "monodevelop --help | grep 'MonoDevelop 6' > /dev/null 2>&1"
-	then
-		MDTOOL="mdtool"
-	fi
-fi
-
-if type "monodevelop-stable" > /dev/null 2>&1
-then
-	if eval "monodevelop-stable --help | grep 'MonoDevelop 6' > /dev/null 2>&1"
-	then
-		MDTOOL="mdtool-stable"
-	fi
-fi
-
 # Show dependency list
 echo "Dependencies:"
 echodep "mono-runtime" "type 'mono' > /dev/null 2>&1"
-echodep "gtk-sharp3" "type 'gacutil' > /dev/null 2>&1 && gacutil /l gtk-sharp | grep -q 3.0.0.0"
-echo ""
-echo "Optional Dependencies:"
-echodep "MonoDevelop 6" "$MDTOOL > /dev/null 2>&1"
-echodep "Rider" "type 'rider' > /dev/null 2>&1"
-echodep "referenceassemblies-pcl / mono-pcl" "test -d /usr/lib/mono/xbuild/Microsoft/Portable"
-echodep "ttf-mscorefonts-installer / mscore-fonts" "fc-list | grep -q Arial"
 echo ""
 read -p "Continue (Y, n): " choice2
 case "$choice2" in 
@@ -70,10 +47,10 @@ then
 	# Try and uninstall previus versions
 	if [ -f /opt/monogame/uninstall.sh ]
 	then
-		sudo sh /opt/monogame/uninstall.sh
+		sudo bash /opt/monogame/uninstall.sh
 	elif [ -f /opt/MonoGameSDK/uninstall.sh ]
 	then
-		sudo sh /opt/MonoGameSDK/uninstall.sh
+		sudo bash /opt/MonoGameSDK/uninstall.sh
 	else
 		echo "Could not uninstall, please uninstall any previous version of MonoGame SDK manually." 1>&2
 		exit 1
@@ -92,13 +69,6 @@ ln -s "$IDIR" "/opt/MonoGameSDK"
 # Fix Permissions
 chmod +x "$IDIR/Tools/ffmpeg"
 chmod +x "$IDIR/Tools/ffprobe"
-
-# MonoDevelop addin
-if [ ! -z "$MDTOOL" ]
-then
-	echo "Installing MonoDevelop Addin..."
-	sudo -H -u $USERNAME bash -c "$MDTOOL setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack  > /dev/null"
-fi
 
 # Monogame Pipeline terminal commands
 echo "Creating launcher items..."
@@ -137,6 +107,7 @@ Terminal=false
 Type=Application
 MimeType=text/mgcb;
 Categories=Development;
+StartupWMClass=Pipeline
 endmsg
 
 # Man pages
@@ -163,4 +134,10 @@ xdg-mime default "MonogamePipeline.desktop" text/mgcb
 chmod +x $IDIR/uninstall.sh
 ln -s $IDIR/uninstall.sh /usr/bin/monogame-uninstall
 
-echo "To uninstall MonoGame SDK you can run \"monogame-uninstall\" from terminal."
+echo "Installation complete"
+echo ""
+echo " - To uninstall MonoGame SDK you can run 'monogame-uninstall' from terminal."
+echo " - To install templates for MonoDevelop, go Tools > Extensions > Gallery > Game Development > MonoGame Extensions, and install it."
+echo " - To install templates for Rider simply run 'dotnet new --install MonoGame.Templates.CSharp'"
+echo ""
+echo ""
