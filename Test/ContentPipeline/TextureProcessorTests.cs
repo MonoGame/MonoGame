@@ -249,12 +249,12 @@ namespace MonoGame.Tests.ContentPipeline
             new object[] {
                 TargetPlatform.DesktopGL,
                 TextureProcessorOutputFormat.Color,
-                SurfaceFormat.Color,
+                SurfaceFormat.Dxt1,
             },
             new object[] {
                 TargetPlatform.DesktopGL,
                 TextureProcessorOutputFormat.Color16Bit,
-                SurfaceFormat.Bgr565,
+                SurfaceFormat.Dxt1,
             },
             new object[] {
                 TargetPlatform.DesktopGL,
@@ -264,22 +264,22 @@ namespace MonoGame.Tests.ContentPipeline
             new object[] {
                 TargetPlatform.Android,
                 TextureProcessorOutputFormat.Etc1Compressed,
-                SurfaceFormat.RgbEtc1,
+                SurfaceFormat.Dxt1,
             },
             new object[] {
                 TargetPlatform.iOS,
                 TextureProcessorOutputFormat.PvrCompressed,
-                SurfaceFormat.RgbPvrtc4Bpp,
+                SurfaceFormat.Dxt1,
             },
             new object[] {
                 TargetPlatform.iOS,
                 TextureProcessorOutputFormat.Compressed,
-                SurfaceFormat.RgbPvrtc4Bpp,
+                SurfaceFormat.Dxt1,
             },
             new object[] {
                 TargetPlatform.Android,
                 TextureProcessorOutputFormat.Compressed,
-                SurfaceFormat.RgbEtc1,
+                SurfaceFormat.Dxt1,
             },
             new object[] {
                 TargetPlatform.Windows,
@@ -320,8 +320,51 @@ namespace MonoGame.Tests.ContentPipeline
             }
         }
 
+        static object[] textureFormatsNormalised = new object[] {
+            new object[] {
+                TargetPlatform.DesktopGL,
+                TextureProcessorOutputFormat.Color,
+                SurfaceFormat.Color,
+            },
+            new object[] {
+                TargetPlatform.DesktopGL,
+                TextureProcessorOutputFormat.Color16Bit,
+                SurfaceFormat.Bgr565,
+            },
+            new object[] {
+                TargetPlatform.DesktopGL,
+                TextureProcessorOutputFormat.Compressed,
+                SurfaceFormat.Dxt1,
+            },
+            new object[] {
+                TargetPlatform.Android,
+                TextureProcessorOutputFormat.Etc1Compressed,
+                SurfaceFormat.RgbEtc1,
+            },
+            new object[] {
+                TargetPlatform.iOS,
+                TextureProcessorOutputFormat.PvrCompressed,
+                SurfaceFormat.RgbPvrtc4Bpp,
+            },
+            new object[] {
+                TargetPlatform.iOS,
+                TextureProcessorOutputFormat.Compressed,
+                SurfaceFormat.RgbPvrtc4Bpp,
+            },
+            new object[] {
+                TargetPlatform.Android,
+                TextureProcessorOutputFormat.Compressed,
+                SurfaceFormat.RgbEtc1,
+            },
+            new object[] {
+                TargetPlatform.Windows,
+                TextureProcessorOutputFormat.Compressed,
+                SurfaceFormat.Dxt1,
+            },
+        };
+
         [Test]
-        [TestCaseSource("textureFormats")]
+        [TestCaseSource("textureFormatsNormalised")]
         public void NormalizeCubeMapDDS(TargetPlatform platform, TextureProcessorOutputFormat format, SurfaceFormat expectedFormat)
         {
             var context = new TestProcessorContext(platform, "dummy.xnb");
