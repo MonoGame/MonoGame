@@ -249,12 +249,12 @@ namespace MonoGame.Tests.ContentPipeline
             new object[] {
                 TargetPlatform.DesktopGL,
                 TextureProcessorOutputFormat.Color,
-                SurfaceFormat.Dxt1,
+                SurfaceFormat.Color,
             },
             new object[] {
                 TargetPlatform.DesktopGL,
                 TextureProcessorOutputFormat.Color16Bit,
-                SurfaceFormat.Dxt1,
+                SurfaceFormat.Bgr565,
             },
             new object[] {
                 TargetPlatform.DesktopGL,
@@ -264,22 +264,22 @@ namespace MonoGame.Tests.ContentPipeline
             new object[] {
                 TargetPlatform.Android,
                 TextureProcessorOutputFormat.Etc1Compressed,
-                SurfaceFormat.Dxt1,
+                SurfaceFormat.RgbEtc1,
             },
             new object[] {
                 TargetPlatform.iOS,
                 TextureProcessorOutputFormat.PvrCompressed,
-                SurfaceFormat.Dxt1,
+                SurfaceFormat.RgbPvrtc4Bpp,
             },
             new object[] {
                 TargetPlatform.iOS,
                 TextureProcessorOutputFormat.Compressed,
-                SurfaceFormat.Dxt1,
+                SurfaceFormat.RgbPvrtc4Bpp,
             },
             new object[] {
                 TargetPlatform.Android,
                 TextureProcessorOutputFormat.Compressed,
-                SurfaceFormat.Dxt1,
+                SurfaceFormat.RgbEtc1,
             },
             new object[] {
                 TargetPlatform.Windows,
