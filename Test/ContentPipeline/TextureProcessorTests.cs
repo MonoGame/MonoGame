@@ -345,8 +345,8 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Assert.AreEqual(1, face.Count);
                 var content = (BitmapContent)face[0];
-                Assert.AreEqual(512, content.Width);
-                Assert.AreEqual(512, content.Height);
+                Assert.AreEqual(128, content.Width);
+                Assert.AreEqual(128, content.Height);
                 SurfaceFormat surfaceFormat;
                 Assert.IsTrue(content.TryGetFormat(out surfaceFormat));
                 Assert.AreEqual(expectedFormat, surfaceFormat);
