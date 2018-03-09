@@ -311,7 +311,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(6, texture.Faces.Count());
             foreach (var face in texture.Faces) {
                 Assert.AreEqual(1, face.Count);
-                var content = (Dxt1BitmapContent)face[0];
+                var content = (BitmapContent)face[0];
                 Assert.AreEqual(512, content.Width);
                 Assert.AreEqual(512, content.Height);
                 SurfaceFormat surfaceFormat;
@@ -344,7 +344,7 @@ namespace MonoGame.Tests.ContentPipeline
             foreach (var face in texture.Faces)
             {
                 Assert.AreEqual(1, face.Count);
-                var content = (Dxt1BitmapContent)face[0];
+                var content = (BitmapContent)face[0];
                 Assert.AreEqual(512, content.Width);
                 Assert.AreEqual(512, content.Height);
                 SurfaceFormat surfaceFormat;
