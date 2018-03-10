@@ -144,17 +144,6 @@
     <Compile Include="Graphics\VertexChannelGeneric.cs" />
     <Compile Include="Graphics\VertexChannelNames.cs" />
     <Compile Include="Graphics\VertexContent.cs" />
-    <Compile Include="Graphics\DxtTexture\Fits\ClusterFit.cs" />
-    <Compile Include="Graphics\DxtTexture\Fits\ColourFit.cs" />
-    <Compile Include="Graphics\DxtTexture\Fits\RangeFit.cs" />
-    <Compile Include="Graphics\DxtTexture\Fits\SingleColourFit.cs" />
-    <Compile Include="Graphics\DxtTexture\Fits\SingleColourLookup.cs" />
-    <Compile Include="Graphics\DxtTexture\Bitmap.cs" />
-    <Compile Include="Graphics\DxtTexture\BlockWindow.cs" />
-    <Compile Include="Graphics\DxtTexture\ColourSet.cs" />
-    <Compile Include="Graphics\DxtTexture\CompressionMode.cs" />
-    <Compile Include="Graphics\DxtTexture\Maths.cs" />
-    <Compile Include="Graphics\DxtTexture\Sym3x3.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Processors -->
