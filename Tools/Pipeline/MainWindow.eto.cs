@@ -309,7 +309,7 @@ namespace MonoGame.Tools.Pipeline
             menuEdit.Items.Add(cmdExclude);
             menuEdit.Items.Add(new SeparatorMenuItem());
             menuEdit.Items.Add(cmdRename);
-            menuEdit.Items.Add(cmdDelete);
+            //menuEdit.Items.Add(cmdDelete);
             Menu.Items.Add(menuEdit);
 
             // View Commands

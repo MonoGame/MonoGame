@@ -28,6 +28,7 @@ namespace MonoGame.Tools.Pipeline
                 var folder = Path.GetDirectoryName(_item.DestinationPath);
                 _item.DestinationPath = Path.Combine(folder, _newname).Replace('\\', '/');
                 _con.View.AddTreeItem(_item);
+                _con.ProjectDirty = true;
 
                 return true;
             }
@@ -38,6 +39,7 @@ namespace MonoGame.Tools.Pipeline
                 var folder = Path.GetDirectoryName(_item.DestinationPath);
                 _item.DestinationPath = Path.Combine(folder, _oldname).Replace('\\', '/');
                 _con.View.AddTreeItem(_item);
+                _con.ProjectDirty = true;
 
                 return true;
             }

@@ -728,7 +728,9 @@ namespace MonoGame.Tools.Pipeline
 
                 if (!repeat)
                 {
-                    if (!View.CopyOrLinkFile(file, File.Exists(Path.Combine(ProjectLocation, item.RelativeDestPath)), out action, out repeat))
+                    if (File.Exists(Path.Combine(ProjectLocation, item.RelativeDestPath)))
+                        action = IncludeType.Link;
+                    else if (!View.CopyOrLinkFile(file, false, out action, out repeat))
                         return false;
                 }
                 
