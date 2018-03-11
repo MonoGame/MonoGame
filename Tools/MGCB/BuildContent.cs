@@ -155,7 +155,7 @@ namespace MGCB
             Name = "build",
             Flag = "b",
             ValueName = "sourceFile",
-            Description = "Build the content source file using the previously set switches and options.")]
+            Description = "Build the content source file using the previously set switches and options. Optional destination path may be specified with \"sourceFile;destFile\" if you wish to change the output filepath.")]
         public void OnBuild(string sourceFile)
         {
             string link = null;
