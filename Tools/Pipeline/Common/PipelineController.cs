@@ -724,23 +724,33 @@ namespace MonoGame.Tools.Pipeline
             {
                 var item = new IncludeItem();
                 item.SourcePath = file;
-                item.RelativeDestPath = Path.Combine(relative, Path.GetFileName(file));
 
-                if (!repeat)
+                if (file.StartsWith(ProjectLocation))
                 {
-                    if (File.Exists(Path.Combine(ProjectLocation, item.RelativeDestPath)))
-                        action = IncludeType.Link;
-                    else if (!View.CopyOrLinkFile(file, false, out action, out repeat))
-                        return false;
-                }
-                
-                if (action == IncludeType.Skip)
-                    continue;
+                    // If the file is in the same directory as the .mgcb file, just add it and skip showing file dialogs
 
-                if (action == IncludeType.Copy && File.Exists(Path.Combine(ProjectLocation, item.RelativeDestPath)))
+                    item.RelativeDestPath = PathHelper.GetRelativePath(ProjectLocation, file);
                     item.IncludeType = IncludeType.Link;
+                }
                 else
-                    item.IncludeType = action;
+                {
+                    item.RelativeDestPath = Path.Combine(relative, Path.GetFileName(file));
+
+                    if (!repeat)
+                    {
+                        if (!View.CopyOrLinkFile(file, File.Exists(Path.Combine(ProjectLocation, item.RelativeDestPath)), out action, out repeat))
+                            return false;
+                    }
+
+                    if (action == IncludeType.Skip)
+                        continue;
+
+                    if (action == IncludeType.Copy && File.Exists(Path.Combine(ProjectLocation, item.RelativeDestPath)))
+                        item.IncludeType = IncludeType.Link;
+                    else
+                        item.IncludeType = action;
+                }
+
                 items.Add(item);
             }
 
