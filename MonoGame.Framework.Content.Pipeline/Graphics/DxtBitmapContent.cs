@@ -4,98 +4,20 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
-using PVRTexLibNET;
 using Nvidia.TextureTools;
 using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    class DxtDataHandler: IDisposable
-    {
-        private BitmapContent _content;
-        byte[] _buffer;
-        int _offset;
-        
-        GCHandle delegateHandleBeginImage;
-        GCHandle delegateHandleWriteData;
-
-        public OutputOptions.WriteDataDelegate WriteData { get; private set; }
-        public OutputOptions.ImageDelegate BeginImage { get; private set; }
-
-        public DxtDataHandler(BitmapContent content, OutputOptions outputOptions)
-        {
-            _content = content;
-
-            WriteData = new OutputOptions.WriteDataDelegate(WriteDataInternal);
-            BeginImage = new OutputOptions.ImageDelegate(BeginImageInternal);
-
-            // Keep the delegate from being re-located or collected by the garbage collector.
-            delegateHandleBeginImage = GCHandle.Alloc(BeginImage);
-            delegateHandleWriteData = GCHandle.Alloc(WriteData);
-
-            outputOptions.SetOutputHandler(BeginImage, WriteData);
-        }
-
-        ~DxtDataHandler()
-        {
-           Dispose(false);
-        }
-
-        void BeginImageInternal(int size, int width, int height, int depth, int face, int miplevel)
-        {
-            _buffer = new byte[size];
-            _offset = 0;
-        }
-
-        bool WriteDataInternal(IntPtr data, int length)
-        {
-            Marshal.Copy(data, _buffer, _offset, length);
-            _offset += length;
-            if (_offset == _buffer.Length)
-                _content.SetPixelData(_buffer);
-            return true;
-        }
-
-        #region IDisposable Support
-        private bool disposed = false;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    // Release managed objects
-                    // ...
-                }
-
-                // Release native objects
-                delegateHandleBeginImage.Free();
-                delegateHandleWriteData.Free();
-
-                disposed = true;
-            }
-        }
-        
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion
-    }
-
     public abstract class DxtBitmapContent : BitmapContent
     {
-        internal byte[] _bitmapData;
-        internal int _blockSize;
+        private byte[] _bitmapData;
+        private int _blockSize;
+        private SurfaceFormat _format;
 
-        internal SurfaceFormat _format;
+        private int _nvttWriteOffset;
 
-        public DxtBitmapContent(int blockSize)
+        protected DxtBitmapContent(int blockSize)
         {
             if (!((blockSize == 8) || (blockSize == 16)))
                 throw new ArgumentException("Invalid block size");
@@ -103,7 +25,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             TryGetFormat(out _format);
         }
 
-        public DxtBitmapContent(int blockSize, int width, int height)
+        protected DxtBitmapContent(int blockSize, int width, int height)
             : this(blockSize)
         {
             Width = width;
@@ -118,6 +40,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public override void SetPixelData(byte[] sourceData)
         {
             _bitmapData = sourceData;
+        }
+
+        private void NvttBeginImage(int size, int width, int height, int depth, int face, int miplevel)
+        {
+            _bitmapData = new byte[size];
+            _nvttWriteOffset = 0;
+        }
+
+        private bool NvttWriteImage(IntPtr data, int length)
+        {
+            Marshal.Copy(data, _bitmapData, _nvttWriteOffset, length);
+            _nvttWriteOffset += length;
+            return true;
+        }
+
+        private void NvttEndImage()
+        {
         }
 
         protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
@@ -154,8 +93,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            //SquishFlags targetFormat = SquishFlags.ColourClusterFit;
-            Format outputFormat = Format.DXT1;
+            Format outputFormat;
             switch (format)
             {
                 case SurfaceFormat.Dxt1:
@@ -179,56 +117,48 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 default:
                     return false;
             }
-
-            // libsquish requires RGBA8888
+            
             var colorBitmap = new PixelBitmapContent<Color>(sourceBitmap.Width, sourceBitmap.Height);
             BitmapContent.Copy(sourceBitmap, colorBitmap);
-
             var sourceData = colorBitmap.GetPixelData();
-            /*
-            var dataSize = Squish.GetStorageRequirements(colorBitmap.Width, colorBitmap.Height, targetFormat);
-            var data = new byte[dataSize];
-            var metric = new float[] { 1.0f, 1.0f, 1.0f };
-            Squish.CompressImage(sourceData, colorBitmap.Width, colorBitmap.Height, data, targetFormat, metric);
-            SetPixelData(data);
-            */
-
-            var dxtCompressor = new Compressor();
-            var inputOptions = new InputOptions();
-            if (outputFormat != Format.DXT1)           
-                inputOptions.SetAlphaMode(AlphaMode.Premultiplied);
-            else
-                inputOptions.SetAlphaMode(AlphaMode.None);
-            inputOptions.SetTextureLayout(TextureType.Texture2D, colorBitmap.Width, colorBitmap.Height, 1);
-
-            // Small hack here. NVTT wants 8bit data in BGRA. Flip the B and R channels
-            // again here.
-            GraphicsUtil.BGRAtoRGBA(sourceData);
             var dataHandle = GCHandle.Alloc(sourceData, GCHandleType.Pinned);
+
+            // Small hack here. NVTT wants 8bit data in BGRA.
+            // Flip the B and R channels again here.
+            GraphicsUtil.BGRAtoRGBA(sourceData);
+
+            // Do all the calls to the NVTT wrapper within this handler
+            // so we properly clean up if things blow up.
             try
             {
                 var dataPtr = dataHandle.AddrOfPinnedObject();
 
+                var inputOptions = new InputOptions();
+                inputOptions.SetTextureLayout(TextureType.Texture2D, colorBitmap.Width, colorBitmap.Height, 1);
                 inputOptions.SetMipmapData(dataPtr, colorBitmap.Width, colorBitmap.Height, 1, 0, 0);
                 inputOptions.SetMipmapGeneration(false);
                 inputOptions.SetGamma(1.0f, 1.0f);
-                
+                if (outputFormat != Format.DXT1)
+                    inputOptions.SetAlphaMode(AlphaMode.Premultiplied);
+                else
+                    inputOptions.SetAlphaMode(AlphaMode.None);
+
                 var compressionOptions = new CompressionOptions();
                 compressionOptions.SetFormat(outputFormat);
                 compressionOptions.SetQuality(Quality.Normal);
 
                 var outputOptions = new OutputOptions();
                 outputOptions.SetOutputHeader(false);
+                outputOptions.SetOutputOptionsOutputHandler(NvttBeginImage, NvttWriteImage, NvttEndImage);
 
-                using (var handler = new DxtDataHandler(this, outputOptions))
-                {                    
-                    dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
-                }
+                var dxtCompressor = new Compressor();
+                dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
             }
             finally
             {
-                dataHandle.Free ();
+                dataHandle.Free();
             }
+
             return true;
         }
 
