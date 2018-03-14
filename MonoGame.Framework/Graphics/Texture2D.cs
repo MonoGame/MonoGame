@@ -35,6 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				return new Rectangle(0, 0, this.width, this.height);
             }
         }
+
         /// <summary>
         /// Creates a new texture of the given size
         /// </summary>
@@ -45,6 +46,7 @@ namespace Microsoft.Xna.Framework.Graphics
             : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture, false, 1)
         {
         }
+
         /// <summary>
         /// Creates a new texture of a given size with a surface format and optional mipmaps 
         /// </summary>
@@ -57,6 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
             : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, 1)
         {
         }
+
         /// <summary>
         /// Creates a new texture array of a given size with a surface format and optional mipmaps.
         /// Throws ArgumentException if the current GraphicsDevice can't work with texture arrays
@@ -115,6 +118,9 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformConstruct(width, height, mipmap, format, type, shared);
         }
 
+        /// <summary>
+        /// Gets the width of the texture in pixels.
+        /// </summary>
         public int Width
         {
             get
@@ -123,6 +129,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets the height of the texture in pixels.
+        /// </summary>
         public int Height
         {
             get
@@ -130,6 +139,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return height;
             }
         }
+
         /// <summary>
         /// Changes the pixels of the texture
         /// Throws ArgumentNullException if data is null
@@ -148,6 +158,7 @@ namespace Microsoft.Xna.Framework.Graphics
             ValidateParams(level, arraySlice, rect, data, startIndex, elementCount, out checkedRect);
             PlatformSetData(level, arraySlice, checkedRect, data, startIndex, elementCount);
         }
+
         /// <summary>
         /// Changes the pixels of the texture
         /// </summary>
@@ -159,8 +170,14 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount"></param>
         public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
         {
-            this.SetData(level, 0, rect, data, startIndex, elementCount);
+            Rectangle checkedRect;
+            ValidateParams(level, 0, rect, data, startIndex, elementCount, out checkedRect);
+            if (rect.HasValue)
+                PlatformSetData(level, 0, checkedRect, data, startIndex, elementCount);
+            else
+                PlatformSetData(level, data, startIndex, elementCount);
         }
+
         /// <summary>
         /// Changes the texture's pixels
         /// </summary>
@@ -170,8 +187,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount"></param>
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            this.SetData(0, null, data, startIndex, elementCount);
+            Rectangle checkedRect;
+            ValidateParams(0, 0, null, data, startIndex, elementCount, out checkedRect);
+            PlatformSetData(0, data, startIndex, elementCount);
         }
+
 		/// <summary>
         /// Changes the texture's pixels
         /// </summary>
@@ -179,10 +199,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data"></param>
 		public void SetData<T>(T[] data) where T : struct
 		{
-		    if (data == null)
-		        throw new ArgumentNullException("data");
-			this.SetData(0, null, data, 0, data.Length);
+            Rectangle checkedRect;
+            ValidateParams(0, 0, null, data, 0, data.Length, out checkedRect);
+            PlatformSetData(0, data, 0, data.Length);
         }
+
         /// <summary>
         /// Retrieves the contents of the texture
         /// Throws ArgumentException if data is null, data.length is too short or
@@ -201,6 +222,7 @@ namespace Microsoft.Xna.Framework.Graphics
             ValidateParams(level, arraySlice, rect, data, startIndex, elementCount, out checkedRect);
             PlatformGetData(level, arraySlice, checkedRect, data, startIndex, elementCount);
         }
+
         /// <summary>
         /// Retrieves the contents of the texture
         /// Throws ArgumentException if data is null, data.length is too short or
@@ -216,6 +238,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             this.GetData(level, 0, rect, data, startIndex, elementCount);
         }
+
         /// <summary>
         /// Retrieves the contents of the texture
         /// Throws ArgumentException if data is null, data.length is too short or
@@ -229,6 +252,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			this.GetData(0, null, data, startIndex, elementCount);
 		}
+
         /// <summary>
         /// Retrieves the contents of the texture
         /// Throws ArgumentException if data is null, data.length is too short or
@@ -247,10 +271,14 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a Texture2D from a stream, supported formats bmp, gif, jpg, png, tif and dds (only for simple textures).
         /// May work with other formats, but will not work with tga files.
         /// </summary>
-        /// <param name="graphicsDevice"></param>
-        /// <param name="stream"></param>
-        /// <returns></returns>
-		public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
+        /// <param name="graphicsDevice">The graphics device where the texture will be created.</param>
+        /// <param name="stream">The stream from which to read the image data.</param>
+        /// <returns>The <see cref="SurfaceFormat.Color"/> texture created from the image stream.</returns>
+        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
+        /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
+        /// result in black color data.
+        /// </remarks>
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
@@ -265,6 +293,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("This image format is not supported", e);
             }
         }
+
         /// <summary>
         /// Converts the texture to a JPG image
         /// </summary>
@@ -275,6 +304,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             PlatformSaveAsJpeg(stream, width, height);
         }
+
         /// <summary>
         /// Converts the texture to a PNG image
         /// </summary>
@@ -310,11 +340,11 @@ namespace Microsoft.Xna.Framework.Graphics
             var textureBounds = new Rectangle(0, 0, Math.Max(width >> level, 1), Math.Max(height >> level, 1));
             checkedRect = rect ?? textureBounds;
             if (level < 0 || level >= LevelCount)
-                throw new ArgumentException("level must be smaller than the number of levels in this texture.");
+                throw new ArgumentException("level must be smaller than the number of levels in this texture.", "level");
             if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
                 throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
             if (arraySlice < 0 || arraySlice >= ArraySize)
-                throw new ArgumentException("arraySlice must be smaller than the ArraySize of this texture and larger than 0.");
+                throw new ArgumentException("arraySlice must be smaller than the ArraySize of this texture and larger than 0.", "arraySlice");
             if (!textureBounds.Contains(checkedRect) || checkedRect.Width <= 0 || checkedRect.Height <= 0)
                 throw new ArgumentException("Rectangle must be inside the texture bounds", "rect");
             if (data == null)
@@ -331,20 +361,35 @@ namespace Microsoft.Xna.Framework.Graphics
             int dataByteSize;
             if (Format.IsCompressedFormat())
             {
-                // round x and y down to next multiple of four; width and height up to next multiple of four
-                var roundedWidth = (checkedRect.Width + 3) & ~0x3;
-                var roundedHeight = (checkedRect.Height + 3) & ~0x3;
-                checkedRect = new Rectangle(checkedRect.X & ~0x3, checkedRect.Y & ~0x3,
+                int blockWidth, blockHeight;
+                Format.GetBlockSize(out blockWidth, out blockHeight);
+                int blockWidthMinusOne = blockWidth - 1;
+                int blockHeightMinusOne = blockHeight - 1;
+                // round x and y down to next multiple of block size; width and height up to next multiple of block size
+                var roundedWidth = (checkedRect.Width + blockWidthMinusOne) & ~blockWidthMinusOne;
+                var roundedHeight = (checkedRect.Height + blockHeightMinusOne) & ~blockHeightMinusOne;
+                checkedRect = new Rectangle(checkedRect.X & ~blockWidthMinusOne, checkedRect.Y & ~blockHeightMinusOne,
 #if OPENGL
                     // OpenGL only: The last two mip levels require the width and height to be
                     // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy
-                    // a 4x4 block.
-                    checkedRect.Width < 4 && textureBounds.Width < 4 ? textureBounds.Width : roundedWidth,
-                    checkedRect.Height < 4 && textureBounds.Height < 4 ? textureBounds.Height : roundedHeight);
+                    // a full block.
+                    checkedRect.Width < blockWidth && textureBounds.Width < blockWidth ? textureBounds.Width : roundedWidth,
+                    checkedRect.Height < blockHeight && textureBounds.Height < blockHeight ? textureBounds.Height : roundedHeight);
 #else
                     roundedWidth, roundedHeight);
 #endif
-                dataByteSize = roundedWidth * roundedHeight * fSize / 16;
+                if (Format == SurfaceFormat.RgbPvrtc2Bpp || Format == SurfaceFormat.RgbaPvrtc2Bpp)
+                {
+                    dataByteSize = (Math.Max(checkedRect.Width, 16) * Math.Max(checkedRect.Height, 8) * 2 + 7) / 8;
+                }
+                else if (Format == SurfaceFormat.RgbPvrtc4Bpp || Format == SurfaceFormat.RgbaPvrtc4Bpp)
+                {
+                    dataByteSize = (Math.Max(checkedRect.Width, 8) * Math.Max(checkedRect.Height, 8) * 4 + 7) / 8;
+                }
+                else
+                {
+                    dataByteSize = roundedWidth * roundedHeight * fSize / (blockWidth * blockHeight);
+                }
             }
             else
             {

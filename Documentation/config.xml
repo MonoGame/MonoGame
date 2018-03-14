@@ -28,13 +28,22 @@
         <topic id="MonoGame_FAQ" name="MonoGame FAQ" filename="monogame_faq.md"/>
         <topic id="Help_and_Support" name="Help and Support" filename="help_and_support.md"/>
     </topic>
-    <topic id="Getting_Started" name="Getting Started" filename="getting_started.md"/>
+    <topic id="Getting_Started" name="Getting Started" filename="getting_started/getting_started.md">
+        <topic id="creating_a_new_project" name="Creating a New Project" filename="getting_started/1_creating_a_new_project.md">
+            <topic id="creating_a_new_project_vs" name="Visual Studio" filename="getting_started/1_creating_a_new_project_vs.md"/>
+            <topic id="creating_a_new_project_md" name="MonoDevelop / Xamarin Studio" filename="getting_started/1_creating_a_new_project_md.md"/>
+        </topic>
+        <topic id="understanding_the_code" name="Understanding the Code" filename="getting_started/2_understanding_the_code.md"/>
+        <topic id="adding_content" name="Adding Content" filename="getting_started/3_adding_content.md"/>
+        <topic id="adding_basic_code" name="Adding Basic Code" filename="getting_started/4_adding_basic_code.md"/>
+    </topic>
     <topic id="Tutorials" name="Tutorials" filename="tutorials.md"/>
     
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
         <topic id="Using_The_Pipeline_Tool" name="Using The Pipeline Tool" filename="using_pipeline_tool.md"/>
         <topic id="Custom_Effects" name="Custom Effects" filename="custom_effects.md"/>
         <topic id="Using_TrueType_Fonts" name="Using TrueType Fonts" filename="adding_ttf_fonts.md"/>
+    <topic id="Localization" name="Localization" filename="localization.md" />
     </topic>
 
     <topic id="Tools" name="Tools" filename="tools.md">
@@ -82,12 +91,6 @@
   <!-- WindowsGL Desktop -->
   <group api="wingl|Windows OpenGL Desktop">    
     <source>..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.dll</source>
-  </group>
-
-  <!-- Windows 8 Store -->
-  <group api="win8metro|Windows 8 Store">
-    <searchdir>C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral</searchdir>
-    <source>..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.dll</source>
   </group>
 
   <!-- Web -->

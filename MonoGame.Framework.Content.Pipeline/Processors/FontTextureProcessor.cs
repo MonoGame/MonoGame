@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             // Perform the final texture conversion.
-            texProfile.ConvertTexture(context, output.Texture, TextureFormat, false, true);
+            texProfile.ConvertTexture(context, output.Texture, TextureFormat, true);
 
 			return output;
 		}

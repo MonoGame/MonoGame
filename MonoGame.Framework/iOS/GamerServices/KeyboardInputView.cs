@@ -258,16 +258,12 @@ namespace Microsoft.Xna.Framework {
 
 		private void OnInputAccepted(EventArgs e)
 		{
-			var handler = InputAccepted;
-			if (handler != null)
-				handler (this, e);
+			EventHelpers.Raise(this, InputAccepted, e);
 		}
 
 		private void OnInputCanceled(EventArgs e)
 		{
-			var handler = InputCanceled;
-			if (handler != null)
-				handler (this, e);
+			EventHelpers.Raise(this, InputCanceled, e);
 		}
 
 		private class TextFieldDelegate : UITextFieldDelegate

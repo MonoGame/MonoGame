@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<project name="Installer Build Script" default="build" basedir=".">
+	<description>Default Addins Automated Build script</description>
+	<property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
+  
+  <property name="buildNumber" value="0.0.0.0"/>
+  <if test="${environment::variable-exists('BUILD_NUMBER')}">
+    <property name="buildNumber" value="${environment::get-variable('BUILD_NUMBER')}"/>
+  </if>
+
+  <target name="checkos" description="check the operating system">
+    <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}"/>
+    <if test="${os == 'Unix'}">
+      <if test="${directory::exists('/Applications') and directory::exists('/Library')}">
+        <property name="os" value="MacOS"/>
+      </if>
+    </if>
+    <echo message="Detected : ${os}"/>
+  </target>
+
+  <target name="build" description="Build All" depends="checkos">
+    <if test="${os == 'MacOS'}">
+      <call target="buildaddin"/>
+    </if>
+  </target>
+
+  <target name="buildaddin" description="Build Visual Studio for Mac Addin" depends="checkos">
+     <if test="${os == 'MacOS'}">
+       <delete failonerror="false">
+          <fileset>
+            <include name="MonoDevelop.MonoGame_IDE_VisualStudioForMac*.mpack" />
+          </fileset>
+       </delete>
+       <exec program="msbuild" workingdir="." commandline=" /t:Clean /p:Configuration=Debug  MonoGame.IDE.VisualStudioForMac.csproj" />
+       <exec program="msbuild" workingdir="." commandline=" /t:Restore /p:Configuration=Debug  MonoGame.IDE.VisualStudioForMac.csproj" />
+       <exec program="msbuild" workingdir="." commandline=" /t:PackageAddin /p:Configuration=Debug  MonoGame.IDE.VisualStudioForMac.csproj" />
+     </if>
+  </target>
+	
+	
+</project>

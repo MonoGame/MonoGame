@@ -7,20 +7,32 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class NewItemDialog : DialogBase
+    partial class NewItemDialog : Dialog<bool>
     {
         TableLayout table1;
         DynamicLayout layout1, layout2;
         Label labelName, labelType, labelExt, labelError;
         TextBox textBox1;
         ListBox list1;
+        Button buttonCreate, buttonCancel;
 
         private void InitializeComponent()
         {
-            Width = 370;
-            Height = 285;
             Title = "New File";
+            DisplayMode = DialogDisplayMode.Attached;
+            Size = new Size(370, 285);
+            MinimumSize = new Size(370, 200);
             Resizable = true;
+
+            buttonCreate = new Button();
+            buttonCreate.Text = "Create";
+            PositiveButtons.Add(buttonCreate);
+            DefaultButton = buttonCreate;
+
+            buttonCancel = new Button();
+            buttonCancel.Text = "Cancel";
+            NegativeButtons.Add(buttonCancel);
+            AbortButton = buttonCancel;
 
             layout1 = new DynamicLayout();
             layout1.Padding = new Padding(6);
@@ -64,10 +76,12 @@ namespace MonoGame.Tools.Pipeline
 
             layout1.Add(labelError, true, false);
 
-            CreateContent(layout1);
+            Content = layout1;
 
             textBox1.TextChanged += TextBox1_TextChanged;
             list1.SelectedIndexChanged += List1_SelectedIndexChanged;
+            buttonCreate.Click += ButtonCreate_Click;
+            buttonCancel.Click += ButtonCancel_Click;
         }
     }
 }

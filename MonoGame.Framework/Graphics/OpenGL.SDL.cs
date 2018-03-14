@@ -6,9 +6,9 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace OpenGL
+namespace MonoGame.OpenGL
 {
-    public partial class GL
+    internal partial class GL
     {
         static partial void LoadPlatformEntryPoints()
         {
@@ -21,15 +21,13 @@ namespace OpenGL
         }
     }
 
-    internal class EntryPointHelper {
-
-        private const string NativeLibName = "SDL2.dll";
-
+    internal class EntryPointHelper
+    {
         [SuppressUnmanagedCodeSecurity]
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl,
+        [DllImport(Sdl.NativeLibName, CallingConvention = CallingConvention.Cdecl,
             EntryPoint = "SDL_GL_GetProcAddress", ExactSpelling = true)]
-        public static extern IntPtr GetProcAddress(IntPtr proc);
-        public static IntPtr GetAddress(string proc)
+        internal static extern IntPtr GetProcAddress(IntPtr proc);
+        internal static IntPtr GetAddress(string proc)
         {
             IntPtr p = Marshal.StringToHGlobalAnsi(proc);
             try

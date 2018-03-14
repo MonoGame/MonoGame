@@ -46,8 +46,8 @@ namespace MonoGame.Tools.Pipeline
             {
                 var obj = _objects[i];
 
-                oldValues.Add(_property.GetValue(obj));
-                _property.SetValue(obj, _values[i]);
+                oldValues.Add(_property.GetValue(obj, null));
+                _property.SetValue(obj, _values[i], null);
             }
 
             _view.UpdateProperties();

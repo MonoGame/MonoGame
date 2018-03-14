@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // XNA does not expose a pressure value, so let's assume it doesn't support it.
                 hasPressure = false;
 
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_UAP
                 // Is a touch device present?
                 // Iterate through all pointer devices and find the maximum number of concurrent touches possible
                 maximumTouchCount = 0;
@@ -65,12 +65,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     maximumTouchCount = 5;
                 else //Pad
                     maximumTouchCount = 11;
-#elif WINDOWS_PHONE
-                // There is no API on WP8, XNA returns 4 according to the docs
-                // http://msdn.microsoft.com/en-nz/library/ff434208.aspx
-                // http://en.wikipedia.org/wiki/Windows_Phone_8#Hardware_requirements
-                isConnected = true;
-                maximumTouchCount = 4;
 #else
                 //Touch isn't implemented in OpenTK, so no linux or mac https://github.com/opentk/opentk/issues/80
                 isConnected = false;

@@ -34,16 +34,22 @@ namespace Microsoft.Xna.Framework.Input
 #endif
 
         internal static GameWindow Window;
+        internal static float HorizontalScrollWheelValue;
         internal static float ScrollWheelValue;
 
-        private static IntPtr PlatformGetHandle()
+        private static IntPtr PlatformGetWindowHandle()
         {
             return IntPtr.Zero;
+        }
+
+        private static void PlatformSetWindowHandle(IntPtr windowHandle)
+        {
         }
 
         private static MouseState PlatformGetState(GameWindow window)
         {
             //We need to maintain precision...
+            window.MouseState.HorizontalScrollWheelValue = (int)HorizontalScrollWheelValue;
             window.MouseState.ScrollWheelValue = (int)ScrollWheelValue;
 
             return window.MouseState;

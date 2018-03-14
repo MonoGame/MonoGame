@@ -1869,5 +1869,33 @@ namespace Microsoft.Xna.Framework
         }
 
         #endregion
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/>.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="g"></param>
+        /// <param name="b"></param>
+        public void Deconstruct(out float r, out float g, out float b)
+        {
+            r = R;
+            g = G;
+            b = B;
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/> with Alpha.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="g"></param>
+        /// <param name="b"></param>
+        /// <param name="a"></param>
+        public void Deconstruct(out float r, out float g, out float b, out float a)
+        {
+            r = R;
+            g = G;
+            b = B;
+            a = A;
+        }
     }
 }

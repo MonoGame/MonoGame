@@ -12,7 +12,7 @@ namespace $safeprojectname$
         , AlwaysRetainTaskState=true
         , LaunchMode=Android.Content.PM.LaunchMode.SingleInstance
         , ScreenOrientation = ScreenOrientation.FullUser
-        , ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Keyboard | ConfigChanges.KeyboardHidden | ConfigChanges.ScreenSize)]
+        , ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Keyboard | ConfigChanges.KeyboardHidden | ConfigChanges.ScreenSize | ConfigChanges.ScreenLayout)]
     public class Activity1 : Microsoft.Xna.Framework.AndroidGameActivity
     {
         protected override void OnCreate(Bundle bundle)

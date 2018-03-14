@@ -5,15 +5,9 @@
 using System;
 using System.IO;
 
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.ObjCRuntime;
-using MonoMac.QTKit;
-using MonoMac.Foundation;
-#else
 using ObjCRuntime;
-using QTKit;
 using Foundation;
-#endif
+using AVFoundation;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -22,12 +16,13 @@ namespace Microsoft.Xna.Framework.Media
     /// </summary>
     public sealed partial class Video : IDisposable
     {
-        private QTMovie _mMovie;
-        internal QTMovieView MovieView { get; private set; }
+        AVPlayerItem movie;
+
+        internal AVPlayer Player { get; private set; }
 
         internal float Volume
         {
-            get { return _mMovie.Volume; }
+            get { return Player.Volume; }
             set
             {
                 // TODO When Xamarain fix the set Volume mMovie.Volume = value;
@@ -36,37 +31,29 @@ namespace Microsoft.Xna.Framework.Media
 
         internal TimeSpan CurrentPosition
         {
-            get { return new TimeSpan(_mMovie.CurrentTime.TimeValue); }
+            get { return new TimeSpan(movie.CurrentTime.Value); }
         }
 
         private void PlatformInitialize()
         {
             var err = new NSError();
 
-            _mMovie = new QTMovie(FileName, out err);
-            if (_mMovie != null)
-            {
-                MovieView = new QTMovieView();
-                MovieView.Movie = _mMovie;
-
-                MovieView.IsControllerVisible = false;
-            }
-            else
-                Console.WriteLine(err);
+            movie = AVPlayerItem.FromUrl(NSUrl.FromFilename(FileName));
+            Player = new AVPlayer(movie);
         }
 
         private void PlatformDispose(bool disposing)
         {
-            if (MovieView != null)
+            if (Player != null)
             {
-                MovieView.Dispose();
-                MovieView = null;
+                Player.Dispose();
+                Player = null;
             }
 
-            if (_mMovie != null)
+            if (movie != null)
             {
-                _mMovie.Dispose();
-                _mMovie = null;
+                movie.Dispose();
+                movie = null;
             }
         }
     }

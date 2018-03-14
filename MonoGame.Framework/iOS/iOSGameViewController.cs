@@ -104,10 +104,7 @@ namespace Microsoft.Xna.Framework
         public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)
         {
             base.DidRotate(fromInterfaceOrientation);
-
-            var handler = InterfaceOrientationChanged;
-            if (handler != null)
-                handler(this, EventArgs.Empty);
+            EventHelpers.Raise(this, InterfaceOrientationChanged, EventArgs.Empty);
         }
         #region Hide statusbar for iOS 7 or newer
         public override bool PrefersStatusBarHidden()

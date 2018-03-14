@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
@@ -62,7 +63,7 @@ namespace Microsoft.Xna.Framework
                 if (_isActive != value)
                 {
                     _isActive = value;
-                    Raise(_isActive ? Activated : Deactivated, EventArgs.Empty);
+                    EventHelpers.Raise(this, _isActive ? Activated : Deactivated, EventArgs.Empty);
                 }
             }
         }
@@ -107,13 +108,6 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
 
-        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
-            where TEventArgs : EventArgs
-        {
-            if (handler != null)
-                handler(this, e);
-        }
-
         /// <summary>
         /// Raises the AsyncRunLoopEnded event.  This method must be called by
         /// derived classes when the asynchronous run loop they start has
@@ -121,7 +115,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         protected void RaiseAsyncRunLoopEnded()
         {
-            Raise(AsyncRunLoopEnded, EventArgs.Empty);
+            EventHelpers.Raise(this, AsyncRunLoopEnded, EventArgs.Empty);
         }
 
         #endregion Events
@@ -253,11 +247,12 @@ namespace Microsoft.Xna.Framework
         protected virtual void OnIsMouseVisibleChanged() {}
 
         /// <summary>
-        /// Used by the GraphicsDeviceManager to update the platform window
-        /// after the graphics device has changed the presentation.
+        /// Called by the GraphicsDeviceManager to notify the platform
+        /// that the presentation parameters have changed.
         /// </summary>
-        internal virtual void OnPresentationChanged()
-        {            
+        /// <param name="pp">The new presentation parameters.</param>
+        internal virtual void OnPresentationChanged(PresentationParameters pp)
+        {
         }
 
         #endregion Methods

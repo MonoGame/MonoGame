@@ -1,0 +1,156 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <AssemblySearchPaths>$(AssemblySearchPaths);{GAC}</AssemblySearchPaths>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoDevelop.Addins" Version="0.4.1" />
+    <PackageReference Include="Eto.Forms" Version="2.3.0" />
+    <PackageReference Include="Eto.Platform.Gtk" Version="2.3.0" />
+    <PackageReference Include="Eto.Platform.XamMac2" Version="2.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Templates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="monogame-project-32.png" />
+    <None Remove="monogame-android.png" />
+    <None Remove="monogame-desktopgl.png" />
+    <None Remove="monogame-ios.png" />
+    <None Remove="monogame-preview.png" />
+    <None Remove="monogame-shared.png" />
+    <None Remove="monogame-windows.png" />
+    <None Remove="project-monogame-32.png" />
+    <None Remove="project-monogame-32%402x.png" />
+    <None Remove="project-monogame-32~dark.png" />
+    <None Remove="project-monogame-32~dark%402x.png" />
+    <None Remove="project-monogame-32~dark~sel.png" />
+    <None Remove="project-monogame-32~dark~sel%402x.png" />
+    <None Remove="project-monogame-32~sel.png" />
+    <None Remove="project-monogame-32~sel%402x.png" />
+    <None Remove="project-monogame-template.png" />
+    <None Remove="project-monogame-template%402x.png" />
+    <None Remove="project-monogame-template~dark.png" />
+    <None Remove="project-monogame-template~dark%402x.png" />
+    <None Remove="monogame-16.png" />
+    <None Remove="monogame-16%402x.png" />
+    <None Remove="monogame-16~dark.png" />
+    <None Remove="monogame-16~dark%402x.png" />
+    <None Remove="monogame-16~dark~sel.png" />
+    <None Remove="monogame-16~dark~sel%402x.png" />
+    <None Remove="monogame-16~sel.png" />
+    <None Remove="monogame-16~sel%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="monogame-project-32.png">
+      <LogicalName>monogame-project-32.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-android.png">
+      <LogicalName>monogame-android.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-desktopgl.png">
+      <LogicalName>monogame-desktopgl.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-ios.png">
+      <LogicalName>monogame-ios.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-preview.png">
+      <LogicalName>monogame-preview.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-shared.png">
+      <LogicalName>monogame-shared.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-windows.png">
+      <LogicalName>monogame-windows.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32.png">
+      <LogicalName>project-monogame-32.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32%402x.png">
+      <LogicalName>project-monogame-32@2x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~dark.png">
+      <LogicalName>project-monogame-32@~dark.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~dark%402x.png">
+      <LogicalName>project-monogame-32~dark%402x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~dark~sel.png">
+      <LogicalName>project-monogame-32~dark~sel.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~dark~sel%402x.png">
+      <LogicalName>project-monogame-32~dark~sel%402x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~sel.png">
+      <LogicalName>project-monogame-32~sel.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-32~sel%402x.png">
+      <LogicalName>project-monogame-32~sel%402x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-template.png">
+      <LogicalName>project-monogame-template.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-template%402x.png">
+      <LogicalName>project-monogame-template%402x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-template~dark.png">
+      <LogicalName>project-monogame-template~dark.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="project-monogame-template~dark%402x.png">
+      <LogicalName>project-monogame-template~dark%402x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16.png">
+      <LogicalName>monogame-16.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16%402x.png">
+      <LogicalName>monogame-16@2x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~dark.png">
+      <LogicalName>monogame-16~dark.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~dark%402x.png">
+      <LogicalName>monogame-16~dark@2x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~dark~sel.png">
+      <LogicalName>monogame-16~dark~sel.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~dark~sel%402x.png">
+      <LogicalName>monogame-16~dark~sel@2x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~sel.png">
+      <LogicalName>monogame-16~sel.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monogame-16~sel%402x.png">
+      <LogicalName>monogame-16~sel@2x.png</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AddinFile Include="..\..\ProjectTemplates\DotNetTemplate\MonoGame.Templates.CSharp\bin\MonoGame.Templates.CSharp.nupkg">
+      <Link>Templates\MonoGame.Templates.CSharp.nupkg</Link>
+    </AddinFile>
+  </ItemGroup>
+  <Target Name="_GenerateAddinInfo" BeforeTargets="CoreCompile">
+     <PropertyGroup>
+         <BuildVersion>$(BUILD_NUMBER)</BuildVersion>
+         <BuildVersion Condition="'$(BuildVersion)' == ''">3.7.0.0</BuildVersion>
+     </PropertyGroup>
+     <ItemGroup>
+       <AddinInfo Include="using System%3B" />
+       <AddinInfo Include="using Mono.Addins%3B" />
+       <AddinInfo Include="using Mono.Addins.Description%3B" />
+       <AddinInfo Include="[assembly: Addin(&quot;MonoGame_IDE_VisualStudioForMac&quot;,Namespace = &quot;MonoDevelop&quot;,Version = &quot;$(BuildVersion)&quot;)]" />
+       <AddinInfo Include="[assembly: AddinName(&quot;MonoGame Extension&quot;)]" />
+       <AddinInfo Include="[assembly: AddinCategory(&quot;Game Development&quot;)]" />
+       <AddinInfo Include="[assembly: AddinDescription(&quot;VisualStudio for Mac extension for MonoGame&quot;)]" />
+       <AddinInfo Include="[assembly: AddinAuthor(&quot;@MonoGameTeam&quot;)]" />
+     </ItemGroup>
+     <WriteLinesToFile File="Properties\AddinInfo.cs" Lines="@(AddinInfo)" Overwrite="true" />
+  </Target>
+</Project>

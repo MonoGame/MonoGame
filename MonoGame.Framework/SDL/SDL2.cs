@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 internal static class Sdl
 {
-    private const string NativeLibName = "SDL2.dll";
+    public const string NativeLibName = "SDL2.dll";
 
     public static int Major;
     public static int Minor;
@@ -20,11 +20,11 @@ internal static class Sdl
         if (handle == IntPtr.Zero)
             return "";
 
-        var ptr = (byte*) handle;
+        var ptr = (byte*)handle;
         while (*ptr != 0)
             ptr++;
 
-        var bytes = new byte[ptr - (byte*) handle];
+        var bytes = new byte[ptr - (byte*)handle];
         Marshal.Copy(handle, bytes, 0, bytes.Length);
 
         return Encoding.UTF8.GetString(bytes);
@@ -113,6 +113,8 @@ internal static class Sdl
         [FieldOffset(0)]
         public Keyboard.Event Key;
         [FieldOffset(0)]
+        public Mouse.MotionEvent Motion;
+        [FieldOffset(0)]
         public Keyboard.TextEditingEvent Edit;
         [FieldOffset(0)]
         public Keyboard.TextInputEvent Text;
@@ -167,6 +169,21 @@ internal static class Sdl
         EventAction action,
         EventType minType,
         EventType maxType);
+
+    [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CreateRGBSurfaceFrom")]
+    private static extern IntPtr SDL_CreateRGBSurfaceFrom(IntPtr pixels, int width, int height, int depth, int pitch, uint rMask, uint gMask, uint bMask, uint aMask);
+    public static IntPtr CreateRGBSurfaceFrom(byte[] pixels, int width, int height, int depth, int pitch, uint rMask, uint gMask, uint bMask, uint aMask)
+    {
+        var handle = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+        try
+        {
+            return SDL_CreateRGBSurfaceFrom(handle.AddrOfPinnedObject(), width, height, depth, pitch, rMask, gMask, bMask, aMask);
+        }
+        finally
+        {
+            handle.Free();
+        }
+    }
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_FreeSurface")]
     public static extern void FreeSurface(IntPtr surface);
@@ -285,6 +302,28 @@ internal static class Sdl
             public int Data2;
         }
 
+        public enum SysWMType
+        {
+            Unknow,
+            Windows,
+            X11,
+            Directfb,
+            Cocoa,
+            UiKit,
+            Wayland,
+            Mir,
+            WinRt,
+            Android
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SDL_SysWMinfo
+        {
+            public Version version;
+            public SysWMType subsystem;
+            public IntPtr window;
+        }
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CreateWindow")]
         private static extern IntPtr SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
 
@@ -342,6 +381,9 @@ internal static class Sdl
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_ShowWindow")]
         public static extern void Show(IntPtr window);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowWMInfo")]
+        public static extern bool GetWindowWMInfo(IntPtr window, ref SDL_SysWMinfo sysWMinfo);
     }
 
     public static class Display
@@ -380,6 +422,14 @@ internal static class Sdl
             GetError(SDL_GetDisplayMode(displayIndex, modeIndex, out mode));
         }
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetClosestDisplayMode")]
+        private static extern int SDL_GetClosestDisplayMode(int displayIndex, Mode mode, out Mode closest);
+
+        public static void GetClosestDisplayMode(int displayIndex, Mode mode, out Mode closest)
+        {
+            GetError(SDL_GetClosestDisplayMode(displayIndex, mode, out closest));
+        }
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetDisplayName")]
         private static extern IntPtr SDL_GetDisplayName(int index);
 
@@ -404,8 +454,7 @@ internal static class Sdl
             return GetError(SDL_GetNumVideoDisplays());
         }
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowDisplayIndex")
-        ]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowDisplayIndex")]
         private static extern int SDL_GetWindowDisplayIndex(IntPtr window);
 
         public static int GetWindowDisplayIndex(IntPtr window)
@@ -511,6 +560,23 @@ internal static class Sdl
             SizeAll,
             No,
             Hand
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MotionEvent
+        {
+            public EventType Type;
+            public uint Timestamp;
+            public uint WindowID;
+            public uint Which;
+            public byte State;
+            private byte _padding1;
+            private byte _padding2;
+            private byte _padding3;
+            public int X;
+            public int Y;
+            public int Xrel;
+            public int Yrel;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -634,11 +700,11 @@ internal static class Sdl
         [Flags]
         public enum Hat : byte
         {
-            Centered,
-            Up,
-            Right,
-            Down,
-            Left,
+            Centered = 0,
+            Up = 1 << 0,
+            Right = 1 << 1,
+            Down = 1 << 2,
+            Left = 1 << 3
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -759,9 +825,11 @@ internal static class Sdl
             public int Which;
         }
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl,
-            EntryPoint = "SDL_GameControllerAddMapping")]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerAddMapping")]
         public static extern int AddMapping(string mappingString);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerAddMappingsFromRW")]
+        public static extern int AddMappingFromRw(IntPtr rw, int freew);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerClose")]
         public static extern void Close(IntPtr gamecontroller);
@@ -792,6 +860,14 @@ internal static class Sdl
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_IsGameController")]
         public static extern byte IsGameController(int joystickIndex);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerMapping")]
+        private static extern IntPtr SDL_GameControllerMapping(IntPtr gamecontroller);
+
+        public static string GetMapping(IntPtr gamecontroller)
+        {
+            return GetString(SDL_GameControllerMapping(gamecontroller));
+        }
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerOpen")]
         private static extern IntPtr SDL_GameControllerOpen(int joystickIndex);

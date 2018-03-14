@@ -32,7 +32,7 @@ namespace MonoGame.Tests.Graphics
         private List<FramePixelData> _submittedFrames;
         private int _totalFramesExpected;
         private readonly IFrameComparer _frameComparer = new PixelDeltaFrameComparer();
-        private readonly ActionDaemon _writerThread = new ActionDaemon();
+        private static readonly ActionDaemon _writerThread = new ActionDaemon();
 
         #endregion
 
@@ -55,7 +55,7 @@ namespace MonoGame.Tests.Graphics
             gdm = new GraphicsDeviceManager(game);
             // some visual tests require a HiDef profile
             gdm.GraphicsProfile = GraphicsProfile.HiDef;
-            ((IGraphicsDeviceManager) game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
+            ((IGraphicsDeviceManager)game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
             gd = game.GraphicsDevice;
             content = game.Content;
 
@@ -76,6 +76,10 @@ namespace MonoGame.Tests.Graphics
         public virtual void TearDown()
         {
             game.Dispose();
+            game = null;
+            gdm = null;
+            gd = null;
+            content = null;
 
             if (_framePrepared && !_framesChecked)
                 Assert.Fail("Initialized fixture for rendering but did not check frames.");
@@ -219,6 +223,10 @@ namespace MonoGame.Tests.Graphics
 
             // write results to console
             WriteComparisonResultReport(allResults, noReference);
+
+            // wait for the writing thread so it doesn't get terminated early
+            if (!_writerThread.Finished)
+                _writerThread.Thread.Join();
 
             // now do the actual assertions
             if (ExactNumberSubmits && _totalFramesExpected != allResults.Count)

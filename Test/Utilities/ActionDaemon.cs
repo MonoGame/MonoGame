@@ -9,15 +9,23 @@ namespace MonoGame.Tests.Utilities
         private readonly Queue<Action> _actions = new Queue<Action>();
         private Thread _thread;
 
+        public Thread Thread
+        {
+            get { return _thread; }
+        }
+
+        public bool Finished
+        {
+            get { return _actions.Count == 0 && (_thread == null || _thread.IsAlive == false); }
+        }
+
         public void AddAction(Action action)
         {
             lock (_actions)
                 _actions.Enqueue(action);
 
             if (_thread == null || !_thread.IsAlive)
-            {
                 Start();
-            }
         }
 
         public void ForceTermination()

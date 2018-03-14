@@ -4,29 +4,10 @@
 
 using System;
 using System.Runtime.InteropServices;
+using MonoGame.OpenGL;
+using GLPixelFormat = MonoGame.OpenGL.PixelFormat;
+using PixelFormat = MonoGame.OpenGL.PixelFormat;
 using Microsoft.Xna.Framework.Utilities;
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-using GLPixelFormat = MonoMac.OpenGL.All;
-using Bool = MonoMac.OpenGL.Boolean;
-#endif
-#if (MONOMAC && !PLATFORM_MACOS_LEGACY)
-using OpenTK.Graphics.OpenGL;
-using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
-using PixelInternalFormat = OpenTK.Graphics.OpenGL.PixelFormat;
-using Bool = OpenTK.Graphics.OpenGL.Boolean;
-#endif
-#if DESKTOPGL
-using OpenGL;
-using GLPixelFormat = OpenGL.PixelFormat;
-using PixelFormat = OpenGL.PixelFormat;
-#endif
-#if GLES
-using OpenTK.Graphics.ES20;
-using GLPixelFormat = OpenTK.Graphics.ES20.All;
-using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;
-using PixelInternalFormat = OpenTK.Graphics.ES20.PixelFormat;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -103,7 +84,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (mipMap)
                 {
 #if IOS || ANDROID
-				    GL.GenerateMipmap(TextureTarget.TextureCubeMap);
+                    GL.GenerateMipmap(GenerateMipmapTarget.TextureCubeMap);
 #else
                     GraphicsDevice.FramebufferHelper.Get().GenerateMipmap((int) glTarget);
                     // This updates the mipmaps after a change in the base texture
@@ -118,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             Threading.EnsureUIThread();
 
-#if OPENGL && (MONOMAC || DESKTOPGL)
+#if OPENGL && DESKTOPGL
             var target = GetGLCubeFace(cubeMapFace);
             var tSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
             GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
@@ -129,16 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var pixelToT = Format.GetSize() / tSizeInByte;
                 var tFullWidth = Math.Max(this.size >> level, 1) / 4 * pixelToT;
                 var temp = new T[Math.Max(this.size >> level, 1) / 4 * tFullWidth];
-
-#if MONOMAC
-                var tempHandle = GCHandle.Alloc(temp, GCHandleType.Pinned);
-                var ptr = tempHandle.AddrOfPinnedObject();
-                GL.GetCompressedTexImage(TextureTarget.Texture2D, level, ptr);
-                tempHandle.Free();
-#else
                 GL.GetCompressedTexImage(target, level, temp);
-#endif
-
                 GraphicsExtensions.CheckGLError();
 
                 var rowCount = rect.Height / 4;
