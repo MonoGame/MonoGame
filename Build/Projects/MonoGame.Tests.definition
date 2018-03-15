@@ -35,6 +35,8 @@
   </Properties>
 
   <Files>
+    <None Include="packages.config" />
+
     <!-- Dependencies -->
     <None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
       <Platforms>WindowsGL</Platforms>
@@ -136,6 +138,11 @@
       <Link>libPVRTexLibWrapper.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libassimp.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <None Include="README.md" />
 
@@ -145,12 +152,6 @@
     <Compile Include="Runner\Extensions.cs" />
     <Compile Include="Runner\FrameInfo.cs" />
     <Compile Include="Runner\FramePixelData.cs" />
-    <Compile Include="Runner\Interface\AggregateTestFilter.cs" />
-    <Compile Include="Runner\Interface\CommandLineInterface.cs" />
-    <Compile Include="Runner\Interface\RegexTestFilter.cs" />
-    <Compile Include="Runner\Interface\RunOptions.cs" />
-    <Compile Include="Runner\Interface\TestEventListenerBase.cs" />
-    <Compile Include="Runner\Interface\TestFilterAction.cs" />
     <Compile Include="Runner\PixelArgb.cs" />
     <Compile Include="Runner\Utility.cs" />
 

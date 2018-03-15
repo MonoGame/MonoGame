@@ -51,6 +51,7 @@
   <target name="build_windows" description="Build Windows" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Windows" />
+      <exec program="${nuget3path}/nuget.exe" commandline="restore MonoGame.Framework.Windows.sln -NonInteractive" />
       <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Debug" />
@@ -62,6 +63,7 @@
     </if>
     <if test="${os == 'Unix'}">
       <exec program="mono" commandline="Protobuild.exe -generate Windows" />
+      <exec program="${nuget3path}/nuget.exe" commandline="restore MonoGame.Framework.Windows.sln -NonInteractive" />
       <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Windows.sln" />
       <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Windows.sln" />
       <exec program="mono" commandline="Protobuild.exe -generate WindowsGL" />
@@ -93,6 +95,7 @@
   <target name="build_linux" description="Build Linux" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Linux" />
+      <exec program="${nuget3path}/nuget.exe" commandline="restore MonoGame.Framework.Linux.sln -NonInteractive" />
       <exec program="msbuild " commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.Framework.Linux.sln /t:Build /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Debug" />
@@ -100,6 +103,7 @@
     </if>
     <if test="${os == 'Unix'}">
       <exec program="mono" commandline="Protobuild.exe -generate Linux" />
+      <exec program="${nuget3path}/nuget.exe" commandline="restore MonoGame.Framework.Linux.sln -NonInteractive" />
       <exec program="msbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Linux.sln" />
       <exec program="msbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Linux.sln" />
       <exec program="msbuild" commandline="/t:Clean /p:Configuration=Debug MonoGame.Framework.Linux.sln" />
@@ -107,6 +111,7 @@
     </if>
     <if test="${os == 'MacOS'}">
       <exec program="mono" commandline="Protobuild.exe -generate Linux" />
+      <exec program="${nuget3path}/nuget.exe" commandline="restore MonoGame.Framework.Linux.sln -NonInteractive" />
       <exec program="msbuild" commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild" commandline="MonoGame.Framework.Linux.sln /t:Build /p:Configuration=Release" />
       <exec program="msbuild" commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Debug" />
@@ -143,6 +148,7 @@
   <target name="build_mac" description="Build MacOS" depends="_prebuild">
     <if test="${os == 'MacOS'}">
       <exec program="mono" commandline="Protobuild.exe -generate MacOS" />
+      <exec program="${nuget3path}/nuget.exe" commandline="restore MonoGame.Framework.MacOS.sln -NonInteractive" />
       <exec program="msbuild" commandline="MonoGame.Framework.MacOS.sln  /t:Clean /p:Configuration=Release" />
       <exec program="msbuild" commandline="MonoGame.Framework.MacOS.sln  /t:Build /p:Configuration=Release" />
       <exec program="msbuild" commandline="MonoGame.Framework.MacOS.sln  /t:Clean /p:Configuration=Debug" />
@@ -195,8 +201,8 @@
             Currently MSBuild doesn't restore the nuget packages like buiding from the
             IDE does.  So we have to do it ourselves using the recommended work around.
         -->
-        <exec program="${nuget3path}\nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.WindowsUniversal.project.json -NonInteractive' />
-        <exec program="${nuget3path}\nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.Net.WindowsUniversal.project.json -NonInteractive' />
+        <exec program="${nuget3path}/nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.WindowsUniversal.project.json -NonInteractive' />
+        <exec program="${nuget3path}/nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.Net.WindowsUniversal.project.json -NonInteractive' />
 
         <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
         <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
@@ -209,18 +215,14 @@
   <!-- Run the unit tests... will fail if the code hasn't been built. -->
   <target name="run_tests" description="Run all the tests" depends="_default">
 
-    <nunit2 if="${os == 'Win32NT'}">
-      <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Debug" />
-      <test assemblyname="Test\bin\Windows\AnyCPU\Debug\MonoGameTests.exe" />
-    </nunit2>
+    <if test="${os == 'Win32NT'}">
+      <exec program="MonoGameTests.exe" commandline="--teamcity" workingdir="Test/bin/Windows/AnyCPU/Debug/" basedir="Test/bin/Windows/AnyCPU/Debug/"/>
+    </if>
 
     <if test="${os == 'MacOS'}">
-      <exec program="chmod" commandline=" u+x Test/bin/Linux/AnyCPU/Debug/ffmpeg" />
-      <exec program="chmod" commandline=" u+x Test/bin/Linux/AnyCPU/Debug/ffprobe" />
-      <nunit2>
-        <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test/bin/Linux/AnyCPU/Debug" />
-        <test assemblyname="Test/bin/Linux/AnyCPU/Debug/MonoGameTests.exe" />
-      </nunit2>
+      <exec program="chmod" commandline="u+x Test/bin/Linux/AnyCPU/Debug/ffmpeg" />
+      <exec program="chmod" commandline="u+x Test/bin/Linux/AnyCPU/Debug/ffprobe" />
+      <exec program="mono" commandline="MonoGameTests.exe --teamcity" workingdir="Test/bin/Linux/AnyCPU/Debug/" />
     </if>
 
   </target>

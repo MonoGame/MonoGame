@@ -158,6 +158,7 @@ namespace MonoGame.Tests.Framework
             Compare(expected, q);
         }
 
+#if !XNA
         [Test]
         public void Deconstruct()
         {
@@ -172,5 +173,6 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(z, quaternion.Z);
             Assert.AreEqual(w, quaternion.W);
         }
+#endif
     }
 }

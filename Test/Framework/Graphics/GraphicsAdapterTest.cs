@@ -42,8 +42,8 @@ namespace MonoGame.Tests.Graphics
                     defaultAdapterCount++;
                 Assert.LessOrEqual(defaultAdapterCount, 1);
 
-                Assert.IsNotNullOrEmpty(adapter.DeviceName);
-                Assert.IsNotNullOrEmpty(adapter.Description);
+                Assert.That(adapter.DeviceName, Is.Not.Null.Or.Empty);
+                Assert.That(adapter.Description, Is.Not.Null.Or.Empty);
                 Assert.AreNotEqual(0, adapter.DeviceId);
                 Assert.AreNotEqual(IntPtr.Zero, adapter.MonitorHandle);
                 Assert.AreNotEqual(0, adapter.VendorId);
