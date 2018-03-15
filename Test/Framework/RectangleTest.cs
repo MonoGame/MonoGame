@@ -256,6 +256,7 @@ namespace MonoGame.Tests.Framework
             StringAssert.IsMatch("{X:-10 Y:10 Width:100 Height:1000}",new Rectangle(-10,10,100,1000).ToString());
         }
 
+#if !XNA
         [Test]
         public void Deconstruct()
         {
@@ -270,5 +271,6 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(width, rectangle.Width);
             Assert.AreEqual(height, rectangle.Height);
         }
+#endif
     }
 }

@@ -33,14 +33,14 @@ namespace MonoGame.Tests.Visual {
 		
 		[TestCase(true)]
 		[TestCase(false)]
-        [Ignore]
+        [Ignore("Fix me!")]
 		public void TexturedQuad_lighting (bool enableLighting)
 		{
 			Game.Components.Add (new TexturedQuadComponent (Game, enableLighting));
 			RunSingleFrameTest ();
 		}
 
-		[Test, Ignore]
+		[Test, Ignore("Fix me!")]
 		public void SpaceshipModel ()
 		{
 			Game.Components.Add (new SpaceshipModelDrawComponent(Game));

@@ -166,6 +166,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(null, value2);
         }
 
+#if !XNA
         [Test]
         public void BoundingBoxDeconstruct()
         {
@@ -192,5 +193,6 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(center, boundingSphere.Center);
             Assert.AreEqual(radius, boundingSphere.Radius);
         }
+#endif
     }
 }

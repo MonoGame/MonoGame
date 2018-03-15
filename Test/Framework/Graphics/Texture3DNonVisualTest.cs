@@ -17,7 +17,7 @@ namespace MonoGame.Tests.Graphics
         const int w=50, h=50, d=50, a = w * d * h;
         private Game _game;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
             reference = new Color[a];
@@ -36,7 +36,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TestFixtureTearDown()
         {
             _game.Dispose();
