@@ -77,6 +77,7 @@ namespace MonoGame.Tests.Framework
             Assert.That(quaternion, Is.EqualTo(originalQuaternion));
         }
 
+#if !XNA
         [Test]
         public void Deconstruct()
         {
@@ -90,5 +91,6 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(normal, plane.Normal);
             Assert.AreEqual(d, plane.D);
         }
+#endif
     }
 }

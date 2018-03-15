@@ -404,8 +404,7 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
 #if DESKTOPGL
-        // TODO we should figure out if there's a way to check this in OpenGL
-        [Ignore]
+        [Ignore("we should figure out if there's a way to check this in OpenGL")]
 #endif
         public void ShouldThrowHelpfulExceptionWhenVertexFormatDoesNotMatchShader()
         {

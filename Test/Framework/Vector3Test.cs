@@ -100,15 +100,18 @@ namespace MonoGame.Tests.Framework
             Assert.AreNotEqual(xa.GetHashCode(), xb.GetHashCode(), "Different properties should change hash.");
             Assert.AreNotEqual(ya.GetHashCode(), yb.GetHashCode(), "Different properties should change hash.");
             Assert.AreNotEqual(za.GetHashCode(), zb.GetHashCode(), "Different properties should change hash.");
+#if !XNA
             Assert.AreNotEqual(xa.GetHashCode(), ya.GetHashCode(), "Identical values on different properties should have different hashes.");
             Assert.AreNotEqual(xb.GetHashCode(), yb.GetHashCode(), "Identical values on different properties should have different hashes.");
             Assert.AreNotEqual(xb.GetHashCode(), zb.GetHashCode(), "Identical values on different properties should have different hashes.");
             Assert.AreNotEqual(yb.GetHashCode(), zb.GetHashCode(), "Identical values on different properties should have different hashes.");
+#endif
             Assert.AreNotEqual(xa.GetHashCode(), yb.GetHashCode());
             Assert.AreNotEqual(ya.GetHashCode(), xb.GetHashCode());
             Assert.AreNotEqual(xa.GetHashCode(), zb.GetHashCode());
         }
 
+#if !XNA
         [Test]
         public void Deconstruct()
         {
@@ -122,5 +125,6 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(y, vector3.Y);
             Assert.AreEqual(z, vector3.Z);
         }
+#endif
     }
 }
