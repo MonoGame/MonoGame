@@ -346,11 +346,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose(bool disposing)
         {
-            if (disposing)
-            {
-                if (_dataStream != null)
-                    _dataStream.Dispose();
-            }
+            if (_dataStream != null)
+                _dataStream.Dispose();
+            
             _dataStream = null;
         }
 
