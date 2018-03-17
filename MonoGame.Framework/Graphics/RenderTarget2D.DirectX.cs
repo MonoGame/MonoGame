@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal RenderTargetView[] _renderTargetViews;
         internal DepthStencilView _depthStencilView;
-        private RenderTarget2D _resolvedTexture;
+        protected RenderTarget2D _resolvedTexture;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
@@ -155,8 +155,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // MSAA RT needs another non-MSAA texture where it is resolved
             if (SampleDescription.Count > 1)
-            {
-                _resolvedTexture = new RenderTarget2D(
+                _resolvedTexture = CreateResolvedTexture();
+
+            return rt;
+        }
+
+        protected RenderTarget2D CreateResolvedTexture()
+        {
+            return new RenderTarget2D(
                     GraphicsDevice,
                     Width,
                     Height,
@@ -167,9 +173,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     RenderTargetUsage,
                     Shared,
                     ArraySize);
-            }
 
-            return rt;
         }
 
         protected override ShaderResourceView CreateShaderResourceView()
