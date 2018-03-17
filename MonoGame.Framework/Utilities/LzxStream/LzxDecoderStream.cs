@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Microsoft.Xna.Framework.Utilities
 {
-    internal class LzxDecoderStream : Stream
+    public class LzxDecoderStream : Stream
     {
         LzxDecoder dec;
         MemoryStream decompressedStream;

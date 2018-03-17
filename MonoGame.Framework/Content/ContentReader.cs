@@ -10,19 +10,19 @@ using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    public sealed class ContentReader : BinaryReader
+    public class ContentReader : BinaryReader
     {
-        private ContentManager contentManager;
-        private Action<IDisposable> recordDisposableObject;
-        private ContentTypeReaderManager typeReaderManager;
-        private GraphicsDevice graphicsDevice;
-        private string assetName;
-        private List<KeyValuePair<int, Action<object>>> sharedResourceFixups;
-        private ContentTypeReader[] typeReaders;
-		internal int version;
-		internal int sharedResourceCount;
+        protected ContentManager contentManager;
+        protected Action<IDisposable> recordDisposableObject;
+        protected ContentTypeReaderManager typeReaderManager;
+        protected GraphicsDevice graphicsDevice;
+        protected string assetName;
+        protected List<KeyValuePair<int, Action<object>>> sharedResourceFixups;
+        protected ContentTypeReader[] typeReaders;
+        protected int version;
+        protected int sharedResourceCount;
 
-        internal ContentTypeReader[] TypeReaders
+        public ContentTypeReader[] TypeReaders
         {
             get
             {
@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal GraphicsDevice GraphicsDevice
+        public GraphicsDevice GraphicsDevice
         {
             get
             {
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal ContentReader(ContentManager manager, Stream stream, GraphicsDevice graphicsDevice, string assetName, int version, Action<IDisposable> recordDisposableObject)
+        public ContentReader(ContentManager manager, Stream stream, GraphicsDevice graphicsDevice, string assetName, int version, Action<IDisposable> recordDisposableObject)
             : base(stream)
         {
             this.graphicsDevice = graphicsDevice;
@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal object ReadAsset<T>()
+        public object ReadAsset<T>()
         {
             InitializeTypeReaders();
 
@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
-        internal object ReadAsset<T>(T existingInstance)
+        public object ReadAsset<T>(T existingInstance)
         {
             InitializeTypeReaders();
 
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
-        internal void InitializeTypeReaders()
+        public void InitializeTypeReaders()
         {
             typeReaderManager = new ContentTypeReaderManager();
             typeReaders = typeReaderManager.LoadAssetReaders(this);
@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework.Content
             sharedResourceFixups = new List<KeyValuePair<int, Action<object>>>();
         }
 
-        internal void ReadSharedResources()
+        public void ReadSharedResources()
         {
             if (sharedResourceCount <= 0)
                 return;
@@ -146,7 +146,7 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
             
-        private void RecordDisposable<T>(T result)
+        protected void RecordDisposable<T>(T result)
         {
             var disposable = result as IDisposable;
             if (disposable == null)
@@ -293,12 +293,12 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
-        internal new int Read7BitEncodedInt()
+        public new int Read7BitEncodedInt()
         {
             return base.Read7BitEncodedInt();
         }
-		
-		internal BoundingSphere ReadBoundingSphere()
+
+        public BoundingSphere ReadBoundingSphere()
 		{
 			var position = ReadVector3();
             var radius = ReadSingle();

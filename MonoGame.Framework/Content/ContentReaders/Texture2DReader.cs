@@ -10,9 +10,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    internal class Texture2DReader : ContentTypeReader<Texture2D>
+    public class Texture2DReader : ContentTypeReader<Texture2D>
     {
-		internal Texture2DReader()
+		public Texture2DReader()
 		{
 			// Do nothing
 		}
