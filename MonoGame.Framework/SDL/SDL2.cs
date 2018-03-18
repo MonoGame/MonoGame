@@ -384,6 +384,9 @@ internal static class Sdl
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowWMInfo")]
         public static extern bool GetWindowWMInfo(IntPtr window, ref SDL_SysWMinfo sysWMinfo);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowBordersSize")]
+        public static extern int GetBorderSize(IntPtr window, out int top, out int left, out int right, out int bottom);
     }
 
     public static class Display
