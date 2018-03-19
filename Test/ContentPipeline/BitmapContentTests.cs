@@ -172,9 +172,6 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-#if DESKTOPGL
-        [Ignore("NVidia native library could not be loaded on Mac build server.")]
-#endif
         public void BitmapCompressFullNoResize()
         {
 #if !XNA
@@ -186,9 +183,6 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-#if DESKTOPGL
-        [Ignore("NVidia native library could not be loaded on Mac build server.")]
-#endif
         public void BitmapCompressFullResize()
         {
 #if !XNA
