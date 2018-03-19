@@ -138,6 +138,9 @@
        <MSBuild Include="MonoGame.Common.props">
          <VSIXSubPath>$(MSBuildSubPath)</VSIXSubPath>
        </MSBuild>
+       <MSBuild Include="../../Tools/MonoGame.Build.Tasks/bin/Windows/AnyCPU/Release/*.*">
+         <VSIXSubPath>$(MSBuildToolsSubPath)</VSIXSubPath>
+       </MSBuild>
        <MSBuild Include="../../Tools/Pipeline/bin/Windows/AnyCPU/Release/*.*">
          <VSIXSubPath>$(MSBuildToolsSubPath)</VSIXSubPath>
        </MSBuild>
