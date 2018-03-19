@@ -1,0 +1,6 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MonoGameInstallDirectory Condition=" '$(MonoGameInstallDirectory)' == '' And Exists ('$(MSBuildProgramFiles32)MonoGame\v3.0') ">$(MSBuildProgramFiles32)</MonoGameInstallDirectory>
+    <MonoGameInstallDirectory Condition=" '$(MonoGameInstallDirectory)' == '' ">$(MSBuildThisFileDirectory)..\..</MonoGameInstallDirectory>
+  </PropertyGroup>
+</Project>

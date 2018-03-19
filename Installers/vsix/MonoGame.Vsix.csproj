@@ -122,7 +122,7 @@
     <ReferenceAssemblies>
       <IncludeInVSIX>True</IncludeInVSIX>
       <VSIXSubPath></VSIXSubPath>
-      <InstallRoot>ReferenceAssemblies</InstallRoot>
+      <InstallRoot>MSBuild</InstallRoot>
     </ReferenceAssemblies>
     <ThirdPartyNotice>
       <IncludeInVSIX>True</IncludeInVSIX>
@@ -133,6 +133,9 @@
   <Target Name="AddContent" Returns="@(MSBuild);@(ReferenceAssemblies)">
      <ItemGroup>
        <MSBuild Include="../../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets">
+         <VSIXSubPath>$(MSBuildSubPath)</VSIXSubPath>
+       </MSBuild>
+       <MSBuild Include="MonoGame.Common.props">
          <VSIXSubPath>$(MSBuildSubPath)</VSIXSubPath>
        </MSBuild>
        <MSBuild Include="../../Tools/Pipeline/bin/Windows/AnyCPU/Release/*.*">
