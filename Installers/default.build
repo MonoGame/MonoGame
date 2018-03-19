@@ -213,4 +213,15 @@ fi
 
   </target>
 
+    <target name="buildvsix" description="Build Vsix" depends="_checkos">
+      <loadfile file="vsix/MonoGame.Sdk.pkgdef.in" property="pkgdef">
+        <filterchain>
+          <replacetokens>
+            <token key="BUILD_NUMBER" value="${buildNumber}" />
+          </replacetokens>
+        </filterchain>
+      </loadfile>
+      <echo file="vsix/MonoGame.Sdk.pkgdef" message="${pkgdef}" />
+    </target>
+
 </project>

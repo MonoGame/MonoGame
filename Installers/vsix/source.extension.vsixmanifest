@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="|create-vsix;GetVsixId|" Version="|create-vsix;GetVsixVersion|" Language="en-US" Publisher="MonoGame" />
+    <DisplayName>|create-vsix;GetVsixDisplayName|</DisplayName>
+    <Description xml:space="preserve">|create-vsix;GetVsixDescription|</Description>
+    <Icon>Resources\MonoGamePackage.ico</Icon>
+  </Metadata>
+  <Installation AllUsers="true" Experimental="|create-vsix;GetIsExperimental|">
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0,16.0)"  />
+  </Installation>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
+  </Prerequisites>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="File" Path="MonoGame.Sdk.pkgdef" />
+  </Assets>
+</PackageManifest>
