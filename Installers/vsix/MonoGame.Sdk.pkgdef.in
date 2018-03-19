@@ -1,10 +1,10 @@
 [$RootKey$\InstalledProducts\MonoGamePackage]
 @="#110"
-"Package"="{d0e8d881-b09d-40bf-923b-b3efddc53c16}"
+"Package"="{692e2fb1-e079-47ce-a52b-e804726bc407}"
 "PID"="@BUILD_NUMBER@"
 "ProductDetails"="#112"
 "LogoID"="#400"
-[$RootKey$\Packages\{d0e8d881-b09d-40bf-923b-b3efddc53c16}]
+[$RootKey$\Packages\{692e2fb1-e079-47ce-a52b-e804726bc407}]
 @="MonoGamePackage"
 "InprocServer32"="$WinDir$\SYSTEM32\MSCOREE.DLL"
 "Class"="MonoGame.Sdk.MonoGamePackage"
