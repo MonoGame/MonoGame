@@ -213,7 +213,8 @@ fi
 
   </target>
 
-    <target name="buildvsix" description="Build Vsix" depends="_checkos">
+  <target name="buildvsix" description="Build Vsix" depends="_checkos">
+    <if test="${os == 'Win32NT'}"> 
       <loadfile file="vsix/MonoGame.Sdk.pkgdef.in" property="pkgdef">
         <filterchain>
           <replacetokens>
@@ -222,6 +223,7 @@ fi
         </filterchain>
       </loadfile>
       <echo file="vsix/MonoGame.Sdk.pkgdef" message="${pkgdef}" />
-    </target>
+    </if>
+  </target>
 
 </project>
