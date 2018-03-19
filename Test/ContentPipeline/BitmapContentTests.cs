@@ -85,7 +85,6 @@ namespace MonoGame.Tests.ContentPipeline
             Fill(b1, color1);
             var b2 = new Dxt1BitmapContent(8, 8);
             BitmapContent.Copy(b1, b2);
-            Assert.Pass();
         }
 
         void BitmapCompressFullResize<T>(T color1)
@@ -95,7 +94,6 @@ namespace MonoGame.Tests.ContentPipeline
             Fill(b1, color1);
             var b2 = new Dxt1BitmapContent(8, 8);
             BitmapContent.Copy(b1, b2);
-            Assert.Pass();
         }
 
         void BitmapCopySameRegionNoResize<T>(T color1, T color2)
