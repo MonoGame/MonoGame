@@ -135,9 +135,12 @@
        <MSBuild Include="../../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets">
          <VSIXSubPath>$(MSBuildSubPath)</VSIXSubPath>
        </MSBuild>
-       <MSBuild Include="../../Tools/Pipeline/bin/Windows/AnyCPU/Release/**/*.*">
+       <MSBuild Include="../../Tools/Pipeline/bin/Windows/AnyCPU/Release/*.*">
          <VSIXSubPath>$(MSBuildToolsSubPath)</VSIXSubPath>
        </MSBuild>
+       <MSBuild Include="../../Tools/Pipeline/bin/Windows/AnyCPU/Release/Templates/*.*">
+         <VSIXSubPath>$(MSBuildToolsSubPath)Templates</VSIXSubPath>
+       </MSBuild>     
      </ItemGroup>
      <ItemGroup>
        <ReferenceAssemblies Include="../../MonoGame.Framework/bin/iOS/iPhoneSimulator/Release/*.*">
@@ -146,11 +149,20 @@
        <ReferenceAssemblies Include="../../MonoGame.Framework/bin/tvOS/iPhoneSimulator/Release/*.*">
          <VSIXSubPath>$(ReferenceAssemblySubPath)/tvOS</VSIXSubPath>
        </ReferenceAssemblies>
+       <ReferenceAssemblies Include="../../MonoGame.Framework/bin/MacOS/AnyCPU/Release/*.*">
+         <VSIXSubPath>$(ReferenceAssemblySubPath)/MacOS</VSIXSubPath>
+       </ReferenceAssemblies>       
        <ReferenceAssemblies Include="../../MonoGame.Framework/bin/Android/AnyCPU/Release/*.*">
          <VSIXSubPath>$(ReferenceAssemblySubPath)/Android</VSIXSubPath>
        </ReferenceAssemblies>
        <ReferenceAssemblies Include="../../MonoGame.Framework/bin/Linux/AnyCPU/Release/*.*">
          <VSIXSubPath>$(ReferenceAssemblySubPath)/DesktopGL</VSIXSubPath>
+       </ReferenceAssemblies>
+       <ReferenceAssemblies Include="../../MonoGame.Framework/bin/Linux/AnyCPU/Release/x86/*.*">
+         <VSIXSubPath>$(ReferenceAssemblySubPath)/DesktopGL/x86</VSIXSubPath>
+       </ReferenceAssemblies>
+       <ReferenceAssemblies Include="../../MonoGame.Framework/bin/Linux/AnyCPU/Release/x64/*.*">
+         <VSIXSubPath>$(ReferenceAssemblySubPath)/DesktopGL/x64</VSIXSubPath>
        </ReferenceAssemblies>
        <ReferenceAssemblies Include="../../MonoGame.Framework/bin/Windows/AnyCPU/Release/*.*">
          <VSIXSubPath>$(ReferenceAssemblySubPath)/Windows</VSIXSubPath>
