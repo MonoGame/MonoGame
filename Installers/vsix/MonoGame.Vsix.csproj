@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props" Condition="Exists('..\..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props')" />
+  <Import Project="packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props" Condition="Exists('packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -21,11 +21,7 @@
     <IsProductComponent Condition=" '$(IsProductComponent)' == '' ">True</IsProductComponent>
     <_BuildVsix Condition=" '$(CreateVsixContainer)' == 'True' And Exists ('$(VsSDKInstall)') ">True</_BuildVsix>
     <_BuildVsix Condition=" '$(_BuildVsix)' == '' ">False</_BuildVsix>
-    <UnstableFrameworks Condition=" '$(UnstableFrameworks)' == '' ">False</UnstableFrameworks>
-    <_PackageDefinitionTemplate Condition=" '$(UnstableFrameworks)' == 'True' ">Xamarin.Android.Sdk-UnstableFrameworks.pkgdef.in</_PackageDefinitionTemplate>
-    <_PackageDefinitionTemplate Condition=" '$(_PackageDefinitionFile)' == '' ">Xamarin.Android.Sdk.pkgdef.in</_PackageDefinitionTemplate>
-    <ExtensionInstallationFolder Condition=" '$(UnstableFrameworks)' == 'True' ">Xamarin\Xamarin.Android.Sdk-UnstableFrameworks</ExtensionInstallationFolder>
-    <ExtensionInstallationFolder Condition=" '$(ExtensionInstallationFolder)' == '' ">Xamarin\Xamarin.Android.Sdk</ExtensionInstallationFolder>
+    <ExtensionInstallationFolder>MonoGame\MonoGame.Sdk</ExtensionInstallationFolder>
     <OutputPath>bin\$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
@@ -54,66 +50,169 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.CoreUtility.15.0.26201\lib\net45\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.CoreUtility.15.0.26201\lib\net45\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Imaging, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Imaging.15.0.26201\lib\net45\Microsoft.VisualStudio.Imaging.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.Imaging.15.0.26201\lib\net45\Microsoft.VisualStudio.Imaging.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.OLE.Interop.7.10.6070\lib\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.OLE.Interop.7.10.6070\lib\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.15.0, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.15.0.15.0.26201\lib\Microsoft.VisualStudio.Shell.15.0.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.Shell.15.0.15.0.26201\lib\Microsoft.VisualStudio.Shell.15.0.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Framework, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Framework.15.0.26201\lib\net45\Microsoft.VisualStudio.Shell.Framework.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.Shell.Framework.15.0.26201\lib\net45\Microsoft.VisualStudio.Shell.Framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.7.10.6071\lib\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.Shell.Interop.7.10.6071\lib\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.8.0.8.0.50727\lib\Microsoft.VisualStudio.Shell.Interop.8.0.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.Shell.Interop.8.0.8.0.50727\lib\Microsoft.VisualStudio.Shell.Interop.8.0.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.9.0.9.0.30729\lib\Microsoft.VisualStudio.Shell.Interop.9.0.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.Shell.Interop.9.0.9.0.30729\lib\Microsoft.VisualStudio.Shell.Interop.9.0.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.TextManager.Interop.7.10.6070\lib\Microsoft.VisualStudio.TextManager.Interop.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.TextManager.Interop.7.10.6070\lib\Microsoft.VisualStudio.TextManager.Interop.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.TextManager.Interop.8.0.8.0.50727\lib\Microsoft.VisualStudio.TextManager.Interop.8.0.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.TextManager.Interop.8.0.8.0.50727\lib\Microsoft.VisualStudio.TextManager.Interop.8.0.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Threading, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Threading.15.0.240\lib\net45\Microsoft.VisualStudio.Threading.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.Threading.15.0.240\lib\net45\Microsoft.VisualStudio.Threading.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Utilities, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Utilities.15.0.26201\lib\net45\Microsoft.VisualStudio.Utilities.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.Utilities.15.0.26201\lib\net45\Microsoft.VisualStudio.Utilities.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Validation, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Validation.15.0.82\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
+      <HintPath>packages\Microsoft.VisualStudio.Validation.15.0.82\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VsSDKInstall)\Microsoft.VsSDK.targets" Condition=" '$(_BuildVsix)' == 'True' " />
-  <PropertyGroup Condition=" '$(UnstableFrameworks)' == 'True' ">
-    <DefineConstants>$(DefineConstants);UNSTABLE_FRAMEWORKS</DefineConstants>
+  <PropertyGroup>
+    <!-- Don't ever deploy, since that won't work on Mac -->
+    <DeployExtension>False</DeployExtension>
+    <MSBuildSubPath>MonoGame/v3.0/</MSBuildSubPath>
+    <MSBuildToolsSubPath>MonoGame/v3.0/Tools/</MSBuildToolsSubPath>
+    <ReferenceAssemblySubPath>MonoGame/v3.0/Assemblies</ReferenceAssemblySubPath>
+    <PrepareForBuildDependsOn Condition=" '$(CreateVsixContainer)' == 'True' ">
+      $(PrepareForBuildDependsOn);
+      AddContent
+    </PrepareForBuildDependsOn>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(_BuildVsix)' == 'True' ">
-    <BuildDependsOn>
-      _CreateDependencies;
-      $(BuildDependsOn);
-      _CopyToBuildConfiguration
-    </BuildDependsOn>
+  <ItemDefinitionGroup>
+    <MSBuild>
+      <IncludeInVSIX>True</IncludeInVSIX>
+      <VSIXSubPath></VSIXSubPath>
+      <InstallRoot>MSBuild</InstallRoot>
+    </MSBuild>
+    <ReferenceAssemblies>
+      <IncludeInVSIX>True</IncludeInVSIX>
+      <VSIXSubPath></VSIXSubPath>
+      <InstallRoot>ReferenceAssemblies</InstallRoot>
+    </ReferenceAssemblies>
+    <ThirdPartyNotice>
+      <IncludeInVSIX>True</IncludeInVSIX>
+      <VSIXSubPath/>
+      <InstallRoot/>
+    </ThirdPartyNotice>
+  </ItemDefinitionGroup>
+  <Target Name="AddContent" Returns="@(MSBuild);@(ReferenceAssemblies)">
+     <ItemGroup>
+       <MSBuild Include="../../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets">
+         <VSIXSubPath>$(MSBuildSubPath)</VSIXSubPath>
+       </MSBuild>
+       <MSBuild Include="../../Tools/Pipeline/bin/Windows/AnyCPU/Release/**/*.*">
+         <VSIXSubPath>$(MSBuildToolsSubPath)</VSIXSubPath>
+       </MSBuild>
+     </ItemGroup>
+     <ItemGroup>
+       <ReferenceAssemblies Include="../../MonoGame.Framework/bin/iOS/iPhoneSimulator/Release/*.*">
+         <VSIXSubPath>$(ReferenceAssemblySubPath)/iOS</VSIXSubPath>
+       </ReferenceAssemblies>
+       <ReferenceAssemblies Include="../../MonoGame.Framework/bin/tvOS/iPhoneSimulator/Release/*.*">
+         <VSIXSubPath>$(ReferenceAssemblySubPath)/tvOS</VSIXSubPath>
+       </ReferenceAssemblies>
+       <ReferenceAssemblies Include="../../MonoGame.Framework/bin/Android/AnyCPU/Release/*.*">
+         <VSIXSubPath>$(ReferenceAssemblySubPath)/Android</VSIXSubPath>
+       </ReferenceAssemblies>
+       <ReferenceAssemblies Include="../../MonoGame.Framework/bin/Linux/AnyCPU/Release/*.*">
+         <VSIXSubPath>$(ReferenceAssemblySubPath)/DesktopGL</VSIXSubPath>
+       </ReferenceAssemblies>
+       <ReferenceAssemblies Include="../../MonoGame.Framework/bin/Windows/AnyCPU/Release/*.*">
+         <VSIXSubPath>$(ReferenceAssemblySubPath)/Windows</VSIXSubPath>
+       </ReferenceAssemblies>
+       <ReferenceAssemblies Include="../../MonoGame.Framework/bin/WindowsUniversal/AnyCPU/Release/*.*">
+         <VSIXSubPath>$(ReferenceAssemblySubPath)/WindowsUniversal</VSIXSubPath>
+       </ReferenceAssemblies>
+     </ItemGroup>
+     <ItemGroup>
+      <_MSBuildFilesWithoutExtension
+          Condition=" '%(Extension)' == '' "
+          Include="@(MSBuild)"
+      />
+      <MSBuild Remove="@(_MSBuildFilesWithoutExtension)" />
+      <_ReferenceFilesWithoutExtension
+          Condition=" '%(Extension)' == '' "
+          Include="@(ReferenceAssemblies)"
+      />
+      <ReferenceAssemblies Remove="@(_ReferenceFilesWithoutExtension)" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="@(MSBuild)" />
+      <Content Include="@(ReferenceAssemblies)" />
+    </ItemGroup>
+  </Target>
+  <Target Name="GetVsixVersion"
+      Returns="$(VsixVersion)">
+    <PropertyGroup>
+      <VsixVersion>$(BUILD_NUMBER)</VsixVersion>
+    </PropertyGroup>
+  </Target>
+    <Target Name="GetIsExperimental"
+      Returns="$(IsExperimental)">
+  </Target>
+    <!--
+    This *replaces* `Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets`
+    -->
+  <PropertyGroup>
+    <_TasksAssembly Condition=" Exists('$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll') ">$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll</_TasksAssembly>
+    <_TasksAssembly Condition=" '$(_TasksAssembly)' == '' ">$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll</_TasksAssembly>
   </PropertyGroup>
+  <UsingTask TaskName="SetVsSDKEnvironmentVariables"
+      TaskFactory="CodeTaskFactory"
+      AssemblyFile="$(_TasksAssembly)">
+    <ParameterGroup>
+      <ProjectDirectory Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+        var toolsPath = System.IO.Path.Combine(ProjectDirectory, "tools", "VSSDK", "bin");
+        System.Environment.SetEnvironmentVariable("VsSDKToolsPath",
+            System.IO.Path.GetFullPath(toolsPath),
+            EnvironmentVariableTarget.Process);
+        var schemaDir = System.IO.Path.Combine(ProjectDirectory, "tools", "VSSDK", "schemas");
+        System.Environment.SetEnvironmentVariable("VsSDKSchemaDir",
+            System.IO.Path.GetFullPath(schemaDir),
+            EnvironmentVariableTarget.Process);
+      </Code>
+    </Task>
+  </UsingTask>
+  <Target Name="SetVsSDKEnvironmentVariables"
+      BeforeTargets="GeneratePkgDef;VSCTCompile;VSIXNameProjectOutputGroup">
+    <SetVsSDKEnvironmentVariables ProjectDirectory="$(ThisPackageDirectory)" />
+  </Target>
 </Project>

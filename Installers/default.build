@@ -214,7 +214,7 @@ fi
   </target>
 
   <target name="buildvsix" description="Build Vsix" depends="_checkos">
-    <if test="${os == 'Win32NT'}"> 
+    <if test="${os != 'Win32NT'}"> 
       <loadfile file="vsix/MonoGame.Sdk.pkgdef.in" property="pkgdef">
         <filterchain>
           <replacetokens>

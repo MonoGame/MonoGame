@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="|create-vsix;GetVsixId|" Version="|create-vsix;GetVsixVersion|" Language="en-US" Publisher="MonoGame" />
-    <DisplayName>|create-vsix;GetVsixDisplayName|</DisplayName>
-    <Description xml:space="preserve">|create-vsix;GetVsixDescription|</Description>
+    <Identity Id="MonoGame.Sdk" Version="|MonoGame.Vsix;GetVsixVersion|" Language="en-US" Publisher="MonoGame" />
+    <DisplayName>MonoGame Sdk</DisplayName>
+    <Description xml:space="preserve">MonoGame Sdk Tooling</Description>
     <Icon>Resources\MonoGamePackage.ico</Icon>
   </Metadata>
-  <Installation AllUsers="true" Experimental="|create-vsix;GetIsExperimental|">
+  <Installation AllUsers="true" Experimental="|MonoGame.Vsix;GetIsExperimental|">
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0,16.0)"  />
   </Installation>
   <Prerequisites>
