@@ -18,7 +18,7 @@
     <IncludeDebugSymbolsInLocalVSIXDeployment>False</IncludeDebugSymbolsInLocalVSIXDeployment>
     <IncludeDebugSymbolsInVSIXContainer>False</IncludeDebugSymbolsInVSIXContainer>
     <IsExperimental Condition=" '$(IsExperimental)' == '' ">true</IsExperimental>
-    <IsProductComponent Condition=" '$(IsProductComponent)' == '' ">True</IsProductComponent>
+    <IsProductComponent Condition=" '$(IsProductComponent)' == '' ">False</IsProductComponent>
     <_BuildVsix Condition=" '$(CreateVsixContainer)' == 'True' And Exists ('$(VsSDKInstall)') ">True</_BuildVsix>
     <_BuildVsix Condition=" '$(_BuildVsix)' == '' ">False</_BuildVsix>
     <ExtensionInstallationFolder>MonoGame\MonoGame.Sdk</ExtensionInstallationFolder>
