@@ -411,7 +411,9 @@ namespace MonoGame.OpenGL
         // ATITC
         AtcRgbaExplicitAlphaAmd = 0x8C93,
         AtcRgbaInterpolatedAlphaAmd = 0x87EE,
-        // DXT
+        // ETC1
+        Etc1 = 0x8D64,
+        Srgb = 0x8C40,
 
     }
 
