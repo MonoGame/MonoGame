@@ -96,8 +96,8 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsHalfFloatTextures = GL.Extensions.Contains("GL_EXT_color_buffer_half_float");
 #else
             SupportsSRgb = GL.Extensions.Contains("GL_EXT_texture_sRGB") && GL.Extensions.Contains("GL_EXT_framebuffer_sRGB");
-            SupportsFloatTextures = device.glMajorVersion >= 3 || GL.Extensions.Contains ("GL_ARB_texture_float");
-            SupportsHalfFloatTextures = device.glMajorVersion >= 3;
+            SupportsFloatTextures = device.glMajorVersion >= 3 || GL.Extensions.Contains ("GL_ARB_texture_float") || GL.Extensions.Contains("GL_EXT_color_buffer_float");
+            SupportsHalfFloatTextures = device.glMajorVersion >= 3 ||  GL.Extensions.Contains("GL_EXT_color_buffer_half_float");
 #endif
 
             // TODO: Implement OpenGL support for texture arrays
