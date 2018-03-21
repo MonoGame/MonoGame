@@ -726,7 +726,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
             case InvalidFormat: 
             default:
-				throw new NotSupportedException();
+                    throw new NotSupportedException(string.Format("The requested SurfaceFormat `{0}` is not supported.", format));
 			}
 		}
 
