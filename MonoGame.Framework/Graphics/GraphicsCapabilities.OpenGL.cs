@@ -99,12 +99,14 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsFloatTextures = device.glMajorVersion >= 3 ||
                                     GL.Extensions.Contains("GL_ARB_texture_float") ||
                                     GL.Extensions.Contains("GL_APPLE_float_pixels") ||
-                                    GL.Extensions.Contains("GL_ATI_texture_float")
+                                    GL.Extensions.Contains("GL_ATI_texture_float") ||
+                                    GL.Extensions.Contains("GL_NV_image_formats")
                                     ;
             SupportsHalfFloatTextures = device.glMajorVersion >= 3 ||
                                         GL.Extensions.Contains("GL_EXT_color_buffer_half_float") ||
                                         GL.Extensions.Contains("GL_OES_texture_half_float") ||
-                                        GL.Extensions.Contains("GL_ARB_half_float_pixel")
+                                        GL.Extensions.Contains("GL_NV_image_formats") ||
+                                        GL.Extensions.Contains("GL_ARB_texture_rg")
                                         ;
 #endif
 
