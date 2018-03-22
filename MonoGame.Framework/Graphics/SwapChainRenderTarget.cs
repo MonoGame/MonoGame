@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // MSAA RT needs another non-MSAA texture where it is resolved
             if (preferredMultiSampleCount > 1)
-                _resolvedTexture = CreateResolvedTexture();
+                CreateResolvedTexture();
 
             // Create the depth buffer if we need it.
             if (depthFormat != DepthFormat.None)

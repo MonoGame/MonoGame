@@ -4,6 +4,7 @@
 
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using System.Diagnostics;
 using Resource = SharpDX.Direct3D11.Resource;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -12,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal RenderTargetView[] _renderTargetViews;
         internal DepthStencilView _depthStencilView;
-        protected RenderTarget2D _resolvedTexture;
+        private RenderTarget2D _resolvedTexture;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
@@ -155,14 +156,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // MSAA RT needs another non-MSAA texture where it is resolved
             if (SampleDescription.Count > 1)
-                _resolvedTexture = CreateResolvedTexture();
+                CreateResolvedTexture();
 
             return rt;
         }
 
-        protected RenderTarget2D CreateResolvedTexture()
+        internal void CreateResolvedTexture()
         {
-            return new RenderTarget2D(
+            Debug.Assert(_resolvedTexture == null, "The resolved texture was already created.");
+
+            _resolvedTexture = new RenderTarget2D(
                     GraphicsDevice,
                     Width,
                     Height,
