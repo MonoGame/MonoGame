@@ -92,9 +92,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // sRGB
 #if GLES
             SupportsSRgb = GL.Extensions.Contains("GL_EXT_sRGB");
-            SupportsFloatTextures = GL.Extensions.Contains("GL_EXT_color_buffer_float");
-            SupportsHalfFloatTextures = GL.Extensions.Contains("GL_EXT_color_buffer_half_float");
-            SupportsNormalized = GL.Extensions.Contains("GL_EXT_texture_norm16");
+            SupportsFloatTextures = GL.RenderApi.ES && (device.glMajorVersion >= 3 || GL.Extensions.Contains("GL_EXT_color_buffer_float"));
+            SupportsHalfFloatTextures = GL.RenderApi.ES && (device.glMajorVersion >= 3 || GL.Extensions.Contains("GL_EXT_color_buffer_half_float"));
+            SupportsNormalized = GL.RenderApi.ES && (device.glMajorVersion >= 3 || GL.Extensions.Contains("GL_EXT_texture_norm16"));
 #else
             SupportsSRgb = GL.Extensions.Contains("GL_EXT_texture_sRGB") && GL.Extensions.Contains("GL_EXT_framebuffer_sRGB");
             SupportsFloatTextures = true;
