@@ -27,6 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsVertexTextures = device.GraphicsProfile == GraphicsProfile.HiDef;
             SupportsFloatTextures = true;
             SupportsHalfFloatTextures = true;
+            SupportsNormalized = true;
 
             SupportsInstancing = true;
 

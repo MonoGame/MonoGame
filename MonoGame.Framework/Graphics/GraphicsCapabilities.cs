@@ -96,6 +96,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal bool SupportsHalfFloatTextures { get; private set; }
 
+        internal bool SupportsNormalized { get; private set; }
+
         /// <summary>
         /// Gets the max texture anisotropy. This value typically lies
         /// between 0 and 16, where 0 means anisotropic filtering is not
