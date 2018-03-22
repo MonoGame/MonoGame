@@ -104,6 +104,7 @@ namespace MonoGame.Framework
             {
                 _wasMoved = true;
                 Form.Location = new Point(value.X, value.Y);
+                RefreshAdapter();
             }
         }
 
@@ -371,14 +372,18 @@ namespace MonoGame.Framework
             if (Game.Window == this)
             {
                 UpdateBackBufferSize();
-
-                // the display that the window is on might have changed, so we need to
-                // check and possibly update the Adapter of the GraphicsDevice
-                if (Game.GraphicsDevice != null)
-                    Game.GraphicsDevice.RefreshAdapter();
+                RefreshAdapter();
             }
 
             OnClientSizeChanged();
+        }
+
+        private void RefreshAdapter()
+        {
+            // the display that the window is on might have changed, so we need to
+            // check and possibly update the Adapter of the GraphicsDevice
+            if (Game.GraphicsDevice != null)
+                Game.GraphicsDevice.RefreshAdapter();
         }
 
         private void UpdateBackBufferSize()
