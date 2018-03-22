@@ -514,6 +514,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var supportsAtitc = graphicsDevice.GraphicsCapabilities.SupportsAtitc;
             var supportsFloat = graphicsDevice.GraphicsCapabilities.SupportsFloatTextures;
             var supportsHalfFloat = graphicsDevice.GraphicsCapabilities.SupportsHalfFloatTextures;
+            var supportsNormalized = graphicsDevice.GraphicsCapabilities.SupportsNormalized;
 
 			switch (format) {
 			case SurfaceFormat.Color:
@@ -652,7 +653,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 break;
 
             case SurfaceFormat.NormalizedByte2:
-                if (!SupportsNormalized)
+                if (!supportsNormalized)
                     goto case InvalidFormat;
                 glInternalFormat = PixelInternalFormat.Rg8i;
                 glFormat = PixelFormat.Rg;
@@ -660,7 +661,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 break;
 
             case SurfaceFormat.NormalizedByte4:
-                if (!SupportsNormalized)
+                if (!supportsNormalized)
                     goto case InvalidFormat;
                 glInternalFormat = PixelInternalFormat.Rgba8i;
                 glFormat = PixelFormat.Rgba;
@@ -668,7 +669,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 break;
 
             case SurfaceFormat.Rg32:
-                if (!SupportsNormalized)
+                if (!supportsNormalized)
                     goto case InvalidFormat;
                 glInternalFormat = PixelInternalFormat.Rg16ui;
                 glFormat = PixelFormat.Rg;
@@ -676,7 +677,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 break;
 
             case SurfaceFormat.Rgba64:
-                if (!SupportsNormalized)
+                if (!supportsNormalized)
                     goto case InvalidFormat;
                 glInternalFormat = PixelInternalFormat.Rgba16;
                 glFormat = PixelFormat.Rgba;
