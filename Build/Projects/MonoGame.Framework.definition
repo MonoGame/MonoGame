@@ -1296,6 +1296,12 @@
     <Compile Include="iOS\OrientationConverter.cs">
       <Platforms>iOS</Platforms>
     </Compile>
+    <Compile Include="iOS\ApiDefinition.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="iOS\LinkWith.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
 
     <!-- tvOS Platform -->
     <Compile Include="iOS\iOSGamePlatform.cs">
@@ -1316,7 +1322,12 @@
     <Compile Include="iOS\iOSGameWindow.cs">
       <Platforms>tvOS</Platforms>
     </Compile>
-
+    <Compile Include="iOS\ApiDefinition.cs">
+      <Platforms>tvOS</Platforms>
+    </Compile>
+    <Compile Include="iOS\LinkWith.cs">
+      <Platforms>tvOS</Platforms>
+    </Compile>
 
     <!-- Windows UAP Platform -->
     <Compile Include="WindowsUniversal\GameFrameworkViewSource.cs">

@@ -116,6 +116,13 @@
     <Reference Include="Microsoft.CSharp" />
   </Platform>
 
+  <Platform Type="iOS">
+    <ObjcBindingNativeFramework Include="..\ThirdParty\Dependencies\openal-soft\iOS\OpenALSoft.framework" />
+  </Platform>
+  <Platform Type="tvOS">
+    <ObjcBindingNativeFramework Include="..\ThirdParty\Dependencies\openal-soft\tvOS\OpenALSoft.framework" />
+  </Platform>
+
   <Service Name="MonoGame.Framework/ANGLEGraphics">
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
