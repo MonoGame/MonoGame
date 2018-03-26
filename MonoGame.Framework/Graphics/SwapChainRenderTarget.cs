@@ -23,31 +23,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public PresentInterval PresentInterval;
 
-        public SwapChainRenderTarget(   GraphicsDevice graphicsDevice,
+        public SwapChainRenderTarget(GraphicsDevice graphicsDevice,
                                         IntPtr windowHandle,
                                         int width,
                                         int height)
-            : this( 
-                graphicsDevice, 
-                windowHandle, 
-                width, 
-                height, 
-                false, 
+            : this(
+                graphicsDevice,
+                windowHandle,
+                width,
+                height,
+                false,
                 SurfaceFormat.Color,
                 DepthFormat.Depth24,
-                0, 
+                0,
                 RenderTargetUsage.DiscardContents,
                 PresentInterval.Default)
         {
         }
 
-        public SwapChainRenderTarget(   GraphicsDevice graphicsDevice,
-                                        IntPtr windowHandle,                                     
+        public SwapChainRenderTarget(GraphicsDevice graphicsDevice,
+                                        IntPtr windowHandle,
                                         int width,
                                         int height,
                                         bool mipMap,
                                         SurfaceFormat surfaceFormat,
-                                        DepthFormat depthFormat,                                        
+                                        DepthFormat depthFormat,
                                         int preferredMultiSampleCount,
                                         RenderTargetUsage usage,
                                         PresentInterval presentInterval)
@@ -66,12 +66,7 @@ namespace Microsoft.Xna.Framework.Graphics
                              ? SharpDX.DXGI.Format.B8G8R8A8_UNorm
                              : SharpDXHelper.ToFormat(surfaceFormat);
 
-            var multisampleDesc = new SampleDescription(1, 0);
-            if (preferredMultiSampleCount > 1)
-            {
-                multisampleDesc.Count = preferredMultiSampleCount;
-                multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
-            }
+            var multisampleDesc = graphicsDevice.GetSupportedSampleDescription(dxgiFormat, preferredMultiSampleCount);
 
             var desc = new SwapChainDescription()
             {
@@ -131,16 +126,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (
                     var depthBuffer = new SharpDX.Direct3D11.Texture2D(d3dDevice,
                                                                        new Texture2DDescription()
-                                                                           {
-                                                                               Format = dxgiFormat,
-                                                                               ArraySize = 1,
-                                                                               MipLevels = 1,
-                                                                               Width = targetSize.X,
-                                                                               Height = targetSize.Y,
-                                                                               SampleDescription = multisampleDesc,
-                                                                               Usage = ResourceUsage.Default,
-                                                                               BindFlags = BindFlags.DepthStencil,
-                                                                           }))
+                                                                       {
+                                                                           Format = dxgiFormat,
+                                                                           ArraySize = 1,
+                                                                           MipLevels = 1,
+                                                                           Width = targetSize.X,
+                                                                           Height = targetSize.Y,
+                                                                           SampleDescription = multisampleDesc,
+                                                                           Usage = ResourceUsage.Default,
+                                                                           BindFlags = BindFlags.DepthStencil,
+                                                                       }))
 
                     // Create a DepthStencil view on this surface to use on bind.
                     _depthStencilView = new DepthStencilView(d3dDevice, depthBuffer);
