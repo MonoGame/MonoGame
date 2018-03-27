@@ -100,7 +100,6 @@ namespace MonoGame.Tools.Pipeline
         private PipelineController(IView view)
         {
             Instance = this;
-            PipelineSettings.Default.Load();
 
             SelectedItems = new List<IProjectItem>();
             _actionStack = new ActionStack(this);
