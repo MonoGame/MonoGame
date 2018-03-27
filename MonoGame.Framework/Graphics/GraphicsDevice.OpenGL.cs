@@ -13,7 +13,6 @@ using OpenTK.Graphics;
 using MonoGame.OpenGL;
 #endif
 
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
@@ -127,7 +126,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glMinorVersion = 0;
         internal int glFramebuffer = 0;
         internal int MaxVertexAttributes;
-        internal List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
 
         // Keeps track of last applied state to avoid redundant OpenGL calls
@@ -146,7 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get
             {
                 if (_vertexShader == null && _pixelShader == null)
-                        throw new InvalidOperationException("There is no shader bound!");
+                    throw new InvalidOperationException("There is no shader bound!");
                 if (_vertexShader == null)
                     return _pixelShader.HashKey;
                 if (_pixelShader == null)
@@ -157,7 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetVertexAttributeArray(bool[] attrs)
         {
-            for(var x = 0; x < attrs.Length; x++)
+            for (var x = 0; x < attrs.Length; x++)
             {
                 if (attrs[x] && !_enabledVertexAttributes.Contains(x))
                 {
@@ -211,7 +209,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         element.VertexAttribPointerType,
                         element.Normalized,
                         vertexStride,
-                        (IntPtr) (offset.ToInt64() + element.Offset));
+                        (IntPtr)(offset.ToInt64() + element.Offset));
 
 #if !(GLES || MONOMAC)
                     // only set the divisor if instancing is supported
@@ -258,12 +256,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Context.MakeCurrent(windowInfo);
 #endif
-
             MaxTextureSlots = 16;
 
             GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
-                        
+
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
@@ -290,7 +287,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new NoSuitableGraphicsDeviceException("Unable to retrieve OpenGL version");
 
                 string[] versionSplit = version.Split(' ');
-                if(versionSplit.Length > 2 && versionSplit[0].Equals("OpenGL") && versionSplit[1].Equals("ES"))
+                if (versionSplit.Length > 2 && versionSplit[0].Equals("OpenGL") && versionSplit[1].Equals("ES"))
                 {
                     glMajorVersion = Convert.ToInt32(versionSplit[2].Substring(0, 1));
                     glMinorVersion = Convert.ToInt32(versionSplit[2].Substring(2, 1));
@@ -308,7 +305,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 glMinorVersion = 1;
             }
 #else
-            try
+                try
             {
                 string version = GL.GetString(StringName.Version);
 
@@ -335,19 +332,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			for (int i = 0; i < maxDrawBuffers; i++)
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
-            _extensions = GetGLExtensions();
-        }
-
-        List<string> GetGLExtensions()
-        {
-            // Setup extensions.
-            List<string> extensions = new List<string>();
-            var extstring = GL.GetString(StringName.Extensions);
-            GraphicsExtensions.CheckGLError();
-            if (!string.IsNullOrEmpty(extstring))
-                extensions.AddRange(extstring.Split(' '));
-
-            return extensions;
         }
 
         private void PlatformInitialize()
@@ -798,7 +782,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     this.framebufferHelper.BindFramebuffer(glResolveFramebuffer);
                     for (var i = 0; i < this._currentRenderTargetCount; ++i)
                     {
-                        this.framebufferHelper.FramebufferTexture2D((int)(FramebufferAttachment.ColorAttachment0 + i), (int) renderTarget.GetFramebufferTarget(renderTargetBinding), renderTarget.GLTexture);
+                        var rt = this._currentRenderTargetBindings[i].RenderTarget as IRenderTarget;
+                        this.framebufferHelper.FramebufferTexture2D((int)(FramebufferAttachment.ColorAttachment0 + i), (int) rt.GetFramebufferTarget(renderTargetBinding), rt.GLTexture);
                     }
                     this.glResolveFramebuffers.Add((RenderTargetBinding[])this._currentRenderTargetBindings.Clone(), glResolveFramebuffer);
                 }
@@ -1212,6 +1197,30 @@ namespace Microsoft.Xna.Framework.Graphics
                                      instanceCount);
             GraphicsExtensions.CheckGLError();
 #endif
+        }
+
+        private void PlatformGetBackBufferData<T>(Rectangle? rectangle, T[] data, int startIndex, int count) where T : struct
+        {
+            var rect = rectangle ?? new Rectangle(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+            var tSize = Marshal.SizeOf(typeof(T));
+            var flippedY = PresentationParameters.BackBufferHeight - rect.Y - rect.Height;
+            GL.ReadPixels(rect.X, flippedY, rect.Width, rect.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
+
+            // buffer is returned upside down, so we swap the rows around when copying over
+            var rowSize = rect.Width*PresentationParameters.BackBufferFormat.GetSize() / tSize;
+            var row = new T[rowSize];
+            for (var dy = 0; dy < rect.Height/2; dy++)
+            {
+                var topRow = startIndex + dy*rowSize;
+                var bottomRow = startIndex + (rect.Height - dy - 1)*rowSize;
+                // copy the bottom row to buffer
+                Array.Copy(data, bottomRow, row, 0, rowSize);
+                // copy top row to bottom row
+                Array.Copy(data, topRow, data, bottomRow, rowSize);
+                // copy buffer to top row
+                Array.Copy(row, 0, data, topRow, rowSize);
+                count -= rowSize;
+            }
         }
 
         private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)

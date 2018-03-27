@@ -53,7 +53,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(false, rectangle.IsEmpty);
             Assert.AreEqual(true, new Rectangle().IsEmpty);
 
-            // Empty - static property 
+            // Empty - static property
 
             Assert.AreEqual(new Rectangle(),Rectangle.Empty);
         }
@@ -93,7 +93,7 @@ namespace MonoGame.Tests.Framework
         public void ContainsVector2()
         {
             Rectangle rectangle = new Rectangle(0, 0, 64, 64);
-            
+
             var p1 = new Vector2(-1, -1);
             var p2 = new Vector2(0, 0);
             var p3 = new Vector2(32, 32);
@@ -223,7 +223,7 @@ namespace MonoGame.Tests.Framework
             // Second overload testing(forward and backward)
 
             Assert.AreEqual(expected, Rectangle.Intersect(first, second));
-            Assert.AreEqual(expected, Rectangle.Intersect(second, first));           
+            Assert.AreEqual(expected, Rectangle.Intersect(second, first));
         }
 
         [Test]
@@ -249,11 +249,28 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(expected, Rectangle.Union(first, second));
             Assert.AreEqual(expected, Rectangle.Union(second, first));
         }
-        
+
         [Test]
         public void ToStringTest()
         {
             StringAssert.IsMatch("{X:-10 Y:10 Width:100 Height:1000}",new Rectangle(-10,10,100,1000).ToString());
         }
+
+#if !XNA
+        [Test]
+        public void Deconstruct()
+        {
+            Rectangle rectangle = new Rectangle(int.MinValue, int.MaxValue, int.MinValue, int.MaxValue);
+
+            int x, y, width, height;
+
+            rectangle.Deconstruct(out x, out y, out width, out height);
+
+            Assert.AreEqual(x, rectangle.X);
+            Assert.AreEqual(y, rectangle.Y);
+            Assert.AreEqual(width, rectangle.Width);
+            Assert.AreEqual(height, rectangle.Height);
+        }
+#endif
     }
 }

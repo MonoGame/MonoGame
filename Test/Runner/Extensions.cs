@@ -33,7 +33,7 @@ namespace MonoGame.Tests {
 	        return new FramePixelData(texture.Width, texture.Height, data);
 	    }
 
-		private static readonly char[] ForbiddenFileNameChars = "{}()\"',".ToCharArray();
+		private static readonly char[] ForbiddenFileNameChars = "{}()\"',:".ToCharArray();
 
 		public static string ReplaceInvalidFileNameChars (this string self)
 		{

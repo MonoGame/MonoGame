@@ -404,7 +404,7 @@ namespace MonoGame.Tests.Graphics {
         // I think this is due to differences in how downsampling is done by default
         // (it makes a big difference here because the textures are so small).
         // There are possibly also some differences because of how rasterization is handled.
-        [Ignore]
+        [Ignore("OpenGL produces a slightly different result")]
 #endif
         public void Draw_many()
         {

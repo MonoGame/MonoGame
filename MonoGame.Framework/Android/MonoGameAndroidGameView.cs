@@ -67,8 +67,6 @@ namespace Microsoft.Xna.Framework
         private readonly AndroidGameWindow _gameWindow;
         private readonly Game _game;
 
-        const int EglContextClientVersion = 0x3098;
-
         // Events that are triggered on the game thread
         public static event EventHandler OnPauseGameThread;
         public static event EventHandler OnResumeGameThread;
@@ -101,7 +99,6 @@ namespace Microsoft.Xna.Framework
             // Add callback to get the SurfaceCreated etc events
             mHolder.AddCallback(this);
             mHolder.SetType(SurfaceType.Gpu);
-            MonoGame.OpenGL.GL.LoadEntryPoints();
         }
 
         public void SurfaceChanged(ISurfaceHolder holder, global::Android.Graphics.Format format, int width, int height)
@@ -660,9 +657,17 @@ namespace Microsoft.Xna.Framework
             {
                 UpdateFrameInternal(updateEventArgs);
             }
-            catch (Content.ContentLoadException)
+            catch (Content.ContentLoadException ex)
             {
-                // ignore it..
+                if (RenderOnUIThread)
+                    throw ex;
+                else
+                {
+                    Game.Activity.RunOnUiThread (() =>
+                    {
+                        throw ex;
+                    });
+                }
             }
 
             prevUpdateTime = curUpdateTime;
@@ -781,16 +786,61 @@ namespace Microsoft.Xna.Framework
 
             public int[] ToConfigAttribs()
             {
+                List<int> attribs = new List<int>();
+                if (Red != 0)
+                {
+                    attribs.Add(EGL11.EglRedSize);
+                    attribs.Add(Red);
+                }
+                if (Green != 0)
+                {
+                    attribs.Add(EGL11.EglGreenSize);
+                    attribs.Add(Green);
+                }
+                if (Blue != 0)
+                {
+                    attribs.Add(EGL11.EglBlueSize);
+                    attribs.Add(Blue);
+                }
+                if (Alpha != 0)
+                {
+                    attribs.Add(EGL11.EglAlphaSize);
+                    attribs.Add(Alpha);
+                }
+                if (Depth != 0)
+                {
+                    attribs.Add(EGL11.EglDepthSize);
+                    attribs.Add(Depth);
+                }
+                if (Stencil != 0)
+                {
+                    attribs.Add(EGL11.EglStencilSize);
+                    attribs.Add(Stencil);
+                }
+                attribs.Add(EGL11.EglRenderableType);
+                attribs.Add(4);
+                attribs.Add(EGL11.EglNone);
 
-                return new int[] {
-                    EGL11.EglRedSize, Red,
-                    EGL11.EglGreenSize, Green,
-                    EGL11.EglBlueSize, Blue,
-                    EGL11.EglAlphaSize, Alpha,
-                    EGL11.EglDepthSize, Depth,
-                    EGL11.EglStencilSize, Stencil,
-                    EGL11.EglRenderableType, 4,
-                    EGL11.EglNone
+                return attribs.ToArray();
+            }
+
+            static int GetAttribute(EGLConfig config, IEGL10 egl, EGLDisplay eglDisplay,int attribute)
+            {
+                int[] data = new int[1];
+                egl.EglGetConfigAttrib(eglDisplay, config, EGL11.EglRedSize, data);
+                return data[0];
+            }
+
+            public static SurfaceConfig FromEGLConfig (EGLConfig config, IEGL10 egl, EGLDisplay eglDisplay)
+            {
+                return new SurfaceConfig()
+                {
+                    Red = GetAttribute(config, egl, eglDisplay, EGL11.EglRedSize),
+                    Green = GetAttribute(config, egl, eglDisplay, EGL11.EglGreenSize),
+                    Blue = GetAttribute(config, egl, eglDisplay, EGL11.EglBlueSize),
+                    Alpha = GetAttribute(config, egl, eglDisplay, EGL11.EglAlphaSize),
+                    Depth = GetAttribute(config, egl, eglDisplay, EGL11.EglDepthSize),
+                    Stencil = GetAttribute(config, egl, eglDisplay, EGL11.EglStencilSize),
                 };
             }
 
@@ -844,40 +894,67 @@ namespace Microsoft.Xna.Framework
                     configs.Add(new SurfaceConfig() { Red = 5, Green = 6, Blue = 5, Depth = 16 });
                     configs.Add(new SurfaceConfig() { Depth = 16 });
                 }
+                configs.Add(new SurfaceConfig() { Red = 8, Green = 8, Blue = 8, Alpha = 8 });
+                configs.Add(new SurfaceConfig() { Red = 5, Green = 6, Blue = 5 });
             }
             else
             {
                 configs.Add(new SurfaceConfig() { Red = 8, Green = 8, Blue = 8, Alpha = 8 });
                 configs.Add(new SurfaceConfig() { Red = 5, Green = 6, Blue = 5 });
             }
-            configs.Add(new SurfaceConfig() { Red = 4, Green = 4, Blue = 4, Alpha = 0, Depth = 0, Stencil = 0 });
+            configs.Add(new SurfaceConfig() { Red = 4, Green = 4, Blue = 4 });
             int[] numConfigs = new int[1];
             EGLConfig[] results = new EGLConfig[1];
 
+            if (!egl.EglGetConfigs(eglDisplay, null, 0, numConfigs)) {
+                throw new Exception("Could not get config count. " + GetErrorAsString());
+            }
 
+            EGLConfig[] cfgs = new EGLConfig[numConfigs[0]];
+            egl.EglGetConfigs(eglDisplay, cfgs, numConfigs[0], numConfigs);
+            Log.Verbose("AndroidGameView", "Device Supports");
+            foreach (var c in cfgs) {
+                Log.Verbose("AndroidGameView", string.Format(" {0}", SurfaceConfig.FromEGLConfig(c, egl, eglDisplay)));
+            }
+
+            bool found = false;
+            numConfigs[0] = 0;
             foreach (var config in configs)
             {
-
-                if (!egl.EglChooseConfig(eglDisplay, config.ToConfigAttribs(), results, 1, numConfigs))
+                Log.Verbose("AndroidGameView", string.Format("Checking Config : {0}", config));
+                found = egl.EglChooseConfig(eglDisplay, config.ToConfigAttribs(), results, 1, numConfigs);
+                Log.Verbose("AndroidGameView", "EglChooseConfig returned {0} and {1}", found, numConfigs[0]);
+                if (!found || numConfigs[0] <= 0)
                 {
+                    Log.Verbose("AndroidGameView", "Config not supported");
                     continue;
                 }
                 Log.Verbose("AndroidGameView", string.Format("Selected Config : {0}", config));
                 break;
             }
 
-            if (numConfigs[0] == 0)
+            if (!found || numConfigs[0] <= 0)
                 throw new Exception("No valid EGL configs found" + GetErrorAsString());
-            eglConfig = results[0];
-
-            int[] contextAttribs = new int[] { EglContextClientVersion, 2, EGL10.EglNone };
-            eglContext = egl.EglCreateContext(eglDisplay, eglConfig, EGL10.EglNoContext, contextAttribs);
+            var createdVersion = new MonoGame.OpenGL.GLESVersion();
+            foreach (var v in MonoGame.OpenGL.GLESVersion.GetSupportedGLESVersions ()) {
+                Log.Verbose("AndroidGameView", "Creating GLES {0} Context", v);
+                eglContext = egl.EglCreateContext(eglDisplay, results[0], EGL10.EglNoContext, v.GetAttributes());
+                if (eglContext == null || eglContext == EGL10.EglNoContext)
+                {
+                    Log.Verbose("AndroidGameView", string.Format("GLES {0} Not Supported. {1}", v, GetErrorAsString()));
+                    eglContext = EGL10.EglNoContext;
+                    continue;
+                }
+                createdVersion = v;
+                break;
+            }
             if (eglContext == null || eglContext == EGL10.EglNoContext)
             {
                 eglContext = null;
                 throw new Exception("Could not create EGL context" + GetErrorAsString());
             }
-
+            Log.Verbose("AndroidGameView", "Created GLES {0} Context", createdVersion);
+            eglConfig = results[0];
             glContextAvailable = true;
         }
 
@@ -943,6 +1020,9 @@ namespace Microsoft.Xna.Framework
                     // the surface is created after the correct viewport is already applied so we must do it again.
                     if (_game.GraphicsDevice != null)
                         _game.graphicsDeviceManager.ResetClientBounds();
+
+                    if (MonoGame.OpenGL.GL.GetError == null)
+                        MonoGame.OpenGL.GL.LoadEntryPoints();
                 }
                 catch (Exception ex)
                 {
@@ -1033,14 +1113,18 @@ namespace Microsoft.Xna.Framework
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
         {
+            bool handled = false;
             if (GamePad.OnKeyDown(keyCode, e))
                 return true;
 
-            Keyboard.KeyDown(keyCode);
+            handled = Keyboard.KeyDown(keyCode);
 #if !OUYA
             // we need to handle the Back key here because it doesnt work any other way
             if (keyCode == Keycode.Back)
+            {
                 GamePad.Back = true;
+                handled = true;
+            }
 #endif
             if (keyCode == Keycode.VolumeUp)
             {
@@ -1056,15 +1140,14 @@ namespace Microsoft.Xna.Framework
                 return true;
             }
 
-            return true;
+            return handled;
         }
 
         public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
         {
             if (GamePad.OnKeyUp(keyCode, e))
                 return true;
-            Keyboard.KeyUp(keyCode);
-            return true;
+            return Keyboard.KeyUp(keyCode);
         }
 
         public override bool OnGenericMotionEvent(MotionEvent e)
@@ -1184,8 +1267,15 @@ namespace Microsoft.Xna.Framework
             public BackgroundContext(MonoGameAndroidGameView view)
             {
                 this.view = view;
-                int[] contextAttribs = new int[] { EglContextClientVersion, 2, EGL10.EglNone };
-                eglContext = view.egl.EglCreateContext(view.eglDisplay, view.eglConfig, view.eglContext, contextAttribs);
+                foreach (var v in MonoGame.OpenGL.GLESVersion.GetSupportedGLESVersions())
+                {
+                    eglContext = view.egl.EglCreateContext(view.eglDisplay, view.eglConfig, EGL10.EglNoContext, v.GetAttributes());
+                    if (eglContext == null || eglContext == EGL10.EglNoContext)
+                    {
+                        continue;
+                    }
+                    break;
+                }
                 if (eglContext == null || eglContext == EGL10.EglNoContext)
                 {
                     eglContext = null;

@@ -13,6 +13,9 @@ namespace MonoGame.Tests.Graphics
     class RenderTarget2DTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
+#if DESKTOPGL
+        [Ignore("This test causes the unit test runner to lock up and not exist. Resource leak of some sort? Threading?")]
+#endif
         public void ZeroSizeShouldFailTest()
         {
             RenderTarget2D renderTarget;
@@ -23,7 +26,7 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
 #if XNA
-        [Ignore]
+        [Ignore("XNA mipmaps fail our pixel comparison tests")]
 #endif
         public void GenerateMips()
         {
@@ -103,6 +106,27 @@ namespace MonoGame.Tests.Graphics
             texture.Dispose();
             spriteBatch.Dispose();
             renderTarget.Dispose();
+        }
+        
+        [TestCase(SurfaceFormat.Color, SurfaceFormat.Color)]
+        // unsupported renderTarget formats
+        [TestCase(SurfaceFormat.Alpha8, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt1, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt3, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt5, SurfaceFormat.Color)]
+#if !XNA        
+        [TestCase(SurfaceFormat.Dxt1a, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt1SRgb, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt3SRgb, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Dxt5SRgb, SurfaceFormat.Color)]
+#endif
+        [TestCase(SurfaceFormat.NormalizedByte2, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.NormalizedByte4, SurfaceFormat.Color)]
+        public void PreferredSurfaceFormatTest(SurfaceFormat preferredSurfaceFormat, SurfaceFormat expectedSurfaceFormat)
+        {                    
+            var renderTarget = new RenderTarget2D(gd, 16, 16, false, preferredSurfaceFormat, DepthFormat.None);
+                    
+            Assert.AreEqual(renderTarget.Format, expectedSurfaceFormat);
         }
     }
 }

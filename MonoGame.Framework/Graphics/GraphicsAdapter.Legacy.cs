@@ -146,7 +146,17 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public static DriverType UseDriverType { get; set; }
 
-        /*
+        /// <summary>
+        /// Queries for support of the requested render target format on the adaptor.
+        /// </summary>
+        /// <param name="graphicsProfile">The graphics profile.</param>
+        /// <param name="format">The requested surface format.</param>
+        /// <param name="depthFormat">The requested depth stencil format.</param>
+        /// <param name="multiSampleCount">The requested multisample count.</param>
+        /// <param name="selectedFormat">Set to the best format supported by the adaptor for the requested surface format.</param>
+        /// <param name="selectedDepthFormat">Set to the best format supported by the adaptor for the requested depth stencil format.</param>
+        /// <param name="selectedMultiSampleCount">Set to the best count supported by the adaptor for the requested multisample count.</param>
+        /// <returns>True if the requested format is supported by the adaptor. False if one or more of the values was changed.</returns>
 		public bool QueryRenderTargetFormat(
 			GraphicsProfile graphicsProfile,
 			SurfaceFormat format,
@@ -156,9 +166,28 @@ namespace Microsoft.Xna.Framework.Graphics
 			out DepthFormat selectedDepthFormat,
 			out int selectedMultiSampleCount)
 		{
-			throw new NotImplementedException();
+			selectedFormat = format;
+            selectedDepthFormat = depthFormat;
+            selectedMultiSampleCount = multiSampleCount;
+
+            // fallback for unsupported renderTarget surface formats.
+            if (selectedFormat == SurfaceFormat.Alpha8 ||
+                selectedFormat == SurfaceFormat.NormalizedByte2 ||
+                selectedFormat == SurfaceFormat.NormalizedByte4 ||
+                selectedFormat == SurfaceFormat.Dxt1 ||
+                selectedFormat == SurfaceFormat.Dxt3 ||
+                selectedFormat == SurfaceFormat.Dxt5 ||
+                selectedFormat == SurfaceFormat.Dxt1a ||
+                selectedFormat == SurfaceFormat.Dxt1SRgb ||
+                selectedFormat == SurfaceFormat.Dxt3SRgb ||
+                selectedFormat == SurfaceFormat.Dxt5SRgb)
+                selectedFormat = SurfaceFormat.Color;
+
+
+            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
 		}
 
+        /*
         public string Description
         {
             get
@@ -248,7 +277,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         */
 
-#if DIRECTX && !WINDOWS_PHONE
+#if DIRECTX
         private static readonly Dictionary<SharpDX.DXGI.Format, SurfaceFormat> FormatTranslations = new Dictionary<SharpDX.DXGI.Format, SurfaceFormat>
             {
                 { SharpDX.DXGI.Format.R8G8B8A8_UNorm, SurfaceFormat.Color },
@@ -287,7 +316,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         if (!modes.Contains(displayMode))
                             modes.Add(displayMode);
                     }
-#elif DIRECTX && !WINDOWS_PHONE
+#elif DIRECTX
                     var dxgiFactory = new SharpDX.DXGI.Factory1();
                     var adapter = dxgiFactory.GetAdapter(0);
                     var output = adapter.Outputs[0];

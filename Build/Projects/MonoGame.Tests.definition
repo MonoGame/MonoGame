@@ -35,6 +35,8 @@
   </Properties>
 
   <Files>
+    <None Include="packages.config" />
+
     <!-- Dependencies -->
     <None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
       <Platforms>WindowsGL</Platforms>
@@ -136,6 +138,11 @@
       <Link>libPVRTexLibWrapper.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libassimp.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <None Include="README.md" />
 
@@ -145,12 +152,6 @@
     <Compile Include="Runner\Extensions.cs" />
     <Compile Include="Runner\FrameInfo.cs" />
     <Compile Include="Runner\FramePixelData.cs" />
-    <Compile Include="Runner\Interface\AggregateTestFilter.cs" />
-    <Compile Include="Runner\Interface\CommandLineInterface.cs" />
-    <Compile Include="Runner\Interface\RegexTestFilter.cs" />
-    <Compile Include="Runner\Interface\RunOptions.cs" />
-    <Compile Include="Runner\Interface\TestEventListenerBase.cs" />
-    <Compile Include="Runner\Interface\TestFilterAction.cs" />
     <Compile Include="Runner\PixelArgb.cs" />
     <Compile Include="Runner\Utility.cs" />
 
@@ -302,6 +303,9 @@
     <Compile Include="ContentPipeline\EffectProcessorTests.cs">
         <Platforms>Windows</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\FbxImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\FontDescriptionTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
@@ -333,6 +337,9 @@
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\TestCompiler.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\OpenAssetImporterTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs">
@@ -658,6 +665,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\GraphicsDevice\Clear-7.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\GetBackBufferData__X_100 Y_100 Width_250 Height_250__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\GetBackBufferData_null_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\Colored3DCube.png">
@@ -1207,7 +1220,25 @@
     <Content Include="Assets\Models\enemy_0.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Models\Box.blend">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Models\BlenderDefaultCube.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Dude\dude_2011.fbx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Dude\head.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Dude\jacket.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Dude\pants.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Dude\upBodyC.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
@@ -1247,6 +1278,9 @@
     </Content>
 
     <Content Include="Assets\Textures\Logo_65x64_16bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\Logo_BMPV5.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Textures\LogoOnly_64px.bmp">
@@ -1316,10 +1350,27 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
+    <Content Include="Assets\Textures\1bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\8bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\24bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\32bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
     <Content Include="Assets\Textures\blue_0.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Textures\red_128.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Textures\red_668_dxt.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 

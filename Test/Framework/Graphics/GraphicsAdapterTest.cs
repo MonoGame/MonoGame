@@ -42,8 +42,8 @@ namespace MonoGame.Tests.Graphics
                     defaultAdapterCount++;
                 Assert.LessOrEqual(defaultAdapterCount, 1);
 
-                Assert.IsNotNullOrEmpty(adapter.DeviceName);
-                Assert.IsNotNullOrEmpty(adapter.Description);
+                Assert.That(adapter.DeviceName, Is.Not.Null.Or.Empty);
+                Assert.That(adapter.Description, Is.Not.Null.Or.Empty);
                 Assert.AreNotEqual(0, adapter.DeviceId);
                 Assert.AreNotEqual(IntPtr.Zero, adapter.MonitorHandle);
                 Assert.AreNotEqual(0, adapter.VendorId);
@@ -94,6 +94,47 @@ namespace MonoGame.Tests.Graphics
             Assert.IsNotNull(adapter);
             Assert.IsTrue(adapter.IsDefaultAdapter);
             Assert.Contains(adapter, GraphicsAdapter.Adapters);
+        }
+
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Color, SurfaceFormat.Color, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Color, SurfaceFormat.Color, true)]
+        // unsupported renderTarget formats
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Alpha8, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Alpha8, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt1, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt1, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt3, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt3, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt5, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt5, SurfaceFormat.Color, false)]
+#if !XNA        
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt1a, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt1a, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt1SRgb, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt1SRgb, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt3SRgb, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt3SRgb, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt5SRgb, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt5SRgb, SurfaceFormat.Color, false)]
+#endif
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.NormalizedByte2, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.NormalizedByte2, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.NormalizedByte4, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.NormalizedByte4, SurfaceFormat.Color, false)]
+        public static void QueryRenderTargetFormat_preferredSurface(GraphicsProfile graphicsProfile, SurfaceFormat preferredSurfaceFormat, SurfaceFormat expectedSurfaceFormat, bool expectedIsSupported)
+        {
+            var adapter = GraphicsAdapter.DefaultAdapter;
+
+            SurfaceFormat selectedFormat;
+            DepthFormat selectedDepthFormat;
+            int selectedMultiSampleCount;
+            bool isSupported = adapter.QueryRenderTargetFormat(graphicsProfile, preferredSurfaceFormat, DepthFormat.None, 0,
+                out selectedFormat, out selectedDepthFormat, out selectedMultiSampleCount);
+
+            Assert.AreEqual(isSupported, expectedIsSupported);
+            Assert.AreEqual(selectedFormat, expectedSurfaceFormat);
+            Assert.AreEqual(selectedDepthFormat, DepthFormat.None);
+            Assert.AreEqual(selectedMultiSampleCount, 0);
         }
     }
 }

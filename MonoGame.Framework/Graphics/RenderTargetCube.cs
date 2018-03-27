@@ -68,13 +68,25 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="preferredMultiSampleCount">The preferred number of multisample locations.</param>
         /// <param name="usage">The usage mode of the render target.</param>
         public RenderTargetCube(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
-            : base(graphicsDevice, size, mipMap, preferredFormat, true)
+            : base(graphicsDevice, size, mipMap, QuerySelectedFormat(graphicsDevice, preferredFormat), true)
         {
             DepthStencilFormat = preferredDepthFormat;
             MultiSampleCount = preferredMultiSampleCount;
             RenderTargetUsage = usage;
 
-            PlatformConstruct(graphicsDevice, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage);
+            PlatformConstruct(graphicsDevice, mipMap, preferredDepthFormat, preferredMultiSampleCount, usage);
+        }
+        
+        protected static SurfaceFormat QuerySelectedFormat(GraphicsDevice graphicsDevice, SurfaceFormat preferredFormat)
+        {
+			SurfaceFormat selectedFormat;
+			DepthFormat selectedDepthFormat;
+			int selectedMultiSampleCount;
+
+            graphicsDevice.Adapter.QueryRenderTargetFormat(graphicsDevice.GraphicsProfile, preferredFormat, DepthFormat.None, 0, 
+                out selectedFormat, out selectedDepthFormat, out selectedMultiSampleCount);
+            
+            return selectedFormat;
         }
     }
 }

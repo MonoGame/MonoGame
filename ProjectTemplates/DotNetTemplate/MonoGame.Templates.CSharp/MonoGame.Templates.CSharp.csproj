@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>A set of C# templates written for the MonoGame framework.</Description>
+    <PackageId>MonoGame.Templates.CSharp</PackageId>
+    <PackageVersion>0.0.1</PackageVersion>
+    <Authors>@MonoGameTeam</Authors>
+    <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>
+    <PackageProjectUrl>http://monogame.net/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MonoGame/MonoGame</RepositoryUrl>
+    <TargetFramework>net461</TargetFramework>
+    <EnableDefaultItems>False</EnableDefaultItems>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageTargetPath>bin\$(PackageId).nupkg</PackageTargetPath>
+    <IncludeOutputsInPackage>false</IncludeOutputsInPackage>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.0" PrivateAssets="All" />
+    <PackageFile Include="content\**\*" Exclude="content\**\.DS_Store;content\**\bin;content\**\obj" PackagePath="%(RelativeDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="content\BlankApp.tvOS\.template.config\" />
+    <Folder Include="content\PipelineExtension\.template.config\" />
+    <Folder Include="content\BlankApp.MacOS\.template.config\" />
+  </ItemGroup>
+</Project>

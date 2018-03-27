@@ -113,6 +113,8 @@ internal static class Sdl
         [FieldOffset(0)]
         public Keyboard.Event Key;
         [FieldOffset(0)]
+        public Mouse.MotionEvent Motion;
+        [FieldOffset(0)]
         public Keyboard.TextEditingEvent Edit;
         [FieldOffset(0)]
         public Keyboard.TextInputEvent Text;
@@ -382,6 +384,9 @@ internal static class Sdl
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowWMInfo")]
         public static extern bool GetWindowWMInfo(IntPtr window, ref SDL_SysWMinfo sysWMinfo);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowBordersSize")]
+        public static extern int GetBorderSize(IntPtr window, out int top, out int left, out int right, out int bottom);
     }
 
     public static class Display
@@ -558,6 +563,23 @@ internal static class Sdl
             SizeAll,
             No,
             Hand
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MotionEvent
+        {
+            public EventType Type;
+            public uint Timestamp;
+            public uint WindowID;
+            public uint Which;
+            public byte State;
+            private byte _padding1;
+            private byte _padding2;
+            private byte _padding3;
+            public int X;
+            public int Y;
+            public int Xrel;
+            public int Yrel;
         }
 
         [StructLayout(LayoutKind.Sequential)]

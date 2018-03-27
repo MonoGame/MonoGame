@@ -77,7 +77,7 @@ namespace MonoGame.Tools.Pipeline
             if (prop == null)
                 return false;
 
-            if (a == null || !a.Equals(prop.GetValue(b)))
+            if (a == null || !a.Equals(prop.GetValue(b, null)))
                 a = null;
 
             return true;

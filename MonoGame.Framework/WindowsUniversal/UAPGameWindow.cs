@@ -26,7 +26,6 @@ namespace Microsoft.Xna.Framework
         private CoreWindow _coreWindow;
         private DisplayInformation _dinfo;
         private ApplicationView _appView;
-        private SwapChainPanel _swapChainPanel;
         private Rectangle _viewBounds;
 
         private object _eventLocker = new object();
@@ -124,9 +123,8 @@ namespace Microsoft.Xna.Framework
 
             _orientation = ToOrientation(_dinfo.CurrentOrientation);
             _dinfo.OrientationChanged += DisplayProperties_OrientationChanged;
-            _swapChainPanel = inputElement as SwapChainPanel;
 
-            _swapChainPanel.SizeChanged += SwapChain_SizeChanged;
+            _coreWindow.SizeChanged += Window_SizeChanged;
 
             _coreWindow.Closed += Window_Closed;
             _coreWindow.Activated += Window_FocusChanged;
@@ -137,6 +135,13 @@ namespace Microsoft.Xna.Framework
             SetViewBounds(_appView.VisibleBounds.Width, _appView.VisibleBounds.Height);
 
             SetCursor(false);
+
+        }
+
+        internal void RegisterCoreWindowService()
+        {
+            // Register the CoreWindow with the services registry
+            Game.Services.AddService(typeof(CoreWindow), _coreWindow);
         }
 
         private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
@@ -174,13 +179,13 @@ namespace Microsoft.Xna.Framework
             _viewBounds = new Rectangle(0, 0, pixelWidth, pixelHeight);
         }
 
-        private void SwapChain_SizeChanged(object sender, SizeChangedEventArgs args)
+        private void Window_SizeChanged(object sender, WindowSizeChangedEventArgs args)
         {
             lock (_eventLocker)
             {
                 _isSizeChanged = true;
-                var pixelWidth  = Math.Max(1, (int)Math.Round(args.NewSize.Width * _dinfo.RawPixelsPerViewPixel));
-                var pixelHeight = Math.Max(1, (int)Math.Round(args.NewSize.Height * _dinfo.RawPixelsPerViewPixel));
+                var pixelWidth  = Math.Max(1, (int)Math.Round(args.Size.Width * _dinfo.RawPixelsPerViewPixel));
+                var pixelHeight = Math.Max(1, (int)Math.Round(args.Size.Height * _dinfo.RawPixelsPerViewPixel));
                 _newViewBounds = new Rectangle(0, 0, pixelWidth, pixelHeight);
             }
         }
@@ -341,17 +346,11 @@ namespace Microsoft.Xna.Framework
 
             while (true)
             {
-                if (Platform.IsActive)
-                {
-                    // Process events incoming to the window.
-                    _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
+                // Process events incoming to the window.
+                _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
 
-                    Tick();
-                }
-                else
-                {
-                    _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessOneAndAllPending);
-                }
+                Tick();
+
                 if (IsExiting)
                     break;
             }

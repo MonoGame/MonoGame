@@ -22,13 +22,19 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal bool SupportsFramebufferObjectEXT { get; private set; }
 
+        /// <summary>
+        /// True, if GL_IMG_multisampled_render_to_texture is supported; false otherwise.
+        /// </summary>
+        internal bool SupportsFramebufferObjectIMG { get; private set; }
+
+
         private void PlatformInitialize(GraphicsDevice device)
         {
 #if GLES
-            SupportsNonPowerOfTwo = device._extensions.Contains("GL_OES_texture_npot") ||
-                   device._extensions.Contains("GL_ARB_texture_non_power_of_two") ||
-                   device._extensions.Contains("GL_IMG_texture_npot") ||
-                   device._extensions.Contains("GL_NV_texture_npot_2D_mipmap");
+            SupportsNonPowerOfTwo = GL.Extensions.Contains("GL_OES_texture_npot") ||
+                GL.Extensions.Contains("GL_ARB_texture_non_power_of_two") ||
+                GL.Extensions.Contains("GL_IMG_texture_npot") ||
+                GL.Extensions.Contains("GL_NV_texture_npot_2D_mipmap");
 #else
             // Unfortunately non PoT texture support is patchy even on desktop systems and we can't
             // rely on the fact that GL2.0+ supposedly supports npot in the core.
@@ -36,13 +42,13 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsNonPowerOfTwo = device._maxTextureSize >= 8192;
 #endif
 
-            SupportsTextureFilterAnisotropic = device._extensions.Contains("GL_EXT_texture_filter_anisotropic");
+            SupportsTextureFilterAnisotropic = GL.Extensions.Contains("GL_EXT_texture_filter_anisotropic");
 
 #if GLES
-			SupportsDepth24 = device._extensions.Contains("GL_OES_depth24");
-			SupportsPackedDepthStencil = device._extensions.Contains("GL_OES_packed_depth_stencil");
-			SupportsDepthNonLinear = device._extensions.Contains("GL_NV_depth_nonlinear");
-            SupportsTextureMaxLevel = device._extensions.Contains("GL_APPLE_texture_max_level");
+			SupportsDepth24 = GL.Extensions.Contains("GL_OES_depth24");
+			SupportsPackedDepthStencil = GL.Extensions.Contains("GL_OES_packed_depth_stencil");
+			SupportsDepthNonLinear = GL.Extensions.Contains("GL_NV_depth_nonlinear");
+            SupportsTextureMaxLevel = GL.Extensions.Contains("GL_APPLE_texture_max_level");
 #else
             SupportsDepth24 = true;
             SupportsPackedDepthStencil = true;
@@ -50,25 +56,29 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsTextureMaxLevel = true;
 #endif
             // Texture compression
-            SupportsS3tc = device._extensions.Contains("GL_EXT_texture_compression_s3tc") ||
-                           device._extensions.Contains("GL_OES_texture_compression_S3TC") ||
-                           device._extensions.Contains("GL_EXT_texture_compression_dxt3") ||
-                           device._extensions.Contains("GL_EXT_texture_compression_dxt5");
-            SupportsDxt1 = SupportsS3tc || device._extensions.Contains("GL_EXT_texture_compression_dxt1");
-            SupportsPvrtc = device._extensions.Contains("GL_IMG_texture_compression_pvrtc");
-            SupportsEtc1 = device._extensions.Contains("GL_OES_compressed_ETC1_RGB8_texture");
-            SupportsAtitc = device._extensions.Contains("GL_ATI_texture_compression_atitc") ||
-                            device._extensions.Contains("GL_AMD_compressed_ATC_texture");
+            SupportsS3tc = GL.Extensions.Contains("GL_EXT_texture_compression_s3tc") ||
+                           GL.Extensions.Contains("GL_OES_texture_compression_S3TC") ||
+                           GL.Extensions.Contains("GL_EXT_texture_compression_dxt3") ||
+                           GL.Extensions.Contains("GL_EXT_texture_compression_dxt5");
+            SupportsDxt1 = SupportsS3tc || GL.Extensions.Contains("GL_EXT_texture_compression_dxt1");
+            SupportsPvrtc = GL.Extensions.Contains("GL_IMG_texture_compression_pvrtc");
+            SupportsEtc1 = GL.Extensions.Contains("GL_OES_compressed_ETC1_RGB8_texture");
+            SupportsAtitc = GL.Extensions.Contains("GL_ATI_texture_compression_atitc") ||
+                            GL.Extensions.Contains("GL_AMD_compressed_ATC_texture");
 
             // Framebuffer objects
 #if GLES
-            SupportsFramebufferObjectARB = true; // always supported on GLES 2.0+
-            SupportsFramebufferObjectEXT = false;
+            SupportsFramebufferObjectARB = GL.BoundApi == GL.RenderApi.ES && (device.glMajorVersion >= 2 || GL.Extensions.Contains("GL_ARB_framebuffer_object")); // always supported on GLES 2.0+
+            SupportsFramebufferObjectEXT = GL.Extensions.Contains("GL_EXT_framebuffer_object");;
+            SupportsFramebufferObjectIMG = GL.Extensions.Contains("GL_IMG_multisampled_render_to_texture") |
+                                                 GL.Extensions.Contains("GL_APPLE_framebuffer_multisample") |
+                                                 GL.Extensions.Contains("GL_EXT_multisampled_render_to_texture") |
+                                                 GL.Extensions.Contains("GL_NV_framebuffer_multisample");
 #else
             // if we're on GL 3.0+, frame buffer extensions are guaranteed to be present, but extensions may be missing
             // it is then safe to assume that GL_ARB_framebuffer_object is present so that the standard function are loaded
-            SupportsFramebufferObjectARB = device.glMajorVersion >= 3 || device._extensions.Contains("GL_ARB_framebuffer_object");
-            SupportsFramebufferObjectEXT = device._extensions.Contains("GL_EXT_framebuffer_object");
+            SupportsFramebufferObjectARB = device.glMajorVersion >= 3 || GL.Extensions.Contains("GL_ARB_framebuffer_object");
+            SupportsFramebufferObjectEXT = GL.Extensions.Contains("GL_EXT_framebuffer_object");
 #endif
             // Anisotropic filtering
             int anisotropy = 0;
@@ -81,16 +91,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // sRGB
 #if GLES
-            SupportsSRgb = device._extensions.Contains("GL_EXT_sRGB");
+            SupportsSRgb = GL.Extensions.Contains("GL_EXT_sRGB");
 #else
-            SupportsSRgb = device._extensions.Contains("GL_EXT_texture_sRGB") && device._extensions.Contains("GL_EXT_framebuffer_sRGB");
+            SupportsSRgb = GL.Extensions.Contains("GL_EXT_texture_sRGB") && GL.Extensions.Contains("GL_EXT_framebuffer_sRGB");
 #endif
 
             // TODO: Implement OpenGL support for texture arrays
             // once we can author shaders that use texture arrays.
             SupportsTextureArrays = false;
 
-            SupportsDepthClamp = device._extensions.Contains("GL_ARB_depth_clamp");
+            SupportsDepthClamp = GL.Extensions.Contains("GL_ARB_depth_clamp");
 
             SupportsVertexTextures = false; // For now, until we implement vertex textures in OpenGL.
 

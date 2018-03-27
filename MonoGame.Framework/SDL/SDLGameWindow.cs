@@ -236,8 +236,11 @@ namespace Microsoft.Xna.Framework
                 _height = displayRect.Height;
             }
 
-            var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), 0);
-            var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), 0);
+            int ignore, minx = 0, miny = 0;
+            Sdl.Window.GetBorderSize(_handle, out miny, out minx, out ignore, out ignore);
+
+            var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), minx);
+            var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), miny);
 
             if (IsFullScreen && !_willBeFullScreen)
             {

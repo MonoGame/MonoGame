@@ -18,15 +18,15 @@ namespace MonoGame.Tests.Graphics
 
 #if !XNA
         [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
-#if !DESKTOPGL
-        // not supported
-        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
-        [TestCase("Assets/Textures/LogoOnly_64px.dds")]
-#endif
+        [TestCase("Assets/Textures/LogoOnly_64px.tga")]
 #endif
         [TestCase("Assets/Textures/LogoOnly_64px.gif")]
         [TestCase("Assets/Textures/LogoOnly_64px.jpg")]
         [TestCase("Assets/Textures/LogoOnly_64px.png")]
+        [TestCase("Assets/Textures/1bit.png")]
+        [TestCase("Assets/Textures/8bit.png")]
+        [TestCase("Assets/Textures/24bit.png")]
+        [TestCase("Assets/Textures/32bit.png")]
         public void FromStreamShouldWorkTest(string filename)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))
@@ -53,13 +53,11 @@ namespace MonoGame.Tests.Graphics
         }
 
 #if XNA
-                [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
-                [TestCase("Assets/Textures/LogoOnly_64px.dds")]
-                [TestCase("Assets/Textures/LogoOnly_64px.tif")]
+        [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
 #endif
-#if !DESKTOPGL
-        [TestCase("Assets/Textures/LogoOnly_64px.tga")]
-#endif
+        // not supported
+        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
+        [TestCase("Assets/Textures/LogoOnly_64px.dds")]
         [TestCase("Assets/Textures/SampleCube64DXT1Mips.dds")]
         public void FromStreamShouldFailTest(string filename)
         {
@@ -614,6 +612,48 @@ namespace MonoGame.Tests.Graphics
             Assert.Throws<ArgumentException>(() => t.SetData(b7));
 #endif
 
+            t.Dispose();
+        }
+
+        [Test]
+#if DESKTOPGL
+        [Ignore("PlatformGetData fails under OpenGL!")]
+#endif
+        public void LoadOddSizedDxtCompressed()
+        {
+            // This is testing that DXT compressed mip levels that 
+            // are not a multiple of 4 are properly loaded.
+
+            var t = content.Load<Texture2D>(Paths.Texture("red_668_dxt"));
+
+            Assert.AreEqual(SurfaceFormat.Dxt1, t.Format);
+            Assert.AreEqual(10, t.LevelCount);
+            Assert.AreEqual(668, t.Width);
+            Assert.AreEqual(668, t.Height);
+
+            for (var m = 0; m < t.LevelCount; m++)
+            {
+                var w = ((t.Width >> m) + 3) & ~3;
+                var h = ((t.Height >> m) + 3) & ~3;
+                var size = w * h / 2;
+
+                // Get the full mip level.
+                var b = new byte[size];
+                t.GetData(m, null, b, 0, size);
+
+                // Decompress it to validate it.
+                var b2 = DxtUtil.DecompressDxt1(b, t.Width >> m, t.Height >> m);
+
+                // Should be a red opaque texture.
+                for (var p=0; p < b2.Length; p+=4)
+                {
+                    Assert.AreEqual(255,    b2[p + 0]);
+                    Assert.AreEqual(0,      b2[p + 1]);
+                    Assert.AreEqual(0,      b2[p + 2]);
+                    Assert.AreEqual(255,    b2[p + 3]);
+                }            
+            }
+                        
             t.Dispose();
         }
 

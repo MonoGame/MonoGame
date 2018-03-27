@@ -1,4 +1,6 @@
-﻿namespace MonoGame.Utilities
+﻿using System.Text;
+
+namespace MonoGame.Utilities
 {
     unsafe partial class Imaging
     {
@@ -113,10 +115,24 @@
         {
             int len;
             var png = stbi_write_png_to_mem((byte*) (data), stride_bytes, x, y, comp, &len);
-            if ((png) == ((byte*) ((void*) (0)))) return 0;
+            if (png == null) return 0;
             func(context, png, len);
             free(png);
             return 1;
+        }
+
+        public static int stbi_write_jpg_to_func(WriteCallback func,
+            void* context,
+            int x,
+            int y,
+            int comp,
+            void* data,
+            int quality
+            )
+        {
+            stbi__write_context s = new stbi__write_context();
+            stbi__start_write_callbacks(s, func, context);
+            return stbi_write_jpg_core(s, x, y, comp, data, quality);
         }
     }
 }

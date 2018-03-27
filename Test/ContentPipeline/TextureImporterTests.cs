@@ -12,16 +12,16 @@ namespace MonoGame.Tests.ContentPipeline
         const string intermediateDirectory = "TestObj";
         const string outputDirectory = "TestBin";
 
-        void ImportStandard(string filename, SurfaceFormat expectedSurfaceFormat)
+        void ImportStandard(string filename, SurfaceFormat expectedSurfaceFormat, int expectedSize)
         {
             var importer = new TextureImporter( );
             var context = new TestImporterContext(intermediateDirectory, outputDirectory);
             var content = importer.Import(filename, context);
             Assert.NotNull(content);
-            Assert.AreEqual(content.Faces.Count, 1);
-            Assert.AreEqual(content.Faces[0].Count, 1);
-            Assert.AreEqual(content.Faces[0][0].Width, 64);
-            Assert.AreEqual(content.Faces[0][0].Height, 64);
+            Assert.AreEqual(1, content.Faces.Count);
+            Assert.AreEqual(1, content.Faces[0].Count);
+            Assert.AreEqual(expectedSize, content.Faces[0][0].Width);
+            Assert.AreEqual(expectedSize, content.Faces[0][0].Height);
             SurfaceFormat format;
             Assert.True(content.Faces[0][0].TryGetFormat(out format));
             Assert.AreEqual(expectedSurfaceFormat, format);
@@ -39,61 +39,61 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void ImportBmp( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.bmp", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/LogoOnly_64px.bmp", SurfaceFormat.Color, 64);
         }
 
         [Test]
         public void ImportBmpRGB555( )
         {
-            ImportStandard("Assets/Textures/Logo555.bmp", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/Logo555.bmp", SurfaceFormat.Color, 64);
         }
 
         [Test]
         public void ImportBmpRGB565( )
         {
-            ImportStandard("Assets/Textures/Logo565.bmp", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/Logo565.bmp", SurfaceFormat.Color, 64);
         }
 
         [Test]
         public void ImportBmp4bits( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px-4bits.bmp", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/LogoOnly_64px-4bits.bmp", SurfaceFormat.Color, 64);
         }
 
         [Test]
-        public void ImportBmpMonochrome( )
+        public void ImportBmpV5()
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px-monochrome.bmp", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/Logo_BMPV5.bmp", SurfaceFormat.Color, 256);
         }
 
         [Test]
         public void ImportGif( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.gif", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/LogoOnly_64px.gif", SurfaceFormat.Color, 64);
         }
 
         [Test]
         public void ImportJpg( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.jpg", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/LogoOnly_64px.jpg", SurfaceFormat.Color, 64);
         }
 
         [Test]
         public void ImportPng( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.png", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/LogoOnly_64px.png", SurfaceFormat.Color, 64);
         }
 
         [Test]
         public void ImportTga( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.tga", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/LogoOnly_64px.tga", SurfaceFormat.Color, 64);
         }
 
         [Test]
         public void ImportTif( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.tif", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/LogoOnly_64px.tif", SurfaceFormat.Color, 64);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void ImportImageWithBadContent( )
         {
-            Assert.Throws(typeof(InvalidContentException), ( ) => ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Vector4));
+            Assert.Throws(typeof(InvalidContentException), ( ) => ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Vector4, 64));
             //ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Color);
         }
 
@@ -193,9 +193,9 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void ImportDds()
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.dds", SurfaceFormat.Dxt3);
-            ImportStandard("Assets/Textures/LogoOnly_64px-R8G8B8.dds", SurfaceFormat.Color);
-            ImportStandard("Assets/Textures/LogoOnly_64px-X8R8G8B8.dds", SurfaceFormat.Color);
+            ImportStandard("Assets/Textures/LogoOnly_64px.dds", SurfaceFormat.Dxt3, 64);
+            ImportStandard("Assets/Textures/LogoOnly_64px-R8G8B8.dds", SurfaceFormat.Color, 64);
+            ImportStandard("Assets/Textures/LogoOnly_64px-X8R8G8B8.dds", SurfaceFormat.Color, 64);
         }
 
         [Test]

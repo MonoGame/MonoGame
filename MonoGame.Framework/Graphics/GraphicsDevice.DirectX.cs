@@ -5,8 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using Microsoft.Xna.Framework.Utilities;
 using SharpDX;
 using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
 using SharpDX.Mathematics.Interop;
 using SharpDX.DXGI;
 
@@ -15,14 +18,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
 using System.Runtime.InteropServices;
-using SharpDX.DXGI;
-
-using SharpDX.Mathematics.Interop;
 #endif
 
-#if WINDOWS
-using SharpDX.DXGI;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -238,6 +235,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void CreateSizeDependentResources()
         {
+            // Clamp MultiSampleCount
+            PresentationParameters.MultiSampleCount =
+                GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
+
             _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null, 
                                                 (SharpDX.Direct3D11.RenderTargetView)null);  
 
@@ -269,7 +270,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // We need presentation parameters to continue here.
             if (    PresentationParameters == null ||
-					PresentationParameters.SwapChainPanel == null)
+					(PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null))
 			{
                 if (_swapChain != null)
                 {
@@ -292,10 +293,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }                
             }
 
-            // Use BGRA for the swap chain.
-            var format = PresentationParameters.BackBufferFormat == SurfaceFormat.Color ? 
-                            SharpDX.DXGI.Format.B8G8R8A8_UNorm : 
-                            SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
+            var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
             var multisampleDesc = GetSupportedSampleDescription(
                 format, 
                 PresentationParameters.MultiSampleCount);
@@ -367,14 +365,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Counter act the composition scale of the render target as 
             // we already handle this in the platform window code. 
-            var asyncResult = PresentationParameters.SwapChainPanel.Dispatcher.RunIdleAsync( (e) =>
-            {   
+            if (PresentationParameters.SwapChainPanel != null)
+            {
+                var asyncResult = PresentationParameters.SwapChainPanel.Dispatcher.RunIdleAsync( (e) =>
+                {   
                 var inverseScale = new RawMatrix3x2();
                 inverseScale.M11 = 1.0f / PresentationParameters.SwapChainPanel.CompositionScaleX;
                 inverseScale.M22 = 1.0f / PresentationParameters.SwapChainPanel.CompositionScaleY;
                 using (var swapChain2 = _swapChain.QueryInterface<SwapChain2>())
                     swapChain2.MatrixTransform = inverseScale;
-            });
+                });
+            }
 
             // Obtain the backbuffer for this window which will be the final 3D rendertarget.
             Point targetSize;
@@ -457,8 +458,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if WINDOWS_UAP
-            if (PresentationParameters.SwapChainPanel == null)
-                throw new ArgumentException("PresentationParameters.SwapChainPanel must not be null.");
+            if (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null)
+                throw new ArgumentException("PresentationParameters.DeviceWindowHandle or PresentationParameters.SwapChainPanel must not be null.");
 #else
             if (PresentationParameters.DeviceWindowHandle == IntPtr.Zero)
                 throw new ArgumentException("PresentationParameters.DeviceWindowHandle must not be null.");
@@ -695,10 +696,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
             }
 
-            // Use BGRA for the swap chain.
-            var format = PresentationParameters.BackBufferFormat == SurfaceFormat.Color ?
-                            SharpDX.DXGI.Format.B8G8R8A8_UNorm :
-                            SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
+            var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
             var multisampleDesc = GetSupportedSampleDescription(
                 format, 
                 PresentationParameters.MultiSampleCount);
@@ -878,8 +876,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal SampleDescription GetSupportedSampleDescription(Format format, int multiSampleCount)
         {
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
-
-            multiSampleCount = GetClampedMultisampleCount(multiSampleCount);
 
             if (multiSampleCount > 1)
             {
@@ -1469,7 +1465,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
+        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex,
+            int primitiveCount, int instanceCount)
         {
             lock (_d3dContext)
             {
@@ -1478,6 +1475,107 @@ namespace Microsoft.Xna.Framework.Graphics
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 int indexCount = GetElementCountArray(primitiveType, primitiveCount);
                 _d3dContext.DrawIndexedInstanced(indexCount, instanceCount, startIndex, baseVertex, 0);
+            }
+        }
+
+        private void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct
+        {
+            // TODO share code with Texture2D.GetData and do pooling for staging textures
+            // first set up a staging texture
+            const SurfaceFormat format = SurfaceFormat.Color;
+            //You can't Map the BackBuffer surface, so we copy to another texture
+            using (var backBufferTexture = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0))
+            {
+                var desc = backBufferTexture.Description;
+                desc.SampleDescription = new SampleDescription(1, 0);
+                desc.BindFlags = BindFlags.None;
+                desc.CpuAccessFlags = CpuAccessFlags.Read;
+                desc.Usage = ResourceUsage.Staging;
+                desc.OptionFlags = ResourceOptionFlags.None;
+
+                using (var stagingTex = new SharpDX.Direct3D11.Texture2D(_d3dDevice, desc))
+                {
+                    lock (_d3dContext)
+                    {
+                        // Copy the data from the GPU to the staging texture.
+                        // if MSAA is enabled we need to first copy to a resource without MSAA
+                        if (backBufferTexture.Description.SampleDescription.Count > 1)
+                        {
+                            desc.Usage = ResourceUsage.Default;
+                            desc.CpuAccessFlags = CpuAccessFlags.None;
+                            using (var noMsTex = new SharpDX.Direct3D11.Texture2D(_d3dDevice, desc))
+                            {
+                                _d3dContext.ResolveSubresource(backBufferTexture, 0, noMsTex, 0, desc.Format);
+                                if (rect.HasValue)
+                                {
+                                    var r = rect.Value;
+                                    _d3dContext.CopySubresourceRegion(noMsTex, 0,
+                                        new ResourceRegion(r.Left, r.Top, 0, r.Right, r.Bottom, 1), stagingTex,
+                                        0);
+                                }
+                                else
+                                    _d3dContext.CopyResource(noMsTex, stagingTex);
+                            }
+                        }
+                        else
+                        {
+                            if (rect.HasValue)
+                            {
+                                var r = rect.Value;
+                                _d3dContext.CopySubresourceRegion(backBufferTexture, 0,
+                                    new ResourceRegion(r.Left, r.Top, 0, r.Right, r.Bottom, 1), stagingTex, 0);
+                            }
+                            else
+                                _d3dContext.CopyResource(backBufferTexture, stagingTex);
+                        }
+
+                        // Copy the data to the array.
+                        DataStream stream = null;
+                        try
+                        {
+                            var databox = _d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
+
+                            int elementsInRow, rows;
+                            if (rect.HasValue)
+                            {
+                                elementsInRow = rect.Value.Width;
+                                rows = rect.Value.Height;
+                            }
+                            else
+                            {
+                                elementsInRow = stagingTex.Description.Width;
+                                rows = stagingTex.Description.Height;
+                            }
+                            var elementSize = format.GetSize();
+                            var rowSize = elementSize * elementsInRow;
+                            if (rowSize == databox.RowPitch)
+                                stream.ReadRange(data, startIndex, count);
+                            else
+                            {
+                                // Some drivers may add pitch to rows.
+                                // We need to copy each row separately and skip trailing zeroes.
+                                stream.Seek(0, SeekOrigin.Begin);
+
+                                var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
+                                for (var row = 0; row < rows; row++)
+                                {
+                                    int i;
+                                    for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
+                                        data[i + startIndex] = stream.Read<T>();
+
+                                    if (i >= count)
+                                        break;
+
+                                    stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            SharpDX.Utilities.Dispose( ref stream);
+                        }
+                    }
+                }
             }
         }
 
