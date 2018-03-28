@@ -17,46 +17,8 @@ using System.Reflection;
 
 namespace MonoGame.Tests.ContentPipeline
 {
-    class ArrayContentCompilerTest
+    class ContentCompilerTest
     {
-        class TestContentManager : ContentManager
-        {
-            class FakeGraphicsService : IGraphicsDeviceService
-            {
-                public GraphicsDevice GraphicsDevice { get; private set; }
-
-#pragma warning disable 67
-                public event EventHandler<EventArgs> DeviceCreated;
-                public event EventHandler<EventArgs> DeviceDisposing;
-                public event EventHandler<EventArgs> DeviceReset;
-                public event EventHandler<EventArgs> DeviceResetting;
-#pragma warning restore 67
-            }
-
-            class FakeServiceProvider : IServiceProvider
-            {
-                public object GetService(Type serviceType)
-                {
-                    if (serviceType == typeof(IGraphicsDeviceService))
-                        return new FakeGraphicsService();
-
-                    throw new NotImplementedException();
-                }
-            }
-
-            private readonly MemoryStream _xnbStream;
-
-            public TestContentManager(MemoryStream xnbStream)
-                : base(new FakeServiceProvider(), "NONE")
-            {
-                _xnbStream = xnbStream;
-            }
-
-            protected override Stream OpenStream(string assetName)
-            {
-                return new MemoryStream(_xnbStream.GetBuffer(), false);
-            }
-        }
         class TestDataClass : IEquatable<TestDataClass>
         {
             public int A;
@@ -120,62 +82,12 @@ namespace MonoGame.Tests.ContentPipeline
             }
         }
 
-        static readonly IReadOnlyCollection<TargetPlatform> Platforms = new[]
-        {
-            TargetPlatform.Windows,
-            TargetPlatform.Xbox360,
-            TargetPlatform.iOS,
-            TargetPlatform.Android,
-            TargetPlatform.DesktopGL,
-            TargetPlatform.MacOSX,
-            TargetPlatform.WindowsStoreApp,
-            TargetPlatform.NativeClient,
-
-            TargetPlatform.PlayStationMobile,
-
-            TargetPlatform.WindowsPhone8,
-            TargetPlatform.RaspberryPi,
-            TargetPlatform.PlayStation4,
-            TargetPlatform.PSVita,
-            TargetPlatform.XboxOne,
-            TargetPlatform.Switch
-        };
-        static readonly IReadOnlyCollection<GraphicsProfile> GraphicsProfiles = new[]
-        {
-            GraphicsProfile.HiDef,
-            GraphicsProfile.Reach
-        };
-        static readonly IReadOnlyCollection<bool> CompressContents = new[]
-        {
-            true,
-            false
-        };
-
-        ContentCompiler Compiler = new ContentCompiler();
-
-
-        void CompileAndLoadAssets<T>(T data, Action<T> validation)
-        {
-            foreach (var platform in Platforms)
-                foreach (var gfxProfile in GraphicsProfiles)
-                    foreach (var compress in CompressContents)
-                        using (var xnbStream = new MemoryStream())
-                        {
-                            Compiler.Compile(xnbStream, data, platform, gfxProfile, compress, "", "");
-                            using (var content = new TestContentManager(xnbStream))
-                            {
-                                var result = content.Load<T>("foo");
-                                validation(result);
-                            }
-                        }
-        }
-
         [Test]
         public void RoundTripJaggedArrayClass()
         {
             var expected = Enumerable.Range(0, 5).Select(a => Enumerable.Range(0, 3).Select(b => new TestDataClass { A = a * 42 << b, B = "index: " + a * 5 + b }).ToArray()).ToArray();
 
-            CompileAndLoadAssets(expected.ToArray(), result =>
+            TestCompiler.CompileAndLoadAssets(expected.ToArray(), result =>
             {
                 Assert.IsNotNull(result);
                 Assert.IsInstanceOf<TestDataClass[][]>(result);
@@ -192,7 +104,7 @@ namespace MonoGame.Tests.ContentPipeline
         {
             var expected = Enumerable.Range(0, 10).Select(i => new TestDataClass { A = i * 42, B = "index: " + i }).ToArray();
 
-            CompileAndLoadAssets(expected.ToArray(), result =>
+            TestCompiler.CompileAndLoadAssets(expected.ToArray(), result =>
             {
                 Assert.IsNotNull(result);
                 Assert.IsInstanceOf<TestDataClass[]>(result);
@@ -212,7 +124,7 @@ namespace MonoGame.Tests.ContentPipeline
                     for (int x = 0; x < expected.GetLength(0); x++)
                         expected[x, y, z] = new TestDataClass { A = x + y * 10 + z * 100, B = string.Format("X: {0} Y: {1} Z: {2}", x, y, z) };
 
-            CompileAndLoadAssets((TestDataClass[,,])expected.Clone(), result =>
+            TestCompiler.CompileAndLoadAssets((TestDataClass[,,])expected.Clone(), result =>
             {
                 Assert.IsNotNull(result);
                 Assert.IsInstanceOf<TestDataClass[,,]>(result);
@@ -245,7 +157,7 @@ namespace MonoGame.Tests.ContentPipeline
                     for (int x = 0; x < expected.Array3D.GetLength(0); x++)
                         expected.Array3D[x, y, z] = new Microsoft.Xna.Framework.Rectangle(x, y, z, -z);
 
-            CompileAndLoadAssets(expected.DeepClone(), result =>
+            TestCompiler.CompileAndLoadAssets(expected.DeepClone(), result =>
             {
                 Assert.IsNotNull(result.Array3D);
                 Assert.IsInstanceOf<Microsoft.Xna.Framework.Rectangle[,,]>(result.Array3D);
@@ -277,7 +189,7 @@ namespace MonoGame.Tests.ContentPipeline
         {
             var expected = Enumerable.Range(0, 10).Select(i => new TestDataStruct { A = i * 42, B = "index: " + i }).ToArray();
 
-            CompileAndLoadAssets(expected.ToArray(), result =>
+            TestCompiler.CompileAndLoadAssets(expected.ToArray(), result =>
             {
                 Assert.IsInstanceOf<TestDataStruct[]>(result);
                 Assert.AreEqual(1, result.Rank);
@@ -296,7 +208,7 @@ namespace MonoGame.Tests.ContentPipeline
                     for (int x = 0; x < expected.GetLength(0); x++)
                         expected[x, y, z] = new TestDataStruct { A = x + y * 10 + z * 100, B = string.Format("X: {0} Y: {1} Z: {2}", x, y, z) };
 
-            CompileAndLoadAssets((TestDataStruct[,,])expected.Clone(), result =>
+            TestCompiler.CompileAndLoadAssets((TestDataStruct[,,])expected.Clone(), result =>
             {
                 Assert.IsInstanceOf<TestDataStruct[,,]>(result);
                 Assert.AreEqual(result.Rank, 3);
@@ -309,6 +221,48 @@ namespace MonoGame.Tests.ContentPipeline
                         for (int x = 0; x < expected.GetLength(0); x++)
                             Assert.AreEqual(expected[x, y, z], result[x, y, z]);
             });
+        }
+
+        [Test]
+        public void ShouldSerializePropertyGivenNameOfItem()
+        {
+            var expected = new HasNoIndexer { Item = "lorem-ipsum" };
+
+            TestCompiler.CompileAndLoadAssets(expected, result =>
+            {
+                Assert.AreEqual(expected.Item, result.Item);
+            });
+        }
+
+        class HasNoIndexer
+        {
+            public string Item { get; set; }
+        }
+
+        [Test]
+        public void ShouldNotSerializePropertyGivenIndexer()
+        {
+            var expected = new HasIndexer();
+            expected["anything"] = "value";
+
+            TestCompiler.CompileAndLoadAssets(expected, result =>
+            {
+                Assert.AreNotEqual(expected["anything"], result["anything"]);
+            });
+        }
+
+        class HasIndexer
+        {
+            readonly Dictionary<string, string> _dictionary = new Dictionary<string, string>();
+            public string this[string key]
+            {
+                get
+                { 
+                    string value;
+                    return _dictionary.TryGetValue(key, out value) ? value : null;
+                }
+                set { _dictionary[key] = value; }
+            }
         }
     }
 }

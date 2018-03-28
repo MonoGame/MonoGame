@@ -287,9 +287,6 @@
     <Compile Include="ContentPipeline\BuilderTargetsTest.cs">
       <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="ContentPipeline\ArrayContentCompilerTest.cs">
-      <Platforms>Windows,MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="ContentPipeline\AssetTestClasses.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
@@ -299,6 +296,9 @@
     </Compile>
     <Compile Include="ContentPipeline\BitmapContentTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\ContentCompilerTest.cs">
+      <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\EffectProcessorTests.cs">
         <Platforms>Windows</Platforms>
@@ -334,6 +334,9 @@
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\OggImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\TestCompiler.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\OpenAssetImporterTests.cs">
