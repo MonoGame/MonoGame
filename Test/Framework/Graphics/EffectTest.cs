@@ -105,6 +105,11 @@ namespace MonoGame.Tests.Graphics
         [Test]
 #if DESKTOPGL
         [Ignore("Fails under OpenGL!")]
+#elif XNA
+        // This test assumes a very specific BasicEffect parameter
+        // order which we cannot match because of differences in the 
+        // old HLSL compiler used by XNA.
+        [Ignore("Invalid under XNA")]
 #endif
         public void EffectParameterShouldBeSetIfSetByNameAndGetByIndex()
         {

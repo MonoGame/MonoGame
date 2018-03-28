@@ -43,12 +43,18 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
+#if XNA
+        [Ignore("XNA does not support this format!")]
+#endif
         public void ImportBmpRGB555( )
         {
             ImportStandard("Assets/Textures/Logo555.bmp", SurfaceFormat.Color, 64);
         }
 
         [Test]
+#if XNA
+        [Ignore("XNA does not support this format!")]
+#endif
         public void ImportBmpRGB565( )
         {
             ImportStandard("Assets/Textures/Logo565.bmp", SurfaceFormat.Color, 64);
@@ -63,10 +69,18 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void ImportBmpV5()
         {
+            // TODO: Should we fix this to match XNA?
+#if XNA
+            ImportStandard("Assets/Textures/Logo_BMPV5.bmp", SurfaceFormat.Vector4, 256);
+#else
             ImportStandard("Assets/Textures/Logo_BMPV5.bmp", SurfaceFormat.Color, 256);
+#endif
         }
 
         [Test]
+#if XNA
+        [Ignore("XNA does not support this format!")]
+#endif
         public void ImportGif( )
         {
             ImportStandard("Assets/Textures/LogoOnly_64px.gif", SurfaceFormat.Color, 64);
@@ -91,6 +105,9 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
+#if XNA
+        [Ignore("XNA does not support this format!")]
+#endif
         public void ImportTif( )
         {
             ImportStandard("Assets/Textures/LogoOnly_64px.tif", SurfaceFormat.Color, 64);
