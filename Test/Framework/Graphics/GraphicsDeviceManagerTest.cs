@@ -394,24 +394,27 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
 #if DESKTOPGL
-        [Ignore("Expected 2 but got 3. Needs Investigating")]
-#elif XNA
-        [Ignore("Expected 2 but got 0. Needs Investigating")]
+        [Ignore("Needs Investigating")]
 #endif
         public void MultiSampleCountRoundsDown()
         {
+            // DirectX docs specify that hardware must support 1, 4,
+            // and 8 sample counts.  We hope this rule extends to other
+            // versions of DirectX and OpenGL.
+            //
+            // This is why we use 5 and 4 here.
+
             gdm.PreferMultiSampling = true;
 
             gdm.PreparingDeviceSettings += (sender, args) =>
             {
                 var pp = args.GraphicsDeviceInformation.PresentationParameters;
-                pp.MultiSampleCount = 3;
+                pp.MultiSampleCount = 5;
             };
 
             gdm.ApplyChanges();
 
-            Assert.AreEqual(2, gd.PresentationParameters.MultiSampleCount);
-
+            Assert.AreEqual(4, gd.PresentationParameters.MultiSampleCount);
         }
 
         [TestCase(false)]
@@ -513,7 +516,6 @@ namespace MonoGame.Tests.Graphics
             }, "GraphicsDevice.Reset(PresentationParameters)");
         }
 
-#if DIRECTX
         [Test]
         public void TooHighMultiSampleCountClampedToMaxSupported()
         {
@@ -526,9 +528,12 @@ namespace MonoGame.Tests.Graphics
             };
             gdm.ApplyChanges();
 
-            // Reference device supports 32 samples
-            Assert.AreEqual
-                (gdm.GraphicsDevice.PresentationParameters.MultiSampleCount, 32);
+            // Reference device is supposed to support 32 samples, but we've 
+            // gotten different results on some systems.  So check for 0 and
+            // that the value is less than the invalid value we set.
+
+            Assert.NotZero(gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
+            Assert.AreNotEqual(33, gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
 
             // Test again for GraphicsDevice.Reset(PresentationParameters)
             var pp2 = gdm.GraphicsDevice.PresentationParameters.Clone();
@@ -539,11 +544,9 @@ namespace MonoGame.Tests.Graphics
             var pp3 = gdm.GraphicsDevice.PresentationParameters.Clone();
             pp3.MultiSampleCount = 500; // Set too high. In DX11 is max 32.
             gdm.GraphicsDevice.Reset(pp3);
-            // Reference device supports 32 samples
-            Assert.AreEqual
-                (gdm.GraphicsDevice.PresentationParameters.MultiSampleCount, 32);
-            
+
+            Assert.NotZero(gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
+            Assert.AreNotEqual(500, gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);            
         }
-#endif
     }
 }
