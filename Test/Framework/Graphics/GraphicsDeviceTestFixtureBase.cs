@@ -75,12 +75,20 @@ namespace MonoGame.Tests.Graphics
         [TearDown]
         public virtual void TearDown()
         {
-            game.Dispose();
-            game = null;
-            gdm = null;
-            gd = null;
+            // XNA's Game only disposes content if UnloadContent is called.
+            content.Dispose();
             content = null;
 
+            // XNA's Game never sees our GDM because Game is never initialized.
+            (gdm as IDisposable).Dispose();
+            gdm = null;            
+            gd = null;
+
+            // This doesn't seem to do much under XNA because the Game 
+            // was never really run... still we do it just in case.
+            game.Dispose();
+            game = null;
+            
             if (_framePrepared && !_framesChecked)
                 Assert.Fail("Initialized fixture for rendering but did not check frames.");
         }
