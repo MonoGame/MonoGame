@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="T:Microsoft.Xna.Framework.Input.Touch.GestureSample">
+      <summary>A representation of data from a multitouch gesture over a span of time.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.GestureSample.Delta">
+      <summary>Holds delta information about the first touchpoint in a multitouch gesture.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.GestureSample.Delta2">
+      <summary>Holds delta information about the second touchpoint in a multitouch gesture.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.GestureSample.GestureType">
+      <summary>The type of gesture in a multitouch gesture sample.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.GestureSample.Position">
+      <summary>Holds the current position of the first touchpoint in this gesture sample.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.GestureSample.Position2">
+      <summary>Holds the current position of the the second touchpoint in this gesture sample.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.GestureSample.Timestamp">
+      <summary>Holds the starting time for this touch gesture sample.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Input.Touch.GestureType">
+      <summary>Contains values that represent different multitouch gestures that can be detected by TouchPanel.ReadGesture. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.GestureType.DoubleTap">
+      <summary>The user tapped the screen twice in quick succession. This always is preceded by a Tap gesture. If the time between taps is too great to be considered a DoubleTap, two Tap gestures will be generated instead.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.GestureType.DragComplete">
+      <summary>A drag gesture (VerticalDrag, HorizontalDrag, or FreeDrag) was completed. This signals only completion. No position or delta data is valid for this sample.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.GestureType.Flick">
+      <summary>The user performed a touch combined with a quick swipe of the screen. Flicks are positionless. The velocity of the flick can be retrieved by reading the Delta member of GestureSample.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.GestureType.FreeDrag">
+      <summary>The user touched the screen, and then performed a free-form drag gesture.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.GestureType.Hold">
+      <summary>The user touched a single point on the screen for approximately one second. This is a single event, and not continuously generated while the user is holding the touchpoint.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.GestureType.HorizontalDrag">
+      <summary>The user touched the screen, and then performed a horizontal (left to right or right to left) gesture.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.GestureType.None">
+      <summary>Represents no gestures.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.GestureType.Pinch">
+      <summary>The user touched two points on the screen, and then converged or diverged them. Pinch behaves like a two-finger drag. When this gesture is enabled, it takes precedence over drag gestures while two fingers are down.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.GestureType.PinchComplete">
+      <summary>A pinch operation was completed. This signals only completion. No position or delta data is valid for this sample.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.GestureType.Tap">
+      <summary>The user briefly touched a single point on the screen.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.GestureType.VerticalDrag">
+      <summary>The user touched the screen, and then performed a vertical (top to bottom or bottom to top) gesture.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Input.Touch.TouchCollection">
+      <summary>Provides methods and properties for accessing state information for the touch screen of a touch-enabled device. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.#ctor(Microsoft.Xna.Framework.Input.Touch.TouchLocation[])">
+      <summary>Initializes a new instance of the TouchCollection structure with a set of touch locations. Reference page contains links to related code samples.</summary>
+      <param name="touches">Array of touch locations.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Add(Microsoft.Xna.Framework.Input.Touch.TouchLocation)">
+      <summary>Adds a TouchLocation to the collection.</summary>
+      <param name="item">TouchLocation to add.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Clear">
+      <summary>Removes all TouchLocation objects from the collection.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Contains(Microsoft.Xna.Framework.Input.Touch.TouchLocation)">
+      <summary>Checks if the current touch collection contains the specified touch location.</summary>
+      <param name="item">Touch location to be checked against the current collection.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.CopyTo(Microsoft.Xna.Framework.Input.Touch.TouchLocation[],System.Int32)">
+      <summary>Copies the touch location to the collection at the specified index.</summary>
+      <param name="array">Array receiving the copied touch location.</param>
+      <param name="arrayIndex">Target index of the collection.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Count">
+      <summary>Gets the current number of touch locations for the touch screen.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.FindById(System.Int32,Microsoft.Xna.Framework.Input.Touch.TouchLocation@)">
+      <summary>Retrieves the touch location matching the specified ID.</summary>
+      <param name="id">ID of touch location sought.</param>
+      <param name="touchLocation">[OutAttribute] Touch location item matching the specified ID.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.GetEnumerator">
+      <summary>Returns an enumerator that iterates through the TouchCollection.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.IndexOf(Microsoft.Xna.Framework.Input.Touch.TouchLocation)">
+      <summary>Determines the index of a TouchLocation in the TouchCollection.</summary>
+      <param name="item">TouchLocation to locate in the collection.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Insert(System.Int32,Microsoft.Xna.Framework.Input.Touch.TouchLocation)">
+      <summary>Inserts a new TouchLocation into the TouchCollection at a specified index.</summary>
+      <param name="index">Index in the touch collection for the new item.</param>
+      <param name="item">TouchLocation to be inserted.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchCollection.IsConnected">
+      <summary>Indicates if the touch screen is available for use.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchCollection.IsReadOnly">
+      <summary>Determines if the touch location array is read-only.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Item(System.Int32)">
+      <summary>Gets or sets the information of the specified touch location.</summary>
+      <param name="index">Index of the touch location to return.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Remove(Microsoft.Xna.Framework.Input.Touch.TouchLocation)">
+      <summary>Removes the specified TouchLocation from the TouchCollection.</summary>
+      <param name="item">TouchLocation to be removed.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.RemoveAt(System.Int32)">
+      <summary>Removes a TouchLocation at the specified index in the TouchCollection.</summary>
+      <param name="index">Index of the TouchLocation to remove.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.System#Collections#IEnumerable#GetEnumerator">
+      <summary>Returns an enumerator that iterates through the TouchCollection.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator">
+      <summary>Provides the ability to iterate through the touch locations in a TouchCollection.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator.Current">
+      <summary>Gets the current element in the TouchCollection.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator.MoveNext">
+      <summary>Advances the enumerator to the next element of the TouchCollection.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator.System#Collections#IEnumerator#Current">
+      <summary>Gets the current element in the TouchCollection as an object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator.System#Collections#IEnumerator#Reset">
+      <summary>Sets the enumerator to its initial position, which is before the first element in the TouchCollection.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Input.Touch.TouchLocation">
+      <summary>Provides methods and properties for interacting with a touch location on a touch screen device. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchLocation.#ctor(System.Int32,Microsoft.Xna.Framework.Input.Touch.TouchLocationState,Microsoft.Xna.Framework.Vector2)">
+      <summary>Initializes a new TouchLocation with an ID, state, position, and pressure.</summary>
+      <param name="id">ID of the new touch location.</param>
+      <param name="state">State of the new touch location.</param>
+      <param name="position">Position, in screen coordinates, of the new touch location.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchLocation.#ctor(System.Int32,Microsoft.Xna.Framework.Input.Touch.TouchLocationState,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Input.Touch.TouchLocationState,Microsoft.Xna.Framework.Vector2)">
+      <summary>Initializes a new TouchLocation with an ID, and a set of both current and previous state, position, and pressure values.</summary>
+      <param name="id">ID of the new touch location.</param>
+      <param name="state">State of the new touch location.</param>
+      <param name="position">Position, in screen coordinates, of the new touch location.</param>
+      <param name="previousState">Previous state for the new touch location.</param>
+      <param name="previousPosition">Previous position for the new touch location.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchLocation.Equals(Microsoft.Xna.Framework.Input.Touch.TouchLocation)">
+      <summary>Determines whether the current TouchLocation is equal to the specified TouchLocation.</summary>
+      <param name="other">The TouchLocation to compare with this instance.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchLocation.Equals(System.Object)">
+      <summary>Determines whether the current TouchLocation is equal to the specified object.</summary>
+      <param name="obj">The Object to compare with the touch location.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchLocation.GetHashCode">
+      <summary>Gets the hash code for this TouchLocation.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchLocation.Id">
+      <summary>Gets the ID of the touch location.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchLocation.op_Equality(Microsoft.Xna.Framework.Input.Touch.TouchLocation,Microsoft.Xna.Framework.Input.Touch.TouchLocation)">
+      <summary>Determines whether two TouchLocation instances are equal.</summary>
+      <param name="value1">The TouchLocation to compare with the second.</param>
+      <param name="value2">The TouchLocation to compare with the first.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchLocation.op_Inequality(Microsoft.Xna.Framework.Input.Touch.TouchLocation,Microsoft.Xna.Framework.Input.Touch.TouchLocation)">
+      <summary>Determines whether two TouchLocation instances are unequal.</summary>
+      <param name="value1">The TouchLocation to compare with the second.</param>
+      <param name="value2">The TouchLocation to compare with the first.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchLocation.Position">
+      <summary>Gets the position of the touch location.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchLocation.State">
+      <summary>Gets the state of the touch location.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchLocation.ToString">
+      <summary>Gets a string representation of the TouchLocation.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchLocation.TryGetPreviousLocation(Microsoft.Xna.Framework.Input.Touch.TouchLocation@)">
+      <summary>Attempts to get the previous location of this touch location object.</summary>
+      <param name="previousLocation">[OutAttribute] Previous location data, as a TouchLocation.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Input.Touch.TouchLocationState">
+      <summary>Defines the possible states of a touch location. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.TouchLocationState.Invalid">
+      <summary>This touch location position is invalid. Typically, you will encounter this state when a new touch location attempts to get the previous state of itself.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.TouchLocationState.Moved">
+      <summary>This touch location position was updated or pressed at the same position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.TouchLocationState.Pressed">
+      <summary>This touch location position is new.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Input.Touch.TouchLocationState.Released">
+      <summary>This touch location position was released.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Input.Touch.TouchPanel">
+      <summary>Provides methods for retrieving touch panel device information. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchPanel.DisplayHeight">
+      <summary>Gets or sets the display height of the touch panel.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchPanel.DisplayOrientation">
+      <summary>Gets or sets the display orientation of the touch panel.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchPanel.DisplayWidth">
+      <summary>Gets or sets the display width of the touch panel.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchPanel.EnabledGestures">
+      <summary>Gets or sets the gestures that are enabled for the touch panel. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchPanel.GetCapabilities">
+      <summary>Gets the touch panel capabilities for an available device. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchPanel.GetState">
+      <summary>Gets the current state of the touch panel. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchPanel.IsGestureAvailable">
+      <summary>Used to determine if a touch gesture is available. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Input.Touch.TouchPanel.ReadGesture">
+      <summary>Reads an available gesture on the touch panel. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchPanel.WindowHandle">
+      <summary>The window handle of the touch panel.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities">
+      <summary>Provides access to information about the capabilities of the touch input device. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities.IsConnected">
+      <summary>Indicates if the touch panel device is available for use.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities.MaximumTouchCount">
+      <summary>Gets the maximum number of touch locations that can be tracked by the touch pad device.</summary>
+    </member>
+  </members>
+</doc>

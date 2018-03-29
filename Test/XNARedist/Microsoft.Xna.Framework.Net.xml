@@ -1,0 +1,743 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="T:Microsoft.Xna.Framework.Net.AvailableNetworkSession">
+      <summary>Describes a multiplayer session that can be joined. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.AvailableNetworkSession.CurrentGamerCount">
+      <summary>Gets the number of gamers in the session.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.AvailableNetworkSession.HostGamertag">
+      <summary>Gets the gamertag of the session host.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.AvailableNetworkSession.OpenPrivateGamerSlots">
+      <summary />
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.AvailableNetworkSession.OpenPublicGamerSlots">
+      <summary />
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.AvailableNetworkSession.QualityOfService">
+      <summary>Gets an estimate of the quality of network service between this local machine and the remote session.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.AvailableNetworkSession.SessionProperties">
+      <summary>Gets any custom properties that have been attached to the session.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.AvailableNetworkSessionCollection">
+      <summary>Represents a collection of sessions available for joining. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.AvailableNetworkSessionCollection.Dispose">
+      <summary>Immediately releases the collection.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.AvailableNetworkSessionCollection.IsDisposed">
+      <summary>Gets a value that indicates whether the object is disposed.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.GameEndedEventArgs">
+      <summary />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.GameEndedEventArgs.#ctor">
+      <summary>Creates an instance of GameEndedEventArgs.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.GamerJoinedEventArgs">
+      <summary />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.GamerJoinedEventArgs.#ctor(Microsoft.Xna.Framework.Net.NetworkGamer)">
+      <summary>Creates an instance of GamerJoinedEventArgs.</summary>
+      <param name="gamer">The gamer who just joined the session.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.GamerJoinedEventArgs.Gamer">
+      <summary>Gets the gamer who just joined the session.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.GamerLeftEventArgs">
+      <summary />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.GamerLeftEventArgs.#ctor(Microsoft.Xna.Framework.Net.NetworkGamer)">
+      <summary>Creates an instance of GamerLeftEventArgs.</summary>
+      <param name="gamer">The gamer who just left the session.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.GamerLeftEventArgs.Gamer">
+      <summary>Gets the gamer who just left the session.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.GameStartedEventArgs">
+      <summary />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.GameStartedEventArgs.#ctor">
+      <summary>Creates an instance of GameStartedEventArgs.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.HostChangedEventArgs">
+      <summary />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.HostChangedEventArgs.#ctor(Microsoft.Xna.Framework.Net.NetworkGamer,Microsoft.Xna.Framework.Net.NetworkGamer)">
+      <summary>Creates an instance of HostChangedEventArgs.</summary>
+      <param name="oldHost">The player who was the previous session host.</param>
+      <param name="newHost">The player who is the new host of the multiplayer session.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.HostChangedEventArgs.NewHost">
+      <summary>Gets the new host of the session.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.HostChangedEventArgs.OldHost">
+      <summary>Gets the player who was the previous session host.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.LocalNetworkGamer">
+      <summary>Represents a local player in a network session.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.LocalNetworkGamer.EnableSendVoice(Microsoft.Xna.Framework.Net.NetworkGamer,System.Boolean)">
+      <summary>Specifies whether voice data should be sent to, or received from, the specified remote gamer.</summary>
+      <param name="remoteGamer">A remote gamer in the session.</param>
+      <param name="enable">true if voice is enabled; false otherwise.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.LocalNetworkGamer.IsDataAvailable">
+      <summary>Determines if there is incoming packet data for this player.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.LocalNetworkGamer.ReceiveData(Microsoft.Xna.Framework.Net.PacketReader,Microsoft.Xna.Framework.Net.NetworkGamer@)">
+      <summary>Reads the next incoming packet and copies the packet data into the specified reader object. Reference page contains links to related code samples.</summary>
+      <param name="data">Network packet data.</param>
+      <param name="sender">[OutAttribute] Gamer who sent this packet.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.LocalNetworkGamer.ReceiveData(System.Byte[],Microsoft.Xna.Framework.Net.NetworkGamer@)">
+      <summary>Reads the next incoming packet using the specified values. Reference page contains links to related code samples.</summary>
+      <param name="data">Storage for the network packet data.</param>
+      <param name="sender">[OutAttribute] Gamer who sent this packet.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.LocalNetworkGamer.ReceiveData(System.Byte[],System.Int32,Microsoft.Xna.Framework.Net.NetworkGamer@)">
+      <summary>Reads the next incoming packet using the specified values. Reference page contains links to related code samples.</summary>
+      <param name="data">Storage for the network packet data.</param>
+      <param name="offset">Offset, in bytes, to begin reading data.</param>
+      <param name="sender">[OutAttribute] Gamer who sent this packet.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.LocalNetworkGamer.SendData(Microsoft.Xna.Framework.Net.PacketWriter,Microsoft.Xna.Framework.Net.SendDataOptions)">
+      <summary> Reference page contains links to related code samples.</summary>
+      <param name="data">Byte array containing session data.</param>
+      <param name="options">Enumeration containing data send options.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.LocalNetworkGamer.SendData(Microsoft.Xna.Framework.Net.PacketWriter,Microsoft.Xna.Framework.Net.SendDataOptions,Microsoft.Xna.Framework.Net.NetworkGamer)">
+      <summary> Reference page contains links to related code samples.</summary>
+      <param name="data">Byte array containing session data.</param>
+      <param name="options">Enumeration containing data send options.</param>
+      <param name="recipient">Gamer receiving the data.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.LocalNetworkGamer.SendData(System.Byte[],Microsoft.Xna.Framework.Net.SendDataOptions)">
+      <summary> Reference page contains links to related code samples.</summary>
+      <param name="data">Byte array containing session data.</param>
+      <param name="options">Enumeration containing data send options.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.LocalNetworkGamer.SendData(System.Byte[],Microsoft.Xna.Framework.Net.SendDataOptions,Microsoft.Xna.Framework.Net.NetworkGamer)">
+      <summary>Sends a byte array to the specified gamer. Reference page contains links to related code samples.</summary>
+      <param name="data">Byte array containing session data.</param>
+      <param name="options">Enumeration containing data send options.</param>
+      <param name="recipient">Gamer to receive the data packet.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.LocalNetworkGamer.SendData(System.Byte[],System.Int32,System.Int32,Microsoft.Xna.Framework.Net.SendDataOptions)">
+      <summary> Reference page contains links to related code samples.</summary>
+      <param name="data">Byte array containing session data.</param>
+      <param name="offset">Offset, in bytes, to the start of the data.</param>
+      <param name="count">Amount, in bytes, of data sent.</param>
+      <param name="options">Enumeration containing data send options.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.LocalNetworkGamer.SendData(System.Byte[],System.Int32,System.Int32,Microsoft.Xna.Framework.Net.SendDataOptions,Microsoft.Xna.Framework.Net.NetworkGamer)">
+      <summary>Sends a selected portion of a byte array to the specified gamer. Reference page contains links to related code samples.</summary>
+      <param name="data">Byte array containing session data.</param>
+      <param name="offset">Offset, in bytes, to the start of the data.</param>
+      <param name="count">Amount, in bytes, of data sent.</param>
+      <param name="options">Enumeration containing data send options.</param>
+      <param name="recipient">Gamer to receive the data packet.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.LocalNetworkGamer.SendPartyInvites">
+      <summary>Sends game invitations to all party members that are not in the current game session. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.LocalNetworkGamer.SignedInGamer">
+      <summary>Gets the SignedInGamer instance for this SignedInGamer object.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.NetworkGamer">
+      <summary>Represents a player in a network session.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.HasLeftSession">
+      <summary>Indicates whether this gamer has left the session.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.HasVoice">
+      <summary>Determines if the player has a voice headset.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.Id">
+      <summary>Gets a unique identifier that can be used to refer to this gamer in network packets.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.IsGuest">
+      <summary>Determines whether this gamer is logged in as a guest profile.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.IsHost">
+      <summary>Determines if the player is the host of the multiplayer session.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.IsLocal">
+      <summary>Determines if the player is playing on a local machine.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.IsMutedByLocalUser">
+      <summary>Determines if the player is muted by one or more local users.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.IsPrivateSlot">
+      <summary>Determines if the player occupies a reserved private session slot.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.IsReady">
+      <summary>Determines whether the gamer is ready to leave the lobby screen and begin gameplay. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.IsTalking">
+      <summary>Determines whether the gamer is currently sending voice data.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.Machine">
+      <summary>Gets an object representing the physical gaming machine this NetworkGamer is playing on.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.RoundtripTime">
+      <summary>Gets an estimate of the network latency involved in sending a packet round trip from the local machine to this gamer and back again.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkGamer.Session">
+      <summary>Gets the multiplayer session of the gamer.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.NetworkMachine">
+      <summary>Represents a physical machine (such as single Xbox 360 console or Windows-based computer) that is participating in a multiplayer session. It can be used to detect when more than one NetworkGamer is playing on the same actual machine.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkMachine.Gamers">
+      <summary>Gets a collection of all the gamers who are playing on this machine.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkMachine.RemoveFromSession">
+      <summary>Forcibly removes this machine from the session.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.NetworkSession">
+      <summary>Represents a multiplayer game session. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.AddLocalGamer(Microsoft.Xna.Framework.GamerServices.SignedInGamer)">
+      <summary>Adds the specified local gamer profile to the network session.</summary>
+      <param name="gamer">The gamer to add to the network session</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.AllGamers">
+      <summary />
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.AllowHostMigration">
+      <summary>Gets or sets whether host migration is allowed. This can be read by any machine in the session, but can only be changed by the host. The default value is false indicating that host migration is disabled. Reference page contains links to related conceptual articles.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.AllowJoinInProgress">
+      <summary>Gets or sets whether join-in-progress is allowed. If the host enables this setting, new machines will be able to join at any time. The default value is false, indicating that join-in-progress is disabled. AllowJoinInProgress can be read by any machine in the session, but can only be changed by the host. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.BeginCreate(Microsoft.Xna.Framework.Net.NetworkSessionType,System.Collections.Generic.IEnumerable{Microsoft.Xna.Framework.GamerServices.SignedInGamer},System.Int32,System.Int32,Microsoft.Xna.Framework.Net.NetworkSessionProperties,System.AsyncCallback,System.Object)">
+      <summary />
+      <param name="sessionType">Type of session being created.</param>
+      <param name="localGamers">A collection of local gamers to add to the network session. The first gamer in the collection becomes the host; the others are added to the session.</param>
+      <param name="maxGamers">Maximum number of players allowed in this network session. For a Windows or an Xbox 360 game, this value must be between 2 and 31; 31 is the maximum number of players supported in a session.</param>
+      <param name="privateGamerSlots">Number of reserved private session slots created for the session. This value must be less than maximumGamers.</param>
+      <param name="sessionProperties">Properties of the session being created.</param>
+      <param name="callback">The method to be called once the asynchronous operation is finished.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.BeginCreate(Microsoft.Xna.Framework.Net.NetworkSessionType,System.Int32,System.Int32,System.AsyncCallback,System.Object)">
+      <summary />
+      <param name="sessionType">Type of session being created.</param>
+      <param name="maxLocalGamers">Maximum number of local players on the same gaming machine in this network session.</param>
+      <param name="maxGamers">Maximum number of players allowed in this network session. For games based on Windows or Xbox 360, this value must be between 2 and 31; 31 is the maximum number of players supported in a session.</param>
+      <param name="callback">The method to be called once the asynchronous operation is finished.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.BeginCreate(Microsoft.Xna.Framework.Net.NetworkSessionType,System.Int32,System.Int32,System.Int32,Microsoft.Xna.Framework.Net.NetworkSessionProperties,System.AsyncCallback,System.Object)">
+      <summary />
+      <param name="sessionType">Type of session being created.</param>
+      <param name="maxLocalGamers">Maximum number of local players on the same gaming machine in this network session.</param>
+      <param name="maxGamers">Maximum number of players allowed in this network session. For games based on Windows or Xbox 360, this value must be between 2 and 31; 31 is the maximum number of players supported in a session.</param>
+      <param name="privateGamerSlots">Number of reserved private session slots created for the session. This value must be less than maximumGamers.</param>
+      <param name="sessionProperties">Properties of the session being created.</param>
+      <param name="callback">The method to be called once the asynchronous operation is finished.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.BeginFind(Microsoft.Xna.Framework.Net.NetworkSessionType,System.Collections.Generic.IEnumerable{Microsoft.Xna.Framework.GamerServices.SignedInGamer},Microsoft.Xna.Framework.Net.NetworkSessionProperties,System.AsyncCallback,System.Object)">
+      <summary />
+      <param name="sessionType">Type of session sought.</param>
+      <param name="localGamers">A collection of local gamers to add to the network session.</param>
+      <param name="searchProperties">Optional session properties to match during the search. If this argument is null, the query results will not be filtered based on properties of available sessions. If any of the search property values in searchProperties are specified, the query returns only sessions with matching properties. null items in the searchProperties collection will match to any value for that session property.</param>
+      <param name="callback">Method to be called once the asynchronous operation is finished.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.BeginFind(Microsoft.Xna.Framework.Net.NetworkSessionType,System.Int32,Microsoft.Xna.Framework.Net.NetworkSessionProperties,System.AsyncCallback,System.Object)">
+      <summary />
+      <param name="sessionType">Type of session sought.</param>
+      <param name="maxLocalGamers">Maximum number of local players on the same gaming machine in this network session.</param>
+      <param name="searchProperties">Optional session properties to match during the search. If this argument is null, query results will not be filtered based on properties of available sessions. If any search property values in searchProperties are specified, the query returns only sessions with matching properties. null items in the searchProperties collection will match to any value for that session property.</param>
+      <param name="callback">Method to be called once the asynchronous operation is finished.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.BeginJoin(Microsoft.Xna.Framework.Net.AvailableNetworkSession,System.AsyncCallback,System.Object)">
+      <summary>Starts a join operation for the specified multiplayer session.</summary>
+      <param name="availableSession">Session the gamer is attempting to join.</param>
+      <param name="callback">The method to be called once the asynchronous operation is finished.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.BeginJoinInvited(System.Collections.Generic.IEnumerable{Microsoft.Xna.Framework.GamerServices.SignedInGamer},System.AsyncCallback,System.Object)">
+      <summary />
+      <param name="localGamers">A collection of local signed-in gamers to add to the network session.</param>
+      <param name="callback">Method to be called at the conclusion of the asynchronous operation.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.BeginJoinInvited(System.Int32,System.AsyncCallback,System.Object)">
+      <summary />
+      <param name="maxLocalGamers">The number of local signed-in gamers to add to the network session when accepting the invite. This must be at least one, and can be as high as the limit imposed by the title or the platform. On Windows, this value must always be set to one.</param>
+      <param name="callback">Method to be called at the conclusion of the asynchronous operation.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.BytesPerSecondReceived">
+      <summary>Gets a performance counter recording the amount of data being received from the network.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.BytesPerSecondSent">
+      <summary>Gets a performance counter recording the amount of data being sent over the network.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.Create(Microsoft.Xna.Framework.Net.NetworkSessionType,System.Collections.Generic.IEnumerable{Microsoft.Xna.Framework.GamerServices.SignedInGamer},System.Int32,System.Int32,Microsoft.Xna.Framework.Net.NetworkSessionProperties)">
+      <summary />
+      <param name="sessionType">Type of session being hosted.</param>
+      <param name="localGamers">A collection of local gamers to add to the network session. The first gamer in the collection becomes the host; the others are added to the session.</param>
+      <param name="maxGamers">Maximum number of players allowed in this network session. This value for games based on Windows or Xbox 360 must be between 2 and 31; 31 is the maximum number of players supported in a session.</param>
+      <param name="privateGamerSlots">Number of reserved private session slots created for the session. This value must be less than maxGamers.</param>
+      <param name="sessionProperties">Properties of the session being created.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.Create(Microsoft.Xna.Framework.Net.NetworkSessionType,System.Int32,System.Int32)">
+      <summary />
+      <param name="sessionType">Type of session being hosted.</param>
+      <param name="maxLocalGamers">Maximum number of local players on the same gaming machine in this network session.</param>
+      <param name="maxGamers">Maximum number of players allowed in this network session. This value for games based on Windows or Xbox 360 must be between 2 and 31; 31 is the maximum number of players supported in a session.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.Create(Microsoft.Xna.Framework.Net.NetworkSessionType,System.Int32,System.Int32,System.Int32,Microsoft.Xna.Framework.Net.NetworkSessionProperties)">
+      <summary />
+      <param name="sessionType">Type of session being hosted.</param>
+      <param name="maxLocalGamers">Maximum number of local players on the same gaming machine in this network session.</param>
+      <param name="maxGamers">Maximum number of players allowed in this network session. This value for games based on Windows or Xbox 360 must be between 2 and 31; 31 is the maximum number of players supported in a session.</param>
+      <param name="privateGamerSlots">Number of reserved private session slots created for the session. This value must be less than maxGamers.</param>
+      <param name="sessionProperties">Properties of the session being created.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.Dispose">
+      <summary>Ends the current multiplayer session.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.EndCreate(System.IAsyncResult)">
+      <summary>Gets the result from a BeginCreate asynchronous call.</summary>
+      <param name="result">An IAsyncResult used to track the progress of the operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.EndFind(System.IAsyncResult)">
+      <summary>Gets the result from a BeginFind asynchronous call.</summary>
+      <param name="result">An IAsyncResult used to track the progress of the operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.EndGame">
+      <summary>Changes the session state from NetworkSessionState.Playing to NetworkSessionState.Lobby.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.EndJoin(System.IAsyncResult)">
+      <summary>Gets the result from a BeginJoin asynchronous call.</summary>
+      <param name="result">An IAsyncResult used to track the progress of the operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.EndJoinInvited(System.IAsyncResult)">
+      <summary>Gets the result from a BeginJoinInvited asynchronous call.</summary>
+      <param name="result">An IAsyncResult used to track the progress of the operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.Find(Microsoft.Xna.Framework.Net.NetworkSessionType,System.Collections.Generic.IEnumerable{Microsoft.Xna.Framework.GamerServices.SignedInGamer},Microsoft.Xna.Framework.Net.NetworkSessionProperties)">
+      <summary> Reference page contains links to related code samples.</summary>
+      <param name="sessionType">Type of session sought.</param>
+      <param name="localGamers">A collection of local gamers to add to the network session.</param>
+      <param name="searchProperties">Optional session properties to match during the search. If this argument is null, the query results will not be filtered based on the session properties of available sessions. If any of the search property values in searchProperties are specified, only sessions with matching properties will be returned by the query. null items in the searchProperties collection will match to any value for that session property.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.Find(Microsoft.Xna.Framework.Net.NetworkSessionType,System.Int32,Microsoft.Xna.Framework.Net.NetworkSessionProperties)">
+      <summary> Reference page contains links to related code samples.</summary>
+      <param name="sessionType">Type of session sought.</param>
+      <param name="maxLocalGamers">Maximum number of local players on the same gaming machine in this network session.</param>
+      <param name="searchProperties">Optional session properties to match during the search. If this argument is null, the query results will not be filtered based on the session properties of available sessions. If any of the search property values in searchProperties are specified, only sessions with matching properties will be returned by the query. null items in the searchProperties collection will match to any value for that session property.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.FindGamerById(System.Byte)">
+      <summary />
+      <param name="gamerId">Identifier specifying the network gamer for which to search.</param>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Net.NetworkSession.GameEnded">
+      <summary>Occurs when the game moves from gameplay to the lobby. Reference page contains links to related code samples.</summary>
+      <param name="" />
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Net.NetworkSession.GamerJoined">
+      <summary>Occurs when a new player joins a multiplayer session. Reference page contains links to related code samples.</summary>
+      <param name="" />
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Net.NetworkSession.GamerLeft">
+      <summary> Reference page contains links to related code samples.</summary>
+      <param name="" />
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Net.NetworkSession.GameStarted">
+      <summary>Occurs when the game moves from the lobby into actual gameplay. Reference page contains links to related code samples.</summary>
+      <param name="" />
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.Host">
+      <summary>Gets the current host of the multiplayer session.</summary>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Net.NetworkSession.HostChanged">
+      <summary>Occurs when the session host has changed.</summary>
+      <param name="" />
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Net.NetworkSession.InviteAccepted">
+      <summary>Event that occurs when a user has accepted an invitation to join a network session.</summary>
+      <param name="">Contains information relevant to event handlers when a gamer accepts a game invitation. These event arguments include a Gamer property representing the signed-in gamer who has accepted the invitation.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.IsDisposed">
+      <summary>Gets a value that indicates whether the object is disposed.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.IsEveryoneReady">
+      <summary>Determines whether all gamers are ready to enter the session. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.IsHost">
+      <summary>Determines whether this machine is the session host.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.Join(Microsoft.Xna.Framework.Net.AvailableNetworkSession)">
+      <summary> Reference page contains links to related code samples.</summary>
+      <param name="availableSession">An existing multiplayer session.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.JoinInvited(System.Collections.Generic.IEnumerable{Microsoft.Xna.Framework.GamerServices.SignedInGamer})">
+      <summary>Joins the specified local gamers, along with the local machine, to an existing network session in response to an InviteAccepted notification event from a non-local session.</summary>
+      <param name="localGamers">A collection of local signed-in gamers to add to the network session.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.JoinInvited(System.Int32)">
+      <summary>Joins the local machine to an existing network session in response to an InviteAccepted notification event from a non-local session.</summary>
+      <param name="maxLocalGamers">The number of local signed-in gamers to add to the network session when accepting the invite. This must be at least one, and can be as high as the limit imposed by either the title or platform. On Windows, this value must always be set to one.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.LocalGamers">
+      <summary>Get the collection of local gamers for a multiplayer session.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.MaxGamers">
+      <summary>Gets or sets the maximum number of players able to join this multiplayer session.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSession.MaxPreviousGamers">
+      <summary>Represents the maximum number of gamers that can be held in the PreviousGamers property.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSession.MaxSupportedGamers">
+      <summary>Maximum number of gamers supported in a session.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.PreviousGamers">
+      <summary>A collection of previous gamers in the network session.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.PrivateGamerSlots">
+      <summary>Gets or sets the number of private slots reserved for gamers who join using an invitation.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.RemoteGamers">
+      <summary>Gets the collection of remote gamers for a multiplayer session.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.ResetReady">
+      <summary>Resets the IsReady property of all session gamers.</summary>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Net.NetworkSession.SessionEnded">
+      <summary>Occurs when the multiplayer session ends. Reference page contains links to related code samples.</summary>
+      <param name="" />
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.SessionProperties">
+      <summary>Gets any custom properties that have been attached to the session.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.SessionState">
+      <summary>Gets the current state of a multiplayer session.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.SessionType">
+      <summary>Gets the current multiplayer session type.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.SimulatedLatency">
+      <summary>Gets or sets the amount of simulated network latency.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSession.SimulatedPacketLoss">
+      <summary>Gets or sets the amount of simulated packet loss.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.StartGame">
+      <summary>Changes the session state from NetworkSessionState.Lobby to NetworkSessionState.Playing.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSession.Update">
+      <summary />
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Net.NetworkSession.WriteArbitratedLeaderboard">
+      <summary>Notifies the game of its final chance to write data to arbitrated leaderboards for the specified player.</summary>
+      <param name="" />
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Net.NetworkSession.WriteTrueSkill">
+      <summary>Notifies the game of its final chance to write TrueSkill data for the specified player.</summary>
+      <param name="" />
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Net.NetworkSession.WriteUnarbitratedLeaderboard">
+      <summary>Notifies the game of its final chance to write data to unarbitrated leaderboards for the specified player.</summary>
+      <param name="" />
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.NetworkSessionEndedEventArgs">
+      <summary>Represents the arguments passed to a SessionEnded event. These arguments are passed to event handlers when a session ends.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionEndedEventArgs.#ctor(Microsoft.Xna.Framework.Net.NetworkSessionEndReason)">
+      <summary>Creates an instance of NetworkSessionEndedEventArgs.</summary>
+      <param name="endReason">Reason for ending the session.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSessionEndedEventArgs.EndReason">
+      <summary>Gets the reason for ending a session.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.NetworkSessionEndReason">
+      <summary>Defines the reason a session ended.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionEndReason.ClientSignedOut">
+      <summary>This client player has signed out of session.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionEndReason.Disconnected">
+      <summary>Network connectivity problems ended the session</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionEndReason.HostEndedSession">
+      <summary>The host left the session, removing all active players.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionEndReason.RemovedByHost">
+      <summary>The host removed this client player from the session.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.NetworkSessionJoinError">
+      <summary>Contains additional data about a NetworkSessionJoinException.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionJoinError.SessionFull">
+      <summary>The session exists but does not have any open slots for local signed-in gamers.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionJoinError.SessionNotFound">
+      <summary>The session could not be found. Occurs if the session has ended after the matchmaking query but before the client joined, of if there is no network connectivity between the client and session host machines.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionJoinError.SessionNotJoinable">
+      <summary>The session exists but is not joinable. Occurs if the session is in progress but does not allow gamers to join a session in progress.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.NetworkSessionJoinException">
+      <summary>Thrown if an error was encountered while joining a session.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionJoinException.#ctor">
+      <summary>Creates an empty instance of NetworkSessionJoinException.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionJoinException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary>Creates an instance of NetworkSessionJoinException with the specified streaming context.</summary>
+      <param name="info">Describes information related to the session being joined when the exception occurred.</param>
+      <param name="context">Describes the stream where the exception occurred.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionJoinException.#ctor(System.String)">
+      <summary>Creates an instance of NetworkSessionJoinException with the specified error message.</summary>
+      <param name="message">A message that describes the error.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionJoinException.#ctor(System.String,Microsoft.Xna.Framework.Net.NetworkSessionJoinError)">
+      <summary>Creates an instance of NetworkSessionJoinException with the specified error and additional information on the exception.</summary>
+      <param name="message">A message that describes the error.</param>
+      <param name="joinError">Reason for the exception.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionJoinException.#ctor(System.String,System.Exception)">
+      <summary>Creates an instance of NetworkSessionJoinException with the specified error message and inner exception.</summary>
+      <param name="message">A message that describes the error.</param>
+      <param name="innerException">The inner exception related to this exception.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionJoinException.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary />
+      <param name="info">Information necessary for serialization and deserialization of the session item.</param>
+      <param name="context">Information necessary for the source and destination of a given serialized stream. Also provides an additional caller-defined context.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSessionJoinException.JoinError">
+      <summary>Gets or sets a more detailed description of the session join failure.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.NetworkSessionProperties">
+      <summary>Describes custom, game-specific information about a NetworkSession object. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionProperties.#ctor">
+      <summary>Creates an empty instance of NetworkSessionProperties.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSessionProperties.Count">
+      <summary>Gets the number of custom session properties.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionProperties.GetEnumerator">
+      <summary>Gets an enumerator for iterating over the custom property values.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSessionProperties.Item(System.Int32)">
+      <summary>Gets or sets a custom session property value at the specified index</summary>
+      <param name="index">Index of the item to retrieve.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionProperties.System#Collections#Generic#ICollection{T}#Add(System.Nullable{System.Int32})">
+      <summary>The System.Collections.Generic.ICollection{T}.Add interface method is not supported by NetworkSessionProperties.</summary>
+      <param name="item">The value to add.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionProperties.System#Collections#Generic#ICollection{T}#Clear">
+      <summary>The System.Collections.Generic.ICollection{T}.Clear interface method is not supported by NetworkSessionProperties.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionProperties.System#Collections#Generic#ICollection{T}#Contains(System.Nullable{System.Int32})">
+      <summary>Checks whether the collection contains the specified value.</summary>
+      <param name="item">The value to search for.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionProperties.System#Collections#Generic#ICollection{T}#CopyTo(System.Nullable{System.Int32}[],System.Int32)">
+      <summary>Copies the contents of the collection to an array.</summary>
+      <param name="array">The array to receive the contents of the collection.</param>
+      <param name="arrayIndex">Starting index for the copy operation.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.NetworkSessionProperties.System#Collections#Generic#ICollection{T}#IsReadOnly">
+      <summary>Gets a value indicating whether the collection is read-only.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionProperties.System#Collections#Generic#ICollection{T}#Remove(System.Nullable{System.Int32})">
+      <summary>The System.Collections.Generic.ICollection{T}.Remove interface method is not supported by NetworkSessionProperties.</summary>
+      <param name="item">The item to remove.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionProperties.System#Collections#Generic#IList{T}#IndexOf(System.Nullable{System.Int32})">
+      <summary>Gets the index of the specified value.</summary>
+      <param name="item">The value to search for.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionProperties.System#Collections#Generic#IList{T}#Insert(System.Int32,System.Nullable{System.Int32})">
+      <summary>The System.Collections.Generic.IList{T}.Insert interface method is not supported by NetworkSessionProperties.</summary>
+      <param name="index">Index for the insertion operation</param>
+      <param name="item">Item to insert.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionProperties.System#Collections#Generic#IList{T}#RemoveAt(System.Int32)">
+      <summary>The System.Collections.Generic.IList{T}.RemoveAt interface method is not supported by NetworkSessionProperties.</summary>
+      <param name="index">Index of the item to remove.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.NetworkSessionProperties.System#Collections#IEnumerable#GetEnumerator">
+      <summary>Gets an enumerator for iterating over the custom property values.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.NetworkSessionState">
+      <summary>Defines the different states of a multiplayer session.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionState.Ended">
+      <summary>The local machine has left the current session or the session has ended. The SessionEnded event is raised at this time. The event's arguments describe the reason for the session ending.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionState.Lobby">
+      <summary>The local machine joins the session, waiting in the pregame lobby. The GameStarted event is raised when gameplay begins.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionState.Playing">
+      <summary>The local machine joins the session, currently in the middle of gameplay. The GameEnded event is raised when the session returns to the lobby.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.NetworkSessionType">
+      <summary>Defines the different types of a multiplayer session. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionType.Local">
+      <summary>Does not involve any networking traffic, but can be used for split-screen gaming on a single Xbox 360 console. Creating a local network session may also make it easier to share code between local and online game modes.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionType.LocalWithLeaderboards">
+      <summary>Creates a local session with access to write to leaderboards on the Xbox LIVE servers. This local session type allows guests or other Xbox LIVE player profiles to join the session.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionType.PlayerMatch">
+      <summary>Uses the Xbox LIVE servers. This enables connection to other machines over the Internet. It requires a Xbox LIVE Silver Membership for Windows-based games or a Xbox LIVE Gold membership for Xbox 360 games. Games in development will also require an App Hub premium membership. While in trial mode, Indie games downloaded from Xbox LIVE Markeplace will not have access to Xbox LIVE matchmaking.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionType.Ranked">
+      <summary>All session matches are ranked. This option is available only for commercial games that have passed Xbox LIVE certification. Due to the competitive nature of the gameplay, this session type does not support join-in-progress.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.NetworkSessionType.SystemLink">
+      <summary>Connect multiple Xbox 360 consoles or computers over a local subnet. These machines do not require a connection to Xbox LIVE or any Xbox LIVE accounts. However, connection to machines on different subnets is not allowed. If you are an App Hub developer testing your game, you can use this type to connect an Xbox 360 console to a computer. However, cross-platform networking is not supported in games distributed to non–App Hub community players.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.PacketReader">
+      <summary>Provides common functionality for efficiently reading incoming network packets. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketReader.#ctor">
+      <summary>Initializes an empty instance of PacketReader.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketReader.#ctor(System.Int32)">
+      <summary>Initializes an empty instance of PacketReader with the specified options.</summary>
+      <param name="capacity">Initial capacity for a received network packet.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.PacketReader.Length">
+      <summary>Gets the length of the packet being read.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.PacketReader.Position">
+      <summary>Gets or sets the current packet read position.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketReader.ReadColor">
+      <summary>Reads a Color value.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketReader.ReadDouble">
+      <summary>Reads an 8-byte floating point value. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketReader.ReadMatrix">
+      <summary>Reads a Matrix value. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketReader.ReadQuaternion">
+      <summary>Reads a Quaternion value. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketReader.ReadSingle">
+      <summary>Reads a 4-byte floating point value. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketReader.ReadVector2">
+      <summary>Reads a Vector2 value. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketReader.ReadVector3">
+      <summary>Reads a Vector3 value. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketReader.ReadVector4">
+      <summary>Reads a Vector3 value. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.PacketWriter">
+      <summary>Provides common functionality for efficiently formatting outgoing network packets. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketWriter.#ctor">
+      <summary>Initializes an empty instance of PacketWriter.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketWriter.#ctor(System.Int32)">
+      <summary>Initializes a new instance of PacketWriter with the specified capacity.</summary>
+      <param name="capacity">Capacity for the packet writer.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.PacketWriter.Length">
+      <summary>Gets the length of the packet being written.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.PacketWriter.Position">
+      <summary>Gets or sets the current packet write position.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketWriter.Write(Microsoft.Xna.Framework.Color)">
+      <summary>Writes a Color value to an outgoing network packet.</summary>
+      <param name="value">Value to be written.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketWriter.Write(Microsoft.Xna.Framework.Matrix)">
+      <summary>Writes a Matrix value to an outgoing network packet. Reference page contains links to related code samples.</summary>
+      <param name="value">Value being written.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketWriter.Write(Microsoft.Xna.Framework.Quaternion)">
+      <summary>Writes a Quaternion value to an outgoing network packet. Reference page contains links to related code samples.</summary>
+      <param name="value">Value being written.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketWriter.Write(Microsoft.Xna.Framework.Vector2)">
+      <summary>Writes a Vector2 value to an outgoing network packet. Reference page contains links to related code samples.</summary>
+      <param name="value">Value being written.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketWriter.Write(Microsoft.Xna.Framework.Vector3)">
+      <summary>Writes a Vector3 value to an outgoing network packet. Reference page contains links to related code samples.</summary>
+      <param name="value">Value being written.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketWriter.Write(Microsoft.Xna.Framework.Vector4)">
+      <summary>Writes a Vector4 value to an outgoing network packet. Reference page contains links to related code samples.</summary>
+      <param name="value">Value being written.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketWriter.Write(System.Double)">
+      <summary>Writes a Double value to an outgoing network packet.</summary>
+      <param name="value">Value to be written.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Net.PacketWriter.Write(System.Single)">
+      <summary>Writes a Single value to an outgoing network packet.</summary>
+      <param name="value">Value to be written.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.QualityOfService">
+      <summary>Describes the quality of the network connection between this machine and the host of a multiplayer session that was discovered with a matchmaking query.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.QualityOfService.AverageRoundtripTime">
+      <summary>Gets the average (median) round trip time of all the network packets that were sent during the quality of service measurement process.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.QualityOfService.BytesPerSecondDownstream">
+      <summary>Gets an estimate of the available downstream network bandwidth from the session host to this machine, measured in bytes per second.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.QualityOfService.BytesPerSecondUpstream">
+      <summary>Gets an estimate of the available upstream network bandwidth from this machine to the session host, measured in bytes per second.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.QualityOfService.IsAvailable">
+      <summary>Checks whether this quality of service operation has completed.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.QualityOfService.MinimumRoundtripTime">
+      <summary>Gets the minimum round trip time of any network packet that was sent during the quality of service measurement process.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.SendDataOptions">
+      <summary>Defines options for network packet transmission.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.SendDataOptions.Chat">
+      <summary>Mark that this packet contains chat data, such as a player-to-player message string entered using the keyboard. To comply with international regulations, you must send such data without packet encryption. Therefore, you must use this flag to mark it. To maintain security, other game data should not use this flag. It is acceptable and efficient to mix encrypted and unencrypted data. If you send packets both with and without this flag within a single frame, both the encrypyted and unencrypted data streams will be merged into a single wire packet. This option can be combined with either or both of the Reliable and InOrder flags. When you request in-order delivery for chat packets, they will be ordered relative to other chat packets, but they may arrive out of order with respect to other non-chat data.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.SendDataOptions.InOrder">
+      <summary>Sends the data with guaranteed ordering, but without reliable delivery. Occasionally, packets of this type are not delivered. However, any delivered packets always arrive in the order in which they are sent. Use this option in situations where the transmitted value changes constantly. Old versions never arrive after a more recent version.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.SendDataOptions.None">
+      <summary>Sends the data with no guarantees. Packets of this type may be delivered in any order, with occasional packet loss. This is the most efficient option in terms of network bandwidth and machine resource usage. However, it is recommended only in situations where your game can recover from occasional packet loss.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.SendDataOptions.Reliable">
+      <summary>Sends the data with reliable delivery, but no special ordering. Packets of this type are resent until arrival at the destination. They may arrive out of order.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Net.SendDataOptions.ReliableInOrder">
+      <summary>Sends the data with reliability and arrival in the order originally sent. Packets of this type are resent until arrival and ordered internally. This means they arrive in the same order in which they were sent. In terms of network bandwidth usage, this is the strongest and most expensive option. Use this only when arrival and ordering are essential. Commonly, a game uses this option for a small percentage of packets. The majority of gameplay data is sent using None or Reliable.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Net.WriteLeaderboardsEventArgs">
+      <summary>Represents the arguments passed to a WriteArbitratedLeaderboard. WriteUnarbitratedLeaderboard, or WriteTrueSkill event.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.WriteLeaderboardsEventArgs.Gamer">
+      <summary>Gets the gamer whose statistics need to be written to the leaderboard.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Net.WriteLeaderboardsEventArgs.IsLeaving">
+      <summary>Indicates whether or not the player is leaving the session early.</summary>
+    </member>
+  </members>
+</doc>
