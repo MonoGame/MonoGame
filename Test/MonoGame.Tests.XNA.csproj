@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MonoGame.Tests</RootNamespace>
-    <AssemblyName>MonoGame.Tests.XNA</AssemblyName>
+    <AssemblyName>MonoGameTests.XNA</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -87,6 +87,7 @@
     <Compile Include="ContentPipeline\AssetTestUtility.cs" />
     <Compile Include="ContentPipeline\AudioContentTests.cs" />
     <Compile Include="ContentPipeline\BitmapContentTests.cs" />
+    <Compile Include="ContentPipeline\EffectProcessorTests.cs" />
     <Compile Include="ContentPipeline\FbxImporterTests.cs" />
     <Compile Include="ContentPipeline\FontDescriptionTests.cs" />
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="ContentPipeline\TestImporterContext.cs" />
     <Compile Include="ContentPipeline\TestProcessorContext.cs" />
     <Compile Include="ContentPipeline\TextureContentTests.cs" />
+    <Compile Include="ContentPipeline\TextureImporterTests.cs" />
     <Compile Include="ContentPipeline\TextureProcessorTests.cs" />
     <Compile Include="ContentPipeline\WavImporterTests.cs" />
     <Compile Include="ContentPipeline\WmaImporterTests.cs" />
@@ -148,6 +150,7 @@
     <Compile Include="Framework\MatrixTest.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
+    <Compile Include="Framework\PointTest.cs" />
     <Compile Include="Framework\QuaternionTest.cs" />
     <Compile Include="Framework\RectangleTest.cs" />
     <Compile Include="Framework\TitleContainerTest.cs" />

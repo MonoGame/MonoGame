@@ -5,6 +5,7 @@ namespace MonoGame.Tests.Framework
 {
     public class PointTest
     {
+#if !XNA
         [Test]
         public void Deconstruct()
         {
@@ -17,5 +18,6 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(x, point.X);
             Assert.AreEqual(y, point.Y);
         }
+#endif
     }
 }
