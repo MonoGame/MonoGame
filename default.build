@@ -59,6 +59,8 @@
       <exec program="Protobuild" commandline="-generate WindowsGL" />
       <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Build /p:Configuration=Release" />
+      <exec program="msbuild " commandline="Test/MonoGame.Tests.XNA.csproj /t:Clean /p:Configuration=Debug" />
+      <exec program="msbuild " commandline="Test/MonoGame.Tests.XNA.csproj /t:Build /p:Configuration=Debug" />
       <call target="build_portable"/>
     </if>
     <if test="${os == 'Unix'}">
@@ -217,6 +219,7 @@
 
     <if test="${os == 'Win32NT'}">
       <exec program="MonoGameTests.exe" commandline="--teamcity" workingdir="Test/bin/Windows/AnyCPU/Debug/" basedir="Test/bin/Windows/AnyCPU/Debug/"/>
+      <exec program="MonoGameTests.XNA.exe" commandline="--teamcity" workingdir="Test/bin/XNA/Debug/" basedir="Test/bin/XNA/Debug/"/>
     </if>
 
     <if test="${os == 'MacOS'}">
