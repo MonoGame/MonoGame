@@ -105,7 +105,7 @@ Icon=monogame
 StartupNotify=true
 Terminal=false
 Type=Application
-MimeType=text/mgcb;
+MimeType=text/x-mgcb;
 Categories=Development;
 StartupWMClass=Pipeline
 endmsg
