@@ -272,27 +272,18 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-#if DESKTOPGL
-        [Ignore("NVidia native library could not be loaded on Mac build server.")]
-#endif
         public void CompressDefaultWindowsOpaque()
         {
             CompressDefault<Dxt1BitmapContent>(TargetPlatform.Windows, Color.Red);
         }
 
         [Test]
-#if DESKTOPGL
-        [Ignore("NVidia native library could not be loaded on Mac build server.")]
-#endif
         public void CompressDefaultWindowsCutOut()
         {
             CompressDefault<Dxt3BitmapContent>(TargetPlatform.Windows, Color.Transparent);
         }
 
         [Test]
-#if DESKTOPGL
-        [Ignore("NVidia native library could not be loaded on Mac build server.")]
-#endif
         public void CompressDefaultWindowsAlpha()
         {
             CompressDefault<Dxt5BitmapContent>(TargetPlatform.Windows, Color.Red * 0.5f);

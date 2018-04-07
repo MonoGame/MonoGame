@@ -98,12 +98,12 @@
       <Link>libnvmath.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll" Condition="Exists ('/Applications/Utilities/Console.app/')">
+    <None Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
       <Link>Nvidia.TextureTools.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config" Condition="Exists ('/Applications/Utilities/Console.app/')">
+    <None Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll.config" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
       <Link>Nvidia.TextureTools.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
