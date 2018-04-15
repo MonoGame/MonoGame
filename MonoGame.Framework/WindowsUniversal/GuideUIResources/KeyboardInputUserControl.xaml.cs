@@ -16,7 +16,7 @@ using Windows.UI.Xaml.Navigation;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace Microsoft.Xna.Framework.WindowsUniversal.GuideUIResources
+namespace Microsoft.Xna.Framework.GamerServices
 {
     public sealed partial class KeyboardInputUserControl : UserControl
     {

@@ -54,8 +54,6 @@ using Windows.UI.Popups;
 using Windows.Services.Store;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Microsoft.Xna.Framework.WindowsUniversal.GuideUIResources;
-
 #else
 using System.Runtime.Remoting.Messaging;
 #if !(WINDOWS && DIRECTX)
