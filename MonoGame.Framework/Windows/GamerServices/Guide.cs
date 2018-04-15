@@ -45,6 +45,7 @@ using MGXna_Framework = global::Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Windows.ApplicationModel.Core;
 using Windows.Services.Store;
@@ -83,6 +84,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         private static readonly CoreDispatcher _dispatcher;
 
 
+        private static SwapChainPanel swapChainPanel;
         //We make this populate on demand rather than in CTOR to avoid issues where the XAML isnt rendered yet. We dont switch to UI thread because this should only be used in something thats already on the UI thread and dispatcher inside dispatcher causes deadlocks.
         private static Grid containerGrid;
         public static Grid ContainerGrid
@@ -100,6 +102,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 
                         SwapChainPanel scPanel = (SwapChainPanel) content;
 
+                        swapChainPanel = scPanel;
+
                         Page root = (Page)scPanel.Parent;
 
                         root.Content = null;
@@ -114,11 +118,74 @@ namespace Microsoft.Xna.Framework.GamerServices
                     else if(content is Grid)
                     {
                         containerGrid = ((Grid) ((Page) ((Frame) Windows.UI.Xaml.Window.Current.Content)?.Content)?.Content);
+
+                        if (swapChainPanel == null)
+                        {
+                            swapChainPanel = (SwapChainPanel)containerGrid.Children.First(t => t is SwapChainPanel);
+                        }
                     }
                 }
 
 
                 return containerGrid;
+            }
+        }
+
+        private static bool _wasMouseHidden;
+
+        private static CoreWindow _coreWindow;
+        private static CoreWindow coreWindow
+        {
+            get
+            {
+                if (_coreWindow == null)
+                {
+                    _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        _coreWindow = Windows.UI.Xaml.Window.Current.CoreWindow;
+                    }).AsTask().Wait();
+                }
+
+                return _coreWindow;
+            }
+        }
+
+        internal static void SetCursor(bool visible)
+        {
+            var asyncResult = coreWindow.Dispatcher.RunIdleAsync((e) =>
+            {
+                if (visible)
+                    coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
+                else
+                    coreWindow.PointerCursor = null;
+            });
+        }
+
+        internal static bool GetCursorVisibility()
+        {
+            bool isVisible = false;
+            var asyncResult = coreWindow.Dispatcher.RunIdleAsync((e) => { isVisible = coreWindow.PointerCursor != null; });
+            return isVisible;
+        }
+
+        private static void ShowMouse()
+        {
+            if (!GetCursorVisibility())
+            {
+                _wasMouseHidden = true;
+                SetCursor(true);
+            }
+            else
+            {
+                _wasMouseHidden = false;
+            }
+        }
+
+        private static void HideMouse()
+        {
+            if (_wasMouseHidden)
+            {
+                SetCursor(false);
             }
         }
 
@@ -190,16 +257,17 @@ namespace Microsoft.Xna.Framework.GamerServices
             _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 KeyboardInputUserControl keyboardInputUserControl = new KeyboardInputUserControl(showKeyboardInputTaskCompletion);
-
+                
                 ContainerGrid.Children.Add(keyboardInputUserControl);
-                keyboardInputUserControl.SetValues(title,description,defaultText, () =>
+                keyboardInputUserControl.SetValues(title,description, usePasswordMode, defaultText, () =>
                 {
                     RemoveElementFromUI(keyboardInputUserControl);
                     IsVisible = false;
+                    HideMouse();
                 });
         }).AsTask().Wait();
 
-            
+            ShowMouse();
 
             return showKeyboardInputTaskCompletion.Task.AsApm(callback, state);
         }

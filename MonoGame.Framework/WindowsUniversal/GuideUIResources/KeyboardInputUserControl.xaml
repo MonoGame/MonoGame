@@ -67,6 +67,7 @@
                         </Grid>
                         <TextBlock FontSize="28" Margin="15" x:Name="Description"></TextBlock>
                         <TextBox Margin="10,10,10,50" x:Name="TextEntry" FontSize="24"></TextBox>
+                            <PasswordBox Margin="10,10,10,50" x:Name="PasswordEntry" FontSize="24"></PasswordBox>
 
                         <Grid Background="{ThemeResource BackdropBrush60Perc}">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

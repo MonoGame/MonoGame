@@ -22,6 +22,7 @@ namespace Microsoft.Xna.Framework.WindowsUniversal.GuideUIResources
     {
         private TaskCompletionSource<string> tcs;
         private Action closeMe;
+        private bool passWordMode;
         public KeyboardInputUserControl(TaskCompletionSource<string> _tcs)
         {
            
@@ -30,7 +31,7 @@ namespace Microsoft.Xna.Framework.WindowsUniversal.GuideUIResources
             this.InitializeComponent();
         }
 
-        public void SetValues(string title, string description, string defaultText = "", Action _closeMe = null)
+        public void SetValues(string title, string description, bool passwordMode, string defaultText = "", Action _closeMe = null)
         {
             closeMe = _closeMe;
             this.Title.Text = title;
@@ -40,11 +41,26 @@ namespace Microsoft.Xna.Framework.WindowsUniversal.GuideUIResources
                 TextEntry.Text = defaultText;
             }
 
+            this.passWordMode = passwordMode;
+            if (passwordMode)
+            {
+                TextEntry.Visibility = Visibility.Collapsed;
+                PasswordEntry.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                TextEntry.Visibility = Visibility.Visible;
+                PasswordEntry.Visibility = Visibility.Collapsed;
+            }
+
         }
 
         private void OkayTapped(object sender, TappedRoutedEventArgs e)
         {
-            tcs.TrySetResult(TextEntry.Text);
+            string txt;
+            txt = passWordMode ? PasswordEntry.Password : TextEntry.Text;
+
+            tcs.TrySetResult(txt);
             closeMe?.Invoke();
         }
 
