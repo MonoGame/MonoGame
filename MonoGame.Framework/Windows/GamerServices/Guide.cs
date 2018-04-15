@@ -308,8 +308,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 
 #if !WINDOWS_UAP
-ShowKeyboardInputDelegate ski = ShowKeyboardInput;
-            //	return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
+            ShowKeyboardInputDelegate ski = ShowKeyboardInput;
+            return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
 #else
             IsVisible = true;
             return ShowKeyboardInput(player, title, description, defaultText, usePasswordMode, callback, state);
