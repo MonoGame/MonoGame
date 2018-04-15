@@ -1,0 +1,89 @@
+﻿<UserControl
+    x:Class="Microsoft.Xna.Framework.WindowsUniversal.GuideUIResources.KeyboardInputUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Microsoft.Xna.Framework.WindowsUniversal.GuideUIResources"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <AcrylicBrush x:Key="DimBackground"
+                      BackgroundSource="Backdrop"
+                      TintColor="Gray"
+                      TintOpacity="0.2"
+                      FallbackColor="#80808080"
+        />
+
+        <AcrylicBrush x:Key="BackdropBrush60Perc"
+                      BackgroundSource="Backdrop"
+                      TintColor="Black"
+                      TintOpacity="0.6"
+                      FallbackColor="Gray"
+        />
+
+        <AcrylicBrush x:Key="BackdropBrush40Perc"
+                      BackgroundSource="Backdrop"
+                      TintColor="Black"
+                      TintOpacity="0.4"
+                      FallbackColor="Gray"
+        />
+
+        <AcrylicBrush x:Key="BackdropBrush40WhitePerc"
+                      BackgroundSource="Backdrop"
+                      TintColor="White"
+                      TintOpacity="0.4"
+                      FallbackColor="White"
+        />
+
+
+        <AcrylicBrush x:Key="BackdropBrush40BluePerc"
+                      BackgroundSource="Backdrop"
+                      TintColor="CornflowerBlue"
+                      TintOpacity="0.4"
+                      FallbackColor="CornflowerBlue"
+        />
+    </UserControl.Resources>
+    <Grid Background="{ThemeResource DimBackground}">
+
+        <Grid>
+
+            <Grid VerticalAlignment="Center" Grid.Column="1" Padding="30">
+                <Rectangle Stroke="Black" Margin="10" RadiusX="2" RadiusY="2" Opacity="0.3"/>
+                <Rectangle Stroke="Black" Margin="9" RadiusX="3" RadiusY="3" Opacity="0.27"/>
+                <Rectangle Stroke="Black" Margin="8" RadiusX="4" RadiusY="4" Opacity="0.24"/>
+                <Rectangle Stroke="Black" Margin="7" RadiusX="5" RadiusY="5" Opacity="0.21"/>
+                <Rectangle Stroke="Black" Margin="6" RadiusX="6" RadiusY="6" Opacity="0.18"/>
+                <Rectangle Stroke="Black" Margin="5" RadiusX="7" RadiusY="7" Opacity="0.15"/>
+                <Rectangle Stroke="Black" Margin="4" RadiusX="8" RadiusY="8" Opacity="0.12"/>
+                <Rectangle Stroke="Black" Margin="3" RadiusX="9" RadiusY="9" Opacity="0.09"/>
+                <Rectangle Stroke="Black" Margin="2" RadiusX="10" RadiusY="10" Opacity="0.06"/>
+                <Rectangle Stroke="Black" Margin="1" RadiusX="11" RadiusY="11" Opacity="0.03"/>
+                <Rectangle Stroke="Black" Margin="0" RadiusX="12" RadiusY="12" Opacity="0.05"/>
+                <Grid Margin="10">
+                <Grid Background="{ThemeResource BackdropBrush40Perc}">
+                    <StackPanel Margin="0,0,0,0">
+                        <Grid Background="{ThemeResource BackdropBrush40BluePerc}" Grid.Row="1" Grid.Column="1" >
+                            <TextBlock FontSize="36" x:Name="Title" Margin="10,0,0,0">Title</TextBlock>
+                        </Grid>
+                        <TextBlock FontSize="28" Margin="15" x:Name="Description"></TextBlock>
+                        <TextBox Margin="10,10,10,50" x:Name="TextEntry" FontSize="24"></TextBox>
+
+                        <Grid Background="{ThemeResource BackdropBrush60Perc}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Margin="15" Tapped="CancelTapped" Background="{ThemeResource BackdropBrush40WhitePerc}" FontSize="24" Width="120">Cancel</Button>
+                                <Button Margin="15" Tapped="OkayTapped"  Background="{ThemeResource BackdropBrush40WhitePerc}" FontSize="24"  Width="120">Okay</Button>
+
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+
+                </Grid>
+</Grid>
+               
+            </Grid>
+        </Grid>
+
+      
+
+    </Grid>
+</UserControl>
