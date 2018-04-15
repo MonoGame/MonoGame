@@ -2,11 +2,11 @@
 # Please make sure that the issue is present in the
 # develop branch of MonoGame before reporting
 #
-# You can download the development build insaller from:
+# You can download the development build installer from:
 # http://www.monogame.net/downloads/
 -->
 
-<!-- Write your issue bellow >
+<!-- Write your issue below -->
 
 
 
@@ -21,5 +21,5 @@
 - Windows
 
 #### What MonoGame platform are you using:
-<!-- ie. DesktopGL, WindowsDX, WindowsUWP, Android:-->
+<!-- e.g. DesktopGL, WindowsDX, WindowsUWP, Android -->
 - DesktopGL
