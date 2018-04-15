@@ -46,20 +46,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
-using Windows.ApplicationModel.Core;
+
+#if WINDOWS_UAP
+using System.Threading.Tasks;
+using Windows.UI.Core;
+using Windows.UI.Popups;
 using Windows.Services.Store;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Microsoft.Xna.Framework.WindowsUniversal.GuideUIResources;
-#if WINDOWS_UAP
-using System.Threading.Tasks;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Store;
-using Windows.UI.Core;
-using Windows.UI.Popups;
-using Windows.System;
-using Microsoft.Xna.Framework.Input;
+
 #else
 using System.Runtime.Remoting.Messaging;
 #if !(WINDOWS && DIRECTX)
