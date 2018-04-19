@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GetInteger((GetPName)GetParamName.MaxSamples, out _maxMultiSampleCount);
 
-            SupportsInstancing = GL.BoundApi == GL.RenderApi.GL && GL.VertexAttribDivisor != null;
+            SupportsInstancing = GL.VertexAttribDivisor != null;
         }
 
     }
