@@ -1191,7 +1191,6 @@ namespace Microsoft.Xna.Framework.Graphics
                                      indexOffsetInBytes,
                                      instanceCount);
             GraphicsExtensions.CheckGLError();
-#endif
         }
 
         private void PlatformGetBackBufferData<T>(Rectangle? rectangle, T[] data, int startIndex, int count) where T : struct
