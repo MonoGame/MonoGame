@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// True, if the underlying platform supports floating point textures. 
         /// For Direct3D platforms this is always <code>true</code>.
         /// For OpenGL Desktop platforms it is always <code>true</code>.
-        /// For OpenGL Mobile platforms is requires `GL_EXT_color_buffer_float`.
+        /// For OpenGL Mobile platforms it requires `GL_EXT_color_buffer_float`.
         /// If the requested format is not supported an <code>NotSupportedException</code>
         /// will be thrown.
         /// </summary>
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// True, if the underlying platform supports half floating point textures. 
         /// For Direct3D platforms this is always <code>true</code>.
         /// For OpenGL Desktop platforms it is always <code>true</code>.
-        /// For OpenGL Mobile platforms is requires `GL_EXT_color_buffer_half_float`.
+        /// For OpenGL Mobile platforms it requires `GL_EXT_color_buffer_half_float`.
         /// If the requested format is not supported an <code>NotSupportedException</code>
         /// will be thrown.
         /// </summary>
