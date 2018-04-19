@@ -6,7 +6,7 @@ using System;
 using System.IO;
 
 using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Utilities;
+
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Content
                 var dirPath = Path.Combine(input.ContentManager.RootDirectoryFullPath, input.AssetName);
 
                 // Resolve the relative path
-                path = FileHelpers.ResolveRelativePath(dirPath, path);
+                path = MonoGame.Utilities.FileHelpers.ResolveRelativePath(dirPath, path);
 			}
 			
 			var durationMs = input.ReadObject<int>();

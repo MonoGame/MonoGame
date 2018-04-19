@@ -4,7 +4,6 @@
 
 using System;
 using System.IO;
-using Microsoft.Xna.Framework.Utilities;
 using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework
@@ -69,7 +68,7 @@ namespace Microsoft.Xna.Framework
             var uri = new Uri("file:///" + name);
             var path = uri.LocalPath;
             path = path.Substring(1);
-            return path.Replace(FileHelpers.NotSeparator, FileHelpers.Separator);
+            return path.Replace(MonoGame.Utilities.FileHelpers.NotSeparator, MonoGame.Utilities.FileHelpers.Separator);
         }
     }
 }
