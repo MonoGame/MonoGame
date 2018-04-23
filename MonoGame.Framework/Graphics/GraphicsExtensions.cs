@@ -515,6 +515,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var supportsFloat = graphicsDevice.GraphicsCapabilities.SupportsFloatTextures;
             var supportsHalfFloat = graphicsDevice.GraphicsCapabilities.SupportsHalfFloatTextures;
             var supportsNormalized = graphicsDevice.GraphicsCapabilities.SupportsNormalized;
+            var isGLES2 = GL.BoundApi == GL.RenderApi.ES && graphicsDevice.glMajorVersion == 2;
 
 			switch (format) {
 			case SurfaceFormat.Color:
@@ -633,7 +634,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     goto case InvalidFormat;
                 glInternalFormat = PixelInternalFormat.R16f;
                 glFormat = PixelFormat.Red;
-                glType = PixelType.HalfFloat;
+                glType = isGLES2 ? PixelType.HalfFloatOES : PixelType.HalfFloat;
                 break;
 
             case SurfaceFormat.Vector2:

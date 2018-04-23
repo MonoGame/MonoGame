@@ -435,6 +435,7 @@ namespace MonoGame.OpenGL
         UnsignedShort5551 = 0x8034,
         Float = 0x1406,
         HalfFloat = 0x140B,
+        HalfFloatOES = 0x8D61,
         Byte = 0x1400,
         UnsignedShort = 0x1403,
         UnsignedInt1010102 = 0x8036,
