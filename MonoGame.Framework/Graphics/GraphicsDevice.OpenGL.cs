@@ -1060,6 +1060,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                      indexElementType,
                                      indexOffsetInBytes);
             GraphicsExtensions.CheckGLError();
+
+            _attribsDirty = true;
         }
 
         private void PlatformDrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, VertexDeclaration vertexDeclaration, int vertexCount) where T : struct
@@ -1103,6 +1105,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			              vertexStart,
 			              vertexCount);
             GraphicsExtensions.CheckGLError();
+
+            _attribsDirty = true;
         }
 
         private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
