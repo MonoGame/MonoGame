@@ -200,7 +200,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // If instancing is not supported, but InstanceFrequency of the buffer is not zero, throw an exception
                 if (!GraphicsCapabilities.SupportsInstancing && vertexBufferBinding.InstanceFrequency > 0)
-                    throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2. Try upgrading your graphics drivers.");
+                    throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2 or GLES 3.2. Try upgrading your graphics drivers.");
 
                 foreach (var element in attrInfo.Elements)
                 {
@@ -211,11 +211,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         vertexStride,
                         (IntPtr)(offset.ToInt64() + element.Offset));
 
-#if !(GLES || MONOMAC)
                     // only set the divisor if instancing is supported
                     if (GraphicsCapabilities.SupportsInstancing) 
                         GL.VertexAttribDivisor(element.AttributeLocation, vertexBufferBinding.InstanceFrequency);
-#endif
 
                     GraphicsExtensions.CheckGLError();
                 }
@@ -1173,11 +1171,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
         {
-#if GLES || MONOMAC
-            throw new PlatformNotSupportedException("Instanced geometry drawing is not supported yet for GLES or MONOMAC.");
-#else
             if (!GraphicsCapabilities.SupportsInstancing)
-                throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2. Try upgrading your graphics card drivers.");
+                throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2 or GLES 3.2. Try upgrading your graphics card drivers.");
             ApplyState(true);
 
             var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
@@ -1196,7 +1191,6 @@ namespace Microsoft.Xna.Framework.Graphics
                                      indexOffsetInBytes,
                                      instanceCount);
             GraphicsExtensions.CheckGLError();
-#endif
         }
 
         private void PlatformGetBackBufferData<T>(Rectangle? rectangle, T[] data, int startIndex, int count) where T : struct
