@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="2MGFX" Path="Tools/2MGFX" Type="Console" Platforms="Windows">
+<Project Name="2MGFX" Path="Tools/2MGFX" Type="Console" Platforms="Windows,Linux,MacOS">
 
   <!-- Common assembly references -->
   <References>
@@ -22,9 +22,36 @@
 
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
+      <Platform Name="Linux">TRACE;LINUX</Platform>
+      <Platform Name="MacOS">TRACE;MACOS</Platform>
     </CustomDefinitions>
-
   </Properties>
+
+  <Dependencies>
+    <Uses Name="HLSL">
+      <Platforms>Windows</Platforms>
+    </Uses>
+    <Uses Name="MojoShader">
+      <Platforms>Windows</Platforms>
+    </Uses>
+    <Uses Name="GLFX">
+      <Platforms>Windows,Linux,MacOS</Platforms>
+    </Uses>
+  </Dependencies>
+
+  <Services>
+    <Service Name="HLSL">
+      <AddDefine>HLSL;</AddDefine>
+      <Platforms>Windows</Platforms>
+    </Service>
+    <Service Name="MojoShader">
+      <Platforms>Windows</Platforms>
+      <Requires>HLSL</Requires>
+    </Service>
+    <Service Name="GLFX">
+      <Platforms>Windows,Linux,MacOS</Platforms>
+    </Service>
+  </Services>
 
   <Files>
 
@@ -69,6 +96,12 @@
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\GraphicsResource.cs">
       <Link>MonoGame.Framework\GraphicsResource.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\Shader\SamplerType.cs">
+      <Link>MonoGame.Framework\SamplerType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\Shader\ShaderStage.cs">
+      <Link>MonoGame.Framework\ShaderStage.cs</Link>
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\States\Blend.cs">
       <Link>MonoGame.Framework\Blend.cs</Link>
@@ -181,37 +214,60 @@
 
     <!-- The core mgfx generation classes -->
     <Compile Include="ConstantBufferData.cs" />
-    <Compile Include="ConstantBufferData.mojo.cs" />
-    <Compile Include="ConstantBufferData.sharpdx.cs" />
+    <Compile Include="ConstantBufferData.mojo.cs">
+      <Services>MojoShader</Services>
+    </Compile>
+    <Compile Include="ConstantBufferData.sharpdx.cs">
+      <Services>HLSL</Services>
+    </Compile>
     <Compile Include="ConstantBufferData.writer.cs" />
     <Compile Include="EffectObject.cs" />
-    <Compile Include="EffectObject.hlsl.cs" />
+    <Compile Include="EffectObject.hlsl.cs">
+      <Services>HLSL</Services>
+    </Compile>
     <Compile Include="EffectObject.pssl.cs" />
     <Compile Include="EffectObject.writer.cs" />    
     <Compile Include="IEffectCompilerOutput.cs" />
     <Compile Include="ShaderCompilerException.cs" />
     <Compile Include="ShaderData.cs" />
-    <Compile Include="ShaderData.mojo.cs" />
+    <Compile Include="ShaderData.mojo.cs">
+      <Services>MojoShader</Services>
+    </Compile>
     <Compile Include="ShaderData.pssl.cs" />
-    <Compile Include="ShaderData.sharpdx.cs" />
+    <Compile Include="ShaderData.sharpdx.cs">
+      <Services>HLSL</Services>
+    </Compile>
     <Compile Include="ShaderData.writer.cs" />
     <Compile Include="PassInfo.cs" />
     <Compile Include="SamplerStateInfo.cs" />
+    <Compile Include="VsInputVariableInfo.cs" />
     <Compile Include="ShaderInfo.cs" />
     <Compile Include="ShaderProfile.cs" />
-    <Compile Include="ShaderProfile.OpenGL.cs" />
-    <Compile Include="ShaderProfile.DirectX.cs" />
+    <Compile Include="ShaderProfile.OpenGL.cs">
+      <Services>MojoShader</Services>
+    </Compile>
+    <Compile Include="ShaderProfile.DirectX.cs">
+      <Services>HLSL</Services>
+    </Compile>
+    <Compile Include="ShaderProfile.GLFX.cs">
+      <Services>GLFX</Services>
+    </Compile>
     <Compile Include="ShaderResult.cs" />
     <Compile Include="TechniqueInfo.cs" />
     <Compile Include="TextureFilterType.cs" />
 
     <!-- The HLSL to GLSL conversion utility -->
-    <Compile Include="MarshalHelper.cs" />
-    <Compile Include="MojoShader.cs" />
+    <Compile Include="MarshalHelper.cs">
+      <Services>MojoShader</Services>
+    </Compile>
+    <Compile Include="MojoShader.cs">
+      <Services>MojoShader</Services>
+    </Compile>
 
     <!-- The MGFX parser -->
     <None Include="MGFX.tpg" />
     <Compile Include="Parser.cs" />
+    <Compile Include="Parser.Static.cs" />
     <Compile Include="ParseTree.cs" />
     <Compile Include="Scanner.cs" />
     <Compile Include="ParseTreeTools.cs" />

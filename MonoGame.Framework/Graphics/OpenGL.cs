@@ -747,18 +747,8 @@ namespace MonoGame.OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        internal unsafe delegate void Uniform4fvDelegate (int location, int size, float* values);
-        internal static Uniform4fvDelegate Uniform4fv;
-
-        [System.Security.SuppressUnmanagedCodeSecurity ()]
-        [MonoNativeFunctionWrapper]
-        internal delegate void Uniform1iDelegate (int location, int value);
-        internal static Uniform1iDelegate Uniform1i;
-
-        [System.Security.SuppressUnmanagedCodeSecurity ()]
-        [MonoNativeFunctionWrapper]
         internal delegate void ScissorDelegate (int x, int y, int width, int height);
-        internal static ScissorDelegate Scissor;
+       internal static ScissorDelegate Scissor;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
@@ -803,6 +793,66 @@ namespace MonoGame.OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
+        public delegate void Uniform1iDelegate (int location, int value);
+        public static Uniform1iDelegate Uniform1i;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        public unsafe delegate void Uniform1ivDelegate (int location, int size, byte* values);
+        public static Uniform1ivDelegate Uniform1iv;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        public unsafe delegate void Uniform2ivDelegate (int location, int size, byte* values);
+        public static Uniform2ivDelegate Uniform2iv;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        public unsafe delegate void Uniform3ivDelegate (int location, int size, byte* values);
+        public static Uniform3ivDelegate Uniform3iv;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        public unsafe delegate void Uniform4ivDelegate (int location, int size, byte* values);
+        public static Uniform4ivDelegate Uniform4iv;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        public unsafe delegate void Uniform1fvDelegate (int location, int size, byte* values);
+        public static Uniform1fvDelegate Uniform1fv;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        public unsafe delegate void Uniform2fvDelegate (int location, int size, byte* values);
+        public static Uniform2fvDelegate Uniform2fv;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        public unsafe delegate void Uniform3fvDelegate (int location, int size, byte* values);
+        public static Uniform3fvDelegate Uniform3fv;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        public unsafe delegate void Uniform4fvDelegate (int location, int size, byte* values);
+        public static Uniform4fvDelegate Uniform4fv;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        public unsafe delegate void UniformMatrix2fvDelegate (int location, int size, bool transpose, byte* values);
+        public static UniformMatrix2fvDelegate UniformMatrix2fv;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        public unsafe delegate void UniformMatrix3fvDelegate (int location, int size, bool transpose, byte* values);
+        public static UniformMatrix3fvDelegate UniformMatrix3fv;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        public unsafe delegate void UniformMatrix4fvDelegate (int location, int size, bool transpose, byte* values);
+        public static UniformMatrix4fvDelegate UniformMatrix4fv;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]       
         internal delegate void GenFramebuffersDelegate (int count, out int buffer);
         internal static GenFramebuffersDelegate GenFramebuffers;
 
@@ -1238,9 +1288,23 @@ namespace MonoGame.OpenGL
             DrawBuffers = LoadEntryPoint<DrawBuffersDelegate> ("glDrawBuffers");
             DrawElements = LoadEntryPoint<DrawElementsDelegate> ("glDrawElements");
             DrawArrays = LoadEntryPoint<DrawArraysDelegate> ("glDrawArrays");
-            Uniform1i = LoadEntryPoint<Uniform1iDelegate> ("glUniform1i");
-            Uniform4fv = LoadEntryPoint<Uniform4fvDelegate> ("glUniform4fv");
             ReadPixelsInternal = LoadEntryPoint<ReadPixelsDelegate>("glReadPixels");
+
+            Uniform1i = LoadEntryPoint<Uniform1iDelegate>("glUniform1i");
+            Uniform1iv = LoadEntryPoint<Uniform1ivDelegate>("glUniform1iv");
+            Uniform2iv = LoadEntryPoint<Uniform2ivDelegate>("glUniform2iv");
+            Uniform3iv = LoadEntryPoint<Uniform3ivDelegate>("glUniform3iv");
+            Uniform4iv = LoadEntryPoint<Uniform4ivDelegate>("glUniform4iv");
+            Uniform1fv = LoadEntryPoint<Uniform1fvDelegate>("glUniform1fv");
+            Uniform2fv = LoadEntryPoint<Uniform2fvDelegate>("glUniform2fv");
+            Uniform3fv = LoadEntryPoint<Uniform3fvDelegate>("glUniform3fv");
+            Uniform4fv = LoadEntryPoint<Uniform4fvDelegate>("glUniform4fv");
+            Uniform2fv = LoadEntryPoint<Uniform2fvDelegate>("glUniform2fv");
+            Uniform3fv = LoadEntryPoint<Uniform3fvDelegate>("glUniform3fv");
+            Uniform4fv = LoadEntryPoint<Uniform4fvDelegate>("glUniform4fv");
+            UniformMatrix2fv = LoadEntryPoint<UniformMatrix2fvDelegate>("glUniformMatrix2fv");
+            UniformMatrix3fv = LoadEntryPoint<UniformMatrix3fvDelegate>("glUniformMatrix3fv");
+            UniformMatrix4fv = LoadEntryPoint<UniformMatrix4fvDelegate>("glUniformMatrix4fv");
 
             ReadBuffer = LoadEntryPoint<ReadBufferDelegate> ("glReadBuffer");
             DrawBuffer = LoadEntryPoint<DrawBufferDelegate> ("glDrawBuffer");
@@ -1480,8 +1544,23 @@ namespace MonoGame.OpenGL
             Uniform1i(location, value);
         }
 
-        internal static unsafe void Uniform4 (int location, int size, float* value) {
+        internal static unsafe void Uniform4 (int location, int size, byte* value) {
             Uniform4fv(location, size, value);
+        }
+
+        internal static unsafe void UniformMatrix2(int location, int size, byte* values)
+        {
+            UniformMatrix2fv(location, size, true, values);
+        }
+
+        internal static unsafe void UniformMatrix3(int location, int size, byte* values)
+        {
+            UniformMatrix3fv(location, size, true, values);
+        }
+
+        internal static unsafe void UniformMatrix4(int location, int size, byte* values)
+        {
+            UniformMatrix4fv(location, size, true, values);
         }
 
         internal unsafe static string GetString (StringName name)
@@ -1548,7 +1627,7 @@ namespace MonoGame.OpenGL
             GetProgramInfoLogInternal (programId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
-            
+
         internal static string GetShaderInfoLog (int shaderId) {
             int length = 0;
             GetShader(shaderId, ShaderParameter.LogLength, out length);

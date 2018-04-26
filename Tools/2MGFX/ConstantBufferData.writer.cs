@@ -4,7 +4,7 @@ namespace TwoMGFX
 {
     internal partial class ConstantBufferData
     {
-        public void Write(BinaryWriter writer, Options options)
+        public void Write(BinaryWriter writer)
         {
             writer.Write(Name);
 

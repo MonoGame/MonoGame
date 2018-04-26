@@ -11,7 +11,33 @@
     <Binary
       Name="CppNet"
       Path="ThirdParty/Dependencies/CppNet/CppNet.dll" />
+    <Binary
+      Name="GLSLOptimizerSharp"
+      Path="ThirdParty/Dependencies/GLSLOptimizerSharp/GLSLOptimizerSharp.dll" />
     <NativeBinary Path="ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\glsl_optimizer.dll" />
+  </Platform>
+
+  <Platform Type="Linux">
+    <Binary
+      Name="CppNet"
+      Path="ThirdParty/Dependencies/CppNet/CppNet.dll" />
+    <Binary
+      Name="GLSLOptimizerSharp"
+      Path="ThirdParty/Dependencies/GLSLOptimizerSharp/GLSLOptimizerSharp.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\GLSLOptimizerSharp.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\libglsl_optimizer.so" />
+  </Platform>
+
+  <Platform Type="MacOS">
+    <Binary
+      Name="CppNet"
+      Path="ThirdParty/Dependencies/CppNet/CppNet.dll" />
+    <Binary
+      Name="GLSLOptimizerSharp"
+      Path="ThirdParty/Dependencies/GLSLOptimizerSharp/GLSLOptimizerSharp.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\GLSLOptimizerSharp.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\libglsl_optimizer.dylib" />
   </Platform>
 
 </ExternalProject>

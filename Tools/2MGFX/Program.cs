@@ -31,12 +31,8 @@ namespace TwoMGFX
                 return 1;
             }
             
-            // TODO: This would be where we would decide the user
-            // is trying to convert an FX file to a MGFX glsl file.
-            //
-            // For now we assume we're going right to a compiled MGFXO file.
-
             // Parse the MGFX file expanding includes, macros, and returning the techniques.
+            // Technique and sampler syntax will be removed from the content of the shader.
             ShaderResult shaderResult;
             try
             {
@@ -52,8 +48,10 @@ namespace TwoMGFX
             // Create the effect object.
             EffectObject effect;
             var shaderErrorsAndWarnings = string.Empty;
+
             try
             {
+                options.Profile.BeforeCreation(shaderResult);
                 effect = EffectObject.CompileEffect(shaderResult, out shaderErrorsAndWarnings);
 
                 if (!string.IsNullOrEmpty(shaderErrorsAndWarnings))
@@ -90,7 +88,7 @@ namespace TwoMGFX
             {
                 using (var stream = new FileStream(options.OutputFile, FileMode.Create, FileAccess.Write))
                 using (var writer = new BinaryWriter(stream))
-                    effect.Write(writer, options);
+                    effect.Write(writer, options.Profile);
             }
             catch (Exception ex)
             {

@@ -15,7 +15,7 @@ namespace TwoMGFX
 
 		public struct Sampler
 		{
-			public MojoShader.MOJOSHADER_samplerType type;
+			public SamplerType type;
 			public int textureSlot;
             public int samplerSlot;
 			public string samplerName;

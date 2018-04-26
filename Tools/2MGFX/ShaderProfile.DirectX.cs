@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace TwoMGFX
 {
-    class DirectX11ShaderProfile : ShaderProfile
+    internal class DirectX11ShaderProfile : ShaderProfile
     {
         private static readonly Regex HlslPixelShaderRegex = new Regex(@"^ps_(?<major>1|2|3|4|5)_(?<minor>0|1|)(_level_(9_1|9_2|9_3))?$", RegexOptions.Compiled);
         private static readonly Regex HlslVertexShaderRegex = new Regex(@"^vs_(?<major>1|2|3|4|5)_(?<minor>0|1|)(_level_(9_1|9_2|9_3))?$", RegexOptions.Compiled);

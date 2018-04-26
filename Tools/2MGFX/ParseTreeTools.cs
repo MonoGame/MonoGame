@@ -74,21 +74,25 @@ namespace TwoMGFX
                 var start = n.Token.StartPos;
                 var end = n.Token.EndPos;
                 var length = end - n.Token.StartPos;
-                var content = sourceFile.Substring(start, length);
-
-                // Replace the content of this node with whitespace.
-                for (var c = 0; c < length; c++)
-                {
-                    if (!char.IsWhiteSpace(content[c]))
-                        content = content.Replace(content[c], ' ');
-                }
-
-                // Add the whitespace back to the source file.
-                var newfile = sourceFile.Substring(0, start);
-                newfile += content;
-                newfile += sourceFile.Substring(end);
-                sourceFile = newfile;
+                WhitespaceRange(ref sourceFile, start, length);
             }
         }
+
+	    public static void WhitespaceRange(ref string text, int start, int length)
+	    {
+	        var whitespaced = text.Substring(start, length);
+            // Replace the content of this node with whitespace.
+            for (var c = 0; c < length; c++)
+            {
+                if (!char.IsWhiteSpace(whitespaced[c]))
+                    whitespaced = whitespaced.Replace(whitespaced[c], ' ');
+            }
+
+            // Add the whitespace back to the source file.
+	        var newText = text.Substring(0, start);
+	        newText += whitespaced;
+	        newText += text.Substring(start + length);
+	        text = newText;
+	    }
     }
 }

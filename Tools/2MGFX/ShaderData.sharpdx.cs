@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct3D;
 
 namespace TwoMGFX
@@ -97,23 +98,23 @@ namespace TwoMGFX
                             {
                                 case ShaderResourceViewDimension.Texture1D:
                                 case ShaderResourceViewDimension.Texture1DArray:
-                                    sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D;
+                                    sampler.type = SamplerType.Sampler1D;
                                     break;
 
                                 case ShaderResourceViewDimension.Texture2D:
                                 case ShaderResourceViewDimension.Texture2DArray:
                                 case ShaderResourceViewDimension.Texture2DMultisampled:
                                 case ShaderResourceViewDimension.Texture2DMultisampledArray:
-                                    sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D;
+                                    sampler.type = SamplerType.Sampler2D;
                                     break;
 
                                 case ShaderResourceViewDimension.Texture3D:
-                                    sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME;
+                                    sampler.type = SamplerType.SamplerVolume;
                                     break;
 
                                 case ShaderResourceViewDimension.TextureCube:
                                 case ShaderResourceViewDimension.TextureCubeArray:
-                                    sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE;
+                                    sampler.type = SamplerType.SamplerCube;
                                     break;
                             }
 

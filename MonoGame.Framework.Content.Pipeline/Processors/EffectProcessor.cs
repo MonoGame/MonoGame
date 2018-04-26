@@ -7,9 +7,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
-#if WINDOWS
 using TwoMGFX;
-#endif
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -50,13 +48,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <remarks>If you get an error during processing, compilation stops immediately. The effect processor displays an error message. Once you fix the current error, it is possible you may get more errors on subsequent compilation attempts.</remarks>
         public override CompiledEffectContent Process(EffectContent input, ContentProcessorContext context)
         {
-#if WINDOWS
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
 
-            options.Profile = ShaderProfile.ForPlatform(context.TargetPlatform.ToString());
-            if (options.Profile == null)
+            var profile = ShaderProfile.ForPlatform(context.TargetPlatform.ToString());
+            if (profile == null)
                 throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
+
+            options.Profile = profile;
 
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
             options.Defines = Defines;
@@ -89,6 +88,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var shaderErrorsAndWarnings = string.Empty;
             try
             {
+                profile.BeforeCreation(shaderResult);
                 effect = EffectObject.CompileEffect(shaderResult, out shaderErrorsAndWarnings);
 
                 // If there were any additional output files we register
@@ -100,6 +100,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 // This will log any warnings and errors and throw.
                 ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input, context);
+                // let the compiler know control flow stops here
+                return null;
             }
 
             // Process any warning messages that the shader compiler might have produced.
@@ -112,7 +114,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 using (var stream = new MemoryStream())
                 {
                     using (var writer = new BinaryWriter(stream))
-                        effect.Write(writer, options);
+                        effect.Write(writer, profile);
 
                     result = new CompiledEffectContent(stream.GetBuffer());
                 }
@@ -123,12 +125,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             return result;
-#else
-            throw new NotImplementedException();
-#endif
         }
 
-#if WINDOWS
         private class ContentPipelineEffectCompilerOutput : IEffectCompilerOutput
         {
             private readonly ContentProcessorContext _context;
@@ -153,7 +151,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 return new ContentIdentity(file, null, line + "," + column);
             }
         }
-#endif
 
         private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
         {
@@ -176,7 +173,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
                     else
                         context.Logger.LogWarning(string.Empty, input.Identity, errorsAndWarningArray[i]);
-                        
+
                     continue;
                 }
 
@@ -193,7 +190,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     fileName = Path.Combine(folder, fileName);
                 }
 
-                // If we got an exception then we'll be throwing an exception 
+                // If we got an exception then we'll be throwing an exception
                 // below, so just gather the lines to throw later.
                 if (buildFailed)
                 {

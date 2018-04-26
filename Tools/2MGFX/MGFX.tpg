@@ -38,6 +38,11 @@ LessThan -> @"<";
 GreaterThan -> @">";
 [IgnoreCase] Compile -> @"compile";
 ShaderModel -> @"[A-Za-z_][A-Za-z0-9_]*";
+
+// Glsl
+GlslIn -> @"in|attribute";
+Void -> @"void";
+
 Code -> @"[\S]+";
 EndOfFile -> @"^$";
 
@@ -151,7 +156,7 @@ EndOfFile -> @"^$";
 
 
 // Productions
-Start -> (Code | Technique_Declaration | Sampler_Declaration)* EndOfFile
+Start -> (Code | Technique_Declaration | Sampler_Declaration | Function_Header | Semantic_Variable)* EndOfFile
 {
    var shader = new ShaderInfo();
 
@@ -161,7 +166,7 @@ Start -> (Code | Technique_Declaration | Sampler_Declaration)* EndOfFile
    return shader; 
 };
 
-Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration+ CloseBracket 
+Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration+ CloseBracket SemiColon?
 {
    var technique = new TechniqueInfo();
    technique.name = $Identifier as string ?? string.Empty;
@@ -424,5 +429,47 @@ Sampler_Declaration -> Sampler Identifier Sampler_Register_Expression* Sampler_D
 	var shaderInfo = paramlist[0] as ShaderInfo;
 	shaderInfo.SamplerStates.Add(sampler.Name, sampler);
 	
+	return null;
+};
+
+// Semantics, glsl only for simplicity
+Semantic_Variable -> GlslIn Identifier Identifier Semantic? Semicolon
+{
+	if ($Semantic == null) return null;
+
+	var variable = new VsInputVariableInfo();
+	variable.TypeName = $Identifier[0] as string;
+	variable.Name = $Identifier[1] as string;
+	variable.SemanticName = Nodes[3].Nodes[1].Token.Text;
+	variable.AttributeSyntax = ($GlslIn[0] as string) == "attribute";
+	variable.Node = this;
+
+	var shaderInfo = paramlist[0] as ShaderInfo;
+	shaderInfo.VsInputVariables.Add(variable.Name, variable);
+
+	return null;
+};
+
+Semantic -> Colon Identifier
+{
+	return $Identifier;
+};
+
+// Functions
+
+// param syntax: (in|out|inout)?(TYPE)(NAME)
+GlslParam -> Identifier Identifier Identifier?
+{
+	// just return something so we can detect that this is available in parents
+	return true;
+};
+
+Function_Header -> Void Identifier OpenParenthesis GlslParam? (Comma GlslParam)* CloseParenthesis
+{
+	// only add parameterless functions since we want this to match with shader stage entry points
+	if ($GlslParam != null) return null;
+	var shaderInfo = paramlist[0] as ShaderInfo;
+	shaderInfo.Functions.Add($Identifier as string, this);
+
 	return null;
 };

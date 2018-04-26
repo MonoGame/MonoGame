@@ -12,6 +12,11 @@ namespace TwoMGFX
 	        : base("A shader failed to compile!")
 	    {	        
 	    }
+
+	    public ShaderCompilerException(string message)
+            : base(message)
+	    {
+	    }
 	}
 }
 

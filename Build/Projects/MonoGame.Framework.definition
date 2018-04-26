@@ -81,6 +81,10 @@
     <Recommends Name="OpenGLGraphics">
       <Platforms>Linux,MacOS</Platforms>
     </Recommends>
+    <!-- for now default all OpenGL builds to MojoShader -->
+    <Recommends Name="MojoShader">
+      <Platforms>WindowsGL,Linux,MacOS,Android,iOS,tvOS</Platforms>
+    </Recommends>
   </Dependencies>
 
   <Services>
@@ -100,6 +104,20 @@
       <Conflicts>ANGLEGraphics,DirectXGraphics,WebGraphics</Conflicts>
       <Requires>OpenALAudio,_GLCompatible</Requires>
     </Service>
+
+    <Service Name="MojoShader">
+      <AddDefine>MOJOSHADER</AddDefine>
+      <Platforms>iOS,MacOS,Linux,Windows,WindowsGL,Android,tvOS</Platforms>
+      <Conflicts>GLFX</Conflicts>
+      <Requires>OpenGLGraphics</Requires>
+    </Service>
+    <Service Name="GLFX">
+      <AddDefine>GLFX</AddDefine>
+      <Platforms>iOS,MacOS,Linux,Windows,WindowsGL,Android,tvOS</Platforms>
+      <Conflicts>MojoShader</Conflicts>
+      <Requires>OpenGLGraphics</Requires>
+    </Service>
+
     <Service Name="DirectXGraphics">
       <Platforms>Windows,WindowsUniversal</Platforms>
       <Conflicts>ANGLEGraphics,OpenGLGraphics,WebGraphics</Conflicts>
@@ -550,7 +568,10 @@
       <Services>DirectXGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Effect\EffectResource.OpenGL.cs">
-      <Services>OpenGLGraphics,WebGraphics</Services>
+      <Services>MojoShader,WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Effect\EffectResource.GLFX.cs">
+      <Services>GLFX</Services>
     </Compile>
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
@@ -720,12 +741,16 @@
     <Compile Include="Graphics\Shader\ConstantBuffer.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Shader\ConstantBuffer.OpenGL.cs">
-      <Services>OpenGLGraphics</Services>
+    <Compile Include="Graphics\Shader\ConstantBuffer.Mojo.cs">
+      <Services>MojoShader</Services>
+    </Compile>
+    <Compile Include="Graphics\Shader\ConstantBuffer.GLFX.cs">
+      <Services>GLFX</Services>
     </Compile>
     <Compile Include="Graphics\Shader\ConstantBuffer.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
+    <Compile Include="Graphics\Shader\SamplerType.cs" />
     <Compile Include="Graphics\Shader\Shader.cs" />
     <Compile Include="Graphics\Shader\Shader.DirectX.cs">
       <Services>DirectXGraphics</Services>
@@ -1391,26 +1416,47 @@
       <Services>_XNADesignProvided</Services>
     </Compile>
 
-    <!-- OpenGL Stock Effects -->
+    <!-- MojoShader Stock Effects -->
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
-      <Services>_GLCompatible</Services>
+      <Services>MojoShader</Services>
     </EmbeddedResource>
     <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ogl.mgfxo">
-      <Services>_GLCompatible</Services>
+      <Services>MojoShader</Services>
     </EmbeddedResource>
     <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo">
-      <Services>_GLCompatible</Services>
+      <Services>MojoShader</Services>
     </EmbeddedResource>
     <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo">
-      <Services>_GLCompatible</Services>
+      <Services>MojoShader</Services>
     </EmbeddedResource>
     <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo">
-      <Services>_GLCompatible</Services>
+      <Services>MojoShader</Services>
     </EmbeddedResource>
     <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo">
-      <Services>_GLCompatible</Services>
+      <Services>MojoShader</Services>
     </EmbeddedResource>
 
+    <!-- GLFX Stock Effects -->
+    <!--
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.glfx.mgfxo">
+      <Services>GLFX</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.glfx.mgfxo">
+      <Services>GLFX</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.glfx.mgfxo">
+      <Services>GLFX</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.glfx.mgfxo">
+      <Services>GLFX</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.glfx.mgfxo">
+      <Services>GLFX</Services>
+    </EmbeddedResource>
+    -->
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.glfx.mgfxo">
+      <Services>GLFX</Services>
+    </EmbeddedResource>
 
     <!-- DirectX Stock Effects -->
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.dx11.mgfxo">

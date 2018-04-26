@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
 {
@@ -46,7 +47,7 @@ namespace TwoMGFX
 				for (var i = 0; i < attributes.Length; i++) {
 					dxshader._attributes [i].name = attributes [i].name;
 					dxshader._attributes [i].index = attributes [i].index;
-					dxshader._attributes [i].usage = EffectObject.ToXNAVertexElementUsage (attributes [i].usage);
+					dxshader._attributes [i].usage = ToXNAVertexElementUsage (attributes [i].usage);
 				}
 			}
 
@@ -122,7 +123,7 @@ namespace TwoMGFX
 
                     textureSlot = samplers[i].index,
                     samplerSlot = samplers[i].index,
-                    type = samplers[i].type,
+                    type = samplers[i].type.ToSamplerType(),
                 };
 
                 SamplerStateInfo state;
@@ -183,5 +184,61 @@ namespace TwoMGFX
 
 			return dxshader;
 		}
+        
+        internal static VertexElementUsage ToXNAVertexElementUsage(MojoShader.MOJOSHADER_usage usage)
+        {
+            switch (usage)
+            {
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
+                    return VertexElementUsage.Position;
+		        case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDWEIGHT:
+                    return VertexElementUsage.BlendWeight;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDINDICES:
+                    return VertexElementUsage.BlendIndices;
+		        case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
+                    return VertexElementUsage.Normal;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POINTSIZE:
+                    return VertexElementUsage.PointSize;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
+                    return VertexElementUsage.TextureCoordinate;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TANGENT:
+                    return VertexElementUsage.Tangent;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BINORMAL:
+                    return VertexElementUsage.Binormal;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TESSFACTOR:
+                    return VertexElementUsage.TessellateFactor;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
+                    return VertexElementUsage.Color;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_FOG:
+                    return VertexElementUsage.Fog;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_DEPTH:
+                    return VertexElementUsage.Depth;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_SAMPLE:
+                    return VertexElementUsage.Sample;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
 	}
+
+    public static partial class ConversionExtensions
+    {
+        internal static SamplerType ToSamplerType(this MojoShader.MOJOSHADER_samplerType type)
+        {
+            switch (type)
+            {
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
+                    return SamplerType.Sampler2D;
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
+                    return SamplerType.SamplerCube;
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
+                    return SamplerType.SamplerVolume;
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D:
+                    return SamplerType.Sampler1D;
+                default:
+                    throw new ArgumentOutOfRangeException("type", type, null);
+            }
+        }
+    }
 }

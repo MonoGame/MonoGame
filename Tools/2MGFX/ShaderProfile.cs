@@ -24,8 +24,8 @@ namespace TwoMGFX
         }
 
         public static readonly ShaderProfile OpenGL = FromName("OpenGL");
-
         public static readonly ShaderProfile DirectX_11 = FromName("DirectX_11");
+        public static readonly ShaderProfile GLFX = FromName("GLFX");
 
         /// <summary>
         /// Returns all the loaded shader profiles.
@@ -65,6 +65,10 @@ namespace TwoMGFX
         internal abstract void AddMacros(Dictionary<string, string> macros);
 
         internal abstract void ValidateShaderModels(PassInfo pass);
+
+        internal virtual void BeforeCreation(ShaderResult shaderResult)
+        {
+        }
 
         internal abstract ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings);
 

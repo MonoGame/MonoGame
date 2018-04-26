@@ -5,7 +5,7 @@ namespace TwoMGFX
 {
     partial class EffectObject
     {
-        public static byte[] CompileHLSL(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ref string errorsAndWarnings)
+        public static byte[] CompileHLSL(ShaderResult shaderResult, string shaderFunction, string shaderModel, ref string errorsAndWarnings)
         {
             SharpDX.D3DCompiler.ShaderBytecode shaderByteCode;
             try
@@ -17,6 +17,7 @@ namespace TwoMGFX
                 // in the first place.
                 //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.NoPreshader;
 
+                // TODO: we don't need the profile here once we drop MojoShader
                 if (shaderResult.Profile == ShaderProfile.DirectX_11)
                     shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.EnableBackwardsCompatibility;
 
@@ -34,7 +35,7 @@ namespace TwoMGFX
                 var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
                     shaderResult.FileContent,
                     shaderFunction,
-                    shaderProfile,
+                    shaderModel,
                     shaderFlags,
                     0,
                     null,

@@ -3,6 +3,12 @@
 
   <Platform Type="Linux">
     <Binary
+      Name="CppNet"
+      Path="ThirdParty/Dependencies/CppNet/CppNet.dll" />
+    <Binary
+      Name="GLSLOptimizerSharp"
+      Path="ThirdParty/Dependencies/GLSLOptimizerSharp/GLSLOptimizerSharp.dll" />
+    <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
     <Binary
@@ -20,6 +26,8 @@
     <Binary
       Name="ATI.TextureConverter"
       Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\GLSLOptimizerSharp.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\libglsl_optimizer.so" />
     <NativeBinary Path="ThirdParty\Dependencies\assimp\libassimp.so" />
     <NativeBinary Path="ThirdParty\Dependencies\NVTT\Linux\libnvcore.so" />
     <NativeBinary Path="ThirdParty\Dependencies\NVTT\Linux\libnvimage.so" />
@@ -41,6 +49,12 @@
 
   <Platform Type="MacOS">
     <Binary
+      Name="CppNet"
+      Path="ThirdParty/Dependencies/CppNet/CppNet.dll" />
+    <Binary
+      Name="GLSLOptimizerSharp"
+      Path="ThirdParty/Dependencies/GLSLOptimizerSharp/GLSLOptimizerSharp.dll" />
+    <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
     <Binary
@@ -58,6 +72,8 @@
     <Binary
       Name="ATI.TextureConverter"
       Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\GLSLOptimizerSharp.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\libglsl_optimizer.dylib" />
     <NativeBinary Path="ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib" />
     <NativeBinary Path="ThirdParty\Dependencies\NVTT\MacOS\libnvimage.dylib" />
     <NativeBinary Path="ThirdParty\Dependencies\NVTT\MacOS\libnvmath.dylib" />
@@ -89,6 +105,9 @@
       Name="CppNet"
       Path="ThirdParty\Dependencies\CppNet\CppNet.dll" />
     <Binary
+      Name="GLSLOptimizerSharp"
+      Path="ThirdParty/Dependencies/GLSLOptimizerSharp/GLSLOptimizerSharp.dll" />
+    <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
     <Binary
@@ -110,6 +129,7 @@
     <NativeBinary Path="ThirdParty\Dependencies\assimp\Assimp64.dll" />
     <NativeBinary Path="ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" />
     <NativeBinary Path="ThirdParty\Dependencies\SharpFont\Windows\x64\freetype6.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\glsl_optimizer.dll" />
     <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImage.dll" />
     <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\Windows\x64\ffmpeg.exe" />
     <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\Windows\x64\ffprobe.exe" />

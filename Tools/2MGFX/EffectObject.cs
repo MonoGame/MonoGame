@@ -611,43 +611,6 @@ namespace TwoMGFX
 			}
         }
 
-        static internal VertexElementUsage ToXNAVertexElementUsage(MojoShader.MOJOSHADER_usage usage)
-        {
-            switch (usage)
-            {
-                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-                    return VertexElementUsage.Position;
-		        case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDWEIGHT:
-                    return VertexElementUsage.BlendWeight;
-                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDINDICES:
-                    return VertexElementUsage.BlendIndices;
-		        case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
-                    return VertexElementUsage.Normal;
-                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POINTSIZE:
-                    return VertexElementUsage.PointSize;
-                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-                    return VertexElementUsage.TextureCoordinate;
-                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TANGENT:
-                    return VertexElementUsage.Tangent;
-                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BINORMAL:
-                    return VertexElementUsage.Binormal;
-                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TESSFACTOR:
-                    return VertexElementUsage.TessellateFactor;
-                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
-                    return VertexElementUsage.Color;
-                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_FOG:
-                    return VertexElementUsage.Fog;
-                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_DEPTH:
-                    return VertexElementUsage.Depth;
-                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_SAMPLE:
-                    return VertexElementUsage.Sample;
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-
         static public EffectObject CompileEffect(ShaderResult shaderResult, out string errorsAndWarnings)
         {
             var effect = new EffectObject();
@@ -754,19 +717,19 @@ namespace TwoMGFX
 
                         switch (sampler.type)
                         {
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D:
+                            case SamplerType.Sampler1D:
                                 param.type = D3DXPARAMETER_TYPE.TEXTURE1D;
                                 break;
 
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
+                            case SamplerType.Sampler2D:
                                 param.type = D3DXPARAMETER_TYPE.TEXTURE2D;
                                 break;
 
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
+                            case SamplerType.SamplerVolume:
                                 param.type = D3DXPARAMETER_TYPE.TEXTURE3D;
                                 break;
 
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
+                            case SamplerType.SamplerCube:
                                 param.type = D3DXPARAMETER_TYPE.TEXTURECUBE;
                                 break;
                         }
