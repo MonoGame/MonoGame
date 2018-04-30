@@ -218,6 +218,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// Unprojects a <see cref="Vector3"/> from screen space into world space.
+        /// Note source.Z must be less than or equal to MaxDepth.
         /// </summary>
         /// <param name="source">The <see cref="Vector3"/> to unproject.</param>
         /// <param name="projection">The projection <see cref="Matrix"/>.</param>
