@@ -1,18 +1,19 @@
 # Game class constructor
 Due to some UWP implementation details, Monogame has to construct your `Game` derived class by itself, using a static initializer `MonoGame.Framework.XamlGame<T>.Create(...)`.
 
-In this situation, we have two main possibilities to create a `Game` derived class:
+In this situation, you have two main possibilities to create a `Game` derived class:
 
 1. Let `XamlGame` to initialize your `Game` derived class using the default constructor
 2. Let `XamlGame` to initialize your `Game` derived class using a custom constructor.
 
-##### 1. XamlGame uses the default constructor
+#### 1. XamlGame uses the default constructor
 
-With this logic, it isn't possible to inject in a "clear" way some dependencies, since the default constructor is called: `var game = new T();`
+With this logic, it isn't possible to inject in a "clear" way some dependencies, since the default constructor is called:
+ `var game = new T();`
 
 
 
-##### 2. XamlGame uses a custom rich constructor
+#### 2. XamlGame uses a custom constructor
 
 Why may you need this constructor?
 
