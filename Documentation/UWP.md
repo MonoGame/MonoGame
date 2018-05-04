@@ -1,12 +1,12 @@
 # Game class constructor
 Due to some UWP implementation details, Monogame has to construct your `Game` derived class by itself, using a static initializer `MonoGame.Framework.XamlGame<T>.Create(...)`.
 
-In this situation, we have to main possibilities to create a `Game` derived class:
+In this situation, we have two main possibilities to create a `Game` derived class:
 
-1. Let `XamlGame` to initialize your `Game` derived class using the default (parameterless!) constructor
-2. Let `XamlGame` to initialize your `Game` derived class using a custom (rich!) constructor.
+1. Let `XamlGame` to initialize your `Game` derived class using the default constructor
+2. Let `XamlGame` to initialize your `Game` derived class using a custom constructor.
 
-##### 1. XamlGame uses the default parameterless constructor
+##### 1. XamlGame uses the default constructor
 
 With this logic, it isn't possible to inject in a "clear" way some dependencies, since the default constructor is called: `var game = new T();`
 
@@ -14,11 +14,11 @@ With this logic, it isn't possible to inject in a "clear" way some dependencies,
 
 ##### 2. XamlGame uses a custom rich constructor
 
-Why may I need this constructor?
+Why may you need this constructor?
 
-`MyGame` needs some dependencies such as an `ISettingsRepository` to get some values from each *platform* settings store. I would then implement an `AndroidSettingsRepository` and an `UwpSettingsRepository`. I cannot construct those dependencies in `MyGame` itself, **because they are platform dependent**, so I have to inject them into `MyGame` constructor.
+Consider `MyGame` needs some dependencies such as an `ISettingsRepository` to get some values from each *platform* settings store. You would then implement an `AndroidSettingsRepository` and an `UwpSettingsRepository`, but you cannot construct those dependencies in `MyGame` itself, **because they are platform dependent**, so you'll have to inject them into `MyGame` constructor.
 
-For example, in a `MainActivity` on Android I would do:
+For example, in a `MainActivity` on Android you would do:
 
 ```c#
 _game = new MyGame(
@@ -26,7 +26,7 @@ _game = new MyGame(
     new AndroidSettingsRepository(this));
 ```
 
-With the UWP implementation using `XamlGame` static initializer, I could do this:
+With the UWP implementation using `XamlGame` static initializer, you could do this:
 
 ```c#
 _game = MonoGame.Framework.XamlGame<MyGame>.Create(
@@ -38,4 +38,5 @@ _game = MonoGame.Framework.XamlGame<MyGame>.Create(
 		new AndroidSettingsRepository(this)));
 ```
 
+In this way, you tell the static initializer **how** you'd like to construct `MyGame`.
 
