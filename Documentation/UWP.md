@@ -35,8 +35,8 @@ _game = MonoGame.Framework.XamlGame<MyGame>.Create(
 	Window.Current.CoreWindow,
 	swapChainPanel,
 	() => new MyGame(
-		new AndroidTextFileImporter(Assets),
-		new AndroidSettingsRepository(this)));
+		new UWPTextFileImporter(Assets),
+		new UWPSettingsRepository(this)));
 ```
 
 In this way, you tell the static initializer **how** you'd like to construct `MyGame`.
