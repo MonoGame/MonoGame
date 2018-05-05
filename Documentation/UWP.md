@@ -3,12 +3,12 @@ Due to some UWP implementation details, Monogame has to construct your `Game` de
 
 In this situation, you have two main possibilities to create a `Game` derived class:
 
-1. Let `XamlGame` to initialize your `Game` derived class using the default constructor
-2. Let `XamlGame` to initialize your `Game` derived class using a custom constructor.
+1. Let `XamlGame` initialize your `Game` derived class using the default constructor
+2. Let `XamlGame` initialize your `Game` derived class using a custom constructor.
 
 #### 1. XamlGame uses the default constructor
 
-With this logic, it isn't possible to inject in a "clear" way some dependencies, since the default constructor is called:
+With this logic, it isn't possible to inject dependencies through the constructor since the default constructor is called:
  `var game = new T();`
 
 
@@ -17,12 +17,12 @@ With this logic, it isn't possible to inject in a "clear" way some dependencies,
 
 Why may you need this constructor?
 
-Consider `MyGame` needs some dependencies such as an `ISettingsRepository` to get some values from each *platform* settings store. You would then implement an `AndroidSettingsRepository` and an `UwpSettingsRepository`, but you cannot construct those dependencies in `MyGame` itself, **because they are platform dependent**, so you'll have to inject them into `MyGame` constructor.
+Consider `Game1` needs some dependencies such as an `ISettingsRepository` to get some values from each *platform* settings store. You would then implement an `AndroidSettingsRepository` and a `UwpSettingsRepository`, but you cannot construct those dependencies in `Game1` itself, **because they are platform dependent**, so you'll have to inject them into its constructor.
 
 For example, in a `MainActivity` on Android you would do:
 
 ```c#
-_game = new MyGame(
+_game = new Game1(
     new AndroidTextFileImporter(Assets),
     new AndroidSettingsRepository(this));
 ```
@@ -30,14 +30,14 @@ _game = new MyGame(
 With the UWP implementation using `XamlGame` static initializer, you could do this:
 
 ```c#
-_game = MonoGame.Framework.XamlGame<MyGame>.Create(
+_game = MonoGame.Framework.XamlGame<Game1>.Create(
 	launchArguments,
 	Window.Current.CoreWindow,
 	swapChainPanel,
-	() => new MyGame(
-		new UWPTextFileImporter(Assets),
-		new UWPSettingsRepository(this)));
+	() => new Game1(
+		new UwpTextFileImporter(Assets),
+		new UwpSettingsRepository(this)));
 ```
 
-In this way, you tell the static initializer **how** you'd like to construct `MyGame`.
+In this way, you tell the static initializer **how** you'd like to construct `Game1`.
 
