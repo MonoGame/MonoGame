@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace TwoMGFX
+namespace TwoMGFX.TPGParser
 {
     public class ShaderInfo
 	{

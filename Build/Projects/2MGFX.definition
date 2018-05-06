@@ -195,14 +195,10 @@
     <Compile Include="ShaderData.pssl.cs" />
     <Compile Include="ShaderData.sharpdx.cs" />
     <Compile Include="ShaderData.writer.cs" />
-    <Compile Include="PassInfo.cs" />
-    <Compile Include="SamplerStateInfo.cs" />
-    <Compile Include="ShaderInfo.cs" />
     <Compile Include="ShaderProfile.cs" />
     <Compile Include="ShaderProfile.OpenGL.cs" />
     <Compile Include="ShaderProfile.DirectX.cs" />
     <Compile Include="ShaderResult.cs" />
-    <Compile Include="TechniqueInfo.cs" />
     <Compile Include="TextureFilterType.cs" />
 
     <!-- The HLSL to GLSL conversion utility -->
@@ -210,11 +206,15 @@
     <Compile Include="MojoShader.cs" />
 
     <!-- The MGFX parser -->
-    <None Include="MGFX.tpg" />
-    <Compile Include="Parser.cs" />
-    <Compile Include="ParseTree.cs" />
-    <Compile Include="Scanner.cs" />
-    <Compile Include="ParseTreeTools.cs" />
+    <None Include="TPGParser\MGFX.tpg" />
+    <Compile Include="TPGParser\Parser.cs" />
+    <Compile Include="TPGParser\ParseTree.cs" />
+    <Compile Include="TPGParser\Scanner.cs" />
+    <Compile Include="TPGParser\ParseTreeTools.cs" />
+    <Compile Include="TPGParser\PassInfo.cs" />
+    <Compile Include="TPGParser\SamplerStateInfo.cs" />
+    <Compile Include="TPGParser\ShaderInfo.cs" />
+    <Compile Include="TPGParser\TechniqueInfo.cs" />
     
     <!-- The MGFX preprocessor -->
     <Compile Include="Preprocessor.cs" />

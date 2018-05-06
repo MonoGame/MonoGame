@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TwoMGFX
+namespace TwoMGFX.TPGParser
 {
     public class TechniqueInfo
     {

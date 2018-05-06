@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 
-namespace TwoMGFX
+namespace TwoMGFX.TPGParser
 {
     public class PassInfo
     {
