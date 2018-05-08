@@ -90,6 +90,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /r '..\..\Tools\MGCB\bin\Windows\AnyCPU\Release\*.dll'
   File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.exe'
   File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.dll'
+  File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.xml'
   File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\Templates'
 
   ; Associate .mgcb files open in the Pipeline tool.
