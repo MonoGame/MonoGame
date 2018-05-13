@@ -341,6 +341,38 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Round this <see cref="Vector2"/> to a vector towards the positive infinity.
+        /// </summary>
+        public void Ceiling()
+        {
+            X = (float)Math.Ceiling(X);
+            Y = (float)Math.Ceiling(Y);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains values from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <returns>Unit vector.</returns>
+        public static Vector2 Ceiling(Vector2 value)
+        {
+            value.X = (float)Math.Ceiling(value.X);
+            value.Y = (float)Math.Ceiling(value.Y);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains values from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <param name="result">Unit vector as an output parameter.</param>
+        public static void Ceiling(ref Vector2 value, out Vector2 result)
+        {
+            result.X = (float)Math.Ceiling(value.X);
+            result.Y = (float)Math.Ceiling(value.Y);
+        }
+
+        /// <summary>
         /// Clamps the specified value within a range.
         /// </summary>
         /// <param name="value1">The value to clamp.</param>
@@ -512,6 +544,38 @@ namespace Microsoft.Xna.Framework
         public bool Equals(Vector2 other)
         {
             return (X == other.X) && (Y == other.Y);
+        }
+
+        /// <summary>
+        /// Round this <see cref="Vector2"/> to a vector towards the negative infinity.
+        /// </summary>
+        public void Floor()
+        {
+            X = (float)Math.Floor(X);
+            Y = (float)Math.Floor(Y);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains values from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <returns>Unit vector.</returns>
+        public static Vector2 Floor(Vector2 value)
+        {
+            value.X = (float)Math.Floor(value.X);
+            value.Y = (float)Math.Floor(value.Y);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains values from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <param name="result">Unit vector as an output parameter.</param>
+        public static void Floor(ref Vector2 value, out Vector2 result)
+        {
+            result.X = (float)Math.Floor(value.X);
+            result.Y = (float)Math.Floor(value.Y);
         }
 
         /// <summary>
@@ -815,6 +879,38 @@ namespace Microsoft.Xna.Framework
             float val = 2.0f * ((vector.X * normal.X) + (vector.Y * normal.Y));
             result.X = vector.X - (normal.X * val);
             result.Y = vector.Y - (normal.Y * val);
+        }
+
+        /// <summary>
+        /// Round this <see cref="Vector2"/> to a vector with the nearest integral value.
+        /// </summary>
+        public void Round()
+        {
+            X = (float)Math.Round(X);
+            Y = (float)Math.Round(Y);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains rounded values from another vector.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <returns>Unit vector.</returns>
+        public static Vector2 Round(Vector2 value)
+        {
+            value.X = (float)Math.Round(value.X);
+            value.Y = (float)Math.Round(value.Y);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains rounded values from another vector.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <param name="result">Unit vector as an output parameter.</param>
+        public static void Round(ref Vector2 value, out Vector2 result)
+        {
+            result.X = (float)Math.Round(value.X);
+            result.Y = (float)Math.Round(value.Y);
         }
 
         /// <summary>

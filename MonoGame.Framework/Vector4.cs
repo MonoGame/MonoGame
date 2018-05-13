@@ -288,6 +288,44 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Round this <see cref="Vector4"/> to a vector towards the positive infinity.
+        /// </summary>
+        public void Ceiling()
+        {
+            X = (float)Math.Ceiling(X);
+            Y = (float)Math.Ceiling(Y);
+            Z = (float)Math.Ceiling(Z);
+            W = (float)Math.Ceiling(W);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains values from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <returns>Unit vector.</returns>
+        public static Vector4 Ceiling(Vector4 value)
+        {
+            value.X = (float)Math.Ceiling(value.X);
+            value.Y = (float)Math.Ceiling(value.Y);
+            value.Z = (float)Math.Ceiling(value.Z);
+            value.W = (float)Math.Ceiling(value.W);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains values from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="result">Unit vector as an output parameter.</param>
+        public static void Ceiling(ref Vector4 value, out Vector4 result)
+        {
+            result.X = (float)Math.Ceiling(value.X);
+            result.Y = (float)Math.Ceiling(value.Y);
+            result.Z = (float)Math.Ceiling(value.Z);
+            result.W = (float)Math.Ceiling(value.W);
+        }
+
+        /// <summary>
         /// Clamps the specified value within a range.
         /// </summary>
         /// <param name="value1">The value to clamp.</param>
@@ -471,6 +509,44 @@ namespace Microsoft.Xna.Framework
                 && this.X == other.X
                 && this.Y == other.Y
                 && this.Z == other.Z;
+        }
+
+        /// <summary>
+        /// Round this <see cref="Vector4"/> to a vector towards the negative infinity.
+        /// </summary>
+        public void Floor()
+        {
+            X = (float)Math.Floor(X);
+            Y = (float)Math.Floor(Y);
+            Z = (float)Math.Floor(Z);
+            W = (float)Math.Floor(W);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains values from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <returns>Unit vector.</returns>
+        public static Vector4 Floor(Vector4 value)
+        {
+            value.X = (float)Math.Floor(value.X);
+            value.Y = (float)Math.Floor(value.Y);
+            value.Z = (float)Math.Floor(value.Z);
+            value.W = (float)Math.Floor(value.W);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains values from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="result">Unit vector as an output parameter.</param>
+        public static void Floor(ref Vector4 value, out Vector4 result)
+        {
+            result.X = (float)Math.Floor(value.X);
+            result.Y = (float)Math.Floor(value.Y);
+            result.Z = (float)Math.Floor(value.Z);
+            result.W = (float)Math.Floor(value.W);
         }
 
         /// <summary>
@@ -787,6 +863,44 @@ namespace Microsoft.Xna.Framework
             result.X = value.X * factor;
             result.Y = value.Y * factor;
             result.Z = value.Z * factor;
+        }
+
+        /// <summary>
+        /// Round this <see cref="Vector4"/> to a vector with the nearest integral value.
+        /// </summary>
+        public void Round()
+        {
+            X = (float)Math.Round(X);
+            Y = (float)Math.Round(Y);
+            Z = (float)Math.Round(Z);
+            W = (float)Math.Round(W);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains rounded values from another vector.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <returns>Unit vector.</returns>
+        public static Vector4 Round(Vector4 value)
+        {
+            value.X = (float)Math.Round(value.X);
+            value.Y = (float)Math.Round(value.Y);
+            value.Z = (float)Math.Round(value.Z);
+            value.W = (float)Math.Round(value.W);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains rounded values from another vector.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="result">Unit vector as an output parameter.</param>
+        public static void Round(ref Vector4 value, out Vector4 result)
+        {
+            result.X = (float)Math.Round(value.X);
+            result.Y = (float)Math.Round(value.Y);
+            result.Z = (float)Math.Round(value.Z);
+            result.W = (float)Math.Round(value.W);
         }
 
         /// <summary>
