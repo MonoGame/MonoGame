@@ -1262,7 +1262,7 @@
       <LogicalName>MonoGame.bmp</LogicalName>
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
     </EmbeddedResource>
-	 <EmbeddedResource Include="SDL\gamecontrollerdb.txt">
+    <EmbeddedResource Include="..\ThirdParty\SDL_GameControllerDB\gamecontrollerdb.txt">
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
       <LogicalName>gamecontrollerdb.txt</LogicalName>
     </EmbeddedResource>
