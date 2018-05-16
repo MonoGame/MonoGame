@@ -178,6 +178,7 @@ internal static class Sdl
         public byte Patch;
     }
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int d_sdl_init(int flags);
     public static d_sdl_init SDL_Init = FuncLoader.LoadFunction<d_sdl_init>(NativeLibrary, "SDL_Init");
 
@@ -186,18 +187,23 @@ internal static class Sdl
         GetError(SDL_Init(flags));
     }
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void d_sdl_disablescreensaver();
     public static d_sdl_disablescreensaver DisableScreenSaver = FuncLoader.LoadFunction<d_sdl_disablescreensaver>(NativeLibrary, "SDL_DisableScreenSaver");
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void d_sdl_getversion(out Version version);
     public static d_sdl_getversion GetVersion = FuncLoader.LoadFunction<d_sdl_getversion>(NativeLibrary, "SDL_GetVersion");
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int d_sdl_pollevent([Out] out Event _event);
     public static d_sdl_pollevent PollEvent = FuncLoader.LoadFunction<d_sdl_pollevent>(NativeLibrary, "SDL_PollEvent");
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int d_sdl_pumpevents();
     public static d_sdl_pumpevents PumpEvents = FuncLoader.LoadFunction<d_sdl_pumpevents>(NativeLibrary, "SDL_PumpEvents");
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate IntPtr d_sdl_creatergbsurfacefrom(IntPtr pixels, int width, int height, int depth, int pitch, uint rMask, uint gMask, uint bMask, uint aMask);
     private static d_sdl_creatergbsurfacefrom SDL_CreateRGBSurfaceFrom = FuncLoader.LoadFunction<d_sdl_creatergbsurfacefrom>(NativeLibrary, "SDL_CreateRGBSurfaceFrom");
 
@@ -214,9 +220,11 @@ internal static class Sdl
         }
     }
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void d_sdl_freesurface(IntPtr surface);
     public static d_sdl_freesurface FreeSurface = FuncLoader.LoadFunction<d_sdl_freesurface>(NativeLibrary, "SDL_FreeSurface");
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate IntPtr d_sdl_geterror();
     private static d_sdl_geterror SDL_GetError = FuncLoader.LoadFunction<d_sdl_geterror>(NativeLibrary, "SDL_GetError");
 
@@ -241,9 +249,11 @@ internal static class Sdl
         return pointer;
     }
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void d_sdl_clearerror();
     public static d_sdl_clearerror ClearError = FuncLoader.LoadFunction<d_sdl_clearerror>(NativeLibrary, "SDL_ClearError");
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IntPtr d_sdl_gethint(string name);
     public static d_sdl_gethint SDL_GetHint = FuncLoader.LoadFunction<d_sdl_gethint>(NativeLibrary, "SDL_GetHint");
 
@@ -252,6 +262,7 @@ internal static class Sdl
         return GetString(SDL_GetHint(name));
     }
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate IntPtr d_sdl_loadbmp_rw(IntPtr src, int freesrc);
     private static d_sdl_loadbmp_rw SDL_LoadBMP_RW = FuncLoader.LoadFunction<d_sdl_loadbmp_rw>(NativeLibrary, "SDL_LoadBMP_RW");
 
@@ -260,9 +271,11 @@ internal static class Sdl
         return GetError(SDL_LoadBMP_RW(src, freesrc));
     }
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void d_sdl_quit();
     public static d_sdl_quit Quit = FuncLoader.LoadFunction<d_sdl_quit>(NativeLibrary, "SDL_Quit");
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate IntPtr d_sdl_rwfrommem(byte[] mem, int size);
     private static d_sdl_rwfrommem SDL_RWFromMem = FuncLoader.LoadFunction<d_sdl_rwfrommem>(NativeLibrary, "SDL_RWFromMem");
 
@@ -271,6 +284,7 @@ internal static class Sdl
         return GetError(SDL_RWFromMem(mem, size));
     }
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int d_sdl_sethint(string name, string value);
     public static d_sdl_sethint SetHint = FuncLoader.LoadFunction<d_sdl_sethint>(NativeLibrary, "SDL_SetHint");
 
@@ -353,6 +367,7 @@ internal static class Sdl
             public IntPtr window;
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_createwindow(string title, int x, int y, int w, int h, int flags);
         private static d_sdl_createwindow SDL_CreateWindow = FuncLoader.LoadFunction<d_sdl_createwindow>(NativeLibrary, "SDL_CreateWindow");
 
@@ -361,9 +376,11 @@ internal static class Sdl
             return GetError(SDL_CreateWindow(title, x, y, w, h, flags));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_destroywindow(IntPtr window);
         public static d_sdl_destroywindow Destroy = FuncLoader.LoadFunction<d_sdl_destroywindow>(NativeLibrary, "SDL_DestroyWindow");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_getwindowdisplayindex(IntPtr window);
         private static d_sdl_getwindowdisplayindex SDL_GetWindowDisplayIndex = FuncLoader.LoadFunction<d_sdl_getwindowdisplayindex>(NativeLibrary, "SDL_GetWindowDisplayIndex");
 
@@ -372,21 +389,27 @@ internal static class Sdl
             return GetError(SDL_GetWindowDisplayIndex(window));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_getwindowflags(IntPtr window);
         public static d_sdl_getwindowflags GetWindowFlags = FuncLoader.LoadFunction<d_sdl_getwindowflags>(NativeLibrary, "SDL_GetWindowFlags");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_setwindowicon(IntPtr window, IntPtr icon);
         public static d_sdl_setwindowicon SetIcon = FuncLoader.LoadFunction<d_sdl_setwindowicon>(NativeLibrary, "SDL_SetWindowIcon");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_getwindowposition(IntPtr window, out int x, out int y);
         public static d_sdl_getwindowposition GetPosition = FuncLoader.LoadFunction<d_sdl_getwindowposition>(NativeLibrary, "SDL_GetWindowPosition");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_getwindowsize(IntPtr window, out int w, out int h);
         public static d_sdl_getwindowsize GetSize = FuncLoader.LoadFunction<d_sdl_getwindowsize>(NativeLibrary, "SDL_GetWindowSize");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_setwindowbordered(IntPtr window, int bordered);
         public static d_sdl_setwindowbordered SetBordered = FuncLoader.LoadFunction<d_sdl_setwindowbordered>(NativeLibrary, "SDL_SetWindowBordered");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_setwindowfullscreen(IntPtr window, int flags);
         private static d_sdl_setwindowfullscreen SDL_SetWindowFullscreen = FuncLoader.LoadFunction<d_sdl_setwindowfullscreen>(NativeLibrary, "SDL_SetWindowFullscreen");
 
@@ -395,24 +418,31 @@ internal static class Sdl
             GetError(SDL_SetWindowFullscreen(window, flags));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_setwindowposition(IntPtr window, int x, int y);
         public static d_sdl_setwindowposition SetPosition = FuncLoader.LoadFunction<d_sdl_setwindowposition>(NativeLibrary, "SDL_SetWindowPosition");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_setwindowresizable(IntPtr window, bool resizable);
         public static d_sdl_setwindowresizable SetResizable = FuncLoader.LoadFunction<d_sdl_setwindowresizable>(NativeLibrary, "SDL_SetWindowResizable");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_setwindowsize(IntPtr window, int w, int h);
         public static d_sdl_setwindowsize SetSize = FuncLoader.LoadFunction<d_sdl_setwindowsize>(NativeLibrary, "SDL_SetWindowSize");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_setwindowtitle(IntPtr window, string title);
         public static d_sdl_setwindowtitle SetTitle = FuncLoader.LoadFunction<d_sdl_setwindowtitle>(NativeLibrary, "SDL_SetWindowTitle");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_showwindow(IntPtr window);
         public static d_sdl_showwindow Show = FuncLoader.LoadFunction<d_sdl_showwindow>(NativeLibrary, "SDL_ShowWindow");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate bool d_sdl_getwindowwminfo(IntPtr window, ref SDL_SysWMinfo sysWMinfo);
         public static d_sdl_getwindowwminfo GetWindowWMInfo = FuncLoader.LoadFunction<d_sdl_getwindowwminfo>(NativeLibrary, "SDL_GetWindowWMInfo");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_getwindowborderssize(IntPtr window, out int top, out int left, out int right, out int bottom);
         public static d_sdl_getwindowborderssize GetBorderSize = FuncLoader.LoadFunction<d_sdl_getwindowborderssize>(NativeLibrary, "SDL_GetWindowBordersSize");
     }
@@ -428,6 +458,7 @@ internal static class Sdl
             public IntPtr DriverData;
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_getdisplaybounds(int displayIndex, out Rectangle rect);
         private static d_sdl_getdisplaybounds SDL_GetDisplayBounds = FuncLoader.LoadFunction<d_sdl_getdisplaybounds>(NativeLibrary, "SDL_GetDisplayBounds");
 
@@ -436,6 +467,7 @@ internal static class Sdl
             GetError(SDL_GetDisplayBounds(displayIndex, out rect));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_getcurrentdisplaymode(int displayIndex, out Mode mode);
         private static d_sdl_getcurrentdisplaymode SDL_GetCurrentDisplayMode = FuncLoader.LoadFunction<d_sdl_getcurrentdisplaymode>(NativeLibrary, "SDL_GetCurrentDisplayMode");
 
@@ -444,6 +476,7 @@ internal static class Sdl
             GetError(SDL_GetCurrentDisplayMode(displayIndex, out mode));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_getdisplaymode(int displayIndex, int modeIndex, out Mode mode);
         private static d_sdl_getdisplaymode SDL_GetDisplayMode = FuncLoader.LoadFunction<d_sdl_getdisplaymode>(NativeLibrary, "SDL_GetDisplayMode");
 
@@ -452,6 +485,7 @@ internal static class Sdl
             GetError(SDL_GetDisplayMode(displayIndex, modeIndex, out mode));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_getclosestdisplaymode(int displayIndex, Mode mode, out Mode closest);
         private static d_sdl_getclosestdisplaymode SDL_GetClosestDisplayMode = FuncLoader.LoadFunction<d_sdl_getclosestdisplaymode>(NativeLibrary, "SDL_GetClosestDisplayMode");
 
@@ -460,6 +494,7 @@ internal static class Sdl
             GetError(SDL_GetClosestDisplayMode(displayIndex, mode, out closest));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_getdisplayname(int index);
         private static d_sdl_getdisplayname SDL_GetDisplayName = FuncLoader.LoadFunction<d_sdl_getdisplayname>(NativeLibrary, "SDL_GetDisplayName");
 
@@ -468,6 +503,7 @@ internal static class Sdl
             return GetString(GetError(SDL_GetDisplayName(index)));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_getnumdisplaymodes(int displayIndex);
         private static d_sdl_getnumdisplaymodes SDL_GetNumDisplayModes = FuncLoader.LoadFunction<d_sdl_getnumdisplaymodes>(NativeLibrary, "SDL_GetNumDisplayModes");
 
@@ -476,6 +512,7 @@ internal static class Sdl
             return GetError(SDL_GetNumDisplayModes(displayIndex));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_getnumvideodisplays();
         private static d_sdl_getnumvideodisplays SDL_GetNumVideoDisplays = FuncLoader.LoadFunction<d_sdl_getnumvideodisplays>(NativeLibrary, "SDL_GetNumVideoDisplays");
 
@@ -484,6 +521,7 @@ internal static class Sdl
             return GetError(SDL_GetNumVideoDisplays());
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_getwindowdisplayindex(IntPtr window);
         private static d_sdl_getwindowdisplayindex SDL_GetWindowDisplayIndex = FuncLoader.LoadFunction<d_sdl_getwindowdisplayindex>(NativeLibrary, "SDL_GetWindowDisplayIndex");
 
@@ -524,6 +562,7 @@ internal static class Sdl
             ContextReleaseBehaviour,
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_gl_createcontext(IntPtr window);
         private static d_sdl_gl_createcontext SDL_GL_CreateContext = FuncLoader.LoadFunction<d_sdl_gl_createcontext>(NativeLibrary, "SDL_GL_CreateContext");
 
@@ -532,9 +571,11 @@ internal static class Sdl
             return GetError(SDL_GL_CreateContext(window));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_gl_deletecontext(IntPtr context);
         public static d_sdl_gl_deletecontext DeleteContext = FuncLoader.LoadFunction<d_sdl_gl_deletecontext>(NativeLibrary, "SDL_GL_DeleteContext");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_gl_getcurrentcontext();
         private static d_sdl_gl_getcurrentcontext SDL_GL_GetCurrentContext = FuncLoader.LoadFunction<d_sdl_gl_getcurrentcontext>(NativeLibrary, "SDL_GL_GetCurrentContext");
 
@@ -543,12 +584,15 @@ internal static class Sdl
             return GetError(SDL_GL_GetCurrentContext());
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_gl_getswapinterval();
         public static d_sdl_gl_getswapinterval GetSwapInterval = FuncLoader.LoadFunction<d_sdl_gl_getswapinterval>(NativeLibrary, "SDL_GL_GetSwapInterval");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_gl_makecurrent(IntPtr window, IntPtr context);
         public static d_sdl_gl_makecurrent MakeCurrent = FuncLoader.LoadFunction<d_sdl_gl_makecurrent>(NativeLibrary, "SDL_GL_MakeCurrent");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_gl_setattribute(Attribute attr, int value);
         private static d_sdl_gl_setattribute SDL_GL_SetAttribute = FuncLoader.LoadFunction<d_sdl_gl_setattribute>(NativeLibrary, "SDL_GL_SetAttribute");
 
@@ -557,9 +601,11 @@ internal static class Sdl
             return GetError(SDL_GL_SetAttribute(attr, value));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_gl_setswapinterval(int interval);
         public static d_sdl_gl_setswapinterval SetSwapInterval = FuncLoader.LoadFunction<d_sdl_gl_setswapinterval>(NativeLibrary, "SDL_GL_SetSwapInterval");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_gl_swapwindow(IntPtr window);
         public static d_sdl_gl_swapwindow SwapWindow = FuncLoader.LoadFunction<d_sdl_gl_swapwindow>(NativeLibrary, "SDL_GL_SwapWindow");
     }
@@ -621,6 +667,7 @@ internal static class Sdl
             public uint Direction;
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_createcolorcursor(IntPtr surface, int x, int y);
         private static d_sdl_createcolorcursor SDL_CreateColorCursor = FuncLoader.LoadFunction<d_sdl_createcolorcursor>(NativeLibrary, "SDL_CreateColorCursor");
 
@@ -629,6 +676,7 @@ internal static class Sdl
             return GetError(SDL_CreateColorCursor(surface, x, y));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_createsystemcursor(SystemCursor id);
         private static d_sdl_createsystemcursor SDL_CreateSystemCursor = FuncLoader.LoadFunction<d_sdl_createsystemcursor>(NativeLibrary, "SDL_CreateSystemCursor");
 
@@ -637,21 +685,27 @@ internal static class Sdl
             return GetError(SDL_CreateSystemCursor(id));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_freecursor(IntPtr cursor);
         public static d_sdl_freecursor FreeCursor = FuncLoader.LoadFunction<d_sdl_freecursor>(NativeLibrary, "SDL_FreeCursor");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate Button d_sdl_getglobalmousestate(out int x, out int y);
         public static d_sdl_getglobalmousestate GetGlobalState = FuncLoader.LoadFunction<d_sdl_getglobalmousestate>(NativeLibrary, "SDL_GetGlobalMouseState");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate Button d_sdl_getmousestate(out int x, out int y);
         public static d_sdl_getmousestate GetState = FuncLoader.LoadFunction<d_sdl_getmousestate>(NativeLibrary, "SDL_GetMouseState");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_setcursor(IntPtr cursor);
         public static d_sdl_setcursor SetCursor = FuncLoader.LoadFunction<d_sdl_setcursor>(NativeLibrary, "SDL_SetCursor");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_showcursor(int toggle);
         public static d_sdl_showcursor ShowCursor = FuncLoader.LoadFunction<d_sdl_showcursor>(NativeLibrary, "SDL_ShowCursor");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_warpmouseinwindow(IntPtr window, int x, int y);
         public static d_sdl_warpmouseinwindow WarpInWindow = FuncLoader.LoadFunction<d_sdl_warpmouseinwindow>(NativeLibrary, "SDL_WarpMouseInWindow");
     }
@@ -721,6 +775,7 @@ internal static class Sdl
             public fixed byte Text[32];
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate Keymod d_sdl_getmodstate();
         public static d_sdl_getmodstate GetModState = FuncLoader.LoadFunction<d_sdl_getmodstate>(NativeLibrary, "SDL_GetModState");
     }
@@ -745,9 +800,11 @@ internal static class Sdl
             public int Which;
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_joystickclose(IntPtr joystick);
         public static d_sdl_joystickclose Close = FuncLoader.LoadFunction<d_sdl_joystickclose>(NativeLibrary, "SDL_JoystickClose");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_joystickfrominstanceid(int joyid);
         private static d_sdl_joystickfrominstanceid SDL_JoystickFromInstanceID = FuncLoader.LoadFunction<d_sdl_joystickfrominstanceid>(NativeLibrary, "SDL_JoystickFromInstanceID");
 
@@ -756,21 +813,27 @@ internal static class Sdl
             return GetError(SDL_JoystickFromInstanceID(joyid));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate short d_sdl_joystickgetaxis(IntPtr joystick, int axis);
         public static d_sdl_joystickgetaxis GetAxis = FuncLoader.LoadFunction<d_sdl_joystickgetaxis>(NativeLibrary, "SDL_JoystickGetAxis");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate byte d_sdl_joystickgetbutton(IntPtr joystick, int button);
         public static d_sdl_joystickgetbutton GetButton = FuncLoader.LoadFunction<d_sdl_joystickgetbutton>(NativeLibrary, "SDL_JoystickGetButton");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate Guid d_sdl_joystickgetguid(IntPtr joystick);
         public static d_sdl_joystickgetguid GetGUID = FuncLoader.LoadFunction<d_sdl_joystickgetguid>(NativeLibrary, "SDL_JoystickGetGUID");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate Hat d_sdl_joystickgethat(IntPtr joystick, int hat);
         public static d_sdl_joystickgethat GetHat = FuncLoader.LoadFunction<d_sdl_joystickgethat>(NativeLibrary, "SDL_JoystickGetHat");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_joystickinstanceid(IntPtr joystick);
         public static d_sdl_joystickinstanceid InstanceID = FuncLoader.LoadFunction<d_sdl_joystickinstanceid>(NativeLibrary, "SDL_JoystickInstanceID");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_joystickopen(int deviceIndex);
         private static d_sdl_joystickopen SDL_JoystickOpen = FuncLoader.LoadFunction<d_sdl_joystickopen>(NativeLibrary, "SDL_JoystickOpen");
 
@@ -779,6 +842,7 @@ internal static class Sdl
             return GetError(SDL_JoystickOpen(deviceIndex));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_joysticknumaxes(IntPtr joystick);
         private static d_sdl_joysticknumaxes SDL_JoystickNumAxes = FuncLoader.LoadFunction<d_sdl_joysticknumaxes>(NativeLibrary, "SDL_JoystickNumAxes");
 
@@ -787,6 +851,7 @@ internal static class Sdl
             return GetError(SDL_JoystickNumAxes(joystick));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_joysticknumbuttons(IntPtr joystick);
         private static d_sdl_joysticknumbuttons SDL_JoystickNumButtons = FuncLoader.LoadFunction<d_sdl_joysticknumbuttons>(NativeLibrary, "SDL_JoystickNumButtons");
 
@@ -795,6 +860,7 @@ internal static class Sdl
             return GetError(SDL_JoystickNumButtons(joystick));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_joysticknumhats(IntPtr joystick);
         private static d_sdl_joysticknumhats SDL_JoystickNumHats = FuncLoader.LoadFunction<d_sdl_joysticknumhats>(NativeLibrary, "SDL_JoystickNumHats");
 
@@ -803,6 +869,7 @@ internal static class Sdl
             return GetError(SDL_JoystickNumHats(joystick));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_numjoysticks();
         private static d_sdl_numjoysticks SDL_NumJoysticks = FuncLoader.LoadFunction<d_sdl_numjoysticks>(NativeLibrary, "SDL_NumJoysticks");
 
@@ -855,15 +922,19 @@ internal static class Sdl
             public int Which;
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_gamecontrolleraddmapping(string mappingString);
         public static d_sdl_gamecontrolleraddmapping AddMapping = FuncLoader.LoadFunction<d_sdl_gamecontrolleraddmapping>(NativeLibrary, "SDL_GameControllerAddMapping");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_gamecontrolleraddmappingsfromrw(IntPtr rw, int freew);
         public static d_sdl_gamecontrolleraddmappingsfromrw AddMappingFromRw = FuncLoader.LoadFunction<d_sdl_gamecontrolleraddmappingsfromrw>(NativeLibrary, "SDL_GameControllerAddMappingsFromRW");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_gamecontrollerclose(IntPtr gamecontroller);
         public static d_sdl_gamecontrollerclose Close = FuncLoader.LoadFunction<d_sdl_gamecontrollerclose>(NativeLibrary, "SDL_GameControllerClose");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_joystickfrominstanceid(int joyid);
         private static d_sdl_joystickfrominstanceid SDL_GameControllerFromInstanceID = FuncLoader.LoadFunction<d_sdl_joystickfrominstanceid>(NativeLibrary, "SDL_JoystickFromInstanceID");
 
@@ -872,12 +943,15 @@ internal static class Sdl
             return GetError(SDL_GameControllerFromInstanceID(joyid));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate short d_sdl_gamecontrollergetaxis(IntPtr gamecontroller, Axis axis);
         public static d_sdl_gamecontrollergetaxis GetAxis = FuncLoader.LoadFunction<d_sdl_gamecontrollergetaxis>(NativeLibrary, "SDL_GameControllerGetAxis");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate byte d_sdl_gamecontrollergetbutton(IntPtr gamecontroller, Button button);
         public static d_sdl_gamecontrollergetbutton GetButton = FuncLoader.LoadFunction<d_sdl_gamecontrollergetbutton>(NativeLibrary, "SDL_GameControllerGetButton");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_gamecontrollergetjoystick(IntPtr gamecontroller);
         private static d_sdl_gamecontrollergetjoystick SDL_GameControllerGetJoystick = FuncLoader.LoadFunction<d_sdl_gamecontrollergetjoystick>(NativeLibrary, "SDL_GameControllerGetJoystick");
 
@@ -886,9 +960,11 @@ internal static class Sdl
             return GetError(SDL_GameControllerGetJoystick(gamecontroller));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate byte d_sdl_isgamecontroller(int joystickIndex);
         public static d_sdl_isgamecontroller IsGameController = FuncLoader.LoadFunction<d_sdl_isgamecontroller>(NativeLibrary, "SDL_IsGameController");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_gamecontrollermapping(IntPtr gamecontroller);
         private static d_sdl_gamecontrollermapping SDL_GameControllerMapping = FuncLoader.LoadFunction<d_sdl_gamecontrollermapping>(NativeLibrary, "SDL_GameControllerMapping");
 
@@ -897,6 +973,7 @@ internal static class Sdl
             return GetString(SDL_GameControllerMapping(gamecontroller));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_gamecontrolleropen(int joystickIndex);
         private static d_sdl_gamecontrolleropen SDL_GameControllerOpen = FuncLoader.LoadFunction<d_sdl_gamecontrolleropen>(NativeLibrary, "SDL_GameControllerOpen");
 
@@ -905,6 +982,7 @@ internal static class Sdl
             return GetError(SDL_GameControllerOpen(joystickIndex));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_gamecontrollername(IntPtr gamecontroller);
         private static d_sdl_gamecontrollername SDL_GameControllerName = FuncLoader.LoadFunction<d_sdl_gamecontrollername>(NativeLibrary, "SDL_GameControllerName");
 
@@ -939,15 +1017,19 @@ internal static class Sdl
             [FieldOffset(0)] public LeftRight leftright;
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_hapticclose(IntPtr haptic);
         public static d_sdl_hapticclose Close = FuncLoader.LoadFunction<d_sdl_hapticclose>(NativeLibrary, "SDL_HapticClose");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_hapticeffectsupported(IntPtr haptic, ref Effect effect);
         public static d_sdl_hapticeffectsupported EffectSupported = FuncLoader.LoadFunction<d_sdl_hapticeffectsupported>(NativeLibrary, "SDL_HapticEffectSupported");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_joystickishaptic(IntPtr joystick);
         public static d_sdl_joystickishaptic IsHaptic = FuncLoader.LoadFunction<d_sdl_joystickishaptic>(NativeLibrary, "SDL_JoystickIsHaptic");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_hapticneweffect(IntPtr haptic, ref Effect effect);
         private static d_sdl_hapticneweffect SDL_HapticNewEffect = FuncLoader.LoadFunction<d_sdl_hapticneweffect>(NativeLibrary, "SDL_HapticNewEffect");
 
@@ -956,9 +1038,11 @@ internal static class Sdl
             GetError(SDL_HapticNewEffect(haptic, ref effect));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate IntPtr d_sdl_hapticopen(int device_index);
         public static d_sdl_hapticopen Open = FuncLoader.LoadFunction<d_sdl_hapticopen>(NativeLibrary, "SDL_HapticOpen");
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_hapticopenfromjoystick(IntPtr joystick);
         private static d_sdl_hapticopenfromjoystick SDL_HapticOpenFromJoystick = FuncLoader.LoadFunction<d_sdl_hapticopenfromjoystick>(NativeLibrary, "SDL_HapticOpenFromJoystick");
 
@@ -967,6 +1051,7 @@ internal static class Sdl
             return GetError(SDL_HapticOpenFromJoystick(joystick));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_hapticrumbleinit(IntPtr haptic);
         private static d_sdl_hapticrumbleinit SDL_HapticRumbleInit = FuncLoader.LoadFunction<d_sdl_hapticrumbleinit>(NativeLibrary, "SDL_HapticRumbleInit");
 
@@ -975,6 +1060,7 @@ internal static class Sdl
             GetError(SDL_HapticRumbleInit(haptic));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_hapticrumbleplay(IntPtr haptic, float strength, uint length);
         private static d_sdl_hapticrumbleplay SDL_HapticRumblePlay = FuncLoader.LoadFunction<d_sdl_hapticrumbleplay>(NativeLibrary, "SDL_HapticRumblePlay");
 
@@ -983,6 +1069,7 @@ internal static class Sdl
             GetError(SDL_HapticRumblePlay(haptic, strength, length));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_hapticrumblesupported(IntPtr haptic);
         private static d_sdl_hapticrumblesupported SDL_HapticRumbleSupported = FuncLoader.LoadFunction<d_sdl_hapticrumblesupported>(NativeLibrary, "SDL_HapticRumbleSupported");
 
@@ -991,6 +1078,7 @@ internal static class Sdl
             return GetError(SDL_HapticRumbleSupported(haptic));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_hapticruneffect(IntPtr haptic, int effect, uint iterations);
         private static d_sdl_hapticruneffect SDL_HapticRunEffect = FuncLoader.LoadFunction<d_sdl_hapticruneffect>(NativeLibrary, "SDL_HapticRunEffect");
 
@@ -999,6 +1087,7 @@ internal static class Sdl
             GetError(SDL_HapticRunEffect(haptic, effect, iterations));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_hapticstopall(IntPtr haptic);
         private static d_sdl_hapticstopall SDL_HapticStopAll = FuncLoader.LoadFunction<d_sdl_hapticstopall>(NativeLibrary, "SDL_HapticStopAll");
 
@@ -1007,6 +1096,7 @@ internal static class Sdl
             GetError(SDL_HapticStopAll(haptic));
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_hapticupdateeffect(IntPtr haptic, int effect, ref Effect data);
         private static d_sdl_hapticupdateeffect SDL_HapticUpdateEffect = FuncLoader.LoadFunction<d_sdl_hapticupdateeffect>(NativeLibrary, "SDL_HapticUpdateEffect");
 
