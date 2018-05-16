@@ -24,6 +24,7 @@ namespace MonoGame.OpenGL
 
     internal class EntryPointHelper
     {
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate IntPtr d_sdl_gl_getprocaddress(IntPtr proc);
         public static d_sdl_gl_getprocaddress GetProcAddress = FuncLoader.LoadFunction<d_sdl_gl_getprocaddress>(Sdl.NativeLibrary, "SDL_GL_GetProcAddress");
         
