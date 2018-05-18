@@ -289,6 +289,7 @@
     <Compile Include="PlaneIntersectionType.cs" />
     <Compile Include="PlayerIndex.cs" />
     <Compile Include="Point.cs" />
+    <Compile Include="Point3.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
     <Compile Include="PrimaryThreadLoader.cs">
       <Platforms>Android,MacOS</Platforms>

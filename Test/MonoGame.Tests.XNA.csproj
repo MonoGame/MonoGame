@@ -147,6 +147,8 @@
     <Compile Include="Framework\MatrixTest.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
+    <Compile Include="Framework\PointTest.cs" />
+    <Compile Include="Framework\Point3Test.cs" />
     <Compile Include="Framework\QuaternionTest.cs" />
     <Compile Include="Framework\RectangleTest.cs" />
     <Compile Include="Framework\TitleContainerTest.cs" />

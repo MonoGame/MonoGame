@@ -209,6 +209,8 @@
     <Compile Include="Framework\MockWindow.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
+    <Compile Include="Framework\PointTest.cs" />
+    <Compile Include="Framework\Point3Test.cs" />
 	<Compile Include="Framework\QuaternionTest.cs" />
     <Compile Include="Framework\RayTest.cs" />
 	<Compile Include="Framework\RectangleTest.cs" />
