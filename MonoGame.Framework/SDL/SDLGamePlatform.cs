@@ -31,11 +31,6 @@ namespace Microsoft.Xna.Framework
         public SdlGamePlatform(Game game)
             : base(game)
         {
-            // if we're on Windows, we need to detect the CPU arch and load the correct dlls
-            // on other system, the MonoGame.Framework.dll.config handles this
-            if (PlatformParameters.DetectWindowsArchitecture)
-                NativeHelper.InitDllDirectory();
-
             _game = game;
             _keys = new List<Keys>();
             Keyboard.SetKeys(_keys);
