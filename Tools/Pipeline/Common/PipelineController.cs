@@ -657,6 +657,10 @@ namespace MonoGame.Tools.Pipeline
         {
             var path = GetFullPath(GetCurrentPath());
 
+            // if path is root of drive in windows (C:) return C:\ instead.
+            //  Should no break anything unless file/directory names end with :
+            if (path[path.Length - 1] == ':') path += "\\";
+
             List<string> files;
             if (!View.ChooseContentFile(path, out files))
                 return;
