@@ -1065,19 +1065,16 @@ namespace MonoGame.Tools.Pipeline
 
         public string GetFullPath(string filePath)
         {
-            // if the path is root of a drive in windows, which normally returns C:, return C:\ instead.
-            if (filePath.Length==2 && filePath[0] !='/' && Path.DirectorySeparatorChar=='\\' && filePath[filePath.Length - 1] == ':')
-                filePath += "\\";
-
-            if (_project == null)
+            if (_project == null || Path.IsPathRooted(filePath))
+            {
+                if (filePath.Length == 2 && filePath[0] != '/')
+                    filePath += "\\";
                 return filePath;
+            }
 
             filePath = filePath.Replace("/", Path.DirectorySeparatorChar.ToString());
             if (filePath.StartsWith("\\"))
                 filePath = filePath.Substring(1);
-
-            if (Path.IsPathRooted(filePath))
-                return filePath;
 
             return _project.Location + Path.DirectorySeparatorChar + filePath;
         }
