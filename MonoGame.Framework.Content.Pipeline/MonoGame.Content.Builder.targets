@@ -80,7 +80,7 @@
     </BuildDependsOn>
   </PropertyGroup>
 
-  <Target Name="RunContentBuilder">
+  <Target Name="RunContentBuilder" DependsOnTargets="Compile">
     <Exec Condition=" '%(ContentReferences.FullPath)' != '' "
           Command="$(MonoGameContentBuilderCmd) /@:&quot;%(ContentReferences.FullPath)&quot; $(Header) /outputDir:&quot;%(ContentReferences.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReferences.ContentIntermediateOutputDir)&quot;"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
