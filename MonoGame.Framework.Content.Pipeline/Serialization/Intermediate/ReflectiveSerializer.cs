@@ -174,7 +174,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                             continue;
                         
                         // We failed to find a required element.
-                        throw new InvalidContentException(string.Format("The Xml element `{0}` is required!", info.Attribute.ElementName));
+                        throw new InvalidContentException(string.Format("The Xml element `{0}` is required, But found '{1}' instead, try swappping elements as they are out of order", info.Attribute.ElementName, input.Xml.Name));
                     }
                 }
 
