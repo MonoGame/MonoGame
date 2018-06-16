@@ -4,19 +4,8 @@
 
 using System;
 using System.Diagnostics;
-
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#else
-using OpenTK.Graphics.OpenGL;
-#endif
-#elif DESKTOPGL
-using OpenGL;
-using ExtTextureFilterAnisotropic = OpenGL.TextureParameterName;
-#elif GLES
-using OpenTK.Graphics.ES20;
-#endif
+using MonoGame.OpenGL;
+using ExtTextureFilterAnisotropic = MonoGame.OpenGL.TextureParameterName;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -24,13 +13,8 @@ namespace Microsoft.Xna.Framework.Graphics
   {
       private readonly float[] _openGLBorderColor = new float[4];
 
-#if GLES
-        private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)All.TextureMaxAnisotropyExt;
-        private const TextureParameterName TextureParameterNameTextureMaxLevel = (TextureParameterName)0x813D;
-#else
-        private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt;
-        private const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
-#endif
+        internal const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt;
+        internal const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
 
         internal void Activate(GraphicsDevice device, TextureTarget target, bool useMipmaps = false)
         {
@@ -190,6 +174,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterNameTextureMaxLevel, 1000);
                 }
+                GraphicsExtensions.CheckGLError();
             }
         }
 

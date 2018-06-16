@@ -48,9 +48,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="context">The processor context.</param>
         /// <param name="content">The content to be compressed.</param>
         /// <param name="format">The user requested format for compression.</param>
-        /// <param name="generateMipmaps">If mipmap generation is required.</param>
         /// <param name="isSpriteFont">If the texture has represents a sprite font, i.e. is greyscale and has sharp black/white contrast.</param>
-        public void ConvertTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool generateMipmaps, bool isSpriteFont)
+        public void ConvertTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool isSpriteFont)
         {
             // We do nothing in this case.
             if (format == TextureProcessorOutputFormat.NoChange)
@@ -60,22 +59,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (format == TextureProcessorOutputFormat.Color)
             {
                 content.ConvertBitmapType(typeof(PixelBitmapContent<Color>));
-                if (generateMipmaps)
-                    content.GenerateMipmaps(false);
                 return;
             }
 
             // Handle this common compression format.
             if (format == TextureProcessorOutputFormat.Color16Bit)
             {
-                GraphicsUtil.CompressColor16Bit(content, generateMipmaps);
+                GraphicsUtil.CompressColor16Bit(context, content);
                 return;
             }
 
             try
             {
                 // All other formats require platform specific choices.
-                PlatformCompressTexture(context, content, format, generateMipmaps, isSpriteFont);
+                PlatformCompressTexture(context, content, format, isSpriteFont);
             }
             catch (EntryPointNotFoundException ex)
             {
@@ -94,6 +91,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        protected abstract void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool generateMipmaps, bool isSpriteFont);
+        protected abstract void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool isSpriteFont);
     }
 }

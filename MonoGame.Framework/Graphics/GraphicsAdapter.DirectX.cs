@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using SharpDX.Direct3D;
-using SharpDX.DXGI;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -62,13 +61,8 @@ namespace Microsoft.Xna.Framework.Graphics
             adapter.SubSystemId = device.Description1.SubsystemId;
             adapter.MonitorHandle = monitor.Description.MonitorHandle;
 
-#if WINDOWS_UAP
             var desktopWidth = monitor.Description.DesktopBounds.Right - monitor.Description.DesktopBounds.Left;
             var desktopHeight = monitor.Description.DesktopBounds.Bottom - monitor.Description.DesktopBounds.Top;
-#else
-            var desktopWidth = monitor.Description.DesktopBounds.Width;
-            var desktopHeight = monitor.Description.DesktopBounds.Height;
-#endif
 
             var modes = new List<DisplayMode>();
 
@@ -101,15 +95,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     modes.Add(mode);
 
-                    if (mode.Width == desktopWidth && mode.Height == desktopHeight && mode.Format == SurfaceFormat.Color)
+                    if (adapter._currentDisplayMode == null)
                     {
-                        if (adapter._currentDisplayMode == null)
+                        if (mode.Width == desktopWidth && mode.Height == desktopHeight && mode.Format == SurfaceFormat.Color)
                             adapter._currentDisplayMode = mode;
                     }
                 }
             }
 
             adapter._supportedDisplayModes = new DisplayModeCollection(modes);
+
+            if (adapter._currentDisplayMode == null) //(i.e. desktop mode wasn't found in the available modes)
+                adapter._currentDisplayMode = new DisplayMode(desktopWidth, desktopHeight, SurfaceFormat.Color);
 
             return adapter;
         }
@@ -118,7 +115,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if(UseReferenceDevice)
                 return true;
-
             switch(graphicsProfile)
             {
                 case GraphicsProfile.Reach:

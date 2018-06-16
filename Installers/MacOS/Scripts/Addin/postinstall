@@ -4,4 +4,16 @@ then
 	CONSOLE_USER=$(stat -f '%Su' /dev/console)
 	sudo -u $CONSOLE_USER /Applications/Xamarin\ Studio.app/Contents/MacOS/mdtool setup install /tmp/MonoDevelop.MonoGame_*.mpack -y
 fi
-sudo rm /tmp/MonoDevelop.MonoGame_*.mpack
+if [ -d "/Applications/Visual Studio.app" ]
+then
+	CONSOLE_USER=$(stat -f '%Su' /dev/console)
+	sudo -u $CONSOLE_USER /Applications/Visual\ Studio.app/Contents/MacOS/vstool setup install /tmp/MonoDevelop.MonoGame_IDE_VisualStudioForMac_*.mpack -y
+fi
+if [ -f "/tmp/MonoDevelop.MonoGame_*.mpack" ]
+then
+	sudo rm /tmp/MonoDevelop.MonoGame_*.mpack
+fi
+if [ -f "/tmp/MonoDevelop.MonoGame_IDE_VisualStudioForMac_*.mpack" ]
+then
+	sudo rm /tmp/MonoDevelop.MonoGame_IDE_VisualStudioForMac_*.mpack
+fi

@@ -161,6 +161,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         rbSwap = pixelFormat.dwBBitMask == 0x1F;
                         return SurfaceFormat.Bgr565;
                     }
+                    else if (pixelFormat.dwRgbBitCount == 24)
+                    {
+                        rbSwap = pixelFormat.dwBBitMask == 0xFF;
+                        return SurfaceFormat.Color;
+                    }
+                    else if (pixelFormat.dwRgbBitCount == 32)
+                    {
+                        rbSwap = pixelFormat.dwBBitMask == 0xFF;
+                        return SurfaceFormat.Color;
+                    }
                     throw new ContentLoadException("Unsupported RGB pixel format");
                 }
             }
@@ -293,19 +303,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 int faceCount = 1;
                 int mipMapCount = (int)(header.dwCaps.HasFlag(DdsCaps.MipMap) ? header.dwMipMapCount : 1);
-                if (header.dwCaps.HasFlag(DdsCaps.Complex))
+                if (header.dwCaps2.HasFlag(DdsCaps2.Cubemap))
                 {
-                    if (header.dwCaps2.HasFlag(DdsCaps2.Cubemap))
-                    {
-                        if (!header.dwCaps2.HasFlag(DdsCaps2.CubemapAllFaces))
-                            throw new ContentLoadException("Incomplete cubemap in DDS file");
-                        faceCount = 6;
-                        output = new TextureCubeContent() { Identity = identity };
-                    }
-                    else
-                    {
-                        output = new Texture2DContent() { Identity = identity };
-                    }
+                    if (!header.dwCaps2.HasFlag(DdsCaps2.CubemapAllFaces))
+                        throw new ContentLoadException("Incomplete cubemap in DDS file");
+                    faceCount = 6;
+                    output = new TextureCubeContent() { Identity = identity };
                 }
                 else
                 {
@@ -324,6 +327,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     {
                         var content = CreateBitmapContent(format, w, h);
                         var byteCount = GetBitmapSize(format, w, h);
+                        // A 24-bit format is slightly different
+                        if (header.ddspf.dwRgbBitCount == 24)
+                            byteCount = 3 * w * h;
                         var bytes = reader.ReadBytes(byteCount);
                         if (rbSwap)
                         {
@@ -339,9 +345,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                                     ByteSwapBGRA5551(bytes);
                                     break;
                                 case SurfaceFormat.Color:
-                                    ByteSwapColor(bytes);
+                                    if (header.ddspf.dwRgbBitCount == 32)
+                                        ByteSwapRGBX(bytes);
+                                    else if (header.ddspf.dwRgbBitCount == 24)
+                                        ByteSwapRGB(bytes);
                                     break;
                             }
+                        }
+                        if ((format == SurfaceFormat.Color) && header.ddspf.dwFlags.HasFlag(Ddpf.Rgb) && !header.ddspf.dwFlags.HasFlag(Ddpf.AlphaPixels))
+                        {
+                            // Fill or add alpha with opaque
+                            if (header.ddspf.dwRgbBitCount == 32)
+                                ByteFillAlpha(bytes);
+                            else if (header.ddspf.dwRgbBitCount == 24)
+                                ByteExpandAlpha(ref bytes);
                         }
                         content.SetPixelData(bytes);
                         mipMaps.Add(content);
@@ -355,7 +372,40 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return output;
         }
 
-        static void ByteSwapColor(byte[] bytes)
+        static void ByteFillAlpha(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 4)
+            {
+                bytes[i + 3] = 255;
+            }
+        }
+
+        static void ByteExpandAlpha(ref byte[] bytes)
+        {
+            var rgba = new byte[bytes.Length + (bytes.Length / 3)];
+            int j = 0;
+            for (int i = 0; i < bytes.Length; i += 3)
+            {
+                rgba[j] = bytes[i];
+                rgba[j + 1] = bytes[i + 1];
+                rgba[j + 2] = bytes[i + 2];
+                rgba[j + 3] = 255;
+                j += 4;
+            }
+            bytes = rgba;
+        }
+
+        static void ByteSwapRGB(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 3)
+            {
+                byte r = bytes[i];
+                bytes[i] = bytes[i + 2];
+                bytes[i + 2] = r;
+            }
+        }
+
+        static void ByteSwapRGBX(byte[] bytes)
         {
             for (int i = 0; i < bytes.Length; i += 4)
             {

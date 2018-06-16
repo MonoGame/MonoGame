@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 try
                 {
-                    _swapChain.Present(PresentInterval.GetFrameLatency(), PresentFlags.None);
+                    _swapChain.Present(PresentInterval.GetSyncInterval(), PresentFlags.None);
                 }
                 catch (SharpDX.SharpDXException)
                 {

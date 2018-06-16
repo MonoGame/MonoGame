@@ -3,10 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class AddItemDialog : DialogBase
+    partial class AddItemDialog : Dialog<bool>
     {
         public bool ApplyForAll { get; private set; }
         public CopyAction Responce { get; private set; }
@@ -53,6 +54,17 @@ namespace MonoGame.Tools.Pipeline
         private void CheckBox1_CheckedChanged(object sender, EventArgs e)
         {
             ApplyForAll = (bool)checkBox1.Checked;
+        }
+
+        private void ButtonOk_Click(object sender, EventArgs e)
+        {
+            Result = true;
+            Close();
+        }
+
+        private void ButtonAdd_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

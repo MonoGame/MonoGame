@@ -30,7 +30,7 @@ namespace MonoGame.Tools.Pipeline
 
         private static readonly string [] _mgcbSearchPaths = new []       
         {
-            "",
+            "/Library/Frameworks/MonoGame.framework/Current/Tools",
 #if DEBUG
             "../../../../../MGCB/bin/Windows/AnyCPU/Debug",
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../MGCB/bin/Windows/AnyCPU/Debug"),
@@ -41,14 +41,13 @@ namespace MonoGame.Tools.Pipeline
             "../MGCB",
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../MGCB"),
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+            "",
         };
 
         public IEnumerable<ContentItemTemplate> Templates
         {
             get { return _templateItems; }
         }
-
-        public bool LaunchDebugger { get; set; }
 
         public PipelineProject ProjectItem
         {
@@ -113,7 +112,12 @@ namespace MonoGame.Tools.Pipeline
             _watcher = new FileWatcher(this, view);
 
             _templateItems = new List<ContentItemTemplate>();
-            LoadTemplates(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
+            var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            if (Directory.Exists(Path.Combine (root, "..", "Resources", "Templates")))
+            {
+                root = Path.Combine(root, "..", "Resources");
+            }
+            LoadTemplates(Path.Combine(root, "Templates"));
             UpdateMenu();
 
             view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
@@ -135,6 +139,8 @@ namespace MonoGame.Tools.Pipeline
             Debug.Assert(ProjectOpen, "OnReferencesModified called with no project open?");
             ProjectDirty = true;
             ResolveTypes();
+
+            View.UpdateProperties();
         }
 
         public void OnItemModified(ContentItem contentItem)
@@ -252,13 +258,19 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
+            var errortext = "Failed to open the project due to an unknown error.";
+
             try
             {
                 _actionStack.Clear();
                 _project = new PipelineProject();
                 
                 var parser = new PipelineProjectParser(this, _project);
-                var errorCallback = new MGBuildParser.ErrorCallback((msg, args) => View.OutputAppend(string.Format(Path.GetFileName(projectFilePath) + ": " + msg, args)));
+                var errorCallback = new MGBuildParser.ErrorCallback((msg, args) =>
+                {
+                    errortext = string.Format(msg, args);
+                    throw new Exception();
+                });
                 parser.OpenProject(projectFilePath, errorCallback);
 
                 ResolveTypes();
@@ -273,7 +285,7 @@ namespace MonoGame.Tools.Pipeline
             }
             catch (Exception)
             {
-                View.ShowError("Open Project", "Failed to open project!");
+                View.ShowError("Error Opening Project", Path.GetFileName(projectFilePath) + ": " + errortext);
                 return;
             }
 
@@ -382,7 +394,7 @@ namespace MonoGame.Tools.Pipeline
         public void Build(bool rebuild)
         {
             var commands = string.Format("/@:\"{0}\" {1}", _project.OriginalPath, rebuild ? "/rebuild" : string.Empty);
-            if (LaunchDebugger)
+            if (PipelineSettings.Default.DebugMode)
                 commands += " /launchdebugger";
             BuildCommand(commands);
         }
@@ -437,9 +449,8 @@ namespace MonoGame.Tools.Pipeline
 
             // Run the build the command.
             var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
-            if (LaunchDebugger)
+            if (PipelineSettings.Default.DebugMode)
                 commands += " /launchdebugger";
-
             BuildCommand(commands);
 
             // Cleanup the temp file once we're done.
@@ -472,7 +483,7 @@ namespace MonoGame.Tools.Pipeline
             View.OutputClear();
 
             var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
-            if (LaunchDebugger)
+            if (PipelineSettings.Default.DebugMode)
                 commands += " /launchdebugger";
 
             _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
@@ -495,6 +506,13 @@ namespace MonoGame.Tools.Pipeline
 
         private void DoBuild(string commands)
         {
+            Encoding encoding;
+            try {
+                encoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
+            } catch (NotSupportedException) {
+                encoding = Encoding.UTF8;
+            }
+            var currentDir = Environment.CurrentDirectory;
             try
             {
                 // Prepare the process.
@@ -504,10 +522,11 @@ namespace MonoGame.Tools.Pipeline
                 _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 _buildProcess.StartInfo.UseShellExecute = false;
                 _buildProcess.StartInfo.RedirectStandardOutput = true;
-                _buildProcess.StartInfo.StandardOutputEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
+                _buildProcess.StartInfo.StandardOutputEncoding = encoding;
                 _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
 
                 // Fire off the process.
+                Environment.CurrentDirectory = _buildProcess.StartInfo.WorkingDirectory;
                 _buildProcess.Start();
                 _buildProcess.BeginOutputReadLine();
                 _buildProcess.WaitForExit();
@@ -523,6 +542,9 @@ namespace MonoGame.Tools.Pipeline
                     View.OutputAppend("Build failed:" + Environment.NewLine);
                     View.OutputAppend(ex.ToString());
                 }
+            }
+            finally {
+                Environment.CurrentDirectory = currentDir;
             }
 
             // Clear the process pointer, so that cancel
@@ -543,7 +565,7 @@ namespace MonoGame.Tools.Pipeline
                 
                 _buildProcess.Kill();
                 _buildProcess = null;
-                View.OutputAppend("Build terminated!" + Environment.NewLine);
+                View.OutputAppend("Build terminated!");
             }
         }
 
@@ -861,9 +883,14 @@ namespace MonoGame.Tools.Pipeline
 
         public void Exclude(bool delete)
         {
-            if (delete && !View.ShowDeleteDialog(SelectedItems))
+            // We don't want to show a delete confirmation for any items outside the project folder
+            var filteredItems = new List<IProjectItem>(SelectedItems.Where(i => !i.OriginalPath.Contains("..")));
+
+            if (filteredItems.Count > 0 && delete && !View.ShowDeleteDialog(filteredItems))
                 return;
 
+            // Still need to pass all items to the Exclude action so it can remove them from the view.
+            // Filtering is done internally so it only deletes files in the project folder
             var action = new ExcludeAction(this, SelectedItems, delete);
             if(action.Do())
                 _actionStack.Add(action);
@@ -1127,6 +1154,7 @@ namespace MonoGame.Tools.Pipeline
             info.OpenItem = exists && oneselected && SelectedItem is ContentItem;
             info.OpenItemWith = exists && oneselected && !(SelectedItem is DirectoryItem);
             info.OpenItemLocation = exists && oneselected;
+            info.OpenOutputItemLocation = exists && oneselected && SelectedItem is ContentItem;
             info.CopyAssetPath = exists && oneselected && SelectedItem is ContentItem;
             info.Add = (exists && oneselected && !(SelectedItem is ContentItem)) || !somethingselected && ProjectOpen;
             info.Exclude = somethingselected && !SelectedItems.Contains(_project);

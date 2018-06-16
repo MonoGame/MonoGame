@@ -83,5 +83,75 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(5, MathHelper.Max(-5, 5));
             Assert.AreEqual(5, MathHelper.Max(5, -5));
         }
+
+        [TestCase(MathHelper.PiOver4, 0.7853982f)]
+        [TestCase(MathHelper.PiOver2, 1.5707964f)]
+        [TestCase(MathHelper.Pi, 3.1415927f)]
+        [TestCase(MathHelper.TwoPi, 6.2831855f)]
+        public void PiConstantsAreExpectedValues(float actualValue, float expectedValue)
+        {
+            Assert.AreEqual(expectedValue, actualValue);
+        }
+
+        [TestCase(0f, 0f)]
+        [TestCase(MathHelper.PiOver4, MathHelper.PiOver4)]
+        [TestCase(-MathHelper.PiOver4, -MathHelper.PiOver4)]
+        [TestCase(MathHelper.PiOver2, MathHelper.PiOver2)]
+        [TestCase(-MathHelper.PiOver2, -MathHelper.PiOver2)]
+        [TestCase(MathHelper.Pi, MathHelper.Pi)]
+        [TestCase(-MathHelper.Pi, MathHelper.Pi)]
+        [TestCase(MathHelper.TwoPi, 0f)]
+        [TestCase(-MathHelper.TwoPi, 0f)]
+        [TestCase(10f, -2.566371f)]
+        [TestCase(-10f, 2.566371f)]
+        // Pi boundaries
+        [TestCase(3.1415927f, 3.1415927f)]
+        [TestCase(3.141593f, -3.1415925f)]
+        [TestCase(-3.1415925f, -3.1415925f)]
+        [TestCase(-3.1415927f, 3.1415927f)]
+        // 2 * Pi boundaries
+        [TestCase(6.283185f, -4.7683716E-7f)]
+        [TestCase(6.2831855f, 0f)]
+        [TestCase(6.283186f, 4.7683716E-7f)]
+        [TestCase(-6.283185f, 4.7683716E-7f)]
+        [TestCase(-6.2831855f, 0f)]
+        [TestCase(-6.283186f, -4.7683716E-7f)]
+        // 3 * Pi boundaries
+        [TestCase(9.424778f, 3.1415925f)]
+        [TestCase(9.424779f, -3.141592f)]
+        [TestCase(-9.424778f, -3.1415925f)]
+        [TestCase(-9.424779f, 3.141592f)]
+        // 4 * Pi boundaries
+        [TestCase(12.56637f, -9.536743E-7f)]
+        [TestCase(12.566371f, 0f)]
+        [TestCase(12.566372f, 9.536743E-7f)]
+        [TestCase(-12.56637f, 9.536743E-7f)]
+        [TestCase(-12.566371f, 0f)]
+        [TestCase(-12.566372f, -9.536743E-7f)]
+        // 5 * Pi boundaries
+        [TestCase(15.707963f, 3.141592f)]
+        [TestCase(15.707964f, -3.1415925f)]
+        [TestCase(-15.707963f, -3.141592f)]
+        [TestCase(-15.707964f, 3.1415925f)]
+        // 10 * Pi boundaries
+        [TestCase(31.415926f, -1.4305115E-6f)]
+        [TestCase(31.415928f, 4.7683716E-7f)]
+        [TestCase(-31.415926f, 1.4305115E-6f)]
+        [TestCase(-31.415928f, -4.7683716E-7f)]
+        // 20 * Pi boundaries
+        [TestCase(62.831852f, -2.861023E-6f)]
+        [TestCase(62.831856f, 9.536743E-7f)]
+        [TestCase(-62.831852f, 2.861023E-6f)]
+        [TestCase(-62.831856f, -9.536743E-7f)]
+        // 20000000 * Pi boundaries
+        [TestCase(6.2831852E7f, -2.8202515f)]
+        [TestCase(6.2831856E7f, 1.1797485f)]
+        [TestCase(-6.2831852E7f, 2.8202515f)]
+        [TestCase(-6.2831856E7f, -1.1797485f)]
+        public void WrapAngleReturnsExpectedValues(float angle, float expectedValue)
+        {
+            var actualValue = MathHelper.WrapAngle(angle);
+            Assert.AreEqual(expectedValue, actualValue);
+        }
     }
 }

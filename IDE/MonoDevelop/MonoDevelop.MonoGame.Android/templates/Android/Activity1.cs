@@ -18,10 +18,12 @@ namespace ${Namespace}
 	           Theme = "@style/Theme.Splash",
                AlwaysRetainTaskState=true,
 	           LaunchMode=LaunchMode.SingleInstance,
+			   ScreenOrientation = ScreenOrientation.FullUser,
 	           ConfigurationChanges = ConfigChanges.Orientation | 
 	                                  ConfigChanges.KeyboardHidden | 
 	                                  ConfigChanges.Keyboard |
-	                                  ConfigChanges.ScreenSize)]
+	                                  ConfigChanges.ScreenSize |
+                                      ConfigChanges.ScreenLayout)]
 	public class Activity1 : AndroidGameActivity
 	{
 		protected override void OnCreate (Bundle bundle)

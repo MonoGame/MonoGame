@@ -26,6 +26,9 @@ namespace MonoGame.Tools.Pipeline
             panelLabel = new Panel();
             panelLabel.Padding = new Padding(5);
 
+            if (!Global.Unix)
+                panelLabel.Height = 25;
+
             stack = new StackLayout();
             stack.Orientation = Orientation.Horizontal;
 

@@ -7,6 +7,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Eto.Forms;
+using Eto.Drawing;
+using System.Reflection;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -22,12 +24,15 @@ namespace MonoGame.Tools.Pipeline
         private List<Pad> _pads;
         private Clipboard _clipboard;
         private ContextMenu _contextMenu;
-        private FileDialogFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
+        private FileFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
         private string[] monoLocations = {
             "/usr/bin/mono",
             "/usr/local/bin/mono",
-            "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono"
+            "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mono"),
         };
+
+        int setw = 0;
 
         public MainWindow()
         {
@@ -53,28 +58,30 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
+            #if MONOMAC
+            splitterVertical.PositionChanged += delegate {
+                setw++;
+                if (setw > 2)
+                {
+                    propertyGridControl.SetWidth();
+                    setw = 0;
+                }
+            };
+            #endif
+
             _contextMenu = new ContextMenu();
             projectControl.SetContextMenu(_contextMenu);
 
-            _mgcbFileFilter = new FileDialogFilter("MonoGame Content Build Project (*.mgcb)", new[] { ".mgcb" });
-            _allFileFilter = new FileDialogFilter("All Files (*.*)", new[] { ".*" });
-            _xnaFileFilter = new FileDialogFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
+            _mgcbFileFilter = new FileFilter("MonoGame Content Build Project (*.mgcb)", new[] { ".mgcb" });
+            _allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
+            _xnaFileFilter = new FileFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = !PipelineController.Instance.Exit();
 
-            if (!e.Cancel)
-                Xwt.Application.Exit();
-
             base.OnClosing(e);
-        }
-
-        public void ShowContextMenu()
-        {
-            if (PipelineController.Instance.ProjectOpen)
-                _contextMenu.Show(projectControl.TreeView.ToEto());
         }
 
         #region IView implements
@@ -84,8 +91,6 @@ namespace MonoGame.Tools.Pipeline
             PipelineController.Instance.OnProjectLoaded += () => projectControl.ExpandBase();
 
             cmdDebugMode.Checked = PipelineSettings.Default.DebugMode;
-            CmdDebugMode_Executed(this, EventArgs.Empty);
-
             foreach (var control in _pads)
                 control.LoadSettings();
 
@@ -117,13 +122,16 @@ namespace MonoGame.Tools.Pipeline
             dialog.Filters.Add(_allFileFilter);
             dialog.CurrentFilter = _mgcbFileFilter;
 
-            var result = dialog.ShowDialog(this) == DialogResult.Ok;
-            filePath = dialog.FileName;
+            if (dialog.ShowDialog(this) == DialogResult.Ok)
+            {
+                filePath = dialog.FileName;
+                if (dialog.CurrentFilter == _mgcbFileFilter && !filePath.EndsWith(".mgcb"))
+                    filePath += ".mgcb";
+                
+                return true;
+            }
 
-            if (result && dialog.CurrentFilter == _mgcbFileFilter && !filePath.EndsWith(".mgcb"))
-                filePath += ".mgcb";
-
-            return result;
+            return false;
         }
 
         public bool AskOpenProject(out string projectFilePath)
@@ -133,10 +141,14 @@ namespace MonoGame.Tools.Pipeline
             dialog.Filters.Add(_allFileFilter);
             dialog.CurrentFilter = _mgcbFileFilter;
 
-            var result = dialog.ShowDialog(this) == DialogResult.Ok;
-            projectFilePath = dialog.FileName;
+            if (dialog.ShowDialog(this) == DialogResult.Ok)
+            {
+                projectFilePath = dialog.FileName;
+                return true;
+            }
 
-            return result;
+            projectFilePath = "";
+            return false;
         }
 
         public bool AskImportProject(out string projectFilePath)
@@ -146,10 +158,14 @@ namespace MonoGame.Tools.Pipeline
             dialog.Filters.Add(_allFileFilter);
             dialog.CurrentFilter = _xnaFileFilter;
 
-            var result = dialog.ShowDialog(this) == DialogResult.Ok;
-            projectFilePath = dialog.FileName;
+            if (dialog.ShowDialog(this) == DialogResult.Ok)
+            {
+                projectFilePath = dialog.FileName;
+                return true;
+            }
 
-            return result;
+            projectFilePath = "";
+            return false;
         }
 
         public void ShowError(string title, string message)
@@ -210,13 +226,13 @@ namespace MonoGame.Tools.Pipeline
         public bool ShowDeleteDialog(List<IProjectItem> items)
         {
             var dialog = new DeleteDialog(PipelineController.Instance, items);
-            return dialog.Run(this) == DialogResult.Ok;
+            return dialog.ShowModal(this);
         }
 
         public bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname)
         {
             var dialog = new EditDialog(title, text, oldname, file);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             newname = dialog.Text;
 
@@ -253,7 +269,7 @@ namespace MonoGame.Tools.Pipeline
         public bool ChooseItemTemplate(string folder, out ContentItemTemplate template, out string name)
         {
             var dialog = new NewItemDialog(PipelineController.Instance.Templates.GetEnumerator(), folder);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             template = dialog.Selected;
             name = dialog.Name;
@@ -264,7 +280,7 @@ namespace MonoGame.Tools.Pipeline
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
             var dialog = new AddItemDialog(file, exists, FileType.File);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             action = dialog.Responce;
             applyforall = dialog.ApplyForAll;
@@ -277,7 +293,7 @@ namespace MonoGame.Tools.Pipeline
             var afd = new AddItemDialog(folder, exists, FileType.Folder);
             applyforall = false;
 
-            if (afd.Run(this) == DialogResult.Ok)
+            if (afd.ShowModal(this))
             {
                 action = afd.Responce;
                 return true;
@@ -303,18 +319,21 @@ namespace MonoGame.Tools.Pipeline
                 foreach (var path in monoLocations)
                 {
                     if (File.Exists(path))
+                    {
                         monoLoc = path;
+                        break;
+                    }
                 }
 
                 if (string.IsNullOrEmpty(monoLoc))
                 {
                     monoLoc = "mono";
-                    OutputAppend("Cound not find mono. Please install the latest version from http://www.mono-project.com");
+                    OutputAppend("Could not find mono. Please install the latest version from http://www.mono-project.com");
                 }
 
                 proc.StartInfo.FileName = monoLoc;
 
-                if (PipelineController.Instance.LaunchDebugger)
+                if (PipelineSettings.Default.DebugMode)
                 {
                     var port = Environment.GetEnvironmentVariable("MONO_DEBUGGER_PORT");
                     port = !string.IsNullOrEmpty(port) ? port : "55555";
@@ -385,6 +404,7 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItem.Enabled = info.OpenItem;
             cmdOpenItemWith.Enabled = info.OpenItemWith;
             cmdOpenItemLocation.Enabled = info.OpenItemLocation;
+            cmdOpenOutputItemLocation.Enabled = info.OpenOutputItemLocation;
             cmdCopyAssetPath.Enabled = info.CopyAssetPath;
             cmdRebuildItem.Enabled = info.RebuildItem;
 
@@ -401,6 +421,7 @@ namespace MonoGame.Tools.Pipeline
             AddContextMenu(cmAdd, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmOpenItemLocation, ref sep);
+            AddContextMenu(cmOpenOutputItemLocation, ref sep);
             AddContextMenu(cmCopyAssetPath, ref sep);
             AddContextMenu(cmRebuildItem, ref sep);
             AddSeparator(ref sep);
@@ -509,7 +530,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdExit_Executed(object sender, EventArgs e)
         {
-            this.Close();
+            Application.Instance.Quit();
         }
 
         private void CmdUndo_Executed(object sender, EventArgs e)
@@ -580,7 +601,6 @@ namespace MonoGame.Tools.Pipeline
         private void CmdDebugMode_Executed(object sender, EventArgs e)
         {
             PipelineSettings.Default.DebugMode = cmdDebugMode.Checked;
-            PipelineController.Instance.LaunchDebugger = cmdDebugMode.Checked;
         }
 
         private void CmdHelp_Executed(object sender, EventArgs e)
@@ -591,7 +611,15 @@ namespace MonoGame.Tools.Pipeline
         private void CmdAbout_Executed(object sender, EventArgs e)
         {
             var adialog = new AboutDialog();
-            adialog.Run(this);
+            adialog.Logo = Bitmap.FromResource("Icons.monogame.png");
+            adialog.WebsiteLabel = "MonoGame Website";
+            adialog.Website = new Uri("http://www.monogame.net/");
+
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LICENSE.txt"))
+                using (var reader = new StreamReader(stream))
+                    adialog.License = reader.ReadToEnd();
+
+            adialog.ShowDialog(this);
         }
 
         private void CmdOpenItem_Executed(object sender, EventArgs e)
@@ -603,13 +631,46 @@ namespace MonoGame.Tools.Pipeline
         private void CmdOpenItemWith_Executed(object sender, EventArgs e)
         {
             if (PipelineController.Instance.SelectedItem != null)
-                Global.ShowOpenWithDialog(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath));
+            {
+                try
+                {
+                    var filepath = PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath);
+                    var dialog = new OpenWithDialog(filepath);
+                    dialog.ShowDialog(this);
+                }
+                catch
+                {
+                    ShowError("Error", "An error occured while trying to launch an open with dialog.");
+                }
+            }
         }
 
         private void CmdOpenItemLocation_Executed(object sender, EventArgs e)
         {
             if (PipelineController.Instance.SelectedItem != null)
                 Process.Start(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.Location));
+        }
+
+        private void CmdOpenOutputItemLocation_Executed(object sender, EventArgs e)
+        {
+            if (PipelineController.Instance.SelectedItem != null)
+            {
+                var dir = Path.Combine(
+                    PipelineController.Instance.ProjectItem.Location,
+                    PipelineController.Instance.ProjectOutputDir,
+                    PipelineController.Instance.SelectedItem.Location
+                );
+
+                dir = dir.Replace("$(Platform)", PipelineController.Instance.ProjectItem.Platform.ToString());
+                dir = dir.Replace("$(Configuration)", PipelineController.Instance.ProjectItem.Config);
+                dir = dir.Replace("$(Config)", PipelineController.Instance.ProjectItem.Config);
+                dir = dir.Replace("$(Profile)", PipelineController.Instance.ProjectItem.Profile.ToString());
+
+                if (Directory.Exists(dir))
+                    Process.Start(dir);
+                else
+                    ShowError("Directory Not Found", "The project output directory was not found, did you forget to build the project?");
+            }
         }
 
         private void CmdCopyAssetPath_Executed(object sender, EventArgs e)

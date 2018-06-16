@@ -520,7 +520,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>Hash code of this <see cref="Vector2"/>.</returns>
         public override int GetHashCode()
         {
-            return X.GetHashCode() + Y.GetHashCode();
+            unchecked
+            {
+                return (X.GetHashCode() * 397) ^ Y.GetHashCode();
+            }
         }
 
         /// <summary>
@@ -1141,6 +1144,17 @@ namespace Microsoft.Xna.Framework
                 destinationArray[i] = new Vector2((normal.X * matrix.M11) + (normal.Y * matrix.M21),
                                                   (normal.X * matrix.M12) + (normal.Y * matrix.M22));
             }
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Vector2"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void Deconstruct(out float x, out float y)
+        {
+            x = X;
+            y = Y;
         }
 
         #endregion

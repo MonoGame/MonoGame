@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				desc.BorderColor = BorderColor.ToColor4();
 #endif
 				desc.Filter = GetFilter(Filter, FilterMode);
-                desc.MaximumAnisotropy = MaxAnisotropy;
+                desc.MaximumAnisotropy = Math.Min(MaxAnisotropy, device.GraphicsCapabilities.MaxTextureAnisotropy);
                 desc.MipLodBias = MipMapLevelOfDetailBias;
                 desc.ComparisonFunction = ComparisonFunction.ToComparison();
 
@@ -154,11 +154,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        protected override void Dispose(bool disposing)
+        partial void PlatformDispose()
         {
-            if (disposing)
-                SharpDX.Utilities.Dispose(ref _state);
-            base.Dispose(disposing);
+            SharpDX.Utilities.Dispose(ref _state);
         }
     }
 }

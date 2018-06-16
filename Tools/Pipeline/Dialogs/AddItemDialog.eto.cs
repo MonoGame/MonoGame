@@ -7,17 +7,28 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class AddItemDialog : DialogBase
+    partial class AddItemDialog : Dialog<bool>
     {
         DynamicLayout layout1;
         Label label1;
         RadioButton radioCopy, radioLink, radioSkip;
         CheckBox checkBox1;
+        Button buttonAdd, buttonCancel;
 
         private void InitializeComponent()
         {
-            if (!Global.Unix)
-                this.Height = 250;
+            DisplayMode = DialogDisplayMode.Attached;
+            Height = 250;
+
+            buttonAdd = new Button();
+            buttonAdd.Text = "Add";
+            PositiveButtons.Add(buttonAdd);
+            DefaultButton = buttonAdd;
+
+            buttonCancel = new Button();
+            buttonCancel.Text = "Cancel";
+            NegativeButtons.Add(buttonCancel);
+            AbortButton = buttonCancel;
 
             layout1 = new DynamicLayout();
             layout1.DefaultSpacing = new Size(8, 8);
@@ -47,12 +58,14 @@ namespace MonoGame.Tools.Pipeline
             layout1.AddRow(checkBox1);
 
             layout1.EndVertical();
-            CreateContent(layout1);
+            Content = layout1;
 
             radioCopy.CheckedChanged += RadioButton_CheckedChanged;
             radioLink.CheckedChanged += RadioButton_CheckedChanged;
             radioSkip.CheckedChanged += RadioButton_CheckedChanged;
             checkBox1.CheckedChanged += CheckBox1_CheckedChanged;
+            buttonAdd.Click += ButtonOk_Click;
+            buttonCancel.Click += ButtonAdd_Click;
         }
     }
 }

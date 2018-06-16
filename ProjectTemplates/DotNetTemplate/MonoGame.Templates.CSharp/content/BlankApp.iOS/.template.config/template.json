@@ -1,0 +1,20 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame iPhone/iPad Application",
+    "groupIdentity": "MonoGame.BlankApp.iOS",
+    "identity": "MonoGame.BlankApp.iOS.CSharp",
+    "shortName": "mgios",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.iOS.csproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true",
+    "description": "A MonoGame game project for iOS."
+}

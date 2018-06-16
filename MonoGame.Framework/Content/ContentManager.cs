@@ -9,8 +9,9 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework.Utilities;
 using Microsoft.Xna.Framework.Graphics;
+using System.Globalization;
 
-#if !WINRT
+#if !WINDOWS_UAP
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 #endif
@@ -35,8 +36,9 @@ namespace Microsoft.Xna.Framework.Content
 
         private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
-            'w', // Windows (DirectX)
-            'x', // Xbox360
+            'w', // Windows (XNA & DirectX)
+            'x', // Xbox360 (XNA)
+            'm', // WindowsPhone7.0 (XNA)
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
@@ -48,6 +50,7 @@ namespace Microsoft.Xna.Framework.Content
             'P', // PlayStation4
             'v', // PSVita
             'O', // XboxOne
+            'S', // Nintendo Switch
 
             // NOTE: There are additional idenfiers for consoles that 
             // are not defined in this repository.  Be sure to ask the
@@ -187,9 +190,34 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     Unload();
                 }
+
+                scratchBuffer = null;
 				disposed = true;
 			}
 		}
+
+        public virtual T LoadLocalized<T> (string assetName)
+        {
+            string [] cultureNames =
+            {
+                CultureInfo.CurrentCulture.Name,                        // eg. "en-US"
+                CultureInfo.CurrentCulture.TwoLetterISOLanguageName     // eg. "en"
+            };
+
+            // Look first for a specialized language-country version of the asset,
+            // then if that fails, loop back around to see if we can find one that
+            // specifies just the language without the country part.
+            foreach (string cultureName in cultureNames) {
+                string localizedAssetName = assetName + '.' + cultureName;
+
+                try {
+                    return Load<T> (localizedAssetName);
+                } catch (ContentLoadException) { }
+            }
+
+            // If we didn't find any localized asset, fall back to the default name.
+            return Load<T> (assetName);
+        }
 
 		public virtual T Load<T>(string assetName)
 		{
@@ -239,7 +267,7 @@ namespace Microsoft.Xna.Framework.Content
                 // This is primarily for editor support. 
                 // Setting the RootDirectory to an absolute path is useful in editor
                 // situations, but TitleContainer can ONLY be passed relative paths.                
-#if DESKTOPGL || MONOMAC || WINDOWS
+#if DESKTOPGL || WINDOWS
                 if (Path.IsPathRooted(assetPath))                
                     stream = File.OpenRead(assetPath);                
                 else
@@ -259,7 +287,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("The content file was not found.", fileNotFound);
 			}
-#if !WINRT
+#if !WINDOWS_UAP
 			catch (DirectoryNotFoundException directoryNotFound)
 			{
 				throw new ContentLoadException("The directory was not found.", directoryNotFound);
@@ -394,11 +422,7 @@ namespace Microsoft.Xna.Framework.Content
                 if (asset.Key == null)
                     ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()));
 
-#if WINDOWS_STOREAPP || WINDOWS_UAP
-                var methodInfo = typeof(ContentManager).GetType().GetTypeInfo().GetDeclaredMethod("ReloadAsset");
-#else
-                var methodInfo = typeof(ContentManager).GetMethod("ReloadAsset", BindingFlags.NonPublic | BindingFlags.Instance);
-#endif
+                var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), "ReloadAsset");
                 var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
                 genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) }); 
             }

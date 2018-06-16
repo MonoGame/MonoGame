@@ -12,7 +12,7 @@ namespace MonoGame.Tests.Framework
         {
             var converter = TypeDescriptor.GetConverter(typeof(Vector4));
             CultureInfo invariantCulture = CultureInfo.InvariantCulture;
-            
+
             Assert.AreEqual(new Vector4(32, 64, 128, 255), converter.ConvertFromString(null, invariantCulture, "32, 64, 128, 255"));
             Assert.AreEqual(new Vector4(0.5f, 2.75f, 4.125f, 8.0625f), converter.ConvertFromString(null, invariantCulture, "0.5, 2.75, 4.125, 8.0625"));
             Assert.AreEqual(new Vector4(1024.5f, 2048.75f, 4096.125f, 8192.0625f), converter.ConvertFromString(null, invariantCulture, "1024.5, 2048.75, 4096.125, 8192.0625"));
@@ -129,5 +129,62 @@ namespace MonoGame.Tests.Framework
         {
             StringAssert.IsMatch("{X:10 Y:20 Z:3.5 W:-100}", new Vector4(10, 20, 3.5f, -100).ToString());
         }
+
+        [Test]
+        public void HashCode() {
+            // Checking for overflows in hash calculation.
+            var max = new Vector4(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue);
+            var min = new Vector4(float.MinValue, float.MinValue, float.MinValue, float.MinValue);
+            Assert.AreNotEqual(max.GetHashCode(), Vector4.Zero.GetHashCode());
+            Assert.AreNotEqual(min.GetHashCode(), Vector4.Zero.GetHashCode());
+
+            // Common values
+            var a = new Vector4(0f, 0f, 0f, 0f);
+            Assert.AreEqual(a.GetHashCode(), Vector4.Zero.GetHashCode(), "Shouldn't do object id compare.");
+            Assert.AreNotEqual(a.GetHashCode(), Vector4.One.GetHashCode());
+
+            // Individual properties alter hash
+            var xa = new Vector4(2f, 1f, 1f, 1f);
+            var xb = new Vector4(3f, 1f, 1f, 1f);
+            var ya = new Vector4(1f, 2f, 1f, 1f);
+            var yb = new Vector4(1f, 3f, 1f, 1f);
+            var za = new Vector4(1f, 1f, 2f, 1f);
+            var zb = new Vector4(1f, 1f, 3f, 1f);
+            var wa = new Vector4(1f, 1f, 1f, 2f);
+            var wb = new Vector4(1f, 1f, 1f, 3f);
+            Assert.AreNotEqual(xa.GetHashCode(), xb.GetHashCode(), "Different properties should change hash.");
+            Assert.AreNotEqual(ya.GetHashCode(), yb.GetHashCode(), "Different properties should change hash.");
+            Assert.AreNotEqual(za.GetHashCode(), zb.GetHashCode(), "Different properties should change hash.");
+            Assert.AreNotEqual(wa.GetHashCode(), wb.GetHashCode(), "Different properties should change hash.");
+#if !XNA
+            Assert.AreNotEqual(xa.GetHashCode(), ya.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(xb.GetHashCode(), yb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(xb.GetHashCode(), zb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(yb.GetHashCode(), zb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(xb.GetHashCode(), wb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(yb.GetHashCode(), wb.GetHashCode(), "Identical values on different properties should have different hashes.");
+#endif
+            Assert.AreNotEqual(xa.GetHashCode(), yb.GetHashCode());
+            Assert.AreNotEqual(ya.GetHashCode(), xb.GetHashCode());
+            Assert.AreNotEqual(xa.GetHashCode(), zb.GetHashCode());
+            Assert.AreNotEqual(xa.GetHashCode(), wb.GetHashCode());
+        }
+
+#if !XNA
+        [Test]
+        public void Deconstruct()
+        {
+            Vector4 vector4 = new Vector4(float.MinValue, float.MaxValue, float.MinValue, float.MaxValue);
+
+            float x, y, z, w;
+
+            vector4.Deconstruct(out x, out y, out z, out w);
+
+            Assert.AreEqual(x, vector4.X);
+            Assert.AreEqual(y, vector4.Y);
+            Assert.AreEqual(z, vector4.Z);
+            Assert.AreEqual(w, vector4.W);
+        }
+#endif
     }
 }

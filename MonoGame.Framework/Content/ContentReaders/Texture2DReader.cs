@@ -74,8 +74,8 @@ namespace Microsoft.Xna.Framework.Content
 				    var levelDataSizeInBytes = reader.ReadInt32();
                     var levelData = reader.ContentManager.GetScratchBuffer(levelDataSizeInBytes);
                     reader.Read(levelData, 0, levelDataSizeInBytes);
-                    int levelWidth = width >> level;
-                    int levelHeight = height >> level;
+                    int levelWidth = Math.Max(width >> level, 1);
+                    int levelHeight = Math.Max(height >> level, 1);
 
                     if (level >= levelCountOutput)
                         continue;
@@ -86,21 +86,32 @@ namespace Microsoft.Xna.Framework.Content
 					    case SurfaceFormat.Dxt1:
                         case SurfaceFormat.Dxt1SRgb:
                         case SurfaceFormat.Dxt1a:
-                            if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1 && convertedFormat == SurfaceFormat.Color)
-						        levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);
-						    break;
+				            if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1 && convertedFormat == SurfaceFormat.Color)
+				            {
+				                levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);
+				                levelDataSizeInBytes = levelData.Length;
+				            }
+				            break;
 					    case SurfaceFormat.Dxt3:
 					    case SurfaceFormat.Dxt3SRgb:
                             if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
-                            if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc && convertedFormat == SurfaceFormat.Color)
-						        levelData = DxtUtil.DecompressDxt3(levelData, levelWidth, levelHeight);
-						    break;
+				                if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc &&
+				                    convertedFormat == SurfaceFormat.Color)
+				                {
+				                    levelData = DxtUtil.DecompressDxt3(levelData, levelWidth, levelHeight);
+                                    levelDataSizeInBytes = levelData.Length;
+                                }
+				            break;
 					    case SurfaceFormat.Dxt5:
 					    case SurfaceFormat.Dxt5SRgb:
                             if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
-                            if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc && convertedFormat == SurfaceFormat.Color)
-    						    levelData = DxtUtil.DecompressDxt5(levelData, levelWidth, levelHeight);
-						    break;
+				                if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc &&
+				                    convertedFormat == SurfaceFormat.Color)
+				                {
+				                    levelData = DxtUtil.DecompressDxt5(levelData, levelWidth, levelHeight);
+                                    levelDataSizeInBytes = levelData.Length;
+                                }
+				            break;
                         case SurfaceFormat.Bgra5551:
                             {
 #if OPENGL

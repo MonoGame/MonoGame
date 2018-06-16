@@ -25,11 +25,6 @@ namespace MonoGame.Tools.Pipeline
             throw new NotImplementedException();
         }
 
-        private static Xwt.Drawing.Image ToXwtImage(Image image)
-        {
-            throw new NotImplementedException();
-        }
-
         private static void PlatformShowOpenWithDialog(string filePath)
         {
             throw new NotImplementedException();

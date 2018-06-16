@@ -131,13 +131,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                     // Must be opened in read mode otherwise it fails to open
                     // read-only files (found in some source control systems)
-                    using (var fs = new FileStream(_fileName, FileMode.Open, FileAccess.Read))
+                    using (var fs = new FileStream(audioFileName, FileMode.Open, FileAccess.Read))
                     {
                         rawData = new byte[fs.Length];
                         fs.Read(rawData, 0, rawData.Length);
                     }
 
-                    var stripped = DefaultAudioProfile.StripRiffWaveHeader(rawData);
+                    AudioFormat riffAudioFormat;
+                    var stripped = DefaultAudioProfile.StripRiffWaveHeader(rawData, out riffAudioFormat);
+
+                    if (riffAudioFormat != null)
+                    {
+                        if ((_format.Format != 2 && _format.Format != 17) && _format.BlockAlign != riffAudioFormat.BlockAlign)
+                            throw new InvalidOperationException("Calculated block align does not match RIFF " + _format.BlockAlign + " : " + riffAudioFormat.BlockAlign);
+                        if (_format.ChannelCount != riffAudioFormat.ChannelCount)
+                            throw new InvalidOperationException("Probed channel count does not match RIFF: " + _format.ChannelCount + ", " + riffAudioFormat.ChannelCount);
+                        if (_format.Format != riffAudioFormat.Format)
+                            throw new InvalidOperationException("Probed audio format does not match RIFF: " + _format.Format + ", " + riffAudioFormat.Format);
+                        if (_format.SampleRate != riffAudioFormat.SampleRate)
+                            throw new InvalidOperationException("Probed sample rate does not match RIFF: " + _format.SampleRate + ", " + riffAudioFormat.SampleRate);
+                    }
+
                     _data = Array.AsReadOnly(stripped);
                 }
             }

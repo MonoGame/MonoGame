@@ -5,10 +5,11 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Security;
+using MonoGame.Utilities;
 
-namespace OpenGL
+namespace MonoGame.OpenGL
 {
-    public partial class GL
+    internal partial class GL
     {
         static partial void LoadPlatformEntryPoints()
         {
@@ -21,15 +22,13 @@ namespace OpenGL
         }
     }
 
-    internal class EntryPointHelper {
-
-        private const string NativeLibName = "SDL2.dll";
-
-        [SuppressUnmanagedCodeSecurity]
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl,
-            EntryPoint = "SDL_GL_GetProcAddress", ExactSpelling = true)]
-        public static extern IntPtr GetProcAddress(IntPtr proc);
-        public static IntPtr GetAddress(string proc)
+    internal class EntryPointHelper
+    {
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr d_sdl_gl_getprocaddress(IntPtr proc);
+        public static d_sdl_gl_getprocaddress GetProcAddress = FuncLoader.LoadFunction<d_sdl_gl_getprocaddress>(Sdl.NativeLibrary, "SDL_GL_GetProcAddress");
+        
+        internal static IntPtr GetAddress(string proc)
         {
             IntPtr p = Marshal.StringToHGlobalAnsi(proc);
             try

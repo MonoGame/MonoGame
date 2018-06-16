@@ -36,6 +36,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal readonly RpcCurve[] RpcCurves;
 
+        internal readonly object UpdateLock = new object();
+
         internal RpcVariable[] CreateCueVariables()
         {
             var clone = new RpcVariable[_cueVariables.Length];
@@ -54,19 +56,24 @@ namespace Microsoft.Xna.Framework.Audio
         {            
         }
 
-        internal static Stream OpenStream(string filePath)
+        internal static Stream OpenStream(string filePath, bool useMemoryStream = false)
         {
             var stream = TitleContainer.OpenStream(filePath);
 
-#if ANDROID
             // Read the asset into memory in one go. This results in a ~50% reduction
             // in load times on Android due to slow Android asset streams.
-            var memStream = new MemoryStream();
-            stream.CopyTo(memStream);
-            memStream.Seek(0, SeekOrigin.Begin);
-            stream.Close();
-            stream = memStream;
+#if ANDROID
+            useMemoryStream = true;
 #endif
+
+            if (useMemoryStream)
+            {
+                var memStream = new MemoryStream();
+                stream.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                stream.Dispose();
+                stream = memStream;
+            }
 
             return stream;
         }
@@ -266,20 +273,23 @@ namespace Microsoft.Xna.Framework.Audio
             var elapsed = cur - _lastUpdateTime;
             _lastUpdateTime = cur;
             var dt = (float)elapsed.TotalSeconds;
-            
-            for (var x = 0; x < ActiveCues.Count; )
+
+            lock (UpdateLock)
             {
-                var cue = ActiveCues[x];
-
-                cue.Update(dt);
-
-                if (cue.IsStopped)
+                for (var x = 0; x < ActiveCues.Count; )
                 {
-                    ActiveCues.Remove(cue);
-                    continue;
-                }
+                    var cue = ActiveCues[x];
 
-                x++;
+                    cue.Update(dt);
+
+                    if (cue.IsStopped || cue.IsDisposed)
+                    {
+                        ActiveCues.Remove(cue);
+                        continue;
+                    }
+
+                    x++;
+                }
             }
 
             // The only global curves we can process seem to be 
@@ -326,12 +336,14 @@ namespace Microsoft.Xna.Framework.Audio
             if (!_variableLookup.TryGetValue(name, out i) || !_variables[i].IsPublic)
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
-            return _variables[i].Value;
+            lock (UpdateLock)
+                return _variables[i].Value;
         }
 
         internal float GetGlobalVariable(int index)
         {
-            return _variables[index].Value;
+            lock (UpdateLock)
+                return _variables[index].Value;
         }
 
         /// <summary>Sets the value of a global variable.</summary>
@@ -346,7 +358,8 @@ namespace Microsoft.Xna.Framework.Audio
             if (!_variableLookup.TryGetValue(name, out i) || !_variables[i].IsPublic)
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
-            _variables[i].SetValue(value);
+            lock (UpdateLock)
+                _variables[i].SetValue(value);
         }
 
         /// <summary>
@@ -383,8 +396,8 @@ namespace Microsoft.Xna.Framework.Audio
             // TODO: Should we be forcing any active
             // audio cues to stop here?
 
-            if (disposing && Disposing != null)
-                Disposing(this, EventArgs.Empty);
+            if (disposing)
+                EventHelpers.Raise(this, Disposing, EventArgs.Empty);
         }
     }
 }

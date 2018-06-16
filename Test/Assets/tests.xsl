@@ -296,24 +296,15 @@
         <div>
             <xsl:attribute name="id">divDetails<xsl:value-of select="$test.suite.id"/></xsl:attribute>
             <blockquote>
-                <!-- Show unsuccessful tests at the top -->
-                <xsl:apply-templates select=".//test-suite[@type='TestFixture' and @success='False'][results//test-case]">
-                    <xsl:sort select="@name" order="ascending" data-type="text"/>
-                </xsl:apply-templates>
-                <!-- And then all successful tests -->
-                <xsl:apply-templates select=".//test-suite[@type='TestFixture' and @success='True'][results//test-case]" mode="success">
-                    <xsl:sort select="@name" order="ascending" data-type="text"/>
-                    <!-- ascending yields False, True, which is desired -->
+                <!-- The test classes, with failed tests grouped together at the top -->
+                <xsl:apply-templates select=".//test-suite[@type='TestFixture'][results//test-case]">
+                    <!-- Group by outcome, with failed tests first -->
                     <xsl:sort select="@success" order="ascending" data-type="text"/>
+                    <!-- Then sort by name within the groups -->
+                    <xsl:sort select="@name" order="ascending" data-type="text"/>
                 </xsl:apply-templates>
             </blockquote>
         </div>
-    </xsl:template>
-
-    <xsl:template match="test-suite" mode="success">
-        <xsl:if test="count(results//test-case[@success='False']) + count(results//test-case[@executed='False']) = 0">
-            <xsl:apply-templates select="."/>
-        </xsl:if>
     </xsl:template>
 
     <xsl:template match="test-suite">

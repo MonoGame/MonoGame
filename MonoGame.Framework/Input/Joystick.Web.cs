@@ -9,6 +9,8 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class Joystick
     {
+        private const bool PlatformIsSupported = true;
+
         internal static bool TrackEvents = false;
 
         private static JoystickCapabilities PlatformGetCapabilities(int index)
@@ -35,7 +37,7 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickCapabilities()
             {
                 IsConnected = connected,
-                Id = id,
+                Identifier = id,
                 AxisCount = axiscount,
                 ButtonCount = buttoncount,
                 HatCount = 0
@@ -45,7 +47,7 @@ namespace Microsoft.Xna.Framework.Input
         private static JoystickState PlatformGetState(int index)
         {
             var connected = false;
-            var axes = new float[0];
+            var axes = new int[0];
             var buttons = new ButtonState[0];
 
             var navigator = Builtins.Global["navigator"];
@@ -58,7 +60,7 @@ namespace Microsoft.Xna.Framework.Input
                     connected = true;
 
                     var axescount = gamepads[index].axes.length;
-                    axes = new float[gamepads[index].axes.length];
+                    axes = new int[gamepads[index].axes.length];
 
                     for (int i = 0; i < axescount; i++)
                         axes[i] = gamepads[index].axes[i];

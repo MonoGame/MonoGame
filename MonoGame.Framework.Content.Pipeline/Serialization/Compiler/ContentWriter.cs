@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'P', // PlayStation4
             'v', // PSVita
             'O', // XboxOne
+            'S', // Nintendo Switch
         };
 
         /// <summary>
@@ -262,7 +263,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 typeWriter = compiler.GetTypeWriter(type);
 
                 typeWriters.Add(typeWriter);
-			    typeWriterMap.Add(typeWriter.GetType(), index);
+                if (!typeWriterMap.ContainsKey(typeWriter.GetType()))
+                    typeWriterMap.Add(typeWriter.GetType(), index);
+
                 typeMap.Add(type, typeWriter);
 
                 typeWriter.OnAddedToContentWriter(this);

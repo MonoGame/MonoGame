@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using Microsoft.Xna.Framework;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace MonoGame.Framework
@@ -21,8 +22,6 @@ namespace MonoGame.Framework
             : base(game)
         {
             _window = new WinFormsGameWindow(this);
-
-            Mouse.Window = _window._form;
 
             Window = _window;
         }
@@ -45,20 +44,18 @@ namespace MonoGame.Framework
 
         public override void BeforeInitialize()
         {
-            var gdm = Game.graphicsDeviceManager;
-
-            _window.EnableClientSizeChangedEvent(false); // Disable ClientSizeChanged event while the window is initialised
-
-            _window.Initialize(gdm.PreferredBackBufferWidth, gdm.PreferredBackBufferHeight);
-
             base.BeforeInitialize();
 
-            if (gdm.IsFullScreen)
-                EnterFullScreen();
+            var gdm = Game.graphicsDeviceManager;
+            if (gdm == null)
+            {
+                _window.Initialize(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
+            }
             else
-                ExitFullScreen();
-
-            _window.EnableClientSizeChangedEvent(true); // Re-enable (and trigger) ClientSizeChanged event
+            {
+                var pp = Game.GraphicsDevice.PresentationParameters;
+                _window.Initialize(pp);
+            }
         }
 
         public override void RunLoop()
@@ -91,61 +88,15 @@ namespace MonoGame.Framework
 
         public override void EnterFullScreen()
         {
-            if (_alreadyInFullScreenMode)
-                return;
-
-            if (Game.graphicsDeviceManager.HardwareModeSwitch)
-            {
-                Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
-                Game.GraphicsDevice.SetHardwareFullscreen();
-            }
-            else
-            {
-                _window.IsBorderless = true;
-            }
-
-            _window._form.WindowState = FormWindowState.Maximized;
-
-            _alreadyInWindowedMode = false;
-            _alreadyInFullScreenMode = true;
         }
 
         public override void ExitFullScreen()
         {
-            if (_alreadyInWindowedMode)
-               return;
-
-            if (Game.graphicsDeviceManager.HardwareModeSwitch)
-            {
-                Game.GraphicsDevice.PresentationParameters.IsFullScreen = false;
-                Game.GraphicsDevice.SetHardwareFullscreen();
-            }
-            else
-            {
-                _window.IsBorderless = false;
-            }
-
-            _window._form.WindowState = FormWindowState.Normal;
-
-            _alreadyInWindowedMode = true;
-            _alreadyInFullScreenMode = false;
         }
 
-        internal override void OnPresentationChanged()
+        internal override void OnPresentationChanged(PresentationParameters pp)
         {
-            _window.EnableClientSizeChangedEvent(false); // Disable ClientSizeChanged event while the window is resized
-
-            if (Game.GraphicsDevice.PresentationParameters.IsFullScreen)
-            {
-                EnterFullScreen();
-            }
-            else
-            {
-                ExitFullScreen();
-                _window.ChangeClientSize(new Size(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight));
-            }
-
-            _window.EnableClientSizeChangedEvent(true); // Re-enable (and trigger) ClientSizeChanged event
+            _window.OnPresentationChanged(pp);
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)

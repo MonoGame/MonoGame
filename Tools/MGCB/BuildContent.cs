@@ -17,16 +17,19 @@ namespace MGCB
     {
         [CommandLineParameter(
             Name = "launchdebugger",
+            Flag = "d",
             Description = "Wait for debugger to attach before building content.")]
         public bool LaunchDebugger = false;
 
         [CommandLineParameter(
             Name = "quiet",
+            Flag = "q",
             Description = "Only output content build errors.")]
         public bool Quiet = false;
 
         [CommandLineParameter(
             Name = "@",
+            Flag = "@",
             ValueName = "responseFile",
             Description = "Read a text response file with additional command line options and switches.")]
         // This property only exists for documentation.
@@ -39,6 +42,7 @@ namespace MGCB
 
         [CommandLineParameter(
             Name = "workingDir",
+            Flag = "w",
             ValueName = "directoryPath",
             Description = "The working directory where all source content is located.")]
         public void SetWorkingDir(string path)
@@ -48,45 +52,53 @@ namespace MGCB
 
         [CommandLineParameter(
             Name = "outputDir",
-            ValueName = "directoryPath",
+            Flag = "o",
+            ValueName = "path",
             Description = "The directory where all content is written.")]
         public string OutputDir = string.Empty;
 
         [CommandLineParameter(
             Name = "intermediateDir",
-            ValueName = "directoryPath",
+            Flag = "n",
+            ValueName = "path",
             Description = "The directory where all intermediate files are written.")]
         public string IntermediateDir = string.Empty;
 
         [CommandLineParameter(
             Name = "rebuild",
+            Flag = "r",
             Description = "Forces a full rebuild of all content.")]
         public bool Rebuild = false;
 
         [CommandLineParameter(
-            Name = "clean",            
+            Name = "clean",
+            Flag = "c",
             Description = "Delete all previously built content and intermediate files.")]
         public bool Clean = false;
 
         [CommandLineParameter(
             Name = "incremental",
+            Flag = "I",
             Description = "Skip cleaning files not included in the current build.")]
         public bool Incremental = false;
 
         [CommandLineParameter(
             Name = "reference",
-            ValueName = "assemblyNameOrFile",
+            Flag = "f",
+            ValueName = "assembly",
             Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
         public readonly List<string> References = new List<string>();
 
         [CommandLineParameter(
             Name = "platform",
+            Flag = "t",
             ValueName = "targetPlatform",
             Description = "Set the target platform for this build.  Defaults to Windows desktop DirectX.")]
         public TargetPlatform Platform = TargetPlatform.Windows;
 
         [CommandLineParameter(
             Name = "profile",
+            Flag = "g",
             ValueName = "graphicsProfile",
             Description = "Set the target graphics profile for this build.  Defaults to HiDef.")]
         public GraphicsProfile Profile = GraphicsProfile.HiDef;
@@ -99,12 +111,14 @@ namespace MGCB
 
         [CommandLineParameter(
             Name = "importer",
+            Flag = "i",
             ValueName = "className",
             Description = "Defines the class name of the content importer for reading source content.")]
         public string Importer = null;
 
         [CommandLineParameter(
             Name = "processor",
+            Flag = "p",
             ValueName = "className",
             Description = "Defines the class name of the content processor for processing imported content.")]
         public void SetProcessor(string processor)
@@ -121,11 +135,12 @@ namespace MGCB
 
         [CommandLineParameter(
             Name = "processorParam",
+            Flag = "P",
             ValueName = "name=value",
             Description = "Defines a parameter name and value to set on a content processor.")]
         public void AddProcessorParam(string nameAndValue)
         {
-            var keyAndValue = nameAndValue.Split('=');
+            var keyAndValue = nameAndValue.Split('=', ':');
             if (keyAndValue.Length != 2)
             {
                 // Do we error out or something?
@@ -138,6 +153,7 @@ namespace MGCB
 
         [CommandLineParameter(
             Name = "build",
+            Flag = "b",
             ValueName = "sourceFile",
             Description = "Build the content source file using the previously set switches and options.")]
         public void OnBuild(string sourceFile)
@@ -404,6 +420,15 @@ namespace MGCB
                     ++errorCount;
                 }
             }
+        }
+
+        [CommandLineParameter(
+            Name = "help",
+            Flag = "h",
+            Description = "Displays this help.")]
+        public void Help()
+        {
+            MGBuildParser.Instance.ShowError(null);
         }
     }
 }

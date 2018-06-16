@@ -27,11 +27,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
         public override ConversionQuality ConvertAudio(TargetPlatform platform, ConversionQuality quality, AudioContent content)
         {
-            // Default to PCM data.
+            // Default to PCM data, or ADPCM if the source is ADPCM.
             var targetFormat = ConversionFormat.Pcm;
-            if (quality != ConversionQuality.Best)
+            if (quality != ConversionQuality.Best || content.Format.Format == 2 || content.Format.Format == 17)
             {
-                if (platform == TargetPlatform.iOS || platform == TargetPlatform.MacOSX)
+                if (platform == TargetPlatform.iOS || platform == TargetPlatform.MacOSX || platform == TargetPlatform.DesktopGL)
                     targetFormat = ConversionFormat.ImaAdpcm;
                 else
                     targetFormat = ConversionFormat.Adpcm;
@@ -167,10 +167,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             if (formatName == "wav")
             {
                 audioFileType = AudioFileType.Wav;
-
-                // A quirk of XNA?
-                if (bitsPerSample == 32)
-                    format = -2;
             }
             else if (formatName == "mp3")
             {
@@ -199,7 +195,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             // XNA seems to calculate the block alignment directly from 
             // the bits per sample and channel count regardless of the 
             // format of the audio data.
-            if (bitsPerSample > 0)
+            // ffprobe doesn't report blockAlign for ADPCM and we cannot calculate it like this
+            if (bitsPerSample > 0 && (format != 2 && format != 17))
                 blockAlign = (bitsPerSample * channelCount) / 8;
 
             // XNA seems to only be accurate to the millisecond.
@@ -227,8 +224,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 loopLength = (int)Math.Floor(sampleRate * durationInSeconds);
         }
 
-        internal static byte[] StripRiffWaveHeader(byte[] data)
+        internal static byte[] StripRiffWaveHeader(byte[] data, out AudioFormat audioFormat)
         {
+            audioFormat = null;
+
             using (var reader = new BinaryReader(new MemoryStream(data)))
             {
                 var signature = new string(reader.ReadChars(4));
@@ -247,7 +246,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     var chunkSignature = new string(reader.ReadChars(4));
                     if (chunkSignature.ToLowerInvariant() == "data")
                         break;
-                    reader.BaseStream.Seek(reader.ReadInt32(), SeekOrigin.Current);
+                    if (chunkSignature.ToLowerInvariant() == "fmt ")
+                    {
+                        int fmtLength = reader.ReadInt32();
+                        short formatTag = reader.ReadInt16();
+                        short channels = reader.ReadInt16();
+                        int sampleRate = reader.ReadInt32();
+                        int avgBytesPerSec = reader.ReadInt32();
+                        short blockAlign = reader.ReadInt16();
+                        short bitsPerSample = reader.ReadInt16();
+                        audioFormat = new AudioFormat(avgBytesPerSec, bitsPerSample, blockAlign, channels, formatTag, sampleRate);
+
+                        fmtLength -= 2 + 2 + 4 + 4 + 2 + 2;
+                        if (fmtLength < 0)
+                            throw new InvalidOperationException("riff wave header has unexpected format");
+                        reader.BaseStream.Seek(fmtLength, SeekOrigin.Current);
+                    }
+                    else
+                    {
+                        reader.BaseStream.Seek(reader.ReadInt32(), SeekOrigin.Current);
+                    }
                 }
 
                 var dataSize = reader.ReadInt32();
@@ -257,15 +275,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             return data;
         }
 
-        public static void WritePcmFile(AudioContent content, string saveToFile)
+        public static void WritePcmFile(AudioContent content, string saveToFile, int bitRate = 192000, int? sampeRate = null)
         {
             string ffmpegStdout, ffmpegStderr;
             var ffmpegExitCode = ExternalTool.Run(
                 "ffmpeg",
                 string.Format(
-                    "-y -i \"{0}\" -vn -c:a pcm_s16le -b:a 192000 -f:a wav -strict experimental \"{1}\"",
+                    "-y -i \"{0}\" -vn -c:a pcm_s16le -b:a {2} {3} -f:a wav -strict experimental \"{1}\"",
                     content.FileName,
-                    saveToFile),
+                    saveToFile,
+                    bitRate,
+                    sampeRate != null ? "-ar " + sampeRate.Value : ""
+                    ),
                 out ffmpegStdout,
                 out ffmpegStderr);
             if (ffmpegExitCode != 0)
@@ -292,8 +313,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         // format when converting to PCM.
                         if (content.Format.BitsPerSample == 8)
                             ffmpegCodecName = "pcm_u8";
-                        else if (content.Format.BitsPerSample == 32)
-                            ffmpegCodecName = "pcm_s32le";
+                        else if (content.Format.BitsPerSample == 32 && content.Format.Format == 3)
+                            ffmpegCodecName = "pcm_f32le";
                         else
                             ffmpegCodecName = "pcm_s16le";
                         ffmpegMuxerName = "wav";
@@ -377,7 +398,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 int loopStart, loopLength;
                 ProbeFormat(temporaryOutput, out audioFileType, out audioFormat, out duration, out loopStart, out loopLength);
 
-                content.SetData(StripRiffWaveHeader(rawData), audioFormat, duration, loopStart, loopLength);
+                AudioFormat riffAudioFormat;
+                byte[] data = StripRiffWaveHeader(rawData, out riffAudioFormat);
+
+                // deal with adpcm
+                if (audioFormat.Format == 2 || audioFormat.Format == 17)
+                {
+                    // riff contains correct blockAlign
+                    audioFormat = riffAudioFormat;
+
+                    // fix loopLength -> has to be multiple of sample per block
+                    // see https://msdn.microsoft.com/de-de/library/windows/desktop/ee415711(v=vs.85).aspx
+                    int samplesPerBlock = SampleAlignment(audioFormat);
+                    loopLength = (int)(audioFormat.SampleRate * duration.TotalSeconds);
+                    int remainder = loopLength % samplesPerBlock;
+                    loopLength += samplesPerBlock - remainder;
+                }
+
+                content.SetData(data, audioFormat, duration, loopStart, loopLength);
             }
             finally
             {
@@ -385,6 +423,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             }
 
             return quality;
+        }
+
+        // Converts block alignment in bytes to sample alignment, primarily for compressed formats
+        // Calculation of sample alignment from http://kcat.strangesoft.net/openal-extensions/SOFT_block_alignment.txt
+        static int SampleAlignment(AudioFormat format)
+        {
+            switch (format.Format)
+            {
+                case 2:     // MS-ADPCM
+                    return (format.BlockAlign / format.ChannelCount - 7) * 2 + 2;
+                case 17:    // IMA/ADPCM
+                    return (format.BlockAlign / format.ChannelCount - 4) / 4 * 8 + 1;
+            }
+            return 0;
         }
     }
 }

@@ -5,9 +5,13 @@
 using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
+#if DESKTOPGL
+using MonoGame.OpenGL;
+#endif
 
 namespace MonoGame.Tests.Graphics
 {
@@ -32,6 +36,126 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(Color.CornflowerBlue, gd.BlendFactor);
 
             blend.Dispose();
+        }
+
+        [Test]
+        public void CtorAdapterNull()
+        {
+            Assert.Throws<ArgumentNullException>(
+                () => new GraphicsDevice(null, GraphicsProfile.Reach, new PresentationParameters()));
+        }
+
+        [Test]
+        public void CtorPresentationParametersNull()
+        {
+            Assert.Throws<ArgumentNullException>(
+                () => new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile.Reach, null));
+        }
+
+        [Test]
+        public void DisposedWhenDisposingInvoked()
+        {
+            var count = 0;
+
+            gd.Disposing += (sender, args) =>
+            {
+                Assert.IsTrue(gd.IsDisposed);
+                count++;
+            };
+
+            gd.Dispose();
+            Assert.AreEqual(1, count);
+
+            // Disposing should not be invoked more than once
+            gd.Dispose();
+            Assert.AreEqual(1, count);
+        }
+
+        [Test]
+        public void ResetDoesNotTriggerDeviceLost()
+        {
+            // TODO figure out exactly when a device is lost
+            var resetCount = 0;
+            var devLostCount = 0;
+
+            gd.DeviceReset += (sender, args) =>
+            {
+                resetCount++;
+                Assert.AreEqual(0, devLostCount);
+            };
+
+            gd.DeviceLost += (sender, args) =>
+            {
+                devLostCount++;
+                Assert.AreEqual(1, resetCount);
+            };
+
+            gd.Reset();
+
+            Assert.AreEqual(1, resetCount);
+            Assert.AreEqual(0, devLostCount);
+        }
+
+        [Test]
+        public void ResetDoesNotClearState()
+        {
+            gd.RasterizerState = RasterizerState.CullNone;
+            gd.BlendState = BlendState.NonPremultiplied;
+            gd.DepthStencilState = DepthStencilState.None;
+            gd.SamplerStates[0] = SamplerState.PointClamp;
+            var vbb = new VertexBufferBinding(new VertexBuffer(gd, VertexPositionColor.VertexDeclaration, 5, BufferUsage.WriteOnly));
+            gd.SetVertexBuffers(vbb);
+
+            gd.Reset();
+
+            Assert.AreEqual(RasterizerState.CullNone, gd.RasterizerState);
+            Assert.AreEqual(BlendState.NonPremultiplied, gd.BlendState);
+            Assert.AreEqual(DepthStencilState.None, gd.DepthStencilState);
+            Assert.AreEqual(SamplerState.PointClamp, gd.SamplerStates[0]);
+            // TODO GetVertexBuffers is not implemented in MG
+#if XNA
+            Assert.AreEqual(vbb, gd.GetVertexBuffers()[0]);
+#endif
+            vbb.VertexBuffer.Dispose();
+        }
+
+        [Test, Ignore("Make sure dynamic graphics resources are notified when graphics device is lost")]
+        public void ContentLostResources()
+        {
+            // https://blogs.msdn.microsoft.com/shawnhar/2007/12/12/virtualizing-the-graphicsdevice-in-xna-game-studio-2-0/
+
+            var rt = new RenderTarget2D(gdm.GraphicsDevice, 5, 5);
+            var vb = new DynamicVertexBuffer(gd, VertexPositionColor.VertexDeclaration, 1, BufferUsage.None);
+            var ib = new DynamicIndexBuffer(gd, IndexElementSize.SixteenBits, 1, BufferUsage.None);
+            var rtc = new RenderTargetCube(gd, 1, false, SurfaceFormat.Color, DepthFormat.Depth16);
+
+            gd.Reset();
+
+            Assert.IsTrue(rt.IsContentLost);
+            Assert.IsFalse(rt.IsDisposed);
+
+            Assert.IsTrue(vb.IsContentLost);
+            Assert.IsFalse(vb.IsDisposed);
+
+            Assert.IsTrue(ib.IsContentLost);
+            Assert.IsFalse(ib.IsDisposed);
+
+            Assert.IsTrue(rtc.IsContentLost);
+            Assert.IsFalse(rtc.IsDisposed);
+
+            rt.Dispose();
+            vb.Dispose();
+            ib.Dispose();
+            rtc.Dispose();
+        }
+
+        [Test]
+#if DESKTOPGL
+        [Ignore("Does not throw the exception. Needs Investigating")]
+#endif
+        public void ResetWindowHandleNullThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() => gd.Reset(new PresentationParameters()));
         }
 
 		[Test]
@@ -226,7 +350,7 @@ namespace MonoGame.Tests.Graphics
             // No vertex shader or pixel shader.
             Assert.Throws<InvalidOperationException>(() => gd.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 3, 0, 1, 10));
 
-            var effect = AssetTestUtility.CompileEffect(gd, "Instancing.fx");
+            var effect = AssetTestUtility.LoadEffect(content, "Instancing");
             effect.Techniques[0].Passes[0].Apply();
 
             // No vertexBuffers.
@@ -301,7 +425,7 @@ namespace MonoGame.Tests.Graphics
             var projection = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.PiOver4, gd.Viewport.AspectRatio, 0.1f, 100);
 
-            var effect = AssetTestUtility.CompileEffect(gd, "Instancing.fx");
+            var effect = AssetTestUtility.LoadEffect(content, "Instancing");
             effect.Parameters["View"].SetValue(view);
             effect.Parameters["Projection"].SetValue(projection);
             pass = effect.Techniques[0].Passes[0];
@@ -471,6 +595,9 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        [Ignore("Vertex Textures are not implemented for OpenGL")]
+#endif
         public void VertexTexturesGetSet()
         {
             // TODO: The availability of vertex textures should depend on GraphicsProfile.
@@ -521,6 +648,9 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        [Ignore("Vertex Textures are not implemented for OpenGL")]
+#endif
         public void VertexTextureVisualTest()
         {
             // Implements an extremely simple terrain that reads from a heightmap in the vertex shader.
@@ -538,7 +668,7 @@ namespace MonoGame.Tests.Graphics
             var projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
                 gd.Viewport.AspectRatio, 1.0f, 100.0f);
 
-            var effect = AssetTestUtility.CompileEffect(gd, "VertexTextureEffect.fx");
+            var effect = AssetTestUtility.LoadEffect(content, "VertexTextureEffect");
             effect.Parameters["WorldViewProj"].SetValue(viewMatrix * projectionMatrix);
             effect.Parameters["HeightMapTexture"].SetValue(heightMapTexture);
             effect.Parameters["HeightMapSize"].SetValue((float) heightMapSize);
@@ -589,6 +719,9 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        [Ignore("Vertex samplers are not implemented for OpenGL")]
+#endif
         public void VertexSamplerStatesGetSet()
         {
             var samplerState = new SamplerState { Filter = TextureFilter.Point };
@@ -598,6 +731,98 @@ namespace MonoGame.Tests.Graphics
             Assert.That(retrievedSamplerState, Is.SameAs(samplerState));
 
             samplerState.Dispose();
+        }
+
+        [Test]
+        public void PresentInvalidOperationException()
+        {
+            // This should work else it means we had
+            // some bad state to start this test!
+            gd.Present();
+
+            // You can't call present with a RT set.
+            var rt = new RenderTarget2D(gd, 100, 100);
+            gd.SetRenderTarget(rt);
+            Assert.Throws<InvalidOperationException>(() => gd.Present());
+
+            // Set the default RT and present works again.
+            gd.SetRenderTarget(null);
+            gd.Present();
+
+            // Cleanup.
+            rt.Dispose();
+        }
+
+#if DESKTOPGL
+        [Test]
+        public void DifferentVboGetsSet()
+        {
+            var vb1 = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 6, BufferUsage.None);
+            var vb2 = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 8, BufferUsage.None);
+
+            var se = new SpriteEffect(gd);
+            se.CurrentTechnique.Passes[0].Apply();
+
+            gd.SetVertexBuffer(vb1);
+            gd.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
+
+            int vbo;
+            GL.GetInteger(GetPName.ArrayBufferBinding, out vbo);
+            Assert.AreEqual(vb1.vbo, vbo);
+
+            gd.SetVertexBuffer(vb2);
+            gd.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
+
+            GL.GetInteger(GetPName.ArrayBufferBinding, out vbo);
+            Assert.AreEqual(vb2.vbo, vbo);
+
+            se.Dispose();
+            vb1.Dispose();
+            vb2.Dispose();
+        }
+#endif
+
+        private static Rectangle?[] BackBufferRects()
+        {
+            return new Rectangle?[]
+            {
+                null,
+                new Rectangle(100, 100, 250, 250),
+            };
+        }
+
+        [TestCaseSource("BackBufferRects")]
+        public void GetBackBufferData(Rectangle? rectangle)
+        {
+            gd.Clear(Color.CornflowerBlue);
+
+            Rectangle rect;
+            if (rectangle == null)
+                rect = gd.Viewport.Bounds;
+            else
+                rect = rectangle.Value;
+
+            var tex = content.Load<Texture2D>(Paths.Texture("Surge"));
+            var sb = new SpriteBatch(gd);
+
+            sb.Begin();
+            sb.Draw(tex, new Rectangle(150, 150, 300, 300), Color.White);
+            sb.End();
+
+            var buffer = new Color[rect.Width * rect.Height];
+            gd.GetBackBufferData(rect, buffer, 0, rect.Width * rect.Height);
+
+            var backbufferTex = new Texture2D(gd, rect.Width, rect.Height);
+            backbufferTex.SetData(buffer);
+
+            PrepareFrameCapture();
+            gd.Clear(Color.Red);
+
+            sb.Begin();
+            sb.Draw(backbufferTex, rect, Color.White);
+            sb.End();
+
+            CheckFrames();
         }
     }
 }

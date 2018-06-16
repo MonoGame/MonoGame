@@ -10,7 +10,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class ReferenceDialog : DialogBase
+    partial class ReferenceDialog : Dialog<bool>
     {
         protected class RefItem
         {
@@ -27,7 +27,7 @@ namespace MonoGame.Tools.Pipeline
         public List<string> References { get; private set; }
 
         private IController _controller;
-        private FileDialogFilter _dllFileFilter, _allFileFilter;
+        private FileFilter _dllFileFilter, _allFileFilter;
         private SelectableFilterCollection<RefItem> _dataStore;
 
         public ReferenceDialog(IController controller, string[] refs)
@@ -36,8 +36,8 @@ namespace MonoGame.Tools.Pipeline
 
             _controller = controller;
 
-            _dllFileFilter = new FileDialogFilter("Dll Files (*.dll)", new[] { ".dll" });
-            _allFileFilter = new FileDialogFilter("All Files (*.*)", new[] { ".*" });
+            _dllFileFilter = new FileFilter("Dll Files (*.dll)", new[] { ".dll" });
+            _allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
 
             var assemblyColumn = new GridColumn();
             assemblyColumn.HeaderText = "Assembly";
@@ -57,15 +57,14 @@ namespace MonoGame.Tools.Pipeline
                 _dataStore.Add(new RefItem(Path.GetFileName(rf), _controller.GetFullPath(rf)));
         }
 
-        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        public override void Close()
         {
             References = new List<string>();
 
             var items = _dataStore.GetEnumerator();
-            while(items.MoveNext())
+            while (items.MoveNext())
                 References.Add(_controller.GetRelativePath(items.Current.Location));
-            
-            base.OnClosing(e);
+            base.Close();
         }
 
         private void Grid1_SelectionChanged(object sender, EventArgs e)
@@ -99,6 +98,17 @@ namespace MonoGame.Tools.Pipeline
             
             foreach (var item in selectedItems)
                 _dataStore.Remove(item as RefItem);
+        }
+
+        private void ButtonOk_Click(object sender, EventArgs e)
+        {
+            Result = true;
+            Close();
+        }
+
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

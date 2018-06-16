@@ -123,6 +123,9 @@ namespace MonoGame.Tests.Graphics
 
 #if !XNA
         [Test]
+#if DESKTOPGL
+        [Ignore("Comparison samplers are ps_4_0 and up, cannot use them on DesktopGL due to MojoShader")]
+#endif
         public void VisualTestComparisonFunction()
         {
             PrepareFrameCapture();
@@ -161,8 +164,7 @@ namespace MonoGame.Tests.Graphics
                     FilterMode = TextureFilterMode.Comparison
                 };
 
-            var customEffect = AssetTestUtility.CompileEffect(gd, 
-                "CustomSpriteBatchEffectComparisonSampler.fx");
+            var customEffect = AssetTestUtility.LoadEffect(content, "CustomSpriteBatchEffectComparisonSampler");
 
             var size = new Vector2(100, 100);
             var offset = new Vector2(10, 10);

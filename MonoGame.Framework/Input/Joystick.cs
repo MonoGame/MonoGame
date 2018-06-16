@@ -10,6 +10,15 @@ namespace Microsoft.Xna.Framework.Input
     public static partial class Joystick
     {
         /// <summary>
+        /// Gets a value indicating whether the current platform supports reading raw joystick data.
+        /// </summary>
+        /// <value><c>true</c> if the current platform supports reading raw joystick data; otherwise, <c>false</c>.</value>
+        public static bool IsSupported
+        {
+            get { return PlatformIsSupported; }
+        }
+
+        /// <summary>
         /// Gets the capabilites of the joystick.
         /// </summary>
         /// <param name="index">Index of the joystick you want to access.</param>

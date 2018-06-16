@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
+using Microsoft.Xna.Framework;
 
 namespace MonoGame.Tests.Audio
 {
@@ -19,6 +20,8 @@ namespace MonoGame.Tests.Audio
         [SetUp]
         public void Setup()
         {
+            // Necessary to get audio initialised
+            FrameworkDispatcher.Update();
             _audioEngine = new AudioEngine(@"Assets\Audio\Win\Tests.xgs");
             _waveBank = new WaveBank(_audioEngine, @"Assets\Audio\Win\Tests.xwb");
             _soundBank = new SoundBank(_audioEngine, @"Assets\Audio\Win\Tests.xsb");
