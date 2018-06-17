@@ -7,6 +7,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Graphics;
+using MonoGame.Utilities;
 using NUnit.Framework;
 using StbImageSharp;
 using StbImageWriteSharp;
@@ -127,6 +129,31 @@ namespace MonoGame.Tests.Graphics
         }
 
         [TestCase]
+        public void Image2DFromStream()
+        {
+            Image2D texture;
+            using (var stream = File.OpenRead("Assets/Textures/red_128.png"))
+            {
+                texture = Image2D.FromStream(stream);
+            }
+
+            Assert.AreEqual(8, texture.Width);
+            Assert.AreEqual(8, texture.Height);
+
+            for (var y = 0; y < texture.Height; ++y)
+            {
+                for (var x = 0; x < texture.Width; ++x)
+                {
+                    var c = texture[x, y];
+                    Assert.AreEqual(255, c.R);
+                    Assert.AreEqual(0, c.G);
+                    Assert.AreEqual(0, c.B);
+                    Assert.AreEqual(128, c.A);
+                }
+            }
+        }
+
+        [TestCase]
         public void FromStreamBlackAlpha()
         {
             // XNA will make any pixel with an alpha value
@@ -150,7 +177,7 @@ namespace MonoGame.Tests.Graphics
                 }
             }
         }
-        
+
         [Test]
         public void ZeroSizeShouldFailTest()
         {
@@ -645,7 +672,7 @@ namespace MonoGame.Tests.Graphics
 #endif
         public void LoadOddSizedDxtCompressed()
         {
-            // This is testing that DXT compressed mip levels that 
+            // This is testing that DXT compressed mip levels that
             // are not a multiple of 4 are properly loaded.
 
             var t = content.Load<Texture2D>(Paths.Texture("red_668_dxt"));
@@ -675,9 +702,9 @@ namespace MonoGame.Tests.Graphics
                     Assert.AreEqual(0,      b2[p + 1]);
                     Assert.AreEqual(0,      b2[p + 2]);
                     Assert.AreEqual(255,    b2[p + 3]);
-                }            
+                }
             }
-                        
+
             t.Dispose();
         }
 
@@ -766,7 +793,7 @@ namespace MonoGame.Tests.Graphics
             t.GetData(3, new Rectangle(0,0,2,2), b2, 0, bs);
             t.GetData(4, new Rectangle(0,0,1,1), b2, 0, bs);
             t.SetData(3, new Rectangle(0,0,2,2), b2, 0, bs);
-            
+
             // would be rounded, but the rectangle is outside the texture area so it wil throw before rounding
             Assert.Throws<ArgumentException>(() => t.GetData(3, new Rectangle(1, 1, 2, 2), b, 0, bs));
             Assert.Throws<ArgumentException>(() => t.GetData(3, new Rectangle(0, 0, 3, 3), b, 0, bs));
