@@ -1031,9 +1031,9 @@ namespace MonoGame.OpenGL
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
-        internal delegate void BlendFuncSeparateDelegatei(int buffer, BlendingFactorSrc colorSrc, BlendingFactorDest colorDst,
+        internal delegate void BlendFuncSeparateiDelegate(int buffer, BlendingFactorSrc colorSrc, BlendingFactorDest colorDst,
             BlendingFactorSrc alphaSrc, BlendingFactorDest alphaDst);
-        internal static BlendFuncSeparateDelegatei BlendFuncSeparatei;
+        internal static BlendFuncSeparateiDelegate BlendFuncSeparatei;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
@@ -1309,7 +1309,7 @@ namespace MonoGame.OpenGL
             BlendEquationSeparate = LoadEntryPoint<BlendEquationSeparateDelegate> ("glBlendEquationSeparate");
             BlendEquationSeparatei = LoadEntryPoint<BlendEquationSeparateiDelegate>("glBlendEquationSeparatei");
             BlendFuncSeparate = LoadEntryPoint<BlendFuncSeparateDelegate> ("glBlendFuncSeparate");
-            BlendFuncSeparatei = LoadEntryPoint<BlendFuncSeparateDelegatei>("glBlendFuncSeparatei");
+            BlendFuncSeparatei = LoadEntryPoint<BlendFuncSeparateiDelegate>("glBlendFuncSeparatei");
             ColorMask = LoadEntryPoint<ColorMaskDelegate> ("glColorMask");
             DepthFunc = LoadEntryPoint<DepthFuncDelegate> ("glDepthFunc");
             DepthMask = LoadEntryPoint<DepthMaskDelegate> ("glDepthMask");
