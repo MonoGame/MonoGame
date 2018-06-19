@@ -1018,11 +1018,22 @@ namespace MonoGame.OpenGL
         internal delegate void BlendEquationSeparateDelegate (BlendEquationMode colorMode, BlendEquationMode alphaMode);
         internal static BlendEquationSeparateDelegate BlendEquationSeparate;
 
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void BlendEquationSeparateiDelegate(int buffer, BlendEquationMode colorMode, BlendEquationMode alphaMode);
+        internal static BlendEquationSeparateiDelegate BlendEquationSeparatei;
+
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
         internal delegate void BlendFuncSeparateDelegate (BlendingFactorSrc colorSrc, BlendingFactorDest colorDst,
             BlendingFactorSrc alphaSrc, BlendingFactorDest alphaDst);
         internal static BlendFuncSeparateDelegate BlendFuncSeparate;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void BlendFuncSeparateDelegatei(int buffer, BlendingFactorSrc colorSrc, BlendingFactorDest colorDst,
+            BlendingFactorSrc alphaSrc, BlendingFactorDest alphaDst);
+        internal static BlendFuncSeparateDelegatei BlendFuncSeparatei;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
@@ -1296,7 +1307,9 @@ namespace MonoGame.OpenGL
 
             BlendColor = LoadEntryPoint<BlendColorDelegate> ("glBlendColor");
             BlendEquationSeparate = LoadEntryPoint<BlendEquationSeparateDelegate> ("glBlendEquationSeparate");
+            BlendEquationSeparatei = LoadEntryPoint<BlendEquationSeparateiDelegate>("glBlendEquationSeparatei");
             BlendFuncSeparate = LoadEntryPoint<BlendFuncSeparateDelegate> ("glBlendFuncSeparate");
+            BlendFuncSeparatei = LoadEntryPoint<BlendFuncSeparateDelegatei>("glBlendFuncSeparatei");
             ColorMask = LoadEntryPoint<ColorMaskDelegate> ("glColorMask");
             DepthFunc = LoadEntryPoint<DepthFuncDelegate> ("glDepthFunc");
             DepthMask = LoadEntryPoint<DepthMaskDelegate> ("glDepthMask");
