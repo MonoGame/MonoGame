@@ -7,7 +7,7 @@ using System.Collections.Generic;
 // can happen during the parser generation.
 #pragma warning disable 168
 
-namespace TwoMGFX
+namespace TwoMGFX.TPGParser
 {
     #region Parser
 

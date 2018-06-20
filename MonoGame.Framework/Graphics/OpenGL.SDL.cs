@@ -5,6 +5,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Security;
+using MonoGame.Utilities;
 
 namespace MonoGame.OpenGL
 {
@@ -23,10 +24,10 @@ namespace MonoGame.OpenGL
 
     internal class EntryPointHelper
     {
-        [SuppressUnmanagedCodeSecurity]
-        [DllImport(Sdl.NativeLibName, CallingConvention = CallingConvention.Cdecl,
-            EntryPoint = "SDL_GL_GetProcAddress", ExactSpelling = true)]
-        internal static extern IntPtr GetProcAddress(IntPtr proc);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr d_sdl_gl_getprocaddress(IntPtr proc);
+        public static d_sdl_gl_getprocaddress GetProcAddress = FuncLoader.LoadFunction<d_sdl_gl_getprocaddress>(Sdl.NativeLibrary, "SDL_GL_GetProcAddress");
+        
         internal static IntPtr GetAddress(string proc)
         {
             IntPtr p = Marshal.StringToHGlobalAnsi(proc);

@@ -1183,8 +1183,10 @@ namespace MonoGame.OpenGL
         internal delegate void VertexAttribDivisorDelegate (int location, int frequency);
         internal static VertexAttribDivisorDelegate VertexAttribDivisor;
 
+#if DEBUG
         [UnmanagedFunctionPointer (CallingConvention.StdCall)]
         delegate void DebugMessageCallbackProc (int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam);
+        static DebugMessageCallbackProc DebugProc;
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
         delegate void DebugMessageCallbackDelegate (DebugMessageCallbackProc callback, IntPtr userParam);
@@ -1193,7 +1195,6 @@ namespace MonoGame.OpenGL
         internal delegate void ErrorDelegate (string message);
         internal static event ErrorDelegate OnError;
 
-#if DEBUG
         static void DebugMessageCallbackHandler(int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam)
         {
             var errorMessage = Marshal.PtrToStringAnsi(message);
@@ -1354,7 +1355,8 @@ namespace MonoGame.OpenGL
                 DebugMessageCallback = LoadEntryPoint<DebugMessageCallbackDelegate>("glDebugMessageCallback");
                 if (DebugMessageCallback != null)
                 {
-                    DebugMessageCallback(DebugMessageCallbackHandler, IntPtr.Zero);
+                    DebugProc = DebugMessageCallbackHandler;
+                    DebugMessageCallback(DebugProc, IntPtr.Zero);
                     Enable(EnableCap.DebugOutput);
                     Enable(EnableCap.DebugOutputSynchronous);
                 }

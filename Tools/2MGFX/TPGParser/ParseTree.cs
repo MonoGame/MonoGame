@@ -6,7 +6,7 @@ using System.Text;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace TwoMGFX
+namespace TwoMGFX.TPGParser
 {
     #region ParseTree
     [Serializable]

@@ -49,9 +49,9 @@
 	<DefineNET4DetectionConstant>True</DefineNET4DetectionConstant>
 
     <FrameworkVersions>
-	  <Platform Name="Android">
-            <Version>v4.4</Version>
-          </Platform>
+      <Platform Name="Android">
+        <Version>v4.4</Version>
+      </Platform>
     </FrameworkVersions>
 
   </Properties>
@@ -1246,6 +1246,9 @@
 
 
     <!-- Common Desktop Platform -->
+    <Compile Include="Utilities\FuncLoader.Desktop.cs">
+      <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
+    </Compile>
     <Compile Include="SDL\SDLGamePlatform.cs">
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
     </Compile>
@@ -1262,7 +1265,7 @@
       <LogicalName>MonoGame.bmp</LogicalName>
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
     </EmbeddedResource>
-	 <EmbeddedResource Include="SDL\gamecontrollerdb.txt">
+    <EmbeddedResource Include="..\ThirdParty\SDL_GameControllerDB\gamecontrollerdb.txt">
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
       <LogicalName>gamecontrollerdb.txt</LogicalName>
     </EmbeddedResource>

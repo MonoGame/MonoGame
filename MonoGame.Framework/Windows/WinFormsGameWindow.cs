@@ -410,27 +410,9 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            // https://bugzilla.novell.com/show_bug.cgi?id=487896
-            // Since there's existing bug from implementation with mono WinForms since 09'
-            // Application.Idle is not working as intended
-            // So we're just going to emulate Application.Run just like Microsoft implementation
-            Form.Show();
-
-            var nativeMsg = new NativeMessage();
-            while (Form != null && Form.IsDisposed == false)
-            {
-                if (PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0))
-                {
-                    Application.DoEvents();
-
-                    if (nativeMsg.msg == WM_QUIT)
-                        break;
-
-                    continue;
-                }
-                UpdateWindows();
-                Game.Tick();
-            }
+            Application.Idle += TickOnIdle;
+            Application.Run(Form);
+            Application.Idle -= TickOnIdle;
 
             // We need to remove the WM_QUIT message in the message 
             // pump as it will keep us from restarting on this 
@@ -448,6 +430,18 @@ namespace MonoGame.Framework
                 Thread.Sleep(100);
             } 
             while (PeekMessage(out msg, IntPtr.Zero, 0, 1 << 5, 1));
+        }
+
+        // Run game loop when the app becomes Idle.
+        private void TickOnIdle(object sender, EventArgs e)
+        {
+            var nativeMsg = new NativeMessage();
+            do
+            {
+                UpdateWindows();
+                Game.Tick();
+            }
+            while (!PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0) && Form != null && Form.IsDisposed == false);
         }
 
         internal void UpdateWindows()
