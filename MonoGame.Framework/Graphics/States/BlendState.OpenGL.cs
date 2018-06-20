@@ -8,6 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class BlendState
     {
+
         internal void PlatformApplyState(GraphicsDevice device, bool force = false)
         {
             var blendEnabled = !(this.ColorSourceBlend == Blend.One && 
@@ -28,12 +29,27 @@ namespace Microsoft.Xna.Framework.Graphics
                 this.ColorBlendFunction != device._lastBlendState.ColorBlendFunction || 
                 this.AlphaBlendFunction != device._lastBlendState.AlphaBlendFunction)
             {
-                GL.BlendEquationSeparate(
-                    this.ColorBlendFunction.GetBlendEquationMode(),
-                    this.AlphaBlendFunction.GetBlendEquationMode());
-                GraphicsExtensions.CheckGLError();
-                device._lastBlendState.ColorBlendFunction = this.ColorBlendFunction;
-                device._lastBlendState.AlphaBlendFunction = this.AlphaBlendFunction;
+                if (_independentBlendEnable)
+                    for (int i = 0; i < 4; i++) {
+                        GL.BlendEquationSeparatei(i,
+                            _targetBlendState[i].ColorBlendFunction.GetBlendEquationMode(),
+                            _targetBlendState[i].AlphaBlendFunction.GetBlendEquationMode());
+
+                        GraphicsExtensions.CheckGLError();
+
+                        device._lastBlendState[i].ColorBlendFunction = this.ColorBlendFunction;
+                        device._lastBlendState[i].AlphaBlendFunction = this.AlphaBlendFunction;
+                    }
+                else {
+                    GL.BlendEquationSeparate(
+                        this.ColorBlendFunction.GetBlendEquationMode(),
+                        this.AlphaBlendFunction.GetBlendEquationMode());
+
+                    GraphicsExtensions.CheckGLError();
+
+                    device._lastBlendState.ColorBlendFunction = this.ColorBlendFunction;
+                    device._lastBlendState.AlphaBlendFunction = this.AlphaBlendFunction;
+                }
             }
 
             if (force ||
@@ -42,11 +58,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 this.AlphaSourceBlend != device._lastBlendState.AlphaSourceBlend ||
                 this.AlphaDestinationBlend != device._lastBlendState.AlphaDestinationBlend)
             {
-                GL.BlendFuncSeparate(
-                    this.ColorSourceBlend.GetBlendFactorSrc(), 
-                    this.ColorDestinationBlend.GetBlendFactorDest(), 
-                    this.AlphaSourceBlend.GetBlendFactorSrc(), 
-                    this.AlphaDestinationBlend.GetBlendFactorDest());
+                if (_independentBlendEnable)
+                    for (int i = 0; i < 4; i++)
+                        GL.BlendFuncSeparatei(i,
+                            _targetBlendState[i].ColorSourceBlend.GetBlendFactorSrc(),
+                            _targetBlendState[i].ColorDestinationBlend.GetBlendFactorDest(),
+                            _targetBlendState[i].AlphaSourceBlend.GetBlendFactorSrc(),
+                            _targetBlendState[i].AlphaDestinationBlend.GetBlendFactorDest());
+                
+                else 
+                    GL.BlendFuncSeparate(
+                        this.ColorSourceBlend.GetBlendFactorSrc(),
+                        this.ColorDestinationBlend.GetBlendFactorDest(),
+                        this.AlphaSourceBlend.GetBlendFactorSrc(),
+                        this.AlphaDestinationBlend.GetBlendFactorDest());
+                
                 GraphicsExtensions.CheckGLError();
                 device._lastBlendState.ColorSourceBlend = this.ColorSourceBlend;
                 device._lastBlendState.ColorDestinationBlend = this.ColorDestinationBlend;
