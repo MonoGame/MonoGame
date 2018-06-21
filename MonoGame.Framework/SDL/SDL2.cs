@@ -29,7 +29,7 @@ internal static class Sdl
             ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x86/libSDL2-2.0.so.0"));
         else if (CurrentPlatform.OS == OS.MacOSX)
             ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "libSDL2-2.0.0.dylib"));
-        
+
         // Load system library
         if (ret == IntPtr.Zero)
         {
@@ -431,8 +431,14 @@ internal static class Sdl
         public static d_sdl_setwindowsize SetSize = FuncLoader.LoadFunction<d_sdl_setwindowsize>(NativeLibrary, "SDL_SetWindowSize");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void d_sdl_setwindowtitle(IntPtr window, string title);
-        public static d_sdl_setwindowtitle SetTitle = FuncLoader.LoadFunction<d_sdl_setwindowtitle>(NativeLibrary, "SDL_SetWindowTitle");
+        private delegate void d_sdl_setwindowtitle(IntPtr window, ref byte value);
+        private static d_sdl_setwindowtitle SDL_SetWindowTitle = FuncLoader.LoadFunction<d_sdl_setwindowtitle>(NativeLibrary, "SDL_SetWindowTitle");
+
+        public static void SetTitle(IntPtr handle, string title)
+        {
+            var bytes = Encoding.UTF8.GetBytes(title);
+            SDL_SetWindowTitle(handle, ref bytes[0]);
+        }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_showwindow(IntPtr window);
