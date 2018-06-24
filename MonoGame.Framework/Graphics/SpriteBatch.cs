@@ -38,6 +38,11 @@ namespace Microsoft.Xna.Framework.Graphics
         internal static bool NeedsHalfPixelOffset;
 
         /// <summary>
+		/// Tells whether Begin has already been called on this SpriteBatch.
+		/// </summary>
+		public bool BeginCalled { get { return _beginCalled; } }
+        
+        /// <summary>
         /// Constructs a <see cref="SpriteBatch"/>.
         /// </summary>
         /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>
