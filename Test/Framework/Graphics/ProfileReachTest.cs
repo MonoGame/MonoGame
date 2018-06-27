@@ -57,25 +57,10 @@ namespace MonoGame.Tests.Graphics
         [TestCase(MaxTexture2DSize,   MaxTexture2DSize-1, false, SurfaceFormat.Color)]
         [TestCase(MaxTexture2DSize-1, MaxTexture2DSize  , false, SurfaceFormat.Color)]
         [TestCase(MaxTexture2DSize-1, MaxTexture2DSize-1, false, SurfaceFormat.Color)]
-        [TestCase(MaxTexture2DSize,   MaxTexture2DSize+1, false, SurfaceFormat.Color, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(MaxTexture2DSize+1, MaxTexture2DSize,   false, SurfaceFormat.Color, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(MaxTexture2DSize+1, MaxTexture2DSize+1, false, SurfaceFormat.Color, ExpectedException = typeof(NotSupportedException))]
         [TestCase(PowerOfTwoSize,   PowerOfTwoSize,   true,  SurfaceFormat.Color)]
-        [TestCase(PowerOfTwoSize,   PowerOfTwoSize-1, true,  SurfaceFormat.Color,  ExpectedException = typeof(NotSupportedException))]
-        [TestCase(PowerOfTwoSize-1, PowerOfTwoSize  , true,  SurfaceFormat.Color,  ExpectedException = typeof(NotSupportedException))]
-        [TestCase(PowerOfTwoSize-1, PowerOfTwoSize-1, true,  SurfaceFormat.Color,  ExpectedException = typeof(NotSupportedException))]
         [TestCase(PowerOfTwoSize,   PowerOfTwoSize,   false, SurfaceFormat.Dxt1 )]
-        [TestCase(PowerOfTwoSize,   PowerOfTwoSize-4, false, SurfaceFormat.Dxt1,  ExpectedException = typeof(NotSupportedException))]
-        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize  , false, SurfaceFormat.Dxt1,  ExpectedException = typeof(NotSupportedException))]
-        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize-4, false, SurfaceFormat.Dxt1,  ExpectedException = typeof(NotSupportedException))]
-        [TestCase(PowerOfTwoSize,   PowerOfTwoSize,   false, SurfaceFormat.Dxt3 )]
-        [TestCase(PowerOfTwoSize,   PowerOfTwoSize-4, false, SurfaceFormat.Dxt3,  ExpectedException = typeof(NotSupportedException))]
-        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize  , false, SurfaceFormat.Dxt3,  ExpectedException = typeof(NotSupportedException))]
-        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize-4, false, SurfaceFormat.Dxt3,  ExpectedException = typeof(NotSupportedException))]      
+        [TestCase(PowerOfTwoSize,   PowerOfTwoSize,   false, SurfaceFormat.Dxt3 )]     
         [TestCase(PowerOfTwoSize,   PowerOfTwoSize,   false, SurfaceFormat.Dxt5 )]
-        [TestCase(PowerOfTwoSize,   PowerOfTwoSize-4, false, SurfaceFormat.Dxt5,  ExpectedException = typeof(NotSupportedException))]
-        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize  , false, SurfaceFormat.Dxt5,  ExpectedException = typeof(NotSupportedException))]
-        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize-4, false, SurfaceFormat.Dxt5,  ExpectedException = typeof(NotSupportedException))]
         public void Texture2DSize(int width, int height, bool mipMap, SurfaceFormat surfaceFormat = SurfaceFormat.Color)
         {
             CheckProfile();
@@ -83,13 +68,30 @@ namespace MonoGame.Tests.Graphics
             Texture2D tx = new Texture2D(_gd, width, height, mipMap, surfaceFormat);
             tx.Dispose();
         }
+
+        
+        [TestCase(MaxTexture2DSize,   MaxTexture2DSize+1, false, SurfaceFormat.Color)]
+        [TestCase(MaxTexture2DSize+1, MaxTexture2DSize,   false, SurfaceFormat.Color)]
+        [TestCase(MaxTexture2DSize+1, MaxTexture2DSize+1, false, SurfaceFormat.Color)]
+        [TestCase(PowerOfTwoSize,   PowerOfTwoSize-1, true,  SurfaceFormat.Color)]
+        [TestCase(PowerOfTwoSize-1, PowerOfTwoSize  , true,  SurfaceFormat.Color)]
+        [TestCase(PowerOfTwoSize-1, PowerOfTwoSize-1, true,  SurfaceFormat.Color)]
+        [TestCase(PowerOfTwoSize,   PowerOfTwoSize-4, false, SurfaceFormat.Dxt1)]
+        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize  , false, SurfaceFormat.Dxt1)]
+        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize-4, false, SurfaceFormat.Dxt1)]
+        [TestCase(PowerOfTwoSize,   PowerOfTwoSize-4, false, SurfaceFormat.Dxt3)]
+        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize  , false, SurfaceFormat.Dxt3)]
+        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize-4, false, SurfaceFormat.Dxt3)] 
+        [TestCase(PowerOfTwoSize,   PowerOfTwoSize-4, false, SurfaceFormat.Dxt5)]
+        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize  , false, SurfaceFormat.Dxt5)]
+        [TestCase(PowerOfTwoSize-4, PowerOfTwoSize-4, false, SurfaceFormat.Dxt5)]
+        public void Texture2DSize_ThrowsNotSupportedException(int width, int height, bool mipMap, SurfaceFormat surfaceFormat = SurfaceFormat.Color)
+        {
+            Assert.Throws<NotSupportedException>( ()=> Texture2DSize(width, height, mipMap, surfaceFormat) );
+        }
         
         [TestCase(MaxTextureCubeSize  )]
         [TestCase(MaxTextureCubeSize/2)]
-        [TestCase(MaxTextureCubeSize*2, ExpectedException = typeof(NotSupportedException))]        
-        [TestCase(MaxTextureCubeSize+1, ExpectedException = typeof(NotSupportedException))] // nonPowerOfTwo or maxSize
-        [TestCase(MaxTextureCubeSize+4, ExpectedException = typeof(NotSupportedException))] // nonPowerOfTwo or maxSize
-        [TestCase(PowerOfTwoSize-4,     ExpectedException = typeof(NotSupportedException))]
         public void TextureCubeSize(int size)
         {
             CheckProfile();
@@ -98,13 +100,25 @@ namespace MonoGame.Tests.Graphics
             tx.Dispose();
         }
         
-        [TestCase(16, 16, 16, ExpectedException = typeof(NotSupportedException))]
-        public void Texture3DSize(int width, int height, int depth)
+        [TestCase(MaxTextureCubeSize*2)]        
+        [TestCase(MaxTextureCubeSize+1)] // nonPowerOfTwo or maxSize
+        [TestCase(MaxTextureCubeSize+4)] // nonPowerOfTwo or maxSize
+        [TestCase(PowerOfTwoSize-4    )]
+        public void TextureCubeSize_ThrowsNotSupportedException(int size)
+        {
+            Assert.Throws<NotSupportedException>( ()=> TextureCubeSize(size) );
+        }
+        
+        [TestCase(16, 16, 16)]
+        public void Texture3DSize_ThrowsNotSupportedException(int width, int height, int depth)
         {
             CheckProfile();
-            
-            Texture3D tx = new Texture3D(_gd, width, height, depth, false, SurfaceFormat.Color);            
-            tx.Dispose();
+                        
+            Assert.Throws<NotSupportedException>(()=>
+            { 
+                Texture3D tx = new Texture3D(_gd, width, height, depth, false, SurfaceFormat.Color);            
+                tx.Dispose();
+            });
         }
         
         [TestCase(SurfaceFormat.Color)]
@@ -116,17 +130,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(SurfaceFormat.Dxt5)]
         [TestCase(SurfaceFormat.NormalizedByte2)]
         [TestCase(SurfaceFormat.NormalizedByte4)]
-        [TestCase(SurfaceFormat.Rgba1010102, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Rg32, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Rgba64, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Alpha8, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Single, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Vector2, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Vector4, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.HalfSingle, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.HalfVector2, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.HalfVector4, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.HdrBlendable, ExpectedException = typeof(NotSupportedException))]
         public void Texture2DSurface(SurfaceFormat surfaceFormat)
         {
             CheckProfile();
@@ -135,13 +138,32 @@ namespace MonoGame.Tests.Graphics
             tx.Dispose();
         }
 
-        [TestCase(SurfaceFormat.Color, ExpectedException = typeof(NotSupportedException))]
-        public void Texture3DSurface(SurfaceFormat surfaceFormat)
+        [TestCase(SurfaceFormat.Rgba1010102)]
+        [TestCase(SurfaceFormat.Rg32)]
+        [TestCase(SurfaceFormat.Rgba64)]
+        [TestCase(SurfaceFormat.Alpha8)]
+        [TestCase(SurfaceFormat.Single)]
+        [TestCase(SurfaceFormat.Vector2)]
+        [TestCase(SurfaceFormat.Vector4)]
+        [TestCase(SurfaceFormat.HalfSingle)]
+        [TestCase(SurfaceFormat.HalfVector2)]
+        [TestCase(SurfaceFormat.HalfVector4)]
+        [TestCase(SurfaceFormat.HdrBlendable)]
+        public void Texture2DSurface_ThrowsNotSupportedException(SurfaceFormat surfaceFormat)
+        {
+            Assert.Throws<NotSupportedException>(() => Texture2DSurface(surfaceFormat));
+        }
+
+        [TestCase(SurfaceFormat.Color)]
+        public void Texture3DSurface_ThrowsNotSupportedException(SurfaceFormat surfaceFormat)
         {
             CheckProfile();
-
-            Texture3D tx = new Texture3D(_gd, 16, 16, 16, false, surfaceFormat);
-            tx.Dispose();
+                        
+            Assert.Throws<NotSupportedException>(()=>
+            {
+                Texture3D tx = new Texture3D(_gd, 16, 16, 16, false, surfaceFormat);
+                tx.Dispose();                
+            });
         }
 
         [TestCase(SurfaceFormat.Color)]
@@ -151,25 +173,30 @@ namespace MonoGame.Tests.Graphics
         [TestCase(SurfaceFormat.Dxt1)]
         [TestCase(SurfaceFormat.Dxt3)]
         [TestCase(SurfaceFormat.Dxt5)]
-        [TestCase(SurfaceFormat.NormalizedByte2, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.NormalizedByte4, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Rgba1010102, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Rg32, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Rgba64, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Alpha8, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Single, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Vector2, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.Vector4, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.HalfSingle, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.HalfVector2, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.HalfVector4, ExpectedException = typeof(NotSupportedException))]
-        [TestCase(SurfaceFormat.HdrBlendable, ExpectedException = typeof(NotSupportedException))]
         public void TextureCubeSurface(SurfaceFormat surfaceFormat)
         {
             CheckProfile();
 
             TextureCube tx = new TextureCube(_gd, 16, false, surfaceFormat);
             tx.Dispose();
+        }
+
+        [TestCase(SurfaceFormat.NormalizedByte2)]
+        [TestCase(SurfaceFormat.NormalizedByte4)]
+        [TestCase(SurfaceFormat.Rgba1010102)]
+        [TestCase(SurfaceFormat.Rg32)]
+        [TestCase(SurfaceFormat.Rgba64)]
+        [TestCase(SurfaceFormat.Alpha8)]
+        [TestCase(SurfaceFormat.Single)]
+        [TestCase(SurfaceFormat.Vector2)]
+        [TestCase(SurfaceFormat.Vector4)]
+        [TestCase(SurfaceFormat.HalfSingle)]
+        [TestCase(SurfaceFormat.HalfVector2)]
+        [TestCase(SurfaceFormat.HalfVector4)]
+        [TestCase(SurfaceFormat.HdrBlendable)]
+        public void TextureCubeSurface_ThrowsNotSupportedException(SurfaceFormat surfaceFormat)
+        {
+            Assert.Throws<NotSupportedException>( ()=> TextureCubeSurface(surfaceFormat) );
         }
 
         [TestCase(SurfaceFormat.Color, SurfaceFormat.Color)]
@@ -213,17 +240,13 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(tx.Format, expectedFallbackFormat);
             tx.Dispose();
         }
-
+        
         [TestCase("DrawPrimitives", 0, MaxPrimitives)]
         [TestCase("DrawPrimitives", 3, MaxPrimitives)]
-        [TestCase("DrawPrimitives", 0, MaxPrimitives+1, ExpectedException = typeof(NotSupportedException))]
-        [TestCase("DrawIndexedPrimitives", 0, MaxPrimitives )]
-        [TestCase("DrawIndexedPrimitives", 0, MaxPrimitives+1, ExpectedException = typeof(NotSupportedException))]
-        [TestCase("DrawUserPrimitives", 0, MaxPrimitives )]
+        [TestCase("DrawIndexedPrimitives", 0, MaxPrimitives)]
+        [TestCase("DrawUserPrimitives", 0, MaxPrimitives)]
         [TestCase("DrawUserPrimitives", 3, MaxPrimitives)]
-        [TestCase("DrawUserPrimitives", 0, MaxPrimitives+1, ExpectedException = typeof(NotSupportedException))]
-        [TestCase("DrawUserIndexedPrimitives", 0, MaxPrimitives )]
-        [TestCase("DrawUserIndexedPrimitives", 0, MaxPrimitives+1, ExpectedException = typeof(NotSupportedException))]
+        [TestCase("DrawUserIndexedPrimitives", 0, MaxPrimitives)]
         public void MaximumPrimitivesPerDrawCall(string method, int vertexStart, int primitiveCount)
         {
             CheckProfile();
@@ -270,8 +293,16 @@ namespace MonoGame.Tests.Graphics
             effect.Dispose();
         }
 
-        [TestCase(IndexElementSize.SixteenBits  )]
-        [TestCase(IndexElementSize.ThirtyTwoBits, ExpectedException = typeof(NotSupportedException))]
+        [TestCase("DrawPrimitives", 0, MaxPrimitives + 1)]
+        [TestCase("DrawIndexedPrimitives", 0, MaxPrimitives + 1)]
+        [TestCase("DrawUserPrimitives", 0, MaxPrimitives + 1)]
+        [TestCase("DrawUserIndexedPrimitives", 0, MaxPrimitives + 1)]
+        public void MaximumPrimitivesPerDrawCall_ThrowsNotSupportedException(string method, int vertexStart, int primitiveCount)
+        {
+            Assert.Throws<NotSupportedException>( ()=> MaximumPrimitivesPerDrawCall(method, vertexStart, primitiveCount) );
+        }
+
+        [TestCase(IndexElementSize.SixteenBits)]
         public void IndexBufferElementSize(IndexElementSize elementSize)
         {
             CheckProfile();
@@ -280,8 +311,13 @@ namespace MonoGame.Tests.Graphics
             ib.Dispose();
         }
 
+        [TestCase(IndexElementSize.ThirtyTwoBits)]
+        public void IndexBufferElementSize_ThrowsNotSupportedException(IndexElementSize elementSize)
+        {
+            Assert.Throws<NotSupportedException>( ()=> IndexBufferElementSize(elementSize) );
+        }
+
         [TestCase(IndexElementSize.SixteenBits)]
-        [TestCase(IndexElementSize.ThirtyTwoBits, ExpectedException = typeof(NotSupportedException))]
         public void IndicesElementSize(IndexElementSize elementSize)
         {
             CheckProfile();
@@ -308,17 +344,25 @@ namespace MonoGame.Tests.Graphics
             effect.Dispose();
         }
         
-        [TestCase(ExpectedException = typeof(NotSupportedException))]
-        public void OcclusionQuery()
+        [TestCase(IndexElementSize.ThirtyTwoBits)]
+        public void IndicesElementSize_ThrowsNotSupportedException(IndexElementSize elementSize)
+        {            
+            Assert.Throws<NotSupportedException>( ()=> IndicesElementSize(elementSize) );
+        }
+
+        [TestCase()]
+        public void OcclusionQuery_ThrowsNotSupportedException()
         {
             CheckProfile();
 
-            var oc = new OcclusionQuery(_gd);
-            oc.Dispose();
+            Assert.Throws<NotSupportedException>(()=>
+            { 
+                var oc = new OcclusionQuery(_gd);
+                oc.Dispose();
+            });
         }
 
         [TestCase(MaxRenderTargets)]
-        [TestCase(MaxRenderTargets + 1, ExpectedException = typeof(NotSupportedException))]
         public void MultipleRenderTargets(int count)
         {
             CheckProfile();
@@ -332,6 +376,12 @@ namespace MonoGame.Tests.Graphics
             _gd.SetRenderTarget(null);
             for(int i=0;i<count;i++)
                 rtBinding[i].RenderTarget.Dispose();
+        }
+
+        [TestCase(MaxRenderTargets + 1)]
+        public void MultipleRenderTargets_ThrowsNotSupportedException(int count)
+        {
+            Assert.Throws<NotSupportedException>( ()=> MultipleRenderTargets(count) );
         }
     }
 }
