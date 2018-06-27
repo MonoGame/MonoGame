@@ -102,6 +102,11 @@ namespace Microsoft.Xna.Framework {
 		/// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
+
+	    /// <summary>
+	    /// Invoked when the IMM service is enabled and a character composition is changed.
+	    /// </summary>
+        public event EventHandler<TextCompositionEventArgs> TextComposition; 
 #endif
 
 		#endregion Events
@@ -148,6 +153,22 @@ namespace Microsoft.Xna.Framework {
 		{
             EventHelpers.Raise(this, TextInput, e);
 		}
+
+	    /// <summary>
+	    /// Enable the system IMM service to support composited character input.
+	    /// </summary>
+        public void StartTextComposition(TextCompositionEventArgs e)
+	    {
+            EventHelpers.Raise(this, TextComposition, e);
+        }
+
+        /// <summary>
+        /// Stop the system IMM service.
+        /// </summary>
+        public void StopTextComposition(TextCompositionEventArgs e)
+	    {
+	        EventHelpers.Raise(this, TextComposition, e);
+        }
 #endif
 
 		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);

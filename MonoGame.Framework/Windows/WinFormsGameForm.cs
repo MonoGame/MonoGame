@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input.Touch;
 using MonoGame.Framework;
@@ -32,6 +34,15 @@ namespace Microsoft.Xna.Framework.Windows
     [System.ComponentModel.DesignerCategory("Code")]
     internal class WinFormsGameForm : Form
     {
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", EntryPoint = "SendMessage")]
+        static extern int SendMessage(IntPtr hwnd, int wMsg, int wParam, ref int lParam);
+
         private readonly WinFormsGameWindow _window;
 
         public const int WM_MOUSEHWHEEL = 0x020E;
@@ -46,9 +57,72 @@ namespace Microsoft.Xna.Framework.Windows
 
         public const int WM_SYSCOMMAND = 0x0112;
 
+        /// <summary>
+        /// IME Notifications Application: Status Window Closed
+        /// </summary>
+        public const int IMN_CLOSESTATUSWINDOW = 0x0001;
+        /// <summary>
+        /// IME Notifications Application: Will Create Status Window
+        /// </summary>
+        public const int IMN_OPENSTATUSWINDOW = 0x0002;
+        /// <summary>
+        /// IME Notification Application: Content in Candidate Window Will Change
+        /// </summary>
+        public const int IMN_CHANGECANDIDATE = 0x0003;
+        /// <summary>
+        /// IME Notification Application: Candidate Window Closed
+        /// </summary>
+        public const int IMN_CLOSECANDIDATE = 0x0004;
+        /// <summary>
+        /// IME Notification Application: Will Open Candidate Window
+        /// </summary>
+        public const int IMN_OPENCANDIDATE = 0x0005;
+
+        /// <summary>
+        /// Set a new extension style
+        /// </summary>
+        public const int GWL_EXSTYLE = -20;
+        /// <summary>
+        /// Set up a new application instance handle
+        /// </summary>
+        public const int GWL_HINSTANCE = -6;
+        /// <summary>
+        /// Set a new window identifier
+        /// </summary>
+        public const int GWL_ID = -12;
+        /// <summary>
+        /// Set a new window style
+        /// </summary>
+        public const int GWL_STYLE = -16;
+        /// <summary>
+        /// Sets the 32-bit value associated with the window
+        /// Each window has a 32-bit value that is used by the application that created the window
+        /// </summary>
+        public const int GWL_USERDATA = -21;
+        /// <summary>
+        /// Set a new handler for the window
+        /// </summary>
+        public const int GWL_WNDPROC = -4;
+        /// <summary>
+        /// To change the parent window of a child window,
+        /// use the SetParent function
+        /// </summary>
+        public const int GWL_HWNDPARENT = -8;
+
+        public const int DLGC_WANTALLKEYS = 0x0004;
+        public const int WM_GETDLGCODE = 0x0087;
+
+        public const int GCS_COMPSTR = 0x0008;
+        public const int GCS_RESULTSTR = 0x0800;
+
+        public const int EM_GETSEL = 0xB0;
+        public const int EM_LINEFROMCHAR = 0xC9;
+        public const int EM_LINEINDEX = 0xBB;
+
         public bool AllowAltF4 = true;
 
         internal bool IsResizing { get; set; }
+        
 
         #region Events
 
@@ -146,6 +220,38 @@ namespace Microsoft.Xna.Framework.Windows
                 case WM_EXITSIZEMOVE:
                     IsResizing = false;
                     break;
+#if DIRECTX && WINDOWS
+                case WindowMessage.ImeSetContext:
+                    if (m.WParam.ToInt32() == 1)
+                    {
+                        IMM.ImmAssociateContext(Handle, _window.Himc);
+                    }
+                    break;
+                case WindowMessage.InputLanguageChange:
+                    // Don't pass this message to base class!
+                    return;
+                case WM_GETDLGCODE:
+                    m.Result = (IntPtr)DLGC_WANTALLKEYS;
+                    return;
+
+                case WindowMessage.ImeStartCompostition:
+                    m.Result = (IntPtr) 0;
+                    var startSize = IMM.ImmGetCompositionString(_window.Himc, GCS_COMPSTR, null, 0);
+
+                    var startBuffer = new byte[startSize];
+                    IMM.ImmGetCompositionString(_window.Himc, GCS_RESULTSTR, startBuffer, startSize);
+                    _window.StartTextComposition(new TextCompositionEventArgs(Encoding.Unicode.GetString(startBuffer),
+                        GetCursorPos(_window.Himc)));
+                    return;
+                case WindowMessage.ImeEndComposition:
+                    var endSize = IMM.ImmGetCompositionString(_window.Himc, GCS_COMPSTR, null, 0);
+
+                    var endBuffer = new byte[endSize];
+                    IMM.ImmGetCompositionString(_window.Himc, GCS_RESULTSTR, endBuffer, endSize);
+                    _window.StopTextComposition(new TextCompositionEventArgs(Encoding.Unicode.GetString(endBuffer),
+                        GetCursorPos(_window.Himc)));
+                    break;
+#endif
             }
 
             if (state != TouchLocationState.Invalid)
@@ -160,6 +266,19 @@ namespace Microsoft.Xna.Framework.Windows
             }
 
             base.WndProc(ref m);
+        }
+        
+        private Point GetCursorPos(IntPtr hWnd)
+        {
+            var lParam = 0;
+            const int wParam = 0;
+            var i = SendMessage(hWnd, EM_GETSEL, wParam, ref lParam);
+            var j = i / 65536;
+            var lineNo = SendMessage(hWnd, EM_LINEFROMCHAR, j, ref lParam) + 1;
+            var k = SendMessage(hWnd, EM_LINEINDEX, -1, ref lParam);
+            var colNo = j - k + 1;
+            var ret = new Point(lineNo, colNo);
+            return ret;
         }
     }
 }
