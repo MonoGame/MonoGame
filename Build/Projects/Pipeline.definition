@@ -20,13 +20,13 @@
 
     <FrameworkVersions>
       <Platform Name="Windows">
-        <Version>v4.6.2</Version>
+        <Version>v4.5</Version>
       </Platform>
       <Platform Name="MacOS">
-        <Version>v4.6.2</Version>
+        <Version>v4.5</Version>
       </Platform>
       <Platform Name="Linux">
-        <Version>v4.6.2</Version>
+        <Version>v4.5</Version>
       </Platform>
     </FrameworkVersions>
     
