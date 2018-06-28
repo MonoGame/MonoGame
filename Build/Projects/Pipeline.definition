@@ -21,15 +21,13 @@
     <FrameworkVersions>
       <Platform Name="Windows">
         <Version>v4.7.1</Version>
-      </Platform>
-      <!--
+      </Platform>      
       <Platform Name="MacOS">
-        <Version>4.0</Version>
+        <Version>v4.7.1</Version>
       </Platform>
       <Platform Name="Linux">
-        <Version>4.0</Version>
-      </Platform>
-      -->
+        <Version>v4.7.1</Version>
+      </Platform>      
     </FrameworkVersions>
     
     <LangVersion>Default</LangVersion>
