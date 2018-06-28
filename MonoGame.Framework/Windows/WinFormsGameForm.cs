@@ -236,20 +236,35 @@ namespace Microsoft.Xna.Framework.Windows
 
                 case WindowMessage.ImeStartCompostition:
                     m.Result = (IntPtr) 0;
-                    var startSize = IMM.ImmGetCompositionString(_window.Himc, GCS_COMPSTR, null, 0);
+                    CandidateList candidate;
+                    IntPtr ptr;
 
+                    var startSize = IMM.ImmGetCompositionString(_window.Himc, GCS_COMPSTR, null, 0);
+                    var candidateSize = IMM.ImmGetCandidateList(_window.Himc, 0, IntPtr.Zero, 0);
+                    ptr = Marshal.AllocHGlobal(startSize);
+                    IMM.ImmGetCandidateList(_window.Himc, 0, ptr, candidateSize);
+                    candidate = (CandidateList)Marshal.PtrToStructure(ptr, typeof(CandidateList));
+                    Marshal.FreeHGlobal(ptr);
                     var startBuffer = new byte[startSize];
                     IMM.ImmGetCompositionString(_window.Himc, GCS_RESULTSTR, startBuffer, startSize);
                     _window.StartTextComposition(new TextCompositionEventArgs(Encoding.Unicode.GetString(startBuffer),
-                        GetCursorPos(_window.Himc)));
+                        GetCursorPos(_window.Himc), candidate));
                     return;
                 case WindowMessage.ImeEndComposition:
+                    CandidateList endCandidate;
+                    IntPtr endPtr;
+
                     var endSize = IMM.ImmGetCompositionString(_window.Himc, GCS_COMPSTR, null, 0);
+                    var endCandidateSize = IMM.ImmGetCandidateList(_window.Himc, 0, IntPtr.Zero, 0);
+                    endPtr = Marshal.AllocHGlobal(endSize);
+                    IMM.ImmGetCandidateList(_window.Himc, 0, endPtr, endCandidateSize);
+                    endCandidate = (CandidateList)Marshal.PtrToStructure(endPtr, typeof(CandidateList));
+                    Marshal.FreeHGlobal(endPtr);
 
                     var endBuffer = new byte[endSize];
                     IMM.ImmGetCompositionString(_window.Himc, GCS_RESULTSTR, endBuffer, endSize);
                     _window.StopTextComposition(new TextCompositionEventArgs(Encoding.Unicode.GetString(endBuffer),
-                        GetCursorPos(_window.Himc)));
+                        GetCursorPos(_window.Himc), endCandidate));
                     break;
 #endif
             }
