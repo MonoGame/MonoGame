@@ -17,17 +17,17 @@
   </References>
 
   <Properties>
-    
+
     <FrameworkVersions>
       <Platform Name="Windows">
         <Version>v4.7.1</Version>
-      </Platform>      
+      </Platform>
       <Platform Name="MacOS">
-        <Version>v4.7.1</Version>
+        <Version>v4.5</Version>
       </Platform>
       <Platform Name="Linux">
-        <Version>v4.7.1</Version>
-      </Platform>      
+        <Version>v4.5</Version>
+      </Platform>
     </FrameworkVersions>
     
     <LangVersion>Default</LangVersion>
