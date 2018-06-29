@@ -307,6 +307,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 string version = GL.GetString(StringName.Version);
 
+                System.Console.WriteLine("OpenGL Version " + version);
+
                 if (string.IsNullOrEmpty(version))
                     throw new NoSuitableGraphicsDeviceException("Unable to retrieve OpenGL version");
 
