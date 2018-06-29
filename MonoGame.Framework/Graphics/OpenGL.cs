@@ -1032,7 +1032,7 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
         internal delegate void BlendFuncSeparateiDelegate(int buffer, BlendingFactorSrc colorSrc, BlendingFactorDest colorDst,
-    BlendingFactorSrc alphaSrc, BlendingFactorDest alphaDst);
+            BlendingFactorSrc alphaSrc, BlendingFactorDest alphaDst);
         internal static BlendFuncSeparateiDelegate BlendFuncSeparatei;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
