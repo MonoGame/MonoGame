@@ -3,9 +3,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace MonoGame.Utilities
+namespace StbSharp
 {
-    unsafe partial class Imaging
+    unsafe partial class StbImageWrite
     {
         public static ushort[] lengthc =
         {
@@ -147,15 +147,16 @@ namespace MonoGame.Utilities
             {59, 6}, {1016, 10}, {65430, 16}, {65431, 16}, {65432, 16}, {65433, 16}, {65434, 16}, {65435, 16},
             {65436, 16},
             {65437, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {122, 7}, {2039, 11}, {65438, 16}, {65439, 16},
-            {65440, 16}, {65441, 16}, {65442, 16}, {65443, 16}, {65444, 16}, {65445, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
-            {0, 0},
+            {65440, 16}, {65441, 16}, {65442, 16}, {65443, 16}, {65444, 16}, {65445, 16}, {0, 0}, {0, 0}, {0, 0},
+            {0, 0}, {0, 0},
             {0, 0}, {123, 7}, {4086, 12}, {65446, 16}, {65447, 16}, {65448, 16}, {65449, 16}, {65450, 16}, {65451, 16},
             {65452, 16}, {65453, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {250, 8}, {4087, 12}, {65454, 16},
             {65455, 16}, {65456, 16}, {65457, 16}, {65458, 16}, {65459, 16}, {65460, 16}, {65461, 16}, {0, 0}, {0, 0},
             {0, 0},
             {0, 0}, {0, 0}, {0, 0}, {504, 9}, {32704, 15}, {65462, 16}, {65463, 16}, {65464, 16}, {65465, 16},
             {65466, 16},
-            {65467, 16}, {65468, 16}, {65469, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {505, 9}, {65470, 16},
+            {65467, 16}, {65468, 16}, {65469, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {505, 9},
+            {65470, 16},
             {65471, 16}, {65472, 16}, {65473, 16}, {65474, 16}, {65475, 16}, {65476, 16}, {65477, 16}, {65478, 16},
             {0, 0},
             {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {506, 9}, {65479, 16}, {65480, 16}, {65481, 16}, {65482, 16},
@@ -172,8 +173,8 @@ namespace MonoGame.Utilities
             {65513, 16},
             {65514, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {65515, 16}, {65516, 16}, {65517, 16},
             {65518, 16},
-            {65519, 16}, {65520, 16}, {65521, 16}, {65522, 16}, {65523, 16}, {65524, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
-            {0, 0},
+            {65519, 16}, {65520, 16}, {65521, 16}, {65522, 16}, {65523, 16}, {65524, 16}, {0, 0}, {0, 0}, {0, 0},
+            {0, 0}, {0, 0},
             {2041, 11}, {65525, 16}, {65526, 16}, {65527, 16}, {65528, 16}, {65529, 16}, {65530, 16}, {65531, 16},
             {65532, 16},
             {65533, 16}, {65534, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}
@@ -182,7 +183,8 @@ namespace MonoGame.Utilities
         public static ushort[,] UVAC_HT =
         {
             {0, 2}, {1, 2}, {4, 3}, {10, 4}, {24, 5}, {25, 5}, {56, 6}, {120, 7}, {500, 9},
-            {1014, 10}, {4084, 12}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {11, 4}, {57, 6}, {246, 8}, {501, 9},
+            {1014, 10}, {4084, 12}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {11, 4}, {57, 6}, {246, 8},
+            {501, 9},
             {2038, 11}, {4085, 12}, {65416, 16}, {65417, 16}, {65418, 16}, {65419, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
             {0, 0},
             {0, 0}, {26, 5}, {247, 8}, {1015, 10}, {4086, 12}, {32706, 15}, {65420, 16}, {65421, 16}, {65422, 16},
@@ -191,33 +193,37 @@ namespace MonoGame.Utilities
             {65425, 16},
             {65426, 16}, {65427, 16}, {65428, 16}, {65429, 16}, {65430, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
             {0, 0},
-            {58, 6}, {502, 9}, {65431, 16}, {65432, 16}, {65433, 16}, {65434, 16}, {65435, 16}, {65436, 16}, {65437, 16},
+            {58, 6}, {502, 9}, {65431, 16}, {65432, 16}, {65433, 16}, {65434, 16}, {65435, 16}, {65436, 16},
+            {65437, 16},
             {65438, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {59, 6}, {1017, 10}, {65439, 16}, {65440, 16},
-            {65441, 16}, {65442, 16}, {65443, 16}, {65444, 16}, {65445, 16}, {65446, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
-            {0, 0},
+            {65441, 16}, {65442, 16}, {65443, 16}, {65444, 16}, {65445, 16}, {65446, 16}, {0, 0}, {0, 0}, {0, 0},
+            {0, 0}, {0, 0},
             {0, 0}, {121, 7}, {2039, 11}, {65447, 16}, {65448, 16}, {65449, 16}, {65450, 16}, {65451, 16}, {65452, 16},
             {65453, 16}, {65454, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {122, 7}, {2040, 11}, {65455, 16},
             {65456, 16}, {65457, 16}, {65458, 16}, {65459, 16}, {65460, 16}, {65461, 16}, {65462, 16}, {0, 0}, {0, 0},
             {0, 0},
             {0, 0}, {0, 0}, {0, 0}, {249, 8}, {65463, 16}, {65464, 16}, {65465, 16}, {65466, 16}, {65467, 16},
             {65468, 16},
-            {65469, 16}, {65470, 16}, {65471, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {503, 9}, {65472, 16},
+            {65469, 16}, {65470, 16}, {65471, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {503, 9},
+            {65472, 16},
             {65473, 16}, {65474, 16}, {65475, 16}, {65476, 16}, {65477, 16}, {65478, 16}, {65479, 16}, {65480, 16},
             {0, 0},
             {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {504, 9}, {65481, 16}, {65482, 16}, {65483, 16}, {65484, 16},
             {65485, 16},
-            {65486, 16}, {65487, 16}, {65488, 16}, {65489, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {505, 9},
+            {65486, 16}, {65487, 16}, {65488, 16}, {65489, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
+            {505, 9},
             {65490, 16}, {65491, 16}, {65492, 16}, {65493, 16}, {65494, 16}, {65495, 16}, {65496, 16}, {65497, 16},
             {65498, 16},
-            {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {506, 9}, {65499, 16}, {65500, 16}, {65501, 16}, {65502, 16},
+            {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {506, 9}, {65499, 16}, {65500, 16}, {65501, 16},
+            {65502, 16},
             {65503, 16}, {65504, 16}, {65505, 16}, {65506, 16}, {65507, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
             {0, 0},
             {2041, 11}, {65508, 16}, {65509, 16}, {65510, 16}, {65511, 16}, {65512, 16}, {65513, 16}, {65514, 16},
             {65515, 16},
             {65516, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {16352, 14}, {65517, 16}, {65518, 16},
             {65519, 16},
-            {65520, 16}, {65521, 16}, {65522, 16}, {65523, 16}, {65524, 16}, {65525, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
-            {0, 0},
+            {65520, 16}, {65521, 16}, {65522, 16}, {65523, 16}, {65524, 16}, {65525, 16}, {0, 0}, {0, 0}, {0, 0},
+            {0, 0}, {0, 0},
             {1018, 10}, {32707, 15}, {65526, 16}, {65527, 16}, {65528, 16}, {65529, 16}, {65530, 16}, {65531, 16},
             {65532, 16},
             {65533, 16}, {65534, 16}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}
@@ -241,9 +247,9 @@ namespace MonoGame.Utilities
 
         public static float[] aasf =
         {
-            1.0f*2.828427125f, 1.387039845f*2.828427125f, 1.306562965f*2.828427125f,
-            1.175875602f*2.828427125f, 1.0f*2.828427125f, 0.785694958f*2.828427125f, 0.541196100f*2.828427125f,
-            0.275899379f*2.828427125f
+            1.0f * 2.828427125f, 1.387039845f * 2.828427125f, 1.306562965f * 2.828427125f,
+            1.175875602f * 2.828427125f, 1.0f * 2.828427125f, 0.785694958f * 2.828427125f, 0.541196100f * 2.828427125f,
+            0.275899379f * 2.828427125f
         };
 
         public static byte[] head0 =
@@ -292,11 +298,13 @@ namespace MonoGame.Utilities
                     {
                         for (k = (int) (0); (k) < (3); ++k)
                         {
-                            px[k] = (byte) (bg[k] + ((d[k] - bg[k])*d[3])/255);
+                            px[k] = (byte) (bg[k] + ((d[k] - bg[k]) * d[3]) / 255);
                         }
+
                         stbiw__write3(s, (byte) (px[1 - rgb_dir]), (byte) (px[1]), (byte) (px[1 + rgb_dir]));
                         break;
                     }
+
                     stbiw__write3(s, (byte) (d[1 - rgb_dir]), (byte) (d[1]), (byte) (d[1 + rgb_dir]));
                     break;
             }
@@ -327,25 +335,26 @@ namespace MonoGame.Utilities
             {
                 for (i = (int) (0); (i) < (x); ++i)
                 {
-                    byte* d = (byte*) (data) + (j*x + i)*comp;
+                    byte* d = (byte*) (data) + (j * x + i) * comp;
                     stbiw__write_pixel(s, (int) (rgb_dir), (int) (comp), (int) (write_alpha), (int) (expand_mono), d);
                 }
+
                 s.func(s.context, &zero, (int) (scanline_pad));
             }
         }
 
         public static int stbi_write_bmp_core(stbi__write_context s, int x, int y, int comp, void* data)
         {
-            int pad = (int) ((-x*3) & 3);
+            int pad = (int) ((-x * 3) & 3);
             return
                 (int)
-                    (stbiw__outfile(s, (int) (-1), (int) (-1), (int) (x), (int) (y), (int) (comp), (int) (1), data,
-                        (int) (0),
-                        (int) (pad), "11 4 22 44 44 22 444444", (int) ('B'), (int) ('M'),
-                        (int) (14 + 40 + (x*3 + pad)*y), (int) (0),
-                        (int) (0), (int) (14 + 40), (int) (40), (int) (x), (int) (y), (int) (1), (int) (24), (int) (0),
-                        (int) (0),
-                        (int) (0), (int) (0), (int) (0), (int) (0)));
+                (stbiw__outfile(s, (int) (-1), (int) (-1), (int) (x), (int) (y), (int) (comp), (int) (1), data,
+                    (int) (0),
+                    (int) (pad), "11 4 22 44 44 22 444444", (int) ('B'), (int) ('M'),
+                    (int) (14 + 40 + (x * 3 + pad) * y), (int) (0),
+                    (int) (0), (int) (14 + 40), (int) (40), (int) (x), (int) (y), (int) (1), (int) (24), (int) (0),
+                    (int) (0),
+                    (int) (0), (int) (0), (int) (0), (int) (0)));
         }
 
         public static int stbi_write_tga_core(stbi__write_context s, int x, int y, int comp, void* data)
@@ -358,11 +367,11 @@ namespace MonoGame.Utilities
             {
                 return
                     (int)
-                        (stbiw__outfile(s, (int) (-1), (int) (-1), (int) (x), (int) (y), (int) (comp), (int) (0), data,
-                            (int) (has_alpha),
-                            (int) (0), "111 221 2222 11", (int) (0), (int) (0), (int) (format), (int) (0), (int) (0),
-                            (int) (0), (int) (0),
-                            (int) (0), (int) (x), (int) (y), (int) ((colorbytes + has_alpha)*8), (int) (has_alpha*8)));
+                    (stbiw__outfile(s, (int) (-1), (int) (-1), (int) (x), (int) (y), (int) (comp), (int) (0), data,
+                        (int) (has_alpha),
+                        (int) (0), "111 221 2222 11", (int) (0), (int) (0), (int) (format), (int) (0), (int) (0),
+                        (int) (0), (int) (0),
+                        (int) (0), (int) (x), (int) (y), (int) ((colorbytes + has_alpha) * 8), (int) (has_alpha * 8)));
             }
             else
             {
@@ -371,26 +380,27 @@ namespace MonoGame.Utilities
                 int k;
                 stbiw__writef(s, "111 221 2222 11", (int) (0), (int) (0), (int) (format + 8), (int) (0), (int) (0),
                     (int) (0),
-                    (int) (0), (int) (0), (int) (x), (int) (y), (int) ((colorbytes + has_alpha)*8), (int) (has_alpha*8));
+                    (int) (0), (int) (0), (int) (x), (int) (y), (int) ((colorbytes + has_alpha) * 8),
+                    (int) (has_alpha * 8));
                 for (j = (int) (y - 1); (j) >= (0); --j)
                 {
-                    byte* row = (byte*) (data) + j*x*comp;
+                    byte* row = (byte*) (data) + j * x * comp;
                     int len;
                     for (i = (int) (0); (i) < (x); i += (int) (len))
                     {
-                        byte* begin = row + i*comp;
+                        byte* begin = row + i * comp;
                         int diff = (int) (1);
                         len = (int) (1);
                         if ((i) < (x - 1))
                         {
                             ++len;
-                            diff = (int) (memcmp(begin, row + (i + 1)*comp, (ulong) (comp)));
+                            diff = (int) (CRuntime.memcmp(begin, row + (i + 1) * comp, (ulong) (comp)));
                             if ((diff) != 0)
                             {
                                 byte* prev = begin;
                                 for (k = (int) (i + 2); ((k) < (x)) && ((len) < (128)); ++k)
                                 {
-                                    if ((memcmp(prev, row + k*comp, (ulong) (comp))) != 0)
+                                    if ((CRuntime.memcmp(prev, row + k * comp, (ulong) (comp))) != 0)
                                     {
                                         prev += comp;
                                         ++len;
@@ -406,7 +416,7 @@ namespace MonoGame.Utilities
                             {
                                 for (k = (int) (i + 2); ((k) < (x)) && ((len) < (128)); ++k)
                                 {
-                                    if (memcmp(begin, row + k*comp, (ulong) (comp)) == 0)
+                                    if (CRuntime.memcmp(begin, row + k * comp, (ulong) (comp)) == 0)
                                     {
                                         ++len;
                                     }
@@ -417,6 +427,7 @@ namespace MonoGame.Utilities
                                 }
                             }
                         }
+
                         if ((diff) != 0)
                         {
                             byte header = (byte) ((len - 1) & 0xff);
@@ -424,7 +435,7 @@ namespace MonoGame.Utilities
                             for (k = (int) (0); (k) < (len); ++k)
                             {
                                 stbiw__write_pixel(s, (int) (-1), (int) (comp), (int) (has_alpha), (int) (0),
-                                    begin + k*comp);
+                                    begin + k * comp);
                             }
                         }
                         else
@@ -445,19 +456,19 @@ namespace MonoGame.Utilities
             int exponent;
             float maxcomp =
                 (float)
-                    ((linear[0]) > ((linear[1]) > (linear[2]) ? (linear[1]) : (linear[2]))
-                        ? (linear[0])
-                        : ((linear[1]) > (linear[2]) ? (linear[1]) : (linear[2])));
+                ((linear[0]) > ((linear[1]) > (linear[2]) ? (linear[1]) : (linear[2]))
+                    ? (linear[0])
+                    : ((linear[1]) > (linear[2]) ? (linear[1]) : (linear[2])));
             if ((maxcomp) < (1e-32f))
             {
                 rgbe[0] = (byte) (rgbe[1] = (byte) (rgbe[2] = (byte) (rgbe[3] = (byte) (0))));
             }
             else
             {
-                float normalize = (float) ((float) (frexp((double) (maxcomp), &exponent))*256.0f/maxcomp);
-                rgbe[0] = ((byte) (linear[0]*normalize));
-                rgbe[1] = ((byte) (linear[1]*normalize));
-                rgbe[2] = ((byte) (linear[2]*normalize));
+                float normalize = (float) ((float) (CRuntime.frexp((double) (maxcomp), &exponent)) * 256.0f / maxcomp);
+                rgbe[0] = ((byte) (linear[0] * normalize));
+                rgbe[1] = ((byte) (linear[1] * normalize));
+                rgbe[2] = ((byte) (linear[2] * normalize));
                 rgbe[3] = ((byte) (exponent + 128));
             }
 
@@ -479,8 +490,9 @@ namespace MonoGame.Utilities
 
         public static void* stbiw__sbgrowf(void** arr, int increment, int itemsize)
         {
-            int m = (int) (*arr != null ? 2*((int*) (*arr) - 2)[0] + increment : increment + 1);
-            void* p = realloc(*arr != null ? ((int*) (*arr) - 2) : ((int*) (0)), (ulong) (itemsize*m + sizeof (int)*2));
+            int m = (int) (*arr != null ? 2 * ((int*) (*arr) - 2)[0] + increment : increment + 1);
+            void* p = CRuntime.realloc(*arr != null ? ((int*) (*arr) - 2) : ((int*) (0)),
+                (ulong) (itemsize * m + sizeof(int) * 2));
             if ((p) != null)
             {
                 if (*arr == null) ((int*) (p))[1] = (int) (0);
@@ -497,12 +509,14 @@ namespace MonoGame.Utilities
             {
                 if ((((data) == null) || ((((int*) (data) - 2)[1] + (1)) >= (((int*) (data) - 2)[0]))))
                 {
-                    stbiw__sbgrowf((void**) (&(data)), (int) (1), sizeof (byte));
+                    stbiw__sbgrowf((void**) (&(data)), (int) (1), sizeof(byte));
                 }
+
                 (data)[((int*) (data) - 2)[1]++] = ((byte) ((*bitbuffer) & 0xff));
                 *bitbuffer >>= 8;
                 *bitcount -= (int) (8);
             }
+
             return data;
         }
 
@@ -514,6 +528,7 @@ namespace MonoGame.Utilities
                 res = (int) ((res << 1) | (code & 1));
                 code >>= 1;
             }
+
             return (int) (res);
         }
 
@@ -524,6 +539,7 @@ namespace MonoGame.Utilities
             {
                 if (a[i] != b[i]) break;
             }
+
             return (uint) (i);
         }
 
@@ -546,17 +562,17 @@ namespace MonoGame.Utilities
             int j;
             int bitcount = (int) (0);
             byte* _out_ = null;
-            byte*** hash_table = (byte***) (malloc((ulong) (16384*sizeof (byte**))));
+            byte*** hash_table = (byte***) (CRuntime.malloc((ulong) (16384 * sizeof(byte**))));
             if ((quality) < (5)) quality = (int) (5);
             if ((((_out_) == null) || ((((int*) (_out_) - 2)[1] + (1)) >= (((int*) (_out_) - 2)[0]))))
             {
-                stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof (byte));
+                stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof(byte));
             }
 
             (_out_)[((int*) (_out_) - 2)[1]++] = (byte) (0x78);
             if ((((_out_) == null) || ((((int*) (_out_) - 2)[1] + (1)) >= (((int*) (_out_) - 2)[0]))))
             {
-                stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof (byte));
+                stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof(byte));
             }
 
             (_out_)[((int*) (_out_) - 2)[1]++] = (byte) (0x5e);
@@ -576,6 +592,7 @@ namespace MonoGame.Utilities
             {
                 hash_table[i] = null;
             }
+
             i = (int) (0);
             while ((i) < (data_len - 3))
             {
@@ -596,16 +613,19 @@ namespace MonoGame.Utilities
                         }
                     }
                 }
-                if (((hash_table[h]) != null) && ((((int*) (hash_table[h]) - 2)[1]) == (2*quality)))
+
+                if (((hash_table[h]) != null) && ((((int*) (hash_table[h]) - 2)[1]) == (2 * quality)))
                 {
-                    memmove(hash_table[h], hash_table[h] + quality, (ulong) (sizeof (byte*)*quality));
+                    CRuntime.memmove(hash_table[h], hash_table[h] + quality, (ulong) (sizeof(byte*) * quality));
                     ((int*) (hash_table[h]) - 2)[1] = (int) (quality);
                 }
+
                 if ((((hash_table[h]) == null) ||
                      ((((int*) (hash_table[h]) - 2)[1] + (1)) >= (((int*) (hash_table[h]) - 2)[0]))))
                 {
-                    stbiw__sbgrowf((void**) (&(hash_table[h])), (int) (1), sizeof (byte*));
+                    stbiw__sbgrowf((void**) (&(hash_table[h])), (int) (1), sizeof(byte*));
                 }
+
                 (hash_table[h])[((int*) (hash_table[h]) - 2)[1]++] = (data + i);
                 if ((bestloc) != null)
                 {
@@ -625,12 +645,14 @@ namespace MonoGame.Utilities
                         }
                     }
                 }
+
                 if ((bestloc) != null)
                 {
                     int d = (int) (data + i - bestloc);
                     for (j = (int) (0); (best) > (lengthc[j + 1] - 1); ++j)
                     {
                     }
+
                     if (j + 257 <= 143)
                     {
                         bitbuf |= (uint) ((stbiw__zlib_bitrev((int) (0x30 + (j + 257)), (int) (8))) << bitcount);
@@ -655,15 +677,18 @@ namespace MonoGame.Utilities
                         bitcount += (int) (8);
                         _out_ = stbiw__zlib_flushf(_out_, &bitbuf, &bitcount);
                     }
+
                     if ((lengtheb[j]) != 0)
                     {
                         bitbuf |= (uint) ((best - lengthc[j]) << bitcount);
                         bitcount += (int) (lengtheb[j]);
                         _out_ = stbiw__zlib_flushf(_out_, &bitbuf, &bitcount);
                     }
+
                     for (j = (int) (0); (d) > (distc[j + 1] - 1); ++j)
                     {
                     }
+
                     {
                         bitbuf |= (uint) ((stbiw__zlib_bitrev((int) (j), (int) (5))) << bitcount);
                         bitcount += (int) (5);
@@ -675,6 +700,7 @@ namespace MonoGame.Utilities
                         bitcount += (int) (disteb[j]);
                         _out_ = stbiw__zlib_flushf(_out_, &bitbuf, &bitcount);
                     }
+
                     i += (int) (best);
                 }
                 else
@@ -691,9 +717,11 @@ namespace MonoGame.Utilities
                         bitcount += (int) (9);
                         _out_ = stbiw__zlib_flushf(_out_, &bitbuf, &bitcount);
                     }
+
                     ++i;
                 }
             }
+
             for (; (i) < (data_len); ++i)
             {
                 if (data[i] <= 143)
@@ -709,6 +737,7 @@ namespace MonoGame.Utilities
                     _out_ = stbiw__zlib_flushf(_out_, &bitbuf, &bitcount);
                 }
             }
+
             if (256 <= 143)
             {
                 bitbuf |= (uint) ((stbiw__zlib_bitrev((int) (0x30 + (256)), (int) (8))) << bitcount);
@@ -740,18 +769,20 @@ namespace MonoGame.Utilities
                 bitcount += (int) (1);
                 _out_ = stbiw__zlib_flushf(_out_, &bitbuf, &bitcount);
             }
+
             for (i = (int) (0); (i) < (16384); ++i)
             {
                 if ((hash_table[i]) != null)
                 {
-                    free(((int*) (hash_table[i]) - 2));
+                    CRuntime.free(((int*) (hash_table[i]) - 2));
                 }
             }
-            free(hash_table);
+
+            CRuntime.free(hash_table);
             {
                 uint s1 = (uint) (1);
                 uint s2 = (uint) (0);
-                int blocklen = (int) (data_len%5552);
+                int blocklen = (int) (data_len % 5552);
                 j = (int) (0);
                 while ((j) < (data_len))
                 {
@@ -760,35 +791,41 @@ namespace MonoGame.Utilities
                         s1 += (uint) (data[j + i]);
                         s2 += (uint) (s1);
                     }
+
                     s1 %= (uint) (65521);
                     s2 %= (uint) (65521);
                     j += (int) (blocklen);
                     blocklen = (int) (5552);
                 }
+
                 if ((((_out_) == null) || ((((int*) (_out_) - 2)[1] + (1)) >= (((int*) (_out_) - 2)[0]))))
                 {
-                    stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof (byte));
+                    stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof(byte));
                 }
+
                 (_out_)[((int*) (_out_) - 2)[1]++] = ((byte) ((s2 >> 8) & 0xff));
                 if ((((_out_) == null) || ((((int*) (_out_) - 2)[1] + (1)) >= (((int*) (_out_) - 2)[0]))))
                 {
-                    stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof (byte));
+                    stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof(byte));
                 }
+
                 (_out_)[((int*) (_out_) - 2)[1]++] = ((byte) ((s2) & 0xff));
                 if ((((_out_) == null) || ((((int*) (_out_) - 2)[1] + (1)) >= (((int*) (_out_) - 2)[0]))))
                 {
-                    stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof (byte));
+                    stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof(byte));
                 }
+
                 (_out_)[((int*) (_out_) - 2)[1]++] = ((byte) ((s1 >> 8) & 0xff));
                 if ((((_out_) == null) || ((((int*) (_out_) - 2)[1] + (1)) >= (((int*) (_out_) - 2)[0]))))
                 {
-                    stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof (byte));
+                    stbiw__sbgrowf((void**) (&(_out_)), (int) (1), sizeof(byte));
                 }
+
                 (_out_)[((int*) (_out_) - 2)[1]++] = ((byte) ((s1) & 0xff));
             }
 
             *out_len = (int) (((int*) (_out_) - 2)[1]);
-            memmove(((int*) (_out_) - 2), _out_, (ulong) (*out_len));
+            CRuntime.memmove(((int*) (_out_) - 2), _out_, (ulong) (*out_len));
             return (byte*) ((int*) (_out_) - 2);
         }
 
@@ -800,6 +837,7 @@ namespace MonoGame.Utilities
             {
                 crc = (uint) ((crc >> 8) ^ crc_table[buffer[i] ^ (crc & 0xff)]);
             }
+
             return (uint) (~crc);
         }
 
@@ -816,9 +854,9 @@ namespace MonoGame.Utilities
         public static byte stbiw__paeth(int a, int b, int c)
         {
             int p = (int) (a + b - c);
-            int pa = (int) (abs((int) (p - a)));
-            int pb = (int) (abs((int) (p - b)));
-            int pc = (int) (abs((int) (p - c)));
+            int pa = (int) (CRuntime.abs((int) (p - a)));
+            int pb = (int) (CRuntime.abs((int) (p - b)));
+            int pc = (int) (CRuntime.abs((int) (p - c)));
             if ((pa <= pb) && (pa <= pc)) return (byte) ((a) & 0xff);
             if (pb <= pc) return (byte) ((b) & 0xff);
             return (byte) ((c) & 0xff);
@@ -853,13 +891,13 @@ namespace MonoGame.Utilities
             int k;
             int p;
             int zlen;
-            if ((stride_bytes) == (0)) stride_bytes = (int) (x*n);
-            filt = (byte*) (malloc((ulong) ((x*n + 1)*y)));
+            if ((stride_bytes) == (0)) stride_bytes = (int) (x * n);
+            filt = (byte*) (CRuntime.malloc((ulong) ((x * n + 1) * y)));
             if (filt == null) return null;
-            line_buffer = (sbyte*) (malloc((ulong) (x*n)));
+            line_buffer = (sbyte*) (CRuntime.malloc((ulong) (x * n)));
             if (line_buffer == null)
             {
-                free(filt);
+                CRuntime.free(filt);
                 return null;
             }
 
@@ -886,7 +924,7 @@ namespace MonoGame.Utilities
                     {
                         int type = (int) (mymap[k]);
                         int est = (int) (0);
-                        byte* z = pixels + stride_bytes*j;
+                        byte* z = pixels + stride_bytes * j;
                         for (i = (int) (0); (i) < (n); ++i)
                         {
                             switch (type)
@@ -905,8 +943,8 @@ namespace MonoGame.Utilities
                                     break;
                                 case 4:
                                     line_buffer[i] =
-                                        ((sbyte)
-                                            (z[i] - stbiw__paeth((int) (0), (int) (z[i - stride_bytes]), (int) (0))));
+                                        ((sbyte) (z[i] - stbiw__paeth((int) (0), (int) (z[i - stride_bytes]),
+                                                      (int) (0))));
                                     break;
                                 case 5:
                                     line_buffer[i] = (sbyte) (z[i]);
@@ -916,7 +954,8 @@ namespace MonoGame.Utilities
                                     break;
                             }
                         }
-                        for (i = (int) (n); (i) < (x*n); ++i)
+
+                        for (i = (int) (n); (i) < (x * n); ++i)
                         {
                             switch (type)
                             {
@@ -934,10 +973,8 @@ namespace MonoGame.Utilities
                                     break;
                                 case 4:
                                     line_buffer[i] =
-                                        (sbyte)
-                                            (z[i] -
-                                             stbiw__paeth((int) (z[i - n]), (int) (z[i - stride_bytes]),
-                                                 (int) (z[i - stride_bytes - n])));
+                                        (sbyte) (z[i] - stbiw__paeth((int) (z[i - n]), (int) (z[i - stride_bytes]),
+                                                     (int) (z[i - stride_bytes - n])));
                                     break;
                                 case 5:
                                     line_buffer[i] = (sbyte) (z[i] - (z[i - n] >> 1));
@@ -948,11 +985,13 @@ namespace MonoGame.Utilities
                                     break;
                             }
                         }
+
                         if ((p) != 0) break;
-                        for (i = (int) (0); (i) < (x*n); ++i)
+                        for (i = (int) (0); (i) < (x * n); ++i)
                         {
-                            est += (int) (abs((int) (line_buffer[i])));
+                            est += (int) (CRuntime.abs((int) (line_buffer[i])));
                         }
+
                         if ((est) < (bestval))
                         {
                             bestval = (int) (est);
@@ -960,18 +999,20 @@ namespace MonoGame.Utilities
                         }
                     }
                 }
-                filt[j*(x*n + 1)] = ((byte) (best));
-                memmove(filt + j*(x*n + 1) + 1, line_buffer, (ulong) (x*n));
+
+                filt[j * (x * n + 1)] = ((byte) (best));
+                CRuntime.memmove(filt + j * (x * n + 1) + 1, line_buffer, (ulong) (x * n));
             }
-            free(line_buffer);
-            zlib = stbi_zlib_compress(filt, (int) (y*(x*n + 1)), &zlen, (int) (8));
-            free(filt);
+
+            CRuntime.free(line_buffer);
+            zlib = stbi_zlib_compress(filt, (int) (y * (x * n + 1)), &zlen, (int) (8));
+            CRuntime.free(filt);
             if (zlib == null) return null;
-            _out_ = (byte*) (malloc((ulong) (8 + 12 + 13 + 12 + zlen + 12)));
+            _out_ = (byte*) (CRuntime.malloc((ulong) (8 + 12 + 13 + 12 + zlen + 12)));
             if (_out_ == null) return null;
             *out_len = (int) (8 + 12 + 13 + 12 + zlen + 12);
             o = _out_;
-            memmove(o, sig, (ulong) (8));
+            CRuntime.memmove(o, sig, (ulong) (8));
             o += 8;
             (o)[0] = ((byte) (((13) >> 24) & 0xff));
             (o)[1] = ((byte) (((13) >> 16) & 0xff));
@@ -1009,9 +1050,9 @@ namespace MonoGame.Utilities
             (o)[2] = ((byte) (("IDAT"[2]) & 0xff));
             (o)[3] = ((byte) (("IDAT"[3]) & 0xff));
             (o) += 4;
-            memmove(o, zlib, (ulong) (zlen));
+            CRuntime.memmove(o, zlib, (ulong) (zlen));
             o += zlen;
-            free(zlib);
+            CRuntime.free(zlib);
             stbiw__wpcrc(&o, (int) (zlen));
             (o)[0] = ((byte) (((0) >> 24) & 0xff));
             (o)[1] = ((byte) (((0) >> 16) & 0xff));
@@ -1042,9 +1083,11 @@ namespace MonoGame.Utilities
                 {
                     stbiw__putc(s, (byte) (0));
                 }
+
                 bitBuf <<= 8;
                 bitCnt -= (int) (8);
             }
+
             *bitBufP = (int) (bitBuf);
             *bitCntP = (int) (bitCnt);
         }
@@ -1082,16 +1125,16 @@ namespace MonoGame.Utilities
             float tmp12 = (float) (tmp1 - tmp2);
             d0 = (float) (tmp10 + tmp11);
             d4 = (float) (tmp10 - tmp11);
-            z1 = (float) ((tmp12 + tmp13)*0.707106781f);
+            z1 = (float) ((tmp12 + tmp13) * 0.707106781f);
             d2 = (float) (tmp13 + z1);
             d6 = (float) (tmp13 - z1);
             tmp10 = (float) (tmp4 + tmp5);
             tmp11 = (float) (tmp5 + tmp6);
             tmp12 = (float) (tmp6 + tmp7);
-            z5 = (float) ((tmp10 - tmp12)*0.382683433f);
-            z2 = (float) (tmp10*0.541196100f + z5);
-            z4 = (float) (tmp12*1.306562965f + z5);
-            z3 = (float) (tmp11*0.707106781f);
+            z5 = (float) ((tmp10 - tmp12) * 0.382683433f);
+            z2 = (float) (tmp10 * 0.541196100f + z5);
+            z4 = (float) (tmp12 * 1.306562965f + z5);
+            z3 = (float) (tmp11 * 0.707106781f);
             z11 = (float) (tmp7 + z3);
             z13 = (float) (tmp7 - z3);
             *d5p = (float) (z13 + z2);
@@ -1113,10 +1156,12 @@ namespace MonoGame.Utilities
             {
                 ++bits[1];
             }
+
             bits[0] = (ushort) (val & ((1 << bits[1]) - 1));
         }
 
-        public static int stbiw__jpg_processDU(stbi__write_context s, int* bitBuf, int* bitCnt, float* CDU, float* fdtbl,
+        public static int stbiw__jpg_processDU(stbi__write_context s, int* bitBuf, int* bitCnt, float* CDU,
+            float* fdtbl,
             int DC, ushort[,] HTDC, ushort[,] HTAC)
         {
             ushort* EOB = stackalloc ushort[2];
@@ -1134,20 +1179,24 @@ namespace MonoGame.Utilities
             int* DU = stackalloc int[64];
             for (dataOff = (int) (0); (dataOff) < (64); dataOff += (int) (8))
             {
-                stbiw__jpg_DCT(&CDU[dataOff], &CDU[dataOff + 1], &CDU[dataOff + 2], &CDU[dataOff + 3], &CDU[dataOff + 4],
+                stbiw__jpg_DCT(&CDU[dataOff], &CDU[dataOff + 1], &CDU[dataOff + 2], &CDU[dataOff + 3],
+                    &CDU[dataOff + 4],
                     &CDU[dataOff + 5], &CDU[dataOff + 6], &CDU[dataOff + 7]);
             }
+
             for (dataOff = (int) (0); (dataOff) < (8); ++dataOff)
             {
                 stbiw__jpg_DCT(&CDU[dataOff], &CDU[dataOff + 8], &CDU[dataOff + 16], &CDU[dataOff + 24],
                     &CDU[dataOff + 32],
                     &CDU[dataOff + 40], &CDU[dataOff + 48], &CDU[dataOff + 56]);
             }
+
             for (i = (int) (0); (i) < (64); ++i)
             {
-                float v = (float) (CDU[i]*fdtbl[i]);
+                float v = (float) (CDU[i] * fdtbl[i]);
                 DU[stbiw__jpg_ZigZag[i]] = ((int) ((v) < (0) ? v - 0.5f : v + 0.5f));
             }
+
             diff = (int) (DU[0] - DC);
             if ((diff) == (0))
             {
@@ -1165,6 +1214,7 @@ namespace MonoGame.Utilities
             for (; ((end0pos) > (0)) && ((DU[end0pos]) == (0)); --end0pos)
             {
             }
+
             if ((end0pos) == (0))
             {
                 stbiw__jpg_writeBits(s, bitBuf, bitCnt, EOB[0], EOB[1]);
@@ -1179,6 +1229,7 @@ namespace MonoGame.Utilities
                 for (; ((DU[i]) == (0)) && (i <= end0pos); ++i)
                 {
                 }
+
                 nrzeroes = (int) (i - startpos);
                 if ((nrzeroes) >= (16))
                 {
@@ -1188,13 +1239,16 @@ namespace MonoGame.Utilities
                     {
                         stbiw__jpg_writeBits(s, bitBuf, bitCnt, M16zeroes[0], M16zeroes[1]);
                     }
+
                     nrzeroes &= (int) (15);
                 }
+
                 stbiw__jpg_calcBits((int) (DU[i]), bits);
                 stbiw__jpg_writeBits(s, bitBuf, bitCnt, HTAC[(nrzeroes << 4) + bits[1], 0],
                     HTAC[(nrzeroes << 4) + bits[1], 1]);
                 stbiw__jpg_writeBits(s, bitBuf, bitCnt, bits[0], bits[1]);
             }
+
             if (end0pos != 63)
             {
                 stbiw__jpg_writeBits(s, bitBuf, bitCnt, EOB[0], EOB[1]);
@@ -1221,23 +1275,25 @@ namespace MonoGame.Utilities
 
             quality = (int) ((quality) != 0 ? quality : 90);
             quality = (int) ((quality) < (1) ? 1 : (quality) > (100) ? 100 : quality);
-            quality = (int) ((quality) < (50) ? 5000/quality : 200 - quality*2);
+            quality = (int) ((quality) < (50) ? 5000 / quality : 200 - quality * 2);
             for (i = (int) (0); (i) < (64); ++i)
             {
                 int uvti;
-                int yti = (int) ((YQT[i]*quality + 50)/100);
+                int yti = (int) ((YQT[i] * quality + 50) / 100);
                 YTable[stbiw__jpg_ZigZag[i]] = ((byte) ((yti) < (1) ? 1 : (yti) > (255) ? 255 : yti));
-                uvti = (int) ((UVQT[i]*quality + 50)/100);
+                uvti = (int) ((UVQT[i] * quality + 50) / 100);
                 UVTable[stbiw__jpg_ZigZag[i]] = ((byte) ((uvti) < (1) ? 1 : (uvti) > (255) ? 255 : uvti));
             }
-            for (row = (int) (0) , k = (int) (0); (row) < (8); ++row)
+
+            for (row = (int) (0), k = (int) (0); (row) < (8); ++row)
             {
-                for (col = (int) (0); (col) < (8); ++col , ++k)
+                for (col = (int) (0); (col) < (8); ++col, ++k)
                 {
-                    fdtbl_Y[k] = (float) (1/(YTable[stbiw__jpg_ZigZag[k]]*aasf[row]*aasf[col]));
-                    fdtbl_UV[k] = (float) (1/(UVTable[stbiw__jpg_ZigZag[k]]*aasf[row]*aasf[col]));
+                    fdtbl_Y[k] = (float) (1 / (YTable[stbiw__jpg_ZigZag[k]] * aasf[row] * aasf[col]));
+                    fdtbl_UV[k] = (float) (1 / (UVTable[stbiw__jpg_ZigZag[k]] * aasf[row] * aasf[col]));
                 }
             }
+
             {
                 byte* head1 = stackalloc byte[24];
                 head1[0] = (byte) (0xFF);
@@ -1352,41 +1408,42 @@ namespace MonoGame.Utilities
                 {
                     for (x = (int) (0); (x) < (width); x += (int) (8))
                     {
-                        for (row = (int) (y) , pos = (int) (0); (row) < (y + 8); ++row)
+                        for (row = (int) (y), pos = (int) (0); (row) < (y + 8); ++row)
                         {
-                            for (col = (int) (x); (col) < (x + 8); ++col , ++pos)
+                            for (col = (int) (x); (col) < (x + 8); ++col, ++pos)
                             {
-                                int p = (int) (row*width*comp + col*comp);
+                                int p = (int) (row * width * comp + col * comp);
                                 float r;
                                 float g;
                                 float b;
                                 if ((row) >= (height))
                                 {
-                                    p -= (int) (width*comp*(row + 1 - height));
+                                    p -= (int) (width * comp * (row + 1 - height));
                                 }
+
                                 if ((col) >= (width))
                                 {
-                                    p -= (int) (comp*(col + 1 - width));
+                                    p -= (int) (comp * (col + 1 - width));
                                 }
+
                                 r = (float) (imageData[p + 0]);
                                 g = (float) (imageData[p + ofsG]);
                                 b = (float) (imageData[p + ofsB]);
-                                YDU[pos] = (float) (+0.29900f*r + 0.58700f*g + 0.11400f*b - 128);
-                                UDU[pos] = (float) (-0.16874f*r - 0.33126f*g + 0.50000f*b);
-                                VDU[pos] = (float) (+0.50000f*r - 0.41869f*g - 0.08131f*b);
+                                YDU[pos] = (float) (+0.29900f * r + 0.58700f * g + 0.11400f * b - 128);
+                                UDU[pos] = (float) (-0.16874f * r - 0.33126f * g + 0.50000f * b);
+                                VDU[pos] = (float) (+0.50000f * r - 0.41869f * g - 0.08131f * b);
                             }
                         }
 
-                        DCY =
-                            (int) (stbiw__jpg_processDU(s, &bitBuf, &bitCnt, YDU, fdtbl_Y, (int) (DCY), YDC_HT, YAC_HT));
-                        DCU =
-                            (int)
-                                (stbiw__jpg_processDU(s, &bitBuf, &bitCnt, UDU, fdtbl_UV, (int) (DCU), UVDC_HT, UVAC_HT));
-                        DCV =
-                            (int)
-                                (stbiw__jpg_processDU(s, &bitBuf, &bitCnt, VDU, fdtbl_UV, (int) (DCV), UVDC_HT, UVAC_HT));
+                        DCY = (int) (stbiw__jpg_processDU(s, &bitBuf, &bitCnt, YDU, fdtbl_Y, (int) (DCY), YDC_HT,
+                            YAC_HT));
+                        DCU = (int) (stbiw__jpg_processDU(s, &bitBuf, &bitCnt, UDU, fdtbl_UV, (int) (DCU), UVDC_HT,
+                            UVAC_HT));
+                        DCV = (int) (stbiw__jpg_processDU(s, &bitBuf, &bitCnt, VDU, fdtbl_UV, (int) (DCV), UVDC_HT,
+                            UVAC_HT));
                     }
                 }
+
                 stbiw__jpg_writeBits(s, &bitBuf, &bitCnt, fillBits[0], fillBits[1]);
             }
 

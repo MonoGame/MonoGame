@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics.PackedVector;
 using FreeImageAPI;
 using System.IO;
 using MonoGame.Utilities;
+using StbSharp;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -197,7 +198,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             int width, height, comp;
             byte[] data = null;
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-                data = ImageReader.Read(stream, out width, out height, out comp, Imaging.STBI_rgb_alpha);
+                data = ImageReader.Read(stream, out width, out height, out comp, StbImage.STBI_rgb_alpha);
 
             var face = new PixelBitmapContent<Color>(width, height);
             face.SetPixelData(data);

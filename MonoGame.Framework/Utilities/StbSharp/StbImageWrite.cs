@@ -1,8 +1,6 @@
-﻿using System.Text;
-
-namespace MonoGame.Utilities
+﻿namespace StbSharp
 {
-    unsafe partial class Imaging
+    internal static unsafe partial class StbImageWrite
     {
         public static int stbi_write_tga_with_rle = 1;
 
@@ -84,7 +82,7 @@ namespace MonoGame.Utilities
             int y,
             int comp,
             void* data
-            )
+        )
         {
             var s = new stbi__write_context();
             stbi__start_write_callbacks(s, func, context);
@@ -97,7 +95,7 @@ namespace MonoGame.Utilities
             int y,
             int comp,
             void* data
-            )
+        )
         {
             var s = new stbi__write_context();
             stbi__start_write_callbacks(s, func, context);
@@ -111,13 +109,13 @@ namespace MonoGame.Utilities
             int comp,
             void* data,
             int stride_bytes
-            )
+        )
         {
             int len;
             var png = stbi_write_png_to_mem((byte*) (data), stride_bytes, x, y, comp, &len);
             if (png == null) return 0;
             func(context, png, len);
-            free(png);
+            CRuntime.free(png);
             return 1;
         }
 
@@ -128,7 +126,7 @@ namespace MonoGame.Utilities
             int comp,
             void* data,
             int quality
-            )
+        )
         {
             stbi__write_context s = new stbi__write_context();
             stbi__start_write_callbacks(s, func, context);

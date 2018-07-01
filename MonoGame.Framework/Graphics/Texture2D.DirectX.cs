@@ -11,6 +11,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.WIC;
+using StbSharp;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
 using Resource = SharpDX.Direct3D11.Resource;
 
@@ -219,7 +220,7 @@ namespace Microsoft.Xna.Framework.Graphics
             int width, height, channels;
 
             // The data returned is always four channel BGRA
-            var data = ImageReader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
+            var data = ImageReader.Read(stream, out width, out height, out channels, StbImage.STBI_rgb_alpha);
 
             // XNA blacks out any pixels with an alpha of zero.
             if (channels == 4)

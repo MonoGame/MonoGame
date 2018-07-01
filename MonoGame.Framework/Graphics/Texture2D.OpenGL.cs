@@ -19,6 +19,7 @@ using System.Drawing;
 using MonoGame.OpenGL;
 using GLPixelFormat = MonoGame.OpenGL.PixelFormat;
 using PixelFormat = MonoGame.OpenGL.PixelFormat;
+using StbSharp;
 
 #if ANDROID
 using Android.Graphics;
@@ -260,7 +261,7 @@ namespace Microsoft.Xna.Framework.Graphics
             int width, height, channels;
 
             // The data returned is always four channel BGRA
-            var data = ImageReader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
+            var data = ImageReader.Read(stream, out width, out height, out channels, StbImage.STBI_rgb_alpha);
 
             // XNA blacks out any pixels with an alpha of zero.
             if (channels == 4)

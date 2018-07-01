@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StbSharp;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -28,7 +29,7 @@ namespace MonoGame.Utilities
             {
                 fixed (byte* b = bytes)
                 {
-                    result = Imaging.stbi_load_from_memory(b, bytes.Length, &xx, &yy, &ccomp, req_comp);
+                    result = StbImage.stbi_load_from_memory(b, bytes.Length, &xx, &yy, &ccomp, req_comp);
                 }
 
                 x = xx;
@@ -37,7 +38,7 @@ namespace MonoGame.Utilities
 
                 if (result == null)
                 {
-                    throw new InvalidOperationException(Imaging.LastError);
+                    throw new InvalidOperationException(StbImage.LastError);
                 }
 
                 // Convert to array
@@ -49,7 +50,7 @@ namespace MonoGame.Utilities
             {
                 if (result != null)
                 {
-                    Operations.Free(result);
+                    CRuntime.free(result);
                 }
             }
 

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace MonoGame.Utilities
+namespace StbSharp
 {
     internal enum ImageWriterFormat
     {
@@ -48,17 +48,17 @@ namespace MonoGame.Utilities
                     switch (format)
                     {
                         case ImageWriterFormat.Bmp:
-                            Imaging.stbi_write_bmp_to_func(WriteCallback, null, x, y, comp, b);
+                            StbImageWrite.stbi_write_bmp_to_func(WriteCallback, null, x, y, comp, b);
                             break;
                         case ImageWriterFormat.Tga:
-                            Imaging.stbi_write_tga_to_func(WriteCallback, null, x, y, comp, b);
+                            StbImageWrite.stbi_write_tga_to_func(WriteCallback, null, x, y, comp, b);
                             break;
                         case ImageWriterFormat.Jpg:
-                            Imaging.stbi_write_jpg_to_func(WriteCallback, null, x, y, comp, b, 90);
+                            StbImageWrite.stbi_write_jpg_to_func(WriteCallback, null, x, y, comp, b, 90);
                             break;
 
                         case ImageWriterFormat.Png:
-                            Imaging.stbi_write_png_to_func(WriteCallback, null, x, y, comp, b, x*comp);
+                            StbImageWrite.stbi_write_png_to_func(WriteCallback, null, x, y, comp, b, x*comp);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException("format", format, null);
