@@ -768,5 +768,16 @@ namespace MonoGame.Tests.Graphics
 
             tex.Dispose();
         }
+
+        [Test]
+        public void NullDeviceShouldThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+            {
+                var texture = new Texture2D(null, 16, 16);
+                texture.Dispose();
+            });
+            GC.GetTotalMemory(true); // collect uninitialized Texture
+        }
     }
 }
