@@ -64,11 +64,11 @@
     <if test="${os == 'Unix'}">
       <exec program="mono" commandline="Protobuild.exe -generate Windows" />
       <exec program="${nuget3path}/nuget.exe" commandline="restore MonoGame.Framework.Windows.sln -NonInteractive" />
-      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Windows.sln" />
-      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Windows.sln" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release" />
       <exec program="mono" commandline="Protobuild.exe -generate WindowsGL" />
-      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.WindowsGL.sln" />
-      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.WindowsGL.sln" />
+      <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Build /p:Configuration=Release" />
     </if>
   </target>
 
@@ -140,8 +140,8 @@
     </if>
     <if test="${os == 'Unix'}">
       <exec program="mono" commandline="Protobuild.exe -generate Web" />
-      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Web.sln" />
-      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Web.sln" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Web.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Web.sln /t:Build /p:Configuration=Release" />
     </if>
   </target>
 
@@ -160,13 +160,13 @@
     <if test="${os == 'MacOS'}">
       <if test="${file::exists('/Developer/MonoTouch/MSBuild/Xamarin.ObjcBinding.CSharp.targets') or file::exists('/Library/Frameworks/Mono.framework/External/xbuild/Xamarin/Xamarin.ObjcBinding.CSharp.targets')}">
         <exec program="mono" commandline="Protobuild.exe -generate iOS" />
-        <exec program="xbuild" commandline="MonoGame.Framework.iOS.sln /t:Clean /p:Configuration=Release" />
-        <exec program="xbuild" commandline="MonoGame.Framework.iOS.sln /t:Build /p:Configuration=Release" />
+        <exec program="msbuild" commandline="MonoGame.Framework.iOS.sln /t:Clean /p:Configuration=Release" />
+        <exec program="msbuild" commandline="MonoGame.Framework.iOS.sln /t:Build /p:Configuration=Release" />
       </if>
       <if test="${file::exists('/Library/Frameworks/Mono.framework/External/xbuild/Xamarin/TVOS/Xamarin.TVOS.CSharp.targets')}" >
         <exec program="mono" commandline="Protobuild.exe -generate tvOS" />
-        <exec program="xbuild" commandline="MonoGame.Framework.tvOS.sln /t:Clean /p:Configuration=Release" />
-        <exec program="xbuild" commandline="MonoGame.Framework.tvOS.sln /t:Build /p:Configuration=Release" />
+        <exec program="msbuild" commandline="MonoGame.Framework.tvOS.sln /t:Clean /p:Configuration=Release" />
+        <exec program="msbuild" commandline="MonoGame.Framework.tvOS.sln /t:Build /p:Configuration=Release" />
       </if>
     </if>
   </target>
@@ -182,8 +182,8 @@
     <if test="${os == 'MacOS'}">
       <if test="${file::exists('/Developer/MonoAndroid/usr/bin/mandroid')}">
         <exec program="mono" commandline="Protobuild.exe -generate Android" />
-	<exec program="xbuild" commandline="MonoGame.Framework.Android.sln /t:Clean /p:Configuration=Release" />
-	<exec program="xbuild" commandline="MonoGame.Framework.Android.sln /t:Build /p:Configuration=Release" />
+        <exec program="msbuild" commandline="MonoGame.Framework.Android.sln /t:Clean /p:Configuration=Release" />
+        <exec program="msbuild" commandline="MonoGame.Framework.Android.sln /t:Build /p:Configuration=Release" />
       </if>
     </if>
   </target>
