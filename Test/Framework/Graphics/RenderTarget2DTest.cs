@@ -13,9 +13,6 @@ namespace MonoGame.Tests.Graphics
     class RenderTarget2DTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-#if DESKTOPGL
-        [Ignore("This test causes the unit test runner to lock up and not exist. Resource leak of some sort? Threading?")]
-#endif
         public void ZeroSizeShouldFailTest()
         {
             RenderTarget2D renderTarget;
