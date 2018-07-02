@@ -1,0 +1,20 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame Mac Application",
+    "groupIdentity": "MonoGame.BlankApp.MacOS",
+	"identity": "MonoGame.BlankApp.MacOS.VisualBasic",
+    "shortName": "mgmacos",
+    "tags": {
+        "language": "VB",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.MacOS.vbproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true",
+    "description": "A MonoGame game project for MacOS."
+}

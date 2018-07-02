@@ -1,0 +1,20 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame Pipeline Extension",
+    "groupIdentity": "MonoGame.BlankApp.Pipeline",
+    "identity": "MonoGame.Pipeline.Extension.VisualBasic",
+    "shortName": "mgpipelineext",
+    "tags": {
+        "language": "VB",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.vbproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true",
+    "description": "A MonoGame Content Pipeline Extension project."
+}

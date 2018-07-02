@@ -17,6 +17,9 @@
 			<exec program="msbuild" commandline=" MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj /t:Restore /p:Configuration=Release" />
 			<exec program="msbuild" commandline=" MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj /t:Clean /p:Configuration=Release" />
 			<exec program="msbuild" commandline=" MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj /t:Build /p:Configuration=Release" />
+			<exec program="msbuild" commandline=" MonoGame.Templates.VisualBasic/MonoGame.Templates.VisualBasic.vbproj /t:Restore /p:Configuration=Release" />
+			<exec program="msbuild" commandline=" MonoGame.Templates.VisualBasic/MonoGame.Templates.VisualBasic.vbproj /t:Clean /p:Configuration=Release" />
+			<exec program="msbuild" commandline=" MonoGame.Templates.VisualBasic/MonoGame.Templates.VisualBasic.vbproj /t:Build /p:Configuration=Release" />
 		</if>
 </target>
 </project>

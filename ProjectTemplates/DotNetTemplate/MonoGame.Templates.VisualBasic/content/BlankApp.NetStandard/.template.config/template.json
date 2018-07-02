@@ -1,0 +1,20 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame NetStandard Library",
+    "groupIdentity": "MonoGame.BlankApp.NetStandard",
+	"identity": "MonoGame.BlankApp.NetStandard.VisualBasic",
+    "shortName": "mgnetstandardlib",
+    "tags": {
+        "language": "VB",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.vbproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true",
+    "description": "A MonoGame NetStandard project. Can be used to share game code between platforms."
+}

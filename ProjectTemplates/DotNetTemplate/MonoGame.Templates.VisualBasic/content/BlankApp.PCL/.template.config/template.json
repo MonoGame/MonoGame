@@ -1,0 +1,20 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame Portable Library",
+    "groupIdentity": "MonoGame.BlankApp.Portable",
+    "identity": "MonoGame.BlankApp.Portable.VisualBasic",
+    "shortName": "mgpcllib",
+    "tags": {
+        "language": "VB",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.vbproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true",
+    "description": "A MonoGame Portable Library project. Can be used to share game code between platforms."
+}

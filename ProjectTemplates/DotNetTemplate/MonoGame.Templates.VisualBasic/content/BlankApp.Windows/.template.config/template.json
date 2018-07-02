@@ -1,0 +1,20 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame Windows Application",
+    "groupIdentity": "MonoGame.BlankApp.Windows",
+    "identity": "MonoGame.BlankApp.Windows.VisualBasic",
+    "shortName": "mgwindows",
+    "tags": {
+        "language": "VB",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.Windows.vbproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true",
+    "description": "A MonoGame game project for Windows using DirectX."
+}

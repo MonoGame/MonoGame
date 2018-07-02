@@ -1,0 +1,20 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame Android Application",
+    "groupIdentity": "MonoGame.BlankApp.Android",
+    "identity": "MonoGame.BlankApp.Android.VisualBasic",
+    "shortName": "mgandroid",
+    "tags": {
+        "language": "VB",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.Android.vbproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true",
+    "description": "A MonoGame game project for Android."
+}
