@@ -54,6 +54,14 @@
       </Platform>
     </FrameworkVersions>
 
+
+    <iOSBindingProject>
+      <Platform Name="iOS">True</Platform>
+    </iOSBindingProject>
+    <tvOSBindingProject>
+      <Platform Name="tvOS">True</Platform>
+    </tvOSBindingProject>
+    
   </Properties>
 
   <Dependencies>
@@ -242,6 +250,13 @@
       <Platforms>Android</Platforms>
       <Link>libs\x86_64\libopenal32.so</Link>
     </EmbeddedNativeLibrary>
+
+    <ObjcBindingNativeFramework Include="..\ThirdParty\Dependencies\openal-soft\iOS\OpenALSoft.framework">
+      <Platforms>iOS</Platforms>
+    </ObjcBindingNativeFramework>
+    <ObjcBindingNativeFramework Include="..\ThirdParty\Dependencies\openal-soft\tvOS\OpenALSoft.framework">
+      <Platforms>tvOS</Platforms>
+    </ObjcBindingNativeFramework>
 
     <!-- Microsoft.Xna.Framework -->
     <Compile Include="BoundingBox.cs" />
@@ -1299,6 +1314,12 @@
     <Compile Include="iOS\OrientationConverter.cs">
       <Platforms>iOS</Platforms>
     </Compile>
+    <ObjcBindingApiDefinition Include="iOS\ApiDefinition.cs">
+      <Platforms>iOS</Platforms>
+    </ObjcBindingApiDefinition>
+    <Compile Include="iOS\LinkWith.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
 
     <!-- tvOS Platform -->
     <Compile Include="iOS\iOSGamePlatform.cs">
@@ -1319,7 +1340,12 @@
     <Compile Include="iOS\iOSGameWindow.cs">
       <Platforms>tvOS</Platforms>
     </Compile>
-
+    <ObjcBindingApiDefinition Include="iOS\ApiDefinition.cs">
+      <Platforms>tvOS</Platforms>
+    </ObjcBindingApiDefinition>
+    <Compile Include="iOS\LinkWith.cs">
+      <Platforms>tvOS</Platforms>
+    </Compile>
 
     <!-- Windows UAP Platform -->
     <Compile Include="WindowsUniversal\GameFrameworkViewSource.cs">
