@@ -130,6 +130,8 @@ namespace MonoGame.Framework
 
         public bool IsFullScreen { get; private set; }
         public bool HardwareModeSwitch { get; private set; }
+        public bool Initialized { get; private set; }
+        public IntPtr Himc { get; private set; }
 
         #endregion
 
@@ -139,6 +141,17 @@ namespace MonoGame.Framework
             Game = platform.Game;
 
             Form = new WinFormsGameForm(this);
+
+#if DIRECTX && WINDOWS
+            if (Initialized)
+            {
+                throw new InvalidOperationException("InputCaputure.Initialize can only be called once!");
+            }
+
+            Himc = IMM.ImmGetContext(Form.Handle);
+            Initialized = true;
+#endif
+
             ChangeClientSize(new Size(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight));
 
             SetIcon();
