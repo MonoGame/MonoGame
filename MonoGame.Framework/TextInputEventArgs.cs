@@ -10,23 +10,32 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// This class is used for the game window's TextInput event as EventArgs.
     /// </summary>
-    public class TextInputEventArgs : EventArgs
+    public struct TextInputEventArgs
     {
-        char character;
+        private char _character;
+        private Keys _key;
+        
         public TextInputEventArgs(char character, Keys key = Keys.None)
         {
-            this.character = character;
-            this.Key = key;
+            _character = character;
+            _key = key;
         }
-        public char Character
-        {
-            get
+
+        public char Character {
+            get { return _character; }
+            internal set
             {
-                return character;
+                _character = value;
             }
         }
-        public Keys Key {
-            get; private set;
+
+        public Keys Key
+        {
+            get { return _key; }
+            internal set
+            {
+                _key = value;
+            }
         }
     }
 }

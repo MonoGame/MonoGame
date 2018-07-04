@@ -144,9 +144,13 @@ namespace Microsoft.Xna.Framework {
 		}
 
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
-		protected void OnTextInput(object sender, TextInputEventArgs e)
+        internal TextInputEventArgs TextInputEventArgs = new TextInputEventArgs();
+
+        internal void OnTextInput(object sender)
 		{
-            EventHelpers.Raise(this, TextInput, e);
+			var textinput = TextInput;
+            if (textinput != null)
+                textinput(sender, TextInputEventArgs);
 		}
 #endif
 

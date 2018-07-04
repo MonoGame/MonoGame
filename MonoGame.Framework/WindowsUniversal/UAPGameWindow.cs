@@ -225,7 +225,10 @@ namespace Microsoft.Xna.Framework
         {
             char ch;
             while (_textQueue.TryDequeue(out ch))
-                OnTextInput(_coreWindow, new TextInputEventArgs(ch));
+            {
+                TextInputEventArgs.Character = ch;
+                OnTextInput(_coreWindow);
+            }
         }
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)

@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private void SdlRunLoop()
+        private unsafe void SdlRunLoop()
         {
             Sdl.Event ev;
 
@@ -141,7 +141,11 @@ namespace Microsoft.Xna.Framework
                         _keys.Add(key);
                     char character = (char)ev.Key.Keysym.Sym;
                     if (char.IsControl(character))
-                        _view.CallTextInput(character, key);
+                    {
+                        _view.TextInputEventArgs.Character = character;
+                        _view.TextInputEventArgs.Key = key;
+                        _view.OnTextInput(_view);
+                    }
                 }
                 else if (ev.Type == Sdl.EventType.KeyUp)
                 {
@@ -150,23 +154,32 @@ namespace Microsoft.Xna.Framework
                 }
                 else if (ev.Type == Sdl.EventType.TextInput)
                 {
-                    int len = 0;
-                    string text = String.Empty;
-                    unsafe
+                    for (int i = 0; i < 32; i++)
                     {
-                        while (Marshal.ReadByte ((IntPtr)ev.Text.Text, len) != 0) {
-                            len++;
+                        if (ev.Text.Text[i] == '\0')
+                            return;
+
+                        if ((ev.Text.Text[i] | 128) == 0) // this is ASCII char
+                        {
+                            _view.TextInputEventArgs.Character = (char)ev.Text.Text[i];
+                            _view.TextInputEventArgs.Key = KeyboardUtil.ToXna(ev.Text.Text[i]);
+                            _view.OnTextInput(_view);
                         }
-                        var buffer = new byte [len];
-                        Marshal.Copy ((IntPtr)ev.Text.Text, buffer, 0, len);
-                        text = System.Text.Encoding.UTF8.GetString (buffer);
-                    }
-                    if (text.Length == 0)
-                        continue;
-                    foreach (var c in text)
-                    {
-                        var key = KeyboardUtil.ToXna((int)c);
-                        _view.CallTextInput(c, key);
+                        else // we need to copy byte data and get UTF8 char :(
+                        {
+                            var bitcount = ((ev.Text.Text[i] | 240) == 240) ? 4 : (((ev.Text.Text[i] | 224) == 224) ? 3 : 2);
+                            var buffer = new byte[bitcount];
+                            Marshal.Copy((IntPtr)ev.Text.Text, buffer, 0, bitcount);
+
+                            foreach (var c in System.Text.Encoding.UTF8.GetString(buffer))
+                            {
+                                _view.TextInputEventArgs.Character = c;
+                                _view.TextInputEventArgs.Key = KeyboardUtil.ToXna(c);
+                                _view.OnTextInput(_view);
+                            }
+
+                            i += bitcount - 1;
+                        }
                     }
                 }
                 else if (ev.Type == Sdl.EventType.WindowEvent)

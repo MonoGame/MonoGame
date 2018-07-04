@@ -323,7 +323,8 @@ namespace MonoGame.Framework
 
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
-            OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
+            TextInputEventArgs.Character = e.KeyChar;
+            OnTextInput(sender);
         }
 
         internal void Initialize(int width, int height)
