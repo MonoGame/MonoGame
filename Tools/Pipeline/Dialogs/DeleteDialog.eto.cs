@@ -24,7 +24,7 @@ namespace MonoGame.Tools.Pipeline
 
             buttonDelete = new Button();
             buttonDelete.Text = "Delete";
-            buttonDelete.BackgroundColor = new Color(1, 0, 0), 
+            buttonDelete.BackgroundColor = new Color(255, 0, 0), 
             PositiveButtons.Add(buttonDelete);
             DefaultButton = buttonDelete;
             buttonDelete.Style = "Destuctive";
