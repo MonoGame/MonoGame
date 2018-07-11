@@ -18,8 +18,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             FontName = desc.FontName;
             Style = desc.Style;
             FontSize = desc.Size;
-            CharacterMap = new List<char>(desc.Characters.Count);
-            VerticalLineSpacing = (int)desc.Spacing; // Will be replaced in the pipeline.
+            CharacterMap = new List<CharEx>(desc.Characters.Count);
+            // VerticalLineSpacing will be replaced in the pipeline.
+            VerticalLineSpacing = (int)desc.Spacing;
             HorizontalSpacing = desc.Spacing;
 
             DefaultCharacter = desc.DefaultCharacter;
@@ -37,7 +38,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public List<Rectangle> Cropping = new List<Rectangle>();
 
-        public List<Char> CharacterMap = new List<Char>();
+        public List<CharEx> CharacterMap = new List<CharEx>();
 
         public int VerticalLineSpacing;
 
@@ -45,7 +46,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public List<Vector3> Kerning = new List<Vector3>();
 
-        public Nullable<Char> DefaultCharacter;	 
+        public CharEx? DefaultCharacter;
 
     }
 }

@@ -424,6 +424,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         }
 
         /// <summary>
+        /// Writes a CharEx value.
+        /// </summary>
+        /// <param name="value">Value to write.</param>
+        public void Write(CharEx value)
+        {
+            Write(value.GetUTF8(), 0, value.GetUTF8().Length);
+        }
+
+        /// <summary>
         /// Writes a Matrix value.
         /// </summary>
         /// <param name="value">Value to write.</param>

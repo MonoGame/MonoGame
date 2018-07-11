@@ -256,6 +256,23 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+        public CharEx ReadCharEx()
+        {
+            int len = 0;
+            byte first = base.ReadByte();
+
+            while (((first << (len)) & 0x80) != 0 && len != 3)
+                len++;
+
+            byte[] byteArray = new byte[len + 1];
+            byteArray[0] = first;
+            for (int i = 1; i <= len; i++)
+            {
+                byteArray[i] = base.ReadByte();
+            }
+            return new CharEx(System.Text.UnicodeEncoding.UTF8.GetString(byteArray));
+        }
+
         public Vector2 ReadVector2()
         {
             Vector2 result = new Vector2();

@@ -8,25 +8,25 @@ using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    internal class CharacterCollection : ICollection<char>
+    internal class CharacterCollection : ICollection<CharEx>
     {
-        private List<char> _items;
+        private List<CharEx> _items;
 
         public CharacterCollection()
         {
-            _items = new List<char>();
+            _items = new List<CharEx>();
         }
 
-        public CharacterCollection(IEnumerable<char> characters)
+        public CharacterCollection(IEnumerable<CharEx> characters)
         {
-            _items = new List<char>();
+            _items = new List<CharEx>();
             foreach (var c in characters)
                 Add(c);
         }
 
-        #region ICollection<char> Members
+        #region ICollectionCharEx Members
 
-        public void Add(char item)
+        public void Add(CharEx item)
         {
             if (!_items.Contains(item))
                 _items.Add(item);
@@ -37,12 +37,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             _items.Clear();
         }
 
-        public bool Contains(char item)
+        public bool Contains(CharEx item)
         {
             return _items.Contains(item);
         }
 
-        public void CopyTo(char[] array, int arrayIndex)
+        public void CopyTo(CharEx[] array, int arrayIndex)
         {
             _items.CopyTo(array, arrayIndex);
         }
@@ -57,16 +57,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             get { return false; }
         }
 
-        public bool Remove(char item)
+        public bool Remove(CharEx item)
         {
             return _items.Remove(item);
         }
 
         #endregion
 
-        #region IEnumerable<char> Members
+        #region IEnumerable<CharEx> Members
 
-        public IEnumerator<char> GetEnumerator()
+        public IEnumerator<CharEx> GetEnumerator()
         {
             return _items.GetEnumerator();
         }
@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 	/// </summary>
 	public class FontDescription : ContentItem
 	{
-        private char? defaultCharacter;
+        private CharEx? defaultCharacter;
         private string fontName;
         private float size;
         private float spacing;
@@ -182,7 +182,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Gets or sets the default character for the font.
         /// </summary>
         [ContentSerializer(Optional = true)]
-        public Nullable<char> DefaultCharacter
+        public Nullable<CharEx> DefaultCharacter
         {
             get
             {
@@ -236,7 +236,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 		
 	    [ContentSerializerIgnore]
-	    public ICollection<char> Characters
+	    public ICollection<CharEx> Characters
 	    {
 	        get { return characters; } 
             internal set { characters = new CharacterCollection(value); }

@@ -243,8 +243,10 @@ namespace Microsoft.Xna.Framework.Content
 			if(preparedType.Contains("PublicKeyToken"))
 				preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
 
-			// TODO: For WinRT this is most likely broken!
-			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
+            // Hack to read Chars as CharEx in Collections
+            preparedType = preparedType.Replace("System.Char, mscorlib", "Microsoft.Xna.Framework.CharEx");
+            // TODO: For WinRT this is most likely broken!
+            preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", _assemblyName));
 			

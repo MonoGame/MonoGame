@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 		private Color transparentPixel = Color.Magenta;
 
 		[DefaultValue(' ')]
-		public virtual char FirstCharacter { get; set; }
+		public virtual CharEx FirstCharacter { get; set; }
 
 		[DefaultValue (true)]
 		public virtual bool PremultiplyAlpha { get; set; }
@@ -25,13 +25,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 		public FontTextureProcessor ()
 		{
-		    FirstCharacter = ' ';
+		    FirstCharacter = (CharEx)' ';
 		    PremultiplyAlpha = true;
 		}
 
-		protected virtual char GetCharacterForIndex (int index)
+		protected virtual CharEx GetCharacterForIndex(int index)
 		{
-			return (char)(((int)FirstCharacter) + index);
+			return new CharEx((int)FirstCharacter + index);
 		}
 
         private List<Glyph> ExtractGlyphs(PixelBitmapContent<Color> bitmap)
