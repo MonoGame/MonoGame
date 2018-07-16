@@ -1249,6 +1249,12 @@
     <Compile Include="Utilities\FuncLoader.Desktop.cs">
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
     </Compile>
+    <Compile Include="Utilities\FuncLoader.Android.cs">
+      <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Utilities\FuncLoader.iOS.cs">
+      <Platforms>iOS,tvOS</Platforms>
+    </Compile>
     <Compile Include="SDL\SDLGamePlatform.cs">
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
     </Compile>

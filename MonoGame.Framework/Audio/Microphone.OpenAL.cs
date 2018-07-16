@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void CheckALCError(string operation)
         {
-            AlcError error = Alc.GetError(_captureDevice);
+            AlcError error = Alc.GetErrorForDevice(_captureDevice);
 
             if (error == AlcError.NoError)
                 return;
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 #if true //DESKTOPGL
             // enumarating capture devices
-            IntPtr deviceList = Alc.alGetString(IntPtr.Zero, (int)AlcGetString.CaptureDeviceSpecifier);
+            IntPtr deviceList = Alc.alcGetString(IntPtr.Zero, (int)AlcGetString.CaptureDeviceSpecifier);
             // we need to marshal a string array
             string deviceIdentifier = Marshal.PtrToStringAnsi(deviceList);
             while (!String.IsNullOrEmpty(deviceIdentifier))
