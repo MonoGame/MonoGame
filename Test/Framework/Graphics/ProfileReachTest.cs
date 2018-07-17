@@ -128,8 +128,10 @@ namespace MonoGame.Tests.Graphics
         [TestCase(SurfaceFormat.Dxt1)]
         [TestCase(SurfaceFormat.Dxt3)]
         [TestCase(SurfaceFormat.Dxt5)]
+#if !DESKTOPGL
         [TestCase(SurfaceFormat.NormalizedByte2)]
         [TestCase(SurfaceFormat.NormalizedByte4)]
+#endif
         public void Texture2DSurface(SurfaceFormat surfaceFormat)
         {
             CheckProfile();
