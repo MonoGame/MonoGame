@@ -174,7 +174,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                GraphicsDevice.DisposeBuffer(vbo);
+                if (GraphicsDevice != null)
+                    GraphicsDevice.DisposeBuffer(vbo);
             }
             base.Dispose(disposing);
         }

@@ -149,5 +149,16 @@ namespace MonoGame.Tests.Graphics
             }
             Assert.Throws(Is.InstanceOf<Exception>(), () => t.SetData(0, x, y, x + w, y + h, z, z + d, write, startIndex, elementCount));
         }
+
+        [Test]
+        public void NullDeviceShouldThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+            {                
+                var texture = new Texture3D(null, 16, 16, 16, false, SurfaceFormat.Color);
+                texture.Dispose();
+            });
+            GC.GetTotalMemory(true); // collect uninitialized Texture
+        }
     }
 }

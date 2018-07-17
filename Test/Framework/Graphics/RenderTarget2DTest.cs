@@ -13,15 +13,23 @@ namespace MonoGame.Tests.Graphics
     class RenderTarget2DTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-#if DESKTOPGL
-        [Ignore("This test causes the unit test runner to lock up and not exist. Resource leak of some sort? Threading?")]
-#endif
         public void ZeroSizeShouldFailTest()
         {
             RenderTarget2D renderTarget;
             Assert.Throws<ArgumentOutOfRangeException>(() => renderTarget = new RenderTarget2D(gd, 0, 1));
             Assert.Throws<ArgumentOutOfRangeException>(() => renderTarget = new RenderTarget2D(gd, 1, 0));
             Assert.Throws<ArgumentOutOfRangeException>(() => renderTarget = new RenderTarget2D(gd, 0, 0));
+        }
+
+        [Test]
+        public void NullDeviceShouldThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+            {
+                var renderTarget = new RenderTarget2D(null, 16, 16);
+                renderTarget.Dispose();
+            });
+            GC.GetTotalMemory(true); // collect uninitialized renderTarget
         }
 
         [Test]
