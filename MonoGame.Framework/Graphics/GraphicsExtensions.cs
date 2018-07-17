@@ -654,16 +654,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 break;
 
             case SurfaceFormat.NormalizedByte2:
-                if (!supportsNormalized)
-                    goto case InvalidFormat;
                 glInternalFormat = PixelInternalFormat.Rg8i;
                 glFormat = PixelFormat.Rg;
                 glType = PixelType.Byte;
                 break;
 
             case SurfaceFormat.NormalizedByte4:
-                if (!supportsNormalized)
-                    goto case InvalidFormat;
                 glInternalFormat = PixelInternalFormat.Rgba8i;
                 glFormat = PixelFormat.Rgba;
                 glType = PixelType.Byte;
