@@ -125,9 +125,18 @@ namespace Microsoft.Xna.Framework.Graphics
         public Dictionary<char, Glyph> GetGlyphs()
         {
             var glyphsDictionary = new Dictionary<char, Glyph>(_glyphs.Length, CharComparer.Default);
-            foreach(var glyph in _glyphs)
-                glyphsDictionary.Add(glyph.Character, glyph);
+            GetGlyphs(glyphsDictionary);
             return glyphsDictionary;
+        }
+
+        /// <summary>
+        /// Adds the glyphs in this SpriteFont to an existing dictionary.
+        /// </summary>
+        /// <param name="glyphsDictionary">An existing dictionary with a key of type char and a value of type Glyph.</param>
+        public void GetGlyphs(Dictionary<char, Glyph> glyphsDictionary)
+        {
+            foreach (var glyph in _glyphs)
+                glyphsDictionary.Add(glyph.Character, glyph);
         }
 
 		/// <summary>
