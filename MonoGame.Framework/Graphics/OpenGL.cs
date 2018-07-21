@@ -8,6 +8,7 @@ using System.Text;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Diagnostics;
+using MonoGame.Utilities;
 
 #if __IOS__ || __TVOS__ || MONOMAC
 using ObjCRuntime;
@@ -542,6 +543,48 @@ namespace MonoGame.OpenGL
 
     internal partial class GL
     {
+        public static IntPtr Library = GetNativeLibrary();
+
+#if ANDROID
+        public static int SupportedVersion;
+#endif
+
+        private static IntPtr GetNativeLibrary()
+        {
+            var ret = IntPtr.Zero;
+
+#if DESKTOPGL
+            if (CurrentPlatform.OS == OS.Windows)
+                ret = FuncLoader.LoadLibrary("opengl32.dll");
+            else if (CurrentPlatform.OS == OS.Linux)
+                ret = FuncLoader.LoadLibrary("libGL.so.1");
+            else
+                ret = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenGL.framework/OpenGL");
+#elif ANDROID
+            if (GL.BoundApi == GL.RenderApi.ES)
+            {
+                ret = FuncLoader.LoadLibrary("libGLESv3.so");
+                SupportedVersion = 3;
+            }
+
+            if (GL.BoundApi == GL.RenderApi.ES && ret == IntPtr.Zero)
+            {
+                ret = FuncLoader.LoadLibrary("libGLESv2.so");
+                SupportedVersion = 2;
+            }
+
+			if (GL.BoundApi == GL.RenderApi.GL)
+            {
+                ret = FuncLoader.LoadLibrary("libGL.so");
+                SupportedVersion = 1;
+            }
+#else
+            ret = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenGLES.framework/OpenGLES");
+#endif
+
+            return ret;
+        }
+
         internal enum RenderApi
         {
             ES = 12448,
@@ -1200,138 +1243,138 @@ namespace MonoGame.OpenGL
             LoadPlatformEntryPoints ();
 
             if (Viewport == null)
-                Viewport = LoadEntryPoint<ViewportDelegate> ("glViewport");
+                Viewport = FuncLoader.LoadFunction<ViewportDelegate> (Library, "glViewport");
             if (Scissor == null)
-                Scissor = LoadEntryPoint<ScissorDelegate> ("glScissor");
+                Scissor = FuncLoader.LoadFunction<ScissorDelegate> (Library, "glScissor");
             if (MakeCurrent == null)
-                MakeCurrent = LoadEntryPoint<MakeCurrentDelegate> ("glMakeCurrent", throwIfNotFound: false);
+                MakeCurrent = FuncLoader.LoadFunction<MakeCurrentDelegate> (Library, "glMakeCurrent", throwIfNotFound: false);
 
-            GetError = LoadEntryPoint<GetErrorDelegate> ("glGetError");
+            GetError = FuncLoader.LoadFunction<GetErrorDelegate> (Library, "glGetError");
 
-            TexParameterf = LoadEntryPoint<TexParameterFloatDelegate> ("glTexParameterf");
-            TexParameterfv = LoadEntryPoint<TexParameterFloatArrayDelegate> ("glTexParameterfv");
-            TexParameteri = LoadEntryPoint<TexParameterIntDelegate> ("glTexParameteri");
+            TexParameterf = FuncLoader.LoadFunction<TexParameterFloatDelegate> (Library, "glTexParameterf");
+            TexParameterfv = FuncLoader.LoadFunction<TexParameterFloatArrayDelegate> (Library, "glTexParameterfv");
+            TexParameteri = FuncLoader.LoadFunction<TexParameterIntDelegate> (Library, "glTexParameteri");
 
-            EnableVertexAttribArray = LoadEntryPoint<EnableVertexAttribArrayDelegate> ("glEnableVertexAttribArray");
-            DisableVertexAttribArray = LoadEntryPoint<DisableVertexAttribArrayDelegate> ("glDisableVertexAttribArray");
-            GetIntegerv = LoadEntryPoint<GetIntegerDelegate> ("glGetIntegerv");
-            GetStringInternal = LoadEntryPoint<GetStringDelegate> ("glGetString");
-            ClearDepth = LoadEntryPoint<ClearDepthDelegate> ("glClearDepth");
+            EnableVertexAttribArray = FuncLoader.LoadFunction<EnableVertexAttribArrayDelegate> (Library, "glEnableVertexAttribArray");
+            DisableVertexAttribArray = FuncLoader.LoadFunction<DisableVertexAttribArrayDelegate> (Library, "glDisableVertexAttribArray");
+            GetIntegerv = FuncLoader.LoadFunction<GetIntegerDelegate> (Library, "glGetIntegerv");
+            GetStringInternal = FuncLoader.LoadFunction<GetStringDelegate> (Library, "glGetString");
+            ClearDepth = FuncLoader.LoadFunction<ClearDepthDelegate> (Library, "glClearDepth");
             if (ClearDepth == null)
-                ClearDepth = LoadEntryPoint<ClearDepthDelegate> ("glClearDepthf");
-            DepthRanged = LoadEntryPoint<DepthRangedDelegate> ("glDepthRange");
-            DepthRangef = LoadEntryPoint<DepthRangefDelegate> ("glDepthRangef");
-            Clear = LoadEntryPoint<ClearDelegate> ("glClear");
-            ClearColor = LoadEntryPoint<ClearColorDelegate> ("glClearColor");
-            ClearStencil = LoadEntryPoint<ClearStencilDelegate> ("glClearStencil");
-            Flush = LoadEntryPoint<FlushDelegate> ("glFlush");
-            GenTextures = LoadEntryPoint<GenTexturesDelegte> ("glGenTextures");
-            BindTexture = LoadEntryPoint<BindTextureDelegate> ("glBindTexture");
+                ClearDepth = FuncLoader.LoadFunction<ClearDepthDelegate> (Library, "glClearDepthf");
+            DepthRanged = FuncLoader.LoadFunction<DepthRangedDelegate> (Library, "glDepthRange");
+            DepthRangef = FuncLoader.LoadFunction<DepthRangefDelegate> (Library, "glDepthRangef");
+            Clear = FuncLoader.LoadFunction<ClearDelegate> (Library, "glClear");
+            ClearColor = FuncLoader.LoadFunction<ClearColorDelegate> (Library, "glClearColor");
+            ClearStencil = FuncLoader.LoadFunction<ClearStencilDelegate> (Library, "glClearStencil");
+            Flush = FuncLoader.LoadFunction<FlushDelegate> (Library, "glFlush");
+            GenTextures = FuncLoader.LoadFunction<GenTexturesDelegte> (Library, "glGenTextures");
+            BindTexture = FuncLoader.LoadFunction<BindTextureDelegate> (Library, "glBindTexture");
 
-            Enable = LoadEntryPoint<EnableDelegate> ("glEnable");
-            Disable = LoadEntryPoint<DisableDelegate> ("glDisable");
-            CullFace = LoadEntryPoint<CullFaceDelegate> ("glCullFace");
-            FrontFace = LoadEntryPoint<FrontFaceDelegate> ("glFrontFace");
-            PolygonMode = LoadEntryPoint<PolygonModeDelegate> ("glPolygonMode");
-            PolygonOffset = LoadEntryPoint<PolygonOffsetDelegate> ("glPolygonOffset");
+            Enable = FuncLoader.LoadFunction<EnableDelegate> (Library, "glEnable");
+            Disable = FuncLoader.LoadFunction<DisableDelegate> (Library, "glDisable");
+            CullFace = FuncLoader.LoadFunction<CullFaceDelegate> (Library, "glCullFace");
+            FrontFace = FuncLoader.LoadFunction<FrontFaceDelegate> (Library, "glFrontFace");
+            PolygonMode = FuncLoader.LoadFunction<PolygonModeDelegate> (Library, "glPolygonMode");
+            PolygonOffset = FuncLoader.LoadFunction<PolygonOffsetDelegate> (Library, "glPolygonOffset");
 
-            BindBuffer = LoadEntryPoint<BindBufferDelegate> ("glBindBuffer");
-            DrawBuffers = LoadEntryPoint<DrawBuffersDelegate> ("glDrawBuffers");
-            DrawElements = LoadEntryPoint<DrawElementsDelegate> ("glDrawElements");
-            DrawArrays = LoadEntryPoint<DrawArraysDelegate> ("glDrawArrays");
-            Uniform1i = LoadEntryPoint<Uniform1iDelegate> ("glUniform1i");
-            Uniform4fv = LoadEntryPoint<Uniform4fvDelegate> ("glUniform4fv");
-            ReadPixelsInternal = LoadEntryPoint<ReadPixelsDelegate>("glReadPixels");
+            BindBuffer = FuncLoader.LoadFunction<BindBufferDelegate> (Library, "glBindBuffer");
+            DrawBuffers = FuncLoader.LoadFunction<DrawBuffersDelegate> (Library, "glDrawBuffers");
+            DrawElements = FuncLoader.LoadFunction<DrawElementsDelegate> (Library, "glDrawElements");
+            DrawArrays = FuncLoader.LoadFunction<DrawArraysDelegate> (Library, "glDrawArrays");
+            Uniform1i = FuncLoader.LoadFunction<Uniform1iDelegate> (Library, "glUniform1i");
+            Uniform4fv = FuncLoader.LoadFunction<Uniform4fvDelegate> (Library, "glUniform4fv");
+            ReadPixelsInternal = FuncLoader.LoadFunction<ReadPixelsDelegate>(Library, "glReadPixels");
 
-            ReadBuffer = LoadEntryPoint<ReadBufferDelegate> ("glReadBuffer");
-            DrawBuffer = LoadEntryPoint<DrawBufferDelegate> ("glDrawBuffer");
+            ReadBuffer = FuncLoader.LoadFunction<ReadBufferDelegate> (Library, "glReadBuffer");
+            DrawBuffer = FuncLoader.LoadFunction<DrawBufferDelegate> (Library, "glDrawBuffer");
 
-            RenderbufferStorage = LoadEntryPoint<RenderbufferStorageDelegate> ("glRenderbufferStorage");
+            RenderbufferStorage = FuncLoader.LoadFunction<RenderbufferStorageDelegate> (Library, "glRenderbufferStorage");
 
             // Render Target Support. These might be null if they are not supported
             // see GraphicsDevice.OpenGL.FramebufferHelper.cs for handling other extensions.
-            GenRenderbuffers = LoadEntryPoint<GenRenderbuffersDelegate> ("glGenRenderbuffers");
-            BindRenderbuffer = LoadEntryPoint<BindRenderbufferDelegate> ("glBindRenderbuffer");
-            DeleteRenderbuffers = LoadEntryPoint<DeleteRenderbuffersDelegate> ("glDeleteRenderbuffers");
-            GenFramebuffers = LoadEntryPoint<GenFramebuffersDelegate> ("glGenFramebuffers");
-            BindFramebuffer = LoadEntryPoint<BindFramebufferDelegate> ("glBindFramebuffer");
-            DeleteFramebuffers = LoadEntryPoint<DeleteFramebuffersDelegate> ("glDeleteFramebuffers");
-            FramebufferTexture2D = LoadEntryPoint<FramebufferTexture2DDelegate> ("glFramebufferTexture2D");
-            FramebufferRenderbuffer = LoadEntryPoint<FramebufferRenderbufferDelegate> ("glFramebufferRenderbuffer");
-            RenderbufferStorageMultisample = LoadEntryPoint<RenderbufferStorageMultisampleDelegate> ("glRenderbufferStorageMultisample");
-            GenerateMipmap = LoadEntryPoint<GenerateMipmapDelegate> ("glGenerateMipmap");
-            BlitFramebuffer = LoadEntryPoint<BlitFramebufferDelegate> ("glBlitFramebuffer");
-            CheckFramebufferStatus = LoadEntryPoint<CheckFramebufferStatusDelegate> ("glCheckFramebufferStatus");
+            GenRenderbuffers = FuncLoader.LoadFunction<GenRenderbuffersDelegate> (Library, "glGenRenderbuffers");
+            BindRenderbuffer = FuncLoader.LoadFunction<BindRenderbufferDelegate> (Library, "glBindRenderbuffer");
+            DeleteRenderbuffers = FuncLoader.LoadFunction<DeleteRenderbuffersDelegate> (Library, "glDeleteRenderbuffers");
+            GenFramebuffers = FuncLoader.LoadFunction<GenFramebuffersDelegate> (Library, "glGenFramebuffers");
+            BindFramebuffer = FuncLoader.LoadFunction<BindFramebufferDelegate> (Library, "glBindFramebuffer");
+            DeleteFramebuffers = FuncLoader.LoadFunction<DeleteFramebuffersDelegate> (Library, "glDeleteFramebuffers");
+            FramebufferTexture2D = FuncLoader.LoadFunction<FramebufferTexture2DDelegate> (Library, "glFramebufferTexture2D");
+            FramebufferRenderbuffer = FuncLoader.LoadFunction<FramebufferRenderbufferDelegate> (Library, "glFramebufferRenderbuffer");
+            RenderbufferStorageMultisample = FuncLoader.LoadFunction<RenderbufferStorageMultisampleDelegate> (Library, "glRenderbufferStorageMultisample");
+            GenerateMipmap = FuncLoader.LoadFunction<GenerateMipmapDelegate> (Library, "glGenerateMipmap");
+            BlitFramebuffer = FuncLoader.LoadFunction<BlitFramebufferDelegate> (Library, "glBlitFramebuffer");
+            CheckFramebufferStatus = FuncLoader.LoadFunction<CheckFramebufferStatusDelegate> (Library, "glCheckFramebufferStatus");
 
-            GenQueries = LoadEntryPoint<GenQueriesDelegate> ("glGenQueries");
-            BeginQuery = LoadEntryPoint<BeginQueryDelegate> ("glBeginQuery");
-            EndQuery = LoadEntryPoint<EndQueryDelegate> ("glEndQuery");
-            GetQueryObject = LoadEntryPoint<GetQueryObjectDelegate>("glGetQueryObjectuiv");
+            GenQueries = FuncLoader.LoadFunction<GenQueriesDelegate> (Library, "glGenQueries");
+            BeginQuery = FuncLoader.LoadFunction<BeginQueryDelegate> (Library, "glBeginQuery");
+            EndQuery = FuncLoader.LoadFunction<EndQueryDelegate> (Library, "glEndQuery");
+            GetQueryObject = FuncLoader.LoadFunction<GetQueryObjectDelegate>(Library, "glGetQueryObjectuiv");
             if (GetQueryObject == null)
-                GetQueryObject = LoadEntryPoint<GetQueryObjectDelegate> ("glGetQueryObjectivARB");
+                GetQueryObject = FuncLoader.LoadFunction<GetQueryObjectDelegate> (Library, "glGetQueryObjectivARB");
             if (GetQueryObject == null)
-                GetQueryObject = LoadEntryPoint<GetQueryObjectDelegate> ("glGetQueryObjectiv");
-            DeleteQueries = LoadEntryPoint<DeleteQueriesDelegate> ("glDeleteQueries");
+                GetQueryObject = FuncLoader.LoadFunction<GetQueryObjectDelegate> (Library, "glGetQueryObjectiv");
+            DeleteQueries = FuncLoader.LoadFunction<DeleteQueriesDelegate> (Library, "glDeleteQueries");
 
-            ActiveTexture = LoadEntryPoint<ActiveTextureDelegate> ("glActiveTexture");
-            CreateShader = LoadEntryPoint<CreateShaderDelegate> ("glCreateShader");
-            ShaderSourceInternal = LoadEntryPoint<ShaderSourceDelegate> ("glShaderSource");
-            CompileShader = LoadEntryPoint<CompileShaderDelegate> ("glCompileShader");
-            GetShaderiv = LoadEntryPoint<GetShaderDelegate> ("glGetShaderiv");
-            GetShaderInfoLogInternal = LoadEntryPoint<GetShaderInfoLogDelegate> ("glGetShaderInfoLog");
-            IsShader = LoadEntryPoint<IsShaderDelegate> ("glIsShader");
-            DeleteShader = LoadEntryPoint<DeleteShaderDelegate> ("glDeleteShader");
-            GetAttribLocation = LoadEntryPoint<GetAttribLocationDelegate> ("glGetAttribLocation");
-            GetUniformLocation = LoadEntryPoint<GetUniformLocationDelegate> ("glGetUniformLocation");
+            ActiveTexture = FuncLoader.LoadFunction<ActiveTextureDelegate> (Library, "glActiveTexture");
+            CreateShader = FuncLoader.LoadFunction<CreateShaderDelegate> (Library, "glCreateShader");
+            ShaderSourceInternal = FuncLoader.LoadFunction<ShaderSourceDelegate> (Library, "glShaderSource");
+            CompileShader = FuncLoader.LoadFunction<CompileShaderDelegate> (Library, "glCompileShader");
+            GetShaderiv = FuncLoader.LoadFunction<GetShaderDelegate> (Library, "glGetShaderiv");
+            GetShaderInfoLogInternal = FuncLoader.LoadFunction<GetShaderInfoLogDelegate> (Library, "glGetShaderInfoLog");
+            IsShader = FuncLoader.LoadFunction<IsShaderDelegate> (Library, "glIsShader");
+            DeleteShader = FuncLoader.LoadFunction<DeleteShaderDelegate> (Library, "glDeleteShader");
+            GetAttribLocation = FuncLoader.LoadFunction<GetAttribLocationDelegate> (Library, "glGetAttribLocation");
+            GetUniformLocation = FuncLoader.LoadFunction<GetUniformLocationDelegate> (Library, "glGetUniformLocation");
 
-            IsProgram = LoadEntryPoint<IsProgramDelegate> ("glIsProgram");
-            DeleteProgram = LoadEntryPoint<DeleteProgramDelegate> ("glDeleteProgram");
-            CreateProgram = LoadEntryPoint<CreateProgramDelegate> ("glCreateProgram");
-            AttachShader = LoadEntryPoint<AttachShaderDelegate> ("glAttachShader");
-            UseProgram = LoadEntryPoint<UseProgramDelegate> ("glUseProgram");
-            LinkProgram = LoadEntryPoint<LinkProgramDelegate> ("glLinkProgram");
-            GetProgramiv = LoadEntryPoint<GetProgramDelegate> ("glGetProgramiv");
-            GetProgramInfoLogInternal = LoadEntryPoint<GetProgramInfoLogDelegate> ("glGetProgramInfoLog");
-            DetachShader = LoadEntryPoint<DetachShaderDelegate> ("glDetachShader");
+            IsProgram = FuncLoader.LoadFunction<IsProgramDelegate> (Library, "glIsProgram");
+            DeleteProgram = FuncLoader.LoadFunction<DeleteProgramDelegate> (Library, "glDeleteProgram");
+            CreateProgram = FuncLoader.LoadFunction<CreateProgramDelegate> (Library, "glCreateProgram");
+            AttachShader = FuncLoader.LoadFunction<AttachShaderDelegate> (Library, "glAttachShader");
+            UseProgram = FuncLoader.LoadFunction<UseProgramDelegate> (Library, "glUseProgram");
+            LinkProgram = FuncLoader.LoadFunction<LinkProgramDelegate> (Library, "glLinkProgram");
+            GetProgramiv = FuncLoader.LoadFunction<GetProgramDelegate> (Library, "glGetProgramiv");
+            GetProgramInfoLogInternal = FuncLoader.LoadFunction<GetProgramInfoLogDelegate> (Library, "glGetProgramInfoLog");
+            DetachShader = FuncLoader.LoadFunction<DetachShaderDelegate> (Library, "glDetachShader");
 
-            BlendColor = LoadEntryPoint<BlendColorDelegate> ("glBlendColor");
-            BlendEquationSeparate = LoadEntryPoint<BlendEquationSeparateDelegate> ("glBlendEquationSeparate");
-            BlendFuncSeparate = LoadEntryPoint<BlendFuncSeparateDelegate> ("glBlendFuncSeparate");
-            ColorMask = LoadEntryPoint<ColorMaskDelegate> ("glColorMask");
-            DepthFunc = LoadEntryPoint<DepthFuncDelegate> ("glDepthFunc");
-            DepthMask = LoadEntryPoint<DepthMaskDelegate> ("glDepthMask");
-            StencilFuncSeparate = LoadEntryPoint<StencilFuncSeparateDelegate> ("glStencilFuncSeparate");
-            StencilOpSeparate = LoadEntryPoint<StencilOpSeparateDelegate> ("glStencilOpSeparate");
-            StencilFunc = LoadEntryPoint<StencilFuncDelegate> ("glStencilFunc");
-            StencilOp = LoadEntryPoint<StencilOpDelegate> ("glStencilOp");
-            StencilMask = LoadEntryPoint<StencilMaskDelegate> ("glStencilMask");
+            BlendColor = FuncLoader.LoadFunction<BlendColorDelegate> (Library, "glBlendColor");
+            BlendEquationSeparate = FuncLoader.LoadFunction<BlendEquationSeparateDelegate> (Library, "glBlendEquationSeparate");
+            BlendFuncSeparate = FuncLoader.LoadFunction<BlendFuncSeparateDelegate> (Library, "glBlendFuncSeparate");
+            ColorMask = FuncLoader.LoadFunction<ColorMaskDelegate> (Library, "glColorMask");
+            DepthFunc = FuncLoader.LoadFunction<DepthFuncDelegate> (Library, "glDepthFunc");
+            DepthMask = FuncLoader.LoadFunction<DepthMaskDelegate> (Library, "glDepthMask");
+            StencilFuncSeparate = FuncLoader.LoadFunction<StencilFuncSeparateDelegate> (Library, "glStencilFuncSeparate");
+            StencilOpSeparate = FuncLoader.LoadFunction<StencilOpSeparateDelegate> (Library, "glStencilOpSeparate");
+            StencilFunc = FuncLoader.LoadFunction<StencilFuncDelegate> (Library, "glStencilFunc");
+            StencilOp = FuncLoader.LoadFunction<StencilOpDelegate> (Library, "glStencilOp");
+            StencilMask = FuncLoader.LoadFunction<StencilMaskDelegate> (Library, "glStencilMask");
 
-            CompressedTexImage2D = LoadEntryPoint<CompressedTexImage2DDelegate> ("glCompressedTexImage2D");
-            TexImage2D = LoadEntryPoint<TexImage2DDelegate> ("glTexImage2D");
-            CompressedTexSubImage2D = LoadEntryPoint<CompressedTexSubImage2DDelegate> ("glCompressedTexSubImage2D");
-            TexSubImage2D = LoadEntryPoint<TexSubImage2DDelegate> ("glTexSubImage2D");
-            PixelStore = LoadEntryPoint<PixelStoreDelegate> ("glPixelStorei");
-            Finish = LoadEntryPoint<FinishDelegate> ("glFinish");
-            GetTexImageInternal = LoadEntryPoint<GetTexImageDelegate> ("glGetTexImage");
-            GetCompressedTexImageInternal = LoadEntryPoint<GetCompressedTexImageDelegate> ("glGetCompressedTexImage");
-            TexImage3D = LoadEntryPoint<TexImage3DDelegate> ("glTexImage3D");
-            TexSubImage3D = LoadEntryPoint<TexSubImage3DDelegate> ("glTexSubImage3D");
-            DeleteTextures = LoadEntryPoint<DeleteTexturesDelegate> ("glDeleteTextures");
+            CompressedTexImage2D = FuncLoader.LoadFunction<CompressedTexImage2DDelegate> (Library, "glCompressedTexImage2D");
+            TexImage2D = FuncLoader.LoadFunction<TexImage2DDelegate> (Library, "glTexImage2D");
+            CompressedTexSubImage2D = FuncLoader.LoadFunction<CompressedTexSubImage2DDelegate> (Library, "glCompressedTexSubImage2D");
+            TexSubImage2D = FuncLoader.LoadFunction<TexSubImage2DDelegate> (Library, "glTexSubImage2D");
+            PixelStore = FuncLoader.LoadFunction<PixelStoreDelegate> (Library, "glPixelStorei");
+            Finish = FuncLoader.LoadFunction<FinishDelegate> (Library, "glFinish");
+            GetTexImageInternal = FuncLoader.LoadFunction<GetTexImageDelegate> (Library, "glGetTexImage");
+            GetCompressedTexImageInternal = FuncLoader.LoadFunction<GetCompressedTexImageDelegate> (Library, "glGetCompressedTexImage");
+            TexImage3D = FuncLoader.LoadFunction<TexImage3DDelegate> (Library, "glTexImage3D");
+            TexSubImage3D = FuncLoader.LoadFunction<TexSubImage3DDelegate> (Library, "glTexSubImage3D");
+            DeleteTextures = FuncLoader.LoadFunction<DeleteTexturesDelegate> (Library, "glDeleteTextures");
 
-            GenBuffers = LoadEntryPoint<GenBuffersDelegate> ("glGenBuffers");
-            BufferData = LoadEntryPoint<BufferDataDelegate> ("glBufferData");
-            MapBuffer = LoadEntryPoint<MapBufferDelegate> ("glMapBuffer");
-            UnmapBuffer = LoadEntryPoint<UnmapBufferDelegate> ("glUnmapBuffer");
-            BufferSubData = LoadEntryPoint<BufferSubDataDelegate> ("glBufferSubData");
-            DeleteBuffers = LoadEntryPoint<DeleteBuffersDelegate> ("glDeleteBuffers");
+            GenBuffers = FuncLoader.LoadFunction<GenBuffersDelegate> (Library, "glGenBuffers");
+            BufferData = FuncLoader.LoadFunction<BufferDataDelegate> (Library, "glBufferData");
+            MapBuffer = FuncLoader.LoadFunction<MapBufferDelegate> (Library, "glMapBuffer");
+            UnmapBuffer = FuncLoader.LoadFunction<UnmapBufferDelegate> (Library, "glUnmapBuffer");
+            BufferSubData = FuncLoader.LoadFunction<BufferSubDataDelegate> (Library, "glBufferSubData");
+            DeleteBuffers = FuncLoader.LoadFunction<DeleteBuffersDelegate> (Library, "glDeleteBuffers");
 
-            VertexAttribPointer = LoadEntryPoint<VertexAttribPointerDelegate> ("glVertexAttribPointer");
+            VertexAttribPointer = FuncLoader.LoadFunction<VertexAttribPointerDelegate> (Library, "glVertexAttribPointer");
 
             // Instanced drawing requires GL 3.2 or up, if the either of the following entry points can not be loaded
             // this will get flagged by setting SupportsInstancing in GraphicsCapabilities to false.
             try {
-                DrawElementsInstanced = LoadEntryPoint<DrawElementsInstancedDelegate> ("glDrawElementsInstanced");
-                VertexAttribDivisor = LoadEntryPoint<VertexAttribDivisorDelegate> ("glVertexAttribDivisor");
+                DrawElementsInstanced = FuncLoader.LoadFunction<DrawElementsInstancedDelegate> (Library, "glDrawElementsInstanced");
+                VertexAttribDivisor = FuncLoader.LoadFunction<VertexAttribDivisorDelegate> (Library, "glVertexAttribDivisor");
             } catch (EntryPointNotFoundException) {
                 // this will be detected in the initialization of GraphicsCapabilities
             }
@@ -1339,7 +1382,7 @@ namespace MonoGame.OpenGL
 #if DEBUG
             try
             {
-                DebugMessageCallback = LoadEntryPoint<DebugMessageCallbackDelegate>("glDebugMessageCallback");
+                DebugMessageCallback = FuncLoader.LoadFunction<DebugMessageCallbackDelegate>(Library, "glDebugMessageCallback");
                 if (DebugMessageCallback != null)
                 {
                     DebugProc = DebugMessageCallbackHandler;
@@ -1354,7 +1397,7 @@ namespace MonoGame.OpenGL
             }
 #endif
             if (BoundApi == RenderApi.ES) {
-                InvalidateFramebuffer = LoadEntryPoint<InvalidateFramebufferDelegate> ("glDiscardFramebufferEXT");
+                InvalidateFramebuffer = FuncLoader.LoadFunction<InvalidateFramebufferDelegate> (Library, "glDiscardFramebufferEXT");
             }
 
             LoadExtensions ();
@@ -1390,75 +1433,58 @@ namespace MonoGame.OpenGL
                 }
                 else if (Extensions.Contains("GL_APPLE_framebuffer_multisample"))
                 {
-                    GL.RenderbufferStorageMultisample = GL.LoadEntryPoint<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleAPPLE");
-                    GL.BlitFramebuffer = GL.LoadEntryPoint<GL.BlitFramebufferDelegate>("glResolveMultisampleFramebufferAPPLE");
+                    GL.RenderbufferStorageMultisample = FuncLoader.LoadFunction<GL.RenderbufferStorageMultisampleDelegate>(Library, "glRenderbufferStorageMultisampleAPPLE");
+                    GL.BlitFramebuffer = FuncLoader.LoadFunction<GL.BlitFramebufferDelegate>(Library, "glResolveMultisampleFramebufferAPPLE");
                 }
                 else if (Extensions.Contains("GL_EXT_multisampled_render_to_texture"))
                 {
-                    GL.RenderbufferStorageMultisample = GL.LoadEntryPoint<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleEXT");
-                    GL.FramebufferTexture2DMultiSample = GL.LoadEntryPoint<GL.FramebufferTexture2DMultiSampleDelegate>("glFramebufferTexture2DMultisampleEXT");
+                    GL.RenderbufferStorageMultisample = FuncLoader.LoadFunction<GL.RenderbufferStorageMultisampleDelegate>(Library, "glRenderbufferStorageMultisampleEXT");
+                    GL.FramebufferTexture2DMultiSample = FuncLoader.LoadFunction<GL.FramebufferTexture2DMultiSampleDelegate>(Library, "glFramebufferTexture2DMultisampleEXT");
 
                 }
                 else if (Extensions.Contains("GL_IMG_multisampled_render_to_texture"))
                 {
-                    GL.RenderbufferStorageMultisample = GL.LoadEntryPoint<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleIMG");
-                    GL.FramebufferTexture2DMultiSample = GL.LoadEntryPoint<GL.FramebufferTexture2DMultiSampleDelegate>("glFramebufferTexture2DMultisampleIMG");
+                    GL.RenderbufferStorageMultisample = FuncLoader.LoadFunction<GL.RenderbufferStorageMultisampleDelegate>(Library, "glRenderbufferStorageMultisampleIMG");
+                    GL.FramebufferTexture2DMultiSample = FuncLoader.LoadFunction<GL.FramebufferTexture2DMultiSampleDelegate>(Library, "glFramebufferTexture2DMultisampleIMG");
                 }
                 else if (Extensions.Contains("GL_NV_framebuffer_multisample"))
                 {
-                    GL.RenderbufferStorageMultisample = GL.LoadEntryPoint<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleNV");
-                    GL.BlitFramebuffer = GL.LoadEntryPoint<GL.BlitFramebufferDelegate>("glBlitFramebufferNV");
+                    GL.RenderbufferStorageMultisample = FuncLoader.LoadFunction<GL.RenderbufferStorageMultisampleDelegate>(Library, "glRenderbufferStorageMultisampleNV");
+                    GL.BlitFramebuffer = FuncLoader.LoadFunction<GL.BlitFramebufferDelegate>(Library, "glBlitFramebufferNV");
                 }
             }
         }
 
         internal static void LoadFrameBufferObjectARBEntryPoints()
         {
-            GenRenderbuffers = LoadEntryPoint<GenRenderbuffersDelegate>("glGenRenderbuffers");
-            BindRenderbuffer = LoadEntryPoint<BindRenderbufferDelegate>("glBindRenderbuffer");
-            DeleteRenderbuffers = LoadEntryPoint<DeleteRenderbuffersDelegate>("glDeleteRenderbuffers");
-            GenFramebuffers = LoadEntryPoint<GenFramebuffersDelegate>("glGenFramebuffers");
-            BindFramebuffer = LoadEntryPoint<BindFramebufferDelegate>("glBindFramebuffer");
-            DeleteFramebuffers = LoadEntryPoint<DeleteFramebuffersDelegate>("glDeleteFramebuffers");
-            FramebufferTexture2D = LoadEntryPoint<FramebufferTexture2DDelegate>("glFramebufferTexture2D");
-            FramebufferRenderbuffer = LoadEntryPoint<FramebufferRenderbufferDelegate>("glFramebufferRenderbuffer");
-            RenderbufferStorageMultisample = LoadEntryPoint<RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisample");
-            GenerateMipmap = LoadEntryPoint<GenerateMipmapDelegate>("glGenerateMipmap");
-            BlitFramebuffer = LoadEntryPoint<BlitFramebufferDelegate>("glBlitFramebuffer");
-            CheckFramebufferStatus = LoadEntryPoint<CheckFramebufferStatusDelegate>("glCheckFramebufferStatus");
+            GenRenderbuffers = FuncLoader.LoadFunction<GenRenderbuffersDelegate>(Library, "glGenRenderbuffers");
+            BindRenderbuffer = FuncLoader.LoadFunction<BindRenderbufferDelegate>(Library, "glBindRenderbuffer");
+            DeleteRenderbuffers = FuncLoader.LoadFunction<DeleteRenderbuffersDelegate>(Library, "glDeleteRenderbuffers");
+            GenFramebuffers = FuncLoader.LoadFunction<GenFramebuffersDelegate>(Library, "glGenFramebuffers");
+            BindFramebuffer = FuncLoader.LoadFunction<BindFramebufferDelegate>(Library, "glBindFramebuffer");
+            DeleteFramebuffers = FuncLoader.LoadFunction<DeleteFramebuffersDelegate>(Library, "glDeleteFramebuffers");
+            FramebufferTexture2D = FuncLoader.LoadFunction<FramebufferTexture2DDelegate>(Library, "glFramebufferTexture2D");
+            FramebufferRenderbuffer = FuncLoader.LoadFunction<FramebufferRenderbufferDelegate>(Library, "glFramebufferRenderbuffer");
+            RenderbufferStorageMultisample = FuncLoader.LoadFunction<RenderbufferStorageMultisampleDelegate>(Library, "glRenderbufferStorageMultisample");
+            GenerateMipmap = FuncLoader.LoadFunction<GenerateMipmapDelegate>(Library, "glGenerateMipmap");
+            BlitFramebuffer = FuncLoader.LoadFunction<BlitFramebufferDelegate>(Library, "glBlitFramebuffer");
+            CheckFramebufferStatus = FuncLoader.LoadFunction<CheckFramebufferStatusDelegate>(Library, "glCheckFramebufferStatus");
         }
 
         internal static void LoadFrameBufferObjectEXTEntryPoints()
         {
-            GenRenderbuffers = LoadEntryPoint<GenRenderbuffersDelegate>("glGenRenderbuffersEXT");
-            BindRenderbuffer = LoadEntryPoint<BindRenderbufferDelegate>("glBindRenderbufferEXT");
-            DeleteRenderbuffers = LoadEntryPoint<DeleteRenderbuffersDelegate>("glDeleteRenderbuffersEXT");
-            GenFramebuffers = LoadEntryPoint<GenFramebuffersDelegate>("glGenFramebuffersEXT");
-            BindFramebuffer = LoadEntryPoint<BindFramebufferDelegate>("glBindFramebufferEXT");
-            DeleteFramebuffers = LoadEntryPoint<DeleteFramebuffersDelegate>("glDeleteFramebuffersEXT");
-            FramebufferTexture2D = LoadEntryPoint<FramebufferTexture2DDelegate>("glFramebufferTexture2DEXT");
-            FramebufferRenderbuffer = LoadEntryPoint<FramebufferRenderbufferDelegate>("glFramebufferRenderbufferEXT");
-            RenderbufferStorageMultisample = LoadEntryPoint<RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleEXT");
-            GenerateMipmap = LoadEntryPoint<GenerateMipmapDelegate>("glGenerateMipmapEXT");
-            BlitFramebuffer = LoadEntryPoint<BlitFramebufferDelegate>("glBlitFramebufferEXT");
-            CheckFramebufferStatus = LoadEntryPoint<CheckFramebufferStatusDelegate>("glCheckFramebufferStatusEXT");
-        }
-
-        internal static T LoadEntryPoint<T>(string proc, bool throwIfNotFound = false) where T:class
-        {
-            try
-            {
-                var addr = EntryPointHelper.GetAddress(proc);
-                if (addr == IntPtr.Zero)
-                    return null;
-                return (T)(object)Marshal.GetDelegateForFunctionPointer(addr, typeof(T));
-            }
-            catch (EntryPointNotFoundException)
-            {
-                if (throwIfNotFound)
-                    throw;
-                return null;
-            }
+            GenRenderbuffers = FuncLoader.LoadFunction<GenRenderbuffersDelegate>(Library, "glGenRenderbuffersEXT");
+            BindRenderbuffer = FuncLoader.LoadFunction<BindRenderbufferDelegate>(Library, "glBindRenderbufferEXT");
+            DeleteRenderbuffers = FuncLoader.LoadFunction<DeleteRenderbuffersDelegate>(Library, "glDeleteRenderbuffersEXT");
+            GenFramebuffers = FuncLoader.LoadFunction<GenFramebuffersDelegate>(Library, "glGenFramebuffersEXT");
+            BindFramebuffer = FuncLoader.LoadFunction<BindFramebufferDelegate>(Library, "glBindFramebufferEXT");
+            DeleteFramebuffers = FuncLoader.LoadFunction<DeleteFramebuffersDelegate>(Library, "glDeleteFramebuffersEXT");
+            FramebufferTexture2D = FuncLoader.LoadFunction<FramebufferTexture2DDelegate>(Library, "glFramebufferTexture2DEXT");
+            FramebufferRenderbuffer = FuncLoader.LoadFunction<FramebufferRenderbufferDelegate>(Library, "glFramebufferRenderbufferEXT");
+            RenderbufferStorageMultisample = FuncLoader.LoadFunction<RenderbufferStorageMultisampleDelegate>(Library, "glRenderbufferStorageMultisampleEXT");
+            GenerateMipmap = FuncLoader.LoadFunction<GenerateMipmapDelegate>(Library, "glGenerateMipmapEXT");
+            BlitFramebuffer = FuncLoader.LoadFunction<BlitFramebufferDelegate>(Library, "glBlitFramebufferEXT");
+            CheckFramebufferStatus = FuncLoader.LoadFunction<CheckFramebufferStatusDelegate>(Library, "glCheckFramebufferStatusEXT");
         }
 
         static partial void LoadPlatformEntryPoints();

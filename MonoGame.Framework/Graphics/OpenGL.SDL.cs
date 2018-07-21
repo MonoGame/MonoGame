@@ -21,28 +21,5 @@ namespace MonoGame.OpenGL
             return new GraphicsContext(info);
         }
     }
-
-    internal class EntryPointHelper
-    {
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate IntPtr d_sdl_gl_getprocaddress(IntPtr proc);
-        public static d_sdl_gl_getprocaddress GetProcAddress = FuncLoader.LoadFunction<d_sdl_gl_getprocaddress>(Sdl.NativeLibrary, "SDL_GL_GetProcAddress");
-        
-        internal static IntPtr GetAddress(string proc)
-        {
-            IntPtr p = Marshal.StringToHGlobalAnsi(proc);
-            try
-            {
-                var addr = GetProcAddress(p);
-                if (addr == IntPtr.Zero)
-                    throw new EntryPointNotFoundException (proc);
-                return addr;
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(p);
-            }
-        }
-    }
 }
 
