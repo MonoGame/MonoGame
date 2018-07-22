@@ -85,6 +85,10 @@
 	<Compile Include="MainWindow.eto.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="LogWindow.cs" />
+    <Compile Include="LogWindow.eto.cs">
+        <DependentUpon>LogWindow.cs</DependentUpon>
+    </Compile>
     
     <!-- Native Windows -->
 	<Compile Include="Global.Windows.cs">
