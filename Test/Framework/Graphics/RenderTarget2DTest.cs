@@ -22,8 +22,19 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        public void NullDeviceShouldThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+            {
+                var renderTarget = new RenderTarget2D(null, 16, 16);
+                renderTarget.Dispose();
+            });
+            GC.GetTotalMemory(true); // collect uninitialized renderTarget
+        }
+
+        [Test]
 #if XNA
-        [Ignore]
+        [Ignore("XNA mipmaps fail our pixel comparison tests")]
 #endif
         public void GenerateMips()
         {

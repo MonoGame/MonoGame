@@ -17,7 +17,7 @@ namespace MonoGame.Tests.Graphics
         const int w=50, h=50, d=50, a = w * d * h;
         private Game _game;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
             reference = new Color[a];
@@ -36,7 +36,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TestFixtureTearDown()
         {
             _game.Dispose();
@@ -148,6 +148,17 @@ namespace MonoGame.Tests.Graphics
                 write[i] = new Color(23, 23, 23, 23);
             }
             Assert.Throws(Is.InstanceOf<Exception>(), () => t.SetData(0, x, y, x + w, y + h, z, z + d, write, startIndex, elementCount));
+        }
+
+        [Test]
+        public void NullDeviceShouldThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+            {                
+                var texture = new Texture3D(null, 16, 16, 16, false, SurfaceFormat.Color);
+                texture.Dispose();
+            });
+            GC.GetTotalMemory(true); // collect uninitialized Texture
         }
     }
 }

@@ -99,7 +99,6 @@ namespace MonoGame.Tools.Pipeline
         private PipelineController(IView view)
         {
             Instance = this;
-            PipelineSettings.Default.Load();
 
             SelectedItems = new List<IProjectItem>();
             _actionStack = new ActionStack(this);
@@ -957,13 +956,18 @@ namespace MonoGame.Tools.Pipeline
 
         public string GetFullPath(string filePath)
         {
-            if (_project == null)
+            if (_project == null || Path.IsPathRooted(filePath))
+            {
+                if (filePath.Length == 2 && filePath[0] != '/')
+                    filePath += "\\";
                 return filePath;
+            }
 
-            if (Path.IsPathRooted(filePath))
-                return filePath;
+            filePath = filePath.Replace("/", Path.DirectorySeparatorChar.ToString());
+            if (filePath.StartsWith("\\"))
+                filePath = filePath.Substring(1);
 
-            return Path.GetFullPath(Path.Combine(_project.Location, filePath));
+            return _project.Location + Path.DirectorySeparatorChar + filePath;
         }
 
         public string GetRelativePath(string path)

@@ -19,6 +19,17 @@ namespace MonoGame.Tests.Graphics
             Assert.Throws<ArgumentOutOfRangeException>(() => renderTarget = new RenderTargetCube(gd, 0, false, SurfaceFormat.Color, DepthFormat.None));
         }
 
+        [Test]
+        public void NullDeviceShouldThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+            {
+                var renderTarget = new RenderTargetCube(null, 16, false, SurfaceFormat.Color, DepthFormat.None);
+                renderTarget.Dispose();
+            });
+            GC.GetTotalMemory(true); // collect uninitialized renderTarget
+        }
+
         [TestCase(1)]
         [TestCase(8)]
         [TestCase(31)]

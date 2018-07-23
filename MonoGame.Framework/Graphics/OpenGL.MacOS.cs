@@ -22,28 +22,6 @@ namespace OpenGL
         {
             return new GraphicsContext ((MacWindowInfo)info);
         }
-
-		internal static class EntryPointHelper {
-			
-			static IntPtr GL = IntPtr.Zero;
-
-			static EntryPointHelper () 
-			{
-				try {
-					GL = Dlfcn.dlopen("/System/Library/Frameworks/OpenGL.framework/OpenGL", 0);
-				} catch (Exception ex) {
-					System.Diagnostics.Debug.WriteLine (ex.ToString());
-				}
-			}
-
-			public static IntPtr GetAddress(String function)
-			{
-				if (GL == IntPtr.Zero)
-					return IntPtr.Zero;
-
-				return Dlfcn.dlsym (GL, function);
-			}
-		}
 	}
 
     public class MacWindowInfo : IWindowInfo

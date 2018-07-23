@@ -362,12 +362,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var fconv = new FormatConverter(imgfactory);
 
-            fconv.Initialize(
-                decoder.GetFrame(0),
-                PixelFormat.Format32bppRGBA,
-                BitmapDitherType.None, null,
-                0.0, BitmapPaletteType.Custom);
-
+            using (var frame = decoder.GetFrame(0))
+            {
+                fconv.Initialize(
+                    frame,
+                    PixelFormat.Format32bppRGBA,
+                    BitmapDitherType.None,
+                    null,
+                    0.0,
+                    BitmapPaletteType.Custom);
+            }
             return fconv;
         }
 

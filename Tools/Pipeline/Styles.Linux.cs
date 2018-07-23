@@ -75,6 +75,23 @@ namespace MonoGame.Tools.Pipeline
                     Global.Application.AppMenu = new GLib.MenuModel((new Gtk.Builder("AppMenu.glade")).GetObject("appmenu").Handle);
             });
 
+            Style.Add<FormHandler>("LogWindow", h =>
+            {
+                if (!Global.UseHeaderBar)
+                    return;
+                
+                var headerBar = new Gtk.HeaderBar();
+                headerBar.ShowCloseButton = true;
+                headerBar.Title = h.Control.Title;
+
+                var buttoncopy = LogWindow.ButtonCopy.ToNative() as Gtk.Button;
+                buttoncopy.StyleContext.AddClass("suggested-action");
+                headerBar.PackStart(buttoncopy);
+
+                h.Control.Titlebar = headerBar;
+                headerBar.ShowAll();
+            });
+                                   
             Style.Add<FormHandler>("MainWindow", h =>
             {
                 if (!Global.UseHeaderBar)

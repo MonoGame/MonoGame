@@ -6,7 +6,7 @@ namespace MonoGame.Tests.Framework
     class ColorTest
     {
         // Contains a test case for each constructor type
-        private object[] _ctorTestCases =
+        private static object[] _ctorTestCases =
         {
 #if !XNA
             new object[] { new Color(new Color(64, 128, 192), 32), 64, 128, 192, 32 },
@@ -174,6 +174,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(half, Color.Lerp(color2, color1, 0.5f));
         }
 
+#if !XNA
         [Test]
         public void Deconstruct()
         {
@@ -198,5 +199,6 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(b2, color2.B);
             Assert.AreEqual(a2, color2.A);
         }
+#endif
     }
 }

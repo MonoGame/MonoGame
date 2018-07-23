@@ -5,6 +5,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Security;
+using MonoGame.Utilities;
 
 namespace MonoGame.OpenGL
 {
@@ -18,29 +19,6 @@ namespace MonoGame.OpenGL
         private static IGraphicsContext PlatformCreateContext (IWindowInfo info)
         {
             return new GraphicsContext(info);
-        }
-    }
-
-    internal class EntryPointHelper
-    {
-        [SuppressUnmanagedCodeSecurity]
-        [DllImport(Sdl.NativeLibName, CallingConvention = CallingConvention.Cdecl,
-            EntryPoint = "SDL_GL_GetProcAddress", ExactSpelling = true)]
-        internal static extern IntPtr GetProcAddress(IntPtr proc);
-        internal static IntPtr GetAddress(string proc)
-        {
-            IntPtr p = Marshal.StringToHGlobalAnsi(proc);
-            try
-            {
-                var addr = GetProcAddress(p);
-                if (addr == IntPtr.Zero)
-                    throw new EntryPointNotFoundException (proc);
-                return addr;
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(p);
-            }
         }
     }
 }

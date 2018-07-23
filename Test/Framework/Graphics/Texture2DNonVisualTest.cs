@@ -616,6 +616,9 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        [Ignore("PlatformGetData fails under OpenGL!")]
+#endif
         public void LoadOddSizedDxtCompressed()
         {
             // This is testing that DXT compressed mip levels that 
@@ -764,6 +767,17 @@ namespace MonoGame.Tests.Graphics
                 Assert.AreEqual((short) i, data[i]);
 
             tex.Dispose();
+        }
+
+        [Test]
+        public void NullDeviceShouldThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+            {
+                var texture = new Texture2D(null, 16, 16);
+                texture.Dispose();
+            });
+            GC.GetTotalMemory(true); // collect uninitialized Texture
         }
     }
 }

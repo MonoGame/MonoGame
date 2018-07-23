@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TwoMGFX.TPGParser;
 
 namespace TwoMGFX
 {
@@ -90,8 +91,8 @@ namespace TwoMGFX
             // Remove the samplers and techniques so that the shader compiler
             // gets a clean file without any FX file syntax in it.
             var cleanFile = newFile;
-            ParseTreeTools.WhitespaceNodes(TokenType.Technique_Declaration, tree.Nodes, ref cleanFile);
-            ParseTreeTools.WhitespaceNodes(TokenType.Sampler_Declaration_States, tree.Nodes, ref cleanFile);
+            WhitespaceNodes(TokenType.Technique_Declaration, tree.Nodes, ref cleanFile);
+            WhitespaceNodes(TokenType.Sampler_Declaration_States, tree.Nodes, ref cleanFile);
 
             // Setup the rest of the shader info.
             ShaderResult result = new ShaderResult();
@@ -122,6 +123,38 @@ namespace TwoMGFX
             result.Debug = options.Debug;
 
             return result;
+        }
+                
+        public static void WhitespaceNodes(TokenType type, List<ParseNode> nodes, ref string sourceFile)
+        {
+            for (var i = 0; i < nodes.Count; i++)
+            {
+                var n = nodes[i];
+                if (n.Token.Type != type)
+                {
+                    WhitespaceNodes(type, n.Nodes, ref sourceFile);
+                    continue;
+                }
+
+                // Get the full content of this node.
+                var start = n.Token.StartPos;
+                var end = n.Token.EndPos;
+                var length = end - n.Token.StartPos;
+                var content = sourceFile.Substring(start, length);
+
+                // Replace the content of this node with whitespace.
+                for (var c = 0; c < length; c++)
+                {
+                    if (!char.IsWhiteSpace(content[c]))
+                        content = content.Replace(content[c], ' ');
+                }
+
+                // Add the whitespace back to the source file.
+                var newfile = sourceFile.Substring(0, start);
+                newfile += content;
+                newfile += sourceFile.Substring(end);
+                sourceFile = newfile;
+            }
         }
     }
 }

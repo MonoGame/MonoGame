@@ -35,6 +35,8 @@
   </Properties>
 
   <Files>
+    <None Include="packages.config" />
+
     <!-- Dependencies -->
     <None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
       <Platforms>WindowsGL</Platforms>
@@ -96,12 +98,12 @@
       <Link>libnvmath.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll" Condition="Exists ('/Applications/Utilities/Console.app/')">
+    <None Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
       <Link>Nvidia.TextureTools.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config" Condition="Exists ('/Applications/Utilities/Console.app/')">
+    <None Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll.config" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
       <Link>Nvidia.TextureTools.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -136,6 +138,11 @@
       <Link>libPVRTexLibWrapper.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libassimp.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <None Include="README.md" />
 
@@ -145,12 +152,6 @@
     <Compile Include="Runner\Extensions.cs" />
     <Compile Include="Runner\FrameInfo.cs" />
     <Compile Include="Runner\FramePixelData.cs" />
-    <Compile Include="Runner\Interface\AggregateTestFilter.cs" />
-    <Compile Include="Runner\Interface\CommandLineInterface.cs" />
-    <Compile Include="Runner\Interface\RegexTestFilter.cs" />
-    <Compile Include="Runner\Interface\RunOptions.cs" />
-    <Compile Include="Runner\Interface\TestEventListenerBase.cs" />
-    <Compile Include="Runner\Interface\TestFilterAction.cs" />
     <Compile Include="Runner\PixelArgb.cs" />
     <Compile Include="Runner\Utility.cs" />
 
@@ -286,9 +287,6 @@
     <Compile Include="ContentPipeline\BuilderTargetsTest.cs">
       <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="ContentPipeline\ArrayContentCompilerTest.cs">
-      <Platforms>Windows,MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="ContentPipeline\AssetTestClasses.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
@@ -298,6 +296,9 @@
     </Compile>
     <Compile Include="ContentPipeline\BitmapContentTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\ContentCompilerTest.cs">
+      <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\EffectProcessorTests.cs">
         <Platforms>Windows</Platforms>
@@ -333,6 +334,9 @@
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\OggImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\TestCompiler.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\OpenAssetImporterTests.cs">
