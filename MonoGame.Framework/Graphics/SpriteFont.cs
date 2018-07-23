@@ -125,7 +125,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public Dictionary<char, Glyph> GetGlyphs()
         {
             var glyphsDictionary = new Dictionary<char, Glyph>(_glyphs.Length, CharComparer.Default);
-            GetGlyphs(glyphsDictionary);
+            foreach (var glyph in _glyphs)
+                glyphsDictionary.Add(glyph.Character, glyph);
             return glyphsDictionary;
         }
 
