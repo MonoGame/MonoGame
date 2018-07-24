@@ -155,12 +155,24 @@ namespace MGCB
             Name = "build",
             Flag = "b",
             ValueName = "sourceFile",
-            Description = "Build the content source file using the previously set switches and options.")]
+            Description = "Build the content source file using the previously set switches and options. Optional destination path may be specified with \"sourceFile;destFile\" if you wish to change the output filepath.")]
         public void OnBuild(string sourceFile)
         {
+            string link = null;
+            if(sourceFile.Contains(";"))
+            {
+                var split = sourceFile.Split(';');
+                sourceFile = split[0];
+                if(split.Length > 0)
+                {
+                    link = split[1];
+                }
+            }
             // Make sure the source file is absolute.
             if (!Path.IsPathRooted(sourceFile))
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
+
+            // link should remain relative, absolute path will get set later when the build occurs
 
             sourceFile = PathHelper.Normalize(sourceFile);
 
@@ -173,6 +185,7 @@ namespace MGCB
             var item = new ContentItem
             {
                 SourceFile = sourceFile, 
+                OutputFile = link,
                 Importer = Importer, 
                 Processor = _processor,
                 ProcessorParams = new OpaqueDataDictionary()
@@ -213,6 +226,9 @@ namespace MGCB
         public class ContentItem
         {
             public string SourceFile;
+
+            // This refers to the "Link" which can override the default output location
+            public string OutputFile;
             public string Importer;
             public string Processor;
             public OpaqueDataDictionary ProcessorParams;
@@ -282,13 +298,22 @@ namespace MGCB
                                 previousContent.Profile != Profile;
 
             // First clean previously built content.
-            foreach (var sourceFile in previousContent.SourceFiles)
+            for(int i = 0; i < previousContent.SourceFiles.Count; i++)
             {
+                var sourceFile = previousContent.SourceFiles[i];
+
+                // This may be an old file (prior to MG 3.7) which doesn't have destination files:
+                string destFile = null;
+                if(i < previousContent.DestFiles.Count)
+                {
+                    destFile = previousContent.DestFiles[i];
+                }
+
                 var inContent = _content.Any(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
                 var cleanOldContent = !inContent && !Incremental;
                 var cleanRebuiltContent = inContent && (Rebuild || Clean);
                 if (cleanRebuiltContent || cleanOldContent || targetChanged)
-                    _manager.CleanContent(sourceFile);                
+                    _manager.CleanContent(sourceFile, destFile);                
             }
 
             var newContent = new SourceFileCollection
@@ -306,7 +331,7 @@ namespace MGCB
             {
                 try
                 {
-                    _manager.RegisterContent(c.SourceFile, null, c.Importer, c.Processor, c.ProcessorParams);
+                    _manager.RegisterContent(c.SourceFile, c.OutputFile, c.Importer, c.Processor, c.ProcessorParams);
                 }
                 catch
                 {
@@ -319,12 +344,13 @@ namespace MGCB
                 try
                 {
                     _manager.BuildContent(c.SourceFile,
-                                          null,
+                                          c.OutputFile,
                                           c.Importer,
                                           c.Processor,
                                           c.ProcessorParams);
 
                     newContent.SourceFiles.Add(c.SourceFile);
+                    newContent.DestFiles.Add(c.OutputFile);
 
                     ++successCount;
                 }

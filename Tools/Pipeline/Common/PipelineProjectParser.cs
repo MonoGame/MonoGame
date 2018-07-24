@@ -151,6 +151,21 @@ namespace MonoGame.Tools.Pipeline
 
         public bool AddContent(string sourceFile, bool skipDuplicates)
         {
+            string link = null;
+
+            if(sourceFile.Contains(";"))
+            {
+                var split = sourceFile.Split(';');
+
+                sourceFile = split[0];
+
+                if(split.Length > 0)
+                {
+                    link = split[1];
+                }
+            }
+
+
             // Make sure the source file is relative to the project.
             var projectDir = ProjectDirectory + Path.DirectorySeparatorChar;
 
@@ -173,10 +188,10 @@ namespace MonoGame.Tools.Pipeline
                 Observer = _observer,
                 BuildAction = BuildAction.Build,
                 OriginalPath = sourceFile,
+                DestinationPath = string.IsNullOrEmpty(link) ? sourceFile : link,
                 ImporterName = Importer,
                 ProcessorName = Processor,
-                ProcessorParams = new OpaqueDataDictionary(),
-                Exists = File.Exists(projectDir + sourceFile)
+                ProcessorParams = new OpaqueDataDictionary()
             };
             _project.ContentItems.Add(item);
 
@@ -210,8 +225,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 BuildAction = BuildAction.Copy,
                 OriginalPath = sourceFile,
-                ProcessorParams = new OpaqueDataDictionary(),
-                Exists = File.Exists(projectDir + sourceFile)
+                ProcessorParams = new OpaqueDataDictionary()
             };
             _project.ContentItems.Add(item);
 
@@ -368,7 +382,10 @@ namespace MonoGame.Tools.Pipeline
                         }
                     }
 
-                    line = string.Format(lineFormat, "build", i.OriginalPath);
+                    string buildValue = i.OriginalPath;
+                    if (i.OriginalPath != i.DestinationPath)
+                        buildValue += ";" + i.DestinationPath;
+                    line = string.Format(lineFormat, "build", buildValue);
                     io.WriteLine(line);
                     io.WriteLine();
                 }

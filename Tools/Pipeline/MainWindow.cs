@@ -272,12 +272,12 @@ namespace MonoGame.Tools.Pipeline
             var result = dialog.ShowModal(this);
 
             template = dialog.Selected;
-            name = dialog.Name;
+            name = dialog.Name + Path.GetExtension(template.TemplateFile);
 
             return result;
         }
 
-        public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
+        public bool CopyOrLinkFile(string file, bool exists, out IncludeType action, out bool applyforall)
         {
             var dialog = new AddItemDialog(file, exists, FileType.File);
             var result = dialog.ShowModal(this);
@@ -288,7 +288,7 @@ namespace MonoGame.Tools.Pipeline
             return result;
         }
 
-        public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
+        public bool CopyOrLinkFolder(string folder, bool exists, out IncludeType action, out bool applyforall)
         {
             var afd = new AddItemDialog(folder, exists, FileType.Folder);
             applyforall = false;
@@ -299,7 +299,7 @@ namespace MonoGame.Tools.Pipeline
                 return true;
             }
 
-            action = CopyAction.Link;
+            action = IncludeType.Link;
             return false;
         }
 
@@ -428,7 +428,7 @@ namespace MonoGame.Tools.Pipeline
             AddContextMenu(cmExclude, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmRename, ref sep);
-            AddContextMenu(cmDelete, ref sep);
+            //AddContextMenu(cmDelete, ref sep);
 
             if (_contextMenu.Items.Count > 0)
             {
