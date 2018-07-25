@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             // Assert: Reset ready message must have happened before this call as it was sent just before
             if (CurrentMachine.IsHost)
             {
-                foreach (NetworkGamer gamer in CurrentMachine.Session.AllGamers)
+                foreach (NetworkGamer gamer in CurrentMachine.Session.allGamers)
                 {
                     if (gamer.IsReady)
                     {

@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             {
                 bool firstGamer = true;
 
-                foreach (LocalNetworkGamer localGamer in CurrentMachine.Session.LocalGamers)
+                foreach (LocalNetworkGamer localGamer in CurrentMachine.localGamers)
                 {
                     if (firstGamer)
                     {

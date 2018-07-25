@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             // Make sure that the host can not accidentaly start the game too early
             if (CurrentMachine.IsHost)
             {
-                foreach (NetworkGamer gamer in CurrentMachine.Session.AllGamers)
+                foreach (NetworkGamer gamer in CurrentMachine.Session.allGamers)
                 {
                     // Safe because any ready state change from a remote gamer will happen after the scope of this Receive() call
                     gamer.SetReadyState(false);
@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             // Tell everyone that our local gamers are not yet ready
-            foreach (LocalNetworkGamer localGamer in CurrentMachine.LocalGamers)
+            foreach (LocalNetworkGamer localGamer in CurrentMachine.localGamers)
             {
                 localGamer.SetReadyState(false);
 

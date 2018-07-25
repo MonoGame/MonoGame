@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             msg.Write((byte)InternalMessageIndex.ConnectionAcknowledged);
 
             // Encode validation info
-            msg.Write((int)CurrentMachine.LocalGamers.Count);
+            msg.Write((int)CurrentMachine.localGamers.Count);
 
             // Send a priori state
             if (CurrentMachine.IsHost)
@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 CurrentMachine.Session.InternalMessages.SessionStateChanged.Create(recipient);
             }
 
-            foreach (LocalNetworkGamer localGamer in CurrentMachine.LocalGamers)
+            foreach (LocalNetworkGamer localGamer in CurrentMachine.localGamers)
             {
                 CurrentMachine.Session.InternalMessages.GamerJoined.Create(localGamer, recipient);
             }
@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            if (senderMachine.Gamers.Count != gamerCount)
+            if (senderMachine.gamers.Count != gamerCount)
             {
                 // TODO: SuspiciousUnexpectedMessage
                 Debug.Assert(false);

@@ -26,9 +26,9 @@ namespace Microsoft.Xna.Framework.Net
 
         private List<OutgoingMessage> messageQueue;
         private List<EventArgs> eventQueue;
-        private List<NetworkGamer> allGamers;
-        private List<NetworkGamer> remoteGamers;
-        private List<NetworkGamer> previousGamers;
+        internal List<NetworkGamer> allGamers; // TODO: Make private once messages are refactored into NetworkSession
+        internal List<NetworkGamer> remoteGamers;
+        internal List<NetworkGamer> previousGamers;
 
         internal bool allowHostMigration;
         internal bool allowJoinInProgress;
@@ -95,17 +95,18 @@ namespace Microsoft.Xna.Framework.Net
             this.InternalMessages = new InternalMessages(this.Backend, this, this.localMachine);
             this.RemoteMachines = new List<NetworkMachine>();
 
-            this.AllGamers = new GamerCollection<NetworkGamer>(this.allGamers);
+            this.AllGamers = new GamerCollection<NetworkGamer>(new List<NetworkGamer>(), this.allGamers);
+            this.PreviousGamers = new GamerCollection<NetworkGamer>(new List<NetworkGamer>(), this.previousGamers);
+            this.RemoteGamers = new GamerCollection<NetworkGamer>(new List<NetworkGamer>(), this.remoteGamers);
+            this.LocalGamers = new GamerCollection<LocalNetworkGamer>(new List<LocalNetworkGamer>(), this.localMachine.localGamers);
             this.BytesPerSecondReceived = 0;
             this.BytesPerSecondSent = 0;
             this.IsDisposed = false;
-            this.LocalGamers = this.localMachine.LocalGamers;
-            this.PreviousGamers = new GamerCollection<NetworkGamer>(this.previousGamers);
-            this.RemoteGamers = new GamerCollection<NetworkGamer>(this.remoteGamers);
             this.SessionProperties = properties;
             this.SessionProperties.Session = this;
             this.SessionState = NetworkSessionState.Lobby;
             this.SessionType = type;
+
             this.SimulatedLatency = TimeSpan.Zero;
             this.SimulatedPacketLoss = 0.0f;
 
@@ -116,10 +117,18 @@ namespace Microsoft.Xna.Framework.Net
         internal PacketPool PacketPool { get; }
         internal InternalMessages InternalMessages { get; }
         internal IList<NetworkMachine> RemoteMachines { get; }
-
         internal bool IsFullyConnected { get { return localMachine.IsFullyConnected; } }
 
         public GamerCollection<NetworkGamer> AllGamers { get; }
+        public GamerCollection<NetworkGamer> PreviousGamers { get; }
+        public GamerCollection<NetworkGamer> RemoteGamers { get; }
+        public GamerCollection<LocalNetworkGamer> LocalGamers { get; }
+        public int BytesPerSecondReceived { get; private set; }
+        public int BytesPerSecondSent { get; private set; }
+        public bool IsDisposed { get; private set; }
+        public NetworkSessionProperties SessionProperties { get; }
+        public NetworkSessionState SessionState { get; internal set; }
+        public NetworkSessionType SessionType { get; }
 
         public bool AllowHostMigration
         {
@@ -129,10 +138,8 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 return allowHostMigration;
             }
-
             set
             {
                 if (IsDisposed || SessionState == NetworkSessionState.Ended)
@@ -143,12 +150,10 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new InvalidOperationException("Only the host can perform this action");
                 }
-
                 if (value == true)
                 {
                     throw new NotImplementedException("Host migration is not yet implemented");
                 }
-
                 /*if (allowHostMigration != value)
                 {
                     allowHostMigration = value;
@@ -166,10 +171,8 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 return allowJoinInProgress;
             }
-
             set
             {
                 if (IsDisposed || SessionState == NetworkSessionState.Ended)
@@ -180,7 +183,6 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new InvalidOperationException("Only the host can perform this action");
                 }
-
                 if (allowJoinInProgress != value)
                 {
                     allowJoinInProgress = value;
@@ -190,9 +192,6 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        public int BytesPerSecondReceived { get; private set; }
-        public int BytesPerSecondSent { get; private set; }
-
         internal NetworkMachine HostMachine
         {
             get
@@ -201,12 +200,10 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 if (hostMachine == null)
                 {
                     throw new NetworkException("Host machine is null at this time");
                 }
-
                 return hostMachine;
             }
         }
@@ -219,19 +216,14 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 NetworkMachine hostMachine = HostMachine;
-
-                if (hostMachine.Gamers.Count == 0)
+                if (hostMachine.gamers.Count == 0)
                 {
                     throw new NetworkException("NetworkSession not ready for use yet. Bug in internal session creation, gamer leaving or host migration code.");
                 }
-
-                return hostMachine.Gamers[0];
+                return hostMachine.gamers[0];
             }
         }
-
-        public bool IsDisposed { get; private set; }
 
         public bool IsEveryoneReady
         {
@@ -241,7 +233,6 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 foreach (NetworkGamer gamer in allGamers)
                 {
                     if (!gamer.IsReady)
@@ -249,7 +240,6 @@ namespace Microsoft.Xna.Framework.Net
                         return false;
                     }
                 }
-
                 return true;
             }
         }
@@ -262,12 +252,9 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 return localMachine.IsHost;
             }
         }
-
-        public GamerCollection<LocalNetworkGamer> LocalGamers { get; }
 
         public int MaxGamers
         {
@@ -277,10 +264,8 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 return maxGamers;
             }
-
             set
             {
                 if (IsDisposed || SessionState == NetworkSessionState.Ended)
@@ -295,7 +280,6 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ArgumentOutOfRangeException();
                 }
-
                 if (maxGamers != value)
                 {
                     maxGamers = value;
@@ -304,23 +288,19 @@ namespace Microsoft.Xna.Framework.Net
                 }
             }
         }
-        
-        public GamerCollection<NetworkGamer> PreviousGamers { get; }
 
         internal int MaxPossiblePrivateGamerSlots
         {
             get
             {
                 int usedPublicSlots = 0;
-
-                foreach (NetworkGamer gamer in AllGamers)
+                foreach (NetworkGamer gamer in allGamers)
                 {
                     if (!gamer.IsPrivateSlot)
                     {
                         usedPublicSlots++;
                     }
                 }
-
                 return maxGamers - usedPublicSlots;
             }
         }
@@ -333,10 +313,8 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 return privateGamerSlots;
             }
-
             set
             {
                 if (IsDisposed || SessionState == NetworkSessionState.Ended)
@@ -351,20 +329,13 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ArgumentOutOfRangeException();
                 }
-
                 if (privateGamerSlots != value)
                 {
                     privateGamerSlots = value;
-
                     InternalMessages.SessionStateChanged.Create(null);
                 }
             }
         }
-
-        public GamerCollection<NetworkGamer> RemoteGamers { get; }
-        public NetworkSessionProperties SessionProperties { get; }
-        public NetworkSessionState SessionState { get; internal set; }
-        public NetworkSessionType SessionType { get; }
 
         public TimeSpan SimulatedLatency // TODO: Should be applied even to local messages
         {
@@ -374,7 +345,6 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 return Backend.SimulatedLatency;
             }
             set
@@ -383,7 +353,6 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 Backend.SimulatedLatency = value;
             }
         }
@@ -396,7 +365,6 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 return Backend.SimulatedPacketLoss;
             }
             set
@@ -405,7 +373,6 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
                 Backend.SimulatedPacketLoss = value;
             }
         }
@@ -426,15 +393,13 @@ namespace Microsoft.Xna.Framework.Net
             get
             {
                 int usedSlots = 0;
-
-                foreach (NetworkGamer gamer in AllGamers)
+                foreach (NetworkGamer gamer in allGamers)
                 {
                     if (gamer.IsPrivateSlot)
                     {
                         usedSlots++;
                     }
                 }
-
                 return PrivateGamerSlots - usedSlots;
             }
         }
@@ -455,7 +420,14 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                publicInfo.Set(SessionType, SessionProperties, HostGamertag, MaxGamers, PrivateGamerSlots, CurrentGamerCount, OpenPrivateGamerSlots, OpenPublicGamerSlots);
+                publicInfo.Set(SessionType,
+                                SessionProperties,
+                                HostGamertag,
+                                MaxGamers,
+                                PrivateGamerSlots,
+                                CurrentGamerCount,
+                                OpenPrivateGamerSlots,
+                                OpenPublicGamerSlots);
 
                 return publicInfo;
             }
@@ -593,7 +565,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new ObjectDisposedException("NetworkSession");
             }
 
-            foreach (NetworkGamer gamer in AllGamers)
+            foreach (NetworkGamer gamer in allGamers)
             {
                 if (gamer.Id == gamerId)
                 {
@@ -617,9 +589,9 @@ namespace Microsoft.Xna.Framework.Net
             machine.HasLeftSession = true;
 
             // Remove gamers
-            for (int i = machine.Gamers.Count - 1; i >= 0; i--)
+            for (int i = machine.gamers.Count - 1; i >= 0; i--)
             {
-                RemoveGamer(machine.Gamers[i]);
+                RemoveGamer(machine.gamers[i]);
             }
 
             // Remove machine
@@ -938,7 +910,7 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             // Recycle inbound packets that the user has read from the last frame
-            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
+            foreach (LocalNetworkGamer localGamer in localMachine.localGamers)
             {
                 localGamer.RecycleInboundPackets();
             }
@@ -947,7 +919,7 @@ namespace Microsoft.Xna.Framework.Net
             Backend.Update();
 
             // Add delayed inbound packets if sender has joined (Might add new inbound packets)
-            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
+            foreach (LocalNetworkGamer localGamer in localMachine.localGamers)
             {
                 localGamer.TryAddDelayedInboundPackets();
             }
@@ -955,14 +927,14 @@ namespace Microsoft.Xna.Framework.Net
             HandleInitialConnection();
 
             // Queue outbound packets as internal messages
-            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
+            foreach (LocalNetworkGamer localGamer in localMachine.localGamers)
             {
                 localGamer.QueueOutboundPackets();
             }
 
             SendInternalMessages();
 
-            foreach (LocalNetworkGamer localGamer in LocalGamers)
+            foreach (LocalNetworkGamer localGamer in localMachine.localGamers)
             {
                 localGamer.RecycleOutboundPackets();
             }
@@ -1017,6 +989,17 @@ namespace Microsoft.Xna.Framework.Net
             SilentUpdate();
 
             TriggerEvents();
+
+            // Update public gamer collections
+            AllGamers.CopyFromReference();
+            RemoteGamers.CopyFromReference();
+            PreviousGamers.CopyFromReference();
+            LocalGamers.CopyFromReference();
+
+            foreach (var remoteMachine in RemoteMachines)
+            {
+                remoteMachine.Gamers.CopyFromReference();
+            }
         }
 
         internal void End(NetworkSessionEndReason reason)

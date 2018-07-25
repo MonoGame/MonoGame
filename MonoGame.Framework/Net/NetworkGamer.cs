@@ -34,8 +34,8 @@ namespace Microsoft.Xna.Framework.Net
         public bool HasLeftSession { get; internal set; }
         public bool HasVoice { get { return false; } }
         public byte Id { get; }
-        public bool IsGuest { get { return Machine.Gamers[0] != this; } }
-        public bool IsHost { get { return Machine.IsHost && Machine.Gamers[0] == this; } }
+        public bool IsGuest { get { return Machine.gamers[0] != this; } }
+        public bool IsHost { get { return Machine.IsHost && Machine.gamers[0] == this; } }
         public bool IsLocal { get { return Machine.IsLocal; } }
         public bool IsMutedByLocalUser { get { return false; } }
         public bool IsPrivateSlot { get; internal set; }

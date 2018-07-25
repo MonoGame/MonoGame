@@ -9,9 +9,9 @@ namespace Microsoft.Xna.Framework.Net
     public class NetworkMachine
     {
         internal Peer peer;
-        private IList<LocalNetworkGamer> localGamers;
-        private IList<NetworkGamer> gamers;
-        private bool beingRemovedThisFrame;
+        internal IList<LocalNetworkGamer> localGamers;
+        internal IList<NetworkGamer> gamers;
+        private bool beingRemovedThisUpdate;
 
         internal NetworkMachine(NetworkSession session, Peer peer, bool isLocal, bool isHost)
         {
@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Net
             this.peer.Tag = this;
             this.localGamers = isLocal ? new List<LocalNetworkGamer>() : null;
             this.gamers = new List<NetworkGamer>();
-            this.beingRemovedThisFrame = false;
+            this.beingRemovedThisUpdate = false;
 
             this.Session = session;
             this.HasLeftSession = false;
@@ -28,8 +28,7 @@ namespace Microsoft.Xna.Framework.Net
             this.HasAcknowledgedLocalMachine = false;
             this.IsLocal = isLocal;
             this.IsHost = isHost;
-            this.LocalGamers = isLocal ? new GamerCollection<LocalNetworkGamer>(localGamers) : null;
-            this.Gamers = new GamerCollection<NetworkGamer>(gamers);
+            this.Gamers = new GamerCollection<NetworkGamer>(new List<NetworkGamer>(), gamers);
         }
 
         internal NetworkSession Session { get; }
@@ -39,7 +38,6 @@ namespace Microsoft.Xna.Framework.Net
         internal bool HasAcknowledgedLocalMachine { get; set; }
         internal bool IsLocal { get; }
         internal bool IsHost { get; }
-        internal GamerCollection<LocalNetworkGamer> LocalGamers { get; }
         public GamerCollection<NetworkGamer> Gamers { get; }
 
         internal LocalNetworkGamer FindLocalGamerBySignedInGamer(SignedInGamer signedInGamer)
@@ -114,11 +112,11 @@ namespace Microsoft.Xna.Framework.Net
             }
             else
             {
-                if (!beingRemovedThisFrame)
+                if (!beingRemovedThisUpdate)
                 {
                     Session.InternalMessages.RemoveMachine.Create(this, null);
 
-                    beingRemovedThisFrame = true;
+                    beingRemovedThisUpdate = true;
                 }
             }
         }
