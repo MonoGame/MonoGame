@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             var gamepad = new GamePadInfo();
             gamepad.Device = Sdl.GameController.Open(deviceId);
-            gamepad.HapticDevice = Sdl.Haptic.Open(deviceId);
+            gamepad.HapticDevice = Sdl.Haptic.OpenFromJoystick(Sdl.GameController.GetJoystick(gamepad.Device));
 
             var id = 0;
             while (Gamepads.ContainsKey(id))
