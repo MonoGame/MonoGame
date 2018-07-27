@@ -33,7 +33,6 @@ namespace MonoGame.Utilities
         }
         
         private const int RTLD_LAZY = 0x0001;
-        private const int RTLD_GLOBAL = 0x0100;
 
         public static IntPtr LoadLibrary(string libname)
         {
@@ -41,9 +40,9 @@ namespace MonoGame.Utilities
                 return Windows.LoadLibraryW(libname);
 
             if (CurrentPlatform.OS == OS.MacOSX)
-                return OSX.dlopen(libname, RTLD_GLOBAL | RTLD_LAZY);
+                return OSX.dlopen(libname, RTLD_LAZY);
 
-            return Linux.dlopen(libname, RTLD_GLOBAL | RTLD_LAZY);
+            return Linux.dlopen(libname, RTLD_LAZY);
         }
 
         public static T LoadFunction<T>(IntPtr library, string function, bool throwIfNotFound = false)
@@ -65,11 +64,11 @@ namespace MonoGame.Utilities
                 return default(T);
             }
 
-            // TODO: Use the function bellow once Protobuild gets axed
-            // requires .NET Framework 4.5.1 and its useful for corert
-            // return Marshal.GetDelegateForFunctionPointer<T>(ret);
-
+#if NETSTANDARD
+            return Marshal.GetDelegateForFunctionPointer<T>(ret);
+#else
             return (T)(object)Marshal.GetDelegateForFunctionPointer(ret, typeof(T));
+#endif
         }
     }
 }
