@@ -591,6 +591,10 @@ internal static class Sdl
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr d_sdl_gl_getprocaddress(string proc);
+        public static d_sdl_gl_getprocaddress GetProcAddress = FuncLoader.LoadFunction<d_sdl_gl_getprocaddress>(NativeLibrary, "SDL_GL_GetProcAddress");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_gl_getswapinterval();
         public static d_sdl_gl_getswapinterval GetSwapInterval = FuncLoader.LoadFunction<d_sdl_gl_getswapinterval>(NativeLibrary, "SDL_GL_GetSwapInterval");
 

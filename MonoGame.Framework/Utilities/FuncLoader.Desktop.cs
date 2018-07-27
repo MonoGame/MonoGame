@@ -57,6 +57,16 @@ namespace MonoGame.Utilities
             else
                 ret = Linux.dlsym(library, function);
 
+#if DESKTOPGL
+            // In case of OpenGL on Windows we also need to check
+            // for wglGetProcAddress to load up the proper function
+            //
+            // Since this only works with DesktopGL, lets use
+            // SDL.GetProcAddress for now.
+            if (ret == IntPtr.Zero && CurrentPlatform.OS == OS.Windows)
+                ret = Sdl.GL.GetProcAddress(function);
+#endif
+
             if (ret == IntPtr.Zero)
             {
                 if (throwIfNotFound)
