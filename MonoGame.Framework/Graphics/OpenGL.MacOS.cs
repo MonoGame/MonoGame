@@ -13,7 +13,7 @@ namespace OpenGL
 {
     public partial class GL
     {
-        public static IntPtr Library = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenGLES.framework/OpenGLES");
+        public static IntPtr Library = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenGL.framework/OpenGL");
         
         static partial void LoadPlatformEntryPoints()
 		{
