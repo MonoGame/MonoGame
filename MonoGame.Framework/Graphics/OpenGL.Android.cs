@@ -19,16 +19,45 @@ namespace MonoGame.OpenGL
 		internal delegate bool BindAPIDelegate (RenderApi api);
 		internal static BindAPIDelegate BindAPI;
 
+        public static IntPtr Library;
+        public static IntPtr libES1 = FuncLoader.LoadLibrary("libGLESv1_CM.so");
+        public static IntPtr libES2 = FuncLoader.LoadLibrary("libGLESv2.so");
+        public static IntPtr libES3 = FuncLoader.LoadLibrary("libGLESv3.so");
+        public static IntPtr libGL = FuncLoader.LoadLibrary("libGL.so");
+
         static partial void LoadPlatformEntryPoints()
         {
             Android.Util.Log.Verbose("GL", "Loading Entry Points");
-            BindAPI = FuncLoader.LoadFunction<BindAPIDelegate>(GL.Library, "eglBindAPI");
-            var supportsFullGL = BindAPI(RenderApi.GL);
-			if (!supportsFullGL) {
-                BindAPI (RenderApi.ES);
-				BoundApi = RenderApi.ES;
-			}
+
+            var eglBindLoaded = false;
+            try
+            {
+                BindAPI = FuncLoader.LoadFunction<BindAPIDelegate>(libGL, "eglBindAPI", true);
+                eglBindLoaded = true;
+            }
+            catch { }
+
+            var supportsFullGL = eglBindLoaded && BindAPI (RenderApi.GL);
+            if (!supportsFullGL) {
+                if (eglBindLoaded)
+                    BindAPI (RenderApi.ES);
+                BoundApi = RenderApi.ES;
+            }
+                
             Android.Util.Log.Verbose("GL", "Bound {0}", BoundApi);
+
+            if (GL.BoundApi == GL.RenderApi.ES && libES3 != IntPtr.Zero)
+                Library = libES3;
+
+            if (GL.BoundApi == GL.RenderApi.ES && libES2 != IntPtr.Zero)
+                Library = libES2;
+            else if (GL.BoundApi == GL.RenderApi.GL && libGL != IntPtr.Zero)
+                Library = libGL;
+        }
+
+        private static T LoadFunction<T>(string function, bool throwIfNotFound = false)
+        {
+            return FuncLoader.LoadFunction<T>(Library, function, throwIfNotFound);
         }
 
         private static IGraphicsContext PlatformCreateContext (IWindowInfo info)
@@ -58,17 +87,15 @@ namespace MonoGame.OpenGL
 
         internal static IEnumerable<GLESVersion> GetSupportedGLESVersions()
         {
-            var lib = GL.Library;
-
-            if (GL.SupportedVersion == 3)
+            if (GL.libES3 != IntPtr.Zero)
             {
                 yield return new GLESVersion { Major = 3, Minor = 2 };
                 yield return new GLESVersion { Major = 3, Minor = 1 };
                 yield return new GLESVersion { Major = 3, Minor = 0 };
             }
-            if (GL.SupportedVersion == 2)
+            if (GL.libES2 != IntPtr.Zero)
             {
-                // We pass -1 becuase when requesting a GLES 2.0 context we 
+                // We pass -1 becuase when requesting a GLES 2.0 context we
                 // dont provide the Minor version.
                 yield return new GLESVersion { Major = 2, Minor = -1 };
             }
@@ -76,4 +103,3 @@ namespace MonoGame.OpenGL
         }
     }
 }
-

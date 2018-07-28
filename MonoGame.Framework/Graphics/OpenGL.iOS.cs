@@ -7,16 +7,23 @@ using System.Runtime.InteropServices;
 using ObjCRuntime;
 using System.Security;
 using OpenGLES;
+using MonoGame.Utilities;
 
 namespace MonoGame.OpenGL
 {
     internal partial class GL
 	{
+        public static IntPtr Library = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenGLES.framework/OpenGLES");
         
         static partial void LoadPlatformEntryPoints()
 		{
 			BoundApi = RenderApi.ES;
-		}
+        }
+
+        private static T LoadFunction<T>(string function, bool throwIfNotFound = false)
+        {
+            return FuncLoader.LoadFunction<T>(Library, function, throwIfNotFound);
+        }
 
         private static IGraphicsContext PlatformCreateContext (IWindowInfo info)
         {
