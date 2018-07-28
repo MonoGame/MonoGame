@@ -10,13 +10,12 @@ namespace MonoGame.Utilities
 
         [DllImport("dl")]
         public static extern IntPtr dlsym(IntPtr handle, string symbol);
-        
+
         private const int RTLD_LAZY = 0x0001;
-        private const int RTLD_GLOBAL = 0x0100;
 
         public static IntPtr LoadLibrary(string libname)
         {
-            return dlopen(libname, RTLD_GLOBAL | RTLD_LAZY);
+            return dlopen(libname, RTLD_LAZY);
         }
 
         public static T LoadFunction<T>(IntPtr library, string function, bool throwIfNotFound = false)
