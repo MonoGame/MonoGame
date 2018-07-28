@@ -545,10 +545,6 @@ namespace MonoGame.OpenGL
     {
         public static IntPtr Library = GetNativeLibrary();
 
-#if ANDROID
-        public static int SupportedVersion;
-#endif
-
         private static IntPtr GetNativeLibrary()
         {
             var ret = IntPtr.Zero;
@@ -560,25 +556,7 @@ namespace MonoGame.OpenGL
                 ret = FuncLoader.LoadLibrary("libGL.so.1");
             else
                 ret = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenGL.framework/OpenGL");
-#elif ANDROID
-            if (GL.BoundApi == GL.RenderApi.ES)
-            {
-                ret = FuncLoader.LoadLibrary("libGLESv3.so");
-                SupportedVersion = 3;
-            }
-
-            if (GL.BoundApi == GL.RenderApi.ES && ret == IntPtr.Zero)
-            {
-                ret = FuncLoader.LoadLibrary("libGLESv2.so");
-                SupportedVersion = 2;
-            }
-
-			if (GL.BoundApi == GL.RenderApi.GL)
-            {
-                ret = FuncLoader.LoadLibrary("libGL.so");
-                SupportedVersion = 1;
-            }
-#else
+#elif !ANDROID
             ret = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenGLES.framework/OpenGLES");
 #endif
 
@@ -1413,7 +1391,7 @@ namespace MonoGame.OpenGL
             Android.Util.Log.Verbose("GL","Supported Extensions");
             foreach (var ext in Extensions)
                 Android.Util.Log.Verbose("GL", "   " + ext);
-#endif 
+#endif
         }
 
         internal static void LoadExtensions()
@@ -1576,7 +1554,7 @@ namespace MonoGame.OpenGL
             GetProgramInfoLogInternal (programId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
-            
+
         internal static string GetShaderInfoLog (int shaderId) {
             int length = 0;
             GetShader(shaderId, ShaderParameter.LogLength, out length);
@@ -1584,7 +1562,7 @@ namespace MonoGame.OpenGL
             GetShaderInfoLogInternal (shaderId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
-            
+
         internal unsafe static void ShaderSource(int shaderId, string code)
         {
             int length = code.Length;
