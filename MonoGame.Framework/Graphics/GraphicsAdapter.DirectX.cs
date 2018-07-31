@@ -119,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics
             FeatureLevel highestSupportedLevel;
             try
             {
-                highestSupportedLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
+                highestSupportedLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel(_adapter);
             }
             catch (SharpDX.SharpDXException ex)
             {
