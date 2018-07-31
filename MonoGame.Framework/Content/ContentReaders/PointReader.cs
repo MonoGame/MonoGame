@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class PointReader : ContentTypeReader<Point>
 	{
-		internal PointReader ()
+		public PointReader ()
 			{
 		}
 

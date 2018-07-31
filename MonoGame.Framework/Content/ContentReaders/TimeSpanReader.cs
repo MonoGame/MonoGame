@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class TimeSpanReader : ContentTypeReader<TimeSpan>
 	{
-		internal TimeSpanReader ()
+		public TimeSpanReader ()
 		{
 		}
 

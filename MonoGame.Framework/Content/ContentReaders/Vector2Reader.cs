@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class Vector2Reader : ContentTypeReader<Vector2>
 	{
-		internal Vector2Reader ()
+		public Vector2Reader ()
 		{
 		}
 

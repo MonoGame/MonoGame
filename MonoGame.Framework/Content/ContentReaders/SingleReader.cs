@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class SingleReader : ContentTypeReader<float>
     {
-        internal SingleReader()
+        public SingleReader()
         {
         }
 

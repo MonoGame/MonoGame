@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class Int64Reader : ContentTypeReader<long>
 	{
-		internal Int64Reader ()
+		public Int64Reader ()
 		{
 		}
 

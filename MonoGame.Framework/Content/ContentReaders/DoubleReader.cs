@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class DoubleReader : ContentTypeReader<double>
     {
-        internal DoubleReader()
+        public DoubleReader()
         {
         }
 

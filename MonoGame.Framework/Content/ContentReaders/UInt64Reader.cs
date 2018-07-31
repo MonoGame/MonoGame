@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class UInt64Reader : ContentTypeReader<ulong>
     {
-        internal UInt64Reader()
+        public UInt64Reader()
         {
         }
 

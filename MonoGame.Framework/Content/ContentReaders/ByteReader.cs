@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     internal class ByteReader : ContentTypeReader<byte>
     {
-        internal ByteReader()
+        public ByteReader()
         {
         }
 

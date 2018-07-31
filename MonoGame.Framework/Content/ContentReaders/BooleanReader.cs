@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class BooleanReader : ContentTypeReader<bool>
     {
-        internal BooleanReader()
+        public BooleanReader()
         {
         }
 

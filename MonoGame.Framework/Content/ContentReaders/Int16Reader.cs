@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class Int16Reader : ContentTypeReader<short>
 	{
-		internal Int16Reader ()
+		public Int16Reader ()
 		{
 		}
 

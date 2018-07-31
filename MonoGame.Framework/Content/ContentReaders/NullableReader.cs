@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Content
     {
         ContentTypeReader elementReader;
 
-        internal NullableReader()
+        public NullableReader()
         {
         }
 

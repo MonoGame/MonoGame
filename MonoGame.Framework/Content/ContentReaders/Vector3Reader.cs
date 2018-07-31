@@ -1,7 +1,7 @@
 #region License
 /*
 MIT License
-Copyright © 2006 The Mono.Xna Team
+Copyright ï¿½ 2006 The Mono.Xna Team
 
 All rights reserved.
 
@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     internal class Vector3Reader : ContentTypeReader<Vector3>
     {
-        internal Vector3Reader()
+        public Vector3Reader()
         {
         }
 

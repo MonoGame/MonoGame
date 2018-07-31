@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class ColorReader : ContentTypeReader<Color>
 	{
-		internal ColorReader ()
+		public ColorReader ()
 		{
 		}
 

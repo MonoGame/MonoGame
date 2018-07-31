@@ -1,7 +1,7 @@
 #region License
 /*
 MIT License
-Copyright © 2006 The Mono.Xna Team
+Copyright ï¿½ 2006 The Mono.Xna Team
 
 All rights reserved.
 
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Content
 	
 	internal class RectangleReader : ContentTypeReader<Rectangle>
     {
-        internal RectangleReader()
+        public RectangleReader()
         {
         }
 

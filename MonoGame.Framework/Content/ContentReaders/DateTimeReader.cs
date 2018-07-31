@@ -1,7 +1,7 @@
 // #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2011 The MonoGame Team
+// MonoGame - Copyright ï¿½ 2011 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     internal class DateTimeReader : ContentTypeReader<DateTime>
     {
-        internal DateTimeReader()
+        public DateTimeReader()
         {
         }
 

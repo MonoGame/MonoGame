@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class Int32Reader : ContentTypeReader<int>
     {
-        internal Int32Reader()
+        public Int32Reader()
         {
         }
 
