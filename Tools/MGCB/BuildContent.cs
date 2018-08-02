@@ -159,15 +159,15 @@ namespace MGCB
         public void OnBuild(string sourceFile)
         {
             string link = null;
-            if(sourceFile.Contains(";"))
+            if (sourceFile.Contains(";"))
             {
                 var split = sourceFile.Split(';');
                 sourceFile = split[0];
+
                 if(split.Length > 0)
-                {
                     link = split[1];
-                }
             }
+
             // Make sure the source file is absolute.
             if (!Path.IsPathRooted(sourceFile))
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
@@ -205,17 +205,27 @@ namespace MGCB
             Description = "Copy the content source file verbatim to the output directory.")]
         public void OnCopy(string sourceFile)
         {
+            string link = null;
+            if (sourceFile.Contains(";"))
+            {
+                var split = sourceFile.Split(';');
+                sourceFile = split[0];
+
+                if (split.Length > 0)
+                    link = split[1];
+            }
+
             if (!Path.IsPathRooted(sourceFile))
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
 
             sourceFile = PathHelper.Normalize(sourceFile);
 
             // Remove duplicates... keep this new one.
-            var previous = _copyItems.FindIndex(e => string.Equals(e, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+            var previous = _copyItems.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
             if (previous != -1)
                 _copyItems.RemoveAt(previous);
 
-            _copyItems.Add(sourceFile);
+            _copyItems.Add(new CopyItem { SourceFile = sourceFile, Link = link });
         }
 
         [CommandLineParameter(
@@ -234,9 +244,15 @@ namespace MGCB
             public OpaqueDataDictionary ProcessorParams;
         }
 
+        public class CopyItem
+        {
+            public string SourceFile;
+            public string Link;
+        }
+
         private readonly List<ContentItem> _content = new List<ContentItem>();
 
-        private readonly List<string> _copyItems = new List<string>();
+        private readonly List<CopyItem> _copyItems = new List<CopyItem>();
 
         private PipelineManager _manager;
 
@@ -404,7 +420,9 @@ namespace MGCB
                     // retaining the file extension.
                     // Note that replacing a sub-path like this requires consistent
                     // directory separator characters.
-                    var relativeName = c.Replace(projectDirectory, string.Empty)
+                    var relativeName = c.Link;
+                    if (string.IsNullOrWhiteSpace(relativeName))
+                        relativeName = c.SourceFile.Replace(projectDirectory, string.Empty)
                                             .TrimStart(Path.DirectorySeparatorChar)
                                             .TrimStart(Path.AltDirectorySeparatorChar);
                     var dest = Path.Combine(outputPath, relativeName);
@@ -414,11 +432,11 @@ namespace MGCB
                     // nearly all cases this is the desired behavior.
                     if (File.Exists(dest))
                     {
-                        var srcTime = File.GetLastWriteTimeUtc(c);
+                        var srcTime = File.GetLastWriteTimeUtc(c.SourceFile);
                         var dstTime = File.GetLastWriteTimeUtc(dest);
                         if (srcTime <= dstTime)
                         {
-                            Console.WriteLine("Skipping {0}", c);
+                            Console.WriteLine("Skipping {0}", c.SourceFile);
                             continue;
                         }
                     }
@@ -428,7 +446,7 @@ namespace MGCB
                     if (!Directory.Exists(destPath))
                         Directory.CreateDirectory(destPath);
 
-                    File.Copy(c, dest, true);
+                    File.Copy(c.SourceFile, dest, true);
 
                     // Destination file should not be read-only even if original was.
                     var fileAttr = File.GetAttributes(dest);
