@@ -153,18 +153,14 @@ namespace MonoGame.Tools.Pipeline
         {
             string link = null;
 
-            if(sourceFile.Contains(";"))
+            if (sourceFile.Contains(";"))
             {
                 var split = sourceFile.Split(';');
-
                 sourceFile = split[0];
 
-                if(split.Length > 0)
-                {
+                if (split.Length > 0)
                     link = split[1];
-                }
             }
-
 
             // Make sure the source file is relative to the project.
             var projectDir = ProjectDirectory + Path.DirectorySeparatorChar;
@@ -210,6 +206,17 @@ namespace MonoGame.Tools.Pipeline
             Description = "Copy the content source file verbatim to the output directory.")]
         public void OnCopy(string sourceFile)
         {
+            string link = null;
+
+            if (sourceFile.Contains(";"))
+            {
+                var split = sourceFile.Split(';');
+                sourceFile = split[0];
+
+                if (split.Length > 0)
+                    link = split[1];
+            }
+
             // Make sure the source file is relative to the project.
             var projectDir = ProjectDirectory + Path.DirectorySeparatorChar;
 
@@ -225,6 +232,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 BuildAction = BuildAction.Copy,
                 OriginalPath = sourceFile,
+                DestinationPath = string.IsNullOrEmpty(link) ? sourceFile : link,
                 ProcessorParams = new OpaqueDataDictionary()
             };
             _project.ContentItems.Add(item);
@@ -329,7 +337,10 @@ namespace MonoGame.Tools.Pipeline
 
                 if (i.BuildAction == BuildAction.Copy)
                 {
-                    line = string.Format(lineFormat, "copy", i.OriginalPath);
+                    string path = i.OriginalPath;
+                    if (i.OriginalPath != i.DestinationPath)
+                        path += ";" + i.DestinationPath;
+                    line = string.Format(lineFormat, "copy", path);
                     io.WriteLine(line);
                     io.WriteLine();
                 }
