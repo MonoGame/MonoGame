@@ -739,22 +739,23 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        bool ISessionBackendListener.ConnectAsClientWhenIntroducedToTarget(PeerEndPoint targetEndPoint)
+        bool ISessionBackendListener.AllowConnectionToTargetAsClient(PeerEndPoint targetEndPoint)
         {
             if (IsHost || IsFullyConnected)
             {
+                Debug.WriteLine("Introduced as client when acting host, doing nothing. (This should not happen)");
                 return false;
             }
 
             if (allowlist.Contains(targetEndPoint))
             {
-                Debug.WriteLine("Introduced to target in allowlist, connecting...");
+                Debug.WriteLine("Introduced as client to target in allowlist, connecting...");
                 allowlist.Remove(targetEndPoint);
                 return true;
             }
             else
             {
-                Debug.WriteLine("Introduced to target not in allowlist, doing nothing.");
+                Debug.WriteLine("Introduced as client to target NOT in allowlist, doing nothing.");
                 return false;
             }
         }

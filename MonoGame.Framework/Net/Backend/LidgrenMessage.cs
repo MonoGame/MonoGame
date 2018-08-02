@@ -79,14 +79,20 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
     internal class LidgrenIncomingMessage : IncomingMessage, IResetable
     {
-        internal LidgrenBackend Backend { get; set; }
-        internal NetBuffer Buffer { get; set; }
+        public LidgrenBackend Backend { get; private set; }
+        public NetBuffer Buffer { get; private set; }
 
         public LidgrenIncomingMessage()
         { }
 
         public LidgrenIncomingMessage(NetBuffer buffer)
         {
+            this.Buffer = buffer;
+        }
+
+        public void Set(LidgrenBackend backend, NetBuffer buffer)
+        {
+            this.Backend = backend;
             this.Buffer = buffer;
         }
 
@@ -123,13 +129,15 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public override PeerEndPoint ReadPeerEndPoint()
         {
-            LidgrenEndPoint ep = LidgrenEndPoint.Parse(Buffer.ReadString());
-
-            return ep;
+            return LidgrenEndPoint.Parse(Buffer.ReadString());
         }
 
         public override Peer ReadPeer()
         {
+            if (Backend == null)
+            {
+                throw new InvalidOperationException("Backend is null, cannot read peer without context");
+            }
             return Backend.FindPeerById(Buffer.ReadInt64());
         }
 
