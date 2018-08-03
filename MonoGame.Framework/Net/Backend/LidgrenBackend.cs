@@ -8,30 +8,29 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 {
-    internal class IntroducerObservedToken
+    internal class IntroducerToken
     {
-        public IntroducerObservedToken(LidgrenEndPoint hostEndPoint, IPEndPoint hostExternalIp, IPEndPoint clientExternalIp)
+        public IntroducerToken(LidgrenGuidEndPoint hostEndPoint, IPEndPoint hostExternalIp, IPEndPoint clientExternalIp)
         {
-            if (hostEndPoint == null)
-            {
-                throw new ArgumentNullException(nameof(hostEndPoint));
-            }
-            if (hostExternalIp == null)
-            {
-                throw new ArgumentNullException(nameof(hostExternalIp));
-            }
-            if (clientExternalIp == null)
-            {
-                throw new ArgumentNullException(nameof(clientExternalIp));
-            }
-            HostEndPoint = hostEndPoint;
-            HostExternalIp = hostExternalIp;
-            ClientExternalIp = clientExternalIp;
+            HostEndPoint = hostEndPoint ?? throw new ArgumentNullException(nameof(hostEndPoint));
+            HostExternalIp = hostExternalIp ?? throw new ArgumentNullException(nameof(hostExternalIp));
+            ClientExternalIp = clientExternalIp ?? throw new ArgumentNullException(nameof(clientExternalIp));
         }
 
-        public LidgrenEndPoint HostEndPoint { get; private set; }
-        public IPEndPoint HostExternalIp { get; private set; } // The external ip of the host as observed by the introducer
-        public IPEndPoint ClientExternalIp { get; private set; } // The external ip of the client as observed by the introducer
+        /// <summary>
+        /// The host end point identification
+        /// </summary>
+        public LidgrenGuidEndPoint HostEndPoint { get; private set; }
+
+        /// <summary>
+        /// The external ip of the host as observed by the introducer
+        /// </summary>
+        public IPEndPoint HostExternalIp { get; private set; }
+
+        /// <summary>
+        /// The external ip of the client as observed by the introducer
+        /// </summary>
+        public IPEndPoint ClientExternalIp { get; private set; }
 
         public string Serialize()
         {
@@ -45,7 +44,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             });
         }
 
-        public static bool Deserialize(string str, out IntroducerObservedToken token)
+        public static bool Deserialize(string str, out IntroducerToken token)
         {
             if (str == null)
             {
@@ -59,13 +58,13 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             try
             {
-                var hostEndPoint = LidgrenEndPoint.Parse(parts[0]);
+                var hostEndPoint = LidgrenGuidEndPoint.Parse(parts[0]);
                 var hostAddress = IPAddress.Parse(parts[1]);
                 var hostPort = int.Parse(parts[2]);
                 var clientAddress = IPAddress.Parse(parts[3]);
                 var clientPort = int.Parse(parts[4]);
 
-                token = new IntroducerObservedToken(hostEndPoint,
+                token = new IntroducerToken(hostEndPoint,
                                                     new IPEndPoint(hostAddress, hostPort),
                                                     new IPEndPoint(clientAddress, clientPort));
             }
@@ -77,31 +76,31 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         }
     }
 
-    internal class LidgrenEndPoint : PeerEndPoint
+    internal class LidgrenGuidEndPoint : PeerEndPoint
     {
-        public static LidgrenEndPoint Parse(string input)
+        public static LidgrenGuidEndPoint Parse(string input)
         {
             Guid guid;
             try { guid = Guid.Parse(input); }
             catch { guid = Guid.Empty; }
-            return new LidgrenEndPoint(guid);
+            return new LidgrenGuidEndPoint(guid);
         }
 
         private Guid guid;
 
-        public LidgrenEndPoint()
+        public LidgrenGuidEndPoint()
         {
             guid = Guid.NewGuid();
         }
 
-        private LidgrenEndPoint(Guid guid)
+        private LidgrenGuidEndPoint(Guid guid)
         {
             this.guid = guid;
         }
 
         public override bool Equals(object obj)
         {
-            var otherLidgren = obj as LidgrenEndPoint;
+            var otherLidgren = obj as LidgrenGuidEndPoint;
             if (otherLidgren == null)
             {
                 return false;
@@ -116,7 +115,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public override bool Equals(PeerEndPoint other)
         {
-            var otherLidgren = other as LidgrenEndPoint;
+            var otherLidgren = other as LidgrenGuidEndPoint;
             if (otherLidgren == null)
             {
                 return false;
@@ -138,11 +137,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
     internal class RemotePeer : LidgrenPeer
     {
         private NetConnection connection;
-        private LidgrenEndPoint endPoint;
+        private LidgrenGuidEndPoint endPoint;
         private IPEndPoint internalIp;
         private IPEndPoint externalIp;
 
-        public RemotePeer(NetConnection connection, LidgrenEndPoint endPoint, IPEndPoint internalIp, IPEndPoint externalIp)
+        public RemotePeer(NetConnection connection, LidgrenGuidEndPoint endPoint, IPEndPoint internalIp, IPEndPoint externalIp)
         {
             this.connection = connection;
             this.endPoint = endPoint;
@@ -169,13 +168,13 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
     {
         private LidgrenBackend backend;
         private NetPeer peer;
-        private LidgrenEndPoint endPoint;
+        private LidgrenGuidEndPoint endPoint;
 
         public LocalPeer(LidgrenBackend backend, NetPeer peer)
         {
             this.backend = backend;
             this.peer = peer;
-            this.endPoint = new LidgrenEndPoint();
+            this.endPoint = new LidgrenGuidEndPoint();
         }
 
         public bool HasShutdown { get; private set; }
@@ -233,7 +232,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             Debug.WriteLine("Introducing client " + remoteClient.ExternalIp + " to host " + remoteHost.ExternalIp + "...");
 
             // The client will receive the NatIntroductionSuccess message
-            string token = new IntroducerObservedToken(remoteHost.EndPoint as LidgrenEndPoint,
+            string token = new IntroducerToken(remoteHost.EndPoint as LidgrenGuidEndPoint,
                                                         remoteHost.ExternalIp,
                                                         remoteClient.ExternalIp).Serialize();
 
@@ -323,27 +322,26 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 }
                 else if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess)
                 {
-                    // This peer is being introduced to a host as client
+                    // This peer is a client from a NAT introduction standpoint
                     var hostPunchIp = msg.SenderEndPoint;
 
                     Debug.WriteLine($"NAT introduction successful received from {hostPunchIp}");
 
-                    IntroducerObservedToken introducerToken;
-                    if (IntroducerObservedToken.Deserialize(msg.ReadString(), out introducerToken))
+                    if (IntroducerToken.Deserialize(msg.ReadString(), out IntroducerToken token))
                     {
-                        if (Listener.AllowConnectionToHostAsClient(introducerToken.HostEndPoint))
+                        if (Listener.AllowConnectionToHostAsClient(token.HostEndPoint))
                         {
-                            Connect(hostPunchIp, introducerToken.HostExternalIp, introducerToken.ClientExternalIp);
+                            Connect(hostPunchIp, token.HostExternalIp, token.ClientExternalIp);
                         }
                     }
                 }
                 else if (msg.MessageType == NetIncomingMessageType.ConnectionApproval)
                 {
                     // This peer is a host from a NAT introduction standpoint
-                    var clientEndPoint = LidgrenEndPoint.Parse(msg.ReadString());
+                    var clientEndPoint = LidgrenGuidEndPoint.Parse(msg.ReadString());
                     var clientInternalIp = msg.ReadIPEndPoint();
                     var clientExternalIp = msg.ReadIPEndPoint();
-                    var hostExternalIp = msg.ReadIPEndPoint(); // From IntroducerObserverToken above
+                    var hostExternalIp = msg.ReadIPEndPoint(); // From IntroducerToken above
 
                     if (Listener.AllowConnectionFromClient(clientEndPoint))
                     {
@@ -366,12 +364,12 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                     }
 
                     var status = (NetConnectionStatus)msg.ReadByte();
-                    Debug.WriteLine("Status now: " + status + " (Reason: " + msg.ReadString() + ")");
+                    Debug.WriteLine($"Status now: {status} (Reason: {msg.ReadString()})");
 
                     if (status == NetConnectionStatus.Connected)
                     {
                         var hailMsg = msg.SenderConnection.RemoteHailMessage;
-                        var endPoint = LidgrenEndPoint.Parse(hailMsg.ReadString());
+                        var endPoint = LidgrenGuidEndPoint.Parse(hailMsg.ReadString());
                         var internalIp = hailMsg.ReadIPEndPoint();
                         var externalIp = hailMsg.ReadIPEndPoint();
 
@@ -410,10 +408,10 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         case NetIncomingMessageType.DebugMessage:
                         case NetIncomingMessageType.WarningMessage:
                         case NetIncomingMessageType.ErrorMessage:
-                            Debug.WriteLine("Lidgren: " + msg.ReadString());
+                            Debug.WriteLine($"Lidgren: {msg.ReadString()}");
                             break;
                         default:
-                            Debug.WriteLine("Unhandled type: " + msg.MessageType);
+                            Debug.WriteLine($"Unhandled type: {msg.MessageType}");
                             break;
                     }
                 }

@@ -17,13 +17,13 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
     internal class HostData
     {
-        public LidgrenEndPoint EndPoint;
+        public LidgrenGuidEndPoint EndPoint;
         public IPEndPoint InternalIp;
         public IPEndPoint ExternalIp;
         public NetworkSessionPublicInfo PublicInfo;
         public DateTime LastUpdated;
 
-        public HostData(LidgrenEndPoint endPoint, IPEndPoint internalIp, IPEndPoint externalIp, NetworkSessionPublicInfo publicInfo)
+        public HostData(LidgrenGuidEndPoint endPoint, IPEndPoint internalIp, IPEndPoint externalIp, NetworkSessionPublicInfo publicInfo)
         {
             EndPoint = endPoint;
             InternalIp = internalIp;
@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         private static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
 
         private NetPeer server;
-        private IDictionary<LidgrenEndPoint, HostData> hosts = new Dictionary<LidgrenEndPoint, HostData>();
+        private IDictionary<LidgrenGuidEndPoint, HostData> hosts = new Dictionary<LidgrenGuidEndPoint, HostData>();
         private DateTime lastReportedStatus = DateTime.MinValue;
 
         public override void Start(string gameAppId)
@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             Console.WriteLine($"Master server with game app id {gameAppId} started on port {config.Port}.");
         }
 
-        private IList<LidgrenEndPoint> hostsToRemove = new List<LidgrenEndPoint>();
+        private IList<LidgrenGuidEndPoint> hostsToRemove = new List<LidgrenGuidEndPoint>();
 
         protected void TrimHosts()
         {
@@ -148,7 +148,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             var messageType = (MasterServerMessageType)msg.ReadByte();
             if (messageType == MasterServerMessageType.RegisterHost)
             {
-                var hostEndPoint = LidgrenEndPoint.Parse(msg.ReadString());
+                var hostEndPoint = LidgrenGuidEndPoint.Parse(msg.ReadString());
                 var internalIp = msg.ReadIPEndPoint();
                 var externalIp = senderIpEndPoint;
                 var publicInfo = NetworkSessionPublicInfo.FromMessage(msg);
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             else if (messageType == MasterServerMessageType.UnregisterHost)
             {
-                LidgrenEndPoint hostEndPoint = LidgrenEndPoint.Parse(msg.ReadString());
+                LidgrenGuidEndPoint hostEndPoint = LidgrenGuidEndPoint.Parse(msg.ReadString());
 
                 if (hosts.ContainsKey(hostEndPoint))
                 {
@@ -192,7 +192,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             else if (messageType == MasterServerMessageType.RequestIntroduction)
             {
-                var hostEndPoint = LidgrenEndPoint.Parse(msg.ReadString());
+                var hostEndPoint = LidgrenGuidEndPoint.Parse(msg.ReadString());
 
                 if (hosts.ContainsKey(hostEndPoint))
                 {
@@ -201,7 +201,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                     var hostData = hosts[hostEndPoint];
 
                     // As the client will receive the NatIntroductionSuccess message, send the host's endPoint as token:
-                    string token = new IntroducerObservedToken(hostData.EndPoint,
+                    string token = new IntroducerToken(hostData.EndPoint,
                                                                 hostData.ExternalIp,
                                                                 clientExternalIp).Serialize();
 

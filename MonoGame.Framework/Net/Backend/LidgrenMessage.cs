@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public override void Write(PeerEndPoint value)
         {
-            Buffer.Write((value as LidgrenEndPoint).ToString());
+            Buffer.Write((value as LidgrenGuidEndPoint).ToString());
         }
 
         public override void Write(Peer value)
@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public override PeerEndPoint ReadPeerEndPoint()
         {
-            return LidgrenEndPoint.Parse(Buffer.ReadString());
+            return LidgrenGuidEndPoint.Parse(Buffer.ReadString());
         }
 
         public override Peer ReadPeer()
