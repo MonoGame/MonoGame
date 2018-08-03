@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             config.AcceptIncomingConnections = true;
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
             config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
-            // When support for host migration is added:
+            // TODO: Fix for host migration
             //config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
             //config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
 
@@ -208,11 +208,15 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 availableSession.SessionProperties,
                 availableSession.LocalGamers);
 
+            var localPeer = (LocalPeer)backend.LocalPeer;
             if (availableSession.SessionType == NetworkSessionType.SystemLink)
             {
-                if ((session as ISessionBackendListener).AllowConnectionToTargetAsClient(availableSession.HostEndPoint))
+                if ((session as ISessionBackendListener).AllowConnectionToHostAsClient(availableSession.HostEndPoint))
                 {
-                    (backend.LocalPeer as LocalPeer).Connect((IPEndPoint)availableSession.Tag);
+                    var hostIp = (IPEndPoint)availableSession.Tag;
+                    var hostExternalIp = hostIp; // LAN is local anyway...
+                    var observedExternalIp = localPeer.InternalIp; // LAN is local anyway...
+                    localPeer.Connect(hostIp, hostExternalIp, observedExternalIp);
                 }
             }
             else if (availableSession.SessionType == NetworkSessionType.PlayerMatch || availableSession.SessionType == NetworkSessionType.Ranked)
@@ -222,7 +226,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 msg.Write(peer.Configuration.AppIdentifier);
                 msg.Write((byte)MasterServerMessageType.RequestIntroduction);
                 msg.Write((availableSession.HostEndPoint as LidgrenEndPoint).ToString());
-                msg.Write((backend.LocalPeer as LocalPeer).InternalIp);
+                msg.Write(localPeer.InternalIp);
                 peer.SendUnconnectedMessage(msg, masterServerEndPoint);
             }
             else

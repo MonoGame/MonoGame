@@ -61,9 +61,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public override void Write(PeerEndPoint value)
         {
-            LidgrenEndPoint ep = value as LidgrenEndPoint;
-
-            Buffer.Write(ep.ToString());
+            Buffer.Write((value as LidgrenEndPoint).ToString());
         }
 
         public override void Write(Peer value)

@@ -196,16 +196,18 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                 if (hosts.ContainsKey(hostEndPoint))
                 {
-                    var internalIp = msg.ReadIPEndPoint();
-                    var externalIp = senderIpEndPoint;
+                    var clientInternalIp = msg.ReadIPEndPoint();
+                    var clientExternalIp = senderIpEndPoint;
                     var hostData = hosts[hostEndPoint];
 
                     // As the client will receive the NatIntroductionSuccess message, send the host's endPoint as token:
-                    string token = hostData.EndPoint.ToString();
+                    string token = new IntroducerObservedToken(hostData.EndPoint,
+                                                                hostData.ExternalIp,
+                                                                clientExternalIp).Serialize();
 
-                    server.Introduce(hostData.InternalIp, hostData.ExternalIp, internalIp, externalIp, token);
+                    server.Introduce(hostData.InternalIp, hostData.ExternalIp, clientInternalIp, clientExternalIp, token);
 
-                    Console.WriteLine($"Introduced host {hostData} and client [InternalIp: {internalIp}, ExternalIp: {externalIp}].");
+                    Console.WriteLine($"Introduced host {hostData} and client [InternalIp: {clientInternalIp}, ExternalIp: {clientExternalIp}].");
                 }
                 else
                 {

@@ -753,7 +753,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        bool ISessionBackendListener.AllowConnectionToTargetAsClient(PeerEndPoint targetEndPoint)
+        bool ISessionBackendListener.AllowConnectionToHostAsClient(PeerEndPoint targetEndPoint)
         {
             if (IsHost || IsFullyConnected)
             {
