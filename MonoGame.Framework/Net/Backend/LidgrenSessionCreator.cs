@@ -182,10 +182,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             config.Port = 0;
             config.AcceptIncomingConnections = true;
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
+            //config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest); // TODO: Host migration
             config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
-            // TODO: Fix for host migration
-            //config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
-            //config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+            config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
 
             var peer = new NetPeer(config);
             try
