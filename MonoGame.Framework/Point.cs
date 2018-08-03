@@ -157,6 +157,26 @@ namespace Microsoft.Xna.Framework
             return !a.Equals(b);
         }
 
+        /// <summary>
+        /// Creates a <see cref="Point"/> from the values of a <see cref="ValueTuple{Int32,Int32}"/>.
+        /// </summary>
+        /// <param name="value"><see cref="ValueTuple{Int32,Int32}"/> to get the values from.</param>
+        /// <returns><see cref="Point"/> with the values of <paramref name="value"/>.</returns>
+        public static implicit operator Point((int, int) value)
+        {
+            return new Point(value.Item1, value.Item2);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="ValueTuple{Int32,Int32}"/> from the values of a <see cref="Point"/>.
+        /// </summary>
+        /// <param name="value"><see cref="Point"/> to get the values from.</param>
+        /// <returns><see cref="ValueTuple{Int32,Int32}"/> with the values of <paramref name="value"/>.</returns>
+        public static implicit operator (int, int)(Point value)
+        {
+            return (value.X, value.Y);
+        }
+
         #endregion
 
         #region Public methods
