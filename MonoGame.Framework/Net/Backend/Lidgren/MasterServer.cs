@@ -135,6 +135,36 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
         }
 
+        public static void RegisterHost(NetPeer peer, GuidEndPoint endPoint, IPEndPoint internalIp, NetworkSessionPublicInfo publicInfo)
+        {
+            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            var msg = MessagePool.Outgoing.Get();
+            msg.Write(peer.Configuration.AppIdentifier);
+            msg.Write((byte)MasterServerMessageType.RegisterHost);
+            msg.Write(endPoint);
+            msg.Write(internalIp);
+            publicInfo.Pack(msg);
+
+            var request = peer.CreateMessage();
+            request.Write(msg.Buffer);
+            peer.SendUnconnectedMessage(request, serverEndPoint);
+            MessagePool.Outgoing.Recycle(msg);
+        }
+
+        public static void UnregisterHost(NetPeer peer, GuidEndPoint endPoint)
+        {
+            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            var msg = MessagePool.Outgoing.Get();
+            msg.Write(peer.Configuration.AppIdentifier);
+            msg.Write((byte)MasterServerMessageType.UnregisterHost);
+            msg.Write(endPoint);
+
+            var request = peer.CreateMessage();
+            request.Write(msg.Buffer);
+            peer.SendUnconnectedMessage(request, serverEndPoint);
+            MessagePool.Outgoing.Recycle(msg);
+        }
+
         protected void HandleMessage(IncomingMessage msg, IPEndPoint senderIpEndPoint)
         {
             string senderGameAppId = msg.ReadString();
@@ -148,7 +178,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             var messageType = (MasterServerMessageType)msg.ReadByte();
             if (messageType == MasterServerMessageType.RegisterHost)
             {
-                var hostEndPoint = GuidEndPoint.Parse(msg.ReadString());
+                var hostEndPoint = msg.ReadGuidEndPoint();
                 var internalIp = msg.ReadIPEndPoint();
                 var externalIp = senderIpEndPoint;
                 var publicInfo = NetworkSessionPublicInfo.FromMessage(msg);
@@ -159,14 +189,22 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             else if (messageType == MasterServerMessageType.UnregisterHost)
             {
-                GuidEndPoint hostEndPoint = GuidEndPoint.Parse(msg.ReadString());
+                var hostEndPoint = msg.ReadGuidEndPoint();
 
                 if (hosts.ContainsKey(hostEndPoint))
                 {
                     var hostData = hosts[hostEndPoint];
-                    hosts.Remove(hostEndPoint);
 
-                    Console.WriteLine($"Host unregistered. {hostData}");
+                    if (senderIpEndPoint == hostData.ExternalIp)
+                    {
+                        hosts.Remove(hostEndPoint);
+
+                        Console.WriteLine($"Host unregistered. {hostData}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Unregister requested for host not registered by {senderIpEndPoint}.");
+                    }
                 }
                 else
                 {
@@ -192,7 +230,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             else if (messageType == MasterServerMessageType.RequestIntroduction)
             {
-                var hostEndPoint = GuidEndPoint.Parse(msg.ReadString());
+                var hostEndPoint = msg.ReadGuidEndPoint();
 
                 if (hosts.ContainsKey(hostEndPoint))
                 {
@@ -202,8 +240,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                     // As the client will receive the NatIntroductionSuccess message, send the host's endPoint as token:
                     string token = new IntroducerToken(hostData.EndPoint,
-                                                                hostData.ExternalIp,
-                                                                clientExternalIp).Serialize();
+                                                        hostData.ExternalIp,
+                                                        clientExternalIp).Serialize();
 
                     server.Introduce(hostData.InternalIp, hostData.ExternalIp, clientInternalIp, clientExternalIp, token);
 

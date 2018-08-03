@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
         }
 
-        public void ReceiveMessages(GenericPool<OutgoingMessage> outgoingPool, GenericPool<IncomingMessage> incomingPool)
+        public void ReceiveMessages()
         {
             NetIncomingMessage msg;
             while ((msg = peer.ReadMessage()) != null)
@@ -152,14 +152,14 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                     {
                         Debug.WriteLine("Discovery request received.");
 
-                        var responseMsg = outgoingPool.Get();
-                        responseMsg.Write(endPoint.ToString());
+                        var responseMsg = MessagePool.Outgoing.Get();
+                        responseMsg.Write(endPoint);
                         Listener.SessionPublicInfo.Pack(responseMsg);
 
                         var response = peer.CreateMessage();
                         response.Write(responseMsg.Buffer);
                         peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
-                        outgoingPool.Recycle(responseMsg);
+                        MessagePool.Outgoing.Recycle(responseMsg);
                     }
                 }
                 else if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess)
@@ -237,10 +237,10 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         throw new NetworkException("Sender connection is null");
                     }
 
-                    var incomingMsg = incomingPool.Get();
+                    var incomingMsg = MessagePool.Incoming.Get();
                     incomingMsg.Set(backend, msg);
                     Listener.ReceiveMessage(incomingMsg, msg.SenderConnection.Tag as RemotePeer);
-                    incomingPool.Recycle(incomingMsg);
+                    MessagePool.Incoming.Recycle(incomingMsg);
                 }
                 else
                 {
@@ -267,29 +267,14 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
         }
 
-        public void RegisterWithMasterServer(GenericPool<OutgoingMessage> outgoingPool)
+        public void RegisterWithMasterServer()
         {
             if (!Listener.IsDiscoverableOnline)
             {
                 return;
             }
-
-            var masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-
-            var msg = outgoingPool.Get();
-            msg.Write(peer.Configuration.AppIdentifier);
-            msg.Write((byte)MasterServerMessageType.RegisterHost);
-            msg.Write(endPoint.ToString());
-            msg.Write(InternalIp);
-            Listener.SessionPublicInfo.Pack(msg);
-
-            var request = peer.CreateMessage();
-            request.Write(msg.Buffer);
-            peer.SendUnconnectedMessage(request, masterServerEndPoint);
-
-            outgoingPool.Recycle(msg);
-
-            Debug.WriteLine("Registering with master server (EndPoint: " + endPoint + ", InternalIp: " + InternalIp + ")");
+            MasterServer.RegisterHost(peer, endPoint, InternalIp, Listener.SessionPublicInfo);
+            Debug.WriteLine($"Registering with master server (EndPoint: {endPoint}, InternalIp: {InternalIp})");
         }
 
         public void UnregisterWithMasterServer()
@@ -298,16 +283,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             {
                 return;
             }
-
-            var masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-
-            var msg = peer.CreateMessage();
-            msg.Write(peer.Configuration.AppIdentifier);
-            msg.Write((byte)MasterServerMessageType.UnregisterHost);
-            msg.Write(endPoint.ToString());
-            peer.SendUnconnectedMessage(msg, masterServerEndPoint);
-
-            Debug.WriteLine("Unregistering with master server (EndPoint: " + endPoint + ")");
+            MasterServer.UnregisterHost(peer, endPoint);
+            Debug.WriteLine($"Unregistering with master server (EndPoint: {endPoint})");
         }
     }
 }

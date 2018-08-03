@@ -12,9 +12,6 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         private List<RemotePeer> remotePeers = new List<RemotePeer>();
         private List<NetConnection> remoteConnections = new List<NetConnection>();
 
-        private GenericPool<OutgoingMessage> outgoingMessagePool = new GenericPool<OutgoingMessage>();
-        private GenericPool<IncomingMessage> incomingMessagePool = new GenericPool<IncomingMessage>();
-
         private DateTime lastMasterServerRegistration = DateTime.MinValue;
         private DateTime lastStatisticsUpdate = DateTime.Now;
         private int lastReceivedBytes = 0;
@@ -128,7 +125,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public override BaseOutgoingMessage GetMessage(Peer recipient, SendDataOptions options, int channel)
         {
-            var msg = outgoingMessagePool.Get();
+            var msg = MessagePool.Outgoing.Get();
             msg.recipient = recipient;
             msg.options = options;
             msg.channel = channel;
@@ -155,18 +152,18 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 msg.Buffer.Position = 0;
 
                 // Pretend that the message was sent to the local peer over the network
-                var incomingMsg = incomingMessagePool.Get();
+                var incomingMsg = MessagePool.Incoming.Get();
                 incomingMsg.Set(this, msg.Buffer);
                 Listener.ReceiveMessage(incomingMsg, localPeer);
-                incomingMessagePool.Recycle(incomingMsg);
+                MessagePool.Incoming.Recycle(incomingMsg);
             }
 
-            outgoingMessagePool.Recycle(msg);
+            MessagePool.Outgoing.Recycle(msg);
         }
 
         public override void Update()
         {
-            localPeer.ReceiveMessages(outgoingMessagePool, incomingMessagePool);
+            localPeer.ReceiveMessages();
 
             if (localPeer.HasShutdown)
             {
@@ -190,7 +187,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
             if (elapsedTime >= NetworkSessionSettings.MasterServerRegistrationInterval)
             {
-                localPeer.RegisterWithMasterServer(outgoingMessagePool);
+                localPeer.RegisterWithMasterServer();
 
                 lastMasterServerRegistration = currentTime;
             }

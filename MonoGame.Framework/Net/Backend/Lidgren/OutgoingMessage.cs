@@ -59,6 +59,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             Buffer.Write(value);
         }
 
+        public void Write(GuidEndPoint value)
+        {
+            Buffer.Write((value as GuidEndPoint).ToString());
+        }
+
         public override void Write(BasePeerEndPoint value)
         {
             Buffer.Write((value as GuidEndPoint).ToString());

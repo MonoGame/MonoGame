@@ -256,6 +256,9 @@
     <Compile Include="Net\Backend\Lidgren\MasterServer.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
+    <Compile Include="Net\Backend\Lidgren\MessagePool.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
     <Compile Include="Net\Backend\Lidgren\OutgoingMessage.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>

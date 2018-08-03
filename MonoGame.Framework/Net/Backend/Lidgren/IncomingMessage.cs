@@ -54,6 +54,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             return Buffer.ReadInt64();
         }
 
+        public GuidEndPoint ReadGuidEndPoint()
+        {
+            return GuidEndPoint.Parse(Buffer.ReadString());
+        }
+
         public override BasePeerEndPoint ReadPeerEndPoint()
         {
             return GuidEndPoint.Parse(Buffer.ReadString());
