@@ -12,6 +12,11 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("Only host can send StartGame");
             }
 
+            // TODO: Send all known gamer ids and their ready state to all peers here so that they can verify that
+            // they know about all of them and the ready state matches. The peers should wait a few seconds before
+            // answering so that any late gamer state changes are not missed. If enough peers suggests that a gamer
+            // is a cheater the gamer in question and its NetworkMachine should be removed from the game.
+
             OutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.GameStarted);
             Queue.Place(msg);

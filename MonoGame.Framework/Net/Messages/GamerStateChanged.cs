@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (readFlags)
             {
                 remoteGamer.IsPrivateSlot = msg.ReadBoolean();
-                remoteGamer.SetReadyState(msg.ReadBoolean());
+                remoteGamer.SetReadyState(msg.ReadBoolean()); // TODO: Discard ready=true if session state is Playing? Report for cheating (and if host, kick)?
             }
         }
     }

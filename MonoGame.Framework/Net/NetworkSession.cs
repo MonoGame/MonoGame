@@ -504,6 +504,10 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new InvalidOperationException("The game can only be started from the lobby state");
             }
+            if (!IsEveryoneReady)
+            {
+                throw new InvalidOperationException("The game cannot be started unless everyone is ready");
+            }
             
             if (gameStartRequestThisFrame)
             {
@@ -558,6 +562,16 @@ namespace Microsoft.Xna.Framework.Net
             resetReadyRequestThisFrame = true;
         }
 
+        // TODO: Improve docs here
+        // Find the gamer with a given unique id. NOTE: This method will return null if the gamer in question has
+        // not yet joined the game for this particular peer OR there is a cheating party in the session (that
+        // may have only connected to some of the peers in the session).
+        //
+        // Regarding a cheating party:
+        // When the session transitions to the Playing state, the host will send all gamer ids it knows about
+        // to all peers. If a peer recieves an id it does not know about, it will report this to the host. If the host
+        // recieves enough reports suggesting a gamer is a cheater, the host will remove the gamer and its NetworkMachine
+        // from the session.
         public NetworkGamer FindGamerById(byte gamerId)
         {
             if (IsDisposed || SessionState == NetworkSessionState.Ended)
@@ -565,7 +579,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new ObjectDisposedException("NetworkSession");
             }
 
-            foreach (NetworkGamer gamer in allGamers)
+            foreach (var gamer in allGamers)
             {
                 if (gamer.Id == gamerId)
                 {
@@ -784,7 +798,7 @@ namespace Microsoft.Xna.Framework.Net
             if (IsHost)
             {
                 // Save snapshot of current connections and send them to the new peer
-                ISet<NetworkMachine> requestedConnections = new HashSet<NetworkMachine>(RemoteMachines);
+                var requestedConnections = new HashSet<NetworkMachine>(RemoteMachines);
                 requestedConnections.Remove(newMachine);
 
                 hostPendingConnections.Add(newMachine, requestedConnections);
@@ -812,14 +826,14 @@ namespace Microsoft.Xna.Framework.Net
 
         void ISessionBackendListener.PeerDisconnected(Peer peer)
         {
-            NetworkMachine disconnectedMachine = peer.Tag as NetworkMachine;
+            var disconnectedMachine = peer.Tag as NetworkMachine;
 
             RemoveMachine(disconnectedMachine);
 
             if (IsHost)
             {
                 // Update pending peers
-                foreach (NetworkMachine pendingMachine in RemoteMachines)
+                foreach (var pendingMachine in RemoteMachines)
                 {
                     if (pendingMachine.IsFullyConnected)
                     {
