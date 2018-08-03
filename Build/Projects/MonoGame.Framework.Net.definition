@@ -237,20 +237,20 @@
     <Compile Include="Net\Backend\GenericPool.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\Backend.cs">
+    <Compile Include="Net\Backend\BackendInterface.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\LidgrenBackend.cs">
+    <Compile Include="Net\Backend\Lidgren\LidgrenBackend.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\LidgrenMasterServer.cs">
+    <Compile Include="Net\Backend\Lidgren\LidgrenMasterServer.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\LidgrenMessage.cs">
+    <Compile Include="Net\Backend\Lidgren\LidgrenMessage.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\LidgrenSessionCreator.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
+    <Compile Include="Net\Backend\Lidgren\LidgrenSessionCreator.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
 
     <!-- Android Platform -->
