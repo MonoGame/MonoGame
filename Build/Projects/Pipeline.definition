@@ -17,6 +17,19 @@
   </References>
 
   <Properties>
+
+    <FrameworkVersions>
+      <Platform Name="Windows">
+        <Version>v4.7.1</Version>
+      </Platform>
+      <Platform Name="MacOS">
+        <Version>v4.7.1</Version>
+      </Platform>
+      <Platform Name="Linux">
+        <Version>v4.7.1</Version>
+      </Platform>
+    </FrameworkVersions>
+    
     <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
