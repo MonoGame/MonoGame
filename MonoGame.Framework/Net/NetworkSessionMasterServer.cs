@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Net
 {
     public sealed class NetworkSessionMasterServer
     {
-        private MasterServer server = NetworkSessionImplementation.MasterServer;
+        private BaseMasterServer server = NetworkSessionImplementation.MasterServer;
 
         public void Start(string gameAppId)
         {

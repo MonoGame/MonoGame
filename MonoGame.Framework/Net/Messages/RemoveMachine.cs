@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public void Create(NetworkMachine machine, NetworkMachine recipient)
         {
-            OutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.RemoveMachine);
 
             msg.Write(machine.peer);
@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(BaseIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
@@ -24,8 +24,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            Peer removePeer = msg.ReadPeer();
-
+            var removePeer = msg.ReadPeer();
             if (removePeer == CurrentMachine.Session.Backend.LocalPeer)
             {
                 CurrentMachine.Session.End(NetworkSessionEndReason.RemovedByHost);

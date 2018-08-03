@@ -5,15 +5,15 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class AllowEndPointResponse : InternalMessage
     {
-        public void Create(PeerEndPoint endPoint, NetworkMachine recipient)
+        public void Create(BasePeerEndPoint endPoint, NetworkMachine recipient)
         {
-            OutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.AllowEndPointResponse);
             msg.Write(endPoint);
             Queue.Place(msg);
         }
 
-        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(BaseIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!CurrentMachine.IsHost)
             {
@@ -22,8 +22,8 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            PeerEndPoint allowedEndPoint = msg.ReadPeerEndPoint();
-            Peer allowedPeer = CurrentMachine.Session.Backend.FindRemotePeerByEndPoint(allowedEndPoint);
+            var allowedEndPoint = msg.ReadPeerEndPoint();
+            var allowedPeer = CurrentMachine.Session.Backend.FindRemotePeerByEndPoint(allowedEndPoint);
 
             if (allowedPeer == null)
             {
@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            NetworkMachine allowedMachine = allowedPeer.Tag as NetworkMachine;
+            var allowedMachine = allowedPeer.Tag as NetworkMachine;
 
             // Should we introduce the peers?
             if (!CurrentMachine.Session.hostPendingAllowlistInsertions.ContainsKey(senderMachine) ||

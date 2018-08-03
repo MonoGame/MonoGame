@@ -2,7 +2,7 @@
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal enum InternalMessageIndex
+    internal enum InternalMessageIndex : byte
     {
         AllowEndPointRequest,
         AllowEndPointResponse,
@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
         public InternalMessage[] FromIndex;
 
-        public InternalMessages(SessionBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
+        public InternalMessages(BaseSessionBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
         {
             FromIndex = new InternalMessage[]
             {
@@ -74,22 +74,22 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
     internal interface IMessageQueue
     {
-        void Place(OutgoingMessage msg);
+        void Place(BaseOutgoingMessage msg);
     }
 
     internal abstract class InternalMessage
     {
-        public SessionBackend Backend { get; private set; }
+        public BaseSessionBackend Backend { get; private set; }
         public IMessageQueue Queue { get; private set; }
         public NetworkMachine CurrentMachine { get; private set; }
 
-        public void Initialize(SessionBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
+        public void Initialize(BaseSessionBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
         {
             this.Backend = backend;
             this.Queue = queue;
             this.CurrentMachine = currentMachine;
         }
 
-        public abstract void Receive(IncomingMessage msg, NetworkMachine senderMachine);
+        public abstract void Receive(BaseIncomingMessage msg, NetworkMachine senderMachine);
     }
 }

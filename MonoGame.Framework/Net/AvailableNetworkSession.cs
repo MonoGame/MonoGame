@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Net
 {
     public sealed class AvailableNetworkSession
     {
-        internal AvailableNetworkSession(PeerEndPoint hostEndPoint, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionType sessionType, int currentGamerCount, string hostGamertag, int openPrivateGamerSlots, int openPublicGamerSlots, NetworkSessionProperties sessionProperties)
+        internal AvailableNetworkSession(BasePeerEndPoint hostEndPoint, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionType sessionType, int currentGamerCount, string hostGamertag, int openPrivateGamerSlots, int openPublicGamerSlots, NetworkSessionProperties sessionProperties)
         {
             this.HostEndPoint = hostEndPoint;
             this.LocalGamers = localGamers;
@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Net
             this.SessionProperties = sessionProperties;
         }
 
-        internal PeerEndPoint HostEndPoint { get; }
+        internal BasePeerEndPoint HostEndPoint { get; }
         internal IEnumerable<SignedInGamer> LocalGamers { get; }
         internal int MaxGamers { get; }
         internal int PrivateGamerSlots { get; }

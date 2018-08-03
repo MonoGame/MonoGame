@@ -16,13 +16,17 @@ namespace Microsoft.Xna.Framework.Net.Messages
             // they know about all of them and the ready state matches. The peers should wait a few seconds before
             // answering so that any late gamer state changes are not missed. If enough peers suggests that a gamer
             // is a cheater the gamer in question and its NetworkMachine should be removed from the game.
+            //
+            // OR
+            //
+            // Let host handle all gamer joining and leaving messages, probably better if doable!
 
-            OutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.GameStarted);
             Queue.Place(msg);
         }
 
-        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(BaseIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {

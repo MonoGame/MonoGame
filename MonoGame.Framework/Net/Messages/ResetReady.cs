@@ -12,12 +12,12 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("Only host can send ResetReady");
             }
 
-            OutgoingMessage msg = Backend.GetMessage(null, SendDataOptions.ReliableInOrder, 1);
+            var msg = Backend.GetMessage(null, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.ResetReady);
             Queue.Place(msg);
         }
 
-        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(BaseIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             // Make sure that the host can not accidentaly start the game too early
             if (CurrentMachine.IsHost)
             {
-                foreach (NetworkGamer gamer in CurrentMachine.Session.allGamers)
+                foreach (var gamer in CurrentMachine.Session.allGamers)
                 {
                     // Safe because any ready state change from a remote gamer will happen after the scope of this Receive() call
                     gamer.SetReadyState(false);
@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             // Tell everyone that our local gamers are not yet ready
-            foreach (LocalNetworkGamer localGamer in CurrentMachine.localGamers)
+            foreach (var localGamer in CurrentMachine.localGamers)
             {
                 localGamer.SetReadyState(false);
 

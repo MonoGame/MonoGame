@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public void Create(LocalNetworkGamer localGamer, NetworkMachine recipient)
         {
-            OutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.GamerJoined);
 
             msg.Write(localGamer.DisplayName);
@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(BaseIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            NetworkGamer remoteGamer = new NetworkGamer(senderMachine, displayName, gamertag, id, isPrivateSlot, isReady);
+            var remoteGamer = new NetworkGamer(senderMachine, displayName, gamertag, id, isPrivateSlot, isReady);
             CurrentMachine.Session.AddGamer(remoteGamer);
         }
     }

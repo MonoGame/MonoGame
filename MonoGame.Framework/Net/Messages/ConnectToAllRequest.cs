@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("Only host can send ConnectToAllRequest");
             }
 
-            OutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.ConnectToAllRequest);
 
             msg.Write((int)machinesToConnectTo.Count);
@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(BaseIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -45,10 +45,10 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             int requestedConnectionCount = msg.ReadInt();
-            CurrentMachine.Session.pendingEndPoints = new HashSet<PeerEndPoint>();
+            CurrentMachine.Session.pendingEndPoints = new HashSet<BasePeerEndPoint>();
             for (int i = 0; i < requestedConnectionCount; i++)
             {
-                PeerEndPoint endPoint = msg.ReadPeerEndPoint();
+                var endPoint = msg.ReadPeerEndPoint();
                 CurrentMachine.Session.pendingEndPoints.Add(endPoint);
             }
         }

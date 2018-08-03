@@ -17,13 +17,13 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
     internal class HostData
     {
-        public LidgrenGuidEndPoint EndPoint;
+        public GuidEndPoint EndPoint;
         public IPEndPoint InternalIp;
         public IPEndPoint ExternalIp;
         public NetworkSessionPublicInfo PublicInfo;
         public DateTime LastUpdated;
 
-        public HostData(LidgrenGuidEndPoint endPoint, IPEndPoint internalIp, IPEndPoint externalIp, NetworkSessionPublicInfo publicInfo)
+        public HostData(GuidEndPoint endPoint, IPEndPoint internalIp, IPEndPoint externalIp, NetworkSessionPublicInfo publicInfo)
         {
             EndPoint = endPoint;
             InternalIp = internalIp;
@@ -38,12 +38,12 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         }
     }
 
-    internal class LidgrenMasterServer : MasterServer
+    internal class MasterServer : BaseMasterServer
     {
         private static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
 
         private NetPeer server;
-        private IDictionary<LidgrenGuidEndPoint, HostData> hosts = new Dictionary<LidgrenGuidEndPoint, HostData>();
+        private IDictionary<GuidEndPoint, HostData> hosts = new Dictionary<GuidEndPoint, HostData>();
         private DateTime lastReportedStatus = DateTime.MinValue;
 
         public override void Start(string gameAppId)
@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             Console.WriteLine($"Master server with game app id {gameAppId} started on port {config.Port}.");
         }
 
-        private IList<LidgrenGuidEndPoint> hostsToRemove = new List<LidgrenGuidEndPoint>();
+        private IList<GuidEndPoint> hostsToRemove = new List<GuidEndPoint>();
 
         protected void TrimHosts()
         {
@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 {
                     try
                     {
-                        var msg = new LidgrenIncomingMessage(rawMsg);
+                        var msg = new IncomingMessage(rawMsg);
                         HandleMessage(msg, rawMsg.SenderEndPoint);
                     }
                     catch (NetException e)
@@ -135,7 +135,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
         }
 
-        protected void HandleMessage(LidgrenIncomingMessage msg, IPEndPoint senderIpEndPoint)
+        protected void HandleMessage(IncomingMessage msg, IPEndPoint senderIpEndPoint)
         {
             string senderGameAppId = msg.ReadString();
 
@@ -148,7 +148,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             var messageType = (MasterServerMessageType)msg.ReadByte();
             if (messageType == MasterServerMessageType.RegisterHost)
             {
-                var hostEndPoint = LidgrenGuidEndPoint.Parse(msg.ReadString());
+                var hostEndPoint = GuidEndPoint.Parse(msg.ReadString());
                 var internalIp = msg.ReadIPEndPoint();
                 var externalIp = senderIpEndPoint;
                 var publicInfo = NetworkSessionPublicInfo.FromMessage(msg);
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             else if (messageType == MasterServerMessageType.UnregisterHost)
             {
-                LidgrenGuidEndPoint hostEndPoint = LidgrenGuidEndPoint.Parse(msg.ReadString());
+                GuidEndPoint hostEndPoint = GuidEndPoint.Parse(msg.ReadString());
 
                 if (hosts.ContainsKey(hostEndPoint))
                 {
@@ -177,7 +177,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             {
                 foreach (var hostData in hosts.Values)
                 {
-                    var response = new LidgrenOutgoingMessage();
+                    var response = new OutgoingMessage();
                     response.Write(hostData.EndPoint.ToString());
                     hostData.PublicInfo.Pack(response);
 
@@ -192,7 +192,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             else if (messageType == MasterServerMessageType.RequestIntroduction)
             {
-                var hostEndPoint = LidgrenGuidEndPoint.Parse(msg.ReadString());
+                var hostEndPoint = GuidEndPoint.Parse(msg.ReadString());
 
                 if (hosts.ContainsKey(hostEndPoint))
                 {

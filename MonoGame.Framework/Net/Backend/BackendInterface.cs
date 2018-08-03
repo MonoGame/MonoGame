@@ -4,19 +4,22 @@ using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework.Net.Backend
 {
-    internal abstract class PeerEndPoint : IEquatable<PeerEndPoint>
+    /**
+     * Interfaces would be ideal here, but abstract classes provide better performance in practice.
+     */
+    internal abstract class BasePeerEndPoint : IEquatable<BasePeerEndPoint>
     {
-        public abstract bool Equals(PeerEndPoint other);
+        public abstract bool Equals(BasePeerEndPoint other);
     }
 
-    internal abstract class OutgoingMessage
+    internal abstract class BaseOutgoingMessage
     {
         public abstract Peer Recipient { get; }
         public abstract SendDataOptions Options { get; }
         public abstract int Channel { get; }
 
         public abstract void Write(Peer value);
-        public abstract void Write(PeerEndPoint value);
+        public abstract void Write(BasePeerEndPoint value);
         public abstract void Write(bool value);
         public abstract void Write(byte value);
         public abstract void Write(int value);
@@ -25,10 +28,10 @@ namespace Microsoft.Xna.Framework.Net.Backend
         public abstract void Write(byte[] value);
     }
 
-    internal abstract class IncomingMessage
+    internal abstract class BaseIncomingMessage
     {
         public abstract Peer ReadPeer();
-        public abstract PeerEndPoint ReadPeerEndPoint();
+        public abstract BasePeerEndPoint ReadPeerEndPoint();
         public abstract bool ReadBoolean();
         public abstract byte ReadByte();
         public abstract int ReadInt();
@@ -39,7 +42,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
     internal abstract class Peer
     {
-        public abstract PeerEndPoint EndPoint { get; }
+        public abstract BasePeerEndPoint EndPoint { get; }
         public abstract TimeSpan RoundtripTime { get; }
         public abstract object Tag { get; set; }
 
@@ -52,14 +55,14 @@ namespace Microsoft.Xna.Framework.Net.Backend
         bool IsDiscoverableOnline { get; }
         NetworkSessionPublicInfo SessionPublicInfo { get; }
 
-        bool AllowConnectionFromClient(PeerEndPoint endPoint);
-        bool AllowConnectionToHostAsClient(PeerEndPoint targetEndPoint);
+        bool AllowConnectionFromClient(BasePeerEndPoint endPoint);
+        bool AllowConnectionToHostAsClient(BasePeerEndPoint targetEndPoint);
         void PeerConnected(Peer peer);
         void PeerDisconnected(Peer peer);
-        void ReceiveMessage(IncomingMessage data, Peer sender);
+        void ReceiveMessage(BaseIncomingMessage data, Peer sender);
     }
 
-    internal abstract class SessionBackend
+    internal abstract class BaseSessionBackend
     {
         public abstract bool HasShutdown { get; }
         public abstract ISessionBackendListener Listener { get; set; }
@@ -70,22 +73,22 @@ namespace Microsoft.Xna.Framework.Net.Backend
         public abstract int BytesPerSecondSent { get; set; }
 
         public abstract void Introduce(Peer client, Peer target);
-        public abstract bool IsConnectedToEndPoint(PeerEndPoint endPoint);
-        public abstract Peer FindRemotePeerByEndPoint(PeerEndPoint endPoint);
-        public abstract OutgoingMessage GetMessage(Peer recipient, SendDataOptions options, int channel);
-        public abstract void SendMessage(OutgoingMessage message);
+        public abstract bool IsConnectedToEndPoint(BasePeerEndPoint endPoint);
+        public abstract Peer FindRemotePeerByEndPoint(BasePeerEndPoint endPoint);
+        public abstract BaseOutgoingMessage GetMessage(Peer recipient, SendDataOptions options, int channel);
+        public abstract void SendMessage(BaseOutgoingMessage message);
         public abstract void Update();
         public abstract void Shutdown(string byeMessage);
     }
 
-    internal abstract class SessionCreator
+    internal abstract class BaseSessionCreator
     {
         public abstract NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties);
         public abstract AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties);
         public abstract NetworkSession Join(AvailableNetworkSession availableSession);
     }
 
-    internal abstract class MasterServer
+    internal abstract class BaseMasterServer
     {
         public abstract void Start(string appId);
         public abstract void Update();

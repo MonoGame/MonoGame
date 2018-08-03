@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("Only host can send GamerIdResponse");
             }
 
-            OutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.GamerIdResponse);
 
             byte id;
@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(BaseIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             // Host approved request, now possible to create network gamer
-            SignedInGamer signedInGamer = CurrentMachine.Session.pendingSignedInGamers[0];
+            var signedInGamer = CurrentMachine.Session.pendingSignedInGamers[0];
             CurrentMachine.Session.pendingSignedInGamers.RemoveAt(0);
 
             if (!wasApprovedByHost)
@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            LocalNetworkGamer localGamer = new LocalNetworkGamer(CurrentMachine, signedInGamer, id, false);
+            var localGamer = new LocalNetworkGamer(CurrentMachine, signedInGamer, id, false);
             CurrentMachine.Session.AddGamer(localGamer);
             CurrentMachine.Session.InternalMessages.GamerJoined.Create(localGamer, null);
         }

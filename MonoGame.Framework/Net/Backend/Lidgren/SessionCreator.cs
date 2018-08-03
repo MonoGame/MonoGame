@@ -9,7 +9,7 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 {
-    internal class LidgrenSessionCreator : SessionCreator
+    internal class SessionCreator : BaseSessionCreator
     {
         private const int DiscoveryTimeMs = 4000;
         private const int FullyConnectedPollingTimeMs = 50;
@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             Debug.WriteLine("Peer started.");
 
-            var session = new NetworkSession(new LidgrenBackend(peer), new PeerEndPoint[0], true, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
+            var session = new NetworkSession(new SessionBackend(peer), new BasePeerEndPoint[0], true, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
 
             if (!WaitUntilFullyConnected(session))
             {
@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             return session;
         }
 
-        private void AddAvailableNetworkSession(IPEndPoint localIPEndPoint, PeerEndPoint endPoint, NetworkSessionPublicInfo publicInfo, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions)
+        private void AddAvailableNetworkSession(IPEndPoint localIPEndPoint, BasePeerEndPoint endPoint, NetworkSessionPublicInfo publicInfo, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions)
         {
             if (searchType == publicInfo.sessionType && searchProperties.SearchMatch(publicInfo.sessionProperties))
             {
@@ -137,8 +137,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 {
                     if (rawMsg.SenderEndPoint.Equals(masterServerEndPoint))
                     {
-                        var msg = new LidgrenIncomingMessage(rawMsg);
-                        var hostEndPoint = LidgrenGuidEndPoint.Parse(msg.ReadString());
+                        var msg = new IncomingMessage(rawMsg);
+                        var hostEndPoint = GuidEndPoint.Parse(msg.ReadString());
                         var hostPublicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
                         AddAvailableNetworkSession(null, hostEndPoint, hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
@@ -146,8 +146,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 }
                 else if (rawMsg.MessageType == NetIncomingMessageType.DiscoveryResponse)
                 {
-                    var msg = new LidgrenIncomingMessage(rawMsg);
-                    var hostEndPoint = LidgrenGuidEndPoint.Parse(msg.ReadString());
+                    var msg = new IncomingMessage(rawMsg);
+                    var hostEndPoint = GuidEndPoint.Parse(msg.ReadString());
                     var hostPublicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
                     AddAvailableNetworkSession(rawMsg.SenderEndPoint, hostEndPoint, hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
@@ -199,9 +199,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             Debug.WriteLine("Peer started.");
 
-            var backend = new LidgrenBackend(peer);
+            var backend = new SessionBackend(peer);
             var session = new NetworkSession(backend,
-                new PeerEndPoint[] { availableSession.HostEndPoint },
+                new BasePeerEndPoint[] { availableSession.HostEndPoint },
                 false,
                 availableSession.MaxGamers,
                 availableSession.PrivateGamerSlots,
@@ -226,7 +226,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 var msg = peer.CreateMessage();
                 msg.Write(peer.Configuration.AppIdentifier);
                 msg.Write((byte)MasterServerMessageType.RequestIntroduction);
-                msg.Write((availableSession.HostEndPoint as LidgrenGuidEndPoint).ToString());
+                msg.Write((availableSession.HostEndPoint as GuidEndPoint).ToString());
                 msg.Write(localPeer.InternalIp);
                 peer.SendUnconnectedMessage(msg, masterServerEndPoint);
             }

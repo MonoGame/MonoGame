@@ -240,16 +240,32 @@
     <Compile Include="Net\Backend\BackendInterface.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\Lidgren\LidgrenBackend.cs">
+
+    <Compile Include="Net\Backend\Lidgren\GuidEndPoint.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\Lidgren\LidgrenMasterServer.cs">
+    <Compile Include="Net\Backend\Lidgren\IncomingMessage.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\Lidgren\LidgrenMessage.cs">
+    <Compile Include="Net\Backend\Lidgren\IntroducerToken.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\Lidgren\LidgrenSessionCreator.cs">
+    <Compile Include="Net\Backend\Lidgren\LocalPeer.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Backend\Lidgren\MasterServer.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Backend\Lidgren\OutgoingMessage.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Backend\Lidgren\RemotePeer.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Backend\Lidgren\SessionBackend.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Backend\Lidgren\SessionCreator.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
 

@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Net
         private bool gameEndRequestThisFrame;
         private bool resetReadyRequestThisFrame;
 
-        private List<OutgoingMessage> messageQueue;
+        private List<BaseOutgoingMessage> messageQueue;
         private List<EventArgs> eventQueue;
         internal List<NetworkGamer> allGamers; // TODO: Make private once messages are refactored into NetworkSession
         internal List<NetworkGamer> remoteGamers;
@@ -36,12 +36,12 @@ namespace Microsoft.Xna.Framework.Net
         internal int privateGamerSlots;
 
         internal IList<SignedInGamer> pendingSignedInGamers; // Must be a list since order is important
-        internal ICollection<PeerEndPoint> allowlist;
-        internal ICollection<PeerEndPoint> pendingEndPoints;
+        internal ICollection<BasePeerEndPoint> allowlist;
+        internal ICollection<BasePeerEndPoint> pendingEndPoints;
         internal IDictionary<NetworkMachine, ICollection<NetworkMachine>> hostPendingConnections;
-        internal IDictionary<NetworkMachine, ICollection<PeerEndPoint>> hostPendingAllowlistInsertions;
+        internal IDictionary<NetworkMachine, ICollection<BasePeerEndPoint>> hostPendingAllowlistInsertions;
 
-        internal NetworkSession(SessionBackend backend, IEnumerable<PeerEndPoint> initialAllowlist, bool isHost, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
+        internal NetworkSession(BaseSessionBackend backend, IEnumerable<BasePeerEndPoint> initialAllowlist, bool isHost, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
             this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, isHost);
             this.hostMachine = this.localMachine.IsHost ? this.localMachine : null;
@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Net
             this.gameEndRequestThisFrame = false;
             this.resetReadyRequestThisFrame = false;
 
-            this.messageQueue = new List<OutgoingMessage>();
+            this.messageQueue = new List<BaseOutgoingMessage>();
             this.eventQueue = new List<EventArgs>();
             this.allGamers = new List<NetworkGamer>();
             this.remoteGamers = new List<NetworkGamer>();
@@ -72,8 +72,8 @@ namespace Microsoft.Xna.Framework.Net
                 }
             }
 
-            this.allowlist = new HashSet<PeerEndPoint>();
-            foreach (PeerEndPoint endPoint in initialAllowlist)
+            this.allowlist = new HashSet<BasePeerEndPoint>();
+            foreach (BasePeerEndPoint endPoint in initialAllowlist)
             {
                 this.allowlist.Add(endPoint);
             }
@@ -83,10 +83,10 @@ namespace Microsoft.Xna.Framework.Net
             if (this.localMachine.IsHost)
             {
                 // Initialize empty pending end point list so that the host is approved automatically
-                this.pendingEndPoints = new HashSet<PeerEndPoint>();
+                this.pendingEndPoints = new HashSet<BasePeerEndPoint>();
 
                 this.hostPendingConnections = new Dictionary<NetworkMachine, ICollection<NetworkMachine>>();
-                this.hostPendingAllowlistInsertions = new Dictionary<NetworkMachine, ICollection<PeerEndPoint>>();
+                this.hostPendingAllowlistInsertions = new Dictionary<NetworkMachine, ICollection<BasePeerEndPoint>>();
             }
 
             this.Backend = backend;
@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework.Net
             SignedInGamer.SignedOut += LocalGamerSignedOut;
         }
         
-        internal SessionBackend Backend { get; }
+        internal BaseSessionBackend Backend { get; }
         internal PacketPool PacketPool { get; }
         internal InternalMessages InternalMessages { get; }
         internal IList<NetworkMachine> RemoteMachines { get; }
@@ -728,12 +728,12 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        void IMessageQueue.Place(OutgoingMessage msg)
+        void IMessageQueue.Place(BaseOutgoingMessage msg)
         {
             messageQueue.Add(msg);
         }
 
-        bool ISessionBackendListener.AllowConnectionFromClient(PeerEndPoint endPoint)
+        bool ISessionBackendListener.AllowConnectionFromClient(BasePeerEndPoint endPoint)
         {
             if (IsHost)
             {
@@ -753,7 +753,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        bool ISessionBackendListener.AllowConnectionToHostAsClient(PeerEndPoint targetEndPoint)
+        bool ISessionBackendListener.AllowConnectionToHostAsClient(BasePeerEndPoint targetEndPoint)
         {
             if (IsHost || IsFullyConnected)
             {
@@ -806,7 +806,7 @@ namespace Microsoft.Xna.Framework.Net
                 InternalMessages.ConnectToAllRequest.Create(requestedConnections, newMachine);
 
                 // Introduce machines to each other
-                hostPendingAllowlistInsertions.Add(newMachine, new HashSet<PeerEndPoint>());
+                hostPendingAllowlistInsertions.Add(newMachine, new HashSet<BasePeerEndPoint>());
 
                 foreach (NetworkMachine existingMachine in requestedConnections)
                 {
@@ -815,7 +815,7 @@ namespace Microsoft.Xna.Framework.Net
 
                     if (!hostPendingAllowlistInsertions.ContainsKey(existingMachine))
                     {
-                        hostPendingAllowlistInsertions.Add(existingMachine, new HashSet<PeerEndPoint>());
+                        hostPendingAllowlistInsertions.Add(existingMachine, new HashSet<BasePeerEndPoint>());
                     }
 
                     hostPendingAllowlistInsertions[existingMachine].Add(newMachine.peer.EndPoint);
@@ -858,7 +858,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        void ISessionBackendListener.ReceiveMessage(IncomingMessage data, Peer sender)
+        void ISessionBackendListener.ReceiveMessage(BaseIncomingMessage data, Peer sender)
         {
             NetworkMachine senderMachine = sender.Tag as NetworkMachine;
 
@@ -880,7 +880,7 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
-            foreach (PeerEndPoint endPoint in pendingEndPoints)
+            foreach (BasePeerEndPoint endPoint in pendingEndPoints)
             {
                 if (!Backend.IsConnectedToEndPoint(endPoint) || !(Backend.FindRemotePeerByEndPoint(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine)
                 {
