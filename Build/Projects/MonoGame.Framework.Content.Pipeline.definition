@@ -432,6 +432,8 @@
     <Compile Include="ContentProcessor.cs" />
     <Compile Include="ContentProcessorAttribute.cs" />
     <Compile Include="ContentProcessorContext.cs" />
+    <Compile Include="ContentStats.cs" />
+    <Compile Include="ContentStatsCollection.cs" />
     <Compile Include="DdsLoader.cs" />
     <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
