@@ -32,6 +32,10 @@
       <Platform Name="iOS">IOS;</Platform>
     </CustomDefinitions>
 
+    <FrameworkVersions>
+      <Version>v4.7.1</Version>
+    </FrameworkVersions>
+
   </Properties>
 
   <Files>

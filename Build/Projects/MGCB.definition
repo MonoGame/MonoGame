@@ -27,6 +27,10 @@
       <Platform Name="Linux">TRACE;LINUX</Platform>
     </CustomDefinitions>
 
+    <FrameworkVersions>
+      <Version>v4.7.1</Version>
+    </FrameworkVersions>
+
   </Properties>
 
   <Files>
