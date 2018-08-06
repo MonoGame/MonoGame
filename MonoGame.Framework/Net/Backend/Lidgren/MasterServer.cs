@@ -107,8 +107,10 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 {
                     try
                     {
-                        var msg = new IncomingMessage(rawMsg);
+                        var msg = MessagePool.Incoming.Get();
+                        msg.Set(null, rawMsg);
                         HandleMessage(msg, rawMsg.SenderEndPoint);
+                        MessagePool.Incoming.Recycle(msg);
                     }
                     catch (NetException e)
                     {
@@ -165,6 +167,39 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             MessagePool.Outgoing.Recycle(msg);
         }
 
+        public static void RequestHosts(NetPeer peer)
+        {
+            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            var request = peer.CreateMessage();
+            request.Write(peer.Configuration.AppIdentifier);
+            request.Write((byte)MasterServerMessageType.RequestHosts);
+            peer.SendUnconnectedMessage(request, serverEndPoint);
+        }
+
+        public static void ParseRequestHostsResponse(NetIncomingMessage response, out GuidEndPoint hostEndPoint, out NetworkSessionPublicInfo hostPublicInfo)
+        {
+            var msg = MessagePool.Incoming.Get();
+            msg.Set(null, response);
+            hostEndPoint = msg.ReadGuidEndPoint();
+            hostPublicInfo = NetworkSessionPublicInfo.FromMessage(msg);
+            MessagePool.Incoming.Recycle(msg);
+        }
+
+        public static void RequestIntroduction(NetPeer peer, GuidEndPoint hostEndPoint, IPEndPoint internalIp)
+        {
+            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            var msg = MessagePool.Outgoing.Get();
+            msg.Write(peer.Configuration.AppIdentifier);
+            msg.Write((byte)MasterServerMessageType.RequestIntroduction);
+            msg.Write(hostEndPoint);
+            msg.Write(internalIp);
+
+            var request = peer.CreateMessage();
+            request.Write(msg.Buffer);
+            peer.SendUnconnectedMessage(request, serverEndPoint);
+            MessagePool.Outgoing.Recycle(msg);
+        }
+
         protected void HandleMessage(IncomingMessage msg, IPEndPoint senderIpEndPoint)
         {
             string senderGameAppId = msg.ReadString();
@@ -193,13 +228,13 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                 if (hosts.ContainsKey(hostEndPoint))
                 {
-                    var hostData = hosts[hostEndPoint];
+                    var host = hosts[hostEndPoint];
 
-                    if (senderIpEndPoint == hostData.ExternalIp)
+                    if (senderIpEndPoint.Equals(host.ExternalIp))
                     {
                         hosts.Remove(hostEndPoint);
 
-                        Console.WriteLine($"Host unregistered. {hostData}");
+                        Console.WriteLine($"Host unregistered. {host}");
                     }
                     else
                     {
@@ -213,17 +248,16 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             else if (messageType == MasterServerMessageType.RequestHosts)
             {
-                foreach (var hostData in hosts.Values)
+                foreach (var host in hosts.Values)
                 {
-                    var response = new OutgoingMessage();
-                    response.Write(hostData.EndPoint.ToString());
-                    hostData.PublicInfo.Pack(response);
+                    var responseMsg = MessagePool.Outgoing.Get();
+                    responseMsg.Write(host.EndPoint);
+                    host.PublicInfo.Pack(responseMsg);
 
-                    response.Buffer.Position = 0;
-
-                    var rawResponse = server.CreateMessage();
-                    rawResponse.Write(response.Buffer);
-                    server.SendUnconnectedMessage(rawResponse, senderIpEndPoint);
+                    var response = server.CreateMessage();
+                    response.Write(responseMsg.Buffer);
+                    server.SendUnconnectedMessage(response, senderIpEndPoint);
+                    MessagePool.Outgoing.Recycle(responseMsg);
                 }
 
                 Console.WriteLine($"List of {hosts.Count} hosts sent to {senderIpEndPoint}.");
@@ -234,18 +268,17 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                 if (hosts.ContainsKey(hostEndPoint))
                 {
+                    var host = hosts[hostEndPoint];
                     var clientInternalIp = msg.ReadIPEndPoint();
                     var clientExternalIp = senderIpEndPoint;
-                    var hostData = hosts[hostEndPoint];
 
-                    // As the client will receive the NatIntroductionSuccess message, send the host's endPoint as token:
-                    string token = new IntroducerToken(hostData.EndPoint,
-                                                        hostData.ExternalIp,
+                    string token = new IntroducerToken(host.EndPoint,
+                                                        host.ExternalIp,
                                                         clientExternalIp).Serialize();
 
-                    server.Introduce(hostData.InternalIp, hostData.ExternalIp, clientInternalIp, clientExternalIp, token);
+                    server.Introduce(host.InternalIp, host.ExternalIp, clientInternalIp, clientExternalIp, token);
 
-                    Console.WriteLine($"Introduced host {hostData} and client [InternalIp: {clientInternalIp}, ExternalIp: {clientExternalIp}].");
+                    Console.WriteLine($"Introduced host {host} and client [InternalIp: {clientInternalIp}, ExternalIp: {clientExternalIp}].");
                 }
                 else
                 {

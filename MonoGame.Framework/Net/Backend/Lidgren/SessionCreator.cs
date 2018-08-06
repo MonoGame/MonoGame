@@ -69,13 +69,13 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             return session;
         }
 
-        private void AddAvailableNetworkSession(IPEndPoint localIPEndPoint, BasePeerEndPoint endPoint, NetworkSessionPublicInfo publicInfo, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions)
+        private void AddAvailableNetworkSession(BasePeerEndPoint endPoint, NetworkSessionPublicInfo publicInfo, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions, IPEndPoint localIp = null)
         {
             if (searchType == publicInfo.sessionType && searchProperties.SearchMatch(publicInfo.sessionProperties))
             {
                 var availableSession = new AvailableNetworkSession(endPoint, localGamers, publicInfo.maxGamers, publicInfo.privateGamerSlots, publicInfo.sessionType, publicInfo.currentGamerCount, publicInfo.hostGamertag, publicInfo.openPrivateGamerSlots, publicInfo.openPublicGamerSlots, publicInfo.sessionProperties)
                 {
-                    Tag = localIPEndPoint
+                    Tag = localIp,
                 };
                 availableSessions.Add(availableSession);
             }
@@ -114,10 +114,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             {
                 Debug.WriteLine("Sending discovery request to master server...");
 
-                var request = discoverPeer.CreateMessage();
-                request.Write(discoverPeer.Configuration.AppIdentifier);
-                request.Write((byte)MasterServerMessageType.RequestHosts);
-                discoverPeer.SendUnconnectedMessage(request, masterServerEndPoint);
+                MasterServer.RequestHosts(discoverPeer);
             }
             else
             {
@@ -133,24 +130,19 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             NetIncomingMessage rawMsg;
             while ((rawMsg = discoverPeer.ReadMessage()) != null)
             {
-                if (rawMsg.MessageType == NetIncomingMessageType.UnconnectedData)
+                if (rawMsg.MessageType == NetIncomingMessageType.UnconnectedData && !rawMsg.SenderEndPoint.Equals(masterServerEndPoint))
                 {
-                    if (rawMsg.SenderEndPoint.Equals(masterServerEndPoint))
-                    {
-                        var msg = new IncomingMessage(rawMsg);
-                        var hostEndPoint = GuidEndPoint.Parse(msg.ReadString());
-                        var hostPublicInfo = NetworkSessionPublicInfo.FromMessage(msg);
-
-                        AddAvailableNetworkSession(null, hostEndPoint, hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
-                    }
+                    Debug.WriteLine($"Unconnected data not from master server recieved from {rawMsg.SenderEndPoint}");
+                    discoverPeer.Recycle(rawMsg);
+                    continue;
                 }
-                else if (rawMsg.MessageType == NetIncomingMessageType.DiscoveryResponse)
-                {
-                    var msg = new IncomingMessage(rawMsg);
-                    var hostEndPoint = GuidEndPoint.Parse(msg.ReadString());
-                    var hostPublicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
-                    AddAvailableNetworkSession(rawMsg.SenderEndPoint, hostEndPoint, hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
+                if (rawMsg.MessageType == NetIncomingMessageType.DiscoveryResponse || rawMsg.MessageType == NetIncomingMessageType.UnconnectedData)
+                {
+                    MasterServer.ParseRequestHostsResponse(rawMsg, out GuidEndPoint endPoint, out NetworkSessionPublicInfo publicInfo);
+                    var localIp = rawMsg.MessageType == NetIncomingMessageType.DiscoveryResponse ? rawMsg.SenderEndPoint : null;
+
+                    AddAvailableNetworkSession(endPoint, publicInfo, localGamers, sessionType, searchProperties, availableSessions, localIp);
                 }
                 else
                 {
@@ -160,10 +152,10 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         case NetIncomingMessageType.DebugMessage:
                         case NetIncomingMessageType.WarningMessage:
                         case NetIncomingMessageType.ErrorMessage:
-                            Debug.WriteLine("Lidgren: " + rawMsg.ReadString());
+                            Debug.WriteLine($"Lidgren: {rawMsg.ReadString()}");
                             break;
                         default:
-                            Debug.WriteLine("Unhandled type: " + rawMsg.MessageType);
+                            Debug.WriteLine($"Unhandled type: {rawMsg.MessageType}");
                             break;
                     }
                 }
@@ -178,8 +170,6 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public override NetworkSession Join(AvailableNetworkSession availableSession)
         {
-            var masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-
             var config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId);
             config.Port = 0;
             config.AcceptIncomingConnections = true;
@@ -223,12 +213,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             else if (availableSession.SessionType == NetworkSessionType.PlayerMatch || availableSession.SessionType == NetworkSessionType.Ranked)
             {
                 // Note: Actual Connect call is handled by NetworkSession once NAT introduction is successful
-                var msg = peer.CreateMessage();
-                msg.Write(peer.Configuration.AppIdentifier);
-                msg.Write((byte)MasterServerMessageType.RequestIntroduction);
-                msg.Write((availableSession.HostEndPoint as GuidEndPoint).ToString());
-                msg.Write(localPeer.InternalIp);
-                peer.SendUnconnectedMessage(msg, masterServerEndPoint);
+                MasterServer.RequestIntroduction(peer, (GuidEndPoint)availableSession.HostEndPoint, localPeer.InternalIp);
             }
             else
             {
