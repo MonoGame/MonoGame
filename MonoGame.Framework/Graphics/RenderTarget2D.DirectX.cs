@@ -138,6 +138,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void ResolveSubresource()
         {
+            if (GraphicsDevice == null)
+                return;
             lock (GraphicsDevice._d3dContext)
             {
                 GraphicsDevice._d3dContext.ResolveSubresource(
