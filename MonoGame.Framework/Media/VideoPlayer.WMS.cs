@@ -7,6 +7,7 @@ using SharpDX;
 using SharpDX.MediaFoundation;
 using SharpDX.Win32;
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -39,14 +40,12 @@ namespace Microsoft.Xna.Framework.Media
         private Texture2D _texture;
         private Callback _callback;
         internal MediaSession Session { get { return _session; } }
+        private VideoSampleGrabber _sampleGrabber;
 
         private class Callback : IAsyncCallback
         {
-            private VideoPlayer _player;
-
-            public Callback(VideoPlayer player)
+            public Callback()
             {
-                _player = player;
             }
 
             public void Dispose()
@@ -57,23 +56,24 @@ namespace Microsoft.Xna.Framework.Media
 
             public void Invoke(AsyncResult asyncResultRef)
             {
-                var ev = _player.Session.EndGetEvent(asyncResultRef);
-
+                var player = (VideoPlayer)asyncResultRef.State;
+                var ev = player.Session.EndGetEvent(asyncResultRef);
                 // Trigger an "on Video Ended" event here if needed
                 if (ev.TypeInfo == MediaEventTypes.SessionTopologyStatus && ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
-                    _player.OnTopologyReady();
+                    player.OnTopologyReady();
                 else if (ev.TypeInfo == MediaEventTypes.SessionStarted)
-                    _player.OnSessionStarted();
+                    player.OnSessionStarted();
                 else if (ev.TypeInfo == MediaEventTypes.SessionStopped)
-                    _player.OnSessionStopped();
+                    player.OnSessionStopped();
                 else if (ev.TypeInfo == MediaEventTypes.SessionClosed)
-                    _player.OnSessionClosed();
+                    player.OnSessionClosed();
                 else if (ev.TypeInfo == MediaEventTypes.SessionPaused)
-                    _player.OnSessionPaused();
+                    player.OnSessionPaused();
                 else if (ev.TypeInfo == MediaEventTypes.EndOfPresentation)
-                    _player.OnPresentationEnded();
+                    player.OnPresentationEnded();
 
-                _player.Session.BeginGetEvent(this, null);
+                if (player.Session != null)
+                    player.Session.BeginGetEvent(this, player);
             }
 
             public AsyncCallbackFlags Flags { get; private set; }
@@ -86,7 +86,6 @@ namespace Microsoft.Xna.Framework.Media
             AudioStreamVolumeGuid = Guid.Parse(((GuidAttribute)typeof(AudioStreamVolume).GetCustomAttributes(typeof(GuidAttribute), false)[0]).Value);
 
             MediaManagerState.CheckStartup();
-            MediaFactory.CreateMediaSession(null, out _session);
         }
 
         private void CreateTexture()
@@ -114,8 +113,7 @@ namespace Microsoft.Xna.Framework.Media
 
             if (_currentVideo != null && State != MediaState.Stopped && State != MediaState.Paused)
             {
-                var sampleGrabber = _currentVideo.SampleGrabber;
-                var texData = sampleGrabber.TextureData;
+                var texData = _sampleGrabber.TextureData;
                 if (texData != null)
                     _texture.SetData(texData);
                 else
@@ -138,10 +136,13 @@ namespace Microsoft.Xna.Framework.Media
             switch (_internalState)
             {
                 case InternalState.Stopped:
+                case InternalState.PresentationEnded:
+                case InternalState.WaitingForSessionStop:
                     result = MediaState.Stopped;
                     return;
 
                 case InternalState.Paused:
+                case InternalState.WaitingForSessionPaused:
                     result = MediaState.Paused;
                     return;
             }
@@ -164,18 +165,21 @@ namespace Microsoft.Xna.Framework.Media
                 PlatformStop();
             }
 
+            MediaFactory.CreateMediaSession(null, out _session);
             CreateTexture();
 
             // Create the callback if it hasn't been created yet
             if (_callback == null)
             {
-                _callback = new Callback(this);
-                _session.BeginGetEvent(_callback, null);
+                _callback = new Callback();
             }
+            _session.BeginGetEvent(_callback, this);
 
             // Set the new video.
             _internalState = InternalState.WaitingForSessionStart;
-            _session.SetTopology(SessionSetTopologyFlags.Immediate, _currentVideo.Topology);
+            Topology topology;
+            _currentVideo.Open(this, out topology, out _sampleGrabber);
+            _session.SetTopology(SessionSetTopologyFlags.Immediate, topology);
 
             WaitForInternalStateChange(InternalState.Playing);
         }
@@ -191,16 +195,12 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformStop()
         {
-            if (State == MediaState.Playing)
+            if (State != MediaState.Stopped)
             {
                 _internalState = InternalState.WaitingForSessionStop;
                 _session.Stop();
-                WaitForInternalStateChange(InternalState.Stopped);
             }
-            else
-            {
-                _internalState = InternalState.Stopped;
-            }
+            WaitForInternalStateChange(InternalState.Stopped);
         }
 
         bool WaitForInternalStateChange(InternalState expectedState, int milliseconds = defaultTimeoutMs)
@@ -264,11 +264,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (disposing)
             {
-                SharpDX.Utilities.Dispose(ref _volumeController);
-                SharpDX.Utilities.Dispose(ref _clock);
-                SharpDX.Utilities.Dispose(ref _session);
-                SharpDX.Utilities.Dispose(ref _texture);
-                SharpDX.Utilities.Dispose(ref _callback);
+                PlatformStop();
             }
         }
 
@@ -312,17 +308,20 @@ namespace Microsoft.Xna.Framework.Media
         {
             _session.Close();
         }
- 
+
         private void OnSessionClosed()
         {
-            if (_volumeController != null)
-            {
-                _volumeController.Dispose();
-                _volumeController = null;
-            }
-            _clock.Dispose();
-            _clock = null;
+            SharpDX.Utilities.Dispose(ref _volumeController);
+            SharpDX.Utilities.Dispose(ref _clock);
+            SharpDX.Utilities.Dispose(ref _session);
+            SharpDX.Utilities.Dispose(ref _texture);
+            SharpDX.Utilities.Dispose(ref _callback);
+            _sampleGrabber = null;
             _internalState = InternalState.Stopped;
+            if (_currentVideo != null)
+            {
+                _currentVideo.Close(this);
+            }
         }
 
         private void OnSessionPaused()
