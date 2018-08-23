@@ -42,6 +42,9 @@ namespace Microsoft.Xna.Framework.Media
         internal MediaSession Session { get { return _session; } }
         private VideoSampleGrabber _sampleGrabber;
 
+        private static readonly Variant PositionCurrent = new Variant();
+        private static readonly Variant PositionBeginning = new Variant { ElementType = VariantElementType.Long, Value = 0L };
+
         private class Callback : IAsyncCallback
         {
             public Callback()
@@ -187,9 +190,7 @@ namespace Microsoft.Xna.Framework.Media
         private void PlatformResume()
         {
             _internalState = InternalState.WaitingForSessionStart;
-            // A variant is required for the second parameter of Start() otherwise it throws an invalid pointer error
-            var varStart = new Variant();
-            _session.Start(null, varStart);
+            _session.Start(null, PositionCurrent);
             WaitForInternalStateChange(InternalState.Playing);
         }
 
@@ -295,8 +296,7 @@ namespace Microsoft.Xna.Framework.Media
             _clock = _session.Clock.QueryInterface<PresentationClock>();
 
             // Start playing.
-            var varStart = new Variant();
-            _session.Start(null, varStart);
+            _session.Start(null, PositionBeginning);
         }
 
         private void OnSessionStarted()
@@ -311,17 +311,20 @@ namespace Microsoft.Xna.Framework.Media
 
         private void OnSessionClosed()
         {
-            SharpDX.Utilities.Dispose(ref _volumeController);
-            SharpDX.Utilities.Dispose(ref _clock);
-            SharpDX.Utilities.Dispose(ref _session);
-            SharpDX.Utilities.Dispose(ref _texture);
-            SharpDX.Utilities.Dispose(ref _callback);
             _sampleGrabber = null;
-            _internalState = InternalState.Stopped;
             if (_currentVideo != null)
             {
                 _currentVideo.Close(this);
+                _currentVideo = null;
             }
+            SharpDX.Utilities.Dispose(ref _volumeController);
+            SharpDX.Utilities.Dispose(ref _clock);
+            _session.ClearTopologies();
+            _session.Shutdown();
+            SharpDX.Utilities.Dispose(ref _session);
+            SharpDX.Utilities.Dispose(ref _texture);
+            SharpDX.Utilities.Dispose(ref _callback);
+            _internalState = InternalState.Stopped;
         }
 
         private void OnSessionPaused()
