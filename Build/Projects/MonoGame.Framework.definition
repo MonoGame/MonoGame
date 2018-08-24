@@ -978,13 +978,16 @@
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.cs">
-      <Platforms>Android,iOS,WindowsUniversal</Platforms>
+      <Platforms>Android,iOS,Windows,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.IOS.cs">
       <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.Windows.cs">
+      <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.WinRT.cs">
       <Platforms>WindowsUniversal</Platforms>
@@ -993,13 +996,16 @@
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="Input\MessageBox.cs">
-      <Platforms>Android,iOS,WindowsUniversal</Platforms>
+      <Platforms>Android,iOS,Windows,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\MessageBox.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Input\MessageBox.IOS.cs">
       <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.Windows.cs">
+      <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Input\MessageBox.WinRT.cs">
       <Platforms>WindowsUniversal</Platforms>
