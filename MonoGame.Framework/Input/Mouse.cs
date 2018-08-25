@@ -53,6 +53,7 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         /// <param name="x">Relative horizontal position of the cursor.</param>
         /// <param name="y">Relative vertical position of the cursor.</param>
+        /// <remarks>Does not work with Windows 8 and Windows Universal.</remarks>
         public static void SetPosition(int x, int y)
         {
             PlatformSetPosition(x, y);
