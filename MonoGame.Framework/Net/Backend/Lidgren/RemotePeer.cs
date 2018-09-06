@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             this.connection = connection;
             this.endPoint = endPoint;
             this.internalIp = internalIp;
-            this.externalIp = externalIp;
+            this.externalIp = new IPEndPoint(externalIp.Address, connection.RemoteEndPoint.Port); // Use observed address but actual port
         }
 
         public NetConnection Connection { get { return connection; } }

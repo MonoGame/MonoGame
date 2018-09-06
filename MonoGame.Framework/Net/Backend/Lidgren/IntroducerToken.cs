@@ -8,8 +8,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         public IntroducerToken(GuidEndPoint hostEndPoint, IPEndPoint hostExternalIp, IPEndPoint clientExternalIp)
         {
             HostEndPoint = hostEndPoint ?? throw new ArgumentNullException(nameof(hostEndPoint));
-            HostExternalIp = hostExternalIp ?? throw new ArgumentNullException(nameof(hostExternalIp));
-            ClientExternalIp = clientExternalIp ?? throw new ArgumentNullException(nameof(clientExternalIp));
+            HostExternalIp = new IPEndPoint(hostExternalIp.Address, 0) ?? throw new ArgumentNullException(nameof(hostExternalIp));
+            ClientExternalIp = new IPEndPoint(clientExternalIp.Address, 0) ?? throw new ArgumentNullException(nameof(clientExternalIp));
         }
 
         /// <summary>

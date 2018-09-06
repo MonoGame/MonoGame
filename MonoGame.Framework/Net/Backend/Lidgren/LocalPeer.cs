@@ -81,14 +81,14 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             peer.Introduce(remoteHost.InternalIp, remoteHost.ExternalIp, remoteClient.InternalIp, remoteClient.ExternalIp, token);
         }
 
-        public void Connect(IPEndPoint destinationIp, IPEndPoint destinationExternalIp, IPEndPoint observedExternalIp)
+        public void Connect(IPEndPoint destinationIp, IPEndPoint destinationExternalIp, IPEndPoint myObservedExternalIp)
         {
             if (peer.GetConnection(destinationIp) == null)
             {
                 var hailMsg = peer.CreateMessage();
                 hailMsg.Write(endPoint.ToString());
                 hailMsg.Write(InternalIp);
-                hailMsg.Write(observedExternalIp);
+                hailMsg.Write(myObservedExternalIp);
                 hailMsg.Write(destinationExternalIp);
                 peer.Connect(destinationIp, hailMsg);
             }
@@ -183,14 +183,14 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                     var clientEndPoint = GuidEndPoint.Parse(msg.ReadString());
                     var clientInternalIp = msg.ReadIPEndPoint();
                     var clientExternalIp = msg.ReadIPEndPoint();
-                    var hostExternalIp = msg.ReadIPEndPoint(); // From IntroducerToken above
+                    var myExternalIp = msg.ReadIPEndPoint(); // From IntroducerToken above
 
                     if (Listener.AllowConnectionFromClient(clientEndPoint))
                     {
                         var hailMsg = peer.CreateMessage();
                         hailMsg.Write(endPoint.ToString());
                         hailMsg.Write(InternalIp);
-                        hailMsg.Write(hostExternalIp); // External ip unknown to this peer, must come from outisde
+                        hailMsg.Write(myExternalIp); // External ip unknown to this peer, must come from outisde
                         msg.SenderConnection.Approve(hailMsg);
                     }
                     else

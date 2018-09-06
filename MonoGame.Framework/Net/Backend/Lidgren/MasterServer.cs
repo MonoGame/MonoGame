@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public override string ToString()
         {
-            return "[EndPoint: " + EndPoint + ", InternalIp: " + InternalIp + ", ExternalIp: " + ExternalIp + "]";
+            return $"[EndPoint: {EndPoint}, InternalIp: {InternalIp}, ExternalIp: {ExternalIp}]";
         }
     }
 
