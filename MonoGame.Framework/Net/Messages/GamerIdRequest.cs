@@ -5,10 +5,14 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class GamerIdRequest : InternalMessage
     {
+        public GamerIdRequest() : base(InternalMessageIndex.GamerIdRequest)
+        { }
+
         public void Create(NetworkMachine recipient)
         {
+            Debug.WriteLine($"Sending {Index} to {CurrentMachine.Session.MachineOwnerName(recipient)}...");
             var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageIndex.GamerIdRequest);
+            msg.Write((byte)Index);
             Queue.Place(msg);
         }
 

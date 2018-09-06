@@ -6,6 +6,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class ConnectToAllRequest : InternalMessage
     {
+        public ConnectToAllRequest() : base(InternalMessageIndex.ConnectToAllRequest)
+        { }
+
         public void Create(ICollection<NetworkMachine> machinesToConnectTo, NetworkMachine recipient)
         {
             if (!CurrentMachine.IsHost)
@@ -13,8 +16,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("Only host can send ConnectToAllRequest");
             }
 
+            Debug.WriteLine($"Sending {Index} to {CurrentMachine.Session.MachineOwnerName(recipient)}...");
             var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageIndex.ConnectToAllRequest);
+            msg.Write((byte)Index);
 
             msg.Write((int)machinesToConnectTo.Count);
             foreach (NetworkMachine machine in machinesToConnectTo)

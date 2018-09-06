@@ -5,6 +5,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class GameStarted : InternalMessage
     {
+        public GameStarted() : base(InternalMessageIndex.GameStarted)
+        { }
+
         public void Create(NetworkMachine recipient)
         {
             if (!CurrentMachine.IsHost)
@@ -21,8 +24,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
             //
             // Let host handle all gamer joining and leaving messages, probably better if doable!
 
+            Debug.WriteLine($"Sending {Index} to {CurrentMachine.Session.MachineOwnerName(recipient)}...");
             var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageIndex.GameStarted);
+            msg.Write((byte)Index);
             Queue.Place(msg);
         }
 

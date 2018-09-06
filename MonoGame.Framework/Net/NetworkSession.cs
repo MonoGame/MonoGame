@@ -590,6 +590,29 @@ namespace Microsoft.Xna.Framework.Net
             return null;
         }
 
+        internal NetworkMachine FindMachineByPeer(Peer peer)
+        {
+            if (IsDisposed || SessionState == NetworkSessionState.Ended)
+            {
+                return null;
+            }
+
+            if (localMachine.peer == peer)
+            {
+                return localMachine;
+            }
+
+            foreach (var remoteMachine in RemoteMachines)
+            {
+                if (remoteMachine.peer == peer)
+                {
+                    return remoteMachine;
+                }
+            }
+
+            return null;
+        }
+
         internal void AddMachine(NetworkMachine machine)
         {
             if (!machine.IsLocal)
@@ -701,7 +724,7 @@ namespace Microsoft.Xna.Framework.Net
             return false;
         }
 
-        private string MachineOwnerName(NetworkMachine machine)
+        internal string MachineOwnerName(NetworkMachine machine)
         {
             if (machine == null)
             {

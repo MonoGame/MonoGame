@@ -5,8 +5,12 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class GamerStateChanged : InternalMessage
     {
+        public GamerStateChanged() : base(InternalMessageIndex.GamerStateChanged)
+        { }
+
         public void Create(LocalNetworkGamer localGamer, bool sendNames, bool sendFlags, NetworkMachine recipient)
         {
+            Debug.WriteLine($"Sending {Index} to {CurrentMachine.Session.MachineOwnerName(recipient)}...");
             var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.GamerStateChanged);
 

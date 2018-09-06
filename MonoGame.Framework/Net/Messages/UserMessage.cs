@@ -5,6 +5,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class UserMessage : InternalMessage
     {
+        public UserMessage() : base(InternalMessageIndex.UserMessage)
+        { }
+
         public void Create(NetworkGamer sender, NetworkGamer recipient, SendDataOptions options, Packet packet)
         {
             if (!CurrentMachine.IsFullyConnected)
@@ -12,8 +15,8 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("UserMessage from not fully connected peer");
             }
 
-            BaseOutgoingMessage msg = Backend.GetMessage(recipient?.Machine.peer, options, 0);
-            msg.Write((byte)InternalMessageIndex.UserMessage);
+            var msg = Backend.GetMessage(recipient?.Machine.peer, options, 0);
+            msg.Write((byte)Index);
 
             bool sendToAll = recipient == null;
 

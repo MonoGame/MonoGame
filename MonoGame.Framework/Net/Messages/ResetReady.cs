@@ -5,6 +5,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class ResetReady : InternalMessage
     {
+        public ResetReady() : base(InternalMessageIndex.ResetReady)
+        { }
+
         public void Create()
         {
             if (!CurrentMachine.IsHost)
@@ -12,8 +15,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("Only host can send ResetReady");
             }
 
+            Debug.WriteLine($"Sending {Index} to {CurrentMachine.Session.MachineOwnerName(null)}...");
             var msg = Backend.GetMessage(null, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageIndex.ResetReady);
+            msg.Write((byte)Index);
             Queue.Place(msg);
         }
 

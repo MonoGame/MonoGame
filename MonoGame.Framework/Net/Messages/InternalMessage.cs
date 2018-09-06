@@ -79,9 +79,15 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
     internal abstract class InternalMessage
     {
+        public InternalMessageIndex Index { get; private set; }
         public BaseSessionBackend Backend { get; private set; }
         public IMessageQueue Queue { get; private set; }
         public NetworkMachine CurrentMachine { get; private set; }
+
+        public InternalMessage(InternalMessageIndex index)
+        {
+            Index = index;
+        }
 
         public void Initialize(BaseSessionBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
         {

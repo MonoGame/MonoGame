@@ -5,6 +5,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class SessionStateChanged : InternalMessage
     {
+        public SessionStateChanged() : base(InternalMessageIndex.SessionStateChanged)
+        { }
+
         public void Create(NetworkMachine recipient)
         {
             if (!CurrentMachine.IsHost)
@@ -12,8 +15,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("Only host can send SessionStateChanged");
             }
 
+            Debug.WriteLine($"Sending {Index} to {CurrentMachine.Session.MachineOwnerName(recipient)}...");
             var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageIndex.SessionStateChanged);
+            msg.Write((byte)Index);
 
             msg.Write(CurrentMachine.Session.allowHostMigration);
             msg.Write(CurrentMachine.Session.allowJoinInProgress);

@@ -5,10 +5,14 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class GamerJoined : InternalMessage
     {
+        public GamerJoined() : base(InternalMessageIndex.GamerJoined)
+        { }
+
         public void Create(LocalNetworkGamer localGamer, NetworkMachine recipient)
         {
+            Debug.WriteLine($"Sending {Index} to {CurrentMachine.Session.MachineOwnerName(recipient)}...");
             var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageIndex.GamerJoined);
+            msg.Write((byte)Index);
 
             msg.Write(localGamer.DisplayName);
             msg.Write(localGamer.Gamertag);

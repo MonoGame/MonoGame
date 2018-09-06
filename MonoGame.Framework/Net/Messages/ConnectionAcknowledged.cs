@@ -6,6 +6,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class ConnectionAcknowledged : InternalMessage
     {
+        public ConnectionAcknowledged() : base(InternalMessageIndex.ConnectionAcknowledged)
+        { }
+
         public void Create(NetworkMachine recipient)
         {
             if (recipient == null)
@@ -13,8 +16,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new ArgumentNullException("recipient");
             }
 
+            Debug.WriteLine($"Sending {Index} to {CurrentMachine.Session.MachineOwnerName(recipient)}...");
             var msg = Backend.GetMessage(recipient.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageIndex.ConnectionAcknowledged);
+            msg.Write((byte)Index);
 
             // Encode validation info
             msg.Write((int)CurrentMachine.localGamers.Count);

@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public void Introduce(RemotePeer remoteClient, RemotePeer remoteHost)
         {
-            Debug.WriteLine("Introducing client " + remoteClient.ExternalIp + " to host " + remoteHost.ExternalIp + "...");
+            Debug.WriteLine($"Introducing client [Ext: {remoteClient.ExternalIp}; Int: {remoteClient.InternalIp}] to host [Ext: {remoteHost.ExternalIp}; Int: {remoteHost.InternalIp}]...");
 
             // The client will receive the NatIntroductionSuccess message
             string token = new IntroducerToken(remoteHost.EndPoint as GuidEndPoint,

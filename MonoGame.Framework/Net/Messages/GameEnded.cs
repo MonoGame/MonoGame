@@ -5,6 +5,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class GameEnded : InternalMessage
     {
+        public GameEnded() : base(InternalMessageIndex.GameEnded)
+        { }
+
         public void Create(NetworkMachine recipient)
         {
             if (!CurrentMachine.IsHost)
@@ -15,8 +18,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
             // Queue reset ready first
             CurrentMachine.Session.InternalMessages.ResetReady.Create();
 
+            Debug.WriteLine($"Sending {Index} to {CurrentMachine.Session.MachineOwnerName(recipient)}...");
             var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageIndex.GameEnded);
+            msg.Write((byte)Index);
             Queue.Place(msg);
         }
 

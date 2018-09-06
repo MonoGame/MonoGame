@@ -6,6 +6,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class GamerIdResponse : InternalMessage
     {
+        public GamerIdResponse() : base(InternalMessageIndex.GamerIdResponse)
+        { }
+
         public void Create(NetworkMachine recipient)
         {
             if (!CurrentMachine.IsHost)
@@ -13,8 +16,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("Only host can send GamerIdResponse");
             }
 
+            Debug.WriteLine($"Sending {Index} to {CurrentMachine.Session.MachineOwnerName(recipient)}...");
             var msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageIndex.GamerIdResponse);
+            msg.Write((byte)Index);
 
             byte id;
             bool wasApprovedByHost = CurrentMachine.Session.GetNewUniqueId(out id);
