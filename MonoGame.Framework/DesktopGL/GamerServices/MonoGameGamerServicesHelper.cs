@@ -123,7 +123,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                 startalpha += 255 / 12;
             }
 
-            if ((gameTime.TotalGameTime - gt).TotalSeconds > 5) // close after 10 seconds
+            if ((gameTime.TotalGameTime - gt).TotalSeconds > 0.5) // close after 1 second
             {
                 string strUsr = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
                 this.Visible = false;
                 this.Enabled = false;
-                //Guide.IsVisible = false;
+                Guide.IsVisible = false;
                 gt = TimeSpan.Zero;
             }
             base.Update(gameTime);

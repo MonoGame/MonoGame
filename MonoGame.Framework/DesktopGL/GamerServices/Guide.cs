@@ -192,14 +192,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 
             Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();
-            if (GamerServicesComponent.LocalNetworkGamer == null)
-            {
-                GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer();
-            }
-            else
-            {
-                GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication(null, null);
-            }
 		}
 
 		public static void ShowLeaderboard()

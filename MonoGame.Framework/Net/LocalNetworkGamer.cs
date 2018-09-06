@@ -1,224 +1,365 @@
-#region License
-// /*
-// Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-#endregion License
-
-#region Using clause
-using System;
+﻿using System;
+using System.IO;
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework.GamerServices;
-
-#endregion Using clause
+using Microsoft.Xna.Framework.Net.Messages;
 
 namespace Microsoft.Xna.Framework.Net
 {
-	public sealed class LocalNetworkGamer : NetworkGamer
-	{
+    internal struct InboundPacket
+    {
+        public Packet packet;
+        public NetworkGamer sender;
 
-		private SignedInGamer sig;
-		internal Queue<CommandReceiveData> receivedData;
-		
-		public LocalNetworkGamer () : base(null, 0, 0)
-		{
-			sig = new SignedInGamer ();
-			receivedData = new Queue<CommandReceiveData>();
-		}
+        public InboundPacket(Packet packet, NetworkGamer sender)
+        {
+            this.packet = packet;
+            this.sender = sender;
+        }
+    }
 
-		public LocalNetworkGamer (NetworkSession session,byte id,GamerStates state)
-			: base(session, id, state | GamerStates.Local)
-		{
-			sig = new SignedInGamer ();
-			receivedData = new Queue<CommandReceiveData>();
-		}
+    internal struct OutboundPacket
+    {
+        public Packet packet;
+        public LocalNetworkGamer sender;
+        public NetworkGamer recipient;
+        public SendDataOptions options;
 
-        /*
-		public void EnableSendVoice (
-			NetworkGamer remoteGamer, 
-			bool enable)
-		{
-			throw new NotImplementedException ();
-		}
-        */
+        public OutboundPacket(Packet packet, LocalNetworkGamer sender, NetworkGamer recipient, SendDataOptions options)
+        {
+            this.packet = packet;
+            this.sender = sender;
+            this.recipient = recipient;
+            this.options = options;
+        }
+    }
 
-		public int ReceiveData (
-			byte[] data, 
-			int offset,
-			out NetworkGamer sender)
-		{
-			if (data == null)
-				throw new ArgumentNullException("data");
-			
-			if (receivedData.Count <= 0) {
-				sender = null;
-				return 0;
-			}
-			
-			lock (receivedData) {
+    public sealed class LocalNetworkGamer : NetworkGamer
+    {
+        private IDictionary<byte, IList<Packet>> delayedUnordered = new Dictionary<byte, IList<Packet>>();
+        private IDictionary<byte, IList<Packet>> delayedOrdered = new Dictionary<byte, IList<Packet>>();
 
-				CommandReceiveData crd;
-				
-				// we will peek at the value first to see if we can process it
-				crd = (CommandReceiveData)receivedData.Peek();
-				
-				if (offset + crd.data.Length > data.Length)
-					throw new ArgumentOutOfRangeException("data","The length + offset is greater than parameter can hold.");
-				
-				// no exception thrown yet so let's process it
-				// take it off the queue
-				receivedData.Dequeue();
-				
-				Array.Copy(crd.data, offset, data, 0, data.Length);
-				sender = crd.gamer;
-				return data.Length;			
-			}
-			
-		}
+        private int inboundPacketIndex = 0;
+        private List<InboundPacket> inboundPackets = new List<InboundPacket>();
+        private List<OutboundPacket> outboundPackets = new List<OutboundPacket>();
 
-		public int ReceiveData (
-			byte[] data,
-			out NetworkGamer sender)
-		{
-			return ReceiveData(data, 0, out sender);
-		}
+        internal LocalNetworkGamer(NetworkMachine machine, SignedInGamer signedInGamer, byte id, bool isPrivateSlot) : base(machine, signedInGamer.DisplayName, signedInGamer.Gamertag, id, isPrivateSlot, false)
+        {
+            this.SignedInGamer = signedInGamer;
+        }
+        
+        public bool IsDataAvailable { get { return inboundPacketIndex < inboundPackets.Count; } }
 
-		public int ReceiveData (
-			PacketReader data,
-			out NetworkGamer sender)
-		{
-			lock (receivedData) {
-				if (receivedData.Count >= 0) {
-					data.Reset(0);
+        public override bool IsReady
+        {
+            set
+            {
+                if (IsDisposed)
+                {
+                    throw new InvalidOperationException("Gamer disposed");
+                }
 
-					// take it off the queue
-					CommandReceiveData crd = (CommandReceiveData)receivedData.Dequeue();
-					
-					// lets make sure that we can handle the data
-					if (data.Length < crd.data.Length) {
-						data.Reset(crd.data.Length);
-					}
+                if (Session.SessionState != NetworkSessionState.Lobby)
+                {
+                    throw new InvalidOperationException("Session state is not lobby");
+                }
 
-					Array.Copy(crd.data, data.Data, data.Length);
-					sender = crd.gamer;
-					return data.Length;	
-					
-				}
-				else {
-					sender = null;
-					return 0;
-				}
-				
-			}
-		}
+                if (ready != value)
+                {
+                    ready = value;
 
-		public void SendData (
-			byte[] data,
-			int offset,
-			int count,
-			SendDataOptions options)
-		{
-			CommandEvent cme = new CommandEvent(new CommandSendData(data, offset, count, options, null, this ));
-			Session.commandQueue.Enqueue(cme);
-		}
+                    Session.InternalMessages.GamerStateChanged.Create(this, false, true, null);
+                }
+            }
+        }
 
-		public void SendData (
-			byte[] data,
-			int offset,
-			int count,
-			SendDataOptions options,
-			NetworkGamer recipient)
-		{
-			CommandEvent cme = new CommandEvent(new CommandSendData(data, offset, count, options, recipient,this ));
-			Session.commandQueue.Enqueue(cme);
-		}
+        public SignedInGamer SignedInGamer { get; }
 
-		public void SendData (
-			byte[] data,
-			SendDataOptions options)
-		{
-			CommandEvent cme = new CommandEvent(new CommandSendData(data, 0, data.Length, options, null, this ));
-			Session.commandQueue.Enqueue(cme);
-		}
+        public void EnableSendVoice(NetworkGamer remoteGamer, bool enable)
+        {
+            throw new NotImplementedException();
+        }
 
-		public void SendData (
-			byte[] data,
-			SendDataOptions options,
-			NetworkGamer recipient)
-		{
-			CommandEvent cme = new CommandEvent(new CommandSendData(data, 0, data.Length, options, recipient, this ));
-			Session.commandQueue.Enqueue(cme);
-		}
+        internal void RecycleInboundPackets()
+        {
+            for (int i = 0; i < inboundPacketIndex; i++)
+            {
+                Session.PacketPool.Recycle(inboundPackets[i].packet);
+            }
 
-		public void SendData (
-			PacketWriter data,
-			SendDataOptions options)
-		{
-			SendData(data.Data, 0, data.Length, options, null);
-			data.Reset();
-		}
+            if (inboundPacketIndex > 0)
+            {
+                inboundPackets.RemoveRange(0, inboundPacketIndex);
+            }
 
-		public void SendData (
-			PacketWriter data,
-			SendDataOptions options,
-			NetworkGamer recipient)
-		{
-			SendData(data.Data, 0, data.Length, options, recipient);
-			data.Reset();
-		}
+            inboundPacketIndex = 0;
+        }
 
-		public bool IsDataAvailable { 
-			get {
-				lock (receivedData) {
-					return receivedData.Count > 0;
-				}
-			}
-		}
+        internal void RecycleOutboundPackets()
+        {
+            foreach (OutboundPacket outboundPacket in outboundPackets)
+            {
+                Session.PacketPool.Recycle(outboundPacket.packet);
+            }
 
-		public SignedInGamer SignedInGamer { 
-			get {
-				return sig;
-			}
-			
-			internal set {
-				sig = value;
-				DisplayName = sig.DisplayName;
-				Gamertag = sig.Gamertag;
-			}
-		}
-	}
+            outboundPackets.Clear();
+        }
+
+        internal void AddInboundPacket(Packet packet, byte senderId, SendDataOptions options)
+        {
+            NetworkGamer sender = Session.FindGamerById(senderId);
+
+            if (options == SendDataOptions.InOrder || options == SendDataOptions.ReliableInOrder)
+            {
+                bool packetsInQueue = delayedOrdered.ContainsKey(senderId) && delayedOrdered[senderId].Count > 0;
+
+                if (sender == null || packetsInQueue)
+                {
+                    if (!delayedOrdered.ContainsKey(senderId))
+                    {
+                        delayedOrdered.Add(senderId, new List<Packet>());
+                    }
+                    delayedOrdered[senderId].Add(packet);
+                }
+                else
+                {
+                    inboundPackets.Add(new InboundPacket(packet, sender));
+                }
+            }
+            else
+            {
+                if (sender == null)
+                {
+                    if (!delayedUnordered.ContainsKey(senderId))
+                    {
+                        delayedUnordered.Add(senderId, new List<Packet>());
+                    }
+                    delayedUnordered[senderId].Add(packet);
+                }
+                else
+                {
+                    inboundPackets.Add(new InboundPacket(packet, sender));
+                }
+            }
+        }
+
+        internal void TryAddDelayedInboundPackets()
+        {
+            // Unordered
+            foreach (var pair in delayedUnordered)
+            {
+                byte senderId = pair.Key;
+                IList<Packet> delayedPackets = pair.Value;
+                NetworkGamer sender = Session.FindGamerById(senderId);
+
+                if (sender != null)
+                {
+                    foreach (Packet delayedPacket in delayedPackets)
+                    {
+                        inboundPackets.Add(new InboundPacket(delayedPacket, sender));
+                    }
+                    delayedPackets.Clear();
+                }
+            }
+
+            // Ordered
+            foreach (var pair in delayedOrdered)
+            {
+                byte senderId = pair.Key;
+                IList<Packet> delayedPackets = pair.Value;
+                NetworkGamer sender = Session.FindGamerById(senderId);
+
+                if (sender != null)
+                {
+                    foreach (Packet delayedPacket in delayedPackets)
+                    {
+                        inboundPackets.Add(new InboundPacket(delayedPacket, sender));
+                    }
+                    delayedPackets.Clear();
+                }
+            }
+        }
+
+        internal void QueueOutboundPackets()
+        {
+            foreach (OutboundPacket outboundPacket in outboundPackets)
+            {
+                Session.InternalMessages.UserMessage.Create(outboundPacket.sender, outboundPacket.recipient, outboundPacket.options, outboundPacket.packet);
+            }
+        }
+
+        // Receiving data
+        public int ReceiveData(byte[] data, out NetworkGamer sender)
+        {
+            return ReceiveData(data, 0, out sender);
+        }
+
+        public int ReceiveData(byte[] data, int offset, out NetworkGamer sender)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException("data");
+            }
+            if (offset >= data.Length)
+            {
+                throw new ArgumentOutOfRangeException("offset");
+            }
+
+            if (inboundPacketIndex >= inboundPackets.Count)
+            {
+                sender = null;
+                return 0;
+            }
+
+            // Get one packet from queue
+            InboundPacket inboundPacket = inboundPackets[inboundPacketIndex];
+            inboundPacketIndex++;
+
+            if (inboundPacket.packet.length > data.Length - offset)
+            {
+                throw new ArgumentException("data is too small to accommodate the incoming network packet");
+            }
+
+            // Write inbound packet data to array
+            inboundPacket.packet.data.CopyTo(data, offset);
+
+            sender = inboundPacket.sender;
+            return inboundPacket.packet.length;
+        }
+
+        public int ReceiveData(PacketReader data, out NetworkGamer sender)
+        {
+            if (inboundPacketIndex >= inboundPackets.Count)
+            {
+                sender = null;
+                return 0;
+            }
+
+            // Get one packet from queue
+            InboundPacket inboundPacket = inboundPackets[inboundPacketIndex];
+            inboundPacketIndex++;
+
+            // Write inbound packet data to stream
+            data.BaseStream.SetLength(0);
+            data.BaseStream.Position = 0;
+            data.BaseStream.Write(inboundPacket.packet.data, 0, inboundPacket.packet.length);
+
+            // Prepare for reading again
+            data.BaseStream.Position = 0;
+
+            sender = inboundPacket.sender;
+            return inboundPacket.packet.length;
+        }
+
+        // Sending data
+        private void InternalSendData(byte[] data, int offset, int count, SendDataOptions options, NetworkGamer recipient)
+        {
+            if (data == null)
+            {
+                throw new NullReferenceException("data");
+            }
+            if (data.Length == 0)
+            {
+                throw new NetworkException("data empty");
+            }
+            if (offset < 0 || offset >= data.Length)
+            {
+                throw new ArgumentOutOfRangeException("offset");
+            }
+            if (count <= 0 || offset + count > data.Length)
+            {
+                throw new ArgumentOutOfRangeException("count");
+            }
+            if (Session == null)
+            {
+                throw new ObjectDisposedException("NetworkSession");
+            }
+
+            Packet packet = Session.PacketPool.GetAndFillWith(data, offset, count);
+            outboundPackets.Add(new OutboundPacket(packet, this, recipient, options));
+        }
+
+        public void SendData(byte[] data, SendDataOptions options)
+        {
+            try { InternalSendData(data, 0, data.Length, options, null); }
+            catch { throw; }
+        }
+
+        public void SendData(byte[] data, SendDataOptions options, NetworkGamer recipient)
+        {
+            if (recipient == null)
+            {
+                throw new NullReferenceException("recipient");
+            }
+
+            try { InternalSendData(data, 0, data.Length, options, recipient); }
+            catch { throw; }
+        }
+
+        public void SendData(byte[] data, int offset, int count, SendDataOptions options)
+        {
+            try { InternalSendData(data, offset, count, options, null); }
+            catch { throw; }
+        }
+
+        public void SendData(byte[] data, int offset, int count, SendDataOptions options, NetworkGamer recipient)
+        {
+            if (recipient == null)
+            {
+                throw new NullReferenceException("recipient");
+            }
+
+            try { InternalSendData(data, offset, count, options, recipient); }
+            catch { throw; }
+        }
+
+        private void InternalSendData(PacketWriter data, SendDataOptions options, NetworkGamer recipient)
+        {
+            if (data == null)
+            {
+                throw new NullReferenceException("data");
+            }
+            if (data.Length == 0)
+            {
+                throw new NetworkException("PacketWriter empty");
+            }
+            if (Session == null)
+            {
+                throw new ObjectDisposedException("NetworkSession");
+            }
+
+            // Write stream contents to an outbound packet
+            Packet packet = Session.PacketPool.Get(data.Length);
+            data.BaseStream.Position = 0;
+            data.BaseStream.Read(packet.data, 0, packet.length);
+
+            // Prepare for writing again
+            data.BaseStream.SetLength(0);
+            data.BaseStream.Position = 0;
+
+            outboundPackets.Add(new OutboundPacket(packet, this, recipient, options));
+        }
+
+        public void SendData(PacketWriter data, SendDataOptions options)
+        {
+            try { InternalSendData(data, options, null); }
+            catch { throw; }
+        }
+
+        public void SendData(PacketWriter data, SendDataOptions options, NetworkGamer recipient)
+        {
+            if (recipient == null)
+            {
+                throw new NullReferenceException("recipient");
+            }
+
+            try { InternalSendData(data, options, recipient); }
+            catch { throw; }
+        }
+
+        public void SendPartyInvites()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

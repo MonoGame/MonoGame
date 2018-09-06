@@ -320,8 +320,10 @@ namespace Microsoft.Xna.Framework.GamerServices
 	{
 		public SignedOutEventArgs (SignedInGamer gamer )
 		{
-			
+            this.Gamer = gamer;
 		}
-	}
+
+        public SignedInGamer Gamer { get; private set; }
+    }
 }
 
