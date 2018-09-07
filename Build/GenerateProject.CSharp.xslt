@@ -1660,6 +1660,8 @@
         <ItemType>SplashScreen</ItemType>
         <ItemType>Resource</ItemType>
         <ItemType>XamarinComponentReference</ItemType>
+        <ItemType>ObjcBindingNativeFramework</ItemType>
+        <ItemType>ObjcBindingApiDefinition</ItemType>
       </xsl:variable>
 
       <xsl:for-each select="msxsl:node-set($item_types)/*">
@@ -2131,13 +2133,27 @@
           <Import Project="$(MSBuildExtensionsPath)\Sce\Sce.Psm.CSharp.targets" />
         </xsl:when>
         <xsl:when test="$root/Input/Generation/Platform = 'iOS' and not(user:IsTrue($root/Input/Properties/UseLegacyiOSAPI))">
-          <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+          <xsl:choose>
+            <xsl:when test="/Input/Properties/iOSBindingProject = 'True'">
+              <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.ObjCBinding.CSharp.targets" />
+            </xsl:when>
+            <xsl:otherwise>
+              <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:when test="$root/Input/Generation/Platform = 'MacOS' and (not(user:IsTrue($root/Input/Properties/UseLegacyMacAPI) or user:DoesNotHaveXamarinMacUnifiedAPI() or $root/Input/Properties/ForceMacAPI = 'XamMac' or $root/Input/Properties/ForceMacAPI = 'MonoMac') or $root/Input/Properties/ForceMacAPI = 'Xamarin.Mac')">
           <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
         </xsl:when>
-        <xsl:when test="/Input/Generation/Platform = 'tvOS'">
-          <Import Project="$(MSBuildExtensionsPath)\Xamarin\TVOS\Xamarin.TVOS.CSharp.targets" />
+        <xsl:when test="$root/Input/Generation/Platform = 'tvOS'">
+          <xsl:choose>
+            <xsl:when test="/Input/Properties/tvOSBindingProject = 'True'">
+              <Import Project="$(MSBuildExtensionsPath)\Xamarin\TVOS\Xamarin.TVOS.ObjCBinding.CSharp.targets" />
+            </xsl:when>
+            <xsl:otherwise>
+              <Import Project="$(MSBuildExtensionsPath)\Xamarin\TVOS\Xamarin.TVOS.CSharp.targets" />
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
           <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

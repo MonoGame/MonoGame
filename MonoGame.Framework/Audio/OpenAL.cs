@@ -223,6 +223,8 @@ namespace MonoGame.OpenAL
             }
 #elif ANDROID
             ret = FuncLoader.LoadLibrary("libopenal32.so");
+#elif IOS
+            ret = FuncLoader.LoadLibrary("@rpath/OpenALSoft.framework/OpenALSoft");
 #else
             ret = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenAL.framework/OpenAL");
 #endif
