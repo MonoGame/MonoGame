@@ -119,7 +119,10 @@ namespace MonoGame.Tests.Graphics
             vbb.VertexBuffer.Dispose();
         }
 
-        [Test, Ignore("Make sure dynamic graphics resources are notified when graphics device is lost")]
+        [Test]
+#if !XNA
+        [Ignore("Make sure dynamic graphics resources are notified when graphics device is lost")]
+#endif
         public void ContentLostResources()
         {
             // https://blogs.msdn.microsoft.com/shawnhar/2007/12/12/virtualizing-the-graphicsdevice-in-xna-game-studio-2-0/

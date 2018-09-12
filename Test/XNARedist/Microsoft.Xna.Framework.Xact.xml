@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="T:Microsoft.Xna.Framework.Audio.AudioCategory">
+      <summary>Represents a particular category of sounds. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioCategory.Equals(Microsoft.Xna.Framework.Audio.AudioCategory)">
+      <summary>Determines whether the specified AudioCategory is equal to this AudioCategory.</summary>
+      <param name="other">AudioCategory to compare with this instance.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioCategory.Equals(System.Object)">
+      <summary>Determines whether the specified Object is equal to this AudioCategory.</summary>
+      <param name="obj">Object to compare with this instance.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioCategory.GetHashCode">
+      <summary>Gets the hash code for this instance.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.AudioCategory.Name">
+      <summary>Specifies the friendly name of this category.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioCategory.op_Equality(Microsoft.Xna.Framework.Audio.AudioCategory,Microsoft.Xna.Framework.Audio.AudioCategory)">
+      <summary>Determines whether the specified AudioCategory instances are equal.</summary>
+      <param name="value1">Object to the left of the equality operator.</param>
+      <param name="value2">Object to the right of the equality operator.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioCategory.op_Inequality(Microsoft.Xna.Framework.Audio.AudioCategory,Microsoft.Xna.Framework.Audio.AudioCategory)">
+      <summary>Determines whether the specified AudioCategory instances are not equal.</summary>
+      <param name="value1">Object to the left of the inequality operator.</param>
+      <param name="value2">Object to the right of the inequality operator.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioCategory.Pause">
+      <summary>Pauses all sounds associated with this category.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioCategory.Resume">
+      <summary>Resumes all paused sounds associated with this category.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioCategory.SetVolume(System.Single)">
+      <summary>Sets the volume of all sounds associated with this category. Reference page contains links to related code samples.</summary>
+      <param name="volume">Volume amplitude multiplier. volume is normally between 0.0 (silence) and 1.0 (full volume), but can range from 0.0f to float.MaxValue. Volume levels map to decibels (dB) as shown in the following table. VolumeDescription 0.0f-96 dB (silence) 1.0f +0 dB (full volume as authored) 2.0f +6 dB (6 dB greater than authored)</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioCategory.Stop(Microsoft.Xna.Framework.Audio.AudioStopOptions)">
+      <summary>Stops all sounds associated with this category.</summary>
+      <param name="options">Enumerated value specifying how the sounds should be stopped.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioCategory.ToString">
+      <summary>Returns a String representation of this AudioCategory.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Audio.AudioEngine">
+      <summary>Represents the audio engine. Applications use the methods of the audio engine to instantiate and manipulate core audio objects. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioEngine.#ctor(System.String)">
+      <summary>Initializes a new instance of this class, using a path to an XACT global settings file.</summary>
+      <param name="settingsFile">Path to a global settings file.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioEngine.#ctor(System.String,System.TimeSpan,System.String)">
+      <summary>Initializes a new instance of this class, using a settings file, a specific audio renderer, and a specific speaker configuration.</summary>
+      <param name="settingsFile">Path to a global settings file.</param>
+      <param name="lookAheadTime">Interactive audio and branch event look-ahead time, in milliseconds.</param>
+      <param name="rendererId">A string that specifies the audio renderer to use.</param>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Audio.AudioEngine.ContentVersion">
+      <summary>Specifies the current content version.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioEngine.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioEngine.Dispose(System.Boolean)">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+      <param name="disposing">[MarshalAsAttribute(U1)] true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Audio.AudioEngine.Disposing">
+      <summary>Occurs when Dispose is called or when this object is finalized and collected by the garbage collector of the Microsoft .NET common language runtime (CLR).</summary>
+      <param name="" />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioEngine.Finalize">
+      <summary>Allows this object to attempt to free resources and perform other cleanup operations before garbage collection reclaims the object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioEngine.GetCategory(System.String)">
+      <summary>Gets an audio category. Reference page contains links to related code samples.</summary>
+      <param name="name">Friendly name of the category to get.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioEngine.GetGlobalVariable(System.String)">
+      <summary>Gets the value of a global variable. Reference page contains links to related conceptual articles.</summary>
+      <param name="name">Friendly name of the variable.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.AudioEngine.IsDisposed">
+      <summary>Gets a value that indicates whether the object is disposed.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.AudioEngine.RendererDetails">
+      <summary>Gets a collection of audio renderers.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioEngine.SetGlobalVariable(System.String,System.Single)">
+      <summary>Sets the value of a global variable.</summary>
+      <param name="name">Value of the global variable.</param>
+      <param name="value">Friendly name of the global variable.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.AudioEngine.Update">
+      <summary>Performs periodic work required by the audio engine. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Audio.AudioStopOptions">
+      <summary>Controls how Cue objects should stop when Stop is called.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Audio.AudioStopOptions.AsAuthored">
+      <summary>Indicates the cue should stop normally, playing any release phase or transition specified in the content.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Audio.AudioStopOptions.Immediate">
+      <summary>Indicates the cue should stop immediately, ignoring any release phase or transition specified in the content.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Audio.Cue">
+      <summary>Defines methods for managing the playback of sounds. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.Cue.Apply3D(Microsoft.Xna.Framework.Audio.AudioListener,Microsoft.Xna.Framework.Audio.AudioEmitter)">
+      <summary>Calculates the 3D audio values between an AudioEmitter and an AudioListener object, and applies the resulting values to this Cue.  Reference page contains code sample.</summary>
+      <param name="listener">The listener to calculate.</param>
+      <param name="emitter">The emitter to calculate.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.Cue.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Audio.Cue.Disposing">
+      <summary>Occurs when Dispose is called or when this object is finalized and collected by the garbage collector of the Microsoft .NET common language runtime (CLR).</summary>
+      <param name="" />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.Cue.GetVariable(System.String)">
+      <summary>Gets a cue-instance variable value based on its friendly name.</summary>
+      <param name="name">Friendly name of the variable.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.Cue.IsCreated">
+      <summary>Returns whether the cue has been created.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.Cue.IsDisposed">
+      <summary>Gets a value indicating whether the object has been disposed.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.Cue.IsPaused">
+      <summary>Returns whether the cue is currently paused.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.Cue.IsPlaying">
+      <summary>Returns whether the cue is playing.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.Cue.IsPrepared">
+      <summary>Returns whether the cue is prepared to play.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.Cue.IsPreparing">
+      <summary>Returns whether the cue is preparing to play.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.Cue.IsStopped">
+      <summary>Returns whether the cue is currently stopped.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.Cue.IsStopping">
+      <summary>Returns whether the cue is stopping playback.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.Cue.Name">
+      <summary>Returns the friendly name of the cue.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.Cue.Pause">
+      <summary>Pauses playback. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.Cue.Play">
+      <summary>Requests playback of a prepared or preparing Cue. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.Cue.Resume">
+      <summary>Resumes playback of a paused Cue. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.Cue.SetVariable(System.String,System.Single)">
+      <summary>Sets the value of a cue-instance variable based on its friendly name.</summary>
+      <param name="name">Friendly name of the variable to set.</param>
+      <param name="value">Value to assign to the variable.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.Cue.Stop(Microsoft.Xna.Framework.Audio.AudioStopOptions)">
+      <summary>Stops playback of a Cue. Reference page contains links to related code samples.</summary>
+      <param name="options">Enumerated value specifying how the sound should stop. If set to None, the sound will play any release phase or transition specified in the audio designer. If set to Immediate, the sound will stop immediately, ignoring any release phases or transitions.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Audio.RendererDetail">
+      <summary>Represents an audio renderer, which is a device that can render audio to a user.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.RendererDetail.Equals(System.Object)">
+      <summary>Returns a value that indicates whether the current instance is equal to a specified object.</summary>
+      <param name="obj">Object to compare to this object.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.RendererDetail.FriendlyName">
+      <summary>Gets the human-readable name for the renderer.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.RendererDetail.GetHashCode">
+      <summary>Gets the hash code for this instance.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.RendererDetail.op_Equality(Microsoft.Xna.Framework.Audio.RendererDetail,Microsoft.Xna.Framework.Audio.RendererDetail)">
+      <summary>Compares two objects to determine whether they are the same.</summary>
+      <param name="left">Object to the left of the equality operator.</param>
+      <param name="right">Object to the right of the equality operator.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.RendererDetail.op_Inequality(Microsoft.Xna.Framework.Audio.RendererDetail,Microsoft.Xna.Framework.Audio.RendererDetail)">
+      <summary>Compares two objects to determine whether they are different.</summary>
+      <param name="left">Object to the left of the inequality operator.</param>
+      <param name="right">Object to the right of the inequality operator.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.RendererDetail.RendererId">
+      <summary>Specifies the string that identifies the renderer.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.RendererDetail.ToString">
+      <summary>Retrieves a string representation of this object.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Audio.SoundBank">
+      <summary>Represents a sound bank, which is a collection of cues. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.SoundBank.#ctor(Microsoft.Xna.Framework.Audio.AudioEngine,System.String)">
+      <summary>Initializes a new instance of this class using a sound bank from file.</summary>
+      <param name="audioEngine">Audio engine that will be associated with this sound bank.</param>
+      <param name="filename">Path to the sound bank file.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.SoundBank.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.SoundBank.Dispose(System.Boolean)">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+      <param name="disposing">[MarshalAsAttribute(U1)] true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Audio.SoundBank.Disposing">
+      <summary>Occurs when Dispose is called or when this object is finalized and collected by the garbage collector of the Microsoft .NET common language runtime (CLR).</summary>
+      <param name="" />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.SoundBank.Finalize">
+      <summary>Allows this object to attempt to free resources and perform other cleanup operations before garbage collection reclaims the object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.SoundBank.GetCue(System.String)">
+      <summary>Gets a cue from the sound bank. Reference page contains links to related code samples.</summary>
+      <param name="name">Friendly name of the cue to get.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.SoundBank.IsDisposed">
+      <summary>Gets a value that indicates whether the object is disposed.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.SoundBank.IsInUse">
+      <summary>Returns whether the sound bank is currently in use.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.SoundBank.PlayCue(System.String)">
+      <summary>Plays a cue. Reference page contains links to related code samples.</summary>
+      <param name="name">Name of the cue to play.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.SoundBank.PlayCue(System.String,Microsoft.Xna.Framework.Audio.AudioListener,Microsoft.Xna.Framework.Audio.AudioEmitter)">
+      <summary>Plays a cue using 3D positional information specified in an AudioListener and AudioEmitter. Reference page contains links to related code samples.</summary>
+      <param name="name">Name of the cue to play.</param>
+      <param name="listener">AudioListener that specifies listener 3D audio information.</param>
+      <param name="emitter">AudioEmitter that specifies emitter 3D audio information.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Audio.WaveBank">
+      <summary>Represents a wave bank, which is a collection of wave files. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.WaveBank.#ctor(Microsoft.Xna.Framework.Audio.AudioEngine,System.String)">
+      <summary>Initializes a new, in-memory instance of this class using a specified AudioEngine and path to a wave bank file.</summary>
+      <param name="audioEngine">Instance of an AudioEngine to associate this wave bank with.</param>
+      <param name="nonStreamingWaveBankFilename">Path to the wave bank file to load.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.WaveBank.#ctor(Microsoft.Xna.Framework.Audio.AudioEngine,System.String,System.Int32,System.Int16)">
+      <summary>Initializes a new, streaming instance of this class, using a provided AudioEngine and streaming wave bank parameters.</summary>
+      <param name="audioEngine">Instance of an AudioEngine to associate this wave bank with.</param>
+      <param name="streamingWaveBankFilename">Path to the wave bank file to stream from.</param>
+      <param name="offset">Offset within the wave bank data file. This offset must be DVD sector aligned.</param>
+      <param name="packetsize">Stream packet size, in sectors, to use for each stream. The minimum value is 2.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.WaveBank.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.WaveBank.Dispose(System.Boolean)">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+      <param name="disposing">[MarshalAsAttribute(U1)] true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Audio.WaveBank.Disposing">
+      <summary>Occurs when Dispose is called or when this object is finalized and collected by the garbage collector of the Microsoft .NET common language runtime (CLR).</summary>
+      <param name="" />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Audio.WaveBank.Finalize">
+      <summary>Allows this object to attempt to free resources and perform other cleanup operations before garbage collection reclaims the object.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.WaveBank.IsDisposed">
+      <summary>Gets a value that indicates whether the object is disposed.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.WaveBank.IsInUse">
+      <summary>Returns whether the wave bank is currently in use.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Audio.WaveBank.IsPrepared">
+      <summary>Returns whether the wave bank is prepared to play.</summary>
+    </member>
+  </members>
+</doc>

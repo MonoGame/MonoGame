@@ -1,0 +1,1310 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.Achievement">
+      <summary>Describes a single achievement, including the achievement name, description, picture, and whether it has been achieved by the currently signed in gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Achievement.Description">
+      <summary>Gets the localized achievement description string.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Achievement.DisplayBeforeEarned">
+      <summary>Gets whether this achievement should be displayed before it is earned.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Achievement.EarnedDateTime">
+      <summary>Gets the date at which this achievement was earned.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Achievement.EarnedOnline">
+      <summary>Gets whether this achievement was earned while online.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Achievement.GamerScore">
+      <summary>Gets the amount of gamer score awarded for earning this achievement.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Achievement.GetPicture">
+      <summary>Gets the image associated with this achievement.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Achievement.HowToEarn">
+      <summary>Gets the localized description of the steps necessary to earn the achievement.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Achievement.IsEarned">
+      <summary>Gets whether the current player has earned this achievement.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Achievement.Key">
+      <summary>Gets the achievement key string.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Achievement.Name">
+      <summary>Gets the localized achievement name string, for display to the user.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AchievementCollection">
+      <summary>Collection holding the achievements belonging to a signed-in gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AchievementCollection.Count">
+      <summary>Gets the number of objects in the collection.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AchievementCollection.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AchievementCollection.GetEnumerator">
+      <summary>Gets an enumerator that can iterate through this AchievementCollection.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AchievementCollection.IsDisposed">
+      <summary>Indicates whether the object is disposed.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AchievementCollection.Item(System.Int32)">
+      <summary>Gets a specific element in the collection using an index value.</summary>
+      <param name="index" />
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AchievementCollection.Item(System.String)">
+      <summary>Retrieves the Achievement matching a specified achievement key string.</summary>
+      <param name="achievementKey" />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AchievementCollection.System#Collections#Generic#ICollection{T}#Add(Microsoft.Xna.Framework.GamerServices.Achievement)">
+      <summary>Adds a new Achievement to this AchievementCollection.</summary>
+      <param name="item">The achievement to add.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AchievementCollection.System#Collections#Generic#ICollection{T}#Clear">
+      <summary>Removes all Achievement instances from this AchievementCollection.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AchievementCollection.System#Collections#Generic#ICollection{T}#Contains(Microsoft.Xna.Framework.GamerServices.Achievement)">
+      <summary>Determines whether the specified achievement is in this AchievementCollection.</summary>
+      <param name="item">The Achievement to locate in this AchievementCollection.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AchievementCollection.System#Collections#Generic#ICollection{T}#CopyTo(Microsoft.Xna.Framework.GamerServices.Achievement[],System.Int32)">
+      <summary>Copies the collection of achievements to an array, starting at the specified index.</summary>
+      <param name="array">Array that will receive the copied elements.</param>
+      <param name="arrayIndex">Index into which to begin inserting elements.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AchievementCollection.System#Collections#Generic#ICollection{T}#IsReadOnly">
+      <summary>Gets a value indicating whether this collection is read-only.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AchievementCollection.System#Collections#Generic#ICollection{T}#Remove(Microsoft.Xna.Framework.GamerServices.Achievement)">
+      <summary>Removes the specified Achievement from the collection.</summary>
+      <param name="item">The achievement to remove.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AchievementCollection.System#Collections#Generic#IList{T}#IndexOf(Microsoft.Xna.Framework.GamerServices.Achievement)">
+      <summary>Gets the index of an achievement in the collection.</summary>
+      <param name="item">The achievement to locate in this collection.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AchievementCollection.System#Collections#Generic#IList{T}#Insert(System.Int32,Microsoft.Xna.Framework.GamerServices.Achievement)">
+      <summary>Inserts a new Achievement into this collection of achievements.</summary>
+      <param name="index">Position at which to place this achievement in the collection.</param>
+      <param name="item">The achievement to insert into the collection.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AchievementCollection.System#Collections#Generic#IList{T}#RemoveAt(System.Int32)">
+      <summary>Removes the Achievement at the specified index position.</summary>
+      <param name="index">Index of the Achievement to remove.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AchievementCollection.System#Collections#IEnumerable#GetEnumerator">
+      <summary>Gets a strongly-typed enumerator that can iterate through the collection.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.ControllerSensitivity">
+      <summary>Indicates how sensitive this gamer prefers controller input to be.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.ControllerSensitivity.High">
+      <summary>Highly sensitive controller input is preferred.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.ControllerSensitivity.Low">
+      <summary>Below average sensitivity is preferred.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.ControllerSensitivity.Medium">
+      <summary>Average controller sensitivity is preferred.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.FriendCollection">
+      <summary>Represents the complete friends list of a local gamer.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.FriendCollection.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendCollection.IsDisposed">
+      <summary>Gets a value that indicates whether the object is disposed.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.FriendGamer">
+      <summary>Provides the presence information of a friend of the local gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.FriendRequestReceivedFrom">
+      <summary>Gets whether the local gamer who requested the friends list has received a friend request from this gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.FriendRequestSentTo">
+      <summary>Gets whether the local gamer who requested the friends list has sent a friend request to this gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.HasVoice">
+      <summary>Gets whether this friend currently has voice capability.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.InviteAccepted">
+      <summary>Gets whether this friend has accepted an invitation from the local gamer who requested the friends list.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.InviteReceivedFrom">
+      <summary>Gets whether the local gamer who requested the friends list has received an invitation from this friend.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.InviteRejected">
+      <summary>Gets whether this friend has rejected an invitation from the local gamer who requested the friends list.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.InviteSentTo">
+      <summary>Gets whether the local gamer who requested the friends list has sent an invitation to this friend.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.IsAway">
+      <summary>Gets whether this friend is currently away from the computer or console.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.IsBusy">
+      <summary>Gets whether this friend is currently busy.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.IsJoinable">
+      <summary>Gets whether this friend is currently in a public session that can be joined.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.IsOnline">
+      <summary>Gets whether this friend is currently online.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.IsPlaying">
+      <summary>Gets whether this friend is currently playing a game.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.FriendGamer.Presence">
+      <summary>Gets a title-defined presence string describing what this friend is currently doing.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GameDefaults">
+      <summary>Describes a gamer's preferred settings.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.AccelerateWithButtons">
+      <summary>Gets the gamer's preference for using controller buttons to accelerate in racing games.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.AutoAim">
+      <summary>Gets whether the title should automatically correct the gamer's aim.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.AutoCenter">
+      <summary>Gets whether the title should automatically center the view when the gamer moves.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.BrakeWithButtons">
+      <summary>Gets the gamer's preference for using controller buttons to brake in racing games.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.ControllerSensitivity">
+      <summary>Gets the preferred controller sensitivity setting for this gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.GameDifficulty">
+      <summary>Gets the preferred difficulty setting for this gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.InvertYAxis">
+      <summary>Gets the gamer's preference for inverting the y-axis input of the controller.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.ManualTransmission">
+      <summary>Gets the gamer's preference for driving a manual shift transmission in racing games.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.MoveWithRightThumbStick">
+      <summary>Gets the gamer's preference for moving by using the right thumbstick.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.PrimaryColor">
+      <summary>Gets the preferred color for the player character.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.RacingCameraAngle">
+      <summary>Gets the gamer's preferred camera angle for racing games.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GameDefaults.SecondaryColor">
+      <summary>Gets a secondary color selection for the player character.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GameDifficulty">
+      <summary>Indicates how difficult this gamer likes things to be.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GameDifficulty.Easy">
+      <summary>Below-average difficulty.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GameDifficulty.Hard">
+      <summary>Above-average difficulty.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GameDifficulty.Normal">
+      <summary>Average difficulty.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.Gamer">
+      <summary>Abstract base class for types that represent game players (profiles that have an associated gamertag). The concrete types SignedInGamer and NetworkGamer derive from this.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Gamer.BeginGetFromGamertag(System.String,System.AsyncCallback,System.Object)">
+      <summary>Begins the process of getting a Gamer object for a specified gamertag.</summary>
+      <param name="gamertag">The Xbox LIVE gamertag for the gamer requested.</param>
+      <param name="callback">The method to call once the asynchronous operation is finished.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Gamer.BeginGetPartnerToken(System.String,System.AsyncCallback,System.Object)">
+      <summary>Begins the asynchronous process of getting the partner token for this gamer.</summary>
+      <param name="audienceUri">URI associated with the service to use with this token. This cannot be null.</param>
+      <param name="callback">Method to call once the asynchronous operation is finished.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Gamer.BeginGetProfile(System.AsyncCallback,System.Object)">
+      <summary>Starts an asynchronous profile read operation.</summary>
+      <param name="callback">The method to call once the asynchronous operation is finished.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Gamer.DisplayName">
+      <summary>Gets the display name string for the gamer.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Gamer.EndGetFromGamertag(System.IAsyncResult)">
+      <summary>Ends the process of getting a Gamer object for a specified gamertag.</summary>
+      <param name="result">An IAsyncResult used to track the progress of the operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Gamer.EndGetPartnerToken(System.IAsyncResult)">
+      <summary>Retrieves the results from an asynchronous request for the partner token for this gamer.</summary>
+      <param name="result">An IAsyncResult used to track the progress of the operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Gamer.EndGetProfile(System.IAsyncResult)">
+      <summary>Ends an asynchronous profile read operation.</summary>
+      <param name="result">An IAsyncResult used to track the progress of the operation.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Gamer.Gamertag">
+      <summary>Gets the gamertag string.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Gamer.GetFromGamertag(System.String)">
+      <summary>Returns a Gamer object for the specified gamertag.</summary>
+      <param name="gamertag">The Xbox LIVE gamertag for the gamer requested.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Gamer.GetPartnerToken(System.String)">
+      <summary>Gets the partner token for this gamer.</summary>
+      <param name="audienceUri">URI associated with the service that will be used with this token. This cannot be null.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Gamer.GetProfile">
+      <summary>Reads profile data for this gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Gamer.IsDisposed">
+      <summary>Gets a value indicating whether the object is disposed.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Gamer.LeaderboardWriter">
+      <summary>Gets an object that can be used to write leaderboard statistics for this gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Gamer.SignedInGamers">
+      <summary />
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Gamer.Tag">
+      <summary>Gets or sets a custom object which can be used to attach arbitrary user defined data to the gamer.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Gamer.ToString">
+      <summary>Retrieves a string representation of this object.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GamerCollection`1">
+      <summary>Represents a collection of gamers. This collection cannot be modified and is updated automatically during the call to Update.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerCollection`1.GetEnumerator">
+      <summary>Returns a strongly typed GamerCollection.GamerCollectionEnumerator Structure that can iterate through a GamerCollection.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerCollection`1.System#Collections#Generic#IEnumerable{T}#GetEnumerator">
+      <summary>Returns an enumerator that can iterate through the collection.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GamerCollection`1.GamerCollectionEnumerator">
+      <summary>Provides the ability to iterate through the gamers in an GamerCollection.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerCollection`1.GamerCollectionEnumerator.Current">
+      <summary>Gets the current element in the GamerCollection.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerCollection`1.GamerCollectionEnumerator.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerCollection`1.GamerCollectionEnumerator.MoveNext">
+      <summary>Advances the enumerator to the next element of the GamerCollection.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerCollection`1.GamerCollectionEnumerator.System#Collections#IEnumerator#Current">
+      <summary>Gets the current element in the GamerCollection as a Object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerCollection`1.GamerCollectionEnumerator.System#Collections#IEnumerator#Reset">
+      <summary>Sets the enumerator to its initial position, which is before the first element in the GamerCollection.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GamerPresence">
+      <summary>Provides properties to set the rich presence state for a locally signed-in gamer profile.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerPresence.PresenceMode">
+      <summary> Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerPresence.PresenceValue">
+      <summary />
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode">
+      <summary>Settings defining the status string that will appear when you view a friend through the Xbox LIVE Guide or on Xbox.com. Use the PresenceMode property to set this option.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.ArcadeMode">
+      <summary>Arcade Mode</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.AtMenu">
+      <summary>At Menu</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.BattlingBoss">
+      <summary>Battling Boss</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.CampaignMode">
+      <summary>Campaign Mode</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.ChallengeMode">
+      <summary>Challenge Mode</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.ConfiguringSettings">
+      <summary>Configuring Settings</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.CoOpLevel">
+      <summary>Co-Op: Level. Includes a numeric value specified with PresenceValue.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.CoOpStage">
+      <summary>Co-Op: Stage. Includes a numeric value specified with PresenceValue.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.CornflowerBlue">
+      <summary>Cornflower Blue</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.CustomizingPlayer">
+      <summary>Customizing Player</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.DifficultyEasy">
+      <summary>Difficulty: Easy</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.DifficultyExtreme">
+      <summary>Difficulty: Extreme</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.DifficultyHard">
+      <summary>Difficulty: Hard</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.DifficultyMedium">
+      <summary>Difficulty: Medium</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.EditingLevel">
+      <summary>Editing Level</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.ExplorationMode">
+      <summary>Exploration Mode</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.FoundSecret">
+      <summary>Found Secret</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.FreePlay">
+      <summary>Free Play</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.GameOver">
+      <summary>Game Over</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.InCombat">
+      <summary>In Combat</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.InGameStore">
+      <summary>In Game Store</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.Level">
+      <summary>Level. Includes a numeric value specified with PresenceValue.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.LocalCoOp">
+      <summary>Local Co-Op</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.LocalVersus">
+      <summary>Local Versus</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.LookingForGames">
+      <summary>Looking For Games</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.Losing">
+      <summary>Losing</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.Multiplayer">
+      <summary>Multiplayer</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.NearlyFinished">
+      <summary>Nearly Finished</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.None">
+      <summary>No Presence String Displayed</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.OnARoll">
+      <summary>On a Roll</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.OnlineCoOp">
+      <summary>Online Co-Op</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.OnlineVersus">
+      <summary>Online Versus</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.Outnumbered">
+      <summary>Outnumbered</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.Paused">
+      <summary>Paused</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.PlayingMinigame">
+      <summary>Playing Minigame</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.PlayingWithFriends">
+      <summary>Playing With Friends</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.PracticeMode">
+      <summary>Practice Mode</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.PuzzleMode">
+      <summary>Puzzle Mode</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.ScenarioMode">
+      <summary>Scenario Mode</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.Score">
+      <summary>Score. Includes a numeric value specified with PresenceValue.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.ScoreIsTied">
+      <summary>Score is Tied</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.SettingUpMatch">
+      <summary>Setting Up Match</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.SinglePlayer">
+      <summary>Single Player</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.Stage">
+      <summary>Stage. Includes a numeric value specified with PresenceValue.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.StartingGame">
+      <summary>Starting Game</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.StoryMode">
+      <summary>Story Mode</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.StuckOnAHardBit">
+      <summary>Stuck on a Hard Bit</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.SurvivalMode">
+      <summary>Survival Mode</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.TimeAttack">
+      <summary>Time Attack</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.TryingForRecord">
+      <summary>Trying For Record</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.TutorialMode">
+      <summary>Tutorial Mode</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.VersusComputer">
+      <summary>Versus Computer</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.VersusScore">
+      <summary>Versus: Score. Includes a numeric value specified with PresenceValue.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.WaitingForPlayers">
+      <summary>Waiting For Players</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.WaitingInLobby">
+      <summary>Waiting In Lobby</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.WastingTime">
+      <summary>Wasting Time</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.WatchingCredits">
+      <summary>Watching Credits</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.WatchingCutscene">
+      <summary>Watching Cutscene</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.Winning">
+      <summary>Winning</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPresenceMode.WonTheGame">
+      <summary>Won the Game</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GamerPrivilegeException">
+      <summary>Thrown if a gamer services or multiplayer API is called without a valid, signed-in profile.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerPrivilegeException.#ctor">
+      <summary>Creates an instance of GamerPrivilegeException.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerPrivilegeException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary>Initializes a new instance of GamerPrivilegeException with the specified streaming context.</summary>
+      <param name="info">Describes the gamer services or multiplayer API being accessed when the exception occurred.</param>
+      <param name="context">Describes the stream where the exception occurred.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerPrivilegeException.#ctor(System.String)">
+      <summary>Initializes a new instance of GamerPrivilegeException with the specified error message.</summary>
+      <param name="message">A message that describes the error.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerPrivilegeException.#ctor(System.String,System.Exception)">
+      <summary>Initializes a new instance of GamerPrivilegeException with the specified error message and inner exception.</summary>
+      <param name="message">A message that describes the error.</param>
+      <param name="innerException">The inner exception related to this exception.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GamerPrivileges">
+      <summary>Describes what operations a gamer is allowed to perform.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerPrivileges.AllowCommunication">
+      <summary>Checks if this gamer is allowed to send and receive communications using voice, text, messaging, or game invites.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerPrivileges.AllowOnlineSessions">
+      <summary>Checks if this gamer is allowed to play in online multiplayer sessions.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerPrivileges.AllowPremiumContent">
+      <summary>Checks if this gamer is allowed to access premium content.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerPrivileges.AllowProfileViewing">
+      <summary>Checks if this gamer is allowed to view the profiles of other gamers.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerPrivileges.AllowPurchaseContent">
+      <summary>Checks if this gamer is allowed to purchase content from LIVE Marketplace.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerPrivileges.AllowTradeContent">
+      <summary>Checks if this gamer is allowed to trade content with other gamers.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerPrivileges.AllowUserCreatedContent">
+      <summary>Checks if this gamer is allowed to access user content created by other gamers.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GamerPrivilegeSetting">
+      <summary>Describes the conditions in which a privilege is available.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPrivilegeSetting.Blocked">
+      <summary>This privilege is not available for the current gamer profile.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPrivilegeSetting.Everyone">
+      <summary>This privilege is available for the current gamer profile.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerPrivilegeSetting.FriendsOnly">
+      <summary>This privilege is only available for friends of the current gamer profile. Use the IsFriend method to check which gamers are friends.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GamerProfile">
+      <summary>Profile settings describing information about a gamer such as the gamer's motto, reputation, and gamer picture. This data is accessible for both locally signed in profiles and remote gamers that you are playing with in a multiplayer session.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerProfile.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerProfile.GamerScore">
+      <summary>Gets the GamerScore of this gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerProfile.GamerZone">
+      <summary>Gets the GamerZone setting.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerProfile.GetGamerPicture">
+      <summary>Gets the gamer picture associated with this profile.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerProfile.IsDisposed">
+      <summary>Gets a value that indicates whether the object is disposed.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerProfile.Motto">
+      <summary>Gets the gamer motto string.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerProfile.Region">
+      <summary>Gets the region of this gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerProfile.Reputation">
+      <summary>Gets the gamer reputation, as a number of stars ranging 0 to 5.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerProfile.TitlesPlayed">
+      <summary>Gets the number of titles this gamer has played.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerProfile.TotalAchievements">
+      <summary>Gets the total number of achievements this gamer has obtained.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GamerServicesDispatcher">
+      <summary>Implements the Windows-specific portion of a GamerServicesDispatcher class. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerServicesDispatcher.Initialize(System.IServiceProvider)">
+      <summary>Initializes gamer services functionality for the game, automatically choosing the most appropriate gamer service type for the platform. Reference page contains links to related code samples.</summary>
+      <param name="serviceProvider">The service provider to be used when locating additional services services. For example, IGraphicsDeviceService.</param>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.GamerServices.GamerServicesDispatcher.InstallingTitleUpdate">
+      <summary>Notifies the game when a Games for Windows - LIVE title update is being installed.</summary>
+      <param name="" />
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerServicesDispatcher.IsInitialized">
+      <summary>Determines if Initialize has been called.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerServicesDispatcher.Update">
+      <summary> Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.GamerServicesDispatcher.WindowHandle">
+      <summary>Gets or sets the handle to the underlying game window.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GamerServicesNotAvailableException">
+      <summary>Thrown if the gamer services system cannot be successfully initialized.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerServicesNotAvailableException.#ctor">
+      <summary>Creates an empty instance of GamerServicesNotAvailableException.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerServicesNotAvailableException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary>Initializes a new instance of GamerServicesNotAvailableException with the specified streaming context.</summary>
+      <param name="info">Describes the gamer services being accessed when the exception occurred.</param>
+      <param name="context">Describes the stream where the exception occurred.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerServicesNotAvailableException.#ctor(System.String)">
+      <summary>Initializes a new instance of GamerServicesNotAvailableException with the specified error message.</summary>
+      <param name="message">A message that describes the error.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GamerServicesNotAvailableException.#ctor(System.String,System.Exception)">
+      <summary>Initializes a new instance of GamerServicesNotAvailableException with the specified error message and the inner exception.</summary>
+      <param name="message">A message that describes the error.</param>
+      <param name="innerException">The inner exception related to this exception.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GamerZone">
+      <summary>This style of social gaming preferred by this Xbox LIVE member.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerZone.Family">
+      <summary>Family-friendly game play.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerZone.Pro">
+      <summary>Competitive game play.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerZone.Recreation">
+      <summary>Non-competitive game play.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerZone.Underground">
+      <summary>Alternative approach to game play.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.GamerZone.Unknown">
+      <summary>Unknown.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GameUpdateRequiredException">
+      <summary>The exception thrown when a game (title) update is required in order to use Xbox LIVE.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GameUpdateRequiredException.#ctor">
+      <summary>Initializes a new GameUpdateRequiredException.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GameUpdateRequiredException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary>Initializes a new GameUpdateRequiredException with specified serialization information and a streaming context.</summary>
+      <param name="info">Describes the gamer services or multiplayer API being accessed when the exception occurred.</param>
+      <param name="context">Describes the stream where the exception occurred.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GameUpdateRequiredException.#ctor(System.String)">
+      <summary>Initializes a new GameUpdateRequiredException with a specified error message.</summary>
+      <param name="message">Text that describes the error.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GameUpdateRequiredException.#ctor(System.String,System.Exception)">
+      <summary>Initializes a new GameUpdateRequiredException, with a specified error message and a reference to the inner exception that caused the error.</summary>
+      <param name="message">Text that describes the error.</param>
+      <param name="innerException">The exception that is the cause of the GameUpdateRequiredException. If this parameter is not null, the exception is raised in a catch block that handles the inner exception.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.Guide">
+      <summary />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.BeginShowKeyboardInput(Microsoft.Xna.Framework.PlayerIndex,System.String,System.String,System.String,System.AsyncCallback,System.Object)">
+      <summary>Begins the process for displaying asynchronously the software keyboard interface for a gamer. Reference page contains links to related code samples.</summary>
+      <param name="player">Index of the player providing input. On platforms such as Windows Phone or Windows that support only one player, the valid value is PlayerIndex.One.</param>
+      <param name="title">Title of the interface dialog box.</param>
+      <param name="description">Text of the interface dialog box.</param>
+      <param name="defaultText">Default text displayed in the input area when the interface dialog box is first shown.</param>
+      <param name="callback">The method to be called once the asynchronous operation is finished.</param>
+      <param name="state">A user-created object uniquely identifying this request.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.BeginShowKeyboardInput(Microsoft.Xna.Framework.PlayerIndex,System.String,System.String,System.String,System.AsyncCallback,System.Object,System.Boolean)">
+      <summary>Begins the process for displaying asynchronously the software keyboard interface for a gamer by using the password mode if it is specified. Reference page contains links to related code samples.</summary>
+      <param name="player">Index of the player providing input. On platforms such as Windows Phone or Windows that support only one player, the valid value is PlayerIndex.One.</param>
+      <param name="title">Title of the interface dialog box.</param>
+      <param name="description">Text of the interface dialog box.</param>
+      <param name="defaultText">Default text displayed in the input area when the interface dialog box is first shown.</param>
+      <param name="callback">Method to be called once the asynchronous operation is finished.</param>
+      <param name="state">User-created object uniquely identifying this request.</param>
+      <param name="usePasswordMode">Specify true to enable password mode, or false to disable it. If the password mode is specified, the characters that the player types are not echoed in the input area.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.BeginShowMessageBox(Microsoft.Xna.Framework.PlayerIndex,System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Int32,Microsoft.Xna.Framework.GamerServices.MessageBoxIcon,System.AsyncCallback,System.Object)">
+      <summary>Begins the process of displaying a message box for a particular player. Reference page contains links to related code samples.</summary>
+      <param name="player">Target player of the message box. On Windows or Windows Phone, the only valid option is PlayerIndex.One.</param>
+      <param name="title">Title of the message box.</param>
+      <param name="text">Text that will be displayed by the message box.</param>
+      <param name="buttons">Captions for the message box buttons. The maximum number of buttons is two on Windows Phone, and three on Xbox 360 or Windows.</param>
+      <param name="focusButton">Zero-based index specifying which button has the focus.</param>
+      <param name="icon">Type of icon displayed in the message box.</param>
+      <param name="callback">Method to be called once the asynchronous operation has finished.</param>
+      <param name="state">User-created object uniquely identifying this request.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.BeginShowMessageBox(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Int32,Microsoft.Xna.Framework.GamerServices.MessageBoxIcon,System.AsyncCallback,System.Object)">
+      <summary>Begins the process of displaying a message box to which any user on the system can respond. Reference page contains links to related code samples.</summary>
+      <param name="title">Title of the message box.</param>
+      <param name="text">Text that will be displayed by the message box.</param>
+      <param name="buttons">Captions for message box buttons. The maximum number of buttons is two on Windows Phone, and three on Xbox 360 or Windows.</param>
+      <param name="focusButton">Zero-based index specifying which button has the focus.</param>
+      <param name="icon">Type of icon displayed in the message box.</param>
+      <param name="callback">Method to be called once the asynchronous operation is finished.</param>
+      <param name="state">User-created object uniquely identifying this request.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.DelayNotifications(System.TimeSpan)">
+      <summary>Delays system notifications for a specified time.</summary>
+      <param name="delay">Time, in seconds, of the delay. Calling this function while notifications are already delayed has no effect. The maximum delay is 120 seconds. If the specified duration exceeds the maximum, the maximum value is used.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.EndShowKeyboardInput(System.IAsyncResult)">
+      <summary>Ends the display of the keyboard input dialog box.</summary>
+      <param name="result">The IAsyncResult returned from BeginShowKeyboardInput.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.EndShowMessageBox(System.IAsyncResult)">
+      <summary>Ends the display of a message box.</summary>
+      <param name="result">The IAsyncResult returned from BeginShowMessageBox.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Guide.IsScreenSaverEnabled">
+      <summary />
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Guide.IsTrialMode">
+      <summary>Determines whether the game is running currently in limited trial mode. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Guide.IsVisible">
+      <summary>Determines if a Guide user interface screen is active.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Guide.NotificationPosition">
+      <summary>Retrieves or sets the location where notifications will appear on the screen.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowComposeMessage(Microsoft.Xna.Framework.PlayerIndex,System.String,System.Collections.Generic.IEnumerable{Microsoft.Xna.Framework.GamerServices.Gamer})">
+      <summary />
+      <param name="player">Gamer composing the message.</param>
+      <param name="text">Text of the message.</param>
+      <param name="recipients">Collection of gamers receiving the message.If this is null, the Select Gamertag user interface is displayed.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowFriendRequest(Microsoft.Xna.Framework.PlayerIndex,Microsoft.Xna.Framework.GamerServices.Gamer)">
+      <summary>Shows the Friend Request user interface.</summary>
+      <param name="player">Index of the player making the request. The profile specified by player must be signed in when calling this function.</param>
+      <param name="gamer">Recipient of the request.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowFriends(Microsoft.Xna.Framework.PlayerIndex)">
+      <summary>Shows the Friends user interface.</summary>
+      <param name="player">Index of the player making the request. The profile specified by player must be signed in when calling this function.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowGameInvite(Microsoft.Xna.Framework.PlayerIndex,System.Collections.Generic.IEnumerable{Microsoft.Xna.Framework.GamerServices.Gamer})">
+      <summary>Displays the game invitation user interface, taking the sender's player index and an optional list of recipient gamers.</summary>
+      <param name="player">Index of the player initiating the invitation.</param>
+      <param name="recipients">List of gamers who receive the invitation. If null, the Guide prompts the player for a recipient gamer.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowGameInvite(System.String)">
+      <summary>Displays the game invitation user interface, taking a session ID.</summary>
+      <param name="sessionId">The session ID to use for the game invitation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowGamerCard(Microsoft.Xna.Framework.PlayerIndex,Microsoft.Xna.Framework.GamerServices.Gamer)">
+      <summary>Shows the Gamer Card user interface.</summary>
+      <param name="player">Index of the player making the request. The profile specified by player must be signed in when calling this function.</param>
+      <param name="gamer">Owner of the gamer card being requested for display.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowMarketplace(Microsoft.Xna.Framework.PlayerIndex)">
+      <summary>Displays the marketplace user interface. Reference page contains links to related code samples.</summary>
+      <param name="player">Index of the controller for the player making the request.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowMessages(Microsoft.Xna.Framework.PlayerIndex)">
+      <summary>Shows the Messages user interface.</summary>
+      <param name="player">Index of the player making the request. The profile specified by player must be signed in when calling this function.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowParty(Microsoft.Xna.Framework.PlayerIndex)">
+      <summary>Shows the Xbox LIVE Party screen. Reference page contains links to related code samples.</summary>
+      <param name="player">The player index for whom to bring up the Xbox LIVE Party screen.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowPartySessions(Microsoft.Xna.Framework.PlayerIndex)">
+      <summary>Shows the Play with Party Member screen. Reference page contains links to related code samples.</summary>
+      <param name="player">The player index for whom the list of game sessions with party members is shown.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowPlayerReview(Microsoft.Xna.Framework.PlayerIndex,Microsoft.Xna.Framework.GamerServices.Gamer)">
+      <summary>Shows the Player Review user interface.</summary>
+      <param name="player">Index of the player making the request. The profile specified by player must be signed in when calling this function.</param>
+      <param name="gamer">Player being reviewed.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowPlayers(Microsoft.Xna.Framework.PlayerIndex)">
+      <summary>Shows the Players user interface.</summary>
+      <param name="player">Index of the player making the request. The profile specified by player must be signed in when calling this function.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.Guide.ShowSignIn(System.Int32,System.Boolean)">
+      <summary>Shows the user interface a gamer uses for signing into Xbox LIVE.</summary>
+      <param name="paneCount">Number of panes displayed at sign in. Each pane accepts a single gamer. On Windows and Windows Phone, only a single pane can be displayed. On Xbox 360, valid values are 1, 2, and 4.</param>
+      <param name="onlineOnly">Determines the profile types being displayed. true if only online profiles are displayed; false otherwise. If onlineOnly is true, local gamers can sign in as guests of a profile currently signed in.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.Guide.SimulateTrialMode">
+      <summary> Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.GuideAlreadyVisibleException">
+      <summary>Thrown if an attmept is made to display a component of the Guide user interface when a Guide component is already displayed.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GuideAlreadyVisibleException.#ctor">
+      <summary>Initializes an empty instance of GuideAlreadyVisibleException.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GuideAlreadyVisibleException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary>Initializes an instance of GuideAlreadyVisibleException with the specified streaming context.</summary>
+      <param name="info">Describes the displayed Guide component when the exception occurred.</param>
+      <param name="context">Describes the stream where the exception occurred.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GuideAlreadyVisibleException.#ctor(System.String)">
+      <summary>Initializes an instance of GuideAlreadyVisibleException with the specified error message.</summary>
+      <param name="message">A message describing the error.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.GuideAlreadyVisibleException.#ctor(System.String,System.Exception)">
+      <summary>Initializes an instance of GuideAlreadyVisibleException with the specified error message and related inner exception.</summary>
+      <param name="message">A message describing the error.</param>
+      <param name="innerException">The inner exception related to this exception.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.InviteAcceptedEventArgs">
+      <summary>Represents the arguments passed to an InviteAccepted event. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.InviteAcceptedEventArgs.#ctor(Microsoft.Xna.Framework.GamerServices.SignedInGamer,System.Boolean)">
+      <summary>Initializes a new instance of InviteAcceptedEventArgs by using a gamer that is signed in and a Boolean value that indicates if the invitation is for the current local session.</summary>
+      <param name="gamer">The gamer who is accepting the game invitation.</param>
+      <param name="isCurrentSession">Indicates if the invitation is for the current local session.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.InviteAcceptedEventArgs.Gamer">
+      <summary>The signed-in gamer who is accepting the game invitation. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.InviteAcceptedEventArgs.IsCurrentSession">
+      <summary>Indicates if the invitation is for the current local session. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.LeaderboardEntry">
+      <summary>Class representing a single row of a leaderboard, holding all the information a specific gamer has uploaded to the board.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardEntry.Columns">
+      <summary>Provides access to the columns of key/value data associated with this leaderboard entry. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardEntry.Gamer">
+      <summary>Provides access to gamer information for this leaderboard entry. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardEntry.Rating">
+      <summary>Provides access to the rating associated with this leaderboard entry. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity">
+      <summary>Contains leaderboard identity information for a particular leaderboard.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity.Create(Microsoft.Xna.Framework.GamerServices.LeaderboardKey)">
+      <summary>Creates a leaderboard identity from a leaderboard key.</summary>
+      <param name="key">The leaderboard key to use for this leaderboard identity.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity.Create(Microsoft.Xna.Framework.GamerServices.LeaderboardKey,System.Int32)">
+      <summary>Creates a new LeaderboardIdentity from a leaderboard key and game mode value.</summary>
+      <param name="key">The leaderboard key to use for this leaderboard identity.</param>
+      <param name="gameMode">The game mode value for this leaderboard identity.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity.GameMode">
+      <summary>Provides access to the game mode for this leaderboard identity.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity.Key">
+      <summary>The key string associated with this leaderboard identity.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.LeaderboardKey">
+      <summary>Values used with LeaderboardIdentity.Create to select which leaderboard to access.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.LeaderboardKey.BestScoreLifeTime">
+      <summary>Best lifetime score for this player and his or her Xbox LIVE friends.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.LeaderboardKey.BestScoreRecent">
+      <summary>Best recent scores for this player and his or her Xbox LIVE friends.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.LeaderboardKey.BestTimeLifeTime">
+      <summary>Best lifetime times for this player and his or her Xbox LIVE friends.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.LeaderboardKey.BestTimeRecent">
+      <summary>Best recent times for this player and his or her Xbox LIVE friends.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.LeaderboardOutcome">
+      <summary>Values used to provide an outcome for a player's leaderboard entry.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.LeaderboardOutcome.Loss">
+      <summary>Player lost the match.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.LeaderboardOutcome.None">
+      <summary>No result reported.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.LeaderboardOutcome.Tie">
+      <summary>Match resulted in a tie: no player won.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.LeaderboardOutcome.Win">
+      <summary>Player won the match.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.LeaderboardReader">
+      <summary>Reads data from leaderboards.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.BeginPageDown(System.AsyncCallback,System.Object)">
+      <summary>Begins an asynchronous read of the page of leaderboard data after the current page. Reference page contains links to related code samples.</summary>
+      <param name="callback">An AsyncCallback representing the method to call when the leaderboard information is read.</param>
+      <param name="asyncState">A user-created object used to uniquely identify the request, or null.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.BeginPageUp(System.AsyncCallback,System.Object)">
+      <summary>Begins an asynchronous read of the page of leaderboard data before the current page. Reference page contains links to related code samples.</summary>
+      <param name="callback">An AsyncCallback representing the method to call when the leaderboard information is read.</param>
+      <param name="asyncState">A user-created object used to uniquely identify the request, or null.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.BeginRead(Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity,Microsoft.Xna.Framework.GamerServices.Gamer,System.Int32,System.AsyncCallback,System.Object)">
+      <summary>Begins reading a leaderboard asynchronously, and specifies a leaderboard identity, pivot gamer, and page size. Reference page contains links to related code samples.</summary>
+      <param name="leaderboardId">The leaderboard identity of the leaderboard to read.</param>
+      <param name="pivotGamer">The gamer of interest in the leaderboard. The current page is set so that this gamer appears on the page.</param>
+      <param name="pageSize">The number of leaderboard entries per page.</param>
+      <param name="callback">An AsyncCallback representing the method to call when the leaderboard information is read.</param>
+      <param name="asyncState">A user-created object used to uniquely identify the request, or null.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.BeginRead(Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity,System.Collections.Generic.IEnumerable{Microsoft.Xna.Framework.GamerServices.Gamer},Microsoft.Xna.Framework.GamerServices.Gamer,System.Int32,System.AsyncCallback,System.Object)">
+      <summary>Begins an asynchronous read of leaderboard data, taking a leaderboard identity, a collection of gamers, a pivot gamer, and a page size. Reference page contains links to related code samples.</summary>
+      <param name="leaderboardId">The leaderboard identity of the leaderboard to read.</param>
+      <param name="gamers">A collection of gamers that should be included in the leaderboard results. This parameter is ignored on Windows Phone.</param>
+      <param name="pivotGamer">The gamer of interest in the leaderboard. The current page is set so that this gamer appears on the page.</param>
+      <param name="pageSize">The number of leaderboard entries per page.</param>
+      <param name="callback">An AsyncCallback representing the method to call when the leaderboard information is read.</param>
+      <param name="asyncState">A user-created object used to uniquely identify the request, or null.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.BeginRead(Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity,System.Int32,System.Int32,System.AsyncCallback,System.Object)">
+      <summary>Begins reading a leaderboard asynchronously, and specifies a leaderboard identity, the start page, and the page size. Reference page contains links to related code samples.</summary>
+      <param name="leaderboardId">The leaderboard identity of the leaderboard to read.</param>
+      <param name="pageStart">The page of leaderboard entries at which to start.</param>
+      <param name="pageSize">The number of leaderboard entries per page.</param>
+      <param name="callback">An AsyncCallback representing the method to call when the leaderboard information is read.</param>
+      <param name="asyncState">A user-created object used to uniquely identify the request, or null.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.CanPageDown">
+      <summary>Provides information about whether there are more leaderboard entries after the current page of entries.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.CanPageUp">
+      <summary>Provides information about whether there are more leaderboard entries before the current page of entries.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.Dispose">
+      <summary>Releases all resources used by this LeaderboardReader.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.EndPageDown(System.IAsyncResult)">
+      <summary>Checks the result of an asynchonous PageDown operation. Reference page contains links to related code samples.</summary>
+      <param name="result">The IASyncResult that represents the state of the asynchronous page-down operation. If the operation is finished, IsCompleted will be true.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.EndPageUp(System.IAsyncResult)">
+      <summary>Checks the result of an asynchonous PageUp operation. Reference page contains links to related code samples.</summary>
+      <param name="result">The IASyncResult that represents the state of the asynchronous page-up operation. If the operation is finished, IsCompleted will be true.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.EndRead(System.IAsyncResult)">
+      <summary>Checks the result of an asynchronous Read operation. Reference page contains links to related code samples.</summary>
+      <param name="result">The IASyncResult that represents the state of the asynchronous read operation. If the operation is finished, IsCompleted will be true.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.Entries">
+      <summary>Gets the collection of leaderboard entries for the leaderboard.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.IsDisposed">
+      <summary>Provides information about whether this leaderboard reader is disposed.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.LeaderboardIdentity">
+      <summary>Provides the identity of the leaderboard.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.PageDown">
+      <summary>Reads the next page of leaderboard data synchronously. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.PageStart">
+      <summary>Gets the index of the leaderboard entry at the start of the current page.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.PageUp">
+      <summary>Reads the previous page of leaderboard data synchronously. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.Read(Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity,Microsoft.Xna.Framework.GamerServices.Gamer,System.Int32)">
+      <summary>Reads a leaderboard synchronously, specifying a leaderboard identity, pivot gamer, and page size. Reference page contains links to related code samples.</summary>
+      <param name="leaderboardId">The leaderboard identity of the leaderboard to read.</param>
+      <param name="pivotGamer">The gamer to center the results on. It can be null.</param>
+      <param name="pageSize">The number of leaderboard entries on a page. Pass zero to include all available entries on a single page.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.Read(Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity,System.Collections.Generic.IEnumerable{Microsoft.Xna.Framework.GamerServices.Gamer},Microsoft.Xna.Framework.GamerServices.Gamer,System.Int32)">
+      <summary>Reads a leaderboard synchronously, specifying a leaderboard identity, collection of gamers, pivot gamer, and page size. Reference page contains links to related code samples.</summary>
+      <param name="leaderboardId">The leaderboard identity of the leaderboard to read.</param>
+      <param name="gamers">A collection of gamers to be included in the leaderboard results. This parameter is ignored on Windows Phone.</param>
+      <param name="pivotGamer">The gamer of interest in the leaderboard. The current page will be set so that this gamer will appear on the page.</param>
+      <param name="pageSize">The number of leaderboard entries per page.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.Read(Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity,System.Int32,System.Int32)">
+      <summary>Begins reading a leaderboard synchronously, specifying a leaderboard identity, the start page, and the page size. Reference page contains links to related code samples.</summary>
+      <param name="leaderboardId">The leaderboard identity of the leaderboard to read.</param>
+      <param name="pageStart">The page of leaderboard entries at which to start. Pass zero to start at the highest scores.</param>
+      <param name="pageSize">The number of leaderboard entries per page. Pass zero to include all available entries on a single page.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.LeaderboardReader.TotalLeaderboardSize">
+      <summary>Provides information about the total number of entries in the leaderboard.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.LeaderboardWriter">
+      <summary>Records leaderboard data for players in a NetworkSession.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.LeaderboardWriter.GetLeaderboard(Microsoft.Xna.Framework.GamerServices.LeaderboardIdentity)">
+      <summary>Gets a leaderboard entry that can be used to write to a specified leaderboard.</summary>
+      <param name="leaderboardId">The identity of the leaderboard to write to.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.MessageBoxIcon">
+      <summary>Defines the different icons for a message box.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.MessageBoxIcon.Alert">
+      <summary>Displays the Alert icon.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.MessageBoxIcon.Error">
+      <summary>Displays the Error icon.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.MessageBoxIcon.None">
+      <summary>No icon is displayed.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.MessageBoxIcon.Warning">
+      <summary>Displays the Warning icon.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.NetworkException">
+      <summary>Thrown if there is a network communication failure.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.NetworkException.#ctor">
+      <summary>Creates an empty instance of NetworkException.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.NetworkException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary>Initializes a new instance of NetworkException with the specified streaming context.</summary>
+      <param name="info">Describes the network data being sent or received when the exception occurred.</param>
+      <param name="context">Describes the stream where the exception occurred.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.NetworkException.#ctor(System.String)">
+      <summary>Initializes a new instance of NetworkException with the specified error message.</summary>
+      <param name="message">A message that describes the error.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.NetworkException.#ctor(System.String,System.Exception)">
+      <summary>Initializes a new instance of NetworkException with the specified error message and the inner exception.</summary>
+      <param name="message">A message that describes the error.</param>
+      <param name="innerException">The inner exception related to this exception.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.NetworkNotAvailableException">
+      <summary>Thrown if a network connection is unavailable.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.NetworkNotAvailableException.#ctor">
+      <summary>Initializes a new NetworkNotAvailableException.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.NetworkNotAvailableException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary>Initializes a new NetworkNotAvailableException with serialization information and the streaming context.</summary>
+      <param name="info">Describes the network data being sent or received when the exception occurred.</param>
+      <param name="context">Describes the stream where the exception occurred.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.NetworkNotAvailableException.#ctor(System.String)">
+      <summary>Initializes a new NetworkNotAvailableException with a specified error message.</summary>
+      <param name="message">Text that describes the error.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.NetworkNotAvailableException.#ctor(System.String,System.Exception)">
+      <summary>Initializes a new NetworkNotAvailableException with a specified error message and a reference to the inner exception that caused the error.</summary>
+      <param name="message">Text that describes the error.</param>
+      <param name="innerException">The exception that caused the GameUpdateRequiredException. If this parameter is not null, this exception is raised in a catch block that handles the inner exception.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.NotificationPosition">
+      <summary />
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.NotificationPosition.BottomCenter">
+      <summary>Positions the message box at the bottom of the screen and centered.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.NotificationPosition.BottomLeft">
+      <summary>Positions the message box at the bottom-left of the screen.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.NotificationPosition.BottomRight">
+      <summary>Positions the message box at the bottom-right of the screen.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.NotificationPosition.Center">
+      <summary>Positions the message box at the center of the screen.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.NotificationPosition.CenterLeft">
+      <summary>Positions the message box at the center of the screen and left-aligned.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.NotificationPosition.CenterRight">
+      <summary>Positions the message box at the center of the screen and right-aligned.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.NotificationPosition.TopCenter">
+      <summary>Positions the message box at the top of the screen and centered.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.NotificationPosition.TopLeft">
+      <summary>Positions the message box at the top-left of the screen.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.NotificationPosition.TopRight">
+      <summary>Positions the message box at the top-right of the screen.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.PropertyDictionary">
+      <summary>Holds a set of properties used to define presence states or leaderboard column values.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.ContainsKey(System.String)">
+      <summary>Determines whether the PropertyDictionary contains an element with the specified key.</summary>
+      <param name="key">The key to locate in the PropertyDictionary.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.Count">
+      <summary>Gets the number of elements contained in this PropertyDictionary.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.GetEnumerator">
+      <summary>Returns an enumerator that iterates through a collection of key/value pairs that represent elements in the PropertyDictionary.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.GetValueDateTime(System.String)">
+      <summary>Gets the value of the property with the specified key, as a System.DateTime.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.GetValueDouble(System.String)">
+      <summary>Gets the value of the property with the specified key, as a System.Double.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.GetValueInt32(System.String)">
+      <summary>Gets the value of the property with the specified key, as a System.Int32.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.GetValueInt64(System.String)">
+      <summary>Gets the value of the property with the specified key, as a System.Int64.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.GetValueOutcome(System.String)">
+      <summary>Gets the value of the property with the specified key, as a LeaderboardOutcome.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.GetValueSingle(System.String)">
+      <summary>Gets the value of the property with the specified key, as a System.Single.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.GetValueStream(System.String)">
+      <summary>Gets the value of the property with the specified key, as a System.IO.Stream.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.GetValueString(System.String)">
+      <summary>Gets the value of the property with the specified key, as a System.String.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.GetValueTimeSpan(System.String)">
+      <summary>Gets the value of the property with the specified key, as a System.TimeSpan.</summary>
+      <param name="key">he key to search for in the PropertyDictionary.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.Item(System.String)">
+      <summary>Gets or sets the element with the specified key.</summary>
+      <param name="key">The key of the element to get or set.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.SetValue(System.String,Microsoft.Xna.Framework.GamerServices.LeaderboardOutcome)">
+      <summary>Sets the value of the property with the specified key, as a LeaderboardOutcome.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+      <param name="value">The value of the property to set for the specified key, as a LeaderboardOutcome.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.SetValue(System.String,System.DateTime)">
+      <summary>Sets the value of the property with the specified key, as a System.DateTime.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+      <param name="value">The value of the property to set for the specified key, as a DateTime.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.SetValue(System.String,System.Double)">
+      <summary>Sets the value of the property with the specified key, as a System.Double.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+      <param name="value">The value of the property to set for the specified key, as a Double.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.SetValue(System.String,System.Int32)">
+      <summary>Sets the value of the property with the specified key, as a System.Int32.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+      <param name="value">The value of the property to set for the specified key, as an Int32.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.SetValue(System.String,System.Int64)">
+      <summary>Sets the value of the property with the specified key, as a System.Int64.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+      <param name="value">The value of the property to set for the specified key, as an Int64.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.SetValue(System.String,System.Single)">
+      <summary>Sets the value of the property with the specified key, as a System.Single.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+      <param name="value">The value of the property to set for the specified key, as a Single.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.SetValue(System.String,System.String)">
+      <summary>Sets the value of the property with the specified key, as a System.String.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+      <param name="value">The value of the property to set for the specified key, as a String.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.SetValue(System.String,System.TimeSpan)">
+      <summary>Sets the value of the property with the specified key, as a System.TimeSpan.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+      <param name="value">The value of the property to set for the specified key, as a TimeSpan.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.System#Collections#Generic#ICollection{T}#Add(System.Collections.Generic.KeyValuePair{System.String,System.Object})">
+      <summary>Adds an element to the PropertyDictionary. This method is not supported.</summary>
+      <param name="item">A KeyValuePair representing a property to add to the PropertyDictionary.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.System#Collections#Generic#ICollection{T}#Clear">
+      <summary>Removes all elements from the PropertyDictionary.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.System#Collections#Generic#ICollection{T}#Contains(System.Collections.Generic.KeyValuePair{System.String,System.Object})">
+      <summary>Determines whether the PropertyDictionary contains an element with the specified key/value pair.</summary>
+      <param name="item">A KeyValuePair that represents the key/value pair to locate in the PropertyDictionary.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.System#Collections#Generic#ICollection{T}#CopyTo(System.Collections.Generic.KeyValuePair{System.String,System.Object}[],System.Int32)">
+      <summary>Copies the elements of the PropertyDictionary to an Array, starting at a particular Array index.</summary>
+      <param name="array">An array of key/value pairs that will receive the elements of the PropertyDictionary. The array must have zero-based indexing.</param>
+      <param name="arrayIndex">The zero-based index in the array at which copying begins.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.System#Collections#Generic#ICollection{T}#IsReadOnly">
+      <summary>Gets a value indicating whether this PropertyDictionary is read-only.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.System#Collections#Generic#ICollection{T}#Remove(System.Collections.Generic.KeyValuePair{System.String,System.Object})">
+      <summary>Removes an element from the PropertyDictionary. This method is not supported.</summary>
+      <param name="item">The object to add to the PropertyDictionary.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.System#Collections#IEnumerable#GetEnumerator">
+      <summary>Returns an enumerator that iterates through the collection of elements in the PropertyDictionary.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.PropertyDictionary.TryGetValue(System.String,System.Object@)">
+      <summary>Determines if a value for the specified key exists in the PropertyDictionary.</summary>
+      <param name="key">The key to search for in the PropertyDictionary.</param>
+      <param name="value">[OutAttribute] When the method returns, this parameter will contain the value associated with the specified key. If no value could be found in the PropertyDictionary, it will contain the default value for the type passed in.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.RacingCameraAngle">
+      <summary>Indicates which camera angle this gamer prefers to use in racing games.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.RacingCameraAngle.Back">
+      <summary>Traditional third-person camera view from behind the car.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.RacingCameraAngle.Front">
+      <summary>Camera view from in front of the car. The car itself is not visible.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.RacingCameraAngle.Inside">
+      <summary>Camera view from inside the car, looking through the windscreen.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.SignedInEventArgs">
+      <summary />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.SignedInEventArgs.#ctor(Microsoft.Xna.Framework.GamerServices.SignedInGamer)">
+      <summary>Creates a new instance of SignedInEventArgs.</summary>
+      <param name="gamer">The gamer that just signed in.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.SignedInEventArgs.Gamer">
+      <summary>Gets the gamer that just signed in.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.SignedInGamer">
+      <summary>Represents a gamer (a profile that has an associated gamertag) on the local system.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.SignedInGamer.AwardAchievement(System.String)">
+      <summary>[Deprecated] Awards the specified achievement to a locally signed-in gamer.</summary>
+      <param name="achievementKey">Identifier specifying the achievement to award.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.SignedInGamer.BeginAwardAchievement(System.String,System.AsyncCallback,System.Object)">
+      <summary>Starts an asynchronous operation to award an achievement to a locally signed-in gamer. Reference page contains links to related code samples.</summary>
+      <param name="achievementKey">Identifier specifying the achievement to award.</param>
+      <param name="callback">The method to be called once the asynchronous operation iss finished.</param>
+      <param name="state">State of the asynchronous operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.SignedInGamer.BeginGetAchievements(System.AsyncCallback,System.Object)">
+      <summary>Starts an asynchronous achievement query operation. Reference page contains links to related code samples.</summary>
+      <param name="callback">The method to be called once the asynchronous operation is finished.</param>
+      <param name="asyncState">State of the asynchronous operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.SignedInGamer.EndAwardAchievement(System.IAsyncResult)">
+      <summary>Ends an asynchronous achievement award operation.</summary>
+      <param name="result">An IAsyncResult used to track the progress of the operation.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.SignedInGamer.EndGetAchievements(System.IAsyncResult)">
+      <summary>Ends an asynchronous achievement query operation.</summary>
+      <param name="result">An IAsyncResult used to track the progress of the operation.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.SignedInGamer.GameDefaults">
+      <summary>Describes a gamer's preferred settings.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.SignedInGamer.GetAchievements">
+      <summary>Returns the collection of all achievements that may be earned by this gamer.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.SignedInGamer.GetFriends">
+      <summary>Reads the friends list of this signed-in gamer, including the gamertag and current presence information for each friend.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.SignedInGamer.IsFriend(Microsoft.Xna.Framework.GamerServices.Gamer)">
+      <summary>Queries whether the specified gamer is a friend of this local gamer.</summary>
+      <param name="gamer">The gamer to query.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.SignedInGamer.IsGuest">
+      <summary>Determines if the gamer is the guest of an Xbox LIVE–enabled profile.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.SignedInGamer.IsHeadset(Microsoft.Xna.Framework.Audio.Microphone)">
+      <summary>Determines if the passed microphone is a headset associated with this signed-in gamer. Use this method to determine if a specific microphone is a gamer-bound headset.</summary>
+      <param name="microphone">The microphone to check against this signed-in gamer.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.SignedInGamer.IsSignedInToLive">
+      <summary>Determines if the gamer has an Xbox LIVE–enabled profile.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.SignedInGamer.PartySize">
+      <summary>Gets the current party size. Reference page contains links to related code samples.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.SignedInGamer.PlayerIndex">
+      <summary>Gets the index of the gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.SignedInGamer.Presence">
+      <summary>Gets an object that may be used to set the rich presence state for this gamer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.SignedInGamer.Privileges">
+      <summary>Describes what operations a gamer is allowed to perform.</summary>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.GamerServices.SignedInGamer.SignedIn">
+      <summary>Occurs when a new gamer signs into the local system.</summary>
+      <param name="" />
+    </member>
+    <member name="E:Microsoft.Xna.Framework.GamerServices.SignedInGamer.SignedOut">
+      <summary>Occurs when a gamer signs out on the local system.</summary>
+      <param name="" />
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.SignedInGamerCollection">
+      <summary>Represents a collection of gamers on the local system.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.SignedInGamerCollection.Item(Microsoft.Xna.Framework.PlayerIndex)">
+      <summary>Gets a specific local gamer based on that player's PlayerIndex on the local system.</summary>
+      <param name="index">The PlayerIndex of the local gamer to retrieve.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.SignedOutEventArgs">
+      <summary />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.SignedOutEventArgs.#ctor(Microsoft.Xna.Framework.GamerServices.SignedInGamer)">
+      <summary>Creates a new instance of SignedOutEventArgs.</summary>
+      <param name="gamer">The gamer that just signed out.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.SignedOutEventArgs.Gamer">
+      <summary>Gets the gamer that just signed out.</summary>
+    </member>
+  </members>
+</doc>

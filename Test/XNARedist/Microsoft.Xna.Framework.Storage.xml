@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="T:Microsoft.Xna.Framework.Storage.StorageContainer">
+      <summary>Represents a logical collection of storage files. Reference page contains links to related conceptual articles.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.CreateDirectory(System.String)">
+      <summary>Creates a new directory in the StorageContainer scope.</summary>
+      <param name="directory">The relative path of the directory to delete within the StorageContainer scope.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.CreateFile(System.String)">
+      <summary>Creates a file at a specified path in the StorageContainer.</summary>
+      <param name="file">The relative path of the file to be created in the StorageContainer.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.DeleteDirectory(System.String)">
+      <summary>Deletes a directory in the StorageContainer scope.</summary>
+      <param name="directory">The relative path of the directory to delete within the StorageContainer scope.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.DeleteFile(System.String)">
+      <summary>Deletes a file in the StorageContainer.</summary>
+      <param name="file">The relative path of the file to delete within the StorageContainer.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.DirectoryExists(System.String)">
+      <summary>Determines whether the specified path refers to an existing directory in the StorageContainer.</summary>
+      <param name="directory">The path to test.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Storage.StorageContainer.DisplayName">
+      <summary>Gets the name of the title.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Storage.StorageContainer.Disposing">
+      <summary>Occurs when Dispose is called or when this object is finalized and collected by the garbage collector of the Microsoft .NET common language runtime.</summary>
+      <param name="" />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.FileExists(System.String)">
+      <summary>Determines whether the specified path refers to an existing file in the StorageContainer.</summary>
+      <param name="file">The path and file name to test.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.Finalize">
+      <summary>Allows this object to attempt to free resources and perform other cleanup operations before garbage collection reclaims the object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.GetDirectoryNames">
+      <summary>Enumerates the directories in the root of a StorageContainer.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.GetDirectoryNames(System.String)">
+      <summary>Enumerates the directories in the root of a StorageContainer that conform to a search pattern.</summary>
+      <param name="searchPattern">A search pattern. Both single-character ("?") and multicharacter ("*") wildcards are supported.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.GetFileNames">
+      <summary>Enumerates files in the root directory of a StorageContainer.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.GetFileNames(System.String)">
+      <summary>Enumerates files in the root directory of a StorageContainer that match a given pattern.</summary>
+      <param name="searchPattern">A search pattern. Both single-character ("?") and multicharacter ("*") wildcards are supported.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Storage.StorageContainer.IsDisposed">
+      <summary>Gets a value that indicates whether the object is disposed.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.OpenFile(System.String,System.IO.FileMode)">
+      <summary>Opens a file in the StorageContainer.</summary>
+      <param name="file">Relative path of the file within the StorageContainer.</param>
+      <param name="fileMode">One of the enumeration values that specifies how to open the file.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.OpenFile(System.String,System.IO.FileMode,System.IO.FileAccess)">
+      <summary>Opens a file in the StorageContainer in the designated mode with the specified read/write access.</summary>
+      <param name="file">Relative path of the file within the StorageContainer.</param>
+      <param name="fileMode">One of the enumeration values that specifies how to open the file.</param>
+      <param name="fileAccess">One of the enumeration values that specifies whether the file is opened with read, write, or read/write access.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageContainer.OpenFile(System.String,System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare)">
+      <summary>Opens a file in the StorageContainer in the designated mode with the specified read/write access and sharing permission.</summary>
+      <param name="file">Relative path of the file within the StorageContainer.</param>
+      <param name="fileMode">One of the enumeration values that specifies how to open the file.</param>
+      <param name="fileAccess">One of the enumeration values that specifies whether the file is opened with read, write, or read/write access.</param>
+      <param name="fileShare">A bitwise combination of enumeration values that specify the type of access other Stream objects have to this file.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Storage.StorageContainer.StorageDevice">
+      <summary>Gets the StorageDevice that holds the files in this container.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Storage.StorageDevice">
+      <summary>Represents a storage device for user data, such as a memory unit or hard drive. Reference page contains links to related conceptual articles.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDevice.BeginOpenContainer(System.String,System.AsyncCallback,System.Object)">
+      <summary>Begins the process for opening a StorageContainer containing any files for the specified title.</summary>
+      <param name="displayName">A constant human-readable string that names the file.</param>
+      <param name="callback">An AsyncCallback that represents the method called when the operation is complete.</param>
+      <param name="state">A user-created object used to uniquely identify the request, or null.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDevice.BeginShowSelector(Microsoft.Xna.Framework.PlayerIndex,System.AsyncCallback,System.Object)">
+      <summary>Begins the process for displaying the storage device selector user interface; specifies the callback implemented when the player chooses a device. Reference page contains links to related code samples.</summary>
+      <param name="player">The PlayerIndex that represents the player who requested the save operation. On Windows, the only valid option is PlayerIndex.One.</param>
+      <param name="callback">An AsyncCallback that represents the method called when the player chooses a device.</param>
+      <param name="state">A user-created object used to uniquely identify the request, or null.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDevice.BeginShowSelector(Microsoft.Xna.Framework.PlayerIndex,System.Int32,System.Int32,System.AsyncCallback,System.Object)">
+      <summary>Begins the process for displaying the storage device selector user interface, for specifying the player who requested the save operation, for setting the size of data to be written to the storage device, and for naming the callback implemented when the player chooses a device. Reference page contains links to related code samples.</summary>
+      <param name="player">The PlayerIndex that represents the player who requested the save operation. On Windows, the only valid option is PlayerIndex.One.</param>
+      <param name="sizeInBytes">The size, in bytes, of the data to write to the storage device.</param>
+      <param name="directoryCount">The number of directories to write to the storage device.</param>
+      <param name="callback">An AsyncCallback that represents the method called when the player chooses a device.</param>
+      <param name="state">A user-created object used to uniquely identify the request, or null.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDevice.BeginShowSelector(System.AsyncCallback,System.Object)">
+      <summary>Begins the process for displaying the storage device selector user interface, and for specifying a callback implemented when the player chooses a device. Reference page contains links to related code samples.</summary>
+      <param name="callback">An AsyncCallback that represents the method called when the player chooses a device.</param>
+      <param name="state">A user-created object used to uniquely identify the request, or null.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDevice.BeginShowSelector(System.Int32,System.Int32,System.AsyncCallback,System.Object)">
+      <summary>Begins the process for displaying the storage device selector user interface, and for specifying the size of the data to be written to the storage device and the callback implemented when the player chooses a device. Reference page contains links to related code samples.</summary>
+      <param name="sizeInBytes">The size, in bytes, of data to write to the storage device.</param>
+      <param name="directoryCount">The number of directories to write to the storage device.</param>
+      <param name="callback">An AsyncCallback that represents the method called when the player chooses a device.</param>
+      <param name="state">A user-created object used to uniquely identify the request, or null.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDevice.DeleteContainer(System.String)">
+      <summary />
+      <param name="titleName">The name of the storage container to delete.</param>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.Storage.StorageDevice.DeviceChanged">
+      <summary>Occurs when a device is removed or inserted.</summary>
+      <param name="" />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDevice.EndOpenContainer(System.IAsyncResult)">
+      <summary>Ends the process for opening a StorageContainer.</summary>
+      <param name="result">The IAsyncResult returned from BeginOpenContainer.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDevice.EndShowSelector(System.IAsyncResult)">
+      <summary>Ends the display of the storage selector user interface. Reference page contains links to related code samples.</summary>
+      <param name="result">The IAsyncResult returned from BeginShowSelector.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Storage.StorageDevice.FreeSpace">
+      <summary>Gets the amount of free space on the device.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Storage.StorageDevice.IsConnected">
+      <summary>Gets whether the device is connected.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Storage.StorageDevice.TotalSpace">
+      <summary>Gets the total amount of space on the device.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException">
+      <summary>The exception that is thrown when the requested StorageDevice is not connected.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException.#ctor">
+      <summary>Initializes a new instance of this class.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary>Initializes a new instance of this class during deserialization.</summary>
+      <param name="info">The information needed to serialize an object.</param>
+      <param name="context">The source or destination for the serialization stream.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException.#ctor(System.String)">
+      <summary>Initializes a new instance of this class with a specified error message.</summary>
+      <param name="message">A message that describes the error.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException.#ctor(System.String,System.Exception)">
+      <summary>Initializes a new instance of this class with a specified error message and a reference to the inner exception that is the cause of this exception.</summary>
+      <param name="message">A message that describes the error.</param>
+      <param name="innerException">The exception that is the cause of the current exception. If the innerException parameter is not a null reference, the current exception is raised in a catch block that handles the inner exception.</param>
+    </member>
+  </members>
+</doc>
