@@ -10,63 +10,68 @@ namespace Microsoft.Xna.Framework.Net
         {
             return x.Id.CompareTo(y.Id);
         }
+
+        internal static IComparer<NetworkGamer> Instance = new NetworkGamerIdComparer();
     }
 
     public class NetworkGamer : Gamer
     {
-        internal static IComparer<NetworkGamer> Comparer = new NetworkGamerIdComparer();
+        protected readonly NetworkSession session;
+        protected readonly NetworkMachine machine;
+        protected readonly byte id;
+        protected readonly bool isPrivateSlot;
 
         protected bool ready;
 
-        internal NetworkGamer(NetworkMachine machine, string displayName, string gamertag, byte id, bool isPrivateSlot, bool isReady) : base()
+        internal NetworkGamer(NetworkMachine machine, byte id, bool isPrivateSlot, string displayName, string gamertag, bool isReady)
+            : base()
         {
-            this.Machine = machine;
+            this.session = machine.Session;
+            this.machine = machine;
+            this.id = id;
+            this.isPrivateSlot = isPrivateSlot;
+
             this.DisplayName = displayName;
             this.Gamertag = gamertag;
-            this.HasLeftSession = false;
-            this.Id = id;
-            this.IsPrivateSlot = isPrivateSlot;
 
             this.ready = isReady;
+
         }
 
-        public NetworkMachine Machine { get; }
-        public bool HasLeftSession { get; internal set; }
-        public bool HasVoice { get { return false; } }
-        public byte Id { get; }
-        public bool IsGuest { get { return Machine.gamers[0] != this; } }
-        public bool IsHost { get { return Machine.IsHost && Machine.gamers[0] == this; } }
+#pragma warning disable CS3005 // Identifier differing only in case is not CLS-compliant
+        public NetworkMachine Machine { get { return machine; } }
+#pragma warning disable CS3005 // Identifier differing only in case is not CLS-compliant
+        public byte Id { get { return id; } }
+#pragma warning disable CS3005 // Identifier differing only in case is not CLS-compliant
+        public bool IsPrivateSlot { get { return isPrivateSlot; } }
+
+        public bool HasLeftSession { get; internal set; } = false;
+        public bool HasVoice { get; } = false;
+        public bool IsTalking { get; } = false;
+        public bool IsMutedByLocalUser { get; } = false;
+
+        public bool IsGuest { get { return Machine.Gamers[0] != this; } }
+        public bool IsHost { get { return Machine.IsHost && id == 0; } }
         public bool IsLocal { get { return Machine.IsLocal; } }
-        public bool IsMutedByLocalUser { get { return false; } }
-        public bool IsPrivateSlot { get; internal set; }
+        public TimeSpan RoundtripTime { get { return Machine.RoundtripTime; } }
+        public NetworkSession Session { get { return session; } }
 
         public virtual bool IsReady
         {
             get
             {
-                if (IsDisposed)
-                {
-                    throw new InvalidOperationException("Gamer disposed");
-                }
-
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkGamer));
                 return ready;
             }
-
-            set { throw new InvalidOperationException("Gamer is not local"); }
+            set
+            {
+                throw new InvalidOperationException("Gamer is not local");
+            }
         }
 
         internal void SetReadyState(bool state)
         {
             ready = state;
         }
-
-        public bool IsTalking { get { return false; } }
-
-        public TimeSpan RoundtripTime
-        {
-            get { return Machine.peer.RoundtripTime; }
-        }
-
-        public NetworkSession Session { get { return Machine.Session; } }
     }
 }

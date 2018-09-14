@@ -1,8 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.GamerServices;
-using Microsoft.Xna.Framework.Net.Messages;
 
 namespace Microsoft.Xna.Framework.Net
 {
@@ -36,14 +34,17 @@ namespace Microsoft.Xna.Framework.Net
 
     public sealed class LocalNetworkGamer : NetworkGamer
     {
-        private IDictionary<byte, IList<Packet>> delayedUnordered = new Dictionary<byte, IList<Packet>>();
-        private IDictionary<byte, IList<Packet>> delayedOrdered = new Dictionary<byte, IList<Packet>>();
+        private const int MaxDelayedPacketsAllowed = 100;
+
+        private Dictionary<byte, List<Packet>> delayedUnordered = new Dictionary<byte, List<Packet>>();
+        private Dictionary<byte, List<Packet>> delayedOrdered = new Dictionary<byte, List<Packet>>();
 
         private int inboundPacketIndex = 0;
         private List<InboundPacket> inboundPackets = new List<InboundPacket>();
         private List<OutboundPacket> outboundPackets = new List<OutboundPacket>();
 
-        internal LocalNetworkGamer(NetworkMachine machine, SignedInGamer signedInGamer, byte id, bool isPrivateSlot) : base(machine, signedInGamer.DisplayName, signedInGamer.Gamertag, id, isPrivateSlot, false)
+        internal LocalNetworkGamer(SignedInGamer signedInGamer, NetworkMachine machine, byte id, bool isPrivateSlot)
+            : base(machine, id, isPrivateSlot, signedInGamer.DisplayName, signedInGamer.Gamertag, false)
         {
             this.SignedInGamer = signedInGamer;
         }
@@ -54,12 +55,9 @@ namespace Microsoft.Xna.Framework.Net
         {
             set
             {
-                if (IsDisposed)
-                {
-                    throw new InvalidOperationException("Gamer disposed");
-                }
+                if (IsDisposed) throw new InvalidOperationException(nameof(LocalNetworkGamer));
 
-                if (Session.SessionState != NetworkSessionState.Lobby)
+                if (session.SessionState != NetworkSessionState.Lobby)
                 {
                     throw new InvalidOperationException("Session state is not lobby");
                 }
@@ -68,7 +66,7 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     ready = value;
 
-                    Session.InternalMessages.GamerStateChanged.Create(this, false, true, null);
+                    Session.SendGamerStateChanged(this);
                 }
             }
         }
@@ -84,7 +82,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             for (int i = 0; i < inboundPacketIndex; i++)
             {
-                Session.PacketPool.Recycle(inboundPackets[i].packet);
+                session.packetPool.Recycle(inboundPackets[i].packet);
             }
 
             if (inboundPacketIndex > 0)
@@ -95,19 +93,9 @@ namespace Microsoft.Xna.Framework.Net
             inboundPacketIndex = 0;
         }
 
-        internal void RecycleOutboundPackets()
+        internal bool AddInboundPacket(Packet packet, byte senderId, SendDataOptions options)
         {
-            foreach (OutboundPacket outboundPacket in outboundPackets)
-            {
-                Session.PacketPool.Recycle(outboundPacket.packet);
-            }
-
-            outboundPackets.Clear();
-        }
-
-        internal void AddInboundPacket(Packet packet, byte senderId, SendDataOptions options)
-        {
-            NetworkGamer sender = Session.FindGamerById(senderId);
+            var sender = session.FindGamerById(senderId);
 
             if (options == SendDataOptions.InOrder || options == SendDataOptions.ReliableInOrder)
             {
@@ -118,6 +106,10 @@ namespace Microsoft.Xna.Framework.Net
                     if (!delayedOrdered.ContainsKey(senderId))
                     {
                         delayedOrdered.Add(senderId, new List<Packet>());
+                    }
+                    if (delayedOrdered[senderId].Count > MaxDelayedPacketsAllowed)
+                    {
+                        return false;
                     }
                     delayedOrdered[senderId].Add(packet);
                 }
@@ -134,6 +126,10 @@ namespace Microsoft.Xna.Framework.Net
                     {
                         delayedUnordered.Add(senderId, new List<Packet>());
                     }
+                    if (delayedUnordered.Count > MaxDelayedPacketsAllowed)
+                    {
+                        return false;
+                    }
                     delayedUnordered[senderId].Add(packet);
                 }
                 else
@@ -141,6 +137,8 @@ namespace Microsoft.Xna.Framework.Net
                     inboundPackets.Add(new InboundPacket(packet, sender));
                 }
             }
+
+            return true;
         }
 
         internal void TryAddDelayedInboundPackets()
@@ -148,30 +146,27 @@ namespace Microsoft.Xna.Framework.Net
             // Unordered
             foreach (var pair in delayedUnordered)
             {
-                byte senderId = pair.Key;
-                IList<Packet> delayedPackets = pair.Value;
-                NetworkGamer sender = Session.FindGamerById(senderId);
+                var sender = session.FindGamerById(pair.Key);
+                var delayedPackets = pair.Value;
 
                 if (sender != null)
                 {
-                    foreach (Packet delayedPacket in delayedPackets)
+                    foreach (var delayedPacket in delayedPackets)
                     {
                         inboundPackets.Add(new InboundPacket(delayedPacket, sender));
                     }
                     delayedPackets.Clear();
                 }
             }
-
             // Ordered
             foreach (var pair in delayedOrdered)
             {
-                byte senderId = pair.Key;
-                IList<Packet> delayedPackets = pair.Value;
-                NetworkGamer sender = Session.FindGamerById(senderId);
+                var sender = session.FindGamerById(pair.Key);
+                var delayedPackets = pair.Value;
 
                 if (sender != null)
                 {
-                    foreach (Packet delayedPacket in delayedPackets)
+                    foreach (var delayedPacket in delayedPackets)
                     {
                         inboundPackets.Add(new InboundPacket(delayedPacket, sender));
                     }
@@ -180,29 +175,34 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal void QueueOutboundPackets()
+        internal void SendOutboundPackets()
         {
-            foreach (OutboundPacket outboundPacket in outboundPackets)
+            foreach (var outboundPacket in outboundPackets)
             {
-                Session.InternalMessages.UserMessage.Create(outboundPacket.sender, outboundPacket.recipient, outboundPacket.options, outboundPacket.packet);
+                session.SendUserMessage(outboundPacket.sender, outboundPacket.options, outboundPacket.packet, outboundPacket.recipient);
+
+                session.packetPool.Recycle(outboundPacket.packet);
             }
+
+            outboundPackets.Clear();
         }
 
         // Receiving data
         public int ReceiveData(byte[] data, out NetworkGamer sender)
         {
-            return ReceiveData(data, 0, out sender);
+            try { return ReceiveData(data, 0, out sender); }
+            catch { throw; }
         }
 
         public int ReceiveData(byte[] data, int offset, out NetworkGamer sender)
         {
             if (data == null)
             {
-                throw new ArgumentNullException("data");
+                throw new ArgumentNullException(nameof(data));
             }
             if (offset >= data.Length)
             {
-                throw new ArgumentOutOfRangeException("offset");
+                throw new ArgumentOutOfRangeException(nameof(offset));
             }
 
             if (inboundPacketIndex >= inboundPackets.Count)
@@ -211,18 +211,13 @@ namespace Microsoft.Xna.Framework.Net
                 return 0;
             }
 
-            // Get one packet from queue
-            InboundPacket inboundPacket = inboundPackets[inboundPacketIndex];
-            inboundPacketIndex++;
-
+            var inboundPacket = inboundPackets[inboundPacketIndex++];
             if (inboundPacket.packet.length > data.Length - offset)
             {
-                throw new ArgumentException("data is too small to accommodate the incoming network packet");
+                throw new ArgumentException($"{nameof(data)} is too small to accommodate the incoming network packet");
             }
 
-            // Write inbound packet data to array
             inboundPacket.packet.data.CopyTo(data, offset);
-
             sender = inboundPacket.sender;
             return inboundPacket.packet.length;
         }
@@ -235,16 +230,11 @@ namespace Microsoft.Xna.Framework.Net
                 return 0;
             }
 
-            // Get one packet from queue
-            InboundPacket inboundPacket = inboundPackets[inboundPacketIndex];
-            inboundPacketIndex++;
+            var inboundPacket = inboundPackets[inboundPacketIndex++];
 
-            // Write inbound packet data to stream
             data.BaseStream.SetLength(0);
             data.BaseStream.Position = 0;
             data.BaseStream.Write(inboundPacket.packet.data, 0, inboundPacket.packet.length);
-
-            // Prepare for reading again
             data.BaseStream.Position = 0;
 
             sender = inboundPacket.sender;
@@ -256,26 +246,22 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (data == null)
             {
-                throw new NullReferenceException("data");
+                throw new NullReferenceException(nameof(data));
             }
             if (data.Length == 0)
             {
-                throw new NetworkException("data empty");
+                throw new NetworkException($"{nameof(data)} empty");
             }
             if (offset < 0 || offset >= data.Length)
             {
-                throw new ArgumentOutOfRangeException("offset");
+                throw new ArgumentOutOfRangeException(nameof(offset));
             }
             if (count <= 0 || offset + count > data.Length)
             {
-                throw new ArgumentOutOfRangeException("count");
-            }
-            if (Session == null)
-            {
-                throw new ObjectDisposedException("NetworkSession");
+                throw new ArgumentOutOfRangeException(nameof(count));
             }
 
-            Packet packet = Session.PacketPool.GetAndFillWith(data, offset, count);
+            var packet = session.packetPool.GetAndFillWith(data, offset, count);
             outboundPackets.Add(new OutboundPacket(packet, this, recipient, options));
         }
 
@@ -289,7 +275,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (recipient == null)
             {
-                throw new NullReferenceException("recipient");
+                throw new NullReferenceException(nameof(recipient));
             }
 
             try { InternalSendData(data, 0, data.Length, options, recipient); }
@@ -306,7 +292,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (recipient == null)
             {
-                throw new NullReferenceException("recipient");
+                throw new NullReferenceException(nameof(recipient));
             }
 
             try { InternalSendData(data, offset, count, options, recipient); }
@@ -317,23 +303,16 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (data == null)
             {
-                throw new NullReferenceException("data");
+                throw new ArgumentNullException(nameof(data));
             }
             if (data.Length == 0)
             {
                 throw new NetworkException("PacketWriter empty");
             }
-            if (Session == null)
-            {
-                throw new ObjectDisposedException("NetworkSession");
-            }
 
-            // Write stream contents to an outbound packet
-            Packet packet = Session.PacketPool.Get(data.Length);
+            var packet = session.packetPool.Get(data.Length);
             data.BaseStream.Position = 0;
             data.BaseStream.Read(packet.data, 0, packet.length);
-
-            // Prepare for writing again
             data.BaseStream.SetLength(0);
             data.BaseStream.Position = 0;
 
@@ -350,7 +329,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (recipient == null)
             {
-                throw new NullReferenceException("recipient");
+                throw new NullReferenceException(nameof(recipient));
             }
 
             try { InternalSendData(data, options, recipient); }

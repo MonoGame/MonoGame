@@ -103,24 +103,6 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             peer.Shutdown(byeMessage);
         }
 
-        private NetDeliveryMethod ToDeliveryMethod(SendDataOptions options)
-        {
-            switch (options)
-            {
-                case SendDataOptions.InOrder:
-                    return NetDeliveryMethod.UnreliableSequenced;
-                case SendDataOptions.Reliable:
-                    return NetDeliveryMethod.ReliableUnordered;
-                case SendDataOptions.ReliableInOrder:
-                    return NetDeliveryMethod.ReliableOrdered;
-                case SendDataOptions.Chat:
-                    return NetDeliveryMethod.ReliableUnordered;
-                case SendDataOptions.Chat & SendDataOptions.InOrder:
-                    return NetDeliveryMethod.ReliableOrdered;
-                default:
-                    throw new InvalidOperationException("Could not convert SendDataOptions!");
-            }
-        }
 
         public void SendMessage(OutgoingMessage msg)
         {

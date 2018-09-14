@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Microsoft.Xna.Framework.Net.Messages;
 using Microsoft.Xna.Framework.GamerServices;
-using Microsoft.Xna.Framework.Net.Backend;
+using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net
 {
-    public sealed partial class NetworkSession : ISessionBackendListener, IDisposable, IMessageQueue
+    public sealed partial class NetworkSession : IDisposable
     {
         private const int MinSupportedLocalGamers = 1;
         private const int MaxSupportedLocalGamers = 4;
@@ -15,109 +14,111 @@ namespace Microsoft.Xna.Framework.Net
         public const int MaxSupportedGamers = 64; // Should be public according to docs
         public const int MaxPreviousGamers = 10; // Should be public according to docs
 
+        internal readonly PacketPool packetPool = new PacketPool();
+
+        private readonly NetPeer peer;
+        private readonly bool isHost;
+        private readonly byte machineId;
+        private readonly NetworkSessionType type;
+        private readonly Guid guid;
+
+        private NetworkSessionProperties properties;
         private NetworkMachine localMachine;
         private NetworkMachine hostMachine;
-        private NetworkSessionPublicInfo publicInfo;
-        private int uniqueIdCount;
+        private NetConnection hostConnection;
+        private List<NetworkMachine> allMachines = new List<NetworkMachine>();
+        private Dictionary<byte, NetworkMachine> machineFromId = new Dictionary<byte, NetworkMachine>();
+        private Dictionary<NetworkMachine, NetConnection> connectionFromMachine = new Dictionary<NetworkMachine, NetConnection>();
 
-        private bool gameStartRequestThisFrame;
-        private bool gameEndRequestThisFrame;
-        private bool resetReadyRequestThisFrame;
+        private NetworkSessionPublicInfo publicInfo = new NetworkSessionPublicInfo();
+        private NetworkSessionState state = NetworkSessionState.Lobby;
 
-        private List<BaseOutgoingMessage> messageQueue;
-        private List<EventArgs> eventQueue;
-        internal List<NetworkGamer> allGamers; // TODO: Make private once messages are refactored into NetworkSession
-        internal List<NetworkGamer> remoteGamers;
-        internal List<NetworkGamer> previousGamers;
+        private bool allowHostMigration = false;
+        private bool allowJoinInProgress = false;
+        private int maxGamers = MaxSupportedGamers;
+        private int privateGamerSlots = 0;
+        
+        private bool gameStartRequestThisFrame = false;
+        private bool gameEndRequestThisFrame = false;
+        private bool resetReadyRequestThisFrame = false;
 
-        internal bool allowHostMigration;
-        internal bool allowJoinInProgress;
-        internal int maxGamers;
-        internal int privateGamerSlots;
+        private List<EventArgs> eventQueue = new List<EventArgs>();
+        private List<LocalNetworkGamer> localGamers = new List<LocalNetworkGamer>();
+        private Dictionary<SignedInGamer, LocalNetworkGamer> localGamerFromSignedInGamer = new Dictionary<SignedInGamer, LocalNetworkGamer>();
+        private List<NetworkGamer> allGamers = new List<NetworkGamer>();
+        private List<NetworkGamer> remoteGamers = new List<NetworkGamer>();
+        private List<NetworkGamer> previousGamers = new List<NetworkGamer>();
+        private Dictionary<byte, NetworkGamer> gamerFromId = new Dictionary<byte, NetworkGamer>();
 
-        internal IList<SignedInGamer> pendingSignedInGamers; // Must be a list since order is important
-        internal ICollection<BasePeerEndPoint> allowlist;
-        internal ICollection<BasePeerEndPoint> pendingEndPoints;
-        internal IDictionary<NetworkMachine, ICollection<NetworkMachine>> hostPendingConnections;
-        internal IDictionary<NetworkMachine, ICollection<BasePeerEndPoint>> hostPendingAllowlistInsertions;
+        private List<SignedInGamer> pendingSignedInGamers = new List<SignedInGamer>();
 
-        internal NetworkSession(BaseSessionBackend backend, IEnumerable<BasePeerEndPoint> initialAllowlist, bool isHost, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
+        internal NetworkSession(NetPeer peer, bool isHost, byte machineId, NetworkSessionType type, NetworkSessionProperties properties, int maxGamers, int privateGamerSlots, IEnumerable<SignedInGamer> localGamers)
         {
-            this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, isHost);
-            this.hostMachine = this.localMachine.IsHost ? this.localMachine : null;
-            this.publicInfo = new NetworkSessionPublicInfo();
-            this.uniqueIdCount = 0;
+            if (isHost && machineId != 0) throw new InvalidOperationException("Host must have machine id 0");
+            if (!isHost && machineId == 0) throw new InvalidOperationException("Client cannot have machine id 0");
 
-            this.gameStartRequestThisFrame = false;
-            this.gameEndRequestThisFrame = false;
-            this.resetReadyRequestThisFrame = false;
+            this.peer = peer;
+            this.isHost = isHost;
+            this.machineId = machineId;
+            this.type = type;
+            this.guid = Guid.NewGuid();
 
-            this.messageQueue = new List<BaseOutgoingMessage>();
-            this.eventQueue = new List<EventArgs>();
-            this.allGamers = new List<NetworkGamer>();
-            this.remoteGamers = new List<NetworkGamer>();
-            this.previousGamers = new List<NetworkGamer>();
+            this.properties = properties;
+            this.localMachine = new NetworkMachine(this, true, isHost, machineId);
+            this.hostMachine = isHost ? this.localMachine : new NetworkMachine(this, false, true, 0);
+            AddMachine(this.localMachine, null);
 
-            this.allowHostMigration = false;
-            this.allowJoinInProgress = false;
+            if (!isHost)
+            {
+                if (peer.ConnectionsCount != 1 || peer.Connections[0].Status != NetConnectionStatus.Connected)
+                {
+                    throw new InvalidOperationException($"Client peer must be connected to host before {nameof(NetworkSession)} can be instantiated");
+                }
+                hostConnection = peer.Connections[0];
+                hostConnection.Tag = this.hostMachine;
+
+                AddMachine(this.hostMachine, hostConnection);
+
+                // Add host gamer with id 0, important for NetworkSession.Host property
+                AddGamer(new NetworkGamer(this.hostMachine, 0, false, "...", "...", false));
+            }
+
             this.maxGamers = maxGamers;
             this.privateGamerSlots = privateGamerSlots;
 
-            this.pendingSignedInGamers = new List<SignedInGamer>();
-            foreach (SignedInGamer gamer in signedInGamers)
+            if (isHost)
             {
-                if (!this.pendingSignedInGamers.Contains(gamer))
+                // Add local gamers directly to make sure that there is always at least one gamer in the session
+                byte id = 0;
+                foreach (var gamer in localGamers)
                 {
-                    this.pendingSignedInGamers.Add(gamer);
+                    AddGamer(new LocalNetworkGamer(gamer, this.localMachine, id++, false));
+                }
+                if (allGamers.Count == 0)
+                {
+                    throw new InvalidOperationException();
                 }
             }
-
-            this.allowlist = new HashSet<BasePeerEndPoint>();
-            foreach (BasePeerEndPoint endPoint in initialAllowlist)
+            else
             {
-                this.allowlist.Add(endPoint);
+                foreach (var gamer in localGamers)
+                {
+                    AddLocalGamer(gamer);
+                }
             }
-
-            this.pendingEndPoints = null;
-
-            if (this.localMachine.IsHost)
-            {
-                // Initialize empty pending end point list so that the host is approved automatically
-                this.pendingEndPoints = new HashSet<BasePeerEndPoint>();
-
-                this.hostPendingConnections = new Dictionary<NetworkMachine, ICollection<NetworkMachine>>();
-                this.hostPendingAllowlistInsertions = new Dictionary<NetworkMachine, ICollection<BasePeerEndPoint>>();
-            }
-
-            this.Backend = backend;
-            this.Backend.Listener = this;
-            this.PacketPool = new PacketPool();
-            this.InternalMessages = new InternalMessages(this.Backend, this, this.localMachine);
-            this.RemoteMachines = new List<NetworkMachine>();
 
             this.AllGamers = new GamerCollection<NetworkGamer>(new List<NetworkGamer>(), this.allGamers);
             this.PreviousGamers = new GamerCollection<NetworkGamer>(new List<NetworkGamer>(), this.previousGamers);
             this.RemoteGamers = new GamerCollection<NetworkGamer>(new List<NetworkGamer>(), this.remoteGamers);
-            this.LocalGamers = new GamerCollection<LocalNetworkGamer>(new List<LocalNetworkGamer>(), this.localMachine.localGamers);
+            this.LocalGamers = new GamerCollection<LocalNetworkGamer>(new List<LocalNetworkGamer>(), this.localGamers);
             this.BytesPerSecondReceived = 0;
             this.BytesPerSecondSent = 0;
-            this.IsDisposed = false;
-            this.SessionProperties = properties;
-            this.SessionProperties.Session = this;
-            this.SessionState = NetworkSessionState.Lobby;
-            this.SessionType = type;
 
             this.SimulatedLatency = TimeSpan.Zero;
             this.SimulatedPacketLoss = 0.0f;
 
             SignedInGamer.SignedOut += LocalGamerSignedOut;
         }
-        
-        internal BaseSessionBackend Backend { get; }
-        internal PacketPool PacketPool { get; }
-        internal InternalMessages InternalMessages { get; }
-        internal IList<NetworkMachine> RemoteMachines { get; }
-        internal bool IsFullyConnected { get { return localMachine.IsFullyConnected; } }
 
         public GamerCollection<NetworkGamer> AllGamers { get; }
         public GamerCollection<NetworkGamer> PreviousGamers { get; }
@@ -125,27 +126,46 @@ namespace Microsoft.Xna.Framework.Net
         public GamerCollection<LocalNetworkGamer> LocalGamers { get; }
         public int BytesPerSecondReceived { get; private set; }
         public int BytesPerSecondSent { get; private set; }
+
         public bool IsDisposed { get; private set; }
-        public NetworkSessionProperties SessionProperties { get; }
-        public NetworkSessionState SessionState { get; internal set; }
-        public NetworkSessionType SessionType { get; }
+
+        public NetworkSessionType SessionType
+        {
+            get
+            {
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                return type;
+            }
+        }
+
+        public NetworkSessionProperties SessionProperties
+        {
+            get
+            {
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                return properties;
+            }
+        }
+
+        public NetworkSessionState SessionState
+        {
+            get
+            {
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                return state;
+            }
+        }
 
         public bool AllowHostMigration
         {
             get
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
                 return allowHostMigration;
             }
             set
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
                 if (!IsHost)
                 {
                     throw new InvalidOperationException("Only the host can perform this action");
@@ -167,19 +187,13 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
                 return allowJoinInProgress;
             }
             set
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
-                if (!IsHost)
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (!isHost)
                 {
                     throw new InvalidOperationException("Only the host can perform this action");
                 }
@@ -187,24 +201,8 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     allowJoinInProgress = value;
 
-                    InternalMessages.SessionStateChanged.Create(null);
+                    //InternalMessages.SessionStateChanged.Create(null);
                 }
-            }
-        }
-
-        internal NetworkMachine HostMachine
-        {
-            get
-            {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
-                if (hostMachine == null)
-                {
-                    throw new NetworkException("Host machine is null at this time");
-                }
-                return hostMachine;
             }
         }
 
@@ -212,16 +210,8 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
-                NetworkMachine hostMachine = HostMachine;
-                if (hostMachine.gamers.Count == 0)
-                {
-                    throw new NetworkException("NetworkSession not ready for use yet. Bug in internal session creation, gamer leaving or host migration code.");
-                }
-                return hostMachine.gamers[0];
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                return gamerFromId[0];
             }
         }
 
@@ -229,11 +219,8 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
-                foreach (NetworkGamer gamer in allGamers)
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                foreach (var gamer in allGamers)
                 {
                     if (!gamer.IsReady)
                     {
@@ -248,11 +235,8 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
-                return localMachine.IsHost;
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                return isHost;
             }
         }
 
@@ -260,19 +244,13 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
                 return maxGamers;
             }
             set
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
-                if (!IsHost)
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (!isHost)
                 {
                     throw new InvalidOperationException("Only the host can perform this action");
                 }
@@ -284,7 +262,7 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     maxGamers = value;
 
-                    InternalMessages.SessionStateChanged.Create(null);
+                    //InternalMessages.SessionStateChanged.Create(null);
                 }
             }
         }
@@ -309,19 +287,13 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
                 return privateGamerSlots;
             }
             set
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
-                if (!IsHost)
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (!isHost)
                 {
                     throw new InvalidOperationException("Only the host can perform this action");
                 }
@@ -332,7 +304,8 @@ namespace Microsoft.Xna.Framework.Net
                 if (privateGamerSlots != value)
                 {
                     privateGamerSlots = value;
-                    InternalMessages.SessionStateChanged.Create(null);
+
+                    //InternalMessages.SessionStateChanged.Create(null);
                 }
             }
         }
@@ -341,19 +314,19 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
-                return Backend.SimulatedLatency;
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+#if DEBUG
+                return TimeSpan.FromSeconds(peer.Configuration.SimulatedRandomLatency);
+#else
+                return TimeSpan.Zero;
+#endif
             }
             set
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
-                Backend.SimulatedLatency = value;
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+#if DEBUG
+                peer.Configuration.SimulatedRandomLatency = (float)value.TotalSeconds;
+#endif
             }
         }
 
@@ -361,75 +334,19 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
-                return Backend.SimulatedPacketLoss;
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+#if DEBUG
+                return peer.Configuration.SimulatedLoss;
+#else
+                return 0.0f;
+#endif
             }
             set
             {
-                if (IsDisposed || SessionState == NetworkSessionState.Ended)
-                {
-                    throw new ObjectDisposedException("NetworkSession");
-                }
-                Backend.SimulatedPacketLoss = value;
-            }
-        }
-
-        // BackendListener
-        internal string HostGamertag
-        {
-            get
-            {
-                return Host != null || Host.Gamertag == string.Empty ? Host.Gamertag : "Game starting...";
-            }
-        }
-
-        internal int CurrentGamerCount { get { return allGamers.Count; } }
-
-        internal int OpenPrivateGamerSlots
-        {
-            get
-            {
-                int usedSlots = 0;
-                foreach (NetworkGamer gamer in allGamers)
-                {
-                    if (gamer.IsPrivateSlot)
-                    {
-                        usedSlots++;
-                    }
-                }
-                return PrivateGamerSlots - usedSlots;
-            }
-        }
-
-        internal int OpenPublicGamerSlots { get { return MaxGamers - PrivateGamerSlots - allGamers.Count; } }
-
-        bool ISessionBackendListener.IsDiscoverableLocally
-        {
-            get { return IsHost && localMachine.IsFullyConnected && SessionType == NetworkSessionType.SystemLink; }
-        }
-
-        bool ISessionBackendListener.IsDiscoverableOnline
-        {
-            get { return IsHost && localMachine.IsFullyConnected && (SessionType == NetworkSessionType.PlayerMatch || SessionType == NetworkSessionType.Ranked); }
-        }
-
-        NetworkSessionPublicInfo ISessionBackendListener.SessionPublicInfo
-        {
-            get
-            {
-                publicInfo.Set(SessionType,
-                                SessionProperties,
-                                HostGamertag,
-                                MaxGamers,
-                                PrivateGamerSlots,
-                                CurrentGamerCount,
-                                OpenPrivateGamerSlots,
-                                OpenPublicGamerSlots);
-
-                return publicInfo;
+                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+#if DEBUG
+                peer.Configuration.SimulatedLoss = value;
+#endif
             }
         }
 
@@ -472,12 +389,9 @@ namespace Microsoft.Xna.Framework.Net
 
         public void AddLocalGamer(SignedInGamer signedInGamer)
         {
-            if (IsDisposed || SessionState == NetworkSessionState.Ended)
-            {
-                throw new ObjectDisposedException("NetworkSession");
-            }
+            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
 
-            if (localMachine.FindLocalGamerBySignedInGamer(signedInGamer) != null)
+            if (localGamerFromSignedInGamer.ContainsKey(signedInGamer))
             {
                 return;
             }
@@ -486,21 +400,18 @@ namespace Microsoft.Xna.Framework.Net
             {
                 pendingSignedInGamers.Add(signedInGamer);
 
-                InternalMessages.GamerIdRequest.Create(HostMachine);
+                SendGamerIdRequest();
             }
         }
 
         public void StartGame()
         {
-            if (IsDisposed || SessionState == NetworkSessionState.Ended)
-            {
-                throw new ObjectDisposedException("NetworkSession");
-            }
-            if (!IsHost)
+            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+            if (!isHost)
             {
                 throw new InvalidOperationException("Only the host can perform this action");
             }
-            if (SessionState != NetworkSessionState.Lobby)
+            if (state != NetworkSessionState.Lobby)
             {
                 throw new InvalidOperationException("The game can only be started from the lobby state");
             }
@@ -513,22 +424,18 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return;
             }
-
-            InternalMessages.GameStarted.Create(null);
+            SendStartGame();
             gameStartRequestThisFrame = true;
         }
 
         public void EndGame()
         {
-            if (IsDisposed || SessionState == NetworkSessionState.Ended)
-            {
-                throw new ObjectDisposedException("NetworkSession");
-            }
-            if (!IsHost)
+            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+            if (!isHost)
             {
                 throw new InvalidOperationException("Only the host can perform this action");
             }
-            if (SessionState != NetworkSessionState.Playing)
+            if (state != NetworkSessionState.Playing)
             {
                 throw new InvalidOperationException("The game can only end from the playing state");
             }
@@ -537,18 +444,14 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return;
             }
-
-            InternalMessages.GameEnded.Create(null);
+            SendEndGame();
             gameEndRequestThisFrame = true;
         }
 
         public void ResetReady()
         {
-            if (IsDisposed || SessionState == NetworkSessionState.Ended)
-            {
-                throw new ObjectDisposedException("NetworkSession");
-            }
-            if (!IsHost)
+            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+            if (!isHost)
             {
                 throw new InvalidOperationException("Only the host can perform this action");
             }
@@ -557,122 +460,102 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return;
             }
-
-            InternalMessages.ResetReady.Create();
+            SendResetReady();
             resetReadyRequestThisFrame = true;
         }
 
-        // TODO: Improve docs here
-        // Find the gamer with a given unique id. NOTE: This method will return null if the gamer in question has
-        // not yet joined the game for this particular peer OR there is a cheating party in the session (that
-        // may have only connected to some of the peers in the session).
-        //
-        // Regarding a cheating party:
-        // When the session transitions to the Playing state, the host will send all gamer ids it knows about
-        // to all peers. If a peer recieves an id it does not know about, it will report this to the host. If the host
-        // recieves enough reports suggesting a gamer is a cheater, the host will remove the gamer and its NetworkMachine
-        // from the session.
+        /// <summary>
+        /// Find the gamer with the given unique id. Note that this method may return null if the message containing
+        /// the unique id arrived to a peer before the internal GamerJoined message arrived.
+        /// </summary>
+        /// <param name="gamerId"></param>
+        /// <returns></returns>
         public NetworkGamer FindGamerById(byte gamerId)
         {
-            if (IsDisposed || SessionState == NetworkSessionState.Ended)
-            {
-                throw new ObjectDisposedException("NetworkSession");
-            }
+            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
 
-            foreach (var gamer in allGamers)
+            if (gamerFromId.ContainsKey(gamerId))
             {
-                if (gamer.Id == gamerId)
-                {
-                    return gamer;
-                }
+                return gamerFromId[gamerId];
             }
-
             return null;
         }
 
-        internal NetworkMachine FindMachineByPeer(Peer peer)
+        private void AddMachine(NetworkMachine machine, NetConnection connection)
         {
-            if (IsDisposed || SessionState == NetworkSessionState.Ended)
+            allMachines.Add(machine);
+            machineFromId.Add(machine.Id, machine);
+            if (connection != null)
             {
-                return null;
-            }
-
-            if (localMachine.peer == peer)
-            {
-                return localMachine;
-            }
-
-            foreach (var remoteMachine in RemoteMachines)
-            {
-                if (remoteMachine.peer == peer)
-                {
-                    return remoteMachine;
-                }
-            }
-
-            return null;
-        }
-
-        internal void AddMachine(NetworkMachine machine)
-        {
-            if (!machine.IsLocal)
-            {
-                RemoteMachines.Add(machine);
+                connectionFromMachine.Add(machine, connection);
             }
         }
 
-        internal void RemoveMachine(NetworkMachine machine)
+        private void RemoveMachine(NetworkMachine machine)
         {
-            machine.HasLeftSession = true;
-
-            // Remove gamers
             for (int i = machine.gamers.Count - 1; i >= 0; i--)
             {
                 RemoveGamer(machine.gamers[i]);
             }
 
-            // Remove machine
-            if (!machine.IsLocal)
+            allMachines.Remove(machine);
+            machineFromId.Remove(machine.Id);
+            connectionFromMachine.Remove(machine);
+        }
+
+        private void RemoveAllMachines()
+        {
+            for (int i = allMachines.Count - 1; i >= 0; i--)
             {
-                RemoteMachines.Remove(machine);
+                RemoveMachine(allMachines[i]);
             }
         }
 
-        internal void RemoveAllMachines()
+        private void AddGamer(NetworkGamer gamer)
         {
-            RemoveMachine(localMachine);
+            gamer.Machine.gamers.Add(gamer);
 
-            for (int i = RemoteMachines.Count - 1; i >= 0; i--)
-            {
-                RemoveMachine(RemoteMachines[i]);
-            }
-        }
-
-        internal void AddGamer(NetworkGamer gamer)
-        {
-            gamer.Machine.AddGamer(gamer);
             allGamers.Add(gamer);
-            allGamers.Sort(NetworkGamer.Comparer);
-            if (!gamer.IsLocal)
+            allGamers.Sort(NetworkGamerIdComparer.Instance);
+
+            if (gamer.IsLocal)
+            {
+                var localGamer = (LocalNetworkGamer)gamer;
+                localGamers.Add(localGamer);
+                localGamerFromSignedInGamer.Add(localGamer.SignedInGamer, localGamer);
+            }
+            else
             {
                 remoteGamers.Add(gamer);
-                remoteGamers.Sort(NetworkGamer.Comparer);
+                remoteGamers.Sort(NetworkGamerIdComparer.Instance);
             }
+
+            gamerFromId.Add(gamer.Id, gamer);
 
             InvokeGamerJoinedEvent(new GamerJoinedEventArgs(gamer));
         }
 
-        internal void RemoveGamer(NetworkGamer gamer)
+        private void RemoveGamer(NetworkGamer gamer)
         {
             gamer.HasLeftSession = true;
 
-            gamer.Machine.RemoveGamer(gamer);
+            gamer.Machine.gamers.Remove(gamer);
+
             allGamers.Remove(gamer);
-            if (!gamer.IsLocal)
+
+            if (gamer.IsLocal)
+            {
+                var localGamer = (LocalNetworkGamer)gamer;
+                localGamers.Remove(localGamer);
+                localGamerFromSignedInGamer.Remove(localGamer.SignedInGamer);
+            }
+            else
             {
                 remoteGamers.Remove(gamer);
             }
-            
+
+            gamerFromId.Remove(gamer.Id);
+
             AddPreviousGamer(gamer);
 
             InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));
@@ -692,30 +575,31 @@ namespace Microsoft.Xna.Framework.Net
         {
             pendingSignedInGamers.Remove(args.Gamer);
 
-            LocalNetworkGamer localGamer = localMachine.FindLocalGamerBySignedInGamer(args.Gamer);
-
-            if (localGamer != null)
+            if (localGamerFromSignedInGamer.ContainsKey(args.Gamer))
             {
-                InternalMessages.GamerLeft.Create(localGamer, null);
+                SendGamerLeft(localGamerFromSignedInGamer[args.Gamer]);
             }
         }
 
-        internal bool GetNewUniqueId(out byte id)
+        internal void DisconnectMachine(NetworkMachine machine, NetworkSessionEndReason reason)
         {
-            // Cycle through all 0-255 values before re-using an old id
-            for (int i = 0; i < 256; i++)
+            if (!isHost) throw new InvalidOperationException();
+
+            if (connectionFromMachine[machine].Status == NetConnectionStatus.Connected)
             {
-                byte candidateId = (byte)uniqueIdCount;
+                connectionFromMachine[machine].Disconnect(reason.ToString());
+            }
+        }
 
-                uniqueIdCount++;
-                if (uniqueIdCount > 255)
+        private bool GetNewUniqueId<T>(Dictionary<byte, T> lookupTable, out byte id)
+        {
+            Debug.WriteLine("TODO FIX NEW UNIQUE ID!"); // need increment counter for multiple simultaneous clients connecting at the same time
+            for (int i = 0; i < 255; i++) // 255 is reserved for "error"
+            {
+                byte candidate = (byte)i;
+                if (!lookupTable.ContainsKey(candidate))
                 {
-                    uniqueIdCount = 0;
-                }
-
-                if (FindGamerById(candidateId) == null)
-                {
-                    id = candidateId;
+                    id = candidate;
                     return true;
                 }
             }
@@ -724,270 +608,54 @@ namespace Microsoft.Xna.Framework.Net
             return false;
         }
 
-        internal string MachineOwnerName(NetworkMachine machine)
+        internal void SilentUpdate()
         {
-            if (machine == null)
-            {
-                return "everyone";
-            }
-            else if (machine.IsLocal)
-            {
-                if (machine.IsHost)
-                {
-                    return "self (host)";
-                }
-                else
-                {
-                    return "self";
-                }
-            }
-            else if (machine.IsHost)
-            {
-                return "host";
-            }
-            else
-            {
-                return "peer";
-            }
-        }
-
-        void IMessageQueue.Place(BaseOutgoingMessage msg)
-        {
-            messageQueue.Add(msg);
-        }
-
-        bool ISessionBackendListener.AllowConnectionFromClient(BasePeerEndPoint endPoint)
-        {
-            if (IsHost)
-            {
-                return (allowJoinInProgress || SessionState == NetworkSessionState.Lobby) && OpenPublicGamerSlots > 0;
-            }
-
-            if (allowlist.Contains(endPoint))
-            {
-                Debug.WriteLine("Connection from client in allowlist, allowing...");
-                allowlist.Remove(endPoint);
-                return true;
-            }
-            else
-            {
-                Debug.WriteLine("Connection from client not in allowlist, denying...");
-                return false;
-            }
-        }
-
-        bool ISessionBackendListener.AllowConnectionToHostAsClient(BasePeerEndPoint targetEndPoint)
-        {
-            if (IsHost || IsFullyConnected)
-            {
-                Debug.WriteLine("Introduced as client when acting host, doing nothing. (This should not happen)");
-                return false;
-            }
-
-            if (allowlist.Contains(targetEndPoint))
-            {
-                Debug.WriteLine("Introduced as client to target in allowlist, connecting...");
-                allowlist.Remove(targetEndPoint);
-                return true;
-            }
-            else
-            {
-                Debug.WriteLine("Introduced as client to target NOT in allowlist, doing nothing.");
-                return false;
-            }
-        }
-
-        void ISessionBackendListener.PeerConnected(Peer peer)
-        {
-            // The first connection is always the (initial) host
-            bool senderIsHost = !IsHost && hostMachine == null;
-
-            // Create a pending network machine
-            NetworkMachine newMachine = new NetworkMachine(this, peer, false, senderIsHost);
-            AddMachine(newMachine);
-
-            if (senderIsHost)
-            {
-                hostMachine = newMachine;
-            }
-
-            if (localMachine.IsFullyConnected)
-            {
-                InternalMessages.FullyConnected.Create(newMachine);
-            }
-
-            InternalMessages.ConnectionAcknowledged.Create(newMachine);
-
-            if (IsHost)
-            {
-                // Save snapshot of current connections and send them to the new peer
-                var requestedConnections = new HashSet<NetworkMachine>(RemoteMachines);
-                requestedConnections.Remove(newMachine);
-
-                hostPendingConnections.Add(newMachine, requestedConnections);
-                
-                InternalMessages.ConnectToAllRequest.Create(requestedConnections, newMachine);
-
-                // Introduce machines to each other
-                hostPendingAllowlistInsertions.Add(newMachine, new HashSet<BasePeerEndPoint>());
-
-                foreach (NetworkMachine existingMachine in requestedConnections)
-                {
-                    hostPendingAllowlistInsertions[newMachine].Add(existingMachine.peer.EndPoint);
-                    InternalMessages.AllowEndPointRequest.Create(existingMachine.peer.EndPoint, newMachine);
-
-                    if (!hostPendingAllowlistInsertions.ContainsKey(existingMachine))
-                    {
-                        hostPendingAllowlistInsertions.Add(existingMachine, new HashSet<BasePeerEndPoint>());
-                    }
-
-                    hostPendingAllowlistInsertions[existingMachine].Add(newMachine.peer.EndPoint);
-                    InternalMessages.AllowEndPointRequest.Create(newMachine.peer.EndPoint, existingMachine);
-                }
-            }
-        }
-
-        void ISessionBackendListener.PeerDisconnected(Peer peer)
-        {
-            var disconnectedMachine = peer.Tag as NetworkMachine;
-
-            RemoveMachine(disconnectedMachine);
-
-            if (IsHost)
-            {
-                // Update pending peers
-                foreach (var pendingMachine in RemoteMachines)
-                {
-                    if (pendingMachine.IsFullyConnected)
-                    {
-                        continue;
-                    }
-
-                    if (hostPendingConnections[pendingMachine].Contains(disconnectedMachine))
-                    {
-                        hostPendingConnections[pendingMachine].Remove(disconnectedMachine);
-
-                        InternalMessages.ConnectToAllRequest.Create(hostPendingConnections[pendingMachine], pendingMachine);
-                    }
-                }
-            }
-            else
-            {
-                if (disconnectedMachine == HostMachine)
-                {
-                    // TODO: Host migration
-                    End(NetworkSessionEndReason.HostEndedSession);
-                }
-            }
-        }
-
-        void ISessionBackendListener.ReceiveMessage(BaseIncomingMessage data, Peer sender)
-        {
-            NetworkMachine senderMachine = sender.Tag as NetworkMachine;
-
-            byte messageType = data.ReadByte();
-
-            if ((InternalMessageIndex)messageType != InternalMessageIndex.UserMessage)
-            {
-                Debug.WriteLine("Receiving " + (InternalMessageIndex)messageType + " from " + MachineOwnerName(senderMachine) + "...");
-            }
-
-            InternalMessage receiver = InternalMessages.FromIndex[messageType];
-            receiver.Receive(data, senderMachine);
-        }
-
-        private void HandleInitialConnection()
-        {
-            if (localMachine.IsFullyConnected || pendingEndPoints == null)
+            if (IsDisposed)
             {
                 return;
             }
 
-            foreach (BasePeerEndPoint endPoint in pendingEndPoints)
+            // Recycle inbound packets that the user has read from the last frame
+            foreach (var localGamer in localGamers)
             {
-                if (!Backend.IsConnectedToEndPoint(endPoint) || !(Backend.FindRemotePeerByEndPoint(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine)
-                {
-                    return;
-                }
+                localGamer.RecycleInboundPackets();
             }
 
-            pendingEndPoints = null;
+            ReceiveMessages();
 
-            InternalMessages.FullyConnected.Create(null);
-
-            foreach (SignedInGamer pendingGamer in pendingSignedInGamers)
+            if (IsDisposed)
             {
-                InternalMessages.GamerIdRequest.Create(HostMachine);
-            }
-        }
-
-        private void SendInternalMessages()
-        {
-            for (int i = 0; i < messageQueue.Count; i++)
-            {
-                Backend.SendMessage(messageQueue[i]);
-
-                if (SessionState == NetworkSessionState.Ended)
-                {
-                    break;
-                }
+                return;
             }
 
-            messageQueue.Clear();
+            // Add delayed inbound packets if sender has joined (Might add new inbound packets)
+            foreach (var localGamer in localGamers)
+            {
+                localGamer.TryAddDelayedInboundPackets();
+            }
+
+            // Queue outbound packets as internal messages
+            foreach (var localGamer in localGamers)
+            {
+                localGamer.SendOutboundPackets(); // TODO: Remove pooling of outbound packets now that we use FlushSendQueue() below
+            }
+
+            peer.FlushSendQueue();
 
             gameStartRequestThisFrame = false;
             gameEndRequestThisFrame = false;
             resetReadyRequestThisFrame = false;
         }
 
-        internal void SilentUpdate()
+        private void TriggerEvents(bool recursive)
         {
-            if (IsDisposed || SessionState == NetworkSessionState.Ended)
+            int originalCount = eventQueue.Count;
+
+            // Do not use foreach as eventQueue might change
+            for (int i = 0; i < (recursive ? eventQueue.Count : originalCount); i++)
             {
-                return;
-            }
-
-            // Recycle inbound packets that the user has read from the last frame
-            foreach (LocalNetworkGamer localGamer in localMachine.localGamers)
-            {
-                localGamer.RecycleInboundPackets();
-            }
-
-            // Handle incoming internal messages (Might add new inbound packets)
-            Backend.Update();
-
-            // Add delayed inbound packets if sender has joined (Might add new inbound packets)
-            foreach (LocalNetworkGamer localGamer in localMachine.localGamers)
-            {
-                localGamer.TryAddDelayedInboundPackets();
-            }
-
-            HandleInitialConnection();
-
-            // Queue outbound packets as internal messages
-            foreach (LocalNetworkGamer localGamer in localMachine.localGamers)
-            {
-                localGamer.QueueOutboundPackets();
-            }
-
-            SendInternalMessages();
-
-            foreach (LocalNetworkGamer localGamer in localMachine.localGamers)
-            {
-                localGamer.RecycleOutboundPackets();
-            }
-
-            if (SessionState == NetworkSessionState.Ended)
-            {
-                return;
-            }
-        }
-
-        private void TriggerEvents()
-        {
-            // This is not an elegant solution but it is convenient. Performance is not a problem since events are rare!
-            foreach (EventArgs arg in eventQueue)
-            {
+                // Performance is not a problem since events are rare!
+                var arg = eventQueue[i];
                 if (arg is GamerJoinedEventArgs)
                 {
                     GamerJoined?.Invoke(this, arg as GamerJoinedEventArgs);
@@ -1010,58 +678,83 @@ namespace Microsoft.Xna.Framework.Net
                 }
             }
 
-            eventQueue.Clear();
+            if (recursive)
+            {
+                eventQueue.Clear();
+            }
+            else
+            {
+                eventQueue.RemoveRange(0, originalCount);
+            }
         }
 
         public void Update()
         {
-            if (IsDisposed || SessionState == NetworkSessionState.Ended)
-            {
-                throw new ObjectDisposedException("NetworkSession");
-            }
-            if (!localMachine.IsFullyConnected)
-            {
-                throw new NetworkException("NetworkSession not initialized properly. The ISessionCreator must call NetworkSession.SilentUpdate() until NetworkSession.IsFullyConnected is true before returning the NetworkSession.");
-            }
+            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
 
             SilentUpdate();
 
-            TriggerEvents();
+            if (IsDisposed)
+            {
+                return;
+            }
+
+            TriggerEvents(true);
 
             // Update public gamer collections
             AllGamers.CopyFromReference();
-            RemoteGamers.CopyFromReference();
             PreviousGamers.CopyFromReference();
+            RemoteGamers.CopyFromReference();
             LocalGamers.CopyFromReference();
 
-            foreach (var remoteMachine in RemoteMachines)
+            foreach (var machine in allMachines)
             {
-                remoteMachine.Gamers.CopyFromReference();
+                machine.Gamers.CopyFromReference();
             }
         }
 
         internal void End(NetworkSessionEndReason reason)
         {
-            if (IsDisposed || SessionState == NetworkSessionState.Ended)
+            if (IsDisposed || state == NetworkSessionState.Ended)
             {
                 return;
             }
 
-            RemoveAllMachines();
+            if (isHost)
+            {
+                // Notify clients gracefully before shutting down
+                foreach (var machine in allMachines)
+                {
+                    if (machine.IsLocal)
+                    {
+                        continue;
+                    }
+                    DisconnectMachine(machine, NetworkSessionEndReason.HostEndedSession);
+                }
+            }
 
-            Backend.Shutdown("Done");
-
-            SessionState = NetworkSessionState.Ended;
-            Session = null;
+            // Note that we do not want to dispose the NetworkSession until the end of this call, as the user
+            // might want to do some clean up on SessionEnded. Furthermore, the user might call Dispose() in the
+            // callback so the early return above is important. Finally, make sure not to trigger any new events that
+            // might arise.
+            state = NetworkSessionState.Ended;
 
             InvokeSessionEnded(new NetworkSessionEndedEventArgs(reason));
+
+            TriggerEvents(false);
+
+            RemoveAllMachines();
+
+            peer.Shutdown("Done");
+
+            Session = null;
+
+            IsDisposed = true;
         }
 
         public void Dispose()
         {
-            End(NetworkSessionEndReason.ClientSignedOut);
-
-            IsDisposed = true;
+            End(isHost ? NetworkSessionEndReason.HostEndedSession : NetworkSessionEndReason.Disconnected);
         }
     }
 }

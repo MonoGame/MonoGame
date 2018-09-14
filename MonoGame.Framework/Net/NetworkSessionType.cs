@@ -2,7 +2,7 @@
 
 namespace Microsoft.Xna.Framework.Net
 {
-    public enum NetworkSessionType
+    public enum NetworkSessionType : byte
     {
         Local,
         SystemLink,

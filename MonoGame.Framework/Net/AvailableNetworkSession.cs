@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
-
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.GamerServices;
-using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net
 {
     public sealed class AvailableNetworkSession
     {
-        internal AvailableNetworkSession(BasePeerEndPoint hostEndPoint, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionType sessionType, int currentGamerCount, string hostGamertag, int openPrivateGamerSlots, int openPublicGamerSlots, NetworkSessionProperties sessionProperties)
+        internal AvailableNetworkSession(Guid hostGuid, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionType sessionType, int currentGamerCount, string hostGamertag, int openPrivateGamerSlots, int openPublicGamerSlots, NetworkSessionProperties sessionProperties)
         {
-            this.HostEndPoint = hostEndPoint;
+            this.HostGuid = hostGuid;
+            this.SessionType = sessionType;
             this.LocalGamers = localGamers;
             this.MaxGamers = maxGamers;
             this.PrivateGamerSlots = privateGamerSlots;
-            this.SessionType = sessionType;
+
             this.CurrentGamerCount = currentGamerCount;
             this.HostGamertag = hostGamertag;
             this.OpenPrivateGamerSlots = openPrivateGamerSlots;
@@ -22,12 +22,13 @@ namespace Microsoft.Xna.Framework.Net
             this.SessionProperties = sessionProperties;
         }
 
-        internal BasePeerEndPoint HostEndPoint { get; }
+        internal Guid HostGuid { get; }
+        internal NetworkSessionType SessionType { get; }
         internal IEnumerable<SignedInGamer> LocalGamers { get; }
         internal int MaxGamers { get; }
         internal int PrivateGamerSlots { get; }
-        internal NetworkSessionType SessionType { get; }
         internal object Tag { get; set; }
+
         public int CurrentGamerCount { get; }
         public string HostGamertag { get; }
         public int OpenPrivateGamerSlots { get; }

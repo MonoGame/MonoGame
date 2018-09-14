@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.Xna.Framework.Net
 {
-    public enum NetworkSessionEndReason
+    public enum NetworkSessionEndReason : byte
     {
         ClientSignedOut,
         HostEndedSession,
         RemovedByHost,
-        Disconnected
+        Disconnected,
     }
 }

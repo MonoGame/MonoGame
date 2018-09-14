@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Net.Messages;
 using Microsoft.Xna.Framework.GamerServices;
-using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net
 {
@@ -10,14 +8,14 @@ namespace Microsoft.Xna.Framework.Net
     internal delegate AvailableNetworkSessionCollection AsyncFind(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties);
     internal delegate NetworkSession AsyncJoin(AvailableNetworkSession availableSession);
 
-    public sealed partial class NetworkSession : ISessionBackendListener, IDisposable, IMessageQueue
+    public sealed partial class NetworkSession : IDisposable
     {
         private static NetworkSession Session;
         private static AsyncCreate AsyncCreateCaller;
         private static AsyncFind AsyncFindCaller;
         private static AsyncJoin AsyncJoinCaller;
 
-        protected static List<SignedInGamer> GetLocalGamers(int maxLocalGamers)
+        private static List<SignedInGamer> GetLocalGamers(int maxLocalGamers)
         {
             var localGamers = new List<SignedInGamer>(SignedInGamer.SignedInGamers);
             if (localGamers.Count > maxLocalGamers)
@@ -58,8 +56,7 @@ namespace Microsoft.Xna.Framework.Net
                 sessionProperties = new NetworkSessionProperties();
             }
 
-            AsyncCreateCaller = new AsyncCreate(NetworkSessionImplementation.SessionCreator.Create);
-
+            AsyncCreateCaller = new AsyncCreate(InternalCreate);
             IAsyncResult result = null;
             try
             {
@@ -136,8 +133,7 @@ namespace Microsoft.Xna.Framework.Net
                 searchProperties = new NetworkSessionProperties();
             }
 
-            AsyncFindCaller = new AsyncFind(NetworkSessionImplementation.SessionCreator.Find);
-
+            AsyncFindCaller = new AsyncFind(InternalFind);
             IAsyncResult result = null;
             try
             {
@@ -193,8 +189,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new ArgumentNullException(nameof(availableSession));
             }
 
-            AsyncJoinCaller = new AsyncJoin(NetworkSessionImplementation.SessionCreator.Join);
-
+            AsyncJoinCaller = new AsyncJoin(InternalJoin);
             IAsyncResult result = null;
             try
             {

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Net.Backend;
+using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net
 {
     public class NetworkSessionProperties : IList<Nullable<int>>, ICollection<Nullable<int>>, IEnumerable<Nullable<int>>, IEnumerable
     {
         private const int Size = 8;
-        private IList<Nullable<int>> list = new List<Nullable<int>>(Size);
+        private IList<int?> list = new List<int?>(Size);
 
         public NetworkSessionProperties()
         {
@@ -18,11 +18,15 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal NetworkSession Session { get; set; }
-        public bool IsReadOnly { get { return Session == null || !Session.IsHost; } }
+        internal NetworkSessionProperties(bool isReadOnly) : this()
+        {
+            IsReadOnly = isReadOnly;
+        }
+
+        public bool IsReadOnly { get; private set; }
         public int Count { get { return list.Count; } }
 
-        public Nullable<int> this[int index]
+        public int? this[int index]
         {
             get
             {
@@ -38,7 +42,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 if (IsReadOnly)
                 {
-                    throw new InvalidOperationException("Properties are read-only when not host");
+                    throw new InvalidOperationException($"{nameof(NetworkSessionProperties)} is read-only");
                 }
 
                 if (index < 0 || index >= list.Count)
@@ -50,7 +54,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal void Pack(BaseOutgoingMessage msg)
+        internal void Pack(NetOutgoingMessage msg)
         {
             msg.Write(list.Count);
 
@@ -64,9 +68,9 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal void Unpack(BaseIncomingMessage msg)
+        internal void Unpack(NetIncomingMessage msg)
         {
-            int remoteCount = msg.ReadInt();
+            int remoteCount = msg.ReadInt32();
             if (remoteCount != list.Count)
             {
                 throw new NetworkException("NetworkSessionProperties size mismatch, different builds?");
@@ -75,8 +79,8 @@ namespace Microsoft.Xna.Framework.Net
             for (int i = 0; i < list.Count; i++)
             {
                 bool isSet = msg.ReadBoolean();
-                int value = msg.ReadInt();
-                list[i] = isSet ? value : (Nullable<int>)null;
+                int value = msg.ReadInt32();
+                list[i] = isSet ? value : (int?)null;
             }
         }
 
@@ -102,7 +106,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (IsReadOnly)
             {
-                throw new InvalidOperationException("Properties are read-only when not host");
+                throw new InvalidOperationException($"{nameof(NetworkSessionProperties)} is read-only");
             }
 
             for (int i = 0; i < list.Count; i++)
@@ -123,7 +127,7 @@ namespace Microsoft.Xna.Framework.Net
             catch { throw; }
         }
 
-        public void Add(Nullable<int> item)
+        public void Add(int? item)
         {
             throw new InvalidOperationException("Use []-operator instead");
         }

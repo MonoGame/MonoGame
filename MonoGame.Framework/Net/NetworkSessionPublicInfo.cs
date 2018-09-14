@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Lidgren.Network;
-using Microsoft.Xna.Framework.Net.Backend;
-using System.IO;
+﻿using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net
 {
@@ -18,7 +13,7 @@ namespace Microsoft.Xna.Framework.Net
         public int openPrivateGamerSlots;
         public int openPublicGamerSlots;
 
-        public static NetworkSessionPublicInfo FromMessage(BaseIncomingMessage msg)
+        public static NetworkSessionPublicInfo FromMessage(NetIncomingMessage msg)
         {
             var publicInfo = new NetworkSessionPublicInfo();
             publicInfo.Unpack(msg);
@@ -37,7 +32,7 @@ namespace Microsoft.Xna.Framework.Net
             this.openPublicGamerSlots = openPublicGamerSlots;
         }
 
-        public void Pack(BaseOutgoingMessage msg)
+        public void Pack(NetOutgoingMessage msg)
         {
             msg.Write((byte)sessionType);
             sessionProperties.Pack(msg);
@@ -49,21 +44,22 @@ namespace Microsoft.Xna.Framework.Net
             msg.Write(openPublicGamerSlots);
         }
 
-        public void Unpack(BaseIncomingMessage msg)
+        public void Unpack(NetIncomingMessage msg)
         {
             if (sessionProperties == null)
             {
-                sessionProperties = new NetworkSessionProperties();
+                // If this NetworkSessionPublicInfo is sent over the network, NetworkSessionProperties should be read-only
+                sessionProperties = new NetworkSessionProperties(true);
             }
 
             sessionType = (NetworkSessionType)msg.ReadByte();
             sessionProperties.Unpack(msg);
             hostGamertag = msg.ReadString();
-            maxGamers = msg.ReadInt();
-            privateGamerSlots = msg.ReadInt();
-            currentGamerCount = msg.ReadInt();
-            openPrivateGamerSlots = msg.ReadInt();
-            openPublicGamerSlots = msg.ReadInt();
+            maxGamers = msg.ReadInt32();
+            privateGamerSlots = msg.ReadInt32();
+            currentGamerCount = msg.ReadInt32();
+            openPrivateGamerSlots = msg.ReadInt32();
+            openPublicGamerSlots = msg.ReadInt32();
         }
     }
 }
