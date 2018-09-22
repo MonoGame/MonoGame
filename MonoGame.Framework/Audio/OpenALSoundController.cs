@@ -235,6 +235,18 @@ namespace Microsoft.Xna.Framework.Audio
                     0
                 };
 #elif IOS
+                AVAudioSession.SharedInstance().Init();
+
+                // This is the default audio session category on iOS.
+                //
+                //   Your audio is silenced by screen locking and by the Silent switch (called the Ring/Silent switch on iPhone).
+                //
+                //   By default, using this category implies that your app’s audio is nonmixable—activating your session will
+                //   interrupt any other audio sessions which are also nonmixable.
+                //
+                //
+                AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.SoloAmbient);
+
                 EventHandler<AVAudioSessionInterruptionEventArgs> handler = delegate(object sender, AVAudioSessionInterruptionEventArgs e) {
                     switch (e.InterruptionType)
                     {
@@ -250,7 +262,11 @@ namespace Microsoft.Xna.Framework.Audio
                             break;
                     }
                 };
+
                 AVAudioSession.Notifications.ObserveInterruption(handler);
+
+                // Activate the instance or else the interruption handler will not be called.
+                AVAudioSession.SharedInstance().SetActive(true);
 
                 int[] attribute = new int[0];
 #else
