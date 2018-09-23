@@ -7,27 +7,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Utilities;
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#endif
-#if MONOMAC && !PLATFORM_MACOS_LEGACY
-using OpenTK.Graphics.OpenGL;
-#endif
-#if DESKTOPGL
-using OpenGL;
-#endif
-#if GLES
-using OpenTK.Graphics.ES20;
-using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class VertexBuffer
     {
 		//internal uint vao;
-		internal uint vbo;
+		internal int vbo;
 
         private void PlatformConstruct()
         {
@@ -187,16 +174,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                Threading.BlockOnUIThread(() =>
-                {
-                    if (!IsDisposed)
-                    {
-                        GL.DeleteBuffers(1, ref vbo);
-                        GraphicsExtensions.CheckGLError();
-                        base.Dispose(disposing);
-                    }
-                });
+                if (GraphicsDevice != null)
+                    GraphicsDevice.DisposeBuffer(vbo);
             }
+            base.Dispose(disposing);
         }
     }
 }

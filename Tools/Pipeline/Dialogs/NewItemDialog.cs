@@ -10,7 +10,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class NewItemDialog : DialogBase
+    partial class NewItemDialog : Dialog<bool>
     {
         public string Name { get; private set; }
         public ContentItemTemplate Selected { get; private set; }
@@ -85,6 +85,17 @@ namespace MonoGame.Tools.Pipeline
             Selected = (ContentItemTemplate)((ImageListItem)list1.SelectedValue).Tag;
             labelExt.Text = Path.GetExtension(Selected.TemplateFile);
             ReloadSensitive();
+        }
+
+        private void ButtonCreate_Click(object sender, EventArgs e)
+        {
+            Result = true;
+            Close();
+        }
+
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

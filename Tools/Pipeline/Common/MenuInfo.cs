@@ -50,6 +50,8 @@ namespace MonoGame.Tools.Pipeline
 
         public bool OpenItemLocation { get; set; }
 
+        public bool OpenOutputItemLocation { get; set; }
+
         public bool CopyAssetPath { get; set; }
 
         public bool RebuildItem { get; set; }

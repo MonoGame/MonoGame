@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Eto;
 using Eto.Forms;
@@ -15,139 +14,145 @@ using Eto.GtkSharp.Forms.ToolBar;
 
 namespace MonoGame.Tools.Pipeline
 {
-    static partial class Gtk3Wrapper
-    {
-        public const string gtklibpath = "libgtk-3.so.0";
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr gtk_header_bar_new();
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_window_set_titlebar(IntPtr window, IntPtr widget);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_header_bar_pack_start(IntPtr bar, IntPtr child);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_header_bar_pack_end(IntPtr bar, IntPtr child);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_header_bar_set_show_close_button(IntPtr bar, bool setting);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_header_bar_set_subtitle(IntPtr handle, string text);
-    }
-
-    public class ModalButton : Gtk.Button
-    {
-        [GLib.Property("active")]
-        public bool Active
-        {
-            set
-            {
-                this.SetProperty("active", new GLib.Value(value));
-            }
-        }
-
-        public ModalButton(IntPtr handle) : base(handle) { }
-    }
-
     public static class Styles
     {
-        private static Gtk.Widget popovermenu1, popovermenu2;
+        [DllImport("libgtk-3.so.0", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr g_cclosure_new (IntPtr callback_func, IntPtr user_data, IntPtr destroy_data);
+        
+        private static Gtk.AccelGroup _accelGroup;
+        private static Gtk.Widget _popovermenu1, _popovermenu2;
+        private static Gtk.Widget _buttonbox, _cancelbox, _separator;
 
-        private static void Connect(IntPtr handle, Command com, bool sensitivity = true)
+        public static void Connect(string action, Command cmd)
         {
-            var b = new Gtk.Button(handle);
-            b.Clicked += delegate
+            var a = new GLib.SimpleAction(action, null);
+            a.Activated += (o, args) => 
             {
-                popovermenu1.Hide();
-                popovermenu2.Hide();
-                com.Execute();
+                _popovermenu1.Hide();
+                _popovermenu2.Hide();
+                cmd.Execute();
             };
 
-            com.EnabledChanged += delegate
-            {
-                if (sensitivity)
-                    b.Sensitive = com.Enabled;
-                else
-                    b.Visible = com.Enabled;
-            };
+            cmd.EnabledChanged += (sender, e) => a.Enabled = cmd.Enabled;
+
+            Global.Application.AddAction(a);
         }
 
-        private static void Connect(IntPtr handle, CheckCommand com)
+        private static void Connect(Command cmd, Gdk.Key key, Gdk.ModifierType modifier = Gdk.ModifierType.None)
         {
-            var widget = new ModalButton(handle);
-            widget.Active = com.Checked;
-
-            widget.Clicked += delegate
+            var cclosure = g_cclosure_new(Marshal.GetFunctionPointerForDelegate(
+                (Action<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr>)((IntPtr a, IntPtr b, IntPtr c, IntPtr d, IntPtr data) =>
             {
-                com.Checked = !com.Checked;
-                widget.Active = com.Checked;
-            };
+                var command = ((GCHandle)data).Target as Command;
+
+                if (command.Enabled)
+                    command.Execute();
+            })), (IntPtr)GCHandle.Alloc(cmd), IntPtr.Zero);
+
+            _accelGroup.Connect((uint)key, modifier, Gtk.AccelFlags.Mask, cclosure);
         }
 
-        [GLib.ConnectBefore]
-        public static void TreeView_ButtonPressEvent(object o, Gtk.ButtonPressEventArgs args)
+        private static void ReloadBuildbox()
         {
-            var treeview = o as Gtk.TreeView;
+            var b = MainWindow.Instance.cmdBuild.Enabled;
+            var c = MainWindow.Instance.cmdCancelBuild.Enabled;
 
-            if (args.Event.Button == 3)
-            {
-                Gtk.TreeViewDropPosition pos;
-                Gtk.TreePath path;
-                Gtk.TreeIter iter;
-
-                if (treeview.GetDestRowAtPos((int)args.Event.X, (int)args.Event.Y, out path, out pos) && treeview.Model.GetIter(out iter, path))
-                {
-                    var paths = treeview.Selection.GetSelectedRows().ToList();
-                    if (paths.Contains(path))
-                        args.RetVal = true;
-                }
-            }
+            _buttonbox.Visible = b;
+            _cancelbox.Visible = c;
+            _separator.Visible = b || c;
         }
 
         public static void Load()
         {
+            Style.Add<ApplicationHandler>("PipelineTool", h =>
+            {
+                Global.Application = h.Control;
+
+                if (Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16)
+                    Global.UseHeaderBar = Global.Application.PrefersAppMenu();
+                
+                if (Global.UseHeaderBar)
+                    Global.Application.AppMenu = new GLib.MenuModel((new Gtk.Builder("AppMenu.glade")).GetObject("appmenu").Handle);
+            });
+
+            Style.Add<FormHandler>("LogWindow", h =>
+            {
+                if (!Global.UseHeaderBar)
+                    return;
+                
+                var headerBar = new Gtk.HeaderBar();
+                headerBar.ShowCloseButton = true;
+                headerBar.Title = h.Control.Title;
+
+                var buttoncopy = LogWindow.ButtonCopy.ToNative() as Gtk.Button;
+                buttoncopy.StyleContext.AddClass("suggested-action");
+                headerBar.PackStart(buttoncopy);
+
+                h.Control.Titlebar = headerBar;
+                headerBar.ShowAll();
+            });
+                                   
             Style.Add<FormHandler>("MainWindow", h =>
             {
                 if (!Global.UseHeaderBar)
                     return;
+                
+                var builder = new Gtk.Builder("MainWindow.glade");
+                var headerBar = new Gtk.HeaderBar(builder.GetObject("headerbar").Handle);
 
                 h.Menu = null;
                 h.ToolBar = null;
 
-                var builder = new Gtk.Builder(null, "MainWindow.glade", null);
-                var headerBar = new Gtk.Widget(builder.GetObject("headerbar").Handle);
-                var separator = new Gtk.Widget(builder.GetObject("separator1").Handle);
+                Connect("new", MainWindow.Instance.cmdNew);
+                Connect("open", MainWindow.Instance.cmdOpen);
+                Connect("save", MainWindow.Instance.cmdSave);
+                Connect("saveas", MainWindow.Instance.cmdSaveAs);
+                Connect("import", MainWindow.Instance.cmdImport);
+                Connect("close", MainWindow.Instance.cmdClose);
+                Connect("help", MainWindow.Instance.cmdHelp);
+                Connect("about", MainWindow.Instance.cmdAbout);
+                Connect("quit", MainWindow.Instance.cmdExit);
+                Connect("undo", MainWindow.Instance.cmdUndo);
+                Connect("redo", MainWindow.Instance.cmdRedo);
+                Connect("build", MainWindow.Instance.cmdBuild);
+                Connect("rebuild", MainWindow.Instance.cmdRebuild);
+                Connect("clean", MainWindow.Instance.cmdClean);
+                Connect("cancel", MainWindow.Instance.cmdCancelBuild);
 
-                popovermenu1 = new Gtk.Widget(builder.GetObject("popovermenu1").Handle);
-                popovermenu2 = new Gtk.Widget(builder.GetObject("popovermenu2").Handle);
+                var widget = new Gtk.ModelButton(builder.GetObject("button_debug").Handle);
+                widget.Active = MainWindow.Instance.cmdDebugMode.Checked;
+                widget.Clicked += (e, sender) =>
+                {
+                    var newstate = !PipelineSettings.Default.DebugMode;
 
-                Gtk3Wrapper.gtk_window_set_titlebar(h.Control.Handle, headerBar.Handle);
-                Gtk3Wrapper.gtk_header_bar_set_show_close_button(headerBar.Handle, true);
+                    widget.Active = newstate;
+                    PipelineSettings.Default.DebugMode = newstate;
+                };
 
-                Connect(builder.GetObject("new_button").Handle, MainWindow.Instance.cmdNew);
-                Connect(builder.GetObject("save_button").Handle, MainWindow.Instance.cmdSave);
-                Connect(builder.GetObject("build_button").Handle, MainWindow.Instance.cmdBuild, false);
-                Connect(builder.GetObject("rebuild_button").Handle, MainWindow.Instance.cmdRebuild, false);
-                Connect(builder.GetObject("cancel_button").Handle, MainWindow.Instance.cmdCancelBuild, false);
-                Connect(builder.GetObject("open_other_button").Handle, MainWindow.Instance.cmdOpen);
-                Connect(builder.GetObject("import_button").Handle, MainWindow.Instance.cmdImport);
-                Connect(builder.GetObject("saveas_button").Handle, MainWindow.Instance.cmdSaveAs);
-                Connect(builder.GetObject("undo_button").Handle, MainWindow.Instance.cmdUndo);
-                Connect(builder.GetObject("redo_button").Handle, MainWindow.Instance.cmdRedo);
-                Connect(builder.GetObject("close_button").Handle, MainWindow.Instance.cmdClose);
-                Connect(builder.GetObject("clean_button").Handle, MainWindow.Instance.cmdClean);
-                Connect(builder.GetObject("help_button").Handle, MainWindow.Instance.cmdHelp);
-                Connect(builder.GetObject("about_button").Handle, MainWindow.Instance.cmdAbout);
-                Connect(builder.GetObject("exit_button").Handle, MainWindow.Instance.cmdExit);
-                Connect(builder.GetObject("debugmode_button").Handle, MainWindow.Instance.cmdDebugMode);
+                _accelGroup = new Gtk.AccelGroup();
 
-                MainWindow.Instance.cmdBuild.EnabledChanged += (sender, e) =>
-                    separator.Visible = MainWindow.Instance.cmdBuild.Enabled || MainWindow.Instance.cmdCancelBuild.Enabled;
-                MainWindow.Instance.cmdCancelBuild.EnabledChanged += (sender, e) => 
-                    separator.Visible = MainWindow.Instance.cmdBuild.Enabled || MainWindow.Instance.cmdCancelBuild.Enabled;
+                Connect(MainWindow.Instance.cmdNew, Gdk.Key.N, Gdk.ModifierType.ControlMask);
+                Connect(MainWindow.Instance.cmdOpen, Gdk.Key.O, Gdk.ModifierType.ControlMask);
+                Connect(MainWindow.Instance.cmdSave, Gdk.Key.S, Gdk.ModifierType.ControlMask);
+                Connect(MainWindow.Instance.cmdExit, Gdk.Key.Q, Gdk.ModifierType.ControlMask);
+                Connect(MainWindow.Instance.cmdUndo, Gdk.Key.Z, Gdk.ModifierType.ControlMask);
+                Connect(MainWindow.Instance.cmdRedo, Gdk.Key.Y, Gdk.ModifierType.ControlMask);
+                Connect(MainWindow.Instance.cmdBuild, Gdk.Key.F6);
+                Connect(MainWindow.Instance.cmdHelp, Gdk.Key.F1);
+
+                h.Control.AddAccelGroup(_accelGroup);
+
+                _popovermenu1 = new Gtk.Widget(builder.GetObject("popovermenu1").Handle);
+                _popovermenu2 = new Gtk.Widget(builder.GetObject("popovermenu2").Handle);
+
+                h.Control.Titlebar = headerBar;
+                headerBar.ShowCloseButton = true;
+
+                _buttonbox = new Gtk.Widget(builder.GetObject("build_buttonbox").Handle);
+                _cancelbox = new Gtk.Widget(builder.GetObject("cancel_button").Handle);
+                _separator = new Gtk.Widget(builder.GetObject("separator1").Handle);
+                MainWindow.Instance.cmdBuild.EnabledChanged += (sender, e) => ReloadBuildbox();
+                MainWindow.Instance.cmdCancelBuild.EnabledChanged += (sender, e) => ReloadBuildbox();
 
                 MainWindow.Instance.TitleChanged += delegate
                 {
@@ -162,7 +167,7 @@ namespace MonoGame.Tools.Pipeline
                     }
 
                     h.Control.Title = title;
-                    Gtk3Wrapper.gtk_header_bar_set_subtitle(headerBar.Handle, subtitle);
+                    headerBar.Subtitle = subtitle;
                 };
 
                 var treeview1 = new Gtk.TreeView(builder.GetObject("treeview1").Handle);
@@ -190,7 +195,7 @@ namespace MonoGame.Tools.Pipeline
 
                 treeview1.RowActivated += (o, args) =>
                 {
-                    popovermenu2.Hide();
+                    _popovermenu2.Hide();
 
                     Gtk.TreeIter iter;
                     if (!store.GetIter(out iter, args.Path))
@@ -200,28 +205,10 @@ namespace MonoGame.Tools.Pipeline
                     PipelineController.Instance.OpenProject(project);
                 };
 
-                h.Control.ShowAll();
+                headerBar.Show();
             });
 
-            Style.Add<DialogHandler>("HeaderBar", h =>
-            {
-                var title = h.Title;
-                var headerBar = Gtk3Wrapper.gtk_header_bar_new();
-                Gtk3Wrapper.gtk_window_set_titlebar(h.Control.Handle, headerBar);
-                h.Title = title;
-
-                if (h.AbortButton.Text == "Close")
-                {
-                    Gtk3Wrapper.gtk_header_bar_set_show_close_button(headerBar, true);
-                    return;
-                }
-
-                var defButton = (Gtk.Button)h.DefaultButton.ControlObject;
-                defButton.StyleContext.AddClass("suggested-action");
-
-                Gtk3Wrapper.gtk_header_bar_pack_end(headerBar, defButton.Handle);
-                Gtk3Wrapper.gtk_header_bar_pack_start(headerBar, ((Gtk.Button)h.AbortButton.ControlObject).Handle);
-            });
+            Style.Add<ButtonHandler>("Destuctive", h => h.Control.StyleContext.AddClass("destructive-action"));
 
             Style.Add<LabelHandler>("Wrap", h => h.Control.MaxWidthChars = 55);
 
@@ -229,25 +216,6 @@ namespace MonoGame.Tools.Pipeline
             {
                 h.Control.ToolbarStyle = Gtk.ToolbarStyle.Icons;
                 h.Control.IconSize = Gtk.IconSize.SmallToolbar;
-            });
-
-            Style.Add<TreeViewHandler>("Scroll", h =>
-            {
-                var treeView = h.Control.Child as Gtk.TreeView;
-
-                Gtk.TreeIter lastIter, iter;
-
-                if (treeView.Model.GetIterFirst(out iter))
-                {
-                    do
-                    {
-                        lastIter = iter;
-                    }
-                    while (treeView.Model.IterNext(ref iter));
-
-                    var path = treeView.Model.GetPath(lastIter);
-                    treeView.ScrollToCell(path, null, false, 0, 0);
-                }
             });
 
             Style.Add<DrawableHandler>("Stretch", h =>
@@ -271,43 +239,6 @@ namespace MonoGame.Tools.Pipeline
                      var al = h.Control.Allocation;
                      al.Width = parent.AllocatedWidth;
                      h.Control.SetAllocation(al);
-                };
-            });
-
-            Style.Add<TextBoxHandler>("OverrideSize", h =>
-            {
-                h.Control.WidthChars = 0;
-            });
-
-            Style.Add<ScrollableHandler>("BuildOutput", h =>
-            {
-                var child = ((((h.Control.Child as Gtk.Viewport).Child as Gtk.VBox).Children[0] as Gtk.HBox).Children[0] as Gtk.Alignment).Child;
-                var ok = false;
-
-                h.Control.SizeAllocated += delegate
-                {
-                    // Set Width of the Drawable
-                    var al = child.Allocation;
-                    al.Width = h.Control.AllocatedWidth - 2;
-                    if (BuildOutput.ReqWidth > al.Width)
-                        al.Width = BuildOutput.ReqWidth;
-                    child.SetAllocation(al);
-
-                    if (PipelineSettings.Default.AutoScrollBuildOutput)
-                    {
-                        // Scroll to bottom
-                        if (BuildOutput.Count == -1)
-                            ok = false;
-
-                        if (!ok)
-                        {
-                            var adj = h.Control.Vadjustment;
-                            adj.Value = adj.Upper - adj.PageSize;
-
-                            if (adj.Upper >= BuildOutput.Count && BuildOutput.Count != -1)
-                                ok = true;
-                        }
-                    }
                 };
             });
         }

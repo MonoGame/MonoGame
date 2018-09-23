@@ -9,6 +9,8 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MonoGame.Tests.References" />
+    <Reference Include="MGCB" />
+    <Reference Include="MonoGame.Build.Tasks" />
   </References>
 
   <Properties>
@@ -33,6 +35,8 @@
   </Properties>
 
   <Files>
+    <None Include="packages.config" />
+
     <!-- Dependencies -->
     <None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
       <Platforms>WindowsGL</Platforms>
@@ -54,14 +58,93 @@
       <Link>x64\libopenal.so.1</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-
-    <None Include="MonoGame.Tests.dll.config">
+    <None Include="..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib"  Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
+      <Link>libSDL2-2.0.0.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib"  Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libopenal.1.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>ffprobe</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>ffmpeg</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvtt.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libnvtt.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libnvcore.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvimage.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libnvimage.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvmath.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libnvmath.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>Nvidia.TextureTools.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll.config" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>Nvidia.TextureTools.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>FreeImageNET.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll.config" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>FreeImageNET.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libfreeimage.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>PVRTexLibNET.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>PVRTexLibNET.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libPVRTexLibWrapper.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libassimp.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
-
-    <None Include="ReadMe.md" />
+    <None Include="README.md" />
 
     <Compile Include="Properties\AssemblyInfo.cs" />
 
@@ -69,12 +152,6 @@
     <Compile Include="Runner\Extensions.cs" />
     <Compile Include="Runner\FrameInfo.cs" />
     <Compile Include="Runner\FramePixelData.cs" />
-    <Compile Include="Runner\Interface\AggregateTestFilter.cs" />
-    <Compile Include="Runner\Interface\CommandLineInterface.cs" />
-    <Compile Include="Runner\Interface\RegexTestFilter.cs" />
-    <Compile Include="Runner\Interface\RunOptions.cs" />
-    <Compile Include="Runner\Interface\TestEventListenerBase.cs" />
-    <Compile Include="Runner\Interface\TestFilterAction.cs" />
     <Compile Include="Runner\PixelArgb.cs" />
     <Compile Include="Runner\Utility.cs" />
 
@@ -207,6 +284,9 @@
     <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
 
+    <Compile Include="ContentPipeline\BuilderTargetsTest.cs">
+      <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\AssetTestClasses.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
@@ -217,13 +297,22 @@
     <Compile Include="ContentPipeline\BitmapContentTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\ContentCompilerTest.cs">
+      <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\EffectProcessorTests.cs">
         <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\FbxImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\FontDescriptionTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\FontTextureProcessorTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\FontDescriptionProcessorTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs">
@@ -245,6 +334,12 @@
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\OggImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\TestCompiler.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\OpenAssetImporterTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs">
@@ -343,6 +438,72 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Audio\rock_loop_stereo_44hz_adpcm_ms.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_8bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_16bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_16bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_24bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_float.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_float.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_imaadpcm.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_imaadpcm.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_msadpcm.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_mono_44khz_msadpcm.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_8bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_16bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_16bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_24bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_float.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_float.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_imaadpcm.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_imaadpcm.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_msadpcm.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\tone_stereo_44khz_msadpcm.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
@@ -503,6 +664,12 @@
     <Content Include="Assets\ReferenceImages\GraphicsDevice\Clear-7.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\GetBackBufferData__X_100 Y_100 Width_250 Height_250__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\GetBackBufferData_null_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\Colored3DCube.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -552,6 +719,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\TexturedQuad_lighting_True_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Model\ShouldDrawSampleModel.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\TexturedQuad_lighting_False_.png">
@@ -606,6 +776,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\ScissorRectangle\Draw_with_render_target_change.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\ScissorRectangle\Draw_with_scissor_rect.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Shader\Shader__Bevels__.png">
@@ -806,6 +979,9 @@
     <Content Include="Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_ColorSRgb_True_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\Texture2D\SetDataRowPitch.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\Texture2D\TextureArrayAsRenderTargetAndShaderResource.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -933,6 +1109,12 @@
     <Content Include="Assets\Textures\Surge.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Fonts\Localized.spritefont">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\Strings.resx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\Effects\DirectX\Bevels.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1035,6 +1217,27 @@
     <Content Include="Assets\Models\enemy_0.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Models\Box.blend">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\BlenderDefaultCube.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Dude\dude_2011.fbx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Dude\head.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Dude\jacket.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Dude\pants.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Dude\upBodyC.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\Fonts\DataFont.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1071,6 +1274,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
+    <Content Include="Assets\Textures\Logo_65x64_16bit.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\Logo_BMPV5.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Textures\LogoOnly_64px.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1135,6 +1344,58 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 	<Content Include="Assets\Textures\RGBA16.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Textures\1bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\8bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\24bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\32bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Textures\color_24bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\color_32bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\color_48bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\color_64bit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Textures\blue_0.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\red_128.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Textures\red_668_dxt.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="..\MonoGame.Framework.Content.Pipeline\MonoGame.Content.Builder.targets">
+      <Link>MonoGame.Content.Builder.targets</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Projects\BuildSimpleProject.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Projects\Content\Content.mgcb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Projects\Content\ContentFont.spritefont">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 

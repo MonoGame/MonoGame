@@ -74,9 +74,9 @@ namespace MonoGame.Tools.Pipeline
 
             foreach (var ct in types)
             {
-                var attrs = ct.GetCustomAttributes<CellAttribute>();
+                var attrs = ct.GetCustomAttributes(typeof(CellAttribute), true);
 
-                foreach (var a in attrs)
+                foreach (CellAttribute a in attrs)
                 {
                     if (a.Type == type || type.IsSubclassOf(a.Type))
                     {
@@ -149,7 +149,9 @@ namespace MonoGame.Tools.Pipeline
 
             if (_cells.Count == 0)
             {
-                drawable.Height = _height = 10;
+                if (_height != 10)
+                    drawable.Height = _height = 10;
+
                 return;
             }
 
@@ -207,14 +209,14 @@ namespace MonoGame.Tools.Pipeline
 
         private void Drawable_MouseUp(object sender, MouseEventArgs e)
         {
-            _moveSeparator = - _separatorWidth / 2 - 1;
+            _moveSeparator = -_separatorWidth / 2 - 1;
 
             if (e.Location.X >= _separatorPos && _selectedCell != null && _selectedCell.Editable && !_skipEdit)
             {
                 var action = new Action(() => _selectedCell.Edit(pixel1));
 
 #if WINDOWS
-                (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action, 
+                (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action,
                     System.Windows.Threading.DispatcherPriority.ContextIdle, null);
 #else
                 action.Invoke();
@@ -226,7 +228,7 @@ namespace MonoGame.Tools.Pipeline
         {
             _mouseLocation = new Point((int)e.Location.X, (int)e.Location.Y);
 
-            if(_moveSeparator > -_separatorWidth / 2 - 1)
+            if (_moveSeparator > -_separatorWidth / 2 - 1)
                 _separatorPos = _moveSeparator + _mouseLocation.X;
 
             drawable.Invalidate();
@@ -280,4 +282,3 @@ namespace MonoGame.Tools.Pipeline
         }
     }
 }
-

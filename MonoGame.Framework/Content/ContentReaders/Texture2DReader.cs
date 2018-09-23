@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     internal class Texture2DReader : ContentTypeReader<Texture2D>
     {
-		internal Texture2DReader()
+		public Texture2DReader()
 		{
 			// Do nothing
 		}
@@ -74,8 +74,8 @@ namespace Microsoft.Xna.Framework.Content
 				    var levelDataSizeInBytes = reader.ReadInt32();
                     var levelData = reader.ContentManager.GetScratchBuffer(levelDataSizeInBytes);
                     reader.Read(levelData, 0, levelDataSizeInBytes);
-                    int levelWidth = width >> level;
-                    int levelHeight = height >> level;
+                    int levelWidth = Math.Max(width >> level, 1);
+                    int levelHeight = Math.Max(height >> level, 1);
 
                     if (level >= levelCountOutput)
                         continue;

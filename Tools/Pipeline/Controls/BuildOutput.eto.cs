@@ -11,7 +11,7 @@ namespace MonoGame.Tools.Pipeline
     {
         Panel panel;
         TextArea textArea;
-        Scrollable scrollable1;
+        Scrollable scrollable;
         Drawable drawable;
 
         private void InitializeComponent()
@@ -24,10 +24,12 @@ namespace MonoGame.Tools.Pipeline
             textArea.Wrap = false;
             textArea.ReadOnly = true;
 
-            scrollable1 = new Scrollable();
-            scrollable1.BackgroundColor = DrawInfo.BackColor;
+            scrollable = new Scrollable();
+            scrollable.BackgroundColor = DrawInfo.BackColor;
+            scrollable.ExpandContentWidth = true;
+            scrollable.ExpandContentHeight = true;
             drawable = new Drawable();
-            scrollable1.Content = drawable;
+            scrollable.Content = drawable;
 
             panel.Content = textArea;
             CreateContent(panel);
@@ -35,10 +37,10 @@ namespace MonoGame.Tools.Pipeline
             drawable.MouseDown += Drawable_MouseDown;
             drawable.MouseMove += Drawable_MouseMove;
             drawable.MouseLeave += Drawable_MouseLeave;
+            drawable.SizeChanged += Drawable_SizeChanged;
             drawable.Paint += Drawable_Paint;
-            scrollable1.SizeChanged += Scrollable1_SizeChanged;
-            scrollable1.Scroll += Scrollable1_Scroll;
+            scrollable.SizeChanged += Scrollable1_SizeChanged;
+            scrollable.Scroll += Scrollable1_Scroll;
         }
     }
 }
-

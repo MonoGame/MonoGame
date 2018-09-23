@@ -25,10 +25,14 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsTextureArrays = device.GraphicsProfile == GraphicsProfile.HiDef;
             SupportsDepthClamp = device.GraphicsProfile == GraphicsProfile.HiDef;
             SupportsVertexTextures = device.GraphicsProfile == GraphicsProfile.HiDef;
-        }
+            SupportsFloatTextures = true;
+            SupportsHalfFloatTextures = true;
+            SupportsNormalized = true;
 
-        private void PlatformInitializeAfterResources(GraphicsDevice device)
-        {
+            SupportsInstancing = true;
+
+            MaxTextureAnisotropy = (device.GraphicsProfile == GraphicsProfile.Reach) ? 2 : 16;
+
             _maxMultiSampleCount = GetMaxMultiSampleCount(device);
         }
 

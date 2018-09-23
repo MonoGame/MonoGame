@@ -4,7 +4,7 @@
 //    https://github.com/renaudbedard/nvorbis/
 //
 // It was released to the public domain by the author (Renaud Bedard).
-// No other license is intended or required. 
+// No other license is intended or required.
 
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using NVorbis;
-using OpenAL;
+using MonoGame.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -246,8 +246,8 @@ namespace Microsoft.Xna.Framework.Audio
                 OggStreamer.Instance.Efx.DeleteFilter(alFilterId);
                 ALHelper.CheckError("Failed to delete EFX filter.");
             }
-            
-            
+
+
         }
 
         void StopPlayback()
@@ -278,7 +278,7 @@ namespace Microsoft.Xna.Framework.Audio
                     var salvaged = new int[processed];
                     if (processed > 0)
                     {
-                        AL.SourceUnqueueBuffers(alSourceId, processed, salvaged);
+                        AL.SourceUnqueueBuffers(alSourceId, processed, out salvaged);
                         ALHelper.CheckError("Failed to unqueue buffers (second attempt).");
                     }
 
@@ -334,10 +334,12 @@ namespace Microsoft.Xna.Framework.Audio
         readonly short[] castBuffer;
 
         readonly HashSet<OggStream> streams = new HashSet<OggStream>();
-        readonly List<OggStream> threadLocalStreams = new List<OggStream>(); 
+        readonly List<OggStream> threadLocalStreams = new List<OggStream>();
 
         readonly Thread underlyingThread;
         volatile bool cancelled;
+
+        bool pendingFinish;
 
         public float UpdateRate { get; private set; }
         public int BufferSize { get; private set; }
@@ -361,6 +363,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             UpdateRate = updateRate;
             BufferSize = bufferSize;
+            pendingFinish = false;
 
             lock (singletonMutex)
             {
@@ -467,7 +470,7 @@ namespace Microsoft.Xna.Framework.Audio
                             tempBuffers = stream.alBufferIds.Skip(queued).ToArray();
 
                         int bufferFilled = 0;
-                        for (int i = 0; i < tempBuffers.Length; i++)
+                        for (int i = 0; i < tempBuffers.Length && !pendingFinish; i++)
                         {
                             finished |= FillBuffer(stream, tempBuffers[i]);
                             bufferFilled++;
@@ -481,17 +484,20 @@ namespace Microsoft.Xna.Framework.Audio
                                 }
                                 else
                                 {
-                                    lock (iterationMutex)
-                                        streams.Remove(stream);
-                                    i = tempBuffers.Length;
+                                    pendingFinish = true;
                                 }
-
-                                if (stream.FinishedAction != null)
-                                    stream.FinishedAction.Invoke();
                             }
                         }
 
-                        if (!finished && bufferFilled > 0) // queue only successfully filled buffers
+                        if (pendingFinish && queued == 0)
+                        {
+                            pendingFinish = false;
+                            lock (iterationMutex)
+                                streams.Remove(stream);
+                            if (stream.FinishedAction != null)
+                                stream.FinishedAction.Invoke();
+                        }
+                        else if (!finished && bufferFilled > 0) // queue only successfully filled buffers
                         {
                             AL.SourceQueueBuffers(stream.alSourceId, bufferFilled, tempBuffers);
                             ALHelper.CheckError("Failed to queue buffers.");

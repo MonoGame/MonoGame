@@ -4,45 +4,38 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Security;
 
-namespace OpenGL
+namespace MonoGame.OpenGL
 {
-    public partial class GL
+    partial class GL
     {
         static partial void LoadPlatformEntryPoints()
         {
             BoundApi = RenderApi.GL;
         }
 
+        private static T LoadFunction<T>(string function, bool throwIfNotFound = false)
+        {
+            var ret = Sdl.GL.GetProcAddress(function);
+
+            if (ret == IntPtr.Zero)
+            {
+                if (throwIfNotFound)
+                    throw new EntryPointNotFoundException(function);
+
+                return default(T);
+            }
+
+#if NETSTANDARD
+            return Marshal.GetDelegateForFunctionPointer<T>(ret);
+#else
+            return (T)(object)Marshal.GetDelegateForFunctionPointer(ret, typeof(T));
+#endif
+        }
+
         private static IGraphicsContext PlatformCreateContext (IWindowInfo info)
         {
             return new GraphicsContext(info);
-        }
-    }
-
-    internal class EntryPointHelper {
-
-        private const string NativeLibName = "SDL2.dll";
-
-        [SuppressUnmanagedCodeSecurity]
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl,
-            EntryPoint = "SDL_GL_GetProcAddress", ExactSpelling = true)]
-        public static extern IntPtr GetProcAddress(IntPtr proc);
-        public static IntPtr GetAddress(string proc)
-        {
-            IntPtr p = Marshal.StringToHGlobalAnsi(proc);
-            try
-            {
-                var addr = GetProcAddress(p);
-                if (addr == IntPtr.Zero)
-                    throw new EntryPointNotFoundException (proc);
-                return addr;
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(p);
-            }
         }
     }
 }

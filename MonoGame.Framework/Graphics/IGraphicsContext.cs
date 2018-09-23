@@ -4,13 +4,14 @@
 
 using System;
 
-namespace OpenGL
+namespace MonoGame.OpenGL
 {
-    public interface IGraphicsContext : IDisposable
+    internal interface IGraphicsContext : IDisposable
     {
         int SwapInterval { get; set; }
         bool IsDisposed { get; }
         void MakeCurrent(IWindowInfo info);
         void SwapBuffers();
+        bool IsCurrent { get; }
     }
 }

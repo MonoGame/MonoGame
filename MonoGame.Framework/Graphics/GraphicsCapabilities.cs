@@ -19,12 +19,6 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformInitialize(device);
         }
 
-        // For figuring out some capabilities we need native resources for querying
-        internal void InitializeAfterResources(GraphicsDevice device)
-        {
-            PlatformInitializeAfterResources(device);
-        }
-
         /// <summary>
         /// Whether the device fully supports non power-of-two textures, including
         /// mip maps and wrap modes other than CLAMP_TO_EDGE
@@ -36,11 +30,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
 		internal bool SupportsTextureFilterAnisotropic { get; private set; }
 
-		internal bool SupportsDepth24 { get; private set; }
+        internal bool SupportsDepth24 { get; private set; }
 
-		internal bool SupportsPackedDepthStencil { get; private set; }
+        internal bool SupportsPackedDepthStencil { get; private set; }
 
-		internal bool SupportsDepthNonLinear { get; private set; }
+        internal bool SupportsDepthNonLinear { get; private set; }
 
         /// <summary>
         /// Gets the support for DXT1
@@ -75,20 +69,52 @@ namespace Microsoft.Xna.Framework.Graphics
         /// and texture sRGB are supported.
         /// </summary>
         internal bool SupportsSRgb { get; private set; }
-        
+
         internal bool SupportsTextureArrays { get; private set; }
 
         internal bool SupportsDepthClamp { get; private set; }
 
         internal bool SupportsVertexTextures { get; private set; }
 
+        /// <summary>
+        /// True, if the underlying platform supports floating point textures. 
+        /// For Direct3D platforms this is always <code>true</code>.
+        /// For OpenGL Desktop platforms it is always <code>true</code>.
+        /// For OpenGL Mobile platforms it requires `GL_EXT_color_buffer_float`.
+        /// If the requested format is not supported an <code>NotSupportedException</code>
+        /// will be thrown.
+        /// </summary>
+        internal bool SupportsFloatTextures { get; private set; }
+
+        /// <summary>
+        /// True, if the underlying platform supports half floating point textures. 
+        /// For Direct3D platforms this is always <code>true</code>.
+        /// For OpenGL Desktop platforms it is always <code>true</code>.
+        /// For OpenGL Mobile platforms it requires `GL_EXT_color_buffer_half_float`.
+        /// If the requested format is not supported an <code>NotSupportedException</code>
+        /// will be thrown.
+        /// </summary>
+        internal bool SupportsHalfFloatTextures { get; private set; }
+
+        internal bool SupportsNormalized { get; private set; }
+
+        /// <summary>
+        /// Gets the max texture anisotropy. This value typically lies
+        /// between 0 and 16, where 0 means anisotropic filtering is not
+        /// supported.
+        /// </summary>
+        internal int MaxTextureAnisotropy { get; private set; }
+
         // The highest possible MSCount
         private const int MultiSampleCountLimit = 32;
+
         private int _maxMultiSampleCount;
 
         internal int MaxMultiSampleCount
         {
             get { return _maxMultiSampleCount; }
         }
+
+        internal bool SupportsInstancing { get; private set; }
     }
 }

@@ -7,11 +7,20 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.Audio
 {
     public class SoundEffectTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            // Necessary to get audio initialised
+            FrameworkDispatcher.Update();
+        }
+
         [Test]
         public void Statics()
         {
@@ -269,8 +278,7 @@ namespace MonoGame.Tests.Audio
             Assert.Throws<ArgumentException>(() => new SoundEffect(new byte[2], 0, 2, 8000, AudioChannels.Mono, 0, int.MaxValue));
         }
 
-        // TODO creating/disposing a Game should not create/dispose the master voice
-        [Test, Ignore]
+        [Test, Ignore("creating/disposing a Game should not create/dispose the master voice")]
         public void InstanceNotDisposedWhenGameDisposed()
         {
             var game = new Game();
@@ -403,7 +411,28 @@ namespace MonoGame.Tests.Audio
         [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav", 16120000)]
         [TestCase(@"Assets/Audio/bark_mono_22hz_8bit.wav", 16120000)]
         [TestCase(@"Assets/Audio/bark_mono_11hz_8bit.wav", 16120000)]
-        public void FromStream_Supported_Formats(string filename, long durationTicks)
+        [TestCase(@"Assets/Audio/tone_mono_44khz_8bit.wav", 5000000)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_8bit.wav", 5000000)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_16bit.wav", 5000000)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_16bit.wav", 5000000)]
+#if !XNA
+        // XNA does not support 24-bit, 32-bit float, MS-ADPCM or IMA/ADPCM in SoundEffect.FromStream, but MonoGame does
+#if DIRECTX
+        [TestCase(@"Assets/Audio/blast_mono_44hz_adpcm_ms.wav", 72020000)]
+        [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav", 72020000)]
+        [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav", 72020000)]
+#else
+        [TestCase(@"Assets/Audio/tone_mono_44khz_imaadpcm.wav", 5560000)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_imaadpcm.wav", 5090000)]
+#endif
+        [TestCase(@"Assets/Audio/tone_mono_44khz_msadpcm.wav", 5080000)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_msadpcm.wav", 5050000)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_float.wav", 5000000)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_float.wav", 5000000)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_24bit.wav", 5000000)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_24bit.wav", 5000000)]
+#endif
+        public void SoundEffectFromStream_Supported_Formats(string filename, long durationTicks)
         {
             using (var stream = File.OpenRead(filename))
             {
@@ -412,13 +441,71 @@ namespace MonoGame.Tests.Audio
             }
         }
 
+#if XNA
+        // MonoGame now supports loading ADPCM through SoundEffect.FromStream()
         [TestCase(@"Assets/Audio/blast_mono_44hz_adpcm_ms.wav")]
         [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav")]
         [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav")]
-        public void FromStream_Unsupported_Formats(string filename)
+        public void SoundEffectFromStream_Unsupported_Formats(string filename)
         {
             using (var stream = File.OpenRead(filename))
                 Assert.Throws<ArgumentException>(() => SoundEffect.FromStream(stream));
+        }
+#endif
+
+        // Proxy for the content manager used in SoundEffectFromContent
+        class GraphicsDeviceProxy : IGraphicsDeviceService
+        {
+            public GraphicsDevice GraphicsDevice
+            {
+                get { return null; }
+            }
+
+            public event EventHandler<EventArgs> DeviceCreated;
+
+            public event EventHandler<EventArgs> DeviceDisposing;
+
+            public event EventHandler<EventArgs> DeviceReset;
+
+            public event EventHandler<EventArgs> DeviceResetting;
+        }
+
+        class ContentManagerProxy : ContentManager
+        {
+            public ContentManagerProxy(IServiceProvider services): base(services) {}
+
+            protected override Stream OpenStream(string assetName)
+            {
+                var fileName = Path.Combine(RootDirectory, assetName + ".xnb");
+                if (File.Exists(fileName))
+                    return new FileStream(fileName, FileMode.Open, FileAccess.Read);
+                return base.OpenStream(assetName);
+            }
+        }
+
+        [TestCase("tone_mono_44khz_8bit", 5000000)]
+        [TestCase("tone_stereo_44khz_8bit", 5000000)]
+        [TestCase("tone_mono_44khz_16bit", 5000000)]
+        [TestCase("tone_stereo_44khz_16bit", 5000000)]
+#if !XNA
+        // XNA does not support 32-bit float, MS-ADPCM or IMA/ADPCM in SoundEffect.FromStream, but MonoGame does
+#if !DIRECTX
+        [TestCase("tone_mono_44khz_imaadpcm", 6010000)]
+        [TestCase("tone_stereo_44khz_imaadpcm", 5300000)]
+#endif
+        [TestCase("tone_mono_44khz_float", 5000000)]
+        [TestCase("tone_stereo_44khz_float", 5000000)]
+        // XNA cannot seem to load our MS-ADPCM XNBs.
+        [TestCase("tone_mono_44khz_msadpcm", 5070000)]
+        [TestCase("tone_stereo_44khz_msadpcm", 5040000)]
+#endif
+        public void SoundEffectFromContent(string filename, long durationTicks)
+        {
+            var services = new GameServiceContainer();
+            services.AddService<IGraphicsDeviceService>(new GraphicsDeviceProxy());
+            var content = new ContentManagerProxy(services);
+            var soundEffect = content.Load<SoundEffect>(Paths.Audio(filename));
+            Assert.AreEqual(durationTicks, soundEffect.Duration.Ticks);
         }
     }
 }

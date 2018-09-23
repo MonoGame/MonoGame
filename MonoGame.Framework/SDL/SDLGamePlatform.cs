@@ -31,11 +31,6 @@ namespace Microsoft.Xna.Framework
         public SdlGamePlatform(Game game)
             : base(game)
         {
-            // if we're on Windows, we need to detect the CPU arch and load the correct dlls
-            // on other system, the MonoGame.Framework.dll.config handles this
-            if (PlatformParameters.DetectWindowsArchitecture)
-                NativeHelper.InitDllDirectory();
-
             _game = game;
             _keys = new List<Keys>();
             Keyboard.SetKeys(_keys);
@@ -90,11 +85,10 @@ namespace Microsoft.Xna.Framework
             _view.SetCursorVisible(_game.IsMouseVisible);
         }
 
-        internal override void OnPresentationChanged()
+        internal override void OnPresentationChanged(PresentationParameters pp)
         {
             var displayIndex = Sdl.Window.GetDisplayIndex(Window.Handle);
             var displayName = Sdl.Display.GetDisplayName(displayIndex);
-            var pp = _game.GraphicsDevice.PresentationParameters;
             BeginScreenDeviceChange(pp.IsFullScreen);
             EndScreenDeviceChange(displayName, pp.BackBufferWidth, pp.BackBufferHeight);
         }
@@ -108,6 +102,7 @@ namespace Microsoft.Xna.Framework
                 SdlRunLoop();
                 Game.Tick();
                 Threading.Run();
+                GraphicsDevice.DisposeContexts();
 
                 if (_isExiting > 0)
                     break;
@@ -127,16 +122,26 @@ namespace Microsoft.Xna.Framework
                 else if (ev.Type == Sdl.EventType.ControllerDeviceRemoved)
                     GamePad.RemoveDevice(ev.ControllerDevice.Which);
                 else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
-                    Joystick.RemoveDevice(ev.JoystickDevice.Which);                
+                    Joystick.RemoveDevice(ev.JoystickDevice.Which);
                 else if (ev.Type == Sdl.EventType.MouseWheel)
-                    Mouse.ScrollY += ev.Wheel.Y * 120;
-                else if (ev.Type == Sdl.EventType.KeyDown) {
-                    var key = KeyboardUtil.ToXna (ev.Key.Keysym.Sym);
-                    if (!_keys.Contains (key))
-                        _keys.Add (key);
+                {
+                    const int wheelDelta = 120;
+                    Mouse.ScrollY += ev.Wheel.Y * wheelDelta;
+                    Mouse.ScrollX += ev.Wheel.X * wheelDelta;
+                }
+                else if (ev.Type == Sdl.EventType.MouseMotion)
+                {
+                    Window.MouseState.X = ev.Motion.X;
+                    Window.MouseState.Y = ev.Motion.Y;
+                }
+                else if (ev.Type == Sdl.EventType.KeyDown)
+                {
+                    var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+                    if (!_keys.Contains(key))
+                        _keys.Add(key);
                     char character = (char)ev.Key.Keysym.Sym;
-                    if (char.IsControl (character))
-                        _view.CallTextInput (character, key);
+                    if (char.IsControl(character))
+                        _view.CallTextInput(character, key);
                 }
                 else if (ev.Type == Sdl.EventType.KeyUp)
                 {
@@ -225,6 +230,7 @@ namespace Microsoft.Xna.Framework
         {
             if (Game.GraphicsDevice != null)
                 Game.GraphicsDevice.Present();
+
         }
 
         protected override void Dispose(bool disposing)

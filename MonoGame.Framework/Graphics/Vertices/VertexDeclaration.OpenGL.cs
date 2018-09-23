@@ -4,54 +4,49 @@
 
 using System;
 using System.Collections.Generic;
-
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#endif
-#if (MONOMAC && !PLATFORM_MACOS_LEGACY)
-using OpenTK.Graphics.OpenGL;
-#endif
-#if DESKTOPGL
-using OpenGL;
-#endif
-#if GLES
-using OpenTK.Graphics.ES20;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class VertexDeclaration
     {
-        Dictionary<int, VertexDeclarationAttributeInfo> shaderAttributeInfo = new Dictionary<int, VertexDeclarationAttributeInfo>();
+        private readonly Dictionary<int, VertexDeclarationAttributeInfo> _shaderAttributeInfo = new Dictionary<int, VertexDeclarationAttributeInfo>();
+
+        internal VertexDeclarationAttributeInfo GetAttributeInfo(Shader shader, int programHash)
+        {
+            VertexDeclarationAttributeInfo attrInfo;
+            if (_shaderAttributeInfo.TryGetValue(programHash, out attrInfo))
+                return attrInfo;
+
+            // Get the vertex attribute info and cache it
+            attrInfo = new VertexDeclarationAttributeInfo(GraphicsDevice.MaxVertexAttributes);
+
+            foreach (var ve in InternalVertexElements)
+            {
+                var attributeLocation = shader.GetAttribLocation(ve.VertexElementUsage, ve.UsageIndex);
+                // XNA appears to ignore usages it can't find a match for, so we will do the same
+                if (attributeLocation < 0)
+                    continue;
+
+                attrInfo.Elements.Add(new VertexDeclarationAttributeInfo.Element
+                {
+                    Offset = ve.Offset,
+                    AttributeLocation = attributeLocation,
+                    NumberOfElements = ve.VertexElementFormat.OpenGLNumberOfElements(),
+                    VertexAttribPointerType = ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
+                    Normalized = ve.OpenGLVertexAttribNormalized(),
+                });
+                attrInfo.EnabledAttributes[attributeLocation] = true;
+            }
+
+            _shaderAttributeInfo.Add(programHash, attrInfo);
+            return attrInfo;
+        }
+
 
 		internal void Apply(Shader shader, IntPtr offset, int programHash)
 		{
-            VertexDeclarationAttributeInfo attrInfo;
-            if (!shaderAttributeInfo.TryGetValue(programHash, out attrInfo))
-            {
-                // Get the vertex attribute info and cache it
-                attrInfo = new VertexDeclarationAttributeInfo(GraphicsDevice.MaxVertexAttributes);
-
-                foreach (var ve in InternalVertexElements)
-                {
-                    var attributeLocation = shader.GetAttribLocation(ve.VertexElementUsage, ve.UsageIndex);
-                    // XNA appears to ignore usages it can't find a match for, so we will do the same
-                    if (attributeLocation >= 0)
-                    {
-                        attrInfo.Elements.Add(new VertexDeclarationAttributeInfo.Element()
-                        {
-                            Offset = ve.Offset,
-                            AttributeLocation = attributeLocation,
-                            NumberOfElements = ve.VertexElementFormat.OpenGLNumberOfElements(),
-                            VertexAttribPointerType = ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
-                            Normalized = ve.OpenGLVertexAttribNormalized(),
-                        });
-                        attrInfo.EnabledAttributes[attributeLocation] = true;
-                    }
-                }
-
-                shaderAttributeInfo.Add(programHash, attrInfo);
-            }
+            var attrInfo = GetAttributeInfo(shader, programHash);
 
             // Apply the vertex attribute info
             foreach (var element in attrInfo.Elements)
@@ -60,17 +55,22 @@ namespace Microsoft.Xna.Framework.Graphics
                     element.NumberOfElements,
                     element.VertexAttribPointerType,
                     element.Normalized,
-                    this.VertexStride,
+                    VertexStride,
                     (IntPtr)(offset.ToInt64() + element.Offset));
+#if !(GLES || MONOMAC)
+                if (GraphicsDevice.GraphicsCapabilities.SupportsInstancing)
+                    GL.VertexAttribDivisor(element.AttributeLocation, 0);
+#endif
                 GraphicsExtensions.CheckGLError();
             }
             GraphicsDevice.SetVertexAttributeArray(attrInfo.EnabledAttributes);
+		    GraphicsDevice._attribsDirty = true;
 		}
 
         /// <summary>
         /// Vertex attribute information for a particular shader/vertex declaration combination.
         /// </summary>
-        class VertexDeclarationAttributeInfo
+        internal class VertexDeclarationAttributeInfo
         {
             internal bool[] EnabledAttributes;
 

@@ -1,0 +1,20 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame Windows Universal Application",
+    "groupIdentity": "MonoGame.BlankApp.UWP",
+    "identity": "MonoGame.BlankApp.UWP.CSharp",
+    "shortName": "mguwp",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.UWP.csproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true",
+    "description": "A MonoGame game project for Windows Universal using DirectX."
+}

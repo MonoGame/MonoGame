@@ -76,5 +76,55 @@ namespace MonoGame.Tests.Framework
             Assert.That(expectedResult1, Is.EqualTo(result1).Using(Vector3Comparer.Epsilon));
             Assert.That(expectedResult2, Is.EqualTo(result2).Using(Vector3Comparer.Epsilon));
         }
+
+        [Test]
+        public void HashCode() {
+            // Checking for overflows in hash calculation.
+            var max = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            var min = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+            Assert.AreNotEqual(max.GetHashCode(), Vector3.Zero.GetHashCode());
+            Assert.AreNotEqual(min.GetHashCode(), Vector3.Zero.GetHashCode());
+
+            // Common values
+            var a = new Vector3(0f, 0f, 0f);
+            Assert.AreEqual(a.GetHashCode(), Vector3.Zero.GetHashCode());
+            Assert.AreNotEqual(a.GetHashCode(), Vector3.One.GetHashCode());
+
+            // Individual properties alter hash
+            var xa = new Vector3(2f, 1f, 1f);
+            var xb = new Vector3(3f, 1f, 1f);
+            var ya = new Vector3(1f, 2f, 1f);
+            var yb = new Vector3(1f, 3f, 1f);
+            var za = new Vector3(1f, 1f, 2f);
+            var zb = new Vector3(1f, 1f, 3f);
+            Assert.AreNotEqual(xa.GetHashCode(), xb.GetHashCode(), "Different properties should change hash.");
+            Assert.AreNotEqual(ya.GetHashCode(), yb.GetHashCode(), "Different properties should change hash.");
+            Assert.AreNotEqual(za.GetHashCode(), zb.GetHashCode(), "Different properties should change hash.");
+#if !XNA
+            Assert.AreNotEqual(xa.GetHashCode(), ya.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(xb.GetHashCode(), yb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(xb.GetHashCode(), zb.GetHashCode(), "Identical values on different properties should have different hashes.");
+            Assert.AreNotEqual(yb.GetHashCode(), zb.GetHashCode(), "Identical values on different properties should have different hashes.");
+#endif
+            Assert.AreNotEqual(xa.GetHashCode(), yb.GetHashCode());
+            Assert.AreNotEqual(ya.GetHashCode(), xb.GetHashCode());
+            Assert.AreNotEqual(xa.GetHashCode(), zb.GetHashCode());
+        }
+
+#if !XNA
+        [Test]
+        public void Deconstruct()
+        {
+            Vector3 vector3 = new Vector3(float.MinValue, float.MaxValue, float.MinValue);
+
+            float x, y, z;
+
+            vector3.Deconstruct(out x, out y, out z);
+
+            Assert.AreEqual(x, vector3.X);
+            Assert.AreEqual(y, vector3.Y);
+            Assert.AreEqual(z, vector3.Z);
+        }
+#endif
     }
 }

@@ -16,29 +16,64 @@ namespace MonoGame.Tools.Pipeline
         [STAThread]
         static void Main(string[] args)
         {
-            var app = new Application(Platform.Detect);
             Styles.Load();
 
-#if WINDOWS
-            Xwt.Application.InitializeAsGuest(Xwt.ToolkitType.Wpf);
-#elif LINUX
-            Xwt.Application.InitializeAsGuest(Xwt.ToolkitType.Gtk3);
+            var app = new Application(Platform.Detect);
+            app.Style = "PipelineTool";
+
+            PipelineSettings.Default.Load();
+
+            if (!string.IsNullOrEmpty(PipelineSettings.Default.ErrorMessage))
+            {
+                var logwin = new LogWindow();
+                logwin.LogText = PipelineSettings.Default.ErrorMessage;
+                app.Run(logwin);
+                return;
+            }
+
+#if !DEBUG
+            try
+#endif
+            {
+                var win = new MainWindow();
+                var controller = PipelineController.Create(win);
+
+#if LINUX
+                Global.Application.AddWindow(win.ToNative() as Gtk.Window);
 #endif
 
-            var win = new MainWindow();
-            var controller = PipelineController.Create(win);
+#if LINUX && !DEBUG
 
-            string project = null;
+                GLib.ExceptionManager.UnhandledException += (e) =>
+                {
+                    var logwin = new LogWindow();
+                    logwin.LogText = e.ExceptionObject.ToString();
 
-            if (Global.Unix && !Global.Linux)
-                project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
-            else if (args != null && args.Length > 0)
-                project = string.Join(" ", args);
+                    logwin.Show();
+                    win.Close();
+                };
+#endif
 
-            if (!string.IsNullOrEmpty(project))
-                controller.OpenProject(project);
+                string project = null;
 
-            app.Run(win);
+                if (Global.Unix && !Global.Linux)
+                    project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
+                else if (args != null && args.Length > 0)
+                    project = string.Join(" ", args);
+
+                if (!string.IsNullOrEmpty(project))
+                    controller.OpenProject(project);
+                
+                app.Run(win);
+            }
+#if !DEBUG
+            catch (Exception ex)
+            {
+                PipelineSettings.Default.ErrorMessage = ex.ToString();
+                PipelineSettings.Default.Save();
+                app.Restart();
+            }
+# endif
         }
     }
 }

@@ -28,7 +28,8 @@ namespace MonoGame.Tools.Pipeline
         private string[] monoLocations = {
             "/usr/bin/mono",
             "/usr/local/bin/mono",
-            "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono"
+            "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mono"),
         };
 
         int setw = 0;
@@ -62,7 +63,6 @@ namespace MonoGame.Tools.Pipeline
                 setw++;
                 if (setw > 2)
                 {
-                    buildOutput.SetWidth();
                     propertyGridControl.SetWidth();
                     setw = 0;
                 }
@@ -81,11 +81,6 @@ namespace MonoGame.Tools.Pipeline
         {
             e.Cancel = !PipelineController.Instance.Exit();
 
-#if WINDOWS || LINUX
-            if (!e.Cancel)
-                Xwt.Application.Exit();
-#endif
-
             base.OnClosing(e);
         }
 
@@ -96,8 +91,6 @@ namespace MonoGame.Tools.Pipeline
             PipelineController.Instance.OnProjectLoaded += () => projectControl.ExpandBase();
 
             cmdDebugMode.Checked = PipelineSettings.Default.DebugMode;
-            CmdDebugMode_Executed(this, EventArgs.Empty);
-
             foreach (var control in _pads)
                 control.LoadSettings();
 
@@ -233,13 +226,13 @@ namespace MonoGame.Tools.Pipeline
         public bool ShowDeleteDialog(List<IProjectItem> items)
         {
             var dialog = new DeleteDialog(PipelineController.Instance, items);
-            return dialog.Run(this) == DialogResult.Ok;
+            return dialog.ShowModal(this);
         }
 
         public bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname)
         {
             var dialog = new EditDialog(title, text, oldname, file);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             newname = dialog.Text;
 
@@ -276,18 +269,18 @@ namespace MonoGame.Tools.Pipeline
         public bool ChooseItemTemplate(string folder, out ContentItemTemplate template, out string name)
         {
             var dialog = new NewItemDialog(PipelineController.Instance.Templates.GetEnumerator(), folder);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             template = dialog.Selected;
-            name = dialog.Name;
+            name = dialog.Name + Path.GetExtension(template.TemplateFile);
 
             return result;
         }
 
-        public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
+        public bool CopyOrLinkFile(string file, bool exists, out IncludeType action, out bool applyforall)
         {
             var dialog = new AddItemDialog(file, exists, FileType.File);
-            var result = dialog.Run(this) == DialogResult.Ok;
+            var result = dialog.ShowModal(this);
 
             action = dialog.Responce;
             applyforall = dialog.ApplyForAll;
@@ -295,18 +288,18 @@ namespace MonoGame.Tools.Pipeline
             return result;
         }
 
-        public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
+        public bool CopyOrLinkFolder(string folder, bool exists, out IncludeType action, out bool applyforall)
         {
             var afd = new AddItemDialog(folder, exists, FileType.Folder);
             applyforall = false;
 
-            if (afd.Run(this) == DialogResult.Ok)
+            if (afd.ShowModal(this))
             {
                 action = afd.Responce;
                 return true;
             }
 
-            action = CopyAction.Link;
+            action = IncludeType.Link;
             return false;
         }
 
@@ -326,18 +319,21 @@ namespace MonoGame.Tools.Pipeline
                 foreach (var path in monoLocations)
                 {
                     if (File.Exists(path))
+                    {
                         monoLoc = path;
+                        break;
+                    }
                 }
 
                 if (string.IsNullOrEmpty(monoLoc))
                 {
                     monoLoc = "mono";
-                    OutputAppend("Cound not find mono. Please install the latest version from http://www.mono-project.com");
+                    OutputAppend("Could not find mono. Please install the latest version from http://www.mono-project.com");
                 }
 
                 proc.StartInfo.FileName = monoLoc;
 
-                if (PipelineController.Instance.LaunchDebugger)
+                if (PipelineSettings.Default.DebugMode)
                 {
                     var port = Environment.GetEnvironmentVariable("MONO_DEBUGGER_PORT");
                     port = !string.IsNullOrEmpty(port) ? port : "55555";
@@ -408,6 +404,7 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItem.Enabled = info.OpenItem;
             cmdOpenItemWith.Enabled = info.OpenItemWith;
             cmdOpenItemLocation.Enabled = info.OpenItemLocation;
+            cmdOpenOutputItemLocation.Enabled = info.OpenOutputItemLocation;
             cmdCopyAssetPath.Enabled = info.CopyAssetPath;
             cmdRebuildItem.Enabled = info.RebuildItem;
 
@@ -424,13 +421,14 @@ namespace MonoGame.Tools.Pipeline
             AddContextMenu(cmAdd, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmOpenItemLocation, ref sep);
+            AddContextMenu(cmOpenOutputItemLocation, ref sep);
             AddContextMenu(cmCopyAssetPath, ref sep);
             AddContextMenu(cmRebuildItem, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmExclude, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmRename, ref sep);
-            AddContextMenu(cmDelete, ref sep);
+            //AddContextMenu(cmDelete, ref sep);
 
             if (_contextMenu.Items.Count > 0)
             {
@@ -603,7 +601,6 @@ namespace MonoGame.Tools.Pipeline
         private void CmdDebugMode_Executed(object sender, EventArgs e)
         {
             PipelineSettings.Default.DebugMode = cmdDebugMode.Checked;
-            PipelineController.Instance.LaunchDebugger = cmdDebugMode.Checked;
         }
 
         private void CmdHelp_Executed(object sender, EventArgs e)
@@ -652,6 +649,28 @@ namespace MonoGame.Tools.Pipeline
         {
             if (PipelineController.Instance.SelectedItem != null)
                 Process.Start(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.Location));
+        }
+
+        private void CmdOpenOutputItemLocation_Executed(object sender, EventArgs e)
+        {
+            if (PipelineController.Instance.SelectedItem != null)
+            {
+                var dir = Path.Combine(
+                    PipelineController.Instance.ProjectItem.Location,
+                    PipelineController.Instance.ProjectOutputDir,
+                    PipelineController.Instance.SelectedItem.Location
+                );
+
+                dir = dir.Replace("$(Platform)", PipelineController.Instance.ProjectItem.Platform.ToString());
+                dir = dir.Replace("$(Configuration)", PipelineController.Instance.ProjectItem.Config);
+                dir = dir.Replace("$(Config)", PipelineController.Instance.ProjectItem.Config);
+                dir = dir.Replace("$(Profile)", PipelineController.Instance.ProjectItem.Profile.ToString());
+
+                if (Directory.Exists(dir))
+                    Process.Start(dir);
+                else
+                    ShowError("Directory Not Found", "The project output directory was not found, did you forget to build the project?");
+            }
         }
 
         private void CmdCopyAssetPath_Executed(object sender, EventArgs e)

@@ -49,6 +49,7 @@ namespace Microsoft.Xna.Framework.Audio
         private int _loopIndex;
 
         private SoundEffectInstance _wav;
+        private bool _streaming;
 
         public PlayWaveEvent(   XactClip clip, float timeStamp, float randomOffset, SoundBank soundBank,
                                 int[] waveBanks, int[] tracks, byte[] weights, int totalWeights,
@@ -83,8 +84,16 @@ namespace Microsoft.Xna.Framework.Audio
 
         public override void Play() 
         {
-            if (_wav != null && _wav.State != SoundState.Stopped)
-                _wav.Stop();
+            if (_wav != null)
+            {
+                if (_wav.State != SoundState.Stopped)
+                    _wav.Stop();
+                if (_streaming)
+                    _wav.Dispose();
+				else					
+					_wav._isXAct = false;					
+                _wav = null;
+            }
 
             Play(true);
         }
@@ -155,7 +164,7 @@ namespace Microsoft.Xna.Framework.Audio
                 };
             }
 
-            _wav = _soundBank.GetSoundEffectInstance(_waveBanks[_wavIndex], _tracks[_wavIndex]);
+            _wav = _soundBank.GetSoundEffectInstance(_waveBanks[_wavIndex], _tracks[_wavIndex], out _streaming);
             if (_wav == null)
             {
                 // We couldn't create a sound effect instance, most likely
@@ -195,6 +204,10 @@ namespace Microsoft.Xna.Framework.Audio
             if (_wav != null)
             {
                 _wav.Stop();
+                if (_streaming)
+                    _wav.Dispose();
+				else
+                	_wav._isXAct = false;				
                 _wav = null;
             }
             _loopIndex = 0;
@@ -265,6 +278,10 @@ namespace Microsoft.Xna.Framework.Audio
                 // limit then we can stop.
                 if (_loopCount == 0 || _loopIndex >= _loopCount)
                 {
+                    if (_streaming)
+                        _wav.Dispose();
+					else
+	                    _wav._isXAct = false;						
                     _wav = null;
                     _loopIndex = 0;
                 }
@@ -279,7 +296,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
 
-            return _wav != null && _wav.State != SoundState.Stopped;
+            return _wav != null;
         }
     }
 }

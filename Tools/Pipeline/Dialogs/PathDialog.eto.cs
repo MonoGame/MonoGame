@@ -7,24 +7,37 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class PathDialog : DialogBase
+    partial class PathDialog : Dialog<bool>
     {
         DynamicLayout layout1;
         StackLayout stack1, stack2;
         Label label1, label2;
         TextBox textBox1;
         Button buttonBrowse;
+        Button buttonOk, buttonCancel;
 
         private void InitializeComponent()
         {
             Title = "Select Folder";
-            Width = 370;
-            Height = 165;
+            DisplayMode = DialogDisplayMode.Attached;
+            Size = new Size(370, 200);
+
+            buttonOk = new Button();
+            buttonOk.Text = "Ok";
+            PositiveButtons.Add(buttonOk);
+            DefaultButton = buttonOk;
+
+            buttonCancel = new Button();
+            buttonCancel.Text = "Cancel";
+            NegativeButtons.Add(buttonCancel);
+            AbortButton = buttonCancel;
 
             layout1 = new DynamicLayout();
             layout1.DefaultSpacing = new Size(4, 4);
             layout1.Padding = new Padding(6);
             layout1.BeginVertical();
+
+            layout1.Add(null, true, true);
 
             label1 = new Label();
             label1.Text = "Path to use:";
@@ -62,10 +75,14 @@ namespace MonoGame.Tools.Pipeline
 
             layout1.Add(stack2);
 
-            CreateContent(layout1);
+            layout1.Add(null, true, true);
+
+            Content = layout1;
 
             textBox1.TextChanged += TextBox1_TextChanged;
             buttonBrowse.Click += ButtonBrowse_Click;
+            buttonOk.Click += ButtonOk_Click;
+            buttonCancel.Click += ButtonCancel_Click;
         }
     }
 }

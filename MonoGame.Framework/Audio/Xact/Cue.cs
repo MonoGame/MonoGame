@@ -120,22 +120,31 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>Pauses playback.</summary>
         public void Pause()
         {
-            if (_curSound != null)
-                _curSound.Pause();
+            lock (_engine.UpdateLock)
+            {
+                if (_curSound != null)
+                    _curSound.Pause();
+            }
         }
 
         /// <summary>Requests playback of a prepared or preparing Cue.</summary>
         /// <remarks>Calling Play when the Cue already is playing can result in an InvalidOperationException.</remarks>
         public void Play()
         {
-            if (!_engine.ActiveCues.Contains(this))
-                _engine.ActiveCues.Add(this);
-            
-            //TODO: Probabilities
-            var index = XactHelpers.Random.Next(_sounds.Length);
-            _curSound = _sounds[index];
+            lock (_engine.UpdateLock)
+            {
+                if (!_engine.ActiveCues.Contains(this))
+                    _engine.ActiveCues.Add(this);
 
-            _curSound.Play(1.0f, _engine);
+                //TODO: Probabilities
+                var index = XactHelpers.Random.Next(_sounds.Length);
+                _curSound = _sounds[index];
+
+                var volume = UpdateRpcCurves();
+
+                _curSound.Play(volume, _engine);
+            }
+
             _played = true;
             IsPrepared = false;
         }
@@ -143,18 +152,24 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>Resumes playback of a paused Cue.</summary>
         public void Resume()
         {
-            if (_curSound != null)
-                _curSound.Resume();
+            lock (_engine.UpdateLock)
+            {
+                if (_curSound != null)
+                    _curSound.Resume();
+            }
         }
 
         /// <summary>Stops playback of a Cue.</summary>
         /// <param name="options">Specifies if the sound should play any pending release phases or transitions before stopping.</param>
         public void Stop(AudioStopOptions options)
         {
-            _engine.ActiveCues.Remove(this);
-            
-            if (_curSound != null)
-                _curSound.Stop(options);
+            lock (_engine.UpdateLock)
+            {
+                _engine.ActiveCues.Remove(this);
+
+                if (_curSound != null)
+                    _curSound.Stop(options);
+            }
 
             IsPrepared = false;
         }
@@ -228,39 +243,50 @@ namespace Microsoft.Xna.Framework.Audio
 
             var direction = listener.Position - emitter.Position;
 
-            // Set the distance for falloff.
-            var distance = direction.Length();
-            var i = FindVariable("Distance");
-            _variables[i].SetValue(distance);
+            lock (_engine.UpdateLock)
+            {
+                // Set the distance for falloff.
+                var distance = direction.Length();
+                var i = FindVariable("Distance");
+                _variables[i].SetValue(distance);
 
-            // Calculate the orientation.
-            if (distance > 0.0f)
-                direction /= distance;
-            var right = Vector3.Cross(listener.Up, listener.Forward);
-            var slope = Vector3.Dot(direction, listener.Forward);
-            var angle = MathHelper.ToDegrees((float)Math.Acos(slope));
-            var j = FindVariable("OrientationAngle");
-            _variables[j].SetValue(angle);
-            if (_curSound != null)
-                _curSound.SetCuePan(Vector3.Dot(direction, right));
+                // Calculate the orientation.
+                if (distance > 0.0f)
+                    direction /= distance;
+                var right = Vector3.Cross(listener.Up, listener.Forward);
+                var slope = Vector3.Dot(direction, listener.Forward);
+                var angle = MathHelper.ToDegrees((float)Math.Acos(slope));
+                var j = FindVariable("OrientationAngle");
+                _variables[j].SetValue(angle);
+                if (_curSound != null)
+                    _curSound.SetCuePan(Vector3.Dot(direction, right));
 
-            // Calculate doppler effect.
-            var relativeVelocity = emitter.Velocity - listener.Velocity;
-            relativeVelocity *= emitter.DopplerScale;
+                // Calculate doppler effect.
+                var relativeVelocity = emitter.Velocity - listener.Velocity;
+                relativeVelocity *= emitter.DopplerScale;
+            }
 
             _applied3D = true;
         }
 
         internal void Update(float dt)
         {
-            if (_curSound != null)
-                _curSound.Update(dt);
+            if (_curSound == null)
+                return;
+
+            _curSound.Update(dt);
+
+            UpdateRpcCurves();
+        }
+
+        private float UpdateRpcCurves()
+        {
+            var volume = 1.0f;
 
             // Evaluate the runtime parameter controls.
             var rpcCurves = _curSound.RpcCurves;
             if (rpcCurves.Length > 0)
             {
-                var volume = 1.0f;
                 var pitch = 0.0f;
                 var reverbMix = 1.0f;
                 float? filterFrequency = null;
@@ -305,8 +331,14 @@ namespace Microsoft.Xna.Framework.Audio
                     }
                 }
 
+                pitch = MathHelper.Clamp(pitch, -1.0f, 1.0f);
+                if (volume < 0.0f)
+                    volume = 0.0f;
+
                 _curSound.UpdateState(_engine, volume, pitch, reverbMix, filterFrequency, filterQFactor);
             }
+
+            return volume;
         }
         
         /// <summary>
@@ -338,9 +370,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 IsCreated = false;
                 IsPrepared = false;
-
-                if (Disposing != null)
-                    Disposing(this, EventArgs.Empty);
+                EventHelpers.Raise(this, Disposing, EventArgs.Empty);
             }
         }
     }

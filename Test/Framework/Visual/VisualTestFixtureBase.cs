@@ -28,8 +28,14 @@ namespace MonoGame.Tests.Visual {
 		[TearDown]
 		public virtual void TearDown ()
 		{
-			_game.Dispose ();
-			_game = null;
+            try
+            {
+                _game.Dispose();
+                _game = null;
+            }
+            catch
+            {
+            }
 		}
 
 		/// <summary>

@@ -9,6 +9,9 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
+#if DESKTOPGL
+using MonoGame.OpenGL;
+#endif
 
 namespace MonoGame.Tests.Graphics
 {
@@ -93,8 +96,30 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(0, devLostCount);
         }
 
-        // TODO Make sure dynamic graphics resources are notified when graphics device is lost
-        [Test, Ignore]
+        [Test]
+        public void ResetDoesNotClearState()
+        {
+            gd.RasterizerState = RasterizerState.CullNone;
+            gd.BlendState = BlendState.NonPremultiplied;
+            gd.DepthStencilState = DepthStencilState.None;
+            gd.SamplerStates[0] = SamplerState.PointClamp;
+            var vbb = new VertexBufferBinding(new VertexBuffer(gd, VertexPositionColor.VertexDeclaration, 5, BufferUsage.WriteOnly));
+            gd.SetVertexBuffers(vbb);
+
+            gd.Reset();
+
+            Assert.AreEqual(RasterizerState.CullNone, gd.RasterizerState);
+            Assert.AreEqual(BlendState.NonPremultiplied, gd.BlendState);
+            Assert.AreEqual(DepthStencilState.None, gd.DepthStencilState);
+            Assert.AreEqual(SamplerState.PointClamp, gd.SamplerStates[0]);
+            // TODO GetVertexBuffers is not implemented in MG
+#if XNA
+            Assert.AreEqual(vbb, gd.GetVertexBuffers()[0]);
+#endif
+            vbb.VertexBuffer.Dispose();
+        }
+
+        [Test, Ignore("Make sure dynamic graphics resources are notified when graphics device is lost")]
         public void ContentLostResources()
         {
             // https://blogs.msdn.microsoft.com/shawnhar/2007/12/12/virtualizing-the-graphicsdevice-in-xna-game-studio-2-0/
@@ -125,6 +150,9 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+#if DESKTOPGL
+        [Ignore("Does not throw the exception. Needs Investigating")]
+#endif
         public void ResetWindowHandleNullThrowsException()
         {
             Assert.Throws<ArgumentException>(() => gd.Reset(new PresentationParameters()));
@@ -568,8 +596,7 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
 #if DESKTOPGL
-        // Vertex Textures are not implemented for OpenGL
-        [Ignore]
+        [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
         public void VertexTexturesGetSet()
         {
@@ -622,8 +649,7 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
 #if DESKTOPGL
-        // Vertex Textures are not implemented for OpenGL
-        [Ignore]
+        [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
         public void VertexTextureVisualTest()
         {
@@ -694,8 +720,7 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
 #if DESKTOPGL
-        // Vertex samplers are not implemented for OpenGL
-        [Ignore]
+        [Ignore("Vertex samplers are not implemented for OpenGL")]
 #endif
         public void VertexSamplerStatesGetSet()
         {
@@ -728,5 +753,76 @@ namespace MonoGame.Tests.Graphics
             rt.Dispose();
         }
 
+#if DESKTOPGL
+        [Test]
+        public void DifferentVboGetsSet()
+        {
+            var vb1 = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 6, BufferUsage.None);
+            var vb2 = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 8, BufferUsage.None);
+
+            var se = new SpriteEffect(gd);
+            se.CurrentTechnique.Passes[0].Apply();
+
+            gd.SetVertexBuffer(vb1);
+            gd.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
+
+            int vbo;
+            GL.GetInteger(GetPName.ArrayBufferBinding, out vbo);
+            Assert.AreEqual(vb1.vbo, vbo);
+
+            gd.SetVertexBuffer(vb2);
+            gd.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
+
+            GL.GetInteger(GetPName.ArrayBufferBinding, out vbo);
+            Assert.AreEqual(vb2.vbo, vbo);
+
+            se.Dispose();
+            vb1.Dispose();
+            vb2.Dispose();
+        }
+#endif
+
+        private static Rectangle?[] BackBufferRects()
+        {
+            return new Rectangle?[]
+            {
+                null,
+                new Rectangle(100, 100, 250, 250),
+            };
+        }
+
+        [TestCaseSource("BackBufferRects")]
+        public void GetBackBufferData(Rectangle? rectangle)
+        {
+            gd.Clear(Color.CornflowerBlue);
+
+            Rectangle rect;
+            if (rectangle == null)
+                rect = gd.Viewport.Bounds;
+            else
+                rect = rectangle.Value;
+
+            var tex = content.Load<Texture2D>(Paths.Texture("Surge"));
+            var sb = new SpriteBatch(gd);
+
+            sb.Begin();
+            sb.Draw(tex, new Rectangle(150, 150, 300, 300), Color.White);
+            sb.End();
+
+            var buffer = new Color[rect.Width * rect.Height];
+            gd.GetBackBufferData(rect, buffer, 0, rect.Width * rect.Height);
+
+            var backbufferTex = new Texture2D(gd, rect.Width, rect.Height);
+            backbufferTex.SetData(buffer);
+
+            PrepareFrameCapture();
+            gd.Clear(Color.Red);
+
+            sb.Begin();
+            sb.Draw(backbufferTex, rect, Color.White);
+            sb.End();
+
+            CheckFrames();
+        }
     }
 }

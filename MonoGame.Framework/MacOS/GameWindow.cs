@@ -230,9 +230,7 @@ namespace Microsoft.Xna.Framework
 		
 		protected virtual void OnClientSizeChanged (EventArgs e)
 		{
-			var h = ClientSizeChanged;
-			if (h != null)
-				h (this, e);
+			EventHelpers.Raise(this, ClientSizeChanged, e);
 		}
 		
 		protected override void OnTitleChanged (EventArgs e)
@@ -434,9 +432,7 @@ namespace Microsoft.Xna.Framework
 			internal set {
 				if (value != _currentOrientation) {
 					_currentOrientation = value;
-					if (OrientationChanged != null) {
-						OrientationChanged (this, EventArgs.Empty);
-					}
+					EventHelpers.Raise(this, OrientationChanged, EventArgs.Empty);
 				}
 			}
 		}
@@ -559,10 +555,7 @@ namespace Microsoft.Xna.Framework
 				throw new ArgumentNullException("e");
 			}
 			
-			if (TextInput != null) 
-			{
-				TextInput.Invoke(this, e);
-			}
+			EventHelpers.Raise(this, TextInput, e);
 		}
 		
 		/// <summary>
@@ -700,21 +693,27 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc); 
 			switch (theEvent.Type) 
 			{ 
-			case NSEventType.ScrollWheel: 
-				if (theEvent.ScrollingDeltaY != 0) 
-				{ 
-					if (theEvent.ScrollingDeltaY > 0) 
-					{ 
-                        Mouse.ScrollWheelValue += (float)(theEvent.ScrollingDeltaY * 0.1f + 0.09f) * 1200; 
-					} 
-					else 
-					{ 
-                        Mouse.ScrollWheelValue += (float)(theEvent.ScrollingDeltaY * 0.1f - 0.09f) * 1200; 
-					} 
-				} 
+			case NSEventType.ScrollWheel:
+                Mouse.HorizontalScrollWheelValue += CalculateScrollWheelValue(theEvent.ScrollingDeltaX);
+                Mouse.ScrollWheelValue += CalculateScrollWheelValue(theEvent.ScrollingDeltaY);
 				break; 
 			} 
 		}
+
+        private static float CalculateScrollWheelValue(nfloat delta)
+        {
+            var scrollWheelValue = 0.0f;
+
+            if (delta != 0)
+            {
+                if (delta > 0)
+                    scrollWheelValue += (float)(delta * 0.1f + 0.09f) * 1200;
+                else
+                    scrollWheelValue += (float)(delta * 0.1f - 0.09f) * 1200;
+            }
+
+            return scrollWheelValue;
+        }
 
 		public override void MouseMoved (NSEvent theEvent)
 		{

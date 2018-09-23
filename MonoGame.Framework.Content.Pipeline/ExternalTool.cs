@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -54,6 +55,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 RedirectStandardError = true,
                 RedirectStandardInput = true,
             };
+
+            EnsureExecutable(fullPath);
 
             using (var process = new Process())
             {
@@ -133,14 +136,41 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (File.Exists(fullName))
                     return fullName;
 
-#if WINDOWS
-                var fullExeName = string.Concat(fullName, ".exe");
-                if (File.Exists(fullExeName))
-                    return fullExeName;
-#endif
+                if (CurrentPlatform.OS == OS.Windows)
+                {
+                    var fullExeName = string.Concat(fullName, ".exe");
+                    if (File.Exists(fullExeName))
+                        return fullExeName;
+                }
             }
 
             return null;
+        }
+
+        /// <summary>   
+        /// Ensures the specified executable has the executable bit set.  If the    
+        /// executable doesn't have the executable bit set on Linux or Mac OS, then 
+        /// Mono will refuse to execute it. 
+        /// </summary>  
+        /// <param name="path">The full path to the executable.</param> 
+        private static void EnsureExecutable(string path)
+        {
+#if LINUX || MACOS
+            if (path == "/bin/bash")
+                return;
+
+            try
+            {
+
+                var p = Process.Start("chmod", "u+x '" + path + "'");
+                p.WaitForExit();
+            }
+            catch
+            {
+                // This platform may not have chmod in the path, in which case we can't 
+                // do anything reasonable here. 
+            }
+#endif
         }
 
         /// <summary>

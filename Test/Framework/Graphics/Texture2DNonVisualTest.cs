@@ -18,15 +18,15 @@ namespace MonoGame.Tests.Graphics
 
 #if !XNA
         [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
-        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
-#if !DESKTOPGL
-        // not supported
-        [TestCase("Assets/Textures/LogoOnly_64px.dds")]
-#endif
+        [TestCase("Assets/Textures/LogoOnly_64px.tga")]
 #endif
         [TestCase("Assets/Textures/LogoOnly_64px.gif")]
         [TestCase("Assets/Textures/LogoOnly_64px.jpg")]
         [TestCase("Assets/Textures/LogoOnly_64px.png")]
+        [TestCase("Assets/Textures/1bit.png")]
+        [TestCase("Assets/Textures/8bit.png")]
+        [TestCase("Assets/Textures/24bit.png")]
+        [TestCase("Assets/Textures/32bit.png")]
         public void FromStreamShouldWorkTest(string filename)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))
@@ -41,10 +41,10 @@ namespace MonoGame.Tests.Graphics
                 System.Drawing.GraphicsUnit gu = System.Drawing.GraphicsUnit.Pixel;
                 System.Drawing.RectangleF rf = bitmap.GetBounds(ref gu);
                 Rectangle rt = _texture.Bounds;
-                Assert.AreEqual((int) rf.Bottom, rt.Bottom);
-                Assert.AreEqual((int) rf.Left, rt.Left);
-                Assert.AreEqual((int) rf.Right, rt.Right);
-                Assert.AreEqual((int) rf.Top, rt.Top);
+                Assert.AreEqual((int)rf.Bottom, rt.Bottom);
+                Assert.AreEqual((int)rf.Left, rt.Left);
+                Assert.AreEqual((int)rf.Right, rt.Right);
+                Assert.AreEqual((int)rf.Top, rt.Top);
                 bitmap.Dispose();
             }//The dds file test case can't be checked with System.Drawing because it does not understand this format
             catch { }
@@ -53,11 +53,11 @@ namespace MonoGame.Tests.Graphics
         }
 
 #if XNA
-                [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
-                [TestCase("Assets/Textures/LogoOnly_64px.dds")]
-                [TestCase("Assets/Textures/LogoOnly_64px.tif")]
+        [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
 #endif
-        [TestCase("Assets/Textures/LogoOnly_64px.tga")]
+        // not supported
+        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
+        [TestCase("Assets/Textures/LogoOnly_64px.dds")]
         [TestCase("Assets/Textures/SampleCube64DXT1Mips.dds")]
         public void FromStreamShouldFailTest(string filename)
         {
@@ -77,6 +77,56 @@ namespace MonoGame.Tests.Graphics
 #endif
         }
 
+        [TestCase]
+        public void FromStreamNotPremultiplied()
+        {
+            // XNA will not try to premultiply your image on
+            // load... this test verifies that this doesn't occur.
+
+            using (var stream = File.OpenRead("Assets/Textures/red_128.png"))
+            using (var texture = Texture2D.FromStream(gd, stream))
+            {
+                Assert.AreEqual(8, texture.Width);
+                Assert.AreEqual(8, texture.Height);
+                Assert.AreEqual(1, texture.LevelCount);
+                var pngData = new Color[8 * 8];
+                texture.GetData(pngData);
+
+                for (var i = 0; i < pngData.Length; i++)
+                {
+                    Assert.AreEqual(255,    pngData[i].R);
+                    Assert.AreEqual(0,      pngData[i].G);
+                    Assert.AreEqual(0,      pngData[i].B);
+                    Assert.AreEqual(128,    pngData[i].A);
+                }
+            }
+        }
+
+        [TestCase]
+        public void FromStreamBlackAlpha()
+        {
+            // XNA will make any pixel with an alpha value
+            // of 0 into black throwing out any color data.
+
+            using (var stream = File.OpenRead("Assets/Textures/blue_0.png"))
+            using (var texture = Texture2D.FromStream(gd, stream))
+            {
+                Assert.AreEqual(8, texture.Width);
+                Assert.AreEqual(8, texture.Height);
+                Assert.AreEqual(1, texture.LevelCount);
+                var pngData = new Color[8 * 8];
+                texture.GetData(pngData);
+
+                for (var i = 0; i < pngData.Length; i++)
+                {
+                    Assert.AreEqual(0, pngData[i].R);
+                    Assert.AreEqual(0, pngData[i].G);
+                    Assert.AreEqual(0, pngData[i].B);
+                    Assert.AreEqual(0, pngData[i].A);
+                }
+            }
+        }
+        
         [Test]
         public void ZeroSizeShouldFailTest()
         {
@@ -565,6 +615,48 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+        [Test]
+#if DESKTOPGL
+        [Ignore("PlatformGetData fails under OpenGL!")]
+#endif
+        public void LoadOddSizedDxtCompressed()
+        {
+            // This is testing that DXT compressed mip levels that 
+            // are not a multiple of 4 are properly loaded.
+
+            var t = content.Load<Texture2D>(Paths.Texture("red_668_dxt"));
+
+            Assert.AreEqual(SurfaceFormat.Dxt1, t.Format);
+            Assert.AreEqual(10, t.LevelCount);
+            Assert.AreEqual(668, t.Width);
+            Assert.AreEqual(668, t.Height);
+
+            for (var m = 0; m < t.LevelCount; m++)
+            {
+                var w = ((t.Width >> m) + 3) & ~3;
+                var h = ((t.Height >> m) + 3) & ~3;
+                var size = w * h / 2;
+
+                // Get the full mip level.
+                var b = new byte[size];
+                t.GetData(m, null, b, 0, size);
+
+                // Decompress it to validate it.
+                var b2 = DxtUtil.DecompressDxt1(b, t.Width >> m, t.Height >> m);
+
+                // Should be a red opaque texture.
+                for (var p=0; p < b2.Length; p+=4)
+                {
+                    Assert.AreEqual(255,    b2[p + 0]);
+                    Assert.AreEqual(0,      b2[p + 1]);
+                    Assert.AreEqual(0,      b2[p + 2]);
+                    Assert.AreEqual(255,    b2[p + 3]);
+                }            
+            }
+                        
+            t.Dispose();
+        }
+
         // DXT1
         [TestCase(8, "random_16px_dxt", 0)]
         [TestCase(8, "random_16px_dxt", 1)]
@@ -658,5 +750,34 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+        [Test]
+        public void GetDataRowPitch()
+        {
+            const int w = 5;
+            const int h = 4;
+            const int size = w * h;
+            var tex = new Texture2D(gd, w, h, false, SurfaceFormat.Bgr565);
+            var data = new short[size];
+            for (var i = 0; i < data.Length; i++)
+                data[i] = (short) i;
+            tex.SetData(data);
+            var getData = new short[size];
+            tex.GetData(data);
+            for (var i = 0; i < getData.Length; i++)
+                Assert.AreEqual((short) i, data[i]);
+
+            tex.Dispose();
+        }
+
+        [Test]
+        public void NullDeviceShouldThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+            {
+                var texture = new Texture2D(null, 16, 16);
+                texture.Dispose();
+            });
+            GC.GetTotalMemory(true); // collect uninitialized Texture
+        }
     }
 }
