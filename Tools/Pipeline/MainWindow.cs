@@ -259,9 +259,12 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new SelectFolderDialog();
             dialog.Directory = initialDirectory;
-            var result = dialog.ShowDialog(this) == DialogResult.Ok;
 
-            folder = dialog.Directory;
+            var result = dialog.ShowDialog(this) == DialogResult.Ok;
+            if (result)
+                folder = dialog.Directory;
+            else
+                folder = string.Empty;
 
             return result;
         }
