@@ -31,7 +31,6 @@ namespace Microsoft.Xna.Framework
         private object _eventLocker = new object();
 
         private InputEvents _inputEvents;
-        private readonly ConcurrentQueue<char> _textQueue = new ConcurrentQueue<char>();
         private bool _isSizeChanged = false;
         private Rectangle _newViewBounds;
         private bool _isOrientationChanged = false;
@@ -128,7 +127,6 @@ namespace Microsoft.Xna.Framework
 
             _coreWindow.Closed += Window_Closed;
             _coreWindow.Activated += Window_FocusChanged;
-            _coreWindow.CharacterReceived += Window_CharacterReceived;
 
             SystemNavigationManager.GetForCurrentView().BackRequested += BackRequested;
 
@@ -214,18 +212,6 @@ namespace Microsoft.Xna.Framework
                 // the client size changed event.
                 OnClientSizeChanged();
             }
-        }
-
-        private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
-        {
-            _textQueue.Enqueue((char)args.KeyCode);
-        }
-
-        private void UpdateTextInput()
-        {
-            char ch;
-            while (_textQueue.TryDequeue(out ch))
-                OnTextInput(_coreWindow, new TextInputEventArgs(ch));
         }
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
@@ -362,8 +348,12 @@ namespace Microsoft.Xna.Framework
             _inputEvents.UpdateState();
 
             // Update TextInput
-            if(!_textQueue.IsEmpty)
-                UpdateTextInput();
+            if(!_inputEvents.TextQueue.IsEmpty)
+            {
+                InputEvents.KeyChar ch;
+                while (_inputEvents.TextQueue.TryDequeue(out ch))
+                    OnTextInput(_coreWindow, new TextInputEventArgs(ch.Character, ch.Key));
+            }
 
             // Update size
             if (_isSizeChanged)
