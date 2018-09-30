@@ -32,7 +32,7 @@ namespace MonoGame.Tools.Pipeline
         public Command cmdBuild, cmdRebuild, cmdClean, cmdCancelBuild;
         public CheckCommand cmdDebugMode;
         public Command cmdHelp, cmdAbout;
-        public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdOpenOutputItemLocation, cmdCopyAssetPath, cmdRebuildItem;
+        public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdOpenOutputItemLocation, cmdCopyAssetName, cmdRebuildItem;
 
         ToolBar toolbar;
         ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuView, menuBuild, menuHelp;
@@ -119,7 +119,7 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItemWith.Executed += CmdOpenItemWith_Executed;
             cmdOpenItemLocation.Executed += CmdOpenItemLocation_Executed;
             cmdOpenOutputItemLocation.Executed += CmdOpenOutputItemLocation_Executed;
-            cmdCopyAssetPath.Executed += CmdCopyAssetPath_Executed;
+            cmdCopyAssetName.Executed += CmdCopyAssetPath_Executed;
             cmdRebuildItem.Executed += CmdRebuildItem_Executed;
         }
 
@@ -262,8 +262,8 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenOutputItemLocation = new Command();
             cmdOpenOutputItemLocation.MenuText = "Open Output Directory";
 
-            cmdCopyAssetPath = new Command();
-            cmdCopyAssetPath.MenuText = "Copy Asset Path";
+            cmdCopyAssetName = new Command();
+            cmdCopyAssetName.MenuText = "Copy Asset Name";
 
             cmdRebuildItem = new Command();
             cmdRebuildItem.Image = Global.GetEtoIcon("Commands.Rebuild.png");
@@ -351,7 +351,7 @@ namespace MonoGame.Tools.Pipeline
 
             cmOpenItemLocation = cmdOpenItemLocation.CreateMenuItem();
             cmOpenOutputItemLocation = cmdOpenOutputItemLocation.CreateMenuItem();
-            cmCopyAssetPath = cmdCopyAssetPath.CreateMenuItem();
+            cmCopyAssetPath = cmdCopyAssetName.CreateMenuItem();
             cmRebuildItem = cmdRebuildItem.CreateMenuItem();
             cmExclude = cmdExclude.CreateMenuItem();
             cmRename = cmdRename.CreateMenuItem();
