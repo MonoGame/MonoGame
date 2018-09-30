@@ -51,7 +51,7 @@ namespace MSBuildTasks
             if (string.IsNullOrEmpty(MgcbPath))
                 LocateMGCBFromNuget();
 
-            MGCBCommandPath = _unix ? "mono \"" + MgcbPath + "\"" : MgcbPath;
+            MGCBCommandPath = (_unix ? "mono " : string.Empty) + \"" + MgcbPath + "\"";
             return true;
         }
 
