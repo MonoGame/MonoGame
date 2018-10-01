@@ -1,5 +1,5 @@
 # Game class constructor
-Due to some UWP implementation details, Monogame has to construct your `Game` derived class by itself, using a static initializer `MonoGame.Framework.XamlGame<T>.Create(...)`.
+Due to some UWP implementation details, MonoGame has to construct your `Game` derived class by itself, using a static initializer `MonoGame.Framework.XamlGame<T>.Create(...)`.
 
 In this situation, you have two main possibilities to create a `Game` derived class:
 
