@@ -235,6 +235,9 @@ namespace MonoGame.Tools.Pipeline
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
+            if (string.IsNullOrEmpty(_currentAssemblyDirectory))
+                return null;
+
             var path = Path.Combine(_currentAssemblyDirectory, (new AssemblyName(args.Name).Name) + ".dll");
             if (!File.Exists(path))
                 return null;
@@ -502,6 +505,8 @@ namespace MonoGame.Tools.Pipeline
                     continue;
                 }                
             }
+
+            _currentAssemblyDirectory = null;
         }
 
         private static void ProcessTypes(IEnumerable<Type> types)
