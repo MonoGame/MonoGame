@@ -325,11 +325,11 @@ namespace MonoGame.Framework
         }
 
         [DllImport("user32.dll")]
-        private static extern short VkKeyScan(char ch);
+        private static extern short VkKeyScanEx(char ch, IntPtr dwhkl);
 
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
-            var key = (Keys) (VkKeyScan(e.KeyChar) & 0xff);
+            var key = (Keys) (VkKeyScanEx(e.KeyChar, InputLanguage.CurrentInputLanguage.Handle) & 0xff);
             OnTextInput(sender, new TextInputEventArgs(e.KeyChar, key));
         }
 
