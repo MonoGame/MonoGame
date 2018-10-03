@@ -43,43 +43,62 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition)
-            : this(leftPosition, rightPosition, GamePadDeadZone.None)
+            : this(leftPosition, rightPosition, GamePadDeadZone.None, GamePadDeadZone.None)
         {
             
         }
 
-        internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone deadZoneMode) : this()
+        internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode) : this()
         {
             // XNA applies dead zones before rounding/clamping values. The public ctor does not allow this because the dead zone must be known before
 
             // Apply dead zone
-            switch (deadZoneMode)
+            switch (leftDeadZoneMode)
             {
                 case GamePadDeadZone.None:
                     _left = leftPosition;
-                    _right = rightPosition;
                     break;
                 case GamePadDeadZone.IndependentAxes:
                     _left = ExcludeIndependentAxesDeadZone(leftPosition, leftThumbDeadZone);
-                    _right = ExcludeIndependentAxesDeadZone(rightPosition, rightThumbDeadZone);
                     break;
                 case GamePadDeadZone.Circular:
                     _left = ExcludeCircularDeadZone(leftPosition, leftThumbDeadZone);
+                    break;
+            }
+
+            // Apply clamp
+            if (rightDeadZoneMode == GamePadDeadZone.Circular)
+            {
+                if (_left.LengthSquared() > 1f)
+                    _left.Normalize();
+            }
+            else
+            {
+                _left = new Vector2(MathHelper.Clamp(Left.X, -1f, 1f), MathHelper.Clamp(Left.Y, -1f, 1f));
+            }
+
+            // Apply dead zone
+            switch (rightDeadZoneMode)
+            {
+                case GamePadDeadZone.None:
+                    _right = rightPosition;
+                    break;
+                case GamePadDeadZone.IndependentAxes:
+                    _right = ExcludeIndependentAxesDeadZone(rightPosition, rightThumbDeadZone);
+                    break;
+                case GamePadDeadZone.Circular:
                     _right = ExcludeCircularDeadZone(rightPosition, rightThumbDeadZone);
                     break;
             }
 
             // Apply clamp
-            if (deadZoneMode == GamePadDeadZone.Circular)
+            if (leftDeadZoneMode == GamePadDeadZone.Circular)
             {
-                if (_left.LengthSquared() > 1f)
-                    _left.Normalize();
                 if (_right.LengthSquared() > 1f)
                     _right.Normalize();
             }
             else
             {
-                _left = new Vector2(MathHelper.Clamp(Left.X, -1f, 1f), MathHelper.Clamp(Left.Y, -1f, 1f));
                 _right = new Vector2(MathHelper.Clamp(Right.X, -1f, 1f), MathHelper.Clamp(Right.Y, -1f, 1f));
             }
 
