@@ -1,6 +1,6 @@
 MonoGame supports more than one method of using fonts, the following is an explanation of how to use TrueType fonts.
 
-#### Using TrueType Fonts with MonoGame
+##### Using TrueType Fonts with MonoGame
 To be able to use a truetype font, MonoGame requires the truetype font file and a .spritefont file.
 Truetype fonts may be installed on the system, or added to the project manually using your IDE in the same directory as the .spritefont file.
 
@@ -20,7 +20,7 @@ If the font is installed on the system, just type the name of the font.
 <FontName>Arial</FontName>
 ```
 
-#### Usage Example
+##### Usage Example
 Make a class variable of type Spritefont
 ```
 SpriteFont font;
