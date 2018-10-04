@@ -2,7 +2,7 @@ Links to various tutorials and articles to help you get started with MonoGame.
 
 ### RB Whitaker's MonoGame Tutorials
  - [1 - C# Crash Course](http://rbwhitaker.wikidot.com/c-sharp-tutorials)
- - [2 - Geting started](http://rbwhitaker.wikidot.com/monogame-getting-started-tutorials)
+ - [2 - Getting started](http://rbwhitaker.wikidot.com/monogame-getting-started-tutorials)
  - [3 - 2D tutorials](http://rbwhitaker.wikidot.com/monogame-2d-tutorials)
  - [4 - 3D tutorials](http://rbwhitaker.wikidot.com/monogame-3d-tutorials)
  - [Extra - XNA tutorials](http://rbwhitaker.wikidot.com/xna-tutorials)
