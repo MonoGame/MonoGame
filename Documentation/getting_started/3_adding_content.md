@@ -26,7 +26,7 @@ In our case let's use the **Add Existing Item** toolbar button.
 
 You should now be prompted to select a file. Select the "ball.png" that you have downloaded a moment ago. After that you will be asked on what action you want to do for adding the file. Just leave the it to default and click **OK**.
 
-![Copy Content](images/3_copy_content.png)
+![Copy Content](images/getting_started/3_copy_content.png)
 
 Now simply click **Save** toolbar button and close the tool.
 
