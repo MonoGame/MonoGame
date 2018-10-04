@@ -1,4 +1,4 @@
-# Contributing to MonoGame
+## Contributing to MonoGame
 
 We're happy that you have chosen to contribute to the MonoGame project.
 
