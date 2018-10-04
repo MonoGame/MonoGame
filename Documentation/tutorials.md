@@ -48,5 +48,3 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [Psuedo Games Tutorials](http://www.youtube.com/watch?feature=player_embedded&v=BwtQn02oy6A)
  - [Desenvolvendo jogos multiplataforma em C# com MonoGame - Alexandre Chohfi (Portuguese)](http://channel9.msdn.com/Blogs/MSDN-Brasil-Cursos-de-Desenvolvimento/Desenvolvendo-jogos-multiplataforma-em-C-com-MonoGame)
  - [Desenvolvimento de jogos para Windows 8 com XNA - Alexandre Chohfi (Portuguese)](https://www.youtube.com/watch?v=gM5pRnYV1tA)
- - [Desenvolvimento de jogos para Windows Phone 8 com MonoGame - Alexandre Chohfi (Portuguese)](https://www.youtube.com/watch?v=1IzuaIApnv4)
- - [Desenvolvimento de jogos para Windows Phone 8 com MonoGame (C#) - Alexandre Chohfi (Portuguese)](https://www.youtube.com/watch?v=YHXTAWzsCDs)
