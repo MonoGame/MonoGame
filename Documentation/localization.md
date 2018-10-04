@@ -134,8 +134,10 @@ var myCharacter = Content.LoadLocalized<Texture2D>("MyCharacter");
 
 The decision on which localized asset to load is made by looking for a file with the following patterns
 
-	<AssetName>.<CurrentCulture.Name>
-	<AssetName>.<CurrentCulture.TwoLetterISOLanguageName>
+```xml
+<AssetName>.<CurrentCulture.Name>
+<AssetName>.<CurrentCulture.TwoLetterISOLanguageName>
+```
 
 These values are retrieved from 
 

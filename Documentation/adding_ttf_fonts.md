@@ -6,31 +6,31 @@ Truetype fonts may be installed on the system, or added to the project manually 
 
 1. Create the .spritefont file.
 
-<p align="center">
+<p>
 <img src="images/adding_ttf_fonts_step_1.PNG"/>
 </p>
 
-<p align="center">
+<p>
 <img src="images/adding_ttf_fonts_step_2.PNG"/>
 </p>
 
 2- Open the newly created .spritefont file in your text editor of choice, find this line and change it to your selected .ttf font.
 If the font is installed on the system, just type the name of the font.
-```
+```xml
 <FontName>Arial</FontName>
 ```
 
 #### Usage Example
 Make a class variable of type Spritefont
-```
+```csharp
 SpriteFont font;
 ```
 Load the font in the LoadContent function
-```
+```csharp
 font = myGame.Content.Load<SpriteFont>("Fonts/myFont")
 ```
 Draw any text in the Draw function
-```
+```csharp
 spriteBatch.Begin();
 // Finds the center of the string in coordinates inside the text rectangle
 Vector2 textMiddlePoint = font.MeasureString(text) / 2;
