@@ -6,11 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.AudioToolbox;
-using MonoMac.AudioUnit;
-using MonoMac.OpenAL;
-#elif OPENAL
+#if OPENAL
 using MonoGame.OpenAL;
 #if IOS || MONOMAC
 using AudioToolbox;
