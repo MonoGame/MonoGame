@@ -13,10 +13,10 @@
     },
     "primaryOutputs": [
         {
-            "path": "MgNamespace.csproj"
+            "path": "MGNamespace.csproj"
         }
     ],
-    "sourceName": "MgNamespace",
+    "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
     "description": "A MonoGame NetStandard library project. Can be used to share game code between platforms."
 }
