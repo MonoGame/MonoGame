@@ -73,13 +73,3 @@ These are some tips for writing or converting effects for use with MonoGame.
 * The effect compiler is aggressive about removing unused parameters, be sure the parameters you are setting are actually used.
 * Preshaders are not supported.
 * If you think you've found a bug porting a shader [please let us know](https://github.com/MonoGame/MonoGame/issues).
-
-# Roadmap
-There is still work to be done for better support of custom effects and shaders in MonoGame:
-
-* Support GLSL in FX files.
-  * Write a new preprocessor replacing [D3DPreprocess](http://msdn.microsoft.com/en-us/library/windows/desktop/dd607332.aspx).
-  * Replace MojoShader with [HL2GLSL](https://github.com/SickheadGames/HL2GLSL).
-* Create automated tests for custom effects.
-* Support PlayStation Suite shaders in MGFX tools and formats.
-* Support pre-compiled GLSL assembly instead of GLSL code.
