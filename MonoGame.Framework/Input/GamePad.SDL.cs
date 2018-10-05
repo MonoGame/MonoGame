@@ -225,7 +225,7 @@ namespace Microsoft.Xna.Framework.Input
             return axis / 32767f;
         }
 
-        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
             if (!Gamepads.ContainsKey(index))
                 return GamePadState.Default;
@@ -243,7 +243,8 @@ namespace Microsoft.Xna.Framework.Input
                         GetFromSdlAxis(Sdl.GameController.GetAxis(gdevice, Sdl.GameController.Axis.RightX)),
                         GetFromSdlAxis(Sdl.GameController.GetAxis(gdevice, Sdl.GameController.Axis.RightY)) * -1f
                     ),
-                    deadZoneMode
+                    leftDeadZoneMode,
+                    rightDeadZoneMode
                 );
 
             var triggers = new GamePadTriggers(

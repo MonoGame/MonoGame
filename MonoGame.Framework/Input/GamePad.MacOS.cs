@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Input
             return new GamePadCapabilities { IsConnected = false };
         }
                
-        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
             return new GamePadState() { IsConnected = false };
         }

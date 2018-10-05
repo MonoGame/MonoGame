@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Input
             return state;
         }
 
-        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
             if (!_gamepads.ContainsKey(index))
                 return (index == 0 ? GetDefaultState() : GamePadState.Default);
@@ -106,7 +106,8 @@ namespace Microsoft.Xna.Framework.Input
             var sticks = new GamePadThumbSticks(
                     new Vector2((float)state.LeftThumbstickX, (float)state.LeftThumbstickY),
                     new Vector2((float)state.RightThumbstickX, (float)state.RightThumbstickY),
-                    deadZoneMode
+                    leftDeadZoneMode,
+					rightDeadZoneMode
                 );
 
             var triggers = new GamePadTriggers(
