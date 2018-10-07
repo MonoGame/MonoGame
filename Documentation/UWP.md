@@ -21,7 +21,7 @@ Consider `Game1` needs some dependencies such as an `ISettingsRepository` to get
 
 For example, in a `MainActivity` on Android you would do:
 
-```c#
+```csharp
 _game = new Game1(
     new AndroidTextFileImporter(Assets),
     new AndroidSettingsRepository(this));
@@ -29,7 +29,7 @@ _game = new Game1(
 
 With the UWP implementation using `XamlGame` static initializer, you could do this:
 
-```c#
+```csharp
 _game = MonoGame.Framework.XamlGame<Game1>.Create(
 	launchArguments,
 	Window.Current.CoreWindow,
