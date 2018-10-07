@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Microsoft.Xna.Framework.Utilities
+namespace MonoGame.Utilities
 {
     internal static partial class ReflectionHelpers
     {

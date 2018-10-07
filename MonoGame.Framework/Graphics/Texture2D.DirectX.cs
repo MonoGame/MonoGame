@@ -5,7 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 using MonoGame.Utilities.Png;
 using SharpDX;
 using SharpDX.Direct3D11;
@@ -13,7 +13,6 @@ using SharpDX.DXGI;
 using SharpDX.WIC;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
 using Resource = SharpDX.Direct3D11.Resource;
-using MonoGame.Utilities;
 
 #if WINDOWS_UAP
 using Windows.Graphics.Imaging;

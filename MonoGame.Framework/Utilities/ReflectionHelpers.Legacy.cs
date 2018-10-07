@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.Xna.Framework.Utilities
+namespace MonoGame.Utilities
 {
     internal static partial class ReflectionHelpers
     {
