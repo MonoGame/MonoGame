@@ -567,19 +567,19 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void OnExiting(object sender, EventArgs args)
         {
-            EventHelpers.Raise(this, Exiting, args);
+            EventHelpers.Raise(sender, Exiting, args);
         }
 		
-		protected virtual void OnActivated (object sender, EventArgs args)
+		protected virtual void OnActivated(object sender, EventArgs args)
 		{
 			AssertNotDisposed();
-            EventHelpers.Raise(this, Activated, args);
+            EventHelpers.Raise(sender, Activated, args);
 		}
 		
-		protected virtual void OnDeactivated (object sender, EventArgs args)
+		protected virtual void OnDeactivated(object sender, EventArgs args)
 		{
 			AssertNotDisposed();
-            EventHelpers.Raise(this, Deactivated, args);
+            EventHelpers.Raise(sender, Deactivated, args);
 		}
 
         #endregion Protected Methods
