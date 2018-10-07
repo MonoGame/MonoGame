@@ -4,7 +4,7 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 using SharpDX;
 using SharpDX.Multimedia;
 using SharpDX.XAudio2;

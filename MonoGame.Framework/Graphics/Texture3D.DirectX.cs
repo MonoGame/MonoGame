@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -63,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                      int left, int top, int right, int bottom, int front, int back,
                                      T[] data, int startIndex, int elementCount, int width, int height, int depth)
         {
-            var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
+            var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             try
             {
