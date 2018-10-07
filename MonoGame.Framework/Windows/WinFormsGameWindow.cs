@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Windows;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
 using Point = System.Drawing.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using XnaPoint = Microsoft.Xna.Framework.Point;
@@ -323,9 +324,13 @@ namespace MonoGame.Framework
             }
         }
 
+        [DllImport("user32.dll")]
+        private static extern short VkKeyScanEx(char ch, IntPtr dwhkl);
+
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
-            OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
+            var key = (Keys) (VkKeyScanEx(e.KeyChar, InputLanguage.CurrentInputLanguage.Handle) & 0xff);
+            OnTextInput(sender, new TextInputEventArgs(e.KeyChar, key));
         }
 
         internal void Initialize(int width, int height)
