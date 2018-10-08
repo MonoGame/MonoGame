@@ -50,19 +50,29 @@ namespace MGCB
             Directory.SetCurrentDirectory(path);
         }
 
+        private string _outputDir = string.Empty;
+
         [CommandLineParameter(
             Name = "outputDir",
             Flag = "o",
             ValueName = "path",
             Description = "The directory where all content is written.")]
-        public string OutputDir = string.Empty;
+        public void SetOutputDir(string path)
+        {
+            _outputDir = Path.GetFullPath(path);
+        }
+
+        private string _intermediateDir = string.Empty;
 
         [CommandLineParameter(
             Name = "intermediateDir",
             Flag = "n",
             ValueName = "path",
             Description = "The directory where all intermediate files are written.")]
-        public string IntermediateDir = string.Empty;
+        public void SetIntermediateDir(string path)
+        {
+            _intermediateDir = Path.GetFullPath(path);
+        }
 
         [CommandLineParameter(
             Name = "rebuild",
@@ -276,11 +286,11 @@ namespace MGCB
         {
             var projectDirectory = PathHelper.Normalize(Directory.GetCurrentDirectory());
 
-            var outputPath = ReplaceSymbols (OutputDir);
+            var outputPath = ReplaceSymbols(_outputDir);
             if (!Path.IsPathRooted(outputPath))
                 outputPath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, outputPath)));
 
-            var intermediatePath = ReplaceSymbols (IntermediateDir);
+            var intermediatePath = ReplaceSymbols(_intermediateDir);
             if (!Path.IsPathRooted(intermediatePath))
                 intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, intermediatePath)));
             
