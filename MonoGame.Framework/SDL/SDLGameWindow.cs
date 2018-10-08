@@ -80,6 +80,8 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        internal uint Id;
+
         public static GameWindow Instance;
         public bool IsFullScreen;
 
@@ -154,6 +156,8 @@ namespace Microsoft.Xna.Framework
 
             _handle = Sdl.Window.Create(AssemblyHelper.GetDefaultWindowTitle(),
                 winx, winy, _width, _height, initflags);
+
+            Id = Sdl.Window.GetWindowId(_handle);
 
             if (_icon != IntPtr.Zero)
                 Sdl.Window.SetIcon(_handle, _icon);
