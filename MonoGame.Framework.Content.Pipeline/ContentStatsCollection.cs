@@ -196,6 +196,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="outputPath">The folder to write the .mgstats file.</param>
         public void Write(string outputPath)
         {
+            // ensure the output folder exists
+            Directory.CreateDirectory(outputPath);
             var filePath = Path.Combine(outputPath, Extension);
             using (var textWriter = new StreamWriter(filePath, false, new UTF8Encoding(false)))
             {
