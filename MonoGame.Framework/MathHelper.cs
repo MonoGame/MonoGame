@@ -243,17 +243,6 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Maps a coordinate back to w = 1.
-        /// </summary>
-        /// <param name="value1">Coordinate value</param>
-        /// <param name="value2">W value</param>
-        /// <returns>The coordinate value divided by w</returns>
-        public static float PerspectiveDivision(float value1, float value2)
-        {
-            return (value1/value2);
-        }
-
-        /// <summary>
         /// Interpolates between two values using a cubic equation.
         /// </summary>
         /// <param name="value1">Source value.</param>

@@ -1138,10 +1138,11 @@ namespace Microsoft.Xna.Framework
             var y = (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42;
             var z = (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43;
             var w = (position.X * matrix.M14) + (position.Y * matrix.M24) + (position.Z * matrix.M34) + matrix.M44;
+            var invW = 1f / w;
 
-            result.X = MathHelper.PerspectiveDivision(x, w);
-            result.Y = MathHelper.PerspectiveDivision(y, w);
-            result.Z = MathHelper.PerspectiveDivision(z, w);
+            result.X = invW * x;
+            result.Y = invW * y;
+            result.Z = invW * z;
         }
 
         /// <summary>
@@ -1170,12 +1171,13 @@ namespace Microsoft.Xna.Framework
             {
                 var position = sourceArray[sourceIndex + i];
                 var w = (position.X * matrix.M14) + (position.Y * matrix.M24) + (position.Z * matrix.M34) + matrix.M44;
+                var invW = 1f / w;
 
                 destinationArray[destinationIndex + i] =
                     new Vector3(
-                        MathHelper.PerspectiveDivision(((position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41), w),
-                        MathHelper.PerspectiveDivision(((position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42), w),
-                        MathHelper.PerspectiveDivision(((position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43), w));
+                        invW * ((position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41),
+                        invW * ((position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42),
+                        invW * ((position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
             }
         }
 
@@ -1198,12 +1200,13 @@ namespace Microsoft.Xna.Framework
             {
                 var position = sourceArray[i];
                 var w = (position.X * matrix.M14) + (position.Y * matrix.M24) + (position.Z * matrix.M34) + matrix.M44;
+                var invW = 1f / w;
 
                 destinationArray[i] =
                     new Vector3(
-                        MathHelper.PerspectiveDivision(((position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41), w),
-                        MathHelper.PerspectiveDivision(((position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42), w),
-                        MathHelper.PerspectiveDivision(((position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43), w));
+                        invW * ((position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41),
+                        invW * ((position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42),
+                        invW * ((position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
             }
         }
 
