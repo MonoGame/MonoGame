@@ -250,8 +250,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The coordinate value divided by w</returns>
         public static float PerspectiveDivision(float value1, float value2)
         {
-            var invW = 1f / value2;
-            return invW * value1;
+            return (value1/value2);
         }
 
         /// <summary>

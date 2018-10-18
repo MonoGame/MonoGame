@@ -1114,6 +1114,70 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         #region TransformCoord
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains a transformation of 3d-vector by the specified <see cref="Matrix"/>, projecting the result back into w = 1 .
+        /// </summary>
+        /// <param name="position">Source <see cref="Vector3"/>.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <returns>Transformed <see cref="Vector3"/>.</returns>
+        public static Vector3 TransformCoord(Vector3 position, Matrix matrix)
+        {
+            TransformCoord(ref position, ref matrix, out position);
+            return position;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains a transformation of 3d-vector by the specified <see cref="Matrix"/>, projecting the result back into w = 1.
+        /// </summary>
+        /// <param name="position">Source <see cref="Vector3"/>.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <param name="result">Transformed <see cref="Vector3"/> as an output parameter.</param>
+        public static void TransformCoord(ref Vector3 position, ref Matrix matrix, out Vector3 result)
+        {
+            var x = (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41;
+            var y = (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42;
+            var z = (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43;
+            var w = (position.X * matrix.M14) + (position.Y * matrix.M24) + (position.Z * matrix.M34) + matrix.M44;
+
+            result.X = MathHelper.PerspectiveDivision(x, w);
+            result.Y = MathHelper.PerspectiveDivision(y, w);
+            result.Z = MathHelper.PerspectiveDivision(z, w);
+        }
+
+        /// <summary>
+        /// Apply transformation on vectors within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/>, projecting the result back into w = 1 and places the results in an another array.
+        /// </summary>
+        /// <param name="sourceArray">Source array.</param>
+        /// <param name="sourceIndex">The starting index of transformation in the source array.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <param name="destinationArray">Destination array.</param>
+        /// <param name="destinationIndex">The starting index in the destination array, where the first <see cref="Vector3"/> should be written.</param>
+        /// <param name="length">The number of vectors to be transformed.</param>
+        public static void TransformCoord(Vector3[] sourceArray, int sourceIndex, ref Matrix matrix, Vector3[] destinationArray, int destinationIndex, int length)
+        {
+            if (sourceArray == null)
+                throw new ArgumentNullException("sourceArray");
+            if (destinationArray == null)
+                throw new ArgumentNullException("destinationArray");
+            if (sourceArray.Length < sourceIndex + length)
+                throw new ArgumentException("Source array length is lesser than sourceIndex + length");
+            if (destinationArray.Length < destinationIndex + length)
+                throw new ArgumentException("Destination array length is lesser than destinationIndex + length");
+
+            // TODO: Are there options on some platforms to implement a vectorized version of this?
+
+            for (var i = 0; i < length; i++)
+            {
+                var position = sourceArray[sourceIndex + i];
+                var w = (position.X * matrix.M14) + (position.Y * matrix.M24) + (position.Z * matrix.M34) + matrix.M44;
+
+                destinationArray[destinationIndex + i] =
+                    new Vector3(
+                        MathHelper.PerspectiveDivision(((position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41), w),
+                        MathHelper.PerspectiveDivision(((position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42), w),
+                        MathHelper.PerspectiveDivision(((position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43), w));
+            }
+        }
 
         /// <summary>
         /// Apply transformation on all vectors within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/>, projecting the result back into w = 1 and places the results in an another array.
@@ -1134,7 +1198,6 @@ namespace Microsoft.Xna.Framework
             {
                 var position = sourceArray[i];
                 var w = (position.X * matrix.M14) + (position.Y * matrix.M24) + (position.Z * matrix.M34) + matrix.M44;
-                var invW = 1f / w;
 
                 destinationArray[i] =
                     new Vector3(
