@@ -111,7 +111,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var backBufferDesc = backBuffer.Description;
             var targetSize = new Point(backBufferDesc.Width, backBufferDesc.Height);
 
-            _texture = backBuffer;
+            // setting the _texture causes rendering issues with MSAA.
+            //_texture = backBuffer;
 
             // MSAA RT needs another non-MSAA texture where it is resolved
             if (preferredMultiSampleCount > 1)

@@ -139,6 +139,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void ResolveSubresource()
         {
+            // An MSAA SwapChainRenderTarget doesn't need a _resolvedTexture
+            if (this is SwapChainRenderTarget)
+                return;
+
             lock (GraphicsDevice._d3dContext)
             {
                 GraphicsDevice._d3dContext.ResolveSubresource(
