@@ -149,6 +149,51 @@ namespace Microsoft.Xna.Framework
                 return new Point(this.X + (this.Width / 2), this.Y + (this.Height / 2));
             }
         }
+        
+        /// <summary>
+        /// The top-left coordinates of this as a vector<see cref="Rectangle"/>.
+        /// <remarks> the center point will be rounded down. </remarks>
+        /// </summary>
+        public Vector2 LocationVector
+        {
+            get
+            {
+                return new Vector2(this.X, this.Y);
+            }
+            set
+            {
+                X = (int)value.X;
+                Y = (int)value.Y;
+            }
+        }
+
+        /// <summary>
+        /// The width-height coordinates of this as a vector<see cref="Rectangle"/>.
+        /// <remarks> the center point will be rounded down. </remarks>
+        /// </summary>
+        public Vector2 SizeVector
+        {
+            get
+            {
+                return new Vector2(this.Width, this.Height);
+            }
+            set
+            {
+                Width = (int)value.X;
+                Height = (int)value.Y;
+            }
+        }
+
+        /// <summary>
+        /// Gets a Vector2 from the center of this Rectangle
+        /// </summary>
+        public Vector2 CenterVector
+        {
+            get
+            {
+                return new Vector2(this.X + (this.Width / 2), this.Y + (this.Height / 2));
+            }
+        }
 
         #endregion
 
