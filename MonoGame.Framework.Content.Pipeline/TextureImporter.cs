@@ -194,11 +194,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
-            var reader = new ImageReader();
             int width, height, comp;
             byte[] data = null;
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-                data = reader.Read(stream, out width, out height, out comp, Imaging.STBI_rgb_alpha);
+                data = ImageReader.Read(stream, out width, out height, out comp, Imaging.STBI_rgb_alpha);
 
             var face = new PixelBitmapContent<Color>(width, height);
             face.SetPixelData(data);
