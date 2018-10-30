@@ -146,6 +146,8 @@ namespace Microsoft.Xna.Framework.Audio
         {
             try
             {
+                AL.LoadEntryPoints();
+
                 _device = Alc.OpenDevice(string.Empty);
                 EffectsExtension.device = _device;
             }
@@ -309,7 +311,7 @@ namespace Microsoft.Xna.Framework.Audio
             get
             {
                 if (_efx == null)
-                    _efx = new EffectsExtension();
+                    _efx = EffectsExtension.Instance;
                 return _efx;
             }
         }
