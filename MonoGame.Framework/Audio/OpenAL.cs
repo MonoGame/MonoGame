@@ -248,13 +248,13 @@ namespace MonoGame.OpenAL
             Alc.alcGetString = FuncLoader.LoadFunction<Alc.d_alcgetstring>(nativeLibrary, "alcGetString");
 
 #if IOS
-            Alc.SuspendContext = FuncLoader.LoadFunction<Alc.d_alcsuspendcontext>(AL.NativeLibrary, "alcSuspendContext");
-            Alc.ProcessContext = FuncLoader.LoadFunction<Alc.d_alcprocesscontext>(AL.NativeLibrary, "alcProcessContext");
+            Alc.SuspendContext = FuncLoader.LoadFunction<Alc.d_alcsuspendcontext>(nativeLibrary, "alcSuspendContext");
+            Alc.ProcessContext = FuncLoader.LoadFunction<Alc.d_alcprocesscontext>(nativeLibrary, "alcProcessContext");
 #endif
 
 #if ANDROID
-            Alc.DevicePause = FuncLoader.LoadFunction<Alc.d_alcdevicepausesoft>(AL.NativeLibrary, "alcDevicePauseSOFT");
-            Alc.DeviceResume = FuncLoader.LoadFunction<Alc.d_alcdeviceresumesoft>(AL.NativeLibrary, "alcDeviceResumeSOFT");
+            Alc.DevicePause = FuncLoader.LoadFunction<Alc.d_alcdevicepausesoft>(nativeLibrary, "alcDevicePauseSOFT");
+            Alc.DeviceResume = FuncLoader.LoadFunction<Alc.d_alcdeviceresumesoft>(nativeLibrary, "alcDeviceResumeSOFT");
 #endif
         }
 
