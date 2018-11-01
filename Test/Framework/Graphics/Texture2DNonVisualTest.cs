@@ -103,6 +103,35 @@ namespace MonoGame.Tests.Graphics
         }
 
         [TestCase]
+        public void FromMemoryStream()
+        {
+            // Make sure MemoryStream can be passed to Texture2D.FromStream
+            using (var ms = new MemoryStream())
+            {
+                using (var stream = File.OpenRead("Assets/Textures/red_128.png"))
+                {
+                    stream.CopyTo(ms);
+                }
+                using (var texture = Texture2D.FromStream(gd, ms))
+                {
+                    Assert.AreEqual(8, texture.Width);
+                    Assert.AreEqual(8, texture.Height);
+                    Assert.AreEqual(1, texture.LevelCount);
+                    var pngData = new Color[8 * 8];
+                    texture.GetData(pngData);
+
+                    for (var i = 0; i < pngData.Length; i++)
+                    {
+                        Assert.AreEqual(255, pngData[i].R);
+                        Assert.AreEqual(0, pngData[i].G);
+                        Assert.AreEqual(0, pngData[i].B);
+                        Assert.AreEqual(128, pngData[i].A);
+                    }
+                }
+            }
+        }
+
+        [TestCase]
         public void FromStreamBlackAlpha()
         {
             // XNA will make any pixel with an alpha value

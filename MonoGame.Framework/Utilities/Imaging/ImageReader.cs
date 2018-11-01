@@ -9,9 +9,17 @@ namespace MonoGame.Utilities
         public static byte[] Read(Stream stream, out int x, out int y, out int comp, int req_comp)
         {
             byte[] bytes, data = null;
-            using (var ms = new MemoryStream())
+
+            var ms = stream as MemoryStream;
+            if (ms == null)
             {
-                stream.CopyTo(ms);
+                using (ms = new MemoryStream())
+                {
+                    stream.CopyTo(ms);
+                    bytes = ms.ToArray();
+                }
+            } else
+            {
                 bytes = ms.ToArray();
             }
 
