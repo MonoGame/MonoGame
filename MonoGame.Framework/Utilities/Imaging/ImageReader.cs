@@ -9,6 +9,13 @@ namespace MonoGame.Utilities
         public static byte[] Read(Stream stream, out int x, out int y, out int comp, int req_comp)
         {
             byte[] bytes, data = null;
+
+            // Rewind stream if it is at end
+            if (stream.CanSeek && stream.Length == stream.Position)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
             using (var ms = new MemoryStream())
             {
                 stream.CopyTo(ms);
