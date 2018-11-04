@@ -11,6 +11,7 @@ using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.Graphics.Display;
+using Windows.Phone.UI.Input;
 
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -128,7 +129,8 @@ namespace Microsoft.Xna.Framework
             _coreWindow.Closed += Window_Closed;
             _coreWindow.Activated += Window_FocusChanged;
 
-            SystemNavigationManager.GetForCurrentView().BackRequested += BackRequested;
+            if (Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
+                Windows.Phone.UI.Input.HardwareButtons.BackPressed += this.HardwareButtons_BackPressed;
 
             SetViewBounds(_appView.VisibleBounds.Width, _appView.VisibleBounds.Height);
 
@@ -289,7 +291,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private void BackRequested(object sender, BackRequestedEventArgs e)
+        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
         {
             // We need to manually hide the keyboard input UI when the back button is pressed
             if (KeyboardInput.IsVisible)
