@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 
 #if OPENAL
 using MonoGame.OpenAL;
@@ -52,18 +53,38 @@ namespace Microsoft.Xna.Framework.Audio
             string defaultDevice = Alc.GetString(IntPtr.Zero, AlcGetString.CaptureDefaultDeviceSpecifier);
 
 #if true //DESKTOPGL
-            // enumarating capture devices
+            // enumerating capture devices
             IntPtr deviceList = Alc.alcGetString(IntPtr.Zero, (int)AlcGetString.CaptureDeviceSpecifier);
-            // we need to marshal a string array
-            string deviceIdentifier = Marshal.PtrToStringAnsi(deviceList);
-            while (!String.IsNullOrEmpty(deviceIdentifier))
+
+            // Marshal native UTF-8 character array to .NET string
+            // Code adapted from https://stackoverflow.com/a/10773988
+            // The native string is a null-char separated list of known capture device specifiers ending with an empty string
+
+            var buffer = new byte[0];
+            while (true)
             {  
+                // length in bytes without terminator
+                var len = 0;
+                while (Marshal.ReadByte(deviceList, len) != 0)
+                    len++;
+
+                if (len == 0)
+                    break;
+
+                // try to reuse the buffer
+                if (buffer.Length < len)
+                    buffer = new byte[len];
+
+                Marshal.Copy(deviceList, buffer, 0, len);
+                var deviceIdentifier = Encoding.UTF8.GetString(buffer, 0, len);
+
                 Microphone microphone = new Microphone(deviceIdentifier);
-                _allMicrophones.Add(microphone);                
+                _allMicrophones.Add(microphone);
                 if (deviceIdentifier == defaultDevice)
                     _default = microphone;
-                deviceList += deviceIdentifier.Length + 1;
-                deviceIdentifier = Marshal.PtrToStringAnsi(deviceList);
+
+                // increase the offset, add one extra for the terminator
+                deviceList += len + 1;
             }
 #else
             // Xamarin platforms don't provide an handle to alGetString that allow to marshal string arrays
