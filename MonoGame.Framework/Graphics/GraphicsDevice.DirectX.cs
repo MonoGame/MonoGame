@@ -1093,6 +1093,13 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var syncInterval = PresentationParameters.PresentationInterval.GetSyncInterval();
 
+                // If the swapchain creation failed, try again.
+                if (_swapChain == null)
+                {
+                    Recreate();
+                    return;
+                }
+
                 // The first argument instructs DXGI to block n VSyncs before presenting.
                 lock (_d3dContext)
                     _swapChain.Present(syncInterval, PresentFlags.None);
