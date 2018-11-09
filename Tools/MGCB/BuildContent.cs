@@ -308,7 +308,7 @@ namespace MGCB
             var previousContent = SourceFileCollection.Read(contentFile);
 
             // If the target changed in any way then we need to force
-            // a fuull rebuild even under incremental builds.
+            // a full rebuild even under incremental builds.
             var targetChanged = previousContent.Config != Config ||
                                 previousContent.Platform != Platform ||
                                 previousContent.Profile != Profile;
@@ -331,6 +331,8 @@ namespace MGCB
                 if (cleanRebuiltContent || cleanOldContent || targetChanged)
                     _manager.CleanContent(sourceFile, destFile);                
             }
+
+            // TODO: Should we be cleaning copy items?  I think maybe we should.
 
             var newContent = new SourceFileCollection
             {
@@ -403,7 +405,10 @@ namespace MGCB
             // If this is an incremental build we merge the list
             // of previous content with the new list.
             if (Incremental && !targetChanged)
+            {
                 newContent.Merge(previousContent);
+                _manager.ContentStats.MergePreviousStats();
+            }
 
             // Delete the old file and write the new content 
             // list if we have any to serialize.
@@ -430,16 +435,24 @@ namespace MGCB
                     // Only copy if the source file is newer than the destination.
                     // We may want to provide an option for overriding this, but for
                     // nearly all cases this is the desired behavior.
-                    if (File.Exists(dest))
+                    if (File.Exists(dest) && !Rebuild)
                     {
                         var srcTime = File.GetLastWriteTimeUtc(c.SourceFile);
                         var dstTime = File.GetLastWriteTimeUtc(dest);
                         if (srcTime <= dstTime)
                         {
-                            Console.WriteLine("Skipping {0}", c.SourceFile);
+                            if (string.IsNullOrEmpty(c.Link))
+                                Console.WriteLine("Skipping {0}", c.SourceFile);
+                            else
+                                Console.WriteLine("Skipping {0} => {1}", c.SourceFile, c.Link);
+
+                            // Copy the stats from the previous stats collection.
+                            _manager.ContentStats.CopyPreviousStats(c.SourceFile);
                             continue;
                         }
                     }
+
+                    var startTime = DateTime.UtcNow;
 
                     // Create the destination directory if it doesn't already exist.
                     var destPath = Path.GetDirectoryName(dest);
@@ -453,6 +466,16 @@ namespace MGCB
                     fileAttr = fileAttr & (~FileAttributes.ReadOnly);
                     File.SetAttributes(dest, fileAttr);
 
+                    var buildTime = DateTime.UtcNow - startTime;
+
+                    if (string.IsNullOrEmpty(c.Link))
+                        Console.WriteLine("{0}", c.SourceFile);
+                    else
+                        Console.WriteLine("{0} => {1}", c.SourceFile, c.Link);
+
+                    // Record content stats on the copy.
+                    _manager.ContentStats.RecordStats(c.SourceFile, dest, "CopyItem", typeof(File), (float)buildTime.TotalSeconds);
+
                     ++successCount;
                 }
                 catch (Exception ex)
@@ -464,6 +487,9 @@ namespace MGCB
                     ++errorCount;
                 }
             }
+
+            // Dump the content build stats.
+            _manager.ContentStats.Write(intermediatePath);
         }
 
         [CommandLineParameter(

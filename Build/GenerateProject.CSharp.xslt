@@ -816,6 +816,21 @@
     </Reference>
   </xsl:template>
   
+  <xsl:template name="ReferenceToSDKExtension"
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <xsl:param name="sdkReference" />
+    <xsl:param name="source_project" />
+
+    <SDKReference>
+      <xsl:attribute name="Include">
+        <xsl:value-of select="$sdkReference/@Include" />, Version=<xsl:value-of select="user:DetectWindows10InstalledSDK()" />
+      </xsl:attribute>
+      <Name>
+        <xsl:value-of select="$sdkReference/@Name" />
+      </Name>
+    </SDKReference>
+  </xsl:template>
+  
   <xsl:template name="ReferenceToGAC"
     xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <xsl:param name="gac" />
@@ -1589,6 +1604,12 @@
                     <xsl:with-param name="source_project" select="$project" />
                   </xsl:call-template>
                 </xsl:for-each>
+                <xsl:for-each select="./SDKReference">
+                  <xsl:call-template name="ReferenceToSDKExtension">
+                    <xsl:with-param name="sdkReference" select="." />
+                    <xsl:with-param name="source_project" select="$project" />
+                  </xsl:call-template>
+                </xsl:for-each>                
                 <xsl:for-each select="./Service">
                   <xsl:if test="user:ServiceIsActive(
                     ./@Name,

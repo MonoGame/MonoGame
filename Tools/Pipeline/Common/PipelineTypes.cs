@@ -171,6 +171,7 @@ namespace MonoGame.Tools.Pipeline
         private static List<ImporterInfo> _importers;
         private static List<ProcessorInfo> _processors;
         private static List<FileSystemWatcher> _watchers;
+        private static string _currentAssemblyDirectory;
 
         public static ImporterTypeDescription[] Importers { get; private set; }
         public static ProcessorTypeDescription[] Processors { get; private set; }
@@ -205,6 +206,8 @@ namespace MonoGame.Tools.Pipeline
 
         static PipelineTypes()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+
             MissingImporter = new ImporterTypeDescription()
                 {
                     DisplayName = "Invalid / Missing Importer",
@@ -228,6 +231,18 @@ namespace MonoGame.Tools.Pipeline
             };
 
             _watchers = new List<FileSystemWatcher>();
+        }
+
+        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            if (string.IsNullOrEmpty(_currentAssemblyDirectory))
+                return null;
+
+            var path = Path.Combine(_currentAssemblyDirectory, (new AssemblyName(args.Name).Name) + ".dll");
+            if (!File.Exists(path))
+                return null;
+
+            return Assembly.Load(File.ReadAllBytes(path));
         }
 
         public static void Load(PipelineProject project)
@@ -459,6 +474,8 @@ namespace MonoGame.Tools.Pipeline
             {
                 try
                 {
+                    _currentAssemblyDirectory = Path.GetDirectoryName(path);
+
                     var a = Assembly.Load(File.ReadAllBytes(path));
                     var types = a.GetTypes();
                     ProcessTypes(types);
@@ -488,6 +505,8 @@ namespace MonoGame.Tools.Pipeline
                     continue;
                 }                
             }
+
+            _currentAssemblyDirectory = null;
         }
 
         private static void ProcessTypes(IEnumerable<Type> types)

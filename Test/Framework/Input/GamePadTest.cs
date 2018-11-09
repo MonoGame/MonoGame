@@ -97,7 +97,7 @@ namespace MonoGame.Tests.Input
         [TestCaseSource("ThumbStickVirtualButtonsIgnoreDeadZoneTestCases")]
         public void ThumbStickVirtualButtonsIgnoreDeadZone(Vector2 left, Vector2 right, GamePadDeadZone deadZone, Buttons expectedButtons)
         {
-            var state = new GamePadState(new GamePadThumbSticks(left, right, deadZone), new GamePadTriggers(), new GamePadButtons(), new GamePadDPad());
+            var state = new GamePadState(new GamePadThumbSticks(left, right, deadZone, deadZone), new GamePadTriggers(), new GamePadButtons(), new GamePadDPad());
 
             Assert.AreEqual(expectedButtons, GetAllPressedButtons(state));
         }
@@ -157,19 +157,19 @@ namespace MonoGame.Tests.Input
             var left = Vector2.One;
             var right = Vector2.One;
 
-            var sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.None);
+            var sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.None, GamePadDeadZone.None);
             Assert.AreEqual(sticks.Left.X, 1);
             Assert.AreEqual(sticks.Left.Y, 1);
             Assert.AreEqual(sticks.Right.X, 1);
             Assert.AreEqual(sticks.Right.Y, 1);
 
-            sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.IndependentAxes);
+            sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.IndependentAxes, GamePadDeadZone.IndependentAxes);
             Assert.AreEqual(sticks.Left.X, 1);
             Assert.AreEqual(sticks.Left.Y, 1);
             Assert.AreEqual(sticks.Right.X, 1);
             Assert.AreEqual(sticks.Right.Y, 1);
 
-            sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.Circular);
+            sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.Circular, GamePadDeadZone.Circular);
             Assert.Less(sticks.Left.X, 1);
             Assert.Less(sticks.Left.Y, 1);
             Assert.Less(sticks.Right.X, 1);

@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -131,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                var elementSizeInBytes = Utilities.ReflectionHelpers.SizeOf<T>.Get();
+                var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 try
                 {

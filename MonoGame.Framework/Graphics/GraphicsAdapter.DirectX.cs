@@ -115,13 +115,26 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if(UseReferenceDevice)
                 return true;
+
+            FeatureLevel highestSupportedLevel;
+            try
+            {
+                highestSupportedLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel(_adapter);
+            }
+            catch (SharpDX.SharpDXException ex)
+            {
+                if (ex.ResultCode == SharpDX.DXGI.ResultCode.Unsupported) // No supported feature levels!
+                    return false;
+                throw;
+            }
+
             switch(graphicsProfile)
             {
                 case GraphicsProfile.Reach:
-                    return SharpDX.Direct3D11.Device.IsSupportedFeatureLevel(_adapter, FeatureLevel.Level_9_1);
+                    return (highestSupportedLevel >= FeatureLevel.Level_9_1);
                 case GraphicsProfile.HiDef:
-                    // We've reduced our HiDef requirements to 9_3.
-                    return SharpDX.Direct3D11.Device.IsSupportedFeatureLevel(_adapter, FeatureLevel.Level_9_3);
+					// We've reduced our HiDef requirements to 9_3.
+                    return (highestSupportedLevel >= FeatureLevel.Level_9_3);
                 default:
                     throw new InvalidOperationException();
             }

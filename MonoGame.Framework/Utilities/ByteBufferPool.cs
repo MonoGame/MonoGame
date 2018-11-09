@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Microsoft.Xna.Framework.Utilities
+namespace MonoGame.Utilities
 {
     internal class ByteBufferPool
     {

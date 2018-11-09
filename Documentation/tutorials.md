@@ -1,7 +1,11 @@
 Links to various tutorials and articles to help you get started with MonoGame.
 
-### Pluralsight
- - [Cross Platform Game Development with MonoGame](http://pluralsight.com/training/courses/TableOfContents?courseName=monogame)
+### RB Whitaker's MonoGame Tutorials
+ - [1 - C# Crash Course](http://rbwhitaker.wikidot.com/c-sharp-tutorials)
+ - [2 - Getting started](http://rbwhitaker.wikidot.com/monogame-getting-started-tutorials)
+ - [3 - 2D tutorials](http://rbwhitaker.wikidot.com/monogame-2d-tutorials)
+ - [4 - 3D tutorials](http://rbwhitaker.wikidot.com/monogame-3d-tutorials)
+ - [Extra - XNA tutorials](http://rbwhitaker.wikidot.com/xna-tutorials)
 
 ### Microsoft
 Tara Walker's "Building a Shooter Game" tutorial series.
@@ -16,10 +20,6 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [Part 8: Creating Explosions using Sprite Animations](http://chrisongames.blogspot.com/2015/02/windows-8-game-development-using-c-xna.html)
  - [Part 9: Adding Sound Effects and Game Music](http://chrisongames.blogspot.com/2015/12/windows-810-game-development-using-c.html)
 
-### Animation and sprite sheets
-
-* [How to create animations and sprite sheets for MonoGame](https://www.codeandweb.com/texturepacker/tutorials/how-to-create-sprite-sheets-and-animations-with-monogame)
-
 ### Neil Danson's F# series
  - [Part 1 - MacOS](http://neildanson.wordpress.com/2013/07/30/f-and-monogame/)
  - [Part 2 - Android](http://neildanson.wordpress.com/2013/07/31/f-and-monogame-part-2-android/)
@@ -27,11 +27,9 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [Part 4 - Content Pipeline](http://neildanson.wordpress.com/2013/08/13/f-and-monogame-part-4-content-pipeline/)
 
 ### Others
+ - [How to create animations and sprite sheets for MonoGame](https://www.codeandweb.com/texturepacker/tutorials/how-to-create-sprite-sheets-and-animations-with-monogame)
  - [Making a platformer in F# with MonoGame](http://bruinbrown.wordpress.com/2013/10/06/making-a-platformer-in-f-with-monogame/)
  - [XNA 4.0 Shader Programming / HLSL](http://digitalerr0r.wordpress.com/tutorials/)
- - [RB Whitaker's MonoGame Tutorials](http://rbwhitaker.wikidot.com/monogame-tutorials)
- - [RB Whitaker's XNA Tutorials including sharers, 2D, 3D, Game loops, advancted topics](http://rbwhitaker.wikidot.com/xna-tutorials)
- - [Setting window position tutorial](http://projectdrake.net/blog/?p=176)
  - [Using Spine with MonoGame - by Randolph Burt (Randeroo)](http://randolphburt.co.uk/2013/03/30/dragons-and-dancing-crabs/)
  - [Mac porting series](http://benkane.wordpress.com/2012/01/20/the-great-porting-adventure-day-8/)
  - [Porting a Windows Phone 7 Game to Android](http://warrenburch.blogspot.co.uk/2011/12/porting-windows-phone-7-game-to-android.html)
@@ -50,5 +48,3 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [Psuedo Games Tutorials](http://www.youtube.com/watch?feature=player_embedded&v=BwtQn02oy6A)
  - [Desenvolvendo jogos multiplataforma em C# com MonoGame - Alexandre Chohfi (Portuguese)](http://channel9.msdn.com/Blogs/MSDN-Brasil-Cursos-de-Desenvolvimento/Desenvolvendo-jogos-multiplataforma-em-C-com-MonoGame)
  - [Desenvolvimento de jogos para Windows 8 com XNA - Alexandre Chohfi (Portuguese)](https://www.youtube.com/watch?v=gM5pRnYV1tA)
- - [Desenvolvimento de jogos para Windows Phone 8 com MonoGame - Alexandre Chohfi (Portuguese)](https://www.youtube.com/watch?v=1IzuaIApnv4)
- - [Desenvolvimento de jogos para Windows Phone 8 com MonoGame (C#) - Alexandre Chohfi (Portuguese)](https://www.youtube.com/watch?v=YHXTAWzsCDs)

@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Input
             };
         }
 
-        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
             var state = GamePadState.Default;
             var jcap = Joystick.GetCapabilities(index);
@@ -102,7 +102,8 @@ namespace Microsoft.Xna.Framework.Input
                     new GamePadThumbSticks(
                         new Vector2(gpc.AxisPressed("leftx", jstate), gpc.AxisPressed("lefty", jstate)),
                         new Vector2(gpc.AxisPressed("rightx", jstate), gpc.AxisPressed("righty", jstate)),
-                        deadZoneMode
+                        leftDeadZoneMode,
+						rightDeadZoneMode
                     );
                 
                 var dpad = 

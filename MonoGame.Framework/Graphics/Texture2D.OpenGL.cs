@@ -5,7 +5,6 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Utilities;
 using MonoGame.Utilities;
 using MonoGame.Utilities.Png;
 
@@ -258,35 +257,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-            var reader = new ImageReader();
             int width, height, channels;
 
-            Threading.BlockOnUIThread(() =>
+            // The data returned is always four channel BGRA
+            var data = ImageReader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
+
+            // XNA blacks out any pixels with an alpha of zero.
+            if (channels == 4)
             {
-				// The data returned is always four channel BGRA
-            	var data = reader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
+                fixed (byte* b = &data[0])
+                {
+                    for (var i = 0; i < data.Length; i += 4)
+                    {
+                        if (b[i + 3] == 0)
+                        {
+                            b[i + 0] = 0;
+                            b[i + 1] = 0;
+                            b[i + 2] = 0;
+                        }
+                    }
+                }
+            }
 
-	            // XNA blacks out any pixels with an alpha of zero.
-	            if (channels == 4)
-	            {
-	                fixed (byte* b = &data[0])
-	                {
-	                    for (var i = 0; i < data.Length; i += 4)
-	                    {
-	                        if (b[i + 3] == 0)
-	                        {
-	                            b[i + 0] = 0;
-	                            b[i + 1] = 0;
-	                            b[i + 2] = 0;
-	                        }
-	                    }
-	                }
-	            }
-
-	            Texture2D texture = null;
-	            texture = new Texture2D(graphicsDevice, width, height);
-	            texture.SetData(data);
-			});
+            Texture2D texture = null;
+            texture = new Texture2D(graphicsDevice, width, height);
+            texture.SetData(data);
 
             return texture;
         }

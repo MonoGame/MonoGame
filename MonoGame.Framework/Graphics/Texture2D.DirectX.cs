@@ -5,7 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 using MonoGame.Utilities.Png;
 using SharpDX;
 using SharpDX.Direct3D11;
@@ -13,7 +13,6 @@ using SharpDX.DXGI;
 using SharpDX.WIC;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
 using Resource = SharpDX.Direct3D11.Resource;
-using MonoGame.Utilities;
 
 #if WINDOWS_UAP
 using Windows.Graphics.Imaging;
@@ -217,11 +216,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-            var reader = new ImageReader();
             int width, height, channels;
 
             // The data returned is always four channel BGRA
-            var data = reader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
+            var data = ImageReader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
 
             // XNA blacks out any pixels with an alpha of zero.
             if (channels == 4)
