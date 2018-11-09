@@ -452,8 +452,9 @@ public static class Sdl
         public delegate int d_sdl_getwindowborderssize(IntPtr window, out int top, out int left, out int right, out int bottom);
         public static d_sdl_getwindowborderssize GetBorderSize = FuncLoader.LoadFunction<d_sdl_getwindowborderssize>(NativeLibrary, "SDL_GetWindowBordersSize");
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_MaximizeWindow")]
-        public static extern void Maximize(IntPtr window);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_maximize(IntPtr window);
+        public static d_sdl_maximize Maximize = FuncLoader.LoadFunction<d_sdl_maximize>(NativeLibrary, "SDL_MaximizeWindow");
     }
 
     public static class Display
@@ -488,9 +489,10 @@ public static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_getdisplaymode(int displayIndex, int modeIndex, out Mode mode);
         private static d_sdl_getdisplaymode SDL_GetDisplayMode = FuncLoader.LoadFunction<d_sdl_getdisplaymode>(NativeLibrary, "SDL_GetDisplayMode");
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetDesktopDisplayMode")
-        ]
-        private static extern int SDL_GetDesktopDisplayMode(int displayIndex, out Mode mode);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate int d_sdl_getdesktopdisplaymode(int displayIndex, out Mode mode);
+        private static d_sdl_getdesktopdisplaymode SDL_GetDesktopDisplayMode = FuncLoader.LoadFunction<d_sdl_getdesktopdisplaymode>(NativeLibrary, "SDL_GetDesktopDisplayMode");
 
         public static void GetDesktopDisplayMode(int displayIndex, out Mode mode)
         {
