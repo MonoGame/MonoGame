@@ -11,10 +11,6 @@ MGFX is MonoGame's own "FX" runtime and tools which with the following core goal
 * Be cross-platform and support multiple shader languages and bytecodes.
 * Easy to extend for future platforms and features.
 
-
-### PlayStation Mobile
-The PSM platform uses neither GLSL or HLSL and instead has a custom shader system of its own which MGFX does not support at this time. For this reason custom effects require PSM specific coding to function.  The stock effects in PSM are limited in functionality and still in development.
-
 # Stock Effects
 The following stock effects in MonoGame and fully supported on current platforms:
 
@@ -30,8 +26,8 @@ If your game requires an extra little bit of performance you can easily hand edi
 
 # Custom Effects
 To use a custom effect with MonoGame you must do one of the following (not both):
+* Run the effect file through the [MonoGame Effect content processor](mgcb.md) for loading via the `ContentManager` (Recommended).
 * Process your effect file with the [2MGFX tool](2mgfx.md) and load them yourself at runtime.
-* Run the effect file thru the [MonoGame Effect content processor](mgcb.md) for loading via the `ContentManager`.
 
 
 ### Effect Writing Tips

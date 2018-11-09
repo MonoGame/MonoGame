@@ -30,11 +30,11 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
-            SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
+            DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
         {
             Threading.BlockOnUIThread(() =>
             {
-                graphicsDevice.PlatformCreateRenderTarget(this, width, height, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage);
+                graphicsDevice.PlatformCreateRenderTarget(this, width, height, mipMap, this.Format, preferredDepthFormat, preferredMultiSampleCount, usage);
             });
             
             
@@ -48,10 +48,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                Threading.BlockOnUIThread(() =>
+                if (GraphicsDevice != null)
                 {
-                    this.GraphicsDevice.PlatformDeleteRenderTarget(this);
-                });
+                    Threading.BlockOnUIThread(() =>
+                    {
+                        this.GraphicsDevice.PlatformDeleteRenderTarget(this);
+                    });
+                }
             }
 
             base.Dispose(disposing);

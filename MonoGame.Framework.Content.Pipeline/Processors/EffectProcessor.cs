@@ -63,15 +63,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             options.OutputFile = context.OutputFilename;
 
             // Parse the MGFX file expanding includes, macros, and returning the techniques.
-            ShaderInfo shaderInfo;
+            ShaderResult shaderResult;
             try
             {
-                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options, 
+                shaderResult = ShaderResult.FromFile(options.SourceFile, options, 
                     new ContentPipelineEffectCompilerOutput(context));
 
                 // Add the include dependencies so that if they change
                 // it will trigger a rebuild of this effect.
-                foreach (var dep in shaderInfo.Dependencies)
+                foreach (var dep in shaderResult.Dependencies)
                     context.AddDependency(dep);
             }
             catch (InvalidContentException)
@@ -89,11 +89,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var shaderErrorsAndWarnings = string.Empty;
             try
             {
-                effect = EffectObject.CompileEffect(shaderInfo, out shaderErrorsAndWarnings);
+                effect = EffectObject.CompileEffect(shaderResult, out shaderErrorsAndWarnings);
 
                 // If there were any additional output files we register
                 // them so that the cleanup process can manage them.
-                foreach (var outfile in shaderInfo.AdditionalOutputFiles)
+                foreach (var outfile in shaderResult.AdditionalOutputFiles)
                     context.AddOutputFile(outfile);
             }
             catch (ShaderCompilerException)

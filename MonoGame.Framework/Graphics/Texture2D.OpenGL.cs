@@ -256,54 +256,39 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
+        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-#if IOS
-			using (var uiImage = UIImage.LoadFromData(NSData.FromStream(stream)))
-			{
-				var cgImage = uiImage.CGImage;
-			    return PlatformFromStream(graphicsDevice, cgImage);
-			}
-#endif
-#if ANDROID
-            using (Bitmap image = BitmapFactory.DecodeStream(stream, null, new BitmapFactory.Options
-            {
-                InScaled = false,
-                InDither = false,
-                InJustDecodeBounds = false,
-                InPurgeable = true,
-                InInputShareable = true,
-            }))
-            {
-                return PlatformFromStream(graphicsDevice, image);
-            }
-#endif
-#if DESKTOPGL || ANGLE
-            Texture2D texture = null;
+            var reader = new ImageReader();
+            int width, height, channels;
+
             Threading.BlockOnUIThread(() =>
             {
-                // We have to do this on the UI thread because Imaging uses a non-threadsafe malloc implementation.
-                var reader = new ImageReader();
-                int x, y, comp;
-                var data = reader.Read(stream, out x, out y, out comp, Imaging.STBI_rgb_alpha);
+				// The data returned is always four channel BGRA
+            	var data = reader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
 
-                // XNA blacks out any pixels with an alpha of zero.
-                for (var i = 0; i < data.Length; i += 4)
-                {
-                    if (data[i + 3] == 0)
-                    {
-                        data[i + 0] = 0;
-                        data[i + 1] = 0;
-                        data[i + 2] = 0;
-                    }
-                }
+	            // XNA blacks out any pixels with an alpha of zero.
+	            if (channels == 4)
+	            {
+	                fixed (byte* b = &data[0])
+	                {
+	                    for (var i = 0; i < data.Length; i += 4)
+	                    {
+	                        if (b[i + 3] == 0)
+	                        {
+	                            b[i + 0] = 0;
+	                            b[i + 1] = 0;
+	                            b[i + 2] = 0;
+	                        }
+	                    }
+	                }
+	            }
 
-                texture = new Texture2D(graphicsDevice, x, y);
-                texture.SetData(data);
-            });
+	            Texture2D texture = null;
+	            texture = new Texture2D(graphicsDevice, width, height);
+	            texture.SetData(data);
+			});
 
             return texture;
-#endif
         }
 
 #if IOS

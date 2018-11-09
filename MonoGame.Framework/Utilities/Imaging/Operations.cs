@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 
 namespace MonoGame.Utilities
 {
     internal static unsafe class Operations
     {
-        internal static Dictionary<long, Pointer> _pointers = new Dictionary<long, Pointer>();
-        internal static long _allocatedTotal;
-        internal static object _lock = new object();
+        internal static ConcurrentDictionary<long, Pointer> _pointers = new ConcurrentDictionary<long, Pointer>();
 
         public static long AllocatedTotal
         {
-            get { return _allocatedTotal; }
+            get { return Pointer.AllocatedTotal; }
         }
 
         public static void* Malloc(long size)
@@ -43,12 +41,11 @@ namespace MonoGame.Utilities
         public static void Free(void* a)
         {
             Pointer pointer;
-            if (!_pointers.TryGetValue((long) a, out pointer))
+            if (!_pointers.TryRemove((long) a, out pointer))
             {
                 return;
             }
 
-            _pointers.Remove((long) pointer.Ptr);
             pointer.Dispose();
         }
 
@@ -70,7 +67,7 @@ namespace MonoGame.Utilities
             var result = Malloc(newSize);
             Memcpy(result, a, pointer.Size);
 
-            _pointers.Remove((long) pointer.Ptr);
+            _pointers.TryRemove((long) pointer.Ptr, out pointer);
             pointer.Dispose();
 
             return result;

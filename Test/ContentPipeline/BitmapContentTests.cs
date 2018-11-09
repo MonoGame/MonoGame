@@ -1,12 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -85,7 +84,6 @@ namespace MonoGame.Tests.ContentPipeline
             Fill(b1, color1);
             var b2 = new Dxt1BitmapContent(8, 8);
             BitmapContent.Copy(b1, b2);
-            Assert.Pass();
         }
 
         void BitmapCompressFullResize<T>(T color1)
@@ -95,7 +93,6 @@ namespace MonoGame.Tests.ContentPipeline
             Fill(b1, color1);
             var b2 = new Dxt1BitmapContent(8, 8);
             BitmapContent.Copy(b1, b2);
-            Assert.Pass();
         }
 
         void BitmapCopySameRegionNoResize<T>(T color1, T color2)
@@ -193,6 +190,70 @@ namespace MonoGame.Tests.ContentPipeline
             BitmapCompressFullResize<float>(0.56f);
             BitmapCompressFullResize<Color>(Color.Red);
             BitmapCompressFullResize<Vector4>(new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+        }
+
+        static BitmapContent BitmapConvert(Type bitmapType, Color color, int w, int h)
+        {
+            var b1 = new PixelBitmapContent<Color>(w, h);
+            Fill(b1, color);
+            var b2 = (BitmapContent)Activator.CreateInstance(bitmapType, b1.Width, b1.Height);
+            BitmapContent.Copy(b1, b2);
+            return b2;
+        }
+
+        static void BitmapAssert(BitmapContent bitmap, Color color, int range)
+        {
+            byte[] rgba;
+            if (bitmap is Dxt1BitmapContent)
+                rgba = DxtUtil.DecompressDxt1(bitmap.GetPixelData(), bitmap.Width, bitmap.Height);
+            else if (bitmap is Dxt3BitmapContent)
+                rgba = DxtUtil.DecompressDxt3(bitmap.GetPixelData(), bitmap.Width, bitmap.Height);
+            else if (bitmap is Dxt5BitmapContent)
+                rgba = DxtUtil.DecompressDxt5(bitmap.GetPixelData(), bitmap.Width, bitmap.Height);
+            else
+                rgba = bitmap.GetPixelData();
+
+            for (var p = 0; p < rgba.Length; p += 4)
+            {
+                Assert.That(rgba[p + 0], Is.EqualTo(color.R).Within(range));
+                Assert.That(rgba[p + 1], Is.EqualTo(color.G).Within(range));
+                Assert.That(rgba[p + 2], Is.EqualTo(color.B).Within(range));
+                Assert.That(rgba[p + 3], Is.EqualTo(color.A).Within(range));
+            }
+        }
+
+        static void BitmapConvertAssert(Type bitmapType, Color color, int w, int h, int range)
+        {
+            var b = BitmapConvert(bitmapType, color, w, h);
+            BitmapAssert(b, color, range);
+        }
+
+        static void BitmapConvertAssert(Type bitmapType, Color color, int w, int h, Color compare, int range)
+        {
+            var b = BitmapConvert(bitmapType, color, w, h);
+            BitmapAssert(b, compare, range);
+        }
+
+        [Test]
+        public void BitmapCompress()
+        {
+            var Transparent = new Color(0, 0, 0, 0);
+            var Grey16Premult = new Color(16, 16, 16, 16);
+            BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Red, 64, 64, 0);
+            BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Green, 32, 34, 2);
+            BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Blue, 8, 9, 0);
+            BitmapConvertAssert(typeof(Dxt1BitmapContent), Transparent, 16, 16, 0);
+            //BitmapConvertAssert(typeof(Dxt1BitmapContent), Grey16Premult, 16, 16, Transparent, 0);
+            BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Red, 64, 64, 0);
+            BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Green, 32, 34, 2);
+            BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Blue, 8, 9, 0);
+            BitmapConvertAssert(typeof(Dxt3BitmapContent), Transparent, 16, 16, 0);
+            BitmapConvertAssert(typeof(Dxt3BitmapContent), Grey16Premult, 16, 16, Grey16Premult, 1);
+            BitmapConvertAssert(typeof(Dxt5BitmapContent), Color.Red, 64, 64, 0);
+            BitmapConvertAssert(typeof(Dxt5BitmapContent), Color.Green, 32, 34, 2);
+            BitmapConvertAssert(typeof(Dxt5BitmapContent), Color.Blue, 8, 9, 0);
+            BitmapConvertAssert(typeof(Dxt5BitmapContent), Transparent, 16, 16, 0);
+            BitmapConvertAssert(typeof(Dxt5BitmapContent), Grey16Premult, 16, 16, Grey16Premult, 0);
         }
 
         [Test]

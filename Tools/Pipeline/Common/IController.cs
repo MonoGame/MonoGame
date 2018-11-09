@@ -104,8 +104,6 @@ namespace MonoGame.Tools.Pipeline
         void NewFolder();
 
         void Rename();
-
-        void Move(string[] paths, string[] newpaths, FileType[] types);
         
         void AddAction(IProjectAction action);
 

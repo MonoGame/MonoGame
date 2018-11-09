@@ -518,7 +518,22 @@ namespace Microsoft.Xna.Framework
             result.Width = Math.Max(value1.Right, value2.Right) - result.X;
             result.Height = Math.Max(value1.Bottom, value2.Bottom) - result.Y;
         }
-				
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public void Deconstruct(out int x, out int y, out int width, out int height)
+        {
+            x = X;
+            y = Y;
+            width = Width;
+            height = Height;
+        }
+
         #endregion
     }
 }

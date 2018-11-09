@@ -110,6 +110,7 @@ namespace MonoGame.Framework
             {
                 _wasMoved = true;
                 Form.Location = new Point(value.X, value.Y);
+                RefreshAdapter();
             }
         }
 
@@ -144,7 +145,7 @@ namespace MonoGame.Framework
             Game = platform.Game;
 
             Form = new WinFormsGameForm(this);
-            Form.ClientSize = new Size(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
+            ChangeClientSize(new Size(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight));
 
             SetIcon();
             Title = Utilities.AssemblyHelper.GetDefaultWindowTitle();
@@ -170,12 +171,24 @@ namespace MonoGame.Framework
             Form.KeyUp += OnKeyUp;
 
             RegisterToAllWindows();
+        }
 
-            Form.CenterOnPrimaryMonitor();
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct POINTSTRUCT
+        {
+            public int X;
+            public int Y;
         }
 
         [DllImport("shell32.dll", CharSet = CharSet.Auto, BestFitMapping = false)]
         private static extern IntPtr ExtractIcon(IntPtr hInst, string exeFileName, int iconIndex);
+        
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        [return: MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        internal static extern bool GetCursorPos(out POINTSTRUCT pt);
+        
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        internal static extern int MapWindowPoints(HandleRef hWndFrom, HandleRef hWndTo, out POINTSTRUCT pt, int cPoints);
 
         private void SetIcon()
         {
@@ -278,7 +291,10 @@ namespace MonoGame.Framework
             if (!Form.Visible)
                 return;
 
-            var clientPos = Form.PointToClient(Control.MousePosition);
+            POINTSTRUCT pos;
+            GetCursorPos(out pos);
+            MapWindowPoints(new HandleRef(null, IntPtr.Zero), new HandleRef(Form, Form.Handle), out pos, 1);
+            var clientPos = new System.Drawing.Point(pos.X, pos.Y);
             var withinClient = Form.ClientRectangle.Contains(clientPos);
             var buttons = Control.MouseButtons;
 
@@ -289,6 +305,8 @@ namespace MonoGame.Framework
             MouseState.LeftButton = (buttons & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
             MouseState.MiddleButton = (buttons & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
             MouseState.RightButton = (buttons & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.XButton1 = (buttons & MouseButtons.XButton1) == MouseButtons.XButton1 ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.XButton2 = (buttons & MouseButtons.XButton2) == MouseButtons.XButton2 ? ButtonState.Pressed : ButtonState.Released;
 
             // Don't process touch state if we're not active
             // and the mouse is within the client area.
@@ -344,16 +362,13 @@ namespace MonoGame.Framework
 
         internal void Initialize(int width, int height)
         {
-            Form.ClientSize = new Size(width, height);
-            if (!_wasMoved)
-                Form.CenterOnPrimaryMonitor();
+            ChangeClientSize(new Size(width, height));
         }
 
         internal void Initialize(PresentationParameters pp)
         {
-            Form.ClientSize = new Size(pp.BackBufferWidth, pp.BackBufferHeight);
-            if (!_wasMoved)
-                Form.CenterOnPrimaryMonitor();
+            ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
+
             if (pp.IsFullScreen)
             {
                 EnterFullScreen(pp);
@@ -419,8 +434,7 @@ namespace MonoGame.Framework
 
                     // the display that the window is on might have changed, so we need to
                     // check and possibly update the Adapter of the GraphicsDevice
-                    if (Game.GraphicsDevice != null)
-                        Game.GraphicsDevice.RefreshAdapter();
+                    RefreshAdapter();
                 }
                 catch (SharpDXException e)
                 {
@@ -444,6 +458,14 @@ namespace MonoGame.Framework
             }
 
             OnClientSizeChanged();
+        }
+
+        private void RefreshAdapter()
+        {
+            // the display that the window is on might have changed, so we need to
+            // check and possibly update the Adapter of the GraphicsDevice
+            if (Game.GraphicsDevice != null)
+                Game.GraphicsDevice.RefreshAdapter();
         }
 
         private void UpdateBackBufferSize()
@@ -470,49 +492,41 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            // https://bugzilla.novell.com/show_bug.cgi?id=487896
-            // Since there's existing bug from implementation with mono WinForms since 09'
-            // Application.Idle is not working as intended
-            // So we're just going to emulate Application.Run just like Microsoft implementation
-            Form.Show();
+            Application.Idle += TickOnIdle;
+            Application.Run(Form);
+            Application.Idle -= TickOnIdle;
 
-            var nativeMsg = new NativeMessage();
-            while (Form != null && Form.IsDisposed == false)
-            {
-                if (PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0))
-                {
-                    Application.DoEvents();
-
-                    if (nativeMsg.msg == WM_QUIT)
-                        break;
-
-                    continue;
-                }
-                UpdateWindows();
-
-                // We might have been made to exit by the message handling above.
-                // This would make Game null.
-                if (Game != null)
-                {
-                    Game.Tick();
-                }
-            }
-
-            // We need to remove the WM_QUIT message in the message
-            // pump as it will keep us from restarting on this
+            // We need to remove the WM_QUIT message in the message 
+            // pump as it will keep us from restarting on this 
             // same thread.
             //
             // This is critical for some NUnit runners which
             // typically will run all the tests on the same
             // process/thread.
             var msg = new NativeMessage();
-            do {
+            do
+            {
                 if (msg.msg == WM_QUIT)
                     break;
 
                 Thread.Sleep(100);
-            }
+            } 
             while (PeekMessage(out msg, IntPtr.Zero, 0, 1 << 5, 1));
+        }
+
+        // Run game loop when the app becomes Idle.
+        private void TickOnIdle(object sender, EventArgs e)
+        {
+            var nativeMsg = new NativeMessage();
+            do
+            {
+                UpdateWindows();
+				if (Game != null)
+				{
+                	Game.Tick();
+				}
+            }
+            while (!PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0) && Form != null && Form.IsDisposed == false);
         }
 
         internal void UpdateWindows()

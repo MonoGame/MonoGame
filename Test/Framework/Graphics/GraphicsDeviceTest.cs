@@ -119,8 +119,7 @@ namespace MonoGame.Tests.Graphics
             vbb.VertexBuffer.Dispose();
         }
 
-        // TODO Make sure dynamic graphics resources are notified when graphics device is lost
-        [Test, Ignore]
+        [Test, Ignore("Make sure dynamic graphics resources are notified when graphics device is lost")]
         public void ContentLostResources()
         {
             // https://blogs.msdn.microsoft.com/shawnhar/2007/12/12/virtualizing-the-graphicsdevice-in-xna-game-studio-2-0/
@@ -597,8 +596,7 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
 #if DESKTOPGL
-        // Vertex Textures are not implemented for OpenGL
-        [Ignore]
+        [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
         public void VertexTexturesGetSet()
         {
@@ -651,8 +649,7 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
 #if DESKTOPGL
-        // Vertex Textures are not implemented for OpenGL
-        [Ignore]
+        [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
         public void VertexTextureVisualTest()
         {
@@ -723,8 +720,7 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
 #if DESKTOPGL
-        // Vertex samplers are not implemented for OpenGL
-        [Ignore]
+        [Ignore("Vertex samplers are not implemented for OpenGL")]
 #endif
         public void VertexSamplerStatesGetSet()
         {

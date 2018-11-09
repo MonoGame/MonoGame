@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             var gamepad = new GamePadInfo();
             gamepad.Device = Sdl.GameController.Open(deviceId);
-            gamepad.HapticDevice = Sdl.Haptic.Open(deviceId);
+            gamepad.HapticDevice = Sdl.Haptic.OpenFromJoystick(Sdl.GameController.GetJoystick(gamepad.Device));
 
             var id = 0;
             while (Gamepads.ContainsKey(id))
@@ -137,6 +137,7 @@ namespace Microsoft.Xna.Framework.Input
             caps.DisplayName = Sdl.GameController.GetName(gamecontroller);
             caps.Identifier = Sdl.Joystick.GetGUID(Sdl.GameController.GetJoystick(gamecontroller)).ToString();
             caps.HasLeftVibrationMotor = caps.HasRightVibrationMotor = (Gamepads[index].HapticType != 0);
+            caps.GamePadType = GamePadType.GamePad;
 
             foreach (var map in mapping)
             {

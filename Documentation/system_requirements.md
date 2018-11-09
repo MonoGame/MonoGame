@@ -12,5 +12,5 @@ This section will give you an overview of minimal system requirements for develo
 * Mac -
 * Android - Android 4.2 or higher
 * iOS -
-* Windows Phone - Windows Phone 8 or higher
+* Windows Phone - Windows Phone 10
 

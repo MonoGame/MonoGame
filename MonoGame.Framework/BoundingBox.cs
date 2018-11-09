@@ -522,6 +522,17 @@ namespace Microsoft.Xna.Framework
             return "{{Min:" + this.Min.ToString() + " Max:" + this.Max.ToString() + "}}";
         }
 
+        /// <summary>
+        /// Deconstruction method for <see cref="BoundingBox"/>.
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        public void Deconstruct(out Vector3 min, out Vector3 max)
+        {
+            min = Min;
+            max = Max;
+        }
+
         #endregion Public Methods
     }
 }

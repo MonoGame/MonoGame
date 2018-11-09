@@ -7,43 +7,28 @@ using System.Runtime.InteropServices;
 using ObjCRuntime;
 using AppKit;
 using System.Security;
+using MonoGame.Utilities;
 
 namespace OpenGL
 {
     public partial class GL
-	{
+    {
+        public static IntPtr Library = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenGL.framework/OpenGL");
         
         static partial void LoadPlatformEntryPoints()
 		{
             BoundApi = RenderApi.GL;
-		}
+        }
+
+        private static T LoadFunction<T>(string function, bool throwIfNotFound = false)
+        {
+            return FuncLoader.LoadFunction<T>(Library, function, throwIfNotFound);
+        }
 
         private static IGraphicsContext PlatformCreateContext (IWindowInfo info)
         {
             return new GraphicsContext ((MacWindowInfo)info);
         }
-
-		internal static class EntryPointHelper {
-			
-			static IntPtr GL = IntPtr.Zero;
-
-			static EntryPointHelper () 
-			{
-				try {
-					GL = Dlfcn.dlopen("/System/Library/Frameworks/OpenGL.framework/OpenGL", 0);
-				} catch (Exception ex) {
-					System.Diagnostics.Debug.WriteLine (ex.ToString());
-				}
-			}
-
-			public static IntPtr GetAddress(String function)
-			{
-				if (GL == IntPtr.Zero)
-					return IntPtr.Zero;
-
-				return Dlfcn.dlsym (GL, function);
-			}
-		}
 	}
 
     public class MacWindowInfo : IWindowInfo

@@ -31,11 +31,6 @@ namespace Microsoft.Xna.Framework
         public SdlGamePlatform(Game game)
             : base(game)
         {
-            // if we're on Windows, we need to detect the CPU arch and load the correct dlls
-            // on other system, the MonoGame.Framework.dll.config handles this
-            if (PlatformParameters.DetectWindowsArchitecture)
-                NativeHelper.InitDllDirectory();
-
             _game = game;
             _keys = new List<Keys>();
             Keyboard.SetKeys(_keys);
@@ -128,15 +123,22 @@ namespace Microsoft.Xna.Framework
                     GamePad.RemoveDevice(ev.ControllerDevice.Which);
                 else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
                     Joystick.RemoveDevice(ev.JoystickDevice.Which);
-                else if (ev.Type == Sdl.EventType.MouseWheel) {
+                else if (ev.Type == Sdl.EventType.MouseWheel)
+                {
                     const int wheelDelta = 120;
                     Mouse.ScrollY += ev.Wheel.Y * wheelDelta;
                     Mouse.ScrollX += ev.Wheel.X * wheelDelta;
                 }
-                else if (ev.Type == Sdl.EventType.KeyDown) {
-                    var key = KeyboardUtil.ToXna (ev.Key.Keysym.Sym);
-                    if (!_keys.Contains (key))
-                        _keys.Add (key);
+                else if (ev.Type == Sdl.EventType.MouseMotion)
+                {
+                    Window.MouseState.X = ev.Motion.X;
+                    Window.MouseState.Y = ev.Motion.Y;
+                }
+                else if (ev.Type == Sdl.EventType.KeyDown)
+                {
+                    var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+                    if (!_keys.Contains(key))
+                        _keys.Add(key);
 
                     char character = (char)ev.Key.Keysym.Sym;
 #if LINUX

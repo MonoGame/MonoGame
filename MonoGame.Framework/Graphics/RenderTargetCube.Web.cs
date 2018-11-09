@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTargetCube
     {
-        private void PlatformConstruct(GraphicsDevice graphicsDevice, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+        private void PlatformConstruct(GraphicsDevice graphicsDevice, bool mipMap, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
         {
             throw new NotImplementedException();
         }

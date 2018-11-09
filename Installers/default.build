@@ -51,6 +51,7 @@
       <mkdir dir="root/tmp" />
       <!-- Build Addin .pkg -->
       <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="./root/tmp/MonoDevelop.MonoGame_${buildNumber}.mpack" overwrite="true"/>
+      <copy file="../IDE/VisualStudioForMac/bin/Debug/net461/MonoDevelop.MonoGame_IDE_VisualStudioForMac_${buildNumber}.mpack" tofile="./root/tmp/MonoDevelop.MonoGame_IDE_VisualStudioForMac_${buildNumber}.mpack" overwrite="true"/>
       <copy todir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle">
          <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
              <include name="ff*"/>
@@ -180,6 +181,7 @@ fi
         <fileset basedir="Linux/Main"/>
       </copy>
       <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="Linux/tmp_run/Main/MonoDevelop.MonoGame.mpack" overwrite="true"/>
+      <copy file="../IDE/VisualStudioForMac/bin/Debug/net461/MonoDevelop.MonoGame_IDE_VisualStudioForMac_${buildNumber}.mpack" tofile="Linux/tmp_run/Main/MonoDevelop.MonoGame_IDE_VisualStudioForMac.mpack" overwrite="true"/>
       <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets" tofile="Linux/tmp_run/MonoGameSDK/MonoGame.Content.Builder.targets"/>
       <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Common.props" tofile="Linux/tmp_run/MonoGameSDK/MonoGame.Common.props"/>
       <copy file="../Tools/Pipeline/bin/Linux/AnyCPU/Release/MonoGame.Build.Tasks.dll" tofile="Linux/tmp_run/MonoGameSDK/MonoGame.Build.Tasks.dll"/>

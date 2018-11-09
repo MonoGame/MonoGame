@@ -302,9 +302,13 @@ namespace MGCB
 
                 }
 
-                if (arg.StartsWith("/@:") || arg.StartsWith("--@:") || arg.StartsWith("-@:"))
+                if (arg.StartsWith("/@") || arg.StartsWith("--@") || arg.StartsWith("-@")
+                    || (arg.EndsWith(".mgcb") && File.Exists(arg)))
                 {
-                    var file = arg.Substring(3);
+                    var file = arg;
+                    if (!File.Exists(arg))
+                        file = arg.Substring(arg.StartsWith("--@") ? 4 : 3);
+
                     var commands = File.ReadAllLines(file);
                     var offset = 0;
                     lines.Insert(0, string.Format("# Begin:{0} ", file));
@@ -335,6 +339,10 @@ namespace MGCB
 
         private bool ParseFlags(string arg)
         {
+            // Filename detected, redo with a build command
+            if (File.Exists(arg))
+                return ParseFlags("/build=" + arg);
+
             // Only one flag
             if (arg.Length >= 3 &&
                 (arg[0] == '-' || arg[0] == '/') &&
@@ -365,7 +373,11 @@ namespace MGCB
                         ShowError("Unknown option '{0}'", arg[i].ToString());
                         break;
                     }
+
+                    ParseArgument("/" + name);
                 }
+
+                return true;
             }
 
             // Not a flag, parse argument

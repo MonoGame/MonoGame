@@ -89,6 +89,7 @@ Test/*.csproj
 #Mac Package Files
 *.pkg
 *.mpack
+**/packages
 
 #Nuget Packages
 **/*.nupkg
