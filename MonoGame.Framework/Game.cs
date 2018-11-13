@@ -411,6 +411,9 @@ namespace Microsoft.Xna.Framework
         private Stopwatch _gameTimer;
         private long _previousTicks = 0;
         private int _updateFrameLag;
+#if WINDOWS_UAP
+        private readonly object _locker = new object();
+#endif
 
         public void Tick()
         {
@@ -420,6 +423,16 @@ namespace Microsoft.Xna.Framework
             // modes across multiple devices and platforms.
 
         RetryTick:
+
+            if (!IsActive && (InactiveSleepTime.TotalMilliseconds >= 1.0))
+            {
+#if WINDOWS_UAP
+                lock (_locker)
+                    System.Threading.Monitor.Wait(_locker, (int)InactiveSleepTime.TotalMilliseconds);
+#else
+                System.Threading.Thread.Sleep((int)InactiveSleepTime.TotalMilliseconds);
+#endif
+            }
 
             // Advance the accumulated elapsed time.
             var currentTicks = _gameTimer.Elapsed.Ticks;
