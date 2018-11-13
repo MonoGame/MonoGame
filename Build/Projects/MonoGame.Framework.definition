@@ -1191,7 +1191,7 @@
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,Web</Platforms>
     </Compile>
     <Compile Include="Utilities\TimerHelper.cs">
-      <Platforms>Windows,WindowsGL</Platforms>
+      <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
     <Compile Include="Utilities\LzxStream\LzxDecoderStream.cs" />
