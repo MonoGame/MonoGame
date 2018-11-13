@@ -221,7 +221,7 @@ namespace MGCB
 
                 var words = arg.Split('=');
                 var name = words[0];
-                var value = words[1];
+                var value = words.Length > 1 ? words[1] : string.Empty;
 
                 _properties[name] = value;
 

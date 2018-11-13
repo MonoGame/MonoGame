@@ -121,7 +121,7 @@ Instructs the content builder to build the specified content file using the prev
 ```
 This defines a text response file (sometimes called a command file) that contains the same options and switches you would normally find on the command line.
 
-Each switch is specified on a new line.  Comment lines are prefixed with #.  You can specify multiple response files or mix normal command line switches with response files.
+Each switch is specified on a new line.  Comment lines are prefixed with #. These lines are removed by a preprocessor. You can specify multiple response files or mix normal command line switches with response files.
 
 An example response file could look like this:
 ```
@@ -154,9 +154,11 @@ Sets or creates a preprocessor parameter with the given name and value.
 $if <name>=<value>
 $endif
 ```
+
 Preprocessor macros are intended to allow conditionals within a response file.
 
-The preprocess step is what expands a response file command into its composite commands for each line in the file. However, a line is only emitted if all conditionals which contain the line evaluate true.
+Preprocessor symbols can be defined from the command line with the `define` option or in a response file with the `$set` directive.
+
 ```
 <example command line>
 MGCB.exe /define:BuildEffects=No /@:example.mgcb
@@ -167,6 +169,26 @@ $if BuildEffects=Yes
    /processor:EffectProcessor
    /build:Effects\custom.fx
    # all other effects here....
+$endif
+```
+
+```
+$set BuildEffects=Yes
+
+$if BuildEffects=Yes
+    # ...
+    # This is executed
+$endif
+```
+
+For booleans you can omit a value to set a symbol and to check if it is set:
+
+```
+$set BuildEffects
+
+$if BuildEffects
+    # ...
+    # This is executed
 $endif
 ```
 
