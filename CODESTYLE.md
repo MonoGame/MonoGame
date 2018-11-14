@@ -60,7 +60,7 @@ public class Foo
 ```
 
 ## Commenting
-Comments should be used to describe intention, algorithmic overview, and/or logical flow.  It would be ideal if, from reading the comments alone, someone other than the author could understand a function�s intended behavior and general operation. While there are no minimum comment requirements (and certainly some very small routines need no commenting at all) it is best that most routines have comments reflecting the programmer�s intent and approach.
+Comments should be used to describe intention, algorithmic overview, and/or logical flow.  It would be ideal if, from reading the comments alone, someone other than the author could understand a function's intended behavior and general operation. While there are no minimum comment requirements (and certainly some very small routines need no commenting at all), it is best that most routines have comments reflecting the programmer's intent and approach.
 
 Comments must provide added value or explanation to the code. Simply describing the code is not helpful or useful.
 ```
@@ -87,11 +87,11 @@ All methods should use XML doc comments. For internal dev comments, the `<devdoc
 public class Foo 
 {
     /// <summary>Public stuff about the method</summary>
-    /// <param name=�bar�>What a neat parameter!</param>
+    /// <param name="bar">What a neat parameter!</param>
     /// <devdoc>Cool internal stuff!</devdoc>
     public void MyMethod(int bar)
     {
-        �
+        ...
     }
 }
 ```
@@ -153,12 +153,12 @@ for (int i=0 ; i<100 ; ++i)     // Wrong
 ## Naming
 Follow all .NET Framework Design Guidelines for both internal and external members. Highlights of these include:
 * Do not use Hungarian notation
-* Do use an underscore prefix for member variables, e.g. `_foo`
+* Do use an underscore prefix for member variables, e.g. "_foo"
 * Do use camelCasing for member variables (first word all lowercase, subsequent words initial uppercase)
 * Do use camelCasing for parameters
 * Do use camelCasing for local variables
 * Do use PascalCasing for function, property, event, and class names (all words initial uppercase)
-* Do prefix interfaces names with �I�
+* Do prefix interfaces names with "I"
 * Do not prefix enums, classes, or delegates with any letter
 
 The reasons to extend the public rules (no Hungarian, underscore prefix for member variables, etc.) is to produce a consistent source code appearance. In addition, the goal is to have clean, readable source. Code legibility should be a primary goal.
@@ -181,29 +181,29 @@ namespace MyNamespace
         #endregion
 
         #region Properties
-        public int Foo { get { � } set { � } }
+        public int Foo { get { ... } set { ... } }
         #endregion
 
         #region Constructors
         public MyClass()
         {
-            �
+            ...
         }
         #endregion
 
         #region Events
-        public event EventHandler FooChanged { add { � } remove { � } }
+        public event EventHandler FooChanged { add { ... } remove { ... } }
         #endregion
 
         #region Methods
         void DoSomething()
         {
-            �
+            ...
         }
 
         void FindSomething()
         {
-            �
+            ...
         }
         #endregion
 
@@ -217,7 +217,7 @@ namespace MyNamespace
         #region Nested types
         class NestedType
         {
-            �
+            ...
         }
         #endregion
     }
