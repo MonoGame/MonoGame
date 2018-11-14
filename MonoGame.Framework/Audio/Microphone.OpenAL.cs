@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using MonoGame.Utilities;
 
 #if OPENAL
 using MonoGame.OpenAL;
@@ -52,18 +53,26 @@ namespace Microsoft.Xna.Framework.Audio
             string defaultDevice = Alc.GetString(IntPtr.Zero, AlcGetString.CaptureDefaultDeviceSpecifier);
 
 #if true //DESKTOPGL
-            // enumarating capture devices
+            // enumerating capture devices
             IntPtr deviceList = Alc.alcGetString(IntPtr.Zero, (int)AlcGetString.CaptureDeviceSpecifier);
-            // we need to marshal a string array
-            string deviceIdentifier = Marshal.PtrToStringAnsi(deviceList);
-            while (!String.IsNullOrEmpty(deviceIdentifier))
+
+            // Marshal native UTF-8 character array to .NET string
+            // The native string is a null-char separated list of known capture device specifiers ending with an empty string
+
+            while (true)
             {  
-                Microphone microphone = new Microphone(deviceIdentifier);
-                _allMicrophones.Add(microphone);                
+                var deviceIdentifier = InteropHelpers.Utf8ToString(deviceList);
+
+                if (string.IsNullOrEmpty(deviceIdentifier))
+                    break;
+
+                var microphone = new Microphone(deviceIdentifier);
+                _allMicrophones.Add(microphone);
                 if (deviceIdentifier == defaultDevice)
                     _default = microphone;
+
+                // increase the offset, add one extra for the terminator
                 deviceList += deviceIdentifier.Length + 1;
-                deviceIdentifier = Marshal.PtrToStringAnsi(deviceList);
             }
 #else
             // Xamarin platforms don't provide an handle to alGetString that allow to marshal string arrays
