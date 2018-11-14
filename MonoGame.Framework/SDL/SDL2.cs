@@ -381,6 +381,10 @@ internal static class Sdl
         public static d_sdl_destroywindow Destroy = FuncLoader.LoadFunction<d_sdl_destroywindow>(NativeLibrary, "SDL_DestroyWindow");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate uint d_sdl_getwindowid(IntPtr window);
+        public static d_sdl_getwindowid GetWindowId = FuncLoader.LoadFunction<d_sdl_getwindowid>(NativeLibrary, "SDL_GetWindowID");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int d_sdl_getwindowdisplayindex(IntPtr window);
         private static d_sdl_getwindowdisplayindex SDL_GetWindowDisplayIndex = FuncLoader.LoadFunction<d_sdl_getwindowdisplayindex>(NativeLibrary, "SDL_GetWindowDisplayIndex");
 
