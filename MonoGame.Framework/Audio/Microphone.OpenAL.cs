@@ -57,34 +57,22 @@ namespace Microsoft.Xna.Framework.Audio
             IntPtr deviceList = Alc.alcGetString(IntPtr.Zero, (int)AlcGetString.CaptureDeviceSpecifier);
 
             // Marshal native UTF-8 character array to .NET string
-            // Code adapted from https://stackoverflow.com/a/10773988
             // The native string is a null-char separated list of known capture device specifiers ending with an empty string
 
-            var buffer = new byte[0];
             while (true)
             {  
-                // length in bytes without terminator
-                var len = 0;
-                while (Marshal.ReadByte(deviceList, len) != 0)
-                    len++;
+                var deviceIdentifier = Sdl.GetString(deviceList);
 
-                if (len == 0)
+                if (deviceIdentifier == string.Empty)
                     break;
 
-                // try to reuse the buffer
-                if (buffer.Length < len)
-                    buffer = new byte[len];
-
-                Marshal.Copy(deviceList, buffer, 0, len);
-                var deviceIdentifier = Encoding.UTF8.GetString(buffer, 0, len);
-
-                Microphone microphone = new Microphone(deviceIdentifier);
+                var microphone = new Microphone(deviceIdentifier);
                 _allMicrophones.Add(microphone);
                 if (deviceIdentifier == defaultDevice)
                     _default = microphone;
 
                 // increase the offset, add one extra for the terminator
-                deviceList += len + 1;
+                deviceList += deviceIdentifier.Length + 1;
             }
 #else
             // Xamarin platforms don't provide an handle to alGetString that allow to marshal string arrays

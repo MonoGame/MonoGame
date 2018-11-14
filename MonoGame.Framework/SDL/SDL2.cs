@@ -52,16 +52,20 @@ internal static class Sdl
     public static int Minor;
     public static int Patch;
 
-    private static unsafe string GetString(IntPtr handle)
+    public static unsafe string GetString(IntPtr handle)
     {
         if (handle == IntPtr.Zero)
-            return "";
+            return string.Empty;
 
-        var ptr = (byte*)handle;
+        var ptr = (byte*) handle;
         while (*ptr != 0)
             ptr++;
 
-        var bytes = new byte[ptr - (byte*)handle];
+        var len = ptr - (byte*) handle;
+        if (len == 0)
+            return string.Empty;
+
+        var bytes = new byte[len];
         Marshal.Copy(handle, bytes, 0, bytes.Length);
 
         return Encoding.UTF8.GetString(bytes);
