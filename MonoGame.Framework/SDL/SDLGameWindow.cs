@@ -80,9 +80,8 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        internal uint Id;
-
         public static GameWindow Instance;
+        public uint? Id;
         public bool IsFullScreen;
 
         internal readonly Game _game;
