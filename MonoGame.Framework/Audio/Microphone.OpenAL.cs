@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Audio
             {  
                 var deviceIdentifier = InteropHelpers.Utf8ToString(deviceList);
 
-                if (deviceIdentifier == string.Empty)
+                if (string.IsNullOrEmpty(deviceIdentifier))
                     break;
 
                 var microphone = new Microphone(deviceIdentifier);

@@ -10,7 +10,9 @@ namespace MonoGame.Utilities
 {
     internal static class InteropHelpers
     {
-        // Convert a pointer to a Utf8 null-terminated string to a .NET System.String
+        /// <summary>
+        /// Convert a pointer to a Utf8 null-terminated string to a .NET System.String
+        /// </summary>
         public static unsafe string Utf8ToString(IntPtr handle)
         {
             if (handle == IntPtr.Zero)
