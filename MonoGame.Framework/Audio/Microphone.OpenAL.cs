@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
+using MonoGame.Utilities;
 
 #if OPENAL
 using MonoGame.OpenAL;
@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             while (true)
             {  
-                var deviceIdentifier = Sdl.GetString(deviceList);
+                var deviceIdentifier = InteropHelpers.Utf8ToString(deviceList);
 
                 if (deviceIdentifier == string.Empty)
                     break;
