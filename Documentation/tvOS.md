@@ -1,5 +1,3 @@
-#
-
 ## Menu Button Handling
 
 The Menu button will map to the "Back" button on the GamePad. However on tvOS,
