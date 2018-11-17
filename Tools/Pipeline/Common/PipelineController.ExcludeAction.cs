@@ -72,6 +72,10 @@ namespace MonoGame.Tools.Pipeline
                 foreach (var sitem in _subitems)
                     _con._project.ContentItems.Remove(sitem);
 
+                //Since these items are removed from the project, manually clear the selection
+                _con.SelectedItems.Clear();
+                _con.SelectionChanged(_con.SelectedItems);
+
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
 
