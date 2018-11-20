@@ -621,14 +621,32 @@ namespace Microsoft.Xna.Framework.Net
             return true;
         }
 
-        internal void SendUserMessage(LocalNetworkGamer sender, SendDataOptions options, Packet packet, NetworkGamer recipient = null)
+        internal void SendUserMessage(LocalNetworkGamer sender, SendDataOptions options, byte[] data, NetworkGamer recipient = null)
         {
             var msg = CreateMessage(MessageType.User, recipient?.Machine);
             msg.Write(sender.Id);
             msg.Write((byte)(recipient == null ? 255 : recipient.Id));
             msg.Write((byte)options);
-            msg.Write(packet.length);
-            msg.Write(packet.data);
+            msg.Write(data.Length);
+            msg.Write(data);
+            SendMessage(msg, ToDeliveryMethod(options));
+        }
+
+        internal void SendUserMessage(LocalNetworkGamer sender, SendDataOptions options, PacketWriter data, NetworkGamer recipient = null)
+        {
+            var msg = CreateMessage(MessageType.User, recipient?.Machine);
+            msg.Write(sender.Id);
+            msg.Write((byte)(recipient == null ? 255 : recipient.Id));
+            msg.Write((byte)options);
+
+            msg.Write(data.Length);
+            data.BaseStream.Position = 0;
+            int dataByte;
+            while ((dataByte = data.BaseStream.ReadByte()) != -1)
+            {
+                msg.Write((byte)dataByte);
+            }
+
             SendMessage(msg, ToDeliveryMethod(options));
         }
 

@@ -41,7 +41,6 @@ namespace Microsoft.Xna.Framework.Net
 
         private int inboundPacketIndex = 0;
         private List<InboundPacket> inboundPackets = new List<InboundPacket>();
-        private List<OutboundPacket> outboundPackets = new List<OutboundPacket>();
 
         internal LocalNetworkGamer(SignedInGamer signedInGamer, NetworkMachine machine, byte id, bool isPrivateSlot)
             : base(machine, id, isPrivateSlot, signedInGamer.DisplayName, signedInGamer.Gamertag, false)
@@ -175,18 +174,6 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal void SendOutboundPackets()
-        {
-            foreach (var outboundPacket in outboundPackets)
-            {
-                session.SendUserMessage(outboundPacket.sender, outboundPacket.options, outboundPacket.packet, outboundPacket.recipient);
-
-                session.packetPool.Recycle(outboundPacket.packet);
-            }
-
-            outboundPackets.Clear();
-        }
-
         // Receiving data
         public int ReceiveData(byte[] data, out NetworkGamer sender)
         {
@@ -242,29 +229,6 @@ namespace Microsoft.Xna.Framework.Net
         }
 
         // Sending data
-        private void InternalSendData(byte[] data, int offset, int count, SendDataOptions options, NetworkGamer recipient)
-        {
-            if (data == null)
-            {
-                throw new NullReferenceException(nameof(data));
-            }
-            if (data.Length == 0)
-            {
-                throw new NetworkException($"{nameof(data)} empty");
-            }
-            if (offset < 0 || offset >= data.Length)
-            {
-                throw new ArgumentOutOfRangeException(nameof(offset));
-            }
-            if (count <= 0 || offset + count > data.Length)
-            {
-                throw new ArgumentOutOfRangeException(nameof(count));
-            }
-
-            var packet = session.packetPool.GetAndFillWith(data, offset, count);
-            outboundPackets.Add(new OutboundPacket(packet, this, recipient, options));
-        }
-
         public void SendData(byte[] data, SendDataOptions options)
         {
             try { InternalSendData(data, 0, data.Length, options, null); }
@@ -299,6 +263,28 @@ namespace Microsoft.Xna.Framework.Net
             catch { throw; }
         }
 
+        private void InternalSendData(byte[] data, int offset, int count, SendDataOptions options, NetworkGamer recipient)
+        {
+            if (data == null)
+            {
+                throw new NullReferenceException(nameof(data));
+            }
+            if (data.Length == 0)
+            {
+                throw new NetworkException($"{nameof(data)} empty");
+            }
+            if (offset < 0 || offset >= data.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            }
+            if (count <= 0 || offset + count > data.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count));
+            }
+
+            session.SendUserMessage(this, options, data, recipient);
+        }
+
         private void InternalSendData(PacketWriter data, SendDataOptions options, NetworkGamer recipient)
         {
             if (data == null)
@@ -310,13 +296,10 @@ namespace Microsoft.Xna.Framework.Net
                 throw new NetworkException("PacketWriter empty");
             }
 
-            var packet = session.packetPool.Get(data.Length);
-            data.BaseStream.Position = 0;
-            data.BaseStream.Read(packet.data, 0, packet.length);
+            session.SendUserMessage(this, options, data, recipient);
+            
             data.BaseStream.SetLength(0);
             data.BaseStream.Position = 0;
-
-            outboundPackets.Add(new OutboundPacket(packet, this, recipient, options));
         }
 
         public void SendData(PacketWriter data, SendDataOptions options)

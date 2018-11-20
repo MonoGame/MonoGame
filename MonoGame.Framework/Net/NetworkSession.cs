@@ -656,12 +656,6 @@ namespace Microsoft.Xna.Framework.Net
                 localGamer.TryAddDelayedInboundPackets();
             }
 
-            // Queue outbound packets as internal messages
-            foreach (var localGamer in localGamers)
-            {
-                localGamer.SendOutboundPackets(); // TODO: Remove pooling of outbound packets now that we use FlushSendQueue() below
-            }
-
             RegisterWithMasterServer();
 
             peer.FlushSendQueue();
