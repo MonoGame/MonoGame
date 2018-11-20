@@ -216,11 +216,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-            var reader = new ImageReader();
             int width, height, channels;
 
             // The data returned is always four channel BGRA
-            var data = reader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
+            var data = ImageReader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
 
             // XNA blacks out any pixels with an alpha of zero.
             if (channels == 4)

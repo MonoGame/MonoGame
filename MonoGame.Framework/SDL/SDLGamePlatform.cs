@@ -171,14 +171,19 @@ namespace Microsoft.Xna.Framework
                 }
                 else if (ev.Type == Sdl.EventType.WindowEvent)
                 {
-                    if (ev.Window.EventID == Sdl.Window.EventId.Resized || ev.Window.EventID == Sdl.Window.EventId.SizeChanged)
-                        _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
-                    else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
-                        IsActive = true;
-                    else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
-                        IsActive = false;
-                    else if (ev.Window.EventID == Sdl.Window.EventId.Moved)
-                        _view.Moved();
+                    if (ev.Window.WindowID == _view.Id)
+                    {
+                        if (ev.Window.EventID == Sdl.Window.EventId.Resized || ev.Window.EventID == Sdl.Window.EventId.SizeChanged)
+                            _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
+                        else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
+                            IsActive = true;
+                        else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
+                            IsActive = false;
+                        else if (ev.Window.EventID == Sdl.Window.EventId.Moved)
+                            _view.Moved();
+                        else if (ev.Window.EventID == Sdl.Window.EventId.Close)
+                            _isExiting++;
+                    }
                 }
             }
         }
@@ -230,7 +235,6 @@ namespace Microsoft.Xna.Framework
         {
             if (Game.GraphicsDevice != null)
                 Game.GraphicsDevice.Present();
-
         }
 
         protected override void Dispose(bool disposing)

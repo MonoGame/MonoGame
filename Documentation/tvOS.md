@@ -1,5 +1,3 @@
-#
-
 ## Menu Button Handling
 
 The Menu button will map to the "Back" button on the GamePad. However on tvOS,
@@ -21,27 +19,29 @@ Some sample code.
 
 ```csharp
 
-	public class Game1 : Game , IPlaformBackButton {
+public class Game1 : Game, IPlaformBackButton
+{
 
-		bool IsOnRootMenu = true;
+    private bool _isOnRootMenu = true;
 
-		public bool Handled () {
-			return IsOnRootMenu ? false : true;
-		}
+    public bool Handled()
+    {
+        return !_isOnRootMenu;
+    }
 
-		public Game1 ()
-		{
-			Services.AddService<IPlaformBackButton>(this);
-		}
+    public Game1()
+    {
+        Services.AddService<IPlaformBackButton>(this);
+    }
 
-		public override Update(GameTime gametime)
-		{
-			if (GamePad.GetState (PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-			{
-				// do something in game
-			}
-		}
-	}
+    public override Update(GameTime gametime)
+    {
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+        {
+            // do something in game
+        }
+    }
+}
 ```
 
 The key to this working is the `IPlatformBackButton` interface. By implementing
