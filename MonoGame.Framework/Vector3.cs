@@ -1177,7 +1177,7 @@ namespace Microsoft.Xna.Framework
                     new Vector3(
                         invW * ((position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41),
                         invW * ((position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42),
-                        invW * ((position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
+                        invW * ((position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43));
             }
         }
 
@@ -1206,7 +1206,7 @@ namespace Microsoft.Xna.Framework
                     new Vector3(
                         invW * ((position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41),
                         invW * ((position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42),
-                        invW * ((position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
+                        invW * ((position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43));
             }
         }
 
