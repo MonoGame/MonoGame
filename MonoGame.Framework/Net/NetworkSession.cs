@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Net
         private bool gameStartRequestThisFrame = false;
         private bool gameEndRequestThisFrame = false;
         private bool resetReadyRequestThisFrame = false;
-
+        
         private DateTime lastMasterServerReport = DateTime.MinValue;
 
         private List<EventArgs> eventQueue = new List<EventArgs>();
@@ -514,6 +514,25 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
+        private void UpdateMachineRoundtrips()
+        {
+            // TODO: Don't assume the same ping to host
+            foreach (var machine in allMachines)
+            {
+                if (!connectionFromMachine.ContainsKey(machine))
+                {
+                    continue;
+                }
+
+                float seconds = connectionFromMachine[machine].AverageRoundtripTime;
+                if (!isHost && !machine.IsHost)
+                {
+                    seconds *= 2.0f;
+                }
+                machine.RoundtripTime = TimeSpan.FromSeconds(seconds);
+            }
+        }
+
         private void AddGamer(NetworkGamer gamer)
         {
             gamer.Machine.gamers.Add(gamer);
@@ -646,6 +665,8 @@ namespace Microsoft.Xna.Framework.Net
             RegisterWithMasterServer();
 
             peer.FlushSendQueue();
+
+            UpdateMachineRoundtrips();
 
             gameStartRequestThisFrame = false;
             gameEndRequestThisFrame = false;

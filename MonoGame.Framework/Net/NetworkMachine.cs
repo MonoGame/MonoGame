@@ -12,8 +12,7 @@ namespace Microsoft.Xna.Framework.Net
         private readonly byte id;
 
         internal readonly List<NetworkGamer> gamers = new List<NetworkGamer>();
-
-        private TimeSpan roundtripTime = TimeSpan.Zero; // TODO
+        
         private bool beingRemoved = false;
 
         internal NetworkMachine(NetworkSession session, bool isLocal, bool isHost, byte id)
@@ -29,7 +28,7 @@ namespace Microsoft.Xna.Framework.Net
         internal bool IsLocal { get { return isLocal; } }
         internal bool IsHost { get { return isHost; } }
         internal byte Id { get { return id; } }
-        internal TimeSpan RoundtripTime { get { return roundtripTime; } }
+        internal TimeSpan RoundtripTime { get; set; } = TimeSpan.Zero;
 
         public GamerCollection<NetworkGamer> Gamers { get; }
 
