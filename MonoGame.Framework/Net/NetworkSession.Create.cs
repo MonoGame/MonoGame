@@ -13,9 +13,9 @@ namespace Microsoft.Xna.Framework.Net
 {
     public sealed partial class NetworkSession : IDisposable
     {
-        private static readonly TimeSpan IndividualPacketTimeOut = TimeSpan.FromSeconds(1.0);
-        private static readonly TimeSpan MaxDiscoveryTimeOut = TimeSpan.FromSeconds(4.0);
-        private static readonly TimeSpan MaxJoinTimeOut = TimeSpan.FromSeconds(2.0);
+        private static readonly TimeSpan NoMessageSleep = TimeSpan.FromSeconds(0.1);
+        private static readonly TimeSpan DiscoveryTimeOut = TimeSpan.FromSeconds(4.0);
+        private static readonly TimeSpan JoinTimeOut = TimeSpan.FromSeconds(2.0);
 
         private static NetworkSession InternalCreate(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
         {
@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 Port = 0, // Use any port
                 AcceptIncomingConnections = false,
-                AutoFlushSendQueue = false,
+                AutoFlushSendQueue = true,
             };
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -82,8 +82,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 clientPeer.Connect((IPEndPoint)availableSession.Tag);
             }
-            else if (availableSession.SessionType == NetworkSessionType.PlayerMatch ||
-                        availableSession.SessionType == NetworkSessionType.Ranked)
+            else if (availableSession.SessionType == NetworkSessionType.PlayerMatch || availableSession.SessionType == NetworkSessionType.Ranked)
             {
                 clientPeer.Configuration.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
                 NetworkSessionMasterServer.RequestIntroduction(clientPeer, availableSession.HostGuid, GetInternalIp(clientPeer));
@@ -98,9 +97,15 @@ namespace Microsoft.Xna.Framework.Net
             byte machineId = 255;
             var joinError = NetworkSessionJoinError.SessionNotFound;
             var startTime = DateTime.Now;
-            NetIncomingMessage msg;
-            while ((msg = clientPeer.WaitMessage((int)IndividualPacketTimeOut.TotalMilliseconds)) != null)
+            while (DateTime.Now - startTime <= JoinTimeOut)
             {
+                var msg = clientPeer.ReadMessage();
+                if (msg == null)
+                {
+                    Thread.Sleep((int)NoMessageSleep.TotalMilliseconds);
+                    continue;
+                }
+
                 if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess)
                 {
                     if (clientPeer.GetConnection(msg.SenderEndPoint) == null)
@@ -135,11 +140,6 @@ namespace Microsoft.Xna.Framework.Net
                     HandleLidgrenMessage(msg);
                 }
                 clientPeer.Recycle(msg);
-
-                if (DateTime.Now - startTime > MaxJoinTimeOut)
-                {
-                    break;
-                }
             }
             if (!success || machineId == 255)
             {
@@ -147,11 +147,12 @@ namespace Microsoft.Xna.Framework.Net
                 throw new NetworkSessionJoinException("Could not connect to host", joinError);
             }
 
-            if (availableSession.SessionType == NetworkSessionType.PlayerMatch ||
-                availableSession.SessionType == NetworkSessionType.Ranked)
+            // Setup client
+            if (availableSession.SessionType == NetworkSessionType.PlayerMatch || availableSession.SessionType == NetworkSessionType.Ranked)
             {
                 clientPeer.Configuration.DisableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
             }
+            clientPeer.Configuration.AutoFlushSendQueue = false;
 
             return new NetworkSession(clientPeer,
                 false,
@@ -193,7 +194,6 @@ namespace Microsoft.Xna.Framework.Net
             {
                 Port = 0, // Use any port
                 AcceptIncomingConnections = false,
-                AutoFlushSendQueue = true,
             };
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
             config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
@@ -230,9 +230,15 @@ namespace Microsoft.Xna.Framework.Net
             var availableSessions = new List<AvailableNetworkSession>();
 
             var startTime = DateTime.Now;
-            NetIncomingMessage msg;
-            while ((msg = discoverPeer.WaitMessage((int)IndividualPacketTimeOut.TotalMilliseconds)) != null)
+            while (DateTime.Now - startTime <= DiscoveryTimeOut)
             {
+                var msg = discoverPeer.ReadMessage();
+                if (msg == null)
+                {
+                    Thread.Sleep((int)NoMessageSleep.TotalMilliseconds);
+                    continue;
+                }
+
                 if (msg.MessageType == NetIncomingMessageType.UnconnectedData && !msg.SenderEndPoint.Equals(masterServerEndPoint))
                 {
                     discoverPeer.Recycle(msg);
@@ -273,11 +279,6 @@ namespace Microsoft.Xna.Framework.Net
                     HandleLidgrenMessage(msg);
                 }
                 discoverPeer.Recycle(msg);
-
-                if (DateTime.Now - startTime > MaxDiscoveryTimeOut)
-                {
-                    break;
-                }
             }
             discoverPeer.Shutdown(string.Empty);
             Debug.WriteLine("Discovery peer shut down.");

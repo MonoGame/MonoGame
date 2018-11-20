@@ -177,11 +177,16 @@ namespace Microsoft.Xna.Framework.Net
 
         private void RegisterWithMasterServer()
         {
-            if (type != NetworkSessionType.PlayerMatch &&
-                type != NetworkSessionType.Ranked)
+            if (!isHost || type == NetworkSessionType.Local || type == NetworkSessionType.SystemLink)
             {
                 return;
             }
+            var currentTime = DateTime.Now;
+            if (currentTime - lastMasterServerReport < NetworkSessionMasterServer.ReportStatusInterval)
+            {
+                return;
+            }
+            lastMasterServerReport = currentTime;
 
             UpdatePublicInfo();
             
@@ -190,8 +195,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private void UnregisterWithMasterServer()
         {
-            if (type != NetworkSessionType.PlayerMatch &&
-                type != NetworkSessionType.Ranked)
+            if (!isHost || type == NetworkSessionType.Local || type == NetworkSessionType.SystemLink)
             {
                 return;
             }

@@ -42,6 +42,8 @@ namespace Microsoft.Xna.Framework.Net
         private bool gameEndRequestThisFrame = false;
         private bool resetReadyRequestThisFrame = false;
 
+        private DateTime lastMasterServerReport = DateTime.MinValue;
+
         private List<EventArgs> eventQueue = new List<EventArgs>();
         private List<LocalNetworkGamer> localGamers = new List<LocalNetworkGamer>();
         private Dictionary<SignedInGamer, LocalNetworkGamer> localGamerFromSignedInGamer = new Dictionary<SignedInGamer, LocalNetworkGamer>();
@@ -54,6 +56,7 @@ namespace Microsoft.Xna.Framework.Net
 
         internal NetworkSession(NetPeer peer, bool isHost, byte machineId, NetworkSessionType type, NetworkSessionProperties properties, int maxGamers, int privateGamerSlots, IEnumerable<SignedInGamer> localGamers)
         {
+            if (peer.Configuration.AutoFlushSendQueue) throw new InvalidOperationException("Peer must not flush send queue automatically");
             if (isHost && machineId != 0) throw new InvalidOperationException("Host must have machine id 0");
             if (!isHost && machineId == 0) throw new InvalidOperationException("Client cannot have machine id 0");
 
@@ -640,6 +643,8 @@ namespace Microsoft.Xna.Framework.Net
                 localGamer.SendOutboundPackets(); // TODO: Remove pooling of outbound packets now that we use FlushSendQueue() below
             }
 
+            RegisterWithMasterServer();
+
             peer.FlushSendQueue();
 
             gameStartRequestThisFrame = false;
@@ -731,6 +736,10 @@ namespace Microsoft.Xna.Framework.Net
                     }
                     DisconnectMachine(machine, NetworkSessionEndReason.HostEndedSession);
                 }
+
+                UnregisterWithMasterServer();
+
+                peer.FlushSendQueue();
             }
 
             // Note that we do not want to dispose the NetworkSession until the end of this call, as the user

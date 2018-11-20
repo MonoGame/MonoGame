@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Net
 
     public class NetworkSessionMasterServer
     {
-        private static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
+        internal static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
 
         private NetPeer serverPeer;
         private IDictionary<Guid, HostData> hosts = new Dictionary<Guid, HostData>();
