@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Net
                 AddMachine(this.hostMachine, hostConnection);
 
                 // Add host gamer with id 0, important for NetworkSession.Host property
-                AddGamer(new NetworkGamer(this.hostMachine, 0, false, "...", "...", false));
+                AddGamer(new NetworkGamer(this.hostMachine, 0, privateGamerSlots > 0, false, "...", "..."));
             }
 
             this.maxGamers = maxGamers;
@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework.Net
                 byte id = 0;
                 foreach (var gamer in localGamers)
                 {
-                    AddGamer(new LocalNetworkGamer(gamer, this.localMachine, id++, false));
+                    AddGamer(new LocalNetworkGamer(gamer, this.localMachine, id++, GetOpenPrivateGamerSlots() > 0));
                 }
                 if (allGamers.Count == 0)
                 {
@@ -278,9 +278,9 @@ namespace Microsoft.Xna.Framework.Net
             get
             {
                 int usedPublicSlots = 0;
-                foreach (NetworkGamer gamer in allGamers)
+                foreach (var gamer in allGamers)
                 {
-                    if (!gamer.IsPrivateSlot)
+                    if (!gamer.isPrivateSlot)
                     {
                         usedPublicSlots++;
                     }
@@ -402,7 +402,13 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
-            if (!pendingSignedInGamers.Contains(signedInGamer))
+            if (pendingSignedInGamers.Contains(signedInGamer))
+            {
+                // Already waiting to join
+                return;
+            }
+
+            if (GetOpenSlotsForMachine(localMachine) > 0)
             {
                 pendingSignedInGamers.Add(signedInGamer);
 
@@ -538,8 +544,8 @@ namespace Microsoft.Xna.Framework.Net
 
         private void AddGamer(NetworkGamer gamer)
         {
-            gamer.Machine.gamers.Add(gamer);
-            gamer.Machine.currentGamerIdRequests--;
+            gamer.machine.gamers.Add(gamer);
+            gamer.machine.currentGamerIdRequests--;
 
             allGamers.Add(gamer);
             allGamers.Sort(NetworkGamerIdComparer.Instance);
@@ -556,11 +562,11 @@ namespace Microsoft.Xna.Framework.Net
                 remoteGamers.Sort(NetworkGamerIdComparer.Instance);
             }
 
-            gamerFromId.Add(gamer.Id, gamer);
+            gamerFromId.Add(gamer.id, gamer);
 
-            if (!reservedGamerIds.ContainsKey(gamer.Id))
+            if (!reservedGamerIds.ContainsKey(gamer.id))
             {
-                reservedGamerIds.Add(gamer.Id, gamer.Machine);
+                reservedGamerIds.Add(gamer.id, gamer.machine);
             }
 
             InvokeGamerJoinedEvent(new GamerJoinedEventArgs(gamer));
@@ -568,9 +574,9 @@ namespace Microsoft.Xna.Framework.Net
 
         private void RemoveGamer(NetworkGamer gamer)
         {
-            gamer.HasLeftSession = true;
+            gamer.hasLeftSession = true;
 
-            gamer.Machine.gamers.Remove(gamer);
+            gamer.machine.gamers.Remove(gamer);
 
             allGamers.Remove(gamer);
 
@@ -585,9 +591,9 @@ namespace Microsoft.Xna.Framework.Net
                 remoteGamers.Remove(gamer);
             }
 
-            gamerFromId.Remove(gamer.Id);
+            gamerFromId.Remove(gamer.id);
 
-            reservedGamerIds.Remove(gamer.Id);
+            reservedGamerIds.Remove(gamer.id);
 
             AddPreviousGamer(gamer);
             InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));

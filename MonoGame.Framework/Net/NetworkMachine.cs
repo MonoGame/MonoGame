@@ -10,9 +10,7 @@ namespace Microsoft.Xna.Framework.Net
         internal readonly bool isLocal;
         internal readonly bool isHost;
         internal readonly byte id;
-
         internal readonly List<NetworkGamer> gamers = new List<NetworkGamer>();
-
         private bool beingRemoved = false;
         internal TimeSpan roundtripTime = TimeSpan.Zero;
         internal int currentGamerIdRequests = 0;

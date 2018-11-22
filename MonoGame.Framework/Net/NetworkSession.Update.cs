@@ -149,20 +149,38 @@ namespace Microsoft.Xna.Framework.Net
 
         private int GetOpenPrivateGamerSlots()
         {
-            int usedSlots = 0;
+            int usedPrivateSlots = 0;
             foreach (var gamer in allGamers)
             {
-                if (gamer.IsPrivateSlot)
+                if (gamer.isPrivateSlot)
                 {
-                    usedSlots++;
+                    usedPrivateSlots++;
                 }
             }
-            return PrivateGamerSlots - usedSlots;
+            return privateGamerSlots - usedPrivateSlots;
         }
 
         private int GetOpenPublicGamerSlots()
         {
-            return maxGamers - PrivateGamerSlots - allGamers.Count;
+            int usedPublicSlots = 0;
+            foreach (var gamer in allGamers)
+            {
+                if (!gamer.isPrivateSlot)
+                {
+                    usedPublicSlots++;
+                }
+            }
+            return maxGamers - privateGamerSlots - usedPublicSlots;
+        }
+
+        private int GetOpenSlotsForMachine(NetworkMachine machine)
+        {
+            int slots = GetOpenPublicGamerSlots();
+            if (machine.isHost)
+            {
+                slots = Math.Max(slots, GetOpenPrivateGamerSlots());
+            }
+            return slots;
         }
 
         private void UpdatePublicInfo()

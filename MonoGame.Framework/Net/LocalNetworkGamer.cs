@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Net
         private List<InboundPacket> inboundPackets = new List<InboundPacket>();
 
         internal LocalNetworkGamer(SignedInGamer signedInGamer, NetworkMachine machine, byte id, bool isPrivateSlot)
-            : base(machine, id, isPrivateSlot, signedInGamer.DisplayName, signedInGamer.Gamertag, false)
+            : base(machine, id, isPrivateSlot, false, signedInGamer.DisplayName, signedInGamer.Gamertag)
         {
             this.SignedInGamer = signedInGamer;
         }
@@ -61,11 +61,11 @@ namespace Microsoft.Xna.Framework.Net
                     throw new InvalidOperationException("Session state is not lobby");
                 }
 
-                if (ready != value)
+                if (isReady != value)
                 {
-                    ready = value;
+                    isReady = value;
 
-                    Session.SendGamerStateChanged(this);
+                    session.SendGamerStateChanged(this);
                 }
             }
         }

@@ -366,19 +366,27 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return false;
             }
-
             if (originMachine.gamers.Count + originMachine.currentGamerIdRequests >= MaxSupportedLocalGamers)
             {
+                // A single requester should not request too many gamer ids
                 return false;
             }
 
-            var available = GetUniqueId(reservedGamerIds, out byte id);
-            if (available)
+            bool slotAvailable = false;
+            byte slotId = 255;
+
+            if (GetOpenSlotsForMachine(originMachine) > 0 && reservedGamerIds.Count < (originMachine.isHost ? maxGamers : maxGamers - privateGamerSlots))
             {
-                reservedGamerIds.Add(id, originMachine);
-                originMachine.currentGamerIdRequests++;
+                // There are open unreserved slots, try to get id
+                slotAvailable = GetUniqueId(reservedGamerIds, out slotId);
+                if (slotAvailable)
+                {
+                    reservedGamerIds.Add(slotId, originMachine);
+                    originMachine.currentGamerIdRequests++;
+                }
             }
-            SendGamerIdResponse(originMachine, available, id);
+
+            SendGamerIdResponse(originMachine, slotAvailable, slotId);
             return true;
         }
 
@@ -398,28 +406,37 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return false;
             }
-            bool success;
+            bool slotAvailable;
             byte id;
             try
             {
-                success = msg.ReadBoolean();
+                slotAvailable = msg.ReadBoolean();
                 id = msg.ReadByte();
             }
             catch
             {
                 return false;
             }
-            if (success && id == 255)
+            if (slotAvailable && id == 255)
             {
                 return false;
             }
+
             if (pendingSignedInGamers.Count == 0)
             {
-                return true; // Don't treat as error
+                // Don't treat as error but host will have marked slot used by client
+                return true;
             }
-
-            var localGamer = new LocalNetworkGamer(pendingSignedInGamers[0], localMachine, id, false);
+            if (!slotAvailable)
+            {
+                pendingSignedInGamers.RemoveAt(0);
+                return true;
+            }
+            var signedInGamer = pendingSignedInGamers[0];
             pendingSignedInGamers.RemoveAt(0);
+
+            var isPrivateSlot = isHost && GetOpenPrivateGamerSlots() > 0;
+            var localGamer = new LocalNetworkGamer(signedInGamer, localMachine, id, isPrivateSlot);
             AddGamer(localGamer);
             SendGamerJoined(localGamer, null);
             return true;
@@ -428,11 +445,11 @@ namespace Microsoft.Xna.Framework.Net
         private void SendGamerJoined(LocalNetworkGamer localGamer, NetworkMachine recipient)
         {
             var msg = CreateMessage(MessageType.GamerJoined, recipient);
-            msg.Write(localGamer.Id);
+            msg.Write(localGamer.id);
             msg.Write(localGamer.DisplayName);
             msg.Write(localGamer.Gamertag);
-            msg.Write(localGamer.IsPrivateSlot);
-            msg.Write(localGamer.IsReady);
+            msg.Write(localGamer.isPrivateSlot);
+            msg.Write(localGamer.isReady);
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
 
@@ -459,8 +476,9 @@ namespace Microsoft.Xna.Framework.Net
             }
             if (isHost && gamerFromId.ContainsKey(id))
             {
+                // Sender is updating a newly connected machine
                 // TODO: Make sure client is not spamming recipient
-                return gamerFromId[id].Machine == originMachine;
+                return gamerFromId[id].machine == originMachine;
             }
 
             if (originMachine.isLocal)
@@ -476,20 +494,21 @@ namespace Microsoft.Xna.Framework.Net
                     // Already added host gamer with id 0, just update it
                     Host.DisplayName = displayName;
                     Host.Gamertag = gamertag;
-                    Host.SetReadyState(isReady);
+                    Host.isPrivateSlot = isPrivateSlot;
+                    Host.isReady = isReady;
                     return true;
                 }
                 return false;
             }
 
-            AddGamer(new NetworkGamer(originMachine, id, isPrivateSlot, displayName, gamertag, isReady));
+            AddGamer(new NetworkGamer(originMachine, id, isPrivateSlot, isReady, displayName, gamertag));
             return true;
         }
 
         private void SendGamerLeft(LocalNetworkGamer localGamer)
         {
             var msg = CreateMessage(MessageType.GamerLeft, null);
-            msg.Write(localGamer.Id);
+            msg.Write(localGamer.id);
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
 
@@ -513,7 +532,7 @@ namespace Microsoft.Xna.Framework.Net
                 return false;
             }
             var gamer = gamerFromId[id];
-            if (gamer.Machine != originMachine)
+            if (gamer.machine != originMachine)
             {
                 return false;
             }
@@ -525,10 +544,10 @@ namespace Microsoft.Xna.Framework.Net
         internal void SendGamerStateChanged(LocalNetworkGamer localGamer)
         {
             var msg = CreateMessage(MessageType.GamerStateChanged, null);
-            msg.Write(localGamer.Id);
+            msg.Write(localGamer.id);
             msg.Write(localGamer.DisplayName);
             msg.Write(localGamer.Gamertag);
-            msg.Write(localGamer.IsReady);
+            msg.Write(localGamer.isReady);
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
 
@@ -557,14 +576,14 @@ namespace Microsoft.Xna.Framework.Net
                 return false;
             }
             var gamer = gamerFromId[id];
-            if (gamer.Machine != originMachine)
+            if (gamer.machine != originMachine)
             {
                 return false;
             }
 
             gamer.DisplayName = displayName;
             gamer.Gamertag = gamertag;
-            gamer.SetReadyState(isReady);
+            gamer.isReady = isReady;
             return true;
         }
 
@@ -584,7 +603,7 @@ namespace Microsoft.Xna.Framework.Net
 
             foreach (var gamer in allGamers)
             {
-                gamer.SetReadyState(false);
+                gamer.isReady = false;
             }
             return true;
         }
@@ -624,7 +643,7 @@ namespace Microsoft.Xna.Framework.Net
 
             foreach (var gamer in allGamers)
             {
-                gamer.SetReadyState(false);
+                gamer.isReady = false;
             }
             state = NetworkSessionState.Lobby;
             InvokeGameEndedEvent(new GameEndedEventArgs());
@@ -633,9 +652,9 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void SendUserMessage(LocalNetworkGamer sender, SendDataOptions options, byte[] data, NetworkGamer recipient = null)
         {
-            var msg = CreateMessage(MessageType.User, recipient?.Machine);
-            msg.Write(sender.Id);
-            msg.Write((byte)(recipient == null ? 255 : recipient.Id));
+            var msg = CreateMessage(MessageType.User, recipient?.machine);
+            msg.Write(sender.id);
+            msg.Write((byte)(recipient == null ? 255 : recipient.id));
             msg.Write((byte)options);
             msg.Write(data.Length);
             msg.Write(data);
@@ -644,9 +663,9 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void SendUserMessage(LocalNetworkGamer sender, SendDataOptions options, PacketWriter data, NetworkGamer recipient = null)
         {
-            var msg = CreateMessage(MessageType.User, recipient?.Machine);
-            msg.Write(sender.Id);
-            msg.Write((byte)(recipient == null ? 255 : recipient.Id));
+            var msg = CreateMessage(MessageType.User, recipient?.machine);
+            msg.Write(sender.id);
+            msg.Write((byte)(recipient == null ? 255 : recipient.id));
             msg.Write((byte)options);
 
             msg.Write(data.Length);
@@ -685,7 +704,7 @@ namespace Microsoft.Xna.Framework.Net
                 return false;
             }
             var sender = gamerFromId.ContainsKey(senderId) ? gamerFromId[senderId] : null; // Sender can be null if gamer joined not yet received
-            if (sender != null && sender.Machine != originMachine)
+            if (sender != null && sender.machine != originMachine)
             {
                 return false;
             }
