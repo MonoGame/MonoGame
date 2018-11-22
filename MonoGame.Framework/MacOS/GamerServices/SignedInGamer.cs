@@ -300,19 +300,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 		#endregion
 	}
 
-	public class SignedInEventArgs : EventArgs
-	{
-		public SignedInEventArgs (SignedInGamer gamer)
-		{
+    public class SignedInEventArgs : EventArgs
+    {
+        public SignedInEventArgs(SignedInGamer gamer)
+        {
+            this.Gamer = gamer;
+        }
 
-		}
-	}
+        public SignedInGamer Gamer { get; private set; }
+    }
 
-	public class SignedOutEventArgs : EventArgs
-	{
-		public SignedOutEventArgs (SignedInGamer gamer)
-		{
+    public class SignedOutEventArgs : EventArgs
+    {
+        public SignedOutEventArgs(SignedInGamer gamer)
+        {
+            this.Gamer = gamer;
+        }
 
-		}
-	}
+        public SignedInGamer Gamer { get; private set; }
+    }
 }
