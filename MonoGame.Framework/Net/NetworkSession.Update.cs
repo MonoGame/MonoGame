@@ -53,10 +53,12 @@ namespace Microsoft.Xna.Framework.Net
 
                     if (allowJoinInProgress || state == NetworkSessionState.Lobby)
                     {
-                        if (GetOpenPublicGamerSlots() > 0 && GetNewUniqueId(machineFromId, out byte machineId))
+                        if (GetOpenPublicGamerSlots() > 0 && GetUniqueId(machineFromId, out byte machineId))
                         {
                             // Approved, create network machine
-                            msg.SenderConnection.Tag = new NetworkMachine(this, false, false, machineId);
+                            var machine = new NetworkMachine(this, false, false, machineId);
+                            msg.SenderConnection.Tag = machine;
+                            AddMachine(machine, msg.SenderConnection);
 
                             // Send approval to client containing unique machine id
                             var hailMsg = peer.CreateMessage();
@@ -90,7 +92,6 @@ namespace Microsoft.Xna.Framework.Net
                         }
 
                         var machine = (NetworkMachine)msg.SenderConnection.Tag;
-                        AddMachine(machine, msg.SenderConnection);
 
                         SendMachineConnectedMessage(machine, null);
                     }
@@ -104,6 +105,7 @@ namespace Microsoft.Xna.Framework.Net
                             }
 
                             var machine = (NetworkMachine)msg.SenderConnection.Tag;
+
                             RemoveMachine(machine);
                             
                             if (isHost)

@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Net
         internal NetworkGamer(NetworkMachine machine, byte id, bool isPrivateSlot, string displayName, string gamertag, bool isReady)
             : base()
         {
-            this.session = machine.Session;
+            this.session = machine.session;
             this.machine = machine;
             this.id = id;
             this.isPrivateSlot = isPrivateSlot;
@@ -51,9 +51,9 @@ namespace Microsoft.Xna.Framework.Net
         public bool IsMutedByLocalUser { get; } = false;
 
         public bool IsGuest { get { return Machine.Gamers[0] != this; } }
-        public bool IsHost { get { return Machine.IsHost && id == 0; } }
-        public bool IsLocal { get { return Machine.IsLocal; } }
-        public TimeSpan RoundtripTime { get { return Machine.RoundtripTime; } }
+        public bool IsHost { get { return Machine.isHost && id == 0; } }
+        public bool IsLocal { get { return Machine.isLocal; } }
+        public TimeSpan RoundtripTime { get { return Machine.roundtripTime; } }
         public NetworkSession Session { get { return session; } }
 
         public virtual bool IsReady

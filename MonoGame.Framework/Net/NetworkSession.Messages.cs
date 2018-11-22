@@ -61,8 +61,8 @@ namespace Microsoft.Xna.Framework.Net
         {
             var msg = peer.CreateMessage();
             msg.Write((byte)type);
-            msg.Write((byte)(recipientMachine?.Id ?? 255));
-            msg.Write((byte)localMachine.Id);
+            msg.Write((byte)(recipientMachine?.id ?? 255));
+            msg.Write((byte)localMachine.id);
             return msg;
         }
 
@@ -86,9 +86,9 @@ namespace Microsoft.Xna.Framework.Net
             bool sendToAll = recipientId == 255;
             var recipientMachine = sendToAll ? null : machineFromId[recipientId];
 
-            Debug.WriteLine($"S [self] ({(originMachine == localMachine ? "[self]" : originMachine.Id.ToString())})->{recipientMachine?.Id.ToString() ?? "[all]"} {msgType}");
+            Debug.WriteLine($"S [self] ({(originMachine == localMachine ? "[self]" : originMachine.id.ToString())})->{recipientMachine?.id.ToString() ?? "[all]"} {msgType}");
 
-            if (!sendToAll && recipientMachine.IsLocal)
+            if (!sendToAll && recipientMachine.isLocal)
             {
                 // Recipient is local machine
                 if (!ignoreSelf)
@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework.Net
             if (msg.LengthBytes < 3)
             {
                 // TODO: Kick machine?
-                Debug.Write($"Received empty message from machine {senderMachine.Id.ToString() ?? "[self]"}");
+                Debug.Write($"Received empty message from machine {senderMachine.id.ToString() ?? "[self]"}");
                 return;
             }
 
@@ -154,13 +154,13 @@ namespace Microsoft.Xna.Framework.Net
             catch
             {
                 // TODO: Kick machine?
-                Debug.WriteLine($"Received message with malformed header from machine {senderMachine.Id.ToString() ?? "[self]"}");
+                Debug.WriteLine($"Received message with malformed header from machine {senderMachine.id.ToString() ?? "[self]"}");
                 return;
             }
             if (headerMsgType >= MessageTypeCount)
             {
                 // TODO: Kick machine?
-                Debug.WriteLine($"Received message with malformed header from machine {senderMachine.Id.ToString() ?? "[self]"}");
+                Debug.WriteLine($"Received message with malformed header from machine {senderMachine.id.ToString() ?? "[self]"}");
                 return;
             }
 
@@ -172,7 +172,7 @@ namespace Microsoft.Xna.Framework.Net
                 if (isHost)
                 {
                     // TODO: Kick machine?
-                    Debug.WriteLine($"Received message with malformed header from machine {senderMachine.Id.ToString() ?? "[self]"}");
+                    Debug.WriteLine($"Received message with malformed header from machine {senderMachine.id.ToString() ?? "[self]"}");
                 }
                 return;
             }
@@ -183,11 +183,11 @@ namespace Microsoft.Xna.Framework.Net
             if (isHost && senderMachine != originMachine)
             {
                 // TODO: Kick machine?
-                Debug.WriteLine($"Received message with malformed header from machine {senderMachine.Id.ToString() ?? "[self]"}");
+                Debug.WriteLine($"Received message with malformed header from machine {senderMachine.id.ToString() ?? "[self]"}");
                 return;
             }
 
-            Debug.WriteLine($"R {(senderMachine == localMachine ? "[self]" : senderMachine.Id.ToString())} ({originMachine.Id.ToString() ?? "[self]"})->{recipientMachine?.Id.ToString() ?? "[all]"} {msgType}");
+            Debug.WriteLine($"R {(senderMachine == localMachine ? "[self]" : senderMachine.id.ToString())} ({originMachine.id.ToString() ?? "[self]"})->{recipientMachine?.id.ToString() ?? "[all]"} {msgType}");
 
             // Handle message
             bool success = false;
@@ -246,7 +246,7 @@ namespace Microsoft.Xna.Framework.Net
             // If host, forward message to peers
             if (isHost && senderMachine != localMachine && recipientMachine != localMachine)
             {
-                Debug.WriteLine($"Forwarding {msgType} message to machine {recipientMachine?.Id.ToString() ?? "[all]"}");
+                Debug.WriteLine($"Forwarding {msgType} message to machine {recipientMachine?.id.ToString() ?? "[all]"}");
 
                 SendMessage(CreateMessageFrom(msg), deliveryMethod, ignoreSelf: true, ignoreMachine: senderMachine);
             }
@@ -257,13 +257,13 @@ namespace Microsoft.Xna.Framework.Net
             if (!isHost) throw new InvalidOperationException();
 
             var msg = CreateMessage(MessageType.MachineConnected, recipient);
-            msg.Write(machine.Id);
+            msg.Write(machine.id);
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
 
         private bool ReceiveMachineConnectedMessage(NetBuffer msg, NetworkMachine originMachine)
         {
-            if (!originMachine.IsHost)
+            if (!originMachine.isHost)
             {
                 return false;
             }
@@ -276,7 +276,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return false;
             }
-            if (id == localMachine.Id)
+            if (id == localMachine.id)
             {
                 // The host is broadcasting our local machine to everyone
                 return true;
@@ -318,13 +318,13 @@ namespace Microsoft.Xna.Framework.Net
             if (!isHost) throw new InvalidOperationException();
 
             var msg = CreateMessage(MessageType.MachineDisconnected, null);
-            msg.Write(machine.Id);
+            msg.Write(machine.id);
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
 
         private bool ReceiveMachineDisconnectedMessage(NetBuffer msg, NetworkMachine originMachine)
         {
-            if (!originMachine.IsHost)
+            if (!originMachine.isHost)
             {
                 return false;
             }
@@ -337,18 +337,20 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return false;
             }
-            if (id == localMachine.Id)
+            if (id == localMachine.id)
             {
                 // Some race condition occured, we should already be disconnected from host
                 // TODO: Suitable place to end session as we were probably kicked?
                 return true;
             }
 
-            if (!isHost)
+
+            if (isHost || !machineFromId.ContainsKey(id))
             {
-                // Host already removed machine
-                RemoveMachine(machineFromId[id]);
+                // Host already removed machine and machine might have been disconnected before it fully connected
+                return true;
             }
+            RemoveMachine(machineFromId[id]);
             return true;
         }
 
@@ -365,7 +367,17 @@ namespace Microsoft.Xna.Framework.Net
                 return false;
             }
 
-            bool available = GetNewUniqueId(gamerFromId, out byte id);
+            if (originMachine.gamers.Count + originMachine.currentGamerIdRequests >= MaxSupportedLocalGamers)
+            {
+                return false;
+            }
+
+            var available = GetUniqueId(reservedGamerIds, out byte id);
+            if (available)
+            {
+                reservedGamerIds.Add(id, originMachine);
+                originMachine.currentGamerIdRequests++;
+            }
             SendGamerIdResponse(originMachine, available, id);
             return true;
         }
@@ -382,7 +394,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private bool ReceiveGamerIdResponse(NetBuffer msg, NetworkMachine originMachine)
         {
-            if (!originMachine.IsHost)
+            if (!originMachine.isHost)
             {
                 return false;
             }
@@ -451,7 +463,7 @@ namespace Microsoft.Xna.Framework.Net
                 return gamerFromId[id].Machine == originMachine;
             }
 
-            if (originMachine.IsLocal)
+            if (originMachine.isLocal)
             {
                 // Already added local gamer
                 return true;
@@ -459,7 +471,7 @@ namespace Microsoft.Xna.Framework.Net
 
             if (id == 0)
             {
-                if (originMachine.IsHost)
+                if (originMachine.isHost)
                 {
                     // Already added host gamer with id 0, just update it
                     Host.DisplayName = displayName;
@@ -565,7 +577,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private bool ReceiveResetReady(NetBuffer msg, NetworkMachine originMachine)
         {
-            if (!originMachine.IsHost)
+            if (!originMachine.isHost)
             {
                 return false;
             }
@@ -586,7 +598,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private bool ReceiveStartGame(NetBuffer msg, NetworkMachine originMachine)
         {
-            if (!originMachine.IsHost)
+            if (!originMachine.isHost)
             {
                 return false;
             }
@@ -605,7 +617,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private bool ReceiveEndGame(NetBuffer msg, NetworkMachine originMachine)
         {
-            if (!originMachine.IsHost)
+            if (!originMachine.isHost)
             {
                 return false;
             }

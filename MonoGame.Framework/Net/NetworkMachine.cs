@@ -6,14 +6,16 @@ namespace Microsoft.Xna.Framework.Net
 {
     public sealed class NetworkMachine
     {
-        private readonly NetworkSession session;
-        private readonly bool isLocal;
-        private readonly bool isHost;
-        private readonly byte id;
+        internal readonly NetworkSession session;
+        internal readonly bool isLocal;
+        internal readonly bool isHost;
+        internal readonly byte id;
 
         internal readonly List<NetworkGamer> gamers = new List<NetworkGamer>();
-        
+
         private bool beingRemoved = false;
+        internal TimeSpan roundtripTime = TimeSpan.Zero;
+        internal int currentGamerIdRequests = 0;
 
         internal NetworkMachine(NetworkSession session, bool isLocal, bool isHost, byte id)
         {
@@ -23,12 +25,6 @@ namespace Microsoft.Xna.Framework.Net
             this.id = id;
             this.Gamers = new GamerCollection<NetworkGamer>(new List<NetworkGamer>(), gamers);
         }
-
-        internal NetworkSession Session { get { return session; } }
-        internal bool IsLocal { get { return isLocal; } }
-        internal bool IsHost { get { return isHost; } }
-        internal byte Id { get { return id; } }
-        internal TimeSpan RoundtripTime { get; set; } = TimeSpan.Zero;
 
         public GamerCollection<NetworkGamer> Gamers { get; }
 

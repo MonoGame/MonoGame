@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Net
     {
         private const int MinSupportedLocalGamers = 1;
         private const int MaxSupportedLocalGamers = 4;
-        private const int MinSupportedGamers = 2;
+        private const int MinSupportedGamers = 1;
         public const int MaxSupportedGamers = 64; // Should be public according to docs
         public const int MaxPreviousGamers = 10; // Should be public according to docs
 
@@ -37,11 +37,11 @@ namespace Microsoft.Xna.Framework.Net
         private bool allowJoinInProgress = false;
         private int maxGamers = MaxSupportedGamers;
         private int privateGamerSlots = 0;
-        
+
         private bool gameStartRequestThisFrame = false;
         private bool gameEndRequestThisFrame = false;
         private bool resetReadyRequestThisFrame = false;
-        
+
         private DateTime lastMasterServerReport = DateTime.MinValue;
 
         private List<EventArgs> eventQueue = new List<EventArgs>();
@@ -51,6 +51,8 @@ namespace Microsoft.Xna.Framework.Net
         private List<NetworkGamer> remoteGamers = new List<NetworkGamer>();
         private List<NetworkGamer> previousGamers = new List<NetworkGamer>();
         private Dictionary<byte, NetworkGamer> gamerFromId = new Dictionary<byte, NetworkGamer>();
+
+        private Dictionary<byte, NetworkMachine> reservedGamerIds = new Dictionary<byte, NetworkMachine>();
 
         private List<SignedInGamer> pendingSignedInGamers = new List<SignedInGamer>();
 
@@ -69,6 +71,7 @@ namespace Microsoft.Xna.Framework.Net
             this.properties = properties;
             this.localMachine = new NetworkMachine(this, true, isHost, machineId);
             this.hostMachine = isHost ? this.localMachine : new NetworkMachine(this, false, true, 0);
+
             AddMachine(this.localMachine, null);
 
             if (!isHost)
@@ -422,7 +425,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new InvalidOperationException("The game cannot be started unless everyone is ready");
             }
-            
+
             if (gameStartRequestThisFrame)
             {
                 return;
@@ -487,7 +490,7 @@ namespace Microsoft.Xna.Framework.Net
         private void AddMachine(NetworkMachine machine, NetConnection connection)
         {
             allMachines.Add(machine);
-            machineFromId.Add(machine.Id, machine);
+            machineFromId.Add(machine.id, machine);
             if (connection != null)
             {
                 connectionFromMachine.Add(machine, connection);
@@ -502,7 +505,7 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             allMachines.Remove(machine);
-            machineFromId.Remove(machine.Id);
+            machineFromId.Remove(machine.id);
             connectionFromMachine.Remove(machine);
         }
 
@@ -525,17 +528,18 @@ namespace Microsoft.Xna.Framework.Net
                 }
 
                 float seconds = connectionFromMachine[machine].AverageRoundtripTime;
-                if (!isHost && !machine.IsHost)
+                if (!isHost && !machine.isHost)
                 {
                     seconds *= 2.0f;
                 }
-                machine.RoundtripTime = TimeSpan.FromSeconds(seconds);
+                machine.roundtripTime = TimeSpan.FromSeconds(seconds);
             }
         }
 
         private void AddGamer(NetworkGamer gamer)
         {
             gamer.Machine.gamers.Add(gamer);
+            gamer.Machine.currentGamerIdRequests--;
 
             allGamers.Add(gamer);
             allGamers.Sort(NetworkGamerIdComparer.Instance);
@@ -553,6 +557,11 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             gamerFromId.Add(gamer.Id, gamer);
+
+            if (!reservedGamerIds.ContainsKey(gamer.Id))
+            {
+                reservedGamerIds.Add(gamer.Id, gamer.Machine);
+            }
 
             InvokeGamerJoinedEvent(new GamerJoinedEventArgs(gamer));
         }
@@ -578,8 +587,9 @@ namespace Microsoft.Xna.Framework.Net
 
             gamerFromId.Remove(gamer.Id);
 
-            AddPreviousGamer(gamer);
+            reservedGamerIds.Remove(gamer.Id);
 
+            AddPreviousGamer(gamer);
             InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));
         }
 
@@ -613,19 +623,17 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        private bool GetNewUniqueId<T>(Dictionary<byte, T> lookupTable, out byte id)
+        private bool GetUniqueId<T>(Dictionary<byte, T> lookupTable, out byte id)
         {
-            Debug.WriteLine("TODO FIX NEW UNIQUE ID!"); // need increment counter for multiple simultaneous clients connecting at the same time
-            for (int i = 0; i < 255; i++) // 255 is reserved for "error"
+            // Be careful not to use <= or a value greater than 255 here
+            for (byte candidate = 0; candidate < 255; candidate++) // 255 is reserved for "error"
             {
-                byte candidate = (byte)i;
                 if (!lookupTable.ContainsKey(candidate))
                 {
                     id = candidate;
                     return true;
                 }
             }
-
             id = 255;
             return false;
         }
@@ -745,7 +753,7 @@ namespace Microsoft.Xna.Framework.Net
                 // Notify clients gracefully before shutting down
                 foreach (var machine in allMachines)
                 {
-                    if (machine.IsLocal)
+                    if (machine.isLocal)
                     {
                         continue;
                     }
