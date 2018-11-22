@@ -354,8 +354,6 @@ namespace Microsoft.Xna.Framework.Net
 
         private void SendGamerIdRequest()
         {
-            if (isHost) throw new InvalidOperationException();
-
             var msg = CreateMessage(MessageType.GamerIdRequest, hostMachine);
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
@@ -384,7 +382,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private bool ReceiveGamerIdResponse(NetBuffer msg, NetworkMachine originMachine)
         {
-            if (isHost || !originMachine.IsHost)
+            if (!originMachine.IsHost)
             {
                 return false;
             }
