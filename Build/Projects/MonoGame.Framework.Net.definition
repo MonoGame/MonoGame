@@ -42,7 +42,7 @@
       <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL;NET</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION;NET</Platform>
       <Platform Name="WindowsGL">TRACE;WINDOWS;OPENGL;OPENAL;NET;DESKTOPGL</Platform>
-      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>		
+      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
     </CustomDefinitions>
   </Properties>
 
@@ -91,40 +91,10 @@
     <Compile Include="Net\AvailableNetworkSessionCollection.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\NetworkSession.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionCreation.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionMasterServer.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionImplementation.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionSettings.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionProperties.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionPublicInfo.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionType.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\NetworkException.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionJoinError.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionJoinException.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
     <Compile Include="Net\GameEndedEventArgs.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\GamerCollection.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\GamerJoinedEventArgs.cs">
@@ -142,7 +112,31 @@
     <Compile Include="Net\InviteAcceptedEventArgs.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
+    <Compile Include="Net\LocalNetworkGamer.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkException.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
     <Compile Include="Net\NetworkGamer.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkMachine.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSession.Create.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSession.Create.Variants.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSession.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSession.Messages.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSession.Update.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\NetworkSessionEndedEventArgs.cs">
@@ -151,16 +145,31 @@
     <Compile Include="Net\NetworkSessionEndReason.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\WriteLeaderboardsEventArgs.cs">
+    <Compile Include="Net\NetworkSessionJoinError.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\GamerCollection.cs">
+    <Compile Include="Net\NetworkSessionJoinException.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\NetworkMachine.cs">
+    <Compile Include="Net\NetworkSessionMasterServer.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\LocalNetworkGamer.cs">
+    <Compile Include="Net\NetworkSessionProperties.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionPublicInfo.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionSettings.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionState.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionType.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\PacketPool.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\PacketReader.cs">
@@ -169,106 +178,13 @@
     <Compile Include="Net\PacketWriter.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\SendDataOptions.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionState.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
     <Compile Include="Net\QualityOfService.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\PacketPool.cs">
+    <Compile Include="Net\SendDataOptions.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-
-    <Compile Include="Net\Messages\AllowEndPointRequest.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\AllowEndPointResponse.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\ConnectionAcknowledged.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\ConnectToAllRequest.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\FullyConnected.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\GameEnded.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\GamerIdRequest.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\GamerIdResponse.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\GamerJoined.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\GamerLeft.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\GamerStateChanged.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\GameStarted.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\InternalMessage.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\RemoveMachine.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\ResetReady.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\UserMessage.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\SessionStateChanged.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-
-    <Compile Include="Net\Backend\GenericPool.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Backend\BackendInterface.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-
-    <Compile Include="Net\Backend\Lidgren\GuidEndPoint.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Backend\Lidgren\IncomingMessage.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Backend\Lidgren\IntroducerToken.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Backend\Lidgren\LocalPeer.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Backend\Lidgren\MasterServer.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Backend\Lidgren\MessagePool.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Backend\Lidgren\OutgoingMessage.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Backend\Lidgren\RemotePeer.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Backend\Lidgren\SessionBackend.cs">
-      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Backend\Lidgren\SessionCreator.cs">
+    <Compile Include="Net\WriteLeaderboardsEventArgs.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
 
