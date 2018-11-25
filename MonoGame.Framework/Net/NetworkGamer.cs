@@ -45,15 +45,15 @@ namespace Microsoft.Xna.Framework.Net
 #pragma warning disable CS3005 // Identifier differing only in case is not CLS-compliant
         public bool HasLeftSession { get { return hasLeftSession; } }
 
-        public bool HasVoice { get; } = false;
-        public bool IsTalking { get; } = false;
-        public bool IsMutedByLocalUser { get; } = false;
-
         public bool IsGuest { get { return machine.gamers[0] != this; } }
         public bool IsHost { get { return machine.isHost && id == 0; } }
         public bool IsLocal { get { return machine.isLocal; } }
         public TimeSpan RoundtripTime { get { return machine.roundtripTime; } }
         public NetworkSession Session { get { return session; } }
+
+        public bool HasVoice { get; }
+        public bool IsTalking { get; }
+        public bool IsMutedByLocalUser { get; }
 
         public virtual bool IsReady
         {

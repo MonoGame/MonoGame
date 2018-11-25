@@ -52,7 +52,8 @@ namespace Microsoft.Xna.Framework.Net
 
         private static IPEndPoint GetInternalIp(NetPeer peer)
         {
-            IPAddress address = NetUtility.GetMyAddress(out IPAddress mask);
+            IPAddress mask;
+            IPAddress address = NetUtility.GetMyAddress(out mask);
             return new IPEndPoint(address, peer.Port);
         }
 
@@ -129,7 +130,8 @@ namespace Microsoft.Xna.Framework.Net
                     }
                     else if (status == NetConnectionStatus.Disconnected)
                     {
-                        if (Enum.TryParse(reason, out NetworkSessionJoinError error))
+                        NetworkSessionJoinError error;
+                        if (Enum.TryParse(reason, out error))
                         {
                             joinError = error;
                         }
@@ -247,7 +249,9 @@ namespace Microsoft.Xna.Framework.Net
 
                 if (msg.MessageType == NetIncomingMessageType.DiscoveryResponse)
                 {
-                    if (NetworkSessionMasterServer.ParseRequestHostsResponse(msg, out Guid guid, out NetworkSessionPublicInfo publicInfo))
+                    Guid guid;
+                    NetworkSessionPublicInfo publicInfo;
+                    if (NetworkSessionMasterServer.ParseRequestHostsResponse(msg, out guid, out publicInfo))
                     {
                         AddAvailableNetworkSession(guid, publicInfo, localGamers, sessionType, searchProperties, availableSessions, tag: msg.SenderEndPoint);
                     }

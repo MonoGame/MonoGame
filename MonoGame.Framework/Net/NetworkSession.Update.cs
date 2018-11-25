@@ -53,7 +53,8 @@ namespace Microsoft.Xna.Framework.Net
 
                     if (allowJoinInProgress || state == NetworkSessionState.Lobby)
                     {
-                        if (GetOpenPublicGamerSlots() > 0 && GetUniqueId(machineFromId, out byte machineId))
+                        byte machineId;
+                        if (GetOpenPublicGamerSlots() > 0 && GetUniqueId(machineFromId, out machineId))
                         {
                             // Approved, create network machine
                             var machine = new NetworkMachine(this, false, false, machineId);
@@ -114,7 +115,9 @@ namespace Microsoft.Xna.Framework.Net
                             }
                             else
                             {
-                                if (msg.ReadString(out string reasonString) && Enum.TryParse(reasonString, out NetworkSessionEndReason reason))
+                                string reasonString;
+                                NetworkSessionEndReason reason;
+                                if (msg.ReadString(out reasonString) && Enum.TryParse(reasonString, out reason))
                                 {
                                     End(reason);
                                 }
