@@ -8,6 +8,8 @@ namespace Microsoft.Xna.Framework.Net
 {
     public sealed partial class NetworkSession : IDisposable
     {
+        private const string LoadingGamertag = "...";
+
         private const int MinSupportedLocalGamers = 1;
         private const int MaxSupportedLocalGamers = 4;
         private const int MinSupportedGamers = 1;
@@ -52,8 +54,6 @@ namespace Microsoft.Xna.Framework.Net
         private List<NetworkGamer> previousGamers = new List<NetworkGamer>();
         private Dictionary<byte, NetworkGamer> gamerFromId = new Dictionary<byte, NetworkGamer>();
 
-        private Dictionary<byte, NetworkMachine> reservedGamerIds = new Dictionary<byte, NetworkMachine>();
-
         private List<SignedInGamer> pendingSignedInGamers = new List<SignedInGamer>();
 
         internal NetworkSession(NetPeer peer, bool isHost, byte machineId, NetworkSessionType type, NetworkSessionProperties properties, int maxGamers, int privateGamerSlots, IEnumerable<SignedInGamer> localGamers)
@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Net
                 AddMachine(this.hostMachine, hostConnection);
 
                 // Add host gamer with id 0, important for NetworkSession.Host property
-                AddGamer(new NetworkGamer(this.hostMachine, 0, privateGamerSlots > 0, false, "...", "..."));
+                AddGamer(new NetworkGamer(this.hostMachine, 0, privateGamerSlots > 0, false, LoadingGamertag, LoadingGamertag));
             }
 
             this.maxGamers = maxGamers;
@@ -545,7 +545,6 @@ namespace Microsoft.Xna.Framework.Net
         private void AddGamer(NetworkGamer gamer)
         {
             gamer.machine.gamers.Add(gamer);
-            gamer.machine.currentGamerIdRequests--;
 
             allGamers.Add(gamer);
             allGamers.Sort(NetworkGamerIdComparer.Instance);
@@ -563,11 +562,6 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             gamerFromId.Add(gamer.id, gamer);
-
-            if (!reservedGamerIds.ContainsKey(gamer.id))
-            {
-                reservedGamerIds.Add(gamer.id, gamer.machine);
-            }
 
             InvokeGamerJoinedEvent(new GamerJoinedEventArgs(gamer));
         }
@@ -592,8 +586,6 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             gamerFromId.Remove(gamer.id);
-
-            reservedGamerIds.Remove(gamer.id);
 
             AddPreviousGamer(gamer);
             InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));

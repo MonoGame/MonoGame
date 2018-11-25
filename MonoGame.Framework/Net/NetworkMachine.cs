@@ -13,7 +13,6 @@ namespace Microsoft.Xna.Framework.Net
         internal readonly List<NetworkGamer> gamers = new List<NetworkGamer>();
         private bool beingRemoved = false;
         internal TimeSpan roundtripTime = TimeSpan.Zero;
-        internal int currentGamerIdRequests = 0;
 
         internal NetworkMachine(NetworkSession session, bool isLocal, bool isHost, byte id)
         {

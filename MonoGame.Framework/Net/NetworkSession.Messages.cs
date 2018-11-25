@@ -209,7 +209,7 @@ namespace Microsoft.Xna.Framework.Net
                         success = ReceiveGamerIdResponse(msg, originMachine);
                         break;
                     case MessageType.GamerJoined:
-                        success = ReceiveGamerJoined(msg, originMachine);
+                        success = ReceiveGamerJoined(msg, originMachine, recipientMachine);
                         break;
                     case MessageType.GamerLeft:
                         success = ReceiveGamerLeft(msg, originMachine);
@@ -366,27 +366,26 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return false;
             }
-            if (originMachine.gamers.Count + originMachine.currentGamerIdRequests >= MaxSupportedLocalGamers)
+            if (originMachine.gamers.Count >= MaxSupportedLocalGamers)
             {
                 // A single requester should not request too many gamer ids
                 return false;
             }
 
-            bool slotAvailable = false;
-            byte slotId = 255;
-
-            if (GetOpenSlotsForMachine(originMachine) > 0 && reservedGamerIds.Count < (originMachine.isHost ? maxGamers : maxGamers - privateGamerSlots))
+            bool available = false;
+            byte id = 255;
+            if (GetOpenSlotsForMachine(originMachine) > 0)
             {
-                // There are open unreserved slots, try to get id
-                slotAvailable = GetUniqueId(reservedGamerIds, out slotId);
-                if (slotAvailable)
+                available = GetUniqueId(gamerFromId, out id);
+
+                // Let Host create remote gamers directly
+                if (available && isHost && originMachine != localMachine)
                 {
-                    reservedGamerIds.Add(slotId, originMachine);
-                    originMachine.currentGamerIdRequests++;
+                    var isPrivateSlot = originMachine.isHost && GetOpenPrivateGamerSlots() > 0;
+                    AddGamer(new NetworkGamer(originMachine, id, isPrivateSlot, false, LoadingGamertag, LoadingGamertag));
                 }
             }
-
-            SendGamerIdResponse(originMachine, slotAvailable, slotId);
+            SendGamerIdResponse(originMachine, available, id);
             return true;
         }
 
@@ -453,7 +452,7 @@ namespace Microsoft.Xna.Framework.Net
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
 
-        private bool ReceiveGamerJoined(NetBuffer msg, NetworkMachine originMachine)
+        private bool ReceiveGamerJoined(NetBuffer msg, NetworkMachine originMachine, NetworkMachine recipientMachine)
         {
             byte id;
             string displayName, gamertag;
@@ -474,12 +473,6 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return false;
             }
-            if (isHost && gamerFromId.ContainsKey(id))
-            {
-                // Sender is updating a newly connected machine
-                // TODO: Make sure client is not spamming recipient
-                return gamerFromId[id].machine == originMachine;
-            }
 
             if (originMachine.isLocal)
             {
@@ -487,21 +480,51 @@ namespace Microsoft.Xna.Framework.Net
                 return true;
             }
 
-            if (id == 0)
+            if (isHost)
             {
-                if (originMachine.isHost)
+                if (!gamerFromId.ContainsKey(id))
                 {
+                    // Host must know about all gamers
+                    return false;
+                }
+                if (id == 0)
+                {
+                    // Someone is impersonating the host gamer
+                    return false;
+                }
+                if (recipientMachine != null && recipientMachine != localMachine)
+                {
+                    // TODO: Make sure client is not spamming recipient
+                }
+
+                // Host already added gamer, just update it
+                var gamer = gamerFromId[id];
+                gamer.DisplayName = displayName;
+                gamer.Gamertag = gamertag;
+                gamer.isPrivateSlot = isPrivateSlot;
+                gamer.isReady = isReady;
+            }
+            else
+            {
+                if (id == 0)
+                {
+                    // Special case for host gamer
+                    if (!originMachine.isHost)
+                    {
+                        return false;
+                    }
+
                     // Already added host gamer with id 0, just update it
                     Host.DisplayName = displayName;
                     Host.Gamertag = gamertag;
                     Host.isPrivateSlot = isPrivateSlot;
                     Host.isReady = isReady;
-                    return true;
                 }
-                return false;
+                else
+                {
+                    AddGamer(new NetworkGamer(originMachine, id, isPrivateSlot, isReady, displayName, gamertag));
+                }
             }
-
-            AddGamer(new NetworkGamer(originMachine, id, isPrivateSlot, isReady, displayName, gamertag));
             return true;
         }
 
