@@ -278,16 +278,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 
 #if !WINDOWS_UAP && !(WINDOWS && DIRECTX)
-            Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();            
-
-            if (GamerServicesComponent.LocalNetworkGamer == null)
-            {
-                GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer();
-            }
-            else
-            {
-                GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication(null, null);
-            }
+            Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();
 #endif
 		}
 

@@ -215,12 +215,6 @@
     <Compile Include="iOS\GamerServices\TextFieldAlertView.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\Net\MonoGamePeerPickerControllerDelegate.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="iOS\Net\MonoGameSessionDelegate.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
     <Compile Include="GamerServices\NotificationPosition.cs">
       <Platforms>iOS</Platforms>
     </Compile>

@@ -295,17 +295,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 				new ArgumentException("paneCount Can only be 1 on iPhone");
 				return;
 			}
-			
-			MonoGameGamerServicesHelper.ShowSigninSheet();
 
-			if (GamerServicesComponent.LocalNetworkGamer == null)
-			{
-				GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer();
-			}
-			else
-			{
-				GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication(null, null);
-			}
+			MonoGameGamerServicesHelper.ShowSigninSheet();
 		}
 
 		public static void ShowLeaderboard()
