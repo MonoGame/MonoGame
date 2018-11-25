@@ -40,16 +40,16 @@ namespace Microsoft.Xna.Framework.Net
             {
                 if (localGamer == null)
                 {
-                    throw new ArgumentNullException($"Element of {nameof(localGamers)}");
+                    throw new ArgumentNullException("Element of localGamers");
                 }
             }
             if (maxGamers < MinSupportedGamers || maxGamers > MaxSupportedGamers)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(maxGamers)} must be in the range [{MinSupportedGamers}, {MaxSupportedGamers}]");
+                throw new ArgumentOutOfRangeException("maxGamers must be in the range [" + MinSupportedGamers + ", " + MaxSupportedGamers + "]");
             }
             if (privateGamerSlots < 0 || privateGamerSlots > maxGamers)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(privateGamerSlots)} must be in the range [0, maxGamers]");
+                throw new ArgumentOutOfRangeException("privateGamerSlots must be in the range [0, maxGamers]");
             }
             if (sessionProperties == null)
             {
@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (maxLocalGamers < MinSupportedLocalGamers || maxLocalGamers > MaxSupportedLocalGamers)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(maxLocalGamers)} must be in the range [{MinSupportedLocalGamers}, {MaxSupportedLocalGamers}]");
+                throw new ArgumentOutOfRangeException("maxLocalGamers must be in the range [" + MinSupportedLocalGamers + ", " + MaxSupportedLocalGamers + "]");
             }
 
             var localGamers = GetLocalGamers(maxLocalGamers);
@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 if (localGamer == null)
                 {
-                    throw new ArgumentNullException($"Element of {nameof(localGamers)}");
+                    throw new ArgumentNullException("Element of localGamers");
                 }
             }
             if (searchProperties == null)
@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (maxLocalGamers < MinSupportedLocalGamers || maxLocalGamers > MaxSupportedLocalGamers)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(maxLocalGamers)} must be in the range [{MinSupportedLocalGamers}, {MaxSupportedLocalGamers}]");
+                throw new ArgumentOutOfRangeException("maxLocalGamers must be in the range [" + MinSupportedLocalGamers + ", " + MaxSupportedLocalGamers + "]");
             }
 
             var localGamers = GetLocalGamers(maxLocalGamers);

@@ -78,7 +78,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 if (peer.ConnectionsCount != 1 || peer.Connections[0].Status != NetConnectionStatus.Connected)
                 {
-                    throw new InvalidOperationException($"Client peer must be connected to host before {nameof(NetworkSession)} can be instantiated");
+                    throw new InvalidOperationException("Client peer must be connected to host before NetworkSession can be instantiated");
                 }
                 hostConnection = peer.Connections[0];
                 hostConnection.Tag = this.hostMachine;

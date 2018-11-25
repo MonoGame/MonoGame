@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 if (IsReadOnly)
                 {
-                    throw new InvalidOperationException($"{nameof(NetworkSessionProperties)} is read-only");
+                    throw new InvalidOperationException("NetworkSessionProperties is read-only");
                 }
 
                 if (index < 0 || index >= list.Count)
@@ -106,7 +106,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (IsReadOnly)
             {
-                throw new InvalidOperationException($"{nameof(NetworkSessionProperties)} is read-only");
+                throw new InvalidOperationException("NetworkSessionProperties is read-only");
             }
 
             for (int i = 0; i < list.Count; i++)

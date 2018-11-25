@@ -201,7 +201,7 @@ namespace Microsoft.Xna.Framework.Net
             var inboundPacket = inboundPackets[inboundPacketIndex++];
             if (inboundPacket.packet.length > data.Length - offset)
             {
-                throw new ArgumentException($"{nameof(data)} is too small to accommodate the incoming network packet");
+                throw new ArgumentException("data is too small to accommodate the incoming network packet");
             }
 
             inboundPacket.packet.data.CopyTo(data, offset);
@@ -271,7 +271,7 @@ namespace Microsoft.Xna.Framework.Net
             }
             if (data.Length == 0)
             {
-                throw new NetworkException($"{nameof(data)} empty");
+                throw new NetworkException("data empty");
             }
             if (offset < 0 || offset >= data.Length)
             {

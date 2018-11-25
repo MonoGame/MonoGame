@@ -253,14 +253,14 @@ namespace Microsoft.Xna.Framework.Net
                     }
                     else
                     {
-                        Debug.WriteLine($"Failed to parse local discovery response from {msg.SenderEndPoint}, ignoring...");
+                        Debug.WriteLine("Failed to parse local discovery response from " + msg.SenderEndPoint + ", ignoring...");
                     }
                 }
                 else if (msg.MessageType == NetIncomingMessageType.UnconnectedData)
                 {
                     if (!msg.SenderEndPoint.Equals(masterServerEndPoint))
                     {
-                        Debug.WriteLine($"Unconnected data not from master server recieved from {msg.SenderEndPoint}, ignoring...");
+                        Debug.WriteLine("Unconnected data not from master server recieved from " + msg.SenderEndPoint + ", ignoring...");
                     }
                     else
                     {
@@ -270,7 +270,7 @@ namespace Microsoft.Xna.Framework.Net
                         }
                         else
                         {
-                            Debug.WriteLine($"Failed to parse master server discovery response from {msg.SenderEndPoint}, ignoring...");
+                            Debug.WriteLine("Failed to parse master server discovery response from " + msg.SenderEndPoint + ", ignoring...");
                         }
                     }
                 }

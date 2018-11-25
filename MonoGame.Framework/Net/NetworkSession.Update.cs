@@ -12,16 +12,16 @@ namespace Microsoft.Xna.Framework.Net
             {
                 case NetIncomingMessageType.VerboseDebugMessage:
                 case NetIncomingMessageType.DebugMessage:
-                    Debug.WriteLine($"Lidgren: {msg.ReadString()}");
+                    Debug.WriteLine("Lidgren: " + msg.ReadString());
                     break;
                 case NetIncomingMessageType.WarningMessage:
-                    Debug.WriteLine($"Lidgren Warning: {msg.ReadString()}");
+                    Debug.WriteLine("Lidgren Warning: " + msg.ReadString());
                     break;
                 case NetIncomingMessageType.ErrorMessage:
-                    Debug.WriteLine($"Lidgren Error: {msg.ReadString()}");
+                    Debug.WriteLine("Lidgren Error: " + msg.ReadString());
                     break;
                 default:
-                    Debug.WriteLine($"Unhandled message type: {msg.MessageType}");
+                    Debug.WriteLine("Unhandled message type: " + msg.MessageType);
                     break;
             }
         }
@@ -78,7 +78,7 @@ namespace Microsoft.Xna.Framework.Net
                 else if (msg.MessageType == NetIncomingMessageType.StatusChanged)
                 {
                     var status = (NetConnectionStatus)msg.ReadByte();
-                    Debug.WriteLine($"Connection status updated: {status} (Reason: {msg.ReadString()})");
+                    Debug.WriteLine("Connection status updated: " + status + " (Reason: " + msg.ReadString() + ")");
 
                     if (status == NetConnectionStatus.Connected)
                     {

@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public override string ToString()
         {
-            return $"[Guid: {Guid}, InternalIp: {InternalIp}, ExternalIp: {ExternalIp}]";
+            return "[Guid: " + Guid + ", InternalIp: " + InternalIp + ", ExternalIp: " + ExternalIp + "]";
         }
     }
 
@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new NetworkException("Could not start server peer", e);
             }
 
-            Console.WriteLine($"Master server with game app id {gameAppId} started on port {config.Port}.");
+            Console.WriteLine("Master server with game app id " + gameAppId + " started on port " + config.Port + ".");
         }
 
         private List<Guid> hostsToRemove = new List<Guid>();
@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.Net
                 var host = hosts[endPoint];
                 hosts.Remove(endPoint);
 
-                Console.WriteLine($"Host removed due to timeout. {host}");
+                Console.WriteLine("Host removed due to timeout. " + host);
             }
         }
 
@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Net
 
             if (currentTime - lastReportedStatus > ReportStatusInterval)
             {
-                Console.WriteLine($"Status: {hosts.Count} registered hosts.");
+                Console.WriteLine("Status: " + hosts.Count + " registered hosts.");
 
                 lastReportedStatus = currentTime;
             }
@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Net
                     }
                     catch (NetException e)
                     {
-                        Console.WriteLine($"Encountered malformed message from {msg.SenderEndPoint}. Lidgren reports '{e.Message}'.");
+                        Console.WriteLine("Encountered malformed message from " + msg.SenderEndPoint + ". Lidgren reports '" + e.Message + "'.");
                     }
                 }
                 else
@@ -143,7 +143,7 @@ namespace Microsoft.Xna.Framework.Net
             var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
             peer.SendUnconnectedMessage(request, serverEndPoint);
 
-            Debug.WriteLine($"Registering with master server (Guid: {guid}, InternalIp: {internalIp}, PublicInfo: ...)");
+            Debug.WriteLine("Registering with master server (Guid: " + guid + ", InternalIp: " + internalIp + ", PublicInfo: ...)");
         }
 
         internal static void UnregisterHost(NetPeer peer, Guid guid)
@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework.Net
             var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
             peer.SendUnconnectedMessage(request, serverEndPoint);
 
-            Debug.WriteLine($"Unregistering with master server (Guid: {guid})");
+            Debug.WriteLine("Unregistering with master server (Guid: " + guid + ")");
         }
 
         internal static void RequestHosts(NetPeer peer)
@@ -208,7 +208,7 @@ namespace Microsoft.Xna.Framework.Net
             string senderGameAppId = msg.ReadString();
             if (!senderGameAppId.Equals(serverPeer.Configuration.AppIdentifier, StringComparison.Ordinal))
             {
-                Console.WriteLine($"Received message with incorrect game app id from {msg.SenderEndPoint}.");
+                Console.WriteLine("Received message with incorrect game app id from " + msg.SenderEndPoint + ".");
                 return;
             }
 
@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework.Net
 
                 hosts[guid] = new HostData(guid, internalIp, externalIp, publicInfo);
 
-                Console.WriteLine($"Host registered/updated. {hosts[guid]}");
+                Console.WriteLine("Host registered/updated. " + hosts[guid]);
             }
             else if (messageType == MasterServerMessageType.UnregisterHost)
             {
@@ -234,16 +234,16 @@ namespace Microsoft.Xna.Framework.Net
                     {
                         hosts.Remove(guid);
 
-                        Console.WriteLine($"Host unregistered. {host}");
+                        Console.WriteLine("Host unregistered. " + host);
                     }
                     else
                     {
-                        Console.WriteLine($"Unregister requested for host not registered by {msg.SenderEndPoint}.");
+                        Console.WriteLine("Unregister requested for host not registered by " + msg.SenderEndPoint + ".");
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"Unregister requested for unknown host from {msg.SenderEndPoint}.");
+                    Console.WriteLine("Unregister requested for unknown host from " + msg.SenderEndPoint + ".");
                 }
             }
             else if (messageType == MasterServerMessageType.RequestHosts)
@@ -255,7 +255,7 @@ namespace Microsoft.Xna.Framework.Net
                     serverPeer.SendUnconnectedMessage(response, msg.SenderEndPoint);
                 }
 
-                Console.WriteLine($"List of {hosts.Count} hosts sent to {msg.SenderEndPoint}.");
+                Console.WriteLine("List of " + hosts.Count + " hosts sent to " + msg.SenderEndPoint + ".");
             }
             else if (messageType == MasterServerMessageType.RequestIntroduction)
             {
@@ -268,11 +268,11 @@ namespace Microsoft.Xna.Framework.Net
 
                     serverPeer.Introduce(host.InternalIp, host.ExternalIp, clientInternalIp, clientExternalIp, string.Empty);
 
-                    Console.WriteLine($"Introduced host {host} and client [InternalIp: {clientInternalIp}, ExternalIp: {clientExternalIp}].");
+                    Console.WriteLine("Introduced host " + host + " and client [InternalIp: " + clientInternalIp + ", ExternalIp: " + clientExternalIp + "].");
                 }
                 else
                 {
-                    Console.WriteLine($"Introduction requested for unknwon host from {msg.SenderEndPoint}.");
+                    Console.WriteLine("Introduction requested for unknwon host from " + msg.SenderEndPoint + ".");
                 }
             }
         }
