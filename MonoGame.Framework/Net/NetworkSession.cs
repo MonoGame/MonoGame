@@ -553,6 +553,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 var localGamer = (LocalNetworkGamer)gamer;
                 localGamers.Add(localGamer);
+                localGamers.Sort(NetworkGamerIdComparer.Instance);
                 localGamerFromSignedInGamer.Add(localGamer.signedInGamer, localGamer);
             }
             else
