@@ -86,7 +86,10 @@ namespace Microsoft.Xna.Framework.Net
             bool sendToAll = recipientId == 255;
             var recipientMachine = sendToAll ? null : machineFromId[recipientId];
 
-            Debug.WriteLine("S " + localMachine.id + " (" + originMachine.id + ")->" + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]") + " " + msgType);
+            if (msgType != MessageType.User)
+            {
+                Debug.WriteLine("S " + localMachine.id + " (" + originMachine.id + ")->" + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]") + " " + msgType);
+            }
 
             if (!sendToAll && recipientMachine.isLocal)
             {
@@ -187,7 +190,10 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
-            Debug.WriteLine("R " + senderMachine.id + " (" + originMachine.id + ")->" + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]") + " " + msgType);
+            if (msgType != MessageType.User)
+            {
+                Debug.WriteLine("R " + senderMachine.id + " (" + originMachine.id + ")->" + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]") + " " + msgType);
+            }
 
             // Handle message
             bool success = false;
@@ -246,7 +252,10 @@ namespace Microsoft.Xna.Framework.Net
             // If host, forward message to peers
             if (isHost && senderMachine != localMachine && recipientMachine != localMachine)
             {
-                Debug.WriteLine("Forwarding " + msgType + " message to machine " + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]"));
+                if (msgType != MessageType.User)
+                {
+                    Debug.WriteLine("Forwarding " + msgType + " message to machine " + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]"));
+                }
 
                 SendMessage(CreateMessageFrom(msg), deliveryMethod, ignoreSelf: true, ignoreMachine: senderMachine);
             }
