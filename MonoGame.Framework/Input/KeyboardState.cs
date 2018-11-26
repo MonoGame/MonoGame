@@ -2,14 +2,17 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
+
 
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
     /// Holds the state of keystrokes by a keyboard.
-    /// </summary>
-	public struct KeyboardState
+    /// </summary>    
+    [Serializable]
+    public struct KeyboardState
     {
         // Used for the common situation where GetPressedKeys will return an empty array
         static Keys[] empty = new Keys[0];

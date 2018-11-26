@@ -2,11 +2,14 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
     /// Represents a mouse state with cursor position and button press information.
     /// </summary>
+    [Serializable]
     public struct MouseState
     {
         int _x, _y;

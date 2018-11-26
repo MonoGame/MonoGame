@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
@@ -11,6 +13,7 @@ namespace Microsoft.Xna.Framework.Input
     /// This is implemented as a partial struct to allow for individual platforms
     /// to offer additional data without separate state queries to GamePad.
     /// </summary>
+    [Serializable]
     public partial struct GamePadState
     {
         /// <summary>
