@@ -51,9 +51,9 @@ namespace Microsoft.Xna.Framework.Net
         public TimeSpan RoundtripTime { get { return machine.roundtripTime; } }
         public NetworkSession Session { get { return session; } }
 
-        public bool HasVoice { get; }
-        public bool IsTalking { get; }
-        public bool IsMutedByLocalUser { get; }
+        public bool HasVoice { get { return false; } }
+        public bool IsTalking { get { return false; } }
+        public bool IsMutedByLocalUser { get { return false; } }
 
         public virtual bool IsReady
         {

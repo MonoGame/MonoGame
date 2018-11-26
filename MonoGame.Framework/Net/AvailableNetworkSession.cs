@@ -22,18 +22,18 @@ namespace Microsoft.Xna.Framework.Net
             this.SessionProperties = sessionProperties;
         }
 
-        internal Guid HostGuid { get; }
-        internal NetworkSessionType SessionType { get; }
-        internal IEnumerable<SignedInGamer> LocalGamers { get; }
-        internal int MaxGamers { get; }
-        internal int PrivateGamerSlots { get; }
+        internal Guid HostGuid { get; private set; }
+        internal NetworkSessionType SessionType { get; private set; }
+        internal IEnumerable<SignedInGamer> LocalGamers { get; private set; }
+        internal int MaxGamers { get; private set; }
+        internal int PrivateGamerSlots { get; private set; }
         internal object Tag { get; set; }
 
-        public int CurrentGamerCount { get; }
-        public string HostGamertag { get; }
-        public int OpenPrivateGamerSlots { get; }
-        public int OpenPublicGamerSlots { get; }
-        public QualityOfService QualityOfService { get; }
-        public NetworkSessionProperties SessionProperties { get; }
+        public int CurrentGamerCount { get; private set; }
+        public string HostGamertag { get; private set; }
+        public int OpenPrivateGamerSlots { get; private set; }
+        public int OpenPublicGamerSlots { get; private set; }
+        public QualityOfService QualityOfService { get; private set; }
+        public NetworkSessionProperties SessionProperties { get; private set; }
     }
 }

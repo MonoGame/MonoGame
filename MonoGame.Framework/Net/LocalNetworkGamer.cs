@@ -36,6 +36,8 @@ namespace Microsoft.Xna.Framework.Net
     {
         private const int MaxDelayedPacketsAllowed = 100;
 
+        internal readonly SignedInGamer signedInGamer;
+
         private Dictionary<byte, List<Packet>> delayedUnordered = new Dictionary<byte, List<Packet>>();
         private Dictionary<byte, List<Packet>> delayedOrdered = new Dictionary<byte, List<Packet>>();
 
@@ -45,9 +47,11 @@ namespace Microsoft.Xna.Framework.Net
         internal LocalNetworkGamer(SignedInGamer signedInGamer, NetworkMachine machine, byte id, bool isPrivateSlot)
             : base(machine, id, isPrivateSlot, false, signedInGamer.DisplayName, signedInGamer.Gamertag)
         {
-            this.SignedInGamer = signedInGamer;
+            this.signedInGamer = signedInGamer;
         }
-        
+
+        public SignedInGamer SignedInGamer { get { return signedInGamer; } }
+
         public bool IsDataAvailable { get { return inboundPacketIndex < inboundPackets.Count; } }
 
         public override bool IsReady
@@ -69,8 +73,6 @@ namespace Microsoft.Xna.Framework.Net
                 }
             }
         }
-
-        public SignedInGamer SignedInGamer { get; }
 
         public void EnableSendVoice(NetworkGamer remoteGamer, bool enable)
         {

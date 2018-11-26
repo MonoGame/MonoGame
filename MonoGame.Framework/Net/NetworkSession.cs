@@ -126,10 +126,10 @@ namespace Microsoft.Xna.Framework.Net
             SignedInGamer.SignedOut += LocalGamerSignedOut;
         }
 
-        public GamerCollection<NetworkGamer> AllGamers { get; }
-        public GamerCollection<NetworkGamer> PreviousGamers { get; }
-        public GamerCollection<NetworkGamer> RemoteGamers { get; }
-        public GamerCollection<LocalNetworkGamer> LocalGamers { get; }
+        public GamerCollection<NetworkGamer> AllGamers { get; private set; }
+        public GamerCollection<NetworkGamer> PreviousGamers { get; private set; }
+        public GamerCollection<NetworkGamer> RemoteGamers { get; private set; }
+        public GamerCollection<LocalNetworkGamer> LocalGamers { get; private set; }
         public int BytesPerSecondReceived { get; private set; }
         public int BytesPerSecondSent { get; private set; }
 
@@ -553,7 +553,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 var localGamer = (LocalNetworkGamer)gamer;
                 localGamers.Add(localGamer);
-                localGamerFromSignedInGamer.Add(localGamer.SignedInGamer, localGamer);
+                localGamerFromSignedInGamer.Add(localGamer.signedInGamer, localGamer);
             }
             else
             {
@@ -578,7 +578,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 var localGamer = (LocalNetworkGamer)gamer;
                 localGamers.Remove(localGamer);
-                localGamerFromSignedInGamer.Remove(localGamer.SignedInGamer);
+                localGamerFromSignedInGamer.Remove(localGamer.signedInGamer);
             }
             else
             {

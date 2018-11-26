@@ -9,6 +9,6 @@ namespace Microsoft.Xna.Framework.Net
             this.EndReason = endReason;
         }
 
-        public NetworkSessionEndReason EndReason { get; }
+        public NetworkSessionEndReason EndReason { get; private set; }
     }
 }

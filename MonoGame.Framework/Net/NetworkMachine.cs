@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Net
             this.Gamers = new GamerCollection<NetworkGamer>(new List<NetworkGamer>(), gamers);
         }
 
-        public GamerCollection<NetworkGamer> Gamers { get; }
+        public GamerCollection<NetworkGamer> Gamers { get; private set; }
 
         public void RemoveFromSession()
         {

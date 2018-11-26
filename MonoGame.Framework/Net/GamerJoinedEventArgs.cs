@@ -9,6 +9,6 @@ namespace Microsoft.Xna.Framework.Net
             this.Gamer = gamer;
         }
 
-        public NetworkGamer Gamer { get; }
+        public NetworkGamer Gamer { get; private set; }
     }
 }

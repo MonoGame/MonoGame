@@ -2,7 +2,7 @@
 
 namespace Microsoft.Xna.Framework.Net
 {
-    public class WriteLeaderboardsEventArgs : EventArgs
+    public sealed class WriteLeaderboardsEventArgs : EventArgs
     {
         internal WriteLeaderboardsEventArgs(NetworkGamer gamer, bool isLeaving)
         {
@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Net
             this.IsLeaving = isLeaving;
         }
 
-        public NetworkGamer Gamer { get; }
-        public bool IsLeaving { get; }
+        public NetworkGamer Gamer { get; private set; }
+        public bool IsLeaving { get; private set; }
     }
 }
