@@ -1172,8 +1172,6 @@ namespace MonoGame.OpenGL
             ReadBuffer = LoadFunction<ReadBufferDelegate> ("glReadBuffer");
             DrawBuffer = LoadFunction<DrawBufferDelegate> ("glDrawBuffer");
 
-            RenderbufferStorage = LoadFunction<RenderbufferStorageDelegate> ("glRenderbufferStorage");
-
             // Render Target Support. These might be null if they are not supported
             // see GraphicsDevice.OpenGL.FramebufferHelper.cs for handling other extensions.
             GenRenderbuffers = LoadFunction<GenRenderbuffersDelegate> ("glGenRenderbuffers");
@@ -1184,6 +1182,7 @@ namespace MonoGame.OpenGL
             DeleteFramebuffers = LoadFunction<DeleteFramebuffersDelegate> ("glDeleteFramebuffers");
             FramebufferTexture2D = LoadFunction<FramebufferTexture2DDelegate> ("glFramebufferTexture2D");
             FramebufferRenderbuffer = LoadFunction<FramebufferRenderbufferDelegate> ("glFramebufferRenderbuffer");
+            RenderbufferStorage = LoadFunction<RenderbufferStorageDelegate> ("glRenderbufferStorage");
             RenderbufferStorageMultisample = LoadFunction<RenderbufferStorageMultisampleDelegate> ("glRenderbufferStorageMultisample");
             GenerateMipmap = LoadFunction<GenerateMipmapDelegate> ("glGenerateMipmap");
             BlitFramebuffer = LoadFunction<BlitFramebufferDelegate> ("glBlitFramebuffer");
