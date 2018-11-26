@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkGamer));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkGamer");
                 return isReady;
             }
             set

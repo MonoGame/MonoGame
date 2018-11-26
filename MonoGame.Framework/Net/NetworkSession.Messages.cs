@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             var msg = peer.CreateMessage();
             msg.Write((byte)type);
-            msg.Write((byte)(recipientMachine?.id ?? 255));
+            msg.Write((byte)(recipientMachine != null ? recipientMachine.id : 255));
             msg.Write((byte)localMachine.id);
             return msg;
         }
@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Net
             bool sendToAll = recipientId == 255;
             var recipientMachine = sendToAll ? null : machineFromId[recipientId];
 
-            Debug.WriteLine("S [self] (" + (originMachine == localMachine ? "[self]" : originMachine.id.ToString()) + ")->" + (recipientMachine?.id.ToString() ?? "[all]") + " " + msgType);
+            Debug.WriteLine("S " + localMachine.id + " (" + originMachine.id + ")->" + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]") + " " + msgType);
 
             if (!sendToAll && recipientMachine.isLocal)
             {
@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework.Net
             if (msg.LengthBytes < 3)
             {
                 // TODO: Kick machine?
-                Debug.Write("Received empty message from machine " + (senderMachine.id.ToString() ?? "[self]"));
+                Debug.Write("Received empty message from machine " + senderMachine.id);
                 return;
             }
 
@@ -154,13 +154,13 @@ namespace Microsoft.Xna.Framework.Net
             catch
             {
                 // TODO: Kick machine?
-                Debug.WriteLine("Received message with malformed header from machine " + (senderMachine.id.ToString() ?? "[self]"));
+                Debug.WriteLine("Received message with malformed header from machine " + senderMachine.id);
                 return;
             }
             if (headerMsgType >= MessageTypeCount)
             {
                 // TODO: Kick machine?
-                Debug.WriteLine("Received message with malformed header from machine " + (senderMachine.id.ToString() ?? "[self]"));
+                Debug.WriteLine("Received message with malformed header from machine " + senderMachine.id);
                 return;
             }
 
@@ -172,7 +172,7 @@ namespace Microsoft.Xna.Framework.Net
                 if (isHost)
                 {
                     // TODO: Kick machine?
-                    Debug.WriteLine("Received message with malformed header from machine " + (senderMachine.id.ToString() ?? "[self]"));
+                    Debug.WriteLine("Received message with malformed header from machine " + senderMachine.id);
                 }
                 return;
             }
@@ -183,11 +183,11 @@ namespace Microsoft.Xna.Framework.Net
             if (isHost && senderMachine != originMachine)
             {
                 // TODO: Kick machine?
-                Debug.WriteLine("Received message with malformed header from machine " + (senderMachine.id.ToString() ?? "[self]"));
+                Debug.WriteLine("Received message with malformed header from machine " + senderMachine.id);
                 return;
             }
 
-            Debug.WriteLine("R " + (senderMachine == localMachine ? "[self]" : senderMachine.id.ToString()) + " (" + (originMachine.id.ToString() ?? "[self]") + ")->" + (recipientMachine?.id.ToString() ?? "[all]") + " " + msgType);
+            Debug.WriteLine("R " + senderMachine.id + " (" + originMachine.id + ")->" + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]") + " " + msgType);
 
             // Handle message
             bool success = false;
@@ -246,7 +246,7 @@ namespace Microsoft.Xna.Framework.Net
             // If host, forward message to peers
             if (isHost && senderMachine != localMachine && recipientMachine != localMachine)
             {
-                Debug.WriteLine("Forwarding " + msgType + " message to machine " + (recipientMachine?.id.ToString() ?? "[all]"));
+                Debug.WriteLine("Forwarding " + msgType + " message to machine " + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]"));
 
                 SendMessage(CreateMessageFrom(msg), deliveryMethod, ignoreSelf: true, ignoreMachine: senderMachine);
             }

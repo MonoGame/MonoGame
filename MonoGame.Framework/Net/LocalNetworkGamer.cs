@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             set
             {
-                if (IsDisposed) throw new InvalidOperationException(nameof(LocalNetworkGamer));
+                if (IsDisposed) throw new InvalidOperationException("LocalNetworkGamer");
 
                 if (session.SessionState != NetworkSessionState.Lobby)
                 {
@@ -187,11 +187,11 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (data == null)
             {
-                throw new ArgumentNullException(nameof(data));
+                throw new ArgumentNullException("data");
             }
             if (offset >= data.Length)
             {
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException("offset");
             }
 
             if (inboundPacketIndex >= inboundPackets.Count)
@@ -241,7 +241,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (recipient == null)
             {
-                throw new NullReferenceException(nameof(recipient));
+                throw new NullReferenceException("recipient");
             }
 
             try { InternalSendData(data, 0, data.Length, options, recipient); }
@@ -258,7 +258,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (recipient == null)
             {
-                throw new NullReferenceException(nameof(recipient));
+                throw new NullReferenceException("recipient");
             }
 
             try { InternalSendData(data, offset, count, options, recipient); }
@@ -269,7 +269,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (data == null)
             {
-                throw new NullReferenceException(nameof(data));
+                throw new NullReferenceException("data");
             }
             if (data.Length == 0)
             {
@@ -277,11 +277,11 @@ namespace Microsoft.Xna.Framework.Net
             }
             if (offset < 0 || offset >= data.Length)
             {
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException("offset");
             }
             if (count <= 0 || offset + count > data.Length)
             {
-                throw new ArgumentOutOfRangeException(nameof(count));
+                throw new ArgumentOutOfRangeException("count");
             }
 
             session.SendUserMessage(this, options, data, recipient);
@@ -291,7 +291,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (data == null)
             {
-                throw new ArgumentNullException(nameof(data));
+                throw new ArgumentNullException("data");
             }
             if (data.Length == 0)
             {
@@ -314,7 +314,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (recipient == null)
             {
-                throw new NullReferenceException(nameof(recipient));
+                throw new NullReferenceException("recipient");
             }
 
             try { InternalSendData(data, options, recipient); }

@@ -15,13 +15,18 @@ namespace Microsoft.Xna.Framework.Net
 
         public GamerCollection(IList<T> list) : base(list)
         {
-            contents = list ?? throw new ArgumentNullException(nameof(list));
+            if (list == null) throw new ArgumentNullException("list");
+
+            this.contents = list;
         }
 
         internal GamerCollection(IList<T> contents, IList<T> reference) : base(contents)
         {
-            this.contents = contents ?? throw new ArgumentNullException(nameof(contents));
-            this.reference = reference ?? throw new ArgumentNullException(nameof(reference));
+            if (contents == null) throw new ArgumentNullException("contents");
+            if (reference == null) throw new ArgumentNullException("reference");
+
+            this.contents = contents;
+            this.reference = reference;
         }
 
         internal void CopyFromReference()

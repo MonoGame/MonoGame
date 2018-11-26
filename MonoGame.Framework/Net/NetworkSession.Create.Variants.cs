@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Net
             }
             if (localGamers == null)
             {
-                throw new ArgumentNullException(nameof(localGamers));
+                throw new ArgumentNullException("localGamers");
             }
             foreach (var localGamer in localGamers)
             {
@@ -119,7 +119,7 @@ namespace Microsoft.Xna.Framework.Net
             }
             if (localGamers == null)
             {
-                throw new ArgumentNullException(nameof(localGamers));
+                throw new ArgumentNullException("localGamers");
             }
             foreach (var localGamer in localGamers)
             {
@@ -186,7 +186,7 @@ namespace Microsoft.Xna.Framework.Net
             }
             if (availableSession == null)
             {
-                throw new ArgumentNullException(nameof(availableSession));
+                throw new ArgumentNullException("availableSession");
             }
 
             AsyncJoinCaller = new AsyncJoin(InternalJoin);

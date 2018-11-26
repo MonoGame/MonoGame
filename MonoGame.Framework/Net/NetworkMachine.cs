@@ -27,8 +27,8 @@ namespace Microsoft.Xna.Framework.Net
 
         public void RemoveFromSession()
         {
-            if (session.IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
-            if (beingRemoved) throw new ObjectDisposedException(nameof(NetworkMachine));
+            if (session.IsDisposed) throw new ObjectDisposedException("NetworkSession");
+            if (beingRemoved) throw new ObjectDisposedException("NetworkMachine");
             if (!isLocal && !session.IsHost)
             {
                 throw new InvalidOperationException("Can only be called by the host or the owner of the machine");

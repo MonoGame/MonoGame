@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 return type;
             }
         }
@@ -148,7 +148,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 return properties;
             }
         }
@@ -157,7 +157,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 return state;
             }
         }
@@ -166,12 +166,12 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 return allowHostMigration;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 if (!IsHost)
                 {
                     throw new InvalidOperationException("Only the host can perform this action");
@@ -193,12 +193,12 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 return allowJoinInProgress;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 if (!isHost)
                 {
                     throw new InvalidOperationException("Only the host can perform this action");
@@ -216,7 +216,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 return gamerFromId[0];
             }
         }
@@ -225,7 +225,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 foreach (var gamer in allGamers)
                 {
                     if (!gamer.IsReady)
@@ -241,7 +241,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 return isHost;
             }
         }
@@ -250,12 +250,12 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 return maxGamers;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 if (!isHost)
                 {
                     throw new InvalidOperationException("Only the host can perform this action");
@@ -293,12 +293,12 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 return privateGamerSlots;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
                 if (!isHost)
                 {
                     throw new InvalidOperationException("Only the host can perform this action");
@@ -320,7 +320,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
 #if DEBUG
                 return TimeSpan.FromSeconds(peer.Configuration.SimulatedRandomLatency);
 #else
@@ -329,7 +329,7 @@ namespace Microsoft.Xna.Framework.Net
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
 #if DEBUG
                 peer.Configuration.SimulatedRandomLatency = (float)value.TotalSeconds;
 #endif
@@ -340,7 +340,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
 #if DEBUG
                 return peer.Configuration.SimulatedLoss;
 #else
@@ -349,7 +349,7 @@ namespace Microsoft.Xna.Framework.Net
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
 #if DEBUG
                 peer.Configuration.SimulatedLoss = value;
 #endif
@@ -395,7 +395,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public void AddLocalGamer(SignedInGamer signedInGamer)
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+            if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
 
             if (localGamerFromSignedInGamer.ContainsKey(signedInGamer))
             {
@@ -418,7 +418,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public void StartGame()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+            if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
             if (!isHost)
             {
                 throw new InvalidOperationException("Only the host can perform this action");
@@ -442,7 +442,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public void EndGame()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+            if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
             if (!isHost)
             {
                 throw new InvalidOperationException("Only the host can perform this action");
@@ -462,7 +462,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public void ResetReady()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+            if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
             if (!isHost)
             {
                 throw new InvalidOperationException("Only the host can perform this action");
@@ -484,7 +484,7 @@ namespace Microsoft.Xna.Framework.Net
         /// <returns></returns>
         public NetworkGamer FindGamerById(byte gamerId)
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+            if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
 
             if (gamerFromId.ContainsKey(gamerId))
             {
@@ -716,7 +716,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public void Update()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(NetworkSession));
+            if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
 
             SilentUpdate();
 

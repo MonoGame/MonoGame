@@ -190,7 +190,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             publicInfo.Set(type,
                             properties,
-                            Host?.Gamertag ?? "Game starting...",
+                            Host.Gamertag,
                             maxGamers,
                             PrivateGamerSlots,
                             allGamers.Count,
