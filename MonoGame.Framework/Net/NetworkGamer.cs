@@ -14,6 +14,13 @@ namespace Microsoft.Xna.Framework.Net
         internal static IComparer<NetworkGamer> Instance = new NetworkGamerIdComparer();
     }
 
+    internal enum NetworkGamerState
+    {
+        Pending,
+        Added,
+        Removed,
+    }
+
     public class NetworkGamer : Gamer
     {
         protected readonly NetworkSession session;
@@ -21,7 +28,8 @@ namespace Microsoft.Xna.Framework.Net
         internal readonly byte id;
         internal bool isPrivateSlot;
         internal bool isReady;
-        internal bool hasLeftSession;
+
+        internal NetworkGamerState state = NetworkGamerState.Pending;
 
         internal NetworkGamer(NetworkMachine machine, byte id, bool isPrivateSlot, bool isReady, string displayName, string gamertag)
             : base()
@@ -43,7 +51,7 @@ namespace Microsoft.Xna.Framework.Net
 #pragma warning disable CS3005 // Identifier differing only in case is not CLS-compliant
         public bool IsPrivateSlot { get { return isPrivateSlot; } }
 #pragma warning disable CS3005 // Identifier differing only in case is not CLS-compliant
-        public bool HasLeftSession { get { return hasLeftSession; } }
+        public bool HasLeftSession { get { return state == NetworkGamerState.Removed; } }
 
         public bool IsGuest { get { return machine.gamers[0] != this; } }
         public bool IsHost { get { return machine.isHost && id == 0; } }

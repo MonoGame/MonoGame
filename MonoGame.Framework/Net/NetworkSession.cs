@@ -488,7 +488,11 @@ namespace Microsoft.Xna.Framework.Net
 
             if (gamerFromId.ContainsKey(gamerId))
             {
-                return gamerFromId[gamerId];
+                var gamer = gamerFromId[gamerId];
+                if (gamer.state == NetworkGamerState.Added)
+                {
+                    return gamer;
+                }
             }
             return null;
         }
@@ -544,6 +548,12 @@ namespace Microsoft.Xna.Framework.Net
 
         private void AddGamer(NetworkGamer gamer)
         {
+            if (gamer.state != NetworkGamerState.Pending)
+            {
+                throw new InvalidOperationException("Only new gamers can be added");
+            }
+            gamer.state = NetworkGamerState.Added;
+
             gamer.machine.gamers.Add(gamer);
 
             allGamers.Add(gamer);
@@ -562,14 +572,26 @@ namespace Microsoft.Xna.Framework.Net
                 remoteGamers.Sort(NetworkGamerIdComparer.Instance);
             }
 
-            gamerFromId.Add(gamer.id, gamer);
+            if (!gamerFromId.ContainsKey(gamer.id))
+            {
+                gamerFromId.Add(gamer.id, gamer);
+                
+            }
+            if (gamerFromId[gamer.id] != gamer)
+            {
+                throw new InvalidOperationException();
+            }
 
             InvokeGamerJoinedEvent(new GamerJoinedEventArgs(gamer));
         }
 
         private void RemoveGamer(NetworkGamer gamer)
         {
-            gamer.hasLeftSession = true;
+            if (gamer.state != NetworkGamerState.Added)
+            {
+                throw new InvalidOperationException("Only gamers in the session can be removed");
+            }
+            gamer.state = NetworkGamerState.Removed;
 
             gamer.machine.gamers.Remove(gamer);
 

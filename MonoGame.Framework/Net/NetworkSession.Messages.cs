@@ -387,11 +387,12 @@ namespace Microsoft.Xna.Framework.Net
             {
                 available = GetUniqueId(gamerFromId, out id);
 
-                // Let Host create remote gamers directly
+                // Let host create (but not add) remote gamer directly
                 if (available && isHost && originMachine != localMachine)
                 {
                     var isPrivateSlot = originMachine.isHost && GetOpenPrivateGamerSlots() > 0;
-                    AddGamer(new NetworkGamer(originMachine, id, isPrivateSlot, false, LoadingGamertag, LoadingGamertag));
+                    var pendingGamer = new NetworkGamer(originMachine, id, isPrivateSlot, false, LoadingGamertag, LoadingGamertag);
+                    gamerFromId.Add(id, pendingGamer);
                 }
             }
             SendGamerIdResponse(originMachine, available, id);
@@ -501,17 +502,26 @@ namespace Microsoft.Xna.Framework.Net
                     // Someone is impersonating the host gamer
                     return false;
                 }
-                if (recipientMachine != null && recipientMachine != localMachine)
+
+                if (recipientMachine == null || recipientMachine == localMachine)
+                {
+                    // Host already added gamer, just update it and add it to the game
+                    var gamer = gamerFromId[id];
+                    if (gamer.state != NetworkGamerState.Pending)
+                    {
+                        return false;
+                    }
+
+                    gamer.DisplayName = displayName;
+                    gamer.Gamertag = gamertag;
+                    gamer.isPrivateSlot = isPrivateSlot;
+                    gamer.isReady = isReady;
+                    AddGamer(gamer);
+                }
+                else
                 {
                     // TODO: Make sure client is not spamming recipient
                 }
-
-                // Host already added gamer, just update it
-                var gamer = gamerFromId[id];
-                gamer.DisplayName = displayName;
-                gamer.Gamertag = gamertag;
-                gamer.isPrivateSlot = isPrivateSlot;
-                gamer.isReady = isReady;
             }
             else
             {

@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Net
         private int GetOpenPrivateGamerSlots()
         {
             int usedPrivateSlots = 0;
-            foreach (var gamer in allGamers)
+            foreach (var gamer in gamerFromId.Values)
             {
                 if (gamer.isPrivateSlot)
                 {
@@ -166,7 +166,7 @@ namespace Microsoft.Xna.Framework.Net
         private int GetOpenPublicGamerSlots()
         {
             int usedPublicSlots = 0;
-            foreach (var gamer in allGamers)
+            foreach (var gamer in gamerFromId.Values)
             {
                 if (!gamer.isPrivateSlot)
                 {
