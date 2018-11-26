@@ -269,7 +269,9 @@ namespace Microsoft.Xna.Framework.Net
                     }
                     else
                     {
-                        if (NetworkSessionMasterServer.ParseRequestHostsResponse(msg, out Guid guid, out NetworkSessionPublicInfo publicInfo))
+                        Guid guid;
+                        NetworkSessionPublicInfo publicInfo;
+                        if (NetworkSessionMasterServer.ParseRequestHostsResponse(msg, out guid, out publicInfo))
                         {
                             AddAvailableNetworkSession(guid, publicInfo, localGamers, sessionType, searchProperties, availableSessions);
                         }
