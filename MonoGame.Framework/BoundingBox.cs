@@ -11,6 +11,7 @@ namespace Microsoft.Xna.Framework
 {
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
+    [Serializable]
     public struct BoundingBox : IEquatable<BoundingBox>
     {
 

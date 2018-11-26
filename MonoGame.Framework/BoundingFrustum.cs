@@ -11,6 +11,7 @@ namespace Microsoft.Xna.Framework
     /// Defines a viewing frustum for intersection operations.
     /// </summary>
     [DebuggerDisplay("{DebugDisplayString,nq}")]
+    [Serializable]
     public class BoundingFrustum : IEquatable<BoundingFrustum>
     {
         #region Private Fields
@@ -121,6 +122,12 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         #region Constructors
+
+        /// <summary>
+        /// Constructs an uninitialized frustrum for serializeability.
+        /// </summary>        
+        public BoundingFrustum()
+        {}
 
         /// <summary>
         /// Constructs the frustum by extracting the view planes from a matrix.

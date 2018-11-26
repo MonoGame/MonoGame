@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework
 #endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
+    [Serializable]
     public struct Vector2 : IEquatable<Vector2>
     {
         #region Private Fields
@@ -116,7 +117,7 @@ namespace Microsoft.Xna.Framework
             this.X = value;
             this.Y = value;
         }
-
+        
         #endregion
 
         #region Operators

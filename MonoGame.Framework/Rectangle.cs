@@ -13,6 +13,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
+    [Serializable]
     public struct Rectangle : IEquatable<Rectangle>
     {
         #region Private Fields

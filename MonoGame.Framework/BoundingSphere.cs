@@ -14,6 +14,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
+    [Serializable]
     public struct BoundingSphere : IEquatable<BoundingSphere>
     {
         #region Public Fields

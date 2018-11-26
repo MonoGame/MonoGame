@@ -10,6 +10,7 @@ namespace Microsoft.Xna.Framework
 {
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
+    [Serializable]
     public struct Ray : IEquatable<Ray>
     {
         #region Public Fields
