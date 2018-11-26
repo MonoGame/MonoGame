@@ -47,7 +47,17 @@ namespace Microsoft.Xna.Framework.Net
             }
             Debug.WriteLine("Server peer started.");
 
-            return new NetworkSession(serverPeer, true, 0, sessionType, sessionProperties, maxGamers, privateGamerSlots, localGamers);
+            var firstGamer = localGamers.First();
+            return new NetworkSession(serverPeer,
+                true,
+                0,
+                sessionType,
+                sessionProperties,
+                maxGamers,
+                privateGamerSlots,
+                localGamers,
+                firstGamer.DisplayName,
+                firstGamer.Gamertag);
         }
 
         private static IPEndPoint GetInternalIp(NetPeer peer)
@@ -164,7 +174,9 @@ namespace Microsoft.Xna.Framework.Net
                 availableSession.SessionProperties,
                 availableSession.MaxGamers,
                 availableSession.PrivateGamerSlots,
-                availableSession.LocalGamers);
+                availableSession.LocalGamers,
+                availableSession.HostGamertag, // TODO: Store real display name here instead of gamertag
+                availableSession.HostGamertag);
         }
 
         private static void AddAvailableNetworkSession(Guid hostGuid, NetworkSessionPublicInfo publicInfo, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions, object tag = null)

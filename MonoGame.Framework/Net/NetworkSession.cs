@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private List<SignedInGamer> pendingSignedInGamers = new List<SignedInGamer>();
 
-        internal NetworkSession(NetPeer peer, bool isHost, byte machineId, NetworkSessionType type, NetworkSessionProperties properties, int maxGamers, int privateGamerSlots, IEnumerable<SignedInGamer> localGamers)
+        internal NetworkSession(NetPeer peer, bool isHost, byte machineId, NetworkSessionType type, NetworkSessionProperties properties, int maxGamers, int privateGamerSlots, IEnumerable<SignedInGamer> localGamers, string hostDisplayName, string hostGamertag)
         {
             if (peer.Configuration.AutoFlushSendQueue) throw new InvalidOperationException("Peer must not flush send queue automatically");
             if (isHost && machineId != 0) throw new InvalidOperationException("Host must have machine id 0");
@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Net
                 AddMachine(this.hostMachine, hostConnection);
 
                 // Add host gamer with id 0, important for NetworkSession.Host property
-                AddGamer(new NetworkGamer(this.hostMachine, 0, privateGamerSlots > 0, false, LoadingGamertag, LoadingGamertag));
+                AddGamer(new NetworkGamer(this.hostMachine, 0, privateGamerSlots > 0, false, hostDisplayName, hostGamertag));
             }
 
             this.maxGamers = maxGamers;
