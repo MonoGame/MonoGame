@@ -684,23 +684,38 @@ namespace Microsoft.Xna.Framework.Net
                 var arg = eventQueue[i];
                 if (arg is GamerJoinedEventArgs)
                 {
-                    GamerJoined?.Invoke(this, arg as GamerJoinedEventArgs);
+                    if (GamerJoined != null)
+                    {
+                        GamerJoined.Invoke(this, arg as GamerJoinedEventArgs);
+                    }
                 }
                 else if (arg is GamerLeftEventArgs)
                 {
-                    GamerLeft?.Invoke(this, arg as GamerLeftEventArgs);
+                    if (GamerLeft != null)
+                    {
+                        GamerLeft.Invoke(this, arg as GamerLeftEventArgs);
+                    }
                 }
                 else if (arg is GameStartedEventArgs)
                 {
-                    GameStarted?.Invoke(this, arg as GameStartedEventArgs);
+                    if (GameStarted != null)
+                    {
+                        GameStarted.Invoke(this, arg as GameStartedEventArgs);
+                    }
                 }
                 else if (arg is GameEndedEventArgs)
                 {
-                    GameEnded?.Invoke(this, arg as GameEndedEventArgs);
+                    if (GameEnded != null)
+                    {
+                        GameEnded.Invoke(this, arg as GameEndedEventArgs);
+                    }
                 }
                 else if (arg is NetworkSessionEndedEventArgs)
                 {
-                    SessionEnded?.Invoke(this, arg as NetworkSessionEndedEventArgs);
+                    if (SessionEnded != null)
+                    {
+                        SessionEnded.Invoke(this, arg as NetworkSessionEndedEventArgs);
+                    }
                 }
             }
 

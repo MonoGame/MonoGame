@@ -121,7 +121,8 @@ namespace Microsoft.Xna.Framework.Net
 
                     if (status == NetConnectionStatus.Connected)
                     {
-                        if (msg.SenderConnection?.RemoteHailMessage?.LengthBytes >= 1)
+                        if (msg.SenderConnection.RemoteHailMessage != null &&
+                            msg.SenderConnection.RemoteHailMessage.LengthBytes >= 1)
                         {
                             success = true;
                             machineId = msg.SenderConnection.RemoteHailMessage.ReadByte();

@@ -675,7 +675,7 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void SendUserMessage(LocalNetworkGamer sender, SendDataOptions options, byte[] data, NetworkGamer recipient = null)
         {
-            var msg = CreateMessage(MessageType.User, recipient?.machine);
+            var msg = CreateMessage(MessageType.User, recipient != null ? recipient.machine : null);
             msg.Write(sender.id);
             msg.Write((byte)(recipient == null ? 255 : recipient.id));
             msg.Write((byte)options);
@@ -686,7 +686,7 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void SendUserMessage(LocalNetworkGamer sender, SendDataOptions options, PacketWriter data, NetworkGamer recipient = null)
         {
-            var msg = CreateMessage(MessageType.User, recipient?.machine);
+            var msg = CreateMessage(MessageType.User, recipient != null ? recipient.machine : null);
             msg.Write(sender.id);
             msg.Write((byte)(recipient == null ? 255 : recipient.id));
             msg.Write((byte)options);
