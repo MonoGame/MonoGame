@@ -184,7 +184,7 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     allowHostMigration = value;
 
-                    InternalMessages.SessionStateChanged.Create(null);
+                    SendSessionStateChanged(null);
                 }*/
             }
         }
@@ -207,7 +207,7 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     allowJoinInProgress = value;
 
-                    //InternalMessages.SessionStateChanged.Create(null);
+                    SendSessionStateChanged(null);
                 }
             }
         }
@@ -268,7 +268,7 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     maxGamers = value;
 
-                    //InternalMessages.SessionStateChanged.Create(null);
+                    SendSessionStateChanged(null);
                 }
             }
         }
@@ -311,7 +311,7 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     privateGamerSlots = value;
 
-                    //InternalMessages.SessionStateChanged.Create(null);
+                    SendSessionStateChanged(null);
                 }
             }
         }

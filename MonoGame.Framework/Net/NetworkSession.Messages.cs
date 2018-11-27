@@ -42,6 +42,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private enum MessageType
         {
+            SessionStateChanged,
             MachineConnected,
             MachineDisconnected,
             GamerIdRequest,
@@ -55,9 +56,9 @@ namespace Microsoft.Xna.Framework.Net
             User,
         }
 
-        private const int MessageTypeCount = 11;
+        private const int MessageTypeCount = 12;
 
-        private NetOutgoingMessage CreateMessage(MessageType type, NetworkMachine recipientMachine)
+        private NetOutgoingMessage CreateMessageWithHeader(MessageType type, NetworkMachine recipientMachine)
         {
             var msg = peer.CreateMessage();
             msg.Write((byte)type);
@@ -198,49 +199,47 @@ namespace Microsoft.Xna.Framework.Net
             // Handle message
             bool success = false;
 
-            //try
+            switch (msgType)
             {
-                switch (msgType)
-                {
-                    case MessageType.MachineConnected:
-                        success = ReceiveMachineConnectedMessage(msg, originMachine);
-                        break;
-                    case MessageType.MachineDisconnected:
-                        success = ReceiveMachineDisconnectedMessage(msg, originMachine);
-                        break;
-                    case MessageType.GamerIdRequest:
-                        success = ReceiveGamerIdRequest(msg, originMachine);
-                        break;
-                    case MessageType.GamerIdResponse:
-                        success = ReceiveGamerIdResponse(msg, originMachine);
-                        break;
-                    case MessageType.GamerJoined:
-                        success = ReceiveGamerJoined(msg, originMachine, recipientMachine);
-                        break;
-                    case MessageType.GamerLeft:
-                        success = ReceiveGamerLeft(msg, originMachine);
-                        break;
-                    case MessageType.GamerStateChanged:
-                        success = ReceiveGamerStateChanged(msg, originMachine);
-                        break;
-                    case MessageType.ResetReady:
-                        success = ReceiveResetReady(msg, originMachine);
-                        break;
-                    case MessageType.StartGame:
-                        success = ReceiveStartGame(msg, originMachine);
-                        break;
-                    case MessageType.EndGame:
-                        success = ReceiveEndGame(msg, originMachine);
-                        break;
-                    case MessageType.User:
-                        success = ReceiveUserMessage(msg, originMachine);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
+                case MessageType.SessionStateChanged:
+                    success = ReceiveSessionStateChanged(msg, originMachine);
+                    break;
+                case MessageType.MachineConnected:
+                    success = ReceiveMachineConnectedMessage(msg, originMachine);
+                    break;
+                case MessageType.MachineDisconnected:
+                    success = ReceiveMachineDisconnectedMessage(msg, originMachine);
+                    break;
+                case MessageType.GamerIdRequest:
+                    success = ReceiveGamerIdRequest(msg, originMachine);
+                    break;
+                case MessageType.GamerIdResponse:
+                    success = ReceiveGamerIdResponse(msg, originMachine);
+                    break;
+                case MessageType.GamerJoined:
+                    success = ReceiveGamerJoined(msg, originMachine, recipientMachine);
+                    break;
+                case MessageType.GamerLeft:
+                    success = ReceiveGamerLeft(msg, originMachine);
+                    break;
+                case MessageType.GamerStateChanged:
+                    success = ReceiveGamerStateChanged(msg, originMachine);
+                    break;
+                case MessageType.ResetReady:
+                    success = ReceiveResetReady(msg, originMachine);
+                    break;
+                case MessageType.StartGame:
+                    success = ReceiveStartGame(msg, originMachine);
+                    break;
+                case MessageType.EndGame:
+                    success = ReceiveEndGame(msg, originMachine);
+                    break;
+                case MessageType.User:
+                    success = ReceiveUserMessage(msg, originMachine);
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
-            //catch
-            { }
 
             if (!success)
             {
@@ -261,11 +260,62 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
+        private void SendSessionStateChanged(NetworkMachine recipient)
+        {
+            if (!isHost) throw new InvalidOperationException();
+
+            var msg = CreateMessageWithHeader(MessageType.SessionStateChanged, recipient);
+            msg.Write(allowHostMigration);
+            msg.Write(allowJoinInProgress);
+            msg.Write(maxGamers);
+            msg.Write(privateGamerSlots);
+            msg.Write((byte)state);
+            properties.Pack(msg);
+            SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
+        }
+
+        private bool ReceiveSessionStateChanged(NetBuffer msg, NetworkMachine originMachine)
+        {
+            if (!originMachine.isHost)
+            {
+                return false;
+            }
+
+            bool allowHostMigration, allowJoinInProgress;
+            int maxGamers, privateGamerSlots;
+            NetworkSessionState state;
+            NetworkSessionProperties properties = new NetworkSessionProperties();
+            try
+            {
+                allowHostMigration = msg.ReadBoolean();
+                allowJoinInProgress = msg.ReadBoolean();
+                maxGamers = msg.ReadInt32();
+                privateGamerSlots = msg.ReadInt32();
+                state = (NetworkSessionState)msg.ReadByte();
+                if (!properties.Unpack(msg))
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+            this.allowHostMigration = allowHostMigration;
+            this.allowJoinInProgress = allowJoinInProgress;
+            this.maxGamers = maxGamers;
+            this.privateGamerSlots = privateGamerSlots;
+            this.state = state;
+            this.properties.Set(properties);
+            return true;
+        }
+
         private void SendMachineConnectedMessage(NetworkMachine machine, NetworkMachine recipient)
         {
             if (!isHost) throw new InvalidOperationException();
 
-            var msg = CreateMessage(MessageType.MachineConnected, recipient);
+            var msg = CreateMessageWithHeader(MessageType.MachineConnected, recipient);
             msg.Write(machine.id);
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
@@ -297,6 +347,9 @@ namespace Microsoft.Xna.Framework.Net
                 // Host has already added machine
                 newMachine = machineFromId[id];
 
+                // Tell new machine about the current state of the game
+                SendSessionStateChanged(newMachine);
+
                 // Tell new machine about the machines already in the session
                 foreach (var existingMachine in allMachines)
                 {
@@ -326,7 +379,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (!isHost) throw new InvalidOperationException();
 
-            var msg = CreateMessage(MessageType.MachineDisconnected, null);
+            var msg = CreateMessageWithHeader(MessageType.MachineDisconnected, null);
             msg.Write(machine.id);
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
@@ -365,7 +418,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private void SendGamerIdRequest()
         {
-            var msg = CreateMessage(MessageType.GamerIdRequest, hostMachine);
+            var msg = CreateMessageWithHeader(MessageType.GamerIdRequest, hostMachine);
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
 
@@ -403,7 +456,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (!isHost || (success && id == 255)) throw new InvalidOperationException();
 
-            var msg = CreateMessage(MessageType.GamerIdResponse, recipient);
+            var msg = CreateMessageWithHeader(MessageType.GamerIdResponse, recipient);
             msg.Write(success);
             msg.Write(id);
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
@@ -453,7 +506,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private void SendGamerJoined(LocalNetworkGamer localGamer, NetworkMachine recipient)
         {
-            var msg = CreateMessage(MessageType.GamerJoined, recipient);
+            var msg = CreateMessageWithHeader(MessageType.GamerJoined, recipient);
             msg.Write(localGamer.id);
             msg.Write(localGamer.DisplayName);
             msg.Write(localGamer.Gamertag);
@@ -549,7 +602,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private void SendGamerLeft(LocalNetworkGamer localGamer)
         {
-            var msg = CreateMessage(MessageType.GamerLeft, null);
+            var msg = CreateMessageWithHeader(MessageType.GamerLeft, null);
             msg.Write(localGamer.id);
             SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
@@ -585,7 +638,7 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void SendGamerStateChanged(LocalNetworkGamer localGamer)
         {
-            var msg = CreateMessage(MessageType.GamerStateChanged, null);
+            var msg = CreateMessageWithHeader(MessageType.GamerStateChanged, null);
             msg.Write(localGamer.id);
             msg.Write(localGamer.DisplayName);
             msg.Write(localGamer.Gamertag);
@@ -633,7 +686,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (!isHost) throw new InvalidOperationException();
 
-            SendMessage(CreateMessage(MessageType.ResetReady, null), NetDeliveryMethod.ReliableOrdered);
+            SendMessage(CreateMessageWithHeader(MessageType.ResetReady, null), NetDeliveryMethod.ReliableOrdered);
         }
 
         private bool ReceiveResetReady(NetBuffer msg, NetworkMachine originMachine)
@@ -654,7 +707,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (!isHost) throw new InvalidOperationException();
 
-            SendMessage(CreateMessage(MessageType.StartGame, null), NetDeliveryMethod.ReliableOrdered);
+            SendMessage(CreateMessageWithHeader(MessageType.StartGame, null), NetDeliveryMethod.ReliableOrdered);
         }
 
         private bool ReceiveStartGame(NetBuffer msg, NetworkMachine originMachine)
@@ -673,7 +726,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (!isHost) throw new InvalidOperationException();
 
-            SendMessage(CreateMessage(MessageType.EndGame, null), NetDeliveryMethod.ReliableOrdered);
+            SendMessage(CreateMessageWithHeader(MessageType.EndGame, null), NetDeliveryMethod.ReliableOrdered);
         }
 
         private bool ReceiveEndGame(NetBuffer msg, NetworkMachine originMachine)
@@ -694,7 +747,7 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void SendUserMessage(LocalNetworkGamer sender, SendDataOptions options, byte[] data, NetworkGamer recipient = null)
         {
-            var msg = CreateMessage(MessageType.User, recipient != null ? recipient.machine : null);
+            var msg = CreateMessageWithHeader(MessageType.User, recipient != null ? recipient.machine : null);
             msg.Write(sender.id);
             msg.Write((byte)(recipient == null ? 255 : recipient.id));
             msg.Write((byte)options);
@@ -705,7 +758,7 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void SendUserMessage(LocalNetworkGamer sender, SendDataOptions options, PacketWriter data, NetworkGamer recipient = null)
         {
-            var msg = CreateMessage(MessageType.User, recipient != null ? recipient.machine : null);
+            var msg = CreateMessageWithHeader(MessageType.User, recipient != null ? recipient.machine : null);
             msg.Write(sender.id);
             msg.Write((byte)(recipient == null ? 255 : recipient.id));
             msg.Write((byte)options);
