@@ -8,7 +8,8 @@ namespace Microsoft.Xna.Framework.Net
     public class NetworkSessionProperties : IList<Nullable<int>>, ICollection<Nullable<int>>, IEnumerable<Nullable<int>>, IEnumerable
     {
         private const int Size = 8;
-        private IList<int?> list = new List<int?>(Size);
+        private List<int?> list = new List<int?>(Size);
+        private readonly bool isReadOnly;
 
         public NetworkSessionProperties()
         {
@@ -20,37 +21,17 @@ namespace Microsoft.Xna.Framework.Net
 
         internal NetworkSessionProperties(bool isReadOnly) : this()
         {
-            IsReadOnly = isReadOnly;
+            this.isReadOnly = isReadOnly;
         }
 
-        public bool IsReadOnly { get; private set; }
+        public bool IsReadOnly { get { return isReadOnly; } }
         public int Count { get { return list.Count; } }
 
-        public int? this[int index]
+        internal void Set(NetworkSessionProperties other)
         {
-            get
+            for (int i = 0; i < list.Count; i++)
             {
-                if (index < 0 || index >= list.Count)
-                {
-                    throw new ArgumentOutOfRangeException("index");
-                }
-
-                return list[index];
-            }
-
-            set
-            {
-                if (IsReadOnly)
-                {
-                    throw new InvalidOperationException("NetworkSessionProperties is read-only");
-                }
-
-                if (index < 0 || index >= list.Count)
-                {
-                    throw new ArgumentOutOfRangeException("index");
-                }
-
-                list[index] = value;
+                list[i] = other.list[i];
             }
         }
 
@@ -68,20 +49,42 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal void Unpack(NetIncomingMessage msg)
+        internal bool Unpack(NetBuffer msg)
         {
-            int remoteCount = msg.ReadInt32();
+            int remoteCount;
+            try
+            {
+                remoteCount = msg.ReadInt32();
+            }
+            catch
+            {
+                return false;
+            }
             if (remoteCount != list.Count)
             {
-                throw new NetworkException("NetworkSessionProperties size mismatch, different builds?");
+                return false;
+            }
+
+            var isSet = new bool[list.Count];
+            var value = new int[list.Count];
+            for (int i = 0; i < list.Count; i++)
+            {
+                try
+                {
+                    isSet[i] = msg.ReadBoolean();
+                    value[i] = msg.ReadInt32();
+                }
+                catch
+                {
+                    return false;
+                }
             }
 
             for (int i = 0; i < list.Count; i++)
             {
-                bool isSet = msg.ReadBoolean();
-                int value = msg.ReadInt32();
-                list[i] = isSet ? value : (int?)null;
+                list[i] = isSet[i] ? value[i] : (int?)null;
             }
+            return true;
         }
 
         internal bool SearchMatch(NetworkSessionProperties remote)
@@ -112,6 +115,34 @@ namespace Microsoft.Xna.Framework.Net
             for (int i = 0; i < list.Count; i++)
             {
                 list[i] = null;
+            }
+        }
+
+        public int? this[int index]
+        {
+            get
+            {
+                if (index < 0 || index >= list.Count)
+                {
+                    throw new ArgumentOutOfRangeException("index");
+                }
+
+                return list[index];
+            }
+
+            set
+            {
+                if (IsReadOnly)
+                {
+                    throw new InvalidOperationException("NetworkSessionProperties is read-only");
+                }
+
+                if (index < 0 || index >= list.Count)
+                {
+                    throw new ArgumentOutOfRangeException("index");
+                }
+
+                list[index] = value;
             }
         }
 

@@ -114,13 +114,9 @@ namespace Microsoft.Xna.Framework.Net
             {
                 if (msg.MessageType == NetIncomingMessageType.UnconnectedData)
                 {
-                    try
+                    if (!HandleMessage(msg))
                     {
-                        HandleMessage(msg);
-                    }
-                    catch (NetException e)
-                    {
-                        Console.WriteLine("Encountered malformed message from " + msg.SenderEndPoint + ". Lidgren reports '" + e.Message + "'.");
+                        Console.WriteLine("Encountered malformed message from " + msg.SenderEndPoint + ".");
                     }
                 }
                 else
@@ -175,20 +171,29 @@ namespace Microsoft.Xna.Framework.Net
             publicInfo.Pack(response);
         }
 
-        internal static bool ParseRequestHostsResponse(NetIncomingMessage response, out Guid guid, out NetworkSessionPublicInfo hostPublicInfo)
+        internal static bool ParseRequestHostsResponse(NetIncomingMessage response, out Guid hostGuid, out NetworkSessionPublicInfo hostPublicInfo)
         {
+            hostGuid = Guid.Empty;
+            hostPublicInfo = null;
+
+            Guid guid;
+            NetworkSessionPublicInfo publicInfo = new NetworkSessionPublicInfo();
             try
             {
                 guid = new Guid(response.ReadString());
-                hostPublicInfo = NetworkSessionPublicInfo.FromMessage(response);
-                return true;
+                if (!publicInfo.Unpack(response))
+                {
+                    return false;
+                }
             }
             catch
             {
-                guid = Guid.Empty;
-                hostPublicInfo = null;
                 return false;
             }
+
+            hostGuid = guid;
+            hostPublicInfo = publicInfo;
+            return true;
         }
 
         internal static void RequestIntroduction(NetPeer peer, Guid guid, IPEndPoint internalIp)
@@ -203,22 +208,43 @@ namespace Microsoft.Xna.Framework.Net
             peer.SendUnconnectedMessage(request, serverEndPoint);
         }
 
-        protected void HandleMessage(NetIncomingMessage msg)
+        protected bool HandleMessage(NetIncomingMessage msg)
         {
-            string senderGameAppId = msg.ReadString();
+            string senderGameAppId;
+            try
+            {
+                senderGameAppId = msg.ReadString();
+            }
+            catch
+            {
+                return false;
+            }
             if (!senderGameAppId.Equals(serverPeer.Configuration.AppIdentifier, StringComparison.Ordinal))
             {
                 Console.WriteLine("Received message with incorrect game app id from " + msg.SenderEndPoint + ".");
-                return;
+                return true;
             }
 
             var messageType = (MasterServerMessageType)msg.ReadByte();
             if (messageType == MasterServerMessageType.RegisterHost)
             {
-                var guid = new Guid(msg.ReadString());
-                var internalIp = msg.ReadIPEndPoint();
-                var externalIp = msg.SenderEndPoint;
-                var publicInfo = NetworkSessionPublicInfo.FromMessage(msg);
+                Guid guid;
+                IPEndPoint internalIp, externalIp;
+                NetworkSessionPublicInfo publicInfo = new NetworkSessionPublicInfo();
+                try
+                {
+                    guid = new Guid(msg.ReadString());
+                    internalIp = msg.ReadIPEndPoint();
+                    externalIp = msg.SenderEndPoint;
+                    if (!publicInfo.Unpack(msg))
+                    {
+                        return false;
+                    }
+                }
+                catch
+                {
+                    return false;
+                }
 
                 hosts[guid] = new HostData(guid, internalIp, externalIp, publicInfo);
 
@@ -226,7 +252,16 @@ namespace Microsoft.Xna.Framework.Net
             }
             else if (messageType == MasterServerMessageType.UnregisterHost)
             {
-                var guid = new Guid(msg.ReadString());
+                Guid guid;
+                try
+                {
+                    guid = new Guid(msg.ReadString());
+                }
+                catch
+                {
+                    return false;
+                }
+
                 if (hosts.ContainsKey(guid))
                 {
                     var host = hosts[guid];
@@ -259,15 +294,23 @@ namespace Microsoft.Xna.Framework.Net
             }
             else if (messageType == MasterServerMessageType.RequestIntroduction)
             {
-                var guid = new Guid(msg.ReadString());
+                Guid guid;
+                IPEndPoint clientInternalIp, clientExternalIp;
+                try
+                {
+                    guid = new Guid(msg.ReadString());
+                    clientInternalIp = msg.ReadIPEndPoint();
+                    clientExternalIp = msg.SenderEndPoint;
+                }
+                catch
+                {
+                    return false;
+                }
+
                 if (hosts.ContainsKey(guid))
                 {
                     var host = hosts[guid];
-                    var clientInternalIp = msg.ReadIPEndPoint();
-                    var clientExternalIp = msg.SenderEndPoint;
-
                     serverPeer.Introduce(host.InternalIp, host.ExternalIp, clientInternalIp, clientExternalIp, string.Empty);
-
                     Console.WriteLine("Introduced host " + host + " and client [InternalIp: " + clientInternalIp + ", ExternalIp: " + clientExternalIp + "].");
                 }
                 else
@@ -275,6 +318,8 @@ namespace Microsoft.Xna.Framework.Net
                     Console.WriteLine("Introduction requested for unknwon host from " + msg.SenderEndPoint + ".");
                 }
             }
+
+            return true;
         }
 
         public void Update()

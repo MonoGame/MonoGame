@@ -1,4 +1,5 @@
-﻿using Lidgren.Network;
+﻿using System;
+using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net
 {
@@ -13,12 +14,7 @@ namespace Microsoft.Xna.Framework.Net
         public int openPrivateGamerSlots;
         public int openPublicGamerSlots;
 
-        public static NetworkSessionPublicInfo FromMessage(NetIncomingMessage msg)
-        {
-            var publicInfo = new NetworkSessionPublicInfo();
-            publicInfo.Unpack(msg);
-            return publicInfo;
-        }
+        private bool locallySet;
 
         public void Set(NetworkSessionType sessionType, NetworkSessionProperties sessionProperties, string hostGamertag, int maxGamers, int privateGamerSlots, int currentGamerCount, int openPrivateGamerSlots, int openPublicGamerSlots)
         {
@@ -30,10 +26,14 @@ namespace Microsoft.Xna.Framework.Net
             this.currentGamerCount = currentGamerCount;
             this.openPrivateGamerSlots = openPrivateGamerSlots;
             this.openPublicGamerSlots = openPublicGamerSlots;
+
+            locallySet = true;
         }
 
         public void Pack(NetOutgoingMessage msg)
         {
+            if (!locallySet) throw new InvalidOperationException("Cannot pack uninitialized or remote public info");
+
             msg.Write((byte)sessionType);
             sessionProperties.Pack(msg);
             msg.Write(hostGamertag);
@@ -44,22 +44,47 @@ namespace Microsoft.Xna.Framework.Net
             msg.Write(openPublicGamerSlots);
         }
 
-        public void Unpack(NetIncomingMessage msg)
+        public bool Unpack(NetIncomingMessage msg)
         {
-            if (sessionProperties == null)
+            NetworkSessionType sessionType;
+            NetworkSessionProperties sessionProperties = new NetworkSessionProperties();
+            string hostGamertag;
+            int maxGamers, privateGamerSlots, currentGamerCount, openPrivateGamerSlots, openPublicGamerSlots;
+            try
             {
-                // If this NetworkSessionPublicInfo is sent over the network, NetworkSessionProperties should be read-only
-                sessionProperties = new NetworkSessionProperties(true);
+                sessionType = (NetworkSessionType)msg.ReadByte();
+                if (!sessionProperties.Unpack(msg))
+                {
+                    return false;
+                }
+                hostGamertag = msg.ReadString();
+                maxGamers = msg.ReadInt32();
+                privateGamerSlots = msg.ReadInt32();
+                currentGamerCount = msg.ReadInt32();
+                openPrivateGamerSlots = msg.ReadInt32();
+                openPublicGamerSlots = msg.ReadInt32();
+            }
+            catch
+            {
+                return false;
             }
 
-            sessionType = (NetworkSessionType)msg.ReadByte();
-            sessionProperties.Unpack(msg);
-            hostGamertag = msg.ReadString();
-            maxGamers = msg.ReadInt32();
-            privateGamerSlots = msg.ReadInt32();
-            currentGamerCount = msg.ReadInt32();
-            openPrivateGamerSlots = msg.ReadInt32();
-            openPublicGamerSlots = msg.ReadInt32();
+            if (this.sessionProperties == null)
+            {
+                // NetworkSessionProperties sent over the network are read-only
+                this.sessionProperties = new NetworkSessionProperties(true);
+            }
+            this.sessionType = sessionType;
+            this.sessionProperties.Set(sessionProperties);
+            this.hostGamertag = hostGamertag;
+            this.maxGamers = maxGamers;
+            this.privateGamerSlots = privateGamerSlots;
+            this.currentGamerCount = currentGamerCount;
+            this.openPrivateGamerSlots = openPrivateGamerSlots;
+            this.openPublicGamerSlots = openPublicGamerSlots;
+
+            locallySet = false;
+            return true;
         }
     }
 }
