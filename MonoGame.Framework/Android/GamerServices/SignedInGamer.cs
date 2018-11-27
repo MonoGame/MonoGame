@@ -90,7 +90,18 @@ namespace Microsoft.Xna.Framework.GamerServices
 			var result = BeginAuthentication(null, null);	
 			EndAuthentication( result );
 		}
-		
+
+		/// <summary>
+		/// Public constructor intended to be used with NetworkSession.AddLocalGamer() in order to
+		/// support platforms on which GamerServices are not implemented in MonoGame.
+		/// </summary>
+		public SignedInGamer(string displayName, string gamertag, PlayerIndex playerIndex)
+		{
+			DisplayName = displayName;
+			Gamertag = gamertag;
+			PlayerIndex = playerIndex;
+		}
+
 		private void AuthenticationCompletedCallback( IAsyncResult result )
 		{
 			EndAuthentication(result);	
@@ -277,15 +288,20 @@ namespace Microsoft.Xna.Framework.GamerServices
 				throw new NotSupportedException();
 			}
 		}
-		
-        public PlayerIndex PlayerIndex
-        {
-            get
-            {
-                return PlayerIndex.One;
-            }
-        }
-		
+
+		PlayerIndex _playerIndex = PlayerIndex.One;
+		public PlayerIndex PlayerIndex
+		{
+			get
+			{
+				return _playerIndex;
+			}
+			internal set
+			{
+				_playerIndex = value;
+			}
+		}
+
 		public GamerPresence Presence 
 		{ 
 			get

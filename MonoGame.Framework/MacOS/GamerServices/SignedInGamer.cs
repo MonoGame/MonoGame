@@ -95,6 +95,17 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		}
 
+		/// <summary>
+		/// Public constructor intended to be used with NetworkSession.AddLocalGamer() in order to
+		/// support platforms on which GamerServices are not implemented in MonoGame.
+		/// </summary>
+		public SignedInGamer(string displayName, string gamertag, PlayerIndex playerIndex)
+		{
+			DisplayName = displayName;
+			Gamertag = gamertag;
+			PlayerIndex = playerIndex;
+		}
+
 		private void AuthenticationCompletedCallback (IAsyncResult result)
 		{
 			EndAuthentication (result);	
@@ -170,17 +181,17 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		delegate void AwardAchievementDelegate (string achievementId, double percentageComplete);
 
-        public IAsyncResult BeginAwardAchievement(string achievementId, AsyncCallback callback, Object state)
-        {
-            return BeginAwardAchievement(achievementId, 100.0, callback, state);
-        }
+		public IAsyncResult BeginAwardAchievement(string achievementId, AsyncCallback callback, Object state)
+		{
+			return BeginAwardAchievement(achievementId, 100.0, callback, state);
+		}
 
-        public IAsyncResult BeginAwardAchievement(
-            string achievementId,
-            double percentageComplete,
-            AsyncCallback callback,
-            Object state
-        )
+		public IAsyncResult BeginAwardAchievement(
+			string achievementId,
+			double percentageComplete,
+			AsyncCallback callback,
+			Object state
+		)
 		{	
 			// Go off and award the achievement
 			AwardAchievementDelegate aad = DoAwardAchievement; 
@@ -261,9 +272,16 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 		}
 
-		public PlayerIndex PlayerIndex {
-			get {
-				return PlayerIndex.One;
+		PlayerIndex _playerIndex = PlayerIndex.One;
+		public PlayerIndex PlayerIndex
+		{
+			get
+			{
+				return _playerIndex;
+			}
+			internal set
+			{
+				_playerIndex = value;
 			}
 		}
 
@@ -286,12 +304,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		protected virtual void OnSignedIn (SignedInEventArgs e)
 		{
-            EventHelpers.Raise(this, SignedIn, e);
-        }
+			EventHelpers.Raise(this, SignedIn, e);
+		}
 
 		protected virtual void OnSignedOut (SignedOutEventArgs e)
 		{
-            EventHelpers.Raise(this, SignedOut, e);
+			EventHelpers.Raise(this, SignedOut, e);
 		}
 
 		#region Events
@@ -300,23 +318,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 		#endregion
 	}
 
-    public class SignedInEventArgs : EventArgs
-    {
-        public SignedInEventArgs(SignedInGamer gamer)
-        {
-            this.Gamer = gamer;
-        }
+	public class SignedInEventArgs : EventArgs
+	{
+		public SignedInEventArgs(SignedInGamer gamer)
+		{
+			this.Gamer = gamer;
+		}
 
-        public SignedInGamer Gamer { get; private set; }
-    }
+		public SignedInGamer Gamer { get; private set; }
+	}
 
-    public class SignedOutEventArgs : EventArgs
-    {
-        public SignedOutEventArgs(SignedInGamer gamer)
-        {
-            this.Gamer = gamer;
-        }
+	public class SignedOutEventArgs : EventArgs
+	{
+		public SignedOutEventArgs(SignedInGamer gamer)
+		{
+			this.Gamer = gamer;
+		}
 
-        public SignedInGamer Gamer { get; private set; }
-    }
+		public SignedInGamer Gamer { get; private set; }
+	}
 }

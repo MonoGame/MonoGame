@@ -136,6 +136,10 @@ namespace Microsoft.Xna.Framework.GamerServices
                 SignedInGamer sig = new SignedInGamer();
                 sig.DisplayName = strUsr;
                 sig.Gamertag = strUsr;
+                if (Enum.IsDefined(typeof(PlayerIndex), Gamer.SignedInGamers.Count))
+                {
+                    sig.PlayerIndex = (PlayerIndex)Gamer.SignedInGamers.Count;
+                }
 
                 Gamer.SignedInGamers.Add(sig);
 

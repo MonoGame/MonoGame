@@ -52,6 +52,10 @@ namespace Microsoft.Xna.Framework.GamerServices
 //				sig.DisplayName = "MonoMac Gamer";
 //				sig.Gamertag = "MonoMac Gamer";
 //				sig.InternalIdentifier = Guid.NewGuid();
+//				if (Enum.IsDefined(typeof(PlayerIndex), Gamer.SignedInGamers.Count))
+//				{
+//					sig.PlayerIndex = (PlayerIndex)Gamer.SignedInGamers.Count;
+//				}
 //
 //				Gamer.SignedInGamers.Add(sig);
 		}

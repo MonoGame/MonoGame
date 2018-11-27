@@ -153,10 +153,14 @@ namespace Microsoft.Xna.Framework.GamerServices
 			if (tableView.SelectedRowCount > 0) {
 				var rowSelected = tableView.SelectedRow;
 				SignedInGamer sig = new SignedInGamer();
-                sig.DisplayName = gamerList[(int)rowSelected].DisplayName;
-                sig.Gamertag = gamerList[(int)rowSelected].Gamertag;
-                sig.InternalIdentifier = gamerList[(int)rowSelected].PlayerInternalIdentifier;
-				
+				sig.DisplayName = gamerList[(int)rowSelected].DisplayName;
+				sig.Gamertag = gamerList[(int)rowSelected].Gamertag;
+				sig.InternalIdentifier = gamerList[(int)rowSelected].PlayerInternalIdentifier;
+				if (Enum.IsDefined(typeof(PlayerIndex), Gamer.SignedInGamers.Count))
+				{
+					sig.PlayerIndex = (PlayerIndex)Gamer.SignedInGamers.Count;
+				}
+
 				Gamer.SignedInGamers.Add(sig);
 			}
 			MonoGameGamerServicesHelper.SerializeProfiles(gamerList);
