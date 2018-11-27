@@ -612,6 +612,11 @@ namespace Microsoft.Xna.Framework.Net
 
             AddPreviousGamer(gamer);
             InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));
+
+            if (localGamers.Count == 0)
+            {
+                End(NetworkSessionEndReason.ClientSignedOut);
+            }
         }
 
         private void AddPreviousGamer(NetworkGamer gamer)
@@ -784,6 +789,12 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
+            // Note that we do not want to dispose the NetworkSession until the end of this call, as the user
+            // might want to do some clean up on SessionEnded. Furthermore, the user might call Dispose() in the
+            // callback so the early return above is important. Finally, make sure not to trigger any new events that
+            // might arise.
+            state = NetworkSessionState.Ended;
+
             if (isHost)
             {
                 // Notify clients gracefully before shutting down
@@ -800,12 +811,6 @@ namespace Microsoft.Xna.Framework.Net
 
                 peer.FlushSendQueue();
             }
-
-            // Note that we do not want to dispose the NetworkSession until the end of this call, as the user
-            // might want to do some clean up on SessionEnded. Furthermore, the user might call Dispose() in the
-            // callback so the early return above is important. Finally, make sure not to trigger any new events that
-            // might arise.
-            state = NetworkSessionState.Ended;
 
             InvokeSessionEnded(new NetworkSessionEndedEventArgs(reason));
 
