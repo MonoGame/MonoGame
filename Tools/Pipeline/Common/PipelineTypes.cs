@@ -367,6 +367,8 @@ namespace MonoGame.Tools.Pipeline
             _processors = null;
             Processors = null;
 
+            _pluginAssemblies = new HashSet<string>();
+
             ImportersStandardValuesCollection = null;
             ProcessorsStandardValuesCollection = null;
         }
@@ -464,7 +466,10 @@ namespace MonoGame.Tools.Pipeline
                     var referencedAssemblies = a.GetReferencedAssemblies();
 
                     foreach (var assembly in referencedAssemblies)
-                        _pluginAssemblies.Add(assembly.FullName);
+                    {
+                        if(!_pluginAssemblies.Contains(assembly.FullName))
+                            _pluginAssemblies.Add(assembly.FullName);
+                    }
 
                     var types = a.GetTypes();
                     ProcessTypes(types);
