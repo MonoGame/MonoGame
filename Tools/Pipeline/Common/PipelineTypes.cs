@@ -465,6 +465,7 @@ namespace MonoGame.Tools.Pipeline
                     var a = Assembly.Load(File.ReadAllBytes(path));
                     var referencedAssemblies = a.GetReferencedAssemblies();
 
+                    _pluginAssemblies.Add(a.FullName);
                     foreach (var assembly in referencedAssemblies)
                     {
                         if(!_pluginAssemblies.Contains(assembly.FullName))
