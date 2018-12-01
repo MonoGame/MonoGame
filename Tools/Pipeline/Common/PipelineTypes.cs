@@ -171,7 +171,9 @@ namespace MonoGame.Tools.Pipeline
         private static List<ImporterInfo> _importers;
         private static List<ProcessorInfo> _processors;
         private static List<FileSystemWatcher> _watchers;
-        private static HashSet<string> _pluginAssemblies = new HashSet<string>();
+
+        // Dictionary of encountered plugin assemblies and their paths
+        private static Dictionary<string, string> _pluginAssemblies = new Dictionary<string, string>();
         private static string _currentAssemblyDirectory;
 
         public static ImporterTypeDescription[] Importers { get; private set; }
@@ -236,14 +238,17 @@ namespace MonoGame.Tools.Pipeline
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            if (string.IsNullOrEmpty(_currentAssemblyDirectory))
-                return null;
+            if(args.RequestingAssembly != null && _pluginAssemblies.ContainsKey(args.RequestingAssembly.FullName))
+            {
+                var path = Path.Combine(_pluginAssemblies[args.RequestingAssembly.FullName], new AssemblyName(args.Name).Name + ".dll");
 
-            var path = Path.Combine(_currentAssemblyDirectory, (new AssemblyName(args.Name).Name) + ".dll");
-            if (!File.Exists(path))
-                return null;
+                if(!_pluginAssemblies.ContainsKey(args.Name))
+                    _pluginAssemblies.Add(args.Name, _pluginAssemblies[args.RequestingAssembly.FullName]);
 
-            return Assembly.Load(File.ReadAllBytes(path));
+                return Assembly.LoadFrom(path);
+            }
+
+            return null;
         }
 
         public static void Load(PipelineProject project)
@@ -367,7 +372,7 @@ namespace MonoGame.Tools.Pipeline
             _processors = null;
             Processors = null;
 
-            _pluginAssemblies = new HashSet<string>();
+            _pluginAssemblies.Clear();
 
             ImportersStandardValuesCollection = null;
             ProcessorsStandardValuesCollection = null;
@@ -465,13 +470,13 @@ namespace MonoGame.Tools.Pipeline
                     var a = Assembly.Load(File.ReadAllBytes(path));
                     var referencedAssemblies = a.GetReferencedAssemblies();
 
-                    _pluginAssemblies.Add(a.FullName);
-                    foreach (var assembly in referencedAssemblies)
+                    _pluginAssemblies.Add(a.FullName, _currentAssemblyDirectory);
+                    foreach (var child in referencedAssemblies)
                     {
-                        if(!_pluginAssemblies.Contains(assembly.FullName))
-                            _pluginAssemblies.Add(assembly.FullName);
+                        if(!_pluginAssemblies.ContainsKey(child.FullName))
+                            _pluginAssemblies.Add(child.FullName, _currentAssemblyDirectory);
                     }
-
+                    
                     var types = a.GetTypes();
                     ProcessTypes(types);
 
@@ -517,7 +522,7 @@ namespace MonoGame.Tools.Pipeline
                 try
 #endif
                 {
-                    if (!asm.ToString().Contains("MonoGame") || _pluginAssemblies.Contains(asm.FullName))
+                    if (!asm.ToString().Contains("MonoGame"))
                         continue;
 
                     var types = asm.GetTypes();
