@@ -522,7 +522,7 @@ namespace MonoGame.Tools.Pipeline
                 try
 #endif
                 {
-                    if (!asm.ToString().Contains("MonoGame"))
+                    if (!asm.ToString().Contains("MonoGame") || _pluginAssemblies.ContainsKey(asm.FullName))
                         continue;
 
                     var types = asm.GetTypes();
