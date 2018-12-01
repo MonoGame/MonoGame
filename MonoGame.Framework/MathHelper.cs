@@ -46,6 +46,13 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public const float TwoPi = (float)(Math.PI * 2.0);
         
+        
+        /// <summary>
+        /// Represents the value of pi times two (alias for TwoPi).
+        /// </summary>
+        public const float Tau = TwoPi;
+        
+        
         /// <summary>
         /// Returns the Cartesian coordinate for one axis of a point that is defined by a given triangle and two normalized barycentric (areal) coordinates.
         /// </summary>
