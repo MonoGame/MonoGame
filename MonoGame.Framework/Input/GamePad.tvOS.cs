@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Input
             return new GamePadCapabilities { IsConnected = false };
         }
                
-        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
             var ind = (GCControllerPlayerIndex)index;
 
@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework.Input
                 }
             }
             var state = new GamePadState(
-                new GamePadThumbSticks(leftThumbStickPosition, rightThumbStickPosition),
+                new GamePadThumbSticks(leftThumbStickPosition, rightThumbStickPosition, leftDeadZoneMode, rightDeadZoneMode),
                 new GamePadTriggers(leftTriggerValue, rightTriggerValue),
                 new GamePadButtons(buttons.ToArray()),
                 new GamePadDPad (Up, Down, Left, Right));

@@ -1183,12 +1183,18 @@
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Utilities\FileHelpers.cs" />
+    <Compile Include="Utilities\InteropHelpers.cs">
+	  <Services>OpenGLGraphics,OpenALAudio</Services>
+    </Compile>
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.Default.cs" >
       <Platforms>Android,iOS,WindowsUniversal,tvOS</Platforms>
     </Compile>
     <Compile Include="Utilities\ReflectionHelpers.Legacy.cs" >
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,Web</Platforms>
+    </Compile>
+    <Compile Include="Utilities\TimerHelper.cs">
+      <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
     <Compile Include="Utilities\LzxStream\LzxDecoderStream.cs" />

@@ -411,6 +411,9 @@ namespace Microsoft.Xna.Framework
         private Stopwatch _gameTimer;
         private long _previousTicks = 0;
         private int _updateFrameLag;
+#if WINDOWS_UAP
+        private readonly object _locker = new object();
+#endif
 
         public void Tick()
         {
@@ -421,26 +424,29 @@ namespace Microsoft.Xna.Framework
 
         RetryTick:
 
+            if (!IsActive && (InactiveSleepTime.TotalMilliseconds >= 1.0))
+            {
+#if WINDOWS_UAP
+                lock (_locker)
+                    System.Threading.Monitor.Wait(_locker, (int)InactiveSleepTime.TotalMilliseconds);
+#else
+                System.Threading.Thread.Sleep((int)InactiveSleepTime.TotalMilliseconds);
+#endif
+            }
+
             // Advance the accumulated elapsed time.
             var currentTicks = _gameTimer.Elapsed.Ticks;
             _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
             _previousTicks = currentTicks;
 
-            // If we're in the fixed timestep mode and not enough time has elapsed
-            // to perform an update we sleep off the the remaining time to save battery
-            // life and/or release CPU time to other threads and processes.
             if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
             {
-                var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
-
-                // NOTE: While sleep can be inaccurate in general it is 
-                // accurate enough for frame limiting purposes if some
-                // fluctuation is an acceptable result.
-#if WINDOWS_UAP
-                Task.Delay(sleepTime).Wait();
-#else
-                System.Threading.Thread.Sleep(sleepTime);
+#if WINDOWS && !DESKTOPGL
+                // Sleep for as long as possible without overshooting the update time
+                var sleepTime = (TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
+                Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
 #endif
+                // Keep looping until it's time to perform the next update
                 goto RetryTick;
             }
 
@@ -567,19 +573,19 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void OnExiting(object sender, EventArgs args)
         {
-            EventHelpers.Raise(this, Exiting, args);
+            EventHelpers.Raise(sender, Exiting, args);
         }
 		
-		protected virtual void OnActivated (object sender, EventArgs args)
+		protected virtual void OnActivated(object sender, EventArgs args)
 		{
 			AssertNotDisposed();
-            EventHelpers.Raise(this, Activated, args);
+            EventHelpers.Raise(sender, Activated, args);
 		}
 		
-		protected virtual void OnDeactivated (object sender, EventArgs args)
+		protected virtual void OnDeactivated(object sender, EventArgs args)
 		{
 			AssertNotDisposed();
-            EventHelpers.Raise(this, Deactivated, args);
+            EventHelpers.Raise(sender, Deactivated, args);
 		}
 
         #endregion Protected Methods

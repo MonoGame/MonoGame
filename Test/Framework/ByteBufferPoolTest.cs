@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Utilities;
+﻿using MonoGame.Utilities;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Framework

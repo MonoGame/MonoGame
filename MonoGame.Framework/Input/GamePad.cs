@@ -74,11 +74,37 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="deadZoneMode">Enumerated value that specifies what dead zone type to use.</param>
         /// <returns>The state of the controller.</returns>
         public static GamePadState GetState(int index, GamePadDeadZone deadZoneMode)
+        {           
+            return GetState(index, deadZoneMode, deadZoneMode);
+        }
+
+        /// <summary>
+        /// Gets the current state of a game pad controller, using a specified dead zone
+        /// on analog stick positions.
+        /// </summary>
+        /// <param name="playerIndex">Player index for the controller you want to query.</param>
+        /// <param name="leftDeadZoneMode">Enumerated value that specifies what dead zone type to use for the left stick.</param>
+        /// <param name="rightDeadZoneMode">Enumerated value that specifies what dead zone type to use for the right stick.</param>
+        /// <returns>The state of the controller.</returns>
+        public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
+        {
+            return GetState((int)playerIndex, leftDeadZoneMode, rightDeadZoneMode);
+        }
+
+        /// <summary>
+        /// Gets the current state of a game pad controller, using a specified dead zone
+        /// on analog stick positions.
+        /// </summary>
+        /// <param name="index">Index for the controller you want to query.</param>
+        /// <param name="leftDeadZoneMode">Enumerated value that specifies what dead zone type to use for the left stick.</param>
+        /// <param name="rightDeadZoneMode">Enumerated value that specifies what dead zone type to use for the right stick.</param>
+        /// <returns>The state of the controller.</returns>
+        public static GamePadState GetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
             if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
                 return GamePadState.Default;
-            
-            return PlatformGetState(index, deadZoneMode);
+
+            return PlatformGetState(index, leftDeadZoneMode, rightDeadZoneMode);
         }
 
         /// <summary>
