@@ -97,7 +97,7 @@ namespace MonoGame.Tests.Input
         [TestCaseSource("ThumbStickVirtualButtonsIgnoreDeadZoneTestCases")]
         public void ThumbStickVirtualButtonsIgnoreDeadZone(Vector2 left, Vector2 right, GamePadDeadZone deadZone, Buttons expectedButtons)
         {
-            var state = new GamePadState(new GamePadThumbSticks(left, right, deadZone), new GamePadTriggers(), new GamePadButtons(), new GamePadDPad());
+            var state = new GamePadState(new GamePadThumbSticks(left, right, deadZone, deadZone), new GamePadTriggers(), new GamePadButtons(), new GamePadDPad());
 
             Assert.AreEqual(expectedButtons, GetAllPressedButtons(state));
         }
@@ -157,19 +157,19 @@ namespace MonoGame.Tests.Input
             var left = Vector2.One;
             var right = Vector2.One;
 
-            var sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.None);
+            var sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.None, GamePadDeadZone.None);
             Assert.AreEqual(sticks.Left.X, 1);
             Assert.AreEqual(sticks.Left.Y, 1);
             Assert.AreEqual(sticks.Right.X, 1);
             Assert.AreEqual(sticks.Right.Y, 1);
 
-            sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.IndependentAxes);
+            sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.IndependentAxes, GamePadDeadZone.IndependentAxes);
             Assert.AreEqual(sticks.Left.X, 1);
             Assert.AreEqual(sticks.Left.Y, 1);
             Assert.AreEqual(sticks.Right.X, 1);
             Assert.AreEqual(sticks.Right.Y, 1);
 
-            sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.Circular);
+            sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.Circular, GamePadDeadZone.Circular);
             Assert.Less(sticks.Left.X, 1);
             Assert.Less(sticks.Left.Y, 1);
             Assert.Less(sticks.Right.X, 1);
@@ -234,6 +234,25 @@ namespace MonoGame.Tests.Input
             Assert.AreEqual(expectedDPadButtonStates[3], state.DPad.Up, "DPad.Up Pressed or Released");
         }
 
+
+        [TestCase((Buttons)0, new[] { ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released })]
+        [TestCase(Buttons.DPadDown, new[] { ButtonState.Pressed, ButtonState.Released, ButtonState.Released, ButtonState.Released })]
+        [TestCase(Buttons.DPadLeft, new[] { ButtonState.Released, ButtonState.Pressed, ButtonState.Released, ButtonState.Released })]
+        [TestCase(Buttons.DPadRight, new[] { ButtonState.Released, ButtonState.Released, ButtonState.Pressed, ButtonState.Released })]
+        [TestCase(Buttons.DPadUp, new[] { ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Pressed })]
+        public void ConstructDPadStateWithButtonsArray(Buttons button, ButtonState[] expectedDPadButtonStates)
+        {
+            var state = new GamePadState(Vector2.Zero, Vector2.Zero, 0f, 0f, button != 0 ? new Buttons[] {button} : new Buttons[] {});
+
+            if (button != 0)
+                Assert.True(state.IsButtonDown(button));
+
+            Assert.AreEqual(expectedDPadButtonStates[0], state.DPad.Down, "DPad.Down Pressed or Released");
+            Assert.AreEqual(expectedDPadButtonStates[1], state.DPad.Left, "DPad.Left Pressed or Released");
+            Assert.AreEqual(expectedDPadButtonStates[2], state.DPad.Right, "DPad.Right Pressed or Released");
+            Assert.AreEqual(expectedDPadButtonStates[3], state.DPad.Up, "DPad.Up Pressed or Released");
+        }
+
         private const int Count = 6;
         public static IEnumerable<Buttons[]> GetButtons()
         {
@@ -242,7 +261,7 @@ namespace MonoGame.Tests.Input
                 // All
                 Enum.GetValues(typeof(Buttons)).Cast<Buttons>().ToArray(),
                 // None
-                new Buttons[0], 
+                new Buttons[0],
                 // Random
                 new [] { Buttons.Start, Buttons.LeftStick, Buttons.DPadDown, Buttons.A},
                 new [] { Buttons.Back, Buttons.BigButton, Buttons.LeftStick, Buttons.Y, Buttons.B, Buttons.RightShoulder, Buttons.LeftTrigger},
@@ -252,9 +271,9 @@ namespace MonoGame.Tests.Input
         }
 
         [Test, Sequential]
-        public void TestState([Random(-1f, 1f, Count)] double leftX, [Random(-1f, 1f, Count)] double leftY, 
-            [Random(-1f, 1f, Count)] double rightX, [Random(-1f, 1f, Count)] double rightY, 
-            [Random(0f, 1f, Count)] double doubleLT, [Random(0f, 1f, Count)] double doubleRT, 
+        public void TestState([Random(-1f, 1f, Count)] double leftX, [Random(-1f, 1f, Count)] double leftY,
+            [Random(-1f, 1f, Count)] double rightX, [Random(-1f, 1f, Count)] double rightY,
+            [Random(0f, 1f, Count)] double doubleLT, [Random(0f, 1f, Count)] double doubleRT,
             [ValueSource("GetButtons")] Buttons[] buttons, [Values(true, false, true, false)] bool isConnected)
         {
             var leftStick = new Vector2((float) leftX, (float) leftY);
@@ -271,7 +290,7 @@ namespace MonoGame.Tests.Input
             state.IsConnected = isConnected;
             Assert.AreEqual(isConnected, state.IsConnected);
 #endif
-            
+
             Assert.AreEqual(leftStick, state.ThumbSticks.Left);
             Assert.AreEqual(rightStick, state.ThumbSticks.Right);
             Assert.AreEqual(leftTrigger, state.Triggers.Left);

@@ -108,6 +108,10 @@
     <Binary
       Name="SharpDX.XAudio2"
       Path="ThirdParty/Dependencies/SharpDX/uap10.0/SharpDX.XAudio2.dll" />
+    <SDKReference 
+      Include="WindowsMobile"
+      Name="Windows Mobile Extensions for the UWP">
+    </SDKReference>
   </Platform>
 	
   <Platform Type="Web">

@@ -18,6 +18,7 @@ namespace MonoGame.Tools.Pipeline
         private void InitializeComponent()
         {
             DisplayMode = DialogDisplayMode.Attached;
+            Width = 400;
             Height = 250;
 
             buttonAdd = new Button();

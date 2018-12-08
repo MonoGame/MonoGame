@@ -32,7 +32,7 @@
       <PlatformResourcePrefix Condition="'$(PlatformResourcePrefix)' != '' And !HasTrailingSlash('$(PlatformResourcePrefix)')">$(PlatformResourcePrefix)\</PlatformResourcePrefix>
       <PlatformResourcePrefix Condition="'$(PlatformResourcePrefix)' == ''"></PlatformResourcePrefix>
       <MonoGameMGCBAdditionalArguments Condition="'$(MonoGameMGCBAdditionalArguments)' ==''">/quiet</MonoGameMGCBAdditionalArguments>
-      <Header>/platform:$(MonoGamePlatform) $(MonoGameMGCBAdditionalArguments)</Header>
+      <Header>/platform:$(MonoGamePlatform)</Header>
     </PropertyGroup>
 
     <!-- Get all Mono Game Content References and store them in a list -->
@@ -82,7 +82,7 @@
 
   <Target Name="RunContentBuilder">
     <Exec Condition=" '%(ContentReferences.FullPath)' != '' "
-          Command="$(MonoGameContentBuilderCmd) /@:&quot;%(ContentReferences.FullPath)&quot; $(Header) /outputDir:&quot;%(ContentReferences.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReferences.ContentIntermediateOutputDir)&quot;"
+          Command="$(MonoGameContentBuilderCmd) $(MonoGameMGCBAdditionalArguments) $(Header) /@:&quot;%(ContentReferences.FullPath)&quot; /outputDir:&quot;%(ContentReferences.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReferences.ContentIntermediateOutputDir)&quot;"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
      <CreateItem Include="%(ContentReferences.RelativeFullPath)%(ContentReferences.ContentOutputDir)\**\*.*"
             AdditionalMetadata="ContentOutputDir=%(ContentReferences.ContentDirectory)">

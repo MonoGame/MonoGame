@@ -223,6 +223,15 @@ namespace MonoGame.OpenAL
             }
 #elif ANDROID
             ret = FuncLoader.LoadLibrary("libopenal32.so");
+
+            if (ret == IntPtr.Zero)
+            {
+                var appFilesDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                var appDir = Path.GetDirectoryName(appFilesDir);
+                var lib = Path.Combine(appDir, "lib", "libopenal32.so");
+
+                ret = FuncLoader.LoadLibrary(lib);
+            }
 #else
             ret = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenAL.framework/OpenAL");
 #endif

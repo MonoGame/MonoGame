@@ -179,6 +179,13 @@ namespace TwoMGFX
 				"#endif\r\n" +
 				glslCode;
 
+			// Enable standard derivatives extension as necessary
+			if ((glslCode.IndexOf("dFdx", StringComparison.InvariantCulture) >= 0)
+				|| (glslCode.IndexOf("dFdy", StringComparison.InvariantCulture) >= 0))
+			{
+				glslCode = "#extension GL_OES_standard_derivatives : enable\r\n" + glslCode;
+			}
+
 			// Store the code for serialization.
 			dxshader.ShaderCode = Encoding.ASCII.GetBytes (glslCode);
 

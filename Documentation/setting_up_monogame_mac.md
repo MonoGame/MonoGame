@@ -5,9 +5,8 @@ This section will help you setup MonoGame on Mac OSX.
 
 ### Developing MonoGame Applications
 
-Developing on the Mac requires a number of other frameworks and applications. 
-If you are targeting MacOS/iOS and/or Android you will need licences from [Xamarin](https://xamarin.com).
-But to get started you can use the Linux or DesktopGL platforms which will run quite happily
+Developing on the Mac requires a number of other frameworks and applications.
+To get started you can use the Linux or DesktopGL platforms which will run quite happily
 on MacOS providing you have mono installed.
 
 So to get setup you will first need to install mono. 
@@ -17,13 +16,11 @@ So to get setup you will first need to install mono.
 Note: If you are running El Capitan you will need to install the very latest mono otherwise things 
 will not work correctly.
 
-You will also need Xamarin Studio
-* Go to [xamarin.com](https://xamarin.com/download)
-* Fill in the required informaton
+You will also need Visual Studio for Mac
+* Go to the [Visual Studio for Mac website](https://visualstudio.microsoft.com/vs/mac/)
 * Download the installer.
 
-This will install Xamarin Studio (which is Free) as well as other parts
-of the Xamarin plafrom which you can optionally use. 
+This will install Visual Studio for Mac (which is free).
 
 To setup MonoGame application development on mac OSX do the following:
 * Go to [MonoGame Downloads page](http://www.monogame.net/downloads/)
@@ -33,5 +30,5 @@ To setup MonoGame application development on mac OSX do the following:
   * You will probably get an error about signing. If you do , right click and Open the .pkg file and you will be able to continue
 * That's it, MonoGame is installed.
 
-Make sure you install mono and Xamarin Studio first so that MonoGame can correctly setup the 
+Make sure you install mono and Visual Studio for Mac first so that MonoGame can correctly setup the 
 project templates and addins.

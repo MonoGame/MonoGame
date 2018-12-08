@@ -259,9 +259,12 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new SelectFolderDialog();
             dialog.Directory = initialDirectory;
-            var result = dialog.ShowDialog(this) == DialogResult.Ok;
 
-            folder = dialog.Directory;
+            var result = dialog.ShowDialog(this) == DialogResult.Ok;
+            if (result)
+                folder = dialog.Directory;
+            else
+                folder = string.Empty;
 
             return result;
         }
@@ -405,7 +408,7 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItemWith.Enabled = info.OpenItemWith;
             cmdOpenItemLocation.Enabled = info.OpenItemLocation;
             cmdOpenOutputItemLocation.Enabled = info.OpenOutputItemLocation;
-            cmdCopyAssetPath.Enabled = info.CopyAssetPath;
+            cmdCopyAssetName.Enabled = info.CopyAssetPath;
             cmdRebuildItem.Enabled = info.RebuildItem;
 
             // Visibility of menu items can't be changed so 

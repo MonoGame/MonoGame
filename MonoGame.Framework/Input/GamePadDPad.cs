@@ -45,16 +45,17 @@ namespace Microsoft.Xna.Framework.Input
             Right = rightValue;
         }
 
-        internal GamePadDPad(Buttons buttons) : this()
+        internal GamePadDPad(Buttons[] buttons) : this()
         {
-            if ((buttons & Buttons.DPadDown) == Buttons.DPadDown)
-                Down = ButtonState.Pressed;
-            if ((buttons & Buttons.DPadLeft) == Buttons.DPadLeft)
-                Left = ButtonState.Pressed;
-            if ((buttons & Buttons.DPadRight) == Buttons.DPadRight)
-                Right = ButtonState.Pressed;
-            if ((buttons & Buttons.DPadUp) == Buttons.DPadUp)
-                Up = ButtonState.Pressed;
+            foreach (var button in buttons)
+            {
+                ConvertButtonToDirection(button);
+            }
+        }
+
+        internal GamePadDPad(Buttons button) : this()
+        {
+            ConvertButtonToDirection(button);
         }
 
         /// <summary>
@@ -114,6 +115,18 @@ namespace Microsoft.Xna.Framework.Input
         public override string ToString()
         {
             return "" + (int)Left + (int)Up + (int)Right + (int)Down;
+        }
+
+        private void ConvertButtonToDirection(Buttons button)
+        {
+            if ((button & Buttons.DPadDown) == Buttons.DPadDown)
+                Down = ButtonState.Pressed;
+            if ((button & Buttons.DPadLeft) == Buttons.DPadLeft)
+                Left = ButtonState.Pressed;
+            if ((button & Buttons.DPadRight) == Buttons.DPadRight)
+                Right = ButtonState.Pressed;
+            if ((button & Buttons.DPadUp) == Buttons.DPadUp)
+                Up = ButtonState.Pressed;
         }
     }
 }

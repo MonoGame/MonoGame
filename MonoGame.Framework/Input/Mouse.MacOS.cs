@@ -6,32 +6,19 @@ using System;
 using System.Runtime.InteropServices;
 using System.Drawing;
 
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-#else
 using Foundation;
 using AppKit;
 using PointF = CoreGraphics.CGPoint;
-#endif
 
 namespace Microsoft.Xna.Framework.Input
 {
     public static partial class Mouse
     {
-#if PLATFORM_MACOS_LEGACY
-        [DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
-        extern static void CGWarpMouseCursorPosition(PointF newCursorPosition);
-        
-        [DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
-        extern static void CGSetLocalEventsSuppressionInterval(double seconds);
-#else
         [DllImport(ObjCRuntime.Constants.CoreGraphicsLibrary)]
         extern static void CGWarpMouseCursorPosition(CoreGraphics.CGPoint newCursorPosition);
 
         [DllImport(ObjCRuntime.Constants.CoreGraphicsLibrary)]
         extern static void CGSetLocalEventsSuppressionInterval(double seconds);
-#endif
 
         internal static GameWindow Window;
         internal static float HorizontalScrollWheelValue;

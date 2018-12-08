@@ -145,6 +145,21 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
+        #region iOS 11 or newer
+
+        /// <summary>
+        /// Defer system gestures on all screen edges in full screen mode.
+        /// </summary>
+        public override UIRectEdge PreferredScreenEdgesDeferringSystemGestures
+        {
+            get
+            {
+                return _platform.Game.graphicsDeviceManager.IsFullScreen ? UIRectEdge.All : base.PreferredScreenEdgesDeferringSystemGestures;
+            }
+        }
+
+        #endregion
+
         #endif
 
         #if TVOS
