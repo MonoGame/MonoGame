@@ -74,28 +74,28 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:Microsoft.Xna.Framework.Input.GamePadState"/> struct.
+        /// Initializes a new instance of the <see cref="T:Microsoft.Xna.Framework.Input.GamePadState"/> struct
         /// using the specified stick, trigger, and button values.
         /// </summary>
         /// <param name="leftThumbStick">Left stick value. Each axis is clamped between −1.0 and 1.0.</param>
         /// <param name="rightThumbStick">Right stick value. Each axis is clamped between −1.0 and 1.0.</param>
         /// <param name="leftTrigger">Left trigger value. This value is clamped between 0.0 and 1.0.</param>
         /// <param name="rightTrigger">Right trigger value. This value is clamped between 0.0 and 1.0.</param>
-        /// <param name="button"> Button to initialize as pressed.</param>
+        /// <param name="button">Button(s) to initialize as pressed.</param>
         public GamePadState(Vector2 leftThumbStick, Vector2 rightThumbStick, float leftTrigger, float rightTrigger, Buttons button)
             : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(button), new GamePadDPad(button))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:Microsoft.Xna.Framework.Input.GamePadState"/> struct.
+        /// Initializes a new instance of the <see cref="T:Microsoft.Xna.Framework.Input.GamePadState"/> struct
         /// using the specified stick, trigger, and button values.
         /// </summary>
         /// <param name="leftThumbStick">Left stick value. Each axis is clamped between −1.0 and 1.0.</param>
         /// <param name="rightThumbStick">Right stick value. Each axis is clamped between −1.0 and 1.0.</param>
         /// <param name="leftTrigger">Left trigger value. This value is clamped between 0.0 and 1.0.</param>
         /// <param name="rightTrigger">Right trigger value. This value is clamped between 0.0 and 1.0.</param>
-        /// <param name="buttons"> Array or parameter list of Buttons to initialize as pressed.</param>
+        /// <param name="buttons"> Array of Buttons to initialize as pressed.</param>
         public GamePadState(Vector2 leftThumbStick, Vector2 rightThumbStick, float leftTrigger, float rightTrigger, Buttons[] buttons)
             : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(buttons), new GamePadDPad(buttons))
         {
