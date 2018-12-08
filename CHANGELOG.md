@@ -1,6 +1,31 @@
 # Change Log
 
 
+## 3.7.1 Release - 12/8/2018
+
+ - MGCB now generates content building statistics. [#6401](https://github.com/MonoGame/MonoGame/pull/6401)
+ - Fixes to dependency loading in Pipeline Tool. [#6450](https://github.com/MonoGame/MonoGame/pull/6450)
+ - Fixed crash when canceling choose folder dialog in Pipeline Tool. [#6449](https://github.com/MonoGame/MonoGame/pull/6449)
+ - Fix add item dialog jumping around in Pipeline Tool. [#6451](https://github.com/MonoGame/MonoGame/pull/6451)
+ - Fix OpenAL library loading on some Android phones. [#6454](https://github.com/MonoGame/MonoGame/pull/6454)
+ - Fix Gamepad index tracking under UWP. [#6456](https://github.com/MonoGame/MonoGame/pull/6456)
+ - Rename "Copy Asset Path" to "Copy Asset Name" for consistency with XNA in Pipeline Tool. [#6457](https://github.com/MonoGame/MonoGame/pull/6457)
+ - Fix TextInput Keys argument for UWP. [#6455](https://github.com/MonoGame/MonoGame/pull/6455)
+ - Add new GamePad.GetState() overloads to support different dead zone modes. [#6467](https://github.com/MonoGame/MonoGame/pull/6467)
+ - Fixed incorrect offset DynamicSoundEffectInstance.SubmitBuffer under XAudio. [#6523](https://github.com/MonoGame/MonoGame/pull/6523)
+ - Improved accuracy of fixed time step. [#6535](https://github.com/MonoGame/MonoGame/pull/6535)
+ - Ensure intermediate output path exists before writing stats in Pipeline Tool. [#6503](https://github.com/MonoGame/MonoGame/pull/6503)
+ - Fix for special window close case under SDL. [#6489](https://github.com/MonoGame/MonoGame/pull/6489)
+ - Marshal microphone identifiers as UTF-8. [#6530](https://github.com/MonoGame/MonoGame/pull/6530)
+ - Clear the current selections when excluding items in the Pipeline Tool. [#6549](https://github.com/MonoGame/MonoGame/pull/6549)
+ - Enable standard derivatives extension for GLSL shaders. [#6501](https://github.com/MonoGame/MonoGame/pull/6501)
+ - Fixed framebuffer object EXT loading under OpenGL. [#6562](https://github.com/MonoGame/MonoGame/pull/6562)
+ - Fixed GL.RenderbufferStorage for devices that use the EXT entry points. [#6563](https://github.com/MonoGame/MonoGame/pull/6563)
+ - Fix VS template installation when C# folder is missing. [#6544](https://github.com/MonoGame/MonoGame/pull/6544)
+ - Fix for SDL loading when a '#' is in the directory path. [#6573](https://github.com/MonoGame/MonoGame/pull/6573)
+ - Restored Buttons[] constructor in GamePadState fixing XNA compatibility. [#6572](https://github.com/MonoGame/MonoGame/pull/6572)
+
+
 ## 3.7 Release - 9/23/2018
 
  - Remove Scale and Rotation properties from Matrix. [#5584](https://github.com/MonoGame/MonoGame/pull/5584)
