@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// All the glyphs in this SpriteFont.
 		/// </summary>
         /// <remarks>Can be used to calculate character bounds when implementing custom SpriteFont rendering.</remarks>
-		public ReadOnlyCollection<Glyph> Glyphs { get { return Array.AsReadOnly(_glyphs); } }
+		public ReadOnlyCollection<Glyph> Glyphs { get { return new ReadOnlyCollection<Glyph>(_glyphs); } }
 
 		class CharComparer: IEqualityComparer<char>
 		{
