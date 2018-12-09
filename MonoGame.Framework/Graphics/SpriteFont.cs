@@ -32,7 +32,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// <summary>
 		/// All the glyphs in this SpriteFont.
 		/// </summary>
-		public Glyph[] Glyphs { get { return _glyphs; } }
+        /// <remarks>Can be used to calculate character bounds when implementing custom SpriteFont rendering.</remarks>
+		public ReadOnlyCollection<Glyph> Glyphs { get { return Array.AsReadOnly(_glyphs); } }
 
 		class CharComparer: IEqualityComparer<char>
 		{
@@ -120,8 +121,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Returns a copy of the dictionary containing the glyphs in this SpriteFont.
         /// </summary>
-        /// <returns>A new Dictionary containing all of the glyphs inthis SpriteFont</returns>
+        /// <returns>A new Dictionary containing all of the glyphs in this SpriteFont</returns>
         /// <remarks>Can be used to calculate character bounds when implementing custom SpriteFont rendering.</remarks>
+        [Obsolete("This method is deprecated and will be removed in a future version. Use SpriteFont.Glyphs to get the glyphs in this SpriteFont.")]
         public Dictionary<char, Glyph> GetGlyphs()
         {
             var glyphsDictionary = new Dictionary<char, Glyph>(_glyphs.Length, CharComparer.Default);
