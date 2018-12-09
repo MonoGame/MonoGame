@@ -236,8 +236,11 @@ namespace MonoGame.Framework
         private void OnDeactivate(object sender, EventArgs eventArgs)
         {
             // If in exclusive mode full-screen, force it out of exclusive mode and minimize the window
-            if (IsFullScreen && _platform.Game.GraphicsDevice.PresentationParameters.HardwareModeSwitch)
-                MinimizeFullScreen();
+			if( IsFullScreen && _platform.Game.GraphicsDevice.PresentationParameters.HardwareModeSwitch ) {			
+				// This is true when the user presses the Windows key while game window has focus
+				if( Form.WindowState == FormWindowState.Minimized )
+					MinimizeFullScreen();				
+			}
             _platform.IsActive = false;
             Keyboard.SetActive(false);
         }
@@ -555,8 +558,14 @@ namespace MonoGame.Framework
             var raiseClientSizeChanged = false;
             if (pp.IsFullScreen && pp.HardwareModeSwitch && IsFullScreen && HardwareModeSwitch)
             {
-                // stay in hardware full screen, need to call ResizeTargets so the displaymode can be switched
-                _platform.Game.GraphicsDevice.ResizeTargets();
+                if( _platform.IsActive ) {
+					// stay in hardware full screen, need to call ResizeTargets so the displaymode can be switched
+					_platform.Game.GraphicsDevice.ResizeTargets();
+				} else {
+					// This needs to be called in case the user presses the Windows key while the focus is on the second monitor,
+					//	which (sometimes) causes the window to exit fullscreen mode, but still keeps it visible
+					MinimizeFullScreen();
+				}
             }
             else if (pp.IsFullScreen && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
             {
