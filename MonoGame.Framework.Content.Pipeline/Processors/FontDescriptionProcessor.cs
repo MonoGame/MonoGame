@@ -233,6 +233,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     if (font.StartsWith(name, StringComparison.OrdinalIgnoreCase))
                     {
                         var fontPath = key.GetValue(font).ToString();
+
+                        // The registry value might have trailing NUL characters
+                        // See https://github.com/MonoGame/MonoGame/issues/4061
+                        var nulIndex = fontPath.IndexOf('\0');
+                        if (nulIndex != -1)
+                            fontPath = fontPath.Substring(0, nulIndex);
+
                         return Path.IsPathRooted(fontPath) ? fontPath : Path.Combine(fontDirectory, fontPath);
                     }
                 }
