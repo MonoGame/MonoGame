@@ -15,13 +15,6 @@ namespace MonoGame.Tools.Pipeline
         Cancel
     }
 
-    public enum CopyAction
-    {
-        Copy,
-        Link,
-        Skip
-    }
-
     public interface IView
     {
         void Attach(IController controller);
@@ -68,9 +61,9 @@ namespace MonoGame.Tools.Pipeline
 
         bool ChooseItemTemplate(string folder, out ContentItemTemplate template, out string name);
 
-        bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall);
+        bool CopyOrLinkFile(string file, bool exists, out IncludeType action, out bool applyforall);
 
-        bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall);
+        bool CopyOrLinkFolder(string folder, bool exists, out IncludeType action, out bool applyforall);
 
         Process CreateProcess(string exe, string commands);
 

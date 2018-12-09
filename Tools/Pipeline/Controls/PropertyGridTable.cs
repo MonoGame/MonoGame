@@ -74,9 +74,9 @@ namespace MonoGame.Tools.Pipeline
 
             foreach (var ct in types)
             {
-                var attrs = ct.GetCustomAttributes<CellAttribute>();
+                var attrs = ct.GetCustomAttributes(typeof(CellAttribute), true);
 
-                foreach (var a in attrs)
+                foreach (CellAttribute a in attrs)
                 {
                     if (a.Type == type || type.IsSubclassOf(a.Type))
                     {

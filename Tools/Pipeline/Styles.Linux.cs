@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Eto;
 using Eto.Forms;
@@ -15,122 +14,19 @@ using Eto.GtkSharp.Forms.ToolBar;
 
 namespace MonoGame.Tools.Pipeline
 {
-    static partial class Gtk3Wrapper
-    {
-        public const string gtklibpath = "libgtk-3.so.0";
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr gtk_header_bar_new();
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_window_set_titlebar(IntPtr window, IntPtr widget);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_header_bar_pack_start(IntPtr bar, IntPtr child);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_header_bar_pack_end(IntPtr bar, IntPtr child);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_header_bar_set_show_close_button(IntPtr bar, bool setting);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_header_bar_set_subtitle(IntPtr handle, string text);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_application_set_app_menu (IntPtr application, IntPtr app_menu);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_application_add_window (IntPtr application, IntPtr window);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr g_simple_action_new (string name, IntPtr parameter_type);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void g_action_map_add_action (IntPtr action_map, IntPtr action);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void g_simple_action_set_enabled (IntPtr simple, bool enabled);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr gtk_accel_group_new();
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr gtk_accel_group_connect (IntPtr accel_group, Gdk.Key accel_key, Gdk.ModifierType accel_mods, Gtk.AccelFlags accel_flags, IntPtr closure);
-    
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr g_cclosure_new (IntPtr callback_func, IntPtr user_data, IntPtr destroy_data);
-
-        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_window_add_accel_group (IntPtr window, IntPtr accel_group);
-    }
-
-    public class SimpleAction : GLib.Object
-    {
-        public delegate void ActivateHandler(object o, EventArgs args);
-        public event ActivateHandler Activate
-        {
-            add { AddSignalHandler("activate", value, typeof(EventArgs)); }
-            remove { RemoveSignalHandler("activate", value); }
-        }
-
-        public bool Enabled
-        {
-            get { return false; }
-            set { Gtk3Wrapper.g_simple_action_set_enabled(Handle, value); }
-        }
-
-        public SimpleAction(string name) : base(Gtk3Wrapper.g_simple_action_new(name, IntPtr.Zero))
-        {
-            
-        }
-    }
-
-    public class ModalButton : Gtk.Button
-    {
-        [GLib.Property("active")]
-        public bool Active
-        {
-            set
-            {
-                this.SetProperty("active", new GLib.Value(value));
-            }
-        }
-
-        public ModalButton(IntPtr handle) : base(handle) { }
-    }
-
     public static class Styles
     {
-        private static IntPtr _actionGroup;
+        [DllImport("libgtk-3.so.0", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr g_cclosure_new (IntPtr callback_func, IntPtr user_data, IntPtr destroy_data);
+        
+        private static Gtk.AccelGroup _accelGroup;
         private static Gtk.Widget _popovermenu1, _popovermenu2;
-        private static Gtk.RadioButton _mainbutton;
         private static Gtk.Widget _buttonbox, _cancelbox, _separator;
-
-        [GLib.ConnectBefore]
-        public static void TreeView_ButtonPressEvent(object o, Gtk.ButtonPressEventArgs args)
-        {
-            var treeview = o as Gtk.TreeView;
-
-            if (args.Event.Button == 3)
-            {
-                Gtk.TreeViewDropPosition pos;
-                Gtk.TreePath path;
-                Gtk.TreeIter iter;
-
-                if (treeview.GetDestRowAtPos((int)args.Event.X, (int)args.Event.Y, out path, out pos) && treeview.Model.GetIter(out iter, path))
-                {
-                    var paths = treeview.Selection.GetSelectedRows().ToList();
-                    if (paths.Contains(path))
-                        args.RetVal = true;
-                }
-            }
-        }
 
         public static void Connect(string action, Command cmd)
         {
-            var a = new SimpleAction(action);
-            a.Activate += (o, args) => 
+            var a = new GLib.SimpleAction(action, null);
+            a.Activated += (o, args) => 
             {
                 _popovermenu1.Hide();
                 _popovermenu2.Hide();
@@ -139,12 +35,12 @@ namespace MonoGame.Tools.Pipeline
 
             cmd.EnabledChanged += (sender, e) => a.Enabled = cmd.Enabled;
 
-            Gtk3Wrapper.g_action_map_add_action(Global.ApplicationHandle, a.Handle);
+            Global.Application.AddAction(a);
         }
 
         private static void Connect(Command cmd, Gdk.Key key, Gdk.ModifierType modifier = Gdk.ModifierType.None)
         {
-            var cclosure = Gtk3Wrapper.g_cclosure_new(Marshal.GetFunctionPointerForDelegate(
+            var cclosure = g_cclosure_new(Marshal.GetFunctionPointerForDelegate(
                 (Action<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr>)((IntPtr a, IntPtr b, IntPtr c, IntPtr d, IntPtr data) =>
             {
                 var command = ((GCHandle)data).Target as Command;
@@ -153,18 +49,7 @@ namespace MonoGame.Tools.Pipeline
                     command.Execute();
             })), (IntPtr)GCHandle.Alloc(cmd), IntPtr.Zero);
 
-            Gtk3Wrapper.gtk_accel_group_connect(_actionGroup, key, modifier, Gtk.AccelFlags.Mask, cclosure);
-        }
-
-        private static void RejectActive(IntPtr handle)
-        {
-            var rb = new Gtk.RadioButton(handle);
-            rb.JoinGroup(_mainbutton);
-            rb.Toggled += (sender, e) => 
-            {
-                if (rb.Active)
-                    _mainbutton.Active = true;
-            };
+            _accelGroup.Connect((uint)key, modifier, Gtk.AccelFlags.Mask, cclosure);
         }
 
         private static void ReloadBuildbox()
@@ -181,22 +66,39 @@ namespace MonoGame.Tools.Pipeline
         {
             Style.Add<ApplicationHandler>("PipelineTool", h =>
             {
-                Global.ApplicationHandle = h.Control.Handle;
+                Global.Application = h.Control;
 
                 if (Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16)
-                    Global.UseHeaderBar = Gtk3Wrapper.gtk_application_prefers_app_menu(h.Control.Handle);
+                    Global.UseHeaderBar = Global.Application.PrefersAppMenu();
                 
                 if (Global.UseHeaderBar)
-                    Gtk3Wrapper.gtk_application_set_app_menu(h.Control.Handle, (new Gtk.Builder("AppMenu.glade")).GetObject("appmenu").Handle);
+                    Global.Application.AppMenu = new GLib.MenuModel((new Gtk.Builder("AppMenu.glade")).GetObject("appmenu").Handle);
             });
 
+            Style.Add<FormHandler>("LogWindow", h =>
+            {
+                if (!Global.UseHeaderBar)
+                    return;
+                
+                var headerBar = new Gtk.HeaderBar();
+                headerBar.ShowCloseButton = true;
+                headerBar.Title = h.Control.Title;
+
+                var buttoncopy = LogWindow.ButtonCopy.ToNative() as Gtk.Button;
+                buttoncopy.StyleContext.AddClass("suggested-action");
+                headerBar.PackStart(buttoncopy);
+
+                h.Control.Titlebar = headerBar;
+                headerBar.ShowAll();
+            });
+                                   
             Style.Add<FormHandler>("MainWindow", h =>
             {
                 if (!Global.UseHeaderBar)
                     return;
                 
                 var builder = new Gtk.Builder("MainWindow.glade");
-                var headerBar = new Gtk.Widget(builder.GetObject("headerbar").Handle);
+                var headerBar = new Gtk.HeaderBar(builder.GetObject("headerbar").Handle);
 
                 h.Menu = null;
                 h.ToolBar = null;
@@ -217,7 +119,17 @@ namespace MonoGame.Tools.Pipeline
                 Connect("clean", MainWindow.Instance.cmdClean);
                 Connect("cancel", MainWindow.Instance.cmdCancelBuild);
 
-                _actionGroup = Gtk3Wrapper.gtk_accel_group_new();
+                var widget = new Gtk.ModelButton(builder.GetObject("button_debug").Handle);
+                widget.Active = MainWindow.Instance.cmdDebugMode.Checked;
+                widget.Clicked += (e, sender) =>
+                {
+                    var newstate = !PipelineSettings.Default.DebugMode;
+
+                    widget.Active = newstate;
+                    PipelineSettings.Default.DebugMode = newstate;
+                };
+
+                _accelGroup = new Gtk.AccelGroup();
 
                 Connect(MainWindow.Instance.cmdNew, Gdk.Key.N, Gdk.ModifierType.ControlMask);
                 Connect(MainWindow.Instance.cmdOpen, Gdk.Key.O, Gdk.ModifierType.ControlMask);
@@ -228,18 +140,13 @@ namespace MonoGame.Tools.Pipeline
                 Connect(MainWindow.Instance.cmdBuild, Gdk.Key.F6);
                 Connect(MainWindow.Instance.cmdHelp, Gdk.Key.F1);
 
-                Gtk3Wrapper.gtk_window_add_accel_group(h.Control.Handle, _actionGroup);
+                h.Control.AddAccelGroup(_accelGroup);
 
                 _popovermenu1 = new Gtk.Widget(builder.GetObject("popovermenu1").Handle);
                 _popovermenu2 = new Gtk.Widget(builder.GetObject("popovermenu2").Handle);
 
-                Gtk3Wrapper.gtk_window_set_titlebar(h.Control.Handle, headerBar.Handle);
-                Gtk3Wrapper.gtk_header_bar_set_show_close_button(headerBar.Handle, true);
-
-                _mainbutton = new Gtk.RadioButton("");
-                RejectActive(builder.GetObject("build_button").Handle);
-                RejectActive(builder.GetObject("rebuild_button").Handle);
-                RejectActive(builder.GetObject("clean_button").Handle);
+                h.Control.Titlebar = headerBar;
+                headerBar.ShowCloseButton = true;
 
                 _buttonbox = new Gtk.Widget(builder.GetObject("build_buttonbox").Handle);
                 _cancelbox = new Gtk.Widget(builder.GetObject("cancel_button").Handle);
@@ -260,7 +167,7 @@ namespace MonoGame.Tools.Pipeline
                     }
 
                     h.Control.Title = title;
-                    Gtk3Wrapper.gtk_header_bar_set_subtitle(headerBar.Handle, subtitle);
+                    headerBar.Subtitle = subtitle;
                 };
 
                 var treeview1 = new Gtk.TreeView(builder.GetObject("treeview1").Handle);

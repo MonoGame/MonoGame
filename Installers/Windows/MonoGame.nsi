@@ -23,7 +23,7 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "The MonoGame Team"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} SDK Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © The MonoGame Team"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright Â© The MonoGame Team"
 
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
@@ -90,6 +90,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /r '..\..\Tools\MGCB\bin\Windows\AnyCPU\Release\*.dll'
   File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.exe'
   File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.dll'
+  File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.xml'
   File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\Templates'
 
   ; Associate .mgcb files open in the Pipeline tool.
@@ -187,7 +188,7 @@ SectionEnd
 
 Section "Visual Studio 2010 Templates" VS2010
 
-  IfFileExists `$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  IfFileExists `$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
     SetOutPath "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
@@ -200,7 +201,7 @@ SectionEnd
 
 Section "Visual Studio 2013 Templates" VS2013
 
-  IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
     SetOutPath "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2013\*.zip'
@@ -214,7 +215,7 @@ SectionEnd
 
 Section "Visual Studio 2015 Templates" VS2015
 
-  IfFileExists `$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  IfFileExists `$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
     SetOutPath "$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
@@ -228,7 +229,7 @@ SectionEnd
 
 Section "Visual Studio 2017 Templates" VS2017
 
-  IfFileExists `$DOCUMENTS\Visual Studio 2017\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  IfFileExists `$DOCUMENTS\Visual Studio 2017\Templates\ProjectTemplates\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
     SetOutPath "$DOCUMENTS\Visual Studio 2017\Templates\ProjectTemplates\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
@@ -285,35 +286,35 @@ LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your 
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 Function checkVS2010
-IfFileExists `$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\*.*` end disable
+IfFileExists `$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\*.*` end disable
   disable:
 	 SectionSetFlags ${VS2010} $0
   end:
 FunctionEnd
  
 Function checkVS2012
-IfFileExists `$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\*.*` end disable
+IfFileExists `$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\*.*` end disable
   disable:
 	 SectionSetFlags ${VS2012} $0
   end:
 FunctionEnd
 
 Function checkVS2013
-IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\*.*` end disable
+IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\*.*` end disable
   disable:
 	 SectionSetFlags ${VS2013} $0
   end:
 FunctionEnd
 
 Function checkVS2015
-IfFileExists `$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\*.*` end disable
+IfFileExists `$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\*.*` end disable
   disable:
 	 SectionSetFlags ${VS2015} $0
   end:
 FunctionEnd
 
 Function checkVS2017
-IfFileExists `$DOCUMENTS\Visual Studio 2017\Templates\ProjectTemplates\Visual C#\*.*` end disable
+IfFileExists `$DOCUMENTS\Visual Studio 2017\Templates\ProjectTemplates\*.*` end disable
   disable:
 	 SectionSetFlags ${VS2017} $0
   end:

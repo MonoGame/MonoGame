@@ -76,5 +76,21 @@ namespace MonoGame.Tests.Framework
             Assert.That(plane, Is.EqualTo(originalPlane));
             Assert.That(quaternion, Is.EqualTo(originalQuaternion));
         }
+
+#if !XNA
+        [Test]
+        public void Deconstruct()
+        {
+            Plane plane = new Plane(new Vector3(255, 255, 255), float.MaxValue);
+
+            Vector3 normal;
+            float d;
+
+            plane.Deconstruct(out normal, out d);
+
+            Assert.AreEqual(normal, plane.Normal);
+            Assert.AreEqual(d, plane.D);
+        }
+#endif
     }
 }

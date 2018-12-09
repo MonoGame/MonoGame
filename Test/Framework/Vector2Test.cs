@@ -65,7 +65,7 @@ namespace MonoGame.Tests.Framework
 
             Vector2 refVec;
 
-            // Overloads comparsion 
+            // Overloads comparsion
             var vector3 = Vector2.Multiply(vector, vector2);
             Vector2.Multiply(ref vector, ref vector2, out refVec);
             Assert.AreEqual(vector3, refVec);
@@ -405,8 +405,10 @@ namespace MonoGame.Tests.Framework
             var yb = new Vector2(1f, 3f);
             Assert.AreNotEqual(xa.GetHashCode(), xb.GetHashCode(), "Different properties should change hash.");
             Assert.AreNotEqual(ya.GetHashCode(), yb.GetHashCode(), "Different properties should change hash.");
+#if !XNA
             Assert.AreNotEqual(xa.GetHashCode(), ya.GetHashCode(), "Identical values on different properties should have different hashes.");
             Assert.AreNotEqual(xb.GetHashCode(), yb.GetHashCode(), "Identical values on different properties should have different hashes.");
+#endif
             Assert.AreNotEqual(xa.GetHashCode(), yb.GetHashCode());
             Assert.AreNotEqual(ya.GetHashCode(), xb.GetHashCode());
         }
@@ -423,6 +425,19 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(new Point(1, 1), new Vector2(1.0f, 1.0f).ToPoint());
             Assert.AreEqual(new Point(19, 27), new Vector2(19.033f, 27.1f).ToPoint());
         }
-#endif     
+
+        [Test]
+        public void Deconstruct()
+        {
+            Vector2 vector2 = new Vector2(float.MinValue, float.MaxValue);
+
+            float x, y;
+
+            vector2.Deconstruct(out x, out y);
+
+            Assert.AreEqual(x, vector2.X);
+            Assert.AreEqual(y, vector2.Y);
+        }
+#endif
     }
 }

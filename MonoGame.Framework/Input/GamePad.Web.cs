@@ -40,6 +40,7 @@ namespace Microsoft.Xna.Framework.Input
             return new GamePadCapabilities 
             {
                 IsConnected = true,
+                GamePadType = GamePadType.GamePad,
                 HasAButton = (gpc.Read("a").index != -1),
                 HasBButton = (gpc.Read("b").index != -1),
                 HasXButton = (gpc.Read("x").index != -1),
@@ -67,7 +68,7 @@ namespace Microsoft.Xna.Framework.Input
             };
         }
 
-        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
             var state = GamePadState.Default;
             var jcap = Joystick.GetCapabilities(index);
@@ -101,7 +102,8 @@ namespace Microsoft.Xna.Framework.Input
                     new GamePadThumbSticks(
                         new Vector2(gpc.AxisPressed("leftx", jstate), gpc.AxisPressed("lefty", jstate)),
                         new Vector2(gpc.AxisPressed("rightx", jstate), gpc.AxisPressed("righty", jstate)),
-                        deadZoneMode
+                        leftDeadZoneMode,
+						rightDeadZoneMode
                     );
                 
                 var dpad = 

@@ -34,13 +34,13 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         [DataMember]
         public float Y;
-      
+
         /// <summary>
         /// The z coordinate of this <see cref="Quaternion"/>.
         /// </summary>
         [DataMember]
         public float Z;
-      
+
         /// <summary>
         /// The rotation component of this <see cref="Quaternion"/>.
         /// </summary>
@@ -348,7 +348,7 @@ namespace Microsoft.Xna.Framework
 		    quaternion.Y = (matrix.M32 + matrix.M23) * half;
 		    quaternion.Z = 0.5f * sqrt;
 		    quaternion.W = (matrix.M12 - matrix.M21) * half;
-			
+
 		    return quaternion;
         }
 
@@ -1013,6 +1013,14 @@ namespace Microsoft.Xna.Framework
             return new Vector4(X,Y,Z,W);
         }
 
+        public void Deconstruct(out float x, out float y, out float z, out float w)
+        {
+            x = X;
+            y = Y;
+            z = Z;
+            w = W;
+        }
+
         #endregion
 
         #region Operators
@@ -1079,7 +1087,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="quaternion1"><see cref="Quaternion"/> instance on the left of the not equal sign.</param>
         /// <param name="quaternion2"><see cref="Quaternion"/> instance on the right of the not equal sign.</param>
-        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
         public static bool operator !=(Quaternion quaternion1, Quaternion quaternion2)
         {
             if (((quaternion1.X == quaternion2.X) && (quaternion1.Y == quaternion2.Y)) && (quaternion1.Z == quaternion2.Z))

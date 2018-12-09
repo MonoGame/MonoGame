@@ -110,6 +110,34 @@
           </packing>
         </child>
         <child>
+          <object class="GtkModelButton" id="button_debug">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">False</property>
+            <property name="text" translatable="yes">Debug Mode</property>
+			<property name="role">1</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">5</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_top">3</property>
+            <property name="margin_bottom">3</property>
+            <property name="orientation">vertical</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">6</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkModelButton">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -120,7 +148,63 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">6</property>
+            <property name="position">7</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_top">3</property>
+            <property name="margin_bottom">3</property>
+            <property name="orientation">vertical</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">8</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkModelButton">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">False</property>
+            <property name="action_name">app.help</property>
+            <property name="text" translatable="yes">Help</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">9</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkModelButton">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">False</property>
+            <property name="action_name">app.about</property>
+            <property name="text" translatable="yes">About</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">10</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkModelButton">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">False</property>
+            <property name="action_name">app.quit</property>
+            <property name="text" translatable="yes">Quit</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">11</property>
           </packing>
         </child>
       </object>
@@ -134,7 +218,7 @@
     <property name="can_focus">False</property>
     <child>
       <object class="GtkBox">
-        <property name="width_request">280</property>
+        <property name="width_request">400</property>
         <property name="height_request">300</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
@@ -231,7 +315,7 @@
         <property name="can_focus">False</property>
         <property name="homogeneous">True</property>
         <child>
-          <object class="GtkRadioButton" id="build_button">
+          <object class="GtkButton" id="build_button">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="can_default">True</property>
@@ -239,7 +323,6 @@
             <property name="tooltip_text" translatable="yes">Build</property>
             <property name="valign">center</property>
             <property name="image">build_image</property>
-            <property name="draw_indicator">False</property>
             <property name="action_name">app.build</property>
           </object>
           <packing>
@@ -249,7 +332,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkRadioButton" id="rebuild_button">
+          <object class="GtkButton" id="rebuild_button">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="can_default">True</property>
@@ -257,7 +340,6 @@
             <property name="tooltip_text" translatable="yes">Rebuild</property>
             <property name="valign">center</property>
             <property name="image">rebuild_image</property>
-            <property name="draw_indicator">False</property>
             <property name="action_name">app.rebuild</property>
           </object>
           <packing>
@@ -267,7 +349,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkRadioButton" id="clean_button">
+          <object class="GtkButton" id="clean_button">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="can_default">True</property>
@@ -275,7 +357,6 @@
             <property name="tooltip_text" translatable="yes">Clean</property>
             <property name="valign">center</property>
             <property name="image">clean_image</property>
-            <property name="draw_indicator">False</property>
             <property name="action_name">app.clean</property>
           </object>
           <packing>

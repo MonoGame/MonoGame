@@ -81,6 +81,7 @@ namespace Microsoft.Xna.Framework
         }
 
         public static GameWindow Instance;
+        public uint? Id;
         public bool IsFullScreen;
 
         internal readonly Game _game;
@@ -154,6 +155,8 @@ namespace Microsoft.Xna.Framework
 
             _handle = Sdl.Window.Create(AssemblyHelper.GetDefaultWindowTitle(),
                 winx, winy, _width, _height, initflags);
+
+            Id = Sdl.Window.GetWindowId(_handle);
 
             if (_icon != IntPtr.Zero)
                 Sdl.Window.SetIcon(_handle, _icon);
@@ -236,8 +239,11 @@ namespace Microsoft.Xna.Framework
                 _height = displayRect.Height;
             }
 
-            var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), 0);
-            var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), 0);
+            int ignore, minx = 0, miny = 0;
+            Sdl.Window.GetBorderSize(_handle, out miny, out minx, out ignore, out ignore);
+
+            var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), minx);
+            var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), miny);
 
             if (IsFullScreen && !_willBeFullScreen)
             {

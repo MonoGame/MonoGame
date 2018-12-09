@@ -5,7 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 using MonoGame.Utilities.Png;
 using SharpDX;
 using SharpDX.Direct3D11;
@@ -44,6 +44,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             int w, h;
             GetSizeForLevel(Width, Height, level, out w, out h);
+
+            // For DXT compressed formats the width and height must be
+            // a multiple of 4 for the complete mip level to be set.
+            if (_format.IsCompressedFormat())
+            {
+                w = (w + 3) & ~3;
+                h = (h + 3) & ~3;
+            }
+
             var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             // Use try..finally to make sure dataHandle is freed in case of an error
@@ -205,26 +214,35 @@ namespace Microsoft.Xna.Framework.Graphics
             return arraySlice * _levelCount + level;
         }
 
-        private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
+        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-            if (!stream.CanSeek)
-                throw new NotSupportedException("stream must support seek operations");
+            int width, height, channels;
 
-            // For reference this implementation was ultimately found through this post:
-            // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
-            Texture2D toReturn = null;
-            SharpDX.WIC.BitmapDecoder decoder;
+            // The data returned is always four channel BGRA
+            var data = ImageReader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
 
-            using (var bitmap = LoadBitmap(stream, out decoder))
-            using (decoder)
+            // XNA blacks out any pixels with an alpha of zero.
+            if (channels == 4)
             {
-                SharpDX.Direct3D11.Texture2D sharpDxTexture = CreateTex2DFromBitmap(bitmap, graphicsDevice);
-
-                toReturn = new Texture2D(graphicsDevice, bitmap.Size.Width, bitmap.Size.Height);
-
-                toReturn._texture = sharpDxTexture;
+                fixed (byte* b = &data[0])
+                {
+                    for (var i = 0; i < data.Length; i += 4)
+                    {
+                        if (b[i + 3] == 0)
+                        {
+                            b[i + 0] = 0;
+                            b[i + 1] = 0;
+                            b[i + 2] = 0;
+                        }
+                    }
+                }
             }
-            return toReturn;
+
+            Texture2D texture = null;
+            texture = new Texture2D(graphicsDevice, width, height);
+            texture.SetData(data);
+
+            return texture;
         }
 
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
@@ -342,12 +360,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var fconv = new FormatConverter(imgfactory);
 
-            fconv.Initialize(
-                decoder.GetFrame(0),
-                PixelFormat.Format32bppRGBA,
-                BitmapDitherType.None, null,
-                0.0, BitmapPaletteType.Custom);
-
+            using (var frame = decoder.GetFrame(0))
+            {
+                fconv.Initialize(
+                    frame,
+                    PixelFormat.Format32bppRGBA,
+                    BitmapDitherType.None,
+                    null,
+                    0.0,
+                    BitmapPaletteType.Custom);
+            }
             return fconv;
         }
 

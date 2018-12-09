@@ -252,37 +252,9 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\Options.cs</Link>
     </Compile>
-    <Compile Include="..\Tools\2MGFX\Parser.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\Parser.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ParseTree.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ParseTree.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ParseTreeTools.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ParseTreeTools.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\PassInfo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\PassInfo.cs</Link>
-    </Compile>
     <Compile Include="..\Tools\2MGFX\Preprocessor.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\Preprocessor.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\SamplerStateInfo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\SamplerStateInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\Scanner.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\Scanner.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderInfo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderInfo.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\ShaderProfile.cs">
       <Platforms>Windows</Platforms>
@@ -300,13 +272,41 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderResult.cs</Link>
     </Compile>
-    <Compile Include="..\Tools\2MGFX\TechniqueInfo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\TechniqueInfo.cs</Link>
-    </Compile>
     <Compile Include="..\Tools\2MGFX\TextureFilterType.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\TextureFilterType.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\Parser.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\ParseTree.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\ParseTree.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\ParseTreeTools.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\ParseTreeTools.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\PassInfo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\PassInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\SamplerStateInfo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\SamplerStateInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\Scanner.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\Scanner.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\ShaderInfo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\ShaderInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\TechniqueInfo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\TechniqueInfo.cs</Link>
     </Compile>
 
 
@@ -432,6 +432,8 @@
     <Compile Include="ContentProcessor.cs" />
     <Compile Include="ContentProcessorAttribute.cs" />
     <Compile Include="ContentProcessorContext.cs" />
+    <Compile Include="ContentStats.cs" />
+    <Compile Include="ContentStatsCollection.cs" />
     <Compile Include="DdsLoader.cs" />
     <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />

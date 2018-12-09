@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Windows;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
 using Point = System.Drawing.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using XnaPoint = Microsoft.Xna.Framework.Point;
@@ -104,6 +105,7 @@ namespace MonoGame.Framework
             {
                 _wasMoved = true;
                 Form.Location = new Point(value.X, value.Y);
+                RefreshAdapter();
             }
         }
 
@@ -164,8 +166,22 @@ namespace MonoGame.Framework
             RegisterToAllWindows();
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct POINTSTRUCT
+        {
+            public int X;
+            public int Y;
+        }
+
         [DllImport("shell32.dll", CharSet = CharSet.Auto, BestFitMapping = false)]
         private static extern IntPtr ExtractIcon(IntPtr hInst, string exeFileName, int iconIndex);
+        
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        [return: MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        internal static extern bool GetCursorPos(out POINTSTRUCT pt);
+        
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        internal static extern int MapWindowPoints(HandleRef hWndFrom, HandleRef hWndTo, out POINTSTRUCT pt, int cPoints);
 
         private void SetIcon()
         {
@@ -220,8 +236,11 @@ namespace MonoGame.Framework
         private void OnDeactivate(object sender, EventArgs eventArgs)
         {
             // If in exclusive mode full-screen, force it out of exclusive mode and minimize the window
-            if (IsFullScreen && _platform.Game.GraphicsDevice.PresentationParameters.HardwareModeSwitch)
-                MinimizeFullScreen();
+			if( IsFullScreen && _platform.Game.GraphicsDevice.PresentationParameters.HardwareModeSwitch ) {			
+				// This is true when the user presses the Windows key while game window has focus
+				if( Form.WindowState == FormWindowState.Minimized )
+					MinimizeFullScreen();				
+			}
             _platform.IsActive = false;
             Keyboard.SetActive(false);
         }
@@ -244,7 +263,10 @@ namespace MonoGame.Framework
             if (!Form.Visible)
                 return;
 
-            var clientPos = Form.PointToClient(Control.MousePosition);
+            POINTSTRUCT pos;
+            GetCursorPos(out pos);
+            MapWindowPoints(new HandleRef(null, IntPtr.Zero), new HandleRef(Form, Form.Handle), out pos, 1);
+            var clientPos = new System.Drawing.Point(pos.X, pos.Y);
             var withinClient = Form.ClientRectangle.Contains(clientPos);
             var buttons = Control.MouseButtons;
 
@@ -255,6 +277,8 @@ namespace MonoGame.Framework
             MouseState.LeftButton = (buttons & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
             MouseState.MiddleButton = (buttons & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
             MouseState.RightButton = (buttons & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.XButton1 = (buttons & MouseButtons.XButton1) == MouseButtons.XButton1 ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.XButton2 = (buttons & MouseButtons.XButton2) == MouseButtons.XButton2 ? ButtonState.Pressed : ButtonState.Released;
 
             // Don't process touch state if we're not active 
             // and the mouse is within the client area.
@@ -303,9 +327,13 @@ namespace MonoGame.Framework
             }
         }
 
+        [DllImport("user32.dll")]
+        private static extern short VkKeyScanEx(char ch, IntPtr dwhkl);
+
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
-            OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
+            var key = (Keys) (VkKeyScanEx(e.KeyChar, InputLanguage.CurrentInputLanguage.Handle) & 0xff);
+            OnTextInput(sender, new TextInputEventArgs(e.KeyChar, key));
         }
 
         internal void Initialize(int width, int height)
@@ -354,14 +382,18 @@ namespace MonoGame.Framework
             if (Game.Window == this)
             {
                 UpdateBackBufferSize();
-
-                // the display that the window is on might have changed, so we need to
-                // check and possibly update the Adapter of the GraphicsDevice
-                if (Game.GraphicsDevice != null)
-                    Game.GraphicsDevice.RefreshAdapter();
+                RefreshAdapter();
             }
 
             OnClientSizeChanged();
+        }
+
+        private void RefreshAdapter()
+        {
+            // the display that the window is on might have changed, so we need to
+            // check and possibly update the Adapter of the GraphicsDevice
+            if (Game.GraphicsDevice != null)
+                Game.GraphicsDevice.RefreshAdapter();
         }
 
         private void UpdateBackBufferSize()
@@ -388,27 +420,9 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            // https://bugzilla.novell.com/show_bug.cgi?id=487896
-            // Since there's existing bug from implementation with mono WinForms since 09'
-            // Application.Idle is not working as intended
-            // So we're just going to emulate Application.Run just like Microsoft implementation
-            Form.Show();
-
-            var nativeMsg = new NativeMessage();
-            while (Form != null && Form.IsDisposed == false)
-            {
-                if (PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0))
-                {
-                    Application.DoEvents();
-
-                    if (nativeMsg.msg == WM_QUIT)
-                        break;
-
-                    continue;
-                }
-                UpdateWindows();
-                Game.Tick();
-            }
+            Application.Idle += TickOnIdle;
+            Application.Run(Form);
+            Application.Idle -= TickOnIdle;
 
             // We need to remove the WM_QUIT message in the message 
             // pump as it will keep us from restarting on this 
@@ -426,6 +440,18 @@ namespace MonoGame.Framework
                 Thread.Sleep(100);
             } 
             while (PeekMessage(out msg, IntPtr.Zero, 0, 1 << 5, 1));
+        }
+
+        // Run game loop when the app becomes Idle.
+        private void TickOnIdle(object sender, EventArgs e)
+        {
+            var nativeMsg = new NativeMessage();
+            do
+            {
+                UpdateWindows();
+                Game.Tick();
+            }
+            while (!PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0) && Form != null && Form.IsDisposed == false);
         }
 
         internal void UpdateWindows()
@@ -532,8 +558,14 @@ namespace MonoGame.Framework
             var raiseClientSizeChanged = false;
             if (pp.IsFullScreen && pp.HardwareModeSwitch && IsFullScreen && HardwareModeSwitch)
             {
-                // stay in hardware full screen, need to call ResizeTargets so the displaymode can be switched
-                _platform.Game.GraphicsDevice.ResizeTargets();
+                if( _platform.IsActive ) {
+					// stay in hardware full screen, need to call ResizeTargets so the displaymode can be switched
+					_platform.Game.GraphicsDevice.ResizeTargets();
+				} else {
+					// This needs to be called in case the user presses the Windows key while the focus is on the second monitor,
+					//	which (sometimes) causes the window to exit fullscreen mode, but still keeps it visible
+					MinimizeFullScreen();
+				}
             }
             else if (pp.IsFullScreen && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
             {

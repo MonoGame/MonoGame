@@ -49,9 +49,9 @@
 	<DefineNET4DetectionConstant>True</DefineNET4DetectionConstant>
 
     <FrameworkVersions>
-	  <Platform Name="Android">
-            <Version>v4.4</Version>
-          </Platform>
+      <Platform Name="Android">
+        <Version>v4.4</Version>
+      </Platform>
     </FrameworkVersions>
 
   </Properties>
@@ -501,7 +501,7 @@
     <Compile Include="Content\ContentTypeReaderManager.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
     <Compile Include="Content\ResourceContentManager.cs">
-      <Platforms>Angle,Android,iOS,Linux,Windows,WindowsGL,tvOS</Platforms>
+      <Platforms>Angle,Android,iOS,Linux,Windows,WindowsGL,MacOS,tvOS</Platforms>
     </Compile>
 
 
@@ -978,13 +978,16 @@
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.cs">
-      <Platforms>Android,iOS,WindowsUniversal</Platforms>
+      <Platforms>Android,iOS,Windows,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.IOS.cs">
       <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.Windows.cs">
+      <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.WinRT.cs">
       <Platforms>WindowsUniversal</Platforms>
@@ -993,13 +996,16 @@
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="Input\MessageBox.cs">
-      <Platforms>Android,iOS,WindowsUniversal</Platforms>
+      <Platforms>Android,iOS,Windows,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\MessageBox.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Input\MessageBox.IOS.cs">
       <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.Windows.cs">
+      <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Input\MessageBox.WinRT.cs">
       <Platforms>WindowsUniversal</Platforms>
@@ -1177,12 +1183,18 @@
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Utilities\FileHelpers.cs" />
+    <Compile Include="Utilities\InteropHelpers.cs">
+	  <Services>OpenGLGraphics,OpenALAudio</Services>
+    </Compile>
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.Default.cs" >
       <Platforms>Android,iOS,WindowsUniversal,tvOS</Platforms>
     </Compile>
     <Compile Include="Utilities\ReflectionHelpers.Legacy.cs" >
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,Web</Platforms>
+    </Compile>
+    <Compile Include="Utilities\TimerHelper.cs">
+      <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
     <Compile Include="Utilities\LzxStream\LzxDecoderStream.cs" />
@@ -1191,36 +1203,15 @@
     <Compile Include="Utilities\Png\PngReader.cs" />
     <Compile Include="Utilities\Png\PngWriter.cs" />
     <Compile Include="Utilities\ByteBufferPool.cs" />
-    <Compile Include="Utilities\Imaging\Stb.Image.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\Stb.Image.Generated.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\ImageReader.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\Stb.ImageWrite.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\Stb.ImageWrite.Generated.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\ImageWriter.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\Operations.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\PinnedArray.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\TinyJpeg.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
-    <Compile Include="Utilities\Imaging\TinyJpeg.Generated.cs">
-        <Platforms>WindowsGL,Linux,MacOS</Platforms>
-    </Compile>
+    <Compile Include="Utilities\Imaging\Stb.Image.cs" />
+    <Compile Include="Utilities\Imaging\Stb.Image.Generated.cs" />
+    <Compile Include="Utilities\Imaging\ImageReader.cs" />
+    <Compile Include="Utilities\Imaging\Stb.ImageWrite.cs" />
+    <Compile Include="Utilities\Imaging\Stb.ImageWrite.Generated.cs" />
+    <Compile Include="Utilities\Imaging\ImageWriter.cs" />
+    <Compile Include="Utilities\Imaging\Operations.cs" />
+    <Compile Include="Utilities\Imaging\PinnedArray.cs" />
+
 	
 
 
@@ -1267,6 +1258,15 @@
 
 
     <!-- Common Desktop Platform -->
+    <Compile Include="Utilities\FuncLoader.Desktop.cs">
+      <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
+    </Compile>
+    <Compile Include="Utilities\FuncLoader.Android.cs">
+      <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Utilities\FuncLoader.iOS.cs">
+      <Platforms>iOS,tvOS</Platforms>
+    </Compile>
     <Compile Include="SDL\SDLGamePlatform.cs">
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
     </Compile>
@@ -1283,7 +1283,7 @@
       <LogicalName>MonoGame.bmp</LogicalName>
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
     </EmbeddedResource>
-	 <EmbeddedResource Include="SDL\gamecontrollerdb.txt">
+    <EmbeddedResource Include="..\ThirdParty\SDL_GameControllerDB\gamecontrollerdb.txt">
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
       <LogicalName>gamecontrollerdb.txt</LogicalName>
     </EmbeddedResource>

@@ -31,8 +31,10 @@
     </CustomDefinitions>
     <FrameworkVersions>
       <Platform Name="MacOS"><Version>v4.6.1</Version></Platform>
+      <Platform Name="Linux"><Version>v4.6.1</Version></Platform>
     </FrameworkVersions>
     <IncludeMonoRuntimeOnMac>True</IncludeMonoRuntimeOnMac>
+    <ImportPipelineTargets>True</ImportPipelineTargets>
   </Properties>
 
   <Files>
@@ -54,14 +56,13 @@
     <Compile Include="Common\FileType.cs" />
     <Compile Include="Common\ProjectState.cs" />
     <Compile Include="Common\PipelineController.MoveAction.cs" />
-    <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
-    <Compile Include="Common\PipelineController.FileWatcher.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
     <Compile Include="Common\PipelineController.UpdateProcessorAction.cs" />
     <Compile Include="Common\PipelineController.UpdatePropertyAction.cs" />
     <Compile Include="Common\PipelineSettings.cs" />
     <Compile Include="Common\IController.cs" />
+    <Compile Include="Common\IncludeItem.cs" />
     <Compile Include="Common\IProjectAction.cs" />
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />
@@ -83,6 +84,10 @@
 	<Compile Include="MainWindow.eto.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="LogWindow.cs" />
+    <Compile Include="LogWindow.eto.cs">
+        <DependentUpon>LogWindow.cs</DependentUpon>
+    </Compile>
     
     <!-- Native Windows -->
 	<Compile Include="Global.Windows.cs">
@@ -90,9 +95,6 @@
       <Platforms>Windows</Platforms>
     </Compile>
 	<Compile Include="Styles.Windows.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-	<Compile Include="Controls\ProjectControl.xwt.cs">
       <Platforms>Windows</Platforms>
     </Compile>
     
@@ -113,9 +115,6 @@
 	<Compile Include="Styles.Linux.cs">
       <Platforms>Linux</Platforms>
     </Compile>
-	<Compile Include="Controls\ProjectControl.xwt.cs">
-      <Platforms>Linux</Platforms>
-    </Compile>
     
     <!-- Native Mac -->
 	<Compile Include="Global.Mac.cs">
@@ -123,9 +122,6 @@
       <Platforms>MacOS</Platforms>
     </Compile>
 	<Compile Include="Styles.Mac.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-	<Compile Include="Controls\ProjectControl.eto.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
 	
@@ -156,6 +152,8 @@
 	<Compile Include="Controls\PropertyGridTable.cs" />
 	<Compile Include="Controls\PropertyGridTable.eto.cs">
       <DependentUpon>PropertyGridTable.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Controls\ProjectControl.eto.cs">
     </Compile>
 	
     <!-- GUI Dialogs -->
@@ -204,17 +202,11 @@
     <EmbeddedResource Include="Icons\TreeView\File.png">
       <LogicalName>TreeView.File.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Icons\TreeView\FileMissing.png">
-      <LogicalName>TreeView.FileMissing.png</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="Icons\TreeView\Folder.png">
       <LogicalName>TreeView.Folder.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Icons\TreeView\FolderMissing.png">
-      <LogicalName>TreeView.FolderMissing.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Icons\TreeView\Missing.png">
-      <LogicalName>TreeView.Missing.png</LogicalName>
+    <EmbeddedResource Include="Icons\TreeView\Link.png">
+      <LogicalName>TreeView.Link.png</LogicalName>
     </EmbeddedResource>
     
     <!-- The resources for output filtering -->
@@ -359,5 +351,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </Files>
-
 </Project>

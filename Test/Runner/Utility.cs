@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
+using NUnit.Framework;
 
 namespace MonoGame.Tests {
 
@@ -398,5 +399,13 @@ namespace MonoGame.Tests {
             var directory = AppDomain.CurrentDomain.BaseDirectory;
 			Directory.SetCurrentDirectory(directory);
 		}
+
+        public static void AreEqual(string expected, string actual)
+        {
+            expected = Path.GetFullPath(expected);
+            actual = Path.GetFullPath(actual);            
+            Assert.AreEqual(expected, actual, "Paths not equal!");
+        }
+
 	}
 }

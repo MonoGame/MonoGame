@@ -2,12 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using FreeImageAPI;
 using System.IO;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -66,9 +65,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>Resulting game asset.</returns>
         public override TextureContent Import(string filename, ContentImporterContext context)
         {
-            // Special case for loading DDS
-            if (filename.ToLower().EndsWith(".dds"))
-                return DdsLoader.Import(filename, context);
+            var ext = Path.GetExtension(filename).ToLower();
+
+            // Special case for loading some formats
+            switch (ext)
+            {
+                case ".dds":
+                    return DdsLoader.Import(filename, context);
+                case ".bmp":
+                    return LoadImage(filename);
+            }
 
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
@@ -131,29 +137,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         private static FIBITMAP ConvertAndSwapChannels(FIBITMAP fBitmap, FREE_IMAGE_TYPE imageType)
         {
             FIBITMAP bgra;
-            switch(imageType)
+            switch (imageType)
             {
-                // RGBF are switched before adding an alpha channel.
+                // Return BGRA images as is
+
+                case FREE_IMAGE_TYPE.FIT_RGBAF:
+                case FREE_IMAGE_TYPE.FIT_RGBA16:
+                    break;
+
+                // Add an alpha channel to BGRA images without one
+
                 case FREE_IMAGE_TYPE.FIT_RGBF:
-                    // Swap R and B channels to make it BGR, then add an alpha channel
-                    SwitchRedAndBlueChannels(fBitmap);
                     bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBAF, true);
                     FreeImage.UnloadEx(ref fBitmap);
                     fBitmap = bgra;
                     break;
 
                 case FREE_IMAGE_TYPE.FIT_RGB16:
-                    // Swap R and B channels to make it BGR, then add an alpha channel
-                    SwitchRedAndBlueChannels(fBitmap);
                     bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBA16, true);
                     FreeImage.UnloadEx(ref fBitmap);
                     fBitmap = bgra;
                     break;
 
-                case FREE_IMAGE_TYPE.FIT_RGBAF:
-                case FREE_IMAGE_TYPE.FIT_RGBA16:
-                    //Don't switch channels in this case or colors will be shown wrong
-                    break;
+
+                // Add an alpha channel to RGB images
+                // Swap the red and blue channels of RGBA images
 
                 default:
                     // Bitmap and other formats are converted to 32-bit by default
@@ -178,6 +186,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
             FreeImage.UnloadEx(ref r);
             FreeImage.UnloadEx(ref b);
+        }
+
+        // Loads BMP using StbSharp. This allows us to load BMP files containing BITMAPV4HEADER and BITMAPV5HEADER
+        // structures, which FreeImage does not support.
+        TextureContent LoadImage(string filename)
+        {
+            var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
+
+            int width, height, comp;
+            byte[] data = null;
+            using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                data = ImageReader.Read(stream, out width, out height, out comp, Imaging.STBI_rgb_alpha);
+
+            var face = new PixelBitmapContent<Color>(width, height);
+            face.SetPixelData(data);
+            output.Faces[0].Add(face);
+
+            return output;
         }
     }
 }

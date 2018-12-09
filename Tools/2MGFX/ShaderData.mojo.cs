@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using TwoMGFX.TPGParser;
 
 namespace TwoMGFX
 {
@@ -177,6 +178,13 @@ namespace TwoMGFX
 				"precision mediump int;\r\n" +
 				"#endif\r\n" +
 				glslCode;
+
+			// Enable standard derivatives extension as necessary
+			if ((glslCode.IndexOf("dFdx", StringComparison.InvariantCulture) >= 0)
+				|| (glslCode.IndexOf("dFdy", StringComparison.InvariantCulture) >= 0))
+			{
+				glslCode = "#extension GL_OES_standard_derivatives : enable\r\n" + glslCode;
+			}
 
 			// Store the code for serialization.
 			dxshader.ShaderCode = Encoding.ASCII.GetBytes (glslCode);

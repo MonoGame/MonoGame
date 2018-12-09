@@ -3,6 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using WGI = Windows.Gaming.Input;
 
 namespace Microsoft.Xna.Framework.Input
@@ -15,6 +18,33 @@ namespace Microsoft.Xna.Framework.Input
 
         internal static bool Back;
 
+        private static Dictionary<int, WGI.Gamepad> _gamepads;
+
+        static GamePad()
+        {
+            _gamepads = new Dictionary<int, WGI.Gamepad>();
+            var gamepads = WGI.Gamepad.Gamepads;
+            for (int i = 0; i < gamepads.Count; i++)
+                _gamepads[i] = gamepads[i];
+
+            WGI.Gamepad.GamepadAdded += (o, e) =>
+            {
+                var index = 0;
+                while (_gamepads.ContainsKey(index))
+                    index++;
+
+                _gamepads[index] = e;
+            };
+
+            WGI.Gamepad.GamepadRemoved += (o, e) =>
+            {
+                int? key = _gamepads.FirstOrDefault(x => x.Value == e).Key;
+
+                if (key.HasValue)
+                    _gamepads.Remove(key.Value);
+            };
+        }
+
         private static int PlatformGetMaxNumberOfGamePads()
         {
             return 16;
@@ -22,15 +52,16 @@ namespace Microsoft.Xna.Framework.Input
 
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
-            if (index >= WGI.Gamepad.Gamepads.Count)
+            if (!_gamepads.ContainsKey(index))
                 return new GamePadCapabilities();
-
-            var gamepad = WGI.Gamepad.Gamepads[index];
+            
+            var gamepad = _gamepads[index];
 
             // we can't check gamepad capabilities for most stuff with Windows.Gaming.Input.Gamepad
             return new GamePadCapabilities
             {
                 IsConnected = true,
+                GamePadType = GamePadType.GamePad,
                 HasAButton = true,
                 HasBButton = true,
                 HasXButton = true,
@@ -65,17 +96,18 @@ namespace Microsoft.Xna.Framework.Input
             return state;
         }
 
-        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
-            if (index >= WGI.Gamepad.Gamepads.Count)
+            if (!_gamepads.ContainsKey(index))
                 return (index == 0 ? GetDefaultState() : GamePadState.Default);
 
-            var state = WGI.Gamepad.Gamepads[index].GetCurrentReading();
+            var state = _gamepads[index].GetCurrentReading();
 
             var sticks = new GamePadThumbSticks(
                     new Vector2((float)state.LeftThumbstickX, (float)state.LeftThumbstickY),
                     new Vector2((float)state.RightThumbstickX, (float)state.RightThumbstickY),
-                    deadZoneMode
+                    leftDeadZoneMode,
+					rightDeadZoneMode
                 );
 
             var triggers = new GamePadTriggers(
@@ -119,10 +151,10 @@ namespace Microsoft.Xna.Framework.Input
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
-            if (index >= WGI.Gamepad.Gamepads.Count)
+            if (!_gamepads.ContainsKey(index))
                 return false;
 
-            var gamepad = WGI.Gamepad.Gamepads[index];
+            var gamepad = _gamepads[index];
 
             gamepad.Vibration = new WGI.GamepadVibration
             {

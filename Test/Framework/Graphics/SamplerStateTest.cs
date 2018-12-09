@@ -124,9 +124,7 @@ namespace MonoGame.Tests.Graphics
 #if !XNA
         [Test]
 #if DESKTOPGL
-        // Comparison samplers are only supported in ps_4_0 and up, so we cannot
-        // use them for DesktopGL due to MojoShader limitations
-        [Ignore]
+        [Ignore("Comparison samplers are ps_4_0 and up, cannot use them on DesktopGL due to MojoShader")]
 #endif
         public void VisualTestComparisonFunction()
         {

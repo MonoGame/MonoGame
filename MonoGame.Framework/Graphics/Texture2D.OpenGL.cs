@@ -5,7 +5,6 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Utilities;
 using MonoGame.Utilities;
 using MonoGame.Utilities.Png;
 
@@ -256,50 +255,35 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
+        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-#if IOS
-			using (var uiImage = UIImage.LoadFromData(NSData.FromStream(stream)))
-			{
-				var cgImage = uiImage.CGImage;
-			    return PlatformFromStream(graphicsDevice, cgImage);
-			}
-#endif
-#if ANDROID
-            using (Bitmap image = BitmapFactory.DecodeStream(stream, null, new BitmapFactory.Options
-            {
-                InScaled = false,
-                InDither = false,
-                InJustDecodeBounds = false,
-                InPurgeable = true,
-                InInputShareable = true,
-            }))
-            {
-                return PlatformFromStream(graphicsDevice, image);
-            }
-#endif
-#if DESKTOPGL || ANGLE
-            var reader = new ImageReader();
-            int x, y, comp;
-            var data = reader.Read(stream, out x, out y, out comp, Imaging.STBI_rgb_alpha);
+            int width, height, channels;
+
+            // The data returned is always four channel BGRA
+            var data = ImageReader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
 
             // XNA blacks out any pixels with an alpha of zero.
-            for (var i = 0; i < data.Length; i += 4)
+            if (channels == 4)
             {
-                if (data[i + 3] == 0)
+                fixed (byte* b = &data[0])
                 {
-                    data[i + 0] = 0;
-                    data[i + 1] = 0;
-                    data[i + 2] = 0;
+                    for (var i = 0; i < data.Length; i += 4)
+                    {
+                        if (b[i + 3] == 0)
+                        {
+                            b[i + 0] = 0;
+                            b[i + 1] = 0;
+                            b[i + 2] = 0;
+                        }
+                    }
                 }
             }
 
             Texture2D texture = null;
-            texture = new Texture2D(graphicsDevice, x, y);
+            texture = new Texture2D(graphicsDevice, width, height);
             texture.SetData(data);
 
             return texture;
-#endif
         }
 
 #if IOS
