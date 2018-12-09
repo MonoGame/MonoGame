@@ -29,6 +29,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		private readonly Texture2D _texture;
 
+        internal Glyph[] GlyphsInternal { get { return _glyphs; } }
+
 		/// <summary>
 		/// All the glyphs in this SpriteFont.
 		/// </summary>
@@ -214,7 +216,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
-            fixed (Glyph* pGlyphs = Glyphs)
+            fixed (Glyph* pGlyphs = _glyphs)
             for (var i = 0; i < text.Length; ++i)
             {
                 var c = text[i];
@@ -233,7 +235,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 var currentGlyphIndex = GetGlyphIndexOrDefault(c);
-                Debug.Assert(currentGlyphIndex >= 0 && currentGlyphIndex < Glyphs.Length, "currentGlyphIndex was outside the bounds of the array.");
+                Debug.Assert(currentGlyphIndex >= 0 && currentGlyphIndex < _glyphs.Length, "currentGlyphIndex was outside the bounds of the array.");
                 var pCurrentGlyph = pGlyphs + currentGlyphIndex;
 
                 // The first character on a line might have a negative left side bearing.
