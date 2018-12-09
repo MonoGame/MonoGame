@@ -288,7 +288,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Round this <see cref="Vector4"/> to a vector towards the positive infinity.
+        /// Round the members of this <see cref="Vector4"/> towards positive infinity.
         /// </summary>
         public void Ceiling()
         {
@@ -299,10 +299,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains values from another vector rounded towards positive infinity.
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded towards positive infinity.
         /// </summary>
         /// <param name="value">Source <see cref="Vector4"/>.</param>
-        /// <returns>Unit vector.</returns>
+        /// <returns>The rounded <see cref="Vector4"/>.</returns>
         public static Vector4 Ceiling(Vector4 value)
         {
             value.X = (float)Math.Ceiling(value.X);
@@ -313,10 +313,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains values from another vector rounded towards positive infinity.
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded towards positive infinity.
         /// </summary>
         /// <param name="value">Source <see cref="Vector4"/>.</param>
-        /// <param name="result">Unit vector as an output parameter.</param>
+        /// <param name="result">The rounded <see cref="Vector4"/>.</param>
         public static void Ceiling(ref Vector4 value, out Vector4 result)
         {
             result.X = (float)Math.Ceiling(value.X);
@@ -512,7 +512,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Round this <see cref="Vector4"/> to a vector towards the negative infinity.
+        /// Round the members of this <see cref="Vector4"/> towards negative infinity.
         /// </summary>
         public void Floor()
         {
@@ -523,10 +523,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains values from another vector rounded towards negative infinity.
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded towards negative infinity.
         /// </summary>
         /// <param name="value">Source <see cref="Vector4"/>.</param>
-        /// <returns>Unit vector.</returns>
+        /// <returns>The rounded <see cref="Vector4"/>.</returns>
         public static Vector4 Floor(Vector4 value)
         {
             value.X = (float)Math.Floor(value.X);
@@ -537,10 +537,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains values from another vector rounded towards negative infinity.
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded towards negative infinity.
         /// </summary>
         /// <param name="value">Source <see cref="Vector4"/>.</param>
-        /// <param name="result">Unit vector as an output parameter.</param>
+        /// <param name="result">The rounded <see cref="Vector4"/>.</param>
         public static void Floor(ref Vector4 value, out Vector4 result)
         {
             result.X = (float)Math.Floor(value.X);
@@ -866,7 +866,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Round this <see cref="Vector4"/> to a vector with the nearest integral value.
+        /// Round the members of this <see cref="Vector4"/> to the nearest integer value.
         /// </summary>
         public void Round()
         {
@@ -877,10 +877,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains rounded values from another vector.
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to the nearest integer value.
         /// </summary>
         /// <param name="value">Source <see cref="Vector4"/>.</param>
-        /// <returns>Unit vector.</returns>
+        /// <returns>The rounded <see cref="Vector4"/>.</returns>
         public static Vector4 Round(Vector4 value)
         {
             value.X = (float)Math.Round(value.X);
@@ -891,10 +891,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains rounded values from another vector.
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to the nearest integer value.
         /// </summary>
         /// <param name="value">Source <see cref="Vector4"/>.</param>
-        /// <param name="result">Unit vector as an output parameter.</param>
+        /// <param name="result">The rounded <see cref="Vector4"/>.</param>
         public static void Round(ref Vector4 value, out Vector4 result)
         {
             result.X = (float)Math.Round(value.X);
