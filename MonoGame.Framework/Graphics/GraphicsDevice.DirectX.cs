@@ -103,6 +103,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Returns a handle to internal device context object. Valid only on DirectX platforms.
+        /// For usage, convert this to SharpDX.Direct3D11.DeviceContext.
+        /// </summary>
+        public object ContextHandle
+        {
+            get
+            {
+                return _d3dContext;
+            }
+        }
+
         private void PlatformSetup()
         {
             MaxTextureSlots = 16;
