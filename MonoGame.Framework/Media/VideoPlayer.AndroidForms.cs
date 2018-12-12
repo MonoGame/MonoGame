@@ -38,17 +38,17 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformPlay()
         {
-            _currentVideo.Player.SetDisplay(((AndroidGameWindow)_game.Window).GameView.Holder);
+            _currentVideo.Player.SetDisplay(((AndroidFormsGameWindow)_game.Window).GameView.Holder);
             _currentVideo.Player.Start();
             
-            AndroidGamePlatform.IsPlayingVdeo = true;
+            AndroidFormsGamePlatform.IsPlayingVdeo = true;
         }
 
         private void PlatformStop()
         {
             _currentVideo.Player.Stop();
 
-            AndroidGamePlatform.IsPlayingVdeo = false;
+            AndroidFormsGamePlatform.IsPlayingVdeo = false;
             _currentVideo.Player.SetDisplay(null);
         }
 

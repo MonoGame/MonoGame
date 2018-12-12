@@ -13,11 +13,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
     /// </summary>
     class AndroidTouchEventManager
     {
-        readonly AndroidGameWindow _gameWindow;
+        readonly GameWindow _gameWindow;
 
         public bool Enabled { get; set; }
 
-        public AndroidTouchEventManager(AndroidGameWindow androidGameWindow)
+        public AndroidTouchEventManager(GameWindow androidGameWindow)
         {
             _gameWindow = androidGameWindow;
         }

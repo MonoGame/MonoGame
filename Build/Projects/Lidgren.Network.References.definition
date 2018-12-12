@@ -7,7 +7,19 @@
     <Reference Include="System.Core" />
   </Platform>
 
+  <Platform Type="AndroidForms">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+  </Platform>
+
   <Platform Type="iOS">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+  </Platform>
+
+  <Platform Type="iOSForms">
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />

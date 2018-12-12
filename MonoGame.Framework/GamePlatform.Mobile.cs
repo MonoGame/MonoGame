@@ -11,9 +11,17 @@ namespace Microsoft.Xna.Framework
         internal static GamePlatform PlatformCreate(Game game)
         {
 #if IOS
+#if FORMS
+            return new iOSFormsGamePlatform(game);
+#else
             return new iOSGamePlatform(game);
+#endif
 #elif ANDROID
+#if FORMS
+            return new AndroidFormsGamePlatform(game);
+#else
             return new AndroidGamePlatform(game);
+#endif
 #elif WINDOWS_PHONE81
             return new MetroGamePlatform(game);
 #elif WEB

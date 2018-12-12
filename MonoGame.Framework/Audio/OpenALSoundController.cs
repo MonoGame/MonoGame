@@ -164,9 +164,13 @@ namespace Microsoft.Xna.Framework.Audio
             {
 #if ANDROID
                 // Attach activity event handlers so we can pause and resume all playing sounds
+#if FORMS
+                MonoGameAndroidFormsGameView.OnPauseGameThread += Activity_Paused;
+                MonoGameAndroidFormsGameView.OnResumeGameThread += Activity_Resumed;
+#else
                 MonoGameAndroidGameView.OnPauseGameThread += Activity_Paused;
                 MonoGameAndroidGameView.OnResumeGameThread += Activity_Resumed;
-
+#endif
                 // Query the device for the ideal frequency and update buffer size so
                 // we can get the low latency sound path.
 

@@ -275,8 +275,13 @@ namespace Microsoft.Xna.Framework
 #else
 
 #if ANDROID
+#if FORMS
+            // Trigger a change in orientation in case the supported orientations have changed
+            ((AndroidFormsGameWindow)_game.Window).SetOrientation(_game.Window.CurrentOrientation, false);
+#else
             // Trigger a change in orientation in case the supported orientations have changed
             ((AndroidGameWindow)_game.Window).SetOrientation(_game.Window.CurrentOrientation, false);
+#endif
 #endif
             // Ensure the presentation parameter orientation and buffer size matches the window
             _graphicsDevice.PresentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
@@ -619,8 +624,11 @@ namespace Microsoft.Xna.Framework
             // Set the veiwport so the (potentially) resized client bounds are drawn in the middle of the screen
             _graphicsDevice.Viewport = new Viewport(newClientBounds.X, -newClientBounds.Y, newClientBounds.Width, newClientBounds.Height);
 
+#if FORMS
+            ((AndroidFormsGameWindow)_game.Window).ChangeClientBounds(newClientBounds);
+#else
             ((AndroidGameWindow)_game.Window).ChangeClientBounds(newClientBounds);
-
+#endif
             // Touch panel needs latest buffer size for scaling
             TouchPanel.DisplayWidth = newClientBounds.Width;
             TouchPanel.DisplayHeight = newClientBounds.Height;

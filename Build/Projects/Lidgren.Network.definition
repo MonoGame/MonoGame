@@ -3,7 +3,7 @@
   Name="Lidgren.Network"
   Path="ThirdParty/Lidgren.Network"
   Type="Library"
-  Platforms="Android,Linux,MacOS,Windows,WindowsGL,iOS">
+  Platforms="Android,AndroidForms,Linux,MacOS,Windows,WindowsGL,iOS,iOSForms">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
@@ -19,6 +19,8 @@
     <Platform Name="MacOS">5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130</Platform>
     <Platform Name="Windows">AE483C29-042E-4226-BA52-D247CE7676DA</Platform>
     <Platform Name="WindowsGL">AE483C29-042E-4226-BA52-D247CE7676DA</Platform>
+	<Platform Name="AndroidForms">0ED2D2C1-381D-41A4-80F0-8F11C0416C7E</Platform>
+    <Platform Name="iOSForms">F5B354E5-C20A-4F47-A98A-B1A912088BEC</Platform>
   </ProjectGuids>
 
   <References>
@@ -35,7 +37,9 @@
 	that it is using the desktop version of the .net API (as oppossed to the metro version).
     -->
       <Platform Name="Android">ANDROID;UNITY_4_5</Platform>
+      <Platform Name="AndroidForms">ANDROID;UNITY_4_5</Platform>
       <Platform Name="iOS">IOS;UNITY_4_5</Platform>
+      <Platform Name="iOSForms">IOS;UNITY_4_5</Platform>
       <Platform Name="Linux">TRACE;UNITY_4_5</Platform>
       <Platform Name="MacOS">TRACE;MONOMAC;UNITY_4_5</Platform>
       <Platform Name="Windows">TRACE;UNITY_4_5</Platform>

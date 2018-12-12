@@ -112,10 +112,13 @@
             <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
           </xsl:when>
           <xsl:when test="$root/Input/Generation/Platform = 'Android'">
-            <TargetFrameworkVersion>v4.2</TargetFrameworkVersion>
+            <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
+          </xsl:when>
+          <xsl:when test="$root/Input/Generation/Platform = 'AndroidForms'">
+            <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
           </xsl:when>
           <xsl:when test="$root/Input/Generation/Platform = 'Ouya'">
-            <TargetFrameworkVersion>v4.2</TargetFrameworkVersion>
+            <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
           </xsl:when>
           <xsl:when test="$root/Input/Generation/Platform = 'Windows8'">
           </xsl:when>
@@ -135,7 +138,7 @@
               <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
               <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
           </xsl:when>		
-          <xsl:when test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'PSMobile' or $root/Input/Generation/Platform = 'tvOS'">
+          <xsl:when test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'iOSForms' or $root/Input/Generation/Platform = 'PSMobile' or $root/Input/Generation/Platform = 'tvOS'">
           </xsl:when>
           <xsl:when test="$root/Input/Generation/Platform = 'PCL'">
             <TargetFrameworkProfile>Profile111</TargetFrameworkProfile>
@@ -273,7 +276,13 @@
               <xsl:when test="$root/Input/Generation/Platform = 'Android'">
                 <xsl:text>PLATFORM_ANDROID</xsl:text>
               </xsl:when>
+              <xsl:when test="$root/Input/Generation/Platform = 'AndroidForms'">
+                <xsl:text>PLATFORM_ANDROID</xsl:text>
+              </xsl:when>
               <xsl:when test="$root/Input/Generation/Platform = 'iOS'">
+                <xsl:text>PLATFORM_IOS</xsl:text>
+              </xsl:when>
+              <xsl:when test="$root/Input/Generation/Platform = 'iOSForms'">
                 <xsl:text>PLATFORM_IOS</xsl:text>
               </xsl:when>
               <xsl:when test="$root/Input/Generation/Platform = 'Linux'">
@@ -380,7 +389,7 @@
     </xsl:if>
     <!--<xsl:call-template name="profile_and_version" />-->
     <xsl:choose>
-      <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'Ouya'">
+      <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'AndroidForms' or $root/Input/Generation/Platform = 'Ouya'">
         <xsl:choose>
           <xsl:when test="$debug = 'true'">
             <MonoDroidLinkMode>None</MonoDroidLinkMode>
@@ -393,7 +402,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:when test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'tvOS'">
+      <xsl:when test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'iOSForms' or $root/Input/Generation/Platform = 'tvOS'">
         <xsl:if test="$debug = 'true'">
           <MtouchDebug>True</MtouchDebug>
         </xsl:if>
@@ -987,13 +996,13 @@
               <xsl:text>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</xsl:text>
             </ProjectTypeGuids>
           </xsl:when>
-          <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'Ouya'">
+          <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'AndroidForms' or $root/Input/Generation/Platform = 'Ouya'">
             <ProjectTypeGuids>
               <xsl:text>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};</xsl:text>
               <xsl:text>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</xsl:text>
             </ProjectTypeGuids>
           </xsl:when>
-          <xsl:when test="$root/Input/Generation/Platform = 'iOS'">
+          <xsl:when test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'iOSForms'">
             <ProjectTypeGuids>
               <xsl:choose>
                 <xsl:when test="user:IsTrue($root/Input/Properties/UseLegacyiOSAPI)">
@@ -1072,7 +1081,7 @@
           <xsl:choose>
             <xsl:when test="$project/@Type = 'App' or $project/@Type = 'Console'">
               <xsl:choose>
-                <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'Ouya'">
+                <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'AndroidForms' or $root/Input/Generation/Platform = 'Ouya'">
                   <xsl:text>Library</xsl:text>
                 </xsl:when>
                 <xsl:when test="$root/Input/Generation/Platform = 'WindowsPhone'">
@@ -1094,7 +1103,7 @@
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:when>
-                <xsl:when test="$root/Input/Generation/Platform = 'iOS'  or $root/Input/Generation/Platform = 'tvOS'">
+                <xsl:when test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'iOSForms' or $root/Input/Generation/Platform = 'tvOS'">
                   <xsl:text>Exe</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
@@ -1124,7 +1133,7 @@
         <NoWarn><xsl:value-of select="$root/Input/Properties/NoWarn" /></NoWarn>
         <xsl:call-template name="profile_and_version" />
         <xsl:choose>
-          <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'Ouya'">
+          <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'AndroidForms' or $root/Input/Generation/Platform = 'Ouya'">
             <FileAlignment>512</FileAlignment>
             <AndroidSupportedAbis>armeabi,armeabi-v7a,x86</AndroidSupportedAbis>
             <AndroidStoreUncompressedFileExtensions />
@@ -1151,7 +1160,7 @@
             <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
             <AndroidResgenClass>Resource</AndroidResgenClass>
           </xsl:when>
-          <xsl:when test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'tvOS'">
+          <xsl:when test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'iOSForms' or $root/Input/Generation/Platform = 'tvOS'">
             <SynchReleaseVersion>False</SynchReleaseVersion>
             <xsl:choose>
               <xsl:when test="$project/@Type = 'App' or $project/@Type = 'Console'">
@@ -1197,7 +1206,7 @@
         </xsl:choose>
       </PropertyGroup>
       <xsl:choose>
-        <xsl:when test="$root/Input/Generation/Platform = 'iOS'">
+        <xsl:when test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'iOSForms'">
           <xsl:call-template name="configuration">
             <xsl:with-param name="type"><xsl:value-of select="$project/@Type" /></xsl:with-param>
             <xsl:with-param name="debug">true</xsl:with-param>
@@ -1447,7 +1456,7 @@
           </xsl:choose>
         </xsl:if>
 
-        <xsl:if test="$root/Input/Generation/Platform = 'iOS'">
+        <xsl:if test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'iOSForms'">
           <xsl:choose>
             <xsl:when test="user:IsTrue($root/Input/Properties/UseLegacyiOSAPI)">
               <Reference Include="monotouch" />
@@ -1462,9 +1471,23 @@
           <Reference Include="Xamarin.TVOS" />
         </xsl:if>
 
-        <xsl:if test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'Ouya'">
+        <xsl:if test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'AndroidForms' or $root/Input/Generation/Platform = 'Ouya'">
           <Reference Include="Mono.Android" />
         </xsl:if>
+
+        <xsl:if test="$root/Input/Generation/Platform = 'AndroidForms'"> 
+          <Reference Include="Xamarin.Android.Support.v4" />
+  	    </xsl:if>
+          <!-- <Reference Include="Xamarin.Forms.Core" /> -->
+          <!-- <Reference Include="Xamarin.Forms.Platform" /> -->
+          <!-- <Reference Include="Xamarin.Forms.Platform.Android" /> -->
+          <!-- <Reference Include="Xamarin.Forms.Xaml" /> -->
+          <!-- <Reference Include="Xamarin.Android.Support.v7.AppCompat" /> -->
+		
+        <!-- <xsl:if test="$root/Input/Generation/Platform = 'AndroidForms' or $root/Input/Generation/Platform = 'iOSForms'">  -->
+          <!-- <Reference Include="Xamarin.Android.Support.v7.AppCompat" /> -->
+          <!-- <Reference Include="Xamarin.Forms" /> -->
+        <!-- </xsl:if> -->
 
         <xsl:for-each select="$project/References/Reference">
           <xsl:variable name="include-path" select="./@Include" />
@@ -2028,7 +2051,7 @@
                         <FromContentProject>True</FromContentProject>
                       </Content>
                     </xsl:when>
-                    <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'Ouya'">
+                    <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'AndroidForms' or $root/Input/Generation/Platform = 'Ouya'">
                       <AndroidAsset>
                         <xsl:attribute name="Include">
                           <xsl:value-of
@@ -2050,7 +2073,7 @@
                         <FromContentProject>True</FromContentProject>
                       </AndroidAsset>
                     </xsl:when>
-                    <xsl:when test="$root/Input/Generation/Platform = 'MacOS' or $root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'tvOS'">
+                    <xsl:when test="$root/Input/Generation/Platform = 'MacOS' or $root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'iOSForms' or $root/Input/Generation/Platform = 'tvOS'">
                       <Content>
                         <xsl:attribute name="Include">
                           <xsl:value-of
@@ -2108,7 +2131,7 @@
         <xsl:when test="$root/Input/Generation/Platform = 'PCL' or user:IsTrue($root/Input/Properties/ForcePCL)">
           <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
         </xsl:when>
-        <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'Ouya'">
+        <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'AndroidForms' or $root/Input/Generation/Platform = 'Ouya'">
           <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
         </xsl:when>
         <xsl:when test="$root/Input/Generation/Platform = 'Windows8'">
@@ -2152,6 +2175,9 @@
           <Import Project="$(MSBuildExtensionsPath)\Sce\Sce.Psm.CSharp.targets" />
         </xsl:when>
         <xsl:when test="$root/Input/Generation/Platform = 'iOS' and not(user:IsTrue($root/Input/Properties/UseLegacyiOSAPI))">
+          <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+        </xsl:when>
+        <xsl:when test="$root/Input/Generation/Platform = 'iOSForms' and not(user:IsTrue($root/Input/Properties/UseLegacyiOSAPI))">
           <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
         </xsl:when>
         <xsl:when test="$root/Input/Generation/Platform = 'MacOS' and (not(user:IsTrue($root/Input/Properties/UseLegacyMacAPI) or user:DoesNotHaveXamarinMacUnifiedAPI() or $root/Input/Properties/ForceMacAPI = 'XamMac' or $root/Input/Properties/ForceMacAPI = 'MonoMac') or $root/Input/Properties/ForceMacAPI = 'Xamarin.Mac')">
@@ -2322,7 +2348,7 @@
         <_PostBuildHookHostPlatform>
           <xsl:choose>
             <!-- We have to choose AnyCPU when targeting iOS on Windows, because Platform will be something like iPhone -->
-            <xsl:when test="($root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'tvOS') and $root/Input/Generation/HostPlatform = 'Windows'">
+            <xsl:when test="($root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'iOSForms' or $root/Input/Generation/Platform = 'tvOS') and $root/Input/Generation/HostPlatform = 'Windows'">
               <xsl:text>AnyCPU</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -2353,7 +2379,7 @@
       </xsl:if>
 
       <!-- We need this custom task for Xamarin.iOS on Windows -->
-      <xsl:if test="($root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'tvOS') and $root/Input/Generation/HostPlatform = 'Windows'">
+      <xsl:if test="($root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'iOSForms' or $root/Input/Generation/Platform = 'tvOS') and $root/Input/Generation/HostPlatform = 'Windows'">
         <UsingTask
           TaskName="LocalTouch"
           TaskFactory="CodeTaskFactory"
@@ -2444,7 +2470,7 @@
         </xsl:for-each>
         <xsl:choose>
           <!-- We can't use the <Touch> task, because Xamarin iOS remaps it on Windows to be a remote command -->
-          <xsl:when test="($root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'tvOS') and $root/Input/Generation/HostPlatform = 'Windows'">
+          <xsl:when test="($root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'iOSForms' or $root/Input/Generation/Platform = 'tvOS') and $root/Input/Generation/HostPlatform = 'Windows'">
             <LocalTouch Path="$(_PostBuildHookTimestamp)" />
           </xsl:when>
           <xsl:otherwise>
@@ -2452,9 +2478,8 @@
           </xsl:otherwise>
         </xsl:choose>
       </Target>
-
+  
       <!-- {ADDITIONAL_TRANSFORMS} -->
-
       <ItemGroup>
         <xsl:for-each select="$root/Input/Projects/Project[@PostBuildHook='True']">
           <xsl:if test="(./@Name != $project/@Name) and not(./Properties/PostBuildHookExcludes/Project[@Name=$project/@Name])">
@@ -2596,6 +2621,7 @@
           </xsl:if>
         </xsl:for-each>
       </ItemGroup>
+	  
 
       <xsl:if test="$root/Input/Properties/MonoDevelopPoliciesFile">
         <ProjectExtensions>

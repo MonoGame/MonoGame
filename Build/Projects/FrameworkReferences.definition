@@ -6,6 +6,23 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
   </Platform>
+  <Platform Type="iOSForms">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Core" />
+    <Binary
+        Name="Xamarin.Forms.Platform"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.forms.3.4.0.1008975/Xamarin.iOS10/Xamarin.Forms.Platform.dll" />
+    <Binary
+        Name="Xamarin.Forms.Core"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.forms.3.4.0.1008975/Xamarin.iOS10/Xamarin.Forms.Core.dll" />
+    <Binary
+        Name="Xamarin.Forms.Xaml"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.forms.3.4.0.1008975/Xamarin.iOS10/Xamarin.Forms.Xaml.dll" />
+    <Binary
+        Name="Xamarin.Forms.Platform.iOS"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.forms.3.4.0.1008975/Xamarin.iOS10/Xamarin.Forms.Platform.iOS.dll" />
+  </Platform>
   <Platform Type="tvOS">
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -31,6 +48,37 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="mscorlib" />
     <Reference Include="System.Core" />
+  </Platform>
+  
+  <Platform Type="AndroidForms">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="mscorlib" />
+    <Reference Include="System.Core" />
+    <Binary
+        Name="Xamarin.Forms.Platform"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.forms.3.4.0.1008975/MonoAndroid10/Xamarin.Forms.Platform.dll" />
+    <Binary
+        Name="Xamarin.Forms.Core"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.forms.3.4.0.1008975/MonoAndroid10/Xamarin.Forms.Core.dll" />
+    <Binary
+        Name="Xamarin.Forms.Xaml"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.forms.3.4.0.1008975/MonoAndroid10/Xamarin.Forms.Xaml.dll" />
+    <Binary
+        Name="Xamarin.Forms.Platform.Android"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.forms.3.4.0.1008975/MonoAndroid10/Xamarin.Forms.Platform.Android.dll" />
+	<Binary
+        Name="FormsViewGroup"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.forms.3.4.0.1008975/MonoAndroid10/FormsViewGroup.dll" />
+    <Binary
+        Name="Xamarin.Android.Support.v4"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.android.support.v4.27.0.2.1/MonoAndroid81/Xamarin.Android.Support.v4.dll" />
+    <Binary
+        Name="Xamarin.Android.Support.Fragment"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.android.support.fragment.27.0.2.1/MonoAndroid81/Xamarin.Android.Support.Fragment.dll" />
+    <Binary
+        Name="Xamarin.Android.Support.v7.AppCompat"
+        Path="ThirdParty/XamarinForms.Dependencies/xamarin.android.support.v7.appcompat.27.0.2.1/MonoAndroid81/Xamarin.Android.Support.v7.AppCompat.dll" />
   </Platform>
 
   <Platform Type="Windows">

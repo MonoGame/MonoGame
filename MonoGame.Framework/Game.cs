@@ -56,7 +56,9 @@ namespace Microsoft.Xna.Framework
         private bool _shouldExit;
         private bool _suppressDraw;
 
-        partial void PlatformConstruct();       
+        partial void PlatformConstruct();
+
+        //public bool IsFullScreen { get; set; }
 
         public Game()
         {
@@ -167,7 +169,11 @@ namespace Microsoft.Xna.Framework
 
 #if ANDROID
         [CLSCompliant(false)]
+#if FORMS
+        public static AndroidFormsGameActivity Activity { get; internal set; }
+#else
         public static AndroidGameActivity Activity { get; internal set; }
+#endif
 #endif
         private static Game _instance = null;
         internal static Game Instance { get { return Game._instance; } }
@@ -444,7 +450,7 @@ namespace Microsoft.Xna.Framework
 #if WINDOWS && !DESKTOPGL
                 // Sleep for as long as possible without overshooting the update time
                 var sleepTime = (TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
-                MonoGame.Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
+                Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
 #endif
                 // Keep looping until it's time to perform the next update
                 goto RetryTick;

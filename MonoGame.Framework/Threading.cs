@@ -97,7 +97,11 @@ namespace Microsoft.Xna.Framework
             {
 #if ANDROID
                 //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
+#if FORMS
+                ((AndroidFormsGameWindow)Game.Instance.Window).GameView.MakeCurrent();
+#else
                 ((AndroidGameWindow)Game.Instance.Window).GameView.MakeCurrent();
+#endif
 #endif
                 action();
                 resetEvent.Set();

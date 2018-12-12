@@ -13,14 +13,21 @@ namespace Microsoft.Xna.Framework.Media
     public sealed partial class VideoPlayer : IDisposable
     {
         private Game _game;
+#if FORMS
+        private iOSFormsGamePlatform _platform;
+#else
         private iOSGamePlatform _platform;
+#endif
         private NSObject _playbackDidFinishObserver;
 
         private void PlatformInitialize()
         {
             _game = Game.Instance;
+#if FORMS
+            _platform = (iOSFormsGamePlatform)_game.Services.GetService(typeof(iOSFormsGamePlatform));
+#else
             _platform = (iOSGamePlatform)_game.Services.GetService(typeof(iOSGamePlatform));
-
+#endif
             if (_platform == null)
                 throw new InvalidOperationException("No iOSGamePlatform instance was available");
         }

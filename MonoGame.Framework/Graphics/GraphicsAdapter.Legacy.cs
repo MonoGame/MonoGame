@@ -75,8 +75,13 @@ namespace Microsoft.Xna.Framework.Graphics
                        (int)(_screen.Bounds.Height * _screen.Scale),
                        SurfaceFormat.Color);
 #elif ANDROID
+#if FORMS
+                View view = ((AndroidFormsGameWindow)Game.Instance.Window).GameView;
+                return new DisplayMode(view.Width, view.Height, SurfaceFormat.Color);
+#else
                 View view = ((AndroidGameWindow)Game.Instance.Window).GameView;
                 return new DisplayMode(view.Width, view.Height, SurfaceFormat.Color);
+#endif
 #elif DESKTOPGL
                 var displayIndex = Sdl.Display.GetWindowDisplayIndex(SdlGameWindow.Instance.Handle);
 

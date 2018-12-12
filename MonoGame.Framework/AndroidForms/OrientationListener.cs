@@ -41,10 +41,10 @@ namespace Microsoft.Xna.Framework
                 // Do nothing (or log warning?). In case android API or Xamarin do not support this Android system property.
             }
 
-            var disporientation = AndroidCompatibility.GetAbsoluteOrientation(orientation);
+            var disporientation = AndroidFormsCompatibility.GetAbsoluteOrientation(orientation);
 
             // Only auto-rotate if target orientation is supported and not current
-            AndroidGameWindow gameWindow = (AndroidGameWindow)Game.Instance.Window;
+            AndroidFormsGameWindow gameWindow = (AndroidFormsGameWindow)Game.Instance.Window;
             if ((gameWindow.GetEffectiveSupportedOrientations() & disporientation) != 0 &&
                 disporientation != gameWindow.CurrentOrientation)
             {
