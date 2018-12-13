@@ -8,7 +8,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class BlendState
     {
-
         internal void PlatformApplyState(GraphicsDevice device, bool force = false)
         {
             var blendEnabled = !(this.ColorSourceBlend == Blend.One &&
@@ -93,7 +92,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 device._lastBlendState.AlphaDestinationBlend = this.AlphaDestinationBlend;
             }
 
-
             if (force || this.ColorWriteChannels != device._lastBlendState.ColorWriteChannels)
             {
                 GL.ColorMask(
@@ -104,8 +102,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 device._lastBlendState.ColorWriteChannels = this.ColorWriteChannels;
             }
-
-
         }
     }
 }
