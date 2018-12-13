@@ -180,6 +180,8 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _independentBlendEnable; }
             set
             {
+                if (value && !GraphicsDevice.GraphicsCapabilities.SupportsSeparateBlendStates)
+                    throw new PlatformNotSupportedException("Independent blend states requires at least OpenGL 4.0 or GL_ARB_draw_buffers_blend. Try upgrading your graphics drivers.");
                 ThrowIfBound();
                 _independentBlendEnable = value;
             }
