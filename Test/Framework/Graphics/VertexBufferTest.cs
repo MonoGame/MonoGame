@@ -428,5 +428,16 @@ namespace MonoGame.Tests.Graphics
 
             vertexBuffer.Dispose();
         }
+
+        [Test]
+        public void NullDeviceShouldThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+            {
+                var vertexBuffer = new VertexBuffer(null, typeof(VertexPositionTexture), 3, BufferUsage.None);
+                vertexBuffer.Dispose();
+            });
+            GC.GetTotalMemory(true); // collect uninitialized vertexBuffer
+        }
     }
 }

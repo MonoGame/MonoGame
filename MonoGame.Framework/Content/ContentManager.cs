@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
@@ -99,7 +101,7 @@ namespace MonoGame.Tests.ContentPipeline
         /// <summary>
         /// This test tries to load a tiff file encoded in rgbf, but freeimage seems to be failing to read files with this encoding
         /// Might be necessary to modify this test with future updates of freeimage.
-        /// 
+        ///
         /// Note that the image was created with Freeimage from a bitmap
         /// </summary>
         [Test]
@@ -221,6 +223,109 @@ namespace MonoGame.Tests.ContentPipeline
             catch(DirectoryNotFoundException)
             {
             }
+        }
+
+        [Test]
+        public void Import24BitPngCheckColorChannels()
+        {
+            var importer = new TextureImporter();
+            var context = new TestImporterContext(intermediateDirectory, outputDirectory);
+            var content = importer.Import("Assets/Textures/color_24bit.png", context);
+
+            var bitmap = (PixelBitmapContent<Color>) content.Faces[0][0];
+            var pixel = bitmap.GetPixel(0, 0);
+
+            Assert.AreEqual(255, pixel.R);
+            Assert.AreEqual(128, pixel.G);
+            Assert.AreEqual(64, pixel.B);
+
+            try
+            {
+                Directory.Delete(intermediateDirectory, true);
+                Directory.Delete(outputDirectory, true);
+            }
+            catch (DirectoryNotFoundException)
+            {
+            }
+        }
+
+        [Test]
+        public void Import32BitPngCheckColorChannels()
+        {
+            var importer = new TextureImporter();
+            var context = new TestImporterContext(intermediateDirectory, outputDirectory);
+            var content = importer.Import("Assets/Textures/color_32bit.png", context);
+
+            var bitmap = (PixelBitmapContent<Color>)content.Faces[0][0];
+            var pixel = bitmap.GetPixel(0, 0);
+
+            Assert.AreEqual(255, pixel.R);
+            Assert.AreEqual(128, pixel.G);
+            Assert.AreEqual(64, pixel.B);
+
+            try
+            {
+                Directory.Delete(intermediateDirectory, true);
+                Directory.Delete(outputDirectory, true);
+            }
+            catch (DirectoryNotFoundException)
+            {
+            }
+        }
+
+        [Test]
+        public void Import48BitPngCheckColorChannels()
+        {
+            var importer = new TextureImporter();
+            var context = new TestImporterContext(intermediateDirectory, outputDirectory);
+            var content = importer.Import("Assets/Textures/color_48bit.png", context);
+
+            var bitmap = (PixelBitmapContent<Rgba64>)content.Faces[0][0];
+            var pixel = bitmap.GetPixel(0, 0).ToVector4();
+
+            AssertFloatsAreEqual(1.0f, pixel.X);
+            AssertFloatsAreEqual(0.5f, pixel.Y);
+            AssertFloatsAreEqual(0.25f, pixel.Z);
+
+            try
+            {
+                Directory.Delete(intermediateDirectory, true);
+                Directory.Delete(outputDirectory, true);
+            }
+            catch (DirectoryNotFoundException)
+            {
+            }
+        }
+
+        [Test]
+        public void Import64BitPngCheckColorChannels()
+        {
+            var importer = new TextureImporter();
+            var context = new TestImporterContext(intermediateDirectory, outputDirectory);
+            var content = importer.Import("Assets/Textures/color_64bit.png", context);
+
+            var bitmap = (PixelBitmapContent<Rgba64>)content.Faces[0][0];
+            var pixel = bitmap.GetPixel(0, 0).ToVector4();
+
+            AssertFloatsAreEqual(1.0f, pixel.X);
+            AssertFloatsAreEqual(0.5f, pixel.Y);
+            AssertFloatsAreEqual(0.25f, pixel.Z);
+
+            try
+            {
+                Directory.Delete(intermediateDirectory, true);
+                Directory.Delete(outputDirectory, true);
+            }
+            catch (DirectoryNotFoundException)
+            {
+            }
+        }
+
+        private static void AssertFloatsAreEqual(float expected, float actual)
+        {
+            // Assume floats are equal if they differ less than 1%
+            var maxDiff = expected * 0.01f;
+            Assert.GreaterOrEqual(maxDiff, Math.Abs(expected - actual));
         }
 
         private static void CheckDdsFace(TextureContent content, int faceIndex, int mipMapCount, int width, int height)

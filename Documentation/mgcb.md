@@ -111,8 +111,9 @@ Note all defined processor parameters are cleared when the `/processor` is set.
 ### Build Content File
 ```
 /build:<content_filepath>
+/build:<content_filepath>;<destination_filepath>
 ```
-Instructs the content builder to build the specified content file using the previously set switches and options.
+Instructs the content builder to build the specified content file using the previously set switches and options. Optional destination path may be specified if you want to change the output filepath.
 
 ### Response File
 ```

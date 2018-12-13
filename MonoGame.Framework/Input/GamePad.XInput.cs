@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Input
             return state;
         }
 
-        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
             // If the device was disconneced then wait for 
             // the timeout to elapsed before we test it again.
@@ -184,7 +184,8 @@ namespace Microsoft.Xna.Framework.Input
             var thumbSticks = new GamePadThumbSticks(
                 leftPosition: new Vector2(gamepad.LeftThumbX, gamepad.LeftThumbY) / (float)short.MaxValue,
                 rightPosition: new Vector2(gamepad.RightThumbX, gamepad.RightThumbY) / (float)short.MaxValue,
-                    deadZoneMode: deadZoneMode);
+                    leftDeadZoneMode: leftDeadZoneMode,
+					rightDeadZoneMode: rightDeadZoneMode);
 
             var triggers = new GamePadTriggers(
                     leftTrigger: gamepad.LeftTrigger / (float)byte.MaxValue,

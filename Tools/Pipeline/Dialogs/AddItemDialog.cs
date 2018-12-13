@@ -10,11 +10,12 @@ namespace MonoGame.Tools.Pipeline
     partial class AddItemDialog : Dialog<bool>
     {
         public bool ApplyForAll { get; private set; }
-        public CopyAction Responce { get; private set; }
+        public IncludeType Responce { get; private set; }
 
         public AddItemDialog(string fileloc, bool exists, FileType filetype)
         {
             InitializeComponent();
+            Responce = IncludeType.Copy;
 
             Title = "Add " + filetype;
 
@@ -33,22 +34,14 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        protected override void OnShown(EventArgs e)
-        {
-            // Delay setting of Width so that label wrapping would be correct.
-            Width = 400;
-
-            base.OnShown(e);
-        }
-
         private void RadioButton_CheckedChanged(object sender, EventArgs e)
         {
             if (radioCopy.Checked)
-                Responce = CopyAction.Copy;
+                Responce = IncludeType.Copy;
             else if (radioLink.Checked)
-                Responce = CopyAction.Link;
+                Responce = IncludeType.Link;
             else
-                Responce = CopyAction.Skip;
+                Responce = IncludeType.Skip;
         }
 
         private void CheckBox1_CheckedChanged(object sender, EventArgs e)

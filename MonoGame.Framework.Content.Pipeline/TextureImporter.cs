@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using FreeImageAPI;
@@ -139,29 +137,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         private static FIBITMAP ConvertAndSwapChannels(FIBITMAP fBitmap, FREE_IMAGE_TYPE imageType)
         {
             FIBITMAP bgra;
-            switch(imageType)
+            switch (imageType)
             {
-                // RGBF are switched before adding an alpha channel.
+                // Return BGRA images as is
+
+                case FREE_IMAGE_TYPE.FIT_RGBAF:
+                case FREE_IMAGE_TYPE.FIT_RGBA16:
+                    break;
+
+                // Add an alpha channel to BGRA images without one
+
                 case FREE_IMAGE_TYPE.FIT_RGBF:
-                    // Swap R and B channels to make it BGR, then add an alpha channel
-                    SwitchRedAndBlueChannels(fBitmap);
                     bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBAF, true);
                     FreeImage.UnloadEx(ref fBitmap);
                     fBitmap = bgra;
                     break;
 
                 case FREE_IMAGE_TYPE.FIT_RGB16:
-                    // Swap R and B channels to make it BGR, then add an alpha channel
-                    SwitchRedAndBlueChannels(fBitmap);
                     bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBA16, true);
                     FreeImage.UnloadEx(ref fBitmap);
                     fBitmap = bgra;
                     break;
 
-                case FREE_IMAGE_TYPE.FIT_RGBAF:
-                case FREE_IMAGE_TYPE.FIT_RGBA16:
-                    //Don't switch channels in this case or colors will be shown wrong
-                    break;
+
+                // Add an alpha channel to RGB images
+                // Swap the red and blue channels of RGBA images
 
                 default:
                     // Bitmap and other formats are converted to 32-bit by default
@@ -194,11 +194,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
-            var reader = new ImageReader();
             int width, height, comp;
             byte[] data = null;
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-                data = reader.Read(stream, out width, out height, out comp, Imaging.STBI_rgb_alpha);
+                data = ImageReader.Read(stream, out width, out height, out comp, Imaging.STBI_rgb_alpha);
 
             var face = new PixelBitmapContent<Color>(width, height);
             face.SetPixelData(data);

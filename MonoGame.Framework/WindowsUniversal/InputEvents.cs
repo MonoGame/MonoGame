@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -19,6 +20,16 @@ namespace Microsoft.Xna.Framework
 {
     internal class InputEvents
     {
+        internal class KeyChar
+        {
+            public char Character;
+
+            public Keys Key;
+        }
+
+        public readonly ConcurrentQueue<KeyChar> TextQueue = new ConcurrentQueue<KeyChar>();
+        private KeyChar _lastEnqueuedKeyChar;
+
         private readonly TouchQueue _touchQueue;
 
         // To convert from DIPs (device independent pixels) to actual screen resolution pixels.
@@ -32,6 +43,7 @@ namespace Microsoft.Xna.Framework
             // only arrive here if some other control hasn't gotten it.
             window.KeyDown += CoreWindow_KeyDown;
             window.KeyUp += CoreWindow_KeyUp;
+            window.CharacterReceived += Window_CharacterReceived;
             window.VisibilityChanged += CoreWindow_VisibilityChanged;
             window.Activated += CoreWindow_Activated;
             window.SizeChanged += CoreWindow_SizeChanged;
@@ -276,6 +288,16 @@ namespace Microsoft.Xna.Framework
             var xnaKey = KeyTranslate(args.VirtualKey, args.KeyStatus);
 
             Keyboard.SetKey(xnaKey);
+
+            _lastEnqueuedKeyChar = new KeyChar();
+            _lastEnqueuedKeyChar.Key = xnaKey;
+            TextQueue.Enqueue(_lastEnqueuedKeyChar);
+        }
+
+        private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
+        {
+            if (_lastEnqueuedKeyChar != null)
+                _lastEnqueuedKeyChar.Character = (char)args.KeyCode;
         }
 
         private void CoreWindow_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)

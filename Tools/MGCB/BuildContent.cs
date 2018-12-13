@@ -155,12 +155,24 @@ namespace MGCB
             Name = "build",
             Flag = "b",
             ValueName = "sourceFile",
-            Description = "Build the content source file using the previously set switches and options.")]
+            Description = "Build the content source file using the previously set switches and options. Optional destination path may be specified with \"sourceFile;destFile\" if you wish to change the output filepath.")]
         public void OnBuild(string sourceFile)
         {
+            string link = null;
+            if (sourceFile.Contains(";"))
+            {
+                var split = sourceFile.Split(';');
+                sourceFile = split[0];
+
+                if(split.Length > 0)
+                    link = split[1];
+            }
+
             // Make sure the source file is absolute.
             if (!Path.IsPathRooted(sourceFile))
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
+
+            // link should remain relative, absolute path will get set later when the build occurs
 
             sourceFile = PathHelper.Normalize(sourceFile);
 
@@ -173,6 +185,7 @@ namespace MGCB
             var item = new ContentItem
             {
                 SourceFile = sourceFile, 
+                OutputFile = link,
                 Importer = Importer, 
                 Processor = _processor,
                 ProcessorParams = new OpaqueDataDictionary()
@@ -192,17 +205,27 @@ namespace MGCB
             Description = "Copy the content source file verbatim to the output directory.")]
         public void OnCopy(string sourceFile)
         {
+            string link = null;
+            if (sourceFile.Contains(";"))
+            {
+                var split = sourceFile.Split(';');
+                sourceFile = split[0];
+
+                if (split.Length > 0)
+                    link = split[1];
+            }
+
             if (!Path.IsPathRooted(sourceFile))
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
 
             sourceFile = PathHelper.Normalize(sourceFile);
 
             // Remove duplicates... keep this new one.
-            var previous = _copyItems.FindIndex(e => string.Equals(e, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+            var previous = _copyItems.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
             if (previous != -1)
                 _copyItems.RemoveAt(previous);
 
-            _copyItems.Add(sourceFile);
+            _copyItems.Add(new CopyItem { SourceFile = sourceFile, Link = link });
         }
 
         [CommandLineParameter(
@@ -213,14 +236,23 @@ namespace MGCB
         public class ContentItem
         {
             public string SourceFile;
+
+            // This refers to the "Link" which can override the default output location
+            public string OutputFile;
             public string Importer;
             public string Processor;
             public OpaqueDataDictionary ProcessorParams;
         }
 
+        public class CopyItem
+        {
+            public string SourceFile;
+            public string Link;
+        }
+
         private readonly List<ContentItem> _content = new List<ContentItem>();
 
-        private readonly List<string> _copyItems = new List<string>();
+        private readonly List<CopyItem> _copyItems = new List<CopyItem>();
 
         private PipelineManager _manager;
 
@@ -276,20 +308,31 @@ namespace MGCB
             var previousContent = SourceFileCollection.Read(contentFile);
 
             // If the target changed in any way then we need to force
-            // a fuull rebuild even under incremental builds.
+            // a full rebuild even under incremental builds.
             var targetChanged = previousContent.Config != Config ||
                                 previousContent.Platform != Platform ||
                                 previousContent.Profile != Profile;
 
             // First clean previously built content.
-            foreach (var sourceFile in previousContent.SourceFiles)
+            for(int i = 0; i < previousContent.SourceFiles.Count; i++)
             {
+                var sourceFile = previousContent.SourceFiles[i];
+
+                // This may be an old file (prior to MG 3.7) which doesn't have destination files:
+                string destFile = null;
+                if(i < previousContent.DestFiles.Count)
+                {
+                    destFile = previousContent.DestFiles[i];
+                }
+
                 var inContent = _content.Any(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
                 var cleanOldContent = !inContent && !Incremental;
                 var cleanRebuiltContent = inContent && (Rebuild || Clean);
                 if (cleanRebuiltContent || cleanOldContent || targetChanged)
-                    _manager.CleanContent(sourceFile);                
+                    _manager.CleanContent(sourceFile, destFile);                
             }
+
+            // TODO: Should we be cleaning copy items?  I think maybe we should.
 
             var newContent = new SourceFileCollection
             {
@@ -306,7 +349,7 @@ namespace MGCB
             {
                 try
                 {
-                    _manager.RegisterContent(c.SourceFile, null, c.Importer, c.Processor, c.ProcessorParams);
+                    _manager.RegisterContent(c.SourceFile, c.OutputFile, c.Importer, c.Processor, c.ProcessorParams);
                 }
                 catch
                 {
@@ -319,12 +362,13 @@ namespace MGCB
                 try
                 {
                     _manager.BuildContent(c.SourceFile,
-                                          null,
+                                          c.OutputFile,
                                           c.Importer,
                                           c.Processor,
                                           c.ProcessorParams);
 
                     newContent.SourceFiles.Add(c.SourceFile);
+                    newContent.DestFiles.Add(c.OutputFile);
 
                     ++successCount;
                 }
@@ -361,7 +405,10 @@ namespace MGCB
             // If this is an incremental build we merge the list
             // of previous content with the new list.
             if (Incremental && !targetChanged)
+            {
                 newContent.Merge(previousContent);
+                _manager.ContentStats.MergePreviousStats();
+            }
 
             // Delete the old file and write the new content 
             // list if we have any to serialize.
@@ -378,7 +425,9 @@ namespace MGCB
                     // retaining the file extension.
                     // Note that replacing a sub-path like this requires consistent
                     // directory separator characters.
-                    var relativeName = c.Replace(projectDirectory, string.Empty)
+                    var relativeName = c.Link;
+                    if (string.IsNullOrWhiteSpace(relativeName))
+                        relativeName = c.SourceFile.Replace(projectDirectory, string.Empty)
                                             .TrimStart(Path.DirectorySeparatorChar)
                                             .TrimStart(Path.AltDirectorySeparatorChar);
                     var dest = Path.Combine(outputPath, relativeName);
@@ -386,28 +435,46 @@ namespace MGCB
                     // Only copy if the source file is newer than the destination.
                     // We may want to provide an option for overriding this, but for
                     // nearly all cases this is the desired behavior.
-                    if (File.Exists(dest))
+                    if (File.Exists(dest) && !Rebuild)
                     {
-                        var srcTime = File.GetLastWriteTimeUtc(c);
+                        var srcTime = File.GetLastWriteTimeUtc(c.SourceFile);
                         var dstTime = File.GetLastWriteTimeUtc(dest);
                         if (srcTime <= dstTime)
                         {
-                            Console.WriteLine("Skipping {0}", c);
+                            if (string.IsNullOrEmpty(c.Link))
+                                Console.WriteLine("Skipping {0}", c.SourceFile);
+                            else
+                                Console.WriteLine("Skipping {0} => {1}", c.SourceFile, c.Link);
+
+                            // Copy the stats from the previous stats collection.
+                            _manager.ContentStats.CopyPreviousStats(c.SourceFile);
                             continue;
                         }
                     }
+
+                    var startTime = DateTime.UtcNow;
 
                     // Create the destination directory if it doesn't already exist.
                     var destPath = Path.GetDirectoryName(dest);
                     if (!Directory.Exists(destPath))
                         Directory.CreateDirectory(destPath);
 
-                    File.Copy(c, dest, true);
+                    File.Copy(c.SourceFile, dest, true);
 
                     // Destination file should not be read-only even if original was.
                     var fileAttr = File.GetAttributes(dest);
                     fileAttr = fileAttr & (~FileAttributes.ReadOnly);
                     File.SetAttributes(dest, fileAttr);
+
+                    var buildTime = DateTime.UtcNow - startTime;
+
+                    if (string.IsNullOrEmpty(c.Link))
+                        Console.WriteLine("{0}", c.SourceFile);
+                    else
+                        Console.WriteLine("{0} => {1}", c.SourceFile, c.Link);
+
+                    // Record content stats on the copy.
+                    _manager.ContentStats.RecordStats(c.SourceFile, dest, "CopyItem", typeof(File), (float)buildTime.TotalSeconds);
 
                     ++successCount;
                 }
@@ -420,6 +487,9 @@ namespace MGCB
                     ++errorCount;
                 }
             }
+
+            // Dump the content build stats.
+            _manager.ContentStats.Write(intermediatePath);
         }
 
         [CommandLineParameter(

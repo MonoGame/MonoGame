@@ -4,7 +4,7 @@
 //    https://github.com/renaudbedard/nvorbis/
 //
 // It was released to the public domain by the author (Renaud Bedard).
-// No other license is intended or required. 
+// No other license is intended or required.
 
 using System;
 using System.Collections.Generic;
@@ -246,8 +246,8 @@ namespace Microsoft.Xna.Framework.Audio
                 OggStreamer.Instance.Efx.DeleteFilter(alFilterId);
                 ALHelper.CheckError("Failed to delete EFX filter.");
             }
-            
-            
+
+
         }
 
         void StopPlayback()
@@ -278,7 +278,7 @@ namespace Microsoft.Xna.Framework.Audio
                     var salvaged = new int[processed];
                     if (processed > 0)
                     {
-                        AL.SourceUnqueueBuffers(alSourceId, processed, salvaged);
+                        AL.SourceUnqueueBuffers(alSourceId, processed, out salvaged);
                         ALHelper.CheckError("Failed to unqueue buffers (second attempt).");
                     }
 
@@ -334,7 +334,7 @@ namespace Microsoft.Xna.Framework.Audio
         readonly short[] castBuffer;
 
         readonly HashSet<OggStream> streams = new HashSet<OggStream>();
-        readonly List<OggStream> threadLocalStreams = new List<OggStream>(); 
+        readonly List<OggStream> threadLocalStreams = new List<OggStream>();
 
         readonly Thread underlyingThread;
         volatile bool cancelled;

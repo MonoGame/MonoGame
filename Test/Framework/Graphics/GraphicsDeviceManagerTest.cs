@@ -515,31 +515,30 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void TooHighMultiSampleCountClampedToMaxSupported()
         {
+            var maxMultiSampleCount = gd.GraphicsCapabilities.MaxMultiSampleCount;
             gdm.PreferMultiSampling = true;
 
             gdm.PreparingDeviceSettings += (sender, args) =>
             {
                 var pp1 = args.GraphicsDeviceInformation.PresentationParameters;
-                pp1.MultiSampleCount = 33;
+                pp1.MultiSampleCount = maxMultiSampleCount + 1;
             };
             gdm.ApplyChanges();
-
-            // Reference device supports 32 samples
             Assert.AreEqual
-                (gdm.GraphicsDevice.PresentationParameters.MultiSampleCount, 32);
+                (maxMultiSampleCount, gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
 
             // Test again for GraphicsDevice.Reset(PresentationParameters)
             var pp2 = gdm.GraphicsDevice.PresentationParameters.Clone();
             pp2.MultiSampleCount = 0;
             gdm.GraphicsDevice.Reset(pp2);
             Assert.AreEqual
-                (gdm.GraphicsDevice.PresentationParameters.MultiSampleCount, 0);
+                (0, gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
+
             var pp3 = gdm.GraphicsDevice.PresentationParameters.Clone();
-            pp3.MultiSampleCount = 500; // Set too high. In DX11 is max 32.
+            pp3.MultiSampleCount = 500; // Set too high. max is maxMultiSampleCount
             gdm.GraphicsDevice.Reset(pp3);
-            // Reference device supports 32 samples
             Assert.AreEqual
-                (gdm.GraphicsDevice.PresentationParameters.MultiSampleCount, 32);
+                (maxMultiSampleCount, gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
             
         }
 #endif

@@ -48,10 +48,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                Threading.BlockOnUIThread(() =>
+                if (GraphicsDevice != null)
                 {
-                    this.GraphicsDevice.PlatformDeleteRenderTarget(this);
-                });
+                    Threading.BlockOnUIThread(() =>
+                    {
+                        this.GraphicsDevice.PlatformDeleteRenderTarget(this);
+                    });
+                }
             }
 
             base.Dispose(disposing);

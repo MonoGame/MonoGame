@@ -11,6 +11,7 @@ using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.Graphics.Display;
+using Windows.Phone.UI.Input;
 
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -31,7 +32,6 @@ namespace Microsoft.Xna.Framework
         private object _eventLocker = new object();
 
         private InputEvents _inputEvents;
-        private readonly ConcurrentQueue<char> _textQueue = new ConcurrentQueue<char>();
         private bool _isSizeChanged = false;
         private Rectangle _newViewBounds;
         private bool _isOrientationChanged = false;
@@ -128,9 +128,9 @@ namespace Microsoft.Xna.Framework
 
             _coreWindow.Closed += Window_Closed;
             _coreWindow.Activated += Window_FocusChanged;
-            _coreWindow.CharacterReceived += Window_CharacterReceived;
 
-            SystemNavigationManager.GetForCurrentView().BackRequested += BackRequested;
+            if (Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
+                Windows.Phone.UI.Input.HardwareButtons.BackPressed += this.HardwareButtons_BackPressed;
 
             SetViewBounds(_appView.VisibleBounds.Width, _appView.VisibleBounds.Height);
 
@@ -216,18 +216,6 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
-        {
-            _textQueue.Enqueue((char)args.KeyCode);
-        }
-
-        private void UpdateTextInput()
-        {
-            char ch;
-            while (_textQueue.TryDequeue(out ch))
-                OnTextInput(_coreWindow, new TextInputEventArgs(ch));
-        }
-
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
         {
             var result = DisplayOrientation.Default;
@@ -303,7 +291,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private void BackRequested(object sender, BackRequestedEventArgs e)
+        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
         {
             // We need to manually hide the keyboard input UI when the back button is pressed
             if (KeyboardInput.IsVisible)
@@ -362,8 +350,12 @@ namespace Microsoft.Xna.Framework
             _inputEvents.UpdateState();
 
             // Update TextInput
-            if(!_textQueue.IsEmpty)
-                UpdateTextInput();
+            if(!_inputEvents.TextQueue.IsEmpty)
+            {
+                InputEvents.KeyChar ch;
+                while (_inputEvents.TextQueue.TryDequeue(out ch))
+                    OnTextInput(_coreWindow, new TextInputEventArgs(ch.Character, ch.Key));
+            }
 
             // Update size
             if (_isSizeChanged)

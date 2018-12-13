@@ -56,14 +56,13 @@
     <Compile Include="Common\FileType.cs" />
     <Compile Include="Common\ProjectState.cs" />
     <Compile Include="Common\PipelineController.MoveAction.cs" />
-    <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
-    <Compile Include="Common\PipelineController.FileWatcher.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
     <Compile Include="Common\PipelineController.UpdateProcessorAction.cs" />
     <Compile Include="Common\PipelineController.UpdatePropertyAction.cs" />
     <Compile Include="Common\PipelineSettings.cs" />
     <Compile Include="Common\IController.cs" />
+    <Compile Include="Common\IncludeItem.cs" />
     <Compile Include="Common\IProjectAction.cs" />
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />
@@ -84,6 +83,10 @@
 	<Compile Include="MainWindow.cs" />
 	<Compile Include="MainWindow.eto.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LogWindow.cs" />
+    <Compile Include="LogWindow.eto.cs">
+        <DependentUpon>LogWindow.cs</DependentUpon>
     </Compile>
     
     <!-- Native Windows -->
@@ -199,17 +202,11 @@
     <EmbeddedResource Include="Icons\TreeView\File.png">
       <LogicalName>TreeView.File.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Icons\TreeView\FileMissing.png">
-      <LogicalName>TreeView.FileMissing.png</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="Icons\TreeView\Folder.png">
       <LogicalName>TreeView.Folder.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Icons\TreeView\FolderMissing.png">
-      <LogicalName>TreeView.FolderMissing.png</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Icons\TreeView\Missing.png">
-      <LogicalName>TreeView.Missing.png</LogicalName>
+    <EmbeddedResource Include="Icons\TreeView\Link.png">
+      <LogicalName>TreeView.Link.png</LogicalName>
     </EmbeddedResource>
     
     <!-- The resources for output filtering -->

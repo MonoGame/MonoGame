@@ -63,6 +63,17 @@ namespace MonoGame.Tests.Graphics {
             Assert.Throws<InvalidOperationException>(() => _spriteBatch.End());
         }
         
+        [Test]
+        public void NullDeviceShouldThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+            {                
+                var spriteBatch = new SpriteBatch(null);
+                spriteBatch.Dispose();
+            });
+            GC.GetTotalMemory(true); // collect uninitialized spriteBatch
+        }
+        
 		[Test]
 		public void Draw_without_blend ()
 		{
