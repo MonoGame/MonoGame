@@ -1232,9 +1232,9 @@ namespace MonoGame.OpenGL
 
             BlendColor = LoadFunction<BlendColorDelegate> ("glBlendColor");
             BlendEquationSeparate = LoadFunction<BlendEquationSeparateDelegate> ("glBlendEquationSeparate");
-            BlendEquationSeparatei = LoadEntryPoint<BlendEquationSeparateiDelegate>("glBlendEquationSeparatei");
+            BlendEquationSeparatei = LoadFunction<BlendEquationSeparateiDelegate>("glBlendEquationSeparatei");
             BlendFuncSeparate = LoadFunction<BlendFuncSeparateDelegate> ("glBlendFuncSeparate");
-            BlendFuncSeparatei = LoadEntryPoint<BlendFuncSeparateiDelegate>("glBlendFuncSeparatei");
+            BlendFuncSeparatei = LoadFunction<BlendFuncSeparateiDelegate>("glBlendFuncSeparatei");
             ColorMask = LoadFunction<ColorMaskDelegate> ("glColorMask");
             DepthFunc = LoadFunction<DepthFuncDelegate> ("glDepthFunc");
             DepthMask = LoadFunction<DepthMaskDelegate> ("glDepthMask");
