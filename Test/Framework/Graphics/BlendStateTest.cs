@@ -60,7 +60,7 @@ namespace MonoGame.Tests.Graphics
             assertMethod(() => blendState.ColorWriteChannels2 = ColorWriteChannels.All);
             assertMethod(() => blendState.ColorWriteChannels3 = ColorWriteChannels.All);
 // The Mac build bot GL driver does not support independent blend states
-#if !XNA && !MONOMAC
+#if !XNA && !DESKTOPGL
             assertMethod(() => blendState.IndependentBlendEnable = true);
 #endif
             assertMethod(() => blendState.MultiSampleMask = 0);
