@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsInstancing = GL.VertexAttribDivisor != null;
 
 #if GLES
-            SupportsSeparateBlendStatesPerRendertarget = false;
+            SupportsSeparateBlendStates = false;
 #else
             SupportsSeparateBlendStates = device.glMajorVersion >= 4 || GL.Extensions.Contains("GL_ARB_draw_buffers_blend");
 #endif
