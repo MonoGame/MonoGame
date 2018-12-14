@@ -197,7 +197,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// </item>
         /// </list>
         /// </remarks>
- 
         public static SoundEffect FromFile(string path)
         {
             if (path == null)
