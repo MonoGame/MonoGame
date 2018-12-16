@@ -1,0 +1,40 @@
+<Project>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);OPENAL</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Platform\Audio\AudioLoader.cs" />
+    <Compile Include="Platform\Audio\DynamicSoundEffectInstance.OpenAL.cs" />
+    <Compile Include="Platform\Audio\Microphone.OpenAL.cs" />
+    <Compile Include="Platform\Audio\OggStream.cs" />
+    <Compile Include="Platform\Audio\OpenAL.cs" />
+    <Compile Include="Platform\Audio\OpenALSoundController.cs" />
+    <Compile Include="Platform\Audio\SoundEffect.OpenAL.cs" />
+    <Compile Include="Platform\Audio\SoundEffectInstance.OpenAL.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll">
+      <Link>x86\soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
+      <Link>x64\soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x86\libopenal.so.1">
+      <Link>x86\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
+      <Link>x64\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib">
+      <Link>libopenal.1.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
