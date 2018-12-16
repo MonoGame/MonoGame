@@ -13,10 +13,9 @@
       <!-- TODO: upgrade to new GraphicsAdapter -->
       <Compile Remove="Graphics\GraphicsAdapter.cs" />
       <!-- TODO: add Null (or DesktopGL compatible) implementation for the following -->
-      <Compile Remove="Content\ContentReaders\VideoReader.cs" />
-      <Compile Remove="Graphics\RenderTarget3D.cs" />
       <Compile Remove="Input\KeyboardInput.cs" />
       <Compile Remove="Input\MessageBox.cs" />
+      <Compile Remove="Content\ContentReaders\VideoReader.cs" />
       <Compile Remove="Media\Video.cs" />
       <Compile Remove="Media\VideoPlayer.cs" />
   </ItemGroup>
