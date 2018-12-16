@@ -274,7 +274,6 @@
     <Compile Include="GameRunBehavior.cs" />
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />
-    <Compile Include="GameUpdateRequiredException.cs" />
     <Compile Include="GameWindow.cs">
 	</Compile>
     <Compile Include="IDrawable.cs" />
