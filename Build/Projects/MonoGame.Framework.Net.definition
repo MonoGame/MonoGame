@@ -65,6 +65,7 @@
     <Compile Include="GamerServices\GamerPrivilegeSetting.cs"/>
     <Compile Include="GamerServices\GamerProfile.cs"/>
     <Compile Include="GamerServices\GamerZone.cs"/>
+    <Compile Include="GamerServices\GameUpdateRequiredException.cs" />
     <Compile Include="GamerServices\LeaderboardEntry.cs"/>
     <Compile Include="GamerServices\LeaderboardIdentity.cs"/>
     <Compile Include="GamerServices\LeaderboardKey.cs"/>

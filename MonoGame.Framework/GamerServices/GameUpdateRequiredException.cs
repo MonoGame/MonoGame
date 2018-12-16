@@ -11,4 +11,3 @@ namespace Microsoft.Xna.Framework.GamerServices
 
     }
 }
-
