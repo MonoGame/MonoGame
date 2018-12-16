@@ -12,6 +12,7 @@
   <ItemGroup>
     <Compile Include="Platform\Graphics\Effect\EffectResource.OpenGL.cs" />
     <Compile Include="Platform\Graphics\GraphicsCapabilities.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\GraphicsDebug.Default.cs" />
     <Compile Include="Platform\Graphics\GraphicsDevice.OpenGL.FramebufferHelper.cs" />
     <Compile Include="Platform\Graphics\GraphicsDevice.OpenGL.cs" />
     <Compile Include="Platform\Graphics\OcclusionQuery.OpenGL.cs" />

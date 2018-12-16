@@ -5,6 +5,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
+    <IntermediateOutputPath>obj\DesktopGL\$(Configuration)\$(TargetFramework)</IntermediateOutputPath>
+    <OutputPath>bin\DesktopGL\$(Configuration)\$(TargetFramework)</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
     <DefineConstants>DESKTOPGL;XNADESIGNPROVIDED</DefineConstants>
   </PropertyGroup>
 
