@@ -237,7 +237,8 @@ namespace Microsoft.Xna.Framework.Audio
 #elif IOS
                 AVAudioSession.SharedInstance().Init();
 
-                // NOTE: Do not override AVAudioSessionCategory set by the game developer per #6595.
+                // NOTE: Do not override AVAudioSessionCategory set by the game developer:
+                //       see https://github.com/MonoGame/MonoGame/issues/6595
 
                 EventHandler<AVAudioSessionInterruptionEventArgs> handler = delegate(object sender, AVAudioSessionInterruptionEventArgs e) {
                     switch (e.InterruptionType)
