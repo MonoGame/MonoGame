@@ -9,7 +9,6 @@ namespace Microsoft.Xna.Framework.Net
     public sealed partial class NetworkSession : IDisposable
     {
         private const string LoadingGamertag = "...";
-
         private const int MinSupportedLocalGamers = 1;
         private const int MaxSupportedLocalGamers = 4;
         private const int MinSupportedGamers = 1;

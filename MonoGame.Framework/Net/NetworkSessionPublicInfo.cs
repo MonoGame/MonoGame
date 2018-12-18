@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Net
         public int openPrivateGamerSlots;
         public int openPublicGamerSlots;
 
-        private bool locallySet;
+        private bool initialized;
 
         public void Set(NetworkSessionType sessionType, NetworkSessionProperties sessionProperties, string hostGamertag, int maxGamers, int privateGamerSlots, int currentGamerCount, int openPrivateGamerSlots, int openPublicGamerSlots)
         {
@@ -27,12 +27,12 @@ namespace Microsoft.Xna.Framework.Net
             this.openPrivateGamerSlots = openPrivateGamerSlots;
             this.openPublicGamerSlots = openPublicGamerSlots;
 
-            locallySet = true;
+            initialized = true;
         }
 
         public void Pack(NetOutgoingMessage msg)
         {
-            if (!locallySet) throw new InvalidOperationException("Cannot pack uninitialized or remote public info");
+            if (!initialized) throw new InvalidOperationException("Cannot pack uninitialized public info");
 
             msg.Write((byte)sessionType);
             sessionProperties.Pack(msg);
@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Net
                 this.sessionProperties = new NetworkSessionProperties(true);
             }
             this.sessionType = sessionType;
-            this.sessionProperties.Set(sessionProperties);
+            this.sessionProperties.CopyValuesFrom(sessionProperties);
             this.hostGamertag = hostGamertag;
             this.maxGamers = maxGamers;
             this.privateGamerSlots = privateGamerSlots;
@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Net
             this.openPrivateGamerSlots = openPrivateGamerSlots;
             this.openPublicGamerSlots = openPublicGamerSlots;
 
-            locallySet = false;
+            initialized = true;
             return true;
         }
     }

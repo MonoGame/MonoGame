@@ -307,7 +307,7 @@ namespace Microsoft.Xna.Framework.Net
             this.maxGamers = maxGamers;
             this.privateGamerSlots = privateGamerSlots;
             this.state = state;
-            this.properties.Set(properties);
+            this.properties.CopyValuesFrom(properties);
             return true;
         }
 

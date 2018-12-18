@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Net
         public bool IsReadOnly { get { return isReadOnly; } }
         public int Count { get { return list.Count; } }
 
-        internal void Set(NetworkSessionProperties other)
+        internal void CopyValuesFrom(NetworkSessionProperties other)
         {
             for (int i = 0; i < list.Count; i++)
             {
