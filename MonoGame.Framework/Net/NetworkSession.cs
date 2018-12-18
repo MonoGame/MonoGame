@@ -416,6 +416,18 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
+        public void RemoveLocalGamer(SignedInGamer gamer)
+        {
+            if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
+
+            pendingSignedInGamers.Remove(gamer);
+
+            if (localGamerFromSignedInGamer.ContainsKey(gamer))
+            {
+                SendGamerLeft(localGamerFromSignedInGamer[gamer]);
+            }
+        }
+
         public void StartGame()
         {
             if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
@@ -631,12 +643,12 @@ namespace Microsoft.Xna.Framework.Net
 
         private void LocalGamerSignedOut(object sender, SignedOutEventArgs args)
         {
-            pendingSignedInGamers.Remove(args.Gamer);
-
-            if (localGamerFromSignedInGamer.ContainsKey(args.Gamer))
+            if (IsDisposed)
             {
-                SendGamerLeft(localGamerFromSignedInGamer[args.Gamer]);
+                return;
             }
+
+            RemoveLocalGamer(args.Gamer);
         }
 
         internal void DisconnectMachine(NetworkMachine machine, NetworkSessionEndReason reason)
