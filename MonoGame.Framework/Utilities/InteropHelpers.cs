@@ -18,18 +18,13 @@ namespace MonoGame.Utilities
             if (handle == IntPtr.Zero)
                 return string.Empty;
 
-            var ptr = (byte*) handle;
-            while (*ptr != 0)
-                ptr++;
+            var start = (byte*) handle;
+            var end = start;
+            while (*end != 0)
+                end++;
 
-            var len = ptr - (byte*) handle;
-            if (len == 0)
-                return string.Empty;
-
-            var bytes = new byte[len];
-            Marshal.Copy(handle, bytes, 0, bytes.Length);
-
-            return Encoding.UTF8.GetString(bytes);
+            var len = (int) (end - start);
+            return Encoding.UTF8.GetString(start, len);
         }
     }
 }
