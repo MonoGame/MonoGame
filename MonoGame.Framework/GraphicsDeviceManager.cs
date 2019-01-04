@@ -13,6 +13,21 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public partial class GraphicsDeviceManager : IGraphicsDeviceService, IDisposable, IGraphicsDeviceManager
     {
+        /// <summary>
+        /// Indicates if DX9 style pixel addressing or current standard
+        /// pixel addressing should be used. This flag is set to <c>false</c>
+        /// by default for XNA compatibility. It is recommended to set
+        /// this flag to <c>true</c> for projects that are not ported
+        /// from XNA.
+        ///
+        /// XNA uses DirectX9 for its graphics. DirectX9 interprets UV
+        /// coordinates differently from other graphics API's. This is
+        /// typically referred to as the half-pixel offset. MonoGame
+        /// replicates XNA behavior if this flag is set to <c>false</c>.
+        ///
+        /// </summary>
+        public static bool UseStandardPixelAddressing;
+
         private readonly Game _game;
         private GraphicsDevice _graphicsDevice;
         private bool _initialized = false;

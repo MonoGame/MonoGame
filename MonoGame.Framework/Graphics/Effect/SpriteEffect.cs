@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // --> We get the correct matrix with near plane 0 and far plane -1.
                 Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out _projection);
 
-                if (SpriteBatch.NeedsHalfPixelOffset)
+                if (!GraphicsDeviceManager.UseStandardPixelAddressing)
                 {
                     _projection.M41 += -0.5f * _projection.M11;
                     _projection.M42 += -0.5f * _projection.M22;

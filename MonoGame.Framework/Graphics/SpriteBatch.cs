@@ -31,8 +31,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		Vector2 _texCoordBR = new Vector2 (0,0);
         #endregion
 
-        internal static bool NeedsHalfPixelOffset;
-
         /// <summary>
         /// Constructs a <see cref="SpriteBatch"/>.
         /// </summary>
