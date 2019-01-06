@@ -129,7 +129,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         public static Microphone Default
         {
-            get { return _default; }
+            get { SoundEffect.Initialize(); return _default; }
         }       
 
         #endregion
