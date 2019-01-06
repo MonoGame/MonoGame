@@ -291,8 +291,17 @@ namespace Microsoft.Xna.Framework.Audio
         {
 			get
             {
-				if (_instance == null)
-					_instance = new OpenALSoundController();
+                if (_instance == null)
+                {
+                    try
+                    {
+                        _instance = new OpenALSoundController();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
+                    }
+                }
 				return _instance;
 			}
 		}

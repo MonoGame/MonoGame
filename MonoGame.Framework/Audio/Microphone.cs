@@ -115,6 +115,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
+                SoundEffect.Initialize();                
                 if (_allMicrophones == null)
                     _allMicrophones = new List<Microphone>();
                 return new ReadOnlyCollection<Microphone>(_allMicrophones);

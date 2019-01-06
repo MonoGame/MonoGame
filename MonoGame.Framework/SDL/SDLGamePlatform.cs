@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Utilities;
@@ -22,7 +21,6 @@ namespace Microsoft.Xna.Framework
         }
 
         private readonly Game _game;
-        private readonly OpenALSoundController _soundControllerInstance;
         private readonly List<Keys> _keys;
 
         private int _isExiting;
@@ -62,15 +60,6 @@ namespace Microsoft.Xna.Framework
 
             GamePad.InitDatabase();
             Window = _view = new SdlGameWindow(_game);
-
-            try
-            {
-                _soundControllerInstance = OpenALSoundController.GetInstance;
-            }
-            catch (DllNotFoundException ex)
-            {
-                throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
-            }
         }
 
         public override void BeforeInitialize ()

@@ -235,17 +235,9 @@ namespace Microsoft.Xna.Framework.Audio
 
 #endregion
 
-        internal static void InitializeSoundEffect()
+        internal static void PlatformInitialize()
         {
-            try
-            {
-                // Getting the instance for the first time initializes OpenAL
-                var oal = OpenALSoundController.GetInstance;
-            }
-            catch (DllNotFoundException ex)
-            {
-                throw new NoAudioHardwareException("Failed to init OpenALSoundController", ex);
-            }
+            var inst = OpenALSoundController.GetInstance;
         }
 
         internal static void PlatformShutdown()

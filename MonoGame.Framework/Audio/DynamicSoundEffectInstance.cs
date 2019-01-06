@@ -76,6 +76,10 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="channels">Number of channels (mono or stereo).</param>
         public DynamicSoundEffectInstance(int sampleRate, AudioChannels channels)
         {
+            SoundEffect.Initialize();
+            if (SoundEffect._systemState != SoundEffect.SoundSystemState.Initialized)
+                return;
+
             if ((sampleRate < 8000) || (sampleRate > 48000))
                 throw new ArgumentOutOfRangeException("sampleRate");
             if ((channels != AudioChannels.Mono) && (channels != AudioChannels.Stereo))
