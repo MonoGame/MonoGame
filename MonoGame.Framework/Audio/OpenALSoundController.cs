@@ -108,6 +108,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
 		private OpenALSoundController()
         {
+            if (AL.NativeLibrary == IntPtr.Zero)
+                throw new DllNotFoundException("Couldn't initialize OpenAL because the native binaries couldn't be found.");
+
             if (!OpenSoundController())
             {
                 throw new NoAudioHardwareException("OpenAL device could not be initialized, see console output for details.");
@@ -148,10 +151,6 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 _device = Alc.OpenDevice(string.Empty);
                 EffectsExtension.device = _device;
-            }
-            catch (DllNotFoundException ex)
-            {
-                throw ex;
             }
             catch (Exception ex)
             {
@@ -296,6 +295,14 @@ namespace Microsoft.Xna.Framework.Audio
                     try
                     {
                         _instance = new OpenALSoundController();
+                    }
+                    catch (DllNotFoundException)
+                    {
+                        throw;
+                    }
+                    catch (NoAudioHardwareException)
+                    {
+                        throw;
                     }
                     catch (Exception ex)
                     {
