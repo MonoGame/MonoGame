@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework
         /// replicates XNA behavior if this flag is set to <c>false</c>.
         ///
         /// </summary>
-        public static bool UseStandardPixelAddressing;
+        public static bool UseStandardPixelAddressing { get; set; }
 
         private Game _game;
         private GraphicsDevice _graphicsDevice;

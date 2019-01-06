@@ -26,7 +26,12 @@ namespace Microsoft.Xna.Framework
         /// replicates XNA behavior if this flag is set to <c>false</c>.
         ///
         /// </summary>
-        public static bool UseStandardPixelAddressing;
+#if DIRECTX
+        // TODO we need to figure out how to inject the half pixel offset into DX shaders
+        public static bool UseStandardPixelAddressing { get { return true; } set { } }
+#else
+        public static bool UseStandardPixelAddressing { get; set; }
+#endif
 
         private readonly Game _game;
         private GraphicsDevice _graphicsDevice;
