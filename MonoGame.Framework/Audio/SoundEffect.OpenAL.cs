@@ -237,7 +237,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformInitialize()
         {
-            OpenALSoundController.EnsureInitialized();            
+            OpenALSoundController.EnsureInitialized();
         }
 
         internal static void PlatformShutdown()
