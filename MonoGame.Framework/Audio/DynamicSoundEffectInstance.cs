@@ -78,7 +78,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             SoundEffect.Initialize();
             if (SoundEffect._systemState != SoundEffect.SoundSystemState.Initialized)
-                return;
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
 
             if ((sampleRate < 8000) || (sampleRate > 48000))
                 throw new ArgumentOutOfRangeException("sampleRate");

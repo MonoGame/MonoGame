@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             Initialize();
             if (_systemState != SoundSystemState.Initialized)
-                return;
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
 
             /*
               The Stream object must point to the head of a valid PCM wave file. Also, this wave file must be in the RIFF bitstream format.
@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             Initialize();
             if (_systemState != SoundSystemState.Initialized)
-                return;
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
 
             _duration = TimeSpan.FromMilliseconds(durationMs);
 
@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             Initialize();
             if (_systemState != SoundSystemState.Initialized)
-                return;
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
 
             // Handle the common case... the rest is platform specific.
             if (codec == MiniFormatTag.Pcm)
@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             Initialize();
             if (_systemState != SoundSystemState.Initialized)
-                return;
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
 
             if (sampleRate < 8000 || sampleRate > 48000)
                 throw new ArgumentOutOfRangeException("sampleRate");

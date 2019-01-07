@@ -286,29 +286,36 @@ namespace Microsoft.Xna.Framework.Audio
             return false;
         }
 
-		public static OpenALSoundController GetInstance
+        public static void EnsureInitialized()
+        {
+            if (_instance == null)
+            {
+                try
+                {
+                    _instance = new OpenALSoundController();
+                }
+                catch (DllNotFoundException)
+                {
+                    throw;
+                }
+                catch (NoAudioHardwareException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
+                }
+            }
+        }
+
+
+        public static OpenALSoundController Instance
         {
 			get
             {
                 if (_instance == null)
-                {
-                    try
-                    {
-                        _instance = new OpenALSoundController();
-                    }
-                    catch (DllNotFoundException)
-                    {
-                        throw;
-                    }
-                    catch (NoAudioHardwareException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
-                    }
-                }
+                    throw new NoAudioHardwareException("OpenAL context has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
 				return _instance;
 			}
 		}
