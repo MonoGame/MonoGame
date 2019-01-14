@@ -140,6 +140,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (_sessionState != SessionState.Paused)
                 return;
+            _sessionState = SessionState.Started;
             _mediaEngineEx.Play();
         }
 
@@ -147,6 +148,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (_sessionState == SessionState.Stopped)
                 return;
+            _sessionState = SessionState.Stopped;
             _mediaEngineEx.Source = null;
         }
     }
