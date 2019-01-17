@@ -7,8 +7,8 @@ open Microsoft.Xna.Framework.Input
 type Game1 () as this =
     inherit Game()
  
-    let _graphics : GraphicsDeviceManager = new GraphicsDeviceManager(this)
-    let mutable _spriteBatch : SpriteBatch = Unchecked.defaultof<_>
+    let graphics = new GraphicsDeviceManager(this)
+    let mutable spriteBatch = Unchecked.defaultof<_>
 
     do
         this.Content.RootDirectory <- "Content"
@@ -20,7 +20,7 @@ type Game1 () as this =
         base.Initialize()
 
     override this.LoadContent() =
-        _spriteBatch <- new SpriteBatch(this.GraphicsDevice)
+        spriteBatch <- new SpriteBatch(this.GraphicsDevice)
 
         // TODO: use this.Content to load your game content here
  
