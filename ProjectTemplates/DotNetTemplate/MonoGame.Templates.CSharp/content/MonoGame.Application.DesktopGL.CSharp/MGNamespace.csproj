@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <MonoGameContentReference Include="**\*.mgcb" />
+    <MonoGameContentReference Include="Content\Content.mgcb" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>

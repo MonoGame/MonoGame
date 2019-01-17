@@ -11,7 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <MonoGameContentReference Include="**\*.mgcb" />
+    <None Include="Content\Content.mgcb" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <MonoGameContentReference Include="Content\Content.mgcb" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
