@@ -1,0 +1,22 @@
+{
+    "author": "MonoGame Team",
+    "classifications": [
+        "MonoGame"
+    ],
+    "name": "MonoGame NetStandard Library",
+    "groupIdentity": "MonoGame.Library.NetStandard",
+    "identity": "MonoGame.Library.NetStandard.FSharp",
+    "shortName": "mgnetstandard",
+    "tags": {
+        "language": "F#",
+        "type": "project"
+    },
+    "primaryOutputs": [
+        {
+            "path": "MGNamespace.fsproj"
+        }
+    ],
+    "sourceName": "MGNamespace",
+    "preferNameDirectory": "true",
+    "description": "A MonoGame NetStandard library project. Can be used to share game code between platforms."
+}
