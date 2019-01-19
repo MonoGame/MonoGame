@@ -23,13 +23,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		Effect _effect;
         bool _beginCalled;
 
-		Effect _spriteEffect;
-	    readonly EffectParameter _matrixTransform;
+		SpriteEffect _spriteEffect;
         readonly EffectPass _spritePass;
 
-		Matrix? _matrix;
-	    private Viewport _lastViewport;
-	    private Matrix _projection;
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
 		Vector2 _texCoordBR = new Vector2 (0,0);
@@ -51,9 +47,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			this.GraphicsDevice = graphicsDevice;
 
-            // Use a custom SpriteEffect so we can control the transformation matrix
-            _spriteEffect = new Effect(graphicsDevice, EffectResource.SpriteEffect.Bytecode);
-            _matrixTransform = _spriteEffect.Parameters["MatrixTransform"];
+            _spriteEffect = new SpriteEffect(graphicsDevice);
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
             _batcher = new SpriteBatcher(graphicsDevice);
@@ -95,7 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _depthStencilState = depthStencilState ?? DepthStencilState.None;
             _rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
             _effect = effect;
-            _matrix = transformMatrix;
+            _spriteEffect.TransformMatrix = transformMatrix;
 
             // Setup things now so a user can change them.
             if (sortMode == SpriteSortMode.Immediate)
@@ -130,29 +124,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			gd.DepthStencilState = _depthStencilState;
 			gd.RasterizerState = _rasterizerState;
 			gd.SamplerStates[0] = _samplerState;
-			
-			var vp = gd.Viewport;
-            if ((vp.Width != _lastViewport.Width) || (vp.Height != _lastViewport.Height))
-            {
-                // Normal 3D cameras look into the -z direction (z = 1 is in front of z = 0). The
-                // sprite batch layer depth is the opposite (z = 0 is in front of z = 1).
-                // --> We get the correct matrix with near plane 0 and far plane -1.
-                Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out _projection);
-
-                // Some platforms require a half pixel offset to match DX.
-                if (NeedsHalfPixelOffset)
-                {
-                    _projection.M41 += -0.5f * _projection.M11;
-                    _projection.M42 += -0.5f * _projection.M22;
-                }
-
-                _lastViewport = vp;
-            }
-
-            if (_matrix.HasValue)
-                _matrixTransform.SetValue(_matrix.GetValueOrDefault() * _projection);
-            else
-                _matrixTransform.SetValue(_projection);
 
             _spritePass.Apply();
 		}
