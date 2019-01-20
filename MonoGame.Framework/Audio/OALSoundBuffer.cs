@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Audio
                 ALHelper.CheckError("Failed to fill buffer.");
             }
 
-            if (loopStart >= 0 && loopLength > 0)
+            if (OpenALSoundController.GetInstance.SupportsLoopPoints && loopStart >= 0 && loopLength > 0)
             {
                 //Loop end is loopStart + loopLength
                 int[] loopData = new int[2] { loopStart, loopStart + loopLength };
