@@ -264,7 +264,7 @@ namespace Microsoft.Xna.Framework.Input
         public int GetPressedKeys(Keys[] keys)
         {
             if (keys == null)
-                throw new System.ArgumentNullException(nameof(keys));
+                throw new System.ArgumentNullException("keys");
 
             uint count = CountBits(keys0) + CountBits(keys1) + CountBits(keys2) + CountBits(keys3)
                     + CountBits(keys4) + CountBits(keys5) + CountBits(keys6) + CountBits(keys7);
