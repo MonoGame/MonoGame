@@ -219,6 +219,18 @@ namespace Microsoft.Xna.Framework.Input
             return index;
         }
 
+        private static int AddKeysToArrayConstrained(uint keys, int offset, Keys[] pressedKeys, int index)
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                if (index >= pressedKeys.Length) break;
+
+                if ((keys & (1 << i)) != 0)
+                    pressedKeys[index++] = (Keys)(offset + i);
+            }
+            return index;
+        }
+
         /// <summary>
         /// Returns an array of values holding keys that are currently being pressed.
         /// </summary>
@@ -242,6 +254,34 @@ namespace Microsoft.Xna.Framework.Input
             if (keys7 != 0) index = AddKeysToArray(keys7, 7 * 32, keys, index);
 
             return keys;
+        }
+
+        /// <summary>
+        /// Fills an array of values holding keys that are currently being pressed, returning how many elements were filled.
+        /// </summary>
+        /// <param name="keys">The keys array to fill. It will fill as much as array holds.</param>
+        /// <returns>The number of keys filled into the array.</returns>
+        public int GetPressedKeys(Keys[] keys)
+        {
+            if (keys == null)
+                throw new System.ArgumentNullException(nameof(keys));
+
+            uint count = CountBits(keys0) + CountBits(keys1) + CountBits(keys2) + CountBits(keys3)
+                    + CountBits(keys4) + CountBits(keys5) + CountBits(keys6) + CountBits(keys7);
+            if (count == 0)
+                return 0;
+
+            int index = 0;
+            if (keys0 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys0, 0 * 32, keys, index);
+            if (keys1 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys1, 1 * 32, keys, index);
+            if (keys2 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys2, 2 * 32, keys, index);
+            if (keys3 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys3, 3 * 32, keys, index);
+            if (keys4 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys4, 4 * 32, keys, index);
+            if (keys5 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys5, 5 * 32, keys, index);
+            if (keys6 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys6, 6 * 32, keys, index);
+            if (keys7 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys7, 7 * 32, keys, index);
+
+            return index;
         }
 
         #endregion
