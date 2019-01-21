@@ -369,25 +369,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
-        protected SharpDX.Direct3D11.Texture2DDescription GetTextureDescription(int msCount = 1, int msQuality = 0)
-        {
-            var desc = new SharpDX.Direct3D11.Texture2DDescription
-            {
-                Width = width,
-                Height = height,
-                MipLevels = _levelCount,
-                ArraySize = ArraySize,
-                Format = SharpDXHelper.ToFormat(_format),
-                BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource,
-                CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None,
-                SampleDescription =
-                {
-                    Count = msCount,
-                    Quality = msQuality
-                },
-                Usage = SharpDX.Direct3D11.ResourceUsage.Default,
-                OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None
-            };
+        internal override SharpDX.Direct3D11.Resource CreateTexture()
+		{
+            // TODO: Move this to SetData() if we want to make Immutable textures!
+            var desc = new SharpDX.Direct3D11.Texture2DDescription();
+            desc.Width = width;
+            desc.Height = height;
+            desc.MipLevels = _levelCount;
+            desc.ArraySize = ArraySize;
+            desc.Format = SharpDXHelper.ToFormat(_format);
+            desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
+            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            desc.SampleDescription.Count = 1;
+            desc.SampleDescription.Quality = 0;
+            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
+            desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
             if (_renderTarget)
             {
@@ -403,13 +399,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_shared)
                 desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.Shared;
 
-            return desc;
-        }
-
-        internal override SharpDX.Direct3D11.Resource CreateTexture()
-		{
-            // TODO: Move this to SetData() if we want to make Immutable textures!
-            return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, GetTextureDescription());
+            return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
         }
 
         private void PlatformReload(Stream textureStream)

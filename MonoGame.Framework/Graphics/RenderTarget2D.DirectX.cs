@@ -17,15 +17,6 @@ namespace Microsoft.Xna.Framework.Graphics
             GenerateIfRequired();
         }
 
-        internal override Resource CreateTexture()
-        {
-            if (MultiSampleCount > 1)
-                return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice,
-                    GetTextureDescription(MultiSampleCount,
-                        (int) StandardMultisampleQualityLevels.StandardMultisamplePattern));
-            return base.CreateTexture();
-        }
-
         private void GenerateIfRequired()
         {
             if (_renderTargetViews != null)
@@ -66,13 +57,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             // Setup the multisampling description.
-            var depthStencilViewDimension = DepthStencilViewDimension.Texture2D;
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if (MultiSampleCount > 1)
             {
                 multisampleDesc.Count = MultiSampleCount;
                 multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
-                depthStencilViewDimension = DepthStencilViewDimension.Texture2DMultisampled;
             }
 
             // Create a descriptor for the depth/stencil buffer.
@@ -94,7 +83,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     new DepthStencilViewDescription()
                     {
                         Format = SharpDXHelper.ToFormat(DepthStencilFormat),
-                        Dimension = depthStencilViewDimension
+                        Dimension = DepthStencilViewDimension.Texture2D
                     });
             }
         }
