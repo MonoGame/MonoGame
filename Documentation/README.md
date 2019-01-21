@@ -4,12 +4,12 @@ THIS IS A WORK IN PROGRESS!
 This is the source for the [documentation published on MonoGame.net](http://www.monogame.net/documentation/).  It is rebuilt when the code changes and is published nightly to the website.
 
 ## General Rules
-First some general rules one should follow when contributing documentation to the MonoGame project.
+The following rules must be observed at all times when contributing documentation to the MonoGame project.
 
- - Write in a neutral technical tone at all times.
+ - Write in a neutral, technical tone.
  - Avoid humor, personal opinions, and colloquial language.
  - **Never** plagiarize any documentation from another source.
- - Automatic documentation tools are useless.
+ - Do not use automatic documentation tools as they are ineffective. 
 
 Breaking these rules can result in your contribution being rejected.
 
@@ -22,16 +22,16 @@ You can create and edit documentation right from the web browser without needing
  - [Submit pull requests](https://help.github.com/articles/creating-a-pull-request/) early and often to merge your documentation changes.
 
 ## Style Guide
-Before you contribute any documentation you should learn a bit about what we expect out of the different types of documentation.
+Review the following expectations before contributing any documentation.
 
 ### Manuals, Guides, and Tutorials
 TODO!
 
 ### API Reference 
-The API reference documentation is a big part of the documentation effort for MonoGame.  The documentation is written in the [C# XML format](http://msdn.microsoft.com/en-us/library/b2s063f7(vs.71).aspx) and is inline to the MonoGame source code. The final web pages with API documentation are generated using [SharpDoc](http://sharpdx.org/documentation/tools/sharpdoc).
+The API reference documentation is a big part of the documentation effort for MonoGame.  The documentation is written in the [C# XML format](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/xml-documentation-comments) and is inline to the MonoGame source code. The final web pages with API documentation are generated using [SharpDoc](https://github.com/xoofx/SharpDoc).
 
 #### Every Word Should Contain Value
-In the reference documentation every word should strive to provide additional information beyond the API itself.  If the documentation only rehashes or rephrases what is already apparent in the class, method, parameter, or property name it has zero value and will only waste the time of both the writer and reader.
+Every word in the reference documentation should provide information beyond the API itself.  Documentation that only rehashes or rephrases what is already apparent in the class, method, parameter, or property name has zero value and wastes time for both the writer and reader.
 
 #### The First Sentence Is The Most Important
 There is no guarantee that the reader will read beyond the first sentence of the reference documentation.  This is why that first sentence is the most important and should convey the most key piece of information.  Take your time to write the most concise and clear first sentence possible.  This helps users tremendously and goes a long way towards having great documentation.

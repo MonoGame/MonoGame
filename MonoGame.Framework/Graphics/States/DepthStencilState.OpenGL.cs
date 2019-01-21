@@ -2,21 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-using GLStencilFunction = MonoMac.OpenGL.StencilFunction;
-#else
-using OpenTK.Graphics.OpenGL;
-using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
-#endif
-#elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
-using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
-#elif GLES
-using OpenTK.Graphics.ES20;
-using GLStencilFunction = OpenTK.Graphics.ES20.StencilFunction;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -73,22 +59,10 @@ namespace Microsoft.Xna.Framework.Graphics
             // set function
             if (this.TwoSidedStencilMode)
             {
-#if GLES
-                    var cullFaceModeFront = CullFaceMode.Front;
-                    var cullFaceModeBack = CullFaceMode.Back;
-                    var stencilFaceFront = CullFaceMode.Front;
-                    var stencilFaceBack = CullFaceMode.Back;
-#elif MONOMAC
-                    var cullFaceModeFront = (Version20)CullFaceMode.Front;
-                    var cullFaceModeBack = (Version20)CullFaceMode.Back;
-                    var stencilFaceFront = StencilFace.Front;
-                    var stencilFaceBack = StencilFace.Back;
-#else
                 var cullFaceModeFront = StencilFace.Front;
                 var cullFaceModeBack = StencilFace.Back;
                 var stencilFaceFront = StencilFace.Front;
                 var stencilFaceBack = StencilFace.Back;
-#endif
 
                 if (force ||
 					this.TwoSidedStencilMode != device._lastDepthStencilState.TwoSidedStencilMode ||

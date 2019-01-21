@@ -6,8 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
@@ -44,15 +47,20 @@ namespace Microsoft.Xna.Framework
             if (version <= 204)
                 Debug.WriteLine ("Please use SDL 2.0.5 or higher.");
 
-            Sdl.Init((int) (
+            // Needed so VS can debug the project on Windows
+            if (version >= 205 && CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
+                Sdl.SetHint("SDL_WINDOWS_DISABLE_THREAD_NAMING", "1");
+
+            Sdl.Init((int)(
                 Sdl.InitFlags.Video |
                 Sdl.InitFlags.Joystick |
                 Sdl.InitFlags.GameController |
                 Sdl.InitFlags.Haptic
-                ));
+            ));
 
             Sdl.DisableScreenSaver();
 
+            GamePad.InitDatabase();
             Window = _view = new SdlGameWindow(_game);
 
             try
@@ -67,7 +75,6 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize ()
         {
-            _view.CreateWindow();
             SdlRunLoop();
 
             base.BeforeInitialize ();
@@ -78,6 +85,14 @@ namespace Microsoft.Xna.Framework
             _view.SetCursorVisible(_game.IsMouseVisible);
         }
 
+        internal override void OnPresentationChanged(PresentationParameters pp)
+        {
+            var displayIndex = Sdl.Window.GetDisplayIndex(Window.Handle);
+            var displayName = Sdl.Display.GetDisplayName(displayIndex);
+            BeginScreenDeviceChange(pp.IsFullScreen);
+            EndScreenDeviceChange(displayName, pp.BackBufferWidth, pp.BackBufferHeight);
+        }
+
         public override void RunLoop()
         {
             Sdl.Window.Show(Window.Handle);
@@ -86,12 +101,12 @@ namespace Microsoft.Xna.Framework
             {
                 SdlRunLoop();
                 Game.Tick();
+                Threading.Run();
+                GraphicsDevice.DisposeContexts();
 
                 if (_isExiting > 0)
                     break;
             }
-
-            Dispose();
         }
 
         private void SdlRunLoop()
@@ -104,16 +119,29 @@ namespace Microsoft.Xna.Framework
                     _isExiting++;
                 else if (ev.Type == Sdl.EventType.JoyDeviceAdded)
                     Joystick.AddDevice(ev.JoystickDevice.Which);
+                else if (ev.Type == Sdl.EventType.ControllerDeviceRemoved)
+                    GamePad.RemoveDevice(ev.ControllerDevice.Which);
                 else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
                     Joystick.RemoveDevice(ev.JoystickDevice.Which);
                 else if (ev.Type == Sdl.EventType.MouseWheel)
-                    Mouse.ScrollY += ev.Wheel.Y * 120;
+                {
+                    const int wheelDelta = 120;
+                    Mouse.ScrollY += ev.Wheel.Y * wheelDelta;
+                    Mouse.ScrollX += ev.Wheel.X * wheelDelta;
+                }
+                else if (ev.Type == Sdl.EventType.MouseMotion)
+                {
+                    Window.MouseState.X = ev.Motion.X;
+                    Window.MouseState.Y = ev.Motion.Y;
+                }
                 else if (ev.Type == Sdl.EventType.KeyDown)
                 {
                     var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
-
                     if (!_keys.Contains(key))
                         _keys.Add(key);
+                    char character = (char)ev.Key.Keysym.Sym;
+                    if (char.IsControl(character))
+                        _view.CallTextInput(character, key);
                 }
                 else if (ev.Type == Sdl.EventType.KeyUp)
                 {
@@ -122,26 +150,40 @@ namespace Microsoft.Xna.Framework
                 }
                 else if (ev.Type == Sdl.EventType.TextInput)
                 {
-                    string text;
+                    int len = 0;
+                    string text = String.Empty;
                     unsafe
                     {
-                        text = new string((char*)ev.Text.Text);
+                        while (Marshal.ReadByte ((IntPtr)ev.Text.Text, len) != 0) {
+                            len++;
+                        }
+                        var buffer = new byte [len];
+                        Marshal.Copy ((IntPtr)ev.Text.Text, buffer, 0, len);
+                        text = System.Text.Encoding.UTF8.GetString (buffer);
                     }
-
                     if (text.Length == 0)
                         continue;
-
                     foreach (var c in text)
-                        _view.CallTextInput(c);
+                    {
+                        var key = KeyboardUtil.ToXna((int)c);
+                        _view.CallTextInput(c, key);
+                    }
                 }
                 else if (ev.Type == Sdl.EventType.WindowEvent)
                 {
-                    if (ev.Window.EventID == Sdl.Window.EventId.Resized)
-                        _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
-                    else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
-                        IsActive = true;
-                    else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
-                        IsActive = false;
+                    if (ev.Window.WindowID == _view.Id)
+                    {
+                        if (ev.Window.EventID == Sdl.Window.EventId.Resized || ev.Window.EventID == Sdl.Window.EventId.SizeChanged)
+                            _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
+                        else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
+                            IsActive = true;
+                        else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
+                            IsActive = false;
+                        else if (ev.Window.EventID == Sdl.Window.EventId.Moved)
+                            _view.Moved();
+                        else if (ev.Window.EventID == Sdl.Window.EventId.Close)
+                            _isExiting++;
+                    }
                 }
             }
         }

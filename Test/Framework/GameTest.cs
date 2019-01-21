@@ -1,86 +1,15 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2012 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
-
-1. Definitions
-
-The terms "reproduce," "reproduction," "derivative works," and "distribution"
-have the same meaning here as under U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the
-software.
-
-A "contributor" is any person that distributes its contribution under this
-license.
-
-"Licensed patents" are a contributor's patent claims that read directly on its
-contribution.
-
-2. Grant of Rights
-
-(A) Copyright Grant- Subject to the terms of this license, including the
-license conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free copyright license to reproduce its
-contribution, prepare derivative works of its contribution, and distribute its
-contribution or any derivative works that you create.
-
-(B) Patent Grant- Subject to the terms of this license, including the license
-conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free license under its licensed patents to
-make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
-its contribution in the software or derivative works of the contribution in the
-software.
-
-3. Conditions and Limitations
-
-(A) No Trademark License- This license does not grant you rights to use any
-contributors' name, logo, or trademarks.
-
-(B) If you bring a patent claim against any contributor over patents that you
-claim are infringed by the software, your patent license from such contributor
-to the software ends automatically.
-
-(C) If you distribute any portion of the software, you must retain all
-copyright, patent, trademark, and attribution notices that are present in the
-software.
-
-(D) If you distribute any portion of the software in source code form, you may
-do so only under this license by including a complete copy of this license with
-your distribution. If you distribute any portion of the software in compiled or
-object code form, you may only do so under a license that complies with this
-license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The
-contributors give no express warranties, guarantees or conditions. You may have
-additional consumer rights under your local laws which this license cannot
-change. To the extent permitted under your local laws, the contributors exclude
-the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 
 namespace MonoGame.Tests {
 	static partial class GameTest {
@@ -119,7 +48,7 @@ namespace MonoGame.Tests {
 			[TestCase ("Services")]
 			[TestCase ("TargetElapsedTime")]
 			[TestCase ("Window")]
-			[RequiresSTA]
+			[Apartment(ApartmentState.STA)]
 			public void Property_does_not_throws_after_Dispose (string propertyName)
 			{
 				var propertyInfo = Game.GetType ().GetProperty (propertyName);
@@ -138,8 +67,8 @@ namespace MonoGame.Tests {
 			[TestCase ("RunOneFrame")]
 			[TestCase ("SuppressDraw")]
 			[TestCase ("Tick")]
-			[RequiresSTA]
-			public void Method_does_not_throw_after_Dispose (string methodName)
+			[Apartment(ApartmentState.STA)]
+            public void Method_does_not_throw_after_Dispose (string methodName)
 			{
 				var methodInfo = Game.GetType ().GetMethod (methodName, new Type [0]);
 				if (methodInfo == null)
@@ -204,7 +133,7 @@ namespace MonoGame.Tests {
 
 		[TestFixture]
 		public class Behaviors : FixtureBase {
-			[Test, RequiresSTA, Ignore]
+			[Test, Ignore("Fix me!"), Apartment(ApartmentState.STA)]
 			public void Nongraphical_run_succeeds ()
 			{
 				Game.Run ();
@@ -213,7 +142,7 @@ namespace MonoGame.Tests {
 				Assert.That (Game, Has.Property ("DrawCount").EqualTo (0));
 			}
 
-			[Test, Ignore, RequiresSTA]
+			[Test, Ignore("Fix me!"), Apartment(ApartmentState.STA)]
 			public void Fixed_time_step_skips_draw_when_update_is_slow ()
 			{
 				Game.MakeGraphical ();
@@ -238,6 +167,114 @@ namespace MonoGame.Tests {
 				//Assert.That(_game, Has.Property("DrawCount").EqualTo(10));
 			}
 		}
+
+        [TestFixture]
+        public class Misc
+        {
+            [Test]
+            [Ignore("MG crashes when no graphicsDeviceManager is set and Run is called")]
+            public void LoadContentNotCalledWithoutGdm()
+            {
+                var g = new CountCallsGame();
+                g.PublicInitialize();
+
+                Assert.AreEqual(0, g.LoadContentCount);
+
+                g.Dispose();
+            }
+
+            [Test]
+            [Ignore("MG crashes when no GraphicsDevice is set and Run is called")]
+            public void LoadContentNotCalledWithoutGd()
+            {
+                var g = new CountCallsGame();
+                var gdm = new GraphicsDeviceManager(g);
+
+                g.PublicInitialize();
+
+                Assert.AreEqual(0, g.LoadContentCount);
+
+                g.Dispose();
+            }
+
+            [Test]
+#if DESKTOPGL
+            [Ignore("This crashes inside SDL on Mac!")]
+#endif
+            public void ExitHappensAtEndOfTick()
+            {
+                // Exit called in Run
+                var g = new ExitTestGame();
+
+                // TODO this is not necessary for XNA, but MG crashes when no GDM is set and Run is called
+                new GraphicsDeviceManager(g);
+                g.Run();
+                Assert.AreEqual(2, g.UpdateCount);
+                Assert.AreEqual(0, g.DrawCount); // Draw should be suppressed
+                Assert.AreEqual(1, g.ExitingCount);
+
+                g.Dispose();
+            }
+
+            private class ExitTestGame : CountCallsGame
+            {
+                private int count = 0;
+
+                protected override void Update(GameTime gameTime)
+                {
+                    if (count > 0)
+                        Exit();
+
+                    base.Update(gameTime);
+                    Assert.IsNotNull(Window);
+                    Assert.AreEqual(0, ExitingCount);
+
+                    count++;
+                }
+            }
+
+            private class CountCallsGame : Game
+            {
+                public int BeginRunCount { get; set; }
+                public int InitializeCount { get; set; }
+                public int LoadContentCount { get; set; }
+                public int UnloadContentCount { get; set; }
+                public int UpdateCount { get; set; }
+                public int BeginDrawCount { get; set; }
+                public int DrawCount { get; set; }
+                public int EndDrawCount { get; set; }
+                public int EndRunCount { get; set; }
+                public int DeactivatedCount { get; set; }
+                public int ActivatedCount { get; set; }
+                public int ExitingCount { get; set; }
+                public int DisposeCount { get; set; }
+
+                public void PublicBeginRun() { BeginRun(); }
+                protected override void BeginRun() { BeginRunCount++; base.BeginRun(); }
+                public void PublicInitialize() { Initialize(); }
+                protected override void Initialize() { InitializeCount++; base.Initialize(); }
+                public void PublicLoadContent() { LoadContent(); }
+                protected override void LoadContent() { LoadContentCount++; base.LoadContent(); }
+                public void PublicUnloadContent() { UnloadContent(); }
+                protected override void UnloadContent() { UnloadContentCount++; base.UnloadContent(); }
+                public void PublicUpdate(GameTime gt = null) { Update(gt ?? new GameTime()); }
+                protected override void Update(GameTime gameTime) { UpdateCount++; base.Update(gameTime); }
+                public bool PublicBeginDraw() { return BeginDraw(); }
+                protected override bool BeginDraw() { BeginDrawCount++; return base.BeginDraw(); }
+                public void PublicDraw(GameTime gt) { Draw(gt ?? new GameTime()); }
+                protected override void Draw(GameTime gameTime) { DrawCount++; base.Draw(gameTime); }
+                public bool PublicEndDraw() { return BeginDraw(); }
+                protected override void EndDraw() { EndDrawCount++; base.EndDraw(); }
+                public void PublicEndRun() { EndRun(); }
+                protected override void EndRun() { EndRunCount++; base.EndRun(); }
+
+                protected override void OnActivated(object sender, EventArgs args) { ActivatedCount++; base.OnActivated(sender, args); }
+                protected override void OnDeactivated(object sender, EventArgs args) { DeactivatedCount++; base.OnDeactivated(sender, args); }
+                protected override void OnExiting(object sender, EventArgs args) { ExitingCount++; base.OnExiting(sender, args); }
+                protected override void Dispose(bool disposing) { DisposeCount++; base.Dispose(disposing); }
+            }
+
+        }
 
 		public class MockGame : TestGameBase {
 			public MockGame ()

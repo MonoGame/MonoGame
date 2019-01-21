@@ -20,6 +20,11 @@ namespace MonoGame.Tests.Framework
             //Test ordering
             Assert.AreEqual(124, new Alpha8(124f / 0xff).PackedValue);
             Assert.AreEqual(26, new Alpha8(0.1f).PackedValue);
+
+			var packed = new Alpha8(0.5f).PackedValue;
+            var unpacked = new Alpha8() { PackedValue = packed }.ToAlpha();
+			Assert.AreEqual(0.5f, unpacked, 0.01f);
+
         }
 
         [Test]
@@ -48,6 +53,13 @@ namespace MonoGame.Tests.Framework
             z = 0.5f;
             w = -0.7f;
             Assert.AreEqual(3088, new Bgra5551(x, y, z, w).PackedValue);
+
+            var packed = new Bgra5551(x, y, z, w).PackedValue;
+            var unpacked = new Bgra5551() { PackedValue = packed }.ToVector4();
+            Assert.AreEqual(x, unpacked.X, 0.1f);
+            Assert.AreEqual(0f, unpacked.Y);
+            Assert.AreEqual(z, unpacked.Z, 0.1f);
+            Assert.AreEqual(0f, unpacked.W);
         }
 
         [Test]
@@ -72,6 +84,11 @@ namespace MonoGame.Tests.Framework
             x = 0.1f;
             y = -0.3f;
             Assert.AreEqual(6554, new Rg32(x, y).PackedValue);
+
+			var packed = new Rg32(x, y).PackedValue;
+			var unpacked = new Rg32() { PackedValue = packed }.ToVector2();
+			Assert.AreEqual(x, unpacked.X, 0.01f);
+			Assert.AreEqual(0f, unpacked.Y);
 
         }
 
@@ -101,6 +118,13 @@ namespace MonoGame.Tests.Framework
             z = 0.5f;
             w = -0.7f;
             Assert.AreEqual(536871014, new Rgba1010102(x, y, z, w).PackedValue);
+
+			var packed = new Rgba1010102(x, y, z, w).PackedValue;
+			var unpacked = new Rgba1010102() { PackedValue = packed }.ToVector4();
+			Assert.AreEqual(x, unpacked.X, 0.01f);
+			Assert.AreEqual(0f, unpacked.Y, 0.01f);
+			Assert.AreEqual(z, unpacked.Z, 0.01f);
+			Assert.AreEqual(0f, unpacked.W, 0.01f);
         }
 
         [Test]
@@ -122,6 +146,17 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(0xC7AD8F5C570A1EB8, new Rgba64(((float) 0x1EB8) / 0xffff, ((float) 0x570A) / 0xffff, ((float) 0x8F5C) / 0xffff, ((float) 0xC7AD) / 0xffff).PackedValue);
             Assert.AreEqual(0xC7AD8F5C570A1EB8, new Rgba64(0.12f, 0.34f, 0.56f, 0.78f).PackedValue);
             Assert.AreEqual(0x73334CCC2666147B, new Rgba64(0.08f, 0.15f, 0.30f, 0.45f).PackedValue);
+
+			float x = 0.1f;
+			float y = -0.3f;
+			float z = 0.5f;
+			float w = -0.7f;
+			var packed = new Rgba64(x, y, z, w).PackedValue;
+			var unpacked = new Rgba64() { PackedValue = packed }.ToVector4();
+			Assert.AreEqual(x, unpacked.X, 0.01f);
+			Assert.AreEqual(0f, unpacked.Y, 0.01f);
+			Assert.AreEqual(z, unpacked.Z, 0.01f);
+			Assert.AreEqual(0f, unpacked.W, 0.01f);
         }
 
         [Test]
@@ -143,6 +178,13 @@ namespace MonoGame.Tests.Framework
             float w = -0.7f;
             Assert.AreEqual(0xA740DA0D, new NormalizedByte4(x, y, z, w).PackedValue);
             Assert.AreEqual(958796544, new NormalizedByte4(0.0008f, 0.15f, 0.30f, 0.45f).PackedValue);
+
+			var packed = new NormalizedByte4(x, y, z, w).PackedValue;
+			var unpacked = new NormalizedByte4() { PackedValue = packed }.ToVector4();
+			Assert.AreEqual(x, unpacked.X, 0.01f);
+			Assert.AreEqual(y, unpacked.Y, 0.01f);
+			Assert.AreEqual(z, unpacked.Z, 0.01f);
+			Assert.AreEqual(w, unpacked.W, 0.01f);
 
         }
 
@@ -166,6 +208,11 @@ namespace MonoGame.Tests.Framework
             float x = 0.1f;
             float y = -0.3f;
             Assert.AreEqual(0xda0d, new NormalizedByte2(x, y).PackedValue);
+
+			var packed = new NormalizedByte2(x, y).PackedValue;
+			var unpacked = new NormalizedByte2() { PackedValue = packed }.ToVector2();
+			Assert.AreEqual(x, unpacked.X, 0.01f);
+			Assert.AreEqual(y, unpacked.Y, 0.01f);
         }
 
         [Test]
@@ -189,6 +236,13 @@ namespace MonoGame.Tests.Framework
 
             Assert.AreEqual(0xa6674000d99a0ccd, new NormalizedShort4(x, y, z, w).PackedValue);
             Assert.AreEqual(4150390751449251866, new NormalizedShort4(0.0008f, 0.15f, 0.30f, 0.45f).PackedValue);
+
+			var packed = new NormalizedShort4(x, y, z, w).PackedValue;
+			var unpacked = new NormalizedShort4() { PackedValue = packed }.ToVector4();
+			Assert.AreEqual(x, unpacked.X, 0.01f);
+			Assert.AreEqual(y, unpacked.Y, 0.01f);
+			Assert.AreEqual(z, unpacked.Z, 0.01f);
+			Assert.AreEqual(w, unpacked.W, 0.01f);
 
         }
 
@@ -215,6 +269,11 @@ namespace MonoGame.Tests.Framework
             x = 0.1f;
             y = -0.3f;
             Assert.AreEqual(3650751693, new NormalizedShort2(x, y).PackedValue);
+
+			var packed = new NormalizedShort2(x, y).PackedValue;
+			var unpacked = new NormalizedShort2() { PackedValue = packed }.ToVector2();
+			Assert.AreEqual(x, unpacked.X, 0.01f);
+			Assert.AreEqual(y, unpacked.Y, 0.01f);
         }
 
         [Test]
@@ -248,6 +307,11 @@ namespace MonoGame.Tests.Framework
             x = 127.5f;
             y = -5.3f;
             Assert.AreEqual(4294639744, new Short2(x, y).PackedValue);
+
+			var packed = new Short2(x, y).PackedValue;
+			var unpacked = new Short2() { PackedValue = packed }.ToVector2();
+			Assert.AreEqual(128f, unpacked.X);
+			Assert.AreEqual(-5f, unpacked.Y);
 
         }
 
@@ -284,6 +348,13 @@ namespace MonoGame.Tests.Framework
             w = -0.7f;
             Assert.AreEqual(18446462598732840960, new Short4(x, y, z, w).PackedValue);
 
+			var packed = new Short4(x, y, z, w).PackedValue;
+			var unpacked = new Short4() { PackedValue = packed }.ToVector4();
+			Assert.AreEqual(0f, unpacked.X);
+			Assert.AreEqual(0f, unpacked.Y);
+			Assert.AreEqual(0f, unpacked.Z);
+			Assert.AreEqual(-1f, unpacked.W);
+
         }
 
         [Test]
@@ -316,6 +387,13 @@ namespace MonoGame.Tests.Framework
             float z = 0.5f;
             float w = -0.7f;
             Assert.AreEqual(520, new Bgra4444(x, y, z, w).PackedValue);
+
+			var packed = new Bgra4444(x, y, z, w).PackedValue;
+			var unpacked = new Bgra4444() { PackedValue = packed }.ToVector4();
+			Assert.AreEqual(0.13f, unpacked.X, 0.01f);
+			Assert.AreEqual(0f, unpacked.Y);
+			Assert.AreEqual(0.53f, unpacked.Z, 0.01f);
+			Assert.AreEqual(0f, unpacked.W);
         }
 
         [Test]
@@ -345,6 +423,12 @@ namespace MonoGame.Tests.Framework
             float y = -0.3f;
             float z = 0.5f;
             Assert.AreEqual(6160, new Bgr565(x, y, z).PackedValue);
+
+			var packed = new Bgr565(x, y, z).PackedValue;
+			var unpacked = new Bgr565() { PackedValue = packed }.ToVector3();
+			Assert.AreEqual(x, unpacked.X, 0.1f);
+			Assert.AreEqual(0f, unpacked.Y);
+			Assert.AreEqual(z, unpacked.Z, 0.1f);
         }
 
         [Test]
@@ -378,6 +462,13 @@ namespace MonoGame.Tests.Framework
             z = 0.5f;
             w = -0.7f;
             Assert.AreEqual(128, new Byte4(x, y, z, w).PackedValue);
+
+			var packed = new Byte4(x, y, z, w).PackedValue;
+			var unpacked = new Byte4() { PackedValue = packed }.ToVector4();
+			Assert.AreEqual(128f, unpacked.X);
+			Assert.AreEqual(0f, unpacked.Y);
+			Assert.AreEqual(0f, unpacked.Z);
+			Assert.AreEqual(0f, unpacked.W);
         }
 
         [Test]
@@ -391,6 +482,10 @@ namespace MonoGame.Tests.Framework
             //Test values
             Assert.AreEqual(11878, new HalfSingle(0.1f).PackedValue);
             Assert.AreEqual(46285, new HalfSingle(-0.3f).PackedValue);
+
+			var packed = new HalfSingle(0.5f).PackedValue;
+            var unpacked = new HalfSingle() { PackedValue = packed }.ToSingle();
+			Assert.AreEqual(0.5f, unpacked, 0.01f);
         }
 
         [Test]
@@ -406,6 +501,13 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(Vector2.One, new HalfVector2(Vector2.One).ToVector2());
             Assert.AreEqual(Vector2.UnitX, new HalfVector2(Vector2.UnitX).ToVector2());
             Assert.AreEqual(Vector2.UnitY, new HalfVector2(Vector2.UnitY).ToVector2());
+
+			var x = 0.1f;
+			var y = -0.3f;
+			var packed = new HalfVector2(x, y).PackedValue;
+			var unpacked = new HalfVector2() { PackedValue = packed }.ToVector2();
+			Assert.AreEqual(x, unpacked.X, 0.01f);
+			Assert.AreEqual(y, unpacked.Y, 0.01f);
         }
 
         [Test]
@@ -429,6 +531,17 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(Vector4.UnitY, new HalfVector4(Vector4.UnitY).ToVector4());
             Assert.AreEqual(Vector4.UnitZ, new HalfVector4(Vector4.UnitZ).ToVector4());
             Assert.AreEqual(Vector4.UnitW, new HalfVector4(Vector4.UnitW).ToVector4());
+
+			var x = 0.1f;
+			var y = -0.3f;
+			var z = 0.5f;
+			var w = -0.7f;
+			var packed = new HalfVector4(x, y, z, w).PackedValue;
+			var unpacked = new HalfVector4() { PackedValue = packed }.ToVector4();
+			Assert.AreEqual(x, unpacked.X, 0.01f);
+			Assert.AreEqual(y, unpacked.Y, 0.01f);
+			Assert.AreEqual(z, unpacked.Z, 0.01f);
+			Assert.AreEqual(w, unpacked.W, 0.01f);
         }
     }
 }

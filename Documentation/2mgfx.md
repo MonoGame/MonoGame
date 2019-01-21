@@ -26,8 +26,11 @@ The `/Profile` option defines the platform we're targeting with this effect file
 DirectX_11
 OpenGL
 PlayStation4
+PSVita
+XboxOne
+Switch
 ```
-NOTE: PlayStation 4 support is only available to licensed Sony developers.
+NOTE: PlayStation 4, Xbox One, PS Vita, and Switch support is only available to licensed console developers.
 
 ### Help
 If you use `/?`, `/help`, or simply pass no paramters to 2MGFX.exe you will get information about these command line options.
@@ -35,7 +38,7 @@ If you use `/?`, `/help`, or simply pass no paramters to 2MGFX.exe you will get 
 ## Runtime Use
 The resulting compiled MGFX file can be used from your game code like so:
 
-```
+```csharp
 byte[] bytecode = File.ReadAllBytes("mycompiled.mgfx");
 var effect = new Effect(bytecode);
 ```

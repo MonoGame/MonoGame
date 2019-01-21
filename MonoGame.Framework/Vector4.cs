@@ -288,6 +288,44 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Round the members of this <see cref="Vector4"/> towards positive infinity.
+        /// </summary>
+        public void Ceiling()
+        {
+            X = (float)Math.Ceiling(X);
+            Y = (float)Math.Ceiling(Y);
+            Z = (float)Math.Ceiling(Z);
+            W = (float)Math.Ceiling(W);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <returns>The rounded <see cref="Vector4"/>.</returns>
+        public static Vector4 Ceiling(Vector4 value)
+        {
+            value.X = (float)Math.Ceiling(value.X);
+            value.Y = (float)Math.Ceiling(value.Y);
+            value.Z = (float)Math.Ceiling(value.Z);
+            value.W = (float)Math.Ceiling(value.W);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector4"/>.</param>
+        public static void Ceiling(ref Vector4 value, out Vector4 result)
+        {
+            result.X = (float)Math.Ceiling(value.X);
+            result.Y = (float)Math.Ceiling(value.Y);
+            result.Z = (float)Math.Ceiling(value.Z);
+            result.W = (float)Math.Ceiling(value.W);
+        }
+
+        /// <summary>
         /// Clamps the specified value within a range.
         /// </summary>
         /// <param name="value1">The value to clamp.</param>
@@ -474,12 +512,57 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Round the members of this <see cref="Vector4"/> towards negative infinity.
+        /// </summary>
+        public void Floor()
+        {
+            X = (float)Math.Floor(X);
+            Y = (float)Math.Floor(Y);
+            Z = (float)Math.Floor(Z);
+            W = (float)Math.Floor(W);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <returns>The rounded <see cref="Vector4"/>.</returns>
+        public static Vector4 Floor(Vector4 value)
+        {
+            value.X = (float)Math.Floor(value.X);
+            value.Y = (float)Math.Floor(value.Y);
+            value.Z = (float)Math.Floor(value.Z);
+            value.W = (float)Math.Floor(value.W);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector4"/>.</param>
+        public static void Floor(ref Vector4 value, out Vector4 result)
+        {
+            result.X = (float)Math.Floor(value.X);
+            result.Y = (float)Math.Floor(value.Y);
+            result.Z = (float)Math.Floor(value.Z);
+            result.W = (float)Math.Floor(value.W);
+        }
+
+        /// <summary>
         /// Gets the hash code of this <see cref="Vector4"/>.
         /// </summary>
         /// <returns>Hash code of this <see cref="Vector4"/>.</returns>
         public override int GetHashCode()
         {
-            return (int)(this.W + this.X + this.Y + this.Y);
+            unchecked
+            {
+                var hashCode = W.GetHashCode();
+                hashCode = (hashCode * 397) ^ X.GetHashCode();
+                hashCode = (hashCode * 397) ^ Y.GetHashCode();
+                hashCode = (hashCode * 397) ^ Z.GetHashCode();
+                return hashCode;
+            }
         }
 
         /// <summary>
@@ -522,8 +605,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The length of this <see cref="Vector4"/>.</returns>
         public float Length()
         {
-            float result = DistanceSquared(this, zero);
-            return (float)Math.Sqrt(result);
+            return (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z) + (W * W));
         }
 
         /// <summary>
@@ -532,7 +614,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The squared length of this <see cref="Vector4"/>.</returns>
         public float LengthSquared()
         {
-            return DistanceSquared(this, zero);
+            return (X * X) + (Y * Y) + (Z * Z) + (W * W);
         }
 
         /// <summary>
@@ -748,7 +830,12 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Normalize()
         {
-            Normalize(ref this, out this);
+            float factor = (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z) + (W * W));
+            factor = 1f / factor;
+            X *= factor;
+            Y *= factor;
+            Z *= factor;
+            W *= factor;
         }
 
         /// <summary>
@@ -758,9 +845,8 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector4 Normalize(Vector4 value)
         {
-            float factor = DistanceSquared(value, zero);
-            factor = 1f / (float)Math.Sqrt(factor);
-
+            float factor = (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z) + (value.W * value.W));
+            factor = 1f / factor;
             return new Vector4(value.X*factor,value.Y*factor,value.Z*factor,value.W*factor);
         }
 
@@ -771,13 +857,50 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Unit vector as an output parameter.</param>
         public static void Normalize(ref Vector4 value, out Vector4 result)
         {
-            float factor = DistanceSquared(value, zero);
-            factor = 1f / (float)Math.Sqrt(factor);
-
+            float factor = (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z) + (value.W * value.W));
+            factor = 1f / factor;
             result.W = value.W * factor;
             result.X = value.X * factor;
             result.Y = value.Y * factor;
             result.Z = value.Z * factor;
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector4"/> to the nearest integer value.
+        /// </summary>
+        public void Round()
+        {
+            X = (float)Math.Round(X);
+            Y = (float)Math.Round(Y);
+            Z = (float)Math.Round(Z);
+            W = (float)Math.Round(W);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to the nearest integer value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <returns>The rounded <see cref="Vector4"/>.</returns>
+        public static Vector4 Round(Vector4 value)
+        {
+            value.X = (float)Math.Round(value.X);
+            value.Y = (float)Math.Round(value.Y);
+            value.Z = (float)Math.Round(value.Z);
+            value.W = (float)Math.Round(value.W);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to the nearest integer value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector4"/>.</param>
+        public static void Round(ref Vector4 value, out Vector4 result)
+        {
+            result.X = (float)Math.Round(value.X);
+            result.Y = (float)Math.Round(value.Y);
+            result.Z = (float)Math.Round(value.Z);
+            result.W = (float)Math.Round(value.W);
         }
 
         /// <summary>
@@ -1121,6 +1244,21 @@ namespace Microsoft.Xna.Framework
         public override string ToString()
         {
             return "{X:" + X + " Y:" + Y + " Z:" + Z + " W:" + W + "}";
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Vector4"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="w"></param>
+        public void Deconstruct(out float x, out float y, out float z, out float w)
+        {
+            x = X;
+            y = Y;
+            z = Z;
+            w = W;
         }
 
         #endregion

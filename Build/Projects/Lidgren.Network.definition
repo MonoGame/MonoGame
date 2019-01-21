@@ -3,7 +3,7 @@
   Name="Lidgren.Network"
   Path="ThirdParty/Lidgren.Network"
   Type="Library"
-  Platforms="Android,Linux,MacOS,Ouya,Windows,WindowsGL,iOS">
+  Platforms="Android,Linux,MacOS,Windows,WindowsGL,iOS">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
@@ -17,7 +17,6 @@
     <Platform Name="iOS">734EAA48-F1CA-481A-B391-0285BC0E8B40</Platform>
     <Platform Name="Linux">758CB33D-6EBD-41EA-BB0C-55B1C97A325F</Platform>
     <Platform Name="MacOS">5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130</Platform>
-    <Platform Name="Ouya">565129E0-4EE5-4F6F-B403-C3484C9740BE</Platform>
     <Platform Name="Windows">AE483C29-042E-4226-BA52-D247CE7676DA</Platform>
     <Platform Name="WindowsGL">AE483C29-042E-4226-BA52-D247CE7676DA</Platform>
   </ProjectGuids>
@@ -39,7 +38,6 @@
       <Platform Name="iOS">IOS;UNITY_4_5</Platform>
       <Platform Name="Linux">TRACE;UNITY_4_5</Platform>
       <Platform Name="MacOS">TRACE;MONOMAC;UNITY_4_5</Platform>
-      <Platform Name="Ouya">ANDROID;UNITY_4_5</Platform>
       <Platform Name="Windows">TRACE;UNITY_4_5</Platform>
       <Platform Name="WindowsGL">TRACE;UNITY_4_5</Platform>
     </CustomDefinitions>

@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests {
@@ -25,7 +26,14 @@ namespace MonoGame.Tests {
 			return (Color)typeof (Color).InvokeMember (self, BindingFlags.GetProperty, null, null, null);
 		}
 
-		private static readonly char[] ForbiddenFileNameChars = "{}()\"',".ToCharArray();
+	    public static FramePixelData ToPixelData(this Texture2D texture)
+	    {
+			var data = new Color [texture.Width * texture.Height];
+			texture.GetData (data);
+	        return new FramePixelData(texture.Width, texture.Height, data);
+	    }
+
+		private static readonly char[] ForbiddenFileNameChars = "{}()\"',:".ToCharArray();
 
 		public static string ReplaceInvalidFileNameChars (this string self)
 		{

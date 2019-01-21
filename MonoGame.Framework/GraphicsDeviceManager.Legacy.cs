@@ -6,17 +6,7 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#else
-using OpenGL;
-#endif
-#elif GLES
-using OpenTK.Graphics.ES20;
-#elif OPENGL
-using OpenTK.Graphics.OpenGL;
-#elif WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_UAP
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -75,7 +65,9 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
-            GraphicsProfile = GraphicsDevice.GetHighestSupportedGraphicsProfile(null);
+            // XNA would read this from the manifest, but it would always default
+            // to Reach unless changed.  So lets mimic that without the manifest bit.
+            GraphicsProfile = GraphicsProfile.Reach;
 
             if (_game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
                 throw new ArgumentException("Graphics Device Manager Already Present");
@@ -126,35 +118,28 @@ namespace Microsoft.Xna.Framework
         //        GraphicsDevice to raise these events without help?
         internal void OnDeviceDisposing(EventArgs e)
         {
-            Raise(DeviceDisposing, e);
+            EventHelpers.Raise(this, DeviceDisposing, e);
         }
 
         // FIXME: Why does the GraphicsDeviceManager not know enough about the
         //        GraphicsDevice to raise these events without help?
         internal void OnDeviceResetting(EventArgs e)
         {
-            Raise(DeviceResetting, e);
+            EventHelpers.Raise(this, DeviceResetting, e);
         }
 
         // FIXME: Why does the GraphicsDeviceManager not know enough about the
         //        GraphicsDevice to raise these events without help?
         internal void OnDeviceReset(EventArgs e)
         {
-            Raise(DeviceReset, e);
+            EventHelpers.Raise(this, DeviceReset, e);
         }
 
         // FIXME: Why does the GraphicsDeviceManager not know enough about the
         //        GraphicsDevice to raise these events without help?
         internal void OnDeviceCreated(EventArgs e)
         {
-            Raise(DeviceCreated, e);
-        }
-
-        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
-            where TEventArgs : EventArgs
-        {
-            if (handler != null)
-                handler(this, e);
+            EventHelpers.Raise(this, DeviceCreated, e);
         }
 
         #endregion
@@ -191,11 +176,7 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice == null)
                 return;
 
-#if WINDOWS_PHONE
-            _graphicsDevice.GraphicsProfile = GraphicsProfile;
-            // Display orientation is always portrait on WP8
-            _graphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
-#elif WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_UAP
 
             // TODO:  Does this need to occur here?
             _game.Window.SetSupportedOrientations(_supportedOrientations);
@@ -351,24 +332,9 @@ namespace Microsoft.Xna.Framework
             presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             presentationParameters.IsFullScreen = false;
 
-#if WINDOWS_PHONE
-			// Nothing to do!
-#elif WINDOWS_UAP
+#if WINDOWS_UAP
 			presentationParameters.DeviceWindowHandle = IntPtr.Zero;
 			presentationParameters.SwapChainPanel = this.SwapChainPanel;
-#elif WINDOWS_STORE
-			// The graphics device can use a XAML panel or a window
-			// to created the default swapchain target.
-            if (this.SwapChainBackgroundPanel != null)
-            {
-                presentationParameters.DeviceWindowHandle = IntPtr.Zero;
-                presentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
-            }
-            else
-            {
-                presentationParameters.DeviceWindowHandle = _game.Window.Handle;
-                presentationParameters.SwapChainBackgroundPanel = null;
-            }
 #else
             presentationParameters.DeviceWindowHandle = _game.Window.Handle;
 #endif
@@ -387,14 +353,16 @@ namespace Microsoft.Xna.Framework
 #endif // WINDOWS || WINRT
 
             // TODO: Implement multisampling (aka anti-alising) for all platforms!
-            if (PreparingDeviceSettings != null)
+            var preparingDeviceSettingsHandler = PreparingDeviceSettings;
+
+            if (preparingDeviceSettingsHandler != null)
             {
                 GraphicsDeviceInformation gdi = new GraphicsDeviceInformation();
                 gdi.GraphicsProfile = GraphicsProfile; // Microsoft defaults this to Reach.
                 gdi.Adapter = GraphicsAdapter.DefaultAdapter;
                 gdi.PresentationParameters = presentationParameters;
                 PreparingDeviceSettingsEventArgs pe = new PreparingDeviceSettingsEventArgs(gdi);
-                PreparingDeviceSettings(this, pe);
+                preparingDeviceSettingsHandler(this, pe);
                 presentationParameters = pe.GraphicsDeviceInformation.PresentationParameters;
                 GraphicsProfile = pe.GraphicsDeviceInformation.GraphicsProfile;
             }
@@ -426,10 +394,6 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-#if WINDOWS_STOREAPP
-        [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
-#endif
 
 #if WINDOWS_UAP
         [CLSCompliant(false)]
@@ -497,15 +461,14 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Gets or sets the boolean which defines how window switches from windowed to fullscreen state.
         /// "Hard" mode(true) is slow to switch, but more effecient for performance, while "soft" mode(false) is vice versa.
-        /// The default value is <c>true</c>. Can only be changed before graphics device is created (in game's constructor).
+        /// The default value is <c>true</c>.
         /// </summary>
         public bool HardwareModeSwitch
         {
             get { return _hardwareModeSwitch; }
             set
             {
-                if (_graphicsDevice == null) _hardwareModeSwitch = value;
-                else throw new InvalidOperationException("This property can only be changed before graphics device is created(in game constructor).");
+                _hardwareModeSwitch = value;
             }
         }
 

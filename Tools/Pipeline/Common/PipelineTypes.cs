@@ -26,6 +26,11 @@ namespace MonoGame.Tools.Pipeline
         public IEnumerable<string> FileExtensions;
         public Type OutputType;
 
+        public ImporterTypeDescription()
+        {
+            TypeName = "Invalid / Missing Importer";
+        }
+
         public override string ToString()
         {
             return TypeName;
@@ -56,8 +61,10 @@ namespace MonoGame.Tools.Pipeline
         public struct Property
         {
             public string Name;
+            public string DisplayName;
             public Type Type;
             public object DefaultValue;
+            public bool Browsable;
 
             public override string ToString()
             {
@@ -163,6 +170,8 @@ namespace MonoGame.Tools.Pipeline
 
         private static List<ImporterInfo> _importers;
         private static List<ProcessorInfo> _processors;
+        private static List<FileSystemWatcher> _watchers;
+        private static string _currentAssemblyDirectory;
 
         public static ImporterTypeDescription[] Importers { get; private set; }
         public static ProcessorTypeDescription[] Processors { get; private set; }
@@ -197,6 +206,8 @@ namespace MonoGame.Tools.Pipeline
 
         static PipelineTypes()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+
             MissingImporter = new ImporterTypeDescription()
                 {
                     DisplayName = "Invalid / Missing Importer",
@@ -218,6 +229,20 @@ namespace MonoGame.Tools.Pipeline
                 DisplayName = "",
                 Properties = new ProcessorTypeDescription.ProcessorPropertyCollection(new ProcessorTypeDescription.Property[0]),
             };
+
+            _watchers = new List<FileSystemWatcher>();
+        }
+
+        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            if (string.IsNullOrEmpty(_currentAssemblyDirectory))
+                return null;
+
+            var path = Path.Combine(_currentAssemblyDirectory, (new AssemblyName(args.Name).Name) + ".dll");
+            if (!File.Exists(path))
+                return null;
+
+            return Assembly.Load(File.ReadAllBytes(path));
         }
 
         public static void Load(PipelineProject project)
@@ -255,10 +280,13 @@ namespace MonoGame.Tools.Pipeline
                     baseType = baseType.BaseType;
 
                 var outputType = baseType.GetGenericArguments()[0];
+                var name = item.Attribute.DisplayName;
+                if (string.IsNullOrEmpty(name))
+                    name = item.GetType().Name;
                 var desc = new ImporterTypeDescription()
                     {
                         TypeName = item.Type.Name,
-                        DisplayName = item.Attribute.DisplayName,
+                        DisplayName = name,
                         DefaultProcessor = item.Attribute.DefaultProcessor,                        
                         FileExtensions = item.Attribute.FileExtensions,   
                         OutputType = outputType,
@@ -282,14 +310,26 @@ namespace MonoGame.Tools.Pipeline
                 var properties = new List<ProcessorTypeDescription.Property>();
                 foreach (var i in typeProperties)
                 {
-                    // TODO:
-                    //p.GetCustomAttribute(typeof(ContentPipelineIgnore))
+                    var attrs = i.GetCustomAttributes(true);
+                    var name = i.Name;
+                    var browsable = true;
+                    var defvalue = i.GetValue(obj, null);
+
+                    foreach (var a in attrs)
+                    {
+                        if (a is BrowsableAttribute)
+                            browsable = (a as BrowsableAttribute).Browsable;
+                        else if (a is DisplayNameAttribute)
+                            name = (a as DisplayNameAttribute).DisplayName;
+                    }
 
                     var p = new ProcessorTypeDescription.Property()
                         {
                             Name = i.Name,
+                            DisplayName = name,
                             Type = i.PropertyType,
-                            DefaultValue = i.GetValue(obj, null),
+                            DefaultValue = defvalue,
+                            Browsable = browsable
                         };
                     properties.Add(p);
                 }
@@ -314,7 +354,11 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public static void Unload()
-        {            
+        {
+            foreach (var watch in _watchers)
+                watch.Dispose();
+            _watchers.Clear();
+
             _importers = null;
             Importers = null;
          
@@ -422,13 +466,36 @@ namespace MonoGame.Tools.Pipeline
 #endif
             }
 
+            foreach (var watch in _watchers)
+                watch.Dispose();
+            _watchers.Clear();
+
             foreach (var path in assemblyPaths)
             {
                 try
-                {                    
-                    var a = Assembly.LoadFrom(path);
+                {
+                    _currentAssemblyDirectory = Path.GetDirectoryName(path);
+
+                    var a = Assembly.Load(File.ReadAllBytes(path));
                     var types = a.GetTypes();
                     ProcessTypes(types);
+
+                    var watch = new FileSystemWatcher();
+                    watch.Path = Path.GetDirectoryName(path);
+                    watch.EnableRaisingEvents = true;
+                    watch.Filter = Path.GetFileName(path);
+                    watch.Changed += (sender, e) =>
+                    {
+                        if (Path.GetFileName(path) == e.Name)
+                            PipelineController.Instance.OnReferencesModified();
+                    };
+                    watch.Created += (sender, e) =>
+                    {
+                        if (Path.GetFileName(path) == e.Name)
+                            PipelineController.Instance.OnReferencesModified();
+                    };
+
+                    _watchers.Add(watch);
                 }
                 catch 
                 {
@@ -438,6 +505,8 @@ namespace MonoGame.Tools.Pipeline
                     continue;
                 }                
             }
+
+            _currentAssemblyDirectory = null;
         }
 
         private static void ProcessTypes(IEnumerable<Type> types)

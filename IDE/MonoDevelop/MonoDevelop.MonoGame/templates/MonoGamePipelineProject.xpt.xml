@@ -13,7 +13,7 @@
 			<Open filename = "Importer1.cs"/>
 		</Actions>
 		
-		<Project name = "${ProjectName}" directory = "." type = "DotNet">
+		<Project name = "${ProjectName}" directory = ".">
 			<Options Target = "Library"/>
 			<Packages>
 				<Package id="MonoGame.Framework.Portable" version="3.2.99.1-Beta" targetFramework="portable-net45+sl50+win+wp80+MonoAndroid10+xamarinios10+MonoTouch10"/>

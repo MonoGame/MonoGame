@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -10,6 +11,7 @@ using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.Graphics.Display;
+using Windows.Phone.UI.Input;
 
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -25,16 +27,24 @@ namespace Microsoft.Xna.Framework
         private CoreWindow _coreWindow;
         private DisplayInformation _dinfo;
         private ApplicationView _appView;
-        private SwapChainPanel _swapChainPanel;
         private Rectangle _viewBounds;
 
         private object _eventLocker = new object();
 
-        private InputEvents _windowEvents;
+        private InputEvents _inputEvents;
+        private bool _isSizeChanged = false;
+        private Rectangle _newViewBounds;
+        private bool _isOrientationChanged = false;
+        private DisplayOrientation _newOrientation;
+        private bool _isFocusChanged = false;
+        private CoreWindowActivationState _newActivationState;
+        private bool _backPressed = false;
 
         #region Internal Properties
 
         internal Game Game { get; set; }
+
+        public ApplicationView AppView { get { return _appView; } }
 
         internal bool IsExiting { get; set; }
 
@@ -51,7 +61,7 @@ namespace Microsoft.Xna.Framework
         public override bool AllowUserResizing
         {
             get { return false; }
-            set 
+            set
             {
                 // You cannot resize a Metro window!
             }
@@ -70,9 +80,9 @@ namespace Microsoft.Xna.Framework
             // when no preference is being changed.
             if (_supportedOrientations == orientations)
                 return;
-            
+
             _supportedOrientations = orientations;
-            
+
             DisplayOrientations supported;
             if (orientations == DisplayOrientation.Default)
             {
@@ -101,9 +111,9 @@ namespace Microsoft.Xna.Framework
         public void Initialize(CoreWindow coreWindow, UIElement inputElement, TouchQueue touchQueue)
         {
             _coreWindow = coreWindow;
-            _windowEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
+            _inputEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
 
-			_dinfo = DisplayInformation.GetForCurrentView();
+            _dinfo = DisplayInformation.GetForCurrentView();
             _appView = ApplicationView.GetForCurrentView();
 
             // Set a min size that is reasonable knowing someone might try
@@ -113,25 +123,47 @@ namespace Microsoft.Xna.Framework
 
             _orientation = ToOrientation(_dinfo.CurrentOrientation);
             _dinfo.OrientationChanged += DisplayProperties_OrientationChanged;
-            _swapChainPanel = inputElement as SwapChainPanel;
 
-            _swapChainPanel.SizeChanged += SwapChain_SizeChanged;
+            _coreWindow.SizeChanged += Window_SizeChanged;
 
             _coreWindow.Closed += Window_Closed;
             _coreWindow.Activated += Window_FocusChanged;
-			_coreWindow.CharacterReceived += Window_CharacterReceived;
+
+            if (Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
+                Windows.Phone.UI.Input.HardwareButtons.BackPressed += this.HardwareButtons_BackPressed;
 
             SetViewBounds(_appView.VisibleBounds.Width, _appView.VisibleBounds.Height);
 
             SetCursor(false);
+
+        }
+
+        internal void RegisterCoreWindowService()
+        {
+            // Register the CoreWindow with the services registry
+            Game.Services.AddService(typeof(CoreWindow), _coreWindow);
         }
 
         private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
         {
-            if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
-                Platform.IsActive = false;
-            else
-                Platform.IsActive = true;
+            lock (_eventLocker)
+            {
+                _isFocusChanged = true;
+                _newActivationState = args.WindowActivationState;
+            }
+        }
+
+        private void UpdateFocus()
+        {
+            lock (_eventLocker)
+            {
+                _isFocusChanged = false;
+
+                if (_newActivationState == CoreWindowActivationState.Deactivated)
+                    Platform.IsActive = false;
+                else
+                    Platform.IsActive = true;
+            }
         }
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
@@ -147,14 +179,27 @@ namespace Microsoft.Xna.Framework
             _viewBounds = new Rectangle(0, 0, pixelWidth, pixelHeight);
         }
 
-        private void SwapChain_SizeChanged(object sender, SizeChangedEventArgs args)
+        private void Window_SizeChanged(object sender, WindowSizeChangedEventArgs args)
         {
             lock (_eventLocker)
             {
+                _isSizeChanged = true;
+                var pixelWidth  = Math.Max(1, (int)Math.Round(args.Size.Width * _dinfo.RawPixelsPerViewPixel));
+                var pixelHeight = Math.Max(1, (int)Math.Round(args.Size.Height * _dinfo.RawPixelsPerViewPixel));
+                _newViewBounds = new Rectangle(0, 0, pixelWidth, pixelHeight);
+            }
+        }
+
+        private void UpdateSize()
+        {
+            lock (_eventLocker)
+            {
+                _isSizeChanged = false;
+
                 var manager = Game.graphicsDeviceManager;
 
                 // Set the new client bounds.
-                SetViewBounds(args.NewSize.Width, args.NewSize.Height);
+                _viewBounds = _newViewBounds;
 
                 // Set the default new back buffer size and viewport, but this
                 // can be overloaded by the two events below.
@@ -170,11 +215,6 @@ namespace Microsoft.Xna.Framework
                 OnClientSizeChanged();
             }
         }
-
-		private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
-		{
-			OnTextInput(sender, new TextInputEventArgs((char)args.KeyCode));
-		}
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
         {
@@ -228,8 +268,19 @@ namespace Microsoft.Xna.Framework
         {
             lock(_eventLocker)
             {
+                _isOrientationChanged = true;
+                _newOrientation = ToOrientation(dinfo.CurrentOrientation);
+            }
+        }
+
+        private void UpdateOrientation()
+        {
+            lock (_eventLocker)
+            {
+                _isOrientationChanged = false;
+
                 // Set the new orientation.
-                _orientation = ToOrientation(dinfo.CurrentOrientation);
+                _orientation = _newOrientation;
 
                 // Call the user callback.
                 OnOrientationChanged();
@@ -238,6 +289,23 @@ namespace Microsoft.Xna.Framework
                 if (_viewBounds.Width > 0 && _viewBounds.Height > 0)
                     Game.graphicsDeviceManager.ApplyChanges();
             }
+        }
+
+        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            // We need to manually hide the keyboard input UI when the back button is pressed
+            if (KeyboardInput.IsVisible)
+                KeyboardInput.Cancel(null);
+            else
+                _backPressed = true;
+
+            e.Handled = true;
+        }
+
+        private void UpdateBackButton()
+        {
+            GamePad.Back = _backPressed;
+            _backPressed = false;
         }
 
         protected override void SetTitle(string title)
@@ -250,10 +318,13 @@ namespace Microsoft.Xna.Framework
             if ( _coreWindow == null )
                 return;
 
-            if (visible)
-                _coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
-            else
-                _coreWindow.PointerCursor = null;
+            var asyncResult = _coreWindow.Dispatcher.RunIdleAsync( (e) =>
+           {
+               if (visible)
+                   _coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
+               else
+                   _coreWindow.PointerCursor = null;
+           });
         }
 
         internal void RunLoop()
@@ -263,26 +334,49 @@ namespace Microsoft.Xna.Framework
 
             while (true)
             {
-                if (Platform.IsActive)
-                {
-                    // Process events incoming to the window.
-                    _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
+                // Process events incoming to the window.
+                _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
 
-                    Tick();
-                }
-                else
-                {
-                    _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessOneAndAllPending);
-                }
+                Tick();
+
                 if (IsExiting)
                     break;
             }
         }
 
+        void ProcessWindowEvents()
+        {
+            // Update input
+            _inputEvents.UpdateState();
+
+            // Update TextInput
+            if(!_inputEvents.TextQueue.IsEmpty)
+            {
+                InputEvents.KeyChar ch;
+                while (_inputEvents.TextQueue.TryDequeue(out ch))
+                    OnTextInput(_coreWindow, new TextInputEventArgs(ch.Character, ch.Key));
+            }
+
+            // Update size
+            if (_isSizeChanged)
+                UpdateSize();
+
+            // Update orientation
+            if (_isOrientationChanged)
+                UpdateOrientation();
+
+            // Update focus
+            if (_isFocusChanged)
+                UpdateFocus();
+
+            // Update back button
+            UpdateBackButton();
+        }
+
         internal void Tick()
         {
             // Update state based on window events.
-            _windowEvents.UpdateState();
+            ProcessWindowEvents();
 
             // Update and render the game.
             if (Game != null)

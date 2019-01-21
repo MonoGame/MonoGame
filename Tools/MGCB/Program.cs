@@ -42,6 +42,7 @@ namespace MGCB
                     System.Diagnostics.Debugger.Launch();
                 } catch (NotImplementedException) {
                     // not implemented under Mono
+                    Console.Error.WriteLine("The debugger is not implemented under Mono and thus is not supported on your platform.");
                 }
             }
 

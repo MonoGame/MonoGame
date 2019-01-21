@@ -2,17 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#else
-using OpenTK.Graphics.OpenGL;
-#endif
-#elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
-#elif GLES
-using OpenTK.Graphics.ES20;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -32,17 +22,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     GL.Disable(EnableCap.Blend);
                 GraphicsExtensions.CheckGLError();
                 device._lastBlendEnable = blendEnabled;
-            }
-
-            if (force || this.BlendFactor != device._lastBlendState.BlendFactor)
-            {
-                GL.BlendColor(
-                    this.BlendFactor.R / 255.0f,      
-                    this.BlendFactor.G / 255.0f, 
-                    this.BlendFactor.B / 255.0f, 
-                    this.BlendFactor.A / 255.0f);
-                GraphicsExtensions.CheckGLError();
-                device._lastBlendState.BlendFactor = this.BlendFactor;
             }
 
             if (force || 

@@ -51,22 +51,38 @@
       <mkdir dir="root/tmp" />
       <!-- Build Addin .pkg -->
       <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="./root/tmp/MonoDevelop.MonoGame_${buildNumber}.mpack" overwrite="true"/>
+      <copy file="../IDE/VisualStudioForMac/bin/Debug/net461/MonoDevelop.MonoGame_IDE_VisualStudioForMac_${buildNumber}.mpack" tofile="./root/tmp/MonoDevelop.MonoGame_IDE_VisualStudioForMac_${buildNumber}.mpack" overwrite="true"/>
       <copy todir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle">
          <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
              <include name="ff*"/>
-         </fileset>
+             <include name="*.dylib"/> 
+        </fileset>
       </copy>
+      <!-- Correct the id of the dylibs -->
+      <foreach item="File" property="dylibname">
+          <in>
+             <items basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle/">
+             <include name="*.dylib" />
+             </items>
+          </in>
+          <do>
+             <echo message="${path::get-file-name(dylibname)}" />
+             <exec program="install_name_tool" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release/Pipeline.app/Contents/MonoBundle" commandline=' -id "@executable_path/../MonoBundle/${path::get-file-name(dylibname)}" ${path::get-file-name(dylibname)}' />
+          </do>
+      </foreach>
       <exec program="pkgbuild" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release" commandline=" --component ./Pipeline.app --identifier com.monogame.pipeline --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Pipeline --install-location /Applications ${project::get-base-directory()}/Pipeline.MacOS.pkg" />
       <exec program="pkgbuild" workingdir="." commandline=" --root ./root --identifier com.monogame.xsaddin --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Addin ${project::get-base-directory()}/MonoGame.XamarinStudio.Addin.pkg" />
       <!-- Build Framework .pkg -->
       <delete dir="./root/tmp" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Tools" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/tvOS" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android" />
-      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/OUYA" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOSX" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Linux" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL/x86" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL/x64" />
       <!-- Copy the Files over for the framework -->
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Tools">
          <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
@@ -79,18 +95,23 @@
                 <include name="MonoGame.Common.props"/>
          </fileset>
       </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}">
+         <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
+                <include name="MonoGame.Build.Tasks.dll"/>
+         </fileset>
+      </copy>
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS">
          <fileset basedir="../MonoGame.Framework/bin/iOS/iPhoneSimulator/Release">
                 <include name="*.*"/>
          </fileset>
       </copy>
-      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android">
-         <fileset basedir="../MonoGame.Framework/bin/Android/AnyCPU/Release">
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/tvOS">
+         <fileset basedir="../MonoGame.Framework/bin/tvOS/iPhoneSimulator/Release">
                 <include name="*.*"/>
          </fileset>
       </copy>
-      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/OUYA">
-         <fileset basedir="../MonoGame.Framework/bin/Ouya/AnyCPU/Release">
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android">
+         <fileset basedir="../MonoGame.Framework/bin/Android/AnyCPU/Release">
                 <include name="*.*"/>
          </fileset>
       </copy>
@@ -106,6 +127,16 @@
       </copy>
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL">
          <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL/x86">
+         <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release/x86">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL/x64">
+         <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release/x64">
                 <include name="*.*"/>
          </fileset>
       </copy>
@@ -150,13 +181,20 @@ fi
         <fileset basedir="Linux/Main"/>
       </copy>
       <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="Linux/tmp_run/Main/MonoDevelop.MonoGame.mpack" overwrite="true"/>
+      <copy file="../IDE/VisualStudioForMac/bin/Debug/net461/MonoDevelop.MonoGame_IDE_VisualStudioForMac_${buildNumber}.mpack" tofile="Linux/tmp_run/Main/MonoDevelop.MonoGame_IDE_VisualStudioForMac.mpack" overwrite="true"/>
       <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets" tofile="Linux/tmp_run/MonoGameSDK/MonoGame.Content.Builder.targets"/>
       <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Common.props" tofile="Linux/tmp_run/MonoGameSDK/MonoGame.Common.props"/>
+      <copy file="../Tools/Pipeline/bin/Linux/AnyCPU/Release/MonoGame.Build.Tasks.dll" tofile="Linux/tmp_run/MonoGameSDK/MonoGame.Build.Tasks.dll"/>
       <copy todir="Linux/tmp_run/MonoGameSDK/Tools">
         <fileset basedir="../Tools/Pipeline/bin/Linux/AnyCPU/Release"/>
       </copy>
       <copy todir="Linux/tmp_run/MonoGameSDK/Assemblies/DesktopGL">
          <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="Linux/tmp_run/MonoGameSDK/Assemblies/Android">
+         <fileset basedir="../MonoGame.Framework/bin/Android/AnyCPU/Release">
                 <include name="*.*"/>
          </fileset>
       </copy>

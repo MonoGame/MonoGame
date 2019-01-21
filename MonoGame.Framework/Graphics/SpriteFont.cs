@@ -1,75 +1,12 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2012 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
-
-1. Definitions
-
-The terms "reproduce," "reproduction," "derivative works," and "distribution"
-have the same meaning here as under U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the
-software.
-
-A "contributor" is any person that distributes its contribution under this
-license.
-
-"Licensed patents" are a contributor's patent claims that read directly on its
-contribution.
-
-2. Grant of Rights
-
-(A) Copyright Grant- Subject to the terms of this license, including the
-license conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free copyright license to reproduce its
-contribution, prepare derivative works of its contribution, and distribute its
-contribution or any derivative works that you create.
-
-(B) Patent Grant- Subject to the terms of this license, including the license
-conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free license under its licensed patents to
-make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
-its contribution in the software or derivative works of the contribution in the
-software.
-
-3. Conditions and Limitations
-
-(A) No Trademark License- This license does not grant you rights to use any
-contributors' name, logo, or trademarks.
-
-(B) If you bring a patent claim against any contributor over patents that you
-claim are infringed by the software, your patent license from such contributor
-to the software ends automatically.
-
-(C) If you distribute any portion of the software, you must retain all
-copyright, patent, trademark, and attribution notices that are present in the
-software.
-
-(D) If you distribute any portion of the software in source code form, you may
-do so only under this license by including a complete copy of this license with
-your distribution. If you distribute any portion of the software in compiled or
-object code form, you may only do so under a license that complies with this
-license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The
-contributors give no express warranties, guarantees or conditions. You may have
-additional consumer rights under your local laws which this license cannot
-change. To the extent permitted under your local laws, the contributors exclude
-the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 // Original code from SilverSprite Project
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Text;
 
 namespace Microsoft.Xna.Framework.Graphics 
@@ -77,15 +14,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	public sealed class SpriteFont 
     {
-		static class Errors 
+		internal static class Errors 
         {
 			public const string TextContainsUnresolvableCharacters =
 				"Text contains characters that cannot be resolved by this SpriteFont.";
+			public const string UnresolvableCharacter =
+				"Character cannot be resolved by this SpriteFont.";
 		}
 
-		private readonly Dictionary<char, Glyph> _glyphs;
+        private readonly Glyph[] _glyphs;
+        private readonly CharacterRegion[] _regions;
+        private char? _defaultCharacter;
+        private int _defaultGlyphIndex = -1;
 		
 		private readonly Texture2D _texture;
+
+		/// <summary>
+		/// All the glyphs in this SpriteFont.
+		/// </summary>
+		public Glyph[] Glyphs { get { return _glyphs; } }
 
 		class CharComparer: IEqualityComparer<char>
 		{
@@ -96,13 +43,24 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			public int GetHashCode(char b)
 			{
-				return (b | (b << 16));
+				return (b);
 			}
 
 			static public readonly CharComparer Default = new CharComparer();
 		}
 
-		internal SpriteFont (
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SpriteFont" /> class.
+		/// </summary>
+		/// <param name="texture">The font texture.</param>
+		/// <param name="glyphBounds">The rectangles in the font texture containing letters.</param>
+		/// <param name="cropping">The cropping rectangles, which are applied to the corresponding glyphBounds to calculate the bounds of the actual character.</param>
+		/// <param name="characters">The characters.</param>
+		/// <param name="lineSpacing">The line spacing (the distance from baseline to baseline) of the font.</param>
+		/// <param name="spacing">The spacing (tracking) between characters in the font.</param>
+		/// <param name="kerning">The letters kernings(X - left side bearing, Y - width and Z - right side bearing).</param>
+		/// <param name="defaultCharacter">The character that will be substituted when a given character is not included in the font.</param>
+		public SpriteFont (
 			Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters,
 			int lineSpacing, float spacing, List<Vector3> kerning, char? defaultCharacter)
 		{
@@ -110,13 +68,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			_texture = texture;
 			LineSpacing = lineSpacing;
 			Spacing = spacing;
-			DefaultCharacter = defaultCharacter;
 
-			_glyphs = new Dictionary<char, Glyph>(characters.Count, CharComparer.Default);
+            _glyphs = new Glyph[characters.Count];
+            var regions = new Stack<CharacterRegion>();
 
 			for (var i = 0; i < characters.Count; i++) 
             {
-				var glyph = new Glyph 
+				_glyphs[i] = new Glyph 
                 {
 					BoundsInTexture = glyphBounds[i],
 					Cropping = cropping[i],
@@ -128,8 +86,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     WidthIncludingBearings = kerning[i].X + kerning[i].Y + kerning[i].Z
 				};
-				_glyphs.Add (glyph.Character, glyph);
+                
+                if(regions.Count == 0 || characters[i] > (regions.Peek().End+1))
+                {
+                    // Start a new region
+                    regions.Push(new CharacterRegion(characters[i], i));
+                } 
+                else if(characters[i] == (regions.Peek().End+1))
+                {
+                    var currentRegion = regions.Pop();
+                    // include character in currentRegion
+                    currentRegion.End++;
+                    regions.Push(currentRegion);
+                }
+                else // characters[i] < (regions.Peek().End+1)
+                {
+                    throw new InvalidOperationException("Invalid SpriteFont. Character map must be in ascending order.");
+                }
 			}
+
+            _regions = regions.ToArray();
+            Array.Reverse(_regions);
+
+			DefaultCharacter = defaultCharacter;
 		}
 
         /// <summary>
@@ -145,7 +124,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Can be used to calculate character bounds when implementing custom SpriteFont rendering.</remarks>
         public Dictionary<char, Glyph> GetGlyphs()
         {
-            return new Dictionary<char, Glyph>(_glyphs, _glyphs.Comparer);
+            var glyphsDictionary = new Dictionary<char, Glyph>(_glyphs.Length, CharComparer.Default);
+            foreach(var glyph in _glyphs)
+                glyphsDictionary.Add(glyph.Character, glyph);
+            return glyphsDictionary;
         }
 
 		/// <summary>
@@ -157,7 +139,23 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// Gets or sets the character that will be substituted when a
 		/// given character is not included in the font.
 		/// </summary>
-		public char? DefaultCharacter { get; set; }
+		public char? DefaultCharacter
+        {
+            get { return _defaultCharacter; }
+            set
+            {   
+                // Get the default glyph index here once.
+                if (value.HasValue)
+                {
+                    if(!TryGetGlyphIndex(value.Value, out _defaultGlyphIndex))
+                        throw new ArgumentException(Errors.UnresolvableCharacter);
+                }
+                else
+                    _defaultGlyphIndex = -1;
+
+                _defaultCharacter = value;
+            }
+        }
 
 		/// <summary>
 		/// Gets or sets the line spacing (the distance from baseline
@@ -200,7 +198,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return size;
 		}
 
-		private void MeasureString(ref CharacterSource text, out Vector2 size)
+		internal unsafe void MeasureString(ref CharacterSource text, out Vector2 size)
 		{
 			if (text.Length == 0)
             {
@@ -208,18 +206,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				return;
 			}
 
-            // Get the default glyph here once.
-            Glyph? defaultGlyph = null;
-            if ( DefaultCharacter.HasValue )
-                defaultGlyph = _glyphs[DefaultCharacter.Value];
-
 			var width = 0.0f;
 			var finalLineHeight = (float)LineSpacing;
-
-            var currentGlyph = Glyph.Empty;
+            
 			var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
+            fixed (Glyph* pGlyphs = Glyphs)
             for (var i = 0; i < text.Length; ++i)
             {
                 var c = text[i];
@@ -237,149 +230,89 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
                 }
 
-                if (!_glyphs.TryGetValue(c, out currentGlyph))
-                {
-                    if (!defaultGlyph.HasValue)
-                        throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
-
-                    currentGlyph = defaultGlyph.Value;
-                }
+                var currentGlyphIndex = GetGlyphIndexOrDefault(c);
+                Debug.Assert(currentGlyphIndex >= 0 && currentGlyphIndex < Glyphs.Length, "currentGlyphIndex was outside the bounds of the array.");
+                var pCurrentGlyph = pGlyphs + currentGlyphIndex;
 
                 // The first character on a line might have a negative left side bearing.
                 // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
                 //  so that text does not hang off the left side of its rectangle.
                 if (firstGlyphOfLine) {
-                    offset.X = Math.Max(currentGlyph.LeftSideBearing, 0);
+                    offset.X = Math.Max(pCurrentGlyph->LeftSideBearing, 0);
                     firstGlyphOfLine = false;
                 } else {
-                    offset.X += Spacing + currentGlyph.LeftSideBearing;
+                    offset.X += Spacing + pCurrentGlyph->LeftSideBearing;
                 }
 
-                offset.X += currentGlyph.Width;
+                offset.X += pCurrentGlyph->Width;
 
-                var proposedWidth = offset.X + Math.Max(currentGlyph.RightSideBearing, 0);
+                var proposedWidth = offset.X + Math.Max(pCurrentGlyph->RightSideBearing, 0);
                 if (proposedWidth > width)
                     width = proposedWidth;
 
-                offset.X += currentGlyph.RightSideBearing;
+                offset.X += pCurrentGlyph->RightSideBearing;
 
-                if (currentGlyph.Cropping.Height > finalLineHeight)
-                    finalLineHeight = currentGlyph.Cropping.Height;
+                if (pCurrentGlyph->Cropping.Height > finalLineHeight)
+                    finalLineHeight = pCurrentGlyph->Cropping.Height;
             }
 
             size.X = width;
             size.Y = offset.Y + finalLineHeight;
 		}
-
-        internal void DrawInto( SpriteBatch spriteBatch, ref CharacterSource text, Vector2 position, Color color,
-			                    float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
-		{
-            var flipAdjustment = Vector2.Zero;
-
-            var flippedVert = (effect & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
-            var flippedHorz = (effect & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
-
-            if (flippedVert || flippedHorz)
+        
+        internal unsafe bool TryGetGlyphIndex(char c, out int index)
+        {
+            fixed (CharacterRegion* pRegions = _regions)
             {
-                Vector2 size;
-                MeasureString(ref text, out size);
-
-                if (flippedHorz)
+                // Get region Index 
+                int regionIdx = -1;
+                var l = 0;
+                var r = _regions.Length - 1;
+                while (l <= r)
                 {
-                    origin.X *= -1;
-                    flipAdjustment.X = -size.X;
+                    var m = (l + r) >> 1;                    
+                    Debug.Assert(m >= 0 && m < _regions.Length, "Index was outside the bounds of the array.");
+                    if (pRegions[m].End < c)
+                    {
+                        l = m + 1;
+                    }
+                    else if (pRegions[m].Start > c)
+                    {
+                        r = m - 1;
+                    }
+                    else
+                    {
+                        regionIdx = m;
+                        break;
+                    }
                 }
 
-                if (flippedVert)
+                if (regionIdx == -1)
                 {
-                    origin.Y *= -1;
-                    flipAdjustment.Y = LineSpacing - size.Y;
+                    index = -1;
+                    return false;
                 }
+
+                index = pRegions[regionIdx].StartIndex + (c - pRegions[regionIdx].Start);
             }
 
-            // TODO: This looks excessive... i suspect we could do most
-            // of this with simple vector math and avoid this much matrix work.
+            return true;
+        }
 
-            Matrix transformation, temp;
-            Matrix.CreateTranslation(-origin.X, -origin.Y, 0f, out transformation);
-            Matrix.CreateScale((flippedHorz ? -scale.X : scale.X), (flippedVert ? -scale.Y : scale.Y), 1f, out temp);
-            Matrix.Multiply(ref transformation, ref temp, out transformation);
-            Matrix.CreateTranslation(flipAdjustment.X, flipAdjustment.Y, 0, out temp);
-            Matrix.Multiply(ref temp, ref transformation, out transformation);
-            Matrix.CreateRotationZ(rotation, out temp);
-            Matrix.Multiply(ref transformation, ref temp, out transformation);
-            Matrix.CreateTranslation(position.X, position.Y, 0f, out temp);
-            Matrix.Multiply(ref transformation, ref temp, out transformation);
-
-            // Get the default glyph here once.
-            Glyph? defaultGlyph = null;
-            if (DefaultCharacter.HasValue)
-                defaultGlyph = _glyphs[DefaultCharacter.Value];
-
-            var currentGlyph = Glyph.Empty;
-            var offset = Vector2.Zero;
-            var firstGlyphOfLine = true;
-
-			for (var i = 0; i < text.Length; ++i)
+        internal int GetGlyphIndexOrDefault(char c)
+        {
+            int glyphIdx;
+            if (!TryGetGlyphIndex(c, out glyphIdx))
             {
-                var c = text[i];
+                if (_defaultGlyphIndex == -1)
+                    throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
 
-                if (c == '\r')
-                    continue;
-
-                if (c == '\n')
-                {
-                    offset.X = 0;
-                    offset.Y += LineSpacing;
-                    firstGlyphOfLine = true;
-                    continue;
-                }
-
-                if (!_glyphs.TryGetValue(c, out currentGlyph))
-                {
-                    if (!defaultGlyph.HasValue)
-                        throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
-
-                    currentGlyph = defaultGlyph.Value;
-                }
-
-                // The first character on a line might have a negative left side bearing.
-                // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
-                //  so that text does not hang off the left side of its rectangle.
-                if (firstGlyphOfLine) {
-                    offset.X = Math.Max(currentGlyph.LeftSideBearing, 0);
-                    firstGlyphOfLine = false;
-                } else {
-                    offset.X += Spacing + currentGlyph.LeftSideBearing;
-                }
-
-                var p = offset;
-
-				if (flippedHorz)
-                    p.X += currentGlyph.BoundsInTexture.Width;
-                p.X += currentGlyph.Cropping.X;
-
-				if (flippedVert)
-                    p.Y += currentGlyph.BoundsInTexture.Height - LineSpacing;
-                p.Y += currentGlyph.Cropping.Y;
-
-				Vector2.Transform(ref p, ref transformation, out p);
-
-                var destRect = new Vector4( p.X, p.Y, 
-                                            currentGlyph.BoundsInTexture.Width * scale.X,
-                                            currentGlyph.BoundsInTexture.Height * scale.Y);
-
-				spriteBatch.DrawInternal(
-                    _texture, destRect, currentGlyph.BoundsInTexture,
-					color, rotation, Vector2.Zero, effect, depth, false);
-
-                offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
-			}
-
-			// We need to flush if we're using Immediate sort mode.
-			spriteBatch.FlushIfNeeded();
-		}
-
+                return _defaultGlyphIndex;
+            }
+            else
+                return glyphIdx;
+        }
+        
         internal struct CharacterSource 
         {
 			private readonly string _string;
@@ -453,5 +386,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 return "CharacterIndex=" + Character + ", Glyph=" + BoundsInTexture + ", Cropping=" + Cropping + ", Kerning=" + LeftSideBearing + "," + Width + "," + RightSideBearing;
 			}
 		}
+
+        private struct CharacterRegion
+        {
+            public char Start;
+            public char End;
+            public int StartIndex;
+
+            public CharacterRegion(char start, int startIndex)
+            {
+                this.Start = start;                
+                this.End = start;
+                this.StartIndex = startIndex;
+            }
+        }
 	}
 }

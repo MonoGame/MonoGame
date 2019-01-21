@@ -11,11 +11,7 @@ using Android.Views;
 namespace Microsoft.Xna.Framework
 {
 	[CLSCompliant(false)]
-#if OUYA
-    public class AndroidGameActivity : Ouya.Console.Api.OuyaActivity
-#else
     public class AndroidGameActivity : Activity
-#endif
     {
         internal Game Game { private get; set; }
 
@@ -61,8 +57,7 @@ namespace Microsoft.Xna.Framework
         protected override void OnPause()
         {
             base.OnPause();
-            if (Paused != null)
-                Paused(this, EventArgs.Empty);
+            EventHelpers.Raise(this, Paused, EventArgs.Empty);
 
             if (_orientationListener.CanDetectOrientation())
                 _orientationListener.Disable();
@@ -72,8 +67,7 @@ namespace Microsoft.Xna.Framework
         protected override void OnResume()
         {
             base.OnResume();
-            if (Resumed != null)
-                Resumed(this, EventArgs.Empty);
+            EventHelpers.Raise(this, Resumed, EventArgs.Empty);
 
             if (Game != null)
             {

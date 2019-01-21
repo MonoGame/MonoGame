@@ -1,35 +1,13 @@
-#region License
-/*
-MIT License
-Copyright © 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -48,16 +26,14 @@ namespace Microsoft.Xna.Framework.Content
 		{
             _locker = new object();
             _contentReadersCache = new Dictionary<Type, ContentTypeReader>(255);
-
-#if WINRT
-            _assemblyName = typeof(ContentTypeReaderManager).GetTypeInfo().Assembly.FullName;
-#else
-            _assemblyName = typeof(ContentTypeReaderManager).Assembly.FullName;
-#endif
+            _assemblyName = ReflectionHelpers.GetAssembly(typeof(ContentTypeReaderManager)).FullName;
         }
 
         public ContentTypeReader GetTypeReader(Type targetType)
         {
+            if (targetType.IsArray && targetType.GetArrayRank() > 1)
+                targetType = typeof(Array);
+
             ContentTypeReader reader;
             if (_contentReaders.TryGetValue(targetType, out reader))
                 return reader;
@@ -117,10 +93,12 @@ namespace Microsoft.Xna.Framework.Content
                 var hSongReader = new SongReader();
                 var hModelReader = new ModelReader();
                 var hInt32Reader = new Int32Reader();
+                var hEffectReader = new EffectReader();
+                var hSingleReader = new SingleReader();
 
                 // At the moment the Video class doesn't exist
                 // on all platforms... Allow it to compile anyway.
-#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL) || (WINRT && !WINDOWS_PHONE)
+#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL) || WINDOWS_UAP
                 var hVideoReader = new VideoReader();
 #endif
             }
@@ -194,7 +172,8 @@ namespace Microsoft.Xna.Framework.Content
 
                     var targetType = contentReaders[i].TargetType;
                     if (targetType != null)
-                      _contentReaders.Add(targetType, contentReaders[i]);
+                        if (!_contentReaders.ContainsKey(targetType))
+                            _contentReaders.Add(targetType, contentReaders[i]);
 
                     // I think the next 4 bytes refer to the "Version" of the type reader,
                     // although it always seems to be zero

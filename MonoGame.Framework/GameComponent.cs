@@ -21,9 +21,7 @@ namespace Microsoft.Xna.Framework
                 if (_enabled != value)
                 {
                     _enabled = value;
-                    if (this.EnabledChanged != null)
-                        this.EnabledChanged(this, EventArgs.Empty);
-                    OnEnabledChanged(this, null);
+                    OnEnabledChanged(this, EventArgs.Empty);
                 }
             }
         }
@@ -36,9 +34,7 @@ namespace Microsoft.Xna.Framework
                 if (_updateOrder != value)
                 {
                     _updateOrder = value;
-                    if (this.UpdateOrderChanged != null)
-                        this.UpdateOrderChanged(this, EventArgs.Empty);
-                    OnUpdateOrderChanged(this, null);
+                    OnUpdateOrderChanged(this, EventArgs.Empty);
                 }
             }
         }
@@ -60,9 +56,15 @@ namespace Microsoft.Xna.Framework
 
         public virtual void Update(GameTime gameTime) { }
 
-        protected virtual void OnUpdateOrderChanged(object sender, EventArgs args) { }
+        protected virtual void OnUpdateOrderChanged(object sender, EventArgs args)
+        {
+            EventHelpers.Raise(sender, UpdateOrderChanged, args);
+        }
 
-        protected virtual void OnEnabledChanged(object sender, EventArgs args) { }
+        protected virtual void OnEnabledChanged(object sender, EventArgs args)
+        {
+            EventHelpers.Raise(sender, EnabledChanged, args);
+        }
 
         /// <summary>
         /// Shuts down the component.

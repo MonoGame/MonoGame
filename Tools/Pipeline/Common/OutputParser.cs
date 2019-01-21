@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace MonoGame.Tools.Pipeline
 {
-    enum OutputState
+    public enum OutputState
     {
         Initialized,
         BuildBegin,
@@ -15,14 +15,16 @@ namespace MonoGame.Tools.Pipeline
         Skipping,
         BuildAsset,
         BuildError,
+        BuildWarning,
         BuildErrorContinue,
         BuildEnd,
         BuildTime,
+        BuildTerminated,
 
         Unknown
     }
 
-    class OutputParser
+    public class OutputParser
     {
         internal OutputState State { get; private set; }
         internal String Filename { get; private set; }
@@ -37,7 +39,8 @@ namespace MonoGame.Tools.Pipeline
         Regex _reSkipping = new Regex(@"^(Skipping)\W(?<filename>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildAsset = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildError = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\W*?:\W*?error\W*?:\W*(?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reFileErrorWithLineNum = new Regex(@"^(?<filename>.+?)(\((?<line>[0-9]+),(?<column>[0-9]+)\))?:\W*?(error|warning)\W*(?<errorCode>[A-Z][0-9]+):\W*(?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        Regex _reFileErrorWithLineNum   = new Regex(@"^(?<filename>.+?)(\((?<line>[0-9]+),(?<column>[0-9]+)(-(?<columnEnd>[0-9]+))?\))?:\W*?(error)\W*(?<errorCode>[A-Z][0-9]+):\W*(?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        Regex _reFileWarningWithLineNum = new Regex(@"^(?<filename>.+?)(\((?<line>[0-9]+),(?<column>[0-9]+)(-(?<columnEnd>[0-9]+))?\))?:\W*?(warning)\W*(?<warningCode>[A-Z][0-9]+):\W*(?<warningMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reFileError = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\W*?: (?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildEnd = new Regex(@"^(Build)\W+(?<buildInfo>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildTime = new Regex(@"^(Time elapsed)\W+(?<buildElapsedTime>.*?)\.\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -94,7 +97,11 @@ namespace MonoGame.Tools.Pipeline
             BuildElapsedTime = null;
             ErrorMessage = null;
 
-            if (_reBuildBegin.IsMatch(line))
+            if (line == "Build terminated!")
+            {
+                State = OutputState.BuildTerminated;
+            }
+            else if (_reBuildBegin.IsMatch(line))
             {
                 State = OutputState.BuildBegin;
                 var m = _reBuildBegin.Match(line);
@@ -136,10 +143,28 @@ namespace MonoGame.Tools.Pipeline
                 State = OutputState.BuildError;
                 var m = _reFileErrorWithLineNum.Match(line);
                 var lineNum = m.Groups["line"];
-                var column = m.Groups["column"];
+                var columnBegin = m.Groups["column"];
+                var columnEnd = m.Groups["columnEnd"];
+                var column = columnBegin.Value;
+                if(columnEnd.Success)
+                    column += "-" + columnEnd.Value;
                 var errorCode = m.Groups["errorCode"];
                 Filename = m.Groups["filename"].Value.Replace("\\\\","/").Replace("\\", "/");
                 ErrorMessage = string.Format("{0} ({1},{2}): {3}", errorCode, lineNum, column, m.Groups["errorMessage"].Value);
+            }
+            else if (_reFileWarningWithLineNum.IsMatch(line))
+            {
+                State = OutputState.BuildWarning;
+                var m = _reFileWarningWithLineNum.Match(line);
+                var lineNum = m.Groups["line"];
+                var columnBegin = m.Groups["column"];
+                var columnEnd = m.Groups["columnEnd"];                
+                var column = columnBegin.Value;
+                if(columnEnd.Success)
+                    column += "-" + columnEnd.Value;
+                var errorCode = m.Groups["warningCode"];
+                Filename = m.Groups["filename"].Value.Replace("\\\\", "/").Replace("\\", "/");
+                ErrorMessage = string.Format("{0} ({1},{2}): {3}", errorCode, lineNum, column, m.Groups["warningMessage"].Value);
             }
             else if (_reFileError.IsMatch(line))
             {

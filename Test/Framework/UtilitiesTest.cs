@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Utilities;
+﻿using MonoGame.Utilities;
 using NUnit.Framework;
 using System.IO;
 
@@ -42,6 +42,7 @@ namespace MonoGame.Tests.Framework
         [TestCase(  @"Content/../file",                 @"../file.extension",       @"file.extension")]
         [TestCase(  @"Content/./file",                  @"file.extension",          @"Content/file.extension")]
         [TestCase(  @"Content/./file",                  @"./file.extension",        @"Content/file.extension")]
+        [TestCase(  @"C:\Game\Content\fi#le",           @"fi#le.extension",         @"C:\Game\Content\fi#le.extension")]
         public void ResolveRelativePath(
                     string rootFilePath,                string relativePath,        string matchFullPath)
         {

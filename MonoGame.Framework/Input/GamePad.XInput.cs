@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             // If the device was disconneced then wait for 
             // the timeout to elapsed before we test it again.
-            if (!_connected[index] && _timeout[index] > DateTime.UtcNow.Ticks)
+            if (!_connected[index] && !HasDisconnectedTimeoutElapsed(index))
                 return new GamePadCapabilities();
       
             // Check to see if the device is connected.
@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Input
             // timeout period has elapsed to avoid the overhead.
             if (!_connected[index])
             {
-                _timeout[index] = DateTime.UtcNow.Ticks + TimeoutTicks;
+                SetDisconnectedTimeout(index);
                 return new GamePadCapabilities();
             }
 
@@ -119,7 +119,7 @@ namespace Microsoft.Xna.Framework.Input
             ret.HasYButton = (buttons & GBF.Y) == GBF.Y;
 
             // analog controls
-            ret.HasRightTrigger = gamepad.LeftTrigger > 0;
+            ret.HasRightTrigger = gamepad.RightTrigger > 0;
             ret.HasRightXThumbStick = gamepad.RightThumbX != 0;
             ret.HasRightYThumbStick = gamepad.RightThumbY != 0;
             ret.HasLeftTrigger = gamepad.LeftTrigger > 0;
@@ -150,11 +150,11 @@ namespace Microsoft.Xna.Framework.Input
             return state;
         }
 
-        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
             // If the device was disconneced then wait for 
             // the timeout to elapsed before we test it again.
-            if (!_connected[index] && _timeout[index] > DateTime.UtcNow.Ticks)
+            if (!_connected[index] && !HasDisconnectedTimeoutElapsed(index))
                 return GetDefaultState();
 
             int packetNumber = 0;
@@ -169,7 +169,7 @@ namespace Microsoft.Xna.Framework.Input
                 packetNumber = xistate.PacketNumber;
                 gamepad = xistate.Gamepad;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
 
@@ -177,14 +177,15 @@ namespace Microsoft.Xna.Framework.Input
             // timeout period has elapsed to avoid the overhead.
             if (!_connected[index])
             {
-                _timeout[index] = DateTime.UtcNow.Ticks + TimeoutTicks;
+                SetDisconnectedTimeout(index);
                 return GetDefaultState();
             }
 
             var thumbSticks = new GamePadThumbSticks(
                 leftPosition: new Vector2(gamepad.LeftThumbX, gamepad.LeftThumbY) / (float)short.MaxValue,
                 rightPosition: new Vector2(gamepad.RightThumbX, gamepad.RightThumbY) / (float)short.MaxValue,
-                    deadZoneMode: deadZoneMode);
+                    leftDeadZoneMode: leftDeadZoneMode,
+					rightDeadZoneMode: rightDeadZoneMode);
 
             var triggers = new GamePadTriggers(
                     leftTrigger: gamepad.LeftTrigger / (float)byte.MaxValue,
@@ -264,16 +265,50 @@ namespace Microsoft.Xna.Framework.Input
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
             if (!_connected[index])
-                return false;
-
-            var controller = _controllers[index];
-            var result = controller.SetVibration(new SharpDX.XInput.Vibration
             {
-                LeftMotorSpeed = (ushort)(leftMotor * ushort.MaxValue),
-                RightMotorSpeed = (ushort)(rightMotor * ushort.MaxValue),
-            });
+                if (!HasDisconnectedTimeoutElapsed(index))
+                    return false;
+                if (!_controllers[index].IsConnected)
+                {
+                    SetDisconnectedTimeout(index);
+                    return false;
+                }
+                _connected[index] = true;
+            }
+
+            SharpDX.Result result;
+            try
+            {
+                var vibration = new SharpDX.XInput.Vibration
+                    {
+                        LeftMotorSpeed = (ushort)(leftMotor * ushort.MaxValue),
+                        RightMotorSpeed = (ushort)(rightMotor * ushort.MaxValue),
+                    };
+                result = _controllers[index].SetVibration(vibration);
+            }
+            catch (SharpDX.SharpDXException ex)
+            {
+                const int deviceNotConnectedHResult = unchecked((int)0x8007048f);
+                if (ex.HResult == deviceNotConnectedHResult)
+                {
+                    _connected[index] = false;
+                    SetDisconnectedTimeout(index);
+                    return false;
+                }
+                throw;
+            }
 
             return result == SharpDX.Result.Ok;
+        }
+
+        private static bool HasDisconnectedTimeoutElapsed(int index)
+        {
+            return _timeout[index] <= DateTime.UtcNow.Ticks;
+        }
+
+        private static void SetDisconnectedTimeout(int index)
+        {
+            _timeout[index] = DateTime.UtcNow.Ticks + TimeoutTicks;
         }
     }
 }

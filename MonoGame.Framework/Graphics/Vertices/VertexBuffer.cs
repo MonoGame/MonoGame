@@ -3,7 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.InteropServices;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -53,12 +53,39 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformGraphicsDeviceResetting();
         }
 
-        public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
+        /// <summary>
+        /// Get the vertex data froom this VertexBuffer.
+        /// </summary>
+        /// <typeparam name="T">The struct you want to fill.</typeparam>
+        /// <param name="offsetInBytes">The offset to the first element in the vertex buffer in bytes.</param>
+        /// <param name="data">An array of T's to be filled.</param>
+        /// <param name="startIndex">The index to start filling the data array.</param>
+        /// <param name="elementCount">The number of T's to get.</param>
+        /// <param name="vertexStride">The size of how a vertex buffer element should be interpreted.</param>
+        ///
+        /// <remarks>
+        /// Note that this pulls data from VRAM into main memory and because of that is a very expensive operation.
+        /// It is often a better idea to keep a copy of the data in main memory.
+        /// </remarks>
+        ///
+        /// <remarks>
+        /// <p>Using this operation it is easy to get certain vertex elements from a VertexBuffer.</p>
+        /// <p>
+        /// For example to get the texture coordinates from a VertexBuffer of <see cref="VertexPositionTexture"/> you can call 
+        /// GetData(4 * 3, data, elementCount, 20). 'data'should be an array of <see cref="Vector2"/> in this example.
+        /// The offsetInBytes is the number of bytes taken up by the <see cref="VertexPositionTexture.Position"/> of the vertex.
+        /// For vertexStride we pass the size of a <see cref="VertexPositionTexture"/>.
+        /// </p>
+        /// </remarks>
+        public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride = 0) where T : struct
         {
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
-
+            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
             if (vertexStride == 0)
                 vertexStride = elementSizeInBytes;
+
+            var vertexByteSize = VertexCount * VertexDeclaration.VertexStride;
+            if (vertexStride > vertexByteSize)
+                throw new ArgumentOutOfRangeException("vertexStride", "Vertex stride can not be larger than the vertex buffer size.");
 
             if (data == null)
                 throw new ArgumentNullException("data");
@@ -66,7 +93,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentOutOfRangeException("elementCount", "This parameter must be a valid index within the array.");
             if (BufferUsage == BufferUsage.WriteOnly)
                 throw new NotSupportedException("Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
-			if (elementCount > 1 && (elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride))
+			if (elementCount > 1 && elementCount * vertexStride > vertexByteSize)
                 throw new InvalidOperationException("The array is not the correct size for the amount of data requested.");
 
             PlatformGetData<T>(offsetInBytes, data, startIndex, elementCount, vertexStride);
@@ -74,13 +101,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-            this.GetData<T>(0, data, startIndex, elementCount, elementSizeInByte);
+            this.GetData<T>(0, data, startIndex, elementCount, 0);
         }
 
         public void GetData<T>(T[] data) where T : struct
         {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
             this.GetData<T>(0, data, 0, data.Length, elementSizeInByte);
         }
 
@@ -106,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// into the vertex buffer with padding between each element.
         /// If you specify <c>0</c> for this parameter, it will be treated as if you had specified <c>sizeof(T)</c>.
         /// With the exception of <c>0</c>, you must specify a value greater than or equal to <c>sizeof(T)</c>.</param>
-        /// <example>
+        /// <remarks>
         /// If <c>T</c> is <c>VertexPositionTexture</c>, but you want to set only the position component of the vertex data,
         /// you would call this method as follows:
         /// <code>
@@ -120,7 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Vector2[] texCoords = new Vector2[numVertices];
         /// vertexBuffer.SetData(12, texCoords, 0, numVertices, vertexBuffer.VertexDeclaration.VertexStride);
         /// </code>
-        /// </example>
+        /// </remarks>
         /// <remarks>
         /// If you provide a <c>byte[]</c> in the <paramref name="data"/> parameter, then you should almost certainly
         /// set <paramref name="vertexStride"/> to <c>1</c>, to avoid leaving any padding between the <c>byte</c> values
@@ -146,7 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// must be within the <paramref name="data"/> array bounds.</param>
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
             SetDataInternal<T>(0, data, startIndex, elementCount, elementSizeInBytes, SetDataOptions.None);
 		}
 		
@@ -159,7 +185,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">Data array.</param>
         public void SetData<T>(T[] data) where T : struct
         {
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
             SetDataInternal<T>(0, data, 0, data.Length, elementSizeInBytes, SetDataOptions.None);
         }
 
@@ -168,11 +194,15 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null)
                 throw new ArgumentNullException("data");
 
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
             var bufferSize = VertexCount * VertexDeclaration.VertexStride;
 
             if (vertexStride == 0)
                 vertexStride = elementSizeInBytes;
+
+            var vertexByteSize = VertexCount * VertexDeclaration.VertexStride;
+            if (vertexStride > vertexByteSize)
+                throw new ArgumentOutOfRangeException("vertexStride", "Vertex stride can not be larger than the vertex buffer size.");
 
             if (startIndex + elementCount > data.Length || elementCount <= 0)
                 throw new ArgumentOutOfRangeException("data","The array specified in the data parameter is not the correct size for the amount of data requested.");

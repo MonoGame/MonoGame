@@ -24,12 +24,11 @@
 				<Reference type="Gac" refto="System.Xml" />
 				<Reference type="Gac" refto="System.Core" />
 				<Reference type="Package" refto="MonoGame.Framework" />
-				<Reference type="Package" refto="OpenTK" />
-				<Reference type="Package" refto="NVorbis" />
 			</References>
 			<Files>
 				<File name="Game1.cs" src="Common/Game1.cs" />
 				<File name="Program.cs" src="Common/Program.cs" />
+				<File name="app.manifest" src="Common/app.manifest" />
 				<RawFile name="Icon.png" src="Common/Icon-md.png"/>
 				<RawFile name="Icon.ico" src="Common/Icon.ico" BuildAction="EmbeddedResource"/>
 				<Directory name="Properties">
@@ -38,8 +37,42 @@
 				<Directory name="Content">
 					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference" />
 				</Directory>
+				<Directory name="x64">
+					<ContentFile>
+						<RawFile name="libopenal.so.1" src="libs/x64/libopenal.so.1" CopyToOutputDirectory="PreserveNewest" />
+					</ContentFile>
+					<ContentFile>
+						<RawFile name="soft_oal.dll" src="libs/x64/soft_oal.dll" CopyToOutputDirectory="PreserveNewest" />
+					</ContentFile>
+					<ContentFile>
+						<RawFile name="libSDL2-2.0.so.0" src="libs/x64/libSDL2-2.0.so.0" CopyToOutputDirectory="PreserveNewest" />
+					</ContentFile>
+					<ContentFile>
+						<RawFile name="SDL2.dll" src="libs/x64/SDL2.dll" CopyToOutputDirectory="PreserveNewest" />
+					</ContentFile>
+				</Directory>
+				<Directory name="x86">
+					<ContentFile>
+						<RawFile name="libopenal.so.1" src="libs/x86/libopenal.so.1" CopyToOutputDirectory="PreserveNewest" />
+					</ContentFile>
+					<ContentFile>
+						<RawFile name="soft_oal.dll" src="libs/x86/soft_oal.dll" CopyToOutputDirectory="PreserveNewest" />
+					</ContentFile>
+					<ContentFile>
+						<RawFile name="libSDL2-2.0.so.0" src="libs/x86/libSDL2-2.0.so.0" CopyToOutputDirectory="PreserveNewest" />
+					</ContentFile>
+					<ContentFile>
+						<RawFile name="SDL2.dll" src="libs/x86/SDL2.dll" CopyToOutputDirectory="PreserveNewest" />
+					</ContentFile>
+				</Directory>
 				<ContentFile>
-					<File name="OpenTK.dll.config" src="Common/OpenTK.dll.config" CopyToOutputDirectory="PreserveNewest" />
+					<File name="MonoGame.Framework.dll.config" src="Common/MonoGame.Framework.dll.config" CopyToOutputDirectory="PreserveNewest" />
+				</ContentFile>
+				<ContentFile>
+					<RawFile name="libopenal.1.dylib" src="libs/libopenal.1.dylib" CopyToOutputDirectory="PreserveNewest" />
+				</ContentFile>
+				<ContentFile>
+					<RawFile name="libSDL2-2.0.0.dylib" src="libs/libSDL2-2.0.0.dylib" CopyToOutputDirectory="PreserveNewest" />
 				</ContentFile>
 			</Files>
 		</Project>

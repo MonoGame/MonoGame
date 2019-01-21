@@ -43,7 +43,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             'w', // Windows (DirectX)
             'x', // Xbox360
-            'm', // WindowsPhone
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
@@ -54,6 +53,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
+            'v', // PSVita
+            'O', // XboxOne
+            'S', // Nintendo Switch
         };
 
         /// <summary>
@@ -261,7 +263,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 typeWriter = compiler.GetTypeWriter(type);
 
                 typeWriters.Add(typeWriter);
-			    typeWriterMap.Add(typeWriter.GetType(), index);
+                if (!typeWriterMap.ContainsKey(typeWriter.GetType()))
+                    typeWriterMap.Add(typeWriter.GetType(), index);
+
                 typeMap.Add(type, typeWriter);
 
                 typeWriter.OnAddedToContentWriter(this);

@@ -4,12 +4,11 @@
 
 namespace MonoGame.Tools.Pipeline
 {
-    interface IProjectItem
+    public interface IProjectItem
     {
-        string OriginalPath { get; }
+        string OriginalPath { get; set; }
         string Name { get; }
         string Location { get; }
-        string Icon { get; set; }
-        bool Exists { get; set; }
+        string DestinationPath { get; set; }
     }
 }

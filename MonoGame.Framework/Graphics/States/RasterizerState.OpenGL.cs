@@ -3,18 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#else
-using OpenTK.Graphics.OpenGL;
-#endif
-#elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
-#elif GLES
-using OpenTK.Graphics.ES20;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -61,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-#if MONOMAC || WINDOWS || DESKTOPGL
+#if WINDOWS || DESKTOPGL
 			if (FillMode == FillMode.Solid) 
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             else
@@ -86,9 +75,28 @@ namespace Microsoft.Xna.Framework.Graphics
                 this.SlopeScaleDepthBias != device._lastRasterizerState.SlopeScaleDepthBias)
             {
                 if (this.DepthBias != 0 || this.SlopeScaleDepthBias != 0)
-                {   
+                {
+                    // from the docs it seems this works the same as for Direct3D
+                    // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glPolygonOffset.xml
+                    // explanation for Direct3D is  in https://github.com/MonoGame/MonoGame/issues/4826
+                    int depthMul;
+                    switch (device.ActiveDepthFormat)
+                    {
+                        case DepthFormat.None:
+                            depthMul = 0;
+                            break;
+                        case DepthFormat.Depth16:
+                            depthMul = 1 << 16 - 1;
+                            break;
+                        case DepthFormat.Depth24:
+                        case DepthFormat.Depth24Stencil8:
+                            depthMul = 1 << 24 - 1;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+    }
                     GL.Enable(EnableCap.PolygonOffsetFill);
-                    GL.PolygonOffset(this.SlopeScaleDepthBias, this.DepthBias);
+                    GL.PolygonOffset(this.SlopeScaleDepthBias, this.DepthBias * depthMul);
                 }
                 else
                     GL.Disable(EnableCap.PolygonOffsetFill);

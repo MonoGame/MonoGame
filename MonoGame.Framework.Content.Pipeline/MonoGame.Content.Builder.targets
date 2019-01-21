@@ -5,49 +5,43 @@
 -->
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
+  <UsingTask TaskName="MonoGame.Build.Tasks.CollectContentReferences" AssemblyFile="MonoGame.Build.Tasks.dll" />
   <!-- Add MonoGameContentReference to item type selection in Visual Studio -->
   <ItemGroup>
     <AvailableItemName Include="MonoGameContentReference" />
   </ItemGroup>
 
-  <!-- This disables the IDE feature that skips executing msbuild in some build situations. --> 
+  <!-- This disables the IDE feature that skips executing msbuild in some build situations. -->
   <PropertyGroup>
     <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
 
   <Target Name="Prepare">
-
     <PropertyGroup>
-
-      <ContentRootDirectory Condition=" '$(ContentRootDirectory)' == '' " >Content</ContentRootDirectory>
-      <ParentOutputDir Condition=" '$(ParentOutputDir)' == '' " >$(ProjectDir)$(ContentRootDirectory)\bin\$(MonoGamePlatform)</ParentOutputDir>
-      <ParentIntermediateDir Condition=" '$(ParentIntermediateDir)' == '' " >$(ProjectDir)$(ContentRootDirectory)\obj\$(MonoGamePlatform)</ParentIntermediateDir>
-
       <!-- El Capitan Support -->
       <MonoExe Condition=" '$(OS)' != 'Windows_NT' And Exists ('/Library/Frameworks/Mono.framework/Versions/Current/bin/mono') ">/Library/Frameworks/Mono.framework/Versions/Current/bin/mono</MonoExe>
       <MonoExe Condition=" '$(OS)' != 'Windows_NT' And Exists ('/usr/local/bin/mono') ">/usr/local/bin/mono</MonoExe>
       <MonoExe Condition=" '$(OS)' != 'Windows_NT' And Exists ('/usr/bin/mono') ">/usr/bin/mono</MonoExe>
       <MonoExe Condition=" '$(OS)' != 'Windows_NT' And '$(MonoExe)' == '' ">mono</MonoExe>
-
       <MonoGameContentBuilderExe Condition="'$(MonoGameContentBuilderExe)' == ''">$(MSBuildThisFileDirectory)Tools\MGCB.exe</MonoGameContentBuilderExe>
       <MonoGameContentBuilderCmd>&quot;$(MonoGameContentBuilderExe)&quot;</MonoGameContentBuilderCmd>
       <MonoGameContentBuilderCmd Condition=" '$(OS)' != 'Windows_NT' ">$(MonoExe) $(MonoGameContentBuilderCmd)</MonoGameContentBuilderCmd>
-
-      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'">Resources\</PlatformResourcePrefix>
-      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'Android'">Assets\</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'MacOSX'">$(MonoMacResourcePrefix)</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'iOS'">$(IPhoneResourcePrefix)</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'Android'">$(MonoAndroidAssetsPrefix)</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition="'$(PlatformResourcePrefix)' != '' And !HasTrailingSlash('$(PlatformResourcePrefix)')">$(PlatformResourcePrefix)\</PlatformResourcePrefix>
       <PlatformResourcePrefix Condition="'$(PlatformResourcePrefix)' == ''"></PlatformResourcePrefix>
-
-      <Header>/platform:$(MonoGamePlatform) /outputDir:&quot;$(ParentOutputDir)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)&quot; /quiet</Header>
+      <MonoGameMGCBAdditionalArguments Condition="'$(MonoGameMGCBAdditionalArguments)' ==''">/quiet</MonoGameMGCBAdditionalArguments>
+      <Header>/platform:$(MonoGamePlatform)</Header>
     </PropertyGroup>
 
     <!-- Get all Mono Game Content References and store them in a list -->
     <!-- We do this here so we are compatible with xbuild -->
-    <ItemGroup>
-      <ContentReferences Include="@(MonoGameContentReference)"/>
-     </ItemGroup>
+    <CollectContentReferences ContentReferences="@(MonoGameContentReference)" MonoGamePlatform="$(MonoGamePlatform)">
+        <Output TaskParameter="Output" ItemName="ContentReferences"/>
+    </CollectContentReferences>
 
-    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsStoreApp, WindowsPhone8, MacOSX, iOS, Linux, DesktopGL, RaspberryPi, Android, Ouya, NativeClient, PlayStation4, or PlayStationMobile."
+    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsStoreApp, WindowsPhone8, MacOSX, iOS, Linux, DesktopGL, RaspberryPi, Android, Ouya, NativeClient, PlayStation4, PSVita, XboxOne or PlayStationMobile."
        Condition="	'$(MonoGamePlatform)' != 'Windows' And
 			'$(MonoGamePlatform)' != 'iOS' And       
 			'$(MonoGamePlatform)' != 'Android' And       
@@ -56,11 +50,12 @@
 			'$(MonoGamePlatform)' != 'MacOSX' And       
 			'$(MonoGamePlatform)' != 'WindowsStoreApp' And       
 			'$(MonoGamePlatform)' != 'NativeClient' And       
-			'$(MonoGamePlatform)' != 'Ouya' And       
 			'$(MonoGamePlatform)' != 'PlayStationMobile' And       
 			'$(MonoGamePlatform)' != 'WindowsPhone8' And       
 			'$(MonoGamePlatform)' != 'RaspberryPi' And       
 			'$(MonoGamePlatform)' != 'PlayStation4' And       
+			'$(MonoGamePlatform)' != 'PSVita' And       
+			'$(MonoGamePlatform)' != 'XboxOne' And 
 			'$(MonoGamePlatform)' != 'WindowsGL'" />
 
     <Error
@@ -73,8 +68,8 @@
         Condition=" '%(ContentReferences.FullPath)' == '' "
     />
 
-    <MakeDir Directories="$(ParentIntermediateDir)"/>
-    <MakeDir Directories="$(ParentOutputDir)"/>
+    <MakeDir Directories="%(ContentReferences.ContentOutputDir)"/>
+    <MakeDir Directories="%(ContentReferences.ContentIntermediateOutputDir)"/>
 
   </Target>
 
@@ -86,23 +81,26 @@
   </PropertyGroup>
 
   <Target Name="RunContentBuilder">
-    <Exec Condition=" '%(ContentReferences.FullPath)' != '' " Command="$(MonoGameContentBuilderCmd) /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)"
+    <Exec Condition=" '%(ContentReferences.FullPath)' != '' "
+          Command="$(MonoGameContentBuilderCmd) $(MonoGameMGCBAdditionalArguments) $(Header) /@:&quot;%(ContentReferences.FullPath)&quot; /outputDir:&quot;%(ContentReferences.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReferences.ContentIntermediateOutputDir)&quot;"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
-
-    <CreateItem Include="$(ParentOutputDir)\**\*.*">
-          <Output TaskParameter="Include" ItemName="ExtraContent" />
+     <CreateItem Include="%(ContentReferences.RelativeFullPath)%(ContentReferences.ContentOutputDir)\**\*.*"
+            AdditionalMetadata="ContentOutputDir=%(ContentReferences.ContentDirectory)">
+        <Output TaskParameter="Include" ItemName="ExtraContent" />
     </CreateItem>
   </Target>
 
   <Target Name="BuildContent" DependsOnTargets="Prepare;RunContentBuilder"
-        Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)">
-      <CreateItem Include="$(ParentOutputDir)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
-            AdditionalMetadata="Link=$(PlatformResourcePrefix)$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension);CopyToOutputDirectory=PreserveNewest"
-            Condition="'%(ExtraContent.Filename)' != ''">
-           <Output TaskParameter="Include" ItemName="Content" Condition="'$(MonoGamePlatform)' != 'Android' And '$(MonoGamePlatform)' != 'iOS' And '$(MonoGamePlatform)' != 'MacOSX'" />
-           <Output TaskParameter="Include" ItemName="BundleResource" Condition="'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'" />
-           <Output TaskParameter="Include" ItemName="AndroidAsset" Condition="'$(MonoGamePlatform)' == 'Android'" />
-      </CreateItem>
+          Condition=" '@(MonoGameContentReference)' != '' "
+          Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)">
+
+    <CreateItem Include="%(ExtraContent.FullPath)"
+         AdditionalMetadata="Link=$(PlatformResourcePrefix)%(ExtraContent.ContentOutputDir)%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension);CopyToOutputDirectory=PreserveNewest"
+         Condition="'%(ExtraContent.Filename)' != ''">
+      <Output TaskParameter="Include" ItemName="Content" Condition="'$(MonoGamePlatform)' != 'Android' And '$(MonoGamePlatform)' != 'iOS' And '$(MonoGamePlatform)' != 'MacOSX'" />
+      <Output TaskParameter="Include" ItemName="BundleResource" Condition="'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'" />
+      <Output TaskParameter="Include" ItemName="AndroidAsset" Condition="'$(MonoGamePlatform)' == 'Android'" />
+    </CreateItem>
   </Target>
 
 </Project>

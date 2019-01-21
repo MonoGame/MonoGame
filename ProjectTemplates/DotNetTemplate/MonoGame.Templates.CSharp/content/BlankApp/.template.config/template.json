@@ -1,0 +1,176 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame Application",
+    "groupIdentity": "MonoGame.BlankApp",
+    "identity": "MonoGame.BlankApp.CSharp",
+    "shortName": "monogame-blank",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "condition": "CreateAndroidProject",
+                            "path": "BlankApp\\BlankApp.Android\\BlankApp.Android.csproj"
+                        },
+                        {
+                            "condition": "CreateiOSProject",
+                            "path": "BlankApp\\BlankApp.iOS\\BlankApp.iOS.csproj"
+                        },
+                        {
+                            "condition": "CreateUWPProject",
+                            "path": "BlankApp\\BlankApp.UWP\\BlankApp.UWP.csproj"
+                        },
+                        {
+                            "condition": "CreateWindowsProject",
+                            "path": "BlankApp\\BlankApp.Windows\\BlankApp.Windows.csproj"
+                        },
+                        {
+                            "condition": "CreateDesktopProject",
+                            "path": "BlankApp\\BlankApp.Desktop\\BlankApp.Desktop.csproj"
+                        },
+                        {
+                            "condition": "CreateSharedProject",
+                            "path": "BlankApp\\BlankApp\\BlankApp.shproj"
+                        },
+                        {
+                            "condition": "CreateNetStandardProject",
+                            "path": "BlankApp\\BlankApp\\BlankApp.csproj"
+                        }
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true",
+    "guids": [ 
+        "C7B4DAAA-FAB0-4526-A544-2CB0A84645B0", // Shared Project
+        "99E19497-29A6-4B77-B773-BEC55F9B55DC", // .NET Standard Library
+        "DE3BCAE4-7EAD-4015-AD18-5D1ADE379906", // iOS
+        "8D9F8CF0-E178-402D-8D40-A88B7B5F3D42", // Android
+        "0991AD91-851A-4C1B-9401-8573FF8D5FF7" // UWP
+    ],
+    "symbols" : {
+        "AppIdentifier" : {
+            "type" : "parameter",
+            "description": "Overrides the Info.plist's CFBundleIdentifier",
+            "replaces": "com.xamarin.BlankApp",
+            "datatype": "string",
+            "defaultValue": "com.companyname"
+        },
+        "MinimumOSVersion" : {
+            "type": "parameter",
+            "description": "Overrides the Info.plist's MinimumOSVersion",
+            "replaces": "8.0",
+            "datatype": "string",
+            "onlyIf": [
+                {
+                "after": "<string>",
+                "before": "</string>"
+                }
+            ]
+        },
+        "UseUniversal": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "false"
+        },
+        "UseIPhone": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "false"
+        },
+        "UseIPad": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "false"
+        },
+        "WindowsSdk": {
+            "type": "parameter",
+            "description": "Window SDK Version. Minimum Version is Fall Creator's Update (10.0.16278).",
+            "dataType": "string",
+            "replaces": "10.0.16267.0"
+        },
+        "AndroidSdk": {
+            "type": "parameter",
+            "dataType": "string",
+            "replaces": "v7.1"
+        },
+        
+        // Project Symbols
+        "CreateNetStandardProject": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "false"
+        },
+        "NoCodeSharing": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "false"
+        },
+        "CreateSharedProject": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "true"
+        },
+        "CreateiOSProject": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "true"
+        },
+        "CreateAndroidProject": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "true"
+        },
+        "CreateUWPProject": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "true"
+        },
+        "CreateWindowsProject": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "true"
+        },
+        "CreateDesktopProject": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "true"
+        }
+    },
+    "sources": [{
+        "modifiers": [
+            {
+                "condition": "(!CreateNetStandardProject)",
+                "exclude": [ "BlankApp/BlankApp/BlankApp.csproj" ]
+            },
+            {
+                "condition": "(!CreateSharedProject)",
+                "exclude": [ "BlankApp/BlankApp/BlankApp.shproj", "BlankApp/BlankApp/BlankApp.projitems" ]
+            },
+            {
+                "condition": "(!CreateiOSProject)",
+                "exclude": [ "BlankApp/BlankApp.iOS/**/*" ]
+            },
+            {
+                "condition": "(!CreateAndroidProject)",
+                "exclude": [ "BlankApp/BlankApp.Android/**/*" ]
+            },
+            {
+                "condition": "(!CreateUWPProject)",
+                "exclude": [ "BlankApp/BlankApp.UWP/**/*" ]
+            },
+            {
+                "condition": "(!CreateWindowsProject)",
+                "exclude": [ "BlankApp/BlankApp.Windows/**/*" ]
+            },
+            {
+                "condition": "(!CreateDesktopProject)",
+                "exclude": [ "BlankApp/BlankApp.Desktop/**/*" ]
+            },
+            {
+                "condition": "(!NoCodeSharing)",
+                "exclude": [ "BlankApp/BlankApp/**/*" ]
+            }
+        ]
+    }]
+}

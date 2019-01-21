@@ -21,7 +21,9 @@ namespace MonoGame.Tools.Pipeline
         public string StartupProject;
         public Microsoft.Xna.Framework.Point Size;
         public int HSeparator, VSeparator;
-        public bool Maximized, FilterOutput, DebugMode;
+        public bool Maximized, DebugMode, PropertyGroupSort;
+        public bool FilterOutput, FilterShowSkipped, FilterShowSuccessful, FilterShowCleaned, AutoScrollBuildOutput;
+        public string ErrorMessage;
 
         static PipelineSettings()
         {
@@ -31,6 +33,13 @@ namespace MonoGame.Tools.Pipeline
         public PipelineSettings()
         {
             ProjectHistory = new List<string>();
+
+            PropertyGroupSort = true;
+            FilterOutput = true;
+            FilterShowSkipped = true;
+            FilterShowSuccessful = true;
+            FilterShowCleaned = true;
+            AutoScrollBuildOutput = true;
 
             try
             {
@@ -100,6 +109,11 @@ namespace MonoGame.Tools.Pipeline
                         {
                             var serializer = new XmlSerializer(typeof(PipelineSettings));
                             Default = (PipelineSettings)serializer.Deserialize(reader);
+
+                            var history = Default.ProjectHistory.ToArray();
+                            foreach (var h in history)
+                                if (!File.Exists(h))
+                                    Default.ProjectHistory.Remove(h);
                         }
                     }
                 }

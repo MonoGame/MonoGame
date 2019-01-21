@@ -24,6 +24,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="MonoGame.Build.Tasks" />
 
 	<!-- Platform specific and special references! -->
     <Reference Include="Framework.Content.Pipeline.References" />
@@ -56,8 +57,10 @@
     <Compile Include="Audio\AudioFileType.cs" />
     <Compile Include="Audio\AudioFormat.cs" />
     <Compile Include="Audio\AudioHelper.cs" />
+    <Compile Include="Audio\AudioProfile.cs" />
     <Compile Include="Audio\ConversionFormat.cs" />
     <Compile Include="Audio\ConversionQuality.cs" />
+    <Compile Include="Audio\DefaultAudioProfile.cs" />
 
 
     <!-- MonoGame.Framework.Content.Pipeline.Builder -->
@@ -91,6 +94,7 @@
     <Compile Include="Graphics\BoneWeightCollection.cs" />
     <Compile Include="Graphics\Font\CharacterRegion.cs" />
     <Compile Include="Graphics\Font\CharacterRegionTypeConverter.cs" />
+    <Compile Include="Graphics\DefaultTextureProfile.cs" />
     <Compile Include="Graphics\DualTextureMaterialContent.cs" />
     <Compile Include="Graphics\Dxt1BitmapContent.cs" />
     <Compile Include="Graphics\Dxt3BitmapContent.cs" />
@@ -102,6 +106,7 @@
     <Compile Include="Graphics\Etc1BitmapContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
+    <Compile Include="Graphics\LocalizedFontDescription.cs" />
     <Compile Include="Graphics\GeometryContent.cs" />
     <Compile Include="Graphics\GeometryContentCollection.cs" />
     <Compile Include="Graphics\Font\Glyph.cs" />
@@ -112,6 +117,7 @@
     <Compile Include="Graphics\IndexCollection.cs" />
     <Compile Include="Graphics\IndirectPositionCollection.cs" />
     <Compile Include="Graphics\MaterialContent.cs" />
+    <Compile Include="Graphics\MeshBuilder.cs" />
     <Compile Include="Graphics\MeshContent.cs" />
     <Compile Include="Graphics\MeshHelper.cs" />
     <Compile Include="Graphics\MipmapChain.cs" />
@@ -131,6 +137,7 @@
     <Compile Include="Graphics\Texture3DContent.cs" />
     <Compile Include="Graphics\TextureContent.cs" />
     <Compile Include="Graphics\TextureCubeContent.cs" />
+    <Compile Include="Graphics\TextureProfile.cs" />
     <Compile Include="Graphics\TextureReferenceDictionary.cs" />
     <Compile Include="Graphics\VertexChannel.cs" />
     <Compile Include="Graphics\VertexChannelCollection.cs" />
@@ -144,6 +151,7 @@
     <Compile Include="Processors\EffectProcessor.cs" />
     <Compile Include="Processors\EffectProcessorDebugMode.cs" />
     <Compile Include="Processors\FontDescriptionProcessor.cs" />
+    <Compile Include="Processors\LocalizedFontProcessor.cs" />
     <Compile Include="Processors\FontTextureProcessor.cs" />
     <Compile Include="Processors\MaterialProcessor.cs" />
     <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
@@ -244,49 +252,61 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\Options.cs</Link>
     </Compile>
-    <Compile Include="..\Tools\2MGFX\Parser.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\Parser.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ParseTree.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ParseTree.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ParseTreeTools.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ParseTreeTools.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\PassInfo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\PassInfo.cs</Link>
-    </Compile>
     <Compile Include="..\Tools\2MGFX\Preprocessor.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\Preprocessor.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\SamplerStateInfo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\SamplerStateInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\Scanner.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\Scanner.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderInfo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderInfo.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\ShaderProfile.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderProfile.cs</Link>
     </Compile>
-    <Compile Include="..\Tools\2MGFX\TechniqueInfo.cs">
+    <Compile Include="..\Tools\2MGFX\ShaderProfile.OpenGL.cs">
       <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\TechniqueInfo.cs</Link>
+      <Link>Processors\MGFX\ShaderProfile.OpenGL.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderProfile.DirectX.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ShaderProfile.DirectX.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderResult.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ShaderResult.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\TextureFilterType.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\TextureFilterType.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\Parser.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\ParseTree.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\ParseTree.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\ParseTreeTools.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\ParseTreeTools.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\PassInfo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\PassInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\SamplerStateInfo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\SamplerStateInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\Scanner.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\Scanner.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\ShaderInfo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\ShaderInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\TPGParser\TechniqueInfo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\TPGParser\TechniqueInfo.cs</Link>
     </Compile>
 
 
@@ -314,6 +334,7 @@
     <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
     <Compile Include="Serialization\Compiler\DualTextureEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\CompiledEffectContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\EffectMaterialWriter.cs" />
     <Compile Include="Serialization\Compiler\EnumWriter.cs" />
     <Compile Include="Serialization\Compiler\EnvironmentMapEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
@@ -324,6 +345,7 @@
     <Compile Include="Serialization\Compiler\ListWriter.cs" />
     <Compile Include="Serialization\Compiler\MatrixWriter.cs" />
     <Compile Include="Serialization\Compiler\ModelWriter.cs" />
+    <Compile Include="Serialization\Compiler\MultiArrayWriter.cs" />
     <Compile Include="Serialization\Compiler\NullableWriter.cs" />
     <Compile Include="Serialization\Compiler\PlaneWriter.cs" />
     <Compile Include="Serialization\Compiler\PointWriter.cs" />
@@ -362,6 +384,7 @@
     <Compile Include="Serialization\Intermediate\ContentTypeSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializerAttribute.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializerT.cs" />
+    <Compile Include="Serialization\Intermediate\CurveKeyCollectionSerializer.cs" />
     <Compile Include="Serialization\Intermediate\DictionarySerializer.cs" />    
     <Compile Include="Serialization\Intermediate\DoubleSerializer.cs" />    
     <Compile Include="Serialization\Intermediate\ElementSerializerT.cs" />    
@@ -380,6 +403,7 @@
     <Compile Include="Serialization\Intermediate\NamespaceAliasHelper.cs" />
     <Compile Include="Serialization\Intermediate\NonGenericIListSerializer.cs" />
     <Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
+	<Compile Include="Serialization\Intermediate\PackedElementsHelper.cs" />
     <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
     <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />
@@ -408,6 +432,8 @@
     <Compile Include="ContentProcessor.cs" />
     <Compile Include="ContentProcessorAttribute.cs" />
     <Compile Include="ContentProcessorContext.cs" />
+    <Compile Include="ContentStats.cs" />
+    <Compile Include="ContentStatsCollection.cs" />
     <Compile Include="DdsLoader.cs" />
     <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
@@ -418,6 +444,7 @@
     <Compile Include="IContentImporter.cs" />
     <Compile Include="IContentProcessor.cs" />
     <Compile Include="InvalidContentException.cs" />
+    <Compile Include="LoadedTypeCollection.cs" />
     <Compile Include="Mp3Importer.cs" />
     <Compile Include="NamedValueDictionary.cs" />
     <Compile Include="OggImporter.cs" />

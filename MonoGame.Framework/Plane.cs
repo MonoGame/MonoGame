@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework
             Vector3 ac = c - a;
 
             Vector3 cross = Vector3.Cross(ab, ac);
-            Normal = Vector3.Normalize(cross);
+            Vector3.Normalize(ref cross, out Normal);
             D = -(Vector3.Dot(Normal, a));
         }
 
@@ -78,6 +78,21 @@ namespace Microsoft.Xna.Framework
             : this(new Vector3(a, b, c), d)
         {
 
+        }
+
+        /// <summary>
+        /// Create a <see cref="Plane"/> that contains the specified point and has the specified <see cref="Normal"/> vector.
+        /// </summary>
+        /// <param name="pointOnPlane">A point the created <see cref="Plane"/> should contain.</param>
+        /// <param name="normal">The normal of the plane.</param>
+        public Plane(Vector3 pointOnPlane, Vector3 normal)
+        {
+            Normal = normal;
+            D = -(
+                pointOnPlane.X * normal.X +
+                pointOnPlane.Y * normal.Y +
+                pointOnPlane.Z * normal.Z
+            );
         }
 
         #endregion Constructors
@@ -178,12 +193,10 @@ namespace Microsoft.Xna.Framework
 
         public void Normalize()
         {
-			float factor;
-			Vector3 normal = Normal;
-			Normal = Vector3.Normalize(Normal);
-			factor = (float)Math.Sqrt(Normal.X * Normal.X + Normal.Y * Normal.Y + Normal.Z * Normal.Z) / 
-					(float)Math.Sqrt(normal.X * normal.X + normal.Y * normal.Y + normal.Z * normal.Z);
-			D = D * factor;
+            float length = Normal.Length();
+            float factor =  1f / length;            
+            Vector3.Multiply(ref Normal, factor, out Normal);
+            D = D * factor;
         }
 
         public static Plane Normalize(Plane value)
@@ -195,11 +208,10 @@ namespace Microsoft.Xna.Framework
 
         public static void Normalize(ref Plane value, out Plane result)
         {
-			float factor;
-			result.Normal = Vector3.Normalize(value.Normal);
-			factor = (float)Math.Sqrt(result.Normal.X * result.Normal.X + result.Normal.Y * result.Normal.Y + result.Normal.Z * result.Normal.Z) / 
-					(float)Math.Sqrt(value.Normal.X * value.Normal.X + value.Normal.Y * value.Normal.Y + value.Normal.Z * value.Normal.Z);
-			result.D = value.D * factor;
+            float length = value.Normal.Length();
+            float factor =  1f / length;            
+            Vector3.Multiply(ref value.Normal, factor, out result.Normal);
+            result.D = value.D * factor;
         }
 
         public static bool operator !=(Plane plane1, Plane plane2)
@@ -280,6 +292,17 @@ namespace Microsoft.Xna.Framework
         public override string ToString()
         {
             return "{Normal:" + Normal + " D:" + D + "}";
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Plane"/>.
+        /// </summary>
+        /// <param name="normal"></param>
+        /// <param name="d"></param>
+        public void Deconstruct(out Vector3 normal, out float d)
+        {
+            normal = Normal;
+            d = D;
         }
 
         #endregion

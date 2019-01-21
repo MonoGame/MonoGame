@@ -7,23 +7,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
-
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#endif
-#if GLES
-using OpenTK.Graphics.ES20;
-using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
-#endif
-#if DESKTOPGL || (MONOMAC && !PLATFORM_MACOS_LEGACY)
-using OpenTK.Graphics.OpenGL;
-#endif
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class IndexBuffer
     {
-		internal uint ibo;	
+		internal int ibo;	
 
         private void PlatformConstruct(IndexElementSize indexElementSize, int indexCount)
         {
@@ -76,10 +66,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !GLES
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
             GraphicsExtensions.CheckGLError();
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
-            IntPtr ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
+            IntPtr ptr = GL.MapBuffer(BufferTarget.ElementArrayBuffer, BufferAccess.ReadOnly);
             // Pointer to the start of data to read in the index buffer
             ptr = new IntPtr(ptr.ToInt64() + offsetInBytes);
 			if (typeof(T) == typeof(byte))
@@ -87,7 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
                 // Copy from the index buffer to the destination array
-                Marshal.Copy(ptr, buffer, 0, buffer.Length);
+                Marshal.Copy(ptr, buffer, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
             }
             else
             {
@@ -98,7 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Copy from the temporary buffer to the destination array
                 Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
             }
-            GL.UnmapBuffer(BufferTarget.ArrayBuffer);
+            GL.UnmapBuffer(BufferTarget.ElementArrayBuffer);
             GraphicsExtensions.CheckGLError();
         }
 #endif
@@ -149,13 +139,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                Threading.BlockOnUIThread(() =>
-                {
-                    GL.DeleteBuffers(1, ref ibo);
-                    GraphicsExtensions.CheckGLError();
-                });
+                if (GraphicsDevice != null)
+                    GraphicsDevice.DisposeBuffer(ibo);
             }
-
             base.Dispose(disposing);
         }
 	}

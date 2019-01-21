@@ -1,0 +1,20 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [ "MonoGame" ],
+    "name": "MonoGame tvOS Application",
+    "groupIdentity": "MonoGame.BlankApp.tvOS",
+    "identity": "MonoGame.BlankApp.tvOS.CSharp",
+    "shortName": "mgtvos",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [ 
+                        {
+                            "path": "BlankApp.tvOS.csproj"
+                        },
+                      ], 
+    "sourceName": "BlankApp", 
+    "preferNameDirectory" : "true",
+    "description": "A MonoGame game project for tvOS."
+}

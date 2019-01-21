@@ -12,16 +12,18 @@ namespace MonoGame.Tools.Pipeline
         void OnItemModified(ContentItem item);
     }
 
-    interface IController : IContentItemObserver
+    public interface IController : IContentItemObserver
     {
         /// <summary>
         /// Types of content which can be created and added to a project. 
         /// </summary>
         IEnumerable<ContentItemTemplate> Templates { get; }
 
-        Selection Selection { get; }
+        List<IProjectItem> SelectedItems { get; }
 
-        string ProjectLocation { get; }
+        IProjectItem SelectedItem { get; }
+
+        PipelineProject ProjectItem { get; }
 
         /// <summary>
         /// True if there is a project.
@@ -39,11 +41,6 @@ namespace MonoGame.Tools.Pipeline
         bool ProjectBuilding { get; }
 
         /// <summary>
-        /// Passes /launchdebugger option when launching MGCB.
-        /// </summary>
-        bool LaunchDebugger { get; set; }
-
-        /// <summary>
         /// The view this controller is attached to.
         /// </summary>
         IView View { get; }
@@ -57,16 +54,6 @@ namespace MonoGame.Tools.Pipeline
         /// Triggered when the project finishes loading.
         /// </summary>
         event Action OnProjectLoaded;
-
-        /// <summary>
-        /// Triggered when the project finishes building.
-        /// </summary>
-        event Action OnBuildStarted;
-
-        /// <summary>
-        /// Triggered when the project finishes building.
-        /// </summary>
-        event Action OnBuildFinished;
 
         /// <summary>
         /// Notify controller that a property of Project or its contents has been modified.
@@ -86,13 +73,15 @@ namespace MonoGame.Tools.Pipeline
 
         void OpenProject(string projectFilePath);
 
+        void ClearRecentList();
+
         void CloseProject();
 
         bool SaveProject(bool saveAs);
         
         void Build(bool rebuild);
 
-        void RebuildItems(IEnumerable<IProjectItem> items);
+        void RebuildItems();
 
         void Clean();
 
@@ -108,23 +97,25 @@ namespace MonoGame.Tools.Pipeline
 
         void IncludeFolder();
 
-        void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders, bool delete);
+        void Exclude(bool delete);
 
         void NewItem();
 
         void NewFolder();
 
-        void Move (string[] paths, string[] newpaths, FileType[] types);
+        void Rename();
         
         void AddAction(IProjectAction action);
 
+        void SelectionChanged(List<IProjectItem> items);
+
         IProjectItem GetItem(string originalPath);
+
+        void CopyAssetPath();
 
         #endregion
 
         #region Undo, Redo
-
-        event CanUndoRedoChanged OnCanUndoRedoChanged;
 
         bool CanRedo { get; }
 

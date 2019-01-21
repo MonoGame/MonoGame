@@ -83,10 +83,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         public Vector4 ToVector4()
         {
             return new Vector4(
-                ((sbyte) ((_packed >> 24) & 0xFF)) / 127.0f,
-                ((sbyte) ((_packed >> 16) & 0xFF)) / 127.0f,
+                ((sbyte) ((_packed >> 0) & 0xFF)) / 127.0f,
                 ((sbyte) ((_packed >> 8) & 0xFF)) / 127.0f,
-                ((sbyte) ((_packed >> 0) & 0xFF)) / 127.0f);
+                ((sbyte) ((_packed >> 16) & 0xFF)) / 127.0f,
+                ((sbyte) ((_packed >> 24) & 0xFF)) / 127.0f);
         }
     }
 }

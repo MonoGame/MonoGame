@@ -15,6 +15,8 @@ namespace Microsoft.Xna.Framework
     {
         private readonly Game _game;
         private GraphicsDevice _graphicsDevice;
+        private bool _initialized = false;
+
         private int _preferredBackBufferHeight;
         private int _preferredBackBufferWidth;
         private SurfaceFormat _preferredBackBufferFormat;
@@ -26,6 +28,9 @@ namespace Microsoft.Xna.Framework
         private bool _disposed;
         private bool _hardwareModeSwitch = true;
         private bool _wantFullScreen;
+        private GraphicsProfile _graphicsProfile;
+        // dirty flag for ApplyChanges
+        private bool _shouldApplyChanges;
 
         /// <summary>
         /// The default back buffer width.
@@ -84,6 +89,7 @@ namespace Microsoft.Xna.Framework
 
             if (_game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
                 throw new ArgumentException("A graphics device manager is already registered.  The graphics device manager cannot be changed once it is set.");
+            _game.graphicsDeviceManager = this;
 
             _game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             _game.Services.AddService(typeof(IGraphicsDeviceService), this);
@@ -94,14 +100,51 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
-        public void CreateDevice()
+        private void CreateDevice()
         {
             if (_graphicsDevice != null)
                 return;
 
-            Initialize();
+            try
+            {
+                if (!_initialized)
+                    Initialize();
+
+                var gdi = DoPreparingDeviceSettings();
+                CreateDevice(gdi);
+            }
+            catch (NoSuitableGraphicsDeviceException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new NoSuitableGraphicsDeviceException("Failed to create graphics device!", ex);
+            }
+        }
+
+        private void CreateDevice(GraphicsDeviceInformation gdi)
+        {
+            if (_graphicsDevice != null)
+                return;
+
+            _graphicsDevice = new GraphicsDevice(gdi);
+            _shouldApplyChanges = false;
+
+            // hook up reset events
+            GraphicsDevice.DeviceReset     += (sender, args) => OnDeviceReset(args);
+            GraphicsDevice.DeviceResetting += (sender, args) => OnDeviceResetting(args);
+
+            // update the touchpanel display size when the graphicsdevice is reset
+            _graphicsDevice.DeviceReset += UpdateTouchPanel;
+            _graphicsDevice.PresentationChanged += OnPresentationChanged;
 
             OnDeviceCreated(EventArgs.Empty);
+        }
+
+        void IGraphicsDeviceManager.CreateDevice()
+        {
+            CreateDevice();
         }
 
         public bool BeginDraw()
@@ -129,40 +172,50 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> DeviceReset;
         public event EventHandler<EventArgs> DeviceResetting;
         public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
+        public event EventHandler<EventArgs> Disposed;
 
-        // FIXME: Why does the GraphicsDeviceManager not know enough about the
-        //        GraphicsDevice to raise these events without help?
-        internal void OnDeviceDisposing(EventArgs e)
+        protected void OnDeviceDisposing(EventArgs e)
         {
-            Raise(DeviceDisposing, e);
+            EventHelpers.Raise(this, DeviceDisposing, e);
         }
 
-        // FIXME: Why does the GraphicsDeviceManager not know enough about the
-        //        GraphicsDevice to raise these events without help?
-        internal void OnDeviceResetting(EventArgs e)
+        protected void OnDeviceResetting(EventArgs e)
         {
-            Raise(DeviceResetting, e);
+            EventHelpers.Raise(this, DeviceResetting, e);
         }
 
-        // FIXME: Why does the GraphicsDeviceManager not know enough about the
-        //        GraphicsDevice to raise these events without help?
         internal void OnDeviceReset(EventArgs e)
         {
-            Raise(DeviceReset, e);
+            EventHelpers.Raise(this, DeviceReset, e);
         }
 
-        // FIXME: Why does the GraphicsDeviceManager not know enough about the
-        //        GraphicsDevice to raise these events without help?
         internal void OnDeviceCreated(EventArgs e)
         {
-            Raise(DeviceCreated, e);
+            EventHelpers.Raise(this, DeviceCreated, e);
         }
 
-        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
-            where TEventArgs : EventArgs
+        /// <summary>
+        /// This populates a GraphicsDeviceInformation instance and invokes PreparingDeviceSettings to
+        /// allow users to change the settings. Then returns that GraphicsDeviceInformation.
+        /// Throws NullReferenceException if users set GraphicsDeviceInformation.PresentationParameters to null.
+        /// </summary>
+        private GraphicsDeviceInformation DoPreparingDeviceSettings()
         {
-            if (handler != null)
-                handler(this, e);
+            var gdi = new GraphicsDeviceInformation();
+            PrepareGraphicsDeviceInformation(gdi);
+            var preparingDeviceSettingsHandler = PreparingDeviceSettings;
+
+            if (preparingDeviceSettingsHandler != null)
+            {
+                // this allows users to overwrite settings through the argument
+                var args = new PreparingDeviceSettingsEventArgs(gdi);
+                preparingDeviceSettingsHandler(this, args);
+
+                if (gdi.PresentationParameters == null || gdi.Adapter == null)
+                    throw new NullReferenceException("Members should not be set to null in PreparingDeviceSettingsEventArgs");
+            }
+
+            return gdi;
         }
 
         #endregion
@@ -188,12 +241,15 @@ namespace Microsoft.Xna.Framework
                     }
                 }
                 _disposed = true;
+                EventHelpers.Raise(this, Disposed, EventArgs.Empty);
             }
         }
 
         #endregion
 
         partial void PlatformApplyChanges();
+
+        partial void PlatformPreparePresentationParameters(PresentationParameters presentationParameters);
 
         private void PreparePresentationParameters(PresentationParameters presentationParameters)
         {
@@ -202,14 +258,35 @@ namespace Microsoft.Xna.Framework
             presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             presentationParameters.IsFullScreen = _wantFullScreen;
+            presentationParameters.HardwareModeSwitch = _hardwareModeSwitch;
             presentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.One : PresentInterval.Immediate;
             presentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
             presentationParameters.DeviceWindowHandle = _game.Window.Handle;
 
-            // TODO: This isn't correct... we need to query the hardware
-            // to see what the max quality level supported is for the current
-            // device and back buffer format.
-            presentationParameters.MultiSampleCount = _preferMultiSampling ? 4 : 0;
+            if (_preferMultiSampling)
+            {
+                // always initialize MultiSampleCount to the maximum, if users want to overwrite
+                // this they have to respond to the PreparingDeviceSettingsEvent and modify
+                // args.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount
+                presentationParameters.MultiSampleCount = GraphicsDevice != null
+                    ? GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount
+                    : 32;
+            }
+            else
+            {
+                presentationParameters.MultiSampleCount = 0;
+            }
+
+            PlatformPreparePresentationParameters(presentationParameters);
+        }
+
+        private void PrepareGraphicsDeviceInformation(GraphicsDeviceInformation gdi)
+        {
+            gdi.Adapter = GraphicsAdapter.DefaultAdapter;
+            gdi.GraphicsProfile = GraphicsProfile;
+            var pp = new PresentationParameters();
+            PreparePresentationParameters(pp);
+            gdi.PresentationParameters = pp;
         }
 
         /// <summary>
@@ -221,28 +298,36 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice == null)
                 CreateDevice();
 
+            if (!_shouldApplyChanges)
+                return;
+
+            _shouldApplyChanges = false;
+
             _game.Window.SetSupportedOrientations(_supportedOrientations);
-
-            PreparePresentationParameters(_graphicsDevice.PresentationParameters);
-
-            // TOOD: Should this trigger some sort of device reset?
-            _graphicsDevice.GraphicsProfile = GraphicsProfile;
 
             // Allow for optional platform specific behavior.
             PlatformApplyChanges();
 
-            // Update the graphics device and then the platform window.
-            _graphicsDevice.OnPresentationChanged();
-            _game.Platform.OnPresentationChanged();
+            // populates a gdi with settings in this gdm and allows users to override them with
+            // PrepareDeviceSettings event this information should be applied to the GraphicsDevice
+            var gdi = DoPreparingDeviceSettings();
 
-            // Set the new display size on the touch panel.
-            //
-            // TODO: In XNA this seems to be done as part of the 
-            // GraphicsDevice.DeviceReset event... we need to get 
-            // those working.
-            //
-            TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
-            TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
+            if (gdi.GraphicsProfile != GraphicsDevice.GraphicsProfile)
+            {
+                // if the GraphicsProfile changed we need to create a new GraphicsDevice
+                DisposeGraphicsDevice();
+                CreateDevice(gdi);
+                return;
+            }
+
+            GraphicsDevice.Reset(gdi.PresentationParameters);
+        }
+
+        private void DisposeGraphicsDevice()
+        {
+            _graphicsDevice.Dispose();
+            EventHelpers.Raise(this, DeviceDisposing, EventArgs.Empty);
+            _graphicsDevice = null;
         }
 
         partial void PlatformInitialize(PresentationParameters presentationParameters);
@@ -257,28 +342,11 @@ namespace Microsoft.Xna.Framework
             // Allow for any per-platform changes to the presentation.
             PlatformInitialize(presentationParameters);
 
-            // TODO: Implement multisampling (aka anti-alising) for all platforms!
-            if (PreparingDeviceSettings != null)
-            {
-                var gdi = new GraphicsDeviceInformation();
-                gdi.GraphicsProfile = GraphicsProfile; // Microsoft defaults this to Reach.
-                gdi.Adapter = GraphicsAdapter.DefaultAdapter;
-                gdi.PresentationParameters = presentationParameters;
-                var pe = new PreparingDeviceSettingsEventArgs(gdi);
-                PreparingDeviceSettings(this, pe);
-                presentationParameters = pe.GraphicsDeviceInformation.PresentationParameters;
-                GraphicsProfile = pe.GraphicsDeviceInformation.GraphicsProfile;
-            }
+            _initialized = true;
+        }
 
-            // Create and initialize the graphics device.
-            _graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile, presentationParameters);
-
-            // Set the new display size on the touch panel.
-            //
-            // TODO: In XNA this seems to be done as part of the 
-            // GraphicsDevice.DeviceReset event... we need to get 
-            // those working.
-            //
+        private void UpdateTouchPanel(object sender, EventArgs eventArgs)
+        {
             TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
             TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
             TouchPanel.DisplayOrientation = _graphicsDevice.PresentationParameters.DisplayOrientation;
@@ -296,10 +364,26 @@ namespace Microsoft.Xna.Framework
             ApplyChanges();
         }
 
+        private void OnPresentationChanged(object sender, PresentationEventArgs args)
+        {
+            _game.Platform.OnPresentationChanged(args.PresentationParameters);
+        }
+
         /// <summary>
         /// The profile which determines the graphics feature level.
         /// </summary>
-        public GraphicsProfile GraphicsProfile { get; set; }
+        public GraphicsProfile GraphicsProfile
+        {
+            get
+            {
+                return _graphicsProfile;
+            }
+            set
+            {
+                _shouldApplyChanges = true;
+                _graphicsProfile = value;
+            }
+        }
 
         /// <summary>
         /// Returns the graphics device for this manager.
@@ -325,6 +409,7 @@ namespace Microsoft.Xna.Framework
             get { return _wantFullScreen; }
             set
             {
+                _shouldApplyChanges = true;
                 _wantFullScreen = value;
             }
         }
@@ -332,17 +417,15 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Gets or sets the boolean which defines how window switches from windowed to fullscreen state.
         /// "Hard" mode(true) is slow to switch, but more effecient for performance, while "soft" mode(false) is vice versa.
-        /// The default value is <c>true</c>. Can only be changed before graphics device is created (in game's constructor).
+        /// The default value is <c>true</c>.
         /// </summary>
         public bool HardwareModeSwitch
         {
             get { return _hardwareModeSwitch;}
             set
             {
-                if (_graphicsDevice == null) 
-                    _hardwareModeSwitch = value;
-                else 
-                    throw new InvalidOperationException("This property can only be changed before graphics device is created(in game constructor).");
+                _shouldApplyChanges = true;
+                _hardwareModeSwitch = value;
             }
         }
 
@@ -361,6 +444,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
+                _shouldApplyChanges = true;
                 _preferMultiSampling = value;
             }
         }
@@ -380,6 +464,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
+                _shouldApplyChanges = true;
                 _preferredBackBufferFormat = value;
             }
         }
@@ -399,6 +484,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
+                _shouldApplyChanges = true;
                 _preferredBackBufferHeight = value;
             }
         }
@@ -418,6 +504,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
+                _shouldApplyChanges = true;
                 _preferredBackBufferWidth = value;
             }
         }
@@ -438,6 +525,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
+                _shouldApplyChanges = true;
                 _preferredDepthStencilFormat = value;
             }
         }
@@ -458,6 +546,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
+                _shouldApplyChanges = true;
                 _synchronizedWithVerticalRetrace = value;
             }
         }
@@ -478,6 +567,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
+                _shouldApplyChanges = true;
                 _supportedOrientations = value;
             }
         }

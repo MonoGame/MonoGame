@@ -1,0 +1,182 @@
+.TH MGCB 1 "October 2017" "MonoGame 3.7"
+
+.SH NAME
+mgcb \- builds optimized game content for MonoGame projects
+
+.SH SYNOPSIS
+.B mgcb
+[\fR\fIOPTIONS\fR]
+.\".IR file ...
+
+.SH DESCRIPTION
+.B mgcb
+is a command line tool for building XNB content on Windows, Mac, and Linux desktop systems.
+
+Typically it is executed by the Pipeline GUI tool when editing content or indirectly from Visual Studio or MonoDevelop during the build process of a MonoGame project. Alternatively you can use it yourself from the command line for specialized build pipelines or for debugging content processing.
+
+.TP
+.BR \fIFILENAME\fR
+Automatically selects either --build or --@ option, depending on the file extension. See below for more detail on what these options are.
+
+.TP
+.BR \-@ ", " \-\-@ =\fIRESPONSEFILE\fR
+Read a text response file with additional command line options and switches.
+
+.TP
+.BR \-b ", " \-\-build =\fISOURCEFILE\fR;\fIDESTINATIONFILE\fR
+Build the content source file using the previously set switches and options. Optional destination path may be specified if you want to change the output filepath.
+
+.TP
+.BR \-c ", " \-\-clean
+Delete all previously built content and intermediate files.
+
+.TP
+.BR \-\-compress
+Compress the XNB files for smaller file sizes.
+
+.TP
+.BR \-\-config =\fISTRING\fR
+The optional build config string from the build system.
+
+.TP
+.BR \-\-copy =\fISOURCEFILE\fR
+Copy the content source file verbatim to the output directory.
+
+.TP
+.BR \-h ", " \-\-help
+Displays help menu.
+
+.TP
+.BR \-i ", " \-\-importer =\fICLASSNAME\fR
+Defines the class name of the content importer for reading source content.
+
+.TP
+.BR \-I ", " \-\-incremental
+Skip cleaning files not included in the current build.
+
+.TP
+.BR \-n ", " \-\-intermediateDir =\fIPATH\fR
+The directory where all intermediate files are written. See below for path macros.
+
+.TP
+.BR \-d ", " \-\-launchdebugger
+Wait for debugger to attach before building content.
+
+.TP
+.BR \-o ", " \-\-outputDir =\fIPATH\fR
+The directory where all content is written. See below for path macros.
+
+.TP
+.BR \-t ", " \-\-platform =\fITARGETPLATFORM\fR
+Set the target platform for this build. Defaults to Windows desktop DirectX.
+
+The following is the list of available target platforms:
+.RS
+.TP 20
+.BR Windows
+Windows DirectX desktop platform.
+.TP 20
+.BR Xbox360
+Xbox 360 platform.
+.TP 20
+.BR iOS
+iOS platform.
+.TP 20
+.BR Android
+Android platform.
+.TP 20
+.BR DesktopGL
+OpenGL desktop platform.
+.TP 20
+.BR MacOSX
+MacOSX platform
+.TP 20
+.BR WindowsStoreApp
+UWP platform.
+.TP 20
+.BR NativeClient
+Web native client platform.
+.TP 20
+.BR PlayStationMobile
+PlayStation mobile platform.
+.TP 20
+.BR WindowsPhone8
+Windows Phone 8 platform.
+.TP 20
+.BR RaspberryPi
+Raspberry Pi platform.
+.TP 20
+.BR PlayStation4
+PlayStation 4 platform.
+.TP 20
+.BR PSVita
+PlayStation Vita platform.
+.TP 20
+.BR XboxOne
+Xbox One platform.
+.TP 20
+.BR Switch
+Nintendo Switch platform.
+.RE
+
+.TP
+.BR \-p ", " \-\-processor =\fICLASSNAME\fR
+Defines the class name of the content processor for processing imported content.
+
+.TP
+.BR \-P ", " \-\-processorParam =\fINAME:VALUE\fR
+Defines a parameter name and value to set on a content processor.
+
+.TP
+.BR \-g ", " \-\-profile =\fIGRAPHICSPROFILE\fR
+Set the target graphics profile for this build. Defaults to HiDef.
+
+The following is the list of available graphics profiles:
+.RS
+.TP 8
+.BR Reach
+Use a limited set of graphic features and capabilities, allowing the game to support the widest variety of devices.
+.TP 8
+.BR HiDef
+Use the largest available set of graphic features and capabilities to target devices, that have more enhanced graphic capabilities. 
+.RE
+
+.TP
+.BR \-q ", " \-\-quiet
+Only output content build errors.
+
+.TP
+.BR \-r ", " \-\-rebuild
+Forces a full rebuild of all content.
+
+.TP
+.BR \-f ", " \-\-reference =\fIASSEMBLY\fR
+Adds an assembly reference for resolving content importers, processors, and writers.
+
+.TP
+.BR \-w ", " \-\-workingDir =\fIDIRECTORYPATH\fR
+The working directory where all source content is located.
+
+.TP
+All command can be also called using / instead of \-\- or \-, this is to ensure compatibility between executing the command from Windows and Unix.
+
+.SH PATH MACROS
+The following is a list of custom path macros:
+
+.TP
+.BR $(Platform)
+Gets replaced by the target platform.
+
+.TP
+.BR $(Configuration)\ /\ $(Config)
+Gets replaced by the current config string.
+
+.TP
+.BR $(Profile)
+Gets replaced by the current graphics profile.
+
+.SH SEE ALSO
+.TP
+More documentation is available at: <http://www.monogame.net/documentation/?page=MGCB>
+
+

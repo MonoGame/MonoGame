@@ -55,6 +55,9 @@
     <Compile Include="..\..\MonoGame.Framework\ContainmentType.cs">
       <Link>MonoGame.Framework\ContainmentType.cs</Link>
     </Compile>
+	<Compile Include="..\..\MonoGame.Framework\EventHelpers.cs">
+      <Link>MonoGame.Framework\EventHelpers.cs</Link>
+    </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\ColorWriteChannels.cs">
       <Link>MonoGame.Framework\ColorWriteChannels.cs</Link>
     </Compile>
@@ -105,6 +108,9 @@
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilter.cs">
       <Link>MonoGame.Framework\TextureFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilterMode.cs">
+      <Link>MonoGame.Framework\TextureFilterMode.cs</Link>
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\Vertices\VertexElementUsage.cs">
       <Link>MonoGame.Framework\VertexElementUsage.cs</Link>
@@ -160,7 +166,16 @@
     <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs">
       <Link>MonoGame.Framework\Utilities\Hash.cs</Link>
     </Compile>
-
+    <Compile Include="..\..\MonoGame.Framework\Utilities\CurrentPlatform.cs" />
+    
+    <!-- We also use a few types from the content pipeline. -->
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs">
+      <Link>MonoGame.Framework.Content.Pipeline\ExternalTool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\LoadedTypeCollection.cs">
+      <Link>MonoGame.Framework.Content.Pipeline\LoadedTypeCollection.c</Link>
+    </Compile>
+    
     <!-- A fake GraphicsDevice to satisfy some of the framework classes above! -->
     <Compile Include="MonoGame.Framework\GraphicsDevice.cs" />
 
@@ -180,11 +195,10 @@
     <Compile Include="ShaderData.pssl.cs" />
     <Compile Include="ShaderData.sharpdx.cs" />
     <Compile Include="ShaderData.writer.cs" />
-    <Compile Include="PassInfo.cs" />
-    <Compile Include="SamplerStateInfo.cs" />
-    <Compile Include="ShaderInfo.cs" />
     <Compile Include="ShaderProfile.cs" />
-    <Compile Include="TechniqueInfo.cs" />
+    <Compile Include="ShaderProfile.OpenGL.cs" />
+    <Compile Include="ShaderProfile.DirectX.cs" />
+    <Compile Include="ShaderResult.cs" />
     <Compile Include="TextureFilterType.cs" />
 
     <!-- The HLSL to GLSL conversion utility -->
@@ -192,13 +206,18 @@
     <Compile Include="MojoShader.cs" />
 
     <!-- The MGFX parser -->
-    <None Include="MGFX.tpg" />
-    <Compile Include="Parser.cs" />
-    <Compile Include="ParseTree.cs" />
-    <Compile Include="Scanner.cs" />
-    <Compile Include="ParseTreeTools.cs" />
+    <None Include="TPGParser\MGFX.tpg" />
+    <Compile Include="TPGParser\Parser.cs" />
+    <Compile Include="TPGParser\ParseTree.cs" />
+    <Compile Include="TPGParser\Scanner.cs" />
+    <Compile Include="TPGParser\ParseTreeTools.cs" />
+    <Compile Include="TPGParser\PassInfo.cs" />
+    <Compile Include="TPGParser\SamplerStateInfo.cs" />
+    <Compile Include="TPGParser\ShaderInfo.cs" />
+    <Compile Include="TPGParser\TechniqueInfo.cs" />
     
     <!-- The MGFX preprocessor -->
     <Compile Include="Preprocessor.cs" />
+    
   </Files>
 </Project>
