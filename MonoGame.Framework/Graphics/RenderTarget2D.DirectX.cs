@@ -149,6 +149,19 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        protected override void PlatformGetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount)
+        {
+            if (MultiSampleCount > 1)
+            {
+                // Uses ID3D11DeviceContext::ResolveSubresource which supports copying between resources having different multisampling quality
+                // https://docs.microsoft.com/en-us/windows/desktop/api/d3d11/nf-d3d11-id3d11devicecontext-copyresource: '...If source and destination differ in multisampled count and quality ... Use ID3D11DeviceContext::ResolveSubresource to resolve a multisampled resource to a resource that is not multisampled.'
+                ResolveSubresource();
+                _resolvedTexture.PlatformGetData(level, arraySlice, rect, data, startIndex, elementCount);
+            }
+            else
+                base.PlatformGetData(level, arraySlice, rect, data, startIndex, elementCount);
+        }
+
         internal override Resource CreateTexture()
         {
             var rt = base.CreateTexture();

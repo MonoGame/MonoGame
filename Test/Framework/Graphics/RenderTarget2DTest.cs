@@ -136,5 +136,39 @@ namespace MonoGame.Tests.Graphics
                     
             Assert.AreEqual(renderTarget.Format, expectedSurfaceFormat);
         }
+
+        [Test]
+        public void ShouldGetData_no_multisampling()
+        {
+            Test_GetData(1);
+        }
+
+        [Test]
+        public void ShouldGetData_with_multisampling()
+        {
+            Test_GetData(8);
+        }
+
+        private void Test_GetData(int multiSampling)
+        {
+            // Arrange
+            const int width = 16;
+            const int height = 16;
+            const int dataSize = width * height;
+            using (var rTarget = new RenderTarget2D(gd, width, height, false, SurfaceFormat.Color, DepthFormat.None, multiSampling, RenderTargetUsage.DiscardContents))
+            {
+                gd.SetRenderTarget(rTarget);
+                gd.Clear(Color.Beige);
+
+                // Act
+                var readData = new Color[dataSize];
+                rTarget.GetData(readData);
+
+                // Assert
+                var expectedData = new Color[dataSize];
+                for (var index = 0; index < dataSize; index++) expectedData[index] = Color.Beige;
+                Assert.AreEqual(expectedData, readData);
+            }
+        }
     }
 }

@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformGetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
+        protected virtual void PlatformGetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             // Create a temp staging resource for copying the data.
             // 
@@ -131,9 +131,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.Format = SharpDXHelper.ToFormat(_format);
                 desc.BindFlags = BindFlags.None;
                 desc.CpuAccessFlags = CpuAccessFlags.Read;
-                desc.SampleDescription = CreateSampleDescription();
                 desc.Usage = ResourceUsage.Staging;
                 desc.OptionFlags = ResourceOptionFlags.None;
+
+                // Must always use a non-multisampled staging texture to obtain data from GPU, because of this:
+                // https://docs.microsoft.com/en-us/windows/desktop/api/d3d11/ne-d3d11-d3d11_usage: '...Therefore, staging resources can't be a depth-stencil buffer or a multisampled render target.'
+                desc.SampleDescription.Count = 1;
+                desc.SampleDescription.Quality = 0;
 
                 // Save sampling description.
                 _sampleDescription = desc.SampleDescription;
