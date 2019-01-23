@@ -56,7 +56,21 @@ namespace Microsoft.Xna.Framework.Audio
                 ALHelper.CheckError("Failed to fill buffer.");
             }
 
-            if (OpenALSoundController.GetInstance.SupportsLoopPoints && loopStart >= 0 && loopLength > 0)
+            bool formatLoopEnabled = true;
+
+            /* Formats that OpenAL Soft currently doesn't support loop points for:
+             * MonoIma4
+             * StereoIma4
+             * MonoMSAdpcm
+             * StereoMSAdpcm
+            */
+            if (format == ALFormat.MonoIma4 || format == ALFormat.StereoIma4
+                || format == ALFormat.MonoMSAdpcm || format == ALFormat.StereoMSAdpcm)
+            {
+                formatLoopEnabled = false;
+            }
+
+            if (OpenALSoundController.GetInstance.SupportsLoopPoints && formatLoopEnabled && loopStart >= 0 && loopLength > 0)
             {
                 //Loop end is loopStart + loopLength
                 int[] loopData = new int[2] { loopStart, loopStart + loopLength };
