@@ -16,11 +16,6 @@ namespace $safeprojectname$
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
-            // This flag should be set to false for XNA compatible rendering.
-            // For new projects it's recommended to set the flag to true.
-            // See the documentation for more information
-            GraphicsDeviceManager.UseStandardPixelAddressing = true;
             
             graphics.IsFullScreen = true;
             graphics.PreferredBackBufferWidth = 800;
