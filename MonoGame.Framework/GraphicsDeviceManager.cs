@@ -13,6 +13,8 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public partial class GraphicsDeviceManager : IGraphicsDeviceService, IDisposable, IGraphicsDeviceManager
     {
+        private static bool _useStandardPixelAddressing = true;
+
         /// <summary>
         /// Indicates if DX9 style pixel addressing or current standard
         /// pixel addressing should be used. This flag is set to
@@ -31,7 +33,11 @@ namespace Microsoft.Xna.Framework
         // TODO we need to figure out how to inject the half pixel offset into DX shaders
         public static bool UseStandardPixelAddressing { get { return true; } set { } }
 #else
-        public static bool UseStandardPixelAddressing { get; set; } = true;
+        public static bool UseStandardPixelAddressing
+        {
+            get { return _useStandardPixelAddressing; }
+            set { _useStandardPixelAddressing = value; }
+        }
 #endif
 
         private readonly Game _game;
