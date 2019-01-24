@@ -259,7 +259,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Fills an array of values holding keys that are currently being pressed, returning how many elements were filled.
         /// </summary>
-        /// <param name="keys">The keys array to fill. It will fill as much as array holds.</param>
+        /// <param name="keys">The keys array to fill. This array is not cleared.</param>
         /// <returns>The number of keys filled into the array.</returns>
         public int GetPressedKeys(Keys[] keys)
         {
