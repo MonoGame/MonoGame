@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Net
             return msg;
         }
 
-        private void SendMessage(NetOutgoingMessage msg, NetDeliveryMethod deliveryMethod, bool ignoreSelf = false, NetworkMachine ignoreMachine = null)
+        private void SendMessage(NetOutgoingMessage msg, NetDeliveryMethod deliveryMethod, bool ignoreSelf = false)
         {
             if (msg.LengthBytes < 3)
             {
@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Net
 
             if (!sendToAll && recipientMachine.isLocal)
             {
-                // Recipient is local machine
+                // Recipient is local machine only
                 if (!ignoreSelf)
                 {
                     msg.Position = 0;
@@ -122,7 +122,7 @@ namespace Microsoft.Xna.Framework.Net
 
                 foreach (var machine in allMachines)
                 {
-                    if (machine == localMachine || machine == ignoreMachine)
+                    if (machine == localMachine)
                     {
                         continue;
                     }
@@ -256,7 +256,7 @@ namespace Microsoft.Xna.Framework.Net
                     Debug.WriteLine("Forwarding " + msgType + " message to machine " + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]"));
                 }
 
-                SendMessage(CreateMessageFrom(msg), deliveryMethod, ignoreSelf: true, ignoreMachine: senderMachine);
+                SendMessage(CreateMessageFrom(msg), deliveryMethod, ignoreSelf: true);
             }
         }
 
@@ -836,7 +836,7 @@ namespace Microsoft.Xna.Framework.Net
                     return previousGamer;
                 }
 
-                var localGamer = (LocalNetworkGamer)recipient;
+                var localGamer = recipient as LocalNetworkGamer;
                 if (localGamer == null)
                 {
                     if (isHost)

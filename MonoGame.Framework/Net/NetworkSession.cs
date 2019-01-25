@@ -602,6 +602,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new InvalidOperationException("Only gamers in the session can be removed");
             }
+            bool wasHost = gamer.IsHost;
             gamer.state = NetworkGamerState.Removed;
 
             gamer.machine.gamers.Remove(gamer);
@@ -624,7 +625,7 @@ namespace Microsoft.Xna.Framework.Net
             AddPreviousGamer(gamer);
             InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));
 
-            if (localGamers.Count == 0)
+            if (wasHost || localGamers.Count == 0)
             {
                 End(NetworkSessionEndReason.ClientSignedOut);
             }
