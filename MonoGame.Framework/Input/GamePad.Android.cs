@@ -23,13 +23,16 @@ namespace Microsoft.Xna.Framework.Input
 
         public bool _hasCustomMapping = false;
 
-        public Axis _leftStickXCustomAxis = Axis.X;
-        public Axis _leftStickYCustomAxis = Axis.Y;
-        public Axis _rightStickXCustomAxis = Axis.Z;
-        public Axis _rightStickYCustomAxis = Axis.Rz;
+        Axis _leftStickXCustomAxis = Axis.X;
+        Axis _leftStickYCustomAxis = Axis.Y;
+        Axis _rightStickXCustomAxis = Axis.Z;
+        Axis _rightStickYCustomAxis = Axis.Rz;
 
-        public Axis _leftTriggerCustomAxis = Axis.Ltrigger;
-        public Axis _rightTriggerCustomAxis = Axis.Rtrigger;
+        Axis _leftTriggerCustomAxis = Axis.Ltrigger;
+        Axis _rightTriggerCustomAxis = Axis.Rtrigger;
+
+        Axis _dPadXCustomAxis = Axis.HatX;
+        Axis _dPadYCustomAxis = Axis.HatY;
 
         public AndroidGamePad(InputDevice device)
         {
@@ -120,12 +123,12 @@ namespace Microsoft.Xna.Framework.Input
 
             if (!DPadButtons)
             {
-                if (e.GetAxisValue(Axis.HatX) < 0)
+                if (e.GetAxisValue(_dPadXCustomAxis) < 0)
                 {
                     _buttons |= Buttons.DPadLeft;
                     _buttons &= ~Buttons.DPadRight;
                 }
-                else if (e.GetAxisValue(Axis.HatX) > 0)
+                else if (e.GetAxisValue(_dPadXCustomAxis) > 0)
                 {
                     _buttons &= ~Buttons.DPadLeft;
                     _buttons |= Buttons.DPadRight;
@@ -136,12 +139,12 @@ namespace Microsoft.Xna.Framework.Input
                     _buttons &= ~Buttons.DPadRight;
                 }
 
-                if (e.GetAxisValue(Axis.HatY) < 0)
+                if (e.GetAxisValue(_dPadYCustomAxis) < 0)
                 {
                     _buttons |= Buttons.DPadUp;
                     _buttons &= ~Buttons.DPadDown;
                 }
-                else if (e.GetAxisValue(Axis.HatY) > 0)
+                else if (e.GetAxisValue(_dPadYCustomAxis) > 0)
                 {
                     _buttons &= ~Buttons.DPadUp;
                     _buttons |= Buttons.DPadDown;
@@ -320,48 +323,47 @@ namespace Microsoft.Xna.Framework.Input
             if (gamePad._hasCustomMapping)
             {
                 gamePad.ProcessMotionEvent(e);
+                return true;
             }
-            else
+
+            gamePad._leftStick = new Vector2(e.GetAxisValue(Axis.X), -e.GetAxisValue(Axis.Y));
+            gamePad._rightStick = new Vector2(e.GetAxisValue(Axis.Z), -e.GetAxisValue(Axis.Rz));
+
+            gamePad._leftTrigger = e.GetAxisValue(Axis.Ltrigger);
+            gamePad._rightTrigger = e.GetAxisValue(Axis.Rtrigger);
+
+            if (!gamePad.DPadButtons)
             {
-                gamePad._leftStick = new Vector2(e.GetAxisValue(Axis.X), -e.GetAxisValue(Axis.Y));
-                gamePad._rightStick = new Vector2(e.GetAxisValue(Axis.Z), -e.GetAxisValue(Axis.Rz));
-
-                gamePad._leftTrigger = e.GetAxisValue(Axis.Ltrigger);
-                gamePad._rightTrigger = e.GetAxisValue(Axis.Rtrigger);
-
-                if (!gamePad.DPadButtons)
+                if (e.GetAxisValue(Axis.HatX) < 0)
                 {
-                    if (e.GetAxisValue(Axis.HatX) < 0)
-                    {
-                        gamePad._buttons |= Buttons.DPadLeft;
-                        gamePad._buttons &= ~Buttons.DPadRight;
-                    }
-                    else if (e.GetAxisValue(Axis.HatX) > 0)
-                    {
-                        gamePad._buttons &= ~Buttons.DPadLeft;
-                        gamePad._buttons |= Buttons.DPadRight;
-                    }
-                    else
-                    {
-                        gamePad._buttons &= ~Buttons.DPadLeft;
-                        gamePad._buttons &= ~Buttons.DPadRight;
-                    }
+                    gamePad._buttons |= Buttons.DPadLeft;
+                    gamePad._buttons &= ~Buttons.DPadRight;
+                }
+                else if (e.GetAxisValue(Axis.HatX) > 0)
+                {
+                    gamePad._buttons &= ~Buttons.DPadLeft;
+                    gamePad._buttons |= Buttons.DPadRight;
+                }
+                else
+                {
+                    gamePad._buttons &= ~Buttons.DPadLeft;
+                    gamePad._buttons &= ~Buttons.DPadRight;
+                }
 
-                    if (e.GetAxisValue(Axis.HatY) < 0)
-                    {
-                        gamePad._buttons |= Buttons.DPadUp;
-                        gamePad._buttons &= ~Buttons.DPadDown;
-                    }
-                    else if (e.GetAxisValue(Axis.HatY) > 0)
-                    {
-                        gamePad._buttons &= ~Buttons.DPadUp;
-                        gamePad._buttons |= Buttons.DPadDown;
-                    }
-                    else
-                    {
-                        gamePad._buttons &= ~Buttons.DPadUp;
-                        gamePad._buttons &= ~Buttons.DPadDown;
-                    }
+                if (e.GetAxisValue(Axis.HatY) < 0)
+                {
+                    gamePad._buttons |= Buttons.DPadUp;
+                    gamePad._buttons &= ~Buttons.DPadDown;
+                }
+                else if (e.GetAxisValue(Axis.HatY) > 0)
+                {
+                    gamePad._buttons &= ~Buttons.DPadUp;
+                    gamePad._buttons |= Buttons.DPadDown;
+                }
+                else
+                {
+                    gamePad._buttons &= ~Buttons.DPadUp;
+                    gamePad._buttons &= ~Buttons.DPadDown;
                 }
             }
 
