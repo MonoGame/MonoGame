@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Audio
 			set;
 		}
 
-        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int sampleAlignment = 0, int loopStart = 0, int loopLength = 0)
+        public unsafe void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int sampleAlignment = 0, int loopStart = 0, int loopLength = 0)
         {
             if ((format == ALFormat.MonoMSAdpcm || format == ALFormat.StereoMSAdpcm) && !OpenALSoundController.GetInstance.SupportsAdpcm)
                 throw new InvalidOperationException("MS-ADPCM is not supported by this OpenAL driver");
@@ -73,7 +73,9 @@ namespace Microsoft.Xna.Framework.Audio
             if (OpenALSoundController.GetInstance.SupportsLoopPoints && formatLoopEnabled && loopStart >= 0 && loopLength > 0)
             {
                 //Loop end is loopStart + loopLength
-                int[] loopData = new int[2] { loopStart, loopStart + loopLength };
+                int* loopData = stackalloc int[2];
+                loopData[0] = loopStart;
+                loopData[1] = loopStart + loopLength;
 
                 AL.Bufferiv(openALDataBuffer, ALBufferi.LoopSoftPointsExt, loopData);
                 ALHelper.CheckError("Failed to set loop points.");

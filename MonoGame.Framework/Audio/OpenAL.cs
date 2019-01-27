@@ -290,7 +290,7 @@ namespace MonoGame.OpenAL
         internal static d_algetbufferi GetBufferi = FuncLoader.LoadFunction<d_algetbufferi>(NativeLibrary, "alGetBufferi");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_albufferiv(int bid, ALBufferi param, int[] values);
+        internal unsafe delegate void d_albufferiv(int bid, ALBufferi param, int* values);
         internal static d_albufferiv Bufferiv = FuncLoader.LoadFunction<d_albufferiv>(NativeLibrary, "alBufferiv");
 
         internal static void GetBuffer(int bid, ALGetBufferi param, out int value)
