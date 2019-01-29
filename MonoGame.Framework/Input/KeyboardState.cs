@@ -201,6 +201,17 @@ namespace Microsoft.Xna.Framework.Input
 
         #region GetPressedKeys()
 
+        /// <summary>
+        /// Returns the number of pressed keys in this <see cref="KeyboardState"/>.
+        /// </summary>
+        /// <returns>An integer representing the number of keys currently pressed in this <see cref="KeyboardState"/>.</returns>
+        public int GetPressedKeyCount()
+        {
+            uint count = CountBits(keys0) + CountBits(keys1) + CountBits(keys2) + CountBits(keys3)
+                    + CountBits(keys4) + CountBits(keys5) + CountBits(keys6) + CountBits(keys7);
+            return (int)count;
+        }
+
         private static uint CountBits(uint v)
         {
             // http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
@@ -287,7 +298,7 @@ namespace Microsoft.Xna.Framework.Input
         #endregion
 
 
-        #region Objet and Equality
+        #region Object and Equality
 
         /// <summary>
         /// Gets the hash code for <see cref="KeyboardState"/> instance.
