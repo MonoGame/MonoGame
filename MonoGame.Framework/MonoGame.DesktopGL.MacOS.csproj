@@ -25,8 +25,8 @@
   <Import Project="Platform\OpenAL.targets" />
 
   <ItemGroup>
+    <Compile Include="Platform\Audio\OggStream.cs" />
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
-    <Compile Include="Platform\PrimaryThreadLoader.cs" />
     <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
     <Compile Include="Platform\Graphics\GraphicsContext.SDL.cs" />
     <Compile Include="Platform\Graphics\OpenGL.Common.cs" />
@@ -44,6 +44,7 @@
     <Compile Include="Platform\Media\Song.NVorbis.cs" />
     <Compile Include="Platform\Media\Video.MacOS.cs" />
     <Compile Include="Platform\Media\VideoPlayer.MacOS.cs" />
+    <Compile Include="Platform\PrimaryThreadLoader.cs" />
     <Compile Include="Platform\Properties\AssemblyInfo.Mac.cs" />
     <Compile Include="Platform\SDL\SDL2.cs" />
     <Compile Include="Platform\SDL\SDLGamePlatform.cs" />

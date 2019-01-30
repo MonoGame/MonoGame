@@ -27,6 +27,7 @@
   <Import Project="Platform\OpenAL.targets" />
 
   <ItemGroup>
+    <Compile Include="Platform\Audio\OggStream.cs" />
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
     <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
     <Compile Include="Platform\Graphics\GraphicsContext.SDL.cs" />

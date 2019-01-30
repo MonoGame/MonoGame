@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>xamarin.android</TargetFramework>
+    <TargetFramework>monoandroid90</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
@@ -12,6 +12,10 @@
 
     <MGOpenGL>GLES</MGOpenGL>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Runtime.Serialization" />
+  </ItemGroup>
 
   <ItemGroup>
       <Compile Remove="Platform\**\*" />
@@ -29,6 +33,7 @@
   <Import Project="Platform\Microsoft.Devices.Sensors.targets" />
 
   <ItemGroup>
+    <Compile Include="Platform\Android\AndroidCompatibility.cs" />
     <Compile Include="Platform\Android\AndroidGameActivity.cs" />
     <Compile Include="Platform\Android\AndroidGamePlatform.cs" />
     <Compile Include="Platform\Android\AndroidGameWindow.cs" />
@@ -50,11 +55,14 @@
     <Compile Include="Platform\Input\Joystick.Default.cs" />
     <Compile Include="Platform\Input\KeyboardInput.Android.cs" />
     <Compile Include="Platform\Input\MessageBox.Android.cs" />
+    <Compile Include="Platform\Input\Mouse.Default.cs" />
+    <Compile Include="Platform\Input\MouseCursor.Default.cs" />
     <Compile Include="Platform\Media\MediaLibrary.Android.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
     <Compile Include="Platform\Media\Song.Android.cs" />
     <Compile Include="Platform\Media\Video.Android.cs" />
     <Compile Include="Platform\Media\VideoPlayer.Android.cs" />
+    <Compile Include="Platform\PrimaryThreadLoader.cs" />
     <Compile Include="Platform\Properties\AssemblyInfo.Android.cs" />
     <Compile Include="Platform\TitleContainer.Android.cs" />
     <Compile Include="Platform\Utilities\FuncLoader.Android.cs" />
