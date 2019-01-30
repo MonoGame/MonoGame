@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>xamarin.ios</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
+    <IntermediateOutputPath>obj\iOS\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>bin\iOS\$(Configuration)</OutputPath>
+
+    <DefineConstants>IOS;GLES</DefineConstants>
+
+    <MGOpenGL>GLES</MGOpenGL>
+  </PropertyGroup>
+
+  <ItemGroup>
+      <Compile Remove="Platform\**\*" />
+      <!-- TODO: upgrade to new GraphicsDeviceManager -->
+      <Compile Remove="GraphicsDeviceManager.cs" />
+      <!-- TODO: upgrade to new GraphicsAdapter -->
+      <Compile Remove="Graphics\GraphicsAdapter.cs" />
+      <!-- TODO: add Null (or iOS compatible) implementation for the following -->
+      <Compile Remove="Graphics\OcclusionQuery.cs" />
+      <Compile Remove="Input\Keyboard.cs" />
+  </ItemGroup>
+
+  <Import Project="Platform\OpenGL.targets" />
+  <Import Project="Platform\OpenAL.targets" />
+  <Import Project="Platform\Microsoft.Devices.Sensors.targets" />
+
+  <ItemGroup>
+    <Compile Include="Platform\iOS\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="Platform\iOS\Devices\Sensors\Compass.cs" />
+    <Compile Include="Platform\iOS\iOSGamePlatform.cs" />
+    <Compile Include="Platform\iOS\iOSGameView.cs" />
+    <Compile Include="Platform\iOS\iOSGameViewController.cs" />
+    <Compile Include="Platform\iOS\iOSGameView_GLAbstraction.cs" />
+    <Compile Include="Platform\iOS\iOSGameView_Touch.cs" />
+    <Compile Include="Platform\iOS\iOSGameWindow.cs" />
+    <Compile Include="Platform\iOS\OrientationConverter.cs" />
+ 
+    <Compile Include="Platform\GamePlatform.Mobile.cs" />
+    <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
+    <Compile Include="Platform\Graphics\OpenGL.iOS.cs" />
+    <Compile Include="Platform\GraphicsDeviceManager.Legacy.cs" />
+    <Compile Include="Platform\Input\GamePad.iOS.cs" />
+    <Compile Include="Platform\Input\Joystick.Default.cs" />
+    <Compile Include="Platform\Input\KeyboardInput.iOS.cs" />
+    <Compile Include="Platform\Input\MessageBox.iOS.cs" />
+    <Compile Include="Platform\Media\MediaLibrary.iOS.cs" />
+    <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
+    <Compile Include="Platform\Media\Song.iOS.cs" />
+    <Compile Include="Platform\Media\Video.iOS.cs" />
+    <Compile Include="Platform\Media\VideoPlayer.iOS.cs" />
+    <Compile Include="Platform\Properties\AssemblyInfo.iOS.cs" />
+    <Compile Include="Platform\TitleContainer.MacOS.cs" />
+    <Compile Include="Platform\Utilities\FuncLoader.iOS.cs" />
+    <Compile Include="Platform\Utilities\InteropHelpers.cs" />
+    <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+      <PackageReference Include="MSBuild.Sdk.Extras" Version="1.6.65" PrivateAssets="All" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildSdkExtrasTargets)" Condition="Exists('$(MSBuildSdkExtrasTargets)')"/>
+</Project>
