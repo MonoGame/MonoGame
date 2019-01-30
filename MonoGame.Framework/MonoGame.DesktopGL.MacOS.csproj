@@ -5,9 +5,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-    <IntermediateOutputPath>obj\DesktopGLMac\$(Configuration)\$(TargetFramework)</IntermediateOutputPath>
-    <OutputPath>bin\DesktopGLMac\$(Configuration)\$(TargetFramework)</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <IntermediateOutputPath>obj\DesktopGLMac\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>bin\DesktopGLMac\$(Configuration)</OutputPath>
 
     <DefineConstants>DESKTOPGL;MONOMAC;XNADESIGNPROVIDED</DefineConstants>
   </PropertyGroup>
@@ -27,6 +26,7 @@
 
   <ItemGroup>
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
+    <Compile Include="Platform\PrimaryThreadLoader.cs" />
     <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
     <Compile Include="Platform\Graphics\GraphicsContext.SDL.cs" />
     <Compile Include="Platform\Graphics\OpenGL.Common.cs" />

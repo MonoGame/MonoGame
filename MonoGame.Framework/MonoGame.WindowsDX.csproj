@@ -5,9 +5,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-    <IntermediateOutputPath>obj\WindowsDX\$(Configuration)\$(TargetFramework)</IntermediateOutputPath>
-    <OutputPath>bin\WindowsDX\$(Configuration)\$(TargetFramework)</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <IntermediateOutputPath>obj\WindowsDX\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>bin\WindowsDX\$(Configuration)</OutputPath>
 
     <DefineConstants>WINDOWS;XNADESIGNPROVIDED</DefineConstants>
   </PropertyGroup>
