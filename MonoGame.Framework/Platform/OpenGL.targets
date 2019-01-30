@@ -15,13 +15,14 @@
     <Compile Include="Platform\Graphics\GraphicsDebug.Default.cs" />
     <Compile Include="Platform\Graphics\GraphicsDevice.OpenGL.FramebufferHelper.cs" />
     <Compile Include="Platform\Graphics\GraphicsDevice.OpenGL.cs" />
-    <Compile Include="Platform\Graphics\OcclusionQuery.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\OcclusionQuery.OpenGL.cs" Condition="'$(MGOpenGL)' != 'GLES'"/>
     <Compile Include="Platform\Graphics\OpenGL.cs" />
     <Compile Include="Platform\Graphics\RenderTarget2D.OpenGL.cs" />
     <Compile Include="Platform\Graphics\RenderTargetCube.OpenGL.cs" />
     <Compile Include="Platform\Graphics\SamplerStateCollection.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Shader\ConstantBuffer.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Shader\Shader.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\Shader\ShaderProgramCache.cs" />
     <Compile Include="Platform\Graphics\States\BlendState.OpenGL.cs" />
     <Compile Include="Platform\Graphics\States\DepthStencilState.OpenGL.cs" />
     <Compile Include="Platform\Graphics\States\RasterizerState.OpenGL.cs" />
