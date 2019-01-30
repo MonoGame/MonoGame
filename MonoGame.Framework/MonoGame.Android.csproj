@@ -8,7 +8,7 @@
     <IntermediateOutputPath>obj\DesktopGL\$(Configuration)</IntermediateOutputPath>
     <OutputPath>bin\DesktopGL\$(Configuration)</OutputPath>
 
-    <DefineConstants></DefineConstants>
+    <DefineConstants>ANDROID;GLES</DefineConstants>
 
     <MGOpenGL>GLES</MGOpenGL>
   </PropertyGroup>
