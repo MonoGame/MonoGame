@@ -5,8 +5,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-    <IntermediateOutputPath>obj\DesktopGL\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>bin\DesktopGL\$(Configuration)</OutputPath>
+    <IntermediateOutputPath>obj\Android\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>bin\Android\$(Configuration)</OutputPath>
 
     <DefineConstants>ANDROID;GLES</DefineConstants>
 
