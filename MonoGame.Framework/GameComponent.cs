@@ -45,12 +45,7 @@ namespace Microsoft.Xna.Framework
         public GameComponent(Game game)
         {
             this.Game = game;
-        }
-
-        ~GameComponent()
-        {
-            Dispose(false);
-        }
+        }        
 
         public virtual void Initialize() { }
 
@@ -77,7 +72,6 @@ namespace Microsoft.Xna.Framework
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         #region IComparable<GameComponent> Members
