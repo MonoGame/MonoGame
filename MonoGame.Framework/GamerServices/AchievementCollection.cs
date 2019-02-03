@@ -52,11 +52,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			innerlist = new List<Achievement>();
 		}
-		
-        ~AchievementCollection()
-        {
-            Dispose(false);
-        }
 
 		#region Properties
 		public int Count
