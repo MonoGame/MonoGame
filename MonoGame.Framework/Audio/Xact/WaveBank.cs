@@ -393,11 +393,6 @@ namespace Microsoft.Xna.Framework.Audio
             GC.SuppressFinalize(this);
         }
 
-        ~WaveBank()
-        {
-            Dispose(false);
-        }
-
         private void Dispose(bool disposing)
         {
             if (IsDisposed)
