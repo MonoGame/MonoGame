@@ -65,11 +65,6 @@ namespace Microsoft.Xna.Framework.Media
 #endif
         }
 
-        ~Video()
-        {
-            Dispose(false);
-        }
-
         #endregion
 
         #region IDisposable Implementation
