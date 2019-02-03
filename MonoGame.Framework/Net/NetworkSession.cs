@@ -224,8 +224,7 @@ namespace Microsoft.Xna.Framework.Net
 
 		public void Dispose ()
 		{
-			this.Dispose(true);
-			GC.SuppressFinalize(this);				
+			this.Dispose(true);			
 		}
 		
 		public void Dispose (bool disposing) 

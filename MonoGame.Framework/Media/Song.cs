@@ -85,7 +85,6 @@ namespace Microsoft.Xna.Framework.Media
 		public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
         
         void Dispose(bool disposing)

@@ -220,7 +220,6 @@ namespace Microsoft.Xna.Framework
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
