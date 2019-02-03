@@ -49,27 +49,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Microsoft.Xna.Framework.GamerServices
 {
 	
-	public sealed class GamerProfile : IDisposable
+	public sealed class GamerProfile
     {
-        ~GamerProfile()
-        {
-            Dispose(false);
-        }
-
-        #region IDisposable implementation
-
-        public void Dispose()
-		{
-            Dispose(true);
-            GC.SuppressFinalize(this);
-		}
-
-        private void Dispose(bool disposing)
-        {
-        }
-
-	    #endregion
-
 	#region Properties
 
         /*
