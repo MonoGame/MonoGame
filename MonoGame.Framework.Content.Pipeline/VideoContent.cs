@@ -102,12 +102,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         break;
                 }
             }
-        }
-
-        ~VideoContent()
-        {
-            Dispose(false);
-        }
+        }        
 
         /// <summary>
         /// Immediately releases the unmanaged resources used by this object.
