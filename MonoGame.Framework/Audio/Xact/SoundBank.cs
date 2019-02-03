@@ -332,11 +332,6 @@ namespace Microsoft.Xna.Framework.Audio
             GC.SuppressFinalize(this);
         }
 
-        ~SoundBank()
-        {
-            Dispose(false);
-        }
-
         private void Dispose(bool disposing)
         {
             if (IsDisposed)
