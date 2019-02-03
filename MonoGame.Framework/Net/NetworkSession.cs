@@ -91,11 +91,6 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			activeSessions.Add(this);
 		}
-		
-        ~NetworkSession()
-        {
-            Dispose(false);
-        }
 
 		private NetworkSessionType sessionType;
 		private int maxGamers;
