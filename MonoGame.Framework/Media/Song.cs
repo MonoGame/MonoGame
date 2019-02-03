@@ -64,11 +64,6 @@ namespace Microsoft.Xna.Framework.Media
             PlatformInitialize(fileName);
         }
 
-        ~Song()
-        {
-            Dispose(false);
-        }
-
         internal string FilePath
 		{
 			get { return _name; }
