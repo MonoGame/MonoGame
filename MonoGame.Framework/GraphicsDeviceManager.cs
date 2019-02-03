@@ -95,11 +95,6 @@ namespace Microsoft.Xna.Framework
             _game.Services.AddService(typeof(IGraphicsDeviceService), this);
         }
 
-        ~GraphicsDeviceManager()
-        {
-            Dispose(false);
-        }
-
         private void CreateDevice()
         {
             if (_graphicsDevice != null)
