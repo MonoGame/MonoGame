@@ -52,11 +52,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			innerlist = new List<FriendGamer>();
 		}
-		
-        ~FriendCollection()
-        {
-            Dispose(false);
-        }
 
 		#region Properties
 		public int Count
