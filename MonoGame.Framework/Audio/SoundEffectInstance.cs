@@ -103,15 +103,6 @@ namespace Microsoft.Xna.Framework.Audio
             PlatformInitialize(buffer, sampleRate, channels);
         }
 
-        /// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before the
-        /// <see cref="Microsoft.Xna.Framework.Audio.SoundEffectInstance"/> is reclaimed by garbage collection.
-        /// </summary>
-        ~SoundEffectInstance()
-        {
-            Dispose(false);
-        }
-
         /// <summary>Applies 3D positioning to the SoundEffectInstance using a single listener.</summary>
         /// <param name="listener">Data about the listener.</param>
         /// <param name="emitter">Data about the source of emission.</param>
