@@ -273,11 +273,6 @@ namespace Microsoft.Xna.Framework.Graphics
             EffectCache = new Dictionary<int, Effect>();
         }
 
-        ~GraphicsDevice()
-        {
-            Dispose(false);
-        }
-
         internal int GetClampedMultisampleCount(int multiSampleCount)
         {
             if (multiSampleCount > 1)
