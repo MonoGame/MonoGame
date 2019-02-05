@@ -8,11 +8,7 @@ using System.IO;
 using Foundation;
 using UIKit;
 #elif MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.Foundation;
-#else
 using Foundation;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework

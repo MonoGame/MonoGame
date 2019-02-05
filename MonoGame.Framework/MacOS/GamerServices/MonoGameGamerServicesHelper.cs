@@ -4,16 +4,10 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Drawing;
 
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-using RectF = System.Drawing.RectangleF;
-#else
 using Foundation;
 using AppKit;
 using RectF = CoreGraphics.CGRect;
 using PointF = CoreGraphics.CGPoint;
-#endif
 
 namespace Microsoft.Xna.Framework.GamerServices
 {

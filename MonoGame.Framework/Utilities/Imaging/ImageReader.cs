@@ -4,59 +4,32 @@ using System.Runtime.InteropServices;
 
 namespace MonoGame.Utilities
 {
-    internal unsafe class ImageReader
+    internal static unsafe class ImageReader
     {
-        public class AnimatedGifFrame
+        public static byte[] Read(Stream stream, out int x, out int y, out int comp, int req_comp)
         {
-            public byte[] Data;
-            public int Delay;
-        }
+            byte[] bytes, data = null;
 
-        private Stream _stream;
-        private byte[] _buffer = new byte[1024];
-
-        private readonly Imaging.stbi_io_callbacks _callbacks;
-
-        public ImageReader()
-        {
-            _callbacks = new Imaging.stbi_io_callbacks
+            // Rewind stream if it is at end
+            if (stream.CanSeek && stream.Length == stream.Position)
             {
-                read = ReadCallback,
-                skip = SkipCallback,
-                eof = Eof
-            };
-        }
-
-        private int SkipCallback(void* user, int i)
-        {
-            return (int) _stream.Seek(i, SeekOrigin.Current);
-        }
-
-        private int Eof(void* user)
-        {
-            return _stream.CanRead ? 1 : 0;
-        }
-
-        private int ReadCallback(void* user, sbyte* data, int size)
-        {
-            if (size > _buffer.Length)
-            {
-                _buffer = new byte[size*2];
+                stream.Seek(0, SeekOrigin.Begin);
             }
 
-            var res = _stream.Read(_buffer, 0, size);
-            Marshal.Copy(_buffer, 0, new IntPtr(data), size);
-            return res;
-        }
+            using (var ms = new MemoryStream())
+            {
+                stream.CopyTo(ms);
+                bytes = ms.ToArray();
+            }
 
-        public byte[] Read(Stream stream, out int x, out int y, out int comp, int req_comp)
-        {
-            _stream = stream;
-
+            int xx, yy, ccomp;
+            byte* result = null;
             try
             {
-                int xx, yy, ccomp;
-                var result = Imaging.stbi_load_from_callbacks(_callbacks, null, &xx, &yy, &ccomp, req_comp);
+                fixed (byte* b = bytes)
+                {
+                    result = Imaging.stbi_load_from_memory(b, bytes.Length, &xx, &yy, &ccomp, req_comp);
+                }
 
                 x = xx;
                 y = yy;
@@ -69,16 +42,18 @@ namespace MonoGame.Utilities
 
                 // Convert to array
                 var c = req_comp != 0 ? req_comp : comp;
-                var data = new byte[x*y*c];
+                data = new byte[x * y * c];
                 Marshal.Copy(new IntPtr(result), data, 0, data.Length);
-                Operations.Free(result);
-
-                return data;
             }
             finally
             {
-                _stream = null;
+                if (result != null)
+                {
+                    Operations.Free(result);
+                }
             }
+
+            return data;
         }
     }
 }

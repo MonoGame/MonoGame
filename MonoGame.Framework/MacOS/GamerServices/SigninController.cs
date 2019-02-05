@@ -4,19 +4,12 @@ using System.Linq;
 
 using System.Drawing;
 
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-using MonoMac.ObjCRuntime;
-using RectF = System.Drawing.RectangleF;
-#else
 using Foundation;
 using AppKit;
 using ObjCRuntime;
 using RectF = CoreGraphics.CGRect;
 using SizeF = CoreGraphics.CGSize;
 using PointF = CoreGraphics.CGPoint;
-#endif
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
@@ -205,7 +198,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			this.controller = controller;
 		}
 		
-        #if MONOMAC && !PLATFORM_MACOS_LEGACY
+#if MONOMAC
 		public override nint GetRowCount (NSTableView tableView)
 		{
 			return controller.gamerList.Count;
@@ -225,7 +218,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                 controller.gamerList[(int)row].DisplayName = theObject.ToString();
             }
         }
-        #else
+#else
         public override int GetRowCount (NSTableView tableView)
         {
             return controller.gamerList.Count;
@@ -245,7 +238,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                 controller.gamerList[row].DisplayName = theObject.ToString();
             }
         }
-        #endif
+#endif
 	}
 	
 	[CLSCompliant(false)]
@@ -258,7 +251,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			this.controller = controller;
 		}
 
-#if MONOMAC && !PLATFORM_MACOS_LEGACY
+#if MONOMAC
 		public override bool ShouldSelectRow (NSTableView tableView, nint row)
 #else
         public override bool ShouldSelectRow (NSTableView tableView, int row)

@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
@@ -189,24 +189,40 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Pass the preferred feature levels based on the
             // target profile that may have been set by the user.
-            var featureLevels = new List<FeatureLevel>();
+            FeatureLevel[] featureLevels;
             if (GraphicsProfile == GraphicsProfile.HiDef)
             {
-                featureLevels.Add(FeatureLevel.Level_11_1);
-                featureLevels.Add(FeatureLevel.Level_11_0);
-                featureLevels.Add(FeatureLevel.Level_10_1);
-                featureLevels.Add(FeatureLevel.Level_10_0);
+                featureLevels = new[]
+                    {
+                        FeatureLevel.Level_11_1,
+                        FeatureLevel.Level_11_0,
+                        FeatureLevel.Level_10_1,
+                        FeatureLevel.Level_10_0,
+                        // Feature levels below 10 are not supported for the HiDef profile
+                    };
             }
-            featureLevels.Add(FeatureLevel.Level_9_3);
-            featureLevels.Add(FeatureLevel.Level_9_2);
-            featureLevels.Add(FeatureLevel.Level_9_1);
+            else // Reach profile
+            {
+                featureLevels = new[]
+                    {
+                        // For the Reach profile, first try use the highest supported 9_X feature level
+                        FeatureLevel.Level_9_3,
+                        FeatureLevel.Level_9_2,
+                        FeatureLevel.Level_9_1,
+                        // If level 9 is not supported, then just use the highest supported level
+                        FeatureLevel.Level_11_1,
+                        FeatureLevel.Level_11_0,
+                        FeatureLevel.Level_10_1,
+                        FeatureLevel.Level_10_0,
+                    };
+            }
 
             var driverType = GraphicsAdapter.UseReferenceDevice ? DriverType.Reference : DriverType.Hardware;
         
             try 
             {
                 // Create the Direct3D device.
-                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels.ToArray()))
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels))
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
 
                 // Necessary to enable video playback
@@ -218,7 +234,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Try again without the debug flag.  This allows debug builds to run
                 // on machines that don't have the debug runtime installed.
                 creationFlags &= ~SharpDX.Direct3D11.DeviceCreationFlags.Debug;
-                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels.ToArray()))
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels))
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
             }
 
@@ -514,31 +530,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Pass the preferred feature levels based on the
             // target profile that may have been set by the user.
-            var featureLevels = new List<FeatureLevel>();
+            FeatureLevel[] featureLevels;
             if (GraphicsProfile == GraphicsProfile.HiDef)
             {
-                featureLevels.Add(FeatureLevel.Level_11_0);
-                featureLevels.Add(FeatureLevel.Level_10_1);
-                featureLevels.Add(FeatureLevel.Level_10_0);
+                featureLevels = new[]
+                    {
+                        FeatureLevel.Level_11_0,
+                        FeatureLevel.Level_10_1,
+                        FeatureLevel.Level_10_0,
+                        // Feature levels below 10 are not supported for the HiDef profile
+                    };
             }
-
-            // We can not give featureLevels for granted in GraphicsProfile.Reach
-            FeatureLevel supportedFeatureLevel = 0;
-            try
+            else // Reach profile
             {
-                supportedFeatureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
+                featureLevels = new[]
+                    {
+                        // For the Reach profile, first try use the highest supported 9_X feature level
+                        FeatureLevel.Level_9_3,
+                        FeatureLevel.Level_9_2,
+                        FeatureLevel.Level_9_1,
+                        // If level 9 is not supported, then just use the highest supported level
+                        FeatureLevel.Level_11_0,
+                        FeatureLevel.Level_10_1,
+                        FeatureLevel.Level_10_0,
+                    };
             }
-            catch (SharpDX.SharpDXException)
-            {
-                // if GetSupportedFeatureLevel() fails, do not crash the initialization. Program can run without this.
-            }
-
-            if (supportedFeatureLevel >= FeatureLevel.Level_9_3)
-                featureLevels.Add(FeatureLevel.Level_9_3);
-            if (supportedFeatureLevel >= FeatureLevel.Level_9_2)
-                featureLevels.Add(FeatureLevel.Level_9_2);
-            if (supportedFeatureLevel >= FeatureLevel.Level_9_1)
-                featureLevels.Add(FeatureLevel.Level_9_1);
 
             var driverType = DriverType.Hardware;   //Default value
             switch (GraphicsAdapter.UseDriverType)
@@ -555,7 +571,7 @@ namespace Microsoft.Xna.Framework.Graphics
             try
             {
                 // Create the Direct3D device.
-                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels.ToArray()))
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels))
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device>();
             }
             catch (SharpDXException)
@@ -563,7 +579,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Try again without the debug flag.  This allows debug builds to run
                 // on machines that don't have the debug runtime installed.
                 creationFlags &= ~SharpDX.Direct3D11.DeviceCreationFlags.Debug;
-                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels.ToArray()))
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels))
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device>();
             }
 
@@ -1350,7 +1366,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             DynamicIndexBuffer buffer;
 
-            var indexSize = Utilities.ReflectionHelpers.SizeOf<T>.Get();
+            var indexSize = ReflectionHelpers.SizeOf<T>.Get();
             var indexElementSize = indexSize == 2 ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits;
 
             var requiredIndexCount = Math.Max(indexCount, 6000);

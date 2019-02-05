@@ -34,14 +34,6 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        protected override void OnShown(EventArgs e)
-        {
-            // Delay setting of Width so that label wrapping would be correct.
-            Width = 400;
-
-            base.OnShown(e);
-        }
-
         private void RadioButton_CheckedChanged(object sender, EventArgs e)
         {
             if (radioCopy.Checked)

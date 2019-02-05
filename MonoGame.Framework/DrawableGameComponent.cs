@@ -68,12 +68,12 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void OnVisibleChanged(object sender, EventArgs args)
         {
-            EventHelpers.Raise(this, VisibleChanged, args);
+            EventHelpers.Raise(sender, VisibleChanged, args);
         }
 
         protected virtual void OnDrawOrderChanged(object sender, EventArgs args)
         {
-            EventHelpers.Raise(this, DrawOrderChanged, args);
+            EventHelpers.Raise(sender, DrawOrderChanged, args);
         }
     }
 }

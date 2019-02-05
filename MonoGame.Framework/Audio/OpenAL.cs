@@ -199,7 +199,7 @@ namespace MonoGame.OpenAL
 
 #if DESKTOPGL
             // Load bundled library
-            var assemblyLocation = Path.GetDirectoryName((new Uri(typeof(AL).Assembly.CodeBase)).LocalPath);
+            var assemblyLocation = Path.GetDirectoryName(typeof(AL).Assembly.Location);
             if (CurrentPlatform.OS == OS.Windows && Environment.Is64BitProcess)
                 ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x64/soft_oal.dll"));
             else if (CurrentPlatform.OS == OS.Windows && !Environment.Is64BitProcess)
@@ -223,6 +223,15 @@ namespace MonoGame.OpenAL
             }
 #elif ANDROID
             ret = FuncLoader.LoadLibrary("libopenal32.so");
+
+            if (ret == IntPtr.Zero)
+            {
+                var appFilesDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                var appDir = Path.GetDirectoryName(appFilesDir);
+                var lib = Path.Combine(appDir, "lib", "libopenal32.so");
+
+                ret = FuncLoader.LoadLibrary(lib);
+            }
 #else
             ret = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenAL.framework/OpenAL");
 #endif

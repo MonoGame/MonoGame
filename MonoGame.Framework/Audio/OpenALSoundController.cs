@@ -235,6 +235,11 @@ namespace Microsoft.Xna.Framework.Audio
                     0
                 };
 #elif IOS
+                AVAudioSession.SharedInstance().Init();
+
+                // NOTE: Do not override AVAudioSessionCategory set by the game developer:
+                //       see https://github.com/MonoGame/MonoGame/issues/6595
+
                 EventHandler<AVAudioSessionInterruptionEventArgs> handler = delegate(object sender, AVAudioSessionInterruptionEventArgs e) {
                     switch (e.InterruptionType)
                     {
@@ -250,7 +255,11 @@ namespace Microsoft.Xna.Framework.Audio
                             break;
                     }
                 };
+
                 AVAudioSession.Notifications.ObserveInterruption(handler);
+
+                // Activate the instance or else the interruption handler will not be called.
+                AVAudioSession.SharedInstance().SetActive(true);
 
                 int[] attribute = new int[0];
 #else

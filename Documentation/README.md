@@ -28,7 +28,7 @@ Review the following expectations before contributing any documentation.
 TODO!
 
 ### API Reference 
-The API reference documentation is a big part of the documentation effort for MonoGame.  The documentation is written in the [C# XML format](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/xml-documentation-comments) and is inline to the MonoGame source code. The final web pages with API documentation are generated using [SharpDoc](http://sharpdx.org/documentation/tools/sharpdoc).
+The API reference documentation is a big part of the documentation effort for MonoGame.  The documentation is written in the [C# XML format](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/xml-documentation-comments) and is inline to the MonoGame source code. The final web pages with API documentation are generated using [SharpDoc](https://github.com/xoofx/SharpDoc).
 
 #### Every Word Should Contain Value
 Every word in the reference documentation should provide information beyond the API itself.  Documentation that only rehashes or rephrases what is already apparent in the class, method, parameter, or property name has zero value and wastes time for both the writer and reader.

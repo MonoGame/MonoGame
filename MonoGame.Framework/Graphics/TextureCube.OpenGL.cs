@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using MonoGame.OpenGL;
 using GLPixelFormat = MonoGame.OpenGL.PixelFormat;
 using PixelFormat = MonoGame.OpenGL.PixelFormat;
-using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {

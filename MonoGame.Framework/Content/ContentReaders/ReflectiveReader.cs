@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {

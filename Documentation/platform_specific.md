@@ -2,3 +2,4 @@ While MonoGame aims to provide a platform-agnostic framework for developing game
 
   - [Android](android.md)
   - [tvOS](tvOS.md)
+  - [Windows Universal Platform (UWP)](UWP.md)

@@ -1,0 +1,22 @@
+{
+    "author": "MonoGameTeam",
+    "classifications": [
+        "MonoGame"
+    ],
+    "name": "MonoGame Android Application",
+    "groupIdentity": "MonoGame.Application.Android",
+    "identity": "MonoGame.Application.Android.CSharp",
+    "shortName": "mgandroid",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [
+        {
+            "path": "MGNamespace.csproj"
+        }
+    ],
+    "sourceName": "MGNamespace",
+    "preferNameDirectory": "true",
+    "description": "A MonoGame game project for Android using OpenGL."
+}

@@ -4,9 +4,8 @@
 
 using System;
 using System.IO;
-
 using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
