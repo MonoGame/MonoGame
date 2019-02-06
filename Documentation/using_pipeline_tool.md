@@ -48,7 +48,7 @@ Just like XNA, the MonoGame content pipeline supports custom content processors.
 
 The first step is removing all `Microsoft.Xna.Framework.XXX` references and replacing them with references to `MonoGame.Framework` and `MonoGame.Framework.Content.Pipeline`.  This is required as you will no longer be building against Microsoft XNA.
 
-Once you references are working you then need to change your assembly target platform.  MonoGame does not support x86 (aka 32bit) assemblies in the content pipeline.  This is mainly to allow of processing really big content as well as to simplify the number of configurations and native code dependancies.  For this reason you should try to target "Any CPU" with your custom content assembly.
+Once you references are working you then need to change your assembly target platform.  MonoGame does not support x86 (aka 32bit) assemblies in the content pipeline.  This is mainly to allow of processing really big content as well as to simplify the number of configurations and native code dependencies.  For this reason you should try to target "Any CPU" with your custom content assembly.
 
 After you have done these fixes you should be able to add these new processors to the content project "References".
 
