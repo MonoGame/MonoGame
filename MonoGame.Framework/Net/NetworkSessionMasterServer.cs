@@ -268,6 +268,7 @@ namespace Microsoft.Xna.Framework.Net
                 var response = serverPeer.CreateMessage();
                 response.Write(GeneralInfo);
                 serverPeer.SendUnconnectedMessage(response, msg.SenderEndPoint);
+                Console.WriteLine("Sent general info to " + msg.SenderEndPoint + ".");
                 return true;
             }
 
