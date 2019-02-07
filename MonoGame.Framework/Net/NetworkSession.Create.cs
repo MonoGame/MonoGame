@@ -104,6 +104,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new InvalidOperationException();
             }
 
+            bool triedConnect = false;
             bool success = false;
             byte machineId = 255;
             var joinError = NetworkSessionJoinError.SessionNotFound;
@@ -119,9 +120,10 @@ namespace Microsoft.Xna.Framework.Net
 
                 if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess)
                 {
-                    if (clientPeer.GetConnection(msg.SenderEndPoint) == null)
+                    if (!triedConnect)
                     {
                         clientPeer.Connect(msg.SenderEndPoint);
+                        triedConnect = true;
                     }
                 }
                 else if (msg.MessageType == NetIncomingMessageType.StatusChanged)
@@ -251,12 +253,6 @@ namespace Microsoft.Xna.Framework.Net
                 if (msg == null)
                 {
                     Thread.Sleep((int)NoMessageSleep.TotalMilliseconds);
-                    continue;
-                }
-
-                if (msg.MessageType == NetIncomingMessageType.UnconnectedData && !msg.SenderEndPoint.Equals(masterServerEndPoint))
-                {
-                    discoverPeer.Recycle(msg);
                     continue;
                 }
 
