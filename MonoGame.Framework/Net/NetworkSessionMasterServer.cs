@@ -8,10 +8,11 @@ namespace Microsoft.Xna.Framework.Net
 {
     internal enum MasterServerMessageType : byte
     {
-        RegisterHost,
-        UnregisterHost,
-        RequestHosts,
-        RequestIntroduction
+        RequestGeneralInfo = 0,
+        RegisterHost = 1,
+        UnregisterHost = 2,
+        RequestHosts = 3,
+        RequestIntroduction = 4,
     };
 
     internal class HostData
@@ -37,17 +38,17 @@ namespace Microsoft.Xna.Framework.Net
         }
     }
 
-    public class NetworkSessionMasterServer
+    public abstract class NetworkSessionMasterServer
     {
-        internal static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
+        private static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
 
         private NetPeer serverPeer;
         private IDictionary<Guid, HostData> hosts = new Dictionary<Guid, HostData>();
         private DateTime lastReportedStatus = DateTime.MinValue;
 
-        public void Start(string gameAppId)
+        public void Start()
         {
-            var config = new NetPeerConfiguration(gameAppId)
+            var config = new NetPeerConfiguration(GameAppId)
             {
                 Port = NetworkSessionSettings.MasterServerPort,
                 AcceptIncomingConnections = false,
@@ -66,7 +67,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new NetworkException("Could not start server peer", e);
             }
 
-            Console.WriteLine("Master server with game app id " + gameAppId + " started on port " + config.Port + ".");
+            Console.WriteLine("Master server with game app id " + GameAppId + " started on port " + config.Port + ".");
         }
 
         private List<Guid> hostsToRemove = new List<Guid>();
@@ -98,7 +99,6 @@ namespace Microsoft.Xna.Framework.Net
         protected void ReportStatus()
         {
             var currentTime = DateTime.Now;
-
             if (currentTime - lastReportedStatus > ReportStatusInterval)
             {
                 Console.WriteLine("Status: " + hosts.Count + " registered hosts.");
@@ -130,7 +130,8 @@ namespace Microsoft.Xna.Framework.Net
         internal static void RegisterHost(NetPeer peer, Guid guid, IPEndPoint internalIp, NetworkSessionPublicInfo publicInfo)
         {
             var request = peer.CreateMessage();
-            request.Write(peer.Configuration.AppIdentifier);
+            request.Write(NetworkSessionSettings.GameAppId);
+            request.Write(NetworkSessionSettings.MasterServerPayload);
             request.Write((byte)MasterServerMessageType.RegisterHost);
             request.Write(guid.ToString());
             request.Write(internalIp);
@@ -145,7 +146,8 @@ namespace Microsoft.Xna.Framework.Net
         internal static void UnregisterHost(NetPeer peer, Guid guid)
         {
             var request = peer.CreateMessage();
-            request.Write(peer.Configuration.AppIdentifier);
+            request.Write(NetworkSessionSettings.GameAppId);
+            request.Write(NetworkSessionSettings.MasterServerPayload);
             request.Write((byte)MasterServerMessageType.UnregisterHost);
             request.Write(guid.ToString());
 
@@ -158,7 +160,8 @@ namespace Microsoft.Xna.Framework.Net
         internal static void RequestHosts(NetPeer peer)
         {
             var request = peer.CreateMessage();
-            request.Write(peer.Configuration.AppIdentifier);
+            request.Write(NetworkSessionSettings.GameAppId);
+            request.Write(NetworkSessionSettings.MasterServerPayload);
             request.Write((byte)MasterServerMessageType.RequestHosts);
 
             var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
@@ -199,7 +202,8 @@ namespace Microsoft.Xna.Framework.Net
         internal static void RequestIntroduction(NetPeer peer, Guid guid, IPEndPoint internalIp)
         {
             var request = peer.CreateMessage();
-            request.Write(peer.Configuration.AppIdentifier);
+            request.Write(NetworkSessionSettings.GameAppId);
+            request.Write(NetworkSessionSettings.MasterServerPayload);
             request.Write((byte)MasterServerMessageType.RequestIntroduction);
             request.Write(guid.ToString());
             request.Write(internalIp);
@@ -208,24 +212,71 @@ namespace Microsoft.Xna.Framework.Net
             peer.SendUnconnectedMessage(request, serverEndPoint);
         }
 
-        protected bool HandleMessage(NetIncomingMessage msg)
+        internal static void RequestGeneralInfo(NetPeer peer)
         {
-            string senderGameAppId;
+            var request = peer.CreateMessage();
+            request.Write(NetworkSessionSettings.GameAppId);
+            request.Write(NetworkSessionSettings.MasterServerPayload); // Note that payload does not need to match to get general info
+            request.Write((byte)MasterServerMessageType.RequestGeneralInfo);
+
+            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            peer.SendUnconnectedMessage(request, serverEndPoint);
+        }
+
+        internal static bool ParseRequestGeneralInfoResponse(NetIncomingMessage response, out string info)
+        {
+            info = null;
+
+            string _info;
             try
             {
-                senderGameAppId = msg.ReadString();
+                _info = response.ReadString();
             }
             catch
             {
                 return false;
             }
-            if (!senderGameAppId.Equals(serverPeer.Configuration.AppIdentifier, StringComparison.Ordinal))
+
+            info = _info;
+            return true;
+        }
+
+        protected bool HandleMessage(NetIncomingMessage msg)
+        {
+            string senderGameAppId;
+            string senderPayload;
+            try
+            {
+                senderGameAppId = msg.ReadString();
+                senderPayload = msg.ReadString();
+            }
+            catch
+            {
+                return false;
+            }
+            if (!senderGameAppId.Equals(GameAppId, StringComparison.InvariantCulture))
             {
                 Console.WriteLine("Received message with incorrect game app id from " + msg.SenderEndPoint + ".");
                 return true;
             }
-
+            var payloadValid = ValidatePayload(senderPayload);
             var messageType = (MasterServerMessageType)msg.ReadByte();
+
+            if (messageType == MasterServerMessageType.RequestGeneralInfo)
+            {
+                // Note: Payload does not need to be valid to request general info (useful to handle new version alerts)
+                var response = serverPeer.CreateMessage();
+                response.Write(GeneralInfo);
+                serverPeer.SendUnconnectedMessage(response, msg.SenderEndPoint);
+                return true;
+            }
+
+            if (!payloadValid)
+            {
+                Console.WriteLine("Received message that failed payload validation from " + msg.SenderEndPoint + ".");
+                return true;
+            }
+
             if (messageType == MasterServerMessageType.RegisterHost)
             {
                 Guid guid;
@@ -347,5 +398,9 @@ namespace Microsoft.Xna.Framework.Net
 
             Console.WriteLine("Master server shut down.");
         }
+
+        public abstract string GameAppId { get; }
+        public abstract string GeneralInfo { get; }
+        public abstract bool ValidatePayload(string payload);
     }
 }

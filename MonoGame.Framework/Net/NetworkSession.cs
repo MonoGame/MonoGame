@@ -132,6 +132,29 @@ namespace Microsoft.Xna.Framework.Net
         public int BytesPerSecondReceived { get; private set; }
         public int BytesPerSecondSent { get; private set; }
 
+        /// <summary>
+        /// A string that is provided by the master server if the NetworkSession is in a session of type
+        /// PlayerMatch or Ranked. Will be null for any other type of session. This property could be used
+        /// to synchronize a game mechanic such as time or difficulty accross multiple sessions or to check
+        /// if the game is up to date. See the corresponding RequestMasterServerGeneralInfo() method. This
+        /// is a MonoGame-only extension.
+        /// </summary>
+        public string MasterServerGeneralInfo { get; private set; }
+
+        /// <summary>
+        /// Request a general info string from the master server. Only applicable to the PlayerMatch and Ranked
+        /// session types. See summary for the MasterServerGeneralInfo property.This is a MonoGame-only extension.
+        /// </summary>
+        public void RequestMasterServerGeneralInfo()
+        {
+            if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
+            if (type != NetworkSessionType.PlayerMatch && type != NetworkSessionType.Ranked)
+            {
+                throw new InvalidOperationException("Can only be invoked on a session of type PlayerMarch or Ranked");
+            }
+            NetworkSessionMasterServer.RequestGeneralInfo(peer);
+        }
+
         public bool IsDisposed { get; private set; }
 
         public NetworkSessionType SessionType

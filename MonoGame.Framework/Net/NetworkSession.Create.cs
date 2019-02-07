@@ -27,6 +27,7 @@ namespace Microsoft.Xna.Framework.Net
             };
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+            config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
             if (sessionType == NetworkSessionType.SystemLink)
             {
                 config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
@@ -77,6 +78,7 @@ namespace Microsoft.Xna.Framework.Net
             };
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+            config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 
             var clientPeer = new NetPeer(config);
             try

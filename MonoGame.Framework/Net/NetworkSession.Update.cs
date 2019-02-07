@@ -137,6 +137,19 @@ namespace Microsoft.Xna.Framework.Net
                     }
                     ReceiveMessage(msg, msg.DeliveryMethod, (NetworkMachine)msg.SenderConnection.Tag);
                 }
+                else if (msg.MessageType == NetIncomingMessageType.UnconnectedData)
+                {
+                    var masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+                    if (msg.SenderEndPoint.Equals(masterServerEndPoint))
+                    {
+                        // Assume that this message is general info
+                        string generalInfo;
+                        if (NetworkSessionMasterServer.ParseRequestGeneralInfoResponse(msg, out generalInfo))
+                        {
+                            MasterServerGeneralInfo = generalInfo;
+                        }
+                    }
+                }
                 else
                 {
                     HandleLidgrenMessage(msg);
@@ -205,7 +218,7 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
             var currentTime = DateTime.Now;
-            if (currentTime - lastMasterServerReport < NetworkSessionMasterServer.ReportStatusInterval)
+            if (currentTime - lastMasterServerReport < NetworkSessionSettings.MasterServerRegistrationInterval)
             {
                 return;
             }

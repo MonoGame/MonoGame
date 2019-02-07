@@ -40,20 +40,20 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        private enum MessageType
+        private enum MessageType : byte
         {
-            SessionStateChanged,
-            MachineConnected,
-            MachineDisconnected,
-            GamerIdRequest,
-            GamerIdResponse,
-            GamerJoined,
-            GamerLeft,
-            GamerStateChanged,
-            ResetReady,
-            StartGame,
-            EndGame,
-            User,
+            SessionStateChanged = 0,
+            MachineConnected = 1,
+            MachineDisconnected = 2,
+            GamerIdRequest = 3,
+            GamerIdResponse = 4,
+            GamerJoined = 5,
+            GamerLeft = 6,
+            GamerStateChanged = 7,
+            ResetReady = 8,
+            StartGame = 9,
+            EndGame = 10,
+            User = 11,
         }
 
         private const int MessageTypeCount = 12;
@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework.Net
 
             if (msgType != MessageType.User)
             {
-                Debug.WriteLine("S " + localMachine.id + " (" + originMachine.id + ")->" + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]") + " " + msgType);
+                Debug.WriteLine("S " + localMachine.id + "(" + originMachine.id + ")->" + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]") + " " + msgType);
             }
 
             if (!sendToAll && recipientMachine.isLocal)
@@ -193,7 +193,7 @@ namespace Microsoft.Xna.Framework.Net
 
             if (msgType != MessageType.User)
             {
-                Debug.WriteLine("R " + senderMachine.id + " (" + originMachine.id + ")->" + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]") + " " + msgType);
+                Debug.WriteLine("R " + senderMachine.id + "(" + originMachine.id + ")->" + (recipientMachine != null ? recipientMachine.id.ToString() : "[all]") + " " + msgType);
             }
 
             // Handle message
