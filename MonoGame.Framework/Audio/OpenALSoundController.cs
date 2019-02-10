@@ -108,6 +108,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
 		private OpenALSoundController()
         {
+            if (AL.NativeLibrary == IntPtr.Zero)
+                throw new DllNotFoundException("Couldn't initialize OpenAL because the native binaries couldn't be found.");
+
             if (!OpenSoundController())
             {
                 throw new NoAudioHardwareException("OpenAL device could not be initialized, see console output for details.");
@@ -148,10 +151,6 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 _device = Alc.OpenDevice(string.Empty);
                 EffectsExtension.device = _device;
-            }
-            catch (DllNotFoundException ex)
-            {
-                throw ex;
             }
             catch (Exception ex)
             {
@@ -287,12 +286,36 @@ namespace Microsoft.Xna.Framework.Audio
             return false;
         }
 
-		public static OpenALSoundController GetInstance
+        public static void EnsureInitialized()
+        {
+            if (_instance == null)
+            {
+                try
+                {
+                    _instance = new OpenALSoundController();
+                }
+                catch (DllNotFoundException)
+                {
+                    throw;
+                }
+                catch (NoAudioHardwareException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
+                }
+            }
+        }
+
+
+        public static OpenALSoundController Instance
         {
 			get
             {
-				if (_instance == null)
-					_instance = new OpenALSoundController();
+                if (_instance == null)
+                    throw new NoAudioHardwareException("OpenAL context has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
 				return _instance;
 			}
 		}

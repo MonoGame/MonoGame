@@ -41,9 +41,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int sampleAlignment = 0)
         {
-            if ((format == ALFormat.MonoMSAdpcm || format == ALFormat.StereoMSAdpcm) && !OpenALSoundController.GetInstance.SupportsAdpcm)
+            if ((format == ALFormat.MonoMSAdpcm || format == ALFormat.StereoMSAdpcm) && !OpenALSoundController.Instance.SupportsAdpcm)
                 throw new InvalidOperationException("MS-ADPCM is not supported by this OpenAL driver");
-            if ((format == ALFormat.MonoIma4 || format == ALFormat.StereoIma4) && !OpenALSoundController.GetInstance.SupportsIma4)
+            if ((format == ALFormat.MonoIma4 || format == ALFormat.StereoIma4) && !OpenALSoundController.Instance.SupportsIma4)
                 throw new InvalidOperationException("IMA/ADPCM is not supported by this OpenAL driver");
 
             openALFormat = format;

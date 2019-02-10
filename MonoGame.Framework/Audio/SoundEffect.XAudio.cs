@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Initializes XAudio.
         /// </summary>
-        internal static void InitializeSoundEffect()
+        internal static void PlatformInitialize()
         {
             try
             {
