@@ -5,20 +5,17 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-    <IntermediateOutputPath>obj\DesktopGLMac\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>bin\DesktopGLMac\$(Configuration)</OutputPath>
-
     <DefineConstants>DESKTOPGL;MONOMAC;XNADESIGNPROVIDED</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-      <Compile Remove="Platform\**\*" />
-      <!-- TODO: upgrade to new GraphicsAdapter -->
-      <Compile Remove="Graphics\GraphicsAdapter.cs" />
-      <!-- TODO: add Null (or DesktopGL compatible) implementation for the following -->
-      <Compile Remove="Input\KeyboardInput.cs" />
-      <Compile Remove="Input\MessageBox.cs" />
-      <Compile Remove="Content\ContentReaders\VideoReader.cs" />
+    <Compile Remove="Platform\**\*" />
+    <!-- TODO: upgrade to new GraphicsAdapter -->
+    <Compile Remove="Graphics\GraphicsAdapter.cs" />
+    <!-- TODO: add Null (or DesktopGL compatible) implementation for the following -->
+    <Compile Remove="Input\KeyboardInput.cs" />
+    <Compile Remove="Input\MessageBox.cs" />
+    <Compile Remove="Content\ContentReaders\VideoReader.cs" />
   </ItemGroup>
 
   <Import Project="Platform\OpenGL.targets" />

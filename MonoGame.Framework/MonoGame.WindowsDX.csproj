@@ -5,14 +5,11 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-    <IntermediateOutputPath>obj\WindowsDX\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>bin\WindowsDX\$(Configuration)</OutputPath>
-
     <DefineConstants>WINDOWS;XNADESIGNPROVIDED</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-      <Compile Remove="Platform\**\*" />
+    <Compile Remove="Platform\**\*" />
   </ItemGroup>
 
   <Import Project="Platform\DirectX.targets" />
@@ -42,7 +39,6 @@
     <Compile Include="Platform\Utilities\ReflectionHelpers.Legacy.cs" />
     <Compile Include="Platform\Utilities\TimerHelper.cs" />
     <Compile Include="Platform\Windows\HorizontalMouseWheelEventArgs.cs" />
-    <Compile Include="Platform\Windows\SharpDXHelper.cs" />
     <Compile Include="Platform\Windows\WinFormsGameForm.cs" />
     <Compile Include="Platform\Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Platform\Windows\WinFormsGameWindow.cs" />

@@ -5,9 +5,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-    <IntermediateOutputPath>obj\Android\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>bin\Android\$(Configuration)</OutputPath>
-
     <DefineConstants>ANDROID;GLES</DefineConstants>
 
     <MGOpenGL>GLES</MGOpenGL>
@@ -18,14 +15,14 @@
   </ItemGroup>
 
   <ItemGroup>
-      <Compile Remove="Platform\**\*" />
-      <!-- TODO: upgrade to new GraphicsDeviceManager -->
-      <Compile Remove="GraphicsDeviceManager.cs" />
-      <!-- TODO: upgrade to new GraphicsAdapter -->
-      <Compile Remove="Graphics\GraphicsAdapter.cs" />
-      <!-- TODO: add Null (or Android compatible) implementation for the following -->
-      <Compile Remove="Graphics\OcclusionQuery.cs" />
-      <Compile Remove="Input\Keyboard.cs" />
+    <Compile Remove="Platform\**\*" />
+    <!-- TODO: upgrade to new GraphicsDeviceManager -->
+    <Compile Remove="GraphicsDeviceManager.cs" />
+    <!-- TODO: upgrade to new GraphicsAdapter -->
+    <Compile Remove="Graphics\GraphicsAdapter.cs" />
+    <!-- TODO: add Null (or Android compatible) implementation for the following -->
+    <Compile Remove="Graphics\OcclusionQuery.cs" />
+    <Compile Remove="Input\Keyboard.cs" />
   </ItemGroup>
 
   <Import Project="Platform\OpenGL.targets" />
