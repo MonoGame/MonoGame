@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>xamarin.ios</TargetFramework>
+    <TargetFramework>xamarinios10</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
@@ -9,6 +9,10 @@
 
     <MGOpenGL>GLES</MGOpenGL>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Runtime.Serialization" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Platform\**\*" />
