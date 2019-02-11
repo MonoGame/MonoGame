@@ -298,19 +298,21 @@ namespace MonoGame.Utilities.Deflate
             _z = null;
         }
 
-
-        public override void Close()
+        protected override void Dispose(bool disposing)
         {
-            if (_stream == null) return;
-            try
+            if (disposing)
             {
-                finish();
-            }
-            finally
-            {
-                end();
-                if (!_leaveOpen) _stream.Close();
-                _stream = null;
+                if (_stream == null) return;
+                try
+                {
+                    finish();
+                }
+                finally
+                {
+                    end();
+                    if (!_leaveOpen) _stream.Dispose();
+                    _stream = null;
+                }
             }
         }
 

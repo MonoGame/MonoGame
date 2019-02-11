@@ -35,6 +35,7 @@
     <Compile Include="Platform\Graphics\Vertices\IndexBuffer.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Vertices\VertexBuffer.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Vertices\VertexDeclaration.OpenGL.cs" />
+    <Compile Include="Platform\Threading.cs" />
   </ItemGroup>
 
   <ItemGroup>
