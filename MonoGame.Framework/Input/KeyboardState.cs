@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input
@@ -9,7 +10,7 @@ namespace Microsoft.Xna.Framework.Input
     /// <summary>
     /// Holds the state of keystrokes by a keyboard.
     /// </summary>
-	public struct KeyboardState
+	public struct KeyboardState : IEnumerable<Keys>
     {
         // Used for the common situation where GetPressedKeys will return an empty array
         static Keys[] empty = new Keys[0];
@@ -230,18 +231,6 @@ namespace Microsoft.Xna.Framework.Input
             return index;
         }
 
-        private static int AddKeysToArrayConstrained(uint keys, int offset, Keys[] pressedKeys, int index)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                if (index >= pressedKeys.Length) break;
-
-                if ((keys & (1 << i)) != 0)
-                    pressedKeys[index++] = (Keys)(offset + i);
-            }
-            return index;
-        }
-
         /// <summary>
         /// Returns an array of values holding keys that are currently being pressed.
         /// </summary>
@@ -268,31 +257,145 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
-        /// Fills an array of values holding keys that are currently being pressed, returning how many elements were filled.
+        /// Fills an array of values holding keys that are currently being pressed.
         /// </summary>
-        /// <param name="keys">The keys array to fill. This array is not cleared.</param>
-        /// <returns>The number of keys filled into the array.</returns>
-        public int GetPressedKeys(Keys[] keys)
+        /// <param name="keys">The keys array to fill.
+        /// This array is not cleared, and it must be equal to or larger than the number of keys pressed.</param>
+        public void GetPressedKeys(Keys[] keys)
         {
             if (keys == null)
                 throw new System.ArgumentNullException("keys");
 
             uint count = CountBits(keys0) + CountBits(keys1) + CountBits(keys2) + CountBits(keys3)
                     + CountBits(keys4) + CountBits(keys5) + CountBits(keys6) + CountBits(keys7);
-            if (count == 0)
-                return 0;
+            if (count > keys.Length)
+            {
+                throw new System.ArgumentOutOfRangeException("keys",
+                    "The supplied array cannot fit the number of pressed keys. Call GetPressedKeyCount() to get the number of pressed keys.");
+            }
 
             int index = 0;
-            if (keys0 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys0, 0 * 32, keys, index);
-            if (keys1 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys1, 1 * 32, keys, index);
-            if (keys2 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys2, 2 * 32, keys, index);
-            if (keys3 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys3, 3 * 32, keys, index);
-            if (keys4 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys4, 4 * 32, keys, index);
-            if (keys5 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys5, 5 * 32, keys, index);
-            if (keys6 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys6, 6 * 32, keys, index);
-            if (keys7 != 0 && index < keys.Length) index = AddKeysToArrayConstrained(keys7, 7 * 32, keys, index);
+            if (keys0 != 0 && index < keys.Length) index = AddKeysToArray(keys0, 0 * 32, keys, index);
+            if (keys1 != 0 && index < keys.Length) index = AddKeysToArray(keys1, 1 * 32, keys, index);
+            if (keys2 != 0 && index < keys.Length) index = AddKeysToArray(keys2, 2 * 32, keys, index);
+            if (keys3 != 0 && index < keys.Length) index = AddKeysToArray(keys3, 3 * 32, keys, index);
+            if (keys4 != 0 && index < keys.Length) index = AddKeysToArray(keys4, 4 * 32, keys, index);
+            if (keys5 != 0 && index < keys.Length) index = AddKeysToArray(keys5, 5 * 32, keys, index);
+            if (keys6 != 0 && index < keys.Length) index = AddKeysToArray(keys6, 6 * 32, keys, index);
+            if (keys7 != 0 && index < keys.Length) index = AddKeysToArray(keys7, 7 * 32, keys, index);
+        }
 
-            return index;
+        /// <summary>
+        /// Returns an enumerator of the pressed keys in the <see cref="KeyboardState"/>.
+        /// </summary>
+        /// <returns>An enumerable set of <see cref="Keys"/>.</returns>
+        public Enumerator GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        /// <summary>
+        /// Returns an enumerator of the pressed keys in the <see cref="KeyboardState"/>.
+        /// </summary>
+        /// <returns>An enumerable set of <see cref="Keys"/>.</returns>
+        IEnumerator<Keys> IEnumerable<Keys>.GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        /// <summary>
+        /// Returns an enumerator of the pressed keys in the <see cref="KeyboardState"/>.
+        /// </summary>
+        /// <returns>An enumerable set of objects.</returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        #endregion
+
+        #region Enumerator
+
+        /// <summary>
+        /// Allows iterating through the pressed keys in a <see cref="KeyboardState"/>.
+        /// </summary>
+        public struct Enumerator : IEnumerator<Keys>
+        {
+            private readonly KeyboardState _kbState;
+            private Keys _curKey;
+            private uint _curKeyset;
+            private int _curIndex;
+            private int _keysetNum;
+
+            public Enumerator(KeyboardState kbState)
+            {
+                _kbState = kbState;
+                _curKeyset = kbState.keys0;
+                _keysetNum = 0;
+                _curKey = Keys.None;
+                _curIndex = 0;
+            }
+
+            public Keys Current
+            {
+                get
+                {
+                    if (_keysetNum == 0 && _curIndex == 0) throw new System.Exception("Enumerator has not started yet!");
+                    if (_keysetNum >= 8) throw new System.Exception("Enumerator is already done enumerating!");
+
+                    return _curKey;
+                }
+            }
+
+            object IEnumerator.Current
+            {
+                get { return Current; }
+            }
+
+            public void Dispose()
+            {
+                
+            }
+
+            public bool MoveNext()
+            {
+                while (_keysetNum < 8)
+                {
+                    for (; _curIndex < 32; _curIndex++)
+                    {
+                        if ((_curKeyset & (1 << _curIndex)) != 0)
+                        {
+                            _curKey = (Keys)((_keysetNum * 32) + _curIndex);
+                            return true;
+                        }
+                    }
+
+                    _curIndex = 0;
+                    _keysetNum++;
+
+                    switch(_keysetNum)
+                    {
+                        case 0: _curKeyset = _kbState.keys0; break;
+                        case 1: _curKeyset = _kbState.keys1; break;
+                        case 2: _curKeyset = _kbState.keys2; break;
+                        case 3: _curKeyset = _kbState.keys3; break;
+                        case 4: _curKeyset = _kbState.keys4; break;
+                        case 5: _curKeyset = _kbState.keys5; break;
+                        case 6: _curKeyset = _kbState.keys6; break;
+                        case 7: _curKeyset = _kbState.keys7; break;
+                    }
+                }
+                
+                return false;
+            }
+
+            public void Reset()
+            {
+                _curKey = Keys.None;
+                _curKeyset = _kbState.keys0;
+                _keysetNum = 0;
+                _curIndex = 0;
+            }
         }
 
         #endregion
