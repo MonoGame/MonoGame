@@ -1300,8 +1300,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_vertexShader == null)
                 throw new InvalidOperationException("A vertex shader must be set!");
-            if (_pixelShader == null)
-                throw new InvalidOperationException("A pixel shader must be set!");
+            //if (_pixelShader == null)
+            //    throw new InvalidOperationException("A pixel shader must be set!");
 
             if (_vertexShaderDirty)
             {
@@ -1320,17 +1320,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_pixelShaderDirty)
             {
-                _d3dContext.PixelShader.Set(_pixelShader.PixelShader);
-                _pixelShaderDirty = false;
-
+                if (_pixelShader != null)
+                {
+                    _d3dContext.PixelShader.Set(_pixelShader.PixelShader);
+                }
+                else
+                {
+                    _d3dContext.PixelShader.Set(null);
+                }
                 unchecked
                 {
                     _graphicsMetrics._pixelShaderCount++;
                 }
+                _pixelShaderDirty = false;
             }
 
             _vertexConstantBuffers.SetConstantBuffers(this);
-            _pixelConstantBuffers.SetConstantBuffers(this);
+            if (_pixelShader != null)
+            {
+                _pixelConstantBuffers.SetConstantBuffers(this);
+            }
 
             VertexTextures.SetTextures(this);
             VertexSamplerStates.PlatformSetSamplers(this);

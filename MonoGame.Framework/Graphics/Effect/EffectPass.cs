@@ -105,6 +105,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     device.SetConstantBuffer(ShaderStage.Pixel, c, cb);
                 }
             }
+            else
+            {
+                device.PixelShader = _pixelShader;
+            }
 
             // Set the render states if we have some.
             if (_rasterizerState != null)
