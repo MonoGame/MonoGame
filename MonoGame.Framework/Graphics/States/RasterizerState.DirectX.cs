@@ -56,6 +56,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     case DepthFormat.Depth24Stencil8:
                         depthMul = 1 << 24 - 1;
                         break;
+                    case DepthFormat.Depth_R32_Typeless:
+                        depthMul = 1 << 32 - 1;
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

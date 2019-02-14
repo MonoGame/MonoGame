@@ -380,8 +380,8 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Height = height;
             desc.MipLevels = _levelCount;
             desc.ArraySize = ArraySize;
-            desc.Format = SharpDXHelper.ToFormat(_format);
-            desc.BindFlags = BindFlags.ShaderResource;
+            desc.Format = (_format != SurfaceFormat.Single) ? SharpDXHelper.ToFormat(_format) : SharpDX.DXGI.Format.R32_Typeless;
+            desc.BindFlags = (_format != SurfaceFormat.Single) ? BindFlags.ShaderResource : BindFlags.DepthStencil | BindFlags.ShaderResource;
             desc.CpuAccessFlags = CpuAccessFlags.None;
             desc.SampleDescription = CreateSampleDescription();
             desc.Usage = ResourceUsage.Default;

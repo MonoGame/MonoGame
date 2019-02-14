@@ -51,6 +51,10 @@ namespace Microsoft.Xna.Framework
                 case DepthFormat.Depth24:
                 case DepthFormat.Depth24Stencil8:
                     return SharpDX.DXGI.Format.D24_UNorm_S8_UInt;
+
+                case DepthFormat.Depth_R32_Typeless:
+                    return SharpDX.DXGI.Format.R32_Typeless;
+
             }
         }
 
