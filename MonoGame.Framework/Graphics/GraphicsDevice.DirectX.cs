@@ -1087,7 +1087,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("Texture arrays are not supported on this graphics device");
 
             if (renderTarget == null)
-                SetRenderTarget(null);
+                SetRenderTargets(null);
             else
                 SetRenderTargets(new RenderTargetBinding(renderTarget, arraySlice));
         }
@@ -1096,7 +1096,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void SetRenderTarget(RenderTarget3D renderTarget, int arraySlice)
         {
             if (renderTarget == null)
-                SetRenderTarget(null);
+                SetRenderTargets(null);
             else
                 SetRenderTargets(new RenderTargetBinding(renderTarget, arraySlice));
         }
