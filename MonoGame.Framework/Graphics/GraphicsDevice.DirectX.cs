@@ -1101,6 +1101,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 SetRenderTargets(new RenderTargetBinding(renderTarget, arraySlice));
         }
 
+        public void SetRenderTarget(RenderTargetShadowCascade renderTarget)
+        {
+            if (!GraphicsCapabilities.SupportsTextureArrays)
+                throw new InvalidOperationException("Texture arrays are not supported on this graphics device");
+
+            if (renderTarget == null)
+                SetRenderTargets(null);
+            else
+                SetRenderTargets(new RenderTargetBinding(renderTarget));
+        }
+
         private void PlatformApplyDefaultRenderTarget()
         {
             // Set the default swap chain.

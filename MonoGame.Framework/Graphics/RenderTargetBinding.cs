@@ -88,6 +88,16 @@ namespace Microsoft.Xna.Framework.Graphics
             _depthFormat = renderTarget.DepthStencilFormat;
         }
 
+        public RenderTargetBinding(RenderTargetShadowCascade renderTarget)
+        {
+            if (renderTarget == null)
+                throw new ArgumentNullException("renderTarget");
+
+            _renderTarget = renderTarget;
+            _arraySlice = (int)CubeMapFace.PositiveX;
+            _depthFormat = renderTarget.DepthStencilFormat;
+        }
+
 #if DIRECTX
 
         public RenderTargetBinding(RenderTarget2D renderTarget, int arraySlice)
