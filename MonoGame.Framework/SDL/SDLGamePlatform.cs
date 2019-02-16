@@ -139,23 +139,48 @@ namespace Microsoft.Xna.Framework
                 }
                 else if (ev.Type == Sdl.EventType.TextInput)
                 {
-                    int len = 0;
-                    string text = String.Empty;
-                    unsafe
+                    if (_view.IsTextInputHandled)
                     {
-                        while (Marshal.ReadByte ((IntPtr)ev.Text.Text, len) != 0) {
-                            len++;
+                        int len = 0;
+                        int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
+                        byte currentByte = 0;
+                        int charByteSize = 0; // UTF8 char lenght to decode
+                        unsafe
+                        {
+                            while ((currentByte = Marshal.ReadByte((IntPtr)ev.Text.Text, len)) != 0)
+                            {
+                                // we're reading the first UTF8 byte, we need to check if it's multibyte
+                                if (charByteSize == 0)
+                                {
+                                    if (currentByte < 192)
+                                        charByteSize = 1;
+                                    else if (currentByte < 224)
+                                        charByteSize = 2;
+                                    else if (currentByte < 240)
+                                        charByteSize = 3;
+                                    else
+                                        charByteSize = 4;
+
+                                    utf8character = 0;
+                                }
+
+                                // assembling the character
+                                utf8character <<= 8;
+                                utf8character |= currentByte;
+
+                                charByteSize--;
+                                if (charByteSize == 0) // finished decoding the current character
+                                {
+                                    var key = KeyboardUtil.ToXna(utf8character);
+                                    // multibyte conversion might fail here, because the char type only handles UTF8 up to 2-byte characters
+                                    // we should switch to a String parameter for this event to fully support UTF8
+                                    // as-is, it won't support CJK characters and will produce wrong results
+                                    _view.CallTextInput((char)utf8character, key);
+                                }
+
+                                len++;
+                            }
                         }
-                        var buffer = new byte [len];
-                        Marshal.Copy ((IntPtr)ev.Text.Text, buffer, 0, len);
-                        text = System.Text.Encoding.UTF8.GetString (buffer);
-                    }
-                    if (text.Length == 0)
-                        continue;
-                    foreach (var c in text)
-                    {
-                        var key = KeyboardUtil.ToXna((int)c);
-                        _view.CallTextInput(c, key);
                     }
                 }
                 else if (ev.Type == Sdl.EventType.WindowEvent)
