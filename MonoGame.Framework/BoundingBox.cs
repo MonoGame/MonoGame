@@ -385,13 +385,13 @@ namespace Microsoft.Xna.Framework
         public bool Intersects(BoundingSphere sphere)
         {
             var squareDistance = 0.0f;
-            var (x, y, z) = sphere.Center;
-            if (x < Min.X) squareDistance += (Min.X - x) * (Min.X - x);
-            if (x > Max.X) squareDistance += (x - Max.X) * (x - Max.X);
-            if (y < Min.Y) squareDistance += (Min.Y - y) * (Min.Y - y);
-            if (y > Max.Y) squareDistance += (y - Max.Y) * (y - Max.Y);
-            if (z < Min.Z) squareDistance += (Min.Z - z) * (Min.Z - z);
-            if (z > Max.Z) squareDistance += (z - Max.Z) * (z - Max.Z);
+            var point = sphere.Center;
+            if (point.X < Min.X) squareDistance += (Min.X - point.X) * (Min.X - point.X);
+            if (point.X > Max.X) squareDistance += (point.X - Max.X) * (point.X - Max.X);
+            if (point.Y < Min.Y) squareDistance += (Min.Y - point.Y) * (Min.Y - point.Y);
+            if (point.Y > Max.Y) squareDistance += (point.Y - Max.Y) * (point.Y - Max.Y);
+            if (point.Z < Min.Z) squareDistance += (Min.Z - point.Z) * (Min.Z - point.Z);
+            if (point.Z > Max.Z) squareDistance += (point.Z - Max.Z) * (point.Z - Max.Z);
             return squareDistance <= sphere.Radius * sphere.Radius;
         }
 
