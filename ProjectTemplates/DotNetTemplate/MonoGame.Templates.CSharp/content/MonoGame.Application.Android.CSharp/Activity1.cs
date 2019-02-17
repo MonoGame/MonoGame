@@ -10,7 +10,6 @@ namespace MGNamespace
         Label = "@string/app_name",
         MainLauncher = true,
         Icon = "@drawable/icon",
-        Theme = "@style/AppTheme",
         AlwaysRetainTaskState = true,
         LaunchMode = LaunchMode.SingleInstance,
         ScreenOrientation = ScreenOrientation.FullUser,
