@@ -1,4 +1,4 @@
-﻿// MIT License - Copyright (C) The Mono.Xna Team
+// MIT License - Copyright (C) The Mono.Xna Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -384,35 +384,15 @@ namespace Microsoft.Xna.Framework
 
         public bool Intersects(BoundingSphere sphere)
         {
-            if (sphere.Center.X - Min.X > sphere.Radius
-                && sphere.Center.Y - Min.Y > sphere.Radius
-                && sphere.Center.Z - Min.Z > sphere.Radius
-                && Max.X - sphere.Center.X > sphere.Radius
-                && Max.Y - sphere.Center.Y > sphere.Radius
-                && Max.Z - sphere.Center.Z > sphere.Radius)
-                return true;
-
-            double dmin = 0;
-
-            if (sphere.Center.X - Min.X <= sphere.Radius)
-                dmin += (sphere.Center.X - Min.X) * (sphere.Center.X - Min.X);
-            else if (Max.X - sphere.Center.X <= sphere.Radius)
-                dmin += (sphere.Center.X - Max.X) * (sphere.Center.X - Max.X);
-
-            if (sphere.Center.Y - Min.Y <= sphere.Radius)
-                dmin += (sphere.Center.Y - Min.Y) * (sphere.Center.Y - Min.Y);
-            else if (Max.Y - sphere.Center.Y <= sphere.Radius)
-                dmin += (sphere.Center.Y - Max.Y) * (sphere.Center.Y - Max.Y);
-
-            if (sphere.Center.Z - Min.Z <= sphere.Radius)
-                dmin += (sphere.Center.Z - Min.Z) * (sphere.Center.Z - Min.Z);
-            else if (Max.Z - sphere.Center.Z <= sphere.Radius)
-                dmin += (sphere.Center.Z - Max.Z) * (sphere.Center.Z - Max.Z);
-
-            if (dmin <= sphere.Radius * sphere.Radius)
-                return true;
-
-            return false;
+            var squareDistance = 0.0f;
+            var (x, y, z) = sphere.Center;
+            if (x < Min.X) squareDistance += (Min.X - x) * (Min.X - x);
+            if (x > Max.X) squareDistance += (x - Max.X) * (x - Max.X);
+            if (y < Min.Y) squareDistance += (Min.Y - y) * (Min.Y - y);
+            if (y > Max.Y) squareDistance += (y - Max.Y) * (y - Max.Y);
+            if (z < Min.Z) squareDistance += (Min.Z - z) * (Min.Z - z);
+            if (z > Max.Z) squareDistance += (z - Max.Z) * (z - Max.Z);
+            return squareDistance <= sphere.Radius * sphere.Radius;
         }
 
         public void Intersects(ref BoundingSphere sphere, out bool result)
