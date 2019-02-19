@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework {
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
 
-        public bool IsTextInputHandled { get { return TextInput != null; } }
+        internal bool IsTextInputHandled { get { return TextInput != null; } }
 #endif
 
 		#endregion Events
