@@ -155,6 +155,9 @@
     <Compile Include="Net\NetworkSessionMasterServer.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
+    <Compile Include="Net\NetworkSessionMasterServer.Messages.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
     <Compile Include="Net\NetworkSessionProperties.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>

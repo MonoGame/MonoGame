@@ -43,6 +43,9 @@ namespace Microsoft.Xna.Framework.Net
         private bool gameEndRequestThisFrame = false;
         private bool resetReadyRequestThisFrame = false;
 
+        private bool hasFailedMasterServerValidation = false;
+        private bool isRegisteredAsHostWithMasterServer = false;
+        private string masterServerGeneralInfo = null;
         private DateTime lastMasterServerReport = DateTime.MinValue;
 
         private List<EventArgs> eventQueue = new List<EventArgs>();
@@ -133,13 +136,61 @@ namespace Microsoft.Xna.Framework.Net
         public int BytesPerSecondSent { get; private set; }
 
         /// <summary>
-        /// A string that is provided by the master server if the NetworkSession is in a session of type
-        /// PlayerMatch or Ranked. Will be null for any other type of session. This property could be used
-        /// to synchronize a game mechanic such as time or difficulty accross multiple sessions or to check
-        /// if the game is up to date. See the corresponding RequestMasterServerGeneralInfo() method. This
-        /// is a MonoGame-only extension.
+        /// Determines whether this session has failed master server validation at least once. Only applicable
+        /// to sessions of type PlayerMatch and Ranked. This is a MonoGame-only extension.
         /// </summary>
-        public string MasterServerGeneralInfo { get; private set; }
+        public bool HasFailedMasterServerValidation
+        {
+            get
+            {
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
+                if (type != NetworkSessionType.PlayerMatch && type != NetworkSessionType.Ranked)
+                {
+                    throw new InvalidOperationException("Can only be invoked on a session of type PlayerMarch or Ranked");
+                }
+                return hasFailedMasterServerValidation;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether this session has successfully been registered as a host with the master server.
+        /// Only applicable to sessions of type PlayerMatch and Ranked. Only the host of a session is allowed
+        /// to call this property. This is a MonoGame-only extension.
+        /// </summary>
+        public bool IsRegisteredAsHostWithMasterServer
+        {
+            get
+            {
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
+                if (!isHost)
+                {
+                    throw new InvalidOperationException("Only the host can perform this action");
+                }
+                if (type != NetworkSessionType.PlayerMatch && type != NetworkSessionType.Ranked)
+                {
+                    throw new InvalidOperationException("Can only be invoked on a session of type PlayerMarch or Ranked");
+                }
+                return isRegisteredAsHostWithMasterServer;
+            }
+        }
+
+        /// <summary>
+        /// A generic string that is provided by the master server after RequestMasterServerGeneralInfo() has been
+        /// called. Will be null until the first response has been received. Only applicable to sessions of type
+        /// PlayerMatch and Ranked.
+        ///
+        /// This property can be used to synchronize a game mechanic such as time or difficulty accross multiple
+        /// sessions or to check if the game is up to date. See the corresponding RequestMasterServerGeneralInfo()
+        /// method. This is a MonoGame-only extension.
+        /// </summary>
+        public string MasterServerGeneralInfo
+        {
+            get
+            {
+                if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
+                return masterServerGeneralInfo;
+            }
+        }
 
         /// <summary>
         /// Request a general info string from the master server. Only applicable to the PlayerMatch and Ranked
@@ -194,7 +245,7 @@ namespace Microsoft.Xna.Framework.Net
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException("NetworkSession");
-                if (!IsHost)
+                if (!isHost)
                 {
                     throw new InvalidOperationException("Only the host can perform this action");
                 }

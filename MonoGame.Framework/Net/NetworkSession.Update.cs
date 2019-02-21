@@ -39,9 +39,7 @@ namespace Microsoft.Xna.Framework.Net
                     {
                         UpdatePublicInfo();
 
-                        var response = peer.CreateMessage();
-                        NetworkSessionMasterServer.SerializeRequestHostsResponse(response, guid, publicInfo);
-                        peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
+                        NetworkSessionMasterServer.SendRequestHostsResponse(peer, msg.SenderEndPoint, true, guid, publicInfo);
                     }
                 }
                 else if (msg.MessageType == NetIncomingMessageType.ConnectionApproval)
@@ -142,12 +140,38 @@ namespace Microsoft.Xna.Framework.Net
                     var masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
                     if (msg.SenderEndPoint.Equals(masterServerEndPoint))
                     {
-                        // Assume that this message is general info
-                        string generalInfo;
-                        if (NetworkSessionMasterServer.ParseRequestGeneralInfoResponse(msg, out generalInfo))
+                        MasterServerMessageType responseType;
+                        MasterServerMessageResult responseResult;
+                        if (NetworkSessionMasterServer.ParseResponseHeader(msg, out responseType, out responseResult))
                         {
-                            MasterServerGeneralInfo = generalInfo;
+                            if (responseResult == MasterServerMessageResult.Ok)
+                            {
+                                if (responseType == MasterServerMessageType.RequestGeneralInfo)
+                                {
+                                    string generalInfo;
+                                    if (NetworkSessionMasterServer.ParseRequestGeneralInfoResponse(msg, out generalInfo))
+                                    {
+                                        masterServerGeneralInfo = generalInfo;
+                                    }
+                                }
+                                else if (responseType == MasterServerMessageType.RegisterHost)
+                                {
+                                    isRegisteredAsHostWithMasterServer = true;
+                                }
+                                else if (responseType == MasterServerMessageType.UnregisterHost)
+                                {
+                                    isRegisteredAsHostWithMasterServer = false;
+                                }
+                            }
+                            else
+                            {
+                                hasFailedMasterServerValidation = true;
+                            }
                         }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Unconnected data not from master server recieved from " + msg.SenderEndPoint + ", ignoring...");
                     }
                 }
                 else

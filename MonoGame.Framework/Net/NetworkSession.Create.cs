@@ -262,7 +262,8 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     Guid guid;
                     NetworkSessionPublicInfo publicInfo;
-                    if (NetworkSessionMasterServer.ParseRequestHostsResponse(msg, out guid, out publicInfo))
+                    if (NetworkSessionMasterServer.ParseExpectedResponseHeader(msg, MasterServerMessageType.RequestHosts) &&
+                        NetworkSessionMasterServer.ParseRequestHostsResponse(msg, out guid, out publicInfo))
                     {
                         AddAvailableNetworkSession(guid, publicInfo, localGamers, sessionType, searchProperties, availableSessions, tag: msg.SenderEndPoint);
                     }
@@ -281,7 +282,8 @@ namespace Microsoft.Xna.Framework.Net
                     {
                         Guid guid;
                         NetworkSessionPublicInfo publicInfo;
-                        if (NetworkSessionMasterServer.ParseRequestHostsResponse(msg, out guid, out publicInfo))
+                        if (NetworkSessionMasterServer.ParseExpectedResponseHeader(msg, MasterServerMessageType.RequestHosts) &&
+                            NetworkSessionMasterServer.ParseRequestHostsResponse(msg, out guid, out publicInfo))
                         {
                             AddAvailableNetworkSession(guid, publicInfo, localGamers, sessionType, searchProperties, availableSessions);
                         }

@@ -6,15 +6,6 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net
 {
-    internal enum MasterServerMessageType : byte
-    {
-        RequestGeneralInfo = 0,
-        RegisterHost = 1,
-        UnregisterHost = 2,
-        RequestHosts = 3,
-        RequestIntroduction = 4,
-    };
-
     internal class HostData
     {
         public Guid Guid;
@@ -38,7 +29,7 @@ namespace Microsoft.Xna.Framework.Net
         }
     }
 
-    public abstract class NetworkSessionMasterServer
+    public abstract partial class NetworkSessionMasterServer
     {
         private static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
 
@@ -127,120 +118,6 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal static void RegisterHost(NetPeer peer, Guid guid, IPEndPoint internalIp, NetworkSessionPublicInfo publicInfo)
-        {
-            var request = peer.CreateMessage();
-            request.Write(NetworkSessionSettings.GameAppId);
-            request.Write(NetworkSessionSettings.MasterServerPayload);
-            request.Write((byte)MasterServerMessageType.RegisterHost);
-            request.Write(guid.ToString());
-            request.Write(internalIp);
-            publicInfo.Pack(request);
-
-            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            peer.SendUnconnectedMessage(request, serverEndPoint);
-
-            Debug.WriteLine("Registering with master server (Guid: " + guid + ", InternalIp: " + internalIp + ", PublicInfo: ...)");
-        }
-
-        internal static void UnregisterHost(NetPeer peer, Guid guid)
-        {
-            var request = peer.CreateMessage();
-            request.Write(NetworkSessionSettings.GameAppId);
-            request.Write(NetworkSessionSettings.MasterServerPayload);
-            request.Write((byte)MasterServerMessageType.UnregisterHost);
-            request.Write(guid.ToString());
-
-            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            peer.SendUnconnectedMessage(request, serverEndPoint);
-
-            Debug.WriteLine("Unregistering with master server (Guid: " + guid + ")");
-        }
-
-        internal static void RequestHosts(NetPeer peer)
-        {
-            var request = peer.CreateMessage();
-            request.Write(NetworkSessionSettings.GameAppId);
-            request.Write(NetworkSessionSettings.MasterServerPayload);
-            request.Write((byte)MasterServerMessageType.RequestHosts);
-
-            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            peer.SendUnconnectedMessage(request, serverEndPoint);
-        }
-
-        internal static void SerializeRequestHostsResponse(NetOutgoingMessage response, Guid guid, NetworkSessionPublicInfo publicInfo)
-        {
-            response.Write(guid.ToString());
-            publicInfo.Pack(response);
-        }
-
-        internal static bool ParseRequestHostsResponse(NetIncomingMessage response, out Guid hostGuid, out NetworkSessionPublicInfo hostPublicInfo)
-        {
-            hostGuid = Guid.Empty;
-            hostPublicInfo = null;
-
-            Guid guid;
-            NetworkSessionPublicInfo publicInfo = new NetworkSessionPublicInfo();
-            try
-            {
-                guid = new Guid(response.ReadString());
-                if (!publicInfo.Unpack(response))
-                {
-                    return false;
-                }
-            }
-            catch
-            {
-                return false;
-            }
-
-            hostGuid = guid;
-            hostPublicInfo = publicInfo;
-            return true;
-        }
-
-        internal static void RequestIntroduction(NetPeer peer, Guid guid, IPEndPoint internalIp)
-        {
-            var request = peer.CreateMessage();
-            request.Write(NetworkSessionSettings.GameAppId);
-            request.Write(NetworkSessionSettings.MasterServerPayload);
-            request.Write((byte)MasterServerMessageType.RequestIntroduction);
-            request.Write(guid.ToString());
-            request.Write(internalIp);
-
-            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            peer.SendUnconnectedMessage(request, serverEndPoint);
-        }
-
-        internal static void RequestGeneralInfo(NetPeer peer)
-        {
-            var request = peer.CreateMessage();
-            request.Write(NetworkSessionSettings.GameAppId);
-            request.Write(NetworkSessionSettings.MasterServerPayload); // Note that payload does not need to match to get general info
-            request.Write((byte)MasterServerMessageType.RequestGeneralInfo);
-
-            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            peer.SendUnconnectedMessage(request, serverEndPoint);
-        }
-
-        internal static bool ParseRequestGeneralInfoResponse(NetIncomingMessage response, out string info)
-        {
-            info = null;
-
-            string _info;
-            try
-            {
-                _info = response.ReadString();
-            }
-            catch
-            {
-                return false;
-            }
-
-            info = _info;
-            return true;
-        }
-
         protected bool HandleMessage(NetIncomingMessage msg)
         {
             string senderGameAppId;
@@ -265,16 +142,17 @@ namespace Microsoft.Xna.Framework.Net
             if (messageType == MasterServerMessageType.RequestGeneralInfo)
             {
                 // Note: Payload does not need to be valid to request general info (useful to handle new version alerts)
-                var response = serverPeer.CreateMessage();
-                response.Write(GeneralInfo);
-                serverPeer.SendUnconnectedMessage(response, msg.SenderEndPoint);
+                SendRequestGeneralInfoResponse(serverPeer, msg.SenderEndPoint, GeneralInfo);
+
                 Console.WriteLine("Sent general info to " + msg.SenderEndPoint + ".");
                 return true;
             }
 
             if (!payloadValid)
             {
-                Console.WriteLine("Received message that failed payload validation from " + msg.SenderEndPoint + ".");
+                SendErrorResponse(serverPeer, msg.SenderEndPoint, messageType, MasterServerMessageResult.InvalidPayload);
+
+                Console.WriteLine("Received message that failed payload validation from " + msg.SenderEndPoint + ", error response sent.");
                 return true;
             }
 
@@ -282,18 +160,8 @@ namespace Microsoft.Xna.Framework.Net
             {
                 Guid guid;
                 IPEndPoint internalIp, externalIp;
-                NetworkSessionPublicInfo publicInfo = new NetworkSessionPublicInfo();
-                try
-                {
-                    guid = new Guid(msg.ReadString());
-                    internalIp = msg.ReadIPEndPoint();
-                    externalIp = msg.SenderEndPoint;
-                    if (!publicInfo.Unpack(msg))
-                    {
-                        return false;
-                    }
-                }
-                catch
+                NetworkSessionPublicInfo publicInfo;
+                if (!ParseRegisterHost(msg, out guid, out internalIp, out externalIp, out publicInfo))
                 {
                     return false;
                 }
@@ -305,11 +173,7 @@ namespace Microsoft.Xna.Framework.Net
             else if (messageType == MasterServerMessageType.UnregisterHost)
             {
                 Guid guid;
-                try
-                {
-                    guid = new Guid(msg.ReadString());
-                }
-                catch
+                if (!ParseUnregisterHost(msg, out guid))
                 {
                     return false;
                 }
@@ -337,9 +201,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 foreach (var host in hosts.Values)
                 {
-                    var response = serverPeer.CreateMessage();
-                    SerializeRequestHostsResponse(response, host.Guid, host.PublicInfo);
-                    serverPeer.SendUnconnectedMessage(response, msg.SenderEndPoint);
+                    SendRequestHostsResponse(serverPeer, msg.SenderEndPoint, false, host.Guid, host.PublicInfo);
                 }
 
                 Console.WriteLine("List of " + hosts.Count + " hosts sent to " + msg.SenderEndPoint + ".");
@@ -348,13 +210,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 Guid guid;
                 IPEndPoint clientInternalIp, clientExternalIp;
-                try
-                {
-                    guid = new Guid(msg.ReadString());
-                    clientInternalIp = msg.ReadIPEndPoint();
-                    clientExternalIp = msg.SenderEndPoint;
-                }
-                catch
+                if (!ParseRequestIntroduction(msg, out guid, out clientInternalIp, out clientExternalIp))
                 {
                     return false;
                 }
