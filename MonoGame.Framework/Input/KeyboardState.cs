@@ -366,6 +366,7 @@ namespace Microsoft.Xna.Framework.Input
                         if ((_curKeyset & (1 << _curIndex)) != 0)
                         {
                             _curKey = (Keys)((_keysetNum * 32) + _curIndex);
+                            _curIndex++;
                             return true;
                         }
                     }
