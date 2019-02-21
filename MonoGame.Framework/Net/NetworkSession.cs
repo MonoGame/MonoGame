@@ -203,7 +203,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new InvalidOperationException("Can only be invoked on a session of type PlayerMarch or Ranked");
             }
-            NetworkSessionMasterServer.RequestGeneralInfo(peer);
+            NetworkMasterServer.RequestGeneralInfo(peer);
         }
 
         public bool IsDisposed { get; private set; }

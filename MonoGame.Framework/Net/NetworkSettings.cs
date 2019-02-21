@@ -2,7 +2,7 @@
 
 namespace Microsoft.Xna.Framework.Net
 {
-    public static class NetworkSessionSettings
+    public static class NetworkSettings
     {
         private static string Id = string.Empty;
 

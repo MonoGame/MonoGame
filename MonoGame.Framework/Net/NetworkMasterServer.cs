@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Net
         }
     }
 
-    public abstract partial class NetworkSessionMasterServer
+    public abstract partial class NetworkMasterServer
     {
         private static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
 
@@ -37,11 +37,16 @@ namespace Microsoft.Xna.Framework.Net
         private IDictionary<Guid, HostData> hosts = new Dictionary<Guid, HostData>();
         private DateTime lastReportedStatus = DateTime.MinValue;
 
+        internal static IPEndPoint ResolveEndPoint()
+        {
+            return NetUtility.Resolve(NetworkSettings.MasterServerAddress, NetworkSettings.MasterServerPort);
+        }
+
         public void Start()
         {
             var config = new NetPeerConfiguration(GameAppId)
             {
-                Port = NetworkSessionSettings.MasterServerPort,
+                Port = NetworkSettings.MasterServerPort,
                 AcceptIncomingConnections = false,
                 AutoFlushSendQueue = true,
             };
@@ -66,7 +71,7 @@ namespace Microsoft.Xna.Framework.Net
         protected void TrimHosts()
         {
             var currentTime = DateTime.Now;
-            var threshold = NetworkSessionSettings.MasterServerRegistrationInterval + TimeSpan.FromSeconds(5.0);
+            var threshold = NetworkSettings.MasterServerRegistrationInterval + TimeSpan.FromSeconds(5.0);
 
             hostsToRemove.Clear();
 

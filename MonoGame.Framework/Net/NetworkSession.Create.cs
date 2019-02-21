@@ -19,9 +19,9 @@ namespace Microsoft.Xna.Framework.Net
 
         private static NetworkSession InternalCreate(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
         {
-            var config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId)
+            var config = new NetPeerConfiguration(NetworkSettings.GameAppId)
             {
-                Port = NetworkSessionSettings.Port,
+                Port = NetworkSettings.Port,
                 AcceptIncomingConnections = true,
                 AutoFlushSendQueue = false,
             };
@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private static NetworkSession InternalJoin(AvailableNetworkSession availableSession)
         {
-            var config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId)
+            var config = new NetPeerConfiguration(NetworkSettings.GameAppId)
             {
                 Port = 0, // Use any port
                 AcceptIncomingConnections = false,
@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework.Net
             else if (availableSession.SessionType == NetworkSessionType.PlayerMatch || availableSession.SessionType == NetworkSessionType.Ranked)
             {
                 clientPeer.Configuration.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
-                NetworkSessionMasterServer.RequestIntroduction(clientPeer, availableSession.HostGuid, GetInternalIp(clientPeer));
+                NetworkMasterServer.RequestIntroduction(clientPeer, availableSession.HostGuid, GetInternalIp(clientPeer));
             }
             else
             {
@@ -207,9 +207,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private static AvailableNetworkSessionCollection InternalFind(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
         {
-            var masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-
-            var config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId)
+            var config = new NetPeerConfiguration(NetworkSettings.GameAppId)
             {
                 Port = 0, // Use any port
                 AcceptIncomingConnections = false,
@@ -233,12 +231,12 @@ namespace Microsoft.Xna.Framework.Net
             if (sessionType == NetworkSessionType.SystemLink)
             {
                 Debug.WriteLine("Sending local discovery request...");
-                discoverPeer.DiscoverLocalPeers(NetworkSessionSettings.Port);
+                discoverPeer.DiscoverLocalPeers(NetworkSettings.Port);
             }
             else if (sessionType == NetworkSessionType.PlayerMatch || sessionType == NetworkSessionType.Ranked)
             {
                 Debug.WriteLine("Sending discovery request to master server...");
-                NetworkSessionMasterServer.RequestHosts(discoverPeer);
+                NetworkMasterServer.RequestHosts(discoverPeer);
             }
             else
             {
@@ -262,8 +260,8 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     Guid guid;
                     NetworkSessionPublicInfo publicInfo;
-                    if (NetworkSessionMasterServer.ParseExpectedResponseHeader(msg, MasterServerMessageType.RequestHosts) &&
-                        NetworkSessionMasterServer.ParseRequestHostsResponse(msg, out guid, out publicInfo))
+                    if (NetworkMasterServer.ParseExpectedResponseHeader(msg, MasterServerMessageType.RequestHosts) &&
+                        NetworkMasterServer.ParseRequestHostsResponse(msg, out guid, out publicInfo))
                     {
                         AddAvailableNetworkSession(guid, publicInfo, localGamers, sessionType, searchProperties, availableSessions, tag: msg.SenderEndPoint);
                     }
@@ -274,7 +272,7 @@ namespace Microsoft.Xna.Framework.Net
                 }
                 else if (msg.MessageType == NetIncomingMessageType.UnconnectedData)
                 {
-                    if (!msg.SenderEndPoint.Equals(masterServerEndPoint))
+                    if (!msg.SenderEndPoint.Equals(NetworkMasterServer.ResolveEndPoint()))
                     {
                         Debug.WriteLine("Unconnected data not from master server recieved from " + msg.SenderEndPoint + ", ignoring...");
                     }
@@ -282,8 +280,8 @@ namespace Microsoft.Xna.Framework.Net
                     {
                         Guid guid;
                         NetworkSessionPublicInfo publicInfo;
-                        if (NetworkSessionMasterServer.ParseExpectedResponseHeader(msg, MasterServerMessageType.RequestHosts) &&
-                            NetworkSessionMasterServer.ParseRequestHostsResponse(msg, out guid, out publicInfo))
+                        if (NetworkMasterServer.ParseExpectedResponseHeader(msg, MasterServerMessageType.RequestHosts) &&
+                            NetworkMasterServer.ParseRequestHostsResponse(msg, out guid, out publicInfo))
                         {
                             AddAvailableNetworkSession(guid, publicInfo, localGamers, sessionType, searchProperties, availableSessions);
                         }

@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Net
                     {
                         UpdatePublicInfo();
 
-                        NetworkSessionMasterServer.SendRequestHostsResponse(peer, msg.SenderEndPoint, true, guid, publicInfo);
+                        NetworkMasterServer.SendRequestHostsResponse(peer, msg.SenderEndPoint, true, guid, publicInfo);
                     }
                 }
                 else if (msg.MessageType == NetIncomingMessageType.ConnectionApproval)
@@ -137,19 +137,18 @@ namespace Microsoft.Xna.Framework.Net
                 }
                 else if (msg.MessageType == NetIncomingMessageType.UnconnectedData)
                 {
-                    var masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-                    if (msg.SenderEndPoint.Equals(masterServerEndPoint))
+                    if (msg.SenderEndPoint.Equals(NetworkMasterServer.ResolveEndPoint()))
                     {
                         MasterServerMessageType responseType;
                         MasterServerMessageResult responseResult;
-                        if (NetworkSessionMasterServer.ParseResponseHeader(msg, out responseType, out responseResult))
+                        if (NetworkMasterServer.ParseResponseHeader(msg, out responseType, out responseResult))
                         {
                             if (responseResult == MasterServerMessageResult.Ok)
                             {
                                 if (responseType == MasterServerMessageType.RequestGeneralInfo)
                                 {
                                     string generalInfo;
-                                    if (NetworkSessionMasterServer.ParseRequestGeneralInfoResponse(msg, out generalInfo))
+                                    if (NetworkMasterServer.ParseRequestGeneralInfoResponse(msg, out generalInfo))
                                     {
                                         masterServerGeneralInfo = generalInfo;
                                     }
@@ -242,7 +241,7 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
             var currentTime = DateTime.Now;
-            if (currentTime - lastMasterServerReport < NetworkSessionSettings.MasterServerRegistrationInterval)
+            if (currentTime - lastMasterServerReport < NetworkSettings.MasterServerRegistrationInterval)
             {
                 return;
             }
@@ -250,7 +249,7 @@ namespace Microsoft.Xna.Framework.Net
 
             UpdatePublicInfo();
             
-            NetworkSessionMasterServer.RegisterHost(peer, guid, GetInternalIp(peer), publicInfo);
+            NetworkMasterServer.RegisterHost(peer, guid, GetInternalIp(peer), publicInfo);
         }
 
         private void UnregisterWithMasterServer()
@@ -260,7 +259,7 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
-            NetworkSessionMasterServer.UnregisterHost(peer, guid);
+            NetworkMasterServer.UnregisterHost(peer, guid);
         }
     }
 }

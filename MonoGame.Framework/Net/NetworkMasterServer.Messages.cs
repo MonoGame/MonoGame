@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Net
         InvalidPayload = 2,
     };
 
-    public abstract partial class NetworkSessionMasterServer
+    public abstract partial class NetworkMasterServer
     {
         internal static bool ParseResponseHeader(NetIncomingMessage response, out MasterServerMessageType type, out MasterServerMessageResult result)
         {
@@ -90,15 +90,13 @@ namespace Microsoft.Xna.Framework.Net
         internal static void RegisterHost(NetPeer peer, Guid guid, IPEndPoint internalIp, NetworkSessionPublicInfo publicInfo)
         {
             var request = peer.CreateMessage();
-            request.Write(NetworkSessionSettings.GameAppId);
-            request.Write(NetworkSessionSettings.MasterServerPayload);
+            request.Write(NetworkSettings.GameAppId);
+            request.Write(NetworkSettings.MasterServerPayload);
             request.Write((byte)MasterServerMessageType.RegisterHost);
             request.Write(guid.ToString());
             request.Write(internalIp);
             publicInfo.Pack(request);
-
-            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            peer.SendUnconnectedMessage(request, serverEndPoint);
+            peer.SendUnconnectedMessage(request, ResolveEndPoint());
 
             Debug.WriteLine("Registering with master server (Guid: " + guid + ", InternalIp: " + internalIp + ", PublicInfo: ...)");
         }
@@ -130,13 +128,11 @@ namespace Microsoft.Xna.Framework.Net
         internal static void UnregisterHost(NetPeer peer, Guid guid)
         {
             var request = peer.CreateMessage();
-            request.Write(NetworkSessionSettings.GameAppId);
-            request.Write(NetworkSessionSettings.MasterServerPayload);
+            request.Write(NetworkSettings.GameAppId);
+            request.Write(NetworkSettings.MasterServerPayload);
             request.Write((byte)MasterServerMessageType.UnregisterHost);
             request.Write(guid.ToString());
-
-            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            peer.SendUnconnectedMessage(request, serverEndPoint);
+            peer.SendUnconnectedMessage(request, ResolveEndPoint());
 
             Debug.WriteLine("Unregistering with master server (Guid: " + guid + ")");
         }
@@ -158,12 +154,10 @@ namespace Microsoft.Xna.Framework.Net
         internal static void RequestHosts(NetPeer peer)
         {
             var request = peer.CreateMessage();
-            request.Write(NetworkSessionSettings.GameAppId);
-            request.Write(NetworkSessionSettings.MasterServerPayload);
+            request.Write(NetworkSettings.GameAppId);
+            request.Write(NetworkSettings.MasterServerPayload);
             request.Write((byte)MasterServerMessageType.RequestHosts);
-
-            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            peer.SendUnconnectedMessage(request, serverEndPoint);
+            peer.SendUnconnectedMessage(request, ResolveEndPoint());
         }
 
         internal static void SendRequestHostsResponse(NetPeer peer, IPEndPoint recipientEndPoint, bool localDiscovery, Guid guid, NetworkSessionPublicInfo publicInfo)
@@ -206,14 +200,12 @@ namespace Microsoft.Xna.Framework.Net
         internal static void RequestIntroduction(NetPeer peer, Guid guid, IPEndPoint internalIp)
         {
             var request = peer.CreateMessage();
-            request.Write(NetworkSessionSettings.GameAppId);
-            request.Write(NetworkSessionSettings.MasterServerPayload);
+            request.Write(NetworkSettings.GameAppId);
+            request.Write(NetworkSettings.MasterServerPayload);
             request.Write((byte)MasterServerMessageType.RequestIntroduction);
             request.Write(guid.ToString());
             request.Write(internalIp);
-
-            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            peer.SendUnconnectedMessage(request, serverEndPoint);
+            peer.SendUnconnectedMessage(request, ResolveEndPoint());
         }
 
         internal static bool ParseRequestIntroduction(NetIncomingMessage request, out Guid guid, out IPEndPoint clientInternalIp, out IPEndPoint clientExternalIp)
@@ -237,12 +229,10 @@ namespace Microsoft.Xna.Framework.Net
         internal static void RequestGeneralInfo(NetPeer peer)
         {
             var request = peer.CreateMessage();
-            request.Write(NetworkSessionSettings.GameAppId);
-            request.Write(NetworkSessionSettings.MasterServerPayload); // Note that payload does not need to match to get general info
+            request.Write(NetworkSettings.GameAppId);
+            request.Write(NetworkSettings.MasterServerPayload); // Note that payload does not need to match to get general info
             request.Write((byte)MasterServerMessageType.RequestGeneralInfo);
-
-            var serverEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            peer.SendUnconnectedMessage(request, serverEndPoint);
+            peer.SendUnconnectedMessage(request, ResolveEndPoint());
         }
 
         internal static bool ParseRequestGeneralInfoResponse(NetIncomingMessage response, out string info)

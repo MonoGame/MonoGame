@@ -152,10 +152,10 @@
     <Compile Include="Net\NetworkSessionJoinException.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\NetworkSessionMasterServer.cs">
+    <Compile Include="Net\NetworkMasterServer.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\NetworkSessionMasterServer.Messages.cs">
+    <Compile Include="Net\NetworkMasterServer.Messages.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\NetworkSessionProperties.cs">
@@ -164,7 +164,7 @@
     <Compile Include="Net\NetworkSessionPublicInfo.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\NetworkSessionSettings.cs">
+    <Compile Include="Net\NetworkSettings.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\NetworkSessionState.cs">
