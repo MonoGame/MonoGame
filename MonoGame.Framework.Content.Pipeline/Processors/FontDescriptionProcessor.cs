@@ -226,21 +226,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (CurrentPlatform.OS == OS.Windows)
             {
                 var fontDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts");
-                var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts", false);
-
-                foreach (var font in key.GetValueNames().OrderBy(x => x))
+                foreach (var key in new RegistryKey[] { Registry.LocalMachine, Registry.CurrentUser })
                 {
-                    if (font.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+                    var subkey = key.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts", false);
+                    foreach (var font in subkey.GetValueNames().OrderBy(x => x))
                     {
-                        var fontPath = key.GetValue(font).ToString();
+                        if (font.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            var fontPath = subkey.GetValue(font).ToString();
 
-                        // The registry value might have trailing NUL characters
-                        // See https://github.com/MonoGame/MonoGame/issues/4061
-                        var nulIndex = fontPath.IndexOf('\0');
-                        if (nulIndex != -1)
-                            fontPath = fontPath.Substring(0, nulIndex);
+                            // The registry value might have trailing NUL characters
+                            // See https://github.com/MonoGame/MonoGame/issues/4061
+                            var nulIndex = fontPath.IndexOf('\0');
+                            if (nulIndex != -1)
+                                fontPath = fontPath.Substring(0, nulIndex);
 
-                        return Path.IsPathRooted(fontPath) ? fontPath : Path.Combine(fontDirectory, fontPath);
+                            return Path.IsPathRooted(fontPath) ? fontPath : Path.Combine(fontDirectory, fontPath);
+                        }
                     }
                 }
             }
