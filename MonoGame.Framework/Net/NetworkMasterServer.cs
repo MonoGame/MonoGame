@@ -97,7 +97,13 @@ namespace Microsoft.Xna.Framework.Net
             var currentTime = DateTime.Now;
             if (currentTime - lastReportedStatus > ReportStatusInterval)
             {
-                Console.WriteLine("Status: " + hosts.Count + " registered hosts.");
+                int playerCount = 0;
+                foreach (var host in hosts.Values)
+                {
+                    playerCount += host.PublicInfo.currentGamerCount;
+                }
+
+                Console.WriteLine("Status: " + playerCount + " players on " + hosts.Count + " registered hosts.");
 
                 lastReportedStatus = currentTime;
             }
