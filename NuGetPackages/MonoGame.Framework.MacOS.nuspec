@@ -31,7 +31,7 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\XamarinMac\MonoGame.Framework.xml" />
         <!-- Native Libs -->
     <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll.config" target="build\native\MonoGame.Framework.dll.config" />
-    <file src="MacOS\AnyCPU\Release\libopenal.1.dylib" target="build\native\libopenal.1.dylib" />
-    <file src="MacOS\AnyCPU\Release\libSDL2-2.0.0.dylib" target="build\native\libSDL2-2.0.0.dylib" />
+    <file src="WindowsGL\AnyCPU\Release\libopenal.1.dylib" target="build\native\libopenal.1.dylib" />
+    <file src="WindowsGL\AnyCPU\Release\libSDL2-2.0.0.dylib" target="build\native\libSDL2-2.0.0.dylib" />
   </files>
 </package>
