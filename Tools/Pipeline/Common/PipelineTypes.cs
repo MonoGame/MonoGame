@@ -459,7 +459,7 @@ namespace MonoGame.Tools.Pipeline
                         continue;
 
                     var types = asm.GetTypes();
-                    ProcessTypes(types, asm.Location);
+                    ProcessTypes(types, null);
                 }
 #if SHIPPING
                 catch (Exception e)
