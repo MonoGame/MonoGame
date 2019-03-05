@@ -166,6 +166,7 @@ namespace MonoGame.Tools.Pipeline
         {
             public ContentProcessorAttribute Attribute;
             public Type Type;
+            public string Path;
         }
 
         private static List<ImporterInfo> _importers;
@@ -305,7 +306,9 @@ namespace MonoGame.Tools.Pipeline
             cur = 0;
             foreach (var item in _processors)
             {
+                _currentAssemblyDirectory = Path.GetDirectoryName(item.Path);
                 var obj = Activator.CreateInstance(item.Type);
+                _currentAssemblyDirectory = null;
                 var typeProperties = item.Type.GetProperties(bindings);
                 var properties = new List<ProcessorTypeDescription.Property>();
                 foreach (var i in typeProperties)
@@ -456,7 +459,7 @@ namespace MonoGame.Tools.Pipeline
                         continue;
 
                     var types = asm.GetTypes();
-                    ProcessTypes(types);
+                    ProcessTypes(types, asm.Location);
                 }
 #if SHIPPING
                 catch (Exception e)
@@ -478,7 +481,7 @@ namespace MonoGame.Tools.Pipeline
 
                     var a = Assembly.Load(File.ReadAllBytes(path));
                     var types = a.GetTypes();
-                    ProcessTypes(types);
+                    ProcessTypes(types, path);
 
                     var watch = new FileSystemWatcher();
                     watch.Path = Path.GetDirectoryName(path);
@@ -509,7 +512,7 @@ namespace MonoGame.Tools.Pipeline
             _currentAssemblyDirectory = null;
         }
 
-        private static void ProcessTypes(IEnumerable<Type> types)
+        private static void ProcessTypes(IEnumerable<Type> types, string path)
         {
             foreach (var t in types)
             {
@@ -539,7 +542,7 @@ namespace MonoGame.Tools.Pipeline
                     if (attributes.Length != 0)
                     {
                         var processorAttribute = attributes[0] as ContentProcessorAttribute;
-                        _processors.Add(new ProcessorInfo { Attribute = processorAttribute, Type = t });
+                        _processors.Add(new ProcessorInfo { Attribute = processorAttribute, Type = t, Path = path });
                     }
                 }
             }
