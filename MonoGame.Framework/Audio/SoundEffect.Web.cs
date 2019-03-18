@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
         }
 
-        internal static void InitializeSoundEffect()
+        internal static void PlatformInitialize()
         {
         }
 

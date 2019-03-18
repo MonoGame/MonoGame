@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         internal void InitializeSound()
         {
-            controller = OpenALSoundController.GetInstance;
+            controller = OpenALSoundController.Instance;
         }
 
 #endregion // Initialization
@@ -174,7 +174,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 // Reset the SendFilter to 0 if we are NOT using reverb since 
                 // sources are recycled
-                if (OpenALSoundController.GetInstance.SupportsEfx)
+                if (OpenALSoundController.Instance.SupportsEfx)
                 {
                     OpenALSoundController.Efx.BindSourceToAuxiliarySlot(SourceId, 0, 0, 0);
                     ALHelper.CheckError("Failed to unset reverb.");

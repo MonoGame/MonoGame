@@ -438,6 +438,48 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(x, vector2.X);
             Assert.AreEqual(y, vector2.Y);
         }
+
+        [Test]
+        public void Round()
+        {
+            Vector2 vector2 = new Vector2(0.4f, 0.6f);
+
+            // CEILING
+
+            Vector2 ceilMember = vector2;
+            ceilMember.Ceiling();
+
+            Vector2 ceilResult;
+            Vector2.Ceiling(ref vector2, out ceilResult);
+
+            Assert.AreEqual(new Vector2(1.0f, 1.0f), ceilMember);
+            Assert.AreEqual(new Vector2(1.0f, 1.0f), Vector2.Ceiling(vector2));
+            Assert.AreEqual(new Vector2(1.0f, 1.0f), ceilResult);
+
+            // FLOOR
+
+            Vector2 floorMember = vector2;
+            floorMember.Floor();
+
+            Vector2 floorResult;
+            Vector2.Floor(ref vector2, out floorResult);
+
+            Assert.AreEqual(new Vector2(0.0f, 0.0f), floorMember);
+            Assert.AreEqual(new Vector2(0.0f, 0.0f), Vector2.Floor(vector2));
+            Assert.AreEqual(new Vector2(0.0f, 0.0f), floorResult);
+
+            // ROUND
+
+            Vector2 roundMember = vector2;
+            roundMember.Round();
+
+            Vector2 roundResult;
+            Vector2.Round(ref vector2, out roundResult);
+
+            Assert.AreEqual(new Vector2(0.0f, 1.0f), roundMember);
+            Assert.AreEqual(new Vector2(0.0f, 1.0f), Vector2.Round(vector2));
+            Assert.AreEqual(new Vector2(0.0f, 1.0f), roundResult);
+        }
 #endif
     }
 }

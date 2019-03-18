@@ -102,6 +102,8 @@ namespace Microsoft.Xna.Framework {
 		/// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
+
+        internal bool IsTextInputHandled { get { return TextInput != null; } }
 #endif
 
 		#endregion Events
