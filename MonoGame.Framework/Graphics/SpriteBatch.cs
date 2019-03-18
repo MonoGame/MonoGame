@@ -37,8 +37,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Constructs a <see cref="SpriteBatch"/>.
         /// </summary>
         /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>
+        /// <param name="capacity">The initial capacity of the internal array holding batch items (the value will be rounded to the next multiple of 64).</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
-        public SpriteBatch (GraphicsDevice graphicsDevice)
+        public SpriteBatch (GraphicsDevice graphicsDevice, int capacity = 0)
 		{
 			if (graphicsDevice == null)
             {
@@ -50,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _spriteEffect = new SpriteEffect(graphicsDevice);
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
-            _batcher = new SpriteBatcher(graphicsDevice);
+            _batcher = new SpriteBatcher(graphicsDevice, capacity);
 
             _beginCalled = false;
 		}
