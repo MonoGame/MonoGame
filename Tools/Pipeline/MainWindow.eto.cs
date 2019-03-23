@@ -32,12 +32,12 @@ namespace MonoGame.Tools.Pipeline
         public Command cmdBuild, cmdRebuild, cmdClean, cmdCancelBuild;
         public CheckCommand cmdDebugMode;
         public Command cmdHelp, cmdAbout;
-        public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdOpenOutputItemLocation, cmdCopyAssetName, cmdRebuildItem;
+        public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdOpenOutputItemLocation, cmdCopyAssetName, cmdRebuildItem, cmdBuildItem;
 
         ToolBar toolbar;
         ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuView, menuBuild, menuHelp;
         ToolItem toolBuild, toolRebuild, toolClean, toolCancelBuild;
-        MenuItem cmOpenItem, cmOpenItemWith, cmOpenItemLocation, cmOpenOutputItemLocation, cmCopyAssetPath, cmRebuildItem, cmExclude, cmRename, cmDelete;
+        MenuItem cmOpenItem, cmOpenItemWith, cmOpenItemLocation, cmOpenOutputItemLocation, cmCopyAssetPath, cmRebuildItem, cmBuildItem, cmExclude, cmRename, cmDelete;
         ButtonMenuItem cmAdd;
 
         ProjectControl projectControl;
@@ -121,7 +121,9 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenOutputItemLocation.Executed += CmdOpenOutputItemLocation_Executed;
             cmdCopyAssetName.Executed += CmdCopyAssetPath_Executed;
             cmdRebuildItem.Executed += CmdRebuildItem_Executed;
-        }
+            cmdBuildItem.Executed += CmdBuildItem_Executed;
+
+         }
 
         private void InitalizeCommands()
         {
@@ -265,9 +267,15 @@ namespace MonoGame.Tools.Pipeline
             cmdCopyAssetName = new Command();
             cmdCopyAssetName.MenuText = "Copy Asset Name";
 
+            cmdBuildItem = new Command();
+            cmdBuildItem.Image = Global.GetEtoIcon("Commands.Build.png");
+            cmdBuildItem.MenuText = "Build";
+
             cmdRebuildItem = new Command();
             cmdRebuildItem.Image = Global.GetEtoIcon("Commands.Rebuild.png");
             cmdRebuildItem.MenuText = "Rebuild";
+
+
         }
 
         private void InitalizeMenu()
@@ -353,6 +361,7 @@ namespace MonoGame.Tools.Pipeline
             cmOpenOutputItemLocation = cmdOpenOutputItemLocation.CreateMenuItem();
             cmCopyAssetPath = cmdCopyAssetName.CreateMenuItem();
             cmRebuildItem = cmdRebuildItem.CreateMenuItem();
+            cmBuildItem = cmdBuildItem.CreateMenuItem();
             cmExclude = cmdExclude.CreateMenuItem();
             cmRename = cmdRename.CreateMenuItem();
             cmDelete = cmdDelete.CreateMenuItem();

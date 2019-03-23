@@ -397,8 +397,13 @@ namespace MonoGame.Tools.Pipeline
                 if (item.OriginalPath.StartsWith(dir.OriginalPath + "/"))
                     yield return item;
         }
-
         public void RebuildItems()
+        {
+            BuildItems(true);
+        }
+
+
+        public void BuildItems(bool rebuild = false)
         {
             var items = new List<IProjectItem>();
 
@@ -440,7 +445,8 @@ namespace MonoGame.Tools.Pipeline
             }
 
             // Run the build the command.
-            var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
+            var commands = string.Format("/@:\"{0}\" {1} /incremental", tempPath, rebuild ? "/rebuild" : string.Empty);
+
             if (PipelineSettings.Default.DebugMode)
                 commands += " /launchdebugger";
             BuildCommand(commands);
@@ -1050,6 +1056,9 @@ namespace MonoGame.Tools.Pipeline
             info.Rename = exists && oneselected && !(SelectedItem is PipelineProject);
             info.Delete = exists && info.Exclude;
             info.RebuildItem = exists && somethingselected && !ProjectBuilding;
+            info.BuildItem = exists && somethingselected && !ProjectBuilding;
         }
+
+
     }
 }
