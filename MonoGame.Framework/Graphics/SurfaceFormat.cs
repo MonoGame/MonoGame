@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Unsigned 32-bit RGBA sRGB pixel format that supports 8 bits per channel.
         /// </summary>
-        ColorSRgb = 30,
+        ColorSRgba = 30,
         /// <summary>
         /// Unsigned 32-bit sRGB pixel format that supports 8 bits per channel. 8 bits are unused.
         /// </summary>
@@ -125,11 +125,15 @@ namespace Microsoft.Xna.Framework.Graphics
         /// DXT5. sRGB texture format with compression. Surface dimensions must be a multiple of 4.
         /// </summary>
         Dxt5SRgb = 35,
+        /// <summary>
+        /// Unsigned 32-bit RGBA sRGB pixel format that supports 8 bits per channel.
+        /// </summary>
+        ColorSRgb = 36,
 
-		/// <summary>
+        /// <summary>
         /// PowerVR texture compression format (iOS and Android).
-		/// </summary>
-		RgbPvrtc2Bpp = 50,
+        /// </summary>
+        RgbPvrtc2Bpp = 50,
         /// <summary>
         /// PowerVR texture compression format (iOS and Android).
         /// </summary>

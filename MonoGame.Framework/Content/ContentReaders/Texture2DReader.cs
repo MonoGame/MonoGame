@@ -10,6 +10,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    public delegate T ContentParameters<T>(GraphicsDevice device, int width, int height, bool mipmap, SurfaceFormat surfaceFormat);
+
     internal class Texture2DReader : ContentTypeReader<Texture2D>
     {
 		public Texture2DReader()
@@ -47,7 +49,7 @@ namespace Microsoft.Xna.Framework.Content
 					break;
 				case SurfaceFormat.Dxt1SRgb:
 					if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1)
-						convertedFormat = SurfaceFormat.ColorSRgb;
+						convertedFormat = SurfaceFormat.ColorSRgba;
 					break;
 				case SurfaceFormat.Dxt3:
 				case SurfaceFormat.Dxt5:
@@ -57,14 +59,16 @@ namespace Microsoft.Xna.Framework.Content
 				case SurfaceFormat.Dxt3SRgb:
 				case SurfaceFormat.Dxt5SRgb:
 					if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
-						convertedFormat = SurfaceFormat.ColorSRgb;
+						convertedFormat = SurfaceFormat.ColorSRgba;
 					break;
 				case SurfaceFormat.NormalizedByte4:
 					convertedFormat = SurfaceFormat.Color;
 					break;
 			}
-			
-            texture = existingInstance ?? new Texture2D(reader.GraphicsDevice, width, height, levelCountOutput > 1, convertedFormat);
+
+            texture = existingInstance ??
+                // evil hack to allow us to load sRGB textures
+                reader.ContentManager.AllocateTexture(reader.GraphicsDevice, width, height, levelCountOutput > 1, convertedFormat);
 #if OPENGL
             Threading.BlockOnUIThread(() =>
             {
