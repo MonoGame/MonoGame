@@ -94,7 +94,6 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-
         private static void RemoveContentManager(ContentManager contentManager)
         {
             lock (ContentManagerLock)
@@ -507,22 +506,5 @@ namespace Microsoft.Xna.Framework.Content
                 scratchBuffer = new byte[size];
             return scratchBuffer;
         }
-
-        // MASSIVELY ugly hack to expediate loading of certain textures in sRGB format. Improve this for the love of god
-        internal Texture2D AllocateTexture(GraphicsDevice device, int width, int height, bool v, SurfaceFormat convertedFormat)
-        {
-            if (m_customAllocator != null) {
-                Texture2D content = m_customAllocator(device, width, height, v, convertedFormat);
-                m_customAllocator = null;
-                return content;
-            }
-            // This is the default one
-            return new Texture2D(device, width, height, v, convertedFormat);
-        }
-        private Func<GraphicsDevice, int, int, bool, SurfaceFormat, Texture2D> m_customAllocator;
-        public void UseCustomTextureAllocatorOnce(Func<GraphicsDevice, int, int, bool, SurfaceFormat, Texture2D> customAllocator)
-        {
-            m_customAllocator = customAllocator;
-        }
-    }
+	}
 }
