@@ -499,9 +499,16 @@ namespace MonoGame.Tools.Pipeline
         private void DoBuild(string commands)
         {
             Encoding encoding;
-            try {
+            try
+            { 
                 encoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
-            } catch (NotSupportedException) {
+            }
+            catch (NotSupportedException)
+            {
+                encoding = Encoding.UTF8;
+            }
+            catch (ArgumentException)
+            {
                 encoding = Encoding.UTF8;
             }
             var currentDir = Environment.CurrentDirectory;
@@ -543,7 +550,7 @@ namespace MonoGame.Tools.Pipeline
             // can run after we've already finished.
             lock (_buildTask)
                 _buildProcess = null;
-        }
+            }
 
         public void CancelBuild()
         {
