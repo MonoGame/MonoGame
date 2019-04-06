@@ -266,13 +266,26 @@ namespace Microsoft.Xna.Framework
         /// <param name="radians">The angle in radians.</param>
         /// <returns>The angle in degrees.</returns>
         /// <remarks>
-        /// This method uses double precission internally,
+        /// This method uses double precision internally,
         /// though it returns single float
         /// Factor = 180 / pi
         /// </remarks>
         public static float ToDegrees(float radians)
         { 
             return (float)(radians * 57.295779513082320876798154814105);
+        }
+
+        /// <summary>
+        /// Converts radians to degrees, returning a precise result.
+        /// </summary>
+        /// <param name="radians">The angle in radians.</param>
+        /// <returns>The angle in degrees.</returns>
+        /// <remarks>
+        /// Factor = 180 / pi
+        /// </remarks>
+        public static double ToDegreesD(double radians)
+        {
+            return (radians * 57.295779513082320876798154814105d);
         }
         
         /// <summary>
@@ -281,13 +294,26 @@ namespace Microsoft.Xna.Framework
         /// <param name="degrees">The angle in degrees.</param>
         /// <returns>The angle in radians.</returns>
         /// <remarks>
-        /// This method uses double precission internally,
+        /// This method uses double precision internally,
         /// though it returns single float
         /// Factor = pi / 180
         /// </remarks>
         public static float ToRadians(float degrees)
         { 
             return (float)(degrees * 0.017453292519943295769236907684886);
+        }
+
+        /// <summary>
+        /// Converts degrees to radians, returning a precise result.
+        /// </summary>
+        /// <param name="degrees">The angle in degrees.</param>
+        /// <returns>The angle in radians.</returns>
+        /// <remarks>
+        /// Factor = pi / 180
+        /// </remarks>
+        public static double ToRadiansD(double degrees)
+        {
+            return (degrees * 0.017453292519943295769236907684886d);
         }
 	 
         /// <summary>
