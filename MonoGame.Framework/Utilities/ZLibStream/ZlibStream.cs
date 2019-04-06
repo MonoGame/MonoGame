@@ -540,6 +540,16 @@ namespace MonoGame.Utilities
         }
 
         /// <summary>
+        /// Finish and flush.
+        /// TODO: shouldn't Flush just do this all the time?
+        /// </summary>
+        public void Finish()
+        {
+            _baseStream.Finish();
+            Flush();
+        }
+
+        /// <summary>
         /// Reading this property always throws a <see cref="NotSupportedException"/>.
         /// </summary>
         public override long Length
@@ -1606,7 +1616,7 @@ namespace MonoGame.Utilities
                     : _z.Inflate(_flushMode);
                 if (rc != ZlibConstants.Z_OK && rc != ZlibConstants.Z_STREAM_END)
                     throw new ZlibException((_wantCompress ? "de" : "in") + "flating: " + _z.Message);
-
+                
                 //if (_workingBuffer.Length - _z.AvailableBytesOut > 0)
                 _stream.Write(_workingBuffer, 0, _workingBuffer.Length - _z.AvailableBytesOut);
 
@@ -1622,7 +1632,7 @@ namespace MonoGame.Utilities
 
 
 
-        private void finish()
+        public void Finish()
         {
             if (_z == null) return;
 
