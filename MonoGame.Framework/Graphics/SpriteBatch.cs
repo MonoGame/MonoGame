@@ -36,10 +36,19 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Constructs a <see cref="SpriteBatch"/>.
         /// </summary>
+        /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>        
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
+        public SpriteBatch(GraphicsDevice graphicsDevice) : this(graphicsDevice, 0)
+        {            
+        }
+
+        /// <summary>
+        /// Constructs a <see cref="SpriteBatch"/>.
+        /// </summary>
         /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>
         /// <param name="capacity">The initial capacity of the internal array holding batch items (the value will be rounded to the next multiple of 64).</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
-        public SpriteBatch (GraphicsDevice graphicsDevice, int capacity = 0)
+        public SpriteBatch (GraphicsDevice graphicsDevice, int capacity)
 		{
 			if (graphicsDevice == null)
             {
