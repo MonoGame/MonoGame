@@ -8,43 +8,44 @@ namespace Microsoft.Xna.Framework
 {
     /// <summary>
     /// Contains commonly used precalculated values and mathematical operations.
+    /// This is a double precision version of <see cref="MathHelper"/>.
     /// </summary>
-    public static class MathHelper
+    public static class MathHelperD
     {
     	/// <summary>
         /// Represents the mathematical constant e(2.71828175).
         /// </summary>
-        public const float E = (float)Math.E;
+        public const double E = Math.E;
         
         /// <summary>
         /// Represents the log base ten of e(0.4342945).
         /// </summary>
-        public const float Log10E = 0.4342945f;
+        public const double Log10E = 0.4342945d;
         
         /// <summary>
         /// Represents the log base two of e(1.442695).
         /// </summary>
-        public const float Log2E = 1.442695f;
+        public const double Log2E = 1.442695d;
         
         /// <summary>
         /// Represents the value of pi(3.14159274).
         /// </summary>
-        public const float Pi = (float)Math.PI;
+        public const double Pi = Math.PI;
         
         /// <summary>
         /// Represents the value of pi divided by two(1.57079637).
         /// </summary>
-        public const float PiOver2 = (float)(Math.PI / 2.0);
+        public const double PiOver2 = (Math.PI / 2.0d);
         
         /// <summary>
         /// Represents the value of pi divided by four(0.7853982).
         /// </summary>
-        public const float PiOver4 = (float)(Math.PI / 4.0);
+        public const double PiOver4 = (Math.PI / 4.0d);
         
         /// <summary>
         /// Represents the value of pi times two(6.28318548).
         /// </summary>
-        public const float TwoPi = (float)(Math.PI * 2.0);
+        public const double TwoPi = (Math.PI * 2.0d);
         
         /// <summary>
         /// Returns the Cartesian coordinate for one axis of a point that is defined by a given triangle and two normalized barycentric (areal) coordinates.
@@ -55,7 +56,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="amount1">The normalized barycentric (areal) coordinate b2, equal to the weighting factor for vertex 2, the coordinate of which is specified in value2.</param>
         /// <param name="amount2">The normalized barycentric (areal) coordinate b3, equal to the weighting factor for vertex 3, the coordinate of which is specified in value3.</param>
         /// <returns>Cartesian coordinate of the specified point with respect to the axis being used.</returns>
-        public static float Barycentric(float value1, float value2, float value3, float amount1, float amount2)
+        public static double Barycentric(double value1, double value2, double value3, double amount1, double amount2)
         {
             return value1 + (value2 - value1) * amount1 + (value3 - value1) * amount2;
         }
@@ -69,13 +70,12 @@ namespace Microsoft.Xna.Framework
         /// <param name="value4">The fourth position in the interpolation.</param>
         /// <param name="amount">Weighting factor.</param>
         /// <returns>A position that is the result of the Catmull-Rom interpolation.</returns>
-        public static float CatmullRom(float value1, float value2, float value3, float value4, float amount)
+        public static double CatmullRom(double value1, double value2, double value3, double value4, double amount)
         {
             // Using formula from http://www.mvps.org/directx/articles/catmull/
-            // Internally using doubles not to lose precission
             double amountSquared = amount * amount;
             double amountCubed = amountSquared * amount;
-            return (float)(0.5 * (2.0 * value2 +
+            return (0.5 * (2.0 * value2 +
                 (value3 - value1) * amount +
                 (2.0 * value1 - 5.0 * value2 + 4.0 * value3 - value4) * amountSquared +
                 (3.0 * value2 - value1 - 3.0 * value3 + value4) * amountCubed));
@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="min">The minimum value. If <c>value</c> is less than <c>min</c>, <c>min</c> will be returned.</param>
         /// <param name="max">The maximum value. If <c>value</c> is greater than <c>max</c>, <c>max</c> will be returned.</param>
         /// <returns>The clamped value.</returns>
-        public static float Clamp(float value, float min, float max)
+        public static double Clamp(double value, double min, double max)
         {
             // First we check to see if we're greater than the max
             value = (value > max) ? max : value;
@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source value.</param>
         /// <param name="value2">Source value.</param>
         /// <returns>Distance between the two values.</returns>
-        public static float Distance(float value1, float value2)
+        public static double Distance(double value1, double value2)
         {
             return Math.Abs(value1 - value2);
         }
@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="tangent2">Source tangent.</param>
         /// <param name="amount">Weighting factor.</param>
         /// <returns>The result of the Hermite spline interpolation.</returns>
-        public static float Hermite(float value1, float tangent1, float value2, float tangent2, float amount)
+        public static double Hermite(double value1, double tangent1, double value2, double tangent2, double amount)
         {
             // All transformed to double not to lose precission
             // Otherwise, for high numbers of param:amount the result is NaN instead of Infinity
@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework
                     (3 * v2 - 3 * v1 - 2 * t1 - t2) * sSquared +
                     t1 * s +
                     v1;
-            return (float)result;
+            return result;
         }
         
         
@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework
         /// Passing amount a value of 0 will cause value1 to be returned, a value of 1 will cause value2 to be returned.
         /// See <see cref="MathHelper.LerpPrecise"/> for a less efficient version with more precision around edge cases.
         /// </remarks>
-        public static float Lerp(float value1, float value2, float amount)
+        public static double Lerp(double value1, double value2, double amount)
         {
             return value1 + (value2 - value1) * amount;
         }
@@ -193,7 +193,7 @@ namespace Microsoft.Xna.Framework
         /// Relevant Wikipedia Article: https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support
         /// Relevant StackOverflow Answer: http://stackoverflow.com/questions/4353525/floating-point-linear-interpolation#answer-23716956
         /// </remarks>
-        public static float LerpPrecise(float value1, float value2, float amount)
+        public static double LerpPrecise(double value1, double value2, double amount)
         {
             return ((1 - amount) * value1) + (value2 * amount);
         }
@@ -204,7 +204,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source value.</param>
         /// <param name="value2">Source value.</param>
         /// <returns>The greater value.</returns>
-        public static float Max(float value1, float value2)
+        public static double Max(double value1, double value2)
         {
             return value1 > value2 ? value1 : value2;
         }
@@ -226,7 +226,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source value.</param>
         /// <param name="value2">Source value.</param>
         /// <returns>The lesser value.</returns>
-        public static float Min(float value1, float value2)
+        public static double Min(double value1, double value2)
         {
             return value1 < value2 ? value1 : value2;
         }
@@ -249,13 +249,13 @@ namespace Microsoft.Xna.Framework
         /// <param name="value2">Source value.</param>
         /// <param name="amount">Weighting value.</param>
         /// <returns>Interpolated value.</returns>
-        public static float SmoothStep(float value1, float value2, float amount)
+        public static double SmoothStep(double value1, double value2, double amount)
         {
             // It is expected that 0 < amount < 1
             // If amount < 0, return value1
             // If amount > 1, return value2
-            float result = MathHelper.Clamp(amount, 0f, 1f);
-            result = MathHelper.Hermite(value1, 0f, value2, 0f, result);
+            double result = MathHelperD.Clamp(amount, 0f, 1f);
+            result = MathHelperD.Hermite(value1, 0f, value2, 0f, result);
 
             return result;
         }
@@ -266,13 +266,11 @@ namespace Microsoft.Xna.Framework
         /// <param name="radians">The angle in radians.</param>
         /// <returns>The angle in degrees.</returns>
         /// <remarks>
-        /// This method uses double precision internally,
-        /// though it returns single float
         /// Factor = 180 / pi
         /// </remarks>
-        public static float ToDegrees(float radians)
-        { 
-            return (radians * 57.295779513082320876798154814105f);
+        public static double ToDegrees(double radians)
+        {
+            return (radians * 57.295779513082320876798154814105d);
         }
         
         /// <summary>
@@ -281,13 +279,11 @@ namespace Microsoft.Xna.Framework
         /// <param name="degrees">The angle in degrees.</param>
         /// <returns>The angle in radians.</returns>
         /// <remarks>
-        /// This method uses double precision internally,
-        /// though it returns single float
         /// Factor = pi / 180
         /// </remarks>
-        public static float ToRadians(float degrees)
+        public static double ToRadians(double degrees)
         { 
-            return (degrees * 0.017453292519943295769236907684886f);
+            return (degrees * 0.017453292519943295769236907684886d);
         }
 	 
         /// <summary>
@@ -295,7 +291,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="angle">The angle to reduce, in radians.</param>
         /// <returns>The new angle, in radians.</returns>
-        public static float WrapAngle(float angle)
+        public static double WrapAngle(double angle)
         {
             if ((angle > -Pi) && (angle <= Pi))
                 return angle;
