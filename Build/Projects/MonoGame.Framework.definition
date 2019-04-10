@@ -282,6 +282,7 @@
     <Compile Include="IUpdateable.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="MathHelper.cs" />
+    <Compile Include="MathHelperD.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="NamespaceDocs.cs" />
     <Compile Include="Plane.cs" />

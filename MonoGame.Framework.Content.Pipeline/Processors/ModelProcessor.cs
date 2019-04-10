@@ -99,9 +99,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             // Perform the processor transforms.
             if (RotationX != 0.0f || RotationY != 0.0f || RotationZ != 0.0f || Scale != 1.0f)
             {
-                var rotX = Matrix.CreateRotationX((float)MathHelperD.ToRadians(RotationX));
-                var rotY = Matrix.CreateRotationY((float)MathHelperD.ToRadians(RotationY));
-                var rotZ = Matrix.CreateRotationZ((float)MathHelperD.ToRadians(RotationZ));
+                var rotX = Matrix.CreateRotationX(MathHelper.ToRadians(RotationX));
+                var rotY = Matrix.CreateRotationY(MathHelper.ToRadians(RotationY));
+                var rotZ = Matrix.CreateRotationZ(MathHelper.ToRadians(RotationZ));
                 var scale = Matrix.CreateScale(Scale);
                 MeshHelper.TransformScene(input, rotZ * rotX * rotY * scale);
             }
