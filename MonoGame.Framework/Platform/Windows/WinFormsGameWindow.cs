@@ -339,7 +339,11 @@ namespace MonoGame.Framework
 
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
+            if (!Form.TextInputEnabled)
+                return;
+
             var key = (Keys) (VkKeyScanEx(e.KeyChar, InputLanguage.CurrentInputLanguage.Handle) & 0xff);
+
             OnTextInput(sender, new TextInputEventArgs(e.KeyChar, key));
         }
 
@@ -607,6 +611,21 @@ namespace MonoGame.Framework
 
             if (raiseClientSizeChanged)
                 OnClientSizeChanged();
+        }
+
+        public override void EnableTextInput()
+        {
+            Form.EnableTextInput();
+        }
+
+        public override void DisableTextInput()
+        {
+            Form.DisableTextInput();
+        }
+
+        public void OnTextInput(TextInputEventArgs args)
+        {
+            OnTextInput(this, args);
         }
 
         #endregion

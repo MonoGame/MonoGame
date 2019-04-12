@@ -89,7 +89,21 @@ namespace Microsoft.Xna.Framework {
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
-#if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
+        /// <summary>
+        /// Allows input to be entered, the input device will then send text events through the input manager
+        /// </summary>
+        public virtual void EnableTextInput() { }
+
+        /// <summary>
+        /// Disallows text input to be entered, will close any IME active and stop sending text events
+        /// </summary>
+        public virtual void DisableTextInput() { }
+
+        /// <summary>
+        /// Use this function to set the rectangle used to type Unicode text inputs if IME supported.
+        /// In SDL2, this method call gives the OS a hint for where to show the candidate text list, since the OS doesn't know where you want to draw the text you received via SDL_TEXTEDITING event.
+        /// </summary>
+        public virtual void SetTextInputRect(Rectangle rect) { }
 
         /// <summary>
 		/// Use this event to retrieve text for objects like textbox's.
@@ -104,7 +118,6 @@ namespace Microsoft.Xna.Framework {
 		public event EventHandler<TextInputEventArgs> TextInput;
 
         internal bool IsTextInputHandled { get { return TextInput != null; } }
-#endif
 
 		#endregion Events
 
@@ -145,12 +158,10 @@ namespace Microsoft.Xna.Framework {
             EventHelpers.Raise(this, ScreenDeviceNameChanged, EventArgs.Empty);
 		}
 
-#if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
 		protected void OnTextInput(object sender, TextInputEventArgs e)
 		{
             EventHelpers.Raise(this, TextInput, e);
 		}
-#endif
 
 		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 		protected abstract void SetTitle (string title);

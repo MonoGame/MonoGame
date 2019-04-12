@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Utilities;
+using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
@@ -141,56 +142,12 @@ namespace Microsoft.Xna.Framework
                 {
                     if (_view.IsTextInputHandled)
                     {
-                        int len = 0;
-                        int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
-                        byte currentByte = 0;
-                        int charByteSize = 0; // UTF8 char lenght to decode
-                        int remainingShift = 0;
                         unsafe
                         {
-                            while ((currentByte = Marshal.ReadByte((IntPtr)ev.Text.Text, len)) != 0)
-                            {
-                                // we're reading the first UTF8 byte, we need to check if it's multibyte
-                                if (charByteSize == 0)
-                                {
-                                    if (currentByte < 192)
-                                        charByteSize = 1;
-                                    else if (currentByte < 224)
-                                        charByteSize = 2;
-                                    else if (currentByte < 240)
-                                        charByteSize = 3;
-                                    else
-                                        charByteSize = 4;
+                            var inputText = SDLBufferToString(ev.Text.Text);
+                            var key = KeyboardUtil.ToXna(inputText[0]);
 
-                                    utf8character = 0;
-                                    remainingShift = 4;
-                                }
-
-                                // assembling the character
-                                utf8character <<= 8;
-                                utf8character |= currentByte;
-
-                                charByteSize--;
-                                remainingShift--;
-
-                                if (charByteSize == 0) // finished decoding the current character
-                                {
-                                    utf8character <<= remainingShift * 8; // shifting it to full UTF8 scope
-
-                                    // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
-                                    // so we need to convert it to Unicode codepoint and check if it's within the supported range
-                                    int codepoint = UTF8ToUnicode(utf8character);
-
-                                    if (codepoint >= 0 && codepoint < 0xFFFF)
-                                    {
-                                        var key = KeyboardUtil.ToXna(codepoint);
-                                        _view.CallTextInput((char)codepoint, key);
-                                    }
-                                    // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
-                                }
-
-                                len++;
-                            }
+                            _view.CallTextInput(inputText, key);
                         }
                     }
                 }
@@ -233,6 +190,23 @@ namespace Microsoft.Xna.Framework
                 return (byte1 % 0x8) * 0x40 * 0x40 * 0x40 + (byte2 % 0x40) * 0x40 * 0x40 + (byte3 % 0x40) * 0x40 + (byte4 % 0x40);
             else
                 return -1;
+        }
+
+        private unsafe string SDLBufferToString(byte* text, int size = 32)
+        {
+            byte[] sourceBytes = new byte[size];
+            int length = 0;
+
+            for (int i = 0; i < size; i++)
+            {
+                if (text[i] == 0)
+                    break;
+
+                sourceBytes[i] = text[i];
+                length++;
+            }
+
+            return Encoding.UTF8.GetString(sourceBytes, 0, length);
         }
 
         public override void StartRunLoop()

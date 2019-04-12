@@ -3,6 +3,10 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input.Touch;
 using MonoGame.Framework;
@@ -11,7 +15,7 @@ using MonoGame.Framework;
 namespace Microsoft.Xna.Framework.Windows
 {
     internal static class MessageExtensions
-    {     
+    {
         public static int GetPointerId(this Message msg)
         {
             return (short)msg.WParam;
@@ -34,6 +38,18 @@ namespace Microsoft.Xna.Framework.Windows
     {
         private readonly WinFormsGameWindow _window;
 
+        private string InputText = string.Empty;
+        public bool TextInputEnabled { get; private set; }
+
+        [DllImport("imm32.dll", EntryPoint = "ImmGetContext")]
+        public static extern IntPtr ImmGetContext(IntPtr hWnd);
+
+        [DllImport("imm32.dll", EntryPoint = "ImmReleaseContext")]
+        public static extern IntPtr ImmReleaseContext(IntPtr hWnd, IntPtr context);
+
+        [DllImport("imm32.dll", EntryPoint = "ImmGetCompositionString", CharSet = CharSet.Unicode)]
+        public static extern int ImmGetCompositionString(IntPtr himc, int dwIndex, IntPtr buf, int bufLen);
+
         public const int WM_MOUSEHWHEEL = 0x020E;
         public const int WM_POINTERUP = 0x0247;
         public const int WM_POINTERDOWN = 0x0246;
@@ -45,6 +61,12 @@ namespace Microsoft.Xna.Framework.Windows
         public const int WM_EXITSIZEMOVE = 0x0232;
 
         public const int WM_SYSCOMMAND = 0x0112;
+
+        public const int WM_IME_CHAR = 0x0286;
+        public const int WM_IME_COMPOSITION = 0x010F;
+        public const int WM_IME_ENDCOMPOSITION = 0x010E;
+
+        public const int GCS_COMPSTR = 0x0008;
 
         public bool AllowAltF4 = true;
 
@@ -63,9 +85,27 @@ namespace Microsoft.Xna.Framework.Windows
 
         public void CenterOnPrimaryMonitor()
         {
-             Location = new System.Drawing.Point(
-                 (Screen.PrimaryScreen.WorkingArea.Width  - Width ) / 2,
-                 (Screen.PrimaryScreen.WorkingArea.Height - Height) / 2);
+            Location = new System.Drawing.Point(
+                (Screen.PrimaryScreen.WorkingArea.Width - Width) / 2,
+                (Screen.PrimaryScreen.WorkingArea.Height - Height) / 2);
+        }
+
+        public void EnableTextInput()
+        {
+            if (!TextInputEnabled)
+            {
+                ImeContext.Enable(Handle);
+                TextInputEnabled = true;
+            }
+        }
+
+        public void DisableTextInput()
+        {
+            if (TextInputEnabled)
+            {
+                ImeContext.Disable(Handle);
+                TextInputEnabled = false;
+            }
         }
 
         [System.Security.Permissions.PermissionSet(System.Security.Permissions.SecurityAction.Demand, Name = "FullTrust")]
@@ -100,7 +140,7 @@ namespace Microsoft.Xna.Framework.Windows
 
                             if (_window.IsFullScreen && _window.HardwareModeSwitch)
                                 this.WindowState = FormWindowState.Minimized;
- 		 
+
                             break;
                     }
                     break;
@@ -159,7 +199,61 @@ namespace Microsoft.Xna.Framework.Windows
                 _window.TouchPanelState.AddEvent(id, state, vec, false);
             }
 
+            if (TextInputEnabled)
+            {
+                switch (m.Msg)
+                {
+                    case WM_IME_ENDCOMPOSITION:
+                        if (InputText != string.Empty)
+                        {
+                            var inputEvent = new TextInputEventArgs();
+                            inputEvent.Type = TextInputEventType.Input;
+                            inputEvent.Text = InputText;
+                            _window.OnTextInput(inputEvent);
+                        }
+
+                        InputText = string.Empty;
+                        break;
+                    case WM_IME_CHAR:
+                        int charInt = m.WParam.ToInt32();
+                        InputText += (char)charInt;
+                        return;
+                    case WM_IME_COMPOSITION:
+                        OnComposition(ref m);
+                        break;
+                }
+            }
+
             base.WndProc(ref m);
+        }
+
+        private unsafe string GetCompositionString(IntPtr context, int type)
+        {
+            int len = ImmGetCompositionString(context, type, IntPtr.Zero, 0);
+            byte[] data = new byte[len];
+
+            fixed (byte* dataPtr = data)
+            {
+                ImmGetCompositionString(context, type, new IntPtr(dataPtr), len);
+            }
+
+            return Encoding.Unicode.GetString(data);
+        }
+
+        private void OnComposition(ref Message message)
+        {
+            if ((message.LParam.ToInt32() & GCS_COMPSTR) != 0)
+            {
+                var context = ImmGetContext(Handle);
+                var compString = GetCompositionString(context, GCS_COMPSTR);
+
+                var compEvent = new TextInputEventArgs();
+                compEvent.Type = TextInputEventType.Composition;
+                compEvent.Text = compString;
+                _window.OnTextInput(compEvent);
+
+                ImmReleaseContext(this.Handle, context);
+            }
         }
     }
 }

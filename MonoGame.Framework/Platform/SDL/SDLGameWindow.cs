@@ -300,6 +300,11 @@ namespace Microsoft.Xna.Framework
             OnClientSizeChanged();
         }
 
+        public void CallTextInput(string text, Keys key = Keys.None)
+        {
+            OnTextInput(this, new TextInputEventArgs() { Key = key, Text = text, Type = TextInputEventType.Input });
+        }
+
         public void CallTextInput(char c, Keys key = Keys.None)
         {
             OnTextInput(this, new TextInputEventArgs(c, key));
@@ -333,6 +338,28 @@ namespace Microsoft.Xna.Framework
                 Sdl.FreeSurface(_icon);
 
             _disposed = true;
+        }
+
+        public override void EnableTextInput()
+        {
+            Sdl.Keyboard.StartTextInput();
+        }
+
+        public override void DisableTextInput()
+        {
+            Sdl.Keyboard.StopTextInput();
+        }
+
+        public override void SetTextInputRect(Rectangle rect)
+        {
+            var sdlRect = new Sdl.Rectangle()
+            {
+                Width = rect.Width,
+                Height = rect.Height,
+                X = rect.X,
+                Y = rect.Y
+            };
+            Sdl.Keyboard.SetTextInputRect(ref sdlRect);
         }
     }
 }

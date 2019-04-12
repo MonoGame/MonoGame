@@ -7,26 +7,35 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
+    public enum TextInputEventType
+    {
+        /// <summary>
+        /// When new text is entered
+        /// </summary>
+        Input,
+
+        /// <summary>
+        /// This the current text that has not yet been entered but is still being edited
+        /// </summary>
+        Composition,
+    }
+
     /// <summary>
     /// This class is used for the game window's TextInput event as EventArgs.
     /// </summary>
     public class TextInputEventArgs : EventArgs
     {
-        char character;
-        public TextInputEventArgs(char character, Keys key = Keys.None)
+        public string Text = string.Empty;
+        public TextInputEventType Type;
+
+        public TextInputEventArgs(char text, Keys key = Keys.None)
         {
-            this.character = character;
+            this.Text = text.ToString();
             this.Key = key;
         }
-        public char Character
-        {
-            get
-            {
-                return character;
-            }
-        }
-        public Keys Key {
-            get; private set;
-        }
+
+        public TextInputEventArgs() { }
+
+        public Keys Key { get; set; } = Keys.None;
     }
 }
