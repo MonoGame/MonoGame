@@ -83,7 +83,7 @@ namespace MonoGame.Tests.Framework
         [TestCase(MathHelperD.PiOver4, 0.78539816339744828d)]
         [TestCase(MathHelperD.PiOver2, 1.5707963267948966d)]
         [TestCase(MathHelperD.Pi, 3.1415926535897931d)]
-        [TestCase(MathHelperD.TwoPi, 6.28318530717959d)]
+        [TestCase(MathHelperD.TwoPi, 6.2831853071795862)]
         public void PiConstantsAreExpectedValues(double actualValue, double expectedValue)
         {
             Assert.AreEqual(expectedValue, actualValue);
@@ -147,7 +147,7 @@ namespace MonoGame.Tests.Framework
         public void WrapAngleReturnsExpectedValues(double angle, double expectedValue)
         {
             var actualValue = MathHelperD.WrapAngle(angle);
-            Assert.AreEqual(expectedValue, actualValue);
+            Assert.AreEqual(expectedValue, actualValue, 0.00000000000001d);
         }
     }
 }
