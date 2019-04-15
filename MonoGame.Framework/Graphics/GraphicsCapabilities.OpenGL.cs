@@ -114,6 +114,12 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger((GetPName)GetParamName.MaxSamples, out _maxMultiSampleCount);
 
             SupportsInstancing = GL.VertexAttribDivisor != null;
+
+#if GLES
+            SupportsSeparateBlendStates = false;
+#else
+            SupportsSeparateBlendStates = device.glMajorVersion >= 4 || GL.Extensions.Contains("GL_ARB_draw_buffers_blend");
+#endif
         }
 
     }

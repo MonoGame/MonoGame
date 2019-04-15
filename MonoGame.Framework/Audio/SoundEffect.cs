@@ -29,6 +29,10 @@ namespace Microsoft.Xna.Framework.Audio
         // Only used from SoundEffect.FromStream.
         private SoundEffect(Stream stream)
         {
+            Initialize();
+            if (_systemState != SoundSystemState.Initialized)
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
+
             /*
               The Stream object must point to the head of a valid PCM wave file. Also, this wave file must be in the RIFF bitstream format.
               The audio format has the following restrictions:
@@ -44,6 +48,10 @@ namespace Microsoft.Xna.Framework.Audio
         // Only used from SoundEffectReader.
         internal SoundEffect(byte[] header, byte[] buffer, int bufferSize, int durationMs, int loopStart, int loopLength)
         {
+            Initialize();
+            if (_systemState != SoundSystemState.Initialized)
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
+
             _duration = TimeSpan.FromMilliseconds(durationMs);
 
             // Peek at the format... handle regular PCM data.
@@ -64,6 +72,10 @@ namespace Microsoft.Xna.Framework.Audio
         // Only used from XACT WaveBank.
         internal SoundEffect(MiniFormatTag codec, byte[] buffer, int channels, int sampleRate, int blockAlignment, int loopStart, int loopLength)
         {
+            Initialize();
+            if (_systemState != SoundSystemState.Initialized)
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
+
             // Handle the common case... the rest is platform specific.
             if (codec == MiniFormatTag.Pcm)
             {
@@ -73,6 +85,41 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             PlatformInitializeXact(codec, buffer, channels, sampleRate, blockAlignment, loopStart, loopLength, out _duration);
+        }
+
+        #endregion
+
+        #region Audio System Initialization
+
+        internal enum SoundSystemState
+        {
+            NotInitialized,
+            Initialized,
+            FailedToInitialized
+        }
+
+        internal static SoundSystemState _systemState = SoundSystemState.NotInitialized;
+
+        /// <summary>
+        /// Initializes the sound system for SoundEffect support.
+        /// This method is automatically called when a SoundEffect is loaded, a DynamicSoundEffectInstance is created, or Microphone.All is queried.
+        /// You can however call this method manually (preferably in, or before the Game constructor) to catch any Exception that may occur during the sound system initialization (and act accordingly).
+        /// </summary>
+        public static void Initialize()
+        {
+            if (_systemState != SoundSystemState.NotInitialized)
+                return;
+
+            try
+            {
+                PlatformInitialize();
+                _systemState = SoundSystemState.Initialized;
+            }
+            catch (Exception)
+            {
+                _systemState = SoundSystemState.FailedToInitialized;
+                throw;
+            }
         }
 
         #endregion
@@ -104,6 +151,10 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>This only supports uncompressed 16bit PCM wav data.</remarks>
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
+            Initialize();
+            if (_systemState != SoundSystemState.Initialized)
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
+
             if (sampleRate < 8000 || sampleRate > 48000)
                 throw new ArgumentOutOfRangeException("sampleRate");
             if ((int)channels != 1 && (int)channels != 2)

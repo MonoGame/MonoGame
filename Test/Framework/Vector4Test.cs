@@ -185,6 +185,48 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(z, vector4.Z);
             Assert.AreEqual(w, vector4.W);
         }
+
+        [Test]
+        public void Round()
+        {
+            Vector4 vector4 = new Vector4(0.0f, 0.4f, 0.6f, 1.0f);
+
+            // CEILING
+
+            Vector4 ceilMember = vector4;
+            ceilMember.Ceiling();
+
+            Vector4 ceilResult;
+            Vector4.Ceiling(ref vector4, out ceilResult);
+
+            Assert.AreEqual(new Vector4(0.0f, 1.0f, 1.0f, 1.0f), ceilMember);
+            Assert.AreEqual(new Vector4(0.0f, 1.0f, 1.0f, 1.0f), Vector4.Ceiling(vector4));
+            Assert.AreEqual(new Vector4(0.0f, 1.0f, 1.0f, 1.0f), ceilResult);
+
+            // FLOOR
+
+            Vector4 floorMember = vector4;
+            floorMember.Floor();
+
+            Vector4 floorResult;
+            Vector4.Floor(ref vector4, out floorResult);
+
+            Assert.AreEqual(new Vector4(0.0f, 0.0f, 0.0f, 1.0f), floorMember);
+            Assert.AreEqual(new Vector4(0.0f, 0.0f, 0.0f, 1.0f), Vector4.Floor(vector4));
+            Assert.AreEqual(new Vector4(0.0f, 0.0f, 0.0f, 1.0f), floorResult);
+
+            // ROUND
+
+            Vector4 roundMember = vector4;
+            roundMember.Round();
+
+            Vector4 roundResult;
+            Vector4.Round(ref vector4, out roundResult);
+
+            Assert.AreEqual(new Vector4(0.0f, 0.0f, 1.0f, 1.0f), roundMember);
+            Assert.AreEqual(new Vector4(0.0f, 0.0f, 1.0f, 1.0f), Vector4.Round(vector4));
+            Assert.AreEqual(new Vector4(0.0f, 0.0f, 1.0f, 1.0f), roundResult);
+        }
 #endif
     }
 }

@@ -95,16 +95,6 @@ namespace Microsoft.Xna.Framework
             base(game)
         {
             game.Services.AddService(typeof(iOSGamePlatform), this);
-			
-			// Setup our OpenALSoundController to handle our SoundBuffer pools
-            try
-            {
-                OpenALSoundController soundControllerInstance = OpenALSoundController.GetInstance;
-            }
-            catch (DllNotFoundException ex)
-            {
-                throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
-            }
 
             //This also runs the TitleContainer static constructor, ensuring it is done on the main thread
             Directory.SetCurrentDirectory(TitleContainer.Location);

@@ -944,11 +944,22 @@ namespace MonoGame.OpenGL
         internal delegate void BlendEquationSeparateDelegate (BlendEquationMode colorMode, BlendEquationMode alphaMode);
         internal static BlendEquationSeparateDelegate BlendEquationSeparate;
 
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void BlendEquationSeparateiDelegate(int buffer, BlendEquationMode colorMode, BlendEquationMode alphaMode);
+        internal static BlendEquationSeparateiDelegate BlendEquationSeparatei;
+
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
         internal delegate void BlendFuncSeparateDelegate (BlendingFactorSrc colorSrc, BlendingFactorDest colorDst,
             BlendingFactorSrc alphaSrc, BlendingFactorDest alphaDst);
         internal static BlendFuncSeparateDelegate BlendFuncSeparate;
+
+        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [MonoNativeFunctionWrapper]
+        internal delegate void BlendFuncSeparateiDelegate(int buffer, BlendingFactorSrc colorSrc, BlendingFactorDest colorDst,
+            BlendingFactorSrc alphaSrc, BlendingFactorDest alphaDst);
+        internal static BlendFuncSeparateiDelegate BlendFuncSeparatei;
 
         [System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
@@ -1221,7 +1232,9 @@ namespace MonoGame.OpenGL
 
             BlendColor = LoadFunction<BlendColorDelegate> ("glBlendColor");
             BlendEquationSeparate = LoadFunction<BlendEquationSeparateDelegate> ("glBlendEquationSeparate");
+            BlendEquationSeparatei = LoadFunction<BlendEquationSeparateiDelegate>("glBlendEquationSeparatei");
             BlendFuncSeparate = LoadFunction<BlendFuncSeparateDelegate> ("glBlendFuncSeparate");
+            BlendFuncSeparatei = LoadFunction<BlendFuncSeparateiDelegate>("glBlendFuncSeparatei");
             ColorMask = LoadFunction<ColorMaskDelegate> ("glColorMask");
             DepthFunc = LoadFunction<DepthFuncDelegate> ("glDepthFunc");
             DepthMask = LoadFunction<DepthMaskDelegate> ("glDepthMask");
@@ -1334,6 +1347,14 @@ namespace MonoGame.OpenGL
                     GL.RenderbufferStorageMultisample = LoadFunction<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleNV");
                     GL.BlitFramebuffer = LoadFunction<GL.BlitFramebufferDelegate>("glBlitFramebufferNV");
                 }
+            }
+            if (GL.BlendFuncSeparatei == null && Extensions.Contains("GL_ARB_draw_buffers_blend"))
+            {
+                GL.BlendFuncSeparatei = LoadFunction<GL.BlendFuncSeparateiDelegate>("BlendFuncSeparateiARB");
+            }
+            if (GL.BlendEquationSeparatei == null && Extensions.Contains("GL_ARB_draw_buffers_blend"))
+            {
+                GL.BlendEquationSeparatei = LoadFunction<GL.BlendEquationSeparateiDelegate>("BlendEquationSeparateiARB");
             }
         }
 

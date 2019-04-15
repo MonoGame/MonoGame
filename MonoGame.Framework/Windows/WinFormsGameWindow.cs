@@ -43,6 +43,9 @@ namespace MonoGame.Framework
         // true if window position was moved either through code or by dragging/resizing the form
         private bool _wasMoved;
 
+        private bool _isResizeTickEnabled;
+        private readonly System.Timers.Timer _resizeTickTimer;
+
         #region Internal Properties
 
         internal Game Game { get; private set; }
@@ -156,9 +159,13 @@ namespace MonoGame.Framework
             Form.MouseEnter += OnMouseEnter;
             Form.MouseLeave += OnMouseLeave;            
 
+            _resizeTickTimer = new System.Timers.Timer(1) { SynchronizingObject = Form, AutoReset = false };
+            _resizeTickTimer.Elapsed += OnResizeTick;
+
             Form.Activated += OnActivated;
             Form.Deactivate += OnDeactivate;
             Form.Resize += OnResize;
+            Form.ResizeBegin += OnResizeBegin;
             Form.ResizeEnd += OnResizeEnd;
 
             Form.KeyPress += OnKeyPress;
@@ -376,8 +383,26 @@ namespace MonoGame.Framework
             OnClientSizeChanged();
         }
 
+        private void OnResizeBegin(object sender, EventArgs e)
+        {
+            _isResizeTickEnabled = true;
+            _resizeTickTimer.Enabled = true;
+        }
+
+        private void OnResizeTick(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (!_isResizeTickEnabled)
+                return;
+            UpdateWindows();
+            Game.Tick();
+            _resizeTickTimer.Enabled = true;
+        }
+
         private void OnResizeEnd(object sender, EventArgs eventArgs)
         {
+            _isResizeTickEnabled = false;
+            _resizeTickTimer.Enabled = false;
+
             _wasMoved = true;
             if (Game.Window == this)
             {

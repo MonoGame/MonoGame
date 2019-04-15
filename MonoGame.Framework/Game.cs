@@ -140,7 +140,8 @@ namespace Microsoft.Xna.Framework
 
                     ContentTypeReaderManager.ClearTypeCreators();
 
-                    SoundEffect.PlatformShutdown();
+                    if (SoundEffect._systemState == SoundEffect.SoundSystemState.Initialized)
+                        SoundEffect.PlatformShutdown();
                 }
 #if ANDROID
                 Activity = null;
@@ -444,7 +445,7 @@ namespace Microsoft.Xna.Framework
 #if WINDOWS && !DESKTOPGL
                 // Sleep for as long as possible without overshooting the update time
                 var sleepTime = (TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
-                Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
+                MonoGame.Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
 #endif
                 // Keep looping until it's time to perform the next update
                 goto RetryTick;

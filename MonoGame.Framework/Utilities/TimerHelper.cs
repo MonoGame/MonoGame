@@ -5,7 +5,7 @@
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Microsoft.Xna.Framework.Utilities
+namespace MonoGame.Utilities
 {
     internal static class TimerHelper
     {

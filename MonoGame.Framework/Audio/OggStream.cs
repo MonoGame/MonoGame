@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             alBufferIds = AL.GenBuffers(bufferCount);
             ALHelper.CheckError("Failed to generate buffers.");
-            alSourceId = OpenALSoundController.GetInstance.ReserveSource();
+            alSourceId = OpenALSoundController.Instance.ReserveSource();
 
             if (OggStreamer.Instance.XRam.IsInitialized)
             {
@@ -238,7 +238,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             AL.Source(alSourceId, ALSourcei.Buffer, 0);
             ALHelper.CheckError("Failed to free source from buffers.");
-            OpenALSoundController.GetInstance.RecycleSource(alSourceId);
+            OpenALSoundController.Instance.RecycleSource(alSourceId);
             AL.DeleteBuffers(alBufferIds);
             ALHelper.CheckError("Failed to delete buffer.");
             if (OggStreamer.Instance.Efx.IsInitialized)
