@@ -57,6 +57,11 @@ If you need help using MonoGame or have other questions we suggest you post on o
 
 If you are interested in contributing fixes or features to MonoGame, please read our [contributors guide](CONTRIBUTING.md) first.
 
+## Getting Started
+
+A full guide to getting started is available in the official documentation: http://www.monogame.net/documentation/?page=Setting_Up_MonoGame
+
+You can also directly grab a release from [GitHub](https://github.com/MonoGame/MonoGame/releases) or the [Downloads Page](http://www.monogame.net/downloads/).
 
 ## Source Code
 
@@ -97,6 +102,12 @@ A high level breakdown of the components of the framework:
  * Download release and development [installers and packages](http://www.monogame.net/downloads/).
  * Follow [@MonoGameTeam](https://twitter.com/monogameteam) on Twitter.
 
+## Projects using MonoGame
+
+ * [Nez](https://github.com/prime31/Nez) A lightweight 2D framework that sits on top of MonoGame/FNA
+ 
+Is your project missing? [Create a README PR](https://github.com/MonoGame/MonoGame/edit/develop/README.md) and add it!
+ 
 ## License
 
 The MonoGame project is under the [Microsoft Public License](https://opensource.org/licenses/MS-PL) except for a few portions of the code.  See the [LICENSE.txt](LICENSE.txt) file for more details.  Third-party libraries used by MonoGame are under their own licenses.  Please refer to those libraries for details on the license they use.
