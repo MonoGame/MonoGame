@@ -104,9 +104,7 @@ A high level breakdown of the components of the framework:
 
 ## Projects using MonoGame
 
- * [Nez](https://github.com/prime31/Nez) A lightweight 2D framework that sits on top of MonoGame/FNA
- 
-Is your project missing? [Create a README PR](https://github.com/MonoGame/MonoGame/edit/develop/README.md) and add it!
+ * [Awesome-MonoGame](https://github.com/aloisdeniel/awesome-monogame) A community-maintained list of MonoGame Projects.
  
 ## License
 
