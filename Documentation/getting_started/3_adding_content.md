@@ -37,7 +37,7 @@ Now that we have added the content, it's time to load it. First declare a new va
 ```csharp
 public class Game1 : Game
 {
-    Texture2D textureBall;
+    Texture2D ballTexture;
 
     GraphicsDeviceManager graphics;
 ```
@@ -51,7 +51,7 @@ protected override void LoadContent()
     spriteBatch = new SpriteBatch(GraphicsDevice);
 
     // TODO: use this.Content to load your game content here
-    textureBall = Content.Load<Texture2D>("ball");
+    ballTexture = Content.Load<Texture2D>("ball");
 }
 ```
 
@@ -64,7 +64,7 @@ protected override void Draw(GameTime gameTime)
 
     // TODO: Add your drawing code here
     spriteBatch.Begin();
-    spriteBatch.Draw(textureBall, new Vector2(0, 0), Color.White);
+    spriteBatch.Draw(ballTexture, new Vector2(0, 0), Color.White);
     spriteBatch.End();
 
     base.Draw(gameTime);
