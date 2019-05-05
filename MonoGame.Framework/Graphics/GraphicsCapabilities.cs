@@ -57,6 +57,11 @@ namespace Microsoft.Xna.Framework.Graphics
         internal bool SupportsEtc1 { get; private set; }
 
         /// <summary>
+        /// Gets the support for ETC2
+        /// </summary>
+        internal bool SupportsEtc2 { get; private set; }
+
+        /// <summary>
         /// Gets the support for ATITC
         /// </summary>
         internal bool SupportsAtitc { get; private set; }

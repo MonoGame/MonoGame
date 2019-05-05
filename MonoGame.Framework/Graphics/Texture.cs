@@ -101,6 +101,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.RgbPvrtc2Bpp:
                 case SurfaceFormat.RgbaPvrtc2Bpp:
                 case SurfaceFormat.RgbEtc1:
+                case SurfaceFormat.Rgb8Etc2:
+                case SurfaceFormat.Srgb8Etc2:
+                case SurfaceFormat.Rgb8A1Etc2:
+                case SurfaceFormat.Srgb8A1Etc2:
                 case SurfaceFormat.Dxt3:
                 case SurfaceFormat.Dxt3SRgb:
                 case SurfaceFormat.Dxt5:
