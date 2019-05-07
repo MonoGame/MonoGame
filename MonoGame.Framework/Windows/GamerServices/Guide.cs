@@ -44,15 +44,16 @@ using MGXna_Framework = global::Microsoft.Xna.Framework;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 #if WINDOWS_UAP
 using System.Threading.Tasks;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Store;
 using Windows.UI.Core;
 using Windows.UI.Popups;
-using Windows.System;
-using Microsoft.Xna.Framework.Input;
+using Windows.Services.Store;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 #else
 using System.Runtime.Remoting.Messaging;
 #if !(WINDOWS && DIRECTX)
@@ -66,59 +67,233 @@ namespace Microsoft.Xna.Framework.GamerServices
 {
 
 
-	public static class Guide
-	{
-		private static bool isScreenSaverEnabled;
-		private static bool isTrialMode = false;
-		private static bool isVisible;
-		private static bool simulateTrialMode;
+    public static class Guide
+    {
+        private static bool isScreenSaverEnabled;
+        private static bool isTrialMode = false;
+        private static bool isVisible;
+        private static bool simulateTrialMode;
 
 #if WINDOWS_UAP
-	    private static readonly CoreDispatcher _dispatcher;
-#endif 
+        private static readonly CoreDispatcher _dispatcher;
+
+
+        private static SwapChainPanel swapChainPanel;
+        //We make this populate on demand rather than in CTOR to avoid issues where the XAML isnt rendered yet. We dont switch to UI thread because this should only be used in something thats already on the UI thread and dispatcher inside dispatcher causes deadlocks.
+        private static Grid containerGrid;
+        public static Grid ContainerGrid
+        {
+            get
+            {
+                if (containerGrid == null)
+                {
+                    var thing= (Page)((Frame)Windows.UI.Xaml.Window.Current.Content)?.Content;
+                    UIElement content = ((UIElement)(thing?.Content));
+
+                    if (content is SwapChainPanel)
+                    {
+                        Debug.WriteLine(content);
+
+                        SwapChainPanel scPanel = (SwapChainPanel) content;
+
+                        swapChainPanel = scPanel;
+
+                        Page root = (Page)scPanel.Parent;
+
+                        root.Content = null;
+
+                        Grid monogameContainerGrid = new Grid();
+                        monogameContainerGrid.Name = "monogameContainerGrid";
+                        monogameContainerGrid.Children.Add(content);
+                        containerGrid = monogameContainerGrid;
+
+                        root.Content = monogameContainerGrid;
+                    }
+                    else if(content is Grid)
+                    {
+                        containerGrid = ((Grid) ((Page) ((Frame) Windows.UI.Xaml.Window.Current.Content)?.Content)?.Content);
+
+                        if (swapChainPanel == null)
+                        {
+                            swapChainPanel = (SwapChainPanel)containerGrid.Children.First(t => t is SwapChainPanel);
+                        }
+                    }
+                }
+
+
+                return containerGrid;
+            }
+        }
+
+        private static bool _wasMouseHidden;
+
+        private static CoreWindow _coreWindow;
+        private static CoreWindow coreWindow
+        {
+            get
+            {
+                if (_coreWindow == null)
+                {
+                    _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        _coreWindow = Windows.UI.Xaml.Window.Current.CoreWindow;
+                    }).AsTask().Wait();
+                }
+
+                return _coreWindow;
+            }
+        }
+
+        internal static void SetCursor(bool visible)
+        {
+            var asyncResult = coreWindow.Dispatcher.RunIdleAsync((e) =>
+            {
+                if (visible)
+                    coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
+                else
+                    coreWindow.PointerCursor = null;
+            });
+        }
+
+        internal static bool GetCursorVisibility()
+        {
+            bool isVisible = false;
+            var asyncResult = coreWindow.Dispatcher.RunIdleAsync((e) => { isVisible = coreWindow.PointerCursor != null; });
+            return isVisible;
+        }
+
+        private static void ShowMouse()
+        {
+            if (!GetCursorVisibility())
+            {
+                _wasMouseHidden = true;
+                SetCursor(true);
+            }
+            else
+            {
+                _wasMouseHidden = false;
+            }
+        }
+
+        private static void HideMouse()
+        {
+            if (_wasMouseHidden)
+            {
+                SetCursor(false);
+            }
+        }
+
+#endif
 
         static Guide()
         {
-#if WINDOWS_UAP
+
+#if WINDOWS_STOREAPP || WINDOWS_UAP
             _dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
+#endif
 
-
+#if WINDOWS_STOREAPP
             var licenseInformation = CurrentApp.LicenseInformation;
             licenseInformation.LicenseChanged += () => isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+            isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+#elif WINDOWS_UAP
+            var context = StoreContext.GetDefault();
+            var task = Task.Run(async () => await context.GetAppLicenseAsync());
 
+            StoreAppLicense licenseInformation = task.Result;
             isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 #endif
         }
 
-		delegate string ShowKeyboardInputDelegate(
-         MGXna_Framework.PlayerIndex player,           
+        delegate string ShowKeyboardInputDelegate(
+         MGXna_Framework.PlayerIndex player,
          string title,
          string description,
          string defaultText,
-		 bool usePasswordMode);
+         bool usePasswordMode);
 
-		private static string ShowKeyboardInput(
-         MGXna_Framework.PlayerIndex player,           
+#if WINDOWS_UAP
+        public static IAsyncResult AsApm<T>(this Task<T> task,
+            AsyncCallback callback,
+            object state)
+        {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
+            var tcs = new TaskCompletionSource<T>(state);
+            task.ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                    tcs.TrySetException(t.Exception.InnerExceptions);
+                else if (t.IsCanceled)
+                    tcs.TrySetCanceled();
+                else
+                {
+                    tcs.TrySetResult(t.Result);
+                }
+
+                callback?.Invoke(tcs.Task);
+            }, TaskScheduler.Default);
+            return tcs.Task;
+        }
+
+        private static TaskCompletionSource<string> showKeyboardInputTaskCompletion;
+        private static IAsyncResult ShowKeyboardInput(
+            MGXna_Framework.PlayerIndex player,
+            string title,
+            string description,
+            string defaultText,
+            bool usePasswordMode,
+            AsyncCallback callback,
+            Object state)
+        {
+            showKeyboardInputTaskCompletion = new TaskCompletionSource<string>(state);
+            _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                KeyboardInputUserControl keyboardInputUserControl = new KeyboardInputUserControl(showKeyboardInputTaskCompletion);
+                
+                ContainerGrid.Children.Add(keyboardInputUserControl);
+                keyboardInputUserControl.SetValues(title,description, usePasswordMode, defaultText, () =>
+                {
+                    RemoveElementFromUI(keyboardInputUserControl);
+                    IsVisible = false;
+                    HideMouse();
+                });
+        }).AsTask().Wait();
+
+            ShowMouse();
+
+            return showKeyboardInputTaskCompletion.Task.AsApm(callback, state);
+        }
+
+        private static void RemoveElementFromUI(UIElement element)
+        {
+            ContainerGrid.Children.Remove(element);
+        }
+#else
+        private static string ShowKeyboardInput(
+         MGXna_Framework.PlayerIndex player,
          string title,
          string description,
          string defaultText,
-		 bool usePasswordMode)
+         bool usePasswordMode)
         {
             throw new NotImplementedException();
-		}
+        }
+#endif
 
-		public static IAsyncResult BeginShowKeyboardInput (
+        public static IAsyncResult BeginShowKeyboardInput(
          MGXna_Framework.PlayerIndex player,
          string title,
          string description,
          string defaultText,
          AsyncCallback callback,
          Object state)
-		{
-		return BeginShowKeyboardInput(player, title, description, defaultText, callback, state, false );
-		}
+        {
+            return BeginShowKeyboardInput(player, title, description, defaultText, callback, state, false);
+        }
 
-		public static IAsyncResult BeginShowKeyboardInput (
+        public static IAsyncResult BeginShowKeyboardInput(
          MGXna_Framework.PlayerIndex player,
          string title,
          string description,
@@ -126,26 +301,37 @@ namespace Microsoft.Xna.Framework.GamerServices
          AsyncCallback callback,
          Object state,
          bool usePasswordMode)
-		{
+        {
+
+
+
 #if !WINDOWS_UAP
-			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
-
-			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
+            ShowKeyboardInputDelegate ski = ShowKeyboardInput;
+            return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
 #else
-            throw new NotImplementedException();
+            IsVisible = true;
+            return ShowKeyboardInput(player, title, description, defaultText, usePasswordMode, callback, state);
 #endif
-		}
 
-		public static string EndShowKeyboardInput (IAsyncResult result)
-		{
+        }
+
+        public static string EndShowKeyboardInput(IAsyncResult result)
+        {
 #if !WINDOWS_UAP
 			ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
 
 			return ski.EndInvoke(result);		
 #else
-            throw new NotImplementedException();
+            if (result.IsCompleted)
+            {
+                return ((Task<string>) result).Result;
+            }
+            else
+            {
+                return null;
+            }
 #endif
-		}
+        }
 
         delegate Nullable<int> ShowMessageBoxDelegate(string title,
          string text,
@@ -169,7 +355,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                 dialog.Commands.Add(new UICommand(button, null, dialog.Commands.Count));
 
             if (focusButton < 0 || focusButton >= dialog.Commands.Count)
-                throw new ArgumentOutOfRangeException("focusButton", "Specified argument was out of the range of valid values.");
+                throw new ArgumentOutOfRangeException(nameof(focusButton), "Specified argument was out of the range of valid values.");
             dialog.DefaultCommandIndex = (uint)focusButton;
 
             // The message box must be popped up on the UI thread.
@@ -217,8 +403,8 @@ namespace Microsoft.Xna.Framework.GamerServices
             return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);
 #else
 
-            var tcs = new TaskCompletionSource<int?>(state);
-            var task = Task.Run<int?>(() => ShowMessageBox(title, text, buttons, focusButton, icon));
+            TaskCompletionSource<int?> tcs = new TaskCompletionSource<int?>(state);
+            Task<int?> task = Task.Run<int?>(() => ShowMessageBox(title, text, buttons, focusButton, icon));
             task.ContinueWith(t =>
             {
                 // Copy the task result into the returned task.
@@ -230,8 +416,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                     tcs.TrySetResult(t.Result);
 
                 // Invoke the user callback if necessary.
-                if (callback != null)
-                    callback(tcs.Task);
+                callback?.Invoke(tcs.Task);
             });
             return tcs.Task;
 #endif
@@ -254,7 +439,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
 #if WINDOWS_UAP
             var x = (Task<int?>)result;
-            return  x.Result;
+            return x.Result;
 #else
             return ((ShowMessageBoxDelegate)result.AsyncState).EndInvoke(result);
 #endif
@@ -264,18 +449,18 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
         }
 
-		public static void Show ()
-		{
-			ShowSignIn(1, false);
-		}
+        public static void Show()
+        {
+            ShowSignIn(1, false);
+        }
 
-		public static void ShowSignIn (int paneCount, bool onlineOnly)
-		{
-			if ( paneCount != 1 && paneCount != 2 && paneCount != 4)
-			{
-				new ArgumentException("paneCount Can only be 1, 2 or 4 on Windows");
-				return;
-			}
+        public static void ShowSignIn(int paneCount, bool onlineOnly)
+        {
+            if (paneCount != 1 && paneCount != 2 && paneCount != 4)
+            {
+                new ArgumentException("paneCount Can only be 1, 2 or 4 on Windows");
+                return;
+            }
 
 #if !WINDOWS_UAP && !(WINDOWS && DIRECTX)
             Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();            
@@ -289,10 +474,10 @@ namespace Microsoft.Xna.Framework.GamerServices
                 GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication(null, null);
             }
 #endif
-		}
+        }
 
-		public static void ShowLeaderboard()
-		{
+        public static void ShowLeaderboard()
+        {
             //if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
             //{
             //    // Lazy load it
@@ -323,10 +508,10 @@ namespace Microsoft.Xna.Framework.GamerServices
             //        }
             //    }
             //}
-		}
+        }
 
-		public static void ShowAchievements()
-		{
+        public static void ShowAchievements()
+        {
             //if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
             //{
             //    // Lazy load it
@@ -357,65 +542,65 @@ namespace Microsoft.Xna.Framework.GamerServices
             //        }
             //    }
             //}
-		}
+        }
 
-		#region Properties
-		public static bool IsScreenSaverEnabled 
-		{ 
-			get
-			{
-				return isScreenSaverEnabled;
-			}
-			set
-			{
-				isScreenSaverEnabled = value;
-			}
-		}
+        #region Properties
+        public static bool IsScreenSaverEnabled
+        {
+            get
+            {
+                return isScreenSaverEnabled;
+            }
+            set
+            {
+                isScreenSaverEnabled = value;
+            }
+        }
 
-		public static bool IsTrialMode 
-		{ 
-			get
-			{
-				// If simulate trial mode is enabled then 
-				// we're in the trial mode.
+        public static bool IsTrialMode
+        {
+            get
+            {
+                // If simulate trial mode is enabled then 
+                // we're in the trial mode.
 #if DEBUG
                 return simulateTrialMode || isTrialMode;
 #else
                 return simulateTrialMode || isTrialMode;
 #endif
-			}
-		}
+            }
+        }
 
-		public static bool IsVisible 
-		{ 
-			get
-			{
-				return isVisible;
-			}
-			set
-			{
-				isVisible = value;
-			}
-		}
+        public static bool IsVisible
+        {
+            get
+            {
+                return isVisible;
+            }
+            set
+            {
+                isVisible = value;
+            }
+        }
 
-		public static bool SimulateTrialMode 
-		{ 
-			get
-			{
-				return simulateTrialMode;
-			}
-			set
-			{
-				simulateTrialMode = value;
-			}
-		}
+        public static bool SimulateTrialMode
+        {
+            get
+            {
+                return simulateTrialMode;
+            }
+            set
+            {
+                simulateTrialMode = value;
+            }
+        }
 
-		public static MGXna_Framework.GameWindow Window 
-		{ 
-			get;
-			set;
-		}
-		#endregion
+        public static MGXna_Framework.GameWindow Window
+        {
+            get;
+            set;
+        }
+        #endregion
 
         internal static void Initialise(MGXna_Framework.Game game)
         {
