@@ -210,7 +210,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.ReadPixels(rect.X, rect.Y, rect.Width, rect.Height, this.glFormat, this.glType, data);
             GraphicsExtensions.CheckGLError();
-            GraphicsDevice.DisposeFramebuffer(framebufferId);
+            GL.DeleteFramebuffers(1, ref framebufferId);
 #else
             var tSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
             GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
