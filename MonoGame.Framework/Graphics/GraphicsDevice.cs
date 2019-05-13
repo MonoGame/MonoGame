@@ -55,6 +55,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private IndexBuffer _indexBuffer;
         private bool _indexBufferDirty;
 
+        private VertexBufferBinding[] _vertexBufferBindings;
+
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
         private int _currentRenderTargetCount;
         private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
@@ -324,6 +326,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Force set the buffers and shaders on next ApplyState() call
             _vertexBuffers = new VertexBufferBindings(_maxVertexBufferSlots);
+            _vertexBufferBindings = new VertexBufferBinding[_maxVertexBufferSlots];
             _vertexBuffersDirty = true;
             _indexBufferDirty = true;
             _vertexShaderDirty = true;
@@ -889,6 +892,54 @@ namespace Microsoft.Xna.Framework.Graphics
             _vertexBuffersDirty |= (vertexBuffer == null)
                                    ? _vertexBuffers.Clear()
                                    : _vertexBuffers.Set(vertexBuffer, vertexOffset);
+        }
+
+        private void _SetVertexBuffers(VertexBufferBinding[] vertexBuffers, int bindingCount)
+        {
+            if (vertexBuffers == null || vertexBuffers.Length == 0 || bindingCount == 0)
+            {
+                _vertexBuffersDirty |= _vertexBuffers.Clear();
+            }
+            else
+            {
+                if (vertexBuffers.Length > _maxVertexBufferSlots || bindingCount > _maxVertexBufferSlots)
+                {
+                    var message = string.Format(CultureInfo.InvariantCulture, "Max number of vertex buffers is {0}.", _maxVertexBufferSlots);
+                    throw new ArgumentOutOfRangeException("vertexBuffers", message);
+                }
+
+                _vertexBuffersDirty |= _vertexBuffers.Set(vertexBuffers, bindingCount);
+            }
+        }
+
+        public void SetVertexBuffers(VertexBufferBinding vertexBuffer)
+        {
+            _vertexBufferBindings[0] = vertexBuffer;
+            _SetVertexBuffers(_vertexBufferBindings, 1);
+        }
+
+        public void SetVertexBuffers(VertexBufferBinding vertexBufferA, VertexBufferBinding vertexBufferB)
+        {
+            _vertexBufferBindings[0] = vertexBufferA;
+            _vertexBufferBindings[1] = vertexBufferB;
+            _SetVertexBuffers(_vertexBufferBindings, 2);
+        }
+
+        public void SetVertexBuffers(VertexBufferBinding vertexBufferA, VertexBufferBinding vertexBufferB, VertexBufferBinding vertexBufferC)
+        {
+            _vertexBufferBindings[0] = vertexBufferA;
+            _vertexBufferBindings[1] = vertexBufferB;
+            _vertexBufferBindings[2] = vertexBufferC;
+            _SetVertexBuffers(_vertexBufferBindings, 3);
+        }
+
+        public void SetVertexBuffers(VertexBufferBinding vertexBufferA, VertexBufferBinding vertexBufferB, VertexBufferBinding vertexBufferC, VertexBufferBinding vertexBufferD)
+        {
+            _vertexBufferBindings[0] = vertexBufferA;
+            _vertexBufferBindings[1] = vertexBufferB;
+            _vertexBufferBindings[2] = vertexBufferC;
+            _vertexBufferBindings[3] = vertexBufferD;
+            _SetVertexBuffers(_vertexBufferBindings, 4);
         }
 
         public void SetVertexBuffers(params VertexBufferBinding[] vertexBuffers)
