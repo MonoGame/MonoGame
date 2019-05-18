@@ -177,11 +177,26 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// this font.</returns>
 		public Vector2 MeasureString(string text)
 		{
-			var source = new CharacterSource(text);
+			var source = new CharacterSourceSpan(text.AsSpan());
 			Vector2 size;
 			MeasureString(ref source, out size);
 			return size;
 		}
+
+        /// <summary>
+        /// Returns the size of a Span of <see cref="char"/>s when
+        /// treated as a <see cref="string"/> and rendered in this font.
+        /// </summary>
+        /// <param name="text">The text to measure.</param>
+        /// <returns>The sizes, in pixels, of 'text' when rendered in
+        /// this font<./returns>
+        public Vector2 MeasureString(ReadOnlySpan<char> text)
+        {
+            var source = new CharacterSourceSpan(text);
+            Vector2 size;
+            MeasureString(ref source, out size);
+            return size;
+        }
 
 		/// <summary>
 		/// Returns the size of the contents of a StringBuilder when
@@ -192,13 +207,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// this font.</returns>
 		public Vector2 MeasureString(StringBuilder text)
 		{
-			var source = new CharacterSource(text);
+			var source = new CharacterSourceSpan(text);
 			Vector2 size;
 			MeasureString(ref source, out size);
 			return size;
 		}
 
-		internal unsafe void MeasureString(ref CharacterSource text, out Vector2 size)
+		internal unsafe void MeasureString(ref CharacterSourceSpan text, out Vector2 size)
 		{
 			if (text.Length == 0)
             {
@@ -343,6 +358,38 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 		}
+
+        //
+        // Wraps either a ReadOnlySpan<char> or a StringBuilder.
+        internal readonly ref struct CharacterSourceSpan
+        {
+            private readonly ReadOnlySpan<char> _span;
+            private readonly StringBuilder _builder;
+
+            public readonly int Length;
+
+            public CharacterSourceSpan(StringBuilder builder)
+            {
+                _builder = builder;
+                Length = _builder.Length;
+            }
+            public CharacterSourceSpan(ReadOnlySpan<char> span)
+            {
+                _span = span;
+                Length = _span.Length;
+            }
+
+            public char this[int index]
+            {
+                get
+                {
+                    if (_builder != null)
+                        return _builder[index];
+                    else
+                        return _span[index];
+                }
+            }
+        }
 
         /// <summary>
         /// Struct that defines the spacing, Kerning, and bounds of a character.
