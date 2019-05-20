@@ -1058,6 +1058,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                      indexElementType,
                                      indexOffsetInBytes);
             GraphicsExtensions.CheckGLError();
+
+            _attribsDirty = true;
         }
 
         private void PlatformDrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, VertexDeclaration vertexDeclaration, int vertexCount) where T : struct
@@ -1101,6 +1103,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			              vertexStart,
 			              vertexCount);
             GraphicsExtensions.CheckGLError();
+
+            _attribsDirty = true;
         }
 
         private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
@@ -1169,7 +1173,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vbHandle.Free();
         }
 
-        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
+        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount, int baseInstance = 0)
         {
             if (!GraphicsCapabilities.SupportsInstancing)
                 throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2 or GLES 3.2. Try upgrading your graphics card drivers.");
@@ -1185,12 +1189,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
             ApplyAttribs(_vertexShader, baseVertex);
 
-            GL.DrawElementsInstanced(target,
+            if (baseInstance > 0)
+                GL.DrawElementsInstancedBaseInstance(target,
                                      indexElementCount,
                                      indexElementType,
                                      indexOffsetInBytes,
-                                     instanceCount);
-            GraphicsExtensions.CheckGLError();
+                                     instanceCount,
+                                     baseInstance);
+            else
+				GL.DrawElementsInstanced(target,
+									 indexElementCount,
+									 indexElementType,
+									 indexOffsetInBytes,
+									 instanceCount);
+			GraphicsExtensions.CheckGLError();
         }
 
         private void PlatformGetBackBufferData<T>(Rectangle? rectangle, T[] data, int startIndex, int count) where T : struct

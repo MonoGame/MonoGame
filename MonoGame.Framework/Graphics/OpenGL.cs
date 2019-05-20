@@ -1104,7 +1104,13 @@ namespace MonoGame.OpenGL
             IntPtr offset, int instanceCount);
         internal static DrawElementsInstancedDelegate DrawElementsInstanced;
 
-        [System.Security.SuppressUnmanagedCodeSecurity ()]
+		[System.Security.SuppressUnmanagedCodeSecurity()]
+		[MonoNativeFunctionWrapper]
+		internal delegate void DrawElementsInstancedBaseInstanceDelegate(GLPrimitiveType primitiveType, int count, DrawElementsType elementType,
+			IntPtr offset, int instanceCount, int baseInstance);
+		internal static DrawElementsInstancedBaseInstanceDelegate DrawElementsInstancedBaseInstance;
+
+		[System.Security.SuppressUnmanagedCodeSecurity ()]
         [MonoNativeFunctionWrapper]
         internal delegate void VertexAttribDivisorDelegate (int location, int frequency);
         internal static VertexAttribDivisorDelegate VertexAttribDivisor;
@@ -1270,7 +1276,9 @@ namespace MonoGame.OpenGL
             try {
                 DrawElementsInstanced = LoadFunction<DrawElementsInstancedDelegate> ("glDrawElementsInstanced");
                 VertexAttribDivisor = LoadFunction<VertexAttribDivisorDelegate> ("glVertexAttribDivisor");
-            } catch (EntryPointNotFoundException) {
+                DrawElementsInstancedBaseInstance = LoadFunction<DrawElementsInstancedBaseInstanceDelegate>("glDrawElementsInstancedBaseInstance");
+            }
+            catch (EntryPointNotFoundException) {
                 // this will be detected in the initialization of GraphicsCapabilities
             }
 
