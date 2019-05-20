@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
+        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount, int baseInstance = 0)
         {
         }
 
