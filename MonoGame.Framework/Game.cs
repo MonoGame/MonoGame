@@ -512,7 +512,10 @@ namespace Microsoft.Xna.Framework
             }
 
             if (_shouldExit)
+            {
                 Platform.Exit();
+                _shouldExit = false; //prevents perpetual exiting on platforms supporting resume.
+            }
         }
 
         #endregion
