@@ -6,6 +6,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -320,6 +321,145 @@ namespace MonoGame.Tests.Graphics
 
             game.Dispose();
 
+        }
+
+        // Expose the FindBestDevice and RankDevices methods for testing
+        class TestGraphicsDeviceManager : GraphicsDeviceManager
+        {
+            public GraphicsDeviceInformation[] Devices;
+
+            public TestGraphicsDeviceManager(Game game)
+                : base(game)
+            { }
+
+            public GraphicsDeviceInformation MyFindBestDevice(bool anySuitableDevice)
+            {
+                return FindBestDevice(anySuitableDevice);
+            }
+
+            protected override GraphicsDeviceInformation FindBestDevice(bool anySuitableDevice)
+            {
+                var result = base.FindBestDevice(anySuitableDevice);
+                return result;
+            }
+
+            public void MyRankDevices(List<GraphicsDeviceInformation> foundDevices)
+            {
+                RankDevices(foundDevices);
+            }
+
+            protected override void RankDevices(List<GraphicsDeviceInformation> foundDevices)
+            {
+                if (IsFullScreen)
+                {
+                    foundDevices.Clear();
+                    foundDevices.AddRange(Devices);
+                }
+                base.RankDevices(foundDevices);
+            }
+        }
+
+        GraphicsDeviceInformation[] fullScreenTestDevices = new[]
+        {
+            new GraphicsDeviceInformation()
+            {
+                Adapter = GraphicsAdapter.DefaultAdapter,
+                GraphicsProfile = GraphicsProfile.Reach,
+                PresentationParameters = new PresentationParameters()
+                {
+                    BackBufferFormat = SurfaceFormat.Color,
+                    BackBufferWidth = 720,
+                    BackBufferHeight = 480,
+                    IsFullScreen = true,
+                    MultiSampleCount = 0,
+                    DisplayOrientation = DisplayOrientation.Default
+                }
+            },
+            new GraphicsDeviceInformation()
+            {
+                Adapter = GraphicsAdapter.DefaultAdapter,
+                GraphicsProfile = GraphicsProfile.Reach,
+                PresentationParameters = new PresentationParameters()
+                {
+                    BackBufferFormat = SurfaceFormat.Color,
+                    BackBufferWidth = 1280,
+                    BackBufferHeight = 720,
+                    IsFullScreen = true,
+                    MultiSampleCount = 0,
+                    DisplayOrientation = DisplayOrientation.Default
+                }
+            },
+            new GraphicsDeviceInformation()
+            {
+                Adapter = GraphicsAdapter.DefaultAdapter,
+                GraphicsProfile = GraphicsProfile.Reach,
+                PresentationParameters = new PresentationParameters()
+                {
+                    BackBufferFormat = SurfaceFormat.Color,
+                    BackBufferWidth = 1920,
+                    BackBufferHeight = 1080,
+                    IsFullScreen = true,
+                    MultiSampleCount = 0,
+                    DisplayOrientation = DisplayOrientation.Default
+                }
+            }
+        };
+
+        [Test]
+        public void GraphicsDeviceManagerFindBestDeviceExactFullScreen()
+        {
+            var game = new TestGameBase();
+            var gdm = new TestGraphicsDeviceManager(game);
+            gdm.PreferredBackBufferFormat = SurfaceFormat.Color;
+            gdm.PreferredBackBufferWidth = 1280;
+            gdm.PreferredBackBufferHeight = 720;
+            gdm.IsFullScreen = true;
+
+            gdm.Devices = fullScreenTestDevices;
+
+            var gdi = gdm.MyFindBestDevice(true);
+            Assert.AreEqual(gdi.PresentationParameters.BackBufferWidth, 1280);
+            Assert.AreEqual(gdi.PresentationParameters.BackBufferHeight, 720);
+
+            game.Dispose();
+        }
+
+        [Test]
+        public void GraphicsDeviceManagerFindBestDeviceNotExactFullScreen()
+        {
+            var game = new TestGameBase();
+            var gdm = new TestGraphicsDeviceManager(game);
+            gdm.PreferredBackBufferFormat = SurfaceFormat.Color;
+            gdm.PreferredBackBufferWidth = 800;
+            gdm.PreferredBackBufferHeight = 480;
+            gdm.IsFullScreen = true;
+
+            gdm.Devices = fullScreenTestDevices;
+
+            var gdi = gdm.MyFindBestDevice(true);
+            Assert.AreEqual(gdi.PresentationParameters.BackBufferWidth, 720);
+            Assert.AreEqual(gdi.PresentationParameters.BackBufferHeight, 480);
+
+            game.Dispose();
+        }
+
+        [Test]
+        public void GraphicsDeviceManagerFindBestDeviceWindowed()
+        {
+            var game = new TestGameBase();
+            var gdm = new TestGraphicsDeviceManager(game);
+            gdm.PreferredBackBufferFormat = SurfaceFormat.Color;
+            gdm.PreferredBackBufferWidth = 800;
+            gdm.PreferredBackBufferHeight = 600;
+            gdm.IsFullScreen = false;
+
+            gdm.Devices = fullScreenTestDevices;
+
+            var gdi = gdm.MyFindBestDevice(true);
+            Assert.AreEqual(gdi.PresentationParameters.BackBufferWidth, 800);
+            Assert.AreEqual(gdi.PresentationParameters.BackBufferHeight, 600);
+
+            game.Dispose();
         }
     }
 
