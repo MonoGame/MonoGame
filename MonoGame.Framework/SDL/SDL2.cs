@@ -993,7 +993,10 @@ internal static class Sdl
 
     public static class Haptic
     {
-        public const uint Infinity = 4292967295U;
+        // For some reason, different game controllers have different maximum value supported
+        // Also, the more the value is close to their limit, the more they tend to randomly ignore it
+        // Hence, we're setting an abitrary safe value as a maximum
+        public const uint Infinity = 1000000U;
 
         public enum EffectId : ushort
         {
