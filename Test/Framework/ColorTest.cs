@@ -102,46 +102,65 @@ namespace MonoGame.Tests.Framework
         {
             var color = new Color(1, 2, 3, 4);
 
+            // Operator comparison
+            Assert.AreEqual(color * 1.0f, 1.0f * color);
+
             // Test 1.0 scale.
             Assert.AreEqual(color, color * 1.0f);
+            Assert.AreEqual(color, 1.0f * color);
             Assert.AreEqual(color, Color.Multiply(color, 1.0f));
             Assert.AreEqual(color * 1.0f, Color.Multiply(color, 1.0f));
+            Assert.AreEqual(1.0f * color, Color.Multiply(color, 1.0f));
 
             // Test 0.999 scale.
             var almostOne = new Color(0, 1, 2, 3);
             Assert.AreEqual(almostOne, color * 0.999f);
+            Assert.AreEqual(almostOne, 0.999f * color);
             Assert.AreEqual(almostOne, Color.Multiply(color, 0.999f));
             Assert.AreEqual(color * 0.999f, Color.Multiply(color, 0.999f));
+            Assert.AreEqual(0.999f * color, Color.Multiply(color, 0.999f));
 
             // Test 1.001 scale.
             Assert.AreEqual(color, color * 1.001f);
+            Assert.AreEqual(color, 1.001f * color);
             Assert.AreEqual(color, Color.Multiply(color, 1.001f));
             Assert.AreEqual(color * 1.001f, Color.Multiply(color, 1.001f));
+            Assert.AreEqual(1.001f * color, Color.Multiply(color, 1.001f));
 
             // Test 0.0 scale.
             Assert.AreEqual(Color.Transparent, color * 0.0f);
+            Assert.AreEqual(Color.Transparent, 0.0f * color);
             Assert.AreEqual(Color.Transparent, Color.Multiply(color, 0.0f));
             Assert.AreEqual(color * 0.0f, Color.Multiply(color, 0.0f));
+            Assert.AreEqual(0.0f * color, Color.Multiply(color, 0.0f));
 
             // Test 0.001 scale.
             Assert.AreEqual(Color.Transparent, color * 0.001f);
+            Assert.AreEqual(Color.Transparent, 0.001f * color);
             Assert.AreEqual(Color.Transparent, Color.Multiply(color, 0.001f));
             Assert.AreEqual(color * 0.001f, Color.Multiply(color, 0.001f));
+            Assert.AreEqual(0.001f * color, Color.Multiply(color, 0.001f));
 
             // Test -0.001 scale.
             Assert.AreEqual(Color.Transparent, color * -0.001f);
+            Assert.AreEqual(Color.Transparent, -0.001f * color);
             Assert.AreEqual(Color.Transparent, Color.Multiply(color, -0.001f));
             Assert.AreEqual(color * -0.001f, Color.Multiply(color, -0.001f));
+            Assert.AreEqual(-0.001f * color, Color.Multiply(color, -0.001f));
 
             // Test for overflow.
             Assert.AreEqual(Color.White, color * 300.0f);
+            Assert.AreEqual(Color.White, 300.0f * color);
             Assert.AreEqual(Color.White, Color.Multiply(color, 300.0f));
             Assert.AreEqual(color * 300.0f, Color.Multiply(color, 300.0f));
+            Assert.AreEqual(300.0f * color, Color.Multiply(color, 300.0f));
 
             // Test for underflow.
             Assert.AreEqual(Color.Transparent, color * -1.0f);
+            Assert.AreEqual(Color.Transparent, -1.0f * color);
             Assert.AreEqual(Color.Transparent, Color.Multiply(color, -1.0f));
             Assert.AreEqual(color * -1.0f, Color.Multiply(color, -1.0f));
+            Assert.AreEqual(-1.0f * color, Color.Multiply(color, -1.0f));
         }
 
         [Test]

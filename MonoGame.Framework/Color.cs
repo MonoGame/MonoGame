@@ -1748,24 +1748,29 @@ namespace Microsoft.Xna.Framework
                 (int)MathHelper.LerpPrecise(value1.A, value2.A, amount));
         }
 		
-	/// <summary>
+	    /// <summary>
         /// Multiply <see cref="Color"/> by value.
         /// </summary>
         /// <param name="value">Source <see cref="Color"/>.</param>
         /// <param name="scale">Multiplicator.</param>
         /// <returns>Multiplication result.</returns>
-	public static Color Multiply(Color value, float scale)
-	{
-	    return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
-	}
+	    public static Color Multiply(Color value, float scale)
+	    {
+	        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+	    }
 	
-	/// <summary>
+	    /// <summary>
         /// Multiply <see cref="Color"/> by value.
         /// </summary>
         /// <param name="value">Source <see cref="Color"/>.</param>
         /// <param name="scale">Multiplicator.</param>
         /// <returns>Multiplication result.</returns>
-	public static Color operator *(Color value, float scale)
+	    public static Color operator *(Color value, float scale)
+        {
+            return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+        }
+
+        public static Color operator *(float scale, Color value)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
         }
