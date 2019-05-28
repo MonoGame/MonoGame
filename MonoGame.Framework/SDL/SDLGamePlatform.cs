@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework
             var version = 100 * Sdl.Major + 10 * Sdl.Minor + Sdl.Patch;
 
             if (version <= 204)
-                Debug.WriteLine ("Please use SDL 2.0.5 or higher.");
+                Debug.WriteLine("Please use SDL 2.0.5 or higher.");
 
             // Needed so VS can debug the project on Windows
             if (version >= 205 && CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
@@ -62,11 +62,11 @@ namespace Microsoft.Xna.Framework
             Window = _view = new SdlGameWindow(_game);
         }
 
-        public override void BeforeInitialize ()
+        public override void BeforeInitialize()
         {
             SdlRunLoop();
 
-            base.BeforeInitialize ();
+            base.BeforeInitialize();
         }
 
         protected override void OnIsMouseVisibleChanged()
@@ -145,6 +145,7 @@ namespace Microsoft.Xna.Framework
                         int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
                         byte currentByte = 0;
                         int charByteSize = 0; // UTF8 char lenght to decode
+                        int remainingShift = 0;
                         unsafe
                         {
                             while ((currentByte = Marshal.ReadByte((IntPtr)ev.Text.Text, len)) != 0)
@@ -162,6 +163,7 @@ namespace Microsoft.Xna.Framework
                                         charByteSize = 4;
 
                                     utf8character = 0;
+                                    remainingShift = 4;
                                 }
 
                                 // assembling the character
@@ -169,13 +171,22 @@ namespace Microsoft.Xna.Framework
                                 utf8character |= currentByte;
 
                                 charByteSize--;
+                                remainingShift--;
+
                                 if (charByteSize == 0) // finished decoding the current character
                                 {
-                                    var key = KeyboardUtil.ToXna(utf8character);
-                                    // multibyte conversion might fail here, because the char type only handles UTF8 up to 2-byte characters
-                                    // we should switch to a String parameter for this event to fully support UTF8
-                                    // as-is, it won't support CJK characters and will produce wrong results
-                                    _view.CallTextInput((char)utf8character, key);
+                                    utf8character <<= remainingShift * 8; // shifting it to full UTF8 scope
+
+                                    // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
+                                    // so we need to convert it to Unicode codepoint and check if it's within the supported range
+                                    int codepoint = UTF8ToUnicode(utf8character);
+
+                                    if (codepoint >= 0 && codepoint < 0xFFFF)
+                                    {
+                                        var key = KeyboardUtil.ToXna(codepoint);
+                                        _view.CallTextInput((char)codepoint, key);
+                                    }
+                                    // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
                                 }
 
                                 len++;
@@ -200,6 +211,28 @@ namespace Microsoft.Xna.Framework
                     }
                 }
             }
+        }
+
+        private int UTF8ToUnicode(int utf8)
+        {
+            int
+                byte4 = utf8 & 0xFF,
+                byte3 = (utf8 >> 8) & 0xFF,
+                byte2 = (utf8 >> 16) & 0xFF,
+                byte1 = (utf8 >> 24) & 0xFF;
+
+            if (byte1 < 0x80)
+                return byte1;
+            else if (byte1 < 0xC0)
+                return -1;
+            else if (byte1 < 0xE0 && byte2 >= 0x80 && byte2 < 0xC0)
+                return (byte1 % 0x20) * 0x40 + (byte2 % 0x40);
+            else if (byte1 < 0xF0 && byte2 >= 0x80 && byte2 < 0xC0 && byte3 >= 0x80 && byte3 < 0xC0)
+                return (byte1 % 0x10) * 0x40 * 0x40 + (byte2 % 0x40) * 0x40 + (byte3 % 0x40);
+            else if (byte1 < 0xF8 && byte2 >= 0x80 && byte2 < 0xC0 && byte3 >= 0x80 && byte3 < 0xC0 && byte4 >= 0x80 && byte4 < 0xC0)
+                return (byte1 % 0x8) * 0x40 * 0x40 * 0x40 + (byte2 % 0x40) * 0x40 * 0x40 + (byte3 % 0x40) * 0x40 + (byte4 % 0x40);
+            else
+                return -1;
         }
 
         public override void StartRunLoop()
