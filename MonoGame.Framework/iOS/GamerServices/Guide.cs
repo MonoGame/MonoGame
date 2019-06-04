@@ -160,6 +160,9 @@ namespace Microsoft.Xna.Framework.GamerServices
         private static UIWindow _window;
         private static UIViewController _gameViewController;
 
+        private static ShowKeyboardInputDelegate ski = ShowKeyboardInput;
+        private static ShowMessageBoxDelegate smb = ShowMessageBox;
+
         [CLSCompliant(false)]
         public static GKMatch Match { get; private set; }
 
@@ -282,15 +285,13 @@ namespace Microsoft.Xna.Framework.GamerServices
             if (IsVisible)
                 throw new GuideAlreadyVisibleException("The function cannot be completed at this time: the Guide UI is already active. Wait until Guide.IsVisible is false before issuing this call.");
 
-            ShowKeyboardInputDelegate ski = ShowKeyboardInput;
-
-            return ski.BeginInvoke(title, description, defaultText, state, usePasswordMode, callback, ski);
+            return ski.BeginInvoke(title, description, defaultText, state, usePasswordMode, callback, state);
         }
 
         public static string EndShowKeyboardInput(IAsyncResult result)
         {
             keyboardViewController = null;
-            return (result.AsyncState as ShowKeyboardInputDelegate).EndInvoke(result);
+            return ski.EndInvoke(result);
         }
 
         delegate Nullable<nint> ShowMessageBoxDelegate(
@@ -335,9 +336,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             IsVisible = true;
 
-            ShowMessageBoxDelegate smb = ShowMessageBox; 
-
-            return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);         
+            return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, state);         
         }
 
         public static IAsyncResult BeginShowMessageBox(
@@ -350,7 +349,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         public static Nullable<nint> EndShowMessageBox(IAsyncResult result)
         {
-            return (result.AsyncState as ShowMessageBoxDelegate).EndInvoke(result);
+            return smb.EndInvoke(result);
         }
 
         public static void ShowMarketplace(PlayerIndex player)

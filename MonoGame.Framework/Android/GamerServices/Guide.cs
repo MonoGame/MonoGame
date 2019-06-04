@@ -62,6 +62,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isTrialMode;
 		private static bool isVisible;
 		private static bool simulateTrialMode;
+        private static ShowKeyboardInputDelegate ski = ShowKeyboardInput;
+        private static ShowMessageBoxDelegate smb = ShowMessageBox;
 
         internal static void Initialise(Game game)
         {
@@ -153,16 +155,14 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 			IsVisible = true;
 
-			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
-
-			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
+			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, state);
 		}
 
 		public static string EndShowKeyboardInput (IAsyncResult result)
 		{
 			try 
 			{
-				return (result.AsyncState as ShowKeyboardInputDelegate).EndInvoke(result);
+				return ski.EndInvoke(result);
 			} 
 			finally 
 			{
@@ -233,9 +233,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			
 			IsVisible = true;
 			
-			ShowMessageBoxDelegate smb = ShowMessageBox; 
-
-			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
+			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, state);			
 		}
 
 		public static IAsyncResult BeginShowMessageBox (
@@ -255,7 +253,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			try
 			{
-				return (result.AsyncState as ShowMessageBoxDelegate).EndInvoke(result);
+				return smb.EndInvoke(result);
 			} 
 			finally 
 			{
