@@ -59,14 +59,6 @@ namespace MonoGame.Tests.Input
         }
 
         [TestCase(new[] { Keys.Up, Keys.A, Keys.Left, Keys.Oem8, Keys.Apps })]
-        public void TestPressedKeysEnumerator(Keys[] keys)
-        {
-            var state = new KeyboardState(keys);
-
-            CollectionAssert.AreEquivalent(state.GetPressedKeys(), state);
-        }
-
-        [TestCase(new[] { Keys.Up, Keys.A, Keys.Left, Keys.Oem8, Keys.Apps })]
         public void TestGetPressedKeysGarbageless(Keys[] keys)
         {
             var state = new KeyboardState(keys);

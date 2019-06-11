@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Input
     /// <summary>
     /// Holds the state of keystrokes by a keyboard.
     /// </summary>
-	public struct KeyboardState : IEnumerable<Keys>
+	public struct KeyboardState
     {
         // Used for the common situation where GetPressedKeys will return an empty array
         static Keys[] empty = new Keys[0];
@@ -283,120 +283,6 @@ namespace Microsoft.Xna.Framework.Input
             if (keys5 != 0 && index < keys.Length) index = AddKeysToArray(keys5, 5 * 32, keys, index);
             if (keys6 != 0 && index < keys.Length) index = AddKeysToArray(keys6, 6 * 32, keys, index);
             if (keys7 != 0 && index < keys.Length) index = AddKeysToArray(keys7, 7 * 32, keys, index);
-        }
-
-        /// <summary>
-        /// Returns an enumerator of the pressed keys in the <see cref="KeyboardState"/>.
-        /// </summary>
-        /// <returns>An enumerable set of <see cref="Keys"/>.</returns>
-        public Enumerator GetEnumerator()
-        {
-            return new Enumerator(this);
-        }
-
-        /// <summary>
-        /// Returns an enumerator of the pressed keys in the <see cref="KeyboardState"/>.
-        /// </summary>
-        /// <returns>An enumerable set of <see cref="Keys"/>.</returns>
-        IEnumerator<Keys> IEnumerable<Keys>.GetEnumerator()
-        {
-            return new Enumerator(this);
-        }
-
-        /// <summary>
-        /// Returns an enumerator of the pressed keys in the <see cref="KeyboardState"/>.
-        /// </summary>
-        /// <returns>An enumerable set of objects.</returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new Enumerator(this);
-        }
-
-        #endregion
-
-        #region Enumerator
-
-        /// <summary>
-        /// Allows iterating through the pressed keys in a <see cref="KeyboardState"/>.
-        /// </summary>
-        public struct Enumerator : IEnumerator<Keys>
-        {
-            private readonly KeyboardState _kbState;
-            private Keys _curKey;
-            private uint _curKeyset;
-            private int _curIndex;
-            private int _keysetNum;
-
-            public Enumerator(KeyboardState kbState)
-            {
-                _kbState = kbState;
-                _curKeyset = kbState.keys0;
-                _keysetNum = 0;
-                _curKey = Keys.None;
-                _curIndex = 0;
-            }
-
-            public Keys Current
-            {
-                get
-                {
-                    if (_keysetNum == 0 && _curIndex == 0) throw new System.Exception("Enumerator has not started yet!");
-                    if (_keysetNum >= 8) throw new System.Exception("Enumerator is already done enumerating!");
-
-                    return _curKey;
-                }
-            }
-
-            object IEnumerator.Current
-            {
-                get { return Current; }
-            }
-
-            public void Dispose()
-            {
-                
-            }
-
-            public bool MoveNext()
-            {
-                while (_keysetNum < 8)
-                {
-                    for (; _curIndex < 32; _curIndex++)
-                    {
-                        if ((_curKeyset & (1 << _curIndex)) != 0)
-                        {
-                            _curKey = (Keys)((_keysetNum * 32) + _curIndex);
-                            _curIndex++;
-                            return true;
-                        }
-                    }
-
-                    _curIndex = 0;
-                    _keysetNum++;
-
-                    switch(_keysetNum)
-                    {
-                        case 0: _curKeyset = _kbState.keys0; break;
-                        case 1: _curKeyset = _kbState.keys1; break;
-                        case 2: _curKeyset = _kbState.keys2; break;
-                        case 3: _curKeyset = _kbState.keys3; break;
-                        case 4: _curKeyset = _kbState.keys4; break;
-                        case 5: _curKeyset = _kbState.keys5; break;
-                        case 6: _curKeyset = _kbState.keys6; break;
-                        case 7: _curKeyset = _kbState.keys7; break;
-                    }
-                }
-                
-                return false;
-            }
-
-            public void Reset()
-            {
-                _curKey = Keys.None;
-                _curKeyset = _kbState.keys0;
-                _keysetNum = 0;
-                _curIndex = 0;
-            }
         }
 
         #endregion
