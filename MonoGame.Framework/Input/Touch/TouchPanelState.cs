@@ -85,14 +85,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
             for (var i = state.Count - 1; i >= 0; i--)
             {
                 var touch = state[i];
-                if (touch.State == TouchLocationState.Released)
+                switch (touch.State)
                 {
-                    state.RemoveAt(i);
-                }
-                else if (touch.State == TouchLocationState.Pressed)
-                {
-                    touch.AgeState();
-                    state[i] = touch;
+                    case TouchLocationState.Released:
+                        state.RemoveAt(i);
+                        break;
+                    case TouchLocationState.Pressed:
+                    case TouchLocationState.Moved:
+                        touch.AgeState();
+                        state[i] = touch;
+                        break;
                 }
             }
         }
