@@ -229,17 +229,61 @@ namespace Microsoft.Xna.Framework
         /// Create a bounding box from the given list of points.
         /// </summary>
         /// <param name="points">The array of Vector3 instances defining the point cloud to bound</param>
+        /// <param name="index">The base index to start iterating from</param>
+        /// <param name="count">The number of points to iterate</param>
         /// <returns>A bounding box that encapsulates the given point cloud.</returns>
         /// <exception cref="System.ArgumentException">Thrown if the given array is null or has no points.</exception>
-        public static BoundingBox CreateFromPoints(Vector3[] points)
+        public static BoundingBox CreateFromPoints(Vector3[] points, int index, int count)
         {
             if (points == null || points.Length == 0)
                 throw new ArgumentException();
 
             var minVec = MaxVector3;
             var maxVec = MinVector3;
-            for (int i=0; i<points.Length; i++)
+            for (int i = index; i < count; i++)
             {                
+                minVec.X = (minVec.X < points[i].X) ? minVec.X : points[i].X;
+                minVec.Y = (minVec.Y < points[i].Y) ? minVec.Y : points[i].Y;
+                minVec.Z = (minVec.Z < points[i].Z) ? minVec.Z : points[i].Z;
+
+                maxVec.X = (maxVec.X > points[i].X) ? maxVec.X : points[i].X;
+                maxVec.Y = (maxVec.Y > points[i].Y) ? maxVec.Y : points[i].Y;
+                maxVec.Z = (maxVec.Z > points[i].Z) ? maxVec.Z : points[i].Z;
+            }
+
+            return new BoundingBox(minVec, maxVec);
+        }
+
+
+        /// <summary>
+        /// Create a bounding box from the given list of points.
+        /// </summary>
+        /// <param name="points">The array of Vector3 instances defining the point cloud to bound</param>
+        /// <returns>A bounding box that encapsulates the given point cloud.</returns>
+        /// <exception cref="System.ArgumentException">Thrown if the given array is null or has no points.</exception>
+        public static BoundingBox CreateFromPoints(Vector3[] points)
+        {
+            return CreateFromPoints(points, 0, points.Length);
+        }
+
+
+        /// <summary>
+        /// Create a bounding box from the given list of points.
+        /// </summary>
+        /// <param name="points">The list of Vector3 instances defining the point cloud to bound</param>
+        /// <param name="index">The base index to start iterating from</param>
+        /// <param name="count">The number of points to iterate</param>
+        /// <returns>A bounding box that encapsulates the given point cloud.</returns>
+        /// <exception cref="System.ArgumentException">Thrown if the given list is null or has no points.</exception>
+        public static BoundingBox CreateFromPoints(List<Vector3> points, int index, int count)
+        {
+            if (points == null || points.Count == 0)
+                throw new ArgumentException();
+
+            var minVec = MaxVector3;
+            var maxVec = MinVector3;
+            for (int i = index; i < count; i++)
+            {
                 minVec.X = (minVec.X < points[i].X) ? minVec.X : points[i].X;
                 minVec.Y = (minVec.Y < points[i].Y) ? minVec.Y : points[i].Y;
                 minVec.Z = (minVec.Z < points[i].Z) ? minVec.Z : points[i].Z;
@@ -261,23 +305,7 @@ namespace Microsoft.Xna.Framework
         /// <exception cref="System.ArgumentException">Thrown if the given list is null or has no points.</exception>
         public static BoundingBox CreateFromPoints(List<Vector3> points)
         {
-            if (points == null || points.Count == 0)
-                throw new ArgumentException();
-
-            var minVec = MaxVector3;
-            var maxVec = MinVector3;
-            for (int i = 0; i < points.Count; i++)
-            {
-                minVec.X = (minVec.X < points[i].X) ? minVec.X : points[i].X;
-                minVec.Y = (minVec.Y < points[i].Y) ? minVec.Y : points[i].Y;
-                minVec.Z = (minVec.Z < points[i].Z) ? minVec.Z : points[i].Z;
-
-                maxVec.X = (maxVec.X > points[i].X) ? maxVec.X : points[i].X;
-                maxVec.Y = (maxVec.Y > points[i].Y) ? maxVec.Y : points[i].Y;
-                maxVec.Z = (maxVec.Z > points[i].Z) ? maxVec.Z : points[i].Z;
-            }
-
-            return new BoundingBox(minVec, maxVec);
+            return CreateFromPoints(points, 0, points.Count);
         }
 
 
