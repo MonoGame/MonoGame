@@ -104,113 +104,126 @@ namespace Microsoft.Xna.Framework
 
             while (Sdl.PollEvent(out ev) == 1)
             {
-                if (ev.Type == Sdl.EventType.Quit)
-                    _isExiting++;
-                else if (ev.Type == Sdl.EventType.JoyDeviceAdded)
-                    Joystick.AddDevice(ev.JoystickDevice.Which);
-                else if (ev.Type == Sdl.EventType.ControllerDeviceRemoved)
-                    GamePad.RemoveDevice(ev.ControllerDevice.Which);
-                else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
-                    Joystick.RemoveDevice(ev.JoystickDevice.Which);
-                else if (ev.Type == Sdl.EventType.MouseWheel)
+                switch (ev.Type)
                 {
-                    const int wheelDelta = 120;
-                    Mouse.ScrollY += ev.Wheel.Y * wheelDelta;
-                    Mouse.ScrollX += ev.Wheel.X * wheelDelta;
-                }
-                else if (ev.Type == Sdl.EventType.MouseMotion)
-                {
-                    Window.MouseState.X = ev.Motion.X;
-                    Window.MouseState.Y = ev.Motion.Y;
-                }
-                else if (ev.Type == Sdl.EventType.KeyDown)
-                {
-                    var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
-                    if (!_keys.Contains(key))
-                        _keys.Add(key);
-                    char character = (char)ev.Key.Keysym.Sym;
-                    _view.OnKeyDown(new InputKeyEventArgs(key));
-                    if (char.IsControl(character))
-                        _view.OnTextInput(new TextInputEventArgs(character, key));
-                }
-                else if (ev.Type == Sdl.EventType.KeyUp)
-                {
-                    var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
-                    _keys.Remove(key);
-                    _view.OnKeyUp(new InputKeyEventArgs(key));
-                }
-                else if (ev.Type == Sdl.EventType.TextInput)
-                {
-                    if (_view.IsTextInputHandled)
+                    case Sdl.EventType.Quit:
+                        _isExiting++;
+                        break;
+                    case Sdl.EventType.JoyDeviceAdded:
+                        Joystick.AddDevice(ev.JoystickDevice.Which);
+                        break;
+                    case Sdl.EventType.JoyDeviceRemoved:
+                        Joystick.RemoveDevice(ev.JoystickDevice.Which);
+                        break;
+                    case Sdl.EventType.ControllerDeviceRemoved:
+                        GamePad.RemoveDevice(ev.ControllerDevice.Which);
+                        break;
+                    case Sdl.EventType.ControllerButtonUp:
+                    case Sdl.EventType.ControllerButtonDown:
+                    case Sdl.EventType.ControllerAxisMotion:
+                        GamePad.UpdatePacketInfo(ev.ControllerDevice.Which, ev.ControllerDevice.TimeStamp);
+                        break;
+                    case Sdl.EventType.MouseWheel:
+                        const int wheelDelta = 120;
+                        Mouse.ScrollY += ev.Wheel.Y * wheelDelta;
+                        Mouse.ScrollX += ev.Wheel.X * wheelDelta;
+                        break;
+                    case Sdl.EventType.MouseMotion:
+                        Window.MouseState.X = ev.Motion.X;
+                        Window.MouseState.Y = ev.Motion.Y;
+                        break;
+                    case Sdl.EventType.KeyDown:
                     {
-                        int len = 0;
-                        int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
-                        byte currentByte = 0;
-                        int charByteSize = 0; // UTF8 char lenght to decode
-                        int remainingShift = 0;
-                        unsafe
+                        var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+                        if (!_keys.Contains(key))
+                            _keys.Add(key);
+                        char character = (char)ev.Key.Keysym.Sym;
+                        _view.OnKeyDown(new InputKeyEventArgs(key));
+                        if (char.IsControl(character))
+                            _view.OnTextInput(new TextInputEventArgs(character, key));
+                        break;
+                    }
+                    case Sdl.EventType.KeyUp:
+                    {
+                        var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+                        _keys.Remove(key);
+                        _view.OnKeyUp(new InputKeyEventArgs(key));
+                        break;
+                    }
+                    case Sdl.EventType.TextInput:
+                        if (_view.IsTextInputHandled)
                         {
-                            while ((currentByte = Marshal.ReadByte((IntPtr)ev.Text.Text, len)) != 0)
+                            int len = 0;
+                            int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
+                            byte currentByte = 0;
+                            int charByteSize = 0; // UTF8 char lenght to decode
+                            int remainingShift = 0;
+                            unsafe
                             {
-                                // we're reading the first UTF8 byte, we need to check if it's multibyte
-                                if (charByteSize == 0)
+                                while ((currentByte = Marshal.ReadByte((IntPtr)ev.Text.Text, len)) != 0)
                                 {
-                                    if (currentByte < 192)
-                                        charByteSize = 1;
-                                    else if (currentByte < 224)
-                                        charByteSize = 2;
-                                    else if (currentByte < 240)
-                                        charByteSize = 3;
-                                    else
-                                        charByteSize = 4;
-
-                                    utf8character = 0;
-                                    remainingShift = 4;
-                                }
-
-                                // assembling the character
-                                utf8character <<= 8;
-                                utf8character |= currentByte;
-
-                                charByteSize--;
-                                remainingShift--;
-
-                                if (charByteSize == 0) // finished decoding the current character
-                                {
-                                    utf8character <<= remainingShift * 8; // shifting it to full UTF8 scope
-
-                                    // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
-                                    // so we need to convert it to Unicode codepoint and check if it's within the supported range
-                                    int codepoint = UTF8ToUnicode(utf8character);
-
-                                    if (codepoint >= 0 && codepoint < 0xFFFF)
+                                    // we're reading the first UTF8 byte, we need to check if it's multibyte
+                                    if (charByteSize == 0)
                                     {
-                                        var key = KeyboardUtil.ToXna(codepoint);
-                                        _view.OnTextInput(new TextInputEventArgs((char)codepoint, key));
-                                    }
-                                    // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
-                                }
+                                        if (currentByte < 192)
+                                            charByteSize = 1;
+                                        else if (currentByte < 224)
+                                            charByteSize = 2;
+                                        else if (currentByte < 240)
+                                            charByteSize = 3;
+                                        else
+                                            charByteSize = 4;
 
-                                len++;
+                                        utf8character = 0;
+                                        remainingShift = 4;
+                                    }
+
+                                    // assembling the character
+                                    utf8character <<= 8;
+                                    utf8character |= currentByte;
+
+                                    charByteSize--;
+                                    remainingShift--;
+
+                                    if (charByteSize == 0) // finished decoding the current character
+                                    {
+                                        utf8character <<= remainingShift * 8; // shifting it to full UTF8 scope
+
+                                        // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
+                                        // so we need to convert it to Unicode codepoint and check if it's within the supported range
+                                        int codepoint = UTF8ToUnicode(utf8character);
+
+                                        if (codepoint >= 0 && codepoint < 0xFFFF)
+                                        {
+                                            _view.OnTextInput(new TextInputEventArgs((char)codepoint, KeyboardUtil.ToXna(codepoint)));
+                                            // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
+                                        }
+                                    }
+
+                                    len++;
+                                }
                             }
                         }
-                    }
-                }
-                else if (ev.Type == Sdl.EventType.WindowEvent)
-                {
-                    if (ev.Window.WindowID == _view.Id)
-                    {
-                        if (ev.Window.EventID == Sdl.Window.EventId.Resized || ev.Window.EventID == Sdl.Window.EventId.SizeChanged)
-                            _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
-                        else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
-                            IsActive = true;
-                        else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
-                            IsActive = false;
-                        else if (ev.Window.EventID == Sdl.Window.EventId.Moved)
-                            _view.Moved();
-                        else if (ev.Window.EventID == Sdl.Window.EventId.Close)
-                            _isExiting++;
-                    }
+                        break;
+                    case Sdl.EventType.WindowEvent:
+
+                        switch (ev.Window.EventID)
+                        {
+                            case Sdl.Window.EventId.Resized:
+                            case Sdl.Window.EventId.SizeChanged:
+                                _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
+                                break;
+                            case Sdl.Window.EventId.FocusGained:
+                                IsActive = true;
+                                break;
+                            case Sdl.Window.EventId.Moved:
+                                _view.Moved();
+                                break;
+                            case Sdl.Window.EventId.Close:
+                                _isExiting++;
+                                break;
+                        }
+                        break;
                 }
             }
         }

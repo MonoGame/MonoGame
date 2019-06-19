@@ -5,8 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Input
@@ -18,9 +16,11 @@ namespace Microsoft.Xna.Framework.Input
             public IntPtr Device;
             public IntPtr HapticDevice;
             public int HapticType;
+            public int PacketNumber;
         }
 
         private static readonly Dictionary<int, GamePadInfo> Gamepads = new Dictionary<int, GamePadInfo>();
+        private static readonly Dictionary<int, int> _translationTable = new Dictionary<int, int>();
 
         private static Sdl.Haptic.Effect _hapticLeftRightEffect = new Sdl.Haptic.Effect
         {
@@ -89,6 +89,8 @@ namespace Microsoft.Xna.Framework.Input
                 gamepad.HapticDevice = IntPtr.Zero;
                 Sdl.ClearError();
             }
+
+            RefreshTranslationTable();
         }
 
         internal static void RemoveDevice(int instanceid)
@@ -100,6 +102,30 @@ namespace Microsoft.Xna.Framework.Input
                     Gamepads.Remove(entry.Key);
                     DisposeDevice(entry.Value);
                     break;
+                }
+            }
+
+            RefreshTranslationTable();
+        }
+
+        internal static void RefreshTranslationTable()
+        {
+            _translationTable.Clear();
+            foreach (var pair in Gamepads)
+            {
+                _translationTable[Sdl.Joystick.InstanceID(Sdl.GameController.GetJoystick(pair.Value.Device))] = pair.Key;
+            }
+        }
+
+        internal static void UpdatePacketInfo(int instanceid, uint packetNumber)
+        {
+            int index;
+            if (_translationTable.TryGetValue(instanceid, out index))
+            {
+                GamePadInfo info = null;
+                if (Gamepads.TryGetValue(index, out info))
+                {
+                    info.PacketNumber = packetNumber < int.MaxValue ? (int)packetNumber : (int)(packetNumber - (uint)int.MaxValue);
                 }
             }
         }
@@ -230,7 +256,8 @@ namespace Microsoft.Xna.Framework.Input
             if (!Gamepads.ContainsKey(index))
                 return GamePadState.Default;
 
-            var gdevice = Gamepads[index].Device;
+            var gamepadInfo = Gamepads[index];
+            var gdevice = gamepadInfo.Device;
 
             // Y gamepad axis is rotate between SDL and XNA
             var thumbSticks =
@@ -277,7 +304,9 @@ namespace Microsoft.Xna.Framework.Input
                     (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadRight) == 1) ? ButtonState.Pressed : ButtonState.Released
                 );
 
-            return new GamePadState(thumbSticks, triggers, buttons, dPad);
+            var ret = new GamePadState(thumbSticks, triggers, buttons, dPad);
+            ret.PacketNumber = gamepadInfo.PacketNumber;
+            return ret;
         }
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
