@@ -233,10 +233,13 @@ namespace Microsoft.Xna.Framework
         /// <param name="count">The number of points to iterate</param>
         /// <returns>A bounding box that encapsulates the given point cloud.</returns>
         /// <exception cref="System.ArgumentException">Thrown if the given array is null or has no points.</exception>
-        public static BoundingBox CreateFromPoints(Vector3[] points, int index, int count)
+        public static BoundingBox CreateFromPoints(Vector3[] points, int index = 0, int count = -1)
         {
             if (points == null || points.Length == 0)
                 throw new ArgumentException();
+
+            if (count == -1)
+                count = points.Length;
 
             var minVec = MaxVector3;
             var maxVec = MinVector3;
@@ -258,27 +261,18 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Create a bounding box from the given list of points.
         /// </summary>
-        /// <param name="points">The array of Vector3 instances defining the point cloud to bound</param>
-        /// <returns>A bounding box that encapsulates the given point cloud.</returns>
-        /// <exception cref="System.ArgumentException">Thrown if the given array is null or has no points.</exception>
-        public static BoundingBox CreateFromPoints(Vector3[] points)
-        {
-            return CreateFromPoints(points, 0, points.Length);
-        }
-
-
-        /// <summary>
-        /// Create a bounding box from the given list of points.
-        /// </summary>
         /// <param name="points">The list of Vector3 instances defining the point cloud to bound</param>
         /// <param name="index">The base index to start iterating from</param>
         /// <param name="count">The number of points to iterate</param>
         /// <returns>A bounding box that encapsulates the given point cloud.</returns>
         /// <exception cref="System.ArgumentException">Thrown if the given list is null or has no points.</exception>
-        public static BoundingBox CreateFromPoints(List<Vector3> points, int index, int count)
+        public static BoundingBox CreateFromPoints(List<Vector3> points, int index = 0, int count = -1)
         {
             if (points == null || points.Count == 0)
                 throw new ArgumentException();
+
+            if (count == -1)
+                count = points.Count;
 
             var minVec = MaxVector3;
             var maxVec = MinVector3;
@@ -294,18 +288,6 @@ namespace Microsoft.Xna.Framework
             }
 
             return new BoundingBox(minVec, maxVec);
-        }
-
-
-        /// <summary>
-        /// Create a bounding box from the given list of points.
-        /// </summary>
-        /// <param name="points">The list of Vector3 instances defining the point cloud to bound</param>
-        /// <returns>A bounding box that encapsulates the given point cloud.</returns>
-        /// <exception cref="System.ArgumentException">Thrown if the given list is null or has no points.</exception>
-        public static BoundingBox CreateFromPoints(List<Vector3> points)
-        {
-            return CreateFromPoints(points, 0, points.Count);
         }
 
 
