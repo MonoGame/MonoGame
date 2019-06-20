@@ -269,8 +269,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _newEnabledVertexAttributes = new bool[MaxVertexAttributes];
 
 
-            SpriteBatch.NeedsHalfPixelOffset = true;
-
             // try getting the context version
             // GL_MAJOR_VERSION and GL_MINOR_VERSION are GL 3.0+ only, so we need to rely on the GL_VERSION string
             // for non GLES this string always starts with the version number in the "major.minor" format, but can be followed by
@@ -935,8 +933,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _posFixup[0] = 1.0f;
             _posFixup[1] = 1.0f;
-            _posFixup[2] = (63.0f/64.0f)/Viewport.Width;
-            _posFixup[3] = -(63.0f/64.0f)/Viewport.Height;
+            if (!GraphicsDeviceManager.UseStandardPixelAddressing)
+            {
+                _posFixup[2] = (63.0f/64.0f)/Viewport.Width;
+                _posFixup[3] = -(63.0f/64.0f)/Viewport.Height;
+            }
+            else
+            {
+                _posFixup[2] = 0f;
+                _posFixup[3] = 0f;
+            }
 
             //If we have a render target bound (rendering offscreen)
             if (IsRenderTargetBound)
