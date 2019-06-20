@@ -220,13 +220,11 @@ namespace Microsoft.Xna.Framework
             {
                 case CoreAcceleratorKeyEventType.KeyDown:
                 case CoreAcceleratorKeyEventType.SystemKeyDown:
-                    if (KeysHelper.IsKey((int)key))
-                        OnKeyDown(sender, new InputKeyEventArgs(key));
+                    OnKeyDown(sender, new InputKeyEventArgs(key));
                     break;
                 case CoreAcceleratorKeyEventType.KeyUp:
                 case CoreAcceleratorKeyEventType.SystemKeyUp:
-                    if (KeysHelper.IsKey((int)key))
-                        OnKeyUp(sender, new InputKeyEventArgs(key));
+                    OnKeyUp(sender, new InputKeyEventArgs(key));
                     break;
                 default:
                     break;
