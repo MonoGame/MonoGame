@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input
@@ -201,6 +202,17 @@ namespace Microsoft.Xna.Framework.Input
 
         #region GetPressedKeys()
 
+        /// <summary>
+        /// Returns the number of pressed keys in this <see cref="KeyboardState"/>.
+        /// </summary>
+        /// <returns>An integer representing the number of keys currently pressed in this <see cref="KeyboardState"/>.</returns>
+        public int GetPressedKeyCount()
+        {
+            uint count = CountBits(keys0) + CountBits(keys1) + CountBits(keys2) + CountBits(keys3)
+                    + CountBits(keys4) + CountBits(keys5) + CountBits(keys6) + CountBits(keys7);
+            return (int)count;
+        }
+
         private static uint CountBits(uint v)
         {
             // http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
@@ -244,10 +256,39 @@ namespace Microsoft.Xna.Framework.Input
             return keys;
         }
 
+        /// <summary>
+        /// Fills an array of values holding keys that are currently being pressed.
+        /// </summary>
+        /// <param name="keys">The keys array to fill.
+        /// This array is not cleared, and it must be equal to or larger than the number of keys pressed.</param>
+        public void GetPressedKeys(Keys[] keys)
+        {
+            if (keys == null)
+                throw new System.ArgumentNullException("keys");
+
+            uint count = CountBits(keys0) + CountBits(keys1) + CountBits(keys2) + CountBits(keys3)
+                    + CountBits(keys4) + CountBits(keys5) + CountBits(keys6) + CountBits(keys7);
+            if (count > keys.Length)
+            {
+                throw new System.ArgumentOutOfRangeException("keys",
+                    "The supplied array cannot fit the number of pressed keys. Call GetPressedKeyCount() to get the number of pressed keys.");
+            }
+
+            int index = 0;
+            if (keys0 != 0 && index < keys.Length) index = AddKeysToArray(keys0, 0 * 32, keys, index);
+            if (keys1 != 0 && index < keys.Length) index = AddKeysToArray(keys1, 1 * 32, keys, index);
+            if (keys2 != 0 && index < keys.Length) index = AddKeysToArray(keys2, 2 * 32, keys, index);
+            if (keys3 != 0 && index < keys.Length) index = AddKeysToArray(keys3, 3 * 32, keys, index);
+            if (keys4 != 0 && index < keys.Length) index = AddKeysToArray(keys4, 4 * 32, keys, index);
+            if (keys5 != 0 && index < keys.Length) index = AddKeysToArray(keys5, 5 * 32, keys, index);
+            if (keys6 != 0 && index < keys.Length) index = AddKeysToArray(keys6, 6 * 32, keys, index);
+            if (keys7 != 0 && index < keys.Length) index = AddKeysToArray(keys7, 7 * 32, keys, index);
+        }
+
         #endregion
 
 
-        #region Objet and Equality
+        #region Object and Equality
 
         /// <summary>
         /// Gets the hash code for <see cref="KeyboardState"/> instance.
