@@ -109,15 +109,19 @@ namespace Microsoft.Xna.Framework {
         /// Buffered keyboard KeyDown event.
         /// </summary>
 		public event EventHandler<InputKeyEventArgs> KeyDown;
-	    /// <summary>
-	    /// Buffered keyboard KeyUp event.
-	    /// </summary>
-		public event EventHandler<InputKeyEventArgs> KeyUp;
+
+        internal bool IsKeyDownHandled { get { return KeyDown != null; } }
+        /// <summary>
+        /// Buffered keyboard KeyUp event.
+        /// </summary>
+        public event EventHandler<InputKeyEventArgs> KeyUp;
+
+        internal bool IsKeyUpHandled { get { return KeyUp != null; } }
 #endif
 
-		#endregion Events
+        #endregion Events
 
-		public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
+        public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
 
 		public abstract void EndScreenDeviceChange (
 			string screenDeviceName, int clientWidth, int clientHeight);

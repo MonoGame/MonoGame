@@ -345,12 +345,14 @@ namespace MonoGame.Framework
 
         internal void CallOnKeyDown(Microsoft.Xna.Framework.Input.Keys key)
         {
-            OnKeyDown(this, new InputKeyEventArgs(key));
+            if(IsKeyDownHandled)
+                OnKeyDown(this, new InputKeyEventArgs(key));
         }
 
         internal void CallOnKeyUp(Microsoft.Xna.Framework.Input.Keys key)
         {
-            OnKeyUp(this, new InputKeyEventArgs(key));
+            if(IsKeyUpHandled)
+                OnKeyUp(this, new InputKeyEventArgs(key));
         }
 
         internal static Microsoft.Xna.Framework.Input.Keys KeyEventTranslate(KeyEventArgs e)
