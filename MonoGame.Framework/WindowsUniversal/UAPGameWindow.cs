@@ -116,11 +116,6 @@ namespace Microsoft.Xna.Framework
             _dinfo = DisplayInformation.GetForCurrentView();
             _appView = ApplicationView.GetForCurrentView();
 
-            // Set a min size that is reasonable knowing someone might try
-            // to use some old school resolution like 640x480.
-            var minSize = new Windows.Foundation.Size(640 / _dinfo.RawPixelsPerViewPixel, 480 / _dinfo.RawPixelsPerViewPixel);
-            _appView.SetPreferredMinSize(minSize);
-
             _orientation = ToOrientation(_dinfo.CurrentOrientation);
             _dinfo.OrientationChanged += DisplayProperties_OrientationChanged;
 
