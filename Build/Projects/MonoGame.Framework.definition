@@ -162,7 +162,7 @@
     <Compile Include="Platform\Properties\AssemblyInfo.Windows.cs">
         <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Platform\Properties\AssemblyInfo.UniversalWindowsPlatform.cs">
+    <Compile Include="Platform\Properties\AssemblyInfo.UWP.cs">
         <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Platform\Properties\AssemblyInfo.Web.cs">
