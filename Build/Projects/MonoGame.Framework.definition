@@ -289,7 +289,7 @@
     <Compile Include="PlayerIndex.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
-    <Compile Include="PrimaryThreadLoader.cs">
+    <Compile Include="Platform\PrimaryThreadLoader.cs">
       <Platforms>Android,MacOS</Platforms>
     </Compile>
     <Compile Include="Quaternion.cs" />
@@ -1251,7 +1251,7 @@
     <Compile Include="Platform\Android\ResumeManager.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Platform\Android\ScreenReciever.cs">
+    <Compile Include="Platform\Android\ScreenReceiver.cs">
       <Platforms>Android</Platforms>
     </Compile>
 
