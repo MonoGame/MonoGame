@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
+    <Compile Include="Platform\Graphics\SwapChainRenderTarget.cs" />
     <Compile Include="Platform\Input\GamePad.XInput.cs" />
     <Compile Include="Platform\Input\Joystick.Default.cs" />
     <Compile Include="Platform\Input\Keyboard.Windows.cs" />
