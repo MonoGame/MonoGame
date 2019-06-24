@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Audio
 			set;
 		}
 
-        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int sampleAlignment = 0)
+        public unsafe void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int sampleAlignment = 0, int loopStart = 0, int loopLength = 0)
         {
             if ((format == ALFormat.MonoMSAdpcm || format == ALFormat.StereoMSAdpcm) && !OpenALSoundController.Instance.SupportsAdpcm)
                 throw new InvalidOperationException("MS-ADPCM is not supported by this OpenAL driver");
@@ -56,6 +56,31 @@ namespace Microsoft.Xna.Framework.Audio
                 ALHelper.CheckError("Failed to fill buffer.");
             }
 
+            bool formatLoopEnabled = true;
+
+            /* Formats that OpenAL Soft currently doesn't support loop points for:
+             * MonoIma4
+             * StereoIma4
+             * MonoMSAdpcm
+             * StereoMSAdpcm
+            */
+            if (format == ALFormat.MonoIma4 || format == ALFormat.StereoIma4
+                || format == ALFormat.MonoMSAdpcm || format == ALFormat.StereoMSAdpcm)
+            {
+                formatLoopEnabled = false;
+            }
+
+            if (OpenALSoundController.GetInstance.SupportsLoopPoints && formatLoopEnabled && loopStart >= 0 && loopLength > 0)
+            {
+                //Loop end is loopStart + loopLength
+                int* loopData = stackalloc int[2];
+                loopData[0] = loopStart;
+                loopData[1] = loopStart + loopLength;
+
+                AL.Bufferiv(openALDataBuffer, ALBufferi.LoopSoftPointsExt, loopData);
+                ALHelper.CheckError("Failed to set loop points.");
+            }
+
             AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, size, sampleRate);
             ALHelper.CheckError("Failed to fill buffer.");
 
@@ -70,7 +95,7 @@ namespace Microsoft.Xna.Framework.Audio
             Duration = (float)(unpackedSize / ((bits / 8) * channels)) / (float)sampleRate;
         }
 
-		public void Dispose()
+        public void Dispose()
 		{
             Dispose(true);
             GC.SuppressFinalize(this);

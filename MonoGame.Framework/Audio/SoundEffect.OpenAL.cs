@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             // bind buffer
             SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate);
+            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate, loopStart, loopLength);
         }
 
         private void PlatformInitializeIeeeFloat(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             // bind buffer
             SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate);
+            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate, loopStart, loopLength);
         }
 
         private void PlatformInitializeAdpcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int blockAlignment, int loopStart, int loopLength)
@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Audio
             SoundBuffer = new OALSoundBuffer();
             // Buffer length must be aligned with the block alignment
             int alignedCount = count - (count % blockAlignment);
-            SoundBuffer.BindDataBuffer(buffer, format, alignedCount, sampleRate, sampleAlignment);
+            SoundBuffer.BindDataBuffer(buffer, format, alignedCount, sampleRate, sampleAlignment, loopStart, loopLength);
         }
 
         private void PlatformInitializeIma4(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int blockAlignment, int loopStart, int loopLength)
@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             // bind buffer
             SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate, sampleAlignment);
+            SoundBuffer.BindDataBuffer(buffer, format, count, sampleRate, sampleAlignment, loopStart, loopLength);
         }
 
         private void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)

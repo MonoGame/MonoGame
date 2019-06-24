@@ -102,6 +102,7 @@ namespace Microsoft.Xna.Framework.Audio
         public bool SupportsAdpcm { get; private set; }
         public bool SupportsEfx { get; private set; }
         public bool SupportsIeee { get; private set; }
+        public bool SupportsLoopPoints { get; private set; }
 
         /// <summary>
         /// Sets up the hardware resources used by the controller.
@@ -280,6 +281,7 @@ namespace Microsoft.Xna.Framework.Audio
                     SupportsAdpcm = AL.IsExtensionPresent("AL_SOFT_MSADPCM");
                     SupportsEfx = AL.IsExtensionPresent("AL_EXT_EFX");
                     SupportsIeee = AL.IsExtensionPresent("AL_EXT_float32");
+                    SupportsLoopPoints = AL.IsExtensionPresent("AL_SOFT_loop_points");
                     return true;
                 }
             }
