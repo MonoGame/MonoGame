@@ -448,7 +448,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 try
                 {
-                    var a = Assembly.Load(path);
+                    var a = Assembly.LoadFrom(path);
                     var types = a.GetTypes();
                     ProcessTypes(types);
                 }
