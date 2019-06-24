@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);OPENAL</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Platform\Audio\AudioLoader.cs" />
+    <Compile Include="Platform\Audio\DynamicSoundEffectInstance.OpenAL.cs" />
+    <Compile Include="Platform\Audio\Microphone.OpenAL.cs" />
+    <Compile Include="Platform\Audio\OALSoundBuffer.cs" />
+    <Compile Include="Platform\Audio\OpenAL.cs" />
+    <Compile Include="Platform\Audio\OpenALSoundController.cs" />
+    <Compile Include="Platform\Audio\SoundEffect.OpenAL.cs" />
+    <Compile Include="Platform\Audio\SoundEffectInstance.OpenAL.cs" />
+  </ItemGroup>
+</Project>

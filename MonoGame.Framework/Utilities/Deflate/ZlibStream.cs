@@ -416,7 +416,7 @@ namespace MonoGame.Utilities.Deflate
                 if (!_disposed)
                 {
                     if (disposing && (this._baseStream != null))
-                        this._baseStream.Close();
+                        this._baseStream.Dispose();
                     _disposed = true;
                 }
             }

@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <MonoGamePlatform>$(MSBuildProjectName.Substring(9))</MonoGamePlatform>
+    <BaseIntermediateOutputPath>obj\$(MonoGamePlatform)</BaseIntermediateOutputPath>
+    <BaseOutputPath>bin\$(MonoGamePlatform)</BaseOutputPath>
+  </PropertyGroup>
+</Project>
+

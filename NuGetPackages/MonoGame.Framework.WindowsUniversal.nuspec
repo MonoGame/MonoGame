@@ -30,7 +30,7 @@ This package provides you with MonoGame Framework that works on Windows 10, Wind
     </metadata>
     <files>
         <file src="..\..\NuGetPackages\build\WindowsUniversal\MonoGame.Framework.WindowsUniversal.targets" target="build\MonoGame.Framework.WindowsUniversal.targets" />
-        <file src="WindowsUniversal\AnyCPU\Release\Themes\generic.xbf" target="lib\netcore\MonoGame.Framework\Themes/generic.xbf" />
+        <file src="WindowsUniversal\AnyCPU\Release\Platform\Themes\generic.xbf" target="lib\netcore\MonoGame.Framework\Themes/generic.xbf" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.dll" target="lib\netcore\MonoGame.Framework.dll" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.pri" target="lib\netcore\MonoGame.Framework.pri" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xml" target="lib\netcore\MonoGame.Framework.xml" />

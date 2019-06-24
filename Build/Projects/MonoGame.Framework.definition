@@ -141,31 +141,31 @@
 
   <Files>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\AssemblyInfo.Android.cs">
+    <Compile Include="Platform\Properties\AssemblyInfo.Android.cs">
         <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.DesktopGL.cs">
+    <Compile Include="Platform\Properties\AssemblyInfo.DesktopGL.cs">
         <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.iOS.cs">
+    <Compile Include="Platform\Properties\AssemblyInfo.iOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.Mac.cs">
+    <Compile Include="Platform\Properties\AssemblyInfo.Mac.cs">
         <Platforms>MacOS</Platforms>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.Angle.cs">
+    <Compile Include="Platform\Properties\AssemblyInfo.Angle.cs">
         <Platforms>Angle</Platforms>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.tvOS.cs">
+    <Compile Include="Platform\Properties\AssemblyInfo.tvOS.cs">
         <Platforms>tvOS</Platforms>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.Windows.cs">
+    <Compile Include="Platform\Properties\AssemblyInfo.Windows.cs">
         <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.UniversalWindowsPlatform.cs">
+    <Compile Include="Platform\Properties\AssemblyInfo.UWP.cs">
         <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.Web.cs">
+    <Compile Include="Platform\Properties\AssemblyInfo.Web.cs">
         <Platforms>Web</Platforms>
     </Compile>
 
@@ -265,10 +265,10 @@
     <Compile Include="GameComponent.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
-    <Compile Include="GamePlatform.Desktop.cs">
+    <Compile Include="Platform\GamePlatform.Desktop.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="GamePlatform.Mobile.cs">
+    <Compile Include="Platform\GamePlatform.Mobile.cs">
       <Platforms>Android,iOS,Web,tvOS</Platforms>
     </Compile>
     <Compile Include="GameRunBehavior.cs" />
@@ -289,7 +289,7 @@
     <Compile Include="PlayerIndex.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
-    <Compile Include="PrimaryThreadLoader.cs">
+    <Compile Include="Platform\PrimaryThreadLoader.cs">
       <Platforms>Android,MacOS</Platforms>
     </Compile>
     <Compile Include="Quaternion.cs" />
@@ -299,20 +299,20 @@
     <Compile Include="TextInputEventArgs.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Threading.cs">
+    <Compile Include="Platform\Threading.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS</Platforms>
     </Compile>
     <Compile Include="TitleContainer.cs" />
-    <Compile Include="TitleContainer.Android.cs">
+    <Compile Include="Platform\TitleContainer.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="TitleContainer.Desktop.cs">
+    <Compile Include="Platform\TitleContainer.Desktop.cs">
       <Platforms>Angle,Linux,Windows,WindowsGL,Web,MacOS</Platforms>
     </Compile>
-    <Compile Include="TitleContainer.MacOS.cs">
+    <Compile Include="Platform\TitleContainer.MacOS.cs">
       <Platforms>iOS,tvOS</Platforms>
     </Compile>
-    <Compile Include="TitleContainer.WinRT.cs">
+    <Compile Include="Platform\TitleContainer.WinRT.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Vector2.cs" />
@@ -326,61 +326,61 @@
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="Audio\AudioListener.cs" />
-    <Compile Include="Audio\AudioLoader.cs">
+    <Compile Include="Platform\Audio\AudioLoader.cs">
 	  <Services>OpenALAudio</Services>
     </Compile>
 	<Compile Include="Audio\DynamicSoundEffectInstance.cs" />
-	<Compile Include="Audio\DynamicSoundEffectInstance.OpenAL.cs">
+	<Compile Include="Platform\Audio\DynamicSoundEffectInstance.OpenAL.cs">
 	  <Services>OpenALAudio</Services>
 	</Compile>
-	<Compile Include="Audio\DynamicSoundEffectInstance.XAudio.cs">
+	<Compile Include="Platform\Audio\DynamicSoundEffectInstance.XAudio.cs">
 	  <Services>XAudioAudio</Services>
 	</Compile>
-    <Compile Include="Audio\DynamicSoundEffectInstance.Web.cs">
+    <Compile Include="Platform\Audio\DynamicSoundEffectInstance.Web.cs">
 	  <Services>WebAudio</Services>
     </Compile>
 	<Compile Include="Audio\DynamicSoundEffectInstanceManager.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
-    <Compile Include="Audio\OALSoundBuffer.cs">
+    <Compile Include="Platform\Audio\OALSoundBuffer.cs">
       <Services>OpenALAudio</Services>
     </Compile>
-	<Compile Include="Audio\OggStream.cs">
+	<Compile Include="Platform\Audio\OggStream.cs">
       <Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
-    <Compile Include="Audio\OpenAL.cs">
+    <Compile Include="Platform\Audio\OpenAL.cs">
       <Services>OpenALAudio</Services>
     </Compile>
-    <Compile Include="Audio\OpenALSoundController.cs">
+    <Compile Include="Platform\Audio\OpenALSoundController.cs">
       <Services>OpenALAudio</Services>
     </Compile>
     <Compile Include="Audio\SoundEffect.cs" />
-    <Compile Include="Audio\SoundEffect.OpenAL.cs">
+    <Compile Include="Platform\Audio\SoundEffect.OpenAL.cs">
       <Services>OpenALAudio</Services>
     </Compile>
-    <Compile Include="Audio\SoundEffect.XAudio.cs">
+    <Compile Include="Platform\Audio\SoundEffect.XAudio.cs">
       <Services>XAudioAudio</Services>
     </Compile>
-    <Compile Include="Audio\SoundEffect.Web.cs">
+    <Compile Include="Platform\Audio\SoundEffect.Web.cs">
       <Services>WebAudio</Services>
     </Compile>
     <Compile Include="Audio\SoundEffectInstance.cs" />
-    <Compile Include="Audio\SoundEffectInstance.OpenAL.cs">
+    <Compile Include="Platform\Audio\SoundEffectInstance.OpenAL.cs">
       <Services>OpenALAudio</Services>
     </Compile>
-    <Compile Include="Audio\SoundEffectInstance.XAudio.cs">
+    <Compile Include="Platform\Audio\SoundEffectInstance.XAudio.cs">
       <Services>XAudioAudio</Services>
     </Compile>
-    <Compile Include="Audio\SoundEffectInstance.Web.cs">
+    <Compile Include="Platform\Audio\SoundEffectInstance.Web.cs">
       <Services>WebAudio</Services>
     </Compile>
     <Compile Include="Audio\SoundEffectInstancePool.cs" />
     <Compile Include="Audio\SoundState.cs" />
 	<Compile Include="Audio\Microphone.cs" />
-	<Compile Include="Audio\Microphone.OpenAL.cs">
+	<Compile Include="Platform\Audio\Microphone.OpenAL.cs">
       <Services>OpenALAudio</Services>
     </Compile>
-	<Compile Include="Audio\Microphone.Default.cs">
+	<Compile Include="Platform\Audio\Microphone.Default.cs">
       <Services>XAudioAudio,WebAudio</Services>
     </Compile>
 	<Compile Include="Audio\NoMicrophoneConnectedException.cs" />
@@ -514,13 +514,13 @@
     <Compile Include="GraphicsDeviceManager.cs">
 		<Platforms>Windows,WindowsGL,Linux,WindowsUniversal,Web,MacOS</Platforms>
     </Compile>
-    <Compile Include="GraphicsDeviceManager.SDL.cs">
+    <Compile Include="Platform\GraphicsDeviceManager.SDL.cs">
       <Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
-    <Compile Include="GraphicsDeviceManager.WinRT.cs">
+    <Compile Include="Platform\GraphicsDeviceManager.WinRT.cs">
 		<Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="GraphicsDeviceManager.Legacy.cs">
+    <Compile Include="Platform\GraphicsDeviceManager.Legacy.cs">
 		<Platforms>Android,Angle,iOS,tvOS</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsMetrics.cs" />
@@ -545,10 +545,10 @@
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\EffectResource.cs" />
-    <Compile Include="Graphics\Effect\EffectResource.DirectX.cs">
+    <Compile Include="Platform\Graphics\Effect\EffectResource.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Effect\EffectResource.OpenGL.cs">
+    <Compile Include="Platform\Graphics\Effect\EffectResource.OpenGL.cs">
       <Services>OpenGLGraphics,WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
@@ -566,44 +566,44 @@
     <Compile Include="Graphics\GraphicsAdapter.cs">
       <ExcludePlatforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS,Web</ExcludePlatforms>
     </Compile>
-    <Compile Include="Graphics\GraphicsAdapter.DirectX.cs">
+    <Compile Include="Platform\Graphics\GraphicsAdapter.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\GraphicsAdapter.Legacy.cs">
+    <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS,Web</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
-    <Compile Include="Graphics\GraphicsCapabilities.DirectX.cs">
+    <Compile Include="Platform\Graphics\GraphicsCapabilities.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\GraphicsCapabilities.OpenGL.cs">
+    <Compile Include="Platform\Graphics\GraphicsCapabilities.OpenGL.cs">
       <Services>OpenGLGraphics,ANGLEGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\GraphicsCapabilities.Web.cs">
+    <Compile Include="Platform\Graphics\GraphicsCapabilities.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\GraphicsContext.SDL.cs">
+    <Compile Include="Platform\Graphics\GraphicsContext.SDL.cs">
       <Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsDebug.cs" />
-    <Compile Include="Graphics\GraphicsDebug.DirectX.cs">
+    <Compile Include="Platform\Graphics\GraphicsDebug.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\GraphicsDebug.Default.cs">
+    <Compile Include="Platform\Graphics\GraphicsDebug.Default.cs">
       <Services>OpenGLGraphics,WebGraphics,ANGLEGraphics</Services>
     </Compile>
     <Compile Include="Graphics\GraphicsDebugMessage.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
-    <Compile Include="Graphics\GraphicsDevice.DirectX.cs">
+    <Compile Include="Platform\Graphics\GraphicsDevice.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\GraphicsDevice.OpenGL.cs">
+    <Compile Include="Platform\Graphics\GraphicsDevice.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\GraphicsDevice.OpenGL.FramebufferHelper.cs">
+    <Compile Include="Platform\Graphics\GraphicsDevice.OpenGL.FramebufferHelper.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\GraphicsDevice.Web.cs">
+    <Compile Include="Platform\Graphics\GraphicsDevice.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
@@ -626,29 +626,29 @@
     <Compile Include="Graphics\OcclusionQuery.cs">
       <ExcludePlatforms>iOS,Android</ExcludePlatforms>
     </Compile>
-    <Compile Include="Graphics\OcclusionQuery.DirectX.cs">
+    <Compile Include="Platform\Graphics\OcclusionQuery.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\OcclusionQuery.OpenGL.cs">
+    <Compile Include="Platform\Graphics\OcclusionQuery.OpenGL.cs">
       <Services>ANGLEGraphics,OpenGLGraphics</Services>
       <ExcludePlatforms>iOS,Android</ExcludePlatforms>
     </Compile>
-    <Compile Include="Graphics\OcclusionQuery.Null.cs">
+    <Compile Include="Platform\Graphics\OcclusionQuery.Null.cs">
       <Services>WebGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\OpenGL.cs">
+    <Compile Include="Platform\Graphics\OpenGL.cs">
       <Platforms>WindowsGL,Linux,iOS,MacOS,Android,Ouya,tvOS</Platforms>
     </Compile>
-    <Compile Include="Graphics\OpenGL.Common.cs">
+    <Compile Include="Platform\Graphics\OpenGL.Common.cs">
       <Platforms>WindowsGL,Linux,Android,Ouya</Platforms>
     </Compile>
-    <Compile Include="Graphics\OpenGL.SDL.cs">
+    <Compile Include="Platform\Graphics\OpenGL.SDL.cs">
       <Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
-    <Compile Include="Graphics\OpenGL.Android.cs">
+    <Compile Include="Platform\Graphics\OpenGL.Android.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
-    <Compile Include="Graphics\OpenGL.iOS.cs">
+    <Compile Include="Platform\Graphics\OpenGL.iOS.cs">
       <Platforms>iOS,tvOS</Platforms>
     </Compile>
     <Compile Include="Graphics\PackedVector\Alpha8.cs" />
@@ -674,68 +674,68 @@
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
-    <Compile Include="Graphics\RenderTarget2D.DirectX.cs">
+    <Compile Include="Platform\Graphics\RenderTarget2D.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\RenderTarget2D.OpenGL.cs">
+    <Compile Include="Platform\Graphics\RenderTarget2D.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\RenderTarget2D.Web.cs">
+    <Compile Include="Platform\Graphics\RenderTarget2D.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\RenderTarget3D.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\RenderTarget3D.DirectX.cs">
+    <Compile Include="Platform\Graphics\RenderTarget3D.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
     <Compile Include="Graphics\RenderTargetBinding.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
-	<Compile Include="Graphics\RenderTargetCube.DirectX.cs">
+	<Compile Include="Platform\Graphics\RenderTargetCube.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\RenderTargetCube.OpenGL.cs">
+    <Compile Include="Platform\Graphics\RenderTargetCube.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\RenderTargetCube.Web.cs">
+    <Compile Include="Platform\Graphics\RenderTargetCube.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Graphics\SamplerStateCollection.cs" />
-    <Compile Include="Graphics\SamplerStateCollection.DirectX.cs">
+    <Compile Include="Platform\Graphics\SamplerStateCollection.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\SamplerStateCollection.OpenGL.cs">
+    <Compile Include="Platform\Graphics\SamplerStateCollection.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\SamplerStateCollection.Web.cs">
+    <Compile Include="Platform\Graphics\SamplerStateCollection.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
-    <Compile Include="Graphics\Shader\ConstantBuffer.DirectX.cs">
+    <Compile Include="Platform\Graphics\Shader\ConstantBuffer.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Shader\ConstantBuffer.OpenGL.cs">
+    <Compile Include="Platform\Graphics\Shader\ConstantBuffer.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Shader\ConstantBuffer.Web.cs">
+    <Compile Include="Platform\Graphics\Shader\ConstantBuffer.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Shader\Shader.cs" />
-    <Compile Include="Graphics\Shader\Shader.DirectX.cs">
+    <Compile Include="Platform\Graphics\Shader\Shader.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Shader\Shader.OpenGL.cs">
+    <Compile Include="Platform\Graphics\Shader\Shader.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Shader\Shader.Web.cs">
+    <Compile Include="Platform\Graphics\Shader\Shader.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Shader\ShaderProgramCache.cs">
+    <Compile Include="Platform\Graphics\Shader\ShaderProgramCache.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS</Platforms>
     </Compile>
     <Compile Include="Graphics\Shader\ShaderStage.cs" />
@@ -748,47 +748,47 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-    <Compile Include="Graphics\States\BlendState.DirectX.cs">
+    <Compile Include="Platform\Graphics\States\BlendState.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\States\BlendState.OpenGL.cs">
+    <Compile Include="Platform\Graphics\States\BlendState.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\States\BlendState.Web.cs">
+    <Compile Include="Platform\Graphics\States\BlendState.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\States\CompareFunction.cs" />
     <Compile Include="Graphics\States\CullMode.cs" />
     <Compile Include="Graphics\States\DepthFormat.cs" />
     <Compile Include="Graphics\States\DepthStencilState.cs" />
-    <Compile Include="Graphics\States\DepthStencilState.DirectX.cs">
+    <Compile Include="Platform\Graphics\States\DepthStencilState.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\States\DepthStencilState.OpenGL.cs">
+    <Compile Include="Platform\Graphics\States\DepthStencilState.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\States\DepthStencilState.Web.cs">
+    <Compile Include="Platform\Graphics\States\DepthStencilState.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\States\FillMode.cs" />
     <Compile Include="Graphics\States\RasterizerState.cs" />
-    <Compile Include="Graphics\States\RasterizerState.DirectX.cs">
+    <Compile Include="Platform\Graphics\States\RasterizerState.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\States\RasterizerState.OpenGL.cs">
+    <Compile Include="Platform\Graphics\States\RasterizerState.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\States\RasterizerState.Web.cs">
+    <Compile Include="Platform\Graphics\States\RasterizerState.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\States\SamplerState.cs" />
-    <Compile Include="Graphics\States\SamplerState.DirectX.cs">
+    <Compile Include="Platform\Graphics\States\SamplerState.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\States\SamplerState.OpenGL.cs">
+    <Compile Include="Platform\Graphics\States\SamplerState.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\States\SamplerState.Web.cs">
+    <Compile Include="Platform\Graphics\States\SamplerState.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\States\StencilOperation.cs" />
@@ -797,112 +797,112 @@
     <Compile Include="Graphics\States\TextureFilter.cs" />
     <Compile Include="Graphics\States\TextureFilterMode.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
-    <Compile Include="Graphics\SwapChainRenderTarget.cs">
+    <Compile Include="Platform\Graphics\SwapChainRenderTarget.cs">
       <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Graphics\Texture2D.cs" />
-    <Compile Include="Graphics\Texture2D.DirectX.cs">
+    <Compile Include="Platform\Graphics\Texture2D.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Texture2D.OpenGL.cs">
+    <Compile Include="Platform\Graphics\Texture2D.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Texture2D.Web.cs">
+    <Compile Include="Platform\Graphics\Texture2D.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Texture3D.cs" />
-    <Compile Include="Graphics\Texture3D.DirectX.cs">
+    <Compile Include="Platform\Graphics\Texture3D.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Texture3D.OpenGL.cs">
+    <Compile Include="Platform\Graphics\Texture3D.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Texture3D.Web.cs">
+    <Compile Include="Platform\Graphics\Texture3D.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\TextureCollection.cs" />
-    <Compile Include="Graphics\TextureCollection.DirectX.cs">
+    <Compile Include="Platform\Graphics\TextureCollection.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\TextureCollection.OpenGL.cs">
+    <Compile Include="Platform\Graphics\TextureCollection.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\TextureCollection.Web.cs">
+    <Compile Include="Platform\Graphics\TextureCollection.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Texture.cs" />
-    <Compile Include="Graphics\Texture.DirectX.cs">
+    <Compile Include="Platform\Graphics\Texture.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Texture.OpenGL.cs">
+    <Compile Include="Platform\Graphics\Texture.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Texture.Web.cs">
+    <Compile Include="Platform\Graphics\Texture.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\TextureCube.cs" />
-    <Compile Include="Graphics\TextureCube.DirectX.cs">
+    <Compile Include="Platform\Graphics\TextureCube.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\TextureCube.OpenGL.cs">
+    <Compile Include="Platform\Graphics\TextureCube.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\TextureCube.Web.cs">
+    <Compile Include="Platform\Graphics\TextureCube.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\BufferUsage.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
-    <Compile Include="Graphics\Vertices\ImmutableVertexInputLayout.cs">
+    <Compile Include="Platform\Graphics\Vertices\ImmutableVertexInputLayout.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
-    <Compile Include="Graphics\Vertices\IndexBuffer.DirectX.cs">
+    <Compile Include="Platform\Graphics\Vertices\IndexBuffer.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\IndexBuffer.OpenGL.cs">
+    <Compile Include="Platform\Graphics\Vertices\IndexBuffer.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\IndexBuffer.Web.cs">
+    <Compile Include="Platform\Graphics\Vertices\IndexBuffer.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
-    <Compile Include="Graphics\Vertices\InputLayoutCache.cs">
+    <Compile Include="Platform\Graphics\Vertices\InputLayoutCache.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\IVertexType.cs" />
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
-    <Compile Include="Graphics\Vertices\VertexBuffer.DirectX.cs">
+    <Compile Include="Platform\Graphics\Vertices\VertexBuffer.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\VertexBuffer.OpenGL.cs">
+    <Compile Include="Platform\Graphics\Vertices\VertexBuffer.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\VertexBuffer.Web.cs">
+    <Compile Include="Platform\Graphics\Vertices\VertexBuffer.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexBufferBinding.cs" />
     <Compile Include="Graphics\Vertices\VertexBufferBindings.cs" />
-    <Compile Include="Graphics\Vertices\VertexBufferBindings.DirectX.cs">
+    <Compile Include="Platform\Graphics\Vertices\VertexBufferBindings.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
-    <Compile Include="Graphics\Vertices\VertexDeclaration.OpenGL.cs">
+    <Compile Include="Platform\Graphics\Vertices\VertexDeclaration.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\VertexDeclaration.Web.cs">
+    <Compile Include="Platform\Graphics\Vertices\VertexDeclaration.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexElement.cs" />
-    <Compile Include="Graphics\Vertices\VertexElement.DirectX.cs">
+    <Compile Include="Platform\Graphics\Vertices\VertexElement.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexElementFormat.cs" />
     <Compile Include="Graphics\Vertices\VertexElementUsage.cs" />
     <Compile Include="Graphics\Vertices\VertexInputLayout.cs" />
-    <Compile Include="Graphics\Vertices\VertexInputLayout.DirectX.cs">
+    <Compile Include="Platform\Graphics\Vertices\VertexInputLayout.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexPosition.cs" />
@@ -911,7 +911,7 @@
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Graphics\Viewport.cs" />
-    <Compile Include="Graphics\WindowInfo.SDL.cs">
+    <Compile Include="Platform\Graphics\WindowInfo.SDL.cs">
       <Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
     
@@ -919,25 +919,25 @@
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
-    <Compile Include="Input\GamePad.Android.cs">
+    <Compile Include="Platform\Input\GamePad.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.IOS.cs">
+    <Compile Include="Platform\Input\GamePad.IOS.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.tvOS.cs">
+    <Compile Include="Platform\Input\GamePad.tvOS.cs">
       <Platforms>tvOS</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.SDL.cs">
+    <Compile Include="Platform\Input\GamePad.SDL.cs">
       <Platforms>Linux,WindowsGL,MacOS</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.Web.cs">
+    <Compile Include="Platform\Input\GamePad.Web.cs">
       <Platforms>Web</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.XInput.cs">
+    <Compile Include="Platform\Input\GamePad.XInput.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.UWP.cs">
+    <Compile Include="Platform\Input\GamePad.UWP.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\GamePadButtons.cs" />
@@ -952,43 +952,43 @@
     <Compile Include="Input\JoystickCapabilities.cs" />
     <Compile Include="Input\JoystickHat.cs" />
     <Compile Include="Input\JoystickState.cs" />
-    <Compile Include="Input\Joystick.Default.cs">
+    <Compile Include="Platform\Input\Joystick.Default.cs">
       <Platforms>Angle,Android,Windows,WindowsUniversal,iOS,tvOS</Platforms>
     </Compile>
-    <Compile Include="Input\Joystick.SDL.cs">
+    <Compile Include="Platform\Input\Joystick.SDL.cs">
       <Platforms>Linux,WindowsGL,MacOS</Platforms>
     </Compile>
-    <Compile Include="Input\Joystick.Web.cs">
+    <Compile Include="Platform\Input\Joystick.Web.cs">
       <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Input\Keyboard.cs">
 		<ExcludePlatforms>Android</ExcludePlatforms>
     </Compile>
-    <Compile Include="Input\Keyboard.Default.cs">
+    <Compile Include="Platform\Input\Keyboard.Default.cs">
 		<ExcludePlatforms>Android,WindowsUniversal,Windows,WindowsGL,Linux,MacOS</ExcludePlatforms>
     </Compile>
-    <Compile Include="Input\Keyboard.SDL.cs">
+    <Compile Include="Platform\Input\Keyboard.SDL.cs">
 		<Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
-    <Compile Include="Input\Keyboard.Windows.cs">
+    <Compile Include="Platform\Input\Keyboard.Windows.cs">
 		<Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Input\Keyboard.WinRT.cs">
+    <Compile Include="Platform\Input\Keyboard.WinRT.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.cs">
       <Platforms>Android,iOS,Windows,WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Input\KeyboardInput.Android.cs">
+    <Compile Include="Platform\Input\KeyboardInput.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Input\KeyboardInput.IOS.cs">
+    <Compile Include="Platform\Input\KeyboardInput.IOS.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="Input\KeyboardInput.Windows.cs">
+    <Compile Include="Platform\Input\KeyboardInput.Windows.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Input\KeyboardInput.WinRT.cs">
+    <Compile Include="Platform\Input\KeyboardInput.WinRT.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardState.cs" />
@@ -997,36 +997,36 @@
     <Compile Include="Input\MessageBox.cs">
       <Platforms>Android,iOS,Windows,WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Input\MessageBox.Android.cs">
+    <Compile Include="Platform\Input\MessageBox.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Input\MessageBox.IOS.cs">
+    <Compile Include="Platform\Input\MessageBox.IOS.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="Input\MessageBox.Windows.cs">
+    <Compile Include="Platform\Input\MessageBox.Windows.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Input\MessageBox.WinRT.cs">
+    <Compile Include="Platform\Input\MessageBox.WinRT.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\Mouse.cs" />
-    <Compile Include="Input\Mouse.SDL.cs">
+    <Compile Include="Platform\Input\Mouse.SDL.cs">
       <Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
-    <Compile Include="Input\Mouse.Windows.cs">
+    <Compile Include="Platform\Input\Mouse.Windows.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Input\Mouse.Default.cs">
+    <Compile Include="Platform\Input\Mouse.Default.cs">
       <ExcludePlatforms>WindowsGL,Linux,Windows,MacOS</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\MouseCursor.cs" />
-    <Compile Include="Input\MouseCursor.SDL.cs">
+    <Compile Include="Platform\Input\MouseCursor.SDL.cs">
       <Platforms>Linux,WindowsGL,MacOS</Platforms>
     </Compile>
-    <Compile Include="Input\MouseCursor.Windows.cs">
+    <Compile Include="Platform\Input\MouseCursor.Windows.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Input\MouseCursor.Default.cs">
+    <Compile Include="Platform\Input\MouseCursor.Default.cs">
       <ExcludePlatforms>Linux,WindowsGL,Windows,MacOS</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\MouseState.cs" />
@@ -1038,11 +1038,11 @@
     <Compile Include="Input\Touch\TouchPanel.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanelState.cs" />
-    <Compile Include="Input\Touch\TouchQueue.cs">
+    <Compile Include="Platform\Input\Touch\TouchQueue.cs">
 			<Platforms>WindowsUniversal</Platforms>
 	</Compile>
 
-    <Page Include="Themes\generic.xaml">
+    <Page Include="Platform\Themes\generic.xaml">
 			<Platforms>WindowsUniversal</Platforms>
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
@@ -1054,145 +1054,145 @@
     <Compile Include="Media\Artist.cs" />
     <Compile Include="Media\Genre.cs" />
     <Compile Include="Media\MediaLibrary.cs" />
-    <Compile Include="Media\MediaLibrary.Default.cs">
+    <Compile Include="Platform\Media\MediaLibrary.Default.cs">
       <ExcludePlatforms>iOS,Android,WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Media\MediaLibrary.Android.cs">
+    <Compile Include="Platform\Media\MediaLibrary.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Media\MediaLibrary.IOS.cs">
+    <Compile Include="Platform\Media\MediaLibrary.IOS.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="Media\MediaLibrary.WinRT.cs">
+    <Compile Include="Platform\Media\MediaLibrary.WinRT.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Media\MediaManagerState.cs">
+    <Compile Include="Platform\Media\MediaManagerState.cs">
       <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\MediaPlayer.cs" />
-    <Compile Include="Media\MediaPlayer.WME.cs">
+    <Compile Include="Platform\Media\MediaPlayer.WME.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Media\MediaPlayer.WMS.cs">
+    <Compile Include="Platform\Media\MediaPlayer.WMS.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Media\MediaPlayer.Default.cs">
+    <Compile Include="Platform\Media\MediaPlayer.Default.cs">
       <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Web,tvOS</Platforms>
     </Compile>
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\MediaState.cs" />
-    <Compile Include="Media\MusicProperties.cs">
+    <Compile Include="Platform\Media\MusicProperties.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Media\PlaylistCollection.cs" />
     <Compile Include="Media\Playlist.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Media\Song.cs" />
-    <Compile Include="Media\Song.Default.cs">
+    <Compile Include="Platform\Media\Song.Default.cs">
         <Platforms>Angle,Web</Platforms>
     </Compile>
-    <Compile Include="Media\Song.Android.cs">
+    <Compile Include="Platform\Media\Song.Android.cs">
         <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Media\Song.IOS.cs">
+    <Compile Include="Platform\Media\Song.IOS.cs">
         <Platforms>iOS,tvOS</Platforms>
     </Compile>
-    <Compile Include="Media\Song.NVorbis.cs">
+    <Compile Include="Platform\Media\Song.NVorbis.cs">
         <Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
-    <Compile Include="Media\Song.WMS.cs">
+    <Compile Include="Platform\Media\Song.WMS.cs">
         <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Media\Song.WinRT.cs">
+    <Compile Include="Platform\Media\Song.WinRT.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
       <ExcludePlatforms>Angle,Linux,WindowsGL,Web,tvOS</ExcludePlatforms>
     </Compile>
-    <Compile Include="Media\Video.IOS.cs">
+    <Compile Include="Platform\Media\Video.IOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="Media\Video.MacOS.cs">
+    <Compile Include="Platform\Media\Video.MacOS.cs">
         <Platforms>MacOS</Platforms>
     </Compile>
-    <Compile Include="Media\Video.Android.cs">
+    <Compile Include="Platform\Media\Video.Android.cs">
         <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Media\Video.WMS.cs">
+    <Compile Include="Platform\Media\Video.WMS.cs">
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.cs">
       <ExcludePlatforms>Angle,Linux,WindowsGL,Web,tvOS</ExcludePlatforms>
     </Compile>
-    <Compile Include="Media\VideoPlayer.IOS.cs">
+    <Compile Include="Platform\Media\VideoPlayer.IOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="Media\VideoPlayer.WME.cs">
+    <Compile Include="Platform\Media\VideoPlayer.WME.cs">
         <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Media\VideoPlayer.MacOS.cs">
+    <Compile Include="Platform\Media\VideoPlayer.MacOS.cs">
         <Platforms>MacOS</Platforms>
     </Compile>
-    <Compile Include="Media\VideoPlayer.Android.cs">
+    <Compile Include="Platform\Media\VideoPlayer.Android.cs">
         <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Media\VideoPlayer.WMS.cs">
+    <Compile Include="Platform\Media\VideoPlayer.WMS.cs">
         <Platforms>Windows</Platforms>
     </Compile>
 
     <!-- Microsoft.Devices.Sensors -->
-    <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs">
+    <Compile Include="Platform\Microsoft\Devices\Sensors\AccelerometerFailedException.cs">
       <Platforms>Android,iOS</Platforms>
     </Compile>
-    <Compile Include="Microsoft\Devices\Sensors\AccelerometerReading.cs">
+    <Compile Include="Platform\Microsoft\Devices\Sensors\AccelerometerReading.cs">
       <Platforms>Android,iOS</Platforms>
     </Compile>
-    <Compile Include="Microsoft\Devices\Sensors\CalibrationEventArgs.cs">
+    <Compile Include="Platform\Microsoft\Devices\Sensors\CalibrationEventArgs.cs">
       <Platforms>Android,iOS</Platforms>
     </Compile>
-    <Compile Include="Microsoft\Devices\Sensors\CompassReading.cs">
+    <Compile Include="Platform\Microsoft\Devices\Sensors\CompassReading.cs">
       <Platforms>Android,iOS</Platforms>
     </Compile>
-    <Compile Include="Microsoft\Devices\Sensors\ISensorReading.cs">
+    <Compile Include="Platform\Microsoft\Devices\Sensors\ISensorReading.cs">
       <Platforms>Android,iOS</Platforms>
     </Compile>
-    <Compile Include="Microsoft\Devices\Sensors\SensorBase.cs">
+    <Compile Include="Platform\Microsoft\Devices\Sensors\SensorBase.cs">
       <Platforms>Android,iOS</Platforms>
     </Compile>
-    <Compile Include="Microsoft\Devices\Sensors\SensorFailedException.cs">
+    <Compile Include="Platform\Microsoft\Devices\Sensors\SensorFailedException.cs">
       <Platforms>Android,iOS</Platforms>
     </Compile>
-    <Compile Include="Microsoft\Devices\Sensors\SensorReadingEventArgs.cs">
+    <Compile Include="Platform\Microsoft\Devices\Sensors\SensorReadingEventArgs.cs">
       <Platforms>Android,iOS</Platforms>
     </Compile>
-    <Compile Include="Microsoft\Devices\Sensors\SensorState.cs">
+    <Compile Include="Platform\Microsoft\Devices\Sensors\SensorState.cs">
       <Platforms>Android,iOS</Platforms>
     </Compile>
 
 
     <!-- Utility Classes -->
-    <Compile Include="Utilities\AssemblyHelper.cs">
+    <Compile Include="Platform\Utilities\AssemblyHelper.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Utilities\CurrentPlatform.cs">
+    <Compile Include="Platform\Utilities\CurrentPlatform.cs">
       <Platforms>Windows,MacOS,WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Utilities\FileHelpers.cs" />
-    <Compile Include="Utilities\InteropHelpers.cs">
+    <Compile Include="Platform\Utilities\InteropHelpers.cs">
 	  <Services>OpenGLGraphics,OpenALAudio</Services>
     </Compile>
     <Compile Include="Utilities\ReflectionHelpers.cs" />
-    <Compile Include="Utilities\ReflectionHelpers.Default.cs" >
+    <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" >
       <Platforms>Android,iOS,WindowsUniversal,tvOS</Platforms>
     </Compile>
-    <Compile Include="Utilities\ReflectionHelpers.Legacy.cs" >
+    <Compile Include="Platform\Utilities\ReflectionHelpers.Legacy.cs" >
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,Web</Platforms>
     </Compile>
-    <Compile Include="Utilities\TimerHelper.cs">
+    <Compile Include="Platform\Utilities\TimerHelper.cs">
       <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
@@ -1215,67 +1215,67 @@
 
 
     <!-- Android Platform -->
-    <Compile Include="Android\AndroidCompatibility.cs">
+    <Compile Include="Platform\Android\AndroidCompatibility.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\AndroidGameActivity.cs">
+    <Compile Include="Platform\Android\AndroidGameActivity.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\AndroidGamePlatform.cs">
+    <Compile Include="Platform\Android\AndroidGamePlatform.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\AndroidGameWindow.cs">
+    <Compile Include="Platform\Android\AndroidGameWindow.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\MonoGameAndroidGameView.cs">
+    <Compile Include="Platform\Android\MonoGameAndroidGameView.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\Devices\Sensors\Accelerometer.cs">
+    <Compile Include="Platform\Android\Devices\Sensors\Accelerometer.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\Devices\Sensors\Compass.cs">
+    <Compile Include="Platform\Android\Devices\Sensors\Compass.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\Input\Keyboard.cs">
+    <Compile Include="Platform\Android\Input\Keyboard.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\Input\Touch\AndroidTouchEventManager.cs">
+    <Compile Include="Platform\Android\Input\Touch\AndroidTouchEventManager.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\IResumeManager.cs">
+    <Compile Include="Platform\Android\IResumeManager.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\OrientationListener.cs">
+    <Compile Include="Platform\Android\OrientationListener.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\ResumeManager.cs">
+    <Compile Include="Platform\Android\ResumeManager.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\ScreenReciever.cs">
+    <Compile Include="Platform\Android\ScreenReceiver.cs">
       <Platforms>Android</Platforms>
     </Compile>
 
 
     <!-- Common Desktop Platform -->
-    <Compile Include="Utilities\FuncLoader.Desktop.cs">
+    <Compile Include="Platform\Utilities\FuncLoader.Desktop.cs">
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
     </Compile>
-    <Compile Include="Utilities\FuncLoader.Android.cs">
+    <Compile Include="Platform\Utilities\FuncLoader.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Utilities\FuncLoader.iOS.cs">
+    <Compile Include="Platform\Utilities\FuncLoader.iOS.cs">
       <Platforms>iOS,tvOS</Platforms>
     </Compile>
-    <Compile Include="SDL\SDLGamePlatform.cs">
+    <Compile Include="Platform\SDL\SDLGamePlatform.cs">
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
     </Compile>
-    <Compile Include="SDL\SDLGameWindow.cs">
+    <Compile Include="Platform\SDL\SDLGameWindow.cs">
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
     </Compile>
-    <Compile Include="SDL\SDL2.cs">
+    <Compile Include="Platform\SDL\SDL2.cs">
       <Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
-    <Compile Include="Input\KeyboardUtil.SDL.cs">
+    <Compile Include="Platform\Input\KeyboardUtil.SDL.cs">
       <Platforms>Angle,Linux,WindowsGL,MacOS</Platforms>
     </Compile>
 	 <EmbeddedResource Include="MonoGame.bmp">
@@ -1289,111 +1289,111 @@
 
 
     <!-- iOS Platform -->
-    <Compile Include="iOS\Devices\Sensors\Accelerometer.cs">
+    <Compile Include="Platform\iOS\Devices\Sensors\Accelerometer.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\Devices\Sensors\Compass.cs">
+    <Compile Include="Platform\iOS\Devices\Sensors\Compass.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\iOSGamePlatform.cs">
+    <Compile Include="Platform\iOS\iOSGamePlatform.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\iOSGameViewController.cs">
+    <Compile Include="Platform\iOS\iOSGameViewController.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\iOSGameView.cs">
+    <Compile Include="Platform\iOS\iOSGameView.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\iOSGameView_GLAbstraction.cs">
+    <Compile Include="Platform\iOS\iOSGameView_GLAbstraction.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\iOSGameView_Touch.cs">
+    <Compile Include="Platform\iOS\iOSGameView_Touch.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\iOSGameWindow.cs">
+    <Compile Include="Platform\iOS\iOSGameWindow.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\OrientationConverter.cs">
+    <Compile Include="Platform\iOS\OrientationConverter.cs">
       <Platforms>iOS</Platforms>
     </Compile>
 
     <!-- tvOS Platform -->
-    <Compile Include="iOS\iOSGamePlatform.cs">
+    <Compile Include="Platform\iOS\iOSGamePlatform.cs">
       <Platforms>tvOS</Platforms>
     </Compile>
-    <Compile Include="iOS\iOSGameViewController.cs">
+    <Compile Include="Platform\iOS\iOSGameViewController.cs">
       <Platforms>tvOS</Platforms>
     </Compile>
-    <Compile Include="iOS\iOSGameView.cs">
+    <Compile Include="Platform\iOS\iOSGameView.cs">
       <Platforms>tvOS</Platforms>
     </Compile>
-    <Compile Include="iOS\iOSGameView_GLAbstraction.cs">
+    <Compile Include="Platform\iOS\iOSGameView_GLAbstraction.cs">
       <Platforms>tvOS</Platforms>
     </Compile>
-    <Compile Include="iOS\iOSGameView_Touch.cs">
+    <Compile Include="Platform\iOS\iOSGameView_Touch.cs">
       <Platforms>tvOS</Platforms>
     </Compile>
-    <Compile Include="iOS\iOSGameWindow.cs">
+    <Compile Include="Platform\iOS\iOSGameWindow.cs">
       <Platforms>tvOS</Platforms>
     </Compile>
 
 
     <!-- Windows UAP Platform -->
-    <Compile Include="WindowsUniversal\GameFrameworkViewSource.cs">
+    <Compile Include="Platform\WindowsUniversal\GameFrameworkViewSource.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="WindowsUniversal\UAPFrameworkView.cs">
+    <Compile Include="Platform\WindowsUniversal\UAPFrameworkView.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="WindowsUniversal\UAPGamePlatform.cs">
+    <Compile Include="Platform\WindowsUniversal\UAPGamePlatform.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="WindowsUniversal\UAPGameWindow.cs">
+    <Compile Include="Platform\WindowsUniversal\UAPGameWindow.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="WindowsUniversal\XamlGame.cs">
+    <Compile Include="Platform\WindowsUniversal\XamlGame.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="WindowsUniversal\InputEvents.cs">
+    <Compile Include="Platform\WindowsUniversal\InputEvents.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Windows\SharpDXHelper.cs">
+    <Compile Include="Platform\Windows\SharpDXHelper.cs">
       <Platforms>Windows,WindowsUniversal</Platforms>
      </Compile>
 
 
     <!-- Windows Desktop Platfom -->
-    <Compile Include="Windows\HorizontalMouseWheelEventArgs.cs">
+    <Compile Include="Platform\Windows\HorizontalMouseWheelEventArgs.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Windows\WinFormsGameForm.cs">
+    <Compile Include="Platform\Windows\WinFormsGameForm.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Windows\WinFormsGamePlatform.cs">
+    <Compile Include="Platform\Windows\WinFormsGamePlatform.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Windows\WinFormsGameWindow.cs">
+    <Compile Include="Platform\Windows\WinFormsGameWindow.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Media\VideoSampleGrabber.cs">
+    <Compile Include="Platform\Media\VideoSampleGrabber.cs">
       <Platforms>Windows</Platforms>
     </Compile>
 
 
     <!-- Web Platform -->
-    <Compile Include="Web\WebGamePlatform.cs">
+    <Compile Include="Platform\Web\WebGamePlatform.cs">
       <Platforms>Web</Platforms>
     </Compile>
-    <Compile Include="Web\WebGameWindow.cs">
+    <Compile Include="Platform\Web\WebGameWindow.cs">
       <Platforms>Web</Platforms>
     </Compile>
-    <Compile Include="Web\WebHelper.cs">
+    <Compile Include="Platform\Web\WebHelper.cs">
       <Platforms>Web</Platforms>
     </Compile>
-    <Compile Include="Input\KeyboardUtil.Web.cs">
+    <Compile Include="Platform\Input\KeyboardUtil.Web.cs">
       <Platforms>Web</Platforms>
     </Compile>
-    <Compile Include="Input\GamepadUtil.Web.cs">
+    <Compile Include="Platform\Input\GamepadUtil.Web.cs">
       <Platforms>Web</Platforms>
     </Compile>
 
@@ -1412,145 +1412,145 @@
     </Compile>
 
     <!-- OpenGL Stock Effects -->
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
       <Services>_GLCompatible</Services>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ogl.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\BasicEffect.ogl.mgfxo">
       <Services>_GLCompatible</Services>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo">
       <Services>_GLCompatible</Services>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo">
       <Services>_GLCompatible</Services>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo">
       <Services>_GLCompatible</Services>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo">
       <Services>_GLCompatible</Services>
     </EmbeddedResource>
 
 
     <!-- DirectX Stock Effects -->
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.dx11.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\AlphaTestEffect.dx11.mgfxo">
       <Services>DirectXGraphics</Services>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.dx11.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\BasicEffect.dx11.mgfxo">
       <Services>DirectXGraphics</Services>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.dx11.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\DualTextureEffect.dx11.mgfxo">
       <Services>DirectXGraphics</Services>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.dx11.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\EnvironmentMapEffect.dx11.mgfxo">
       <Services>DirectXGraphics</Services>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.dx11.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SkinnedEffect.dx11.mgfxo">
       <Services>DirectXGraphics</Services>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo">
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo">
       <Services>DirectXGraphics</Services>
     </EmbeddedResource>
 
     <!-- NVorbis -->
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\BufferedReadStream.cs">
-      <Link>Utilities\NVorbis\BufferedReadStream.cs</Link>
+      <Link>Platform\Utilities\NVorbis\BufferedReadStream.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\DataPacket.cs">
-      <Link>Utilities\NVorbis\DataPacket.cs</Link>
+      <Link>Platform\Utilities\NVorbis\DataPacket.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\Huffman.cs">
-      <Link>Utilities\NVorbis\Huffman.cs</Link>
+      <Link>Platform\Utilities\NVorbis\Huffman.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\IContainerReader.cs">
-      <Link>Utilities\NVorbis\IContainerReader.cs</Link>
+      <Link>Platform\Utilities\NVorbis\IContainerReader.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\IPacketProvider.cs">
-      <Link>Utilities\NVorbis\IPacketProvider.cs</Link>
+      <Link>Platform\Utilities\NVorbis\IPacketProvider.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\IVorbisStreamStatus.cs">
-      <Link>Utilities\NVorbis\IVorbisStreamStatus.cs</Link>
+      <Link>Platform\Utilities\NVorbis\IVorbisStreamStatus.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\Mdct.cs">
-      <Link>Utilities\NVorbis\Mdct.cs</Link>
+      <Link>Platform\Utilities\NVorbis\Mdct.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\NewStreamEventArgs.cs">
-      <Link>Utilities\NVorbis\NewStreamEventArgs.cs</Link>
+      <Link>Platform\Utilities\NVorbis\NewStreamEventArgs.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\ParameterChangeEventArgs.cs">
-      <Link>Utilities\NVorbis\ParameterChangeEventArgs.cs</Link>
+      <Link>Platform\Utilities\NVorbis\ParameterChangeEventArgs.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\RingBuffer.cs">
-      <Link>Utilities\NVorbis\RingBuffer.cs</Link>
+      <Link>Platform\Utilities\NVorbis\RingBuffer.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\StreamReadBuffer.cs">
-      <Link>Utilities\NVorbis\StreamReadBuffer.cs</Link>
+      <Link>Platform\Utilities\NVorbis\StreamReadBuffer.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\Utils.cs">
-      <Link>Utilities\NVorbis\Utils.cs</Link>
+      <Link>Platform\Utilities\NVorbis\Utils.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisCodebook.cs">
-      <Link>Utilities\NVorbis\VorbisCodebook.cs</Link>
+      <Link>Platform\Utilities\NVorbis\VorbisCodebook.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisFloor.cs">
-      <Link>Utilities\NVorbis\VorbisFloor.cs</Link>
+      <Link>Platform\Utilities\NVorbis\VorbisFloor.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisMapping.cs">
-      <Link>Utilities\NVorbis\VorbisMapping.cs</Link>
+      <Link>Platform\Utilities\NVorbis\VorbisMapping.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisMode.cs">
-      <Link>Utilities\NVorbis\VorbisMode.cs</Link>
+      <Link>Platform\Utilities\NVorbis\VorbisMode.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisReader.cs">
-      <Link>Utilities\NVorbis\VorbisReader.cs</Link>
+      <Link>Platform\Utilities\NVorbis\VorbisReader.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisResidue.cs">
-      <Link>Utilities\NVorbis\VorbisResidue.cs</Link>
+      <Link>Platform\Utilities\NVorbis\VorbisResidue.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisStreamDecoder.cs">
-      <Link>Utilities\NVorbis\VorbisStreamDecoder.cs</Link>
+      <Link>Platform\Utilities\NVorbis\VorbisStreamDecoder.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisTime.cs">
-      <Link>Utilities\NVorbis\VorbisTime.cs</Link>
+      <Link>Platform\Utilities\NVorbis\VorbisTime.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggContainerReader.cs">
-      <Link>Utilities\NVorbis\Ogg\OggContainerReader.cs</Link>
+      <Link>Platform\Utilities\NVorbis\Ogg\OggContainerReader.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggCrc.cs">
-      <Link>Utilities\NVorbis\Ogg\OggCrc.cs</Link>
+      <Link>Platform\Utilities\NVorbis\Ogg\OggCrc.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPacket.cs">
-      <Link>Utilities\NVorbis\Ogg\OggPacket.cs</Link>
+      <Link>Platform\Utilities\NVorbis\Ogg\OggPacket.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPacketReader.cs">
-      <Link>Utilities\NVorbis\Ogg\OggPacketReader.cs</Link>
+      <Link>Platform\Utilities\NVorbis\Ogg\OggPacketReader.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPageFlags.cs">
-      <Link>Utilities\NVorbis\Ogg\OggPageFlags.cs</Link>
+      <Link>Platform\Utilities\NVorbis\Ogg\OggPageFlags.cs</Link>
       <Services>NVorbis</Services>
     </Compile>
 

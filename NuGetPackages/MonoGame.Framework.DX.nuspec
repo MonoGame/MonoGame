@@ -52,7 +52,7 @@ This package also includes the Portable version of MonoGame for use in Bait and 
     <files>
         <!-- Windows UWP -->
         <file src="..\..\NuGetPackages\build\WindowsUniversal\MonoGame.Framework.WindowsUniversal.targets" target="build\uap10.0\MonoGame.Framework.WindowsUniversal.targets" />
-        <file src="WindowsUniversal\AnyCPU\Release\Themes\generic.xbf" target="lib\uap10.0\MonoGame.Framework\Themes\generic.xbf" />
+        <file src="WindowsUniversal\AnyCPU\Release\Platform\Themes\generic.xbf" target="lib\uap10.0\MonoGame.Framework\Themes\generic.xbf" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.dll" target="lib\uap10.0\MonoGame.Framework.dll" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.pri" target="lib\uap10.0\MonoGame.Framework.pri" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xml" target="lib\uap10.0\MonoGame.Framework.xml" />
