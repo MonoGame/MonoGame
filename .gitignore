@@ -81,7 +81,6 @@ Tools/MonoGame.Build.Tasks/MonoGame.Build.Tasks.*.csproj
 ThirdParty/Lidgren.Network/*.csproj
 Test/*.csproj
 !Test/MonoGame.Test.XNA.csproj
-/*.sln
 *.speccache
 *.ncrunchproject
 *.ncrunchsolution
