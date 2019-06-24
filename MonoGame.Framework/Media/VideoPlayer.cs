@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private MediaState _state;
         private Video _currentVideo;
+        private GraphicsDevice _graphicsDevice;
         private float _volume = 1.0f;
         private bool _isLooped = false;
         private bool _isMuted = false;
@@ -32,7 +33,7 @@ namespace Microsoft.Xna.Framework.Media
         public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Gets a value that indicates whether the player is playing video in a loop.
+        /// Gets or sets a value that indicates whether the player is playing video in a loop.
         /// </summary>
         public bool IsLooped
         {
@@ -119,11 +120,22 @@ namespace Microsoft.Xna.Framework.Media
 
         #region Public API
 
-        public VideoPlayer()
+        /// <summary>
+        /// Creates an instance of the VideoPlayer.
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device that will be used for texture creation.</param>
+        /// <remarks>XNA's VideoPlayer did not take a GraphicsDevice parameter. This is a breaking change in MonoGame.</remarks>
+        public VideoPlayer(GraphicsDevice graphicsDevice)
         {
             _state = MediaState.Stopped;
+            _graphicsDevice = graphicsDevice;
 
             PlatformInitialize();
+        }
+
+        ~VideoPlayer()
+        {
+            Dispose(false);
         }
 
         /// <summary>
@@ -296,6 +308,8 @@ namespace Microsoft.Xna.Framework.Media
                 PlatformDispose(disposing);
                 IsDisposed = true;
             }
+            _currentVideo = null;
+            _graphicsDevice = null;
         }
 
         #endregion

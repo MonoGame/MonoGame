@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Media
 
         public void OnShutdown()
         {
-
+            TextureData = null;
         }
 
         public void OnClockPause(long systemTime)

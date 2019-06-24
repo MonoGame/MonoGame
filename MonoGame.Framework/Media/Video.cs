@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (!_disposed)
             {
-                //PlatformDispose(disposing);
+                PlatformDispose(disposing);
                 _disposed = true;
             }
         }
