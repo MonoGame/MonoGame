@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.WindowsDX", "MonoGame.Framework\MonoGame.WindowsDX.csproj", "{23F49F43-750D-48D2-8F25-9CFC34006CF7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.WindowsDX", "MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj", "{23F49F43-750D-48D2-8F25-9CFC34006CF7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Tests.XNA", "Test\MonoGame.Tests.XNA.csproj", "{7134181E-E02F-482F-9250-343ABC60E861}"
 EndProject
