@@ -343,18 +343,6 @@ namespace MonoGame.Framework
             OnTextInput(sender, new TextInputEventArgs(e.KeyChar, key));
         }
 
-        internal void CallOnKeyDown(Microsoft.Xna.Framework.Input.Keys key)
-        {
-            if(IsKeyDownHandled)
-                OnKeyDown(this, new InputKeyEventArgs(key));
-        }
-
-        internal void CallOnKeyUp(Microsoft.Xna.Framework.Input.Keys key)
-        {
-            if(IsKeyUpHandled)
-                OnKeyUp(this, new InputKeyEventArgs(key));
-        }
-
         internal void Initialize(int width, int height)
         {
             ChangeClientSize(new Size(width, height));

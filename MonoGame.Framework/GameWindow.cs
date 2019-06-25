@@ -103,20 +103,18 @@ namespace Microsoft.Xna.Framework {
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
 
-        internal bool IsTextInputHandled { get { return TextInput != null; } }
+        internal bool IsTextInputHandled { get => TextInput != null; }
 
         /// <summary>
         /// Buffered keyboard KeyDown event.
         /// </summary>
 		public event EventHandler<InputKeyEventArgs> KeyDown;
 
-        internal bool IsKeyDownHandled { get { return KeyDown != null; } }
         /// <summary>
         /// Buffered keyboard KeyUp event.
         /// </summary>
         public event EventHandler<InputKeyEventArgs> KeyUp;
 
-        internal bool IsKeyUpHandled { get { return KeyUp != null; } }
 #endif
 
         #endregion Events
@@ -161,15 +159,15 @@ namespace Microsoft.Xna.Framework {
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
 		internal void OnTextInput(object sender, TextInputEventArgs e)
 		{
-            EventHelpers.Raise(this, TextInput, e);
+            TextInput?.Invoke(this, e);
 		}
         internal void OnKeyDown(object sender, InputKeyEventArgs e)
 	    {
-	        EventHelpers.Raise(this, KeyDown, e);
+            KeyDown?.Invoke(this, e);
 	    }
         internal void OnKeyUp(object sender, InputKeyEventArgs e)
 	    {
-	        EventHelpers.Raise(this, KeyUp, e);
+            KeyUp?.Invoke(this, e);
 	    }
 #endif
 

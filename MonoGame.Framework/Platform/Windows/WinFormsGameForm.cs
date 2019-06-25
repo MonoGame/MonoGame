@@ -188,11 +188,11 @@ namespace Microsoft.Xna.Framework.Windows
                 {
                     case WM_KEYDOWN:
                     case WM_SYSKEYDOWN:
-                        _window.CallOnKeyDown(key);
+                        _window.OnKeyDown(_window, new InputKeyEventArgs(key));
                         break;
                     case WM_KEYUP:
                     case WM_SYSKEYUP:
-                        _window.CallOnKeyUp(key);
+                        _window.OnKeyUp(_window, new InputKeyEventArgs(key));
                         break;
                     default:
                         break;
