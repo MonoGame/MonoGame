@@ -99,3 +99,7 @@ Test/*.csproj
 
 Installers/MacOS/Scripts/Framework/postinstall
 IDE/MonoDevelop/MonoDevelop.MonoGame/templates/Common/MonoGame.Framework.dll.config
+
+# CAKE
+tools/**
+!tools/packages.config

@@ -13,6 +13,8 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="bin\**\*" />
+    <Compile Remove="obj\**\*" />
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
   </ItemGroup>
