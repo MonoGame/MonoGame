@@ -12,20 +12,17 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public struct TextInputEventArgs
     {
-        char character;
         public TextInputEventArgs(char character, Keys key = Keys.None)
         {
-            this.character = character;
-            this.Key = key;
+            Character = character;
+            Key = key;
         }
         public char Character
         {
-            get
-            {
-                return character;
-            }
+            get; private set;
         }
-        public Keys Key {
+        public Keys Key
+        {
             get; private set;
         }
     }
