@@ -159,15 +159,15 @@ namespace Microsoft.Xna.Framework {
 		}
 
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
-		protected void OnTextInput(object sender, TextInputEventArgs e)
+		internal void OnTextInput(object sender, TextInputEventArgs e)
 		{
             EventHelpers.Raise(this, TextInput, e);
 		}
-	    protected void OnKeyDown(object sender, InputKeyEventArgs e)
+        internal void OnKeyDown(object sender, InputKeyEventArgs e)
 	    {
 	        EventHelpers.Raise(this, KeyDown, e);
 	    }
-	    protected void OnKeyUp(object sender, InputKeyEventArgs e)
+        internal void OnKeyUp(object sender, InputKeyEventArgs e)
 	    {
 	        EventHelpers.Raise(this, KeyUp, e);
 	    }

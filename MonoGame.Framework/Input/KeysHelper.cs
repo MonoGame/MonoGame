@@ -9,15 +9,15 @@ namespace Microsoft.Xna.Framework.Input
 {
     internal static class KeysHelper
     {
-        static Dictionary<int, Keys> _map;
+        static HashSet<int> _map;
 
         static KeysHelper()
         {
-            _map = new Dictionary<int, Keys>();
+            _map = new HashSet<int>();
             var allKeys = (Keys[])Enum.GetValues(typeof(Keys));
             foreach (var key in allKeys)
             {
-                _map.Add((int)key, (key));
+                _map.Add((int)key);
             }
         }
 
@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>Returns true if value is valid Key, false otherwise</returns>
         public static bool IsKey(int value)
         {
-            return _map.ContainsKey(value);
+            return _map.Contains(value);
         }
     }
 }

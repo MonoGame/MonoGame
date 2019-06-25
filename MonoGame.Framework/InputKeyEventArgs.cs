@@ -9,8 +9,15 @@ namespace Microsoft.Xna.Framework
 {
     public class InputKeyEventArgs : EventArgs
     {
+        /// <summary>
+        /// The key that was either pressed or released.
+        /// </summary>
         public Keys Key { get; private set; }
 
+        /// <summary>
+        /// Create a new keyboard input event
+        /// </summary>
+        /// <param name="key">The key involved in this event</param>
         public InputKeyEventArgs(Keys key)
         {
             Key = key;
