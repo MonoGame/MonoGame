@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// The key that was either pressed or released.
         /// </summary>
-        public Keys Key { get; private set; }
+        public readonly Keys Key;
 
         /// <summary>
         /// Create a new keyboard input event
