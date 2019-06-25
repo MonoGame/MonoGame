@@ -2,18 +2,24 @@
 
   <PropertyGroup>
     <TargetFramework>net45</TargetFramework>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-
     <DefineConstants>WINDOWS;XNADESIGNPROVIDED</DefineConstants>
+    <AssemblyName>MonoGame.Framework</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
+
+This package provides you with MonoGame Framework that uses DirectX for rendering and works on Windows.</Description>
+    <PackageTags>monogame;.net core;core;.net standard;standard;windowsdx</PackageTags>
+    <PackageId>MonoGame.Framework.WindowsDX</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Platform\**\*" />
+    <Compile Remove="Properties\**\*" />
   </ItemGroup>
 
-  <Import Project="Platform\DirectX.targets" />
-  <Import Project="Platform\XAudio.targets" />
+  <ItemGroup>
+    <None Remove="Platform\**\*" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
@@ -33,7 +39,6 @@
     <Compile Include="Platform\Media\Video.WMS.cs" />
     <Compile Include="Platform\Media\VideoPlayer.WMS.cs" />
     <Compile Include="Platform\Media\VideoSampleGrabber.cs" />
-    <Compile Include="Platform\Properties\AssemblyInfo.Windows.cs" />
     <Compile Include="Platform\TitleContainer.Desktop.cs" />
     <Compile Include="Platform\Utilities\AssemblyHelper.cs" />
     <Compile Include="Platform\Utilities\CurrentPlatform.cs" />
@@ -56,4 +61,7 @@
     <Reference Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.XAudio2.dll"/>
     <Reference Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.XInput.dll"/>
   </ItemGroup>
+
+  <Import Project="Platform\DirectX.targets" />
+  <Import Project="Platform\XAudio.targets" />
 </Project>
