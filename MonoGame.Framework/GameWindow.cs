@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework {
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
 
-        internal bool IsTextInputHandled { get => TextInput != null; }
+        internal bool IsTextInputHandled { get { return TextInput != null; } }
 
         /// <summary>
         /// Buffered keyboard KeyDown event.
