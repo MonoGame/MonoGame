@@ -131,7 +131,7 @@ namespace Microsoft.Xna.Framework
                     char character = (char)ev.Key.Keysym.Sym;
                     _view.OnKeyDown(new InputKeyEventArgs(key));
                     if (char.IsControl(character))
-                        _view.CallTextInput(character, key);
+                        _view.OnTextInput(new TextInputEventArgs(character, key));
                 }
                 else if (ev.Type == Sdl.EventType.KeyUp)
                 {
@@ -186,7 +186,7 @@ namespace Microsoft.Xna.Framework
                                     if (codepoint >= 0 && codepoint < 0xFFFF)
                                     {
                                         var key = KeyboardUtil.ToXna(codepoint);
-                                        _view.CallTextInput((char)codepoint, key);
+                                        _view.OnTextInput(new TextInputEventArgs((char)codepoint, key));
                                     }
                                     // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
                                 }

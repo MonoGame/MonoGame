@@ -370,8 +370,7 @@ namespace Microsoft.Xna.Framework
                 InputEvents.KeyChar ch;
                 while (_inputEvents.TextQueue.TryDequeue(out ch))
                 {
-                    if(IsTextInputHandled)
-                        OnTextInput(new TextInputEventArgs(ch.Character, ch.Key));
+                    OnTextInput(new TextInputEventArgs(ch.Character, ch.Key));
                 }
             }
 
