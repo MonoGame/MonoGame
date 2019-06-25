@@ -220,11 +220,11 @@ namespace Microsoft.Xna.Framework
             {
                 case CoreAcceleratorKeyEventType.KeyDown:
                 case CoreAcceleratorKeyEventType.SystemKeyDown:
-                    OnKeyDown(sender, new InputKeyEventArgs(key));
+                    OnKeyDown(new InputKeyEventArgs(key));
                     break;
                 case CoreAcceleratorKeyEventType.KeyUp:
                 case CoreAcceleratorKeyEventType.SystemKeyUp:
-                    OnKeyUp(sender, new InputKeyEventArgs(key));
+                    OnKeyUp(new InputKeyEventArgs(key));
                     break;
                 default:
                     break;
@@ -371,7 +371,7 @@ namespace Microsoft.Xna.Framework
                 while (_inputEvents.TextQueue.TryDequeue(out ch))
                 {
                     if(IsTextInputHandled)
-                        OnTextInput(_coreWindow, new TextInputEventArgs(ch.Character, ch.Key));
+                        OnTextInput(new TextInputEventArgs(ch.Character, ch.Key));
                 }
             }
 
