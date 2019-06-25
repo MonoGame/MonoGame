@@ -243,6 +243,22 @@ Section "Visual Studio 2017 Templates" VS2017
 
 SectionEnd
 
+Section "Visual Studio 2019 Templates" VS2019
+
+  IfFileExists `$DOCUMENTS\Visual Studio 2019\Templates\ProjectTemplates\*.*` InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    SetOutPath "$DOCUMENTS\Visual Studio 2019\Templates\ProjectTemplates\Visual C#\MonoGame"
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2013\MonoGameShared.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2015\WindowsUniversal10.VB.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2017\*.zip'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+    DetailPrint "Visual Studio 2019 not found"
+  EndTemplates:
+
+SectionEnd
+
 ; Optional section (can be disabled by the user)
 Section "Start Menu Shortcuts" Menu
 	CreateDirectory $SMPROGRAMS\${APPNAME}
@@ -272,6 +288,7 @@ LangString VS2012Desc ${LANG_ENGLISH} "Install the project templates for Visual 
 LangString VS2013Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2013"
 LangString VS2015Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2015"
 LangString VS2017Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2017"
+LangString VS2017Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2019"
 LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your start menu"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -282,6 +299,7 @@ LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your 
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2013} $(VS2013Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2015} $(VS2015Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2017} $(VS2017Desc)
+  !insertmacro MUI_DESCRIPTION_TEXT ${VS2019} $(VS2019Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${Menu} $(MenuDesc)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -320,6 +338,13 @@ IfFileExists `$DOCUMENTS\Visual Studio 2017\Templates\ProjectTemplates\*.*` end 
   end:
 FunctionEnd
 
+Function checkVS2019
+IfFileExists `$DOCUMENTS\Visual Studio 2019\Templates\ProjectTemplates\*.*` end disable
+  disable:
+	 SectionSetFlags ${VS2019} $0
+  end:
+FunctionEnd
+
 Function .onInit 
   IntOp $0 $0 | ${SF_RO}
   Call checkVS2010
@@ -327,6 +352,7 @@ Function .onInit
   Call checkVS2013
   Call checkVS2015
   Call checkVS2017
+  Call checkVS2019
   IntOp $0 ${SF_SELECTED} | ${SF_RO}
   SectionSetFlags ${core_id} $0
 FunctionEnd
@@ -386,6 +412,7 @@ Section "Uninstall"
   RMDir /r "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2017\Templates\ProjectTemplates\Visual C#\MonoGame"
+  RMDir /r "$DOCUMENTS\Visual Studio 2019\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "${MSBuildInstallDir}"
   RMDir /r "$SMPROGRAMS\${APPNAME}"
 
