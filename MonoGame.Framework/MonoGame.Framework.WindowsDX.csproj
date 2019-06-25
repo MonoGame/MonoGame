@@ -51,6 +51,10 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="MonoGame.Framework.WindowsDX.targets" PackagePath="build" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="System.Windows.Forms"/>
 
     <Reference Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll"/>
