@@ -1,8 +1,14 @@
 <Project>
   <PropertyGroup>
-    <MonoGamePlatform>$(MSBuildProjectName.Substring(9))</MonoGamePlatform>
+    <MonoGamePlatform>$(MSBuildProjectName.Substring(19))</MonoGamePlatform>
     <BaseIntermediateOutputPath>obj\$(MonoGamePlatform)</BaseIntermediateOutputPath>
     <BaseOutputPath>bin\$(MonoGamePlatform)</BaseOutputPath>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
+    <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/MonoGame/MonoGame/tree/core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MonoGame/MonoGame/tree/core</RepositoryUrl>
+    <Authors>MonoGame Team</Authors>
+    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
   </PropertyGroup>
 </Project>
 
