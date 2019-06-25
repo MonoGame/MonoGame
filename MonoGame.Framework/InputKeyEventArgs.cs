@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework
         /// Create a new keyboard input event
         /// </summary>
         /// <param name="key">The key involved in this event</param>
-        public InputKeyEventArgs(Keys key)
+        public InputKeyEventArgs(Keys key = Keys.None)
         {
             Key = key;
         }

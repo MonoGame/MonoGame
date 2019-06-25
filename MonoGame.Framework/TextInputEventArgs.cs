@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public struct TextInputEventArgs
     {
-        public TextInputEventArgs(char character, Keys key = Keys.None)
+        public TextInputEventArgs(char character = '\u0000', Keys key = Keys.None)
         {
             Character = character;
             Key = key;
