@@ -10,6 +10,7 @@
     <Compile Include="Platform\Graphics\GraphicsCapabilities.DirectX.cs" />
     <Compile Include="Platform\Graphics\GraphicsDebug.DirectX.cs" />
     <Compile Include="Platform\Graphics\GraphicsDevice.DirectX.cs" />
+    <Compile Include="Platform\Graphics\IRenderTarget.DirectX.cs" />
     <Compile Include="Platform\Graphics\OcclusionQuery.DirectX.cs" />
     <Compile Include="Platform\Graphics\RenderTarget2D.DirectX.cs" />
     <Compile Include="Platform\Graphics\RenderTarget3D.DirectX.cs" />
