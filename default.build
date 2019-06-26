@@ -79,7 +79,7 @@
     <exec program="ThirdParty\Dependencies\Piranha\Piranha.exe " commandline='make-portable-skeleton -i MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.dll -o MonoGame.Framework\bin\Portable\AnyCPU\MonoGame.Framework.dll -p ".NETPortable,Version=v4.0,Profile=Profile328"' />
 
     <!-- Convert MonoGame.Framework.Net.dll -->
-    <copy file="MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.Net.dll" tofile="MonoGame.Framework\bin\Portable\AnyCPU\temp.dll" overwrite="true"/>
+    <copy file="MonoGame.Framework.Net\bin\Windows\AnyCPU\Release\MonoGame.Framework.Net.dll" tofile="MonoGame.Framework\bin\Portable\AnyCPU\temp.dll" overwrite="true"/>
     <exec program="ThirdParty\Dependencies\Piranha\Piranha.exe " workingdir="MonoGame.Framework\bin\Portable\AnyCPU" commandline='make-portable-skeleton -i temp.dll -o MonoGame.Framework.Net.dll -p ".NETPortable,Version=v4.0,Profile=Profile328"' />
     <delete file="MonoGame.Framework\bin\Portable\AnyCPU\temp.dll" />
 
@@ -202,7 +202,7 @@
             IDE does.  So we have to do it ourselves using the recommended work around.
         -->
         <exec program="${nuget3path}/nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.WindowsUniversal.project.json -NonInteractive' />
-        <exec program="${nuget3path}/nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.Net.WindowsUniversal.project.json -NonInteractive' />
+        <exec program="${nuget3path}/nuget.exe " commandline='restore MonoGame.Framework.Net\MonoGame.Framework.Net.WindowsUniversal.project.json -NonInteractive' />
 
         <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
         <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />

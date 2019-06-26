@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Windows,WindowsGL,WindowsUniversal">
+<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework.Net" Type="Library" Platforms="Android,iOS,Linux,MacOS,Windows,WindowsGL,WindowsUniversal">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
@@ -52,129 +52,129 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     
     <!-- Microsoft.Xna.Framework.GamerServices -->
-    <Compile Include="Platform\GamerServices\AchievementCollection.cs"/>
-    <Compile Include="Platform\GamerServices\Achievement.cs"/>
-    <Compile Include="Platform\GamerServices\FriendCollection.cs"/>
-    <Compile Include="Platform\GamerServices\FriendGamer.cs"/>
-    <Compile Include="Platform\GamerServices\GamerCollection.cs"/>
-    <Compile Include="Platform\GamerServices\Gamer.cs"/>
-    <Compile Include="Platform\GamerServices\GamerDefaults.cs"/>
-    <Compile Include="Platform\GamerServices\GamerPresence.cs"/>
-    <Compile Include="Platform\GamerServices\GamerPresenceMode.cs"/>
-    <Compile Include="Platform\GamerServices\GamerPrivileges.cs"/>
-    <Compile Include="Platform\GamerServices\GamerPrivilegeSetting.cs"/>
-    <Compile Include="Platform\GamerServices\GamerProfile.cs"/>
-    <Compile Include="Platform\GamerServices\GamerZone.cs"/>
-    <Compile Include="Platform\GamerServices\GameUpdateRequiredException.cs" />
-    <Compile Include="Platform\GamerServices\LeaderboardEntry.cs"/>
-    <Compile Include="Platform\GamerServices\LeaderboardIdentity.cs"/>
-    <Compile Include="Platform\GamerServices\LeaderboardKey.cs"/>
-    <Compile Include="Platform\GamerServices\LeaderboardReader.cs"/>
-    <Compile Include="Platform\GamerServices\LeaderboardWriter.cs"/>
-    <Compile Include="Platform\GamerServices\MessageBoxIcon.cs" />
-    <Compile Include="Platform\GamerServices\PropertyDictionary.cs"/>
-    <Compile Include="Platform\GamerServices\SignedInGamerCollection.cs"/>
-    <Compile Include="Platform\GamerServices\GuideAlreadyVisibleException.cs">
+    <Compile Include="GamerServices\AchievementCollection.cs"/>
+    <Compile Include="GamerServices\Achievement.cs"/>
+    <Compile Include="GamerServices\FriendCollection.cs"/>
+    <Compile Include="GamerServices\FriendGamer.cs"/>
+    <Compile Include="GamerServices\GamerCollection.cs"/>
+    <Compile Include="GamerServices\Gamer.cs"/>
+    <Compile Include="GamerServices\GamerDefaults.cs"/>
+    <Compile Include="GamerServices\GamerPresence.cs"/>
+    <Compile Include="GamerServices\GamerPresenceMode.cs"/>
+    <Compile Include="GamerServices\GamerPrivileges.cs"/>
+    <Compile Include="GamerServices\GamerPrivilegeSetting.cs"/>
+    <Compile Include="GamerServices\GamerProfile.cs"/>
+    <Compile Include="GamerServices\GamerZone.cs"/>
+    <Compile Include="GamerServices\GameUpdateRequiredException.cs" />
+    <Compile Include="GamerServices\LeaderboardEntry.cs"/>
+    <Compile Include="GamerServices\LeaderboardIdentity.cs"/>
+    <Compile Include="GamerServices\LeaderboardKey.cs"/>
+    <Compile Include="GamerServices\LeaderboardReader.cs"/>
+    <Compile Include="GamerServices\LeaderboardWriter.cs"/>
+    <Compile Include="GamerServices\MessageBoxIcon.cs" />
+    <Compile Include="GamerServices\PropertyDictionary.cs"/>
+    <Compile Include="GamerServices\SignedInGamerCollection.cs"/>
+    <Compile Include="GamerServices\GuideAlreadyVisibleException.cs">
       <Platforms>Android,MacOS,Windows,WindowsGL,Linux</Platforms>
     </Compile>
-    <Compile Include="Platform\GamerServices\GamerServicesDispatcher.cs">
+    <Compile Include="GamerServices\GamerServicesDispatcher.cs">
       <Platforms>MacOS,Windows,WindowsGL,Linux</Platforms>
     </Compile>
-    <Compile Include="Platform\GamerServices\GamerServicesComponent.cs">
+    <Compile Include="GamerServices\GamerServicesComponent.cs">
       <Platforms>Android,iOS,Linux,MacOS,Windows,WindowsGL</Platforms>
     </Compile>
  
 
  
     <!-- Microsoft.Xna.Framework.Net -->
-    <Compile Include="Platform\Net\AvailableNetworkSessionCollection.cs">
+    <Compile Include="Net\AvailableNetworkSessionCollection.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\AvailableNetworkSession.cs">
+    <Compile Include="Net\AvailableNetworkSession.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\CommandEvent.cs">
+    <Compile Include="Net\CommandEvent.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\CommandEventType.cs">
+    <Compile Include="Net\CommandEventType.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\CommandGamerJoined.cs">
+    <Compile Include="Net\CommandGamerJoined.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\CommandGamerLeft.cs">
+    <Compile Include="Net\CommandGamerLeft.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\CommandGamerStateChange.cs">
+    <Compile Include="Net\CommandGamerStateChange.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\CommandReceiveData.cs">
+    <Compile Include="Net\CommandReceiveData.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\CommandSendData.cs">
+    <Compile Include="Net\CommandSendData.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\CommandSessionStateChange.cs">
+    <Compile Include="Net\CommandSessionStateChange.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\GamerStates.cs">
+    <Compile Include="Net\GamerStates.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\ICommand.cs">
+    <Compile Include="Net\ICommand.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\LocalNetworkGamer.cs">
+    <Compile Include="Net\LocalNetworkGamer.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\MonoGamerPeer.cs">
+    <Compile Include="Net\MonoGamerPeer.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkException.cs">
+    <Compile Include="Net\NetworkException.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkGamer.cs">
+    <Compile Include="Net\NetworkGamer.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkMachine.cs">
+    <Compile Include="Net\NetworkMachine.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkMessageType.cs">
+    <Compile Include="Net\NetworkMessageType.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkNotAvailableException.cs">
+    <Compile Include="Net\NetworkNotAvailableException.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkSession.cs">
+    <Compile Include="Net\NetworkSession.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkSessionEndReason.cs">
+    <Compile Include="Net\NetworkSessionEndReason.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkSessionJoinError.cs">
+    <Compile Include="Net\NetworkSessionJoinError.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkSessionJoinException.cs">
+    <Compile Include="Net\NetworkSessionJoinException.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkSessionProperties.cs">
+    <Compile Include="Net\NetworkSessionProperties.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkSessionState.cs">
+    <Compile Include="Net\NetworkSessionState.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\NetworkSessionType.cs">
+    <Compile Include="Net\NetworkSessionType.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\PacketReader.cs">
+    <Compile Include="Net\PacketReader.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\PacketWriter.cs">
+    <Compile Include="Net\PacketWriter.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\QualityOfService.cs">
+    <Compile Include="Net\QualityOfService.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
-    <Compile Include="Platform\Net\SendDataOptions.cs">
+    <Compile Include="Net\SendDataOptions.cs">
       <ExcludePlatforms>WindowsUniversal</ExcludePlatforms> 
     </Compile>
 
@@ -211,7 +211,7 @@
     <Compile Include="Platform\iOS\Net\MonoGameSessionDelegate.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="Platform\GamerServices\NotificationPosition.cs">
+    <Compile Include="Platform\iOS\GamerServices\NotificationPosition.cs">
       <Platforms>iOS</Platforms>
     </Compile>
     
