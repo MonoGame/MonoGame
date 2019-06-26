@@ -613,6 +613,12 @@
     <Compile Include="Graphics\IGraphicsContext.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Platform\Graphics\IRenderTarget.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Platform\Graphics\IRenderTarget.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>    
     <Compile Include="Graphics\IWindowInfo.cs" />
     <Compile Include="Graphics\ModelBoneCollection.cs" />
     <Compile Include="Graphics\ModelBone.cs" />
