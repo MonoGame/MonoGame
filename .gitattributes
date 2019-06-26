@@ -1,0 +1,29 @@
+* text eol=lf
+
+*.cs      diff=csharp
+
+
+*.xnb     binary
+*.mgfxo   binary
+*.wav     binary
+*.mp3     binary
+*.ogg     binary
+*.wma     binary
+*.xgs     binary
+*.xsb     binary
+*.xwb     binary
+*.blend   binary
+*.fbx     binary
+*.png     binary
+*.tga     binary
+*.bmp     binary
+*.dds     binary
+*.gif     binary
+*.jpg     binary
+*.tif     binary
+*.ico     binary
+*.icns    binary
+*.exe     binary
+*.dll     binary
+*.pfx     binary
+
