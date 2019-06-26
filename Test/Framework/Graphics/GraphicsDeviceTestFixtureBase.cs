@@ -53,7 +53,7 @@ namespace MonoGame.Tests.Graphics
         {
 #if !XNA
             // We enable the half-pixel offset for XNA compatibility
-            GraphicsDeviceManager.UseStandardPixelAddressing = false;
+            GraphicsDevice.UseStandardPixelAddressing = false;
 #endif
 
             game = new TestGameBase();
