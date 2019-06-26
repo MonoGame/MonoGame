@@ -6,9 +6,6 @@ using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    /// <summary>
-    /// Represents a render target.
-    /// </summary>
     internal partial interface IRenderTarget
     {
         int GLTexture { get; }

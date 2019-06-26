@@ -6,9 +6,6 @@ using SharpDX.Direct3D11;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    /// <summary>
-    /// Represents a render target.
-    /// </summary>
     internal partial interface IRenderTarget
     {
         /// <summary>
