@@ -16,6 +16,16 @@ MSBuildSettings mspacksettings;
 DotNetCoreMSBuildSettings dnbuildsettings;
 DotNetCorePackSettings dnpacksettings;
 
+private void PackProject(string filePath)
+{
+    // Windows and Linux dotnet tool does not allow building of .NET
+    // projects, as such we must call msbuild on these platforms.
+    if (IsRunningOnWindows())
+        DotNetCorePack(filePath, dnpacksettings);
+    else
+        MSBuild(filePath, mspacksettings);
+}
+
 //////////////////////////////////////////////////////////////////////
 // TASKS
 //////////////////////////////////////////////////////////////////////
@@ -43,11 +53,7 @@ Task("BuildDesktopGL")
     .Does(() =>
 {
     DotNetCoreRestore("MonoGame.Framework.DesktopGL.sln");
-
-    if (IsRunningOnWindows())
-        DotNetCorePack("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj", dnpacksettings);
-    else
-        MSBuild("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj", mspacksettings);
+    PackProject("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
 });
 
 Task("BuildWindowsDX")
@@ -55,11 +61,7 @@ Task("BuildWindowsDX")
     .Does(() =>
 {
     DotNetCoreRestore("MonoGame.Framework.WindowsDX.sln");
-
-    if (IsRunningOnWindows())
-        DotNetCorePack("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj", dnpacksettings);
-    else
-        MSBuild("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj", mspacksettings);
+    PackProject("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
 });
 
 //////////////////////////////////////////////////////////////////////
