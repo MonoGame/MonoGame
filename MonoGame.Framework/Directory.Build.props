@@ -1,4 +1,5 @@
 <Project>
+
   <PropertyGroup>
     <MonoGamePlatform>$(MSBuildProjectName.Substring(19))</MonoGamePlatform>
     <BaseIntermediateOutputPath>obj\$(MonoGamePlatform)</BaseIntermediateOutputPath>
@@ -10,5 +11,6 @@
     <Authors>MonoGame Team</Authors>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
   </PropertyGroup>
+
 </Project>
 
