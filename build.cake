@@ -64,13 +64,19 @@ Task("BuildWindowsDX")
     PackProject("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
 });
 
+Task("BuildAndroid")
+    .IsDependentOn("Prep")
+    .WithCriteria(() => IsRunningOnWindows()) // Xamarin requires desktop MSBuild
+    .Does(() => MSBuild("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj", mspacksettings));
+
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
 Task("Default")
     .IsDependentOn("BuildDesktopGL")
-    .IsDependentOn("BuildWindowsDX");
+    .IsDependentOn("BuildWindowsDX")
+    .IsDependentOn("BuildAndroid");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
