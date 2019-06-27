@@ -1,3 +1,4 @@
+#tool nuget:?package=vswhere&version=2.6.7
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
 
 //////////////////////////////////////////////////////////////////////
@@ -15,6 +16,8 @@ var configuration = Argument("build-configuration", "Release");
 MSBuildSettings mspacksettings;
 DotNetCoreMSBuildSettings dnbuildsettings;
 DotNetCorePackSettings dnpacksettings;
+
+bool windowsAndroidSupported;
 
 private void PackProject(string filePath)
 {
@@ -46,6 +49,25 @@ Task("Prep")
     dnpacksettings.MSBuildSettings = dnbuildsettings;
     dnpacksettings.Verbosity = DotNetCoreVerbosity.Minimal;
     dnpacksettings.Configuration = configuration;
+
+    if (IsRunningOnWindows())
+    {
+        // Get a version of msbuild with the mobile development workload, null on failure
+        DirectoryPath vsLatest = VSWhereLatest(new VSWhereLatestSettings { Requires = "Component.Xamarin"});
+
+        if (vsLatest != null)
+        {
+            Information(vsLatest.FullPath);
+            var files = GetFiles(vsLatest.FullPath + "/**/MSBuild.exe");
+            if (files.Any())
+            {
+                var msbuildPath = files.First();
+                Information($"Using MSBuild at \"{msbuildPath}\".");
+                mspacksettings.ToolPath = msbuildPath;
+                windowsAndroidSupported = true;
+            }
+        }
+    }
 });
 
 Task("BuildDesktopGL")
@@ -66,8 +88,25 @@ Task("BuildWindowsDX")
 
 Task("BuildAndroid")
     .IsDependentOn("Prep")
-    .WithCriteria(() => IsRunningOnWindows()) // Xamarin requires desktop MSBuild
-    .Does(() => MSBuild("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj", mspacksettings));
+    .Does(() =>
+{
+    if (IsRunningOnWindows())
+    {
+        if (windowsAndroidSupported)
+        {
+            DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj");
+            MSBuild("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj", mspacksettings);
+        }
+        else
+        {
+            Warning("MSBuild not found or Xamarin is not installed. Skipping Android build.");
+        }
+    } 
+    else
+    {
+        Warning("Android build is only supported on Windows");
+    }
+});
 
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
