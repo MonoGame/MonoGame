@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
     <TargetFramework>monoandroid90</TargetFramework>
@@ -94,10 +94,5 @@ This package provides you with MonoGame Framework that works on Android.</Descri
   <Import Project="Platform\OpenGL.targets" />
   <Import Project="Platform\OpenAL.targets" />
   <Import Project="Platform\Microsoft.Devices.Sensors.targets" />
-
-  <ItemGroup>
-      <PackageReference Include="MSBuild.Sdk.Extras" Version="1.6.65" PrivateAssets="All" />
-  </ItemGroup>
-
-  <Import Project="$(MSBuildSdkExtrasTargets)" Condition="Exists('$(MSBuildSdkExtrasTargets)')"/>
 </Project>
+
