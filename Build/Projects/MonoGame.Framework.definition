@@ -610,7 +610,9 @@
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
-    <Compile Include="Graphics\IGraphicsContext.cs" />
+    <Compile Include="Platform\Graphics\IGraphicsContext.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\IRenderTarget.cs" />
     <Compile Include="Platform\Graphics\IRenderTarget.DirectX.cs">
@@ -618,8 +620,10 @@
     </Compile>
     <Compile Include="Platform\Graphics\IRenderTarget.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
-    </Compile>    
-    <Compile Include="Graphics\IWindowInfo.cs" />
+    </Compile>
+    <Compile Include="Platform\Graphics\IWindowInfo.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\ModelBoneCollection.cs" />
     <Compile Include="Graphics\ModelBone.cs" />
     <Compile Include="Graphics\Model.cs" />
