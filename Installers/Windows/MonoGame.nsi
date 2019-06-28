@@ -13,6 +13,8 @@ SetCompressor /SOLID /FINAL lzma
 
 !define MUI_UNICON "${FrameworkPath}\monogame.ico"
 
+!insertmacro MUI_LANGUAGE "English"
+
 Name '${APPNAME} SDK ${INSTALLERVERSION}'
 OutFile 'MonoGameSetup.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
@@ -64,11 +66,6 @@ RequestExecutionLevel admin
   WriteRegStr HKCR "${FILECLASS}\shell\open" "" `${COMMANDTEXT}`
   WriteRegStr HKCR "${FILECLASS}\shell\open\command" "" `${COMMAND}`
 !macroend
-
-;--------------------------------
-;Languages
-
-!insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
 

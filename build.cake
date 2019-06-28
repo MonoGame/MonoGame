@@ -137,16 +137,27 @@ Task("BuildContentPipeline")
     MSBuild("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj", msPackSettings);
 });
 
-//////////////////////////////////////////////////////////////////////
-// TASK TARGETS
-//////////////////////////////////////////////////////////////////////
-
-Task("Default")
+Task("BuildAll")
     .IsDependentOn("BuildDesktopGL")
     .IsDependentOn("BuildWindowsDX")
     .IsDependentOn("BuildAndroid")
     .IsDependentOn("BuildUWP")
     .IsDependentOn("BuildContentPipeline");
+
+
+Task("PackInstallers")
+    .IsDependentOn("BuildAll")
+    .Does(() =>
+{
+    CakeExecuteScript("./Installers/build.cake");
+});
+
+//////////////////////////////////////////////////////////////////////
+// TASK TARGETS
+//////////////////////////////////////////////////////////////////////
+
+Task("Default")
+    .IsDependentOn("BuildAll");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
