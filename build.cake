@@ -13,9 +13,9 @@ var configuration = Argument("build-configuration", "Release");
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
 
-MSBuildSettings mspacksettings;
-DotNetCoreMSBuildSettings dnbuildsettings;
-DotNetCorePackSettings dnpacksettings;
+MSBuildSettings msPackSettings;
+DotNetCoreMSBuildSettings dnBuildSettings;
+DotNetCorePackSettings dnPackSettings;
 
 FilePath androidToolPath;
 FilePath uwpToolPath;
@@ -35,9 +35,9 @@ private void PackProject(string filePath)
     // Windows and Linux dotnet tool does not allow building of .NET
     // projects, as such we must call msbuild on these platforms.
     if (IsRunningOnWindows())
-        DotNetCorePack(filePath, dnpacksettings);
+        DotNetCorePack(filePath, dnPackSettings);
     else
-        MSBuild(filePath, mspacksettings);
+        MSBuild(filePath, msPackSettings);
 }
 
 private FilePath GetMSBuildWith(string requires)
@@ -64,12 +64,12 @@ private FilePath GetMSBuildWith(string requires)
 Task("Prep")
     .Does(() =>
 {
-    mspacksettings = GetMSBuildPackSettings();
+    msPackSettings = GetMSBuildPackSettings();
 
-    dnpacksettings = new DotNetCorePackSettings();
-    dnpacksettings.MSBuildSettings = dnbuildsettings;
-    dnpacksettings.Verbosity = DotNetCoreVerbosity.Minimal;
-    dnpacksettings.Configuration = configuration;
+    dnPackSettings = new DotNetCorePackSettings();
+    dnPackSettings.MSBuildSettings = dnBuildSettings;
+    dnPackSettings.Verbosity = DotNetCoreVerbosity.Minimal;
+    dnPackSettings.Configuration = configuration;
 
     androidToolPath = GetMSBuildWith("Component.Xamarin");
 
