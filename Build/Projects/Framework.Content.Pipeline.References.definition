@@ -12,9 +12,6 @@
       Name="SharpFont"
       Path="ThirdParty\Dependencies\SharpFont\x32\SharpFont.dll" />
     <Binary
-      Name="FreeImageNET"
-      Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" />
-    <Binary
       Name="PVRTexLibNET"
       Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
     <Binary
@@ -28,7 +25,6 @@
     <NativeBinary Path="ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll.config" />
     <NativeBinary Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config" />
     <NativeBinary Path="ThirdParty\Dependencies\assimp\AssimpNet.dll.config" />
-    <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll.config" />
     <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so" />
     <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\Linux\x64\ffmpeg" />
     <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\Linux\x64\ffprobe" />
@@ -50,9 +46,6 @@
       Name="SharpFont"
       Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
     <Binary
-      Name="FreeImageNET"
-      Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" />
-    <Binary
       Name="PVRTexLibNET"
       Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
     <Binary
@@ -70,7 +63,6 @@
     <NativeBinary Path="ThirdParty\Dependencies\assimp\libassimp.dylib" />
     <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg" />
     <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe" />
-    <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll.config" />
     <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" />
     <NativeBinary Path="ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib" />
     <NativeBinary Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config" />
@@ -97,9 +89,6 @@
     <Binary
       Name="SharpFont"
       Path="ThirdParty\Dependencies\SharpFont\Windows\x64\SharpFont.dll" />
-    <Binary
-      Name="FreeImageNET"
-      Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImageNET.dll" />
     <Binary
       Name="PVRTexLibNET"
       Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />

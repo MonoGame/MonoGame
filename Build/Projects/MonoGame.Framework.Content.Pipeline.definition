@@ -50,6 +50,10 @@
   <Files>
 
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="MonoGame.Framework.Content.Pipeline.dll.config">
+      <Platforms>Linux,MacOS</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Audio -->
@@ -465,6 +469,8 @@
 
 	<!-- Utility Classes -->
     <Compile Include="Utilities\Vector4Converter.cs" />
+    <Compile Include="Utilities\FreeImageAPI.cs" />
+    <Compile Include="Utilities\FreeImageAPIC.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32.Dirty.cs" />
