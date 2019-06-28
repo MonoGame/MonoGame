@@ -1,11 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-     <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.7">
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.7.*" Condition="'$(TargetFramework)' == 'net45'">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.7" Condition="'$(TargetFramework)' == 'netstandard2.0'">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
