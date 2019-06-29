@@ -1,0 +1,84 @@
+<Project Sdk="MSBuild.Sdk.Extras">
+
+  <PropertyGroup>
+    <TargetFramework>uap10.0</TargetFramework>
+    <!-- TODO: NET45 is here for reflection API (Utilities\ReflectionHelpers), but does not make sense semantically -->
+    <DefineConstants>WINDOWS_UAP;DIRECTX11_1;NET45</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
+    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
+
+This package provides you with MonoGame Framework that works on Windows 10, Windows Phone 10 and Xbox One using UWP(Universal Windows Platform).</Description>
+    <PackageTags>monogame;.net core;core;.net standard;standard;uwp</PackageTags>
+    <PackageId>MonoGame.Framework.WindowsUniversal</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SDKReference Include="WindowsMobile, Version=10.0.17763.0">
+      <Name>Windows Mobile Extensions for the UWP</Name>
+    </SDKReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\**\*" />
+    <Compile Remove="obj\**\*" />
+    <Compile Remove="Platform\**\*" />
+    <Compile Remove="Properties\**\*" />
+    <!-- System.ComponentModel is not in WinRT APIs, so we can't use TypeConverter -->
+    <Compile Remove="Design\**\*" />
+    <Compile Remove="Content\ResourceContentManager.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Platform\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Platform\GamePlatform.Desktop.cs" />
+    <Compile Include="Platform\GraphicsDeviceManager.WinRT.cs" />
+    <Compile Include="Platform\Input\GamePad.UWP.cs" />
+    <Compile Include="Platform\Input\Joystick.Default.cs" />
+    <Compile Include="Platform\Input\Keyboard.WinRT.cs" />
+    <Compile Include="Platform\Input\KeyboardInput.WinRT.cs" />
+    <Compile Include="Platform\Input\MessageBox.WinRT.cs" />
+    <Compile Include="Platform\Input\Mouse.Default.cs" />
+    <Compile Include="Platform\Input\MouseCursor.Default.cs" />
+    <Compile Include="Platform\Input\Touch\TouchQueue.cs" />
+    <Compile Include="Platform\Media\MediaLibrary.WinRT.cs" />
+    <Compile Include="Platform\Media\MediaPlayer.WME.cs" />
+    <Compile Include="Platform\Media\MusicProperties.cs" />
+    <Compile Include="Platform\Media\Song.WinRT.cs" />
+    <Compile Include="Platform\Media\VideoPlayer.WME.cs" />
+    <Compile Include="Platform\TitleContainer.WinRT.cs" />
+    <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
+    <Compile Include="Platform\WindowsUniversal\GameFrameworkViewSource.cs" />
+    <Compile Include="Platform\WindowsUniversal\UAPFrameworkView.cs" />
+    <Compile Include="Platform\WindowsUniversal\UAPGamePlatform.cs" />
+    <Compile Include="Platform\WindowsUniversal\UAPGameWindow.cs" />
+    <Compile Include="Platform\WindowsUniversal\XamlGame.cs" />
+    <Compile Include="Platform\WindowsUniversal\InputEvents.cs" />
+
+    <Page Include="Platform\Themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="MonoGame.Framework.Uwp.targets" PackagePath="build" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\uap10.0\SharpDX.dll" />
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.Direct2D1.dll" />
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.Direct3D11.dll" />
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.DXGI.dll" />
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\uap10.0\SharpDX.MediaFoundation.dll" />
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\uap10.0\SharpDX.XAudio2.dll" />
+  </ItemGroup>
+
+  <Import Project="Platform\DirectX.targets" />
+  <Import Project="Platform\XAudio.targets" />
+</Project>
+

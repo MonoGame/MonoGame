@@ -13,20 +13,48 @@ var configuration = Argument("build-configuration", "Release");
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
 
-MSBuildSettings mspacksettings;
-DotNetCoreMSBuildSettings dnbuildsettings;
-DotNetCorePackSettings dnpacksettings;
+MSBuildSettings msPackSettings;
+DotNetCoreMSBuildSettings dnBuildSettings;
+DotNetCorePackSettings dnPackSettings;
 
-bool windowsAndroidSupported;
+FilePath androidToolPath;
+FilePath uwpToolPath;
+
+private MSBuildSettings GetMSBuildPackSettings()
+{
+    var s = new MSBuildSettings();
+    s.Verbosity = Verbosity.Minimal;
+    s.Configuration = configuration;
+    s.WithProperty("Version", version);
+    s.WithTarget("Pack");
+    return s;
+}
 
 private void PackProject(string filePath)
 {
     // Windows and Linux dotnet tool does not allow building of .NET
     // projects, as such we must call msbuild on these platforms.
     if (IsRunningOnWindows())
-        DotNetCorePack(filePath, dnpacksettings);
+        DotNetCorePack(filePath, dnPackSettings);
     else
-        MSBuild(filePath, mspacksettings);
+        MSBuild(filePath, msPackSettings);
+}
+
+private FilePath GetMSBuildWith(string requires)
+{
+    if (IsRunningOnWindows())
+    {
+        DirectoryPath vsLatest = VSWhereLatest(new VSWhereLatestSettings { Requires = requires});
+
+        if (vsLatest != null)
+        {
+            var files = GetFiles(vsLatest.FullPath + "/**/MSBuild.exe");
+            if (files.Any())
+                return files.First();
+        }
+    }
+
+    return null;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -36,38 +64,17 @@ private void PackProject(string filePath)
 Task("Prep")
     .Does(() =>
 {
-    mspacksettings = new MSBuildSettings();
-    mspacksettings.Verbosity = Verbosity.Minimal;
-    mspacksettings.Configuration = configuration;
-    mspacksettings = mspacksettings.WithProperty("Version", version);
-    mspacksettings = mspacksettings.WithTarget("Pack");
+    msPackSettings = GetMSBuildPackSettings();
 
-    dnbuildsettings = new DotNetCoreMSBuildSettings();
-    dnbuildsettings = dnbuildsettings.WithProperty("Version", version);
+    dnPackSettings = new DotNetCorePackSettings();
+    dnPackSettings.MSBuildSettings = dnBuildSettings;
+    dnPackSettings.Verbosity = DotNetCoreVerbosity.Minimal;
+    dnPackSettings.Configuration = configuration;
 
-    dnpacksettings = new DotNetCorePackSettings();
-    dnpacksettings.MSBuildSettings = dnbuildsettings;
-    dnpacksettings.Verbosity = DotNetCoreVerbosity.Minimal;
-    dnpacksettings.Configuration = configuration;
+    androidToolPath = GetMSBuildWith("Component.Xamarin");
 
     if (IsRunningOnWindows())
-    {
-        // Get a version of msbuild with the mobile development workload, null on failure
-        DirectoryPath vsLatest = VSWhereLatest(new VSWhereLatestSettings { Requires = "Component.Xamarin"});
-
-        if (vsLatest != null)
-        {
-            Information(vsLatest.FullPath);
-            var files = GetFiles(vsLatest.FullPath + "/**/MSBuild.exe");
-            if (files.Any())
-            {
-                var msbuildPath = files.First();
-                Information($"Using MSBuild at \"{msbuildPath}\".");
-                mspacksettings.ToolPath = msbuildPath;
-                windowsAndroidSupported = true;
-            }
-        }
-    }
+        uwpToolPath = GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.17763"); 
 });
 
 Task("BuildDesktopGL")
@@ -90,23 +97,36 @@ Task("BuildAndroid")
     .IsDependentOn("Prep")
     .Does(() =>
 {
-    if (IsRunningOnWindows())
+    if (androidToolPath != null)
     {
-        if (windowsAndroidSupported)
-        {
-            DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj");
-            MSBuild("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj", mspacksettings);
-        }
-        else
-        {
-            Warning("MSBuild not found or Xamarin is not installed. Skipping Android build.");
-        }
-    } 
+        var packSettings = GetMSBuildPackSettings();
+        packSettings.ToolPath = androidToolPath;
+        DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj");
+        MSBuild("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj", packSettings);
+    }
     else
     {
-        Warning("Android build is only supported on Windows");
+        Warning("Skipping Android build: MSBuild not found or Xamarin is not installed.");
     }
 });
+
+Task("BuildUWP")
+    .IsDependentOn("Prep")
+    .Does(() =>
+{
+    if (uwpToolPath != null)
+    {
+        var packSettings = GetMSBuildPackSettings();
+        packSettings.ToolPath = uwpToolPath;
+        DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.UWP.csproj");
+        MSBuild("MonoGame.Framework/MonoGame.Framework.UWP.csproj", packSettings);
+    }
+    else
+    {
+        Warning("Skipping UWP build: MSBuild not found or UWP workload (with SDK 17763) is not installed.");
+    }
+});
+
 
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
@@ -115,7 +135,8 @@ Task("BuildAndroid")
 Task("Default")
     .IsDependentOn("BuildDesktopGL")
     .IsDependentOn("BuildWindowsDX")
-    .IsDependentOn("BuildAndroid");
+    .IsDependentOn("BuildAndroid")
+    .IsDependentOn("BuildUWP");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
