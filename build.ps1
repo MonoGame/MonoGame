@@ -226,6 +226,7 @@ if ($ShowDescription) { $cakeArguments += "-showdescription" }
 if ($DryRun) { $cakeArguments += "-dryrun" }
 if ($Experimental) { $cakeArguments += "-experimental" }
 if ($Mono) { $cakeArguments += "-mono" }
+$cakeArguments += "-paths_tools=$TOOLS_DIR"
 $cakeArguments += $ScriptArgs
 
 # Start Cake
