@@ -31,8 +31,8 @@
     <!-- The program entry point -->
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CommandLineParser.cs" />
-    <Compile Include="Options.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\CommandLineParser.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\Options.cs" />
 
 
     <!-- 
@@ -180,44 +180,44 @@
     <Compile Include="MonoGame.Framework\GraphicsDevice.cs" />
 
     <!-- The core mgfx generation classes -->
-    <Compile Include="ConstantBufferData.cs" />
-    <Compile Include="ConstantBufferData.mojo.cs" />
-    <Compile Include="ConstantBufferData.sharpdx.cs" />
-    <Compile Include="ConstantBufferData.writer.cs" />
-    <Compile Include="EffectObject.cs" />
-    <Compile Include="EffectObject.hlsl.cs" />
-    <Compile Include="EffectObject.pssl.cs" />
-    <Compile Include="EffectObject.writer.cs" />    
-    <Compile Include="IEffectCompilerOutput.cs" />
-    <Compile Include="ShaderCompilerException.cs" />
-    <Compile Include="ShaderData.cs" />
-    <Compile Include="ShaderData.mojo.cs" />
-    <Compile Include="ShaderData.pssl.cs" />
-    <Compile Include="ShaderData.sharpdx.cs" />
-    <Compile Include="ShaderData.writer.cs" />
-    <Compile Include="ShaderProfile.cs" />
-    <Compile Include="ShaderProfile.OpenGL.cs" />
-    <Compile Include="ShaderProfile.DirectX.cs" />
-    <Compile Include="ShaderResult.cs" />
-    <Compile Include="TextureFilterType.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ConstantBufferData.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ConstantBufferData.mojo.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ConstantBufferData.sharpdx.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ConstantBufferData.writer.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\EffectObject.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\EffectObject.hlsl.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\EffectObject.pssl.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\EffectObject.writer.cs" />    
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\IEffectCompilerOutput.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderCompilerException.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderData.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderData.mojo.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderData.pssl.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderData.sharpdx.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderData.writer.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderProfile.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderProfile.OpenGL.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderProfile.DirectX.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderResult.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TextureFilterType.cs" />
 
     <!-- The HLSL to GLSL conversion utility -->
-    <Compile Include="MarshalHelper.cs" />
-    <Compile Include="MojoShader.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\MarshalHelper.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\MojoShader.cs" />
 
     <!-- The MGFX parser -->
     <None Include="TPGParser\MGFX.tpg" />
-    <Compile Include="TPGParser\Parser.cs" />
-    <Compile Include="TPGParser\ParseTree.cs" />
-    <Compile Include="TPGParser\Scanner.cs" />
-    <Compile Include="TPGParser\ParseTreeTools.cs" />
-    <Compile Include="TPGParser\PassInfo.cs" />
-    <Compile Include="TPGParser\SamplerStateInfo.cs" />
-    <Compile Include="TPGParser\ShaderInfo.cs" />
-    <Compile Include="TPGParser\TechniqueInfo.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\Parser.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\ParseTree.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\Scanner.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\ParseTreeTools.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\PassInfo.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\SamplerStateInfo.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\ShaderInfo.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\TechniqueInfo.cs" />
     
     <!-- The MGFX preprocessor -->
-    <Compile Include="Preprocessor.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\Preprocessor.cs" />
     
   </Files>
 </Project>
