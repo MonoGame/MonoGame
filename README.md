@@ -1,4 +1,4 @@
-# MonoGame
+﻿# MonoGame
 
 One framework for creating powerful cross-platform games.  The spiritual successor to XNA with thousands of titles shipped across desktop, mobile, and console platforms.  [MonoGame](http://www.monogame.net/) is a fully managed .NET open source game framework without any black boxes.  Create, develop and distribute your games your way.
 
@@ -56,6 +56,14 @@ If you think you have found a bug or have a feature request, use our [issue trac
 If you need help using MonoGame or have other questions we suggest you post on our [community forums](http://community.monogame.net).  Please do not use the GitHub issue tracker for personal support requests.
 
 If you are interested in contributing fixes or features to MonoGame, please read our [contributors guide](CONTRIBUTING.md) first.
+
+### Subscription
+
+If you'd like to help the project by supporting us financially, consider supporting us via a subscription for the price of a monthly coffee.
+
+Money goes towards hosting, new hardware and if enough people subscribe a dedicated developer.
+
+There are several options on our [Donation Page](http://www.monogame.net/donate/).
 
 
 ## Source Code
