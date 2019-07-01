@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice != null)
                 return;
 
-            _graphicsDevice = new GraphicsDevice(gdi);
+            _graphicsDevice = new GraphicsDevice(gdi.Adapter, gdi.GraphicsProfile, gdi.PresentationParameters);
             _shouldApplyChanges = false;
 
             // hook up reset events

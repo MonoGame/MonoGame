@@ -211,11 +211,6 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public GraphicsDebug GraphicsDebug { get { return _graphicsDebug; } set { _graphicsDebug = value; } }
 
-        internal GraphicsDevice(GraphicsDeviceInformation gdi)
-            : this(gdi.Adapter, gdi.GraphicsProfile, gdi.PresentationParameters)
-        {
-        }
-
         internal GraphicsDevice()
 		{
             PresentationParameters = new PresentationParameters();
