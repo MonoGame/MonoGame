@@ -30,6 +30,7 @@ namespace Microsoft.Xna.Framework
         private bool _drawBegun;
         bool disposed;
         private bool _hardwareModeSwitch = true;
+        private bool _preferStandardPixelAddressing = true;
 
 #if (WINDOWS || WINDOWS_UAP) && DIRECTX
         private bool _firstLaunch = true;
@@ -368,7 +369,7 @@ namespace Microsoft.Xna.Framework
             }
 
             // Needs to be before ApplyChanges()
-            _graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile, presentationParameters);
+            _graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile, this.PreferStandardPixelAddressing, presentationParameters);
 
 #if !MONOMAC
             ApplyChanges();
@@ -457,6 +458,31 @@ namespace Microsoft.Xna.Framework
                 Game.Activity.Window.SetFlags(WindowManagerFlags.ForceNotFullscreen, WindowManagerFlags.ForceNotFullscreen);
         }
 #endif
+        
+        /// <summary>
+        /// Indicates if DX9 style pixel addressing or current standard
+        /// pixel addressing should be used. This flag is set to
+        /// <c>true</c> by default. It should be set to <c>false</c>
+        /// for XNA compatibility. It is recommended to leave this flag
+        /// set to <c>true</c> for projects that are not ported from
+        /// XNA.
+        /// </summary>
+        /// <remarks>
+        /// XNA uses DirectX9 for its graphics. DirectX9 interprets UV
+        /// coordinates differently from other graphics API's. This is
+        /// typically referred to as the half-pixel offset. MonoGame
+        /// replicates XNA behavior if this flag is set to <c>false</c>.
+        /// </remarks>
+        public bool PreferStandardPixelAddressing
+        {
+            get { return _preferStandardPixelAddressing; }
+            set
+            {
+                if (this.GraphicsDevice != null)
+                    throw new InvalidOperationException();
+                _preferStandardPixelAddressing = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the boolean which defines how window switches from windowed to fullscreen state.
