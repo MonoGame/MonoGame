@@ -17,19 +17,6 @@ MSBuildSettings msPackSettings;
 DotNetCoreMSBuildSettings dnBuildSettings;
 DotNetCorePackSettings dnPackSettings;
 
-FilePath androidToolPath;
-FilePath uwpToolPath;
-
-private MSBuildSettings GetMSBuildPackSettings()
-{
-    var s = new MSBuildSettings();
-    s.Verbosity = Verbosity.Minimal;
-    s.Configuration = configuration;
-    s.WithProperty("Version", version);
-    s.WithTarget("Pack");
-    return s;
-}
-
 private void PackProject(string filePath)
 {
     // Windows and Linux dotnet tool does not allow building of .NET
@@ -40,21 +27,24 @@ private void PackProject(string filePath)
         MSBuild(filePath, msPackSettings);
 }
 
-private FilePath GetMSBuildWith(string requires)
+private bool GetMSBuildWith(string requires)
 {
     if (IsRunningOnWindows())
     {
-        DirectoryPath vsLatest = VSWhereLatest(new VSWhereLatestSettings { Requires = requires});
+        DirectoryPath vsLatest = VSWhereLatest(new VSWhereLatestSettings { Requires = requires });
 
         if (vsLatest != null)
         {
             var files = GetFiles(vsLatest.FullPath + "/**/MSBuild.exe");
             if (files.Any())
-                return files.First();
+            {
+                msPackSettings.ToolPath = files.First();
+                return true;
+            }
         }
     }
 
-    return null;
+    return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -64,17 +54,16 @@ private FilePath GetMSBuildWith(string requires)
 Task("Prep")
     .Does(() =>
 {
-    msPackSettings = GetMSBuildPackSettings();
+    msPackSettings = new MSBuildSettings();
+    msPackSettings.Verbosity = Verbosity.Minimal;
+    msPackSettings.Configuration = configuration;
+    msPackSettings.WithProperty("Version", version);
+    msPackSettings.WithTarget("Pack");
 
     dnPackSettings = new DotNetCorePackSettings();
     dnPackSettings.MSBuildSettings = dnBuildSettings;
     dnPackSettings.Verbosity = DotNetCoreVerbosity.Minimal;
     dnPackSettings.Configuration = configuration;
-
-    androidToolPath = GetMSBuildWith("Component.Xamarin");
-
-    if (IsRunningOnWindows())
-        uwpToolPath = GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.17763"); 
 });
 
 Task("BuildDesktopGL")
@@ -95,38 +84,37 @@ Task("BuildWindowsDX")
 
 Task("BuildAndroid")
     .IsDependentOn("Prep")
-    .Does(() =>
+    .WithCriteria(() =>
 {
-    if (androidToolPath != null)
+    if (IsRunningOnWindows())
+        return GetMSBuildWith("Component.Xamarin");
+
+    // Xamarin Android on Linux needs to be installed in this specific dir
+    // We don't have Mac support... yet!
+    return DirectoryExists("/usr/lib/xamarin.android");
+}).Does(() =>
+{
+    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj");
+
+    var buildSettings = msPackSettings;
+    if (DirectoryExists("/usr/lib/xamarin.android"))
     {
-        var packSettings = GetMSBuildPackSettings();
-        packSettings.ToolPath = androidToolPath;
-        DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj");
-        MSBuild("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj", packSettings);
+        // Some weird bug when packing xamarin andoid assembly from Linux
+        // Easy workaround at least :)
+        buildSettings = buildSettings.WithProperty("DesignTimeBuild", "true");
     }
-    else
-    {
-        Warning("Skipping Android build: MSBuild not found or Xamarin is not installed.");
-    }
+
+    MSBuild("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj", buildSettings);
 });
 
 Task("BuildUWP")
     .IsDependentOn("Prep")
+    .WithCriteria(() => GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.17763"))
     .Does(() =>
 {
-    if (uwpToolPath != null)
-    {
-        var packSettings = GetMSBuildPackSettings();
-        packSettings.ToolPath = uwpToolPath;
-        DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.UWP.csproj");
-        MSBuild("MonoGame.Framework/MonoGame.Framework.UWP.csproj", packSettings);
-    }
-    else
-    {
-        Warning("Skipping UWP build: MSBuild not found or UWP workload (with SDK 17763) is not installed.");
-    }
+    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.UWP.csproj");
+    MSBuild("MonoGame.Framework/MonoGame.Framework.UWP.csproj", msPackSettings);
 });
-
 
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
