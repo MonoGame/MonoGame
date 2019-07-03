@@ -20,6 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
     public class SwapChainRenderTarget : RenderTarget2D
     {
         private SwapChain _swapChain;
+        private SharpDX.Direct3D11.Texture2D _backBuffer;
 
         public PresentInterval PresentInterval;
 
@@ -102,13 +103,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Obtain the backbuffer for this window which will be the final 3D rendertarget.
-            var backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0);
+            // store the backbuffer in a field so it can be disposed later
+            _backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0);
 
             // Create a view interface on the rendertarget to use on bind.
-            _renderTargetViews = new[] { new RenderTargetView(d3dDevice, backBuffer) };
+            _renderTargetViews = new[] { new RenderTargetView(d3dDevice, _backBuffer) };
 
             // Get the rendertarget dimensions for later.
-            var backBufferDesc = backBuffer.Description;
+            var backBufferDesc = _backBuffer.Description;
             var targetSize = new Point(backBufferDesc.Width, backBufferDesc.Height);
 
             // setting the _texture causes rendering issues with MSAA.
@@ -168,6 +170,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (disposing)
             {
+                SharpDX.Utilities.Dispose(ref _backBuffer);
                 SharpDX.Utilities.Dispose(ref _swapChain);
             }
 
