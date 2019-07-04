@@ -436,7 +436,7 @@ namespace Microsoft.Xna.Framework
         /// <c>true</c> by default. It should be set to <c>false</c>
         /// for XNA compatibility. It is recommended to leave this flag
         /// set to <c>true</c> for projects that are not ported from
-        /// XNA.
+        /// XNA. This value is passed to <see cref="GraphicsDevice.UseStandardPixelAddressing"/>.
         /// </summary>
         /// <remarks>
         /// XNA uses DirectX9 for its graphics. DirectX9 interprets UV

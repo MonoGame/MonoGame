@@ -17,10 +17,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Indicates if DX9 style pixel addressing or current standard
         /// pixel addressing should be used. This flag is set to
-        /// <c>true</c> by default. It should be set to <c>false</c>
-        /// for XNA compatibility. It is recommended to leave this flag
-        /// set to <c>true</c> for projects that are not ported from
-        /// XNA.
+        /// <c>true</c> by default. If `UseStandardPixelAddressing` is
+        /// `false` you have to add half-pixel offset to a Projection matrix.
+        /// See also <see cref="GraphicsDeviceManager.PreferStandardPixelAddressing"/>.
         /// </summary>
         /// <remarks>
         /// XNA uses DirectX9 for its graphics. DirectX9 interprets UV
@@ -244,7 +243,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="adapter">The graphics adapter.</param>
         /// <param name="graphicsProfile">The graphics profile.</param>
-        /// <param name="preferStandardPixelAddressing"> Indicates if DX9 style pixel addressing or current standard pixel addressing should be used.</param>
+        /// <param name="preferStandardPixelAddressing"> Indicates if DX9 style pixel addressing or current standard pixel addressing should be used. This value is passed to <see cref="GraphicsDevice.UseStandardPixelAddressing"/></param>
         /// <param name="presentationParameters">The presentation options.</param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="presentationParameters"/> is <see langword="null"/>.

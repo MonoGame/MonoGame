@@ -28,6 +28,9 @@ set to `true` by default to encourage users to use the modern style of pixel add
 DirectX platforms will ignore setting the `PreferStandardPixelAddressing` flag and will
 always render with a half pixel offset compared to XNA. This is usually not noticeable.
 
+This value is passed to `UseStandardPixelAddressing` in `GraphicsDevice`. If `UseStandardPixelAddressing`
+is `false` you have to add half-pixel offset to a Projection matrix.
+
 `SpriteBatch` rendering is not affected by the flag. Regardless of what value the flag has,
 `SpriteBatch` will render things exactly the same as in XNA.
 
