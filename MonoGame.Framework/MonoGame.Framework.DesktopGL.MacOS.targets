@@ -1,0 +1,15 @@
+<Project>
+
+  <PropertyGroup>
+    <MonoGamePlatform>DesktopGL</MonoGamePlatform>
+  </PropertyGroup>
+
+  <Target Name="CopyDesktopGLNative" AfterTargets="AfterBuild">
+    <ItemGroup>
+      <_lib_osx Include="$(MSBuildThisFileDirectory)\..\runtimes\osx\native\*.*" />
+    </ItemGroup>
+  
+    <Copy SourceFiles="@(_lib_osx)" DestinationFolder="$(OutDir)" />
+  </Target>
+
+</Project>
