@@ -167,6 +167,12 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformStop(bool immediate)
         {
+            FreeSource();
+            SoundState = SoundState.Stopped;
+        }
+
+        private void FreeSource()
+        {
             if (HasSourceId)
             {
                 AL.SourceStop(SourceId);
@@ -186,7 +192,6 @@ namespace Microsoft.Xna.Framework.Audio
 
                 controller.FreeSource(this);
             }
-            SoundState = SoundState.Stopped;
         }
 
         private void PlatformSetIsLooped(bool value)
@@ -350,7 +355,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose(bool disposing)
         {
-            
+            FreeSource();
         }
     }
 }
