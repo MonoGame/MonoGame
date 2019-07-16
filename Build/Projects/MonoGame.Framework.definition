@@ -279,9 +279,6 @@
     <Compile Include="IDrawable.cs" />
     <Compile Include="IGameComponent.cs" />
     <Compile Include="IGraphicsDeviceManager.cs" />
-    <Compile Include="InputKeyEventArgs.cs">
-      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
-    </Compile>
     <Compile Include="IUpdateable.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="MathHelper.cs" />
@@ -961,6 +958,9 @@
     <Compile Include="Input\GamePadThumbSticks.cs" />
     <Compile Include="Input\GamePadTriggers.cs" />
     <Compile Include="Input\GamePadType.cs" />
+    <Compile Include="Platform\Input\InputKeyEventArgs.cs">
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
+    </Compile>
     <Compile Include="Input\Joystick.cs" />
     <Compile Include="Input\JoystickCapabilities.cs" />
     <Compile Include="Input\JoystickHat.cs" />
@@ -1006,7 +1006,7 @@
     </Compile>
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
-    <Compile Include="Input\KeysHelper.cs">
+    <Compile Include="Platform\Input\KeysHelper.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyState.cs" />

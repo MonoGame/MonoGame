@@ -38,9 +38,11 @@ This package provides you with MonoGame Framework that works on Windows 10, Wind
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
     <Compile Include="Platform\GraphicsDeviceManager.WinRT.cs" />
     <Compile Include="Platform\Input\GamePad.UWP.cs" />
+    <Compile Include="Platform\Input\InputKeyEventArgs.cs" />
     <Compile Include="Platform\Input\Joystick.Default.cs" />
     <Compile Include="Platform\Input\Keyboard.WinRT.cs" />
     <Compile Include="Platform\Input\KeyboardInput.WinRT.cs" />
+    <Compile Include="Platform\Input\KeysHelper.cs" />
     <Compile Include="Platform\Input\MessageBox.WinRT.cs" />
     <Compile Include="Platform\Input\Mouse.Default.cs" />
     <Compile Include="Platform\Input\MouseCursor.Default.cs" />
