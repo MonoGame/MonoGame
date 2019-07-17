@@ -433,6 +433,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// TransparentBlack color (R:0,G:0,B:0,A:0).
         /// </summary>
+        [Obsolete("Use Color.Transparent instead. In future versions this method can be removed.")]
         public static Color TransparentBlack
         {
             get;
