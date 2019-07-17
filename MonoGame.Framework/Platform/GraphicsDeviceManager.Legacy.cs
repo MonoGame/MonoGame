@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework
         private bool _drawBegun;
         bool disposed;
         private bool _hardwareModeSwitch = true;
-        private bool _preferStandardPixelAddressing = true;
+        private bool _preferHalfPixelOffset = false;
 
 #if (WINDOWS || WINDOWS_UAP) && DIRECTX
         private bool _firstLaunch = true;
@@ -369,7 +369,7 @@ namespace Microsoft.Xna.Framework
             }
 
             // Needs to be before ApplyChanges()
-            _graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile, this.PreferStandardPixelAddressing, presentationParameters);
+            _graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile, this.PreferHalfPixelOffset, presentationParameters);
 
 #if !MONOMAC
             ApplyChanges();
@@ -462,25 +462,25 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Indicates if DX9 style pixel addressing or current standard
         /// pixel addressing should be used. This flag is set to
-        /// <c>true</c> by default. It should be set to <c>false</c>
+        /// <c>false</c> by default. It should be set to <c>true</c>
         /// for XNA compatibility. It is recommended to leave this flag
-        /// set to <c>true</c> for projects that are not ported from
-        /// XNA. This value is passed to <see cref="GraphicsDevice.UseStandardPixelAddressing"/>.
+        /// set to <c>false</c> for projects that are not ported from
+        /// XNA. This value is passed to <see cref="GraphicsDevice.UseHalfPixelOffset"/>.
         /// </summary>
         /// <remarks>
         /// XNA uses DirectX9 for its graphics. DirectX9 interprets UV
         /// coordinates differently from other graphics API's. This is
         /// typically referred to as the half-pixel offset. MonoGame
-        /// replicates XNA behavior if this flag is set to <c>false</c>.
+        /// replicates XNA behavior if this flag is set to <c>true</c>.
         /// </remarks>
-        public bool PreferStandardPixelAddressing
+        public bool PreferHalfPixelOffset
         {
-            get { return _preferStandardPixelAddressing; }
+            get { return _preferHalfPixelOffset; }
             set
             {
                 if (this.GraphicsDevice != null)
                     throw new InvalidOperationException();
-                _preferStandardPixelAddressing = value;
+                _preferHalfPixelOffset = value;
             }
         }
 

@@ -17,17 +17,17 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Indicates if DX9 style pixel addressing or current standard
         /// pixel addressing should be used. This flag is set to
-        /// <c>true</c> by default. If `UseStandardPixelAddressing` is
-        /// `false` you have to add half-pixel offset to a Projection matrix.
-        /// See also <see cref="GraphicsDeviceManager.PreferStandardPixelAddressing"/>.
+        /// <c>false</c> by default. If `UseHalfPixelOffset` is
+        /// `true` you have to add half-pixel offset to a Projection matrix.
+        /// See also <see cref="GraphicsDeviceManager.PreferHalfPixelOffset"/>.
         /// </summary>
         /// <remarks>
         /// XNA uses DirectX9 for its graphics. DirectX9 interprets UV
         /// coordinates differently from other graphics API's. This is
         /// typically referred to as the half-pixel offset. MonoGame
-        /// replicates XNA behavior if this flag is set to <c>false</c>.
+        /// replicates XNA behavior if this flag is set to <c>true</c>.
         /// </remarks>
-        public bool UseStandardPixelAddressing { get; private set; }
+        public bool UseHalfPixelOffset { get; private set; }
 
         private Viewport _viewport;
 
@@ -201,7 +201,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal GraphicsDevice()
 		{
-            UseStandardPixelAddressing = true;
             PresentationParameters = new PresentationParameters();
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
             Setup();
@@ -230,7 +229,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Adapter = adapter;
             PresentationParameters = presentationParameters;
             _graphicsProfile = graphicsProfile;
-            UseStandardPixelAddressing = true;
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities();
             GraphicsCapabilities.Initialize(this);
@@ -243,12 +241,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="adapter">The graphics adapter.</param>
         /// <param name="graphicsProfile">The graphics profile.</param>
-        /// <param name="preferStandardPixelAddressing"> Indicates if DX9 style pixel addressing or current standard pixel addressing should be used. This value is passed to <see cref="GraphicsDevice.UseStandardPixelAddressing"/></param>
+        /// <param name="preferHalfPixelOffset"> Indicates if DX9 style pixel addressing or current standard pixel addressing should be used. This value is passed to <see cref="GraphicsDevice.UseHalfPixelOffset"/></param>
         /// <param name="presentationParameters">The presentation options.</param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="presentationParameters"/> is <see langword="null"/>.
         /// </exception>
-        public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, bool preferStandardPixelAddressing, PresentationParameters presentationParameters)
+        public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, bool preferHalfPixelOffset, PresentationParameters presentationParameters)
         {
             if (adapter == null)
                 throw new ArgumentNullException("adapter");
@@ -258,11 +256,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("presentationParameters");
 #if DIRECTX
             // TODO we need to figure out how to inject the half pixel offset into DX shaders
-            preferStandardPixelAddressing = true;
+            preferHalfPixelOffset = false;
 #endif
             Adapter = adapter;
             _graphicsProfile = graphicsProfile;
-            UseStandardPixelAddressing = preferStandardPixelAddressing;
+            UseHalfPixelOffset = preferHalfPixelOffset;
             PresentationParameters = presentationParameters;
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities();

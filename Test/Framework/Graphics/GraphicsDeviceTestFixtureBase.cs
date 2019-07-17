@@ -55,7 +55,7 @@ namespace MonoGame.Tests.Graphics
             gdm = new GraphicsDeviceManager(game);
 #if !XNA
             // We enable the half-pixel offset for XNA compatibility
-            gdm.PreferStandardPixelAddressing = false;
+            gdm.PreferHalfPixelOffset = true;
 #endif
             // some visual tests require a HiDef profile
             gdm.GraphicsProfile = GraphicsProfile.HiDef;
