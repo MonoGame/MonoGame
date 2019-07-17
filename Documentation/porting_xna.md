@@ -23,14 +23,17 @@ XNA uses the DirectX9 graphics API. MonoGame uses the newer DX11 API for DirectX
 DirectX9 interprets UV coordinates differently from other graphics API's. This is typically
 referred to as the half-pixel offset. 
 MonoGame supports replicating XNA behavior (currently only on OpenGL platforms) by setting
-the `UseStandardPixelAddressing` flag in `GraphicsDeviceManager` to `false`. This flag is
-set to `true` by default to encourage users to use the modern style of pixel addressing.
-DirectX platforms will ignore setting the `UseStandardPixelAddressing` flag and will
+the `PreferHalfPixelOffset` flag in `GraphicsDeviceManager` to `true`. This flag is
+set to `false` by default to encourage users to use the modern style of pixel addressing.
+DirectX platforms will ignore setting the `PreferHalfPixelOffset` flag and will
 always render with a half pixel offset compared to XNA. This is usually not noticeable.
+
+This value is passed to `UseHalfPixelOffset` in `GraphicsDevice`. If `UseHalfPixelOffset`
+is `true` you have to add half-pixel offset to a Projection matrix.
 
 `SpriteBatch` rendering is not affected by the flag. Regardless of what value the flag has,
 `SpriteBatch` will render things exactly the same as in XNA.
 
 If you migrated your game from XNA and some things seem blurred out or very slightly offset,
-you may want to try to disable the `UseStandardPixelAddressing` flag.
+you may want to try to enable the `PreferHalfPixelOffset` flag.
 

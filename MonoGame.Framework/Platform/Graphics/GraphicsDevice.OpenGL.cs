@@ -933,7 +933,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _posFixup[0] = 1.0f;
             _posFixup[1] = 1.0f;
-            if (!GraphicsDeviceManager.UseStandardPixelAddressing)
+            if (UseHalfPixelOffset)
             {
                 _posFixup[2] = (63.0f/64.0f)/Viewport.Width;
                 _posFixup[3] = -(63.0f/64.0f)/Viewport.Height;

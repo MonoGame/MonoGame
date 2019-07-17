@@ -460,7 +460,7 @@ namespace MonoGame.Tests.Graphics {
 #if XNA 
             halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
 #else // MG
-            if (!GraphicsDeviceManager.UseStandardPixelAddressing)            
+            if (gd.UseHalfPixelOffset)
                 halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
 #endif
 
