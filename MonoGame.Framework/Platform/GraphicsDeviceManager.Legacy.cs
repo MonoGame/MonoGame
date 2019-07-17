@@ -479,7 +479,7 @@ namespace Microsoft.Xna.Framework
             set
             {
                 if (this.GraphicsDevice != null)
-                    throw new InvalidOperationException();
+                    throw new InvalidOperationException("Setting PreferHalfPixelOffset is not allowed after the creation of GraphicsDevice.");
                 _preferHalfPixelOffset = value;
             }
         }
