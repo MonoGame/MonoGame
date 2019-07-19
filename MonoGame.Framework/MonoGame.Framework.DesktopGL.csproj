@@ -26,7 +26,6 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     <Compile Remove="Graphics\GraphicsAdapter.cs" />
     <Compile Remove="Media\Video.cs" />
     <Compile Remove="Media\VideoPlayer.cs" />
-    <Compile Remove="Media\VideoSoundtrackType.cs" />
     <Compile Remove="Content\ContentReaders\VideoReader.cs" />
     <Compile Remove="Input\MessageBox.cs" />
     <Compile Remove="Input\KeyboardInput.cs" />

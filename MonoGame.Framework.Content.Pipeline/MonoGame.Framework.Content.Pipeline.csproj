@@ -1,0 +1,288 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net471</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
+
+This package provides you with the content pipeline for Windows, Mac and Linux which is used to compile raw content to xnb files.</Description>
+    <PackageTags>monogame;content;content pipeline</PackageTags>
+    <PackageId>MonoGame.Framework.Content.Pipeline</PackageId>
+    
+    <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
+    <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
+    <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>
+    <PackageProjectUrl>http://monogame.net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MonoGame/MonoGame</RepositoryUrl>
+    <Authors>MonoGame Team</Authors>
+    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\**\*" />
+    <Compile Remove="obj\**\*" />
+    <Compile Remove="Properties\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\MonoGame.Framework\Platform\Utilities\CurrentPlatform.cs">
+      <Link>Utilities\CurrentPlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\Hash.cs">
+      <Link>Utilities\Hash.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\ReflectionHelpers.cs">
+      <Link>Utilities\ReflectionHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Platform\Utilities\AssemblyHelper.cs">
+      <Link>Utilities\AssemblyHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Platform\Utilities\ReflectionHelpers.Default.cs">
+      <Link>Utilities\ReflectionHelpers.Default.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\GraphicsExtensions.cs">
+      <Link>Utilities\GraphicsExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\ImageReader.cs">
+      <Link>Utilities\Imaging\ImageReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\ImageWriter.cs">
+      <Link>Utilities\Imaging\ImageWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\Operations.cs">
+      <Link>Utilities\Imaging\Operations.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\PinnedArray.cs">
+      <Link>Utilities\Imaging\PinnedArray.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\Stb.Image.cs">
+      <Link>Utilities\Imaging\Stb.Image.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\Stb.Image.Generated.cs">
+      <Link>Utilities\Imaging\Stb.Image.Generated.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\Stb.ImageWrite.cs">
+      <Link>Utilities\Imaging\Stb.ImageWrite.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\Stb.ImageWrite.Generated.cs">
+      <Link>Utilities\Imaging\Stb.ImageWrite.Generated.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentExtensions.cs">
+      <Link>Utilities\ContentExtensions.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SharpDX">
+      <HintPath>..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.D3DCompiler">
+      <HintPath>..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll</HintPath>
+    </Reference>
+    <Reference Include="CppNet">
+      <HintPath>..\ThirdParty\Dependencies\CppNet\CppNet.dll</HintPath>
+    </Reference>
+    <Reference Include="AssimpNet">
+      <HintPath>..\ThirdParty\Dependencies\assimp\AssimpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Nvidia.TextureTools">
+      <HintPath>..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpFont">
+      <HintPath>..\ThirdParty\Dependencies\SharpFont\x32\SharpFont.dll</HintPath>
+    </Reference>
+    <Reference Include="ATI.TextureConverter">
+      <HintPath>..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll</HintPath>
+    </Reference>
+    <Reference Include="PVRTexLibNET">
+      <HintPath>..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="MonoGame.Framework.Content.Pipeline.dll.config" PackagePath="lib\net471">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" PackagePath="lib\net471" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" PackagePath="lib\net471" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\net471" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll" PackagePath="lib\net471" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config" PackagePath="lib\net471">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" PackagePath="lib\net471" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll.config" PackagePath="lib\net471">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x32\SharpFont.dll" PackagePath="lib\net471" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x32\SharpFont.dll.config" PackagePath="lib\net471">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" PackagePath="lib\net471" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config" PackagePath="lib\net471">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" PackagePath="lib\net471" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config" PackagePath="lib\net471">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\ThirdParty\Dependencies\assimp\libassimp.so" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvimage.so" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvmath.so" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvtt.so" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll.config" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffmpeg" PackagePath="lib\net471\linux" Visible="false">
+      <Link>linux\ffmpeg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffprobe" PackagePath="lib\net471\linux" Visible="false">
+      <Link>linux\ffprobe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x86\libPVRTexLibWrapper.so" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x64\libPVRTexLibWrapper.so" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvimage.dylib" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvmath.dylib" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvtt.dylib" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll.config" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng15.15.dylib" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg" PackagePath="lib\net471\osx" Visible="false">
+      <Link>osx\ffmpeg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe" PackagePath="lib\net471\osx" Visible="false">
+      <Link>osx\ffprobe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Windows\nvtt.dll" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\assimp\Assimp64.dll" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\Windows\x64\freetype6.dll" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImage.dll" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffmpeg.exe" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffprobe.exe" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\Windows\x64\PVRTexLibWrapper.dll" PackagePath="lib\net471" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Switch\Tools\2MGFX\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\Switch\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\XBoxOne\Tools\2MGFX\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\XBoxOne\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\PlayStation4\Tools\2MGFX\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\PlayStation4\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\PSVita\Tools\2MGFX\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\PSVita\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+
+</Project>

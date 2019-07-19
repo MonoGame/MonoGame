@@ -3,6 +3,15 @@
 
   <Platform Type="Linux">
     <Binary
+      Name="SharpDX"
+      Path="ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" />
+    <Binary
+      Name="SharpDX.D3DCompiler"
+      Path="ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" />
+    <Binary
+      Name="CppNet"
+      Path="ThirdParty\Dependencies\CppNet\CppNet.dll" />
+    <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
     <Binary
@@ -36,6 +45,15 @@
 
 
   <Platform Type="MacOS">
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" />
+    <Binary
+      Name="SharpDX.D3DCompiler"
+      Path="ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" />
+    <Binary
+      Name="CppNet"
+      Path="ThirdParty\Dependencies\CppNet\CppNet.dll" />
     <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />

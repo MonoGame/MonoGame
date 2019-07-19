@@ -7,9 +7,8 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
-#if WINDOWS
 using TwoMGFX;
-#endif
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -50,7 +49,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <remarks>If you get an error during processing, compilation stops immediately. The effect processor displays an error message. Once you fix the current error, it is possible you may get more errors on subsequent compilation attempts.</remarks>
         public override CompiledEffectContent Process(EffectContent input, ContentProcessorContext context)
         {
-#if WINDOWS
+            if (CurrentPlatform.OS != OS.Windows)
+                throw new NotImplementedException();
+
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
 
@@ -123,12 +124,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             return result;
-#else
-            throw new NotImplementedException();
-#endif
         }
 
-#if WINDOWS
         private class ContentPipelineEffectCompilerOutput : IEffectCompilerOutput
         {
             private readonly ContentProcessorContext _context;
@@ -153,7 +150,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 return new ContentIdentity(file, null, line + "," + column);
             }
         }
-#endif
 
         private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
         {

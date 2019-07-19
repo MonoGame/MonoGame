@@ -116,6 +116,14 @@ Task("BuildUWP")
     MSBuild("MonoGame.Framework/MonoGame.Framework.UWP.csproj", msPackSettings);
 });
 
+Task("BuildContentPipeline")
+    .IsDependentOn("Prep")
+    .Does(() =>
+{
+    DotNetCoreRestore("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj");
+    MSBuild("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj", msPackSettings);
+});
+
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
@@ -124,7 +132,8 @@ Task("Default")
     .IsDependentOn("BuildDesktopGL")
     .IsDependentOn("BuildWindowsDX")
     .IsDependentOn("BuildAndroid")
-    .IsDependentOn("BuildUWP");
+    .IsDependentOn("BuildUWP")
+    .IsDependentOn("BuildContentPipeline");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
