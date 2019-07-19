@@ -11,11 +11,6 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
     
     <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
     <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
-    <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>
-    <PackageProjectUrl>http://monogame.net</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/MonoGame/MonoGame</RepositoryUrl>
-    <Authors>MonoGame Team</Authors>
-    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
