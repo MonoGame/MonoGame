@@ -19,7 +19,7 @@
       Path="ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" />
     <Binary
       Name="SharpFont"
-      Path="ThirdParty\Dependencies\SharpFont\x32\SharpFont.dll" />
+      Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
     <Binary
       Name="PVRTexLibNET"
       Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
@@ -106,7 +106,7 @@
       Path="ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" />
     <Binary
       Name="SharpFont"
-      Path="ThirdParty\Dependencies\SharpFont\Windows\x64\SharpFont.dll" />
+      Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
     <Binary
       Name="PVRTexLibNET"
       Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
@@ -116,7 +116,7 @@
     <NativeBinary Path="ThirdParty\Dependencies\NVTT\Windows\nvtt.dll" />
     <NativeBinary Path="ThirdParty\Dependencies\assimp\Assimp64.dll" />
     <NativeBinary Path="ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" />
-    <NativeBinary Path="ThirdParty\Dependencies\SharpFont\Windows\x64\freetype6.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\SharpFont\x64\freetype6.dll" />
     <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImage.dll" />
     <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\Windows\x64\ffmpeg.exe" />
     <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\Windows\x64\ffprobe.exe" />

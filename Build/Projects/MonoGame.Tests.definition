@@ -58,6 +58,7 @@
       <Link>x64\libopenal.so.1</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- We run the Linux unit test on the Mac build bot for whatever reason -->
     <None Include="..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib"  Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
       <Link>libSDL2-2.0.0.dylib</Link>
@@ -132,6 +133,19 @@
       <Platforms>Linux</Platforms>
       <Link>PVRTexLibNET.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <!-- We need the dll.config file on Mac because Mono doesn't test for the .dylib extension automatically -->
+    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config">
+      <Platforms>Linux</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib"  Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng15.15.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libpng15.15.dylib</Link>
     </None>
     <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
