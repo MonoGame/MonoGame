@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MonoGame.Utilities;
 using MonoGame.Utilities.Png;
+using StbImageSharp;
 
 #if IOS
 using UIKit;
@@ -19,6 +20,7 @@ using System.Drawing;
 using MonoGame.OpenGL;
 using GLPixelFormat = MonoGame.OpenGL.PixelFormat;
 using PixelFormat = MonoGame.OpenGL.PixelFormat;
+using StbImageWriteSharp;
 
 #if ANDROID
 using Android.Graphics;
@@ -257,31 +259,42 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-            int width, height, channels;
+            byte[] bytes;
+
+            // Rewind stream if it is at end
+            if (stream.CanSeek && stream.Length == stream.Position)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
+            // Copy it's data to memory
+            // As some platforms dont provide full stream functionality and thus streams can't be read as it is
+            using (var ms = new MemoryStream())
+            {
+                stream.CopyTo(ms);
+                bytes = ms.ToArray();
+            }
 
             // The data returned is always four channel BGRA
-            var data = ImageReader.Read(stream, out width, out height, out channels, Imaging.STBI_rgb_alpha);
+            var result = ImageResult.FromMemory(bytes, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
 
             // XNA blacks out any pixels with an alpha of zero.
-            if (channels == 4)
+            fixed (byte* b = &result.Data[0])
             {
-                fixed (byte* b = &data[0])
+                for (var i = 0; i < result.Data.Length; i += 4)
                 {
-                    for (var i = 0; i < data.Length; i += 4)
+                    if (b[i + 3] == 0)
                     {
-                        if (b[i + 3] == 0)
-                        {
-                            b[i + 0] = 0;
-                            b[i + 1] = 0;
-                            b[i + 2] = 0;
-                        }
+                        b[i + 0] = 0;
+                        b[i + 1] = 0;
+                        b[i + 2] = 0;
                     }
                 }
             }
 
             Texture2D texture = null;
-            texture = new Texture2D(graphicsDevice, width, height);
-            texture.SetData(data);
+            texture = new Texture2D(graphicsDevice, result.Width, result.Height);
+            texture.SetData(result.Data);
 
             return texture;
         }
@@ -416,6 +429,14 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+#if DESKTOPGL
+        internal enum ImageWriterFormat
+        {
+            Jpg,
+            Png
+        }
+#endif
+
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
 #if DESKTOPGL
@@ -460,10 +481,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		        data = new byte[width * height * 4];
 		        GetData(data);
 
+                // Write
                 var writer = new ImageWriter();
-                writer.Write(data, width, height, 4, format, stream);
-	        }
-	        finally
+                switch (format)
+                {
+                    case ImageWriterFormat.Jpg:
+                        writer.WriteJpg(data, width, height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream, 90);
+                        break;
+                    case ImageWriterFormat.Png:
+                        writer.WritePng(data, width, height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream);
+                        break;
+                }
+            }
+            finally
 	        {
 		        if (data != null)
 		        {
