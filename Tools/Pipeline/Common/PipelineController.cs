@@ -501,7 +501,7 @@ namespace MonoGame.Tools.Pipeline
             Encoding encoding;
             try {
                 encoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
-            } catch (NotSupportedException) {
+            } catch (Exception ex) when (ex is NotSupportedException || ex is ArgumentException) {
                 encoding = Encoding.UTF8;
             }
             var currentDir = Environment.CurrentDirectory;
