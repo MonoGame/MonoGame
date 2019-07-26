@@ -14,12 +14,14 @@
   </Platform>
 
   <Platform Type="MacOS">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <Reference Include="System.Drawing" />
     <Binary Name="nunit.framework" Path="packages\NUnit.3.9.0\lib\net45\nunit.framework.dll" />
     <Binary Name="nunitlite" Path="packages\NUnitLite.3.9.0\lib\net45\nunitlite.dll" />
   </Platform>
 
   <Platform Type="Linux">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <Reference Include="System.Drawing" />
     <Binary Name="nunit.framework" Path="packages\NUnit.3.9.0\lib\net45\nunit.framework.dll" />
     <Binary Name="nunitlite" Path="packages\NUnitLite.3.9.0\lib\net45\nunitlite.dll" />

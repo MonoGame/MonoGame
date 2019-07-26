@@ -30,7 +30,7 @@
       <Platform Name="Linux">TRACE;LINUX;GTK3</Platform>
     </CustomDefinitions>
     <FrameworkVersions>
-      <Version>4.7.2</Version>
+      <Version>v4.7.2</Version>
     </FrameworkVersions>
     <IncludeMonoRuntimeOnMac>True</IncludeMonoRuntimeOnMac>
     <ImportPipelineTargets>True</ImportPipelineTargets>

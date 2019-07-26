@@ -2,6 +2,7 @@
 <ExternalProject Name="Framework.Content.Pipeline.References">
 
   <Platform Type="Linux">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <Binary
       Name="SharpDX"
       Path="ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" />
@@ -45,6 +46,7 @@
 
 
   <Platform Type="MacOS">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <Binary
       Name="SharpDX"
       Path="ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" />

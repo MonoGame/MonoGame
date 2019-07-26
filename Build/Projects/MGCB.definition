@@ -10,7 +10,10 @@
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
+
+    <Reference Include="MGCBReferences" />
   </References>
+
 
   <Properties>
     
@@ -28,7 +31,7 @@
     </CustomDefinitions>
 
     <FrameworkVersions>
-      <Version>4.7.2</Version>
+      <Version>v4.7.2</Version>
     </FrameworkVersions>
 
   </Properties>

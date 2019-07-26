@@ -33,7 +33,7 @@
     </CustomDefinitions>
 
     <FrameworkVersions>
-      <Version>4.7.2</Version>
+      <Version>v4.7.2</Version>
     </FrameworkVersions>
 
   </Properties>

@@ -2,6 +2,7 @@
 <ExternalProject Name="PipelineReferences">
 
   <Platform Type="Linux">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
     <Binary Name="Eto.Gtk" Path="ThirdParty\Dependencies\Eto\Eto.Gtk.dll" />
       
@@ -15,6 +16,7 @@
   </Platform>
 
   <Platform Type="MacOS">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
     <Binary Name="Eto.XamMac2" Path="ThirdParty\Dependencies\Eto\Eto.XamMac2.dll" />
   </Platform>
