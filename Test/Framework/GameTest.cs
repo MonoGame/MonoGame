@@ -48,7 +48,6 @@ namespace MonoGame.Tests {
 			[TestCase ("Services")]
 			[TestCase ("TargetElapsedTime")]
 			[TestCase ("Window")]
-			[Apartment(ApartmentState.STA)]
 			public void Property_does_not_throws_after_Dispose (string propertyName)
 			{
 				var propertyInfo = Game.GetType ().GetProperty (propertyName);
@@ -67,7 +66,6 @@ namespace MonoGame.Tests {
 			[TestCase ("RunOneFrame")]
 			[TestCase ("SuppressDraw")]
 			[TestCase ("Tick")]
-			[Apartment(ApartmentState.STA)]
             public void Method_does_not_throw_after_Dispose (string methodName)
 			{
 				var methodInfo = Game.GetType ().GetMethod (methodName, new Type [0]);
@@ -133,7 +131,7 @@ namespace MonoGame.Tests {
 
 		[TestFixture]
 		public class Behaviors : FixtureBase {
-			[Test, Ignore("Fix me!"), Apartment(ApartmentState.STA)]
+			[Test, Ignore("Fix me!")]
 			public void Nongraphical_run_succeeds ()
 			{
 				Game.Run ();
@@ -142,7 +140,7 @@ namespace MonoGame.Tests {
 				Assert.That (Game, Has.Property ("DrawCount").EqualTo (0));
 			}
 
-			[Test, Ignore("Fix me!"), Apartment(ApartmentState.STA)]
+			[Test, Ignore("Fix me!")]
 			public void Fixed_time_step_skips_draw_when_update_is_slow ()
 			{
 				Game.MakeGraphical ();

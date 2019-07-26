@@ -173,14 +173,8 @@
     <Compile Include="Runner\PixelArgb.cs" />
     <Compile Include="Runner\Utility.cs" />
 
-    <Compile Include="Runner\Linux\Program.cs">
-        <Platforms>Linux</Platforms>
-    </Compile>
-    <Compile Include="Runner\MacOS\Program.cs">
-        <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="Runner\Windows\Program.cs">
-        <Platforms>Windows,WindowsGL</Platforms>
+    <Compile Include="Runner\Program.cs">
+        <Platforms>Windows,WindowsGL,MacOS,Linux</Platforms>
     </Compile>
 
     <Compile Include="Runner\Desktop\FramePixelData.cs">
@@ -244,7 +238,7 @@
     <Compile Include="Framework\Audio\SoundEffectTest.cs" />
     <Compile Include="Framework\Audio\XactTest.cs" />
     <Compile Include="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
-    <Compile Include="Framework\Audio\SoundEffectInstanceXAudioTest.cs">
+    <Compile Include="Framework\WindowsDX\Audio\SoundEffectInstanceXAudioTest.cs">
         <Platforms>Windows</Platforms>
     </Compile>
 

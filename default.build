@@ -189,13 +189,13 @@
   <target name="run_tests" description="Run all the tests" depends="_default">
 
     <if test="${os == 'Win32NT'}">
-      <exec program="MonoGameTests.exe" commandline="--teamcity" workingdir="Test/bin/Windows/AnyCPU/Debug/" basedir="Test/bin/Windows/AnyCPU/Debug/"/>
+      <exec program="MonoGame.Tests.exe" commandline="--teamcity" workingdir="Test/bin/Windows/AnyCPU/Debug/" basedir="Test/bin/Windows/AnyCPU/Debug/"/>
     </if>
 
     <if test="${os == 'MacOS'}">
       <exec program="chmod" commandline="u+x Test/bin/Linux/AnyCPU/Debug/ffmpeg" />
       <exec program="chmod" commandline="u+x Test/bin/Linux/AnyCPU/Debug/ffprobe" />
-      <exec program="mono" commandline="MonoGameTests.exe --teamcity" workingdir="Test/bin/Linux/AnyCPU/Debug/" />
+      <exec program="mono" commandline="MonoGame.Tests.exe --teamcity" workingdir="Test/bin/Linux/AnyCPU/Debug/" />
     </if>
 
   </target>
