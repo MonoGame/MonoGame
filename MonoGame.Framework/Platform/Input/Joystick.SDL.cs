@@ -9,6 +9,14 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class Joystick
     {
+        private static JoystickState _defaultJoystickState = new JoystickState
+        {
+            IsConnected = false,
+            Axes = new int[0],
+            Buttons = new ButtonState[0],
+            Hats = new JoystickHat[0]
+        };
+
         internal static Dictionary<int, IntPtr> Joysticks = new Dictionary<int, IntPtr>();
 
         internal static void AddDevice(int deviceId)
@@ -52,7 +60,8 @@ namespace Microsoft.Xna.Framework.Input
 
         private static JoystickCapabilities PlatformGetCapabilities(int index)
         {
-            if (!Joysticks.ContainsKey(index))
+            IntPtr joystickPtr = IntPtr.Zero;
+            if (!Joysticks.TryGetValue(index, out joystickPtr))
                 return new JoystickCapabilities
                 {
                     IsConnected = false,
@@ -63,7 +72,7 @@ namespace Microsoft.Xna.Framework.Input
                     HatCount = 0
                 };
 
-            var jdevice = Joysticks[index];
+            var jdevice = joystickPtr;
             return new JoystickCapabilities
             {
                 IsConnected = true,
@@ -77,17 +86,12 @@ namespace Microsoft.Xna.Framework.Input
 
         private static JoystickState PlatformGetState(int index)
         {
-            if (!Joysticks.ContainsKey(index))
-                return new JoystickState
-                {
-                    IsConnected = false,
-                    Axes = new int[0],
-                    Buttons = new ButtonState[0],
-                    Hats = new JoystickHat[0]
-                };
+            IntPtr joystickPtr = IntPtr.Zero;
+            if (!Joysticks.TryGetValue(index, out joystickPtr))
+                return _defaultJoystickState;
 
             var jcap = PlatformGetCapabilities(index);
-            var jdevice = Joysticks[index];
+            var jdevice = joystickPtr;
 
             var axes = new int[jcap.AxisCount];
             for (var i = 0; i < axes.Length; i++)
@@ -104,10 +108,10 @@ namespace Microsoft.Xna.Framework.Input
 
                 hats[i] = new JoystickHat
                 {
-                    Up = hatstate.HasFlag(Sdl.Joystick.Hat.Up) ? ButtonState.Pressed : ButtonState.Released,
-                    Down = hatstate.HasFlag(Sdl.Joystick.Hat.Down) ? ButtonState.Pressed : ButtonState.Released,
-                    Left = hatstate.HasFlag(Sdl.Joystick.Hat.Left) ? ButtonState.Pressed : ButtonState.Released,
-                    Right = hatstate.HasFlag(Sdl.Joystick.Hat.Right) ? ButtonState.Pressed : ButtonState.Released
+                    Up = ((hatstate & Sdl.Joystick.Hat.Up) != 0) ? ButtonState.Pressed : ButtonState.Released,
+                    Down = ((hatstate & Sdl.Joystick.Hat.Down) != 0) ? ButtonState.Pressed : ButtonState.Released,
+                    Left = ((hatstate & Sdl.Joystick.Hat.Left) != 0) ? ButtonState.Pressed : ButtonState.Released,
+                    Right = ((hatstate & Sdl.Joystick.Hat.Right) != 0) ? ButtonState.Pressed : ButtonState.Released
                 };
             }
 
