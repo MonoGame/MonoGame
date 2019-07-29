@@ -33,7 +33,8 @@
     <NativeBinary Path="ThirdParty\Dependencies\NVTT\Linux\libnvmath.so" />
     <NativeBinary Path="ThirdParty\Dependencies\NVTT\Linux\libnvtt.so" />
     <NativeBinary Path="ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll.config" />
-    <NativeBinary Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.so" Link="libfreetype6.so" />
+    <NativeBinary Path="ThirdParty\Dependencies\SharpFont\x64\libpng16.so.16" />
     <NativeBinary Path="ThirdParty\Dependencies\assimp\AssimpNet.dll.config" />
     <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so" />
     <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\Linux\x64\ffmpeg" />

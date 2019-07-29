@@ -502,7 +502,7 @@
         </xsl:attribute>
       </xsl:if>
       <xsl:choose>
-        <xsl:when test="$path_as">
+        <xsl:when test="$path_as != ''">
           <Link><xsl:value-of select="$path_as" /></Link>
         </xsl:when>
         <xsl:when test="$anchor != ''">
@@ -1917,7 +1917,7 @@
                     <xsl:with-param name="project_name"><xsl:value-of select="$project/@Name" /></xsl:with-param>
                     <xsl:with-param name="project_language"><xsl:value-of select="$project/@Language" /></xsl:with-param>
                     <xsl:with-param name="path"><xsl:value-of select="@Path" /></xsl:with-param>
-                    <xsl:with-param name="path_as"></xsl:with-param>
+                    <xsl:with-param name="path_as"><xsl:value-of select="@Link" /></xsl:with-param>
                     <xsl:with-param name="anchor"><xsl:value-of select="@Anchor" /></xsl:with-param>
                     <xsl:with-param name="is_conditional"></xsl:with-param>
                   </xsl:call-template>
