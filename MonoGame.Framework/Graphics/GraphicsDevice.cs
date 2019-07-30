@@ -33,6 +33,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _isDisposed;
 
+#if DEBUG
+		private static Color _discardColor = new Color(68, 34, 136, 255);
+#else
+		private static Color _discardColor = new Color(0, 0, 0, 255);
+#endif
+
         private Color _blendFactor = Color.White;
         private bool _blendFactorDirty;
 
@@ -88,11 +94,10 @@ namespace Microsoft.Xna.Framework.Graphics
         // clears to colors where all components are either 0 or 255.
         // Despite XNA4 using Purple here, we use black (in Release) to avoid
         // performance warnings on Intel/Mesa
-#if DEBUG
-        private static readonly Color DiscardColor = new Color(68, 34, 136, 255);
-#else
-        private static readonly Color DiscardColor = new Color(0, 0, 0, 255);
-#endif
+        public static Color DiscardColor {
+			get { return _discardColor; }
+			set { _discardColor = value; }
+		}
 
         /// <summary>
         /// The active vertex shader.
