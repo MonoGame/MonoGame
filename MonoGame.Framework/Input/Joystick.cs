@@ -10,6 +10,17 @@ namespace Microsoft.Xna.Framework.Input
     public static partial class Joystick
     {
         /// <summary>
+        /// A default <see cref="JoystickState"/>.
+        /// </summary>
+        private static JoystickState _defaultJoystickState = new JoystickState
+        {
+            IsConnected = false,
+            Axes = new int[0],
+            Buttons = new ButtonState[0],
+            Hats = new JoystickHat[0]
+        };
+
+        /// <summary>
         /// Gets a value indicating whether the current platform supports reading raw joystick data.
         /// </summary>
         /// <value><c>true</c> if the current platform supports reading raw joystick data; otherwise, <c>false</c>.</value>
@@ -36,6 +47,16 @@ namespace Microsoft.Xna.Framework.Input
         public static JoystickState GetState(int index)
         {
             return PlatformGetState(index);
+        }
+
+        /// <summary>
+        /// Gets the current state of the joystick by updating an existing <see cref="JoystickState"/>.
+        /// </summary>
+        /// <param name="joystickState">The <see cref="JoystickState"/> to update.</param>
+        /// <param name="index">Index of the joystick you want to access.</param>
+        public static void GetState(ref JoystickState joystickState, int index)
+        {
+            PlatformGetState(ref joystickState, index);
         }
     }
 }

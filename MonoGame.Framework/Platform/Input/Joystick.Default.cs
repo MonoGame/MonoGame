@@ -24,13 +24,12 @@ namespace Microsoft.Xna.Framework.Input
 
         private static JoystickState PlatformGetState(int index)
         {
-            return new JoystickState()
-            {
-                IsConnected = false,
-                Axes = new int[0],
-                Buttons = new ButtonState[0],
-                Hats = new JoystickHat[0]
-            };
+            return _defaultJoystickState;
+        }
+
+        private static void PlatformGetState(ref JoystickState joystickState, int index)
+        {
+
         }
     }
 }
