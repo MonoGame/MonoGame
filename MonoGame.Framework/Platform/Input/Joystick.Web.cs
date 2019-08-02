@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework.Input
             };
         }
 
-        private static JoystickState PlatformGetState(ref JoystickState joystickState, int index)
+        private static void PlatformGetState(ref JoystickState joystickState, int index)
         {
             joystickState.IsConnected = false;
 
