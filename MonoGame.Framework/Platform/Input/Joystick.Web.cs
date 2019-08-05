@@ -47,8 +47,8 @@ namespace Microsoft.Xna.Framework.Input
         private static JoystickState PlatformGetState(int index)
         {
             var connected = false;
-            var axes = new int[0];
-            var buttons = new ButtonState[0];
+            var axes = _defaultJoystickState.Axes;
+            var buttons = _defaultJoystickState.Buttons;
 
             var navigator = Builtins.Global["navigator"];
             var gamepads = navigator.getGamepads ? navigator.getGamepads() : navigator.webkitGetGamepads();
@@ -83,8 +83,52 @@ namespace Microsoft.Xna.Framework.Input
                 IsConnected = connected,
                 Axes = axes,
                 Buttons = buttons,
-                Hats = new JoystickHat[0]
+                Hats = _defaultJoystickState.Hats
             };
+        }
+
+        private static void PlatformGetState(ref JoystickState joystickState, int index)
+        {
+            joystickState.IsConnected = false;
+
+            var navigator = Builtins.Global["navigator"];
+            var gamepads = navigator.getGamepads ? navigator.getGamepads() : navigator.webkitGetGamepads();
+
+            if (gamepads.length > index)
+            {
+                if (gamepads[index])
+                {
+                    joystickState.IsConnected = true;
+
+                    var axescount = gamepads[index].axes.length;
+                    if (joystickState.Axes.Length < axescount)
+                    {
+                        joystickState.Axes = new int[axescount];
+                    }
+
+                    for (int i = 0; i < axescount; i++)
+                        joystickState.Axes[i] = gamepads[index].axes[i];
+
+                    var buttoncount = gamepads[index].buttons.length;
+                    if (joystickState.Buttons.Length < buttoncount)
+                    {
+                        joystickState.Buttons = new ButtonState[buttoncount];
+                    }
+                    
+                    for (int i = 0; i < buttoncount; i++)
+                    {
+                        if (gamepads[index].buttons[i].pressed)
+                            joystickState.Buttons[i] = ButtonState.Pressed;
+                        else
+                            joystickState.Buttons[i] = ButtonState.Released;
+                    }
+                }
+            }
+
+            if (joystickState.Hats == null)
+            {
+                joystickState.Hats = _defaultJoystickState.Hats;
+            }
         }
     }
 }
