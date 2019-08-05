@@ -70,46 +70,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public Effect (GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
             : this(graphicsDevice)
-		{
-			// By default we currently cache all unique byte streams
-			// and use cloning to populate the effect with parameters,
-			// techniques, and passes.
-			//
-			// This means all the immutable types in an effect:
-			//
-			//  - Shaders
-			//  - Annotations
-			//  - Names
-			//  - State Objects
-			//
-			// Are shared for every instance of an effect while the 
-			// parameter values and constant buffers are copied.
-			//
-			// This might need to change slightly if/when we support
-			// shared constant buffers as 'new' should return unique
-			// effects without any shared instance state.
- 
+        {
+            // By default we currently cache all unique byte streams
+            // and use cloning to populate the effect with parameters,
+            // techniques, and passes.
+            //
+            // This means all the immutable types in an effect:
+            //
+            //  - Shaders
+            //  - Annotations
+            //  - Names
+            //  - State Objects
+            //
+            // Are shared for every instance of an effect while the 
+            // parameter values and constant buffers are copied.
+            //
+            // This might need to change slightly if/when we support
+            // shared constant buffers as 'new' should return unique
+            // effects without any shared instance state.
+
             //Read the header
             MGFXHeader header = ReadHeader(effectCode, index);
-			var effectKey = header.EffectKey;
-			int headerSize = header.HeaderSize;
+            var effectKey = header.EffectKey;
+            int headerSize = header.HeaderSize;
 
-            // First look for it in the cache.
-            //
-            Effect cloneSource;
-            if (!graphicsDevice.EffectCache.TryGetValue(effectKey, out cloneSource))
-            {
-                using (var stream = new MemoryStream(effectCode, index + headerSize, count - headerSize, false))
-            	using (var reader = new BinaryReader(stream))
-            {
-                // Create one.
-                cloneSource = new Effect(graphicsDevice);
-                    cloneSource.ReadEffect(reader);
-
-                // Cache the effect for later in its original unmodified state.
-                    graphicsDevice.EffectCache.Add(effectKey, cloneSource);
-                }
-            }
+            var cloneSource = graphicsDevice.GetEffect(graphicsDevice, effectCode, index, count, effectKey, headerSize);
 
             // Clone it.
             _isClone = true;
@@ -227,7 +212,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Effect File Reader
 
-		private void ReadEffect (BinaryReader reader)
+		internal void ReadEffect (BinaryReader reader)
 		{
 			// TODO: Maybe we should be reading in a string 
 			// table here to save some bytes in the file.

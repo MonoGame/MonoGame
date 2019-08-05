@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using MonoGame.Utilities;
 using System.Runtime.InteropServices;
-
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -118,9 +118,14 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly ConstantBufferCollection _pixelConstantBuffers = new ConstantBufferCollection(ShaderStage.Pixel, 16);
 
         /// <summary>
+        /// Effects can be added to the EffectCache from multiple threads.
+        /// </summary>
+        private readonly object _effectCacheLock = new object();
+
+        /// <summary>
         /// The cache of effects from unique byte streams.
         /// </summary>
-        internal Dictionary<int, Effect> EffectCache;
+        private Dictionary<int, Effect> EffectCache;
 
         // Resources may be added to and removed from the list from many threads.
         private readonly object _resourcesLock = new object();
@@ -509,6 +514,41 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _depthStencilStateDirty = true;
             }
+        }
+
+        /// <summary>
+        /// Get an effect and store it in the cache if necessary.
+        /// </summary>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="effectCode"></param>
+        /// <param name="index"></param>
+        /// <param name="count"></param>
+        /// <param name="effectKey"></param>
+        /// <param name="headerSize"></param>
+        /// <returns></returns>
+        internal Effect GetEffect(GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count, int effectKey, int headerSize)
+        {
+            Effect cloneSource;
+
+            lock (_effectCacheLock)
+            {
+                //First look for it in the cache.
+                if (!EffectCache.TryGetValue(effectKey, out cloneSource))
+                {
+                    using (var stream = new MemoryStream(effectCode, index + headerSize, count - headerSize, false))
+                    using (var reader = new BinaryReader(stream))
+                    {
+                        // Create one.
+                        cloneSource = new Effect(graphicsDevice);
+                        cloneSource.ReadEffect(reader);
+
+                        // Cache the effect for later in its original unmodified state.
+                        graphicsDevice.EffectCache.Add(effectKey, cloneSource);
+                    }
+                }
+            }
+
+            return cloneSource;
         }
 
         internal void ApplyState(bool applyShaders)
