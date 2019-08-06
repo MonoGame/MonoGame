@@ -526,7 +526,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="effectKey"></param>
         /// <param name="headerSize"></param>
         /// <returns></returns>
-        internal Effect GetEffect(GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count, int effectKey, int headerSize)
+        internal Effect GetEffect(byte[] effectCode, int index, int count, int effectKey, int headerSize)
         {
             Effect cloneSource;
 
@@ -539,11 +539,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     using (var reader = new BinaryReader(stream))
                     {
                         // Create one.
-                        cloneSource = new Effect(graphicsDevice);
+                        cloneSource = new Effect(this);
                         cloneSource.ReadEffect(reader);
 
                         // Cache the effect for later in its original unmodified state.
-                        graphicsDevice.EffectCache.Add(effectKey, cloneSource);
+                        EffectCache.Add(effectKey, cloneSource);
                     }
                 }
             }

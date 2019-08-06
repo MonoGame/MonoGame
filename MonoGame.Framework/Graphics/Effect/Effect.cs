@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var effectKey = header.EffectKey;
             int headerSize = header.HeaderSize;
 
-            var cloneSource = graphicsDevice.GetEffect(graphicsDevice, effectCode, index, count, effectKey, headerSize);
+            var cloneSource = graphicsDevice.GetEffect(effectCode, index, count, effectKey, headerSize);
 
             // Clone it.
             _isClone = true;
