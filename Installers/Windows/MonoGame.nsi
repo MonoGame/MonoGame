@@ -138,8 +138,8 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
 
   ; Install Windows 10 UAP Assemblies
   SetOutPath '$INSTDIR\Assemblies\WindowsUniversal'
-  File '..\..\MonoGame.Framework\bin\WindowsUniversal\AnyCPU\Release\*.dll'
-  File '..\..\MonoGame.Framework\bin\WindowsUniversal\AnyCPU\Release\*.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsUniversal\Release\uap10.0\*.dll'
+  File '..\..\MonoGame.Framework\bin\WindowsUniversal\Release\uap10.0\*.xml'
 
   ; Install iOS Assemblies
   IfFileExists `$PROGRAMFILES\MSBuild\Xamarin\iOS\*.*` InstalliOSAssemblies SkipiOSAssemblies

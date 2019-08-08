@@ -62,13 +62,14 @@ This package provides you with MonoGame Framework that works on Windows 10, Wind
     <Compile Include="Platform\WindowsUniversal\InputEvents.cs" />
 
     <Page Include="Platform\Themes\generic.xaml">
+      <Link>Themes\generic.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="MonoGame.Framework.Uwp.targets" PackagePath="build" />
+    <Content Include="MonoGame.Framework.WindowsUniversal.targets" PackagePath="build" />
   </ItemGroup>
 
   <ItemGroup>
