@@ -4,7 +4,7 @@
   <description>The MonoGame automated build script.</description>
 
   <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
-  <property name="msbuilddir" value="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\" />
+  <property name="msbuildwin" value="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe" />
   
   <!-- Helper default target. -->
   <target   name="build" 
@@ -50,24 +50,24 @@
   <target name="build_windows" description="Build Windows" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Windows" />
-      <exec program="${nuget3path}/nuget.exe" commandline="restore MonoGame.Framework.Windows.sln -NonInteractive" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Debug" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Debug" />
+      <exec program="${msbuildwin}" commandline="/t:restore MonoGame.Framework.Windows.sln" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Debug" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Debug" />
       <exec program="Protobuild" commandline="-generate WindowsGL" />
-      <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Build /p:Configuration=Release" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.WindowsGL.sln /t:Clean /p:Configuration=Release" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.WindowsGL.sln /t:Build /p:Configuration=Release" />
       <call target="build_portable"/>
     </if>
     <if test="${os == 'Unix'}">
       <exec program="mono" commandline="Protobuild.exe -generate Windows" />
       <exec program="${nuget3path}/nuget.exe" commandline="restore MonoGame.Framework.Windows.sln -NonInteractive" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release" />
+      <exec program="msbuild" commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild" commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release" />
       <exec program="mono" commandline="Protobuild.exe -generate WindowsGL" />
-      <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Build /p:Configuration=Release" />
+      <exec program="msbuild" commandline="MonoGame.Framework.WindowsGL.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild" commandline="MonoGame.Framework.WindowsGL.sln /t:Build /p:Configuration=Release" />
     </if>
   </target>
 
@@ -78,10 +78,10 @@
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Linux" />
       <exec program="${nuget3path}/nuget.exe" commandline="restore MonoGame.Framework.Linux.sln -NonInteractive" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Linux.sln /t:Build /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Debug" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Linux.sln /t:Build /p:Configuration=Debug" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Release" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.Linux.sln /t:Build /p:Configuration=Release" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Debug" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.Linux.sln /t:Build /p:Configuration=Debug" />
     </if>
     <if test="${os == 'Unix'}">
       <exec program="mono" commandline="Protobuild.exe -generate Linux" />
@@ -121,13 +121,13 @@
           <variable name="JSIL_DIRECTORY" value="C:\JSIL" />
         </environment>
       </exec>
-      <exec program="msbuild " commandline="MonoGame.Framework.Web.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Web.sln /t:Build /p:Configuration=Release" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.Web.sln /t:Clean /p:Configuration=Release" />
+      <exec program="${msbuildwin}" commandline="MonoGame.Framework.Web.sln /t:Build /p:Configuration=Release" />
     </if>
     <if test="${os == 'Unix'}">
       <exec program="mono" commandline="Protobuild.exe -generate Web" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Web.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Web.sln /t:Build /p:Configuration=Release" />
+      <exec program="msbuild" commandline="MonoGame.Framework.Web.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild" commandline="MonoGame.Framework.Web.sln /t:Build /p:Configuration=Release" />
     </if>
   </target>
 
@@ -163,8 +163,8 @@
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('C:\Program Files (x86)\MSBuild\Novell\Novell.MonoDroid.CSharp.targets')}">
         <exec program="Protobuild" commandline="-generate Android" />
-        <exec program="msbuild " commandline="MonoGame.Framework.Android.sln /t:Clean /p:Configuration=Release" />
-        <exec program="msbuild " commandline="MonoGame.Framework.Android.sln /t:Build /p:Configuration=Release" />
+        <exec program="msbuild" commandline="MonoGame.Framework.Android.sln /t:Clean /p:Configuration=Release" />
+        <exec program="msbuild" commandline="MonoGame.Framework.Android.sln /t:Build /p:Configuration=Release" />
       </if>
     </if>
     <if test="${os == 'MacOS'}">
@@ -182,11 +182,8 @@
 
   <target name="build_windows10" description="Build Windows 10 UAP" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
-      <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsXaml\v14.0\Microsoft.Windows.UI.Xaml.CSharp.targets')}">
-        <exec program="${msbuilddir}\msbuild.exe " commandline='MonoGame.Framework\MonoGame.Framework.WindowsUniversal.csproj /t:Restore /p:Configuration=Release' />
-        <exec program="${msbuilddir}\msbuild.exe " commandline='MonoGame.Framework\MonoGame.Framework.WindowsUniversal.csproj /p:Configuration=Release' />
-
-      </if>
+      <exec program="${msbuildwin}" commandline='MonoGame.Framework\MonoGame.Framework.WindowsUniversal.csproj /t:Restore /p:Configuration=Release' />
+      <exec program="${msbuildwin}" commandline='MonoGame.Framework\MonoGame.Framework.WindowsUniversal.csproj /p:Configuration=Release' />
     </if>
   </target>
 
