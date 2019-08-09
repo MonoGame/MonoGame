@@ -234,7 +234,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // The data returned is always four channel BGRA
-            var result = ImageResult.FromMemory(bytes, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
+            var result = ImageResult.FromMemory(bytes, ColorComponents.RedGreenBlueAlpha);
 
             // XNA blacks out any pixels with an alpha of zero.
             fixed (byte* b = &result.Data[0])
