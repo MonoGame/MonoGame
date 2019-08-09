@@ -39,6 +39,9 @@ namespace Microsoft.Xna.Framework.Windows
         public const int WM_POINTERDOWN = 0x0246;
         public const int WM_POINTERUPDATE = 0x0245;
         public const int WM_KEYDOWN = 0x0100;
+        public const int WM_KEYUP = 0x0101;
+        public const int WM_SYSKEYDOWN = 0x0104;
+        public const int WM_SYSKEYUP = 0x0105;
         public const int WM_TABLET_QUERYSYSTEMGESTURESTA = (0x02C0 + 12);
 
         public const int WM_ENTERSIZEMOVE = 0x0231;
@@ -93,6 +96,7 @@ namespace Microsoft.Xna.Framework.Windows
                     }
 #if (WINDOWS && DIRECTX)
                 case WM_KEYDOWN:
+                    HandleKeyMessage(ref m);
                     switch (m.WParam.ToInt32())
                     {
                         case 0x5B:  // Left Windows Key
@@ -100,9 +104,16 @@ namespace Microsoft.Xna.Framework.Windows
 
                             if (_window.IsFullScreen && _window.HardwareModeSwitch)
                                 this.WindowState = FormWindowState.Minimized;
- 		 
+
                             break;
                     }
+                    break;
+                case WM_SYSKEYDOWN:
+                    HandleKeyMessage(ref m);
+                    break;
+                case WM_KEYUP:
+                case WM_SYSKEYUP:
+                    HandleKeyMessage(ref m);
                     break;
 #endif
                 case WM_SYSCOMMAND:
@@ -160,6 +171,62 @@ namespace Microsoft.Xna.Framework.Windows
             }
 
             base.WndProc(ref m);
+        }
+
+        void HandleKeyMessage(ref Message m)
+        {
+            long virtualKeyCode = m.WParam.ToInt64();
+            bool extended = (m.LParam.ToInt64() & 0x01000000) != 0;
+            long scancode = (m.LParam.ToInt64() & 0x00ff0000) >> 16;
+            var key = KeyCodeTranslate(
+                (System.Windows.Forms.Keys)virtualKeyCode,
+                extended,
+                scancode);
+            if (Input.KeysHelper.IsKey((int)key))
+            {
+                switch (m.Msg)
+                {
+                    case WM_KEYDOWN:
+                    case WM_SYSKEYDOWN:
+                        _window.OnKeyDown(new InputKeyEventArgs(key));
+                        break;
+                    case WM_KEYUP:
+                    case WM_SYSKEYUP:
+                        _window.OnKeyUp(new InputKeyEventArgs(key));
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        }
+
+        private static Microsoft.Xna.Framework.Input.Keys KeyCodeTranslate(
+            System.Windows.Forms.Keys keyCode, bool extended, long scancode)
+        {
+            switch (keyCode)
+            {
+                // WinForms does not distinguish between left/right keys
+                // We have to check for special keys such as control/shift/alt/ etc
+                case System.Windows.Forms.Keys.ControlKey:
+                    return extended
+                        ? Microsoft.Xna.Framework.Input.Keys.RightControl
+                        : Microsoft.Xna.Framework.Input.Keys.LeftControl;
+                case System.Windows.Forms.Keys.ShiftKey:
+                    // left shift is 0x2A, right shift is 0x36. IsExtendedKey is always false.
+                    return ((scancode & 0x1FF) == 0x36)
+                               ? Microsoft.Xna.Framework.Input.Keys.RightShift
+                                : Microsoft.Xna.Framework.Input.Keys.LeftShift;
+                // Note that the Alt key is now refered to as Menu.
+                case System.Windows.Forms.Keys.Menu:
+                case System.Windows.Forms.Keys.Alt:
+                    return extended
+                        ? Microsoft.Xna.Framework.Input.Keys.RightAlt
+                        : Microsoft.Xna.Framework.Input.Keys.LeftAlt;
+
+                default:
+                    return (Microsoft.Xna.Framework.Input.Keys)keyCode;
+            }
         }
     }
 }

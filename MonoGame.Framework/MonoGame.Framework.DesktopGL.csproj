@@ -47,9 +47,11 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
     <Compile Include="Platform\Media\Song.NVorbis.cs" />
     <Compile Include="Platform\Input\GamePad.SDL.cs" />
+    <Compile Include="Platform\Input\InputKeyEventArgs.cs" />
     <Compile Include="Platform\Input\Joystick.SDL.cs" />
     <Compile Include="Platform\Input\Keyboard.SDL.cs" />
     <Compile Include="Platform\Input\KeyboardUtil.SDL.cs" />
+    <Compile Include="Platform\Input\KeysHelper.cs" />
     <Compile Include="Platform\Input\Mouse.SDL.cs" />
     <Compile Include="Platform\Input\MouseCursor.SDL.cs" />
     <Compile Include="Platform\Graphics\GraphicsContext.SDL.cs" />

@@ -123,6 +123,7 @@ namespace Microsoft.Xna.Framework
 
             _coreWindow.Closed += Window_Closed;
             _coreWindow.Activated += Window_FocusChanged;
+            _coreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
 
             if (Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
                 Windows.Phone.UI.Input.HardwareButtons.BackPressed += this.HardwareButtons_BackPressed;
@@ -211,6 +212,25 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        private void Dispatcher_AcceleratorKeyActivated(CoreDispatcher sender, AcceleratorKeyEventArgs args)
+        {
+            // NOTE: Dispatcher event is used becuase KeyDown event doesn't handle Alt key
+            var key = InputEvents.KeyTranslate(args.VirtualKey, args.KeyStatus);
+            switch (args.EventType)
+            {
+                case CoreAcceleratorKeyEventType.KeyDown:
+                case CoreAcceleratorKeyEventType.SystemKeyDown:
+                    OnKeyDown(new InputKeyEventArgs(key));
+                    break;
+                case CoreAcceleratorKeyEventType.KeyUp:
+                case CoreAcceleratorKeyEventType.SystemKeyUp:
+                    OnKeyUp(new InputKeyEventArgs(key));
+                    break;
+                default:
+                    break;
+            }
+        }
+		
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
         {
             var result = DisplayOrientation.Default;
@@ -349,7 +369,9 @@ namespace Microsoft.Xna.Framework
             {
                 InputEvents.KeyChar ch;
                 while (_inputEvents.TextQueue.TryDequeue(out ch))
-                    OnTextInput(_coreWindow, new TextInputEventArgs(ch.Character, ch.Key));
+                {
+                    OnTextInput(new TextInputEventArgs(ch.Character, ch.Key));
+                }
             }
 
             // Update size

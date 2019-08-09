@@ -300,11 +300,6 @@ namespace Microsoft.Xna.Framework
             OnClientSizeChanged();
         }
 
-        public void CallTextInput(char c, Keys key = Keys.None)
-        {
-            OnTextInput(this, new TextInputEventArgs(c, key));
-        }
-
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
             // Nothing to do here

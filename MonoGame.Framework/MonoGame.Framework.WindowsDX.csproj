@@ -26,9 +26,11 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
     <Compile Include="Platform\Graphics\SwapChainRenderTarget.cs" />
     <Compile Include="Platform\Input\GamePad.XInput.cs" />
+    <Compile Include="Platform\Input\InputKeyEventArgs.cs" />
     <Compile Include="Platform\Input\Joystick.Default.cs" />
     <Compile Include="Platform\Input\Keyboard.Windows.cs" />
     <Compile Include="Platform\Input\KeyboardInput.Windows.cs" />
+    <Compile Include="Platform\Input\KeysHelper.cs" />
     <Compile Include="Platform\Input\MessageBox.Windows.cs" />
     <Compile Include="Platform\Input\Mouse.Windows.cs" />
     <Compile Include="Platform\Input\MouseCursor.Windows.cs" />

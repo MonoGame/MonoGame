@@ -155,8 +155,9 @@ namespace Microsoft.Xna.Framework.Input
 
         public static Keys ToXna(int key)
         {
-            if (_map.ContainsKey(key))
-                return _map[key];
+            Keys xnaKey;
+            if (_map.TryGetValue(key, out xnaKey))
+                return xnaKey;
 
             return Keys.None;
         }
