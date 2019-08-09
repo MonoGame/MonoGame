@@ -180,7 +180,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         for (var row = 0; row < rows; row++)
                         {
                             int i;
-                            for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
+                            int maxElements =  (row + 1) * rowSize / elementSizeInByte;
+                            for (i = row * rowSize / elementSizeInByte; i < maxElements; i++)
                                 data[i + startIndex] = stream.Read<T>();
 
                             if (i >= elementCount)
@@ -261,9 +262,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             for (int row = 0; row < (uint)pixelHeight; row++)
             {
+                int rowxPixelWidth = row * pixelWidth * 4;
                 for (int col = 0; col < (uint)pixelWidth; col++)
                 {
-                    offset = (row * pixelWidth * 4) + (col * 4);
+                    offset = rowxPixelWidth + (col * 4);
 
                     byte B = pixels[offset];
                     byte R = pixels[offset + 2];
