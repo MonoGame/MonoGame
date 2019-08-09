@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Utilities;
+using StbImageSharp;
 using System;
 using System.IO;
 
@@ -126,14 +126,62 @@ namespace MonoGame.Framework.Graphics
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public static Image2D FromStream(Stream stream)
+        public unsafe static Image2D FromStream(Stream stream)
         {
-            int x, y;
-            int comp;
+            byte[] bytes;
 
-            var data = ImageReader.ReadColor(stream, out x, out y, out comp);
+            // Rewind stream if it is at end
+            if (stream.CanSeek && stream.Length == stream.Position)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+            }
 
-            return new Image2D(x, y, data);
+            // Copy it's data to memory
+            // As some platforms dont provide full stream functionality and thus streams can't be read as it is
+            using (var ms = new MemoryStream())
+            {
+                stream.CopyTo(ms);
+                bytes = ms.ToArray();
+            }
+
+            byte* result = null;
+            try
+            {
+                // Load image
+                int x, y, comp;
+                fixed (byte* b = bytes)
+                {
+                    result = StbImage.stbi_load_from_memory(b, bytes.Length, &x, &y, &comp, StbImage.STBI_rgb_alpha);
+                }
+
+                if (result == null)
+                {
+                    throw new InvalidOperationException(StbImage.LastError);
+                }
+
+                // Convert to managed color array
+                byte* src = result;
+                var data = new Color[x * y];
+                fixed (Color* dest = data)
+                {
+                    for (var i = 0; i < data.Length; ++i)
+                    {
+                        dest[i].R = *src++;
+                        dest[i].G = *src++;
+                        dest[i].B = *src++;
+                        dest[i].A = *src++;
+                    }
+                }
+
+                return new Image2D(x, y, data);
+            }
+            finally
+            {
+                if (result != null)
+                {
+                    CRuntime.free(result);
+                }
+            }
         }
     }
 }
