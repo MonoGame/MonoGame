@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net45</TargetFramework>
-    <DefineConstants>WINDOWS;XNADESIGNPROVIDED</DefineConstants>
+    <DefineConstants>WINDOWS;XNADESIGNPROVIDED;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
 
@@ -51,6 +51,10 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
     <Compile Include="Platform\Windows\WinFormsGameForm.cs" />
     <Compile Include="Platform\Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Platform\Windows\WinFormsGameWindow.cs" />
+  </ItemGroup> 
+
+  <ItemGroup>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -58,15 +62,15 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System.Windows.Forms"/>
+    <Reference Include="System.Windows.Forms" />
 
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll"/>
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.Direct2D1.dll"/>
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.Direct3D11.dll"/>
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.DXGI.dll"/>
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.MediaFoundation.dll"/>
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.XAudio2.dll"/>
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.XInput.dll"/>
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" />
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.Direct2D1.dll" />
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.Direct3D11.dll" />
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.DXGI.dll" />
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.MediaFoundation.dll" />
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.XAudio2.dll" />
+    <Reference Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.XInput.dll" />
   </ItemGroup>
 
   <Import Project="Platform\DirectX.targets" />

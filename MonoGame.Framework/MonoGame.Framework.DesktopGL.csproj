@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
-    <DefineConstants>OPENGL;OPENAL;XNADESIGNPROVIDED;LINUX;DESKTOPGL;SUPPORTS_EFX;NETSTANDARD</DefineConstants>
+    <DefineConstants>OPENGL;OPENAL;XNADESIGNPROVIDED;LINUX;DESKTOPGL;SUPPORTS_EFX;NETSTANDARD;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
 
@@ -60,83 +60,13 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
     <Compile Include="Platform\GraphicsDeviceManager.SDL.cs" />
+    
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
 
     <!-- NVorbis -->
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\BufferedReadStream.cs">
-      <Link>Platform\NVorbis\BufferedReadStream.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\DataPacket.cs">
-      <Link>Platform\NVorbis\DataPacket.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Huffman.cs">
-      <Link>Platform\NVorbis\Huffman.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IContainerReader.cs">
-      <Link>Platform\NVorbis\IContainerReader.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IPacketProvider.cs">
-      <Link>Platform\NVorbis\IPacketProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IVorbisStreamStatus.cs">
-      <Link>Platform\NVorbis\IVorbisStreamStatus.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Mdct.cs">
-      <Link>Platform\NVorbis\Mdct.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\NewStreamEventArgs.cs">
-      <Link>Platform\NVorbis\NewStreamEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\ParameterChangeEventArgs.cs">
-      <Link>Platform\NVorbis\ParameterChangeEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\RingBuffer.cs">
-      <Link>Platform\NVorbis\RingBuffer.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\StreamReadBuffer.cs">
-      <Link>Platform\NVorbis\StreamReadBuffer.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Utils.cs">
-      <Link>Platform\NVorbis\Utils.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisCodebook.cs">
-      <Link>Platform\NVorbis\VorbisCodebook.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisFloor.cs">
-      <Link>Platform\NVorbis\VorbisFloor.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisMapping.cs">
-      <Link>Platform\NVorbis\VorbisMapping.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisMode.cs">
-      <Link>Platform\NVorbis\VorbisMode.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisReader.cs">
-      <Link>Platform\NVorbis\VorbisReader.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisResidue.cs">
-      <Link>Platform\NVorbis\VorbisResidue.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisStreamDecoder.cs">
-      <Link>Platform\NVorbis\VorbisStreamDecoder.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisTime.cs">
-      <Link>Platform\NVorbis\VorbisTime.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggContainerReader.cs">
-      <Link>Platform\NVorbis\Ogg\OggContainerReader.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggCrc.cs">
-      <Link>Platform\NVorbis\Ogg\OggCrc.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPacket.cs">
-      <Link>Platform\NVorbis\Ogg\OggPacket.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPacketReader.cs">
-      <Link>Platform\NVorbis\Ogg\OggPacketReader.cs</Link>
-    </Compile>
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPageFlags.cs">
-      <Link>Platform\NVorbis\Ogg\OggPageFlags.cs</Link>
-    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\**\*.cs" LinkBase="ThirdParty\NVorbis"/>
+    <Compile Remove="..\ThirdParty\NVorbis\NVorbis\Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>

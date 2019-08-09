@@ -35,15 +35,15 @@
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
 
     <CustomDefinitions>
-      <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL;OPENAL</Platform>
-      <Platform Name="iOS">IOS;GLES;OPENGL;OPENAL</Platform>
-      <Platform Name="tvOS">IOS;TVOS;GLES;OPENGL;OPENAL</Platform>
-      <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL;DESKTOPGL;SUPPORTS_EFX</Platform>
-      <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL;DESKTOPGL;SUPPORTS_EFX</Platform>
-      <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL;SUPPORTS_EFX</Platform>
-      <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
-      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
-      <Platform Name="Web">TRACE;WEB</Platform>
+      <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL;OPENAL;STBSHARP_INTERNAL</Platform>
+      <Platform Name="iOS">IOS;GLES;OPENGL;OPENAL;STBSHARP_INTERNAL</Platform>
+      <Platform Name="tvOS">IOS;TVOS;GLES;OPENGL;OPENAL;STBSHARP_INTERNAL</Platform>
+      <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL;DESKTOPGL;SUPPORTS_EFX;STBSHARP_INTERNAL</Platform>
+      <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL;DESKTOPGL;SUPPORTS_EFX;STBSHARP_INTERNAL</Platform>
+      <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL;SUPPORTS_EFX;STBSHARP_INTERNAL</Platform>
+      <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION;STBSHARP_INTERNAL</Platform>
+      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE;STBSHARP_INTERNAL</Platform>
+      <Platform Name="Web">TRACE;WEB;STBSHARP_INTERNAL</Platform>
     </CustomDefinitions>
 	
 	<DefineNET4DetectionConstant>True</DefineNET4DetectionConstant>
@@ -1218,15 +1218,6 @@
     <Compile Include="Utilities\Png\PngReader.cs" />
     <Compile Include="Utilities\Png\PngWriter.cs" />
     <Compile Include="Utilities\ByteBufferPool.cs" />
-    <Compile Include="Utilities\Imaging\Stb.Image.cs" />
-    <Compile Include="Utilities\Imaging\Stb.Image.Generated.cs" />
-    <Compile Include="Utilities\Imaging\ImageReader.cs" />
-    <Compile Include="Utilities\Imaging\Stb.ImageWrite.cs" />
-    <Compile Include="Utilities\Imaging\Stb.ImageWrite.Generated.cs" />
-    <Compile Include="Utilities\Imaging\ImageWriter.cs" />
-    <Compile Include="Utilities\Imaging\Operations.cs" />
-    <Compile Include="Utilities\Imaging\PinnedArray.cs" />
-
 	
 
 
@@ -1467,6 +1458,53 @@
     <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo">
       <Services>DirectXGraphics</Services>
     </EmbeddedResource>
+    
+    <!-- StbImageSharp-->
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\AnimatedFrameResult.cs">
+      <Link>Utilities\StbImageSharp\AnimatedFrameResult.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\ColorComponents.cs">
+      <Link>Utilities\StbImageSharp\ColorComponents.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\CRuntime.cs">
+      <Link>Utilities\StbImageSharp\CRuntime.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\ImageResult.cs">
+      <Link>Utilities\StbImageSharp\ImageResult.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\ImageStreamLoader.cs">
+      <Link>Utilities\StbImageSharp\ImageStreamLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\MemoryStats.cs">
+      <Link>Utilities\StbImageSharp\MemoryStats.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\StbImage.cs">
+      <Link>Utilities\StbImageSharp\StbImage.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\StbImage.Generated.cs">
+      <Link>Utilities\StbImageSharp\StbImage.Generated.cs</Link>
+    </Compile>
+    
+    <!-- StbImageWriteSharp-->
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\ColorComponents.cs">
+      <Link>Utilities\StbImageWriteSharp\ColorComponents.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\CRuntime.cs">
+      <Link>Utilities\StbImageWriteSharp\CRuntime.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\ImageWriter.cs">
+      <Link>Utilities\StbImageWriteSharp\ImageWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\MemoryStats.cs">
+      <Link>Utilities\StbImageWriteSharp\MemoryStats.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\StbImageWrite.cs">
+      <Link>Utilities\StbImageWriteSharp\StbImageWrite.cs</Link>
+    </Compile>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\StbImageWrite.Generated.cs">
+      <Link>Utilities\StbImageWriteSharp\StbImageWrite.Generated.cs</Link>
+    </Compile>
+    
 
     <!-- NVorbis -->
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\BufferedReadStream.cs">
