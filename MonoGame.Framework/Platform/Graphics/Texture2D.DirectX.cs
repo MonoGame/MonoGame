@@ -164,9 +164,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         // for 4x4 block compression formats an element is one block, so elementsInRow
                         // and number of rows are 1/4 of number of pixels in width and height of the rectangle
-                        // >>2 is Equivalent to /4 for int
-                        elementsInRow >>= 2;
-                        rows >>=2;
+                        elementsInRow /= 4;
+                        rows /= 4;
                     }
                     var rowSize = elementSize * elementsInRow;
                     if (rowSize == databox.RowPitch)
@@ -181,9 +180,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         for (var row = 0; row < rows; row++)
                         {
                             int i;
-                            // pre-evaluate non-dependant condition (32 bits of memory vs (1 add, 1 multiply and 1 divide per iteration))
-                            int condition =  (row + 1) * rowSize / elementSizeInByte;
-                            for (i = row * rowSize / elementSizeInByte; i < condition; i++)
+                            int maxElements =  (row + 1) * rowSize / elementSizeInByte;
+                            for (i = row * rowSize / elementSizeInByte; i < maxElements; i++)
                                 data[i + startIndex] = stream.Read<T>();
 
                             if (i >= elementCount)
@@ -264,8 +262,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             for (int row = 0; row < (uint)pixelHeight; row++)
             {
-            // Move row specific calculations out of inner loop 
-            int rowxPixelWidth = row * pixelWidth * 4;
+                int rowxPixelWidth = row * pixelWidth * 4;
                 for (int col = 0; col < (uint)pixelWidth; col++)
                 {
                     offset = rowxPixelWidth + (col * 4);
