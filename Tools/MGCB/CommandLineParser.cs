@@ -21,72 +21,13 @@ namespace MGCB
     {
         public static MGBuildParser Instance;
 
-        #region Supporting Types
-
-        public class PreprocessorProperty
-        {
-            public string Name;            
-            public string CurrentValue;
-
-            public PreprocessorProperty()
-            {
-                Name = string.Empty;
-                CurrentValue = string.Empty;
-            }
-        }
-
-        public class PreprocessorPropertyCollection
-        {
-            private readonly List<PreprocessorProperty> _properties;
-
-            public PreprocessorPropertyCollection()
-            {
-                _properties = new List<PreprocessorProperty>();
-            }
-
-            public string this[string name]
-            {
-                get
-                {
-                    foreach (var i in _properties)
-                    {
-                        if (i.Name.Equals(name))
-                            return i.CurrentValue;
-                    }
-
-                    return null;
-                }
-
-                set
-                {
-                    foreach (var i in _properties)
-                    {
-                        if (i.Name.Equals(name))
-                        {
-                            i.CurrentValue = value;
-                            return;
-                        }
-                    }
-
-                    var prop = new PreprocessorProperty()
-                        {
-                            Name = name,
-                            CurrentValue = value,
-                        };
-                    _properties.Add(prop);
-                }
-            }
-        }
-
-        #endregion
-
         private readonly object _optionsObject;
         private readonly Queue<MemberInfo> _requiredOptions;
         private readonly Dictionary<string, MemberInfo> _optionalOptions;
         private readonly Dictionary<string, string> _flags;
         private readonly List<string> _requiredUsageHelp;
 
-        public readonly PreprocessorPropertyCollection _properties;
+        public readonly Dictionary<string, string> _properties;
 
         public delegate void ErrorCallback(string msg, object[] args);
         public event ErrorCallback OnError;
@@ -100,7 +41,7 @@ namespace MGCB
             _optionalOptions = new Dictionary<string, MemberInfo>();
             _requiredUsageHelp = new List<string>();
 
-            _properties = new PreprocessorPropertyCollection();
+            _properties = new Dictionary<string, string>();
 
             // Reflect to find what commandline options are available...
 
@@ -219,122 +160,116 @@ namespace MGCB
         private IEnumerable<string> Preprocess(IEnumerable<string> args)
         {
             var output = new List<string>();
-            var lines = new List<string>(args);
-            var ifstack = new Stack<Tuple<string, string>>();
-            var fileStack = new Stack<string>();
-
-            while (lines.Count > 0)
-            {            
-                var arg = lines[0];
-                lines.RemoveAt(0);
-
-                if (arg.StartsWith("# Begin:"))
-                {
-                    var file = arg.Substring(8);
-                    fileStack.Push(file);
-                    continue;
-                }
-
-                if (arg.StartsWith("# End:"))
-                {
-                    fileStack.Pop();
-                    continue;
-                }
-
-                if (arg.StartsWith("$endif"))
-                {
-                    ifstack.Pop();
-                    continue;
-                }
-                
-                if (ifstack.Count > 0)
-                {
-                    var skip = false;
-                    foreach (var i in ifstack)
-                    {
-                        var val = _properties[i.Item1];
-                        if (!(i.Item2).Equals(val))
-                        {
-                            skip = true;
-                            break;
-                        }
-                    }
-
-                    if (skip)
-                        continue;
-                }
-
-                if (arg.StartsWith("$set"))
-                {
-                    var words = arg.Substring(5).Split('=');
-                    var name = words[0];
-                    var value = words[1];
-
-                    _properties[name] = value;
-
-                    continue;
-                }
-
-                if (arg.StartsWith("$if"))
-                {
-                    if (fileStack.Count == 0)
-                        throw new Exception("$if is invalid outside of a response file.");
-
-                    var words = arg.Substring(4).Split('=');
-                    var name = words[0];
-                    var value = words[1];
-
-                    var condition = new Tuple<string, string>(name, value);
-                    ifstack.Push(condition);
-                    
-                    continue;
-                }
-
-                if (arg.StartsWith("/define:") || arg.StartsWith("--define:"))
-                {
-                    var words = arg.Substring(8).Split('=');
-                    var name = words[0];
-                    var value = words[1];
-
-                    _properties[name] = value;
-
-                    continue;
-
-                }
-
-                if (arg.StartsWith("/@") || arg.StartsWith("--@") || arg.StartsWith("-@")
-                    || (arg.EndsWith(".mgcb") && File.Exists(arg)))
-                {
-                    var file = arg;
-                    if (!File.Exists(arg))
-                        file = arg.Substring(arg.StartsWith("--@") ? 4 : 3);
-
-                    var commands = File.ReadAllLines(file);
-                    var offset = 0;
-                    lines.Insert(0, string.Format("# Begin:{0} ", file));
-                    offset++;
-
-                    for (var j = 0; j < commands.Length; j++)
-                    {
-                        var line = commands[j];
-                        if (string.IsNullOrEmpty(line))
-                            continue;
-                        if (line.StartsWith("#"))
-                            continue;
-
-                        lines.Insert(offset, line);
-                        offset++;
-                    }
-
-                    lines.Insert(offset, string.Format("# End:{0}", file));
-
-                    continue;
-                }                
-                
-                output.Add(arg);
-            }
+            var ifstack = new Stack<IfCondition>();
+            foreach (var arg in args)
+                ParsePreprocessArg(arg, output, ifstack, false);
 
             return output.ToArray();
+        }
+
+        private void ParsePreprocessArg(string arg, List<string> output, Stack<IfCondition> ifstack, bool inResponseFile)
+        {
+            if (arg.StartsWith("$endif"))
+            {
+                ifstack.Pop();
+                return;
+            }
+
+            if (ifstack.Count > 0)
+            {
+                foreach (var ifCondition in ifstack)
+                {
+                    var expected = ifCondition.Value;
+                    string actual;
+                    if (!_properties.TryGetValue(ifCondition.Key, out actual))
+                        return;
+                    if (expected != string.Empty && !expected.Equals(actual))
+                        return;
+                }
+            }
+
+            if (arg.StartsWith("$set "))
+            {
+                if (!inResponseFile)
+                    throw new Exception("$set is invalid outside of a response file.");
+                var words = arg.Substring(5).Split('=');
+                var name = words[0].Trim();
+                var value = words.Length > 1 ? words[1].Trim() : string.Empty;
+
+                _properties[name] = value;
+                return;
+            }
+
+            if (arg.StartsWith("$if "))
+            {
+                if (!inResponseFile)
+                    throw new Exception("$if is invalid outside of a response file.");
+
+                var words = arg.Substring(4).Split('=');
+                var name = words[0].Trim();
+                var value = words.Length > 1 ? words[1].Trim() : string.Empty;
+
+                var condition = new IfCondition(name, value);
+                ifstack.Push(condition);
+
+                return;
+            }
+
+            if (arg.StartsWith("/define:") || arg.StartsWith("--define:"))
+            {
+                arg = arg.Substring(arg[0] == '/' ? 8 : 9);
+
+                var words = arg.Split('=');
+                var name = words[0];
+                var value = words.Length > 1 ? words[1] : string.Empty;
+
+                _properties[name] = value;
+
+                return;
+            }
+
+            if (arg.StartsWith("/@") || arg.StartsWith("--@") || arg.StartsWith("-@") || (arg.EndsWith(".mgcb")))
+            {
+                var file = arg;
+                if (file.StartsWith("/@") || file.StartsWith("-@"))
+                    file = arg.Substring(3);
+                if (file.StartsWith("--@"))
+                    file = arg.Substring(4);
+
+                file = Path.GetFullPath(file);
+
+                if (!File.Exists(file))
+                    throw new Exception(string.Format("File '{0}' does not exist.", file));
+
+                var prevDir = Directory.GetCurrentDirectory();
+                var dir = Path.GetDirectoryName(file);
+
+                if (prevDir != dir)
+                {
+                    // make sure the working dir is changed both during preprocessing and during execution
+                    Directory.SetCurrentDirectory(dir);
+                    output.Add("/workingDir:" + dir);
+                }
+
+                var lines = File.ReadAllLines(file);
+                foreach (var line in lines)
+                {
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+                        continue;
+
+                    ParsePreprocessArg(line, output, ifstack, true);
+                }
+
+                if (prevDir != dir)
+                {
+                    Directory.SetCurrentDirectory(prevDir);
+                    output.Add("/workingDir:" + prevDir);
+                }
+
+                return;
+            }
+
+            output.Add(arg);
         }
 
         private bool ParseFlags(string arg)
@@ -651,10 +586,21 @@ namespace MGCB
             }
         }
 
-
         static T GetAttribute<T>(ICustomAttributeProvider provider) where T : Attribute
         {
             return provider.GetCustomAttributes(typeof(T), false).OfType<T>().FirstOrDefault();
+        }
+
+        private struct IfCondition
+        {
+            public readonly string Key;
+            public readonly string Value;
+
+            public IfCondition(string key, string value)
+            {
+                Key = key;
+                Value = value;
+            }
         }
     }
 

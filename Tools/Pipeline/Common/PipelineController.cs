@@ -249,6 +249,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void OpenProject(string projectFilePath)
         {
+            projectFilePath = Path.GetFullPath(projectFilePath);
             CloseProject();
 
             if (OnProjectLoading != null)
