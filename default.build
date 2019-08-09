@@ -194,8 +194,8 @@
   <target name="build_windows10" description="Build Windows 10 UAP" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsXaml\v14.0\Microsoft.Windows.UI.Xaml.CSharp.targets')}">
-        <exec program="${msbuilddir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Restore /p:Configuration=Release' />
-        <exec program="${msbuilddir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /p:Configuration=Release' />
+        <exec program="${msbuilddir}\msbuild.exe " commandline='MonoGame.Framework\MonoGame.Framework.WindowsUniversal.csproj /t:Restore /p:Configuration=Release' />
+        <exec program="${msbuilddir}\msbuild.exe " commandline='MonoGame.Framework\MonoGame.Framework.WindowsUniversal.csproj /p:Configuration=Release' />
 
       </if>
     </if>
