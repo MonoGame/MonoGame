@@ -153,7 +153,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal override void CreateTexture()
         {
-            base.CreateTexture();
             var desc = GetTexture2DDescription();
             desc.BindFlags |= BindFlags.RenderTarget;
             if (Mipmap)
