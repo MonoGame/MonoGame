@@ -11,6 +11,8 @@
     <RepositoryUrl>https://github.com/MonoGame/MonoGame</RepositoryUrl>
     <Authors>MonoGame Team</Authors>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
 </Project>

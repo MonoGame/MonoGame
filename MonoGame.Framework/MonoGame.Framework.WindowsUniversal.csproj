@@ -12,6 +12,8 @@
 This package provides you with MonoGame Framework that works on Windows 10, Windows Phone 10 and Xbox One using UWP(Universal Windows Platform).</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;uwp</PackageTags>
     <PackageId>MonoGame.Framework.WindowsUniversal</PackageId>
+
+    <SharpDXVersion>4.0.1</SharpDXVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -60,24 +62,19 @@ This package provides you with MonoGame Framework that works on Windows 10, Wind
     <Compile Include="Platform\WindowsUniversal\UAPGameWindow.cs" />
     <Compile Include="Platform\WindowsUniversal\XamlGame.cs" />
     <Compile Include="Platform\WindowsUniversal\InputEvents.cs" />
-
-    <Page Include="Platform\Themes\generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="MonoGame.Framework.Uwp.targets" PackagePath="build" />
+    <Content Include="MonoGame.Framework.WindowsUniversal.targets" PackagePath="build" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\uap10.0\SharpDX.dll" />
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.Direct2D1.dll" />
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.Direct3D11.dll" />
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.DXGI.dll" />
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\uap10.0\SharpDX.MediaFoundation.dll" />
-    <Reference Include="..\ThirdParty\Dependencies\SharpDX\uap10.0\SharpDX.XAudio2.dll" />
+    <PackageReference Include="SharpDX" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.Direct2D1" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.Direct3D11" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.DXGI" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.MediaFoundation" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.XAudio2" Version="$(SharpDXVersion)" />
   </ItemGroup>
 
   <Import Project="Platform\DirectX.targets" />

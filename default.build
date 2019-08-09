@@ -194,17 +194,8 @@
   <target name="build_windows10" description="Build Windows 10 UAP" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsXaml\v14.0\Microsoft.Windows.UI.Xaml.CSharp.targets')}">
-        <exec program="Protobuild" commandline="-generate WindowsUniversal" />
-
-        <!--
-            Currently MSBuild doesn't restore the nuget packages like buiding from the
-            IDE does.  So we have to do it ourselves using the recommended work around.
-        -->
-        <exec program="${nuget3path}/nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.WindowsUniversal.project.json -NonInteractive' />
-        <exec program="${nuget3path}/nuget.exe " commandline='restore MonoGame.Framework.Net\MonoGame.Framework.Net.WindowsUniversal.project.json -NonInteractive' />
-
-        <exec program="${msbuilddir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
-        <exec program="${msbuilddir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="${msbuilddir}\msbuild.exe " commandline='MonoGame.Framework\MonoGame.Framework.WindowsUniversal.csproj /t:Restore /p:Configuration=Release' />
+        <exec program="${msbuilddir}\msbuild.exe " commandline='MonoGame.Framework\MonoGame.Framework.WindowsUniversal.csproj /p:Configuration=Release' />
 
       </if>
     </if>
