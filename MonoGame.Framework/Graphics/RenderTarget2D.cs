@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
             RenderTargetUsage = usage;
             MultiSampleCount = preferredMultiSampleCount;
 
-            PlatformConstruct(graphicsDevice, width, height, mipMap, format, depthFormat, preferredMultiSampleCount, usage, shared);
+            PlatformConstruct(graphicsDevice, width, height, mipMap, depthFormat, preferredMultiSampleCount, usage, shared);
         }
 
         protected internal override void GraphicsDeviceResetting()

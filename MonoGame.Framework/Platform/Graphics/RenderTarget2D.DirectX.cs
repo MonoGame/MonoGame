@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
         {
-            _sampleDescription = GraphicsDevice.GetSupportedSampleDescription(SharpDXHelper.ToFormat(preferredFormat), preferredMultiSampleCount);
+            _sampleDescription = GraphicsDevice.GetSupportedSampleDescription(SharpDXHelper.ToFormat(preferredDepthFormat), preferredMultiSampleCount);
             // set the actual multisample count, not the preferred value
             MultiSampleCount = _sampleDescription.Count;
 
