@@ -266,14 +266,35 @@ namespace Microsoft.Xna.Framework.Graphics
 		        throw new ArgumentNullException("data");
 			this.GetData(0, null, data, 0, data.Length);
 		}
-		
+
         /// <summary>
-        /// Creates a Texture2D from a stream, supported formats bmp, gif, jpg, png, tif and dds (only for simple textures).
+        /// Creates a <see cref="Texture2D"/> from a file, supported formats bmp, gif, jpg, png, tif and dds (only for simple textures).
+        /// May work with other formats, but will not work with tga files.
+        /// This internally calls <see cref="FromStream"/>.
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device to use to create the texture.</param>
+        /// <param name="path">The path to the image file.</param>
+        /// <returns>The <see cref="Texture2D"/> created from the given file.</returns>
+        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
+        /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
+        /// result in black color data.
+        /// </remarks>
+        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string path)
+        {
+            if (path == null)
+                throw new ArgumentNullException("path");
+
+            using (var stream = File.OpenRead(path))
+                return FromStream(graphicsDevice, stream);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="Texture2D"/> from a stream, supported formats bmp, gif, jpg, png, tif and dds (only for simple textures).
         /// May work with other formats, but will not work with tga files.
         /// </summary>
-        /// <param name="graphicsDevice">The graphics device where the texture will be created.</param>
+        /// <param name="graphicsDevice">The graphics device to use to create the texture.</param>
         /// <param name="stream">The stream from which to read the image data.</param>
-        /// <returns>The <see cref="SurfaceFormat.Color"/> texture created from the image stream.</returns>
+        /// <returns>The <see cref="Texture2D"/> created from the image stream.</returns>
         /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
         /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
         /// result in black color data.
@@ -288,7 +309,8 @@ namespace Microsoft.Xna.Framework.Graphics
             try
             {
                 return PlatformFromStream(graphicsDevice, stream);
-            }catch(Exception e)
+            }
+            catch(Exception e)
             {
                 throw new InvalidOperationException("This image format is not supported", e);
             }

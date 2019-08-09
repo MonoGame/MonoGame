@@ -232,6 +232,33 @@ namespace Microsoft.Xna.Framework.Audio
 
         /// <summary>
         /// Creates a new SoundEffect object based on the specified data stream.
+        /// This internally calls <see cref="FromStream"/>.
+        /// </summary>
+        /// <param name="path">The path to the audio file.</param>
+        /// <returns>The <see cref="SoundEffect"/> loaded from the given file.</returns>
+        /// <remarks>The stream must point to the head of a valid wave file in the RIFF bitstream format.  The formats supported are:
+        /// <list type="bullet">
+        /// <item>
+        /// <description>8-bit unsigned PCM</description>
+        /// <description>16-bit signed PCM</description>
+        /// <description>24-bit signed PCM</description>
+        /// <description>32-bit IEEE float PCM</description>
+        /// <description>MS-ADPCM 4-bit compressed</description>
+        /// <description>IMA/ADPCM (IMA4) 4-bit compressed</description>
+        /// </item>
+        /// </list>
+        /// </remarks>
+        public static SoundEffect FromFile(string path)
+        {
+            if (path == null)
+                throw new ArgumentNullException("path");
+
+            using (var stream = File.OpenRead(path))
+                return FromStream(stream);
+        }
+
+        /// <summary>
+        /// Creates a new SoundEffect object based on the specified data stream.
         /// </summary>
         /// <param name="stream">A stream containing the wave data.</param>
         /// <returns>A new SoundEffect object.</returns>
