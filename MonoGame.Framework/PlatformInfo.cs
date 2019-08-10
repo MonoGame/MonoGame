@@ -3,7 +3,7 @@
     /// <summary>
     /// Type of the underlying game platform(this API is unique to MonoGame)
     /// </summary>
-    public enum MonogamePlatformType
+    public enum MonogamePlatform
     {
         Android,
         iOS,
@@ -14,18 +14,19 @@
         Web,
         PSVita,
         XBoxOne,
-        PlayStation4
+        PlayStation4,
+        Switch
     }
 
     /// <summary>
-    /// Utility class that returns information about the underlying game platform(this API is unique to MonoGame)
+    /// Utility class that returns information about the underlying platform(this API is unique to MonoGame)
     /// </summary>
-    public static partial class MonogamePlatform
+    public static partial class PlatformInfo
     {
         /// <summary>
-        /// Underlying platform type
+        /// Underlying game platform type
         /// </summary>
-        public static MonogamePlatformType Current
+        public static MonogamePlatform Current
         {
             get
             {

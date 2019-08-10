@@ -1609,26 +1609,26 @@
     </Compile>
 
     <!-- MonogamePlatform -->
-    <Compile Include="MonogamePlatform.cs" />
-    <Compile Include="Platform\MonogamePlatform.Windows.cs">
+    <Compile Include="PlatformInfo.cs" />
+    <Compile Include="Platform\PlatformInfo.Windows.cs">
         <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Platform\MonogamePlatform.DesktopGL.cs">
+    <Compile Include="Platform\PlatformInfo.DesktopGL.cs">
         <Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
-    <Compile Include="Platform\MonogamePlatform.Android.cs">
+    <Compile Include="Platform\PlatformInfo.Android.cs">
         <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Platform\MonogamePlatform.iOS.cs">
+    <Compile Include="Platform\PlatformInfo.iOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="Platform\MonogamePlatform.tvOS.cs">
+    <Compile Include="Platform\PlatformInfo.tvOS.cs">
         <Platforms>tvOS</Platforms>
     </Compile>
-    <Compile Include="Platform\MonogamePlatform.WindowsUniversal.cs">
+    <Compile Include="Platform\PlatformInfo.WindowsUniversal.cs">
         <Platforms>WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Platform\MonogamePlatform.Web.cs">
+    <Compile Include="Platform\PlatformInfo.Web.cs">
         <Platforms>Web</Platforms>
     </Compile>
   </Files>

@@ -51,7 +51,7 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
     <Compile Include="Platform\Windows\WinFormsGameForm.cs" />
     <Compile Include="Platform\Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Platform\Windows\WinFormsGameWindow.cs" />
-    <Compile Include="Platform\MonogamePlatform.Windows.cs" />
+    <Compile Include="Platform\PlatformInfo.Windows.cs" />
   </ItemGroup> 
 
   <ItemGroup>

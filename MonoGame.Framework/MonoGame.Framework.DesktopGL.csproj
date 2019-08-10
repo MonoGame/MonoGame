@@ -60,7 +60,7 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
     <Compile Include="Platform\GraphicsDeviceManager.SDL.cs" />
-    <Compile Include="Platform\MonogamePlatform.DesktopGL.cs" />
+    <Compile Include="Platform\PlatformInfo.DesktopGL.cs" />
     
     <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
