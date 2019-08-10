@@ -1614,7 +1614,7 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Platform\MonogamePlatform.DesktopGL.cs">
-        <Platforms>WindowsGL, Linux, MacOS</Platforms>
+        <Platforms>WindowsGL,Linux,MacOS</Platforms>
     </Compile>
     <Compile Include="Platform\MonogamePlatform.Android.cs">
         <Platforms>Android</Platforms>
