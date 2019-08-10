@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// Type of the underlying game platform(this API is unique to MonoGame)
+    /// Type of the underlying game platform
     /// </summary>
     public enum MonogamePlatform
     {
@@ -19,7 +19,7 @@
     }
 
     /// <summary>
-    /// Utility class that returns information about the underlying platform(this API is unique to MonoGame)
+    /// Utility class that returns information about the underlying platform
     /// </summary>
     public static partial class PlatformInfo
     {
