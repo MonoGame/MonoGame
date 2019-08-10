@@ -1,49 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project Name="2MGFX" Path="Tools/2MGFX" Type="Console" Platforms="Windows">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Common assembly references -->
-  <References>
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Xml" />
-    <Reference Include="2MGFXReferences" />
-  </References>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>2mgfx</ToolCommandName>
+    <PackageId>dotnet-2mgfx</PackageId>
+  </PropertyGroup>
 
-  <Properties>
-    
-    <LangVersion>Default</LangVersion>
-    <NoWarn>1591,0436</NoWarn>
-    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
+  <ItemGroup>
+    <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" />
+    <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" />
+    <Reference Include="..\..\ThirdParty\Dependencies\CppNet\CppNet.dll" />
+  </ItemGroup>
 
-    <RootNamespace>TwoMGFX</RootNamespace>
-    <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
+  <ItemGroup>
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
 
-    <CustomDefinitions>
-      <Platform Name="Windows">TRACE;WINDOWS</Platform>
-    </CustomDefinitions>
-
-    <FrameworkVersions>
-      <Version>v4.7.2</Version>
-    </FrameworkVersions>
-
-  </Properties>
-
-  <Files>
-
-    <!-- The program entry point -->
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+  <ItemGroup>
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\CommandLineParser.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\Options.cs" />
-
-
-    <!-- 
-        We directly include a few MonoGame.Framework classes just so 
-        we can use some enums and state classes from 2MGFX without all
-        the extra dependancies of MonoGame.Framework.
-    -->
     <Compile Include="..\..\MonoGame.Framework\BoundingBox.cs">
       <Link>MonoGame.Framework\BoundingBox.cs</Link>
     </Compile>
@@ -59,7 +36,7 @@
     <Compile Include="..\..\MonoGame.Framework\ContainmentType.cs">
       <Link>MonoGame.Framework\ContainmentType.cs</Link>
     </Compile>
-	<Compile Include="..\..\MonoGame.Framework\EventHelpers.cs">
+    <Compile Include="..\..\MonoGame.Framework\EventHelpers.cs">
       <Link>MonoGame.Framework\EventHelpers.cs</Link>
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\ColorWriteChannels.cs">
@@ -128,7 +105,7 @@
     <Compile Include="..\..\MonoGame.Framework\Plane.cs">
       <Link>MonoGame.Framework\Plane.cs</Link>
     </Compile>
-	  <Compile Include="..\..\MonoGame.Framework\Point.cs">
+    <Compile Include="..\..\MonoGame.Framework\Point.cs">
       <Link>MonoGame.Framework\Point.cs</Link>
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\PlaneIntersectionType.cs">
@@ -140,7 +117,7 @@
     <Compile Include="..\..\MonoGame.Framework\Ray.cs">
       <Link>MonoGame.Framework\Ray.cs</Link>
     </Compile>
-	<Compile Include="..\..\MonoGame.Framework\Rectangle.cs">
+    <Compile Include="..\..\MonoGame.Framework\Rectangle.cs">
       <Link>MonoGame.Framework\Rectangle.cs</Link>
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\Vector2.cs">
@@ -166,24 +143,17 @@
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\PackedVector\IPackedVector.cs">
       <Link>MonoGame.Framework\Graphics\PackedVector\IPackedVector.cs</Link>
-    </Compile>    
+    </Compile>
     <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs">
       <Link>MonoGame.Framework\Utilities\Hash.cs</Link>
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\Platform\Utilities\CurrentPlatform.cs" />
-    
-    <!-- We also use a few types from the content pipeline. -->
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs">
       <Link>MonoGame.Framework.Content.Pipeline\ExternalTool.cs</Link>
     </Compile>
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\LoadedTypeCollection.cs">
       <Link>MonoGame.Framework.Content.Pipeline\LoadedTypeCollection.c</Link>
     </Compile>
-    
-    <!-- A fake GraphicsDevice to satisfy some of the framework classes above! -->
-    <Compile Include="MonoGame.Framework\GraphicsDevice.cs" />
-
-    <!-- The core mgfx generation classes -->
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ConstantBufferData.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ConstantBufferData.mojo.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ConstantBufferData.sharpdx.cs" />
@@ -191,7 +161,7 @@
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\EffectObject.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\EffectObject.hlsl.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\EffectObject.pssl.cs" />
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\EffectObject.writer.cs" />    
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\EffectObject.writer.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\IEffectCompilerOutput.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderCompilerException.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderData.cs" />
@@ -204,13 +174,8 @@
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderProfile.DirectX.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\ShaderResult.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TextureFilterType.cs" />
-
-    <!-- The HLSL to GLSL conversion utility -->
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\MarshalHelper.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\MojoShader.cs" />
-
-    <!-- The MGFX parser -->
-    <None Include="TPGParser\MGFX.tpg" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\Parser.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\ParseTree.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\Scanner.cs" />
@@ -219,9 +184,18 @@
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\SamplerStateInfo.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\ShaderInfo.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\TPGParser\TechniqueInfo.cs" />
-    
-    <!-- The MGFX preprocessor -->
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Processors\MGFX\Preprocessor.cs" />
-    
-  </Files>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="TPGParser\MGFX.tpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+ 
 </Project>
+
