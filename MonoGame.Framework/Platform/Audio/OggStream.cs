@@ -371,7 +371,11 @@ namespace Microsoft.Xna.Framework.Audio
                     throw new InvalidOperationException("Already running");
 
                 Instance = this;
-                underlyingThread = new Thread(EnsureBuffersFilled) { Priority = ThreadPriority.Lowest };
+                underlyingThread = new Thread(EnsureBuffersFilled)
+                {
+                    Priority = ThreadPriority.Lowest,
+                    IsBackground = true
+                };
                 underlyingThread.Start();
             }
 
