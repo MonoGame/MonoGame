@@ -7,10 +7,12 @@
     {
         Android,
         iOS,
+        tvOS,
         DesktopGL,
         Windows,
         WindowsUniversal,
         Web,
+        PSVita,
         XBoxOne,
         PlayStation4
     }

@@ -1622,6 +1622,9 @@
     <Compile Include="Platform\MonogamePlatform.iOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
+    <Compile Include="Platform\MonogamePlatform.tvOS.cs">
+        <Platforms>tvOS</Platforms>
+    </Compile>
     <Compile Include="Platform\MonogamePlatform.WindowsUniversal.cs">
         <Platforms>WindowsUniversal</Platforms>
     </Compile>
