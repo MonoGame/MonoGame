@@ -26,7 +26,7 @@
         /// <summary>
         /// Underlying game platform type
         /// </summary>
-        public static MonogamePlatform Current
+        public static MonogamePlatform MonogamePlatform
         {
             get
             {
