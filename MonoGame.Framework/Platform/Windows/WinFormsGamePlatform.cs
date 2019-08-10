@@ -20,7 +20,10 @@ namespace MonoGame.Framework
 
         public override GamePlatformType GamePlatformType
         {
-            get { return GamePlatformType.Windows; }
+            get
+            {
+                return GamePlatformType.Windows;
+            }
         }
 
         public WinFormsGamePlatform(Game game)
