@@ -22,6 +22,9 @@
     /// </summary>
     public static partial class MonogamePlatform
     {
+        /// <summary>
+        /// Underlying platform type
+        /// </summary>
         public static MonogamePlatformType Current
         {
             get
