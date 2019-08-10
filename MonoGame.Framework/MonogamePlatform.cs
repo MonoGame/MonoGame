@@ -16,7 +16,7 @@
     }
 
     /// <summary>
-    /// Utility class that returns information about the underlying game platform((this API is unique to MonoGame)
+    /// Utility class that returns information about the underlying game platform(this API is unique to MonoGame)
     /// </summary>
     public static partial class MonogamePlatform
     {
