@@ -20,7 +20,7 @@
     }
 #endif
 
-#if IOS
+#if IOS && !TVOS
     partial class PlatformInfo
     {
         private static MonogamePlatform PlatformGetCurrent()
