@@ -69,7 +69,6 @@ This package provides you with MonoGame Framework that works on Android.</Descri
     <Compile Include="Platform\Utilities\FuncLoader.Android.cs" />
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
-    <Compile Include="Platform\PlatformInfo.Android.cs" />
   </ItemGroup>
 
   <ItemGroup>
