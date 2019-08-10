@@ -18,14 +18,6 @@ namespace MonoGame.Framework
 
         private WinFormsGameWindow _window;
 
-        public override GamePlatformType GamePlatformType
-        {
-            get
-            {
-                return GamePlatformType.Windows;
-            }
-        }
-
         public WinFormsGamePlatform(Game game)
             : base(game)
         {

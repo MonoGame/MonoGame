@@ -15,14 +15,6 @@ namespace Microsoft.Xna.Framework
 {
     internal class SdlGamePlatform : GamePlatform
     {
-        public override GamePlatformType GamePlatformType
-        {
-            get
-            {
-                return GamePlatformType.DesktopGL;
-            }
-        }
-
         public override GameRunBehavior DefaultRunBehavior
         {
             get { return GameRunBehavior.Synchronous; }

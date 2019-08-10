@@ -271,7 +271,6 @@
     <Compile Include="Platform\GamePlatform.Mobile.cs">
       <Platforms>Android,iOS,Web,tvOS</Platforms>
     </Compile>
-    <Compile Include="GamePlatformType.cs" />
     <Compile Include="GameRunBehavior.cs" />
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />
@@ -1609,5 +1608,25 @@
       <Services>NVorbis</Services>
     </Compile>
 
+    <!-- MonogamePlatform -->
+    <Compile Include="MonogamePlatform.cs" />
+    <Compile Include="Platform\MonogamePlatform.Windows.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Platform\MonogamePlatform.DesktopGL.cs">
+        <Platforms>WindowsGL, Linux, MacOS</Platforms>
+    </Compile>
+    <Compile Include="Platform\MonogamePlatform.Android.cs">
+        <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Platform\MonogamePlatform.iOS.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Platform\MonogamePlatform.WindowsUniversal.cs">
+        <Platforms>WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="Platform\MonogamePlatform.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
   </Files>
 </Project>

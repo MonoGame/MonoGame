@@ -11,11 +11,6 @@ namespace Microsoft.Xna.Framework
 {
     class AndroidGamePlatform : GamePlatform
     {
-        public override GamePlatformType GamePlatformType
-        {
-            get { return GamePlatformType.Android; }
-        }
-
         public AndroidGamePlatform(Game game)
             : base(game)
         {
