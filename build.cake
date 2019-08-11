@@ -13,6 +13,9 @@ var configuration = Argument("build-configuration", "Release");
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
 
+var majorVersion = "3.0";
+var buildNumber = EnvironmentVariable("BUILD_NUMBER");
+
 MSBuildSettings msPackSettings;
 DotNetCoreMSBuildSettings dnBuildSettings;
 DotNetCorePackSettings dnPackSettings;
@@ -125,8 +128,8 @@ Task("BuildUWP")
     .WithCriteria(() => GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.17763"))
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.UWP.csproj");
-    MSBuild("MonoGame.Framework/MonoGame.Framework.UWP.csproj", msPackSettings);
+    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
+    MSBuild("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj", msPackSettings);
 });
 
 Task("BuildContentPipeline")
@@ -144,13 +147,62 @@ Task("BuildAll")
     .IsDependentOn("BuildUWP")
     .IsDependentOn("BuildContentPipeline");
 
-
-Task("PackInstallers")
-    .IsDependentOn("BuildAll")
+Task("PackVSTemplates")
     .Does(() =>
 {
-    CakeExecuteScript("./Installers/build.cake");
+    var vsdirs = GetDirectories("./ProjectTemplates/VisualStudio20*");
+    foreach (var vsdir in vsdirs)
+    {
+        DeleteFiles(vsdir.CombineWithFilePath("*.zip").FullPath);
+        var projdirs = GetDirectories(vsdir.CombineWithFilePath("*").FullPath);
+	foreach (var projdir in projdirs)
+	{
+	    var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
+            Zip(projdir, outputPath);
+	}
+    }
 });
+
+Task("PackWindows")
+    .WithCriteria(() => IsRunningOnWindows())
+    .IsDependentOn("BuildWindowsDX")
+    .IsDependentOn("BuildUWP")
+    .IsDependentOn("PackVSTemplates")
+    .Does(() =>
+{
+    // The old build script passes defines through an nsh file, NSIS needs it to exist or it will crash
+    // TODO remove this
+    if (!FileExists("./Installers/Windows/header.nsh"))
+        System.IO.File.Create("./Installers/Windows/header.nsh").Dispose();
+
+    var settings = new MakeNSISSettings();
+    settings.ToolPath = "C:/Program Files (x86)/NSIS/makensis.exe";
+    settings.WorkingDirectory = "./Installers/Windows";
+    settings.Defines = new Dictionary<string, string>()
+    {
+        { "FrameworkPath", Context.Environment.WorkingDirectory.CombineWithFilePath("Installers/").FullPath },
+        { "VERSION", majorVersion},
+        { "INSTALLERVERSION", buildNumber },
+    };
+
+    MakeNSIS("./Installers/Windows/MonoGame.nsi", settings);
+});
+
+Task("PackLinux")
+    .Does(() =>
+{
+});
+
+Task("PackMac")
+    .IsDependentOn("PackWindows")
+    .Does(() =>
+{
+});
+
+Task("PackInstallers")
+    .IsDependentOn("PackWindows")
+    .IsDependentOn("PackLinux")
+    .IsDependentOn("PackMac");
 
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
