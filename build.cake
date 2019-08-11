@@ -140,12 +140,20 @@ Task("BuildContentPipeline")
     MSBuild("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj", msPackSettings);
 });
 
+Task("BuildTools")
+    .IsDependentOn("Prep")
+    .Does(() =>
+{
+});
+
 Task("BuildAll")
     .IsDependentOn("BuildDesktopGL")
     .IsDependentOn("BuildWindowsDX")
     .IsDependentOn("BuildAndroid")
+    .IsDependentOn("BuildiOS")
     .IsDependentOn("BuildUWP")
-    .IsDependentOn("BuildContentPipeline");
+    .IsDependentOn("BuildContentPipeline")
+    .IsDependentOn("BuildTools");
 
 Task("PackVSTemplates")
     .Does(() =>
@@ -165,8 +173,7 @@ Task("PackVSTemplates")
 
 Task("PackWindows")
     .WithCriteria(() => IsRunningOnWindows())
-    .IsDependentOn("BuildWindowsDX")
-    .IsDependentOn("BuildUWP")
+    .IsDependentOn("BuildAll")
     .IsDependentOn("PackVSTemplates")
     .Does(() =>
 {
@@ -189,12 +196,13 @@ Task("PackWindows")
 });
 
 Task("PackLinux")
+    .IsDependentOn("BuildAll")
     .Does(() =>
 {
 });
 
 Task("PackMac")
-    .IsDependentOn("PackWindows")
+    .IsDependentOn("BuildAll")
     .Does(() =>
 {
 });
@@ -209,7 +217,7 @@ Task("PackInstallers")
 //////////////////////////////////////////////////////////////////////
 
 Task("Default")
-    .IsDependentOn("BuildAll");
+    .IsDependentOn("PackInstallers");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
