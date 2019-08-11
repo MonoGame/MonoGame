@@ -461,7 +461,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if DESKTOPGL
-        internal void SaveAsImage(Stream stream, int width, int height, ImageWriterFormat format)
+        internal unsafe void SaveAsImage(Stream stream, int width, int height, ImageWriterFormat format)
         {
 	        if (stream == null)
 	        {
@@ -475,22 +475,24 @@ namespace Microsoft.Xna.Framework.Graphics
 	        {
 		        throw new ArgumentOutOfRangeException("height", height, "'height' cannot be less than or equal to zero");
 	        }
-	        byte[] data = null;
+	        Color[] data = null;
 	        try
 	        {
-		        data = new byte[width * height * 4];
-		        GetData(data);
+                data = GetColorData();
 
                 // Write
-                var writer = new ImageWriter();
-                switch (format)
+                fixed (Color* ptr = &data[0])
                 {
-                    case ImageWriterFormat.Jpg:
-                        writer.WriteJpg(data, width, height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream, 90);
-                        break;
-                    case ImageWriterFormat.Png:
-                        writer.WritePng(data, width, height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream);
-                        break;
+                    var writer = new ImageWriter();
+                    switch (format)
+                    {
+                        case ImageWriterFormat.Jpg:
+                            writer.WriteJpg(ptr, width, height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream, 90);
+                            break;
+                        case ImageWriterFormat.Png:
+                            writer.WritePng(ptr, width, height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream);
+                            break;
+                    }
                 }
             }
             finally
