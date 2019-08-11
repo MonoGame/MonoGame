@@ -90,8 +90,10 @@ Task("BuildAndroid")
         return GetMSBuildWith("Component.Xamarin");
 
     // Xamarin Android on Linux needs to be installed in this specific dir
-    // We don't have Mac support... yet!
-    return DirectoryExists("/usr/lib/xamarin.android");
+    if (DirectoryExists("/usr/lib/xamarin.android"))
+        return true;
+
+    return DirectoryExists("/Developer/MonoAndroid");
 }).Does(() =>
 {
     DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj");
@@ -105,6 +107,17 @@ Task("BuildAndroid")
     }
 
     MSBuild("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj", buildSettings);
+});
+
+Task("BuildiOS")
+    .IsDependentOn("Prep")
+    .WithCriteria(() =>
+{
+    return DirectoryExists("/Developer/MonoTouch");
+}).Does(() =>
+{
+    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.iOSCore.csproj");
+    MSBuild("MonoGame.Framework/MonoGame.Framework.iOSCore.csproj", msPackSettings);
 });
 
 Task("BuildUWP")
