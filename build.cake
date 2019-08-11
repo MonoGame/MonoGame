@@ -60,6 +60,9 @@ Task("Prep")
     msPackSettings.WithProperty("Version", version);
     msPackSettings.WithTarget("Pack");
 
+    dnBuildSettings = new DotNetCoreMSBuildSettings();
+    dnBuildSettings.WithProperty("Version", version);
+
     dnPackSettings = new DotNetCorePackSettings();
     dnPackSettings.MSBuildSettings = dnBuildSettings;
     dnPackSettings.Verbosity = DotNetCoreVerbosity.Minimal;
