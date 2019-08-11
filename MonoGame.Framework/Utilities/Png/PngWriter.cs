@@ -33,7 +33,7 @@ namespace MonoGame.Utilities.Png
             width = texture2D.Width;
             height = texture2D.Height;
 
-            GetColorData(texture2D);
+            colorData = texture2D.GetColorData();
 
             // write PNG signature
             outputStream.Write(HeaderChunk.PngSignature, 0, HeaderChunk.PngSignature.Length);
@@ -202,11 +202,6 @@ namespace MonoGame.Utilities.Png
                 default:
                     return -1;
             }
-        }
-
-        private void GetColorData(Texture2D texture2D)
-        {
-            colorData = texture2D.GetColorData();
         }
     }
 }
