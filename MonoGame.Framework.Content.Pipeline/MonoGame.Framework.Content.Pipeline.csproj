@@ -43,33 +43,12 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
     <Compile Include="..\MonoGame.Framework\Graphics\GraphicsExtensions.cs">
       <Link>Utilities\GraphicsExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\ImageReader.cs">
-      <Link>Utilities\Imaging\ImageReader.cs</Link>
-    </Compile>
-    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\ImageWriter.cs">
-      <Link>Utilities\Imaging\ImageWriter.cs</Link>
-    </Compile>
-    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\Operations.cs">
-      <Link>Utilities\Imaging\Operations.cs</Link>
-    </Compile>
-    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\PinnedArray.cs">
-      <Link>Utilities\Imaging\PinnedArray.cs</Link>
-    </Compile>
-    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\Stb.Image.cs">
-      <Link>Utilities\Imaging\Stb.Image.cs</Link>
-    </Compile>
-    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\Stb.Image.Generated.cs">
-      <Link>Utilities\Imaging\Stb.Image.Generated.cs</Link>
-    </Compile>
-    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\Stb.ImageWrite.cs">
-      <Link>Utilities\Imaging\Stb.ImageWrite.cs</Link>
-    </Compile>
-    <Compile Include="..\MonoGame.Framework\Utilities\Imaging\Stb.ImageWrite.Generated.cs">
-      <Link>Utilities\Imaging\Stb.ImageWrite.Generated.cs</Link>
-    </Compile>
     <Compile Include="..\MonoGame.Framework\Content\ContentExtensions.cs">
       <Link>Utilities\ContentExtensions.cs</Link>
     </Compile>
+    
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
   </ItemGroup>
 
   <ItemGroup>
