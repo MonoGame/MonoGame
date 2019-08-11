@@ -65,10 +65,13 @@ This package provides you with MonoGame Framework that works on iOS.</Descriptio
     <Compile Include="Platform\Utilities\FuncLoader.iOS.cs" />
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
+    
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="MonoGame.Framework.iOSCore.targets" PackagePath="build" />
+    <Content Include="MonoGame.Framework.iOS.targets" PackagePath="build" />
   </ItemGroup>
 
   <Import Project="Platform\OpenGL.targets" />
