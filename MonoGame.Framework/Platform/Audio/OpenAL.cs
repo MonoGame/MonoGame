@@ -221,6 +221,18 @@ namespace MonoGame.OpenAL
                 else
                     ret = FuncLoader.LoadLibrary("libopenal.1.dylib");
             }
+
+            // Try extra locations for Windows because of .NET Core rids
+            if (CurrentPlatform.OS == OS.Windows)
+            {
+                var rid = Environment.Is64BitProcess ? "win-x64" : "win-x86";
+
+                if (ret == IntPtr.Zero)
+                    ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "../../runtimes", rid, "native/soft_oal.dll"));
+
+                if (ret == IntPtr.Zero)
+                    ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "runtimes", rid, "native/soft_oal.dll"));
+            }
 #elif ANDROID
             ret = FuncLoader.LoadLibrary("libopenal32.so");
 
