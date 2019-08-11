@@ -5,9 +5,14 @@
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
 
+const string DefaultVersion = "1.0.0.0";
+
 var target = Argument("build-target", "Default");
-var version = Argument("build-version", "1.0.0.0");
+var version = Argument("build-version", DefaultVersion);
 var configuration = Argument("build-configuration", "Release");
+
+if (version == DefaultVersion)
+    Warning($"No version specified. Using default version '{DefaultVersion}'.");
 
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
