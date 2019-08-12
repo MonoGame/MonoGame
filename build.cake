@@ -146,15 +146,6 @@ Task("BuildTools")
 {
 });
 
-Task("BuildAll")
-    .IsDependentOn("BuildDesktopGL")
-    .IsDependentOn("BuildWindowsDX")
-    .IsDependentOn("BuildAndroid")
-    .IsDependentOn("BuildiOS")
-    .IsDependentOn("BuildUWP")
-    .IsDependentOn("BuildContentPipeline")
-    .IsDependentOn("BuildTools");
-
 Task("PackVSTemplates")
     .Does(() =>
 {
@@ -207,14 +198,24 @@ Task("PackMac")
 {
 });
 
-Task("PackInstallers")
-    .IsDependentOn("PackWindows")
-    .IsDependentOn("PackLinux")
-    .IsDependentOn("PackMac");
 
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
+
+Task("BuildAll")
+    .IsDependentOn("BuildDesktopGL")
+    .IsDependentOn("BuildWindowsDX")
+    .IsDependentOn("BuildAndroid")
+    .IsDependentOn("BuildiOS")
+    .IsDependentOn("BuildUWP")
+    .IsDependentOn("BuildContentPipeline")
+    .IsDependentOn("BuildTools");
+
+Task("PackInstallers")
+    .IsDependentOn("PackWindows")
+    .IsDependentOn("PackLinux")
+    .IsDependentOn("PackMac");
 
 Task("Default")
     .IsDependentOn("PackInstallers");
