@@ -453,7 +453,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)alpha8Data[i]).ToVector4());
+                        colorData[i] = new Color(alpha8Data[i].ToVector4());
                     }
 
                     break;
@@ -464,7 +464,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)bgr565Data[i]).ToVector4());
+                        colorData[i] = new Color(bgr565Data[i].ToVector4());
                     }
 
                     break;
@@ -475,7 +475,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)bgra4444Data[i]).ToVector4());
+                        colorData[i] = new Color(bgra4444Data[i].ToVector4());
                     }
 
                     break;
@@ -486,7 +486,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)bgra5551Data[i]).ToVector4());
+                        colorData[i] = new Color(bgra5551Data[i].ToVector4());
                     }
                     break;
 
@@ -496,7 +496,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)halfSingleData[i]).ToVector4());
+                        colorData[i] = new Color(halfSingleData[i].ToVector4());
                     }
 
                     break;
@@ -507,7 +507,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)halfVector2Data[i]).ToVector4());
+                        colorData[i] = new Color(halfVector2Data[i].ToVector4());
                     }
 
                     break;
@@ -518,7 +518,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)halfVector4Data[i]).ToVector4());
+                        colorData[i] = new Color(halfVector4Data[i].ToVector4());
                     }
 
                     break;
@@ -529,7 +529,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)normalizedByte2Data[i]).ToVector4());
+                        colorData[i] = new Color(normalizedByte2Data[i].ToVector4());
                     }
 
                     break;
@@ -540,7 +540,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)normalizedByte4Data[i]).ToVector4());
+                        colorData[i] = new Color(normalizedByte4Data[i].ToVector4());
                     }
 
                     break;
@@ -551,7 +551,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)rg32Data[i]).ToVector4());
+                        colorData[i] = new Color(rg32Data[i].ToVector4());
                     }
 
                     break;
@@ -562,7 +562,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)rgba64Data[i]).ToVector4());
+                        colorData[i] = new Color(rgba64Data[i].ToVector4());
                     }
 
                     break;
@@ -573,7 +573,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < colorDataLength; i++)
                     {
-                        colorData[i] = new Color(((IPackedVector)rgba1010102Data[i]).ToVector4());
+                        colorData[i] = new Color(rgba1010102Data[i].ToVector4());
                     }
 
                     break;
