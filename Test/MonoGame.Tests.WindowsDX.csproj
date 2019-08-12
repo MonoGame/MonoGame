@@ -21,7 +21,7 @@
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj" />
     <ProjectReference Include="..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj" />
   </ItemGroup>
-
+
   <ItemGroup>
     <Compile Remove="Properties/**/*" />
     <Compile Remove="Interactive/**/*" />
