@@ -13,18 +13,6 @@ SetCompressor /SOLID /FINAL lzma
 
 !define MUI_UNICON "${FrameworkPath}\monogame.ico"
 
-Name '${APPNAME} SDK ${INSTALLERVERSION}'
-OutFile 'MonoGameSetup.exe'
-InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
-!define MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
-VIProductVersion "${INSTALLERVERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} SDK"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "The MonoGame Team"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${INSTALLERVERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${INSTALLERVERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} SDK Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © The MonoGame Team"
-
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
 
@@ -48,6 +36,19 @@ RequestExecutionLevel admin
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
+!insertmacro MUI_LANGUAGE "English"
+
+Name '${APPNAME} SDK ${INSTALLERVERSION}'
+OutFile 'MonoGameSetup.exe'
+InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
+!define MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
+VIProductVersion "${INSTALLERVERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} SDK"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "The MonoGame Team"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${INSTALLERVERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${INSTALLERVERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} SDK Installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © The MonoGame Team"
 
 !macro VS_ASSOCIATE_EDITOR TOOLNAME VSVERSION EXT TOOLPATH
   WriteRegStr   HKCU 'Software\Microsoft\VisualStudio\${VSVERSION}\Default Editors\${EXT}' 'Custom' '${TOOLNAME}'
@@ -64,11 +65,6 @@ RequestExecutionLevel admin
   WriteRegStr HKCR "${FILECLASS}\shell\open" "" `${COMMANDTEXT}`
   WriteRegStr HKCR "${FILECLASS}\shell\open\command" "" `${COMMAND}`
 !macroend
-
-;--------------------------------
-;Languages
-
-!insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
 
