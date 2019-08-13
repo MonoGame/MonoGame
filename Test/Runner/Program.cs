@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 using NUnitLite;
 using NUnit.Framework;
 

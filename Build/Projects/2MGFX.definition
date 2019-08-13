@@ -24,6 +24,10 @@
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
     </CustomDefinitions>
 
+    <FrameworkVersions>
+      <Version>v4.7.2</Version>
+    </FrameworkVersions>
+
   </Properties>
 
   <Files>

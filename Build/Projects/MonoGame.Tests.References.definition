@@ -3,26 +3,24 @@
 
   <Platform Type="Windows">
     <Reference Include="System.Drawing" />
-    <Binary Name="nunit.framework" Path="packages\NUnit.3.9.0\lib\net45\nunit.framework.dll" />
-    <Binary Name="nunitlite" Path="packages\NUnitLite.3.9.0\lib\net45\nunitlite.dll" />
+    <PackageReference Include="NUnitLite" Version="3.9.0" />
   </Platform>
 
   <Platform Type="WindowsGL">
     <Reference Include="System.Drawing" />
-    <Binary Name="nunit.framework" Path="packages\NUnit.3.9.0\lib\net45\nunit.framework.dll" />
-    <Binary Name="nunitlite" Path="packages\NUnitLite.3.9.0\lib\net45\nunitlite.dll" />
+    <PackageReference Include="NUnitLite" Version="3.9.0" />
   </Platform>
 
   <Platform Type="MacOS">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <Reference Include="System.Drawing" />
-    <Binary Name="nunit.framework" Path="packages\NUnit.3.9.0\lib\net45\nunit.framework.dll" />
-    <Binary Name="nunitlite" Path="packages\NUnitLite.3.9.0\lib\net45\nunitlite.dll" />
+    <PackageReference Include="NUnitLite" Version="3.9.0" />
   </Platform>
 
   <Platform Type="Linux">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <Reference Include="System.Drawing" />
-    <Binary Name="nunit.framework" Path="packages\NUnit.3.9.0\lib\net45\nunit.framework.dll" />
-    <Binary Name="nunitlite" Path="packages\NUnitLite.3.9.0\lib\net45\nunitlite.dll" />
+    <PackageReference Include="NUnitLite" Version="3.9.0" />
   </Platform>
 
   <Platform Type="iOS">
