@@ -24,9 +24,6 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
 
   <ItemGroup>
     <Compile Remove="Graphics\GraphicsAdapter.cs" />
-    <Compile Remove="Media\Video.cs" />
-    <Compile Remove="Media\VideoPlayer.cs" />
-    <Compile Remove="Content\ContentReaders\VideoReader.cs" />
     <Compile Remove="Input\MessageBox.cs" />
     <Compile Remove="Input\KeyboardInput.cs" />
   </ItemGroup>
@@ -46,6 +43,8 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     <Compile Include="Platform\Media\MediaLibrary.Default.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
     <Compile Include="Platform\Media\Song.NVorbis.cs" />
+    <Compile Include="Platform\Media\Video.DesktopGL.cs" />
+    <Compile Include="Platform\Media\VideoPlayer.DesktopGL.cs" />
     <Compile Include="Platform\Input\GamePad.SDL.cs" />
     <Compile Include="Platform\Input\InputKeyEventArgs.cs" />
     <Compile Include="Platform\Input\Joystick.SDL.cs" />
