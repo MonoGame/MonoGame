@@ -221,17 +221,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="buffer">The buffer containing PCM audio data.</param>
         public void SubmitBuffer(byte[] buffer)
         {
-            AssertNotDisposed();
-            
-            if (buffer.Length == 0)
-                throw new ArgumentException("Buffer may not be empty.");
-
-            // Ensure that the buffer length matches alignment.
-            // The data must be 16-bit, so the length is a multiple of 2 (mono) or 4 (stereo).
-            var sampleSize = 2 * (int)_channels;
-            if (buffer.Length % sampleSize != 0)
-                throw new ArgumentException("Buffer length does not match format alignment.");
-
             SubmitBuffer(buffer, 0, buffer.Length);
         }
 

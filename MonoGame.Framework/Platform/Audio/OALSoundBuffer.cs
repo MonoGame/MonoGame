@@ -11,7 +11,6 @@ namespace Microsoft.Xna.Framework.Audio
 	{
 		int openALDataBuffer;
 		ALFormat openALFormat;
-		int dataSize;
         bool _isDisposed;
 
 		public OALSoundBuffer()
@@ -39,7 +38,15 @@ namespace Microsoft.Xna.Framework.Audio
 			set;
 		}
 
-        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int sampleAlignment = 0)
+        public unsafe void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int sampleAlignment = 0)
+        {
+            fixed (byte* dataPtr = dataBuffer)
+            {
+                BindDataBuffer(dataPtr, format, size, sampleRate, sampleAlignment);
+            }
+        }
+
+        public unsafe void BindDataBuffer(void* dataBuffer, ALFormat format, int size, int sampleRate, int sampleAlignment = 0)
         {
             if ((format == ALFormat.MonoMSAdpcm || format == ALFormat.StereoMSAdpcm) && !OpenALSoundController.Instance.SupportsAdpcm)
                 throw new InvalidOperationException("MS-ADPCM is not supported by this OpenAL driver");
@@ -47,7 +54,6 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new InvalidOperationException("IMA/ADPCM is not supported by this OpenAL driver");
 
             openALFormat = format;
-            dataSize = size;
             int unpackedSize = 0;
 
             if (sampleAlignment > 0)
@@ -56,7 +62,7 @@ namespace Microsoft.Xna.Framework.Audio
                 ALHelper.CheckError("Failed to fill buffer.");
             }
 
-            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, size, sampleRate);
+            AL.alBufferData((uint) openALDataBuffer, (int) openALFormat, dataBuffer, size, sampleRate);
             ALHelper.CheckError("Failed to fill buffer.");
 
             int bits, channels;

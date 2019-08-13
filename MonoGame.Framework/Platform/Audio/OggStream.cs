@@ -409,30 +409,22 @@ namespace Microsoft.Xna.Framework.Audio
                 return streams.Remove(stream);
         }
 
-        public bool FillBuffer(OggStream stream, int bufferId)
+        public unsafe bool FillBuffer(OggStream stream, int bufferId)
         {
             int readSamples;
             lock (readMutex)
             {
                 readSamples = stream.Reader.ReadSamples(readSampleBuffer, 0, BufferSize);
-                CastBuffer(readSampleBuffer, castBuffer, readSamples);
             }
-            AL.BufferData(bufferId, stream.Reader.Channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16, castBuffer,
-                readSamples * sizeof(short), stream.Reader.SampleRate);
+            var format = stream.Reader.Channels == 1 ? ALFormat.MonoFloat32 : ALFormat.StereoFloat32;
+            fixed (float* bufferPtr = readSampleBuffer)
+            {
+                AL.alBufferData((uint) bufferId, (int) (stream.Reader.Channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16), bufferPtr, readSamples * sizeof(short), stream.Reader.SampleRate);
+            }
             ALHelper.CheckError("Failed to fill buffer, readSamples = {0}, SampleRate = {1}, buffer.Length = {2}.", readSamples, stream.Reader.SampleRate, castBuffer.Length);
 
 
             return readSamples != BufferSize;
-        }
-        static void CastBuffer(float[] inBuffer, short[] outBuffer, int length)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                var temp = (int)(32767f * inBuffer[i]);
-                if (temp > short.MaxValue) temp = short.MaxValue;
-                else if (temp < short.MinValue) temp = short.MinValue;
-                outBuffer[i] = (short)temp;
-            }
         }
 
         void EnsureBuffersFilled()

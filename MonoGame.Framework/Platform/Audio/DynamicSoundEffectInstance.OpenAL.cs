@@ -70,23 +70,21 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        private void PlatformSubmitBuffer(byte[] buffer, int offset, int count)
+        private unsafe void PlatformSubmitBuffer(byte[] buffer, int offset, int count)
+        {
+            fixed (byte* dataPtr = buffer)
+            {
+                AlSubmitBuffer(dataPtr, offset, count, _format);
+            }
+        }
+
+        private unsafe void AlSubmitBuffer(byte* dataPtr, int offset, int count, ALFormat format)
         {
             // Get a buffer
             OALSoundBuffer oalBuffer = new OALSoundBuffer();
 
             // Bind the data
-            if (offset == 0)
-            {
-                oalBuffer.BindDataBuffer(buffer, _format, count, _sampleRate);
-            }
-            else
-            {
-                // BindDataBuffer does not support offset
-                var offsetBuffer = new byte[count];
-                Array.Copy(buffer, offset, offsetBuffer, 0, count);
-                oalBuffer.BindDataBuffer(offsetBuffer, _format, count, _sampleRate);
-            }
+            oalBuffer.BindDataBuffer(dataPtr + offset, format, count, _sampleRate);
 
             // Queue the buffer
             AL.SourceQueueBuffer(SourceId, oalBuffer.OpenALDataBuffer);
@@ -99,6 +97,15 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 AL.SourcePlay(SourceId);
                 ALHelper.CheckError("Failed to resume source playback.");
+            }
+        }
+
+        internal unsafe void SubmitFloatBuffer(float[] buffer, int sampleOffset, int sampleCount)
+        {
+            var format = _channels == AudioChannels.Mono ? ALFormat.MonoFloat32 : ALFormat.StereoFloat32;
+            fixed (float* dataPtr = buffer)
+            {
+                AlSubmitBuffer((byte*) dataPtr, sampleOffset, sampleCount, format);
             }
         }
 

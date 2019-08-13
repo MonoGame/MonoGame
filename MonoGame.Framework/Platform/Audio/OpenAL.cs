@@ -257,22 +257,8 @@ namespace MonoGame.OpenAL
         internal static d_alenable Enable = FuncLoader.LoadFunction<d_alenable>(NativeLibrary, "alEnable");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_albufferdata(uint bid, int format, IntPtr data, int size, int freq);
+        internal unsafe delegate void d_albufferdata(uint bid, int format, void* data, int size, int freq);
         internal static d_albufferdata alBufferData = FuncLoader.LoadFunction<d_albufferdata>(NativeLibrary, "alBufferData");
-
-        internal static void BufferData(int bid, ALFormat format, byte[] data, int size, int freq)
-        {
-            var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            alBufferData((uint)bid, (int)format, handle.AddrOfPinnedObject(), size, freq);
-            handle.Free();
-        }
-
-        internal static void BufferData(int bid, ALFormat format, short[] data, int size, int freq)
-        {
-            var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            alBufferData((uint)bid, (int)format, handle.AddrOfPinnedObject(), size, freq);
-            handle.Free();
-        }
 
         [CLSCompliant(false)]
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
