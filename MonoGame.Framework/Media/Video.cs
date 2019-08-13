@@ -32,6 +32,11 @@ namespace Microsoft.Xna.Framework.Media
         public float FramesPerSecond { get; internal set; }
 
         /// <summary>
+        /// Gets the width of this video, in pixels.
+        /// </summary>
+        public int Width { get; internal set; }
+
+        /// <summary>
         /// Gets the height of this video, in pixels.
         /// </summary>
         public int Height { get; internal set; }
@@ -40,11 +45,6 @@ namespace Microsoft.Xna.Framework.Media
         /// Gets the VideoSoundtrackType for this video.
         /// </summary>
         public VideoSoundtrackType VideoSoundtrackType { get; internal set; }
-
-        /// <summary>
-        /// Gets the width of this video, in pixels.
-        /// </summary>
-        public int Width { get; internal set; }
 
         #endregion
 
@@ -59,11 +59,10 @@ namespace Microsoft.Xna.Framework.Media
         internal Video(string fileName)
         {
             FileName = fileName;
-
-#if !WINDOWS_UAP
             PlatformInitialize();
-#endif
         }
+
+        partial void PlatformInitialize();
 
         ~Video()
         {
@@ -84,7 +83,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (!_disposed)
             {
-                //PlatformDispose(disposing);
+                PlatformDispose(disposing);
                 _disposed = true;
             }
         }

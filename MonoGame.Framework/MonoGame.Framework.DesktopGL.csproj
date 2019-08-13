@@ -124,6 +124,10 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     <Content Include="MonoGame.Framework.DesktopGL.targets" PackagePath="build" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="..\ThirdParty\Dependencies\Theorafile\Theorafile-CS.dll" />
+  </ItemGroup>
+
   <Import Project="Platform\OpenGL.targets" />
   <Import Project="Platform\OpenAL.targets" />
 </Project>

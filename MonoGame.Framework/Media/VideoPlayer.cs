@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private MediaState _state;
         private Video _currentVideo;
-        private float _volume = 1.0f;
+        private float _volume;
         private bool _isLooped = false;
         private bool _isMuted = false;
 
@@ -89,6 +89,10 @@ namespace Microsoft.Xna.Framework.Media
                 PlatformGetState(ref _state);
                 return _state;
             }
+            private set
+            {
+                _state = value;
+            }
         }
 
         /// <summary>
@@ -105,10 +109,7 @@ namespace Microsoft.Xna.Framework.Media
             
             set
             {
-                if (value < 0.0f || value > 1.0f)
-                    throw new ArgumentOutOfRangeException();
-
-                _volume = value;
+                _volume = MathHelper.Clamp(value, 0f, 1f);
 
                 if (_currentVideo != null)
                     PlatformSetVolume();
@@ -122,6 +123,7 @@ namespace Microsoft.Xna.Framework.Media
         public VideoPlayer()
         {
             _state = MediaState.Stopped;
+            _volume = 1f;
 
             PlatformInitialize();
         }

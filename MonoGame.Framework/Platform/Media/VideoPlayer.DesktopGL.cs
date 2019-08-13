@@ -251,77 +251,35 @@ namespace Microsoft.Xna.Framework.Media
 
 		#endregion
 
-		#region Public Member Data: XNA VideoPlayer Implementation
+		#region Platform specific methods
 
-		public bool IsDisposed
+		private void PlatformInitialize()
 		{
-			get;
-			private set;
+			timer = new Stopwatch();
+			videoTexture = new RenderTargetBinding[1];
 		}
 
-		public bool IsLooped
+		private void PlatformSetIsLooped()
 		{
-			get;
-			set;
 		}
 
-		private bool backing_ismuted;
-		public bool IsMuted
+		private void PlatformSetIsMuted()
 		{
-			get
-			{
-				return backing_ismuted;
-			}
-			set
-			{
-				backing_ismuted = value;
-				UpdateVolume();
-			}
+			UpdateVolume();
 		}
 
-		public TimeSpan PlayPosition
+		private TimeSpan PlatformGetPlayPosition()
 		{
-			get
-			{
-				return timer.Elapsed;
-			}
+			return timer.Elapsed;
 		}
 
-		public MediaState State
+		private void PlatformSetVolume()
 		{
-			get;
-			private set;
+			UpdateVolume();
 		}
 
-		public Video Video
+		private void PlatformGetState(ref MediaState state)
 		{
-			get;
-			private set;
-		}
-
-		private float backing_volume;
-		public float Volume
-		{
-			get
-			{
-				return backing_volume;
-			}
-			set
-			{
-				if (value > 1.0f)
-				{
-					backing_volume = 1.0f;
-				}
-				else if (value < 0.0f)
-				{
-					backing_volume = 0.0f;
-				}
-				else
-				{
-					backing_volume = value;
-				}
-				UpdateVolume();
-			}
 		}
 
 		#endregion
@@ -395,21 +353,7 @@ namespace Microsoft.Xna.Framework.Media
 
 		#region Public Methods: XNA VideoPlayer Implementation
 
-		public VideoPlayer()
-		{
-			// Initialize public members.
-			IsDisposed = false;
-			IsLooped = false;
-			IsMuted = false;
-			State = MediaState.Stopped;
-			Volume = 1.0f;
-
-			// Initialize private members.
-			timer = new Stopwatch();
-			videoTexture = new RenderTargetBinding[1];
-		}
-
-		public void Dispose()
+		private void PlatformDispose(bool disposing)
 		{
 			if (IsDisposed)
 			{
@@ -446,7 +390,7 @@ namespace Microsoft.Xna.Framework.Media
 			IsDisposed = true;
 		}
 
-		public Texture2D GetTexture()
+		private Texture2D PlatformGetTexture()
 		{
 			checkDisposed();
 
@@ -531,12 +475,11 @@ namespace Microsoft.Xna.Framework.Media
 			return videoTexture[0].RenderTarget as Texture2D;
 		}
 
-		public void Play(Video video)
+		private void PlatformPlay()
 		{
 			checkDisposed();
 
 			// We need to assign this regardless of what happens next.
-			Video = video;
 
 			// FIXME: This is a part of the Duration hack!
 			if (Video.needsDurationHack)
@@ -605,7 +548,7 @@ namespace Microsoft.Xna.Framework.Media
 			}
 		}
 
-		public void Stop()
+		private void PlatformStop()
 		{
 			checkDisposed();
 
@@ -630,7 +573,7 @@ namespace Microsoft.Xna.Framework.Media
 			Theorafile.tf_reset(Video.theora);
 		}
 
-		public void Pause()
+		private void PlatformPause()
 		{
 			checkDisposed();
 
@@ -651,7 +594,7 @@ namespace Microsoft.Xna.Framework.Media
 			}
 		}
 
-		public void Resume()
+		private void PlatformResume()
 		{
 			checkDisposed();
 

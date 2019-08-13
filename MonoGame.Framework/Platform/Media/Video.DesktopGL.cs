@@ -17,41 +17,6 @@ namespace Microsoft.Xna.Framework.Media
 {
 	public sealed partial class Video
 	{
-		#region Public Properties
-
-		public int Width
-		{
-			get;
-			private set;
-		}
-
-		public int Height
-		{
-			get;
-			private set;
-		}
-
-		public float FramesPerSecond
-		{
-			get;
-			internal set;
-		}
-
-		public VideoSoundtrackType VideoSoundtrackType
-		{
-			get;
-			private set;
-		}
-
-		// FIXME: This is hacked, look up "This is a part of the Duration hack!"
-		public TimeSpan Duration
-		{
-			get;
-			internal set;
-		}
-
-		#endregion
-
 		#region Internal Properties
 
 		internal GraphicsDevice GraphicsDevice
@@ -131,7 +96,7 @@ namespace Microsoft.Xna.Framework.Media
 
 		#region Destructor
 
-		~Video()
+		private void PlatformDispose(bool disposing)
 		{
 			if (theora != IntPtr.Zero)
 			{
