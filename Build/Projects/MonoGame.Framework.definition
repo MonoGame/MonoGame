@@ -1128,6 +1128,9 @@
     <Compile Include="Media\Video.cs">
       <ExcludePlatforms>Angle,Linux,WindowsGL,Web,tvOS</ExcludePlatforms>
     </Compile>
+    <Compile Include="Platform\Media\Video.DesktopGL.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
     <Compile Include="Platform\Media\Video.IOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
@@ -1141,7 +1144,10 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.cs">
-      <ExcludePlatforms>Angle,Linux,WindowsGL,Web,tvOS</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Web,tvOS</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Platform\Media\VideoPlayer.DesktopGL.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Platform\Media\VideoPlayer.IOS.cs">
         <Platforms>iOS</Platforms>
