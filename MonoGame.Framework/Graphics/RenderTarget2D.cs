@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         int width,
                         int height,
                         bool mipMap,
-                        SurfaceFormat format,
+                        SurfaceFormat preferredFormat,
                         DepthFormat depthFormat,
                         int preferredMultiSampleCount,
                         RenderTargetUsage usage,
