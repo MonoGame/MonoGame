@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Media
         }
         */
 
-        private void PlatformInitialize()
+        partial void PlatformInitialize()
         {
             var url = NSUrl.FromFilename(Path.GetFullPath(FileName));
 

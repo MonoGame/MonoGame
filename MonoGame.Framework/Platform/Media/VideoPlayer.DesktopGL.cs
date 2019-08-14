@@ -23,7 +23,6 @@ namespace Microsoft.Xna.Framework.Media
 		#region Hardware-accelerated YUV -> RGBA
 
 		private Effect shaderProgram;
-		private IntPtr stateChangesPtr;
 		private Texture2D[] yuvTextures = new Texture2D[3];
 		private Viewport viewport;
 
@@ -49,9 +48,12 @@ namespace Microsoft.Xna.Framework.Media
 		private VertexBufferBinding vertBuffer;
 
 		// Used to restore our previous GL state.
+		private Shader oldVertexShader;
+		private Shader oldPixelShader;
 		private Texture[] oldTextures= new Texture[3];
 		private SamplerState[] oldSamplers = new SamplerState[3];
 		private RenderTargetBinding[] oldTargets;
+		private int oldBufferCount;
 		private VertexBufferBinding[] oldBuffers;
 		private BlendState prevBlend;
 		private DepthStencilState prevDepthStencil;
@@ -63,14 +65,8 @@ namespace Microsoft.Xna.Framework.Media
 			// Load the YUV->RGBA Effect
 			shaderProgram = new Effect(
 				currentDevice,
-				Resources.YUVToRGBAEffect
+				EffectResource.YUVToRGBAEffect.Bytecode
 			);
-			unsafe
-			{
-				stateChangesPtr = Marshal.AllocHGlobal(
-					sizeof(MojoShader.MOJOSHADER_effectStateChanges)
-				);
-			}
 
 			// Allocate the vertex buffer
 			vertBuffer = new VertexBufferBinding(
@@ -97,10 +93,6 @@ namespace Microsoft.Xna.Framework.Media
 			if (shaderProgram != null)
 			{
 				shaderProgram.Dispose();
-			}
-			if (stateChangesPtr != IntPtr.Zero)
-			{
-				Marshal.FreeHGlobal(stateChangesPtr);
 			}
 
 			// Delete the vertex buffer
@@ -157,11 +149,8 @@ namespace Microsoft.Xna.Framework.Media
 
 		private void GL_pushState()
 		{
-			// Begin the effect, flagging to restore previous state on end
-			currentDevice.GLDevice.BeginPassRestore(
-				shaderProgram.glEffect,
-				stateChangesPtr
-			);
+			oldVertexShader = currentDevice.VertexShader;
+			oldPixelShader = currentDevice.PixelShader;
 
 			// Prep our samplers
 			for (int i = 0; i < 3; i += 1)
@@ -173,16 +162,18 @@ namespace Microsoft.Xna.Framework.Media
 			}
 
 			// Prep buffers
-			oldBuffers = currentDevice.GetVertexBuffers();
+			oldBufferCount = currentDevice.VertexBuffers.Count;
+			if (oldBuffers == null || oldBuffers.Length < oldBufferCount)
+				oldBuffers = new VertexBufferBinding[oldBufferCount];
+
+			for (var i = 0; i < oldBufferCount; i++)
+				oldBuffers[i] = currentDevice.VertexBuffers.Get(i);
+
 			currentDevice.SetVertexBuffers(vertBuffer);
 
 			// Prep target bindings
 			oldTargets = currentDevice.GetRenderTargets();
-			currentDevice.GLDevice.SetRenderTargets(
-				videoTexture,
-				null,
-				DepthFormat.None
-			);
+			currentDevice.SetRenderTargets(videoTexture);
 
 			// Prep render state
 			prevBlend = currentDevice.BlendState;
@@ -194,13 +185,13 @@ namespace Microsoft.Xna.Framework.Media
 
 			// Prep viewport
 			prevViewport = currentDevice.Viewport;
-			currentDevice.GLDevice.SetViewport(viewport);
+			currentDevice.Viewport = viewport;
 		}
 
 		private void GL_popState()
 		{
-			// End the effect, restoring the previous shader state
-			currentDevice.GLDevice.EndPassRestore(shaderProgram.glEffect);
+			currentDevice.VertexShader = oldVertexShader;
+			currentDevice.PixelShader = oldPixelShader;
 
 			// Restore GL state
 			currentDevice.BlendState = prevBlend;
@@ -210,33 +201,23 @@ namespace Microsoft.Xna.Framework.Media
 			prevDepthStencil = null;
 			prevRasterizer = null;
 
-			/* Restore targets using GLDevice directly.
-			 * This prevents accidental clearing of previously bound targets.
-			 */
 			if (oldTargets == null || oldTargets.Length == 0)
 			{
-				currentDevice.GLDevice.SetRenderTargets(
-					null,
-					null,
-					DepthFormat.None
-				);
+				currentDevice.SetRenderTarget(null);
 			}
 			else
 			{
+				// TODO make sure this does not clear previously bound targets
 				IRenderTarget oldTarget = oldTargets[0].RenderTarget as IRenderTarget;
-				currentDevice.GLDevice.SetRenderTargets(
-					oldTargets,
-					oldTarget.DepthStencilBuffer,
-					oldTarget.DepthStencilFormat
-				);
+				currentDevice.SetRenderTargets(oldTargets);
 			}
 			oldTargets = null;
 
 			// Set viewport AFTER setting targets!
-			currentDevice.GLDevice.SetViewport(prevViewport);
+			currentDevice.Viewport = prevViewport;
 
 			// Restore buffers
-			currentDevice.SetVertexBuffers(oldBuffers);
+			currentDevice.VertexBuffers.Set(oldBuffers, oldBufferCount);
 			oldBuffers = null;
 
 			// Restore samplers
@@ -628,11 +609,7 @@ namespace Microsoft.Xna.Framework.Media
 			);
 			if (samples > 0)
 			{
-				audioStream.SubmitFloatBufferEXT(
-					audioData,
-					0,
-					samples
-				);
+				audioStream.SubmitFloatBuffer(audioData, 0, samples);
 			}
 			else if (Theorafile.tf_eos(Video.theora) == 1)
 			{
@@ -648,25 +625,13 @@ namespace Microsoft.Xna.Framework.Media
 		private void UpdateTexture()
 		{
 			// Prepare YUV GL textures with our current frame data
-			currentDevice.GLDevice.SetTextureData2DPointer(
-				yuvTextures[0],
-				yuvData
-			);
-			currentDevice.GLDevice.SetTextureData2DPointer(
-				yuvTextures[1],
-				new IntPtr(
-					yuvData.ToInt64() +
-					(Video.Width * Video.Height)
-				)
-			);
-			currentDevice.GLDevice.SetTextureData2DPointer(
-				yuvTextures[2],
-				new IntPtr(
-					yuvData.ToInt64() +
-					(Video.Width * Video.Height) +
-					(Video.Width / 2 * Video.Height / 2)
-				)
-			);
+			yuvTextures[0].SetDataFromPointer(yuvData);
+
+			var yuvData1 = new IntPtr(yuvData.ToInt64() + (Video.Width * Video.Height));
+			yuvTextures[1].SetDataFromPointer(yuvData1);
+
+			var yuvData2 = new IntPtr(yuvData.ToInt64() + (Video.Width * Video.Height) + (Video.Width / 2 * Video.Height / 2));
+			yuvTextures[2].SetDataFromPointer(yuvData2);
 
 			// Draw the YUV textures to the framebuffer with our shader.
 			GL_pushState();

@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Media
     {
         internal Android.Media.MediaPlayer Player;
 
-        private void PlatformInitialize()
+        partial void PlatformInitialize()
         {
             Player = new Android.Media.MediaPlayer();
             if (Player != null)

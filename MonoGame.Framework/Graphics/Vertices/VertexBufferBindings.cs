@@ -16,6 +16,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly VertexBuffer[] _vertexBuffers;
         private readonly int[] _vertexOffsets;
 
+        internal VertexBuffer[] Buffers { get { return _vertexBuffers; } }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="VertexBufferBindings" /> class.
         /// </summary>
@@ -96,14 +98,28 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <see langword="true"/> if the input layout was changed; otherwise,
         /// <see langword="false"/>.
         /// </returns>
-        public bool Set(params VertexBufferBinding[] vertexBufferBindings)
+        public bool Set(VertexBufferBinding[] vertexBufferBindings)
+        {
+            return Set(vertexBufferBindings, vertexBufferBindings.Length);
+        }
+
+        /// <summary>
+        /// Binds the the specified vertex buffers to the input slots.
+        /// </summary>
+        /// <param name="vertexBufferBindings">The vertex buffer bindings.</param>
+        /// <param name="count">The number of buffers to bind starting from the start of the array.</param>
+        /// <returns>
+        /// <see langword="true"/> if the input layout was changed; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
+        public bool Set(VertexBufferBinding[] vertexBufferBindings, int count)
         {
             Debug.Assert(vertexBufferBindings != null);
             Debug.Assert(vertexBufferBindings.Length > 0);
             Debug.Assert(vertexBufferBindings.Length <= _vertexBuffers.Length);
 
             bool isDirty = false;
-            for (int i = 0; i < vertexBufferBindings.Length; i++)
+            for (int i = 0; i < count; i++)
             {
                 Debug.Assert(vertexBufferBindings[i].VertexBuffer != null);
 

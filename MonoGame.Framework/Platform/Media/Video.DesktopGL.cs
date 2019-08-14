@@ -17,16 +17,6 @@ namespace Microsoft.Xna.Framework.Media
 {
 	public sealed partial class Video
 	{
-		#region Internal Properties
-
-		internal GraphicsDevice GraphicsDevice
-		{
-			get;
-			private set;
-		}
-
-		#endregion
-
 		#region Internal Variables: Theorafile
 
 		internal IntPtr theora;
@@ -36,32 +26,16 @@ namespace Microsoft.Xna.Framework.Media
 
 		#region Internal Constructors
 
-		internal Video(string fileName, GraphicsDevice device)
+		partial void PlatformInitialize()
 		{
-			GraphicsDevice = device;
+			// MG Note: we double check that the metadata in the XNB matches
+			//          what Theorafile reads from the actual video file
 
-			Theorafile.tf_fopen(fileName, out theora);
+			Theorafile.tf_fopen(FileName, out theora);
 			int width, height;
 			double fps;
 			Theorafile.tf_videoinfo(theora, out width, out height, out fps);
-			Width = width;
-			Height = height;
-			FramesPerSecond = (float) fps;
 
-			// FIXME: This is a part of the Duration hack!
-			Duration = TimeSpan.MaxValue;
-			needsDurationHack = true;
-		}
-
-		internal Video(
-			string fileName,
-			GraphicsDevice device,
-			int durationMS,
-			int width,
-			int height,
-			float framesPerSecond,
-			VideoSoundtrackType soundtrackType
-		) : this(fileName, device) {
 			/* If you got here, you've still got the XNB file! Well done!
 			 * Except if you're running FNA, you're not using the WMV anymore.
 			 * But surely it's the same video, right...?
@@ -77,7 +51,7 @@ namespace Microsoft.Xna.Framework.Media
 					" Height: " + Height.ToString()
 				);
 			}
-			if (Math.Abs(FramesPerSecond - framesPerSecond) >= 1.0f)
+			if (Math.Abs(fps - FramesPerSecond) >= 1.0f)
 			{
 				throw new InvalidOperationException(
 					"XNB/OGV framesPerSecond mismatch!" +
@@ -85,11 +59,7 @@ namespace Microsoft.Xna.Framework.Media
 				);
 			}
 
-			// FIXME: Oh, hey! I wish we had this info in Theora!
-			Duration = TimeSpan.FromMilliseconds(durationMS);
 			needsDurationHack = false;
-
-			VideoSoundtrackType = soundtrackType;
 		}
 
 		#endregion

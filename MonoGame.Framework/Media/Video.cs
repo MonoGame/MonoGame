@@ -3,7 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.IO;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -13,6 +13,13 @@ namespace Microsoft.Xna.Framework.Media
     public sealed partial class Video : IDisposable
 	{
 		private bool _disposed;
+		private GraphicsDevice _graphicsDevice;
+
+		internal GraphicsDevice GraphicsDevice
+		{
+			get { return _graphicsDevice; }
+			private set { _graphicsDevice = value; }
+		}
 
 		#region Public API
 
@@ -50,15 +57,10 @@ namespace Microsoft.Xna.Framework.Media
 
         #region Internal API
 
-        internal Video(string fileName, float durationMS) :
-            this(fileName)
-        {
-            Duration = TimeSpan.FromMilliseconds(durationMS);
-        }
-
-        internal Video(string fileName)
+        internal Video(string fileName, GraphicsDevice graphicsDevice)
         {
             FileName = fileName;
+            _graphicsDevice = graphicsDevice;
             PlatformInitialize();
         }
 

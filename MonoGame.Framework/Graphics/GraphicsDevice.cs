@@ -85,6 +85,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
 
         internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
+        internal VertexBufferBindings VertexBuffers { get { return _vertexBuffers; } }
 
         public TextureCollection VertexTextures { get; private set; }
 

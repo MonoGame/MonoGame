@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Media
             get { return new TimeSpan(movie.CurrentTime.Value); }
         }
 
-        private void PlatformInitialize()
+        partial void PlatformInitialize()
         {
             var err = new NSError();
 

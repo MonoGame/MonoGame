@@ -30,11 +30,12 @@ namespace Microsoft.Xna.Framework.Content
             var framesPerSecond = input.ReadObject<float>();
             var soundTrackType = input.ReadObject<int>();  // 0 = Music, 1 = Dialog, 2 = Music and dialog
 
-            return new Video(path, durationMS)
+            return new Video(path, input.GraphicsDevice)
             {
                 Width = width,
                 Height = height,
                 FramesPerSecond = framesPerSecond,
+                Duration = TimeSpan.FromMilliseconds(durationMS),
                 VideoSoundtrackType = (VideoSoundtrackType)soundTrackType
             };
         }

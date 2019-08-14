@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Media
 
         MediaType _mediaType;
 
-        private void PlatformInitialize()
+        partial void PlatformInitialize()
         {
             if (Topology != null)
                 return;
