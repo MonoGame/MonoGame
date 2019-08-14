@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Media
             GC.SuppressFinalize(this);
         }
 
-        void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposed)
             {
@@ -89,6 +89,8 @@ namespace Microsoft.Xna.Framework.Media
                 _disposed = true;
             }
         }
+
+        partial void PlatformDispose(bool disposing);
 
         #endregion
     }

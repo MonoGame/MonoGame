@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Media
             MovieView.MoviePlayer.PrepareToPlay();
         }
 
-        private void PlatformDispose(bool disposing)
+        partial void PlatformDispose(bool disposing)
         {
             if (MovieView == null)
                 return;

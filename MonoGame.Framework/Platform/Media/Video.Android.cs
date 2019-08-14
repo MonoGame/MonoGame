@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
-        private void PlatformDispose(bool disposing)
+        partial void PlatformDispose(bool disposing)
         {
             if (Player == null)
                 return;

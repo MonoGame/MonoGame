@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Media
             mediaSource.Dispose();
         }
 
-        private void PlatformDispose(bool disposing)
+        partial void PlatformDispose(bool disposing)
         {
             if (_topology != null)
             {

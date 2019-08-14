@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Media
 
 		#region Destructor
 
-		private void PlatformDispose(bool disposing)
+		partial void PlatformDispose(bool disposing)
 		{
 			if (theora != IntPtr.Zero)
 			{

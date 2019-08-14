@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Media
             Player = new AVPlayer(movie);
         }
 
-        private void PlatformDispose(bool disposing)
+        partial void PlatformDispose(bool disposing)
         {
             if (Player != null)
             {
