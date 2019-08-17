@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             try
             {
-                var p = Process.Start("chmod", "u+x '" + path + "'");
+                var p = Process.Start("chmod", "u+x \"" + path + "\"");
                 p.WaitForExit();
             }
             catch
