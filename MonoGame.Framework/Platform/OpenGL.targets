@@ -48,6 +48,7 @@
     <EmbeddedResource Include="Platform\Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\YUVToRGBAEffect.ogl.mgfxo" />
   </ItemGroup>
 
 </Project>

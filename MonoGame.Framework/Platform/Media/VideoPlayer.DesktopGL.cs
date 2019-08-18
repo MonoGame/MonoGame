@@ -161,6 +161,8 @@ namespace Microsoft.Xna.Framework.Media
 				currentDevice.SamplerStates[i] = SamplerState.LinearClamp;
 			}
 
+            shaderProgram.CurrentTechnique.Passes[0].Apply();
+
 			// Prep buffers
 			oldBufferCount = currentDevice.VertexBuffers.Count;
 			if (oldBuffers == null || oldBuffers.Length < oldBufferCount)

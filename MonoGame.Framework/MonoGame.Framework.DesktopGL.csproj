@@ -43,6 +43,7 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     <Compile Include="Platform\Media\MediaLibrary.Default.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
     <Compile Include="Platform\Media\Song.NVorbis.cs" />
+    <Compile Include="Platform\Media\Theorafile.cs" />
     <Compile Include="Platform\Media\Video.DesktopGL.cs" />
     <Compile Include="Platform\Media\VideoPlayer.DesktopGL.cs" />
     <Compile Include="Platform\Input\GamePad.SDL.cs" />
@@ -87,6 +88,11 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
       <PackagePath>runtimes\win-x86\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\ThirdParty\Dependencies\Theorafile\x86\libtheorafile.dll">
+      <Link>x86\theorafile.dll</Link>
+      <PackagePath>runtimes\win-x86\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
       <Link>x64\soft_oal.dll</Link>
@@ -95,6 +101,11 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     </Content>
     <Content Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
       <Link>x64\SDL2.dll</Link>
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\Theorafile\x64\libtheorafile.dll">
+      <Link>x64\theorafile.dll</Link>
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -109,6 +120,11 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
       <PackagePath>runtimes\linux-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\ThirdParty\Dependencies\Theorafile\x64\libtheorafile.so">
+      <Link>libtheorafile.so</Link>
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib">
       <Link>libopenal.1.dylib</Link>
@@ -120,12 +136,13 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
       <PackagePath>runtimes\osx\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\ThirdParty\Dependencies\Theorafile\libtheorafile.dylib">
+      <Link>libtheorafile.dylib</Link>
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="MonoGame.Framework.DesktopGL.targets" PackagePath="build" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="..\ThirdParty\Dependencies\Theorafile\Theorafile-CS.dll" />
   </ItemGroup>
 
   <Import Project="Platform\OpenGL.targets" />

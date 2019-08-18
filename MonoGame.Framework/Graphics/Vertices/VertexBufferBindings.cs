@@ -115,7 +115,6 @@ namespace Microsoft.Xna.Framework.Graphics
         public bool Set(VertexBufferBinding[] vertexBufferBindings, int count)
         {
             Debug.Assert(vertexBufferBindings != null);
-            Debug.Assert(vertexBufferBindings.Length > 0);
             Debug.Assert(vertexBufferBindings.Length <= _vertexBuffers.Length);
 
             bool isDirty = false;

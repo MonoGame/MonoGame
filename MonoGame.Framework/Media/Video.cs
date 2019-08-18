@@ -61,6 +61,10 @@ namespace Microsoft.Xna.Framework.Media
         {
             FileName = fileName;
             _graphicsDevice = graphicsDevice;
+        }
+
+        internal void Initialize()
+        {
             PlatformInitialize();
         }
 
