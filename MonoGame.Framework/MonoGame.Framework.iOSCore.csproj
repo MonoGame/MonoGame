@@ -32,7 +32,6 @@ This package provides you with MonoGame Framework that works on iOS.</Descriptio
     <Compile Remove="GraphicsDeviceManager.cs" />
     <Compile Remove="Graphics\GraphicsAdapter.cs" />
     <Compile Remove="Graphics\OcclusionQuery.cs" />
-    <Compile Remove="Input\Keyboard.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,13 +44,14 @@ This package provides you with MonoGame Framework that works on iOS.</Descriptio
     <Compile Include="Platform\iOS\iOSGameView_Touch.cs" />
     <Compile Include="Platform\iOS\iOSGameWindow.cs" />
     <Compile Include="Platform\iOS\OrientationConverter.cs" />
- 
+
     <Compile Include="Platform\GamePlatform.Mobile.cs" />
     <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
     <Compile Include="Platform\Graphics\OpenGL.iOS.cs" />
     <Compile Include="Platform\GraphicsDeviceManager.Legacy.cs" />
     <Compile Include="Platform\Input\GamePad.iOS.cs" />
     <Compile Include="Platform\Input\Joystick.Default.cs" />
+    <Compile Include="Platform\Input\Keyboard.Default.cs" />
     <Compile Include="Platform\Input\KeyboardInput.iOS.cs" />
     <Compile Include="Platform\Input\MessageBox.iOS.cs" />
     <Compile Include="Platform\Input\Mouse.Default.cs" />
@@ -65,7 +65,7 @@ This package provides you with MonoGame Framework that works on iOS.</Descriptio
     <Compile Include="Platform\Utilities\FuncLoader.iOS.cs" />
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
-    
+
     <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
   </ItemGroup>
