@@ -53,6 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return texture;
         }
 
+#if !WINDOWS_UAP
         internal enum ImageWriterFormat
         {
             Jpg,
@@ -101,5 +102,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
+#endif
     }
 }
