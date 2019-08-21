@@ -213,20 +213,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return arraySlice * _levelCount + level;
         }
 
-        private void PlatformSaveAsJpeg(Stream stream, int width, int height)
-        {
-#if WINDOWS_UAP
-            SaveAsImage(Windows.Graphics.Imaging.BitmapEncoder.JpegEncoderId, stream, width, height);
-#else
-            SaveAsImage(stream, width, height, ImageWriterFormat.Jpg);
-#endif
-        }
-
-        private void PlatformSaveAsPng(Stream stream, int width, int height)
-        {
-            SaveAsImage(stream, width, height, ImageWriterFormat.Png);
-        }
-
 #if WINDOWS_UAP
         private void SaveAsImage(Guid encoderId, Stream stream, int width, int height)
         {

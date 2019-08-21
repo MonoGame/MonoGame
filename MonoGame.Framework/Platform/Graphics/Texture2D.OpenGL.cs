@@ -384,24 +384,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        private void PlatformSaveAsJpeg(Stream stream, int width, int height)
-        {
-#if !ANDROID
-            SaveAsImage(stream, width, height, ImageWriterFormat.Jpg);
-#else
-            SaveAsImage(stream, width, height, Bitmap.CompressFormat.Jpeg);
-#endif
-        }
-
-        private void PlatformSaveAsPng(Stream stream, int width, int height)
-        {
-#if !ANDROID
-            SaveAsImage(stream, width, height, ImageWriterFormat.Png);
-#else
-            SaveAsImage(stream, width, height, Bitmap.CompressFormat.Png);
-#endif
-        }
-
 #if ANDROID
         private void SaveAsImage(Stream stream, int width, int height, Bitmap.CompressFormat format)
         {

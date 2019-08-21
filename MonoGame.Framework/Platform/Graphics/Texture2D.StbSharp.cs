@@ -53,13 +53,23 @@ namespace Microsoft.Xna.Framework.Graphics
             return texture;
         }
 
-        internal enum ImageWriterFormat
+        private void PlatformSaveAsJpeg(Stream stream, int width, int height)
+        {
+            SaveAsImage(stream, width, height, ImageWriterFormat.Jpg);
+        }
+
+        private void PlatformSaveAsPng(Stream stream, int width, int height)
+        {
+            SaveAsImage(stream, width, height, ImageWriterFormat.Png);
+        }
+
+        private enum ImageWriterFormat
         {
             Jpg,
             Png
         }
 
-        internal unsafe void SaveAsImage(Stream stream, int width, int height, ImageWriterFormat format)
+        private unsafe void SaveAsImage(Stream stream, int width, int height, ImageWriterFormat format)
         {
             if (stream == null)
             {
