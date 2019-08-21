@@ -213,33 +213,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return arraySlice * _levelCount + level;
         }
 
-#if WINDOWS_UAP
-        private void SaveAsImage(Guid encoderId, Stream stream, int width, int height)
-        {
-            var pixelData = new byte[Width * Height * GraphicsExtensions.GetSize(Format)];
-            GetData(pixelData);
-
-            // TODO: We need to convert from Format to R8G8B8A8!
-
-            // TODO: We should implement async SaveAsPng() for WinRT.
-            Task.Run(async () =>
-            {
-                // Create a temporary memory stream for writing the png.
-                var memstream = new InMemoryRandomAccessStream();
-
-                // Write the png.
-                var encoder = await Windows.Graphics.Imaging.BitmapEncoder.CreateAsync(encoderId, memstream);
-                encoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Ignore, (uint)width, (uint)height, 96, 96, pixelData);
-                await encoder.FlushAsync();
-
-                // Copy the memory stream into the real output stream.
-                memstream.Seek(0);
-                memstream.AsStreamForRead().CopyTo(stream);
-
-            }).Wait();
-        }
-#endif
-
         protected internal virtual Texture2DDescription GetTexture2DDescription()
         {
             var desc = new Texture2DDescription();

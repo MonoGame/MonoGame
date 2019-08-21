@@ -384,26 +384,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if ANDROID
-        private void SaveAsImage(Stream stream, int width, int height, Bitmap.CompressFormat format)
-        {
-            int[] data = new int[width * height];
-            GetData(data);
-            // internal structure is BGR while bitmap expects RGB
-            for (int i = 0; i < data.Length; ++i)
-            {
-                uint pixel = (uint)data[i];
-                data[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
-            }
-            using (Bitmap bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888))
-            {
-                bitmap.SetPixels(data, 0, width, 0, 0, width, height);
-                bitmap.Compress(format, 100, stream);
-                bitmap.Recycle();
-            }
-        }
-#endif
-
         // This method allows games that use Texture2D.FromStream
         // to reload their textures after the GL context is lost.
         private void PlatformReload(Stream textureStream)
