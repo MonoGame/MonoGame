@@ -1608,5 +1608,8 @@
       <Services>NVorbis</Services>
     </Compile>
 
+    <!-- MonogamePlatform -->
+    <Compile Include="PlatformInfo.cs" />
+    <Compile Include="PlatformInfo.Platform.cs" />
   </Files>
 </Project>
