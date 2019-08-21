@@ -35,6 +35,7 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
     <Compile Include="Platform\TitleContainer.Desktop.cs" />
     <Compile Include="Platform\Audio\OggStream.cs" />
     <Compile Include="Platform\Graphics\OpenGL.Common.cs" />
+    <Compile Include="Platform\Graphics\Texture2D.StbSharp.cs" />    
     <Compile Include="Platform\SDL\SDL2.cs" />
     <Compile Include="Platform\SDL\SDLGamePlatform.cs" />
     <Compile Include="Platform\SDL\SDLGameWindow.cs" />
