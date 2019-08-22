@@ -2,12 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-namespace Microsoft.Xna.Framework
+namespace MonoGame.Framework.Utilities
 {
     /// <summary>
     /// Type of the underlying game platform
     /// </summary>
-    public enum MonogamePlatform
+    public enum MonoGamePlatform
     {
         Android,
         iOS,
@@ -34,16 +34,30 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Utility class that returns information about the underlying platform
     /// </summary>
-    public static partial class PlatformInfo
+    public static class PlatformInfo
     {
         /// <summary>
         /// Underlying game platform type
         /// </summary>
-        public static MonogamePlatform MonogamePlatform
+        public static MonoGamePlatform MonoGamePlatform
         {
             get
             {
-                return PlatformGetCurrent();
+#if ANDROID
+                return MonoGamePlatform.Android;
+#elif DESKTOPGL
+                return MonoGamePlatform.DesktopGL;
+#elif IOS && !TVOS
+                return MonoGamePlatform.iOS;
+#elif TVOS
+                return MonoGamePlatform.tvOS;
+#elif WEB
+                return MonoGamePlatform.Web;
+#elif WINDOWS && DIRECTX
+                return MonoGamePlatform.Windows;
+#elif WINDOWS_UAP
+                return MonoGamePlatform.WindowsUniversal;
+#endif
             }
         }
 
@@ -54,7 +68,11 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return PlatformGetGraphicsBackend();
+#if DIRECTX
+                return GraphicsBackend.DirectX;
+#else
+                return GraphicsBackend.OpenGL;
+#endif
             }
         }
     }
