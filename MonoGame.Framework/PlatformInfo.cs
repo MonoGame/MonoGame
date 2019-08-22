@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Xna.Framework
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+namespace Microsoft.Xna.Framework
 {
     /// <summary>
     /// Type of the underlying game platform
@@ -19,6 +23,15 @@
     }
 
     /// <summary>
+    /// Graphics backend
+    /// </summary>
+    public enum GraphicsBackend
+    {
+        DirectX,
+        OpenGL
+    }
+
+    /// <summary>
     /// Utility class that returns information about the underlying platform
     /// </summary>
     public static partial class PlatformInfo
@@ -31,6 +44,17 @@
             get
             {
                 return PlatformGetCurrent();
+            }
+        }
+
+        /// <summary>
+        /// Graphics backend
+        /// </summary>
+        public static GraphicsBackend GraphicsBackend
+        {
+            get
+            {
+                return PlatformGetGraphicsBackend();
             }
         }
     }
