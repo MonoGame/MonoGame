@@ -5,33 +5,6 @@
 namespace MonoGame.Framework.Utilities
 {
     /// <summary>
-    /// Type of the underlying game platform
-    /// </summary>
-    public enum MonoGamePlatform
-    {
-        Android,
-        iOS,
-        tvOS,
-        DesktopGL,
-        Windows,
-        WindowsUniversal,
-        Web,
-        PSVita,
-        XBoxOne,
-        PlayStation4,
-        Switch
-    }
-
-    /// <summary>
-    /// Graphics backend
-    /// </summary>
-    public enum GraphicsBackend
-    {
-        DirectX,
-        OpenGL
-    }
-
-    /// <summary>
     /// Utility class that returns information about the underlying platform
     /// </summary>
     public static class PlatformInfo
@@ -52,11 +25,19 @@ namespace MonoGame.Framework.Utilities
 #elif TVOS
                 return MonoGamePlatform.tvOS;
 #elif WEB
-                return MonoGamePlatform.Web;
+                return MonoGamePlatform.WebGL;
 #elif WINDOWS && DIRECTX
                 return MonoGamePlatform.Windows;
 #elif WINDOWS_UAP
                 return MonoGamePlatform.WindowsUniversal;
+#elif SWITCH
+                return MonoGamePlatform.NintendoSwitch;
+#elif XB1
+                return MonoGamePlatform.XboxOne;
+#elif PLAYSTATION4
+                return MonoGamePlatform.PlayStation4;
+#elif PSVITA
+                return MonoGamePlatform.PSVita;
 #endif
             }
         }
