@@ -1611,6 +1611,8 @@
       <Services>NVorbis</Services>
     </Compile>
 
-    <Compile Include="PlatformInfo.cs" />
+    <Compile Include="Utilities\PlatformInfo.cs" />
+    <Compile Include="Utilities\MonoGamePlatform.cs" />
+    <Compile Include="Utilities\GraphicsBackend.cs" />
   </Files>
 </Project>
