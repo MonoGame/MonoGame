@@ -288,7 +288,7 @@ LangString VS2012Desc ${LANG_ENGLISH} "Install the project templates for Visual 
 LangString VS2013Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2013"
 LangString VS2015Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2015"
 LangString VS2017Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2017"
-LangString VS2017Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2019"
+LangString VS2019Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2019"
 LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your start menu"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
