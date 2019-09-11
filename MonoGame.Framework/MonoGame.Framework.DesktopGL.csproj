@@ -100,6 +100,17 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	
+	<Content Include="..\ThirdParty\Dependencies\openal-soft\Linux\x86\libopenal.so.1">
+      <Link>x86\libopenal.so.1</Link>
+      <PackagePath>runtimes\linux-x86\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SDL\Linux\x86\libSDL2-2.0.so.0">
+      <Link>x86\libSDL2-2.0.so.0</Link>
+      <PackagePath>runtimes\linux-x86\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
       <Link>x64\libopenal.so.1</Link>
