@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D4838656-8545-4DC5-8822-D4AD313E17AC}</ProjectGuid>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
+    <AssemblyName>MonoGame.Framework.Net</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>1591,0436</NoWarn>
+    <TargetFrameworkProfile />
+    <LangVersion>Default</LangVersion>
+    <SynchReleaseVersion>False</SynchReleaseVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+    <OutputPath>bin\iOS\iPhone\Debug</OutputPath>
+    <IntermediateOutputPath>obj\iOS\iPhone\Debug</IntermediateOutputPath>
+    <DocumentationFile>bin\iOS\iPhone\Debug\MonoGame.Framework.Net.xml</DocumentationFile>
+    <DefineConstants>DEBUG;IOS;GLES;OPENGL;OPENAL;NET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <MtouchDebug>True</MtouchDebug>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <OutputPath>bin\iOS\iPhone\Release</OutputPath>
+    <IntermediateOutputPath>obj\iOS\iPhone\Release</IntermediateOutputPath>
+    <DocumentationFile>bin\iOS\iPhone\Release\MonoGame.Framework.Net.xml</DocumentationFile>
+    <DefineConstants>IOS;GLES;OPENGL;OPENAL;NET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+    <OutputPath>bin\iOS\iPhoneSimulator\Debug</OutputPath>
+    <IntermediateOutputPath>obj\iOS\iPhoneSimulator\Debug</IntermediateOutputPath>
+    <DocumentationFile>bin\iOS\iPhoneSimulator\Debug\MonoGame.Framework.Net.xml</DocumentationFile>
+    <DefineConstants>DEBUG;IOS;GLES;OPENGL;OPENAL;NET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <MtouchDebug>True</MtouchDebug>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <OutputPath>bin\iOS\iPhoneSimulator\Release</OutputPath>
+    <IntermediateOutputPath>obj\iOS\iPhoneSimulator\Release</IntermediateOutputPath>
+    <DocumentationFile>bin\iOS\iPhoneSimulator\Release\MonoGame.Framework.Net.xml</DocumentationFile>
+    <DefineConstants>IOS;GLES;OPENGL;OPENAL;NET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <OutputPath>bin\iOS\iPhone\Ad-Hoc</OutputPath>
+    <IntermediateOutputPath>obj\iOS\iPhone\Ad-Hoc</IntermediateOutputPath>
+    <DocumentationFile>bin\iOS\iPhone\Ad-Hoc\MonoGame.Framework.Net.xml</DocumentationFile>
+    <DefineConstants>IOS;GLES;OPENGL;OPENAL;NET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <OutputPath>bin\iOS\iPhone\AppStore</OutputPath>
+    <IntermediateOutputPath>obj\iOS\iPhone\AppStore</IntermediateOutputPath>
+    <DocumentationFile>bin\iOS\iPhone\AppStore\MonoGame.Framework.Net.xml</DocumentationFile>
+    <DefineConstants>IOS;GLES;OPENGL;OPENAL;NET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="GamerServices\AchievementCollection.cs" />
+    <Compile Include="GamerServices\Achievement.cs" />
+    <Compile Include="GamerServices\FriendCollection.cs" />
+    <Compile Include="GamerServices\FriendGamer.cs" />
+    <Compile Include="GamerServices\GamerCollection.cs" />
+    <Compile Include="GamerServices\Gamer.cs" />
+    <Compile Include="GamerServices\GamerDefaults.cs" />
+    <Compile Include="GamerServices\GamerPresence.cs" />
+    <Compile Include="GamerServices\GamerPresenceMode.cs" />
+    <Compile Include="GamerServices\GamerPrivileges.cs" />
+    <Compile Include="GamerServices\GamerPrivilegeSetting.cs" />
+    <Compile Include="GamerServices\GamerProfile.cs" />
+    <Compile Include="GamerServices\GamerZone.cs" />
+    <Compile Include="GamerServices\GameUpdateRequiredException.cs" />
+    <Compile Include="GamerServices\LeaderboardEntry.cs" />
+    <Compile Include="GamerServices\LeaderboardIdentity.cs" />
+    <Compile Include="GamerServices\LeaderboardKey.cs" />
+    <Compile Include="GamerServices\LeaderboardReader.cs" />
+    <Compile Include="GamerServices\LeaderboardWriter.cs" />
+    <Compile Include="GamerServices\MessageBoxIcon.cs" />
+    <Compile Include="GamerServices\PropertyDictionary.cs" />
+    <Compile Include="GamerServices\SignedInGamerCollection.cs" />
+    <Compile Include="GamerServices\GamerServicesComponent.cs">
+      <Platforms>Android,iOS,Linux,MacOS,Windows,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Net\AvailableNetworkSessionCollection.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\AvailableNetworkSession.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\CommandEvent.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\CommandEventType.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\CommandGamerJoined.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\CommandGamerLeft.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\CommandGamerStateChange.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\CommandReceiveData.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\CommandSendData.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\CommandSessionStateChange.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\GamerStates.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\ICommand.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\LocalNetworkGamer.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\MonoGamerPeer.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkException.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkGamer.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkMachine.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkMessageType.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkNotAvailableException.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSession.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionEndReason.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionJoinError.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionJoinException.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionProperties.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionState.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionType.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\PacketReader.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\PacketWriter.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\QualityOfService.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\SendDataOptions.cs">
+      <ExcludePlatforms>WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Platform\iOS\GamerServices\Guide.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Platform\iOS\GamerServices\KeyboardInputViewController.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Platform\iOS\GamerServices\KeyboardInputView.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Platform\iOS\GamerServices\SignedInGamer.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Platform\iOS\GamerServices\TextFieldAlertView.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Platform\iOS\Net\MonoGamePeerPickerControllerDelegate.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Platform\iOS\Net\MonoGameSessionDelegate.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Platform\iOS\GamerServices\NotificationPosition.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  <PropertyGroup>
+    <_PostBuildHookTimestamp>@(IntermediateAssembly-&gt;'%(FullPath).timestamp')</_PostBuildHookTimestamp>
+    <_PostBuildHookHostPlatform>AnyCPU</_PostBuildHookHostPlatform>
+  </PropertyGroup>
+  <UsingTask TaskName="LocalTouch" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll">
+    <ParameterGroup>
+      <Path ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Code Type="Fragment" Language="cs">
+              
+                  if (!File.Exists(Path))
+                  {
+                    var stream = File.Create(Path);
+                    stream.Dispose();
+                  }
+                  File.SetLastAccessTime(Path, DateTime.Now);
+                  
+            </Code>
+    </Task>
+  </UsingTask>
+  <Target Name="PostBuildHooks" Inputs="@(IntermediateAssembly);@(ReferencePath)" Outputs="@(IntermediateAssembly);$(_PostBuildHookTimestamp)" AfterTargets="CoreCompile" BeforeTargets="AfterCompile">
+    <LocalTouch Path="$(_PostBuildHookTimestamp)" />
+  </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">
+      <Project>{734EAA48-F1CA-481A-B391-0285BC0E8B40}</Project>
+      <Name>Lidgren.Network.iOS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
+      <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
+      <Name>MonoGame.Framework.iOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties><Policies>
+  <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+  <CSharpFormattingPolicy IndentSwitchSection="True" NewLinesForBracesInProperties="True" NewLinesForBracesInAccessors="True" NewLinesForBracesInAnonymousMethods="True" NewLinesForBracesInControlBlocks="True" NewLinesForBracesInAnonymousTypes="True" NewLinesForBracesInObjectCollectionArrayInitializers="True" NewLinesForBracesInLambdaExpressionBody="True" NewLineForElse="True" NewLineForCatch="True" NewLineForFinally="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceAfterMethodCallName="False" SpaceBeforeOpenSquareBracket="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+</Policies>
+</Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>
