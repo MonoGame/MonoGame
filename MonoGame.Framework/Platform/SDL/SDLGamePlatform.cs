@@ -216,6 +216,9 @@ namespace Microsoft.Xna.Framework
                             case Sdl.Window.EventId.FocusGained:
                                 IsActive = true;
                                 break;
+                            case Sdl.Window.EventId.FocusLost:
+                                IsActive = false;
+                                break;
                             case Sdl.Window.EventId.Moved:
                                 _view.Moved();
                                 break;
