@@ -45,11 +45,19 @@
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
     </CustomDefinitions>
 
+    <FrameworkVersions>
+      <Version>v4.7.2</Version>
+    </FrameworkVersions>
+
   </Properties>
 
   <Files>
 
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="MonoGame.Framework.Content.Pipeline.dll.config">
+      <Platforms>Linux,MacOS</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Audio -->
@@ -176,138 +184,39 @@
     <Compile Include="Processors\VideoProcessor.cs" />
 
     <!-- TwoMGFX-->
-    <Compile Include="..\Tools\2MGFX\CommandLineParser.cs">	
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\CommandLineParser.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ConstantBufferData.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ConstantBufferData.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ConstantBufferData.mojo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ConstantBufferData.mojo.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ConstantBufferData.sharpdx.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ConstantBufferData.sharpdx.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ConstantBufferData.writer.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ConstantBufferData.writer.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\EffectObject.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\EffectObject.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\EffectObject.hlsl.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\EffectObject.hlsl.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\EffectObject.pssl.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\EffectObject.pssl.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\EffectObject.writer.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\EffectObject.writer.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\IEffectCompilerOutput.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\IEffectCompilerOutput.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\MarshalHelper.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\MarshalHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderCompilerException.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderCompilerException.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderData.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderData.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderData.mojo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderData.mojo.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderData.pssl.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderData.pssl.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderData.sharpdx.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderData.sharpdx.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderData.writer.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderData.writer.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\MojoShader.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\MojoShader.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\Options.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\Options.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\Preprocessor.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\Preprocessor.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderProfile.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderProfile.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderProfile.OpenGL.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderProfile.OpenGL.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderProfile.DirectX.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderProfile.DirectX.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderResult.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\ShaderResult.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\TextureFilterType.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\TextureFilterType.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\TPGParser\Parser.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\TPGParser\Parser.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\TPGParser\ParseTree.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\TPGParser\ParseTree.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\TPGParser\ParseTreeTools.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\TPGParser\ParseTreeTools.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\TPGParser\PassInfo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\TPGParser\PassInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\TPGParser\SamplerStateInfo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\TPGParser\SamplerStateInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\TPGParser\Scanner.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\TPGParser\Scanner.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\TPGParser\ShaderInfo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\TPGParser\ShaderInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\TPGParser\TechniqueInfo.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\TPGParser\TechniqueInfo.cs</Link>
-    </Compile>
+    <Compile Include="Processors\MGFX\CommandLineParser.cs" />
+    <Compile Include="Processors\MGFX\ConstantBufferData.cs" />
+    <Compile Include="Processors\MGFX\ConstantBufferData.mojo.cs" />
+    <Compile Include="Processors\MGFX\ConstantBufferData.sharpdx.cs" />
+    <Compile Include="Processors\MGFX\ConstantBufferData.writer.cs" />
+    <Compile Include="Processors\MGFX\EffectObject.cs" />
+    <Compile Include="Processors\MGFX\EffectObject.hlsl.cs" />
+    <Compile Include="Processors\MGFX\EffectObject.pssl.cs" />
+    <Compile Include="Processors\MGFX\EffectObject.writer.cs" />
+    <Compile Include="Processors\MGFX\IEffectCompilerOutput.cs" />
+    <Compile Include="Processors\MGFX\MarshalHelper.cs" />
+    <Compile Include="Processors\MGFX\ShaderCompilerException.cs" />
+    <Compile Include="Processors\MGFX\ShaderData.cs" />
+    <Compile Include="Processors\MGFX\ShaderData.mojo.cs" />
+    <Compile Include="Processors\MGFX\ShaderData.pssl.cs" />
+    <Compile Include="Processors\MGFX\ShaderData.sharpdx.cs" />
+    <Compile Include="Processors\MGFX\ShaderData.writer.cs" />
+    <Compile Include="Processors\MGFX\MojoShader.cs" />
+    <Compile Include="Processors\MGFX\Options.cs" />
+    <Compile Include="Processors\MGFX\Preprocessor.cs" />
+    <Compile Include="Processors\MGFX\ShaderProfile.cs" />
+    <Compile Include="Processors\MGFX\ShaderProfile.OpenGL.cs" />
+    <Compile Include="Processors\MGFX\ShaderProfile.DirectX.cs" />
+    <Compile Include="Processors\MGFX\ShaderResult.cs" />
+    <Compile Include="Processors\MGFX\TextureFilterType.cs" />
+    <Compile Include="Processors\MGFX\TPGParser\Parser.cs" />
+    <Compile Include="Processors\MGFX\TPGParser\ParseTree.cs" />
+    <Compile Include="Processors\MGFX\TPGParser\ParseTreeTools.cs" />
+    <Compile Include="Processors\MGFX\TPGParser\PassInfo.cs" />
+    <Compile Include="Processors\MGFX\TPGParser\SamplerStateInfo.cs" />
+    <Compile Include="Processors\MGFX\TPGParser\Scanner.cs" />
+    <Compile Include="Processors\MGFX\TPGParser\ShaderInfo.cs" />
+    <Compile Include="Processors\MGFX\TPGParser\TechniqueInfo.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler -->
@@ -465,6 +374,8 @@
 
 	<!-- Utility Classes -->
     <Compile Include="Utilities\Vector4Converter.cs" />
+    <Compile Include="Utilities\FreeImageAPI.cs" />
+    <Compile Include="Utilities\FreeImageAPIC.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32.Dirty.cs" />

@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web;
+using System.Net;
 using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -450,11 +450,11 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual('*', fontDesc.DefaultCharacter);
                         
                 var expectedCharacters = new List<char>();
-                for (var c = HttpUtility.HtmlDecode("&#32;")[0]; c <= HttpUtility.HtmlDecode("&#126;")[0]; c++)
+                for (var c = WebUtility.HtmlDecode("&#32;")[0]; c <= WebUtility.HtmlDecode("&#126;")[0]; c++)
                     expectedCharacters.Add(c);
 
-                expectedCharacters.Add(HttpUtility.HtmlDecode("&#916;")[0]);
-                expectedCharacters.Add(HttpUtility.HtmlDecode("&#176;")[0]);
+                expectedCharacters.Add(WebUtility.HtmlDecode("&#916;")[0]);
+                expectedCharacters.Add(WebUtility.HtmlDecode("&#176;")[0]);
 
                 var characters = new List<char>(fontDesc.Characters);
                 foreach (var c in expectedCharacters)

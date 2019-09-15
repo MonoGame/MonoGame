@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -204,6 +205,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector2"/> on the left of the div sign.</param>
         /// <param name="value2">Divisor <see cref="Vector2"/> on the right of the div sign.</param>
         /// <returns>The result of dividing the vectors.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 operator /(Vector2 value1, Vector2 value2)
         {
             value1.X /= value2.X;
@@ -217,6 +219,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector2"/> on the left of the div sign.</param>
         /// <param name="divider">Divisor scalar on the right of the div sign.</param>
         /// <returns>The result of dividing a vector by a scalar.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 operator /(Vector2 value1, float divider)
         {
             float factor = 1 / divider;

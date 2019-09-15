@@ -14,9 +14,34 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice : IDisposable
     {
+        /// <summary>
+        /// Indicates if DX9 style pixel addressing or current standard
+        /// pixel addressing should be used. This flag is set to
+        /// <c>false</c> by default. If `UseHalfPixelOffset` is
+        /// `true` you have to add half-pixel offset to a Projection matrix.
+        /// See also <see cref="GraphicsDeviceManager.PreferHalfPixelOffset"/>.
+        /// </summary>
+        /// <remarks>
+        /// XNA uses DirectX9 for its graphics. DirectX9 interprets UV
+        /// coordinates differently from other graphics API's. This is
+        /// typically referred to as the half-pixel offset. MonoGame
+        /// replicates XNA behavior if this flag is set to <c>true</c>.
+        /// </remarks>
+        public bool UseHalfPixelOffset { get; private set; }
+
         private Viewport _viewport;
 
         private bool _isDisposed;
+
+        // On Intel Integrated graphics, there is a fast hw unit for doing
+        // clears to colors where all components are either 0 or 255.
+        // Despite XNA4 using Purple here, we use black (in Release) to avoid
+        // performance warnings on Intel/Mesa
+#if DEBUG
+        private static Color _discardColor = new Color(68, 34, 136, 255);
+#else
+        private static Color _discardColor = new Color(0, 0, 0, 255);
+#endif
 
         private Color _blendFactor = Color.White;
         private bool _blendFactorDirty;
@@ -69,15 +94,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public SamplerStateCollection SamplerStates { get; private set; }
 
-        // On Intel Integrated graphics, there is a fast hw unit for doing
-        // clears to colors where all components are either 0 or 255.
-        // Despite XNA4 using Purple here, we use black (in Release) to avoid
-        // performance warnings on Intel/Mesa
-#if DEBUG
-        private static readonly Color DiscardColor = new Color(68, 34, 136, 255);
-#else
-        private static readonly Color DiscardColor = new Color(0, 0, 0, 255);
-#endif
+        /// <summary>
+        /// Get or set the color a <see cref="RenderTarget2D"/> is cleared to when it is set.
+        /// </summary>
+        public static Color DiscardColor {
+			get { return _discardColor; }
+			set { _discardColor = value; }
+		}
 
         /// <summary>
         /// The active vertex shader.
@@ -184,11 +207,6 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public GraphicsDebug GraphicsDebug { get { return _graphicsDebug; } set { _graphicsDebug = value; } }
 
-        internal GraphicsDevice(GraphicsDeviceInformation gdi)
-            : this(gdi.Adapter, gdi.GraphicsProfile, gdi.PresentationParameters)
-        {
-        }
-
         internal GraphicsDevice()
 		{
             PresentationParameters = new PresentationParameters();
@@ -219,6 +237,39 @@ namespace Microsoft.Xna.Framework.Graphics
             Adapter = adapter;
             PresentationParameters = presentationParameters;
             _graphicsProfile = graphicsProfile;
+            Setup();
+            GraphicsCapabilities = new GraphicsCapabilities();
+            GraphicsCapabilities.Initialize(this);
+
+            Initialize();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GraphicsDevice" /> class.
+        /// </summary>
+        /// <param name="adapter">The graphics adapter.</param>
+        /// <param name="graphicsProfile">The graphics profile.</param>
+        /// <param name="preferHalfPixelOffset"> Indicates if DX9 style pixel addressing or current standard pixel addressing should be used. This value is passed to <see cref="GraphicsDevice.UseHalfPixelOffset"/></param>
+        /// <param name="presentationParameters">The presentation options.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="presentationParameters"/> is <see langword="null"/>.
+        /// </exception>
+        public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, bool preferHalfPixelOffset, PresentationParameters presentationParameters)
+        {
+            if (adapter == null)
+                throw new ArgumentNullException("adapter");
+            if (!adapter.IsProfileSupported(graphicsProfile))
+                throw new NoSuitableGraphicsDeviceException(String.Format("Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
+            if (presentationParameters == null)
+                throw new ArgumentNullException("presentationParameters");
+#if DIRECTX
+            // TODO we need to figure out how to inject the half pixel offset into DX shaders
+            preferHalfPixelOffset = false;
+#endif
+            Adapter = adapter;
+            _graphicsProfile = graphicsProfile;
+            UseHalfPixelOffset = preferHalfPixelOffset;
+            PresentationParameters = presentationParameters;
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities();
             GraphicsCapabilities.Initialize(this);

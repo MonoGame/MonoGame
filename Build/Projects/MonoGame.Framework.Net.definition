@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Windows,WindowsGL,WindowsUniversal">
+<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework.Net" Type="Library" Platforms="Android,iOS,Linux,MacOS,Windows,WindowsGL,WindowsUniversal">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
@@ -179,85 +179,85 @@
     </Compile>
 
     <!-- Android Platform -->
-    <Compile Include="Android\GamerServices\Guide.cs">
+    <Compile Include="Platform\Android\GamerServices\Guide.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\GamerServices\MonoGameGamerServicesHelper.cs">
+    <Compile Include="Platform\Android\GamerServices\MonoGameGamerServicesHelper.cs">
       <Platforms>Android</Platforms>
     </Compile>
-    <Compile Include="Android\GamerServices\SignedInGamer.cs">
+    <Compile Include="Platform\Android\GamerServices\SignedInGamer.cs">
       <Platforms>Android</Platforms>
     </Compile>
 
     <!-- iOS Platform -->
-    <Compile Include="iOS\GamerServices\Guide.cs">
+    <Compile Include="Platform\iOS\GamerServices\Guide.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\GamerServices\KeyboardInputViewController.cs">
+    <Compile Include="Platform\iOS\GamerServices\KeyboardInputViewController.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\GamerServices\KeyboardInputView.cs">
+    <Compile Include="Platform\iOS\GamerServices\KeyboardInputView.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\GamerServices\SignedInGamer.cs">
+    <Compile Include="Platform\iOS\GamerServices\SignedInGamer.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\GamerServices\TextFieldAlertView.cs">
+    <Compile Include="Platform\iOS\GamerServices\TextFieldAlertView.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\Net\MonoGamePeerPickerControllerDelegate.cs">
+    <Compile Include="Platform\iOS\Net\MonoGamePeerPickerControllerDelegate.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\Net\MonoGameSessionDelegate.cs">
+    <Compile Include="Platform\iOS\Net\MonoGameSessionDelegate.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="GamerServices\NotificationPosition.cs">
+    <Compile Include="Platform\iOS\GamerServices\NotificationPosition.cs">
       <Platforms>iOS</Platforms>
     </Compile>
     
     <!-- DesktopGL Platform -->
-    <Compile Include="DesktopGL\GamerServices\Guide.cs">
+    <Compile Include="Platform\DesktopGL\GamerServices\Guide.cs">
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
-    <Compile Include="DesktopGL\GamerServices\MonoGameGamerServicesHelper.cs">
+    <Compile Include="Platform\DesktopGL\GamerServices\MonoGameGamerServicesHelper.cs">
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
-    <Compile Include="DesktopGL\GamerServices\SignedInGamer.cs">
+    <Compile Include="Platform\DesktopGL\GamerServices\SignedInGamer.cs">
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
 
 
     <!-- MacOS Platform -->
-    <Compile Include="MacOS\GamerServices\Guide.cs">
+    <Compile Include="Platform\MacOS\GamerServices\Guide.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
-    <Compile Include="MacOS\GamerServices\MonoGameGamerServicesHelper.cs">
+    <Compile Include="Platform\MacOS\GamerServices\MonoGameGamerServicesHelper.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
-    <Compile Include="MacOS\GamerServices\MonoGameLocalGamerProfile.cs">
+    <Compile Include="Platform\MacOS\GamerServices\MonoGameLocalGamerProfile.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
-    <Compile Include="MacOS\GamerServices\SignedInGamer.cs">
+    <Compile Include="Platform\MacOS\GamerServices\SignedInGamer.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
-    <Compile Include="MacOS\GamerServices\SigninController.cs">
+    <Compile Include="Platform\MacOS\GamerServices\SigninController.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
 
 
     <!-- Windows Universal Platform -->
-    <Compile Include="WindowsUniversal\GamerServices\SignedInGamer.cs">
+    <Compile Include="Platform\WindowsUniversal\GamerServices\SignedInGamer.cs">
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
 
     <!-- Windows Desktop Platform -->
-    <Compile Include="Windows\GamerServices\Guide.cs">
+    <Compile Include="Platform\Windows\GamerServices\Guide.cs">
       <Platforms>Windows,WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Windows\GamerServices\MonoGameGamerServicesHelper.cs">
+    <Compile Include="Platform\Windows\GamerServices\MonoGameGamerServicesHelper.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Windows\GamerServices\SignedInGamer.cs">
+    <Compile Include="Platform\Windows\GamerServices\SignedInGamer.cs">
       <Platforms>Windows</Platforms>
     </Compile>
  

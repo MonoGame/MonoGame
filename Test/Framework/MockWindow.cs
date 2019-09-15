@@ -18,7 +18,7 @@ namespace MonoGame.Tests.Framework
         }
 
         // TODO: Make this common so that all platforms have it!
-#if (WINDOWS && !WINDOWS_UAP) || LINUX
+#if (WINDOWS && !WINDOWS_UAP) || DESKTOPGL
         public override Point Position { get; set; }
 #endif
 

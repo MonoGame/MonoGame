@@ -2,11 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using FreeImageAPI;
-using System.IO;
 using MonoGame.Utilities;
+using StbImageSharp;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -78,13 +80,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
-            FREE_IMAGE_FORMAT format = FREE_IMAGE_FORMAT.FIF_UNKNOWN;
-            var fBitmap = FreeImage.LoadEx(filename, FREE_IMAGE_LOAD_FLAGS.DEFAULT, ref format);
+            var format = FreeImage.GetFileType(filename, 0);
+            var fBitmap = FreeImage.Load(format, filename, 0);
             //if freeimage can not recognize the image type
             if(format == FREE_IMAGE_FORMAT.FIF_UNKNOWN)
                 throw new ContentLoadException("TextureImporter failed to load '" + filename + "'");
             //if freeimage can recognize the file headers but can't read its contents
-            else if(fBitmap.IsNull)
+            else if(fBitmap == IntPtr.Zero)
                 throw new InvalidContentException("TextureImporter couldn't understand the contents of '" + filename + "'", output.Identity);
             BitmapContent face = null;
             var height = (int) FreeImage.GetHeight(fBitmap);
@@ -122,7 +124,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     face = new PixelBitmapContent<Vector4>(width, height);
                     break;
             }
-            FreeImage.UnloadEx(ref fBitmap);
+            FreeImage.Unload(fBitmap);
 
             face.SetPixelData(bytes);
             output.Faces[0].Add(face);
@@ -134,10 +136,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="fBitmap">Image to process</param>
         /// <param name="imageType">Type of the image for the procedure</param>
         /// <returns></returns>
-        private static FIBITMAP ConvertAndSwapChannels(FIBITMAP fBitmap, FREE_IMAGE_TYPE imageType)
+        private static IntPtr ConvertAndSwapChannels(IntPtr fBitmap, FREE_IMAGE_TYPE imageType)
         {
-            FIBITMAP bgra;
-            switch (imageType)
+            IntPtr bgra;
+            switch(imageType)
             {
                 // Return BGRA images as is
 
@@ -149,13 +151,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 case FREE_IMAGE_TYPE.FIT_RGBF:
                     bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBAF, true);
-                    FreeImage.UnloadEx(ref fBitmap);
+                    FreeImage.Unload(fBitmap);
                     fBitmap = bgra;
                     break;
 
                 case FREE_IMAGE_TYPE.FIT_RGB16:
                     bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBA16, true);
-                    FreeImage.UnloadEx(ref fBitmap);
+                    FreeImage.Unload(fBitmap);
                     fBitmap = bgra;
                     break;
 
@@ -167,7 +169,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     // Bitmap and other formats are converted to 32-bit by default
                     bgra = FreeImage.ConvertTo32Bits(fBitmap);
                     SwitchRedAndBlueChannels(bgra);
-                    FreeImage.UnloadEx(ref fBitmap);
+                    FreeImage.Unload(fBitmap);
                     fBitmap = bgra;
                     break;
             }
@@ -178,14 +180,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Switches the red and blue channels
         /// </summary>
         /// <param name="fBitmap">image</param>
-        private static void SwitchRedAndBlueChannels(FIBITMAP fBitmap)
+        private static void SwitchRedAndBlueChannels(IntPtr fBitmap)
         {
             var r = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
             var b = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
             FreeImage.SetChannel(fBitmap, b, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
             FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
-            FreeImage.UnloadEx(ref r);
-            FreeImage.UnloadEx(ref b);
+            FreeImage.Unload(r);
+            FreeImage.Unload(b);
         }
 
         // Loads BMP using StbSharp. This allows us to load BMP files containing BITMAPV4HEADER and BITMAPV5HEADER
@@ -194,13 +196,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
-            int width, height, comp;
-            byte[] data = null;
+            ImageResult result;
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-                data = ImageReader.Read(stream, out width, out height, out comp, Imaging.STBI_rgb_alpha);
+            {
+                var imageLoader = new ImageStreamLoader();
+                result = imageLoader.Load(stream, ColorComponents.RedGreenBlueAlpha);
+            }
 
-            var face = new PixelBitmapContent<Color>(width, height);
-            face.SetPixelData(data);
+            var face = new PixelBitmapContent<Color>(result.Width, result.Height);
+            face.SetPixelData(result.Data);
             output.Faces[0].Add(face);
 
             return output;

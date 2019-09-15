@@ -456,10 +456,12 @@ namespace MonoGame.Tests.Graphics {
             _spriteBatch.End();
 
             // Test viewport/effect BasicEffect (Vertex & Pixel shader)
-#if DIRECTX
             Matrix halfPixelOffset = Matrix.Identity;
-#else            
-            Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+#if XNA 
+            halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+#else // MG
+            if (gd.UseHalfPixelOffset)
+                halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
 #endif
 
             _effect.Projection = halfPixelOffset * Matrix.CreateOrthographicOffCenter(0, gd.Viewport.Width, gd.Viewport.Height, 0, 0, 1);

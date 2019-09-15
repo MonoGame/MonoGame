@@ -58,6 +58,8 @@
         <topic id="tvOS" name="tvOS" filename="tvOS.md"/>
         <topic id="UWP" name="UWP" filename="UWP.md"/>
     </topic>
+
+    <topic id="Porting_from_XNA" name="Porting an XNA game to MG" filename="porting_xna.md"/>
     
     <topic id="External_Links" name="External Links" filename="links.md"/>
 

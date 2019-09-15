@@ -1,0 +1,9 @@
+<Project>
+
+  <PropertyGroup>
+    <AssemblyName>MonoGame.Tests</AssemblyName>
+    <RunWorkingDirectory>$(MSBuildThisFileDirectory)</RunWorkingDirectory>
+  </PropertyGroup>
+
+</Project>
+

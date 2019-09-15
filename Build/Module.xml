@@ -4,8 +4,8 @@
   <DefaultAction>Generate</DefaultAction>
   <DefaultLinuxPlatforms>Android,Angle,Linux,WindowsGL</DefaultLinuxPlatforms>
   <DefaultMacOSPlatforms>Angle,MacOS,iOS,WindowsGL,Android,tvOS,Linux</DefaultMacOSPlatforms>
-  <DefaultWindowsPlatforms>Android,Angle,Linux,Windows,WindowsGL,WindowsUniversal,iOS,tvOS</DefaultWindowsPlatforms>
-  <SupportedPlatforms>Android,Angle,Linux,Windows,WindowsGL,WindowsUniversal,iOS,MacOS,Web,tvOS,PSVita,XBoxOne,Switch</SupportedPlatforms>
+  <DefaultWindowsPlatforms>Android,Angle,Linux,Windows,WindowsGL,iOS,tvOS</DefaultWindowsPlatforms>
+  <SupportedPlatforms>Android,Angle,Linux,Windows,WindowsGL,iOS,MacOS,Web,tvOS,PSVita,XBoxOne,Switch</SupportedPlatforms>
   <DisableSynchronisation>true</DisableSynchronisation>
   <GenerateNuGetRepositories>false</GenerateNuGetRepositories>
   <Packages>

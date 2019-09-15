@@ -24,11 +24,27 @@ namespace MonoGame.Tools.Pipeline
         private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
         
         private string _processor;
+
+        private List<string> _errors;
         
         #endregion
 
         #region CommandLineParameters
-        
+
+        // make sure working dir is recognized
+        [CommandLineParameter(
+            Name = "workingDir",
+            ValueName = "directoryPath")]
+        public string WorkingDir
+        {
+            set
+            {
+                var projectDir = Path.GetDirectoryName(_project.OriginalPath);
+                if (!value.Equals(projectDir) && !value.Equals(Directory.GetCurrentDirectory()))
+                    _errors.Add("Nested response files or changing the working directory are not supported from Pipeline Tool.");
+            }
+        }
+
         [CommandLineParameter(
             Name = "outputDir",
             ValueName = "directoryPath",
@@ -254,6 +270,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void OpenProject(string projectFilePath, MGBuildParser.ErrorCallback errorCallback)
         {
+            _errors = new List<string>();
             _project.ContentItems.Clear();
 
             // Store the file name for saving later.
@@ -266,10 +283,13 @@ namespace MonoGame.Tools.Pipeline
                 parser.OnError += errorCallback;
 
             var commands = new string[]
-                {
-                    string.Format("/@:{0}", projectFilePath),
-                };
+            {
+                string.Format("/@:{0}", projectFilePath),
+            };
             parser.Parse(commands);
+
+            if (_errors.Any())
+                errorCallback('\n' + string.Join("\n", _errors.ToArray()), new object[0]);
         }
 
         public void SaveProject()

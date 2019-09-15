@@ -9,6 +9,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.Graphics
 {
+#if !WINDOWS
+    [Ignore("Texture3D is not implemented for the OpenGL backend.")]
+#endif
     [TestFixture]
     public class Texture3DNonVisualTest
     {

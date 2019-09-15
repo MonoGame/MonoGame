@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+
+    <DefineConstants>DESKTOPGL</DefineConstants>
+    <BaseOutputPath>bin\DesktopGL</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnitLite" Version="3.11.0" />
+    <PackageReference Include="System.Drawing.Common" Version="4.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
+    <ProjectReference Include="..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Properties/**/*" />
+    <Compile Remove="Interactive/**/*" />
+    <Compile Remove="Runner/iOS/**/*" />
+
+    <Compile Remove="Framework/WindowsDX/**/*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets/**/*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
