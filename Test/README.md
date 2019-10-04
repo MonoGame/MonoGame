@@ -84,7 +84,7 @@ the test fixture is already set up):
 > Before you start:  
 > Examine the existing visual tests to get a sense of how components
 > are being composed into a test and what components may already
-> satisify part of the requirements of the new test.
+> satisfy part of the requirements of the new test.
 
 
 1. Implement any new drawing logic needed in a new subclass of one of
