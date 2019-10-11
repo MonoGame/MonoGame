@@ -1,0 +1,17 @@
+﻿<Project>
+
+  <Target Name="TestOutput" AfterTargets="AfterBuild">
+    <XmlPeek
+      XmlInputPath="$(MSBuildThisFileDirectory)\..\monogame.content.builder.nuspec"
+      Query="//*[name()='version']/text()">
+      <Output TaskParameter="Result" ItemName="MonoGameContentBuilderVersion" />
+    </XmlPeek>
+
+    <PropertyGroup>
+      <MonoGameContentBuilderVersion>@(MonoGameContentBuilderVersion)</MonoGameContentBuilderVersion>
+    </PropertyGroup>
+
+    <Message Importance="high" Text="Version: $(MonoGameContentBuilderVersion)" />
+  </Target>
+
+</Project>
