@@ -1,0 +1,12 @@
+﻿<Project>
+
+  <Import Project="$(MSBuildThisFileDirectory)/version/**/Version.props" />
+  
+  <PropertyGroup>
+    <DotnetCommand Condition="'$(DotnetCommand)' == ''">dotnet</DotnetCommand>
+    <MGCBCommand Condition="'$(MGCBCommand)' == ''">$(DotnetCommand) tool run dotnet-mgcb</MGCBCommand>
+    <MGCBVersion Condition="'$(MGCBVersion)' == ''">$(MonoGameContentBuilderVersion)</MGCBVersion>
+    <MGCBArguments>/platform:$(MonoGamePlatform) /quiet</MGCBArguments>
+  </PropertyGroup>
+
+</Project>

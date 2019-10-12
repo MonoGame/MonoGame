@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="MonoGame.Content.Builder.props" PackagePath="build" />
     <Content Include="MonoGame.Content.Builder.targets" PackagePath="build" />
+    <Content Include="version\Version.props" PackagePath="build\version\$(Version)" />
   </ItemGroup>
 
 </Project>
