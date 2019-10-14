@@ -114,19 +114,19 @@
   </Target>
 
   <!--
-    Restores or installs the correct version of the MGCB tool if MGCBCommand is not already defined
+    Restores or installs the correct version of the MGCB tool if MGCBCommand is not already defined.
 
     Outputs:
       - MGCBCommand: the command to run the MGCB tool without any arguments
   -->
   <Target Name="UpdateMGCB" Condition="'$(MGCBCommand)' == ''" DependsOnTargets="GetInstalledMGCB">
 
-    <!-- If the correct version is in the manifest, restore to ensure it's installed -->
+    <!-- If the correct version is in the manifest, restore to ensure it's installed. -->
     <Exec
       Condition="$(MGCBInstalledVersion) == $(MGCBVersion)"
       Command="$(DotnetCommand) tool restore" />
 
-    <!-- If the correct version is not in the manifest, install the correct version -->
+    <!-- If the correct version is not in the manifest, install the correct version. -->
     <CallTarget
       Condition="$(MGCBInstalledVersion) != $(MGCBVersion)"
       Targets="InstallMGCB" />
@@ -138,7 +138,7 @@
   </Target>
 
   <!--
-    Converts MonoGameContentReference items to ContentReference items, deriving the necessary metadata
+    Converts MonoGameContentReference items to ContentReference items, deriving the necessary metadata.
 
     Outputs:
       - ContentReference: references to .mgcb files that can be built with MGCB
@@ -275,7 +275,7 @@
     Condition=" '@(MonoGameContentReference)' != '' "
     Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)">
 
-    <!-- Call CreateItem on each piece of ExtraContent so it's easy to switch the item type by platform -->
+    <!-- Call CreateItem on each piece of ExtraContent so it's easy to switch the item type by platform. -->
     <CreateItem
       Include="%(ExtraContent.FullPath)"
       AdditionalMetadata="Link=$(PlatformResourcePrefix)%(ExtraContent.ContentDir)%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension);CopyToOutputDirectory=PreserveNewest"
