@@ -945,7 +945,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformDispose()
         {
             // make sure to release full screen or this might cause issues on exit
-            if (_swapChain.IsFullScreen)
+            if (_swapChain != null && _swapChain.IsFullScreen)
                 _swapChain.SetFullscreenState(false, null);
 
             SharpDX.Utilities.Dispose(ref _renderTargetView);

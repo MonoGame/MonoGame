@@ -32,6 +32,10 @@
       <Platform Name="iOS">IOS;</Platform>
     </CustomDefinitions>
 
+    <FrameworkVersions>
+      <Version>v4.7.2</Version>
+    </FrameworkVersions>
+
   </Properties>
 
   <Files>
@@ -58,6 +62,7 @@
       <Link>x64\libopenal.so.1</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- We run the Linux unit test on the Mac build bot for whatever reason -->
     <None Include="..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib"  Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
       <Link>libSDL2-2.0.0.dylib</Link>
@@ -133,6 +138,19 @@
       <Link>PVRTexLibNET.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- We need the dll.config file on Mac because Mono doesn't test for the .dylib extension automatically -->
+    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config">
+      <Platforms>Linux</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib"  Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng15.15.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
+      <Platforms>Linux</Platforms>
+      <Link>libpng15.15.dylib</Link>
+    </None>
     <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib" Condition="Exists ('/Applications/Utilities/Console.app/')">
       <Platforms>Linux</Platforms>
       <Link>libPVRTexLibWrapper.dylib</Link>
@@ -155,14 +173,8 @@
     <Compile Include="Runner\PixelArgb.cs" />
     <Compile Include="Runner\Utility.cs" />
 
-    <Compile Include="Runner\Linux\Program.cs">
-        <Platforms>Linux</Platforms>
-    </Compile>
-    <Compile Include="Runner\MacOS\Program.cs">
-        <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="Runner\Windows\Program.cs">
-        <Platforms>Windows,WindowsGL</Platforms>
+    <Compile Include="Runner\Program.cs">
+        <Platforms>Windows,WindowsGL,MacOS,Linux</Platforms>
     </Compile>
 
     <Compile Include="Runner\Desktop\FramePixelData.cs">
@@ -226,7 +238,7 @@
     <Compile Include="Framework\Audio\SoundEffectTest.cs" />
     <Compile Include="Framework\Audio\XactTest.cs" />
     <Compile Include="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
-    <Compile Include="Framework\Audio\SoundEffectInstanceXAudioTest.cs">
+    <Compile Include="Framework\WindowsDX\Audio\SoundEffectInstanceXAudioTest.cs">
         <Platforms>Windows</Platforms>
     </Compile>
 

@@ -48,6 +48,15 @@ namespace Microsoft.Xna.Framework.Input
             var bytes = new byte[w * h * 4];
             texture.GetData(bytes);
             var gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+
+            // convert ABGR to ARGB
+            for (int i = 0; i < bytes.Length; i += 4)
+            {
+                var r = bytes[i];
+                bytes[i] = bytes[i + 2];
+                bytes[i + 2] = r;
+            }
+
             try
             {
                 using (var bitmap = new Bitmap(w, h, h * 4, PixelFormat.Format32bppArgb, gcHandle.AddrOfPinnedObject()))

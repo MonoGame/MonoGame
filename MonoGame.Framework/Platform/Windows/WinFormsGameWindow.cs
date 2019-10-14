@@ -146,7 +146,7 @@ namespace MonoGame.Framework
             ChangeClientSize(new Size(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight));
 
             SetIcon();
-            Title = Utilities.AssemblyHelper.GetDefaultWindowTitle();
+            Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             Form.MaximizeBox = false;
             Form.FormBorderStyle = FormBorderStyle.FixedSingle;

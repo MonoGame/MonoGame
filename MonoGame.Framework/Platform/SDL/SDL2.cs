@@ -41,6 +41,18 @@ internal static class Sdl
                 ret = FuncLoader.LoadLibrary("libSDL2-2.0.0.dylib");
         }
 
+        // Try extra locations for Windows because of .NET Core rids
+        if (CurrentPlatform.OS == OS.Windows)
+        {
+            var rid = Environment.Is64BitProcess ? "win-x64" : "win-x86";
+
+            if (ret == IntPtr.Zero)
+                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "../../runtimes", rid, "native/SDL2.dll"));
+
+            if (ret == IntPtr.Zero)
+                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "runtimes", rid, "native/SDL2.dll"));
+        }
+
         // Welp, all failed, PANIC!!!
         if (ret == IntPtr.Zero)
             throw new Exception("Failed to load SDL library.");

@@ -33,10 +33,10 @@ The API reference documentation is a big part of the documentation effort for Mo
 #### Every Word Should Contain Value
 Every word in the reference documentation should provide information beyond the API itself.  Documentation that only rehashes or rephrases what is already apparent in the class, method, parameter, or property name has zero value and wastes time for both the writer and reader.
 
-#### The First Sentence Is The Most Important
+#### The First Sentence Is the Most Important
 There is no guarantee that the reader will read beyond the first sentence of the reference documentation.  This is why that first sentence is the most important and should convey the most key piece of information.  Take your time to write the most concise and clear first sentence possible.  This helps users tremendously and goes a long way towards having great documentation.
 
-#### Surface Information Hidden In the Code
+#### Surface Information Hidden in the Code
 Being inline with the code allows you to easily look for critical information within it that the user might not know from looking at the API alone.  Take your time to explore inner method calls and platform specific sections of the code.  The time to write the documentation is once you feel you fully understand the code you are documenting.  If you don't feel you understand the code then leave the documentation for someone else to write.
 
 #### Documentation Is Referenced Not Read

@@ -13,6 +13,9 @@ var configuration = Argument("build-configuration", "Release");
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
 
+var majorVersion = "3.0";
+var buildNumber = EnvironmentVariable("BUILD_NUMBER");
+
 MSBuildSettings msPackSettings;
 DotNetCoreMSBuildSettings dnBuildSettings;
 DotNetCorePackSettings dnPackSettings;
@@ -60,6 +63,9 @@ Task("Prep")
     msPackSettings.WithProperty("Version", version);
     msPackSettings.WithTarget("Pack");
 
+    dnBuildSettings = new DotNetCoreMSBuildSettings();
+    dnBuildSettings.WithProperty("Version", version);
+
     dnPackSettings = new DotNetCorePackSettings();
     dnPackSettings.MSBuildSettings = dnBuildSettings;
     dnPackSettings.Verbosity = DotNetCoreVerbosity.Minimal;
@@ -90,8 +96,10 @@ Task("BuildAndroid")
         return GetMSBuildWith("Component.Xamarin");
 
     // Xamarin Android on Linux needs to be installed in this specific dir
-    // We don't have Mac support... yet!
-    return DirectoryExists("/usr/lib/xamarin.android");
+    if (DirectoryExists("/usr/lib/xamarin.android"))
+        return true;
+
+    return DirectoryExists("/Developer/MonoAndroid");
 }).Does(() =>
 {
     DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj");
@@ -107,13 +115,24 @@ Task("BuildAndroid")
     MSBuild("MonoGame.Framework/MonoGame.Framework.AndroidCore.csproj", buildSettings);
 });
 
+Task("BuildiOS")
+    .IsDependentOn("Prep")
+    .WithCriteria(() =>
+{
+    return DirectoryExists("/Developer/MonoTouch");
+}).Does(() =>
+{
+    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.iOSCore.csproj");
+    MSBuild("MonoGame.Framework/MonoGame.Framework.iOSCore.csproj", msPackSettings);
+});
+
 Task("BuildUWP")
     .IsDependentOn("Prep")
     .WithCriteria(() => GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.17763"))
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.UWP.csproj");
-    MSBuild("MonoGame.Framework/MonoGame.Framework.UWP.csproj", msPackSettings);
+    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
+    MSBuild("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj", msPackSettings);
 });
 
 Task("BuildContentPipeline")
@@ -124,16 +143,85 @@ Task("BuildContentPipeline")
     MSBuild("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj", msPackSettings);
 });
 
+Task("BuildTools")
+    .IsDependentOn("Prep")
+    .Does(() =>
+{
+});
+
+Task("PackVSTemplates")
+    .Does(() =>
+{
+    var vsdirs = GetDirectories("./ProjectTemplates/VisualStudio20*");
+    foreach (var vsdir in vsdirs)
+    {
+        DeleteFiles(vsdir.CombineWithFilePath("*.zip").FullPath);
+        var projdirs = GetDirectories(vsdir.CombineWithFilePath("*").FullPath);
+	foreach (var projdir in projdirs)
+	{
+	    var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
+            Zip(projdir, outputPath);
+	}
+    }
+});
+
+Task("PackWindows")
+    .WithCriteria(() => IsRunningOnWindows())
+    .IsDependentOn("BuildAll")
+    .IsDependentOn("PackVSTemplates")
+    .Does(() =>
+{
+    // The old build script passes defines through an nsh file, NSIS needs it to exist or it will crash
+    // TODO remove this
+    if (!FileExists("./Installers/Windows/header.nsh"))
+        System.IO.File.Create("./Installers/Windows/header.nsh").Dispose();
+
+    var settings = new MakeNSISSettings();
+    settings.ToolPath = "C:/Program Files (x86)/NSIS/makensis.exe";
+    settings.WorkingDirectory = "./Installers/Windows";
+    settings.Defines = new Dictionary<string, string>()
+    {
+        { "FrameworkPath", Context.Environment.WorkingDirectory.CombineWithFilePath("Installers/").FullPath },
+        { "VERSION", majorVersion},
+        { "INSTALLERVERSION", buildNumber },
+    };
+
+    MakeNSIS("./Installers/Windows/MonoGame.nsi", settings);
+});
+
+Task("PackLinux")
+    .IsDependentOn("BuildAll")
+    .Does(() =>
+{
+});
+
+Task("PackMac")
+    .IsDependentOn("BuildAll")
+    .Does(() =>
+{
+});
+
+
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
-Task("Default")
+Task("BuildAll")
     .IsDependentOn("BuildDesktopGL")
     .IsDependentOn("BuildWindowsDX")
     .IsDependentOn("BuildAndroid")
+    .IsDependentOn("BuildiOS")
     .IsDependentOn("BuildUWP")
-    .IsDependentOn("BuildContentPipeline");
+    .IsDependentOn("BuildContentPipeline")
+    .IsDependentOn("BuildTools");
+
+Task("PackInstallers")
+    .IsDependentOn("PackWindows")
+    .IsDependentOn("PackLinux")
+    .IsDependentOn("PackMac");
+
+Task("Default")
+    .IsDependentOn("PackInstallers");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION

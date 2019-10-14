@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="MGCBReferences">
+
+  <Platform Type="Linux">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
+  </Platform>
+  <Platform Type="MacOS">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
+  </Platform>
+
+</ExternalProject>

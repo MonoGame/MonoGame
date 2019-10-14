@@ -10,7 +10,10 @@
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
+
+    <Reference Include="MGCBReferences" />
   </References>
+
 
   <Properties>
     
@@ -26,6 +29,10 @@
       <Platform Name="MacOS">TRACE;MONOMAC</Platform>
       <Platform Name="Linux">TRACE;LINUX</Platform>
     </CustomDefinitions>
+
+    <FrameworkVersions>
+      <Version>v4.7.2</Version>
+    </FrameworkVersions>
 
   </Properties>
 

@@ -817,6 +817,9 @@
     <Compile Include="Platform\Graphics\Texture2D.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
+    <Compile Include="Platform\Graphics\Texture2D.StbSharp.cs">
+      <Services>OpenGLGraphics,DirectXGraphics</Services>
+    </Compile>
     <Compile Include="Platform\Graphics\Texture2D.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
@@ -1608,5 +1611,8 @@
       <Services>NVorbis</Services>
     </Compile>
 
+    <Compile Include="Utilities\PlatformInfo.cs" />
+    <Compile Include="Utilities\MonoGamePlatform.cs" />
+    <Compile Include="Utilities\GraphicsBackend.cs" />
   </Files>
 </Project>

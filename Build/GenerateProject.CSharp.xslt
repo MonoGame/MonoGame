@@ -69,21 +69,22 @@
   
   <xsl:template name="AllowLangVersion"
     xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <xsl:if test="not($root/Input/Generation/Platform = 'MacOS') or ((user:HasXamarinMacUnifiedAPI() and not(user:IsTrue($root/Input/Properties/UseLegacyMacAPI)) and not($root/Input/Properties/ForceMacAPI = 'XamMac') and not($root/Input/Properties/ForceMacAPI = 'MonoMac')) or $root/Input/Properties/ForceMacAPI = 'Xamarin.Mac')">
-      <xsl:choose>
-        <xsl:when test="$root/Input/Properties/LangVersion">
-          <LangVersion>
-            <xsl:value-of select="$root/Input/Properties/LangVersion"/>
-          </LangVersion>
-        </xsl:when>
-        <xsl:when test="$root/Input/Generation/Platform = 'WindowsPhone81' or $root/Input/Generation/Platform = 'Windows8'">
-          <LangVersion>5</LangVersion>
-        </xsl:when>
-        <xsl:otherwise>
-          <LangVersion>6</LangVersion>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="$root/Input/Properties/LangVersion">
+        <LangVersion>
+          <xsl:value-of select="$root/Input/Properties/LangVersion"/>
+        </LangVersion>
+      </xsl:when>
+      <xsl:when test="$root/Input/Generation/Platform = 'Unity'">
+        <LangVersion>4</LangVersion>
+      </xsl:when>
+      <xsl:when test="$root/Input/Generation/Platform = 'WindowsPhone81' or $root/Input/Generation/Platform = 'Windows8'">
+        <LangVersion>5</LangVersion>
+      </xsl:when>
+      <xsl:otherwise>
+        <LangVersion>6</LangVersion>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="profile_and_version"
@@ -107,7 +108,7 @@
         <xsl:choose>
           <xsl:when test="user:IsTrue($root/Input/Properties/ForcePCL)">
             <xsl:value-of select="user:WarnForConcretePCLUsage($root/Input/Generation/Platform)" />
-            <TargetFrameworkProfile>Profile111</TargetFrameworkProfile>
+            <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
             <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
             <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
           </xsl:when>
@@ -132,15 +133,18 @@
               <TargetPlatformVersion>
                 <xsl:value-of select="user:DetectWindows10InstalledSDK()"/>
               </TargetPlatformVersion>
-              <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
+              <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
               <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
           </xsl:when>		
           <xsl:when test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'PSMobile' or $root/Input/Generation/Platform = 'tvOS'">
           </xsl:when>
           <xsl:when test="$root/Input/Generation/Platform = 'PCL'">
-            <TargetFrameworkProfile>Profile111</TargetFrameworkProfile>
+            <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
             <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
             <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+          </xsl:when>
+          <xsl:when test="$root/Input/Generation/Platform = 'Unity'">
+            <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
           </xsl:when>
           <xsl:otherwise>
             <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -245,23 +249,11 @@
               <xsl:if test="$root/Input/Generation/Platform = ./@Name">
                 <xsl:value-of select="." />
                 <xsl:if test="$root/Input/Generation/Platform = 'MacOS'">
-                  <!--
-                    We always add PLATFORM_MACOS_LEGACY here because there is 
-                    no way to access this variant from the project definition
-                    configuration (intentionally because we don't see it as
-                    a different platform, but rather just different API versions).
-                  -->
                   <xsl:choose>
                     <xsl:when test="user:IsTrue($root/Input/Properties/UseLegacyMacAPI) or $root/Input/Properties/ForceMacAPI = 'XamMac' or $root/Input/Properties/ForceMacAPI = 'MonoMac'">
-                      <xsl:text>;PLATFORM_MACOS_LEGACY</xsl:text>
-                    </xsl:when>
-                    <xsl:when test="user:HasXamarinMac() or $root/Input/Properties/ForceMacAPI = 'Xamarin.Mac'">
-                      <xsl:if test="user:DoesNotHaveXamarinMacUnifiedAPI() and not($root/Input/Properties/ForceMacAPI = 'Xamarin.Mac')">
-                        <xsl:text>;PLATFORM_MACOS_LEGACY</xsl:text>
-                      </xsl:if>
+                      <xsl:message terminate="yes">XamMac and MonoMac APIs are no longer supported - You should upgrade your project to Xamarin.Mac, as it is now freely available under an open source license</xsl:message>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:text>;PLATFORM_MACOS_LEGACY</xsl:text>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:if>
@@ -283,15 +275,9 @@
                 <xsl:text>PLATFORM_MACOS</xsl:text>
                 <xsl:choose>
                   <xsl:when test="user:IsTrue($root/Input/Properties/UseLegacyMacAPI) or $root/Input/Properties/ForceMacAPI = 'XamMac' or $root/Input/Properties/ForceMacAPI = 'MonoMac'">
-                    <xsl:text>;PLATFORM_MACOS_LEGACY</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="user:HasXamarinMac() or $root/Input/Properties/ForceMacAPI = 'Xamarin.Mac'">
-                    <xsl:if test="user:DoesNotHaveXamarinMacUnifiedAPI() and not($root/Input/Properties/ForceMacAPI = 'Xamarin.Mac')">
-                      <xsl:text>;PLATFORM_MACOS_LEGACY</xsl:text>
-                    </xsl:if>
+                    <xsl:message terminate="yes">XamMac and MonoMac APIs are no longer supported - You should upgrade your project to Xamarin.Mac, as it is now freely available under an open source license</xsl:message>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:text>;PLATFORM_MACOS_LEGACY</xsl:text>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:when>
@@ -324,6 +310,12 @@
               </xsl:when>
               <xsl:when test="$root/Input/Generation/Platform = 'tvOS'">
                 <xsl:text>PLATFORM_TVOS</xsl:text>
+              </xsl:when>
+              <xsl:when test="$root/Input/Generation/Platform = 'Unity'">
+                <xsl:text>PLATFORM_UNITY</xsl:text>
+              </xsl:when>
+              <xsl:when test="$root/Input/Generation/Platform = 'PCL'">
+                <xsl:text>PLATFORM_PCL</xsl:text>
               </xsl:when>
             </xsl:choose>
             <xsl:text>;</xsl:text>
@@ -453,18 +445,11 @@
         <CreatePackage>False</CreatePackage>
         <EnablePackageSigning>False</EnablePackageSigning>
         <xsl:choose>
-          <xsl:when test="user:HasXamarinMac()">
-            <xsl:choose>
-              <xsl:when test="$root/Input/Properties/IncludeMonoRuntimeOnMac">
-                <IncludeMonoRuntime><xsl:value-of select="$root/Input/Properties/IncludeMonoRuntimeOnMac" /></IncludeMonoRuntime>
-                <xsl:if test="$root/Input/Properties/MonoMacRuntimeLinkMode">
-                  <LinkMode><xsl:value-of select="$root/Input/Properties/MonoMacRuntimeLinkMode" /></LinkMode>
-                </xsl:if>
-              </xsl:when>
-              <xsl:otherwise>
-                <IncludeMonoRuntime>False</IncludeMonoRuntime>
-              </xsl:otherwise>
-            </xsl:choose>
+          <xsl:when test="$root/Input/Properties/IncludeMonoRuntimeOnMac">
+            <IncludeMonoRuntime><xsl:value-of select="$root/Input/Properties/IncludeMonoRuntimeOnMac" /></IncludeMonoRuntime>
+            <xsl:if test="$root/Input/Properties/MonoMacRuntimeLinkMode">
+              <LinkMode><xsl:value-of select="$root/Input/Properties/MonoMacRuntimeLinkMode" /></LinkMode>
+            </xsl:if>
           </xsl:when>
           <xsl:otherwise>
             <IncludeMonoRuntime>False</IncludeMonoRuntime>
@@ -483,11 +468,13 @@
     <xsl:param name="project_language" />
     <xsl:param name="path" />
     <xsl:param name="path_as" />
+    <xsl:param name="anchor" />
     <xsl:param name="is_conditional" />
     <None>
       <xsl:attribute name="Include">
         <xsl:value-of
           select="user:GetRelativePath(
+            $root/Input/Generation/WorkingDirectory,
             concat(
               $project_path,
               '\',
@@ -502,6 +489,7 @@
           <xsl:text>exists('</xsl:text>
           <xsl:value-of
             select="user:GetRelativePath(
+              $root/Input/Generation/WorkingDirectory,
               concat(
                 $project_path,
                 '\',
@@ -514,8 +502,11 @@
         </xsl:attribute>
       </xsl:if>
       <xsl:choose>
-        <xsl:when test="$path_as">
+        <xsl:when test="$path_as != ''">
           <Link><xsl:value-of select="$path_as" /></Link>
+        </xsl:when>
+        <xsl:when test="$anchor != ''">
+          <Link><xsl:value-of select="$anchor" />/<xsl:value-of select="user:GetFilename($path)" /></Link>
         </xsl:when>
         <xsl:otherwise>
           <Link><xsl:value-of select="user:GetFilename($path)" /></Link>
@@ -613,6 +604,7 @@
                   <xsl:value-of select="$cpp_assembly_name" />
                   <xsl:text>.dll</xsl:text>
                 </xsl:with-param>
+                <xsl:with-param name="anchor"></xsl:with-param>
                 <xsl:with-param name="is_conditional">true</xsl:with-param>
               </xsl:call-template>
               <xsl:call-template name="NativeBinary">
@@ -631,6 +623,51 @@
                   <xsl:value-of select="$cpp_assembly_name" />
                   <xsl:text>.dll</xsl:text>
                 </xsl:with-param>
+                <xsl:with-param name="anchor"></xsl:with-param>
+                <xsl:with-param name="is_conditional">true</xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="$root/Input/Generation/HostPlatform = 'Linux'">
+              <xsl:call-template name="NativeBinary">
+                <xsl:with-param name="project_path"><xsl:value-of select="$source_project/@Path" /></xsl:with-param>
+                <xsl:with-param name="project_name"><xsl:value-of select="$source_project/@Name" /></xsl:with-param>
+                <xsl:with-param name="project_language"><xsl:value-of select="$source_project/@Language" /></xsl:with-param>
+                <xsl:with-param name="path_as">
+                  <xsl:text>lib</xsl:text>
+                  <xsl:value-of select="$cpp_assembly_name" />
+                  <xsl:text>32.so</xsl:text>
+                </xsl:with-param>
+                <xsl:with-param name="path">
+                  <xsl:value-of select="$target_project/@Path" />
+                  <xsl:text>\bin\</xsl:text>
+                  <xsl:value-of select="$cpp_platform_path" />
+                  <xsl:text>\</xsl:text>
+                  <xsl:text>lib</xsl:text>
+                  <xsl:value-of select="$cpp_assembly_name" />
+                  <xsl:text>32.so</xsl:text>
+                </xsl:with-param>
+                <xsl:with-param name="anchor"></xsl:with-param>
+                <xsl:with-param name="is_conditional">true</xsl:with-param>
+              </xsl:call-template>
+              <xsl:call-template name="NativeBinary">
+                <xsl:with-param name="project_path"><xsl:value-of select="$source_project/@Path" /></xsl:with-param>
+                <xsl:with-param name="project_name"><xsl:value-of select="$source_project/@Name" /></xsl:with-param>
+                <xsl:with-param name="project_language"><xsl:value-of select="$source_project/@Language" /></xsl:with-param>
+                <xsl:with-param name="path_as">
+                  <xsl:text>lib</xsl:text>
+                  <xsl:value-of select="$cpp_assembly_name" />
+                  <xsl:text>64.so</xsl:text>
+                </xsl:with-param>
+                <xsl:with-param name="path">
+                  <xsl:value-of select="$target_project/@Path" />
+                  <xsl:text>\bin\</xsl:text>
+                  <xsl:value-of select="$cpp_platform_path" />
+                  <xsl:text>\</xsl:text>
+                  <xsl:text>lib</xsl:text>
+                  <xsl:value-of select="$cpp_assembly_name" />
+                  <xsl:text>64.so</xsl:text>
+                </xsl:with-param>
+                <xsl:with-param name="anchor"></xsl:with-param>
                 <xsl:with-param name="is_conditional">true</xsl:with-param>
               </xsl:call-template>
             </xsl:when>
@@ -646,8 +683,16 @@
                   <xsl:value-of select="$cpp_platform_path" />
                   <xsl:text>\lib</xsl:text>
                   <xsl:value-of select="$cpp_assembly_name" />
-                  <xsl:text>.so</xsl:text>
+                  <xsl:choose>
+                    <xsl:when test="$root/Input/Generation/Platform = 'MacOS'">
+                      <xsl:text>.dylib</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>.so</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:with-param>
+                <xsl:with-param name="anchor"></xsl:with-param>
                 <xsl:with-param name="is_conditional"></xsl:with-param>
               </xsl:call-template>
             </xsl:otherwise>
@@ -690,6 +735,7 @@
             <xsl:attribute name="Include">
               <xsl:value-of
                 select="user:GetRelativePath(
+                  $root/Input/Generation/WorkingDirectory,
                   concat(
                     $source_project/@Path,
                     '\',
@@ -729,6 +775,7 @@
             <HintPath>
               <xsl:value-of
                 select="user:GetRelativePath(
+                  $root/Input/Generation/WorkingDirectory,
                   concat(
                     $source_project/@Path,
                     '\',
@@ -754,6 +801,71 @@
     </xsl:if>
   </xsl:template>
   
+  <xsl:template name="ReferenceToProtobuildProjectDllConfig"
+    xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <xsl:param name="target_project_name" />
+    <xsl:param name="source_project_name" />
+    
+    <xsl:variable
+      name="target_project"
+      select="$root/Input/Projects/Project[@Name=$target_project_name]" />
+    <xsl:variable
+      name="source_project"
+      select="$root/Input/Projects/Project[@Name=$source_project_name]" />
+    
+    <xsl:if test="user:ProjectIsActive(
+      $target_project/@Platforms,
+      '',
+      '',
+      $root/Input/Generation/Platform)">
+
+      <xsl:choose>
+        <xsl:when test="$target_project/@Language = 'C#'">
+        </xsl:when>
+        <xsl:when test="$target_project/@Language = 'C++'">
+          <xsl:if test="$root/Input/Generation/Platform = 'Linux'">
+            <None>
+              <xsl:variable name="config_path">
+                <xsl:value-of select="$target_project/@Path" />
+                <xsl:text>\bin\</xsl:text>
+                <xsl:value-of select="$target_project/@Name" />
+                <xsl:text>Binding.dll.config</xsl:text>
+              </xsl:variable>
+              <xsl:attribute name="Include">
+                <xsl:value-of
+                  select="user:GetRelativePath(
+                    $root/Input/Generation/WorkingDirectory,
+                    concat(
+                      $source_project/@Path,
+                      '\',
+                      $source_project/@Name,
+                      '.',
+                      $root/Input/Generation/Platform,
+                      '.srcproj'),
+                    $config_path)" />
+              </xsl:attribute>
+              <Link>
+                <xsl:value-of select="$target_project/@Name" />
+                <xsl:text>Binding.dll.config</xsl:text>
+              </Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+              <NativeBinary>True</NativeBinary>
+            </None>
+          </xsl:if>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:message terminate="yes">
+            <xsl:text>The project </xsl:text>
+            <xsl:value-of select="$target_project_name" />
+            <xsl:text>does not have a known language (it was '</xsl:text>
+            <xsl:value-of select="$target_project/@Language" />
+            <xsl:text>').</xsl:text>
+          </xsl:message>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+  
   <xsl:template name="ReferenceToExternalProject"
     xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <xsl:param name="external_project" />
@@ -763,6 +875,7 @@
       <xsl:attribute name="Include">
         <xsl:value-of
           select="user:GetRelativePath(
+            $root/Input/Generation/WorkingDirectory,
             concat(
               $source_project/@Path,
               '\',
@@ -799,6 +912,7 @@
       <HintPath>
         <xsl:value-of
           select="user:GetRelativePath(
+            $root/Input/Generation/WorkingDirectory,
             concat(
               $source_project/@Path,
               '\',
@@ -814,21 +928,6 @@
         </xsl:when>
       </xsl:choose>
     </Reference>
-  </xsl:template>
-  
-  <xsl:template name="ReferenceToSDKExtension"
-  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <xsl:param name="sdkReference" />
-    <xsl:param name="source_project" />
-
-    <SDKReference>
-      <xsl:attribute name="Include">
-        <xsl:value-of select="$sdkReference/@Include" />, Version=<xsl:value-of select="user:DetectWindows10InstalledSDK()" />
-      </xsl:attribute>
-      <Name>
-        <xsl:value-of select="$sdkReference/@Name" />
-      </Name>
-    </SDKReference>
   </xsl:template>
   
   <xsl:template name="ReferenceToGAC"
@@ -868,6 +967,11 @@
           <xsl:attribute name="Include">
             <xsl:value-of select="@Include" />
           </xsl:attribute>
+          <xsl:if test="@Exclude">
+            <xsl:attribute name="Exclude">
+              <xsl:value-of select="@Exclude" />
+            </xsl:attribute>
+          </xsl:if>
           <xsl:apply-templates select="node()"/>
         </xsl:element>
       </xsl:if>
@@ -896,6 +1000,7 @@
             namespace="http://schemas.microsoft.com/developer/msbuild/2003">
             <xsl:attribute name="Include">
               <xsl:value-of select="user:GetRelativePath(
+                $root/Input/Generation/WorkingDirectory,
                 concat(
                   $root/Input/Generation/RootPath,
                   $target_project/@Path,
@@ -1014,21 +1119,7 @@
           </xsl:when>
           <xsl:when test="$root/Input/Generation/Platform = 'MacOS'">
             <ProjectTypeGuids>
-              <xsl:choose>
-                <xsl:when test="(user:HasXamarinMac() or $root/Input/Properties/ForceMacAPI = 'Xamarin.Mac' or $root/Input/Properties/ForceMacAPI = 'XamMac') and not($root/Input/Properties/ForceMacAPI = 'MonoMac')">
-                  <xsl:choose>
-                    <xsl:when test="(user:IsTrue($root/Input/Properties/UseLegacyMacAPI) or $root/Input/Properties/ForceMacAPI = 'XamMac' or user:DoesNotHaveXamarinMacUnifiedAPI()) and not($root/Input/Properties/ForceMacAPI = 'Xamarin.Mac')">
-                      <xsl:text>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};</xsl:text>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:text>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};</xsl:text>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:text>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};</xsl:text>
-                </xsl:otherwise>
-              </xsl:choose>
+              <xsl:text>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};</xsl:text>
               <xsl:text>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</xsl:text>
             </ProjectTypeGuids>
           </xsl:when>
@@ -1094,7 +1185,7 @@
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:when>
-                <xsl:when test="$root/Input/Generation/Platform = 'iOS'  or $root/Input/Generation/Platform = 'tvOS'">
+                <xsl:when test="$root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'tvOS'">
                   <xsl:text>Exe</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
@@ -1126,7 +1217,14 @@
         <xsl:choose>
           <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'Ouya'">
             <FileAlignment>512</FileAlignment>
-            <AndroidSupportedAbis>armeabi,armeabi-v7a,x86</AndroidSupportedAbis>
+            <xsl:choose>
+              <xsl:when test="user:HasXamarinAndroidTargets()">
+                <AndroidSupportedAbis>armeabi,armeabi-v7a,arm64-v8a,x86,x86_64</AndroidSupportedAbis>
+              </xsl:when>
+              <xsl:otherwise>
+                <AndroidSupportedAbis>armeabi,armeabi-v7a,x86</AndroidSupportedAbis>
+              </xsl:otherwise>
+            </xsl:choose>
             <AndroidStoreUncompressedFileExtensions />
             <MandroidI18n />
             <DeployExternal>False</DeployExternal>
@@ -1158,11 +1256,6 @@
                 <ConsolePause>false</ConsolePause>
               </xsl:when>
             </xsl:choose>
-          </xsl:when>
-          <xsl:when test="$root/Input/Generation/Platform = 'MacOS'">
-            <xsl:if test="user:HasXamarinMac() = false()">
-              <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
-            </xsl:if>
           </xsl:when>
           <xsl:when test="$root/Input/Generation/Platform = 'WindowsPhone'">
             <xsl:choose>
@@ -1430,21 +1523,7 @@
 
       <ItemGroup>
         <xsl:if test="$root/Input/Generation/Platform = 'MacOS'">
-          <xsl:choose>
-            <xsl:when test="(user:HasXamarinMac() or $root/Input/Properties/ForceMacAPI = 'Xamarin.Mac' or $root/Input/Properties/ForceMacAPI = 'XamMac') and not($root/Input/Properties/ForceMacAPI = 'MonoMac')">
-              <xsl:choose>
-                <xsl:when test="(user:IsTrue($root/Input/Properties/UseLegacyMacAPI) or $root/Input/Properties/ForceMacAPI = 'XamMac' or user:DoesNotHaveXamarinMacUnifiedAPI()) and not($root/Input/Properties/ForceMacAPI = 'Xamarin.Mac')">
-                  <Reference Include="XamMac" />
-                </xsl:when>
-                <xsl:otherwise>
-                  <Reference Include="Xamarin.Mac" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:when>
-            <xsl:otherwise>
-              <Reference Include="MonoMac" />
-            </xsl:otherwise>
-          </xsl:choose>
+          <Reference Include="Xamarin.Mac" />
         </xsl:if>
 
         <xsl:if test="$root/Input/Generation/Platform = 'iOS'">
@@ -1589,6 +1668,19 @@
 
               <xsl:variable name="extern"
                 select="$root/Input/Projects/ExternalProject[@Name=$include-name]" />
+              <xsl:for-each select="$extern/PackageReference">
+                <xsl:variable name="include-path" select="./@Include" />
+                <xsl:variable name="version" select="./@Version" />
+                <PackageReference>
+                  <xsl:attribute name="Include">
+                    <xsl:value-of select="@Include" />
+                  </xsl:attribute>
+                  <xsl:attribute name="Version">
+                    <xsl:value-of select="@Version" />
+                  </xsl:attribute>
+                  <xsl:text />
+                </PackageReference>
+              </xsl:for-each>
 
               <xsl:for-each select="$extern/Binary">
                 <xsl:call-template name="ReferenceToBinary">
@@ -1598,18 +1690,27 @@
               </xsl:for-each>
               <xsl:for-each select="$extern/Platform
                                       [@Type=$root/Input/Generation/Platform]">
+
+                <xsl:for-each select="./PackageReference">
+                  <xsl:variable name="include-path" select="./@Include" />
+                  <xsl:variable name="version" select="./@Version" />
+                  <PackageReference>
+                    <xsl:attribute name="Include">
+                      <xsl:value-of select="@Include" />
+                    </xsl:attribute>
+                    <xsl:attribute name="Version">
+                      <xsl:value-of select="@Version" />
+                    </xsl:attribute>
+                    <xsl:text />
+                  </PackageReference>
+                </xsl:for-each>
+
                 <xsl:for-each select="./Binary">
                   <xsl:call-template name="ReferenceToBinary">
                     <xsl:with-param name="binary" select="." />
                     <xsl:with-param name="source_project" select="$project" />
                   </xsl:call-template>
                 </xsl:for-each>
-                <xsl:for-each select="./SDKReference">
-                  <xsl:call-template name="ReferenceToSDKExtension">
-                    <xsl:with-param name="sdkReference" select="." />
-                    <xsl:with-param name="source_project" select="$project" />
-                  </xsl:call-template>
-                </xsl:for-each>                
                 <xsl:for-each select="./Service">
                   <xsl:if test="user:ServiceIsActive(
                     ./@Name,
@@ -1651,6 +1752,7 @@
             <HintPath>
               <xsl:value-of
                 select="user:GetRelativePath(
+                  $root/Input/Generation/WorkingDirectory,
                   concat(
                     $project/@Path,
                     '\',
@@ -1714,6 +1816,7 @@
 
                 <xsl:for-each select="$extern/Platform
                                         [@Type=$root/Input/Generation/Platform]">
+
                   <xsl:for-each select="./Reference">
                     <xsl:variable name="refd-name" select="./@Include" />
                     <xsl:if test="count($root/Input/Projects/IncludeProject[@Name=$refd-name]) > 0">
@@ -1801,18 +1904,21 @@
                   <xsl:with-param name="project_language"><xsl:value-of select="$project/@Language" /></xsl:with-param>
                   <xsl:with-param name="path"><xsl:value-of select="@Path" /></xsl:with-param>
                   <xsl:with-param name="path_as"></xsl:with-param>
+                  <xsl:with-param name="anchor"><xsl:value-of select="@Anchor" /></xsl:with-param>
                   <xsl:with-param name="is_conditional"></xsl:with-param>
                 </xsl:call-template>
               </xsl:for-each>
               <xsl:for-each select="$extern/Platform
                                       [@Type=$root/Input/Generation/Platform]">
+
                 <xsl:for-each select="./NativeBinary">
                   <xsl:call-template name="NativeBinary">
                     <xsl:with-param name="project_path"><xsl:value-of select="$project/@Path" /></xsl:with-param>
                     <xsl:with-param name="project_name"><xsl:value-of select="$project/@Name" /></xsl:with-param>
                     <xsl:with-param name="project_language"><xsl:value-of select="$project/@Language" /></xsl:with-param>
                     <xsl:with-param name="path"><xsl:value-of select="@Path" /></xsl:with-param>
-                    <xsl:with-param name="path_as"></xsl:with-param>
+                    <xsl:with-param name="path_as"><xsl:value-of select="@Link" /></xsl:with-param>
+                    <xsl:with-param name="anchor"><xsl:value-of select="@Anchor" /></xsl:with-param>
                     <xsl:with-param name="is_conditional"></xsl:with-param>
                   </xsl:call-template>
                 </xsl:for-each>
@@ -1829,6 +1935,7 @@
                         <xsl:with-param name="project_language"><xsl:value-of select="$project/@Language" /></xsl:with-param>
                         <xsl:with-param name="path"><xsl:value-of select="@Path" /></xsl:with-param>
                         <xsl:with-param name="path_as"></xsl:with-param>
+                        <xsl:with-param name="anchor"><xsl:value-of select="@Anchor" /></xsl:with-param>
                         <xsl:with-param name="is_conditional"></xsl:with-param>
                       </xsl:call-template>
                     </xsl:for-each>
@@ -1848,6 +1955,7 @@
                       <xsl:with-param name="project_language"><xsl:value-of select="$project/@Language" /></xsl:with-param>
                       <xsl:with-param name="path"><xsl:value-of select="@Path" /></xsl:with-param>
                       <xsl:with-param name="path_as"></xsl:with-param>
+                      <xsl:with-param name="anchor"><xsl:value-of select="@Anchor" /></xsl:with-param>
                       <xsl:with-param name="is_conditional"></xsl:with-param>
                     </xsl:call-template>
                   </xsl:for-each>
@@ -1981,6 +2089,7 @@
                     <xsl:attribute name="Include">
                       <xsl:value-of
                         select="user:GetRelativePath(
+                        $root/Input/Generation/WorkingDirectory,
                         concat(
                           $root/Input/Generation/RootPath,
                           $project/@Path,
@@ -2010,6 +2119,7 @@
                         <xsl:attribute name="Include">
                           <xsl:value-of
                             select="user:GetRelativePath(
+                          $root/Input/Generation/WorkingDirectory,
                           concat(
                             $root/Input/Generation/RootPath,
                             $project/@Path,
@@ -2033,6 +2143,7 @@
                         <xsl:attribute name="Include">
                           <xsl:value-of
                             select="user:GetRelativePath(
+                          $root/Input/Generation/WorkingDirectory,
                           concat(
                             $root/Input/Generation/RootPath,
                             $project/@Path,
@@ -2055,6 +2166,7 @@
                         <xsl:attribute name="Include">
                           <xsl:value-of
                             select="user:GetRelativePath(
+                          $root/Input/Generation/WorkingDirectory,
                           concat(
                             $root/Input/Generation/RootPath,
                             $project/@Path,
@@ -2078,6 +2190,7 @@
                         <xsl:attribute name="Include">
                           <xsl:value-of
                             select="user:GetRelativePath(
+                          $root/Input/Generation/WorkingDirectory,
                           concat(
                             $root/Input/Generation/RootPath,
                             $project/@Path,
@@ -2109,7 +2222,14 @@
           <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
         </xsl:when>
         <xsl:when test="$root/Input/Generation/Platform = 'Android' or $root/Input/Generation/Platform = 'Ouya'">
-          <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+          <xsl:choose>
+            <xsl:when test="user:HasXamarinAndroidTargets()">
+              <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+            </xsl:when>
+            <xsl:otherwise>
+              <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:when test="$root/Input/Generation/Platform = 'Windows8'">
           <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
@@ -2154,7 +2274,7 @@
         <xsl:when test="$root/Input/Generation/Platform = 'iOS' and not(user:IsTrue($root/Input/Properties/UseLegacyiOSAPI))">
           <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
         </xsl:when>
-        <xsl:when test="$root/Input/Generation/Platform = 'MacOS' and (not(user:IsTrue($root/Input/Properties/UseLegacyMacAPI) or user:DoesNotHaveXamarinMacUnifiedAPI() or $root/Input/Properties/ForceMacAPI = 'XamMac' or $root/Input/Properties/ForceMacAPI = 'MonoMac') or $root/Input/Properties/ForceMacAPI = 'Xamarin.Mac')">
+        <xsl:when test="$root/Input/Generation/Platform = 'MacOS'">
           <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
         </xsl:when>
         <xsl:when test="/Input/Generation/Platform = 'tvOS'">
@@ -2331,26 +2451,6 @@
           </xsl:choose>
         </_PostBuildHookHostPlatform>
       </PropertyGroup>
-
-      <!-- 
-        Post-build hooks don't work on this platform due to Xamarin limitations.  There's no
-        way to work around the issue without significant effort (because these post-build hooks
-        need to run after compilation but before AOT).
-      -->
-      <xsl:if test="msxsl:node-set($post_build_hooks)/PostBuildHook">
-        <xsl:if test="$root/Input/Generation/Platform = 'MacOS'">
-          <xsl:choose>
-            <xsl:when test="(user:HasXamarinMac() or $root/Input/Properties/ForceMacAPI = 'Xamarin.Mac' or $root/Input/Properties/ForceMacAPI = 'XamMac') and not($root/Input/Properties/ForceMacAPI = 'MonoMac')">
-              <xsl:if test="user:IsTrue($root/Input/Properties/UseLegacyMacAPI) or user:DoesNotHaveXamarinMacUnifiedAPI() or $root/Input/Properties/ForceMacAPI = 'XamMac'">
-                <xsl:value-of select="user:WarnForPostBuildHooksOnOldMacPlatform()" />
-              </xsl:if>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="user:WarnForPostBuildHooksOnOldMacPlatform()" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:if>
-      </xsl:if>
 
       <!-- We need this custom task for Xamarin.iOS on Windows -->
       <xsl:if test="($root/Input/Generation/Platform = 'iOS' or $root/Input/Generation/Platform = 'tvOS') and $root/Input/Generation/HostPlatform = 'Windows'">
@@ -2597,6 +2697,103 @@
         </xsl:for-each>
       </ItemGroup>
 
+      <ItemGroup>
+        <xsl:for-each select="$root/Input/Projects/Project[@PostBuildHook='True']">
+          <xsl:if test="(./@Name != $project/@Name) and not(./Properties/PostBuildHookExcludes/Project[@Name=$project/@Name])">
+            <xsl:call-template name="ReferenceToProtobuildProjectDllConfig">
+              <xsl:with-param name="target_project_name" select="./@Name" />
+              <xsl:with-param name="source_project_name" select="$project/@Name" />
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:for-each>
+        <xsl:for-each select="$project/References/Reference">
+          <xsl:variable name="include-name" select="./@Include" />
+          <xsl:if test="
+            count($root/Input/Projects/Project[@Name=$include-name]) = 0">
+            <xsl:if test="
+              count($root/Input/Projects/ExternalProject[@Name=$include-name]) > 0">
+
+              <xsl:variable name="extern"
+                select="$root/Input/Projects/ExternalProject[@Name=$include-name]" />
+
+              <xsl:for-each select="$extern/Reference">
+                <xsl:variable name="refd-name" select="./@Include" />
+                <xsl:if test="count($root/Input/Projects/Project[@Name=$refd-name]) > 0">
+                  <xsl:call-template name="ReferenceToProtobuildProjectDllConfig">
+                    <xsl:with-param name="target_project_name" select="$refd-name" />
+                    <xsl:with-param name="source_project_name" select="$project/@Name" />
+                  </xsl:call-template>
+                </xsl:if>
+              </xsl:for-each>
+
+
+              <xsl:for-each select="$extern/Platform
+                                      [@Type=$root/Input/Generation/Platform]">
+                <xsl:for-each select="./Reference">
+                  <xsl:variable name="refd-name" select="./@Include" />
+                  <xsl:if test="count($root/Input/Projects/Project[@Name=$refd-name]) > 0">
+                    <xsl:call-template name="ReferenceToProtobuildProjectDllConfig">
+                      <xsl:with-param name="target_project_name" select="$refd-name" />
+                      <xsl:with-param name="source_project_name" select="$project/@Name" />
+                    </xsl:call-template>
+                  </xsl:if>
+                </xsl:for-each>
+                <xsl:for-each select="./Service">
+                  <xsl:if test="user:ServiceIsActive(
+                    ./@Name,
+                    '',
+                    '',
+                    $root/Input/Services/ActiveServicesNames)">
+                    <xsl:for-each select="./Reference">
+                      <xsl:variable name="refd-name" select="./@Include" />
+                      <xsl:if test="count($root/Input/Projects/Project[@Name=$refd-name]) > 0">
+                        <xsl:call-template name="ReferenceToProtobuildProjectDllConfig">
+                          <xsl:with-param name="target_project_name" select="$refd-name" />
+                          <xsl:with-param name="source_project_name" select="$project/@Name" />
+                        </xsl:call-template>
+
+                      </xsl:if>
+                    </xsl:for-each>
+                  </xsl:if>
+                </xsl:for-each>
+              </xsl:for-each>
+              <xsl:for-each select="$extern/Service">
+                <xsl:if test="user:ServiceIsActive(
+                  ./@Name,
+                  '',
+                  '',
+                  $root/Input/Services/ActiveServicesNames)">
+                  <xsl:for-each select="./Reference">
+                    <xsl:variable name="refd-name" select="./@Include" />
+                    <xsl:if test="count($root/Input/Projects/Project[@Name=$refd-name]) > 0">
+                      <xsl:call-template name="ReferenceToProtobuildProjectDllConfig">
+                        <xsl:with-param name="target_project_name" select="$refd-name" />
+                        <xsl:with-param name="source_project_name" select="$project/@Name" />
+                      </xsl:call-template>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:if>
+              </xsl:for-each>
+
+            </xsl:if>
+          </xsl:if>
+        </xsl:for-each>
+
+        <xsl:for-each select="$project/References/Reference">
+          <xsl:variable name="include-path" select="./@Include" />
+          <xsl:if test="
+            count($root/Input/Projects/Project[@Name=$include-path]) > 0">
+            <xsl:if test="
+              count($root/Input/Projects/ExternalProject[@Name=$include-path]) = 0">
+              <xsl:call-template name="ReferenceToProtobuildProjectDllConfig">
+                <xsl:with-param name="target_project_name" select="$include-path" />
+                <xsl:with-param name="source_project_name" select="$project/@Name" />
+              </xsl:call-template>
+            </xsl:if>
+          </xsl:if>
+        </xsl:for-each>
+      </ItemGroup>
+
       <xsl:if test="$root/Input/Properties/MonoDevelopPoliciesFile">
         <ProjectExtensions>
           <MonoDevelop>
@@ -2622,3 +2819,4 @@
   </xsl:template>
 
 </xsl:stylesheet>
+

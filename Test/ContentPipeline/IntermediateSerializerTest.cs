@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Web;
+using System.Net;
 using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -416,8 +416,8 @@ namespace MonoGame.Tests.ContentPipeline
 
             for (var i = 32; i <= 126; i++)
                 fontDescription.Characters.Add((char) i);
-            fontDescription.Characters.Add(HttpUtility.HtmlDecode("&#916;")[0]);
-            fontDescription.Characters.Add(HttpUtility.HtmlDecode("&#176;")[0]);
+            fontDescription.Characters.Add(WebUtility.HtmlDecode("&#916;")[0]);
+            fontDescription.Characters.Add(WebUtility.HtmlDecode("&#176;")[0]);
 
             SerializeAndAssert("19_FontDescription.xml", fontDescription);
         }

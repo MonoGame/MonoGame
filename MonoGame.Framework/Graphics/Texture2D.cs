@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -422,5 +423,166 @@ namespace Microsoft.Xna.Framework.Graphics
                                             "elementCount * sizeof(T) is {0}, but data size is {1}.",
                                             elementCount * tSize, dataByteSize), "elementCount");
         }
-	}
+
+        internal Color[] GetColorData()
+        {
+            int colorDataLength = Width * Height;
+            var colorData = new Color[colorDataLength];
+
+            switch (Format)
+            {
+                case SurfaceFormat.Single:
+                    var floatData = new float[colorDataLength];
+                    GetData(floatData);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        float brightness = floatData[i];
+                        // Export as a greyscale image.
+                        colorData[i] = new Color(brightness, brightness, brightness);
+                    }
+                    break;
+
+                case SurfaceFormat.Color:
+                    GetData(colorData);
+                    break;
+
+                case SurfaceFormat.Alpha8:
+                    var alpha8Data = new Alpha8[colorDataLength];
+                    GetData(alpha8Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(alpha8Data[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.Bgr565:
+                    var bgr565Data = new Bgr565[colorDataLength];
+                    GetData(bgr565Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(bgr565Data[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.Bgra4444:
+                    var bgra4444Data = new Bgra4444[colorDataLength];
+                    GetData(bgra4444Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(bgra4444Data[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.Bgra5551:
+                    var bgra5551Data = new Bgra5551[colorDataLength];
+                    GetData(bgra5551Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(bgra5551Data[i].ToVector4());
+                    }
+                    break;
+
+                case SurfaceFormat.HalfSingle:
+                    var halfSingleData = new HalfSingle[colorDataLength];
+                    GetData(halfSingleData);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(halfSingleData[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.HalfVector2:
+                    var halfVector2Data = new HalfVector2[colorDataLength];
+                    GetData(halfVector2Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(halfVector2Data[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.HalfVector4:
+                    var halfVector4Data = new HalfVector4[colorDataLength];
+                    GetData(halfVector4Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(halfVector4Data[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.NormalizedByte2:
+                    var normalizedByte2Data = new NormalizedByte2[colorDataLength];
+                    GetData(normalizedByte2Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(normalizedByte2Data[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.NormalizedByte4:
+                    var normalizedByte4Data = new NormalizedByte4[colorDataLength];
+                    GetData(normalizedByte4Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(normalizedByte4Data[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.Rg32:
+                    var rg32Data = new Rg32[colorDataLength];
+                    GetData(rg32Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(rg32Data[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.Rgba64:
+                    var rgba64Data = new Rgba64[colorDataLength];
+                    GetData(rgba64Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(rgba64Data[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.Rgba1010102:
+                    var rgba1010102Data = new Rgba1010102[colorDataLength];
+                    GetData(rgba1010102Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(rgba1010102Data[i].ToVector4());
+                    }
+
+                    break;
+
+                default:
+                    throw new Exception("Texture surface format not supported");
+            }
+
+            return colorData;
+        }
+    }
 }
