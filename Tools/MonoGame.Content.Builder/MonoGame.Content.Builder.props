@@ -4,9 +4,8 @@
   
   <PropertyGroup>
     <DotnetCommand Condition="'$(DotnetCommand)' == ''">dotnet</DotnetCommand>
-    <MGCBCommand Condition="'$(MGCBCommand)' == ''">$(DotnetCommand) tool run dotnet-mgcb</MGCBCommand>
+    <MGCBPackageId Condition="'$(MGCBPackageId)' == ''">dotnet-mgcb</MGCBPackageId>
     <MGCBVersion Condition="'$(MGCBVersion)' == ''">$(MonoGameContentBuilderVersion)</MGCBVersion>
-    <MGCBArguments>/platform:$(MonoGamePlatform) /quiet</MGCBArguments>
   </PropertyGroup>
 
 </Project>
