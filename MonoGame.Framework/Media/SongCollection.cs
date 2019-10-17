@@ -11,11 +11,11 @@ namespace Microsoft.Xna.Framework.Media
 	public class SongCollection : ICollection<Song>, IEnumerable<Song>, IEnumerable, IDisposable
 	{
 		private bool isReadOnly = false;
-		private List<Song> innerlist = new List<Song>();
+		private List<Song> innerlist;
 
-        internal SongCollection()
+        public SongCollection()
         {
-
+             innerlist = new List<Song>();
         }
 
         internal SongCollection(List<Song> songs)
