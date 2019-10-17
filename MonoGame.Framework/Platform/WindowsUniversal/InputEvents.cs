@@ -35,6 +35,22 @@ namespace Microsoft.Xna.Framework
         // To convert from DIPs (device independent pixels) to actual screen resolution pixels.
         private static float _currentDipFactor;
 
+        private CoreIndependentInputSource _coreIndependentInputSource;
+
+        /// <summary>
+        /// Sets the cursor of <see cref="CoreIndependentInputSource"/> thread
+        /// </summary>
+        public CoreCursor CoreCursor
+        {
+            set
+            {
+                _coreIndependentInputSource.Dispatcher.TryRunAsync(
+                    CoreDispatcherPriority.Normal,
+                    () => _coreIndependentInputSource.PointerCursor = value)
+                    .GetAwaiter().GetResult();
+            }
+        }
+
         public InputEvents(CoreWindow window, UIElement inputElement, TouchQueue touchQueue)
         {
             _touchQueue = touchQueue;
