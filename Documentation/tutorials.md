@@ -27,6 +27,7 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [Part 4 - Content Pipeline](http://neildanson.wordpress.com/2013/08/13/f-and-monogame-part-4-content-pipeline/)
 
 ### Others
+ - [A collection of tutorials, libraries and more, many of which are MonoGame related](https://github.com/UnterrainerInformatik/GameDevelopmentLinks)
  - [How to create animations and sprite sheets for MonoGame](https://www.codeandweb.com/texturepacker/tutorials/how-to-create-sprite-sheets-and-animations-with-monogame)
  - [Making a platformer in F# with MonoGame](http://bruinbrown.wordpress.com/2013/10/06/making-a-platformer-in-f-with-monogame/)
  - [XNA 4.0 Shader Programming / HLSL](http://digitalerr0r.wordpress.com/tutorials/)
