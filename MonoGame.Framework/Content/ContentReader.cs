@@ -15,7 +15,6 @@ namespace Microsoft.Xna.Framework.Content
         private ContentManager contentManager;
         private Action<IDisposable> recordDisposableObject;
         private ContentTypeReaderManager typeReaderManager;
-        private GraphicsDevice graphicsDevice;
         private string assetName;
         private List<KeyValuePair<int, Action<object>>> sharedResourceFixups;
         private ContentTypeReader[] typeReaders;
@@ -34,14 +33,17 @@ namespace Microsoft.Xna.Framework.Content
         {
             get
             {
-                return this.graphicsDevice;
+                var graphicsDeviceService = ContentManager.ServiceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
+                if (graphicsDeviceService == null)
+                    throw new InvalidOperationException("No Graphics Device Service");
+
+                return graphicsDeviceService.GraphicsDevice;
             }
         }
 
-        internal ContentReader(ContentManager manager, Stream stream, GraphicsDevice graphicsDevice, string assetName, int version, Action<IDisposable> recordDisposableObject)
+        internal ContentReader(ContentManager manager, Stream stream, string assetName, int version, Action<IDisposable> recordDisposableObject)
             : base(stream)
         {
-            this.graphicsDevice = graphicsDevice;
             this.recordDisposableObject = recordDisposableObject;
             this.contentManager = manager;
             this.assetName = assetName;
