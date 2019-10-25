@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
@@ -27,15 +26,6 @@ namespace Microsoft.Xna.Framework.Content
             {
                 return typeReaders;
             }
-        }
-
-        internal GraphicsDevice GetGraphicsDevice()
-        {
-            var graphicsDeviceService = ContentManager.ServiceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-            if (graphicsDeviceService == null)
-                throw new InvalidOperationException("No Graphics Device Service");
-
-            return graphicsDeviceService.GraphicsDevice;
         }
 
         internal ContentReader(ContentManager manager, Stream stream, string assetName, int version, Action<IDisposable> recordDisposableObject)
