@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Content
             byte[] data = input.ContentManager.GetScratchBuffer(dataSize);
             input.Read(data, 0, dataSize);
 
-            var buffer = new VertexBuffer(input.GraphicsDevice, declaration, vertexCount, BufferUsage.None);
+            var buffer = new VertexBuffer(input.GetGraphicsDevice(), declaration, vertexCount, BufferUsage.None);
             buffer.SetData(data, 0, dataSize);
             return buffer;
         }

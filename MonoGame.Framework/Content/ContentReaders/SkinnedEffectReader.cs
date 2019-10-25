@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content
     {
         protected internal override SkinnedEffect Read(ContentReader input, SkinnedEffect existingInstance)
         {
-            var effect = new SkinnedEffect(input.GraphicsDevice);
+            var effect = new SkinnedEffect(input.GetGraphicsDevice());
 			effect.Texture = input.ReadExternalReference<Texture> () as Texture2D;
 			effect.WeightsPerVertex = input.ReadInt32 ();
 			effect.DiffuseColor = input.ReadVector3 ();
