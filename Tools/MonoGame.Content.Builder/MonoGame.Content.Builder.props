@@ -6,6 +6,7 @@
     <DotnetCommand Condition="'$(DotnetCommand)' == ''">dotnet</DotnetCommand>
     <MGCBPackageId Condition="'$(MGCBPackageId)' == ''">dotnet-mgcb</MGCBPackageId>
     <MGCBVersion Condition="'$(MGCBVersion)' == ''">$(MonoGameContentBuilderVersion)</MGCBVersion>
+    <EnableMGCBItems Condition="'$(EnableMGCBItems)' == ''">true</EnableMGCBItems>
   </PropertyGroup>
 
 </Project>

@@ -161,6 +161,10 @@
   -->
   <Target Name="CollectContentReferences">
 
+    <ItemGroup Condition="'$(EnableMGCBItems)' == 'true'>
+      <MonoGameContentReference Include="**/*.mgcb" />
+    </ItemGroup>
+
     <ItemGroup>
 
       <!-- Start with existing metadata. -->
