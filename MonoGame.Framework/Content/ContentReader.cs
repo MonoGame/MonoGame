@@ -29,16 +29,13 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal GraphicsDevice GraphicsDevice
+        internal GraphicsDevice GetGraphicsDevice()
         {
-            get
-            {
-                var graphicsDeviceService = ContentManager.ServiceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-                if (graphicsDeviceService == null)
-                    throw new InvalidOperationException("No Graphics Device Service");
+            var graphicsDeviceService = ContentManager.ServiceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
+            if (graphicsDeviceService == null)
+                throw new InvalidOperationException("No Graphics Device Service");
 
-                return graphicsDeviceService.GraphicsDevice;
-            }
+            return graphicsDeviceService.GraphicsDevice;
         }
 
         internal ContentReader(ContentManager manager, Stream stream, string assetName, int version, Action<IDisposable> recordDisposableObject)
