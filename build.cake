@@ -82,6 +82,7 @@ Task("BuildDesktopGL")
 
 Task("BuildWindowsDX")
     .IsDependentOn("Prep")
+    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
     DotNetCoreRestore("MonoGame.Framework.WindowsDX.sln");
