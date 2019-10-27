@@ -1,10 +1,14 @@
 <Project>
   <PropertyGroup>
-    <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>
+    <PackageIcon>Icon.png</PackageIcon>
     <PackageProjectUrl>http://monogame.net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/MonoGame/MonoGame</RepositoryUrl>
     <Authors>MonoGame Team</Authors>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Images\Icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>
 
