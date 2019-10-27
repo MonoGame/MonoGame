@@ -63,10 +63,7 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
     <Content Include="MonoGame.Framework.WindowsDX.targets" PackagePath="build" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" >
-    <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'" >
+  <PropertyGroup>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
