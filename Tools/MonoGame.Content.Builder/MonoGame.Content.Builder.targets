@@ -182,7 +182,7 @@
       <ContentReference>
         <FullDir>$([System.String]::Copy(%(FullDir)).Replace('\','/'))</FullDir>
         <ContentFolder Condition="'%(Link)' == ''">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName(%(FullPath)))))</ContentFolder>
-        <ContentFolder Condition="'%(Link)' != ''">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetFullPath(%(Link)))))))</ContentFolder>
+        <ContentFolder Condition="'%(Link)' != ''">$([System.IO.Path]::GetDirectoryName(%(Link)))</ContentFolder>
       </ContentReference>
 
       <!-- Assemble final metadata. -->
