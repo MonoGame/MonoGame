@@ -22,8 +22,8 @@
     "symbols": {
         "framework": {
             "type": "parameter",
-            "defaultValue": "netcoreapp2.0",
-            "replaces": "netcoreapp2.0"
+            "defaultValue": "netcoreapp3.0",
+            "replaces": "netcoreapp3.0"
         }
     }
 }
