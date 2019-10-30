@@ -171,6 +171,7 @@
       <ContentReference Include="@(MonoGameContentReference)">
         <Link>%(MonoGameContentReference.Link)</Link>
         <FullDir>%(MonoGameContentReference.RootDir)%(MonoGameContentReference.Directory)</FullDir>
+        <ContentFolder></ContentFolder>
         <OutputFolder>%(MonoGameContentReference.Filename)</OutputFolder>
       </ContentReference>
 
@@ -181,8 +182,8 @@
       -->
       <ContentReference>
         <FullDir>$([System.String]::Copy(%(FullDir)).Replace('\','/'))</FullDir>
-        <ContentFolder Condition="'%(Link)' == ''">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName(%(FullPath)))))</ContentFolder>
         <ContentFolder Condition="'%(Link)' != ''">$([System.IO.Path]::GetDirectoryName(%(Link)))</ContentFolder>
+        <ContentFolder Condition="'%(Link)' == '' AND '%(RelativeDir)' != ''">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName(%(RelativeDir)))))</ContentFolder>
       </ContentReference>
 
       <!-- Assemble final metadata. -->
@@ -234,7 +235,7 @@
 
     <Warning
       Text="No Content References Found. Please make sure your .mgcb file has a build action of MonoGameContentReference"
-      Condition=" '%(ContentReference.FullPath)' == '' "
+      Condition="'%(ContentReference.FullPath)' == ''"
     />
 
     <MakeDir Directories="%(ContentReference.ContentOutputDir)"/>
@@ -253,12 +254,14 @@
 
     <!-- Execute MGCB from the project directory so we use the correct manifest. -->
     <Exec
-      Condition=" '%(ContentReference.FullPath)' != '' "
+      Condition="'%(ContentReference.FullPath)' != ''"
       Command="$(MGCBCommand) $(MonoGameMGCBAdditionalArguments) /platform:$(MonoGamePlatform) /@:&quot;%(ContentReference.FullPath)&quot; /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
       WorkingDirectory="$(MSBuildProjectDirectory)" />
 
     <ItemGroup>
-      <ExtraContent Include="%(ContentReference.ContentOutputDir)\**\*.*">
+      <ExtraContent
+        Condition="'%(ContentReference.ContentOutputDir)' != ''"
+        Include="%(ContentReference.ContentOutputDir)\**\*.*">
         <ContentDir>%(ContentReference.ContentDir)</ContentDir>
       </ExtraContent>
     </ItemGroup>
@@ -276,7 +279,7 @@
   <Target
     Name="IncludeContent"
     DependsOnTargets="RunContentBuilder"
-    Condition=" '@(MonoGameContentReference)' != '' "
+    Condition="'$(EnableMGCBItems)' == 'true' OR '@(MonoGameContentReference)' != ''"
     Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)">
 
     <!-- Call CreateItem on each piece of ExtraContent so it's easy to switch the item type by platform. -->
