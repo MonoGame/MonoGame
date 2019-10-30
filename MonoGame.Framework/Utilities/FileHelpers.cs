@@ -42,6 +42,10 @@ namespace MonoGame.Utilities
             // Uri accepts forward slashes
             filePath = filePath.Replace(BackwardSlash, ForwardSlash);
 
+            // Sanitize the path of double slashes, they confuse Uri
+            while (filePath.Contains("//"))
+                filePath = filePath.Replace("//", "/");
+
             bool hasForwardSlash = filePath.StartsWith(ForwardSlashString);
             if (!hasForwardSlash)
                 filePath = ForwardSlashString + filePath;
