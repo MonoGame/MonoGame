@@ -161,7 +161,7 @@
   -->
   <Target Name="CollectContentReferences">
 
-    <ItemGroup Condition="'$(EnableMGCBItems)' == 'true'>
+    <ItemGroup Condition="'$(EnableMGCBItems)' == 'true'">
       <MonoGameContentReference Include="**/*.mgcb" />
     </ItemGroup>
 
