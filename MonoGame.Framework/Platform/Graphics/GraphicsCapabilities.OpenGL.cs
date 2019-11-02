@@ -66,6 +66,12 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsAtitc = GL.Extensions.Contains("GL_ATI_texture_compression_atitc") ||
                             GL.Extensions.Contains("GL_AMD_compressed_ATC_texture");
 
+            if (GL.BoundApi == GL.RenderApi.ES)
+            {
+                SupportsEtc2 = device.glMajorVersion >= 3;
+            }
+
+
             // Framebuffer objects
 #if GLES
             SupportsFramebufferObjectARB = GL.BoundApi == GL.RenderApi.ES && (device.glMajorVersion >= 2 || GL.Extensions.Contains("GL_ARB_framebuffer_object")); // always supported on GLES 2.0+

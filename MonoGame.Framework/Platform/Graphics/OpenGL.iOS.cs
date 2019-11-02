@@ -35,7 +35,12 @@ namespace MonoGame.OpenGL
     {
         public GraphicsContext ()
         {
-            Context = new EAGLContext (EAGLRenderingAPI.OpenGLES2);
+            var ios7OrAbove = UIKit.UIDevice.CurrentDevice.CheckSystemVersion(7, 0);
+
+            if (ios7OrAbove)
+                Context = new EAGLContext(EAGLRenderingAPI.OpenGLES3);
+            else
+                Context = new EAGLContext(EAGLRenderingAPI.OpenGLES2);
         }
 
         public bool IsCurrent {

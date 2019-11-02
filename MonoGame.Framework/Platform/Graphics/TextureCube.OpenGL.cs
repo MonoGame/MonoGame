@@ -64,6 +64,12 @@ namespace Microsoft.Xna.Framework.Graphics
                             case SurfaceFormat.Dxt5:
                             case SurfaceFormat.Dxt5SRgb:
                             case SurfaceFormat.RgbEtc1:
+                            case SurfaceFormat.Rgb8Etc2:
+                            case SurfaceFormat.Srgb8Etc2:
+                            case SurfaceFormat.Rgb8A1Etc2:
+                            case SurfaceFormat.Srgb8A1Etc2:
+                            case SurfaceFormat.Rgba8Etc2:
+                            case SurfaceFormat.SRgb8A8Etc2:
                             case SurfaceFormat.RgbaAtcExplicitAlpha:
                             case SurfaceFormat.RgbaAtcInterpolatedAlpha:
                                 imageSize = (size + 3) / 4 * ((size + 3) / 4) * format.GetSize();
