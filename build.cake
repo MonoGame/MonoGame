@@ -149,9 +149,9 @@ Task("BuildTools")
     .Does(() =>
 {
     DotNetCoreRestore("Tools/2MGFX/2MGFX.csproj");
-    MSBuild("Tools/2MGFX/2MGFX.csproj", msPackSettings);
-	DotNetCoreRestore("Tools/MGCB/MGCB.csproj");
-    MSBuild("Tools/MGCB/MGCB.csproj", msPackSettings);
+    PackProject("Tools/2MGFX/2MGFX.csproj");
+    DotNetCoreRestore("Tools/MGCB/MGCB.csproj");
+    PackProject("Tools/MGCB/MGCB.csproj");
 });
 
 Task("PackVSTemplates")
@@ -162,14 +162,14 @@ Task("PackVSTemplates")
     {
         DeleteFiles(vsdir.CombineWithFilePath("*.zip").FullPath);
         var projdirs = GetDirectories(vsdir.CombineWithFilePath("*").FullPath);
-	foreach (var projdir in projdirs)
-	{
-	    var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
+    foreach (var projdir in projdirs)
+    {
+        var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
             Zip(projdir, outputPath);
-	}
     }
-	// pack core templates as a nuget
-	DotNetCoreRestore("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
+    }
+    // pack core templates as a nuget
+    DotNetCoreRestore("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
     MSBuild("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj", msPackSettings);
 });
 
