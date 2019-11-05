@@ -148,6 +148,10 @@ Task("BuildTools")
     .IsDependentOn("Prep")
     .Does(() =>
 {
+    DotNetCoreRestore("Tools/2MGFX/2MGFX.csproj");
+    MSBuild("Tools/2MGFX/2MGFX.csproj", msPackSettings);
+	DotNetCoreRestore("Tools/MGCB/MGCB.csproj");
+    MSBuild("Tools/MGCB/MGCB.csproj", msPackSettings);
 });
 
 Task("PackVSTemplates")
