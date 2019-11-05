@@ -134,7 +134,7 @@
     <PropertyGroup>
       <MGCBCommand>$(DotnetCommand) tool run mgcb</MGCBCommand>
     </PropertyGroup>
-    
+
   </Target>
 
   <!--
@@ -171,7 +171,7 @@
       <ContentReference Include="@(MonoGameContentReference)">
         <Link>%(MonoGameContentReference.Link)</Link>
         <FullDir>%(MonoGameContentReference.RootDir)%(MonoGameContentReference.Directory)</FullDir>
-        <ContentFolder></ContentFolder>
+        <ContentFolder>%(MonoGameContentReference.ContentFolder)</ContentFolder>
         <OutputFolder>%(MonoGameContentReference.Filename)</OutputFolder>
       </ContentReference>
 
@@ -182,8 +182,8 @@
       -->
       <ContentReference>
         <FullDir>$([System.String]::Copy(%(FullDir)).Replace('\','/'))</FullDir>
-        <ContentFolder Condition="'%(Link)' != ''">$([System.IO.Path]::GetDirectoryName(%(Link)))</ContentFolder>
-        <ContentFolder Condition="'%(Link)' == '' AND '%(RelativeDir)' != ''">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName(%(RelativeDir)))))</ContentFolder>
+        <ContentFolder Condition="'%(ContentFolder)' == '' AND '%(Link)' != ''">$([System.IO.Path]::GetDirectoryName(%(Link)))</ContentFolder>
+        <ContentFolder Condition="'%(ContentFolder)' == '' AND '%(Link)' == '' AND '%(RelativeDir)' != ''">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName(%(RelativeDir)))))</ContentFolder>
       </ContentReference>
 
       <!-- Assemble final metadata. -->
@@ -236,6 +236,11 @@
     <Warning
       Text="No Content References Found. Please make sure your .mgcb file has a build action of MonoGameContentReference"
       Condition="'%(ContentReference.FullPath)' == ''"
+    />
+
+    <Warning
+      Text="Content Reference output directory contains '..' which may cause content to be placed outside of the output directory. Please set ContentFolder on your MonoGameContentReference '%(ContentReference.Filename)' to enforce the correct content output location."
+      Condition="$([System.String]::Copy('%(ContentReference.ContentDir)').Contains('..'))"
     />
 
     <MakeDir Directories="%(ContentReference.ContentOutputDir)"/>
