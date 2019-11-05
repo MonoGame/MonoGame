@@ -148,13 +148,13 @@ Task("BuildTools")
     .Does(() =>
 {
     DotNetCoreRestore("Tools/2MGFX/2MGFX.csproj");
-    MSBuild("Tools/2MGFX/2MGFX.csproj", msPackSettings);
+    PackProject("Tools/2MGFX/2MGFX.csproj");
 
     DotNetCoreRestore("Tools/MGCB/MGCB.csproj");
-    MSBuild("Tools/MGCB/MGCB.csproj", msPackSettings);
+    PackProject("Tools/MGCB/MGCB.csproj");
 
     DotNetCoreRestore("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
-    MSBuild("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj", msPackSettings);
+    PackProject("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
 });
 
 Task("PackVSTemplates")
