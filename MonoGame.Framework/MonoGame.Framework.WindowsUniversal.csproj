@@ -14,7 +14,6 @@ This package provides you with MonoGame Framework that works on Windows 10, Wind
     <PackageId>MonoGame.Framework.WindowsUniversal</PackageId>
 
     <SharpDXVersion>4.0.1</SharpDXVersion>
-	<PackageVersion>3.8.0-develop</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
