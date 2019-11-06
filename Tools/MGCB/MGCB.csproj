@@ -6,6 +6,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>mgcb</ToolCommandName>
     <PackageId>dotnet-mgcb</PackageId>
+	<PackageVersion>3.8.0-develop</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>

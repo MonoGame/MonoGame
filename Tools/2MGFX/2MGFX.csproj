@@ -6,6 +6,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>2mgfx</ToolCommandName>
     <PackageId>dotnet-2mgfx</PackageId>
+	<PackageVersion>3.8.0-develop</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>

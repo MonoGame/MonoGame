@@ -10,6 +10,7 @@
 This package provides you with MonoGame Framework that works on Android.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;android</PackageTags>
     <PackageId>MonoGame.Framework.Android</PackageId>
+	<PackageVersion>3.8.0-develop</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>

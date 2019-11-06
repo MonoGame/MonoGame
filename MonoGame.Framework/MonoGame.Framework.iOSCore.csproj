@@ -11,6 +11,7 @@
 This package provides you with MonoGame Framework that works on iOS.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;ios</PackageTags>
     <PackageId>MonoGame.Framework.iOS</PackageId>
+	<PackageVersion>3.8.0-develop</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
