@@ -1,0 +1,29 @@
+{
+    "author": "MonoGame Team",
+    "classifications": [
+        "MonoGame"
+    ],
+    "name": "MonoGame Cross-Platform Desktop Application (OpenGL) - .Net Core 3",
+    "groupIdentity": "MonoGame.Application.DesktopGL.NetCore",
+    "identity": "MonoGame.Application.DesktopGL.NetCore.CSharp",
+    "shortName": "mgdesktopglcore",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [
+        {
+            "path": "MGNamespace.csproj"
+        }
+    ],
+    "sourceName": "MGNamespace",
+    "preferNameDirectory": "true",
+    "description": "A MonoGame game project for Windows, Linux and macOS using OpenGL, and targeting .Net Core 3.",
+    "symbols": {
+        "framework": {
+            "type": "parameter",
+            "defaultValue": "netcoreapp3.0",
+            "replaces": "netcoreapp3.0"
+        }
+    }
+}

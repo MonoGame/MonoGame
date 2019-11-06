@@ -10,11 +10,10 @@ namespace MGNamespace
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        [STAThread]
         static void Main()
         {
-            using (var game = new Game1())
-                game.Run();
+            var factory = new MonoGame.Framework.GameFrameworkViewSource<Game1>();
+            Windows.ApplicationModel.Core.CoreApplication.Run(factory);
         }
     }
 }
