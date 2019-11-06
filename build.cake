@@ -170,7 +170,7 @@ Task("PackVSTemplates")
     }
     // pack core templates as a nuget
     DotNetCoreRestore("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
-    MSBuild("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj", msPackSettings);
+    PackProject("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
 });
 
 Task("PackWindows")
