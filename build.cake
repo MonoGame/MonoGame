@@ -6,7 +6,9 @@
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("build-target", "Default");
-var version = Argument("build-version", "1.0.0.0");
+string version = null;
+if (HasArgument("build-version"))
+    version = Argument<string>("build-version");
 var configuration = Argument("build-configuration", "Release");
 
 //////////////////////////////////////////////////////////////////////
@@ -14,7 +16,8 @@ var configuration = Argument("build-configuration", "Release");
 //////////////////////////////////////////////////////////////////////
 
 var majorVersion = "3.0";
-var buildNumber = EnvironmentVariable("BUILD_NUMBER");
+if (version == null)
+    version = EnvironmentVariable("BUILD_NUMBER") ?? "1.0.0.0";
 
 MSBuildSettings msPackSettings;
 DotNetCoreMSBuildSettings dnBuildSettings;
@@ -166,12 +169,15 @@ Task("PackVSTemplates")
     {
         DeleteFiles(vsdir.CombineWithFilePath("*.zip").FullPath);
         var projdirs = GetDirectories(vsdir.CombineWithFilePath("*").FullPath);
-	foreach (var projdir in projdirs)
-	{
-	    var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
+    foreach (var projdir in projdirs)
+    {
+        var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
             Zip(projdir, outputPath);
-	}
     }
+    }
+    // pack core templates as a nuget
+    DotNetCoreRestore("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
+    PackProject("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
 });
 
 Task("PackWindows")
@@ -192,7 +198,7 @@ Task("PackWindows")
     {
         { "FrameworkPath", Context.Environment.WorkingDirectory.CombineWithFilePath("Installers/").FullPath },
         { "VERSION", majorVersion},
-        { "INSTALLERVERSION", buildNumber },
+        { "INSTALLERVERSION", version },
     };
 
     MakeNSIS("./Installers/Windows/MonoGame.nsi", settings);

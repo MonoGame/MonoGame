@@ -18,5 +18,5 @@
     ],
     "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
-    "description": "A MonoGame shared library project."
+    "description": "A MonoGame shared library project that can be use to share code and content across all targets."
 }
