@@ -166,12 +166,15 @@ Task("PackVSTemplates")
     {
         DeleteFiles(vsdir.CombineWithFilePath("*.zip").FullPath);
         var projdirs = GetDirectories(vsdir.CombineWithFilePath("*").FullPath);
-	foreach (var projdir in projdirs)
-	{
-	    var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
+    foreach (var projdir in projdirs)
+    {
+        var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
             Zip(projdir, outputPath);
-	}
     }
+    }
+    // pack core templates as a nuget
+    DotNetCoreRestore("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
+    PackProject("ProjectTemplates/DotNetTemplate/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
 });
 
 Task("PackWindows")

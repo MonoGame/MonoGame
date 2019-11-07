@@ -3,10 +3,10 @@
     "classifications": [
         "MonoGame"
     ],
-    "name": "MonoGame Cross-Platform Desktop Application (OpenGL)",
-    "groupIdentity": "MonoGame.Application.DesktopGL",
-    "identity": "MonoGame.Application.DesktopGL.CSharp",
-    "shortName": "mgdesktopgl",
+    "name": "MonoGame Pipeline Extension",
+    "groupIdentity": "MonoGame.Library.Pipeline",
+    "identity": "MonoGame.Library.Pipeline.Extension.CSharp",
+    "shortName": "mgpipeline",
     "tags": {
         "language": "C#",
         "type": "project"
@@ -18,12 +18,12 @@
     ],
     "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
-    "description": "A MonoGame game project for Windows, Linux and macOS using OpenGL.",
+    "description": "A MonoGame content pipeline extension library project.",
     "symbols": {
         "framework": {
             "type": "parameter",
-            "defaultValue": "netcoreapp3.0",
-            "replaces": "netcoreapp3.0"
+            "defaultValue": "net45",
+            "replaces": "netstandard2.0"
         }
     }
 }
