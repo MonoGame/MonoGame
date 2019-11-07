@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="MonoGame.Content.Builder.props" PackagePath="build" />
+    <Content Include="MonoGame.Content.Builder.targets" PackagePath="build" />
+    <Content Include="version\Version.props" PackagePath="build\version\$(PackageVersion)" />
+  </ItemGroup>
+
+</Project>

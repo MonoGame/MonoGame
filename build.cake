@@ -148,6 +148,14 @@ Task("BuildTools")
     .IsDependentOn("Prep")
     .Does(() =>
 {
+    DotNetCoreRestore("Tools/2MGFX/2MGFX.csproj");
+    PackProject("Tools/2MGFX/2MGFX.csproj");
+
+    DotNetCoreRestore("Tools/MGCB/MGCB.csproj");
+    PackProject("Tools/MGCB/MGCB.csproj");
+
+    DotNetCoreRestore("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
+    PackProject("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
 });
 
 Task("PackVSTemplates")
