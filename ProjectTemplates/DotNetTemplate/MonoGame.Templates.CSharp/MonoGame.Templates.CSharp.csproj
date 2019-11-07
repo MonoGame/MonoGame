@@ -6,7 +6,7 @@
     <PackageId>MonoGame.Templates.CSharp</PackageId>
     <Authors>@MonoGameTeam</Authors>
 
-    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
 
     <IncludeContentInPack>true</IncludeContentInPack>
     <IncludeBuildOutput>false</IncludeBuildOutput>
