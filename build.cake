@@ -6,7 +6,9 @@
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("build-target", "Default");
-var version = Argument("build-version", "1.0.0.0");
+string version = null;
+if (HasArgument("build-version"))
+    version = Argument<string>("build-version");
 var configuration = Argument("build-configuration", "Release");
 
 //////////////////////////////////////////////////////////////////////
@@ -14,7 +16,8 @@ var configuration = Argument("build-configuration", "Release");
 //////////////////////////////////////////////////////////////////////
 
 var majorVersion = "3.0";
-var buildNumber = EnvironmentVariable("BUILD_NUMBER");
+if (version == null)
+    version = EnvironmentVariable("BUILD_NUMBER") ?? "1.0.0.0";
 
 MSBuildSettings msPackSettings;
 DotNetCoreMSBuildSettings dnBuildSettings;
@@ -195,7 +198,7 @@ Task("PackWindows")
     {
         { "FrameworkPath", Context.Environment.WorkingDirectory.CombineWithFilePath("Installers/").FullPath },
         { "VERSION", majorVersion},
-        { "INSTALLERVERSION", buildNumber },
+        { "INSTALLERVERSION", version },
     };
 
     MakeNSIS("./Installers/Windows/MonoGame.nsi", settings);
