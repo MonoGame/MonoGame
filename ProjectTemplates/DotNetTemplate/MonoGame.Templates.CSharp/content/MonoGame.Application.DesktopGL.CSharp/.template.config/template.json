@@ -3,7 +3,7 @@
     "classifications": [
         "MonoGame"
     ],
-    "name": "MonoGame Cross-Platform Desktop Application (OpenGL) - .Net 4.5.2",
+    "name": "MonoGame Cross-Platform Desktop Application (OpenGL)",
     "groupIdentity": "MonoGame.Application.DesktopGL",
     "identity": "MonoGame.Application.DesktopGL.CSharp",
     "shortName": "mgdesktopgl",
@@ -18,5 +18,12 @@
     ],
     "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
-    "description": "A MonoGame game project for Windows, Linux and macOS using OpenGL, and targeting .Net 4.5.2."
+    "description": "A MonoGame game project for Windows, Linux and macOS using OpenGL.",
+    "symbols": {
+        "framework": {
+            "type": "parameter",
+            "defaultValue": "netcoreapp3.0",
+            "replaces": "netcoreapp3.0"
+        }
+    }
 }
