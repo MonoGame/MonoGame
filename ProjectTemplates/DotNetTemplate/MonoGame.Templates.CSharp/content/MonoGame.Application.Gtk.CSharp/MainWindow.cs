@@ -8,24 +8,12 @@ namespace MGNamespace
 {
     class MainWindow : Window
     {
-        private HeaderBar _headerBar;
         private Game1 _game;
 
         public MainWindow() : base(WindowType.Toplevel)
         {
             DefaultWidth = 640;
             DefaultHeight = 480;
-
-            _headerBar = new HeaderBar();
-            _headerBar.ShowCloseButton = true;
-            _headerBar.Title = "Example Gtk Game";
-
-            var btnPreferences = new Button();
-            btnPreferences.TooltipText = "Fullscreen";
-            btnPreferences.Image = Image.NewFromIconName("view-fullscreen-symbolic", IconSize.Button);
-            _headerBar.PackEnd(btnPreferences);
-
-            Titlebar = _headerBar;
 
             var vbox = new VBox();
             vbox.Margin = 4;
@@ -35,7 +23,7 @@ namespace MGNamespace
             vbox.PackStart(mgwidget, true, true, 0);
 
             var buttonClickMe = new Button();
-            buttonClickMe.Label = "CLICK ME! (I do nothing, just like the fullscreen button...)";
+            buttonClickMe.Label = "CLICK ME! (I do nothing...)";
             vbox.PackStart(buttonClickMe, false, true, 0);
 
             Child = vbox;
