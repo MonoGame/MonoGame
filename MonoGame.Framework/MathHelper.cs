@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public const float TwoPi = (float)(Math.PI * 2.0);
         
-		/// <summary>
+        /// <summary>
         /// Represents the value of pi times two(6.28318548).
         /// This is an alias of TwoPi.
         /// </summary>
