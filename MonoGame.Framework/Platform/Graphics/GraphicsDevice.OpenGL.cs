@@ -242,7 +242,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _programCache = new ShaderProgramCache(this);
 #if DESKTOPGL || ANGLE
+#if GTK
+            var windowInfo = new WindowInfo(IntPtr.Zero);
+#else
             var windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
+#endif
 
             if (Context == null || Context.IsDisposed)
             {
@@ -508,7 +512,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-#if DESKTOPGL || ANGLE
+#if !GTK && (DESKTOPGL || ANGLE)
         static internal void DisposeContext(IntPtr resource)
         {
             lock (_disposeContextsLock)
@@ -1237,7 +1241,13 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void OnPresentationChanged()
         {
 #if DESKTOPGL || ANGLE
+
+#if GTK
+            Context.MakeCurrent(new WindowInfo(IntPtr.Zero));
+#else
             Context.MakeCurrent(new WindowInfo(SdlGameWindow.Instance.Handle));
+#endif
+
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 #endif
 
@@ -1261,7 +1271,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-#if DESKTOPGL
+#if DESKTOPGL && !GTK
         private void GetModeSwitchedSize(out int width, out int height)
         {
             var mode = new Sdl.Display.Mode

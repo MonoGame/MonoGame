@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Audio
         private IntPtr _context;
         IntPtr NullContext = IntPtr.Zero;
         private int[] allSourcesArray;
-#if DESKTOPGL || ANGLE
+#if DESKTOPGL || ANGLE || GTK
 
         // MacOS & Linux shares a limit of 256.
         internal const int MAX_NUMBER_OF_SOURCES = 256;

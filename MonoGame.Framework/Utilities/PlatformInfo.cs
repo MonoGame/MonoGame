@@ -38,6 +38,8 @@ namespace MonoGame.Framework.Utilities
                 return MonoGamePlatform.PlayStation4;
 #elif PSVITA
                 return MonoGamePlatform.PSVita;
+#elif GTK
+                return MonoGamePlatform.Gtk;
 #endif
             }
         }
