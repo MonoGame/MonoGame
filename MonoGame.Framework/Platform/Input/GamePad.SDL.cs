@@ -309,7 +309,7 @@ namespace Microsoft.Xna.Framework.Input
             return ret;
         }
 
-        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
+        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
         {
             if (!Gamepads.ContainsKey(index))
                 return false;

@@ -116,7 +116,21 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>Returns true if the vibration motors were set.</returns>
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
         {
-            return SetVibration((int)playerIndex, leftMotor, rightMotor);
+            return SetVibration((int)playerIndex, leftMotor, rightMotor, 0.0f, 0.0f);
+        }
+
+        /// <summary>
+        /// Sets the vibration motor speeds on the controller device if supported.
+        /// </summary>
+        /// <param name="playerIndex">Player index that identifies the controller to set.</param>
+        /// <param name="leftMotor">The speed of the left motor, between 0.0 and 1.0. This motor is a low-frequency motor.</param>
+        /// <param name="rightMotor">The speed of the right motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <param name="leftTrigger">(Xbox One controller only) The speed of the left trigger motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <param name="rightTrigger">(Xbox One controller only) The speed of the right trigger motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <returns>Returns true if the vibration motors were set.</returns>
+        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
+        {
+            return SetVibration((int)playerIndex, leftMotor, rightMotor, leftTrigger, rightTrigger);
         }
 
         /// <summary>
@@ -127,11 +141,25 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="rightMotor">The speed of the right motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
         /// <returns>Returns true if the vibration motors were set.</returns>
         public static bool SetVibration(int index, float leftMotor, float rightMotor)
+        {           
+            return SetVibration(index, leftMotor, rightMotor, 0.0f, 0.0f);
+        }
+
+        /// <summary>
+        /// Sets the vibration motor speeds on the controller device if supported.
+        /// </summary>
+        /// <param name="index">Index for the controller you want to query.</param>
+        /// <param name="leftMotor">The speed of the left motor, between 0.0 and 1.0. This motor is a low-frequency motor.</param>
+        /// <param name="rightMotor">The speed of the right motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <param name="leftTrigger">(Xbox One controller only) The speed of the left trigger motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <param name="rightTrigger">(Xbox One controller only) The speed of the right trigger motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <returns>Returns true if the vibration motors were set.</returns>
+        public static bool SetVibration(int index, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
         {
             if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
                 return false;
-            
-            return PlatformSetVibration(index, MathHelper.Clamp(leftMotor, 0.0f, 1.0f), MathHelper.Clamp(rightMotor, 0.0f, 1.0f));
+
+            return PlatformSetVibration(index, MathHelper.Clamp(leftMotor, 0.0f, 1.0f), MathHelper.Clamp(rightMotor, 0.0f, 1.0f), MathHelper.Clamp(leftTrigger, 0.0f, 1.0f), MathHelper.Clamp(rightTrigger, 0.0f, 1.0f));
         }
 
         /// <summary>

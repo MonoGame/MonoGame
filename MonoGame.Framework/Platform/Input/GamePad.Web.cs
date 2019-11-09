@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Input
             return state;
         }
 
-        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
+        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
         {
             return false;
         }

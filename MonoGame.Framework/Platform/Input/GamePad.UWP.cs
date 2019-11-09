@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework.Input
             return result;
         }
 
-        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
+        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
         {
             if (!_gamepads.ContainsKey(index))
                 return false;
@@ -159,9 +159,9 @@ namespace Microsoft.Xna.Framework.Input
             gamepad.Vibration = new WGI.GamepadVibration
             {
                 LeftMotor = leftMotor,
-                LeftTrigger = leftMotor,
+                LeftTrigger = leftTrigger,
                 RightMotor = rightMotor,
-                RightTrigger = rightMotor
+                RightTrigger = rightTrigger
             };
 
             return true;
