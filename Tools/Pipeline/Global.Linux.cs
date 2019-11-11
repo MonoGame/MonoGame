@@ -18,6 +18,7 @@ namespace MonoGame.Tools.Pipeline
         private static void PlatformInit()
         {
             Linux = true;
+            UseHeaderBar = true;
             _theme = IconTheme.Default;
 
             var linkIcon = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, 16, 16);
