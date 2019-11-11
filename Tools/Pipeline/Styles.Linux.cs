@@ -67,12 +67,6 @@ namespace MonoGame.Tools.Pipeline
             Style.Add<ApplicationHandler>("PipelineTool", h =>
             {
                 Global.Application = h.Control;
-
-                if (Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16)
-                    Global.UseHeaderBar = Global.Application.PrefersAppMenu();
-                
-                if (Global.UseHeaderBar)
-                    Global.Application.AppMenu = new GLib.MenuModel((new Gtk.Builder("AppMenu.glade")).GetObject("appmenu").Handle);
             });
 
             Style.Add<FormHandler>("LogWindow", h =>
