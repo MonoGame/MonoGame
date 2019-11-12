@@ -442,10 +442,16 @@ namespace Microsoft.Xna.Framework
 
             if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
             {
-#if WINDOWS && !DESKTOPGL
                 // Sleep for as long as possible without overshooting the update time
                 var sleepTime = (TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
+                // We only have a precision timer on Windows, so other platforms may still overshoot
+#if WINDOWS && !DESKTOPGL
                 MonoGame.Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
+#elif WINDOWS_UAP
+                lock (_locker)
+                    System.Threading.Monitor.Wait(_locker, (int)sleepTime);
+#else
+                System.Threading.Thread.Sleep((int)sleepTime);
 #endif
                 // Keep looping until it's time to perform the next update
                 goto RetryTick;
