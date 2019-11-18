@@ -106,6 +106,12 @@ ballPosition.Y = Math.Min(Math.Max(ballTexture.Height / 2, ballPosition.Y), grap
 base.Update(gameTime);
 ```
 
+Note that the following using statement must be added at the top of the .cs file in order to use the Math class:
+
+```csharp
+using System;
+```
+
 Now run the game and the ball won't be able to escape window bounds anymore.
 
 Happy Coding ^^
