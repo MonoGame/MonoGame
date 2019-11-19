@@ -100,8 +100,15 @@ Run the game and you should be able to move the ball with the arrow keys. You wi
 if(kstate.IsKeyDown(Keys.Right))
     ballPosition.X += ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-ballPosition.X = Math.Min(Math.Max(ballTexture.Width / 2, ballPosition.X), graphics.PreferredBackBufferWidth - ballTexture.Width / 2);
-ballPosition.Y = Math.Min(Math.Max(ballTexture.Height / 2, ballPosition.Y), graphics.PreferredBackBufferHeight - ballTexture.Height / 2);
+if(ballPosition.X > graphics.PreferredBackBufferWidth - ballTexture.Width / 2)
+    ballPosition.X = graphics.PreferredBackBufferWidth - ballTexture.Width / 2;
+else if(ballPosition.X < ballTexture.Width / 2)
+    ballPosition.X = ballTexture.Width / 2;
+            
+if(ballPosition.Y > graphics.PreferredBackBufferHeight - ballTexture.Height / 2)
+    ballPosition.Y = graphics.PreferredBackBufferHeight - ballTexture.Height / 2;
+else if(ballPosition.Y < ballTexture.Height / 2)
+    ballPosition.Y = ballTexture.Height / 2;
 
 base.Update(gameTime);
 ```
