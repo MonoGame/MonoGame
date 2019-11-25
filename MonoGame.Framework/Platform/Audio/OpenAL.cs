@@ -199,7 +199,8 @@ namespace MonoGame.OpenAL
 
 #if DESKTOPGL
             // Load bundled library
-            var assemblyLocation = Path.GetDirectoryName(typeof(AL).Assembly.Location);
+            var assemblyLocation = Path.GetDirectoryName(typeof(AL).Assembly.Location) ?? "./";
+
             if (CurrentPlatform.OS == OS.Windows && Environment.Is64BitProcess)
                 ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x64/soft_oal.dll"));
             else if (CurrentPlatform.OS == OS.Windows && !Environment.Is64BitProcess)
