@@ -5,7 +5,7 @@
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
 
-var target = Argument("build-target", "Default");
+var target = Argument("target", "Default");
 string version = null;
 if (HasArgument("build-version"))
     version = Argument<string>("build-version");
