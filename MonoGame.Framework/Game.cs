@@ -449,9 +449,11 @@ namespace Microsoft.Xna.Framework
                 MonoGame.Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
 #elif WINDOWS_UAP
                 lock (_locker)
-                    System.Threading.Monitor.Wait(_locker, (int)sleepTime);
-#else
-                System.Threading.Thread.Sleep((int)sleepTime);
+                    if (sleepTime >= 2.0)
+                        System.Threading.Monitor.Wait(_locker, 1);
+#elif DESKTOPGL || ANDROID || IOS
+                if (sleepTime >= 2.0)
+                    System.Threading.Thread.Sleep(1);
 #endif
                 // Keep looping until it's time to perform the next update
                 goto RetryTick;
