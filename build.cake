@@ -162,6 +162,7 @@ Task("BuildTools")
 });
 
 Task("PackVSTemplates")
+    .IsDependentOn("Prep")
     .Does(() =>
 {
     var vsdirs = GetDirectories("./ProjectTemplates/VisualStudio20*");
