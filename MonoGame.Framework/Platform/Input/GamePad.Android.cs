@@ -151,7 +151,6 @@ namespace Microsoft.Xna.Framework.Input
                 if (index == 0 && Back)
                 {
                     // Consume state
-                    Back = false;
                     state = new GamePadState(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons(Buttons.Back), new GamePadDPad());
                     state.IsConnected = false;
                 }

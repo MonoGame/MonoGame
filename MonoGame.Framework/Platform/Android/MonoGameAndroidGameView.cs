@@ -1149,6 +1149,8 @@ namespace Microsoft.Xna.Framework
 
         public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
         {
+            if (keyCode == Keycode.Back)
+                GamePad.Back = false;
             if (GamePad.OnKeyUp(keyCode, e))
                 return true;
             return Keyboard.KeyUp(keyCode);
