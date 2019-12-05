@@ -50,6 +50,9 @@ namespace MonoGame.Framework
 
         internal Game Game { get; private set; }
 
+        internal MouseState PreviousUpdateMouseState;
+        internal bool MouseStateSetPositionRequested;
+
         #endregion
 
         #region Public Properties

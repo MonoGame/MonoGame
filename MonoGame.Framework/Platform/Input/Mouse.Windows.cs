@@ -5,6 +5,7 @@
 using System;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using MonoGame.Framework;
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -27,8 +28,11 @@ namespace Microsoft.Xna.Framework.Input
             return window.MouseState;
         }
 
-        private static void SetPosition(GameWindow window, int x, int y)
+        private static void PlatformSetPosition(int x, int y)
         {
+            var window = PrimaryWindow as WinFormsGameWindow;
+            if (window == null)
+                return;
             window.MouseState.X = x;
             window.MouseState.Y = y;
             window.MouseStateSetPositionRequested = true;
