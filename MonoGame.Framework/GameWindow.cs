@@ -74,7 +74,9 @@ namespace Microsoft.Xna.Framework {
         }
 
         internal MouseState MouseState;
-	    internal TouchPanelState TouchPanelState;
+        internal MouseState PreviousUpdateMouseState;
+        internal bool MouseStateSetPositionRequested;
+        internal TouchPanelState TouchPanelState;
 
         protected GameWindow()
         {

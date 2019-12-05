@@ -10,10 +10,6 @@ namespace Microsoft.Xna.Framework.Input
 {
     public static partial class Mouse
     {
-        [DllImportAttribute("user32.dll", EntryPoint = "SetCursorPos")]
-        [return: MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        private static extern bool SetCursorPos(int X, int Y);
-
         private static Control _window;
 
         private static IntPtr PlatformGetWindowHandle()
@@ -31,13 +27,11 @@ namespace Microsoft.Xna.Framework.Input
             return window.MouseState;
         }
 
-        private static void PlatformSetPosition(int x, int y)
+        private static void SetPosition(GameWindow window, int x, int y)
         {
-            PrimaryWindow.MouseState.X = x;
-            PrimaryWindow.MouseState.Y = y;
-            
-            var pt = _window.PointToScreen(new System.Drawing.Point(x, y));
-            SetCursorPos(pt.X, pt.Y);
+            window.MouseState.X = x;
+            window.MouseState.Y = y;
+            window.MouseStateSetPositionRequested = true;
         }
 
         public static void PlatformSetCursor(MouseCursor cursor)

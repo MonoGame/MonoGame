@@ -418,10 +418,16 @@ namespace Microsoft.Xna.Framework
 
         public void Tick()
         {
-            // NOTE: This code is very sensitive and can break very badly
-            // with even what looks like a safe change.  Be sure to test 
-            // any change fully in both the fixed and variable timestep 
-            // modes across multiple devices and platforms.
+            TickWait();
+            TickRun();
+        }
+
+        internal void TickWait()
+        {
+        // NOTE: This code is very sensitive and can break very badly
+        // with even what looks like a safe change.  Be sure to test 
+        // any change fully in both the fixed and variable timestep 
+        // modes across multiple devices and platforms.
 
         RetryTick:
 
@@ -450,7 +456,10 @@ namespace Microsoft.Xna.Framework
                 // Keep looping until it's time to perform the next update
                 goto RetryTick;
             }
+        }
 
+        internal void TickRun()
+        {
             // Do not allow any update to take longer than our maximum.
             if (_accumulatedElapsedTime > _maxElapsedTime)
                 _accumulatedElapsedTime = _maxElapsedTime;

@@ -55,7 +55,8 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="y">Relative vertical position of the cursor.</param>
         public static void SetPosition(int x, int y)
         {
-            PlatformSetPosition(x, y);
+            if (PrimaryWindow != null)
+                SetPosition(PrimaryWindow, x, y);
         }
 
         /// <summary>
