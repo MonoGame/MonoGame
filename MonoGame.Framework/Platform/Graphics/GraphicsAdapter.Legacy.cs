@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -63,8 +64,26 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
+#if DESKTOPGL
+        string _description = null;
+        public string Description {
+            get {
+                if (_description == null) {
+                    try {
+                        _description = GL.GetString(StringName.Renderer);
+                    } catch {
+                        _description = string.Empty;
+                    }
+                }
+
+                return _description;
+            }
+            private set { _description = value; }
+        }
+#else
         string _description = string.Empty;
         public string Description { get { return _description; } private set { _description = value; } }
+#endif
 
         public DisplayMode CurrentDisplayMode
         {
