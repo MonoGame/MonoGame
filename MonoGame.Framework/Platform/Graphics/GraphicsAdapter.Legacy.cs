@@ -65,20 +65,15 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if DESKTOPGL
-        string _description = null;
         public string Description {
             get {
-                if (_description == null) {
-                    try {
-                        _description = GL.GetString(StringName.Renderer);
-                    } catch {
-                        _description = string.Empty;
-                    }
+                try {
+                    return GL.GetString(StringName.Renderer);
+                } catch {
+                    return string.Empty;
                 }
-
-                return _description;
             }
-            private set { _description = value; }
+            private set { }
         }
 #else
         string _description = string.Empty;
