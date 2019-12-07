@@ -2,9 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if DESKTOPGL
-using MonoGame.OpenGL;
-#endif
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -70,7 +67,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public string Description {
             get {
                 try {
-                    return GL.GetString(StringName.Renderer);
+                    return MonoGame.OpenGL.GL.GetString(MonoGame.OpenGL.StringName.Renderer);
                 } catch {
                     return string.Empty;
                 }
