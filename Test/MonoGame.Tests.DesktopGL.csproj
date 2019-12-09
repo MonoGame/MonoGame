@@ -6,6 +6,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
+    <RunWorkingDirectory>$(MSBuildProjectDirectory)\bin\DesktopGL\$(Configuration)\$(TargetFramework)\</RunWorkingDirectory>
+
 
     <DefineConstants>DESKTOPGL</DefineConstants>
     <BaseOutputPath>bin\DesktopGL</BaseOutputPath>
