@@ -5,6 +5,8 @@
     <TargetFramework>net471</TargetFramework>
     <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <RunWorkingDirectory>$(MSBuildProjectDirectory)\bin\WindowsDX\$(Configuration)\$(TargetFramework)\</RunWorkingDirectory>
 
     <DefineConstants>WINDOWS;DIRECTX</DefineConstants>
     <BaseOutputPath>bin\WindowsDX</BaseOutputPath>
@@ -23,6 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="bin\**\*" />
+    <Compile Remove="obj\**\*" />
     <Compile Remove="Properties/**/*" />
     <Compile Remove="Interactive/**/*" />
     <Compile Remove="Runner/iOS/**/*" />
