@@ -31,14 +31,12 @@ then
 	rm /usr/local/bin/monogame-uninstall
 fi
 echo "#!/bin/bash
-
-sudo rm -Rf '/Applicatons/Pipeline.app/'
+sudo rm -rf '/Applicatons/Pipeline.app/'
 sudo pkgutil --forget com.monogame.pipeline
-if [ -d '/Applications/Xamarin Studio.app' ]
-then
+if [ -d '/Applications/Xamarin Studio.app' ];then
   /Applications/Xamarin\ Studio.app/Contents/MacOS/mdtool setup uninstall MonoDevelop.MonoGame -y
 fi
-if [ ! -d '/Library/Frameworks/Mono.framework/Versions/4.6.2' ]
+if [ ! -d '/Library/Frameworks/Mono.framework/Versions/4.6.2' ];then
 	ln -s /Library/Frameworks/Mono.framework/Versions/Current /Library/Frameworks/Mono.framework/Versions/4.6.2
 fi
 sudo rm /usr/local/bin/mgcb
