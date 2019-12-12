@@ -1222,6 +1222,9 @@
     <Compile Include="Utilities\Png\PngReader.cs" />
     <Compile Include="Utilities\Png\PngWriter.cs" />
     <Compile Include="Utilities\ByteBufferPool.cs" />
+    <Compile Include="Platform\Utilities\SignalWatcher.cs">
+      <Platforms>MacOS,WindowsGL,Linux</Platforms>
+    </Compile>
 	
 
 

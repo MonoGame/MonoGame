@@ -58,6 +58,14 @@ namespace Microsoft.Xna.Framework
 
             Sdl.DisableScreenSaver();
 
+            SignalWatcher.Init(() =>
+            {
+                if (_isExiting == 0)
+                {
+                    this.Game.DoExiting();
+                }
+            });
+
             GamePad.InitDatabase();
             Window = _view = new SdlGameWindow(_game);
         }
@@ -93,7 +101,7 @@ namespace Microsoft.Xna.Framework
                 Threading.Run();
                 GraphicsDevice.DisposeContexts();
 
-                if (_isExiting > 0)
+                if (_isExiting > 0 || SignalWatcher.IsExiting)
                     break;
             }
         }
