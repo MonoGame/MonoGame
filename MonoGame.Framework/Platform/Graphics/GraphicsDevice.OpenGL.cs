@@ -254,7 +254,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Context.MakeCurrent(windowInfo);
 #endif
-            GL.GetInteger(GetPName.MaxCombindTextureImageUnits, out MaxTextureSlots);
+            GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
