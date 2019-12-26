@@ -19,6 +19,7 @@ namespace Microsoft.Xna.Framework.Input
 
         // Array of 256 bits:
         uint keys0, keys1, keys2, keys3, keys4, keys5, keys6, keys7;
+        byte modifiers;
 
         bool InternalGetKey(Keys key)
         {
@@ -90,21 +91,8 @@ namespace Microsoft.Xna.Framework.Input
 
         #region XNA Interface
 
-        /// <summary>
-        /// Gets the current state of the Caps Lock key.
-        /// </summary>
-        public bool CapsLock { get; private set; }
-
-        /// <summary>
-        /// Gets the current state of the Num Lock key.
-        /// </summary>
-        public bool NumLock { get; private set; }
-
         internal KeyboardState(List<Keys> keys, bool capsLock = false, bool numLock = false) : this()
         {
-            CapsLock = capsLock;
-            NumLock = numLock;
-
             keys0 = 0;
             keys1 = 0;
             keys2 = 0;
@@ -113,6 +101,7 @@ namespace Microsoft.Xna.Framework.Input
             keys5 = 0;
             keys6 = 0;
             keys7 = 0;
+            modifiers = (byte)(0 | (capsLock ? 1 : 0) | (numLock ? 2 : 0));
 
             if (keys != null)
                 foreach (Keys k in keys)
@@ -127,9 +116,6 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="numLock">Num Lock state.</param>
         public KeyboardState(Keys[] keys, bool capsLock = false, bool numLock = false) : this()
         {
-            CapsLock = capsLock;
-            NumLock = numLock;
-
             keys0 = 0;
             keys1 = 0;
             keys2 = 0;
@@ -138,6 +124,7 @@ namespace Microsoft.Xna.Framework.Input
             keys5 = 0;
             keys6 = 0;
             keys7 = 0;
+            modifiers = (byte)(0 | (capsLock ? 1 : 0) | (numLock ? 2 : 0));
 
             if (keys != null)
                 foreach (Keys k in keys)
@@ -150,9 +137,6 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="keys">List of keys to be flagged as pressed on initialization.</param>
         public KeyboardState(params Keys[] keys) : this()
         {
-            CapsLock = false;
-            NumLock = false;
-
             keys0 = 0;
             keys1 = 0;
             keys2 = 0;
@@ -161,10 +145,33 @@ namespace Microsoft.Xna.Framework.Input
             keys5 = 0;
             keys6 = 0;
             keys7 = 0;
+            modifiers = 0;
 
             if (keys != null)
                 foreach (Keys k in keys)
                     InternalSetKey(k);
+        }
+
+        /// <summary>
+        /// Gets the current state of the Caps Lock key.
+        /// </summary>
+        public bool CapsLock
+        {
+            get
+            {
+                return (modifiers & 1) > 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the current state of the Num Lock key.
+        /// </summary>
+        public bool NumLock
+        {
+            get
+            {
+                return (modifiers & 2) > 0;
+            }
         }
 
         /// <summary>
