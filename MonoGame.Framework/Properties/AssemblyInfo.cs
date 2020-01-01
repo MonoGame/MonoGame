@@ -19,11 +19,11 @@ using System.Resources;
 
 // Allow the content pipeline assembly to access
 // some of our internal helper methods that it needs.
-[assembly: InternalsVisibleTo("MonoGame.Framework.Content.Pipeline")]
-[assembly: InternalsVisibleTo("MonoGame.Framework.Net")]
+// [assembly: InternalsVisibleTo("MonoGame.Framework.Content.Pipeline")]
+// [assembly: InternalsVisibleTo("MonoGame.Framework.Net")]
 
 //Tests projects need access too
-[assembly: InternalsVisibleTo("MonoGame.Tests")]
+//[assembly: InternalsVisibleTo("MonoGame.Tests")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -39,5 +39,6 @@ using System.Resources;
 
 // Version information for the assembly which is automatically
 // set by our automated build process.
-[assembly: AssemblyVersion("0.0.0.0")]
-[assembly: AssemblyFileVersion("0.0.0.0")]
+[assembly: AssemblyVersion("3.8.0.0")]
+[assembly: AssemblyFileVersion("3.8.0.0")]
+[assembly: AssemblyInformationalVersion("3.8.0-codefoco-build.1+528.Branch.codefoco-build.Sha.d3ec5d11fcd14df10d5a93d6efba0686fe13fd9e")]

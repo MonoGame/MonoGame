@@ -14,6 +14,7 @@ This package provides you with MonoGame Framework that works on Windows 10, Wind
     <PackageId>MonoGame.Framework.WindowsUniversal</PackageId>
 
     <SharpDXVersion>4.0.1</SharpDXVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
@@ -83,5 +84,6 @@ This package provides you with MonoGame Framework that works on Windows 10, Wind
 
   <Import Project="Platform\DirectX.targets" />
   <Import Project="Platform\XAudio.targets" />
+  <Import Project="MonoGame.Sign.targets" />
 </Project>
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <SignAssembly>true</SignAssembly>
+        <PublicSign Condition=" '$(OS)' !='Windows_NT' and '$(PublicSign)' == '' and '$(SignAssembly)' == 'true'">true</PublicSign>
+        <KeyFileName Condition=" '$(KeyFileName)' == '' ">Codefoco.snk</KeyFileName>
+        <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\..\$(KeyFileName)</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+    <Target Name="_SignAssembly" AfterTargets="CoreCompile" Condition="'$(SignAssembly)' == 'true' and '$(OS)' !='Windows_NT' ">
+        <Exec Command="sn -q -R @(IntermediateAssembly -> '&quot;%(Identity)&quot;') &quot;$(AssemblyOriginatorKeyFile)&quot;" />
+    </Target>
+</Project>

@@ -11,6 +11,7 @@
 This package provides you with MonoGame Framework that works on iOS.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;ios</PackageTags>
     <PackageId>MonoGame.Framework.iOS</PackageId>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
@@ -78,5 +79,6 @@ This package provides you with MonoGame Framework that works on iOS.</Descriptio
   <Import Project="Platform\OpenGL.targets" />
   <Import Project="Platform\OpenAL.targets" />
   <Import Project="Platform\Microsoft.Devices.Sensors.targets" />
+  <Import Project="MonoGame.Sign.targets" />
 </Project>
 

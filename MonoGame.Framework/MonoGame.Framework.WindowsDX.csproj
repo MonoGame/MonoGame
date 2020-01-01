@@ -9,6 +9,7 @@
 This package provides you with MonoGame Framework that uses DirectX for rendering and works on Windows.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;windowsdx</PackageTags>
     <PackageId>MonoGame.Framework.WindowsDX</PackageId>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
@@ -79,4 +80,5 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
 
   <Import Project="Platform\DirectX.targets" />
   <Import Project="Platform\XAudio.targets" />
+  <Import Project="MonoGame.Sign.targets" />
 </Project>

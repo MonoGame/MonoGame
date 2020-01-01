@@ -103,6 +103,9 @@ Task("BuildAndroid")
     if (DirectoryExists("/usr/lib/xamarin.android"))
         return true;
 
+    if (DirectoryExists("/Library/Frameworks/Xamarin.Android.framework"))
+        return true;
+
     return DirectoryExists("/Developer/MonoAndroid");
 }).Does(() =>
 {
@@ -123,6 +126,9 @@ Task("BuildiOS")
     .IsDependentOn("Prep")
     .WithCriteria(() =>
 {
+    if (DirectoryExists("/Library/Frameworks/Xamarin.iOS.framework"))
+        return true;
+    
     return DirectoryExists("/Developer/MonoTouch");
 }).Does(() =>
 {
@@ -226,9 +232,9 @@ Task("BuildAll")
     .IsDependentOn("BuildWindowsDX")
     .IsDependentOn("BuildAndroid")
     .IsDependentOn("BuildiOS")
-    .IsDependentOn("BuildUWP")
-    .IsDependentOn("BuildContentPipeline")
-    .IsDependentOn("BuildTools");
+    .IsDependentOn("BuildUWP");
+   // .IsDependentOn("BuildContentPipeline")
+   // .IsDependentOn("BuildTools");
 
 Task("PackInstallers")
     .IsDependentOn("PackWindows")
@@ -236,7 +242,7 @@ Task("PackInstallers")
     .IsDependentOn("PackMac");
 
 Task("Default")
-    .IsDependentOn("PackInstallers");
+    .IsDependentOn("BuildAll");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
