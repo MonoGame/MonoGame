@@ -6,7 +6,7 @@ using System;
 #if ANDROID
 using Android.Content.PM;
 #endif
-#if IOS
+#if __IOS__
 using UIKit;
 #endif
 
@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     maximumTouchCount = 2;
                 else
                     maximumTouchCount = 1;
-#elif IOS
+#elif __IOS__
                 //iPhone supports 5, iPad 11
                 isConnected = true;
                 if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone)

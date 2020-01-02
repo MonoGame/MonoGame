@@ -69,6 +69,8 @@ non-infringement.
 using System;
 using UIKit;
 
+#if !__TVOS__
+
 namespace Microsoft.Xna.Framework
 {
     public static class OrientationConverter
@@ -145,3 +147,5 @@ namespace Microsoft.Xna.Framework
         }
     }
 }
+
+#endif

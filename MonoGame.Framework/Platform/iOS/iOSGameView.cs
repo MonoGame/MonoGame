@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework {
 
 		private void Initialize ()
 		{
-            #if !TVOS
+            #if !__TVOS__
 			MultipleTouchEnabled = true;
             #endif
 			Opaque = true;

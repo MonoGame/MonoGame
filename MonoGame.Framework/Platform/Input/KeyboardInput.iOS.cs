@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using UIKit;
 
 namespace Microsoft.Xna.Framework.Input
@@ -6,7 +7,7 @@ namespace Microsoft.Xna.Framework.Input
     public static partial class KeyboardInput
     {
         private static TaskCompletionSource<string> tcs;
-        private static UIAlertView alert;
+        private static UIAlertController alert;
 
         private static Task<string> PlatformShow(string title, string description, string defaultText, bool usePasswordMode)
         {
@@ -14,32 +15,43 @@ namespace Microsoft.Xna.Framework.Input
 
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {
-                alert = new UIAlertView();
+                alert = new UIAlertController ();
                 alert.Title = title;
                 alert.Message = description;
-                alert.AlertViewStyle = usePasswordMode ? UIAlertViewStyle.SecureTextInput : UIAlertViewStyle.PlainTextInput;
-                alert.AddButton("Cancel");
-                alert.AddButton("Ok");
-                UITextField alertTextField = alert.GetTextField(0);
+                alert.AddTextField (CreateTextField (defaultText, usePasswordMode));
+
+                Action<UIAlertAction> cancelAction = (action) => {
+                    if (!tcs.Task.IsCompleted)
+                        tcs.SetResult (null);
+                };
+
+                Action<UIAlertAction> okAction = (action) => {
+
+                    if (!tcs.Task.IsCompleted)
+                        tcs.SetResult (alert.TextFields [0].Text);
+                };
+
+                alert.AddAction (UIAlertAction.Create ("Cancel", UIAlertActionStyle.Cancel, cancelAction));
+                alert.AddAction (UIAlertAction.Create ("OK", UIAlertActionStyle.Default, okAction));
+
+                UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController (alert, true, null);
+            });
+
+            return tcs.Task;
+        }
+
+        private static Action<UITextField> CreateTextField (string defaultText, bool usePasswordMode)
+        {
+            Action<UITextField> create = (alertTextField) => {
+                alertTextField.Text = defaultText;
+                alertTextField.SecureTextEntry = usePasswordMode;
                 alertTextField.KeyboardType = UIKeyboardType.ASCIICapable;
                 alertTextField.AutocorrectionType = UITextAutocorrectionType.No;
                 alertTextField.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
                 alertTextField.Text = defaultText;
-                alert.Dismissed += (sender, e) =>
-                {
-                    if (!tcs.Task.IsCompleted)
-                        tcs.SetResult(e.ButtonIndex == 0 ? null : alert.GetTextField(0).Text);
-                };
+            };
 
-                // UIAlertView's textfield does not show keyboard in iOS8
-                // http://stackoverflow.com/questions/25563108/uialertviews-textfield-does-not-show-keyboard-in-ios8
-                if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
-                    alert.Presented += (sender, args) => alertTextField.SelectAll(alert);
-
-                alert.Show();
-            });
-
-            return tcs.Task;
+            return create;
         }
 
         private static void PlatformCancel(string result)
@@ -49,7 +61,7 @@ namespace Microsoft.Xna.Framework.Input
 
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {
-                alert.DismissWithClickedButtonIndex(0, true);
+                alert.DismissViewController (true, null);
             });
         }
     }

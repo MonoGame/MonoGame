@@ -14,7 +14,7 @@ using Android.Content;
 using Android.Media;
 #endif
 
-#if IOS
+#if __IOS__ || __TVOS__
 using AudioToolbox;
 using AVFoundation;
 #endif
@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Audio
         // MacOS & Linux shares a limit of 256.
         internal const int MAX_NUMBER_OF_SOURCES = 256;
 
-#elif IOS
+#elif (__IOS__ || __TVOS__)
 
         // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
         internal const int MAX_NUMBER_OF_SOURCES = 32;
@@ -233,7 +233,7 @@ namespace Microsoft.Xna.Framework.Audio
                     AlcUpdateBuffers, updateBuffers,
                     0
                 };
-#elif IOS
+#elif (__IOS__ || __TVOS__)
                 AVAudioSession.SharedInstance().Init();
 
                 // NOTE: Do not override AVAudioSessionCategory set by the game developer:

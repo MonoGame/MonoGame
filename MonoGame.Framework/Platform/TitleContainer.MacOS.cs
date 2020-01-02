@@ -4,7 +4,7 @@
 
 using System;
 using System.IO;
-#if IOS
+#if (__IOS__ || __TVOS__)
 using Foundation;
 using UIKit;
 #elif MONOMAC
@@ -18,20 +18,20 @@ namespace Microsoft.Xna.Framework
         static partial void PlatformInit()
         {
             Location = NSBundle.MainBundle.ResourcePath;
-#if IOS
+#if (__IOS__ || __TVOS__)
             SupportRetina = UIScreen.MainScreen.Scale >= 2.0f;
             RetinaScale = (int)Math.Round(UIScreen.MainScreen.Scale);
 #endif
         }
 
-#if IOS
+#if (__IOS__ || __TVOS__)
         static internal bool SupportRetina { get; private set; }
         static internal int RetinaScale { get; private set; }
 #endif
 
         private static Stream PlatformOpenStream(string safeName)
         {
-#if IOS
+#if (__IOS__ || __TVOS__)
             var absolutePath = Path.Combine(Location, safeName);
             if (SupportRetina)
             {

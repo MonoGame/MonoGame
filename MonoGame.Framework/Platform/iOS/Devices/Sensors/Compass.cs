@@ -2,7 +2,10 @@ using System;
 
 using Microsoft.Xna.Framework;
 
+#if !__TVOS__
 using CoreMotion;
+#endif
+
 using Foundation;
 
 namespace Microsoft.Devices.Sensors
@@ -19,13 +22,19 @@ namespace Microsoft.Devices.Sensors
 
         public static bool IsSupported
         {
+#if __TVOS__
+            get { return false; }
+#else
             get { return motionManager.DeviceMotionAvailable; }
+#endif
         }
+
         public SensorState State
         {
             get { return state; }
         }
 
+#if !__TVOS__
         private static event CMDeviceMotionHandler readingChanged;
 
         public Compass()
@@ -121,6 +130,15 @@ namespace Microsoft.Devices.Sensors
         {
             motionManager.MagnetometerUpdateInterval = this.TimeBetweenUpdates.TotalSeconds;
         }
+#else // !__TVOS__
+        public override void Start()
+        {
+        }
+
+        public override void Stop()
+        {
+        }
+#endif
     }
 }
 

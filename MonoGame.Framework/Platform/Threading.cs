@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework.Graphics;
-#if IOS
+#if (__IOS__ || __TVOS__)
 using Foundation;
 using OpenGLES;
 #endif
@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework
 #if ANDROID || WINDOWS || DESKTOPGL || ANGLE
         static List<Action> actions = new List<Action>();
         //static Mutex actionsMutex = new Mutex();
-#elif IOS
+#elif (__IOS__ || __TVOS__)
         public static EAGLContext BackgroundContext;
 #endif
 
@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
-#if IOS
+#if (__IOS__ || __TVOS__) 
             lock (BackgroundContext)
             {
                 // Make the context current on this thread if it is not already

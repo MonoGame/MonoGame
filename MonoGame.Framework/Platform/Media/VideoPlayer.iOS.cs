@@ -4,9 +4,9 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using MediaPlayer;
 using Foundation;
-using UIKit;
+using AVKit;
+using AVFoundation;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -36,25 +36,22 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformPause()
         {
-            throw new NotImplementedException();
+            _currentVideo.MovieView.Player.Pause ();
         }
 
         private void PlatformResume()
         {
-            _currentVideo.MovieView.MoviePlayer.Play();
+            _currentVideo.MovieView.Player.Play ();
         }
 
         private void PlatformPlay()
         {
             _platform.IsPlayingVideo = true;
 
-            _playbackDidFinishObserver = NSNotificationCenter.DefaultCenter.AddObserver(
-                MPMoviePlayerController.PlaybackDidFinishNotification, OnStop);
-
-            _currentVideo.MovieView.MoviePlayer.RepeatMode = IsLooped ? MPMovieRepeatMode.One : MPMovieRepeatMode.None;
+            _playbackDidFinishObserver = AVPlayerItem.Notifications.ObserveDidPlayToEndTime(OnStop);
 
             _platform.ViewController.PresentViewController(_currentVideo.MovieView, false, null);
-            _currentVideo.MovieView.MoviePlayer.Play();
+            _currentVideo.MovieView.Player.Play();
         }
 
         private void PlatformStop()
@@ -65,19 +62,21 @@ namespace Microsoft.Xna.Framework.Media
                 _playbackDidFinishObserver = null;
             }
 
-            _currentVideo.MovieView.MoviePlayer.Stop();
+            _currentVideo.MovieView.Player.Pause ();
+            _currentVideo.MovieView.Player.Rate = 0f;
+
             _platform.IsPlayingVideo = false;
             _platform.ViewController.DismissViewController(false, null);
         }
 
-        private void OnStop(NSNotification e)
+        private void OnStop(object sender, NSNotificationEventArgs args)
         {
             Stop();
         }
 
         private TimeSpan PlatformGetPlayPosition()
         {
-            throw new NotImplementedException();
+            return TimeSpan.FromSeconds (_currentVideo.MovieView.Player.CurrentTime.Seconds);
         }
 
         private void PlatformSetIsLooped()

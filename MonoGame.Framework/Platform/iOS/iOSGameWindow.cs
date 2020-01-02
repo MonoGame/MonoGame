@@ -135,7 +135,7 @@ namespace Microsoft.Xna.Framework {
 
 		public override DisplayOrientation CurrentOrientation {
 			get {
-                #if TVOS
+                #if __TVOS__
                 return DisplayOrientation.LandscapeLeft;
                 #else
 				return OrientationConverter.ToDisplayOrientation(_viewController.InterfaceOrientation);

@@ -4,7 +4,7 @@
 
 using System;
 using System.Collections.Generic;
-#if IOS
+#if __IOS__ || __TVOS__
 using UIKit;
 #endif
 
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Media
 	
 		public static IList<MediaSource> GetAvailableMediaSources()
         {
-#if IOS
+#if __IOS__ || __TVOS__
 			MediaSource[] result = { new MediaSource(UIDevice.CurrentDevice.SystemName, MediaSourceType.LocalDevice) };
 #else
 			MediaSource[] result = { new MediaSource("DummpMediaSource", MediaSourceType.LocalDevice) };

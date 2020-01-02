@@ -317,7 +317,7 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
-#if IOS
+#if (__IOS__ || __TVOS__)
         [Obsolete("This platform's policy does not allow programmatically closing.", true)]
 #endif
         public void Exit()
@@ -451,7 +451,7 @@ namespace Microsoft.Xna.Framework
                 lock (_locker)
                     if (sleepTime >= 2.0)
                         System.Threading.Monitor.Wait(_locker, 1);
-#elif DESKTOPGL || ANDROID || IOS
+#elif (DESKTOPGL || ANDROID || __IOS__ || __TVOS__)
                 if (sleepTime >= 2.0)
                     System.Threading.Thread.Sleep(1);
 #endif

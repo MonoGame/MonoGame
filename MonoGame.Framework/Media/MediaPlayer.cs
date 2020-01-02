@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Media
         public static TimeSpan PlayPosition
         {
             get { return PlatformGetPlayPosition(); }
-#if (IOS && !TVOS) || ANDROID
+#if (__IOS__ && !__TVOS__) || ANDROID
             set { PlatformSetPlayPosition(value); }
 #endif
         }

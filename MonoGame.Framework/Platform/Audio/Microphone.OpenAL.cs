@@ -9,7 +9,7 @@ using MonoGame.Utilities;
 
 #if OPENAL
 using MonoGame.OpenAL;
-#if IOS || MONOMAC
+#if __IOS__ || MONOMAC || __TVOS__
 using AudioToolbox;
 using AudioUnit;
 using AVFoundation;

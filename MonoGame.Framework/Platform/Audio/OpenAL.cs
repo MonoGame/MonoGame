@@ -650,7 +650,7 @@ namespace MonoGame.OpenAL
             return GetString(device, (int)p);
         }
 
-#if IOS
+#if __IOS__ || __TVOS__
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate void d_alcsuspendcontext(IntPtr context);
         internal static d_alcsuspendcontext SuspendContext = FuncLoader.LoadFunction<d_alcsuspendcontext>(AL.NativeLibrary, "alcSuspendContext");

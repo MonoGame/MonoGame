@@ -8,7 +8,7 @@ using System.IO;
 #if OPENAL
 using MonoGame.OpenAL;
 #endif
-#if IOS
+#if __IOS__ || __TVOS__
 using AudioToolbox;
 using AudioUnit;
 #endif
@@ -17,7 +17,11 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect : IDisposable
     {
+#if __TVOS__
+        internal const int MAX_PLAYING_INSTANCES = 32;
+#else
         internal const int MAX_PLAYING_INSTANCES = OpenALSoundController.MAX_NUMBER_OF_SOURCES;
+#endif
         internal static uint ReverbSlot = 0;
         internal static uint ReverbEffect = 0;
 

@@ -6,7 +6,7 @@ using System;
 using System.IO;
 #if WINDOWS_UAP
 using Windows.Storage.FileProperties;
-#elif IOS
+#elif __IOS__ && !__TVOS__
 using System.Drawing;
 using CoreGraphics;
 using MediaPlayer;
@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Media
         private SongCollection songCollection;
 #if WINDOWS_UAP
         private StorageItemThumbnail thumbnail;
-#elif IOS && !TVOS
+#elif __IOS__ && !__TVOS__
         private MPMediaItemArtwork thumbnail;
 #elif ANDROID
         private Android.Net.Uri thumbnail;
@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Media
             {
 #if WINDOWS_UAP
                 return this.thumbnail != null;
-#elif IOS && !TVOS
+#elif __IOS__ && !__TVOS__
                 // If album art is missing the bounds will be: Infinity, Infinity, 0, 0
                 return this.thumbnail != null && this.thumbnail.Bounds.Width != 0;
 #elif ANDROID
@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             this.thumbnail = thumbnail;
         }
-#elif IOS && !TVOS
+#elif __IOS__ && !__TVOS__
         internal Album(SongCollection songCollection, string name, Artist artist, Genre genre, MPMediaItemArtwork thumbnail)
             : this(songCollection, name, artist, genre)
         {
@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Media
 #endif
         }
         
-#if IOS && !TVOS
+#if __IOS__ && !__TVOS__
         [CLSCompliant(false)]
         public UIImage GetAlbumArt(int width = 0, int height = 0)
         {
@@ -192,7 +192,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 #endif
 
-#if IOS && !TVOS
+#if __IOS__ && !__TVOS__
         [CLSCompliant(false)]
         public UIImage GetThumbnail()
         {

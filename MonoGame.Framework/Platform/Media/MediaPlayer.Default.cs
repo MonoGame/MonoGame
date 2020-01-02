@@ -4,7 +4,7 @@
 
 using System;
 
-#if IOS
+#if __IOS__
 using AudioToolbox;
 using AVFoundation;
 #endif
@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Media
             return _queue.ActiveSong.Position;
         }
 
-#if (IOS && !TVOS) || ANDROID
+#if (__IOS__ && !__TVOS__) || ANDROID
         private static void PlatformSetPlayPosition(TimeSpan playPosition)
         {
             if (_queue.ActiveSong != null)
@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private static bool PlatformGetGameHasControl()
         {
-#if IOS
+#if __IOS__
             return !AVAudioSession.SharedInstance().OtherAudioPlaying;
 #else
             // TODO: Fix me!

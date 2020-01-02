@@ -10,7 +10,7 @@ namespace Microsoft.Devices.Sensors
 	public abstract class SensorBase<TSensorReading> : IDisposable
 		where TSensorReading : ISensorReading
 	{
-#if IOS
+#if __IOS__ && !__TVOS__
         [CLSCompliant(false)]
         protected static readonly CoreMotion.CMMotionManager motionManager = new CoreMotion.CMMotionManager();
 #endif

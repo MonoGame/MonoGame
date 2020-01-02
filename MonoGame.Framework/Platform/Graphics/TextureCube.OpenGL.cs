@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (mipMap)
                 {
-#if IOS || ANDROID
+#if (__IOS__ || __TVOS__) || ANDROID
                     GL.GenerateMipmap(GenerateMipmapTarget.TextureCubeMap);
 #else
                     GraphicsDevice.FramebufferHelper.Get().GenerateMipmap((int) glTarget);

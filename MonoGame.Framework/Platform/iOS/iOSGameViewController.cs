@@ -12,14 +12,14 @@ using CoreGraphics;
 namespace Microsoft.Xna.Framework
 {
     class iOSGameViewController : 
-    #if TVOS
+    #if __TVOS__
         GameController.GCEventViewController
     #else
         UIViewController
     #endif
     {
         iOSGamePlatform _platform;
-        #if TVOS
+        #if __TVOS__
         IPlatformBackButton platformBackButton;
         #endif
 
@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework
             {
                 UIScreen screen = UIScreen.MainScreen;
 
-                #if !TVOS
+                #if !__TVOS__
                 // iOS 7 and older reverses width/height in landscape mode when reporting resolution,
                 // iOS 8+ reports resolution correctly in all cases
                 if (InterfaceOrientation == UIInterfaceOrientation.LandscapeLeft || InterfaceOrientation == UIInterfaceOrientation.LandscapeRight)
@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework
             // Need to set resize mask to ensure a view resize (which in iOS 8+ corresponds with a rotation) adjusts
             // the view and underlying CALayer correctly
             View.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
-            #if TVOS
+            #if __TVOS__
             ControllerUserInteractionEnabled = false;
             #endif
         }
@@ -78,7 +78,7 @@ namespace Microsoft.Xna.Framework
         {
             get { return (iOSGameView)base.View; }
         }
-        #if !TVOS
+        #if !__TVOS__
 
         #region Autorotation for iOS 5 or older
         public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
@@ -162,7 +162,7 @@ namespace Microsoft.Xna.Framework
 
         #endif
 
-        #if TVOS
+        #if __TVOS__
 
         public override UIView PreferredFocusedView
         {
@@ -187,10 +187,6 @@ namespace Microsoft.Xna.Framework
                         if (!platformBackButton.Handled())
                         {
                             ControllerUserInteractionEnabled = true;
-                        }
-                        else
-                        {
-                            Microsoft.Xna.Framework.Input.GamePad.MenuPressed = true;
                         }
                     }
                     else

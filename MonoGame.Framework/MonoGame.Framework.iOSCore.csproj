@@ -1,7 +1,7 @@
 <Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
-    <TargetFramework>xamarinios10</TargetFramework>
+    <TargetFrameworks>xamarinios10;xamarintvos10</TargetFrameworks>
     <DefineConstants>IOS;GLES</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>

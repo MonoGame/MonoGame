@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         // always true on mobile, this can't be queried on any platform (it was most probably only set to true if the headset was plugged in an XInput controller)
-#if IOS || ANDROID
+#if __IOS__ || ANDROID
         private const bool _isHeadset = true;
 #else
         private const bool _isHeadset = false;

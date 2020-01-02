@@ -7,7 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MonoGame.Utilities;
 
-#if IOS
+#if (__IOS__ || __TVOS__)
 using UIKit;
 using CoreGraphics;
 using Foundation;
@@ -254,7 +254,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if IOS
+#if (__IOS__ || __TVOS__)
         [CLSCompliant(false)]
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, UIImage uiImage)
         {
@@ -296,7 +296,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
-#if IOS
+#if (__IOS__ || __TVOS__)
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, CGImage cgImage)
         {
 			var width = cgImage.Width;

@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework
 
             _applicationObservers = new List<NSObject>();
 
-            #if !TVOS
+            #if !__TVOS__
             UIApplication.SharedApplication.SetStatusBarHidden(true, UIStatusBarAnimation.Fade);
             #endif
 
@@ -293,7 +293,7 @@ namespace Microsoft.Xna.Framework
         private void Application_DidBecomeActive(NSNotification notification)
         {
             IsActive = true;
-            #if TVOS
+            #if __TVOS__
             _viewController.ControllerUserInteractionEnabled = false;
             #endif
             //TouchPanel.Reset();
@@ -319,7 +319,7 @@ namespace Microsoft.Xna.Framework
 
         private DisplayOrientation CurrentOrientation {
             get {
-                #if TVOS
+                #if __TVOS__
                 return DisplayOrientation.LandscapeLeft;
                 #else
                 return OrientationConverter.ToDisplayOrientation(_viewController.InterfaceOrientation);

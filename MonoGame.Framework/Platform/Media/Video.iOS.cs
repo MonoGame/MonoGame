@@ -4,10 +4,9 @@
 
 using System;
 using System.IO;
-
-using MediaPlayer;
+using AVFoundation;
+using AVKit;
 using Foundation;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -16,7 +15,7 @@ namespace Microsoft.Xna.Framework.Media
     /// </summary>
     public sealed partial class Video : IDisposable
     {
-        internal MPMoviePlayerViewController MovieView { get; private set; }
+        internal AVPlayerViewController MovieView { get; private set; }
 
         /*
         // NOTE: https://developer.apple.com/library/ios/documentation/MediaPlayer/Reference/MPMoviePlayerController_Class/Reference/Reference.html
@@ -42,10 +41,11 @@ namespace Microsoft.Xna.Framework.Media
         {
             var url = NSUrl.FromFilename(Path.GetFullPath(FileName));
 
-            MovieView = new MPMoviePlayerViewController(url);
-            MovieView.MoviePlayer.ScalingMode = MPMovieScalingMode.AspectFill;
-            MovieView.MoviePlayer.ControlStyle = MPMovieControlStyle.None;
-            MovieView.MoviePlayer.PrepareToPlay();
+            MovieView = new AVPlayerViewController ();
+            var player = AVPlayer.FromUrl (url);
+            MovieView.Player = player;
+            MovieView.VideoGravity = AVLayerVideoGravity.ResizeAspectFill;
+            MovieView.ShowsPlaybackControls = false;
         }
 
         private void PlatformDispose(bool disposing)
