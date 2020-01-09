@@ -166,6 +166,7 @@
     <Compile Include="Framework\RayTest.cs" />
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Runner\PixelArgb.cs" />
+    <Compile Include="Runner\Program.cs" />
     <Compile Include="Runner\Utility.cs" />
     <Compile Include="Framework\Components\FrameCompareComponent.cs" />
     <Compile Include="Framework\GameTest+Properties.cs" />
@@ -176,7 +177,6 @@
     <Compile Include="Framework\Components\UpdateGuard.cs" />
     <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
-    <Compile Include="Runner\Windows\Program.cs" />
     <Compile Include="Framework\Components\Colored3DCubeComponent.cs" />
     <Compile Include="Framework\Components\TexturedQuadComponent.cs" />
     <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
