@@ -50,13 +50,6 @@ namespace MonoGame.Tests.Input
             }
         }
 
-#endif
-
-        [Test]
-        public void TestGetState()
-        {
-            Keyboard.GetState();
-        }
 
         [TestCase(new[] { Keys.Up, Keys.A, Keys.Left, Keys.Oem8, Keys.Apps })]
         public void TestGetPressedKeysGarbageless(Keys[] keys)
@@ -71,6 +64,14 @@ namespace MonoGame.Tests.Input
             state.GetPressedKeys(newKeysArray);
 
             CollectionAssert.AreEquivalent(keys, newKeysArray);
+        }
+
+#endif
+
+        [Test]
+        public void TestGetState()
+        {
+            Keyboard.GetState();
         }
     }
 }
