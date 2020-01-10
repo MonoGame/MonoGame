@@ -419,8 +419,12 @@ namespace Microsoft.Xna.Framework.Graphics
             if (GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt) == FramebufferErrorCode.FramebufferComplete)
             {
 #endif
+
                 GL.Clear(bufferMask);
+#if !__TVOS__ && !__IOS__
                 GraphicsExtensions.CheckGLError();
+#endif
+
 #if MONOMAC
             }
 #endif

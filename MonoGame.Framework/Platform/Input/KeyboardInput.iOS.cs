@@ -15,9 +15,7 @@ namespace Microsoft.Xna.Framework.Input
 
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {
-                alert = new UIAlertController ();
-                alert.Title = title;
-                alert.Message = description;
+                alert = UIAlertController.Create(title, description, UIAlertControllerStyle.Alert);
                 alert.AddTextField (CreateTextField (defaultText, usePasswordMode));
 
                 Action<UIAlertAction> cancelAction = (action) => {
