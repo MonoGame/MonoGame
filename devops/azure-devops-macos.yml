@@ -1,0 +1,180 @@
+pool:
+  name: Hosted macOS
+  demands: msbuild
+
+steps:
+- checkout: self
+
+- task: InstallAppleCertificate@2
+  inputs:
+    certSecureFile: 'Dev.p12'
+    certPwd: '$(DevCertPwd)'
+    keychain: 'temp'
+
+- task: InstallAppleProvisioningProfile@1
+  inputs:
+    provisioningProfileLocation: 'secureFiles'
+    provProfileSecureFile: '0b4d25a7-8250-4ec1-bbae-6dde6271ead8.mobileprovision'
+
+- task: InstallAppleProvisioningProfile@1
+  inputs:
+    provisioningProfileLocation: 'secureFiles'
+    provProfileSecureFile: '7651b03d-ed9e-44e8-882a-928a7f0b5215.mobileprovision'
+
+- task: InstallAppleProvisioningProfile@1
+  inputs:
+    provisioningProfileLocation: 'secureFiles'
+    provProfileSecureFile: '39824897-47c7-4b5a-b439-b738319bf109.mobileprovision'
+
+- task: InstallAppleProvisioningProfile@1
+  inputs:
+    provisioningProfileLocation: 'secureFiles'
+    provProfileSecureFile: 'b2503178-3599-453e-909f-0b9d05f21112.mobileprovision'
+
+# Install Mono
+- task: CmdLine@2
+  displayName: 'Provisioning Mono SDK'
+  inputs:
+    script: 'cd ~;
+            curl -O https://download.mono-project.com/archive/6.4.0/macos-10-universal/MonoFramework-MDK-6.4.0.198.macos10.xamarin.universal.pkg;
+            sudo installer -pkg ~/MonoFramework-MDK-6.4.0.198.macos10.xamarin.universal.pkg -target /'
+
+# Azure DevOps hosted pool is still using an old version of Xamarin.iOS, 
+# so we will upgrade
+- task: CmdLine@2
+  displayName: 'Provisioning Xamarin.iOS'
+  inputs:
+    script: 'cd ~;
+            curl -O https://download.visualstudio.microsoft.com/download/pr/d11a42ff-dd11-4005-b5a8-799856a96aad/2893a2da0df8a2e2d45ea17e2be2ccce/xamarin.ios-13.4.0.2.pkg;
+            sudo installer -pkg ~/xamarin.ios-13.4.0.2.pkg -target /'
+
+- task: CmdLine@2
+  displayName: 'Provisioning Xamarin.Mac'
+  inputs:
+    script: 'cd ~;
+            curl -O https://download.visualstudio.microsoft.com/download/pr/6a9f2134-313e-4d48-ac3e-4b14ecb3e311/4dd2ac187f85b54c672bb55304003b43/xamarin.mac-6.4.0.2.pkg;
+            sudo installer -pkg ~/xamarin.mac-6.4.0.2.pkg -target /'
+
+- task: CmdLine@2
+  displayName: 'Provisioning Xamarin.Android'
+  inputs:
+    script: 'cd ~;
+            curl -O https://download.visualstudio.microsoft.com/download/pr/1e90a742-fe8b-4e8c-8e4b-a5045d6105eb/385189201cb606b9c44957d67f1ce55c/xamarin.android-10.0.6.2.pkg;
+            sudo installer -pkg ~/xamarin.android-10.0.6.2.pkg -target /'
+
+
+
+# Print the current version of Xamarin.iOS
+- task: CmdLine@2
+  displayName: 'Show Xamarin.iOS Version'
+  inputs:
+    script: '/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/bin/mtouch --version'
+
+
+
+- task: NuGetCommand@2 #MonoGame.Framework/MonoGame.Framework.iOSCore.csproj
+  displayName: 'NuGet restore  MonoGame.Framework/MonoGame.Framework.iOSCore.csproj'
+  inputs:
+    restoreSolution: ./MonoGame.Framework/MonoGame.Framework.iOSCore.csproj
+
+- script: 'brew update'
+  displayName: 'Brew Update'
+
+- script: 'brew install gitversion --ignore-dependencies'
+  displayName: 'Install GitVersion'
+
+- task: PowerShell@2
+  displayName: 'PreBuild Codefoco.MonoGame.Framework'
+  inputs:
+    targetType: filePath
+    filePath: ./devops/PreBuild.ps1
+    arguments: 'Codefoco.MonoGame.Framework Codefoco.MonoGame.Framework.nuspec'
+
+# Build  MonoGame
+
+- task: MSBuild@1 # Fantas.MonoGame.sln
+  displayName: 'Build csproj ./MonoGame.Framework/MonoGame.Framework.iOSCore.csproj'
+  inputs:
+    solution: ./MonoGame.Framework/MonoGame.Framework.iOSCore.csproj
+    configuration: Release
+
+- task: PublishBuildArtifacts@1 
+  displayName: 'Publish Artifact: MonoGame.Frawework.dll'
+  inputs:
+    PathtoPublish: bin/iOSCore/Release/xamarinios10/MonoGame.Framework.dll
+    ArtifactName: Xamarin.iOS.MonoGame.Framework.dll
+
+- task: PublishBuildArtifacts@1 
+  displayName: 'Publish Artifact: MonoGame.Frawework.pdb'
+  inputs:
+    PathtoPublish: bin/iOSCore/Release/xamarinios10/MonoGame.Framework.pdb
+    ArtifactName: Xamarin.iOS.MonoGame.Framework.pdb
+
+- task: PublishBuildArtifacts@1 
+  displayName: 'Publish Artifact: MonoGame.Frawework.xml'
+  inputs:
+    PathtoPublish: bin/iOSCore/Release/xamarinios10/MonoGame.Framework.xml
+    ArtifactName: Xamarin.iOS.MonoGame.Framework.xml
+
+- task: PublishBuildArtifacts@1 
+  displayName: 'Publish Artifact: MonoGame.Frawework.pdb'
+  inputs:
+    PathtoPublish: bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.dll
+    ArtifactName: Xamarin.iOS.MonoGame.Framework.dll
+
+- task: PublishBuildArtifacts@1 
+  displayName: 'Publish Artifact: MonoGame.Frawework.pdb'
+  inputs:
+    PathtoPublish: bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.pdb
+    ArtifactName: Xamarin.iOS.MonoGame.Framework.pdb
+
+- task: PublishBuildArtifacts@1 
+  displayName: 'Publish Artifact: MonoGame.Frawework.xml'
+  inputs:
+    PathtoPublish: bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.xml
+    ArtifactName: Xamarin.iOS.MonoGame.Framework.xml
+
+- task: TriggerBuild@3
+  displayName: 'Trigger a new build of Codefoco.MonoGame.Windows'
+  inputs:
+    buildDefinition: 'Codefoco.MonoGame.Windows'
+    ignoreSslCertificateErrors: true
+    useSameSourceVersion: true
+    password: '$(myToken)'
+
+- task: SendTelegramNotification@0
+  condition: in(variables['Agent.JobStatus'], 'SucceededWithIssues')
+  inputs:
+    botToken: '$(botToken)'
+    chats: '$(chatId)'
+    taskStatus: false
+    message: |
+            ⚠️ <b>Warning!</b>  <a href="$(Build.Repository.Uri)">$(Build.DefinitionName)</a> (<code>$(Build.SourceBranchName)</code>)
+            <pre>$(Build.SourceVersion)</pre>
+            $(Build.SourceVersionMessage) by $(Build.QueuedBy)
+
+- task: SendTelegramNotification@0
+  condition: in(variables['Agent.JobStatus'], 'Failed')
+  inputs:
+    botToken: '$(botToken)'
+    chats: '$(chatId)'
+    taskStatus: false
+    buildQueuedBy: false
+    message: |
+            ❌ <b>Fail!</b>  <a href="$(Build.Repository.Uri)">$(Build.DefinitionName)</a> (<code>$(Build.SourceBranchName)</code>)
+            <pre>$(Build.SourceVersion)</pre>
+            $(Build.SourceVersionMessage) by $(Build.QueuedBy)
+
+- task: SendTelegramNotification@0
+  condition: in(variables['Agent.JobStatus'], 'Succeeded')
+  inputs:
+    botToken: '$(botToken)'
+    chats: '$(chatId)'
+    taskStatus: false
+    buildQueuedBy: false
+    message: |
+            ✅ <b>Success!</b>  <a href="$(Build.Repository.Uri)">$(Build.DefinitionName)</a> (<code>$(Build.SourceBranchName)</code>)
+            <pre>$(Build.SourceVersion)</pre>
+            $(Build.SourceVersionMessage) by $(Build.QueuedBy)
+
+# 
