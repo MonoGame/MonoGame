@@ -4,6 +4,7 @@ pool:
 
 steps:
 - checkout: self
+  submodules: 'true'
 
 - task: InstallAppleCertificate@2
   inputs:
