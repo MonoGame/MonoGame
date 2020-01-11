@@ -102,37 +102,37 @@ steps:
 - task: PublishBuildArtifacts@1 
   displayName: 'Publish Artifact: MonoGame.Frawework.dll'
   inputs:
-    PathtoPublish: bin/iOSCore/Release/xamarinios10/MonoGame.Framework.dll
+    PathtoPublish: ./MonoGame.Framework/bin/iOSCore/Release/xamarinios10/MonoGame.Framework.dll
     ArtifactName: Xamarin.iOS.MonoGame.Framework.dll
 
 - task: PublishBuildArtifacts@1 
   displayName: 'Publish Artifact: MonoGame.Frawework.pdb'
   inputs:
-    PathtoPublish: bin/iOSCore/Release/xamarinios10/MonoGame.Framework.pdb
+    PathtoPublish: ./MonoGame.Framework/bin/iOSCore/Release/xamarinios10/MonoGame.Framework.pdb
     ArtifactName: Xamarin.iOS.MonoGame.Framework.pdb
 
 - task: PublishBuildArtifacts@1 
   displayName: 'Publish Artifact: MonoGame.Frawework.xml'
   inputs:
-    PathtoPublish: bin/iOSCore/Release/xamarinios10/MonoGame.Framework.xml
+    PathtoPublish: ./MonoGame.Framework/bin/iOSCore/Release/xamarinios10/MonoGame.Framework.xml
     ArtifactName: Xamarin.iOS.MonoGame.Framework.xml
 
 - task: PublishBuildArtifacts@1 
   displayName: 'Publish Artifact: MonoGame.Frawework.pdb'
   inputs:
-    PathtoPublish: bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.dll
+    PathtoPublish: ./MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.dll
     ArtifactName: Xamarin.iOS.MonoGame.Framework.dll
 
 - task: PublishBuildArtifacts@1 
   displayName: 'Publish Artifact: MonoGame.Frawework.pdb'
   inputs:
-    PathtoPublish: bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.pdb
+    PathtoPublish: ./MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.pdb
     ArtifactName: Xamarin.iOS.MonoGame.Framework.pdb
 
 - task: PublishBuildArtifacts@1 
   displayName: 'Publish Artifact: MonoGame.Frawework.xml'
   inputs:
-    PathtoPublish: bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.xml
+    PathtoPublish: ./MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.xml
     ArtifactName: Xamarin.iOS.MonoGame.Framework.xml
 
 - task: TriggerBuild@3
