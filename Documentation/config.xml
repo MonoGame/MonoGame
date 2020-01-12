@@ -38,8 +38,10 @@
         <topic id="adding_content" name="Adding Content" filename="getting_started/3_adding_content.md"/>
         <topic id="adding_basic_code" name="Adding Basic Code" filename="getting_started/4_adding_basic_code.md"/>
     </topic>
+    <topic id="setting_up_project" name="Setting up a new project" filename="setting_up_project/setting_up_project.md">
+        <topic id="setting_up_project_vscode" name="Visual Studio Code" filename="setting_up_project/setting_up_project_vscode.md"/>
+    </topic>
     <topic id="Tutorials" name="Tutorials" filename="tutorials.md"/>
-    
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
         <topic id="Using_The_Pipeline_Tool" name="Using The Pipeline Tool" filename="using_pipeline_tool.md"/>
         <topic id="Custom_Effects" name="Custom Effects" filename="custom_effects.md"/>
