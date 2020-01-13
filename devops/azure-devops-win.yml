@@ -1,0 +1,187 @@
+pool:
+  name: Hosted VS2017
+  demands:
+  - msbuild
+  - visualstudio
+  - vstest
+
+steps:
+- checkout: self 
+  submodules: true
+
+- task: NuGetToolInstaller@1
+  displayName: 'Use NuGet 5.3.1'
+  inputs:
+    versionSpec: 5.3.1
+
+- powershell: 'Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString(''https://chocolatey.org/install.ps1''))'
+  displayName: 'Install Choco'
+
+- script: 'choco install gitversion.portable --pre '
+  displayName: 'Install GitVersion'
+
+- task: PowerShell@2
+  displayName: 'PreBuild Script MonoGame'
+  inputs:
+    targetType: filePath
+    filePath: ./devops/PreBuild.ps1
+    arguments: 'Codefoco.MonoGame.Framework Codefoco.MonoGame.Framework.nuspec'
+
+- task: PowerShell@2
+  displayName: 'Cake Build MonoGame.Framework'
+  inputs:
+    targetType: filePath
+    filePath: ./build.ps1
+
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Xamarin.iOS.MonoGame.Framework.dll'
+  inputs:
+    buildType: 'specific'
+    project: 'NuGets'
+    definition: 'Codefoco.MonoGame.Framework.Mac'
+    specificBuildWithTriggering: true
+    artifactName: Xamarin.iOS.MonoGame.Framework.dll
+
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Xamarin.iOS.MonoGame.Framework.pdb'
+  inputs:
+    buildType: 'specific'
+    project: 'NuGets'
+    definition: 'Codefoco.MonoGame.Framework.Mac'
+    specificBuildWithTriggering: true
+    artifactName: Xamarin.iOS.MonoGame.Framework.pdb
+
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Xamarin.iOS.MonoGame.Framework.xml'
+  inputs:
+    buildType: 'specific'
+    project: 'NuGets'
+    definition: 'Codefoco.MonoGame.Framework.Mac'
+    specificBuildWithTriggering: true
+    artifactName: Xamarin.iOS.MonoGame.Framework.xml
+
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Xamarin.tvOS.MonoGame.Framework.dll'
+  inputs:
+    buildType: 'specific'
+    project: 'NuGets'
+    definition: 'Codefoco.MonoGame.Framework.Mac'
+    specificBuildWithTriggering: true
+    artifactName: Xamarin.tvOS.MonoGame.Framework.dll
+
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Xamarin.tvOS.MonoGame.Framework.pdb'
+  inputs:
+    buildType: 'specific'
+    project: 'NuGets'
+    definition: 'Codefoco.MonoGame.Framework.Mac'
+    specificBuildWithTriggering: true
+    artifactName: Xamarin.tvOS.MonoGame.Framework.pdb
+
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Xamarin.tvOS.MonoGame.Framework.xml'
+  inputs:
+    buildType: 'specific'
+    project: 'NuGets'
+    definition: 'Codefoco.MonoGame.Framework.Mac'
+    specificBuildWithTriggering: true
+    artifactName: Xamarin.tvOS.MonoGame.Framework.xml
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: MonoGame.Framework/bin/iOSCore/Release/xamarinios10/MonoGame.Framework.dll'
+  inputs:
+    SourceFolder: '$(System.ArtifactsDirectory)\Xamarin.iOS.MonoGame.Framework.dll\'
+    TargetFolder: MonoGame.Framework/bin/iOSCore/Release/xamarinios10/
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: MonoGame.Framework/bin/iOSCore/Release/xamarinios10/MonoGame.Framework.pdb'
+  inputs:
+    SourceFolder: '$(System.ArtifactsDirectory)\Xamarin.iOS.MonoGame.Framework.pdb\'
+    TargetFolder: MonoGame.Framework/bin/iOSCore/Release/xamarinios10/
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: MonoGame.Framework/bin/iOSCore/Release/xamarinios10/MonoGame.Framework.xml'
+  inputs:
+    SourceFolder: '$(System.ArtifactsDirectory)\Xamarin.iOS.MonoGame.Framework.xml\'
+    TargetFolder: MonoGame.Framework/bin/iOSCore/Release/xamarinios10/
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.dll'
+  inputs:
+    SourceFolder: '$(System.ArtifactsDirectory)\Xamarin.tvOS.MonoGame.Framework.dll\'
+    TargetFolder: MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.pdb'
+  inputs:
+    SourceFolder: '$(System.ArtifactsDirectory)\Xamarin.tvOS.MonoGame.Framework.pdb\'
+    TargetFolder: MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.xml'
+  inputs:
+    SourceFolder: '$(System.ArtifactsDirectory)\Xamarin.tvOS.MonoGame.Framework.xml\'
+    TargetFolder: MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/
+
+- script: 'nuget setapikey $(apikey)'
+  displayName: 'Set NuGet API Key'
+
+- task: PowerShell@2
+  displayName: 'Package Codefoco.MonoGame.Framework.nuget NuGet'
+  inputs:
+    targetType: filePath
+    filePath: ./devops/Package.ps1
+    arguments: 'Codefoco.MonoGame.Framework Codefoco.MonoGame.Framework.nuspec'
+
+- script: 'rename Codefoco.MonoGame.Framework.*.nupkg Codefoco.MonoGame.Framework.nupkg'
+  displayName: 'Rename Fantas.MonoGame Nuget Package'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Save Codefoco.MonoGame.Framework.nupkg Artifact'
+  inputs:
+    PathtoPublish: Codefoco.MonoGame.Framework.nupkg
+    ArtifactName: Codefoco.MonoGame.Framework.nupkg
+
+- task: PowerShell@2
+  displayName: 'Publish Codefoco.MonoGame.Framework NuGet'
+  inputs:
+    targetType: filePath
+    filePath: ./devops/Publish.ps1
+    arguments: Codefoco.MonoGame.Framework
+
+- task: SendTelegramNotification@0
+  condition: in(variables['Agent.JobStatus'], 'SucceededWithIssues')
+  inputs:
+    botToken: '$(botToken)'
+    chats: '$(chatId)'
+    taskStatus: false
+    message: |
+            ⚠️ <b>Warning!</b>  <a href="$(Build.Repository.Uri)">$(Build.DefinitionName)</a> (<code>$(Build.SourceBranchName)</code>)
+            <pre>$(Build.SourceVersion)</pre>
+            $(Build.SourceVersionMessage) by $(Build.QueuedBy)
+
+- task: SendTelegramNotification@0
+  condition: in(variables['Agent.JobStatus'], 'Failed')
+  inputs:
+    botToken: '$(botToken)'
+    chats: '$(chatId)'
+    taskStatus: false
+    buildQueuedBy: false
+    message: |
+            ❌ <b>Fail!</b>  <a href="$(Build.Repository.Uri)">$(Build.DefinitionName)</a> (<code>$(Build.SourceBranchName)</code>)
+            <pre>$(Build.SourceVersion)</pre>
+            $(Build.SourceVersionMessage) by $(Build.QueuedBy)
+
+- task: SendTelegramNotification@0
+  condition: in(variables['Agent.JobStatus'], 'Succeeded')
+  inputs:
+    botToken: '$(botToken)'
+    chats: '$(chatId)'
+    taskStatus: false
+    buildQueuedBy: false
+    message: |
+            ✅ <b>Success!</b>  <a href="$(Build.Repository.Uri)">$(Build.DefinitionName)</a> (<code>$(Build.SourceBranchName)</code>)
+            <pre>$(Build.SourceVersion)</pre>
+            $(Build.SourceVersionMessage) by $(Build.QueuedBy)
+
+# 

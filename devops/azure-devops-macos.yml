@@ -118,22 +118,22 @@ steps:
     ArtifactName: Xamarin.iOS.MonoGame.Framework.xml
 
 - task: PublishBuildArtifacts@1 
-  displayName: 'Publish Artifact: MonoGame.Frawework.pdb'
+  displayName: 'Publish Artifact: MonoGame.Frawework.dll'
   inputs:
     PathtoPublish: ./MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.dll
-    ArtifactName: Xamarin.iOS.MonoGame.Framework.dll
+    ArtifactName: Xamarin.tvOS.MonoGame.Framework.dll
 
 - task: PublishBuildArtifacts@1 
   displayName: 'Publish Artifact: MonoGame.Frawework.pdb'
   inputs:
     PathtoPublish: ./MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.pdb
-    ArtifactName: Xamarin.iOS.MonoGame.Framework.pdb
+    ArtifactName: Xamarin.tvOS.MonoGame.Framework.pdb
 
 - task: PublishBuildArtifacts@1 
   displayName: 'Publish Artifact: MonoGame.Frawework.xml'
   inputs:
     PathtoPublish: ./MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/MonoGame.Framework.xml
-    ArtifactName: Xamarin.iOS.MonoGame.Framework.xml
+    ArtifactName: Xamarin.tvOS.MonoGame.Framework.xml
 
 - task: TriggerBuild@3
   displayName: 'Trigger a new build of Codefoco.MonoGame.Windows'
