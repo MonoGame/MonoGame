@@ -138,7 +138,7 @@ steps:
 - task: TriggerBuild@3
   displayName: 'Trigger a new build of Codefoco.MonoGame.Windows'
   inputs:
-    buildDefinition: 'Codefoco.MonoGame.Windows'
+    buildDefinition: 'Codefoco.MonoGame.Framework.Windows'
     ignoreSslCertificateErrors: true
     useSameSourceVersion: true
     password: '$(myToken)'
