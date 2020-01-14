@@ -59,9 +59,9 @@ This package provides you with MonoGame Framework that works on several differen
     <!-- Xamarin.tvOS -->
     <file src="NuGetPackages\build\iOS\MonoGame.Framework.iOS.targets" target="build\xamarintvos\MonoGame.Framework.iOS.targets" />
     <!-- C# Assemblies -->
-    <file src="MonoGame.Framework\bin\iOSCore\Release\xamarinios10\MonoGame.Framework.dll" target="lib\xamarintvos\MonoGame.Framework.dll" />
-    <file src="MonoGame.Framework\bin\iOSCore\Release\xamarinios10\MonoGame.Framework.xml" target="lib\xamarintvos\MonoGame.Framework.xml" />
-    <file src="MonoGame.Framework\bin\iOSCore\Release\xamarinios10\MonoGame.Framework.pdb" target="lib\xamarintvos\MonoGame.Framework.pdb" />
+    <file src="MonoGame.Framework\bin\iOSCore\Release\xamarintvos10\MonoGame.Framework.dll" target="lib\xamarintvos\MonoGame.Framework.dll" />
+    <file src="MonoGame.Framework\bin\iOSCore\Release\xamarintvos10\MonoGame.Framework.xml" target="lib\xamarintvos\MonoGame.Framework.xml" />
+    <file src="MonoGame.Framework\bin\iOSCore\Release\xamarintvos10\MonoGame.Framework.pdb" target="lib\xamarintvos\MonoGame.Framework.pdb" />
 
     <file src="MonoGame.Framework\bin\DesktopGL\Release\net452\x64\SDL2.dll" target="runtimes\win-x64\native\SDL2.dll" />
     <file src="MonoGame.Framework\bin\DesktopGL\Release\net452\x64\soft_oal.dll" target="runtimes\win-x64\native\soft_oal.dll" />
