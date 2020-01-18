@@ -132,7 +132,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <AddinFile Include="..\..\ProjectTemplates\DotNetTemplate\MonoGame.Templates.CSharp\bin\MonoGame.Templates.CSharp.nupkg">
+    <AddinFile Include="..\..\ProjectTemplates\DotNetTemplate\MonoGame.Templates.CSharp\bin\MonoGame.Templates.CSharp.1.0.0.nupkg">
       <Link>Templates\MonoGame.Templates.CSharp.nupkg</Link>
     </AddinFile>
   </ItemGroup>
