@@ -53,6 +53,14 @@ internal static class Sdl
             if (ret == IntPtr.Zero)
                 ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "runtimes", rid, "native/SDL2.dll"));
         }
+        else if (CurrentPlatform.OS == OS.MacOSX)
+        {
+            if (ret == IntPtr.Zero)
+                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "../../runtimes", "osx", "native/libSDL2-2.0.0.dylib"));
+
+            if (ret == IntPtr.Zero)
+                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "runtimes", "osx", "native/libSDL2-2.0.0.dylib"));
+        }
 
         // Welp, all failed, PANIC!!!
         if (ret == IntPtr.Zero)
