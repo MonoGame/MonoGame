@@ -14,7 +14,7 @@
 
 This package provides you with MonoGame Framework that works on several different platforms.</description>
     <summary>This package is a multi-target package of MonoGame. Created by Vinicius Jarina to make it easier to work with MonoGame as a dependency</summary>
-    <copyright>Copyright © 2009-2019 The MonoGame Team</copyright>
+    <copyright>Copyright © 2009-2020 The MonoGame Team</copyright>
     <language>en-US</language>
   </metadata>
   <files>
@@ -26,12 +26,12 @@ This package provides you with MonoGame Framework that works on several differen
     <file src="MonoGame.Framework\bin\AndroidCore\Release\monoandroid90\90\MonoGame.Framework.pdb" target="lib\MonoAndroid\MonoGame.Framework.pdb" />
 
     <!-- .NET Core -->
-    <file src="NuGetPackages\build\DesktopGL\MonoGame.Framework.DesktopGL.targets" target="build\netcoreapp2.0\MonoGame.Framework.DesktopGL.targets" />
+    <file src="NuGetPackages\build\DesktopGL\MonoGame.Framework.DesktopGL.targets" target="build\netcoreapp3.1\MonoGame.Framework.DesktopGL.targets" />
     
     <!-- C# Assemblies -->
-    <file src="MonoGame.Framework\bin\DesktopGL\Release\netcoreapp2.0\MonoGame.Framework.dll" target="lib\netcoreapp2.0\MonoGame.Framework.dll" />
-    <file src="MonoGame.Framework\bin\DesktopGL\Release\netcoreapp2.0\MonoGame.Framework.xml" target="lib\netcoreapp2.0\MonoGame.Framework.xml" />
-    <file src="MonoGame.Framework\bin\DesktopGL\Release\netcoreapp2.0\MonoGame.Framework.pdb" target="lib\netcoreapp2.0\MonoGame.Framework.pdb" />
+    <file src="MonoGame.Framework\bin\DesktopGL\Release\netcoreapp3.1\MonoGame.Framework.dll" target="lib\netcoreapp3.1\MonoGame.Framework.dll" />
+    <file src="MonoGame.Framework\bin\DesktopGL\Release\netcoreapp3.1\MonoGame.Framework.xml" target="lib\netcoreapp3.1\MonoGame.Framework.xml" />
+    <file src="MonoGame.Framework\bin\DesktopGL\Release\netcoreapp3.1\MonoGame.Framework.pdb" target="lib\netcoreapp3.1\MonoGame.Framework.pdb" />
     
     <!-- .NET 4.5 -->
     <file src="NuGetPackages\build\DesktopGL\MonoGame.Framework.DesktopGL.targets" target="build\net45\MonoGame.Framework.DesktopGL.targets" />

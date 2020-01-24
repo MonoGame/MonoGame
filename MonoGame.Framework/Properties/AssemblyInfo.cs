@@ -8,9 +8,10 @@ using System.Resources;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
+[assembly: AssemblyDescription ("MonoGame is an open source implementation of the Microsoft XNA 4.x Framework")]
 [assembly: AssemblyCompany("MonoGame Team")]
 [assembly: AssemblyProduct("MonoGame.Framework")]
-[assembly: AssemblyCopyright("Copyright © 2009-2016 MonoGame Team")]
+[assembly: AssemblyCopyright("Copyright © 2009-2020 MonoGame Team")]
 [assembly: AssemblyTrademark("MonoGame® is a registered trademark of the MonoGame Team")]
 [assembly: AssemblyCulture("")]
 
