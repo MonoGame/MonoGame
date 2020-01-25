@@ -409,6 +409,7 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItemLocation.Enabled = info.OpenItemLocation;
             cmdOpenOutputItemLocation.Enabled = info.OpenOutputItemLocation;
             cmdCopyAssetName.Enabled = info.CopyAssetPath;
+            cmdBuildItem.Enabled = info.BuildItem;
             cmdRebuildItem.Enabled = info.RebuildItem;
 
             // Visibility of menu items can't be changed so 
@@ -426,6 +427,8 @@ namespace MonoGame.Tools.Pipeline
             AddContextMenu(cmOpenItemLocation, ref sep);
             AddContextMenu(cmOpenOutputItemLocation, ref sep);
             AddContextMenu(cmCopyAssetPath, ref sep);
+            AddSeparator(ref sep);
+            AddContextMenu(cmBuildItem, ref sep);
             AddContextMenu(cmRebuildItem, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmExclude, ref sep);
@@ -684,6 +687,11 @@ namespace MonoGame.Tools.Pipeline
         private void CmdRebuildItem_Executed(object sender, EventArgs e)
         {
             PipelineController.Instance.RebuildItems();
+        }
+
+        private void CmdBuildItem_Executed(object sender, EventArgs e)
+        {
+            PipelineController.Instance.BuildItems();
         }
 
         #endregion
