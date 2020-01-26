@@ -21,9 +21,9 @@ This package provides you with MonoGame Framework that works on several differen
     <!-- Xamarin.Android -->
     <file src="NuGetPackages\build\Android\MonoGame.Framework.Android.targets" target="build\MonoAndroid\MonoGame.Framework.Android.targets" />
     <!-- C# Assemblies -->
-    <file src="MonoGame.Framework\bin\AndroidCore\Release\monoandroid90\90\MonoGame.Framework.dll" target="lib\MonoAndroid\MonoGame.Framework.dll" />
-    <file src="MonoGame.Framework\bin\AndroidCore\Release\monoandroid90\90\MonoGame.Framework.xml" target="lib\MonoAndroid\MonoGame.Framework.xml" />
-    <file src="MonoGame.Framework\bin\AndroidCore\Release\monoandroid90\90\MonoGame.Framework.pdb" target="lib\MonoAndroid\MonoGame.Framework.pdb" />
+    <file src="MonoGame.Framework\bin\AndroidCore\Release\monoandroid90\MonoGame.Framework.dll" target="lib\MonoAndroid\MonoGame.Framework.dll" />
+    <file src="MonoGame.Framework\bin\AndroidCore\Release\monoandroid90\MonoGame.Framework.xml" target="lib\MonoAndroid\MonoGame.Framework.xml" />
+    <file src="MonoGame.Framework\bin\AndroidCore\Release\monoandroid90\MonoGame.Framework.pdb" target="lib\MonoAndroid\MonoGame.Framework.pdb" />
 
     <!-- .NET Core -->
     <file src="NuGetPackages\build\DesktopGL\MonoGame.Framework.DesktopGL.targets" target="build\netcoreapp3.1\MonoGame.Framework.DesktopGL.targets" />
