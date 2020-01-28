@@ -74,7 +74,6 @@ Now that we have our directory, let us create our shared game library project wh
 ```sh
 dotnet new sln
 dotnet new mgshared -n Pong
-dotnet sln add Pong/Pong.csproj
 ```
 
 As stated in the previous tutorial, shared project are not working properly with some newer stuff. So instead of using them lets make our own using wildcards:
