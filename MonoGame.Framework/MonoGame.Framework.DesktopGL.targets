@@ -4,12 +4,12 @@
     <MonoGamePlatform>DesktopGL</MonoGamePlatform>
   </PropertyGroup>
 
-  <Target Name="CopyDesktopGLNative" AfterTargets="AfterBuild" Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+  <Target Name="CopyDesktopGLNative" AfterTargets="AfterBuild" >
     <ItemGroup>
-      <_lib_winx64 Include="$(MSBuildThisFileDirectory)\..\runtimes\win-x64\native\*.*" />
-      <_lib_winx86 Include="$(MSBuildThisFileDirectory)\..\runtimes\win-x86\native\*.*" />
-      <_lib_linux Include="$(MSBuildThisFileDirectory)\..\runtimes\linux-x64\native\*.*" />
-      <_lib_osx Include="$(MSBuildThisFileDirectory)\..\runtimes\osx\native\*.*" />
+      <_lib_winx64 Include="$(MSBuildThisFileDirectory)\..\..\runtimes\win-x64\native\*.*" />
+      <_lib_winx86 Include="$(MSBuildThisFileDirectory)\..\..\runtimes\win-x86\native\*.*" />
+      <_lib_linux Include="$(MSBuildThisFileDirectory)\..\..\runtimes\linux-x64\native\*.*" />
+      <_lib_osx Include="$(MSBuildThisFileDirectory)\..\..\runtimes\osx\native\*.*" />
     </ItemGroup>
   
     <Copy SourceFiles="@(_lib_winx64)" DestinationFolder="$(OutDir)\x64" />
