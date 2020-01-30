@@ -16,7 +16,11 @@ namespace MonoGame.Utilities
 
             static SizeOf()
             {
+#if NETSTANDARD && !NETFRAMEWORK
                 _sizeOf = Marshal.SizeOf<T>();
+#else
+                _sizeOf = Marshal.SizeOf(typeof(T));
+#endif
             }
 
             static public int Get()

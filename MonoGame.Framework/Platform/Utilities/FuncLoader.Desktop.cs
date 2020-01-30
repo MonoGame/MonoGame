@@ -64,7 +64,7 @@ namespace MonoGame.Utilities
                 return default(T);
             }
 
-#if NETSTANDARD
+#if NETSTANDARD && !NETFRAMEWORK
             return Marshal.GetDelegateForFunctionPointer<T>(ret);
 #else
             return (T)(object)Marshal.GetDelegateForFunctionPointer(ret, typeof(T));
