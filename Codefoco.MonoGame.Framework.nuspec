@@ -19,14 +19,14 @@ This package provides you with MonoGame Framework that works on several differen
   </metadata>
   <files>
     <!-- Xamarin.Android -->
-    <file src="NuGetPackages\build\Android\MonoGame.Framework.Android.targets" target="build\MonoAndroid\Codefoco.MonoGame.Framework.targets" />
+    <file src="MonoGame.Framework\MonoGame.Framework.AndroidCore.targets" target="build\MonoAndroid\Codefoco.MonoGame.Framework.targets" />
     <!-- C# Assemblies -->
     <file src="MonoGame.Framework\bin\AndroidCore\Release\monoandroid90\MonoGame.Framework.dll" target="lib\MonoAndroid\MonoGame.Framework.dll" />
     <file src="MonoGame.Framework\bin\AndroidCore\Release\monoandroid90\MonoGame.Framework.xml" target="lib\MonoAndroid\MonoGame.Framework.xml" />
     <file src="MonoGame.Framework\bin\AndroidCore\Release\monoandroid90\MonoGame.Framework.pdb" target="lib\MonoAndroid\MonoGame.Framework.pdb" />
 
     <!-- .NET Core -->
-    <file src="NuGetPackages\build\DesktopGL\MonoGame.Framework.DesktopGL.targets" target="build\netcoreapp3.1\Codefoco.MonoGame.Framework.targets" />
+    <file src="MonoGame.Framework\MonoGame.Framework.DesktopGL.targets" target="build\netcoreapp3.1\Codefoco.MonoGame.Framework.targets" />
     
     <!-- C# Assemblies -->
     <file src="MonoGame.Framework\bin\DesktopGL\Release\netcoreapp3.1\MonoGame.Framework.dll" target="lib\netcoreapp3.1\MonoGame.Framework.dll" />
@@ -34,7 +34,7 @@ This package provides you with MonoGame Framework that works on several differen
     <file src="MonoGame.Framework\bin\DesktopGL\Release\netcoreapp3.1\MonoGame.Framework.pdb" target="lib\netcoreapp3.1\MonoGame.Framework.pdb" />
     
     <!-- .NET 4.5 -->
-    <file src="NuGetPackages\build\DesktopGL\MonoGame.Framework.DesktopGL.targets" target="build\net45\Codefoco.MonoGame.Framework.targets" />
+    <file src="MonoGame.Framework\MonoGame.Framework.DesktopGL.targets" target="build\net45\Codefoco.MonoGame.Framework.targets" />
     
     <!-- C# Assemblies -->
     <file src="MonoGame.Framework\bin\DesktopGL\Release\net45\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />
@@ -42,7 +42,7 @@ This package provides you with MonoGame Framework that works on several differen
     <file src="MonoGame.Framework\bin\DesktopGL\Release\net45\MonoGame.Framework.pdb" target="lib\net45\MonoGame.Framework.pdb" />
 
     <!-- .NET Standard -->
-    <file src="NuGetPackages\build\DesktopGL\MonoGame.Framework.DesktopGL.targets" target="build\netstandard2.0\Codefoco.MonoGame.Framework.targets" />
+    <file src="MonoGame.Framework\MonoGame.Framework.DesktopGL.targets" target="build\netstandard2.0\Codefoco.MonoGame.Framework.targets" />
     
     <!-- C# Assemblies -->
     <file src="MonoGame.Framework\bin\DesktopGL\Release\netstandard2.0\MonoGame.Framework.dll" target="lib\netstandard2.0\MonoGame.Framework.dll" />
@@ -50,14 +50,14 @@ This package provides you with MonoGame Framework that works on several differen
     <file src="MonoGame.Framework\bin\DesktopGL\Release\netstandard2.0\MonoGame.Framework.pdb" target="lib\netstandard2.0\MonoGame.Framework.pdb" />
 
     <!-- Xamarin.iOS -->
-    <file src="NuGetPackages\build\iOS\MonoGame.Framework.iOS.targets" target="build\xamarinios\Codefoco.MonoGame.Framework.targets" />
+    <file src="MonoGame.Framework\MonoGame.Framework.iOS.targets" target="build\xamarinios\Codefoco.MonoGame.Framework.targets" />
     <!-- C# Assemblies -->
     <file src="MonoGame.Framework\bin\iOSCore\Release\xamarinios10\MonoGame.Framework.dll" target="lib\xamarinios\MonoGame.Framework.dll" />
     <file src="MonoGame.Framework\bin\iOSCore\Release\xamarinios10\MonoGame.Framework.xml" target="lib\xamarinios\MonoGame.Framework.xml" />
     <file src="MonoGame.Framework\bin\iOSCore\Release\xamarinios10\MonoGame.Framework.pdb" target="lib\xamarinios\MonoGame.Framework.pdb" />
 
     <!-- Xamarin.tvOS -->
-    <file src="NuGetPackages\build\iOS\MonoGame.Framework.iOS.targets" target="build\xamarintvos\Codefoco.MonoGame.Framework.targets" />
+    <file src="MonoGame.Framework\MonoGame.Framework.iOS.targets" target="build\xamarintvos\Codefoco.MonoGame.Framework.targets" />
     <!-- C# Assemblies -->
     <file src="MonoGame.Framework\bin\iOSCore\Release\xamarintvos10\MonoGame.Framework.dll" target="lib\xamarintvos\MonoGame.Framework.dll" />
     <file src="MonoGame.Framework\bin\iOSCore\Release\xamarintvos10\MonoGame.Framework.xml" target="lib\xamarintvos\MonoGame.Framework.xml" />
