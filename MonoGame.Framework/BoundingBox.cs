@@ -451,6 +451,13 @@ namespace Microsoft.Xna.Framework
 
         public bool Intersects(BoundingSphere sphere)
         {
+            bool result;
+            Intersects(ref sphere, out result);
+            return result;
+        }
+
+        public void Intersects(ref BoundingSphere sphere, out bool result)
+        {
             var squareDistance = 0.0f;
             var point = sphere.Center;
             if (point.X < Min.X) squareDistance += (Min.X - point.X) * (Min.X - point.X);
@@ -459,12 +466,7 @@ namespace Microsoft.Xna.Framework
             if (point.Y > Max.Y) squareDistance += (point.Y - Max.Y) * (point.Y - Max.Y);
             if (point.Z < Min.Z) squareDistance += (Min.Z - point.Z) * (Min.Z - point.Z);
             if (point.Z > Max.Z) squareDistance += (point.Z - Max.Z) * (point.Z - Max.Z);
-            return squareDistance <= sphere.Radius * sphere.Radius;
-        }
-
-        public void Intersects(ref BoundingSphere sphere, out bool result)
-        {
-            result = Intersects(sphere);
+            result = squareDistance <= sphere.Radius * sphere.Radius;
         }
 
         public PlaneIntersectionType Intersects(Plane plane)

@@ -51,6 +51,8 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCaseSource("BuilderTargetsBuildTools")]
 #if DESKTOPGL
         [Ignore("Fails on Mac build server with xbuild for some reason.")]
+#else
+        [Ignore("This test need to be rewritten to properly test Tools\\MonoGame.Content.Builder instead of the old builder targets.")]
 #endif
         public void BuildSimpleProject(string buildTool)
         {

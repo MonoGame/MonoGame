@@ -672,6 +672,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 {
                     throw;
                 }
+                catch (InvalidContentException)
+                {
+                    throw;
+                }
                 catch (Exception inner)
                 {
                     throw new PipelineException(string.Format("Importer '{0}' had unexpected failure!", pipelineEvent.Importer), inner);
