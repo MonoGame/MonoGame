@@ -16,6 +16,12 @@ namespace Microsoft.Xna.Framework.Input
         public bool IsConnected { get; internal set; }
 
         /// <summary>
+        /// Gets the joystick's display name.
+        /// </summary>
+        /// <value>String representing the display name of the joystick.</value>
+        public string DisplayName { get; internal set; }
+
+        /// <summary>
         /// Gets the unique identifier of the joystick.
         /// </summary>
         /// <value>String representing the unique identifier of the joystick.</value>
