@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Input
                 Identifier = Sdl.Joystick.GetGUID(jdevice).ToString(),
                 IsGamepad = (Sdl.GameController.IsGameController(index) == 1),
                 AxisCount = Sdl.Joystick.NumAxes(jdevice),
-                ButtonCount = Sdl.Joystick.NumButtons(jdevice),
+                ButtonCount = Sdl.Joystick.NumButtons(jdevice), 
                 HatCount = Sdl.Joystick.NumHats(jdevice)
             };
         }
