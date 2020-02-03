@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickCapabilities()
             {
                 IsConnected = false,
+                DisplayName = "",
                 IsGamepad = false,
                 AxisCount = 0,
                 ButtonCount = 0,
