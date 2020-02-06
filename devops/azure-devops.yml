@@ -1,0 +1,136 @@
+# Repo: codefoco/AzureDevopsTemplates
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: codefoco/AzureDevopsTemplates
+      endpoint: codefoco
+jobs:
+- job: 'MonoGameMac'
+  displayName: 'Mac'
+  variables:
+    - group: 'Keys'
+
+  pool:
+    vmImage: 'macOS-10.14'
+    demands: msbuild
+
+  steps:
+  - checkout: self
+    submodules: 'true'
+
+  - template: common-dotnet.yml@templates
+  - template: common-macos.yml@templates
+
+  - task: NuGetCommand@2 #MonoGame.Framework/MonoGame.Framework.iOSCore.csproj
+    displayName: 'NuGet restore  MonoGame.Framework/MonoGame.Framework.iOSCore.csproj'
+    inputs:
+      restoreSolution: ./MonoGame.Framework/MonoGame.Framework.iOSCore.csproj
+
+  - task: PowerShell@2
+    displayName: 'PreBuild Codefoco.MonoGame.Framework'
+    inputs:
+      targetType: filePath
+      filePath: ./devops/PreBuild.ps1
+      arguments: 'Codefoco.MonoGame.Framework Codefoco.MonoGame.Framework.nuspec'
+
+  # Build  MonoGame
+
+  - task: MSBuild@1 # Fantas.MonoGame.sln
+    displayName: 'Build csproj ./MonoGame.Framework/MonoGame.Framework.iOSCore.csproj'
+    inputs:
+      solution: ./MonoGame.Framework/MonoGame.Framework.iOSCore.csproj
+      configuration: Release
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish Pipeline Artifact: Xamarin.iOS.MonoGame.Frawework'
+    inputs:
+      targetPath: ./MonoGame.Framework/bin/iOSCore/Release/xamarinios10/
+      artifact: 'Xamarin.iOS.MonoGame.Frawework'
+      publishLocation: 'pipeline'
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish Pipeline Artifact: Xamarin.tvOS.MonoGame.Frawework'
+    inputs:
+      targetPath: ./MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/
+      artifact: 'Xamarin.tvOS.MonoGame.Frawework'
+      publishLocation: 'pipeline'
+
+  - template: send-telegram.yml@templates
+
+- job: 'MonoGameWindows'
+  displayName: 'Windows'
+  dependsOn: 'MonoGameMac'
+  variables:
+    - group: 'Keys'
+
+  pool:
+    vmImage: 'windows-2019'
+    demands:
+    - msbuild
+    - visualstudio
+    - vstest
+
+  steps:
+  - checkout: self
+    submodules: true
+
+  - template: common-dotnet.yml@templates
+  - template: common-win.yml@templates
+
+  - task: PowerShell@2
+    displayName: 'PreBuild Script MonoGame'
+    inputs:
+      targetType: filePath
+      filePath: ./devops/PreBuild.ps1
+      arguments: 'Codefoco.MonoGame.Framework Codefoco.MonoGame.Framework.nuspec'
+      errorActionPreference: 'silentlyContinue'
+      pwsh: true
+
+  - task: PowerShell@2
+    displayName: 'Cake Build MonoGame.Framework'
+    inputs:
+      targetType: filePath
+      filePath: ./build.ps1
+
+  - task: DownloadPipelineArtifact@2
+    displayName: 'Download Build Xamarin.iOS'
+    inputs:
+      buildType: 'current'
+      artifactName: 'Xamarin.iOS.MonoGame.Frawework'
+      targetPath: './MonoGame.Framework/bin/iOSCore/Release/xamarinios10/'
+
+  - task: DownloadPipelineArtifact@2
+    displayName: 'Download Build Xamarin.tvOS'
+    inputs:
+      buildType: 'current'
+      artifactName: 'Xamarin.tvOS.MonoGame.Frawework'
+      targetPath: './MonoGame.Framework/bin/iOSCore/Release/xamarintvos10/'
+
+  - script: 'nuget setapikey $(apikey)'
+    displayName: 'Set NuGet API Key'
+
+  - task: PowerShell@2
+    displayName: 'Package Codefoco.MonoGame.Framework.nuget NuGet'
+    inputs:
+      targetType: filePath
+      filePath: ./devops/Package.ps1
+      arguments: 'Codefoco.MonoGame.Framework Codefoco.MonoGame.Framework.nuspec'
+
+  - script: 'rename Codefoco.MonoGame.Framework.*.nupkg Codefoco.MonoGame.Framework.nupkg'
+    displayName: 'Rename Fantas.MonoGame Nuget Package'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Save Codefoco.MonoGame.Framework.nupkg Artifact'
+    inputs:
+      PathtoPublish: Codefoco.MonoGame.Framework.nupkg
+      ArtifactName: Codefoco.MonoGame.Framework.nupkg
+
+  - task: PowerShell@2
+    displayName: 'Publish Codefoco.MonoGame.Framework NuGet'
+    inputs:
+      targetType: filePath
+      filePath: ./devops/Publish.ps1
+      arguments: Codefoco.MonoGame.Framework
+
+  - template: send-telegram.yml@templates
