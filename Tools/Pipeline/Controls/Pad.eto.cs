@@ -26,7 +26,7 @@ namespace MonoGame.Tools.Pipeline
             panelLabel = new Panel();
             panelLabel.Padding = new Padding(5);
 
-            if (!Global.Unix)
+            if (!Global.IsGtk)
                 panelLabel.Height = 25;
 
             stack = new StackLayout();

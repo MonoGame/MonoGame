@@ -22,6 +22,7 @@ namespace MonoGame.Tools.Pipeline
         public static bool Linux { get; private set; }
         public static bool UseHeaderBar { get; set; }
         public static bool Unix { get; private set; }
+        public static bool IsGtk { get; private set; }
 
         private static Dictionary<string, Bitmap> _files;
         private static Image _folder;

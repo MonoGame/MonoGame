@@ -15,6 +15,8 @@ namespace MonoGame.Tools.Pipeline
     {
         public override void OnCreate()
         {
+            HasDialog = true;
+
             if (Value == null)
                 Value = new List<string>();
 
@@ -31,6 +33,7 @@ namespace MonoGame.Tools.Pipeline
         public override void Edit(PixelLayout control)
         {
             var dialog = new ReferenceDialog(PipelineController.Instance, (Value as List<string>).ToArray());
+       
             if (dialog.ShowModal(control) && _eventHandler != null)
             {
                 _eventHandler(dialog.References, EventArgs.Empty);

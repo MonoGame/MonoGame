@@ -18,7 +18,14 @@ namespace MonoGame.Tools.Pipeline
         {
             Styles.Load();
 
+#if GTK
+            var app = new Application(Platforms.Gtk);
+#elif WPF
+            var app = new Application(Platforms.Wpf);
+#else
             var app = new Application(Platform.Detect);
+#endif
+
             app.Style = "PipelineTool";
 
             PipelineSettings.Default.Load();
@@ -73,7 +80,7 @@ namespace MonoGame.Tools.Pipeline
                 PipelineSettings.Default.Save();
                 app.Restart();
             }
-# endif
+#endif
         }
     }
 }

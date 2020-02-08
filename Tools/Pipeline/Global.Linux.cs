@@ -17,6 +17,7 @@ namespace MonoGame.Tools.Pipeline
 
         private static void PlatformInit()
         {
+            IsGtk = true;
             Linux = true;
             UseHeaderBar = true;
             _theme = IconTheme.Default;

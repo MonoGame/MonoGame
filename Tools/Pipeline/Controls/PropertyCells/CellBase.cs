@@ -22,14 +22,6 @@ namespace MonoGame.Tools.Pipeline
 
     public class CellBase
     {
-        public string Category { get; set; }
-        public object Value { get; set; }
-        public string DisplayValue { get; set; }
-        public string Text { get; set; }
-        public bool Editable { get; set; }
-        public int Height { get; set; }
-        public Action OnKill;
-
         protected EventHandler _eventHandler;
         protected Rectangle _lastRec;
         protected Type _type;
@@ -48,6 +40,15 @@ namespace MonoGame.Tools.Pipeline
 
             OnCreate();
         }
+
+        public string Category { get; set; }
+        public object Value { get; set; }
+        public string DisplayValue { get; set; }
+        public string Text { get; set; }
+        public bool Editable { get; set; }
+        public int Height { get; set; }
+        public Action OnKill { get; set; }
+        public bool HasDialog { get; protected set; }
 
         public virtual void OnCreate()
         {

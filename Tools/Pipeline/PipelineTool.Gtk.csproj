@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -15,9 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Eto.Forms" Version="2.5.0-rc.4" />
-    <PackageReference Include="Eto.Platform.Gtk" Version="2.5.0-rc.4" />
-    <PackageReference Include="GtkSharp" Version="3.22.25.*" />
+    <PackageReference Include="Eto.Platform.Gtk" Version="2.5.0-rc.5" />
+    <PackageReference Include="GtkSharp" Version="3.22.25.56" />
   </ItemGroup>
 
   <ItemGroup>

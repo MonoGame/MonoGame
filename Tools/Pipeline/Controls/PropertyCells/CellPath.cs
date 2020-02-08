@@ -13,6 +13,7 @@ namespace MonoGame.Tools.Pipeline
     {
         public override void OnCreate()
         {
+            HasDialog = true;
             if (Value == null)
                 Value = "";
         }
