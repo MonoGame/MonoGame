@@ -7,7 +7,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-#if LINUX
+#if GTK
     public partial class Pad : GroupBox
 #else
     public partial class Pad : Panel

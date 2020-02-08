@@ -27,7 +27,7 @@
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
       <Platform Name="MacOS">TRACE;MONOMAC;GTK2</Platform>
-      <Platform Name="Linux">TRACE;LINUX;GTK3</Platform>
+      <Platform Name="Linux">TRACE;LINUX;GTK</Platform>
     </CustomDefinitions>
     <FrameworkVersions>
       <Version>v4.7.2</Version>

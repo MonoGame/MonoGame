@@ -38,11 +38,11 @@ namespace MonoGame.Tools.Pipeline
                 var win = new MainWindow();
                 var controller = PipelineController.Create(win);
 
-#if LINUX
+#if GTK
                 Global.Application.AddWindow(win.ToNative() as Gtk.Window);
 #endif
 
-#if LINUX && !DEBUG
+#if GTK && !DEBUG
 
                 GLib.ExceptionManager.UnhandledException += (e) =>
                 {

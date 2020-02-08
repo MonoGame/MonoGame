@@ -38,20 +38,6 @@ namespace MonoGame.Tools.Pipeline
             Global.Application.AddAction(a);
         }
 
-        private static void Connect(Command cmd, Gdk.Key key, Gdk.ModifierType modifier = Gdk.ModifierType.None)
-        {
-            var cclosure = g_cclosure_new(Marshal.GetFunctionPointerForDelegate(
-                (Action<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr>)((IntPtr a, IntPtr b, IntPtr c, IntPtr d, IntPtr data) =>
-            {
-                var command = ((GCHandle)data).Target as Command;
-
-                if (command.Enabled)
-                    command.Execute();
-            })), (IntPtr)GCHandle.Alloc(cmd), IntPtr.Zero);
-
-            _accelGroup.Connect((uint)key, modifier, Gtk.AccelFlags.Mask, cclosure);
-        }
-
         private static void ReloadBuildbox()
         {
             var b = MainWindow.Instance.cmdBuild.Enabled;
@@ -124,15 +110,15 @@ namespace MonoGame.Tools.Pipeline
                 };
 
                 _accelGroup = new Gtk.AccelGroup();
-
-                Connect(MainWindow.Instance.cmdNew, Gdk.Key.N, Gdk.ModifierType.ControlMask);
+                
+                /*Connect(MainWindow.Instance.cmdNew, Gdk.Key.N, Gdk.ModifierType.ControlMask);
                 Connect(MainWindow.Instance.cmdOpen, Gdk.Key.O, Gdk.ModifierType.ControlMask);
                 Connect(MainWindow.Instance.cmdSave, Gdk.Key.S, Gdk.ModifierType.ControlMask);
                 Connect(MainWindow.Instance.cmdExit, Gdk.Key.Q, Gdk.ModifierType.ControlMask);
                 Connect(MainWindow.Instance.cmdUndo, Gdk.Key.Z, Gdk.ModifierType.ControlMask);
                 Connect(MainWindow.Instance.cmdRedo, Gdk.Key.Y, Gdk.ModifierType.ControlMask);
                 Connect(MainWindow.Instance.cmdBuild, Gdk.Key.F6);
-                Connect(MainWindow.Instance.cmdHelp, Gdk.Key.F1);
+                Connect(MainWindow.Instance.cmdHelp, Gdk.Key.F1);*/
 
                 h.Control.AddAccelGroup(_accelGroup);
 

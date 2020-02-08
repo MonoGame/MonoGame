@@ -248,7 +248,7 @@ namespace MonoGame.Tools.Pipeline
             SetWidth();
 #endif
 
-#if LINUX
+#if GTK
             // force size reallocation
             drawable.Width = pixel1.Width - 2;
 

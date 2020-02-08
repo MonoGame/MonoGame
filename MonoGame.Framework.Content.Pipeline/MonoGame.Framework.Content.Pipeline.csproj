@@ -11,6 +11,7 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
     
     <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
     <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
+    <CopyContentFiles>True</CopyContentFiles>
   </PropertyGroup>
 
   <ItemGroup>
@@ -90,7 +91,7 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">
     <Content Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" PackagePath="lib\netstandard2.0" Visible="false" />
     <Content Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" PackagePath="lib\netstandard2.0" Visible="false" />
     <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\netstandard2.0" Visible="false" />

@@ -15,9 +15,6 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
-                if (Unix)
-                    return Linux ? "/" : ":";
-
                 return "/?<>\\:*|\"";
             }
         }
@@ -104,7 +101,7 @@ namespace MonoGame.Tools.Pipeline
 
         public static Image GetEtoIcon(string resource)
         {
-#if LINUX
+#if GTK
             var nativeicon = PlatformGetIcon(resource);
 
             if (nativeicon != null)
