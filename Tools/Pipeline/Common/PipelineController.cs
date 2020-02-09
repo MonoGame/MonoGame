@@ -37,7 +37,9 @@ namespace MonoGame.Tools.Pipeline
             "../../../../MGCB/bin/Debug/netcoreapp3.0",
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../MGCB/bin/Debug/netcoreapp3.0"),
 #endif
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../MGCB")
+            "../MGCB",
+            "../../../../MGCB/bin/Debug/netcoreapp3.0",
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
         };
 
         public IEnumerable<ContentItemTemplate> Templates
