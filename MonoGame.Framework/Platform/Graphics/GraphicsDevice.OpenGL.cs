@@ -1191,7 +1191,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             ApplyAttribs(_vertexShader, baseVertex);
 
-            if (baseInstance > 0)
+            if (GraphicsCapabilities.SupportsBaseIndexInstancing && baseInstance > 0)
                 GL.DrawElementsInstancedBaseInstance(target,
                                      indexElementCount,
                                      indexElementType,
