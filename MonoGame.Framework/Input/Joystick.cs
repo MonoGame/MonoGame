@@ -30,6 +30,14 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
+        /// Gets a value indicating how many joysticks are connected to the system.
+        /// </summary>
+        public static int JoystickCount
+        {
+            get { return PlatformJoystickCount; }
+        }
+
+        /// <summary>
         /// Gets the capabilites of the joystick.
         /// </summary>
         /// <param name="index">Index of the joystick you want to access.</param>

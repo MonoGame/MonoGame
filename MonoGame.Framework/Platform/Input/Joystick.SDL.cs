@@ -48,6 +48,14 @@ namespace Microsoft.Xna.Framework.Input
             Joysticks.Clear ();
         }
 
+        private static int PlatformJoystickCount
+        {
+            get
+            {
+                return Joysticks.Count;
+            }
+        }
+
         private const bool PlatformIsSupported = true;
 
         private static JoystickCapabilities PlatformGetCapabilities(int index)

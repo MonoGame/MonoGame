@@ -27,6 +27,14 @@ namespace Microsoft.Xna.Framework.Input
             return _defaultJoystickState;
         }
 
+        private static int PlatformJoystickCount
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
         private static void PlatformGetState(ref JoystickState joystickState, int index)
         {
 
