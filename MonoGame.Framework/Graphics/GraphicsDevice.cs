@@ -1329,7 +1329,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="instanceCount">The number of instances to render.</param>
         /// <param name="baseInstance">Used to offset the instance range indexed from the instance buffer.</param>
         /// <remarks>Draw geometry with data from multiple bound vertex streams at different frequencies.</remarks>
-        public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount, int baseInstance)
+        public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount, int baseInstance = 0)
         {
             if (_vertexShader == null)
                 throw new InvalidOperationException("Vertex shader must be set before calling DrawInstancedPrimitives.");
