@@ -52,7 +52,17 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return Joysticks.Count;
+                if (Joysticks.Count == 0) return 0;
+
+                //Joysticks retain their indices, so fetch the highest index out of the ones plugged in
+                int highestIndex = 0;
+                foreach (var entry in Joysticks)
+                {
+                    if (entry.Key > highestIndex)
+                        highestIndex = entry.Key;
+                }
+
+                return highestIndex + 1;
             }
         }
 
