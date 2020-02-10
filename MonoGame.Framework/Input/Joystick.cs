@@ -30,11 +30,14 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
-        /// Gets a value indicating how many joysticks are connected to the system.
+        /// Gets a value indicating the last joystick index connected to the system. If this value is less than 0, no joysticks are connected.
+        /// <para>The order joysticks are connected and disconnected determines their index.
+        /// As such, this value may be larger than 0 even if only one joystick is connected.
+        /// </para>
         /// </summary>
-        public static int JoystickCount
+        public static int LastJoystickIndex
         {
-            get { return PlatformJoystickCount; }
+            get { return PlatformLastJoystickIndex; }
         }
 
         /// <summary>

@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Input
             return _defaultJoystickState;
         }
 
-        private static int PlatformJoystickCount
+        private static int PlatformLastJoystickIndex
         {
             get
             {

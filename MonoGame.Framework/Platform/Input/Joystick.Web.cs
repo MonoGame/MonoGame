@@ -44,25 +44,12 @@ namespace Microsoft.Xna.Framework.Input
             };
         }
 
-        private static int PlatformJoystickCount
+        private static int PlatformLastJoystickIndex
         {
             get
             {
-                var navigator = Builtins.Global["navigator"];
-                var gamepads = navigator.getGamepads ? navigator.getGamepads() : navigator.webkitGetGamepads();
-                
-                int count = 0;
-                
-                for (int i = 0; i < gamepads.length; i++)
-                {
-                    //WebKit gamepad elements may be null if the gamepad disconnects during a session in order to preserve index
-                    if (gamepads[i])
-                    {
-                        count++;
-                    }
-                }
-                
-                return count;
+                //Stubbed so it compiles
+                return 0;
             }
         }
 

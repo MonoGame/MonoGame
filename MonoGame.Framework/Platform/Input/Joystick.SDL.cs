@@ -10,6 +10,7 @@ namespace Microsoft.Xna.Framework.Input
     static partial class Joystick
     {
         internal static Dictionary<int, IntPtr> Joysticks = new Dictionary<int, IntPtr>();
+        private static int _lastJoystickIndex = -1;
 
         internal static void AddDevice(int deviceId)
         {
@@ -18,6 +19,9 @@ namespace Microsoft.Xna.Framework.Input
 
             while (Joysticks.ContainsKey(id))
                 id++;
+
+            if (id > _lastJoystickIndex)
+                _lastJoystickIndex = id;
 
             Joysticks.Add(id, jdevice);
 
@@ -31,8 +35,14 @@ namespace Microsoft.Xna.Framework.Input
             {
                 if (Sdl.Joystick.InstanceID(entry.Value) == instanceid)
                 {
+                    int key = entry.Key;
+
                     Sdl.Joystick.Close(Joysticks[entry.Key]);
                     Joysticks.Remove(entry.Key);
+
+                    if (key == _lastJoystickIndex)
+                        RecalculateLastJoystickIndex();
+
                     break;
                 }
             }
@@ -48,22 +58,19 @@ namespace Microsoft.Xna.Framework.Input
             Joysticks.Clear ();
         }
 
-        private static int PlatformJoystickCount
+        private static void RecalculateLastJoystickIndex()
         {
-            get
+            _lastJoystickIndex = -1;
+            foreach (var entry in Joysticks)
             {
-                if (Joysticks.Count == 0) return 0;
-
-                //Joysticks retain their indices, so fetch the highest index out of the ones plugged in
-                int highestIndex = 0;
-                foreach (var entry in Joysticks)
-                {
-                    if (entry.Key > highestIndex)
-                        highestIndex = entry.Key;
-                }
-
-                return highestIndex + 1;
+                if (entry.Key > _lastJoystickIndex)
+                    _lastJoystickIndex = entry.Key;
             }
+        }
+
+        private static int PlatformLastJoystickIndex
+        {
+            get { return _lastJoystickIndex; }
         }
 
         private const bool PlatformIsSupported = true;
