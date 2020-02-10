@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickCapabilities()
             {
                 IsConnected = connected,
-                DisplayName = "",
+                DisplayName = string.Empty,
                 Identifier = id,
                 AxisCount = axiscount,
                 ButtonCount = buttoncount,
