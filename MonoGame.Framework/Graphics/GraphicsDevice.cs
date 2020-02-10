@@ -1310,12 +1310,13 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
         /// <param name="primitiveCount">The number of primitives in a single instance.</param>
         /// <param name="instanceCount">The number of instances to render.</param>
+        /// <param name="baseInstance">Used to offset the instance range indexed from the instance buffer.</param>
         /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
         [Obsolete("Use DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount) instead. In future versions this method can be removed.")]
         public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex,
-                                            int numVertices, int startIndex, int primitiveCount, int instanceCount)
+                                            int numVertices, int startIndex, int primitiveCount, int instanceCount, int baseInstance = 0)
         {
-            DrawInstancedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount, instanceCount);
+            DrawInstancedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount, instanceCount, baseInstance);
         }
 
         /// <summary>
@@ -1326,8 +1327,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
         /// <param name="primitiveCount">The number of primitives in a single instance.</param>
         /// <param name="instanceCount">The number of instances to render.</param>
+        /// <param name="baseInstance">Used to offset the instance range indexed from the instance buffer.</param>
         /// <remarks>Draw geometry with data from multiple bound vertex streams at different frequencies.</remarks>
-        public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
+        public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount, int baseInstance)
         {
             if (_vertexShader == null)
                 throw new InvalidOperationException("Vertex shader must be set before calling DrawInstancedPrimitives.");
@@ -1341,7 +1343,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
 
-            PlatformDrawInstancedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount, instanceCount);
+            PlatformDrawInstancedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount, instanceCount, baseInstance);
 
             unchecked
             {
