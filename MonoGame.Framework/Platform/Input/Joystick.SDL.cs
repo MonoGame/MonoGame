@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Input
     static partial class Joystick
     {
         internal static Dictionary<int, IntPtr> Joysticks = new Dictionary<int, IntPtr>();
-        private static int _lastJoystickIndex = -1;
+        private static int _lastConnectedIndex = -1;
 
         internal static void AddDevice(int deviceId)
         {
@@ -20,8 +20,8 @@ namespace Microsoft.Xna.Framework.Input
             while (Joysticks.ContainsKey(id))
                 id++;
 
-            if (id > _lastJoystickIndex)
-                _lastJoystickIndex = id;
+            if (id > _lastConnectedIndex)
+                _lastConnectedIndex = id;
 
             Joysticks.Add(id, jdevice);
 
@@ -40,8 +40,8 @@ namespace Microsoft.Xna.Framework.Input
                     Sdl.Joystick.Close(Joysticks[entry.Key]);
                     Joysticks.Remove(entry.Key);
 
-                    if (key == _lastJoystickIndex)
-                        RecalculateLastJoystickIndex();
+                    if (key == _lastConnectedIndex)
+                        RecalculateLastConnectedIndex();
 
                     break;
                 }
@@ -58,19 +58,19 @@ namespace Microsoft.Xna.Framework.Input
             Joysticks.Clear ();
         }
 
-        private static void RecalculateLastJoystickIndex()
+        private static void RecalculateLastConnectedIndex()
         {
-            _lastJoystickIndex = -1;
+            _lastConnectedIndex = -1;
             foreach (var entry in Joysticks)
             {
-                if (entry.Key > _lastJoystickIndex)
-                    _lastJoystickIndex = entry.Key;
+                if (entry.Key > _lastConnectedIndex)
+                    _lastConnectedIndex = entry.Key;
             }
         }
 
-        private static int PlatformLastJoystickIndex
+        private static int PlatformLastConnectedIndex
         {
-            get { return _lastJoystickIndex; }
+            get { return _lastConnectedIndex; }
         }
 
         private const bool PlatformIsSupported = true;

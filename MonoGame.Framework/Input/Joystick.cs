@@ -35,9 +35,9 @@ namespace Microsoft.Xna.Framework.Input
         /// As such, this value may be larger than 0 even if only one joystick is connected.
         /// </para>
         /// </summary>
-        public static int LastJoystickIndex
+        public static int LastConnectedIndex
         {
-            get { return PlatformLastJoystickIndex; }
+            get { return PlatformLastConnectedIndex; }
         }
 
         /// <summary>

@@ -27,11 +27,11 @@ namespace Microsoft.Xna.Framework.Input
             return _defaultJoystickState;
         }
 
-        private static int PlatformLastJoystickIndex
+        private static int PlatformLastConnectedIndex
         {
             get
             {
-                return 0;
+                return -1;
             }
         }
 

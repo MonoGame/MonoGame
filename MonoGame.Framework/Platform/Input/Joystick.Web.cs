@@ -44,12 +44,12 @@ namespace Microsoft.Xna.Framework.Input
             };
         }
 
-        private static int PlatformLastJoystickIndex
+        private static int PlatformLastConnectedIndex
         {
             get
             {
                 //Stubbed so it compiles
-                return 0;
+                return -1;
             }
         }
 
