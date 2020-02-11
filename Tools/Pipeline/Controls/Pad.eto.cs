@@ -7,7 +7,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-#if LINUX
+#if GTK
     public partial class Pad : GroupBox
 #else
     public partial class Pad : Panel
@@ -26,7 +26,7 @@ namespace MonoGame.Tools.Pipeline
             panelLabel = new Panel();
             panelLabel.Padding = new Padding(5);
 
-            if (!Global.Unix)
+            if (!Global.IsGtk)
                 panelLabel.Height = 25;
 
             stack = new StackLayout();

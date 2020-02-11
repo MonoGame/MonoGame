@@ -19,12 +19,12 @@ namespace MonoGame.Tools.Pipeline
             HoverBackColor = SystemColors.Highlight;
             DisabledTextColor = SystemColors.ControlText;
             DisabledTextColor.A = 0.4f;
-            BorderColor = Global.Unix ? SystemColors.WindowBackground : SystemColors.Control;
+            BorderColor = Global.IsGtk ? SystemColors.WindowBackground : SystemColors.Control;
         }
 
         public static void SetPixelsPerPoint(Graphics g)
         {
-            if (!once && !Global.Unix)
+            if (!once && !Global.IsGtk)
             {
                 once = true;
                 TextHeight = (int)(SystemFonts.Default().LineHeight * g.PixelsPerPoint + 0.5);

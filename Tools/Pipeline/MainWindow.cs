@@ -310,12 +310,7 @@ namespace MonoGame.Tools.Pipeline
         {
             var proc = new Process();
 
-            if (!Global.Unix)
-            {
-                proc.StartInfo.FileName = exe;
-                proc.StartInfo.Arguments = commands;
-            }
-            else
+            if (Global.Unix && exe.EndsWith(".exe"))
             {
                 string monoLoc = null;
 
@@ -352,6 +347,15 @@ namespace MonoGame.Tools.Pipeline
                 {
                     proc.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
                 }
+            }
+            else
+            {
+                proc.StartInfo.FileName = exe;
+                proc.StartInfo.Arguments = commands;
+
+                // TODO: Fix debugging .NET Core stuff from Unix
+
+                System.Console.WriteLine(exe + " " + commands);
             }
 
             return proc;

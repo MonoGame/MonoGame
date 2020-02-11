@@ -31,16 +31,15 @@ namespace MonoGame.Tools.Pipeline
         {
             "/Library/Frameworks/MonoGame.framework/Current/Tools",
 #if DEBUG
-            "../../../../../MGCB/bin/Windows/AnyCPU/Debug",
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../MGCB/bin/Windows/AnyCPU/Debug"),
+            "../../../../MGCB/bin/Debug/netcoreapp3.0",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../MGCB/bin/Debug/netcoreapp3.0"),
 #else
-            "../../../../../MGCB/bin/Windows/AnyCPU/Release",
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../MGCB/bin/Windows/AnyCPU/Release"),
+            "../../../../MGCB/bin/Debug/netcoreapp3.0",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../MGCB/bin/Debug/netcoreapp3.0"),
 #endif
             "../MGCB",
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../MGCB"),
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-            "",
+            "../../../../MGCB/bin/Debug/netcoreapp3.0",
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
         };
 
         public IEnumerable<ContentItemTemplate> Templates
@@ -486,15 +485,22 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private string FindMGCB()
-        {            
+        {
             foreach (var root in _mgcbSearchPaths)
             {
                 var mgcbPath = Path.Combine(root, "MGCB.exe");
                 if (File.Exists(mgcbPath))
                     return Path.GetFullPath(mgcbPath);
+
+                if (Global.Unix)
+                {
+                    mgcbPath = Path.Combine(root, "MGCB");
+                    if (File.Exists(mgcbPath))
+                        return Path.GetFullPath(mgcbPath);
+                }
             }
 
-            throw new FileNotFoundException("MGCB.exe is not in the search path!");
+            throw new FileNotFoundException("MGCB is not in the search path!");
         }
 
         private void DoBuild(string commands)

@@ -213,7 +213,23 @@ namespace MonoGame.Tools.Pipeline
 
             if (e.Location.X >= _separatorPos && _selectedCell != null && _selectedCell.Editable && !_skipEdit)
             {
-                var action = new Action(() => _selectedCell.Edit(pixel1));
+                var action = new Action(() =>
+                {
+                    if (Global.IsGtk && !_selectedCell.HasDialog)
+                    {
+                        pixel1.RemoveAll();
+                        pixel1 = new PixelLayout();
+                        pixel1.Add(drawable, 0, 0);
+                        _selectedCell.Edit(pixel1);
+                        Content = pixel1;
+
+                        pixel1.Style = "Stretch";
+                    }
+                    else
+                    {
+                        _selectedCell.Edit(pixel1);
+                    }
+                });
 
 #if WINDOWS
                 (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action,
@@ -248,7 +264,7 @@ namespace MonoGame.Tools.Pipeline
             SetWidth();
 #endif
 
-#if LINUX
+#if GTK
             // force size reallocation
             drawable.Width = pixel1.Width - 2;
 

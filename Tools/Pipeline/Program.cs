@@ -18,7 +18,14 @@ namespace MonoGame.Tools.Pipeline
         {
             Styles.Load();
 
+#if GTK
+            var app = new Application(Platforms.Gtk);
+#elif WPF
+            var app = new Application(Platforms.Wpf);
+#else
             var app = new Application(Platform.Detect);
+#endif
+
             app.Style = "PipelineTool";
 
             PipelineSettings.Default.Load();
@@ -38,11 +45,11 @@ namespace MonoGame.Tools.Pipeline
                 var win = new MainWindow();
                 var controller = PipelineController.Create(win);
 
-#if LINUX
+#if GTK
                 Global.Application.AddWindow(win.ToNative() as Gtk.Window);
 #endif
 
-#if LINUX && !DEBUG
+#if GTK && !DEBUG
 
                 GLib.ExceptionManager.UnhandledException += (e) =>
                 {
@@ -73,7 +80,7 @@ namespace MonoGame.Tools.Pipeline
                 PipelineSettings.Default.Save();
                 app.Restart();
             }
-# endif
+#endif
         }
     }
 }
