@@ -57,6 +57,7 @@ namespace Microsoft.Xna.Framework.Input
                 return new JoystickCapabilities
                 {
                     IsConnected = false,
+                    DisplayName = string.Empty,
                     Identifier = "",
                     IsGamepad = false,
                     AxisCount = 0,
@@ -68,10 +69,11 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickCapabilities
             {
                 IsConnected = true,
+                DisplayName = Sdl.Joystick.GetJoystickName(jdevice),
                 Identifier = Sdl.Joystick.GetGUID(jdevice).ToString(),
                 IsGamepad = (Sdl.GameController.IsGameController(index) == 1),
                 AxisCount = Sdl.Joystick.NumAxes(jdevice),
-                ButtonCount = Sdl.Joystick.NumButtons(jdevice),
+                ButtonCount = Sdl.Joystick.NumButtons(jdevice), 
                 HatCount = Sdl.Joystick.NumHats(jdevice)
             };
         }
