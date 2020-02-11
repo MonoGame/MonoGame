@@ -1175,7 +1175,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vbHandle.Free();
         }
 
-        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
+        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount, int baseInstance = 0)
         {
             if (!GraphicsCapabilities.SupportsInstancing)
                 throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2 or GLES 3.2. Try upgrading your graphics card drivers.");
@@ -1191,11 +1191,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
             ApplyAttribs(_vertexShader, baseVertex);
 
-            GL.DrawElementsInstanced(target,
+            if (baseInstance > 0)
+            {
+                if (!GraphicsCapabilities.SupportsBaseIndexInstancing)
+                    throw new PlatformNotSupportedException("Instanced geometry drawing with base instance requires at least OpenGL 4.2. Try upgrading your graphics card drivers.");
+
+                GL.DrawElementsInstancedBaseInstance(target,
+                                          indexElementCount,
+                                          indexElementType,
+                                          indexOffsetInBytes,
+                                          instanceCount,
+                                          baseInstance);
+            }
+            else
+                GL.DrawElementsInstanced(target,
                                      indexElementCount,
                                      indexElementType,
                                      indexOffsetInBytes,
                                      instanceCount);
+
             GraphicsExtensions.CheckGLError();
         }
 
