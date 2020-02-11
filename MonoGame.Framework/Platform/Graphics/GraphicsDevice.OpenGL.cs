@@ -1191,19 +1191,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
             ApplyAttribs(_vertexShader, baseVertex);
 
-            if (GraphicsCapabilities.SupportsBaseIndexInstancing && baseInstance > 0)
+            if (baseInstance > 0)
+            {
+                if (!GraphicsCapabilities.SupportsBaseIndexInstancing)
+                    throw new PlatformNotSupportedException("Instanced geometry drawing with base index requires at least OpenGL 4.2. Try upgrading your graphics card drivers.");
+
                 GL.DrawElementsInstancedBaseInstance(target,
-                                     indexElementCount,
-                                     indexElementType,
-                                     indexOffsetInBytes,
-                                     instanceCount,
-                                     baseInstance);
+                                          indexElementCount,
+                                          indexElementType,
+                                          indexOffsetInBytes,
+                                          instanceCount,
+                                          baseInstance);
+            }
             else
                 GL.DrawElementsInstanced(target,
                                      indexElementCount,
                                      indexElementType,
                                      indexOffsetInBytes,
                                      instanceCount);
+
             GraphicsExtensions.CheckGLError();
         }
 
