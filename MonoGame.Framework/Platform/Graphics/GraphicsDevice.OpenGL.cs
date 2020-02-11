@@ -1194,7 +1194,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (baseInstance > 0)
             {
                 if (!GraphicsCapabilities.SupportsBaseIndexInstancing)
-                    throw new PlatformNotSupportedException("Instanced geometry drawing with base index requires at least OpenGL 4.2. Try upgrading your graphics card drivers.");
+                    throw new PlatformNotSupportedException("Instanced geometry drawing with base instance requires at least OpenGL 4.2. Try upgrading your graphics card drivers.");
 
                 GL.DrawElementsInstancedBaseInstance(target,
                                           indexElementCount,
