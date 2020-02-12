@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        private void PlatformConstruct(bool isVertexShader, byte[] shaderBytecode)
+        private void PlatformConstruct(ShaderStage stage, byte[] shaderBytecode)
         {
             throw new NotImplementedException();
         }

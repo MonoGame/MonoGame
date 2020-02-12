@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return 0;
         }
 
-        private void PlatformConstruct(bool isVertexShader, byte[] shaderBytecode)
+        private void PlatformConstruct(ShaderStage stage, byte[] shaderBytecode)
         {
             _glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
 
