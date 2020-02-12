@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// DXT5. Texture format with compression. Surface dimensions must be a multiple 4.
         /// </summary>
-        Dxt5 = 6,
+        Dxt5,
         /// <summary>
         /// Signed 16-bit bump-map format for store 8 bits for <c>u</c> and <c>v</c> data.
         /// </summary>
