@@ -100,6 +100,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Nintendo Switch
         /// </summary>
         Switch,
+
+        /// <summary>
+        /// Google Stadia
+        /// </summary>
+        Stadia,
     }
 
 

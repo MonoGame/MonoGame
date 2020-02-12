@@ -262,4 +262,6 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
     </Compile>
   </ItemGroup>
 
+  <Import Project="..\Stadia\Pipeline.targets" Condition="exists('..\Stadia\Pipeline.targets')"/>
+
 </Project>
