@@ -29,7 +29,13 @@ internal static class Sdl
         else if (CurrentPlatform.OS == OS.Linux && !Environment.Is64BitProcess)
             ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x86/libSDL2-2.0.so.0"));
         else if (CurrentPlatform.OS == OS.MacOSX)
+        {
             ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "libSDL2-2.0.0.dylib"));
+
+            //Look in Frameworks for .app bundles
+            if (ret == IntPtr.Zero)
+                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "..", "Frameworks", "libSDL2-2.0.0.dylib"));
+        }
 
         // Load system library
         if (ret == IntPtr.Zero)

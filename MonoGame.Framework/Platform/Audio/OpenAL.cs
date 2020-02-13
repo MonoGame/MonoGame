@@ -210,7 +210,13 @@ namespace MonoGame.OpenAL
             else if (CurrentPlatform.OS == OS.Linux && !Environment.Is64BitProcess)
                 ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x86/libopenal.so.1"));
             else if (CurrentPlatform.OS == OS.MacOSX)
+            {
                 ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "libopenal.1.dylib"));
+
+                //Look in Frameworks for .app bundles
+                if (ret == IntPtr.Zero)
+                    ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "..", "Frameworks", "libopenal.1.dylib"));
+            }
 
             // Load system library
             if (ret == IntPtr.Zero)
