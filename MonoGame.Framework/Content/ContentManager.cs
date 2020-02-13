@@ -50,6 +50,7 @@ namespace Microsoft.Xna.Framework.Content
             'v', // PSVita
             'O', // XboxOne
             'S', // Nintendo Switch
+            'G', // Google Stadia
 
             // NOTE: There are additional idenfiers for consoles that 
             // are not defined in this repository.  Be sure to ask the

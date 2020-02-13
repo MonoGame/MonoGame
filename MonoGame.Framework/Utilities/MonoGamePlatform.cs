@@ -62,6 +62,11 @@ namespace MonoGame.Framework.Utilities
         /// <summary>
         /// MonoGame Nintendo Switch platform.
         /// </summary>
-        NintendoSwitch
+        NintendoSwitch,
+
+        /// <summary>
+        /// MonoGame Google Stadia platform.
+        /// </summary>
+        Stadia
     }
 }
