@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>BlankApp.iOS</string>
+	<string>MGNamespace</string>
 	<key>CFBundleIconFiles</key>
 	<array>
 		<string>GameThumbnail.png</string>
 	</array>
 	<key>CFBundleIdentifier</key>
-	<string>project.MonoGame.BlankApp.iOS</string>
+	<string>project.MonoGame.MGNamespace</string>
 	<key>MinimumOSVersion</key>
 	<string>7.0</string>
 	<key>UISupportedInterfaceOrientations</key>
