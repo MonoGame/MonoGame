@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Eto.Forms" Version="2.5.0-rc.5" />
     <PackageReference Include="Eto.Platform.Wpf" Version="2.5.0-rc.5" />
   </ItemGroup>
 

@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-    <DefineConstants>GTK</DefineConstants>
+    <TargetFramework>net471</TargetFramework>
+    <DefineConstants>MONOMAC;MAC</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,16 +14,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Global.Mac.cs" />
+    <Compile Remove="Global.Linux.cs" />
     <Compile Remove="Global.Windows.cs" />
-    <Compile Remove="Styles.Mac.cs" />
+    <Compile Remove="Styles.Linux.cs" />
     <Compile Remove="Styles.Windows.cs" />
     <Compile Remove="Properties\*.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Eto.Forms" Version="2.5.0-rc.5" />
-    <PackageReference Include="Eto.Platform.Gtk" Version="2.5.0-rc.5" />
+    <PackageReference Include="Eto.Platform.Mac64" Version="2.5.0-rc.5" />
     <PackageReference Include="GtkSharp" Version="3.22.25.56" />
   </ItemGroup>
 
