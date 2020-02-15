@@ -121,6 +121,9 @@
     <BundleResource Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
+    <InterfaceDefinition Include="LaunchScreen.storyboard" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="MonoGame.Content.Builder" Version="3.8.*" />
     <PackageReference Include="MonoGame.Framework.iOS" Version="3.8.*" />
   </ItemGroup>
