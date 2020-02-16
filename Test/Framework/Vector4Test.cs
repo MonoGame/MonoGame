@@ -24,9 +24,9 @@ namespace MonoGame.Tests.Framework
             var vectorStr = (1024.5f).ToString(otherCulture) + otherCulture.TextInfo.ListSeparator + " " +
                             (2048.75f).ToString(otherCulture) + otherCulture.TextInfo.ListSeparator + " " +
                             (4096.125f).ToString(otherCulture) + otherCulture.TextInfo.ListSeparator + " " +
-                            (8192.0625f).ToString(otherCulture);
-            Assert.AreEqual(new Vector4(1024.5f, 2048.75f, 4096.125f, 8192.0625f), converter.ConvertFromString(null, otherCulture, vectorStr));
-            Assert.AreEqual(vectorStr, converter.ConvertToString(null, otherCulture, new Vector4(1024.5f, 2048.75f, 4096.125f, 8192.0625f)));
+                            (2048.75f).ToString(otherCulture);
+            Assert.AreEqual(new Vector4(1024.5f, 2048.75f, 4096.125f, 2048.75f), converter.ConvertFromString(null, otherCulture, vectorStr));
+            Assert.AreEqual(vectorStr, converter.ConvertToString(null, otherCulture, new Vector4(1024.5f, 2048.75f, 4096.125f, 2048.75f)));
         }
 
         [Test]
