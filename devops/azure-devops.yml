@@ -32,7 +32,8 @@ jobs:
     inputs:
       targetType: filePath
       filePath: ./devops/PreBuild.ps1
-      arguments: 'Codefoco.MonoGame.Framework Codefoco.MonoGame.Framework.nuspec'
+      arguments: 'Codefoco.MonoGame.Framework'
+      pwsh: true
 
   # Build  MonoGame
 
@@ -83,7 +84,7 @@ jobs:
     inputs:
       targetType: filePath
       filePath: ./devops/PreBuild.ps1
-      arguments: 'Codefoco.MonoGame.Framework Codefoco.MonoGame.Framework.nuspec'
+      arguments: 'Codefoco.MonoGame.Framework'
       errorActionPreference: 'silentlyContinue'
       pwsh: true
 
@@ -115,7 +116,9 @@ jobs:
     inputs:
       targetType: filePath
       filePath: ./devops/Package.ps1
-      arguments: 'Codefoco.MonoGame.Framework Codefoco.MonoGame.Framework.nuspec'
+      arguments: 'Codefoco.MonoGame.Framework'
+      pwsh: true
+
 
   - script: 'rename Codefoco.MonoGame.Framework.*.nupkg Codefoco.MonoGame.Framework.nupkg'
     displayName: 'Rename Fantas.MonoGame Nuget Package'
@@ -132,5 +135,7 @@ jobs:
       targetType: filePath
       filePath: ./devops/Publish.ps1
       arguments: Codefoco.MonoGame.Framework
+      pwsh: true
+
 
   - template: send-telegram.yml@templates

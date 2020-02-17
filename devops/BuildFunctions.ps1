@@ -28,34 +28,6 @@ function Test-Should-Deploy ()
 	return $false
 }
 
-function Get-Published-PreRelase-Package ($PackageId)
-{
-	$out = [string](nuget list -PreRelease id:$PackageId)
-	$version = $out.Split(' ')[1]
-	return $version
-}
-
-function Get-Published-PreRelase-Package-Version ($PackageId)
-{
-	$version = Get-Published-PreRelase-Package $PackageId
-	$version = $version.Split('-')[0]
-	return $version
-}
-
-function Get-Published-Package ($PackageId)
-{
-	$out = [string](nuget list id:$PackageId)
-	$version = $out.Split(' ')[1]
-	return $version
-}
-
-function Get-Published-Package-Version ($PackageId)
-{
-	$version = Get-Published-Package $PackageId
-	$version = $version.Split('-')[0]
-	return $version
-}
-
 function Get-Git-Package-Version ()
 {
 	Update-Ensure-Git-Not-Detached 
@@ -83,7 +55,7 @@ function Update-NuSpec-Release-Notes($File, $releaseNotes)
 	
 		$releaseNotesPath = "package.metadata.releaseNotes"
 	
-		if ($releaseNotes -ne $null -and $releaseNotes -ne "") {
+		if ($null -ne $releaseNotes -and $releaseNotes -ne "") {
 			Set-XmlElementsTextValue -XmlDocument $fileContents -ElementPath $releaseNotesPath -TextValue $releaseNotes
 		}
 		$fileContents.Save($File)
@@ -97,7 +69,7 @@ function Update-NuSpec-Version($File, $Version)
 
 	$versionPath = "package.metadata.version"
 
-	if ($Version -ne $null -and $Version -ne "") {
+	if ($null -ne $Version -and $Version -ne "") {
 		Set-XmlElementsTextValue -XmlDocument $fileContents -ElementPath $versionPath -TextValue $Version
 	}
 
@@ -171,21 +143,12 @@ function Test-Tag-Build ($nugetGitVersion, $buildMetaData, $fullSemVer) {
 	return $false
 }
 
-function Test-Stable-Release ($stableVersion, $preReleaseVersion, $nugetGitVersion, $buildMetaData, $fullSemVer)
+function Test-Stable-Release ($nugetGitVersion, $buildMetaData, $fullSemVer)
 {
-	# This is unlikelly to heppen, but could happen if the tag creation didn't triggered the Package
-	if ($stableVersion -ne $preReleaseVersion -and $preReleaseVersion -ne $nugetGitVersion) {
-		return 1
-	}
 	if (Test-Tag-Build $nugetGitVersion $buildMetaData $fullSemVer) {
-		return 2
+		return $true
 	}
-	return 0
-}
-
-function Set-Forced-Git-Version ($version)
-{
-	Write-Output "next-version: $version" > GitVersion.yml
+	return $false
 }
 
 function Get-Prefix-Name ()
@@ -200,9 +163,6 @@ function Get-Prefix-Name ()
 
 function Get-Next-Version-String ($PackageId)
 {
-	$stableVersion      = Get-Published-Package-Version ($PackageId)
-	$preReleaseVersion  = Get-Published-PreRelase-Package-Version ($PackageId)
-	
 	$nugetGitVersion   = Get-Git-Package-Version
 	$buildMetaData = Get-Git-Build-MetaData
 	$fullSemVer = Get-Git-Full-Sem-Ver
@@ -213,65 +173,13 @@ function Get-Next-Version-String ($PackageId)
 	$prefix = $prefix.Replace(".", "")
 	$nextVersion = ""
 	
-	$stable = Test-Stable-Release $stableVersion $preReleaseVersion $nugetGitVersion $buildMetaData $fullSemVer
-	if ($stable -eq 1){
-		$nextVersion = $preReleaseVersion
-		Set-Forced-Git-Version $nextVersion
-    } elseif ($stable -eq 2) {
+	$stable = Test-Stable-Release $nugetGitVersion $buildMetaData $fullSemVer
+	if ($stable){
 		$nextVersion = $nugetGitVersion
 	} else {
 		$nextVersion = "$($nugetGitVersion)-$($prefix)-build$($buildMetaData)" 
 	}
 	return $nextVersion
-}
-
-function Test-Version-Stable-Release ($version)
-{
-	$count = $version.Split("-").Length
-	if ($count -eq 3) {
-		return $false
-	}
-	return $true
-}
-
-function Test-Package-Already-Published ($PackageId, $nextVersion)
-{
-	if (Test-Version-Stable-Release $nextVersion) {
-		$publishedVersion = Get-Published-Package $PackageId
-		if ($publishedVersion -eq $nextVersion) {
-			return $true
-		}
-		return $false
-	}
-
-	$buildMetaData = Get-Git-Build-MetaData
-	$currentVersion = $nextVersion.Split('-')[0]
-	
-	[int]$currentBuild = [Convert]::ToInt32($buildMetaData, 10)
-	$currentPrefix = Get-Prefix-Name
-
-	$version = Get-Published-PreRelase-Package $PackageId
-	#if the latest pre-relese returned is a stable release
-	if (Test-Version-Stable-Release $version) {
-		return $false
-	}
-	
-	$publishedVersion = $version.Split('-')[0]
-	$publishedPrefix  = $version.Split('-')[1]
-	$build = $version.Split('-')[2]
-	$build = $build.Replace("build", "")
-	[int]$publishedBuild = [Convert]::ToInt32($build, 10)
-
-	if ($currentVersion -ne $publishedVersion) {
-		return $false
-	}
-	if ($currentPrefix -ne $publishedPrefix) {
-		return $false
-	}
-	if ($currentBuild -gt $publishedPrefix) {
-		return $false
-	}
-	return $true
 }
 
 function Test-Git-Detached ()
@@ -295,6 +203,6 @@ function Update-Ensure-Git-Not-Detached ()
 		return
 	}
 	$currentTag = Get-Git-Current-Tag
-	& git checkout -B $currentTag
+	$result = [string](& git checkout -B $currentTag)
 	# We are using -B because maybe the branch alrady exist
 }

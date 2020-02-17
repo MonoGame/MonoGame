@@ -73,6 +73,6 @@ This package provides you with MonoGame Framework that works on several differen
     <file src="MonoGame.Framework\bin\DesktopGL\Release\net45\libSDL2-2.0.0.dylib" target="runtimes\osx\native\libSDL2-2.0.0.dylib" />
     
     <file src="MonoGame.Framework\bin\DesktopGL\Release\net45\x64\libopenal.so.1" target="runtimes\linux-x64\native\libopenal.so.1" />
-    <file src="MonoGame.Framework\bin\DesktopGL\Release\net45\x64\libopenal.so.1" target="runtimes\linux-x64\native\libSDL2-2.0.so.0" />
+    <file src="MonoGame.Framework\bin\DesktopGL\Release\net45\x64\libSDL2-2.0.so.0" target="runtimes\linux-x64\native\libSDL2-2.0.so.0" />
   </files>
 </package>
