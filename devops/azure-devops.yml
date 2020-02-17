@@ -35,6 +35,13 @@ jobs:
       arguments: 'Codefoco.MonoGame.Framework'
       pwsh: true
 
+  - task: PowerShell@2
+    displayName: 'PreBuild Codefoco.MonoGame.Framework.WindowsDX'
+    inputs:
+      targetType: filePath
+      filePath: ./devops/PreBuild.ps1
+      arguments: 'Codefoco.MonoGame.Framework.WindowsDX'
+      pwsh: true
   # Build  MonoGame
 
   - task: MSBuild@1 # Fantas.MonoGame.sln
