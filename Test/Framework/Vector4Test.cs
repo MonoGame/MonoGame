@@ -11,7 +11,7 @@ namespace MonoGame.Tests.Framework
         public void TypeConverter()
         {
             var converter = TypeDescriptor.GetConverter(typeof(Vector4));
-            CultureInfo invariantCulture = CultureInfo.InvariantCulture;
+            var invariantCulture = CultureInfo.InvariantCulture;
 
             Assert.AreEqual(new Vector4(32, 64, 128, 255), converter.ConvertFromString(null, invariantCulture, "32, 64, 128, 255"));
             Assert.AreEqual(new Vector4(0.5f, 2.75f, 4.125f, 8.0625f), converter.ConvertFromString(null, invariantCulture, "0.5, 2.75, 4.125, 8.0625"));
@@ -20,10 +20,13 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual("0.5, 2.75, 4.125, 8.0625", converter.ConvertToString(null, invariantCulture, new Vector4(0.5f, 2.75f, 4.125f, 8.0625f)));
             Assert.AreEqual("1024.5, 2048.75, 4096.125, 8192.0625", converter.ConvertToString(null, invariantCulture, new Vector4(1024.5f, 2048.75f, 4096.125f, 8192.0625f)));
 
-            CultureInfo otherCulture = new CultureInfo("el-GR");
-
-            Assert.AreEqual(new Vector4(1024.5f, 2048.75f, 4096.125f, 8192.0625f), converter.ConvertFromString(null, otherCulture, "1024,5; 2048,75; 4096,125; 8192,0625"));
-            Assert.AreEqual("1024,5; 2048,75; 4096,125; 8192,0625", converter.ConvertToString(null, otherCulture, new Vector4(1024.5f, 2048.75f, 4096.125f, 8192.0625f)));
+            var otherCulture = new CultureInfo("el-GR");
+            var vectorStr = (1024.5f).ToString(otherCulture) + otherCulture.TextInfo.ListSeparator + " " +
+                            (2048.75f).ToString(otherCulture) + otherCulture.TextInfo.ListSeparator + " " +
+                            (4096.125f).ToString(otherCulture) + otherCulture.TextInfo.ListSeparator + " " +
+                            (2048.75f).ToString(otherCulture);
+            Assert.AreEqual(new Vector4(1024.5f, 2048.75f, 4096.125f, 2048.75f), converter.ConvertFromString(null, otherCulture, vectorStr));
+            Assert.AreEqual(vectorStr, converter.ConvertToString(null, otherCulture, new Vector4(1024.5f, 2048.75f, 4096.125f, 2048.75f)));
         }
 
         [Test]
