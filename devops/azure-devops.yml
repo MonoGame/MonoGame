@@ -22,7 +22,7 @@ jobs:
   - template: common-dotnet.yml@templates
   - template: common-macos.yml@templates
 
- - script: 'git fetch --tags; gitversion'
+  - script: 'git fetch --tags; gitversion'
     displayName: 'Test GitVersion'
 
   - task: NuGetCommand@2 #MonoGame.Framework/MonoGame.Framework.iOSCore.csproj
