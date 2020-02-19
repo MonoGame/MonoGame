@@ -19,7 +19,7 @@ var majorVersion = "3.0";
 if (version == null)
     version = EnvironmentVariable("BUILD_NUMBER") ?? "3.8.0.1";
 
-MSBuildSettings msPackSettings;
+MSBuildSettings msPackSettings, mdPackSettings;
 DotNetCoreMSBuildSettings dnBuildSettings;
 DotNetCorePackSettings dnPackSettings;
 
@@ -65,6 +65,12 @@ Task("Prep")
     msPackSettings.Configuration = configuration;
     msPackSettings.WithProperty("Version", version);
     msPackSettings.WithTarget("Pack");
+
+    mdPackSettings = new MSBuildSettings();
+    mdPackSettings.Verbosity = Verbosity.Minimal;
+    mdPackSettings.Configuration = configuration;
+    mdPackSettings.WithProperty("Version", version);
+    mdPackSettings.WithTarget("PackageAddin");
 
     dnBuildSettings = new DotNetCoreMSBuildSettings();
     dnBuildSettings.WithProperty("Version", version);
@@ -152,6 +158,7 @@ Task("BuildTools")
 });
 
 Task("PackDotNetTemplates")
+    .IsDependentOn("Prep")
     .Does(() =>
 {
     DotNetCoreRestore("Templates/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
@@ -160,6 +167,7 @@ Task("PackDotNetTemplates")
 
 Task("PackVSTemplates")
     .IsDependentOn("PackDotNetTemplates")
+    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
     var vsdirs = GetDirectories("./Templates/VisualStudio20*");
@@ -173,31 +181,16 @@ Task("PackVSTemplates")
                 Zip(projdir, outputPath);
         }
     }
-    
 });
 
-Task("PackWindows")
-    .WithCriteria(() => IsRunningOnWindows())
-    .IsDependentOn("BuildAll")
-    .IsDependentOn("PackVSTemplates")
-    .Does(() =>
-{
-});
-
-Task("PackLinux")
-    .IsDependentOn("BuildAll")
+Task("PackVSMacTemplates")
     .IsDependentOn("PackDotNetTemplates")
+    .WithCriteria(() => IsRunningOnUnix() && DirectoryExists("/Applications") && DirectoryExists("/Library"))
     .Does(() =>
 {
+    DotNetCoreRestore("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj");
+    MSBuild("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj", mdPackSettings);
 });
-
-Task("PackMac")
-    .IsDependentOn("BuildAll")
-    .IsDependentOn("PackDotNetTemplates")
-    .Does(() =>
-{
-});
-
 
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
@@ -213,9 +206,10 @@ Task("BuildAll")
     .IsDependentOn("BuildTools");
 
 Task("Pack")
-    .IsDependentOn("PackWindows")
-    .IsDependentOn("PackLinux")
-    .IsDependentOn("PackMac");
+    .IsDependentOn("BuildAll")
+    .IsDependentOn("PackDotNetTemplates")
+    .IsDependentOn("PackVSTemplates")
+    .IsDependentOn("PackVSMacTemplates");
 
 Task("Default")
     .IsDependentOn("Pack");
