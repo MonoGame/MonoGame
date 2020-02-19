@@ -1077,7 +1077,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (renderTarget == null)
                 SetRenderTarget(null);
             else
-                SetRenderTargets(new RenderTargetBinding(renderTarget, arraySlice));
+            {
+                _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, arraySlice);
+                SetRenderTargets(_tempRenderTargetBinding);
+            }
         }
 
         // Only implemented for DirectX right now, so not in GraphicsDevice.cs
@@ -1086,7 +1089,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (renderTarget == null)
                 SetRenderTarget(null);
             else
-                SetRenderTargets(new RenderTargetBinding(renderTarget, arraySlice));
+            {
+                _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, arraySlice);
+                SetRenderTargets(_tempRenderTargetBinding);
+            }
         }
 
         private void PlatformApplyDefaultRenderTarget()
