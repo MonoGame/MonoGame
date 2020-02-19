@@ -3,7 +3,7 @@
 	<Runtime>
 	</Runtime>
 	<Extension path="/MonoDevelop/Ide/ProjectTemplateCategories">
-		<Category id="monogame" _name="MonoGame" icon="md-monogame-icon-project-16" insertbefore="other">
+		<Category id="monogame" _name="MonoGame" icon="monogame-project-icon-16" insertbefore="other">
 			<Category id="app" _name="App">
 				<Category id="general" _name="General" />
 			</Category>
@@ -14,63 +14,42 @@
 	</Extension>
 	<Extension path="/MonoDevelop/Ide/Templates">
 		<Template
-			id="MonoGame.BlankApp.DesktopGL.CSharp"
+			id="MonoGame.Application.DesktopGL.CSharp"
 			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame game project for Windows, Mac and Linux using OpenGL."
 			category="monogame/app/general"/>
 		<Template
-			id="MonoGame.BlankApp.iOS.CSharp"
+			id="MonoGame.Application.iOS.CSharp"
 			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame game project for iOS using OpenGL."
 			category="monogame/app/general"/>
 		<Template
-			id="MonoGame.BlankApp.Android.CSharp"
+			id="MonoGame.Application.Android.CSharp"
 			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame game project for Android using OpenGL."
 			category="monogame/app/general"/>
 		<Template
-			id="MonoGame.BlankApp.Windows.CSharp"
+			id="MonoGame.Application.WindowsDX.CSharp"
 			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame game project for Windows using DirectX."
 			category="monogame/app/general"/>
 		<Template
-			id="MonoGame.BlankApp.MacOS.CSharp"
-			path="Templates/MonoGame.Templates.CSharp.nupkg"
-			icon="md-monogame-project"
-			imageId="md-monogame-template"
-			_overrideDescription="A MonoGame game project for MacOS using OpenGL. This project is suitable for releasing on the Mac AppStore."
-			category="monogame/app/general"/>
-		<Template
-			id="MonoGame.BlankApp.tvOS.CSharp"
-			path="Templates/MonoGame.Templates.CSharp.nupkg"
-			icon="md-monogame-project"
-			imageId="md-monogame-template"
-			_overrideDescription="A MonoGame game project for tvOS using OpenGL."
-			category="monogame/app/general"/>
-		<Template
-			id="MonoGame.BlankApp.Shared.CSharp"
+			id="MonoGame.Library.Shared.CSharp"
 			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
 			_overrideDescription="A MonoGame Shared project. Use this project to share game code between platforms."
 			category="monogame/library/general"/>
 		<Template
-			id="MonoGame.BlankApp.Portable.CSharp"
-			path="Templates/MonoGame.Templates.CSharp.nupkg"
-			icon="md-monogame-project"
-			imageId="md-monogame-template"
-			_overrideDescription="A MonoGame Portable Class Library project. Use this project to share game code between platforms."
-			category="monogame/library/general"/>
-		<Template
-			id="MonoGame.BlankApp.NetStandard.CSharp"
+			id="MonoGame.Library.NetStandard.CSharp"
 			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
@@ -96,7 +75,7 @@
 		<Image id="md-monogame-preview-project" resource="monogame-preview.png" />
 	</Extension>
 	<Extension path="/MonoDevelop/Core/StockIcons">
-		<StockIcon stockid="monogame-project-icon-16" resource="monogame-project-16.png" size="Dnd" />
+		<StockIcon stockid="monogame-project-icon-16" resource="monogame-16.png" size="Dnd" />
 		<StockIcon stockid="monogame-project-icon" resource="monogame-project-32.png" size="Dnd" />
 		<StockIcon stockid="md-monogame-project" resource="project-monogame-32.png" size="Dnd" />
 		<StockIcon stockid="md-monogame-template" resource="project-monogame-template.png" size="Dnd" />

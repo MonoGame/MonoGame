@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26124.0
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.DesktopGL", "MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj", "{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Debug|x64.Build.0 = Debug|Any CPU
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Debug|x86.Build.0 = Debug|Any CPU
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Release|x64.ActiveCfg = Release|Any CPU
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Release|x64.Build.0 = Release|Any CPU
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Release|x86.ActiveCfg = Release|Any CPU
+		{DFD94AD3-6584-4CAE-BFC9-61E01600D9E0}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

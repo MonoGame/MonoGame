@@ -16,7 +16,7 @@ namespace MonoGame.Tests.Graphics {
         private Texture2D _texture2;
         private Texture2D _texture3;
         private BasicEffect _effect;
-        private Effect _effect2;
+        private Microsoft.Xna.Framework.Graphics.Effect _effect2;
 
 		[SetUp]
 		public override void SetUp ()
@@ -34,7 +34,7 @@ namespace MonoGame.Tests.Graphics {
                 View = Matrix.Identity,
                 World = Matrix.Identity
             };
-            _effect2 = content.Load<Effect>(Paths.CompiledEffect("Grayscale"));            
+            _effect2 = content.Load<Microsoft.Xna.Framework.Graphics.Effect>(Paths.CompiledEffect("Grayscale"));            
 		}
 
 	    [TearDown]

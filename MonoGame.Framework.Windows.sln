@@ -9,13 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Tests.WindowsDX", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Framework.Content.Pipeline", "MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj", "{6BF31C53-0484-432B-AD7D-F7DFEB98C92F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "2MGFX", "Tools\2MGFX\2MGFX.csproj", "{6AE7672E-0D05-4BB8-AC9A-785837A742CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Effect.Compiler", "Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj", "{6AE7672E-0D05-4BB8-AC9A-785837A742CA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGCB", "Tools\MGCB\MGCB.csproj", "{98A2930A-FC0B-4B3D-8113-A6340A550127}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Content.Builder", "Tools\MonoGame.Content.Builder\MonoGame.Content.Builder.csproj", "{98A2930A-FC0B-4B3D-8113-A6340A550127}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{9A4EC299-FA43-4773-A91E-E8E4EB0B6C33}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineTool.Wpf", "Tools\Pipeline\PipelineTool.Wpf.csproj", "{52B8CF0D-087F-4A72-AD6C-6AEEAA3F4092}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor.Wpf", "Tools\Pipeline\MonoGame.Content.Builder.Editor.Wpf.csproj", "{52B8CF0D-087F-4A72-AD6C-6AEEAA3F4092}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,8 +103,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DB6EDE25-DC0E-4705-93E9-73155A697921}
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{52B8CF0D-087F-4A72-AD6C-6AEEAA3F4092} = {9A4EC299-FA43-4773-A91E-E8E4EB0B6C33}
 	EndGlobalSection
 EndGlobal

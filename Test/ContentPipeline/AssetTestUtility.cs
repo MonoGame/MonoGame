@@ -17,17 +17,17 @@ namespace MonoGame.Tests.ContentPipeline
     internal static class AssetTestUtility
     {
 
-        public static Effect LoadEffect(ContentManager content, string name)
+        public static Microsoft.Xna.Framework.Graphics.Effect LoadEffect(ContentManager content, string name)
         {
 #if DIRECTX
             var gd = ((IGraphicsDeviceService) content.ServiceProvider.GetService(typeof(IGraphicsDeviceService))).GraphicsDevice;
             return CompileEffect(gd, Paths.RawEffect(name));
 #else
-            return content.Load<Effect>(Paths.CompiledEffect(name));
+            return content.Load<Microsoft.Xna.Framework.Graphics.Effect>(Paths.CompiledEffect(name));
 #endif
         }
 
-        public static Effect CompileEffect(GraphicsDevice graphicsDevice, string effectPath)
+        public static Microsoft.Xna.Framework.Graphics.Effect CompileEffect(GraphicsDevice graphicsDevice, string effectPath)
         {
 #if !WINDOWS || DIRECTX || XNA
             var effectProcessor = new EffectProcessor();
@@ -38,7 +38,7 @@ namespace MonoGame.Tests.ContentPipeline
                 Identity = new ContentIdentity(effectPath)
             }, context);
 
-            return new Effect(graphicsDevice, compiledEffect.GetEffectCode());
+            return new Microsoft.Xna.Framework.Graphics.Effect(graphicsDevice, compiledEffect.GetEffectCode());
 #else // OpenGL
             throw new NotImplementedException();
 #endif

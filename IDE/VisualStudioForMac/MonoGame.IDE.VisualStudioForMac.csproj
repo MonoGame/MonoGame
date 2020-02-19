@@ -132,14 +132,14 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <AddinFile Include="..\..\ProjectTemplates\DotNetTemplate\MonoGame.Templates.CSharp\bin\MonoGame.Templates.CSharp.1.0.0.nupkg">
+    <AddinFile Include="..\..\Artifacts\MonoGame.Templates.CSharp\Release\*.nupkg">
       <Link>Templates\MonoGame.Templates.CSharp.nupkg</Link>
     </AddinFile>
   </ItemGroup>
   <Target Name="_GenerateAddinInfo" BeforeTargets="CoreCompile">
      <PropertyGroup>
          <BuildVersion>$(BUILD_NUMBER)</BuildVersion>
-         <BuildVersion Condition="'$(BuildVersion)' == ''">3.7.0.0</BuildVersion>
+         <BuildVersion Condition="'$(BuildVersion)' == ''">3.8.0.1</BuildVersion>
      </PropertyGroup>
      <ItemGroup>
        <AddinInfo Include="using System%3B" />

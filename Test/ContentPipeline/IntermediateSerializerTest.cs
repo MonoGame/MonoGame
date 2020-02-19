@@ -373,7 +373,7 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Texture = grassExternalReference,
                 Texture2 = grassExternalReference,
-                Shader = new ExternalReference<Effect>(Path.GetFullPath("Assets/Xml/foliage.fx"))
+                Shader = new ExternalReference<Microsoft.Xna.Framework.Graphics.Effect>(Path.GetFullPath("Assets/Xml/foliage.fx"))
             });
         }
 

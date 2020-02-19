@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.IDE.VisualStudioForMac", "VisualStudioForMac\MonoGame.IDE.VisualStudioForMac.csproj", "{95728082-6120-4837-BB99-257181AF0506}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Templates", "..\ProjectTemplates\DotNetTemplate\MonoGame.Templates.csproj", "{01CCC19F-CEF9-4A47-9931-3F5AEF008BB1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Templates", "..\Templates\MonoGame.Templates.CSharp\MonoGame.Templates.CSharp.csproj", "{01CCC19F-CEF9-4A47-9931-3F5AEF008BB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

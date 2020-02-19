@@ -9,13 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Tests.DesktopGL", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Framework.Content.Pipeline", "MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj", "{7A02A18D-15C4-4440-8921-D191B0F050A1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "2MGFX", "Tools\2MGFX\2MGFX.csproj", "{4381A4EF-A2B6-4162-92A8-E240A8DC562B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Effect.Compiler", "Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj", "{4381A4EF-A2B6-4162-92A8-E240A8DC562B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGCB", "Tools\MGCB\MGCB.csproj", "{0A2C8210-21D2-450E-8647-E08954E57498}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Content.Builder", "Tools\MonoGame.Content.Builder\MonoGame.Content.Builder.csproj", "{0A2C8210-21D2-450E-8647-E08954E57498}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{C9C1F3D2-48F2-4411-A7F7-608FD59861B5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineTool.Gtk", "Tools\Pipeline\PipelineTool.Gtk.csproj", "{4458364B-E957-4D12-A01A-012510FE6906}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor.Gtk", "Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.Gtk.csproj", "{4458364B-E957-4D12-A01A-012510FE6906}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,8 +103,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E1E69DA8-12D1-4CB2-84DC-33EEA2316293}
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{4458364B-E957-4D12-A01A-012510FE6906} = {C9C1F3D2-48F2-4411-A7F7-608FD59861B5}
 	EndGlobalSection
 EndGlobal
