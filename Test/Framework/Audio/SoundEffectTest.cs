@@ -155,13 +155,13 @@ namespace MonoGame.Tests.Audio
             // Test the duration mono.
             {
                 var s = new SoundEffect(new byte[2], 8000, AudioChannels.Mono);
-                Assert.AreEqual(TimeSpan.Zero, s.Duration);
+                Assert.AreEqual(0, (int)s.Duration.TotalMilliseconds / 10);
                 s.Dispose();
                 s = new SoundEffect(new byte[16000], 8000, AudioChannels.Mono);
                 Assert.AreEqual(TimeSpan.FromSeconds(1), s.Duration);
                 s.Dispose();
                 s = new SoundEffect(new byte[2], 48000, AudioChannels.Mono);
-                Assert.AreEqual(TimeSpan.Zero, s.Duration);
+                Assert.AreEqual(0, (int)s.Duration.TotalMilliseconds / 10);
                 s.Dispose();
                 s = new SoundEffect(new byte[96000], 48000, AudioChannels.Mono);
                 Assert.AreEqual(TimeSpan.FromSeconds(1), s.Duration);
@@ -171,13 +171,13 @@ namespace MonoGame.Tests.Audio
             // Test the duration stereo.
             {
                 var s = new SoundEffect(new byte[4], 8000, AudioChannels.Stereo);
-                Assert.AreEqual(TimeSpan.Zero, s.Duration);
+                Assert.AreEqual(0, (int)s.Duration.TotalMilliseconds / 10);
                 s.Dispose();
                 s = new SoundEffect(new byte[32000], 8000, AudioChannels.Stereo);
                 Assert.AreEqual(TimeSpan.FromSeconds(1), s.Duration);
                 s.Dispose();
                 s = new SoundEffect(new byte[4], 48000, AudioChannels.Stereo);
-                Assert.AreEqual(TimeSpan.Zero, s.Duration);
+                Assert.AreEqual(0, (int)s.Duration.TotalMilliseconds / 10);
                 s.Dispose();
                 s = new SoundEffect(new byte[192000], 48000, AudioChannels.Stereo);
                 Assert.AreEqual(TimeSpan.FromSeconds(1), s.Duration);
@@ -341,18 +341,18 @@ namespace MonoGame.Tests.Audio
             }
         }
 
-        [TestCase(@"Assets/Audio/blast_mono.wav", 71650000)]
-        [TestCase(@"Assets/Audio/blast_mono_22hz.wav", 71650000)]
-        [TestCase(@"Assets/Audio/blast_mono_11hz.wav", 71650000)]
-        [TestCase(@"Assets/Audio/rock_loop_stereo.wav", 79400000)]
-        [TestCase(@"Assets/Audio/rock_loop_stereo_22hz.wav", 79400000)]
-        [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", 79400000)]
-        public void LoadCtor1_16Bit(string filename, long durationTicks)
+        [TestCase(@"Assets/Audio/blast_mono.wav", 7165)]
+        [TestCase(@"Assets/Audio/blast_mono_22hz.wav", 7165)]
+        [TestCase(@"Assets/Audio/blast_mono_11hz.wav", 7165)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo.wav", 7940)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_22hz.wav", 7940)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", 7940)]
+        public void LoadCtor1_16Bit(string filename, int milliseconds)
         {
             int sampleRate; AudioChannels channels;
             var data = LoadRiff(filename, out sampleRate, out channels);
             var sound = new SoundEffect(data, sampleRate, channels);
-            Assert.AreEqual(durationTicks, sound.Duration.Ticks);
+            Assert.AreEqual(milliseconds / 10, (int)sound.Duration.TotalMilliseconds / 10);
         }
 
         [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav")]
@@ -370,27 +370,27 @@ namespace MonoGame.Tests.Audio
         // These 8bit PCMs pass although the SoundEffect constructors although
         // they don't support 8bit PCM.  This is because it is interpreting it
         // as 16bit and generating a bad sound... hence half the duration.
-        [TestCase(@"Assets/Audio/rock_loop_stereo_44hz_8bit.wav", 79400000)]
-        public void LoadCtor1_8Bit_BadDuration(string filename, long durationTicks)
+        [TestCase(@"Assets/Audio/rock_loop_stereo_44hz_8bit.wav", 7940)]
+        public void LoadCtor1_8Bit_BadDuration(string filename, int milliseconds)
         {
             int sampleRate; AudioChannels channels;
             var data = LoadRiff(filename, out sampleRate, out channels);
             var sound = new SoundEffect(data, sampleRate, channels);
-            Assert.AreEqual(durationTicks / 2, sound.Duration.Ticks);
+            Assert.AreEqual(milliseconds / 20, (int)sound.Duration.TotalMilliseconds / 10);
         }
 
         // MSADPCM data can be passed into the constructors, but
         // it calculates and incorrect duration and plays static.
-        [TestCase(@"Assets/Audio/blast_mono_44hz_adpcm_ms.wav", 18110000)]
-        [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav", 18110000)]
-        [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav", 18110000)]
-        [TestCase(@"Assets/Audio/rock_loop_stereo_44hz_adpcm_ms.wav", 20140000)]
-        public void LoadCtor1_MsAdpcm_BadDuration(string filename, long durationTicks)
+        [TestCase(@"Assets/Audio/blast_mono_44hz_adpcm_ms.wav", 1811)]
+        [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav", 1811)]
+        [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav", 1811)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_44hz_adpcm_ms.wav", 2014)]
+        public void LoadCtor1_MsAdpcm_BadDuration(string filename, int milliseconds)
         {
             int sampleRate; AudioChannels channels;
             var data = LoadRiff(filename, out sampleRate, out channels);
             var sound = new SoundEffect(data, sampleRate, channels);
-            Assert.AreEqual(durationTicks, sound.Duration.Ticks);
+            Assert.AreEqual(milliseconds / 10, (int)sound.Duration.TotalMilliseconds / 10);
         }
 
         [Test]
@@ -399,45 +399,45 @@ namespace MonoGame.Tests.Audio
             Assert.Throws<ArgumentNullException>(() => SoundEffect.FromStream(null));
         }
 
-        [TestCase(@"Assets/Audio/blast_mono.wav", 71650000)]
-        [TestCase(@"Assets/Audio/blast_mono_22hz.wav", 71650000)]
-        [TestCase(@"Assets/Audio/blast_mono_11hz.wav", 71650000)]
-        [TestCase(@"Assets/Audio/rock_loop_stereo.wav", 79400000)]
-        [TestCase(@"Assets/Audio/rock_loop_stereo_22hz.wav", 79400000)]
-        [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", 79400000)]
-        [TestCase(@"Assets/Audio/rock_loop_stereo_44hz_8bit.wav", 79400000)]
-        [TestCase(@"Assets/Audio/rock_loop_stereo_22hz_8bit.wav", 79400000)]
-        [TestCase(@"Assets/Audio/rock_loop_stereo_11hz_8bit.wav", 79400000)]
-        [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav", 16120000)]
-        [TestCase(@"Assets/Audio/bark_mono_22hz_8bit.wav", 16120000)]
-        [TestCase(@"Assets/Audio/bark_mono_11hz_8bit.wav", 16120000)]
-        [TestCase(@"Assets/Audio/tone_mono_44khz_8bit.wav", 5000000)]
-        [TestCase(@"Assets/Audio/tone_stereo_44khz_8bit.wav", 5000000)]
-        [TestCase(@"Assets/Audio/tone_mono_44khz_16bit.wav", 5000000)]
-        [TestCase(@"Assets/Audio/tone_stereo_44khz_16bit.wav", 5000000)]
+        [TestCase(@"Assets/Audio/blast_mono.wav", 7165)]
+        [TestCase(@"Assets/Audio/blast_mono_22hz.wav", 7165)]
+        [TestCase(@"Assets/Audio/blast_mono_11hz.wav", 7165)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo.wav", 7940)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_22hz.wav", 7940)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", 7940)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_44hz_8bit.wav", 7940)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_22hz_8bit.wav", 7940)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_11hz_8bit.wav", 7940)]
+        [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav", 1612)]
+        [TestCase(@"Assets/Audio/bark_mono_22hz_8bit.wav", 1612)]
+        [TestCase(@"Assets/Audio/bark_mono_11hz_8bit.wav", 1612)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_8bit.wav", 500)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_8bit.wav", 500)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_16bit.wav", 500)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_16bit.wav", 500)]
 #if !XNA
         // XNA does not support 24-bit, 32-bit float, MS-ADPCM or IMA/ADPCM in SoundEffect.FromStream, but MonoGame does
 #if DIRECTX
-        [TestCase(@"Assets/Audio/blast_mono_44hz_adpcm_ms.wav", 72020000)]
-        [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav", 72020000)]
-        [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav", 72020000)]
+        [TestCase(@"Assets/Audio/blast_mono_44hz_adpcm_ms.wav", 7202)]
+        [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav", 7202)]
+        [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav", 7202)]
 #else
-        [TestCase(@"Assets/Audio/tone_mono_44khz_imaadpcm.wav", 5560000)]
-        [TestCase(@"Assets/Audio/tone_stereo_44khz_imaadpcm.wav", 5090000)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_imaadpcm.wav", 556)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_imaadpcm.wav", 509)]
 #endif
-        [TestCase(@"Assets/Audio/tone_mono_44khz_msadpcm.wav", 5080000)]
-        [TestCase(@"Assets/Audio/tone_stereo_44khz_msadpcm.wav", 5050000)]
-        [TestCase(@"Assets/Audio/tone_mono_44khz_float.wav", 5000000)]
-        [TestCase(@"Assets/Audio/tone_stereo_44khz_float.wav", 5000000)]
-        [TestCase(@"Assets/Audio/tone_mono_44khz_24bit.wav", 5000000)]
-        [TestCase(@"Assets/Audio/tone_stereo_44khz_24bit.wav", 5000000)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_msadpcm.wav", 508)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_msadpcm.wav", 505)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_float.wav", 500)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_float.wav", 500)]
+        [TestCase(@"Assets/Audio/tone_mono_44khz_24bit.wav", 500)]
+        [TestCase(@"Assets/Audio/tone_stereo_44khz_24bit.wav", 500)]
 #endif
-        public void SoundEffectFromStream_Supported_Formats(string filename, long durationTicks)
+        public void SoundEffectFromStream_Supported_Formats(string filename, long milliseconds)
         {
             using (var stream = File.OpenRead(filename))
             {
                 var sound = SoundEffect.FromStream(stream);
-                Assert.AreEqual(durationTicks, sound.Duration.Ticks);
+                Assert.AreEqual(milliseconds / 10, (int)sound.Duration.TotalMilliseconds / 10);
             }
         }
 
