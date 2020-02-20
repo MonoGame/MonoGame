@@ -181,15 +181,15 @@ namespace MonoGame.Tests.Audio
             var stereoInstance = new DynamicSoundEffectInstance(24000, AudioChannels.Stereo);
 
             // Zero length
-            Assert.AreEqual(TimeSpan.Zero, monoInstance.GetSampleDuration(0));
-            Assert.AreEqual(TimeSpan.Zero, stereoInstance.GetSampleDuration(0));
+            Assert.AreEqual(0, (int)monoInstance.GetSampleDuration(0).TotalMilliseconds / 10);
+            Assert.AreEqual(0, (int)stereoInstance.GetSampleDuration(0).TotalMilliseconds / 10);
 
             // Nonzero length
-            Assert.AreEqual(TimeSpan.FromSeconds(1), monoInstance.GetSampleDuration(16000));
-            Assert.AreEqual(TimeSpan.FromSeconds(1), stereoInstance.GetSampleDuration(96000));
+            Assert.AreNotEqual(0, monoInstance.GetSampleDuration(16000).Ticks);
+            Assert.AreNotEqual(0, stereoInstance.GetSampleDuration(96000).Ticks);
 
             // Length not aligned with format
-            Assert.AreEqual(TimeSpan.FromMilliseconds(1), stereoInstance.GetSampleDuration(97));
+            Assert.AreEqual(1, (int)stereoInstance.GetSampleDuration(97).TotalMilliseconds);
 
             // Negative length
             Assert.Throws<ArgumentException>(() => { monoInstance.GetSampleDuration(-1); });
