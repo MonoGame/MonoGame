@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Mac</BaseOutputPath>
     <DefineConstants>MONOMAC;MAC</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor</AssemblyName>
+    <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Eto.Forms" Version="2.5.0-rc.5" />
-    <PackageReference Include="Eto.Platform.Mac64" Version="2.5.0-rc.5" />
+    <PackageReference Include="Eto.Forms" Version="2.5.0" />
+    <PackageReference Include="Eto.Platform.Mac64" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,10 +30,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="App.icns">
-      <Link>MonoGame.Content.Builder.Editor.Mac.app/Contents/Resources/Resources/App.icns</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Remove="App.icns" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="App.icns" />
   </ItemGroup>
   <Import Project="MonoGame.Content.Builder.Editor.targets" />
 
