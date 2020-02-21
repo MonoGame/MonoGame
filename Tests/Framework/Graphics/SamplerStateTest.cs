@@ -5,7 +5,6 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
