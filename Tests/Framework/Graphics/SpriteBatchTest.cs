@@ -25,7 +25,7 @@ namespace MonoGame.Tests.Graphics {
             _spriteBatch = new SpriteBatch (gd);
             _texture = content.Load<Texture2D> (Paths.Texture ("MonoGameIcon"));
             _texture2 = content.Load<Texture2D>(Paths.Texture("Surge"));
-            _texture3 = content.Load<Texture2D> (Paths.Texture ("Lines-64"));
+            _texture3 = content.Load<Texture2D> (Paths.Texture ("lines-64"));
             _effect = new BasicEffect(gd)
             {
                 VertexColorEnabled = true,
