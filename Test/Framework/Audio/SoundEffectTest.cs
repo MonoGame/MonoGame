@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Threading;
 
 namespace MonoGame.Tests.Audio
 {
@@ -506,6 +507,74 @@ namespace MonoGame.Tests.Audio
             var content = new ContentManagerProxy(services);
             var soundEffect = content.Load<SoundEffect>(Paths.Audio(filename));
             Assert.AreEqual(durationTicks, soundEffect.Duration.Ticks);
+        }
+
+        [Test]
+        public void IsLooped()
+        {
+            using (var stream = File.OpenRead(@"Assets/Audio/tone_mono_44khz_16bit.wav"))
+            using (var se = SoundEffect.FromStream(stream))
+            {
+                using (var si = se.CreateInstance())
+                {
+                    // Should default to looped.
+                    Assert.IsFalse(si.IsLooped);
+
+                    // Make sure we can change it.
+                    si.IsLooped = true;
+                    Assert.IsTrue(si.IsLooped);
+
+                    // Make sure we can change it back.
+                    si.IsLooped = false;
+                    Assert.IsFalse(si.IsLooped);
+
+                    // Make sure it doesn't loop.
+                    si.Play();
+                    var start = DateTime.UtcNow;
+                    var elapsed = TimeSpan.Zero;
+                    while (si.State != SoundState.Stopped)
+                    {
+                        // Cannot change the looped state after playing begins.
+                        Assert.Throws<InvalidOperationException>(() => si.IsLooped = true);
+                        Assert.IsFalse(si.IsLooped);
+
+                        // Make sure we're not looping my checking our total play time.
+                        elapsed = DateTime.UtcNow - start;
+                        Assert.Less(elapsed, TimeSpan.FromSeconds(1));
+                    }
+
+                    // Even once the sound has now stopped... you cannot change it to looped again.
+                    Assert.AreEqual(SoundState.Stopped, si.State);
+                    Assert.Throws<InvalidOperationException>(() => si.IsLooped = true);
+                }
+
+                using (var si = se.CreateInstance())
+                {
+                    // Make sure looping is working.
+                    si.IsLooped = true;
+                    Assert.IsTrue(si.IsLooped);
+
+                    si.Play();
+                    var start = DateTime.UtcNow;
+                    var elapsed = TimeSpan.Zero;
+                    while (elapsed < TimeSpan.FromSeconds(3))
+                    {
+                        Thread.Sleep(100);
+                        elapsed = DateTime.UtcNow - start;
+                    }
+
+                    // We still should be playing if we're looping.
+                    Assert.AreEqual(SoundState.Playing, si.State);
+
+                    // Make sure we can still stop.
+                    si.Stop();
+                    Thread.Sleep(100);
+                    Assert.AreEqual(SoundState.Stopped, si.State);
+
+                    // You cannot switch off looping later either.
+                    Assert.Throws<InvalidOperationException>(() => si.IsLooped = false);
+                }
+            }
         }
     }
 }
