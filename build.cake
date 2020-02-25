@@ -19,12 +19,7 @@ DotNetCorePackSettings dnPackSettings;
 
 private void PackProject(string filePath)
 {
-    // Windows and Linux dotnet tool does not allow building of .NET
-    // projects, as such we must call msbuild on these platforms.
-    if (IsRunningOnWindows())
-        DotNetCorePack(filePath, dnPackSettings);
-    else
-        MSBuild(filePath, msPackSettings);
+    MSBuild(filePath, msPackSettings);
 }
 
 private bool GetMSBuildWith(string requires)
