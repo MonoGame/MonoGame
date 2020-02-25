@@ -6,18 +6,12 @@
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("build-target", "Default");
-string version = null;
-if (HasArgument("build-version"))
-    version = Argument<string>("build-version");
+var version = Argument("build-version", EnvironmentVariable("BUILD_NUMBER") ?? "3.8.0.1");
 var configuration = Argument("build-configuration", "Release");
 
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
-
-var majorVersion = "3.0";
-if (version == null)
-    version = EnvironmentVariable("BUILD_NUMBER") ?? "3.8.0.1";
 
 MSBuildSettings msPackSettings, mdPackSettings;
 DotNetCoreMSBuildSettings dnBuildSettings;
@@ -89,6 +83,15 @@ Task("BuildDesktopGL")
     PackProject("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
 });
 
+Task("TestDesktopGL")
+    .IsDependentOn("BuildDesktopGL")
+    .Does(() =>
+{
+    DotNetCoreRun("../../../../Tests/MonoGame.Tests.DesktopGL.csproj", "", new DotNetCoreRunSettings {
+        WorkingDirectory = "Artifacts/Tests/DesktopGL/Debug"
+    });
+});
+
 Task("BuildWindowsDX")
     .IsDependentOn("Prep")
     .WithCriteria(() => IsRunningOnWindows())
@@ -96,6 +99,15 @@ Task("BuildWindowsDX")
 {
     DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
     PackProject("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
+});
+
+Task("TestWindows")
+    .IsDependentOn("BuildWindowsDX")
+    .Does(() =>
+{
+    DotNetCoreRun("../../../../Tests/MonoGame.Tests.WindowsDX.csproj", "", new DotNetCoreRunSettings {
+        WorkingDirectory = "Artifacts/Tests/WindowsDX/Debug"
+    });
 });
 
 Task("BuildAndroid")
@@ -157,6 +169,15 @@ Task("BuildTools")
     PackProject("Tools/MonoGame.Packaging.Flatpak/MonoGame.Packaging.Flatpak.csproj");
 });
 
+Task("TestTools")
+    .IsDependentOn("BuildTools")
+    .Does(() =>
+{
+    DotNetCoreRun("../../../../Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj", "", new DotNetCoreRunSettings {
+        WorkingDirectory = "Artifacts/Tests/Tools/Debug"
+    });
+});
+
 Task("PackDotNetTemplates")
     .IsDependentOn("Prep")
     .Does(() =>
@@ -210,6 +231,11 @@ Task("Pack")
     .IsDependentOn("PackDotNetTemplates")
     .IsDependentOn("PackVSTemplates")
     .IsDependentOn("PackVSMacTemplates");
+
+Task("Test")
+    .IsDependentOn("TestWindowsDX")
+    .IsDependentOn("TestDesktopGL")
+    .IsDependentOn("TestTools");
 
 Task("Default")
     .IsDependentOn("Pack");
