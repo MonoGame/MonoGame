@@ -101,7 +101,7 @@ Task("BuildWindowsDX")
     PackProject("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
 });
 
-Task("TestWindows")
+Task("TestWindowsDX")
     .IsDependentOn("BuildWindowsDX")
     .Does(() =>
 {
