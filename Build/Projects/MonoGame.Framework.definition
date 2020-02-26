@@ -1219,6 +1219,9 @@
     <Compile Include="Utilities\LzxStream\LzxDecoderStream.cs" />
     <Compile Include="Utilities\ZLibStream\ZlibStream.cs" />
     <Compile Include="Utilities\ByteBufferPool.cs" />
+    <Compile Include="Platform\Utilities\SignalWatcher.cs">
+      <Platforms>MacOS,WindowsGL,Linux</Platforms>
+    </Compile>
 	
 
 
