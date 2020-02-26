@@ -4,6 +4,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.exec
 //import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.nant
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.nuGetPack
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.powerShell
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.finishBuildTrigger
@@ -169,7 +170,7 @@ object DevelopWin : BuildType({
             scriptMode = file {
                 path = "build.ps1"
             }
-            param("jetbrains_powershell_scriptArguments", """-ScriptArgs '-build-version="%build.number%"', '-build-target="Pack"'""")
+            param("jetbrains_powershell_scriptArguments", "-build-version='4.3.2.1' -build-target='Foo'")
         }
     }
 
@@ -625,7 +626,6 @@ object TestMac : BuildType({
             path = "build.sh"
             arguments = "--build-number=%build.number% --build-target=Test"
             formatStderrAsError = true
-            reduceTestFeedback = true
         }
     }
 
@@ -715,11 +715,10 @@ object TestWindows : BuildType({
             name = "Running Cake Script"
             platform = PowerShellStep.Platform.x64
             formatStderrAsError = true
-            reduceTestFeedback = true
             scriptMode = file {
                 path = "build.ps1"
             }
-            param("jetbrains_powershell_scriptArguments", """-ScriptArgs '-build-version="%build.number%"', '-build-target="Test"'""")
+            param("jetbrains_powershell_scriptArguments", "-build-version='1.2.3.4' -build-target='Bar'")
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.bundled%")
             param("dotNetCoverage.dotCover.filters", """
                 +:MonoGame.Framework
