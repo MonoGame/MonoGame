@@ -49,6 +49,14 @@ private bool GetMSBuildWith(string requires)
 Task("Prep")
     .Does(() =>
 {
+    // We tag the version with the build branch to make it
+    // easier to spot special builds in NuGet feeds.
+    var branch = EnvironmentVariable("GIT_BRANCH") ?? "";
+    if (branch == "develop")
+	version += "-develop";
+
+    Console.WriteLine("Build Version: {0}", version);
+
     msPackSettings = new MSBuildSettings();
     msPackSettings.Verbosity = Verbosity.Minimal;
     msPackSettings.Configuration = configuration;
