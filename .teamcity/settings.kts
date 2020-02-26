@@ -170,7 +170,7 @@ object DevelopWin : BuildType({
             scriptMode = file {
                 path = "build.ps1"
             }
-            param("jetbrains_powershell_scriptArguments", "-build-version='4.3.2.1' -build-target='Foo'")
+            param("jetbrains_powershell_scriptArguments", "-build-version='4.3.2.1' -build-target='FooBar'")
         }
     }
 
