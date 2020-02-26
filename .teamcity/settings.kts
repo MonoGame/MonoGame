@@ -1,6 +1,9 @@
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.nant
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.PowerShellStep
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.exec
+//import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.nant
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.nuGetPack
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.finishBuildTrigger
@@ -34,10 +37,10 @@ project {
 
     buildType(Version)
     buildType(DevelopMac)
-    buildType(PackagingWindows)
+    //buildType(PackagingWindows)
     buildType(DevelopWin)
     buildType(NuGetDevelop)
-    buildType(PackageMacAndLinux)
+    //buildType(PackageMacAndLinux)
     buildType(TestWindows)
     buildType(TestMac)
     buildType(GenerateDocumentation)
@@ -57,7 +60,7 @@ project {
             param("username", "")
         }
     }
-    buildTypesOrder = arrayListOf(Version, DevelopWin, DevelopMac, TestWindows, TestMac, GenerateDocumentation, PackagingWindows, PackageMacAndLinux, PackageNuGet, NuGetDevelop)
+    buildTypesOrder = arrayListOf(Version, DevelopWin, DevelopMac, TestWindows, TestMac, GenerateDocumentation, /*PackagingWindows, PackageMacAndLinux,*/ PackageNuGet, NuGetDevelop)
 }
 
 object DevelopMac : BuildType({
@@ -87,12 +90,11 @@ object DevelopMac : BuildType({
     }
 
     steps {
-        nant {
-            name = "Running NAnt Script"
-            mode = nantFile {
-                path = "default.build"
-            }
-            targets = "build_linux build_mac build_ios"
+        exec {
+            name = "Running Cake Script"
+            path = "build.sh"
+            arguments = "--build-number=%build.number% --build-target=Pack"
+            formatStderrAsError = true
         }
     }
 
@@ -160,16 +162,14 @@ object DevelopWin : BuildType({
     }
 
     steps {
-        nant {
-            name = "Running NAnt Script"
-            mode = nantFile {
-                path = "default.build"
+        powerShell {
+            name = "Running PS Script"
+            platform = PowerShellStep.Platform.x64
+            formatStderrAsError = true
+            scriptMode = file {
+                path = "build.ps1"
             }
-            targets = "build_windows build_web build_android build_windows8 build_windowsphone81 build_windows10"
-            param("dotNetCoverage.dotCover.filters", """
-                +:MonoGame.Framework
-                +:MonoGame.Framework.Content.Pipeline
-            """.trimIndent())
+            param("jetbrains_powershell_scriptArguments", """-ScriptArgs '-build-version="%build.number%"', '-build-target="Pack"'""")
         }
     }
 
@@ -228,16 +228,13 @@ object GenerateDocumentation : BuildType({
     }
 
     steps {
-        nant {
-            name = "Running NAnt Script"
-            mode = nantFile {
-                path = "default.build"
-            }
-            targets = "build_docs"
-            param("dotNetCoverage.dotCover.filters", """
-                +:MonoGame.Framework
-                +:MonoGame.Framework.Content.Pipeline
-            """.trimIndent())
+        script {
+            name = "Running Command Script"
+            scriptContent = """
+                rmdir .\Documentation\Output /s /q
+                ThirdParty\Dependencies\SharpDoc\SharpDoc.exe -config Documentation\config.xml
+            """.trimIndent()
+            formatStderrAsError = true
         }
     }
 
@@ -361,6 +358,7 @@ object NuGetDevelop : BuildType({
     }
 })
 
+/*
 object PackageMacAndLinux : BuildType({
     name = "Package Mac and Linux"
     description = "Create the Mac and Linux SDK packages."
@@ -442,6 +440,7 @@ object PackageMacAndLinux : BuildType({
         equals("teamcity.agent.jvm.os.name", "Mac OS X")
     }
 })
+*/
 
 object PackageNuGet : BuildType({
     name = "Package NuGet"
@@ -523,6 +522,7 @@ object PackageNuGet : BuildType({
     }
 })
 
+/*
 object PackagingWindows : BuildType({
     name = "Package Windows"
     description = "Create the Windows SDK packaging."
@@ -601,6 +601,7 @@ object PackagingWindows : BuildType({
         startsWith("teamcity.agent.name", "MonoGameWin")
     }
 })
+*/
 
 object TestMac : BuildType({
     name = "Test Mac"
@@ -619,12 +620,11 @@ object TestMac : BuildType({
     }
 
     steps {
-        nant {
-            name = "Running NAnt Script"
-            mode = nantFile {
-                path = "default.build"
-            }
-            targets = "run_tests"
+        exec {
+            name = "Running Cake Script"
+            path = "build.sh"
+            arguments = "--build-number=%build.number% --build-target=Test"
+            formatStderrAsError = true
             reduceTestFeedback = true
         }
     }
@@ -711,13 +711,15 @@ object TestWindows : BuildType({
     }
 
     steps {
-        nant {
-            name = "Running NAnt Script"
-            mode = nantFile {
-                path = "default.build"
-            }
-            targets = "run_tests"
+        powerShell {
+            name = "Running Cake Script"
+            platform = PowerShellStep.Platform.x64
+            formatStderrAsError = true
             reduceTestFeedback = true
+            scriptMode = file {
+                path = "build.ps1"
+            }
+            param("jetbrains_powershell_scriptArguments", """-ScriptArgs '-build-version="%build.number%"', '-build-target="Test"'""")
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.bundled%")
             param("dotNetCoverage.dotCover.filters", """
                 +:MonoGame.Framework
