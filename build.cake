@@ -99,6 +99,7 @@ Task("BuildWindowsDX")
 
 Task("TestWindowsDX")
     .IsDependentOn("BuildWindowsDX")
+    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/WindowsDX/Debug");
