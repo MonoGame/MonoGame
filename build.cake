@@ -84,7 +84,8 @@ Task("TestDesktopGL")
 {
     CreateDirectory("Artifacts/Tests/DesktopGL/Debug");
     DotNetCoreRun("../../../../Tests/MonoGame.Tests.DesktopGL.csproj", "", new DotNetCoreRunSettings {
-        WorkingDirectory = "Artifacts/Tests/DesktopGL/Debug"
+        WorkingDirectory = "Artifacts/Tests/DesktopGL/Debug",
+	ArgumentCustomization = args=>args.Append("--teamcity")
     });
 });
 
@@ -104,7 +105,8 @@ Task("TestWindowsDX")
 {
     CreateDirectory("Artifacts/Tests/WindowsDX/Debug");
     DotNetCoreRun("../../../../Tests/MonoGame.Tests.WindowsDX.csproj", "", new DotNetCoreRunSettings {
-        WorkingDirectory = "Artifacts/Tests/WindowsDX/Debug"
+        WorkingDirectory = "Artifacts/Tests/WindowsDX/Debug",
+	ArgumentCustomization = args=>args.Append("--teamcity")
     });
 });
 
@@ -173,7 +175,8 @@ Task("TestTools")
 {
     CreateDirectory("Artifacts/Tests/Tools/Debug");
     DotNetCoreRun("../../../../Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj", "", new DotNetCoreRunSettings {
-        WorkingDirectory = "Artifacts/Tests/Tools/Debug"
+        WorkingDirectory = "Artifacts/Tests/Tools/Debug",
+	ArgumentCustomization = args=>args.Append("--teamcity")
     });
 });
 
