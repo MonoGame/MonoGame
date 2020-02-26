@@ -137,8 +137,8 @@ Task("BuildUWP")
     .WithCriteria(() => GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.17763"))
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.UWP.csproj");
-    PackProject("MonoGame.Framework/MonoGame.Framework.UWP.csproj");
+    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
+    PackProject("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
 });
 
 Task("BuildContentPipeline")
