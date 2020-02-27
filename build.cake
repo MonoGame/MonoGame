@@ -182,6 +182,7 @@ Task("BuildTools")
 
 Task("TestTools")
     .IsDependentOn("BuildTools")
+    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/Tools/Debug");
