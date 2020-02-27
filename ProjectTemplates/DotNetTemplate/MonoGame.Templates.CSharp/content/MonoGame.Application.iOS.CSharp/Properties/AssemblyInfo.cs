@@ -4,8 +4,8 @@ using System.Runtime.CompilerServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("BlankApp.iOS")]
-[assembly: AssemblyProduct("BlankApp.iOS")]
+[assembly: AssemblyTitle("MGNamespace")]
+[assembly: AssemblyProduct("MGNamespace")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]

@@ -46,6 +46,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 {
                     directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Library", "Fonts"));
                     directories.Add("/Library/Fonts");
+                    directories.Add("/System/Library/Fonts/Supplemental");
                 }
 
                 foreach (var dir in directories)

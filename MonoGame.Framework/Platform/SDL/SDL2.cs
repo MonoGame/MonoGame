@@ -29,7 +29,13 @@ internal static class Sdl
         else if (CurrentPlatform.OS == OS.Linux && !Environment.Is64BitProcess)
             ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x86/libSDL2-2.0.so.0"));
         else if (CurrentPlatform.OS == OS.MacOSX)
+        {
             ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "libSDL2-2.0.0.dylib"));
+
+            //Look in Frameworks for .app bundles
+            if (ret == IntPtr.Zero)
+                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "..", "Frameworks", "libSDL2-2.0.0.dylib"));
+        }
 
         // Load system library
         if (ret == IntPtr.Zero)
@@ -944,6 +950,10 @@ internal static class Sdl
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_free(IntPtr ptr);
+        public static d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_gamecontrolleraddmapping(string mappingString);
         public static d_sdl_gamecontrolleraddmapping AddMapping = FuncLoader.LoadFunction<d_sdl_gamecontrolleraddmapping>(NativeLibrary, "SDL_GameControllerAddMapping");
 
@@ -991,7 +1001,16 @@ internal static class Sdl
 
         public static string GetMapping(IntPtr gamecontroller)
         {
-            return InteropHelpers.Utf8ToString(SDL_GameControllerMapping(gamecontroller));
+            IntPtr nativeStr = SDL_GameControllerMapping(gamecontroller);
+            if (nativeStr == IntPtr.Zero)
+                return string.Empty;
+
+            string mappingStr = InteropHelpers.Utf8ToString(nativeStr);
+
+            //The mapping string returned by SDL is owned by us and thus must be freed
+            SDL_Free(nativeStr);
+
+            return mappingStr;
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

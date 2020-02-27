@@ -355,7 +355,7 @@ namespace Microsoft.Xna.Framework.Graphics
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
 
-        public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
+        private void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
             // TODO: We need to figure out how to detect if we have a
             // depth stencil buffer or not, and clear options relating
@@ -529,7 +529,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
-        public void PlatformPresent()
+        private void PlatformPresent()
         {
 #if DESKTOPGL || ANGLE
             Context.SwapBuffers();

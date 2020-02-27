@@ -45,6 +45,15 @@ namespace Microsoft.Xna.Framework.Input
             };
         }
 
+        private static int PlatformLastConnectedIndex
+        {
+            get
+            {
+                //Stubbed so it compiles
+                return -1;
+            }
+        }
+
         private static JoystickState PlatformGetState(int index)
         {
             var connected = false;

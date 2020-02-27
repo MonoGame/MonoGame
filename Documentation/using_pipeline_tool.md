@@ -22,7 +22,7 @@ You can edit the content project settings directly from the property grid editor
 
 This is where you setup the folders for output, the platform to target, the assembly references for custom processors, etc.
 
-Note that currently the Pipeline tool is not setup to support multiple target platforms.  This means you may need to manage mutliple content projects or manually change the target platform between builds.  We are working on adding functionaliy to support multiple platforms and configurations within a single project.
+Note that currently the Pipeline tool is not setup to support multiple target platforms.  This means you may need to manage multiple content projects or manually change the target platform between builds.  We are working on adding functionality to support multiple platforms and configurations within a single project.
 
 
 ## Adding Content Items

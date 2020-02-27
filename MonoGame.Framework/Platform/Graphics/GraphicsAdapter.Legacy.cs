@@ -63,8 +63,21 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
+#if DESKTOPGL
+        public string Description {
+            get {
+                try {
+                    return MonoGame.OpenGL.GL.GetString(MonoGame.OpenGL.StringName.Renderer);
+                } catch {
+                    return string.Empty;
+                }
+            }
+            private set { }
+        }
+#else
         string _description = string.Empty;
         public string Description { get { return _description; } private set { _description = value; } }
+#endif
 
         public DisplayMode CurrentDisplayMode
         {
