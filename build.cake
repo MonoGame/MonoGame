@@ -51,7 +51,7 @@ Task("Prep")
 {
     // We tag the version with the build branch to make it
     // easier to spot special builds in NuGet feeds.
-    var branch = EnvironmentVariable("GIT_BRANCH") ?? "";
+    var branch = EnvironmentVariable("GIT_BRANCH") ?? string.Empty;
     if (branch == "develop")
 	version += "-develop";
 
@@ -88,12 +88,14 @@ Task("BuildDesktopGL")
 
 Task("TestDesktopGL")
     .IsDependentOn("BuildDesktopGL")
+    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/DesktopGL/Debug");
-    DotNetCoreRun("../../../../Tests/MonoGame.Tests.DesktopGL.csproj", "", new DotNetCoreRunSettings {
+    DotNetCoreRun("../../../../Tests/MonoGame.Tests.DesktopGL.csproj", "", new DotNetCoreRunSettings
+    {
         WorkingDirectory = "Artifacts/Tests/DesktopGL/Debug",
-	ArgumentCustomization = args=>args.Append("--teamcity")
+	    ArgumentCustomization = args => args.Append("--teamcity")
     });
 });
 
@@ -112,9 +114,10 @@ Task("TestWindowsDX")
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/WindowsDX/Debug");
-    DotNetCoreRun("../../../../Tests/MonoGame.Tests.WindowsDX.csproj", "", new DotNetCoreRunSettings {
+    DotNetCoreRun("../../../../Tests/MonoGame.Tests.WindowsDX.csproj", "", new DotNetCoreRunSettings
+    {
         WorkingDirectory = "Artifacts/Tests/WindowsDX/Debug",
-	ArgumentCustomization = args=>args.Append("--teamcity")
+	    ArgumentCustomization = args => args.Append("--teamcity")
     });
 });
 
@@ -182,9 +185,10 @@ Task("TestTools")
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/Tools/Debug");
-    DotNetCoreRun("../../../../Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj", "", new DotNetCoreRunSettings {
+    DotNetCoreRun("../../../../Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj", "", new DotNetCoreRunSettings
+    {
         WorkingDirectory = "Artifacts/Tests/Tools/Debug",
-	ArgumentCustomization = args=>args.Append("--teamcity")
+	    ArgumentCustomization = args => args.Append("--teamcity")
     });
 });
 
