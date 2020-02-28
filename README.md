@@ -80,7 +80,7 @@ A high level breakdown of the components of the framework:
  * The content pipeline is located in [MonoGame.Framework.Content.Pipeline](MonoGame.Framework.Content.Pipeline).
  * Project templates are in [Templates](Templates).
  * See [Tests](Tests) for the framework unit tests.
- * See [Tools/Tests](Tools/Tests) for the content pipeline and other tool tests.
+ * See [Tools/Tests](Tools/MonoGame.Tools.Tests) for the content pipeline and other tool tests.
  * [mgcb](Tools/MonoGame.Content.Builder) is the command line tool for content processing.
  * [mgfxc](Tools/MonoGame.Effect.Compiler) is the command line effect compiler tool.
  * The [mgcb-editor](Tools/MonoGame.Content.Builder.Editor) tool is a GUI frontend for content processing.
