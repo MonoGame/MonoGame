@@ -20,11 +20,8 @@ Our [build server](http://teamcity.monogame.net/?guest=1) builds, tests, and pac
 |:---|--------|
 | Build Windows, Web, and Android | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_DevelopWin/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_DevelopWin&guest=1) |
 | Build Mac, iOS, and Linux | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_DevelopMac/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_DevelopMac&guest=1) |
-| Generate Documentation | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_GenerateDocumentation/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_GenerateDocumentation&guest=1) |
 | Windows Tests | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_TestWindows/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_TestWindows&guest=1) |
-| Package NuGet | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_PackageNuGet/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_PackageNuGet&guest=1) |
-| Package Mac and Linux | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_PackageMacAndLinux/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_PackageMacAndLinux&guest=1) |
-| Package Windows | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_PackagingWindows/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_PackagingWindows&guest=1) |
+| Mac Tests | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_TestMac/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_TestMac&guest=1) |
 
 
 ## Supported Platforms
@@ -72,13 +69,8 @@ The full source code is available here from GitHub:
 
  * Clone the source: `git clone https://github.com/MonoGame/MonoGame.git`
  * Set up the submodules: `git submodule update --init`
- * Run Protobuild.exe to generate project files and solutions.
-   * If on Linux or Mac, run it with mono: `mono Protobuild.exe`
- * You can generate solutions for platforms that are not buildable from the current OS with: 
-   * Windows: `.\Protobuild.exe --generate $PLATFORM`
-   * Linux or Mac: `mono Protobuild.exe --generate $PLATFORM`
  * Open the solution for your target platform to build the game framework.
- * Open the solution for your development platform for building the pipeline and content tools.
+ * Open the Tools solution for your development platform to build the pipeline and content tools.
 
 For the prerequisites for building from source, please look at the [Requirements](REQUIREMENTS.md) file.
 
