@@ -10,6 +10,7 @@ using System.Reflection;
 using MonoGame.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
+using System.Linq.Expressions;
 
 #if !WINDOWS_UAP
 using Microsoft.Xna.Framework.Audio;
@@ -219,8 +220,8 @@ namespace Microsoft.Xna.Framework.Content
             return Load<T> (assetName);
         }
 
-		public virtual T Load<T>(string assetName)
-		{
+        public virtual T Load<T>(string assetName, Stream streamData=null)
+        {
             if (string.IsNullOrEmpty(assetName))
             {
                 throw new ArgumentNullException("assetName");
@@ -231,7 +232,7 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             T result = default(T);
-            
+
             // On some platforms, name and slash direction matter.
             // We store the asset by a /-seperating key rather than how the
             // path to the file was passed to us to avoid
@@ -251,11 +252,11 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             // Load the asset.
-            result = ReadAsset<T>(assetName, null);
+            result = ReadAsset<T>(assetName, null, streamData);
 
             loadedAssets[key] = result;
             return result;
-		}
+        }
 		
 		protected virtual Stream OpenStream(string assetName)
 		{
@@ -300,7 +301,7 @@ namespace Microsoft.Xna.Framework.Content
 			return stream;
 		}
 
-		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
+		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject,Stream streamData=null)
 		{
 			if (string.IsNullOrEmpty(assetName))
 			{
@@ -315,7 +316,7 @@ namespace Microsoft.Xna.Framework.Content
 			object result = null;
 
             // Try to load as XNB file
-            var stream = OpenStream(assetName);
+            var stream = streamData ?? OpenStream(assetName);
             using (var xnbReader = new BinaryReader(stream))
             {
                 using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
@@ -388,7 +389,7 @@ namespace Microsoft.Xna.Framework.Content
 
         internal void RecordDisposable(IDisposable disposable)
         {
-            Debug.Assert(disposable != null, "The disposable is null!");
+            //Debug.Assert(disposable != null, "The disposable is null!");
 
             // Avoid recording disposable objects twice. ReloadAsset will try to record the disposables again.
             // We don't know which asset recorded which disposable so just guard against storing multiple of the same instance.
@@ -404,7 +405,7 @@ namespace Microsoft.Xna.Framework.Content
             get { return loadedAssets; }
         }
 
-		protected virtual void ReloadGraphicsAssets()
+        protected virtual void ReloadGraphicsAssets()
         {
             foreach (var asset in LoadedAssets)
             {
@@ -413,11 +414,26 @@ namespace Microsoft.Xna.Framework.Content
                 if (asset.Key == null)
                     ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()));
 
-                var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), "ReloadAsset");
-                var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
-                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) }); 
+                Delegate reloadAssetCompiled = null;
+                if (!ReloadAssetDelegateCache.TryGetValue(asset.Key, out reloadAssetCompiled))
+                {
+                    var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), "ReloadAsset");
+                    var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
+
+                    var originalAssetName = Expression.Parameter(typeof(string));
+                    var currentAsset = Expression.Parameter(asset.Value.GetType());
+
+                    var ReloadAssetCall = Expression.Call(Expression.Constant(this), methodInfo, originalAssetName, currentAsset);
+
+                    reloadAssetCompiled = Expression.Lambda(ReloadAssetCall, originalAssetName, currentAsset).Compile();
+                    ReloadAssetDelegateCache.Add(asset.Key, reloadAssetCompiled);
+                }
+
+                reloadAssetCompiled.DynamicInvoke(asset.Key, asset.Value);
             }
         }
+
+        private static Dictionary<string, Delegate> ReloadAssetDelegateCache = new Dictionary<string, Delegate>();
 
         protected virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
         {
