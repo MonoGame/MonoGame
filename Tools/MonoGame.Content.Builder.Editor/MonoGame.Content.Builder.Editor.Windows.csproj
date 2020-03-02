@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Wpf</BaseOutputPath>
     <DefineConstants>WINDOWS;WPF</DefineConstants>
     <ApplicationIcon>App.ico</ApplicationIcon>
