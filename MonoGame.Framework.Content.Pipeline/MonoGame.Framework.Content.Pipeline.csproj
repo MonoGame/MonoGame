@@ -263,7 +263,7 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>
-
-  <Import Project="..\Stadia\Pipeline.targets" Condition="exists('..\Stadia\Pipeline.targets')" />
+  
+  <Import Project="..\Stadia\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Stadia\MonoGame.Framework.Content.Pipeline.targets')" />
 
 </Project>
