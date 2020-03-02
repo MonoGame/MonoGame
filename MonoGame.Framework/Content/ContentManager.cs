@@ -389,7 +389,7 @@ namespace Microsoft.Xna.Framework.Content
 
         internal void RecordDisposable(IDisposable disposable)
         {
-            //Debug.Assert(disposable != null, "The disposable is null!");
+            Debug.Assert(disposable != null, "The disposable is null!");
 
             // Avoid recording disposable objects twice. ReloadAsset will try to record the disposables again.
             // We don't know which asset recorded which disposable so just guard against storing multiple of the same instance.

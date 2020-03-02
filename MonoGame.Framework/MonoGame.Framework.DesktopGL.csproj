@@ -9,8 +9,6 @@
 This package provides you with MonoGame Framework that uses OpenGL for rendering and works on Windows, Linux and MacOS.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;desktopgl</PackageTags>
     <PackageId>MonoGame.Framework.DesktopGL</PackageId>
-    <AssemblyVersion>3.0.8.3</AssemblyVersion>
-    <FileVersion>3.0.8.3</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
