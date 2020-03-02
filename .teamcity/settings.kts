@@ -1,6 +1,7 @@
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.exec
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.nant
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.nuGetPack
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.finishBuildTrigger
@@ -36,12 +37,10 @@ project {
     buildType(DevelopMac)
     buildType(PackagingWindows)
     buildType(DevelopWin)
-    buildType(NuGetDevelop)
     buildType(PackageMacAndLinux)
     buildType(TestWindows)
     buildType(TestMac)
     buildType(GenerateDocumentation)
-    buildType(PackageNuGet)
 
     features {
         feature {
@@ -57,7 +56,7 @@ project {
             param("username", "")
         }
     }
-    buildTypesOrder = arrayListOf(Version, DevelopWin, DevelopMac, TestWindows, TestMac, GenerateDocumentation, PackagingWindows, PackageMacAndLinux, PackageNuGet, NuGetDevelop)
+    buildTypesOrder = arrayListOf(Version, DevelopWin, DevelopMac, TestWindows, TestMac, GenerateDocumentation, PackagingWindows, PackageMacAndLinux)
 }
 
 object DevelopMac : BuildType({
@@ -66,16 +65,15 @@ object DevelopMac : BuildType({
 
     allowExternalStatus = true
     artifactRules = """
-        MonoGame.Framework/bin => MonoGame.Framework.zip!/MonoGame.Framework/bin
-        MonoGame.Framework.Content.Pipeline/bin => MonoGame.Framework.Content.Pipeline.zip!/MonoGame.Framework.Content.Pipeline/bin
-        Tools/MGCB/bin => Tools.zip!/Tools/MGCB/bin
-        Tools/Pipeline/bin => Tools.zip!/Tools/Pipeline/bin
-        Test/bin => Test.zip!/Test/bin
+        Artifacts/**/*.nupkg
+        Artifacts/**/*.vsix
+        Artifacts/**/*.mpack
     """.trimIndent()
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     params {
-        param("system.nuget3path", "%teamcity.tool.NuGet.CommandLine.DEFAULT%/tools")
+        param("env.GIT_BRANCH", "%vcsroot.branch%")
+        param("env.BUILD_NUMBER", "%build.number%")
     }
 
     vcs {
@@ -87,12 +85,11 @@ object DevelopMac : BuildType({
     }
 
     steps {
-        nant {
-            name = "Running NAnt Script"
-            mode = nantFile {
-                path = "default.build"
-            }
-            targets = "build_linux build_mac build_ios"
+        exec {
+            name = "Running Cake Script"
+            path = "dotnet"
+            arguments = "cake build.cake"
+            formatStderrAsError = true
         }
     }
 
@@ -105,9 +102,6 @@ object DevelopMac : BuildType({
     }
 
     features {
-        feature {
-            type = "JetBrains.AssemblyInfo"
-        }
         feature {
             type = "teamcity.github.status"
             param("guthub_context", "Build Mac, iOS, and Linux")
@@ -129,6 +123,7 @@ object DevelopMac : BuildType({
 
     requirements {
         equals("teamcity.agent.jvm.os.name", "Mac OS X")
+        exists("DotNetCLI")
     }
 })
 
@@ -138,17 +133,15 @@ object DevelopWin : BuildType({
 
     allowExternalStatus = true
     artifactRules = """
-        MonoGame.Framework/bin => MonoGame.Framework.zip!/MonoGame.Framework/bin
-        MonoGame.Framework.Content.Pipeline/bin => MonoGame.Framework.Content.Pipeline.zip!/MonoGame.Framework.Content.Pipeline/bin
-        Tools/2MGFX/bin => Tools.zip!/Tools/2MGFX/bin
-        Tools/MGCB/bin => Tools.zip!/Tools/MGCB/bin
-        Tools/Pipeline/bin => Tools.zip!/Tools/Pipeline/bin
-        Test/bin => Test.zip!/Test/bin
+        Artifacts/**/*.nupkg
+        Artifacts/**/*.vsix
+        Artifacts/**/*.mpack
     """.trimIndent()
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     params {
-        param("system.nuget3path", "%teamcity.tool.NuGet.CommandLine.DEFAULT%/tools")
+        param("env.GIT_BRANCH", "%vcsroot.branch%")
+        param("env.BUILD_NUMBER", "%build.number%")
     }
 
     vcs {
@@ -160,16 +153,11 @@ object DevelopWin : BuildType({
     }
 
     steps {
-        nant {
-            name = "Running NAnt Script"
-            mode = nantFile {
-                path = "default.build"
-            }
-            targets = "build_windows build_web build_android build_windows8 build_windowsphone81 build_windows10"
-            param("dotNetCoverage.dotCover.filters", """
-                +:MonoGame.Framework
-                +:MonoGame.Framework.Content.Pipeline
-            """.trimIndent())
+        exec {
+            name = "Running Cake Script"
+            path = "dotnet-cake"
+            arguments = "build.cake"
+            formatStderrAsError = true
         }
     }
 
@@ -194,9 +182,6 @@ object DevelopWin : BuildType({
             param("secure:github_access_token", "credentialsJSON:6be4e606-4738-4fe6-b476-503782a0a65f")
             param("secure:guthub_username", "credentialsJSON:638301b3-2489-409b-8e34-566fa418c654")
         }
-        feature {
-            type = "JetBrains.AssemblyInfo"
-        }
     }
 
     dependencies {
@@ -208,12 +193,14 @@ object DevelopWin : BuildType({
 
     requirements {
         startsWith("teamcity.agent.name", "MonoGameWin")
+        exists("DotNetCLI")
     }
 })
 
 object GenerateDocumentation : BuildType({
     name = "Generate Documentation"
     description = "Generate the SDK documentation."
+    paused = true
 
     allowExternalStatus = true
     artifactRules = """Documentation\Output=>Documentation.zip"""
@@ -228,16 +215,13 @@ object GenerateDocumentation : BuildType({
     }
 
     steps {
-        nant {
-            name = "Running NAnt Script"
-            mode = nantFile {
-                path = "default.build"
-            }
-            targets = "build_docs"
-            param("dotNetCoverage.dotCover.filters", """
-                +:MonoGame.Framework
-                +:MonoGame.Framework.Content.Pipeline
-            """.trimIndent())
+        script {
+            name = "Running SharpDoc"
+            scriptContent = """
+                rmdir .\Documentation\Output /s /q
+                ThirdParty\Dependencies\SharpDoc\SharpDoc.exe -config Documentation\config.xml
+            """.trimIndent()
+            formatStderrAsError = true
         }
     }
 
@@ -298,72 +282,10 @@ object GenerateDocumentation : BuildType({
     }
 })
 
-object NuGetDevelop : BuildType({
-    name = "NuGet Publish Develop"
-    description = "Create and publish the develop NuGet packages."
-
-    allowExternalStatus = true
-    buildNumberPattern = "${Version.depParamRefs.buildNumber}"
-
-    vcs {
-        root(RelativeId("Develop"), "-:.", "+:NuGetPackages")
-
-        checkoutMode = CheckoutMode.ON_SERVER
-        cleanCheckout = true
-    }
-
-    steps {
-        nuGetPack {
-            toolPath = "%teamcity.tool.NuGet.CommandLine.DEFAULT%"
-            paths = """NuGetPackages\*.nuspec"""
-            version = "%build.number%-develop"
-            baseDir = customPath {
-                path = """MonoGame.Framework\bin\"""
-            }
-            outputDir = """NuGetPackages\Output"""
-            cleanOutputDir = true
-            publishPackages = true
-            param("nugetCustomPath", "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-            param("nugetPathSelector", "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-        }
-    }
-
-    triggers {
-        finishBuildTrigger {
-            buildType = "${Version.id}"
-            successfulOnly = true
-            branchFilter = "+:refs/heads/develop"
-        }
-    }
-
-    dependencies {
-        snapshot(GenerateDocumentation) {
-            onDependencyFailure = FailureAction.CANCEL
-            onDependencyCancel = FailureAction.CANCEL
-        }
-        snapshot(TestWindows) {
-            onDependencyFailure = FailureAction.CANCEL
-            onDependencyCancel = FailureAction.CANCEL
-        }
-        artifacts(DevelopMac) {
-            artifactRules = "MonoGame.Framework.zip!**"
-        }
-        artifacts(DevelopWin) {
-            artifactRules = """
-                MonoGame.Framework.zip!**
-                MonoGame.Framework.Content.Pipeline.zip!**
-            """.trimIndent()
-        }
-    }
-
-    requirements {
-        startsWith("system.agent.name", "MonoGameWin")
-    }
-})
-
 object PackageMacAndLinux : BuildType({
     name = "Package Mac and Linux"
     description = "Create the Mac and Linux SDK packages."
+    paused = true
 
     allowExternalStatus = true
     artifactRules = """
@@ -443,89 +365,10 @@ object PackageMacAndLinux : BuildType({
     }
 })
 
-object PackageNuGet : BuildType({
-    name = "Package NuGet"
-    description = "Create the develop NuGet packages."
-
-    allowExternalStatus = true
-    buildNumberPattern = "${Version.depParamRefs.buildNumber}"
-
-    vcs {
-        root(RelativeId("Develop"), "-:.", "+:NuGetPackages")
-
-        checkoutMode = CheckoutMode.ON_SERVER
-        cleanCheckout = true
-        showDependenciesChanges = true
-    }
-
-    steps {
-        nuGetPack {
-            toolPath = "%teamcity.tool.NuGet.CommandLine.DEFAULT%"
-            paths = """NuGetPackages\*.nuspec"""
-            version = "%build.number%-develop"
-            baseDir = customPath {
-                path = """MonoGame.Framework\bin\"""
-            }
-            outputDir = """NuGetPackages\Output"""
-            cleanOutputDir = true
-            param("nugetCustomPath", "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-            param("nugetPathSelector", "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-        }
-    }
-
-    triggers {
-        finishBuildTrigger {
-            buildType = "${GenerateDocumentation.id}"
-            successfulOnly = true
-            branchFilter = """
-                +:*
-                -:refs/heads/develop
-                -:refs/heads/master
-            """.trimIndent()
-        }
-    }
-
-    features {
-        feature {
-            type = "teamcity.github.status"
-            param("guthub_context", "Package NuGet")
-            param("guthub_owner", "MonoGame")
-            param("guthub_authentication_type", "token")
-            param("guthub_guest", "true")
-            param("guthub_repo", "MonoGame")
-            param("github_report_on", "on start and finish")
-            param("secure:github_access_token", "credentialsJSON:6be4e606-4738-4fe6-b476-503782a0a65f")
-        }
-    }
-
-    dependencies {
-        snapshot(GenerateDocumentation) {
-            onDependencyFailure = FailureAction.CANCEL
-            onDependencyCancel = FailureAction.CANCEL
-        }
-        snapshot(TestWindows) {
-            onDependencyFailure = FailureAction.CANCEL
-            onDependencyCancel = FailureAction.CANCEL
-        }
-        artifacts(DevelopMac) {
-            artifactRules = "MonoGame.Framework.zip!**"
-        }
-        artifacts(DevelopWin) {
-            artifactRules = """
-                MonoGame.Framework.zip!**
-                MonoGame.Framework.Content.Pipeline.zip!**
-            """.trimIndent()
-        }
-    }
-
-    requirements {
-        startsWith("system.agent.name", "MonoGameWin")
-    }
-})
-
 object PackagingWindows : BuildType({
     name = "Package Windows"
     description = "Create the Windows SDK packaging."
+    paused = true
 
     allowExternalStatus = true
     artifactRules = """Installers\Windows\MonoGameSetup.exe"""
@@ -610,8 +453,13 @@ object TestMac : BuildType({
     artifactRules = "Test/bin/Linux/AnyCPU/Debug/TestResult.xml"
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
+    params {
+        param("env.GIT_BRANCH", "%vcsroot.branch%")
+        param("env.BUILD_NUMBER", "%build.number%")
+    }
+
     vcs {
-        root(RelativeId("Develop"), "-:.", "+:MonoGame.Framework.Content.Pipeline", "+:MonoGame.Framework", "+:Test", "+:Tools", "+:default.build")
+        root(RelativeId("Develop"))
 
         checkoutMode = CheckoutMode.ON_SERVER
         cleanCheckout = true
@@ -619,13 +467,11 @@ object TestMac : BuildType({
     }
 
     steps {
-        nant {
-            name = "Running NAnt Script"
-            mode = nantFile {
-                path = "default.build"
-            }
-            targets = "run_tests"
-            reduceTestFeedback = true
+        exec {
+            name = "Running Cake Script"
+            path = "dotnet"
+            arguments = "cake build.cake --build-target=Test"
+            formatStderrAsError = true
         }
     }
 
@@ -679,6 +525,7 @@ object TestMac : BuildType({
 
             artifacts {
                 artifactRules = "Test.zip!**"
+                enabled = false
             }
         }
     }
@@ -702,8 +549,13 @@ object TestWindows : BuildType({
     """.trimIndent()
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
+    params {
+        param("env.GIT_BRANCH", "%vcsroot.branch%")
+        param("env.BUILD_NUMBER", "%build.number%")
+    }
+
     vcs {
-        root(RelativeId("Develop"), "-:.", "+:MonoGame.Framework.Content.Pipeline", "+:MonoGame.Framework", "+:Test", "+:Tools", "+:default.build")
+        root(RelativeId("Develop"))
 
         checkoutMode = CheckoutMode.ON_SERVER
         cleanCheckout = true
@@ -711,18 +563,11 @@ object TestWindows : BuildType({
     }
 
     steps {
-        nant {
-            name = "Running NAnt Script"
-            mode = nantFile {
-                path = "default.build"
-            }
-            targets = "run_tests"
-            reduceTestFeedback = true
-            param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.bundled%")
-            param("dotNetCoverage.dotCover.filters", """
-                +:MonoGame.Framework
-                +:MonoGame.Framework.Content.Pipeline
-            """.trimIndent())
+        exec {
+            name = "Running Cake Script"
+            path = "dotnet-cake"
+            arguments = """build.cake -build-target="Test""""
+            formatStderrAsError = true
         }
     }
 
@@ -778,6 +623,7 @@ object TestWindows : BuildType({
 
             artifacts {
                 artifactRules = "Test.zip!**"
+                enabled = false
             }
         }
     }

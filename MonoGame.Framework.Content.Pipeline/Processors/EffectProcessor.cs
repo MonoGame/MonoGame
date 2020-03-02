@@ -7,7 +7,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
-using TwoMGFX;
+using MonoGame.Effect;
 using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
