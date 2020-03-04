@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>monoandroid90</TargetFramework>
-    <DefineConstants>ANDROID;GLES</DefineConstants>
+    <DefineConstants>ANDROID;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
     <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
