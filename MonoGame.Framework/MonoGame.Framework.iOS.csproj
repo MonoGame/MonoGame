@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>xamarinios10</TargetFramework>
-    <DefineConstants>IOS;GLES</DefineConstants>
+    <DefineConstants>IOS;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
 
