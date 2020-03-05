@@ -315,6 +315,7 @@ namespace MonoGame.OpenGL
     {
         ArrayBufferBinding = 0x8894,
         MaxTextureImageUnits = 0x8872,
+        MaxCombinedTextureImageUnits = 0x8B4D,
         MaxVertexAttribs = 0x8869,
         MaxTextureSize = 0x0D33,
         MaxDrawBuffers = 0x8824,
