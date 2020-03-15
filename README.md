@@ -42,6 +42,7 @@ We support a growing list of platforms across the desktop, mobile, and console s
    * PlayStation Vita
    * Xbox One (both UWP and XDK)
    * Nintendo Switch
+   * Google Stadia
  * Other
    * tvOS (OpenGL)
 
