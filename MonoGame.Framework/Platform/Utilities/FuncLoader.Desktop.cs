@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace MonoGame.Utilities
@@ -33,6 +34,43 @@ namespace MonoGame.Utilities
         }
         
         private const int RTLD_LAZY = 0x0001;
+
+        public static IntPtr LoadLibraryExt(string libname)
+        {
+            var ret = IntPtr.Zero;
+            var assemblyLocation = Path.GetDirectoryName(typeof(FuncLoader).Assembly.Location) ?? "./";
+
+            // Try .NET Framework / mono locations
+            if (CurrentPlatform.OS == OS.MacOSX)
+            {
+                ret = LoadLibrary(Path.Combine(assemblyLocation, libname));
+
+                // Look in Frameworks for .app bundles
+                if (ret == IntPtr.Zero)
+                    ret = LoadLibrary(Path.Combine(assemblyLocation, "..", "Frameworks", libname));
+            }
+            else
+            {
+                if (Environment.Is64BitProcess)
+                    ret = LoadLibrary(Path.Combine(assemblyLocation, "x64", libname));
+                else
+                    ret = LoadLibrary(Path.Combine(assemblyLocation, "x86", libname));
+            }
+
+            // Try .NET Core development locations
+            if (ret == IntPtr.Zero)
+                ret = LoadLibrary(Path.Combine(assemblyLocation, "runtimes", CurrentPlatform.Rid, "native", libname));
+
+            // Try current folder (.NET Core will copy it there after publish) or system library
+            if (ret == IntPtr.Zero)
+                ret = LoadLibrary(libname);
+
+            // Welp, all failed, PANIC!!!
+            if (ret == IntPtr.Zero)
+                throw new Exception("Failed to load library: " + libname);
+
+            return ret;
+        }
 
         public static IntPtr LoadLibrary(string libname)
         {
