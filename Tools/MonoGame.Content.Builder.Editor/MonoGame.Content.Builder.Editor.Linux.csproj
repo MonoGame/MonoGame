@@ -6,7 +6,7 @@
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Gtk</BaseOutputPath>
     <DefineConstants>GTK</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <AssemblyName>mgcb-editor</AssemblyName>
+    <AssemblyName>mgcb-editor-linux</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +21,7 @@
     <Compile Remove="Global.Windows.cs" />
     <Compile Remove="Styles.Mac.cs" />
     <Compile Remove="Styles.Windows.cs" />
+    <Compile Remove="Launcher\*.cs" />
   </ItemGroup>
 
   <ItemGroup>

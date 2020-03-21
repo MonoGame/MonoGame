@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Launcher</BaseOutputPath>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>mgcb-editor</ToolCommandName>
+    <PackageId>dotnet-mgcb-editor</PackageId>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>mgcb-editor</AssemblyName>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="$(SolutionName.Contains('Linux'))">
+      <PropertyGroup>
+        <TargetPlatform>Linux</TargetPlatform>
+      </PropertyGroup>
+    </When>
+    <When Condition="$(SolutionName.Contains('Mac'))">
+      <PropertyGroup>
+        <TargetPlatform>Mac</TargetPlatform>
+      </PropertyGroup>
+    </When>
+    <When Condition="$(SolutionName.Contains('Windows'))">
+      <PropertyGroup>
+        <TargetPlatform>Windows</TargetPlatform>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <TargetPlatform>All</TargetPlatform>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+  <ItemGroup>
+    <Compile Remove="**\*" />
+    <None Remove="**\*" />
+
+    <Compile Include="Launcher\**\*.cs" />
+    <None Include="Launcher\**\*" Exclude="*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Content.Builder\MonoGame.Content.Builder.csproj">
+      <AppReference>true</AppReference>
+    </ProjectReference>
+
+    <!-- Reference platform projects with 'ReferenceOutputAssembly' false so they don't impact each other.
+         For example, if Windows has 'ReferenceOutputAssembly' set to true, the SDK used by the launcher and
+         the Mac app is changed to WindowsDesktop, which prevents them from running on other platforms. -->
+    <ProjectReference Include="MonoGame.Content.Builder.Editor.Linux.csproj" Condition="'$(TargetPlatform)' == 'All' OR '$(TargetPlatform)' == 'Linux'">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <AppReference>true</AppReference>
+    </ProjectReference>
+    <ProjectReference Include="MonoGame.Content.Builder.Editor.Mac.csproj" Condition="'$(TargetPlatform)' == 'All' OR '$(TargetPlatform)' == 'Mac'">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <AppReference>true</AppReference>
+    </ProjectReference>
+    <ProjectReference Include="MonoGame.Content.Builder.Editor.Windows.csproj" Condition="'$(TargetPlatform)' == 'All' OR '$(TargetPlatform)' == 'Windows'">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <AppReference>true</AppReference>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Import Project="Launcher\AppReference.targets" />
+
+</Project>

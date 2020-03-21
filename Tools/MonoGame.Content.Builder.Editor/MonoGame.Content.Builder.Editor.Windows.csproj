@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Wpf</BaseOutputPath>
     <DefineConstants>WINDOWS;WPF</DefineConstants>
     <ApplicationIcon>App.ico</ApplicationIcon>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <AssemblyName>mgcb-editor</AssemblyName>
+    <AssemblyName>mgcb-editor-win</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +16,7 @@
     <Compile Remove="Global.Linux.cs" />
     <Compile Remove="Styles.Mac.cs" />
     <Compile Remove="Styles.Linux.cs" />
+    <Compile Remove="Launcher\*.cs" />
     <Compile Remove="Properties\*.cs" />
   </ItemGroup>
 
