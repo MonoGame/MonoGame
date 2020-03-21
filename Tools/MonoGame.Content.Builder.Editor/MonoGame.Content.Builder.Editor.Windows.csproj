@@ -8,16 +8,15 @@
     <DefineConstants>WINDOWS;WPF</DefineConstants>
     <ApplicationIcon>App.ico</ApplicationIcon>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <AssemblyName>mgcb-editor-win</AssemblyName>
+    <AssemblyName>mgcb-editor-wpf</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Global.Mac.cs" />
-    <Compile Remove="Global.Linux.cs" />
-    <Compile Remove="Styles.Mac.cs" />
-    <Compile Remove="Styles.Linux.cs" />
-    <Compile Remove="Launcher\*.cs" />
-    <Compile Remove="Properties\*.cs" />
+    <None Remove="Platform\**\*" />
+    <Compile Remove="Platform\**\*" />
+
+    <Compile Include="Platform\Windows\**\*.cs" />
+    <Compile Include="Platform\Utilities\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>

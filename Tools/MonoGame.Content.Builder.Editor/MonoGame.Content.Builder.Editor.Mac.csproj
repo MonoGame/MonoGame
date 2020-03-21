@@ -11,11 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Global.Linux.cs" />
-    <Compile Remove="Global.Windows.cs" />
-    <Compile Remove="Styles.Linux.cs" />
-    <Compile Remove="Styles.Windows.cs" />
-    <Compile Remove="Launcher\*.cs" />
+    <None Remove="Platform\**\*" />
+    <Compile Remove="Platform\**\*" />
+
+    <Compile Include="Platform\Mac\**\*.cs" />
+    <Compile Include="Platform\Utilities\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>

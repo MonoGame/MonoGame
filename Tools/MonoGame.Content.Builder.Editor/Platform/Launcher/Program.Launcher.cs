@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Tools.Pipeline.Utilities;
 using System;
 //using System.CommandLine.Invocation;
 using System.Diagnostics;
@@ -11,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 //using MGCB.Editor.CommandLine;
 
-namespace MonoGame.Tools.Pipeline.Launcher
+namespace MonoGame.Tools.Pipeline
 {
     public static class Program
     {
@@ -31,6 +32,25 @@ namespace MonoGame.Tools.Pipeline.Launcher
             //});
 
             //return await parser.InvokeAsync(args);
+
+
+
+
+            // Get the argument string by replacing the current assembly with the platform assembly in the current argument string.
+            var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+            var platform = GetPlatform();
+            var appName = Environment.CommandLine.Replace(assemblyName, $"{assemblyName}-{platform}");
+
+            var process = new DotNetProcess(
+                new ProcessStartInfo
+                {
+                    FileName = appName,
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                });
+
+            process.Start();
+            //process.WaitForExit();
         }
 
         //private static void Launch(bool detach)
@@ -69,30 +89,20 @@ namespace MonoGame.Tools.Pipeline.Launcher
         //    }
         //}
 
-        //private static string GetPlatform()
-        //{
-        //    //switch (Environment.OSVersion.Platform)
-        //    //{
-        //    //    case PlatformID.Unix:
-        //    //        return "Gtk";
-        //    //    case PlatformID.MacOSX: // TODO: fix this. Mac's return Unix intentionally
-        //    //        return "Mac";
-        //    //    default:
-        //    //        return "Windows";
-        //    //}
-
-        //    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        //    {
-        //        return "Windows";
-        //    }
-        //    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        //    {
-        //        return "Mac"; // TODO: join Mac and Linux under Gtk here if that works
-        //    }
-        //    else
-        //    {
-        //        return "Gtk";
-        //    }
-        //}
+        private static string GetPlatform()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return "wpf";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return "mac";
+            }
+            else
+            {
+                return "gtk";
+            }
+        }
     }
 }
