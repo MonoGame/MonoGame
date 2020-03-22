@@ -9,6 +9,10 @@
     <PackageId>dotnet-mgcb-editor</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor</AssemblyName>
+
+    <!-- DisableFastUpToDateCheck so we get updates to other projects even though
+         the ProjectReferences have 'ReferenceOutputAssembly' set to false. -->
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
 
   <Choose>

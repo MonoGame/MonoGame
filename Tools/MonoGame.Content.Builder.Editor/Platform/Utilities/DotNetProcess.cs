@@ -13,10 +13,10 @@ namespace MonoGame.Tools.Pipeline.Utilities
     class DotNetProcess : Process
     {
         public DotNetProcess(ProcessStartInfo initStartInfo)
-            : this(initStartInfo, new string[] { "" })
+            : this(new string[] { "" }, initStartInfo)
         { }
 
-        public DotNetProcess(ProcessStartInfo initStartInfo, IEnumerable<string> searchPaths)
+        public DotNetProcess(IEnumerable<string> searchPaths, ProcessStartInfo initStartInfo)
         {
             string filePath = FindDotNetApp(initStartInfo.FileName, searchPaths);
 

@@ -306,61 +306,6 @@ namespace MonoGame.Tools.Pipeline
             return false;
         }
 
-        public Process CreateProcess(string exe, string commands)
-        {
-            var proc = new Process();
-
-            if (Global.Unix && exe.EndsWith(".exe"))
-            {
-                string monoLoc = null;
-
-                foreach (var path in monoLocations)
-                {
-                    if (File.Exists(path))
-                    {
-                        monoLoc = path;
-                        break;
-                    }
-                }
-
-                if (string.IsNullOrEmpty(monoLoc))
-                {
-                    monoLoc = "mono";
-                    OutputAppend("Could not find mono. Please install the latest version from http://www.mono-project.com");
-                }
-
-                proc.StartInfo.FileName = monoLoc;
-
-                if (PipelineSettings.Default.DebugMode)
-                {
-                    var port = Environment.GetEnvironmentVariable("MONO_DEBUGGER_PORT");
-                    port = !string.IsNullOrEmpty(port) ? port : "55555";
-                    var monodebugger = string.Format("--debug --debugger-agent=transport=dt_socket,server=y,address=127.0.0.1:{0}",
-                        port);
-                    proc.StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monodebugger, exe, commands);
-                    OutputAppend("************************************************");
-                    OutputAppend("RUNNING MGCB IN DEBUG MODE!!!");
-                    OutputAppend(string.Format("Attach your Debugger to localhost:{0}", port));
-                    OutputAppend("************************************************");
-                }
-                else
-                {
-                    proc.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
-                }
-            }
-            else
-            {
-                proc.StartInfo.FileName = exe;
-                proc.StartInfo.Arguments = commands;
-
-                // TODO: Fix debugging .NET Core stuff from Unix
-
-                System.Console.WriteLine(exe + " " + commands);
-            }
-
-            return proc;
-        }
-
         public void UpdateCommands(MenuInfo info)
         {
             // Title
