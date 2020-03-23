@@ -3,84 +3,128 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.CommandLine.Invocation;
+using System.Threading;
 using Eto;
 using Eto.Forms;
+using MonoGame.Tools.Pipeline.Utilities;
 
 namespace MonoGame.Tools.Pipeline
 {
-    static class Program
+    public static class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            Styles.Load();
+            new CommandLineParser(new CommandLineInterface()).Invoke(args);
+        }
 
-#if GTK
-            var app = new Application(Platforms.Gtk);
-#elif WPF
-            var app = new Application(Platforms.Wpf);
-#else
-            var app = new Application(Platforms.Mac64);
-#endif
-
-            app.Style = "PipelineTool";
-
-            PipelineSettings.Default.Load();
-
-            if (!string.IsNullOrEmpty(PipelineSettings.Default.ErrorMessage))
+        private class CommandLineInterface : ICommandLineInterface
+        {
+            public void Register(InvocationContext context)
             {
-                var logwin = new LogWindow();
-                logwin.LogText = PipelineSettings.Default.ErrorMessage;
-                app.Run(logwin);
-                return;
+                try
+                {
+                    //FileAssociation.Associate();
+                    Console.WriteLine("Registered MGCB Editor!");
+                }
+                catch
+                {
+                    Console.Error.WriteLine("Failed to register MGCB Editor");
+                    throw;
+                }
             }
 
-#if !DEBUG
-            try
-#endif
+            public void Unregister(InvocationContext context)
             {
-                var win = new MainWindow();
-                var controller = PipelineController.Create(win);
+                try
+                {
+                    //FileAssociation.Disassociate();
+                    Console.WriteLine("Unregistered MGCB Editor!");
+                }
+                catch
+                {
+                    Console.Error.WriteLine("Failed to unregister MGCB Editor");
+                    throw;
+                }
+            }
+
+            public void Run(InvocationContext context, string project)
+            {
+                var thread = new Thread(() => LoadUserInterface(project));
+#if WPF
+                thread.SetApartmentState(ApartmentState.STA);
+#endif
+                thread.Start();
+                thread.Join();
+            }
+
+            private void LoadUserInterface(string project)
+            {
+                Styles.Load();
 
 #if GTK
-                Global.Application.AddWindow(win.ToNative() as Gtk.Window);
+                var app = new Application(Platforms.Gtk);
+#elif WPF
+                var app = new Application(Platforms.Wpf);
+#else
+                var app = new Application(Platforms.Mac64);
+#endif
+
+                app.Style = "PipelineTool";
+
+                PipelineSettings.Default.Load();
+
+                if (!string.IsNullOrEmpty(PipelineSettings.Default.ErrorMessage))
+                {
+                    var logwin = new LogWindow();
+                    logwin.LogText = PipelineSettings.Default.ErrorMessage;
+                    app.Run(logwin);
+                    return;
+                }
+
+#if !DEBUG
+                try
+#endif
+                {
+                    var win = new MainWindow();
+                    var controller = PipelineController.Create(win);
+
+#if GTK
+                    Global.Application.AddWindow(win.ToNative() as Gtk.Window);
 #endif
 
 #if GTK && !DEBUG
+                    GLib.ExceptionManager.UnhandledException += (e) =>
+                    {
+                        var logwin = new LogWindow();
+                        logwin.LogText = e.ExceptionObject.ToString();
 
-                GLib.ExceptionManager.UnhandledException += (e) =>
-                {
-                    var logwin = new LogWindow();
-                    logwin.LogText = e.ExceptionObject.ToString();
-
-                    logwin.Show();
-                    win.Close();
-                };
+                        logwin.Show();
+                        win.Close();
+                    };
 #endif
 
-                string project = null;
+                    if (string.IsNullOrEmpty(project) && Global.Unix && !Global.Linux)
+                        project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
 
-                if (Global.Unix && !Global.Linux)
-                    project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
-                else if (args != null && args.Length > 0)
-                    project = string.Join(" ", args);
+                    if (!string.IsNullOrEmpty(project))
+                        controller.OpenProject(project);
 
-                if (!string.IsNullOrEmpty(project))
-                    controller.OpenProject(project);
-                
-                app.Run(win);
-            }
+                    app.Run(win);
+                }
 #if !DEBUG
-            catch (Exception ex)
-            {
-                PipelineSettings.Default.ErrorMessage = ex.ToString();
-                PipelineSettings.Default.Save();
-                app.Restart();
-            }
+                catch (Exception ex)
+                {
+                    PipelineSettings.Default.ErrorMessage = ex.ToString();
+                    PipelineSettings.Default.Save();
+                    app.Restart();
+                }
 #endif
+            }
         }
     }
 }

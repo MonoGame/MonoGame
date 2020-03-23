@@ -4,13 +4,11 @@
 
 using MonoGame.Tools.Pipeline.Utilities;
 using System;
-//using System.CommandLine.Invocation;
+using System.CommandLine.Invocation;
 using System.Diagnostics;
-using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-//using MGCB.Editor.CommandLine;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -20,88 +18,74 @@ namespace MonoGame.Tools.Pipeline
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        public static /*async Task<int>*/void Main(string[] args)
+        public static void Main(string[] args)
         {
-            //// Even though the launcher doesn't use the parameters, parse them here so that:
-            ////   1. The launcher will know whether to detach or to pipe output and errors from the Editor.
-            ////   2. The parser gets full native console features, including word wrapping and text color.
-            //var parser = new CommandLineParser((string project, bool register, bool unregister) =>
-            //{
-            //    bool detach = !register && !unregister;
-            //    Launch(detach);
-            //});
-
-            //return await parser.InvokeAsync(args);
-
-
-
-
-            // Get the argument string by replacing the current assembly with the platform assembly in the current argument string.
-            var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-            var platform = GetPlatform();
-            var appName = Environment.CommandLine.Replace(assemblyName, $"{assemblyName}-{platform}");
-
-            var process = new DotNetProcess(
-                new ProcessStartInfo
-                {
-                    FileName = appName,
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                });
-
-            process.Start();
-            //process.WaitForExit();
+            new CommandLineParser(new CommandLineInterface()).Invoke(args);
         }
 
-        //private static void Launch(bool detach)
-        //{
-        //    // Get the dotnet command, preferring the dotnet command that was used to execute this app.
-        //    var processPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
-        //    var dotnetCommand = Path.GetFileName(processPath).Contains("dotnet") ? processPath : "dotnet";
-
-        //    // Get the argument string by replacing the current assembly with the platform assembly in the current argument string.
-        //    var assembly = Assembly.GetExecutingAssembly();
-        //    var assemblyName = assembly.GetName().Name;
-        //    var platform = GetPlatform();
-        //    var arguments = Environment.CommandLine.Replace(assemblyName, $"{assemblyName}.{platform}");
-
-        //    var process = new System.Diagnostics.Process();
-        //    process.StartInfo.FileName = dotnetCommand;
-        //    process.StartInfo.Arguments = arguments;
-        //    process.StartInfo.CreateNoWindow = true;
-        //    process.StartInfo.UseShellExecute = false;
-
-        //    if (!detach)
-        //    {
-        //        process.StartInfo.RedirectStandardOutput = true;
-        //        process.StartInfo.RedirectStandardError = true;
-        //        process.OutputDataReceived += (object sender, DataReceivedEventArgs e) => Console.WriteLine(e.Data);
-        //        process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => Console.Error.WriteLine(e.Data);
-        //    }
-
-        //    process.Start();
-
-        //    if (!detach)
-        //    {
-        //        process.BeginOutputReadLine();
-        //        process.BeginErrorReadLine();
-        //        process.WaitForExit();
-        //    }
-        //}
-
-        private static string GetPlatform()
+        /// <summary>
+        /// The launcher's CLI wraps the platform-specific app and operates depending on the inputs:
+        ///   - If CLI options were used, the launcher waits for the child to exit and pipes output and errors back out.
+        ///   - If no options were used or only the 'project' argument was used, the launcher starts and detaches the child.
+        /// </summary>
+        private class CommandLineInterface : ICommandLineInterface
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            public void Register(InvocationContext context) => Launch(context);
+
+            public void Unregister(InvocationContext context) => Launch(context);
+
+            public void Run(InvocationContext context, string project) => Launch(context, true);
+
+            private void Launch(InvocationContext context, bool detach = false)
             {
-                return "wpf";
+                // Assemble the platform app process with the same arguments.
+                var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+                var platform = GetPlatform();
+                var appName = $"{assemblyName}-{platform}";
+                var args = string.Join(" ", context.ParseResult.Tokens.Select(t => t.Value));
+
+                var process = new DotNetProcess(
+                    new ProcessStartInfo
+                    {
+                        FileName = appName,
+                        Arguments = args,
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    });
+
+                if (!detach)
+                {
+                    // If we're not detaching, pipe output back to the console.
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
+                    process.OutputDataReceived += (object sender, DataReceivedEventArgs e) => Console.WriteLine(e.Data);
+                    process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => Console.Error.WriteLine(e.Data);
+                }
+
+                process.Start();
+
+                if (!detach)
+                {
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+                    process.WaitForExit();
+                }
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+
+            private static string GetPlatform()
             {
-                return "mac";
-            }
-            else
-            {
-                return "gtk";
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    return "wpf";
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    return "mac";
+                }
+                else
+                {
+                    return "gtk";
+                }
             }
         }
     }

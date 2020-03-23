@@ -47,6 +47,10 @@
     <Compile Include="Platform\Utilities\**\*.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20158.1" />
+  </ItemGroup>
+
   <!-- Reference app projects with 'ReferenceOutputAssembly' false so they don't impact each other.
        For example, if Windows has 'ReferenceOutputAssembly' set to true, the SDK used by the launcher and
        the Mac app is changed to WindowsDesktop, which prevents them from running on other platforms. -->
