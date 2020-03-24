@@ -499,9 +499,9 @@ namespace MonoGame.Tools.Pipeline
             try
             {
                 // Prepare the process.
-                _buildProcess = new DotNetProcess(
-                    _mgcbSearchPaths,
-                    new ProcessStartInfo
+                _buildProcess = new Process
+                {
+                    StartInfo = new ProcessStartInfo
                     {
                         FileName = "mgcb",
                         Arguments = commands,
@@ -511,8 +511,8 @@ namespace MonoGame.Tools.Pipeline
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         StandardOutputEncoding = encoding
-                    });
-
+                    }.ResolveDotnetApp(_mgcbSearchPaths)
+                };
                 _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
 
                 // Fire off the process.

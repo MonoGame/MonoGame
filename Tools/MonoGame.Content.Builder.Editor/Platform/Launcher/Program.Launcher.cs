@@ -44,14 +44,16 @@ namespace MonoGame.Tools.Pipeline
                 var appName = $"{assemblyName}-{platform}";
                 var args = string.Join(" ", context.ParseResult.Tokens.Select(t => t.Value));
 
-                var process = new DotNetProcess(
-                    new ProcessStartInfo
+                var process = new System.Diagnostics.Process
+                {
+                    StartInfo = new ProcessStartInfo
                     {
                         FileName = appName,
                         Arguments = args,
                         CreateNoWindow = true,
                         UseShellExecute = false
-                    });
+                    }.ResolveDotnetApp()
+                };
 
                 if (!detach)
                 {

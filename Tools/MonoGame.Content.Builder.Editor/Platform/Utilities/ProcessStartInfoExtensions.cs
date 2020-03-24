@@ -10,32 +10,31 @@ using System.Runtime.InteropServices;
 
 namespace MonoGame.Tools.Pipeline.Utilities
 {
-    class DotNetProcess : Process
+    static class ProcessStartInfoExtensions
     {
-        public DotNetProcess(ProcessStartInfo initStartInfo)
-            : this(new string[] { "" }, initStartInfo)
-        { }
-
-        public DotNetProcess(IEnumerable<string> searchPaths, ProcessStartInfo initStartInfo)
+        public static ProcessStartInfo ResolveDotnetApp(this ProcessStartInfo startInfo, IEnumerable<string> searchPaths = null)
         {
-            string filePath = FindDotNetApp(initStartInfo.FileName, searchPaths);
+            string filePath = FindDotnetApp(startInfo.FileName, searchPaths);
 
             if (Path.GetExtension(filePath).Equals(".dll", StringComparison.OrdinalIgnoreCase))
             {
-                initStartInfo.FileName = DotNetMuxer.MuxerPathOrDefault();
-                initStartInfo.Arguments = filePath + " " + initStartInfo.Arguments;
+                startInfo.FileName = DotNetMuxer.MuxerPathOrDefault();
+                startInfo.Arguments = string.IsNullOrEmpty(startInfo.Arguments)
+                    ? $"\"{filePath}\""
+                    : $"\"{filePath}\" {startInfo.Arguments}";
             }
             else
             {
-                initStartInfo.FileName = filePath;
+                startInfo.FileName = filePath;
             }
 
-            StartInfo = initStartInfo;
+            return startInfo;
         }
 
-        private static string FindDotNetApp(string fileName, IEnumerable<string> searchPaths)
+        private static string FindDotnetApp(string fileName, IEnumerable<string> searchPaths = null)
         {
             string filePath = null;
+            searchPaths ??= new string[] { "" };
             foreach (string searchPath in searchPaths)
             {
                 string testPath = Path.GetFullPath(Path.Combine(searchPath, fileName));

@@ -28,11 +28,13 @@ namespace MonoGame.Tools.Pipeline
             {
                 try
                 {
-                    //FileAssociation.Associate();
+                    FileAssociation.Associate();
+                    Console.WriteLine("");
                     Console.WriteLine("Registered MGCB Editor!");
                 }
                 catch
                 {
+                    Console.WriteLine("");
                     Console.Error.WriteLine("Failed to register MGCB Editor");
                     throw;
                 }
@@ -42,11 +44,13 @@ namespace MonoGame.Tools.Pipeline
             {
                 try
                 {
-                    //FileAssociation.Disassociate();
+                    FileAssociation.Unassociate();
+                    Console.WriteLine("");
                     Console.WriteLine("Unregistered MGCB Editor!");
                 }
                 catch
                 {
+                    Console.WriteLine("");
                     Console.Error.WriteLine("Failed to unregister MGCB Editor");
                     throw;
                 }
