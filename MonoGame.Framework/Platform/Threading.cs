@@ -23,10 +23,12 @@ namespace Microsoft.Xna.Framework
 
         static int mainThreadId;
 
-#if ANDROID || WINDOWS || DESKTOPGL || ANGLE
+#if ANDROID || WINDOWS || DESKTOPGL || ANGLE || IOS
         static List<Action> actions = new List<Action>();
         //static Mutex actionsMutex = new Mutex();
-#elif IOS
+#endif
+
+#if IOS
         public static EAGLContext BackgroundContext;
 #endif
 
@@ -79,19 +81,6 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
-#if IOS
-            lock (BackgroundContext)
-            {
-                // Make the context current on this thread if it is not already
-                if (!Object.ReferenceEquals(EAGLContext.CurrentContext, BackgroundContext))
-                    EAGLContext.SetCurrentContext(BackgroundContext);
-                // Execute the action
-                action();
-                // Must flush the GL calls so the GPU asset is ready for the main context to use it
-                GL.Flush();
-                GraphicsExtensions.CheckGLError();
-            }
-#else
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
             Add(() =>
             {
@@ -104,10 +93,9 @@ namespace Microsoft.Xna.Framework
             });
             resetEvent.Wait();
 #endif
-#endif
         }
 
-#if ANDROID || WINDOWS || DESKTOPGL || ANGLE
+#if ANDROID || WINDOWS || DESKTOPGL || ANGLE || IOS
         static void Add(Action action)
         {
             lock (actions)
@@ -123,14 +111,29 @@ namespace Microsoft.Xna.Framework
         {
             EnsureUIThread();
 
-            lock (actions)
+#if IOS
+            lock (BackgroundContext)
             {
-                foreach (Action action in actions)
+                // Make the context current on this thread if it is not already
+                if (!Object.ReferenceEquals(EAGLContext.CurrentContext, BackgroundContext))
+                    EAGLContext.SetCurrentContext(BackgroundContext);
+#endif
+
+                lock (actions)
                 {
-                    action();
+                    foreach (Action action in actions)
+                    {
+                        action();
+                    }
+                    actions.Clear();
                 }
-                actions.Clear();
+
+#if IOS
+                // Must flush the GL calls so the GPU asset is ready for the main context to use it
+                GL.Flush();
+                GraphicsExtensions.CheckGLError();
             }
+#endif
         }
 #endif
     }
