@@ -49,6 +49,7 @@ namespace MonoGame.Tools.Pipeline
         public int Height { get; set; }
         public Action OnKill { get; set; }
         public bool HasDialog { get; protected set; }
+        public bool SkipCellDraw { get; set; }
 
         public virtual void OnCreate()
         {
@@ -67,7 +68,9 @@ namespace MonoGame.Tools.Pipeline
 
             g.DrawText(SystemFonts.Default(), DrawInfo.GetTextColor(selected, false), rec.X + 5, rec.Y + (rec.Height - Height) / 2, Text);
             g.FillRectangle(DrawInfo.GetBackgroundColor(selected), separatorPos - 6, rec.Y, rec.Width, rec.Height);
-            DrawCell(g, rec, separatorPos, selected);
+            
+            if (!SkipCellDraw)
+                DrawCell(g, rec, separatorPos, selected);
         }
 
         public virtual void DrawCell(Graphics g, Rectangle rec, int separatorPos, bool selected)

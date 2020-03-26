@@ -33,7 +33,7 @@
     <None Remove="App.icns" />
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="App.icns" />
+    <BundleResource Include="Icon.icns" />
   </ItemGroup>
   <Import Project="MonoGame.Content.Builder.Editor.targets" />
 
