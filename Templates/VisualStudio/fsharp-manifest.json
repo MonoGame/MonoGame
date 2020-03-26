@@ -3,8 +3,8 @@
     "type": "tools",
     "categories": [ "other" ],
     "identity": {
-        "internalName": "MonoGame-Templates-CSharp",
-	"displayName": "MonoGame CSharp Templates"
+        "internalName": "MonoGame-Templates-FSharp",
+	"displayName": "MonoGame F# Templates"
     },
     "overview": "readme.md",
     "publisher": "MonoGame",
