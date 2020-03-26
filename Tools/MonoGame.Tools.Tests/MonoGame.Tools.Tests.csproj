@@ -9,6 +9,7 @@
     <DefineConstants>DESKTOPGL</DefineConstants>
     <BaseOutputPath>..\..\Artifacts\Tests\Tools</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <UseAppHost>true</UseAppHost>
   </PropertyGroup>
 
   <ItemGroup>

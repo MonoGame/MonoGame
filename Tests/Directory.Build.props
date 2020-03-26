@@ -6,6 +6,7 @@
     <BaseIntermediateOutputPath>obj\$(MonoGamePlatform)</BaseIntermediateOutputPath>
     <BaseOutputPath>..\Artifacts\Tests\$(MonoGamePlatform)</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <UseAppHost>true</UseAppHost>
   </PropertyGroup>
 
 </Project>
