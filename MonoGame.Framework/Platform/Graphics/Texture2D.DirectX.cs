@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var elementsInRow = rect.Width;
                 var rows = rect.Height;
                 var region = new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1);
-                d3dContext.CopySubresourceRegion(GetTextureForGetData(), subresourceIndex, region, _cachedStagingTexture, 0);
+                d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, _cachedStagingTexture, 0);
 
                 // Copy the data to the array.
                 DataStream stream = null;
@@ -211,57 +211,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return arraySlice * _levelCount + level;
         }
 
-        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
-        {
-            byte[] bytes;
-
-            // Rewind stream if it is at end
-            if (stream.CanSeek && stream.Length == stream.Position)
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-            }
-
-            // Copy it's data to memory
-            // As some platforms dont provide full stream functionality and thus streams can't be read as it is
-            using (var ms = new MemoryStream())
-            {
-                stream.CopyTo(ms);
-                bytes = ms.ToArray();
-            }
-
-            // The data returned is always four channel BGRA
-            var result = ImageResult.FromMemory(bytes, ColorComponents.RedGreenBlueAlpha);
-
-            // XNA blacks out any pixels with an alpha of zero.
-            fixed (byte* b = &result.Data[0])
-            {
-                for (var i = 0; i < result.Data.Length; i += 4)
-                {
-                    if (b[i + 3] == 0)
-                    {
-                        b[i + 0] = 0;
-                        b[i + 1] = 0;
-                        b[i + 2] = 0;
-                    }
-                }
-            }
-
-            Texture2D texture = null;
-            texture = new Texture2D(graphicsDevice, result.Width, result.Height);
-            texture.SetData(result.Data);
-
-            return texture;
-        }
-
-        private void PlatformSaveAsJpeg(Stream stream, int width, int height)
-        {
-#if WINDOWS_UAP
-            SaveAsImage(Windows.Graphics.Imaging.BitmapEncoder.JpegEncoderId, stream, width, height);
-#else
-            throw new NotImplementedException();
-#endif
-        }
-
         //Converts Pixel Data from BGRA to RGBA
         private static void ConvertToRGBA(int pixelHeight, int pixelWidth, byte[] pixels)
         {
@@ -283,105 +232,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformSaveAsPng(Stream stream, int width, int height)
-        {
-            var pngWriter = new PngWriter();
-            pngWriter.Write(this, stream);
-        }
-
-#if WINDOWS_UAP
-        private void SaveAsImage(Guid encoderId, Stream stream, int width, int height)
-        {
-            var pixelData = new byte[Width * Height * GraphicsExtensions.GetSize(Format)];
-            GetData(pixelData);
-
-            // TODO: We need to convert from Format to R8G8B8A8!
-
-            // TODO: We should implement async SaveAsPng() for WinRT.
-            Task.Run(async () =>
-            {
-                // Create a temporary memory stream for writing the png.
-                var memstream = new InMemoryRandomAccessStream();
-
-                // Write the png.
-                var encoder = await Windows.Graphics.Imaging.BitmapEncoder.CreateAsync(encoderId, memstream);
-                encoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Ignore, (uint)width, (uint)height, 96, 96, pixelData);
-                await encoder.FlushAsync();
-
-                // Copy the memory stream into the real output stream.
-                memstream.Seek(0);
-                memstream.AsStreamForRead().CopyTo(stream);
-
-            }).Wait();
-        }
-#endif
-
-        static unsafe SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(BitmapSource bsource, GraphicsDevice device)
-        {
-            Texture2DDescription desc;
-            desc.Width = bsource.Size.Width;
-            desc.Height = bsource.Size.Height;
-            desc.ArraySize = 1;
-            desc.BindFlags = BindFlags.ShaderResource;
-            desc.Usage = ResourceUsage.Default;
-            desc.CpuAccessFlags = CpuAccessFlags.None;
-            desc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
-            desc.MipLevels = 1;
-            desc.OptionFlags = ResourceOptionFlags.None;
-            desc.SampleDescription.Count = 1;
-            desc.SampleDescription.Quality = 0;
-
-            using (DataStream s = new DataStream(bsource.Size.Height * bsource.Size.Width * 4, true, true))
-            {
-                bsource.CopyPixels(bsource.Size.Width * 4, s);
-
-                // XNA blacks out any pixels with an alpha of zero.
-                var data = (byte*)s.DataPointer;
-                for (var i = 0; i < s.Length; i+=4)
-                {
-                    if (data[i + 3] == 0)
-                    {
-                        data[i + 0] = 0;
-                        data[i + 1] = 0;
-                        data[i + 2] = 0;
-                    }
-                }
-
-                DataRectangle rect = new DataRectangle(s.DataPointer, bsource.Size.Width * 4);
-
-                return new SharpDX.Direct3D11.Texture2D(device._d3dDevice, desc, rect);
-            }
-        }
-
-        static ImagingFactory imgfactory;
-        private static BitmapSource LoadBitmap(Stream stream, out SharpDX.WIC.BitmapDecoder decoder)
-        {
-            if (imgfactory == null)
-            {
-                imgfactory = new ImagingFactory();
-            }
-
-            decoder = new SharpDX.WIC.BitmapDecoder(
-                imgfactory,
-                stream,
-                DecodeOptions.CacheOnDemand
-                );
-
-            var fconv = new FormatConverter(imgfactory);
-
-            using (var frame = decoder.GetFrame(0))
-            {
-                fconv.Initialize(
-                    frame,
-                    PixelFormat.Format32bppRGBA,
-                    BitmapDitherType.None,
-                    null,
-                    0.0,
-                    BitmapPaletteType.Custom);
-            }
-            return fconv;
-        }
-
         protected internal virtual Texture2DDescription GetTexture2DDescription()
         {
             var desc = new Texture2DDescription();
@@ -401,6 +251,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return desc;
         }
+
         internal override void CreateTexture()
         {
             // TODO: Move this to SetData() if we want to make Immutable textures!
