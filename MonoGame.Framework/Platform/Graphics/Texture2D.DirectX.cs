@@ -211,27 +211,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return arraySlice * _levelCount + level;
         }
 
-        //Converts Pixel Data from BGRA to RGBA
-        private static void ConvertToRGBA(int pixelHeight, int pixelWidth, byte[] pixels)
-        {
-            int offset = 0;
-
-            for (int row = 0; row < (uint)pixelHeight; row++)
-            {
-                int rowxPixelWidth = row * pixelWidth * 4;
-                for (int col = 0; col < (uint)pixelWidth; col++)
-                {
-                    offset = rowxPixelWidth + (col * 4);
-
-                    byte B = pixels[offset];
-                    byte R = pixels[offset + 2];
-
-                    pixels[offset] = R;
-                    pixels[offset + 2] = B;
-                }
-            }
-        }
-
         protected internal virtual Texture2DDescription GetTexture2DDescription()
         {
             var desc = new Texture2DDescription();
