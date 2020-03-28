@@ -9,7 +9,7 @@ namespace MonoGame.Tools.Pipeline
 {
     public static class FileAssociation
     {
-        // Used to refresh Explorer windows after the registry is updated
+        // Used to refresh Explorer windows after the registry is updated.
         [DllImport("Shell32.dll")]
         private static extern int SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
 
@@ -34,24 +34,16 @@ namespace MonoGame.Tools.Pipeline
             var command = $"\"{startInfo.FileName}\" {startInfo.Arguments}";
             var iconPath = $"{assembly.Location},0";
 
-            var madeChanges = false;
-            madeChanges |= SetWindowsAssociation(extension, progId, fileTypeDescription, iconPath, verb, commandText, command);
-            madeChanges |= SetVSAssociation();
-            if (madeChanges)
-            {
-                RefreshEnvironment();
-            }
+            SetWindowsAssociation(extension, progId, fileTypeDescription, iconPath, verb, commandText, command);
+            SetVSAssociation();
+            RefreshEnvironment();
         }
 
         public static void Unassociate()
         {
-            var madeChanges = false;
-            madeChanges |= UnsetWindowsAssociation(extension, progId);
-            madeChanges |= UnsetVSAssociation();
-            if (madeChanges)
-            {
-                RefreshEnvironment();
-            }
+            UnsetWindowsAssociation(extension, progId);
+            UnsetVSAssociation();
+            RefreshEnvironment();
         }
 
         private static bool SetWindowsAssociation(string extension, string progId, string fileTypeDescription, string icon, string verb, string commandText, string command)

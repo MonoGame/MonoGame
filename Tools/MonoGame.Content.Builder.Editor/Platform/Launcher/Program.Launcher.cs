@@ -60,8 +60,8 @@ namespace MonoGame.Tools.Pipeline
                     // If we're not detaching, pipe output back to the console.
                     process.StartInfo.RedirectStandardOutput = true;
                     process.StartInfo.RedirectStandardError = true;
-                    process.OutputDataReceived += (object sender, DataReceivedEventArgs e) => Console.WriteLine(e.Data);
-                    process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => Console.Error.WriteLine(e.Data);
+                    process.OutputDataReceived += (sender, eventArgs) => Console.WriteLine(eventArgs.Data);
+                    process.ErrorDataReceived += (sender, eventArgs) => Console.Error.WriteLine(eventArgs.Data);
                 }
 
                 process.Start();
