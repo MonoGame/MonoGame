@@ -222,8 +222,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (c == '\n')
                 {
-                    finalLineHeight = LineSpacing;
-
                     offset.X = 0;
                     offset.Y += LineSpacing;
                     firstGlyphOfLine = true;
