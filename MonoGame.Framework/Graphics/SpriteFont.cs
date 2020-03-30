@@ -222,8 +222,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (c == '\n')
                 {
-                    finalLineHeight = LineSpacing;
-
                     offset.X = 0;
                     offset.Y += LineSpacing;
                     firstGlyphOfLine = true;
@@ -251,9 +249,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     width = proposedWidth;
 
                 offset.X += pCurrentGlyph->RightSideBearing;
-
-                if (pCurrentGlyph->Cropping.Height > finalLineHeight)
-                    finalLineHeight = pCurrentGlyph->Cropping.Height;
             }
 
             size.X = width;
