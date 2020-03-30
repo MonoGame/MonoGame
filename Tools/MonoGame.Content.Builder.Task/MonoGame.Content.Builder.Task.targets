@@ -59,11 +59,15 @@
     <!-- Get header indices, because the Manifest path may contain spaces or semicolons, which means we cannot simply split. -->
     <PropertyGroup>
       <DotnetToolHeader>$(ConsoleOutput.Split(';')[0])</DotnetToolHeader>
+      <DotnetToolHeaderPackageIDColumnName>$(DotnetToolHeader.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0])</DotnetToolHeaderPackageIDColumnName>
+      <DotnetToolHeaderVersionColumnName>$(DotnetToolHeader.Split(' ', StringSplitOptions.RemoveEmptyEntries)[1])</DotnetToolHeaderVersionColumnName>
+      <DotnetToolHeaderCommandsColumnName>$(DotnetToolHeader.Split(' ', StringSplitOptions.RemoveEmptyEntries)[2])</DotnetToolHeaderCommandsColumnName>
+      <DotnetToolHeaderManifestColumnName>$(DotnetToolHeader.Split(' ', StringSplitOptions.RemoveEmptyEntries)[3])</DotnetToolHeaderManifestColumnName>
 
-      <DotnetToolPackageIdIndex>$(DotnetToolHeader.IndexOf('Package Id'))</DotnetToolPackageIdIndex>
-      <DotnetToolVersionIndex>$(DotnetToolHeader.IndexOf('Version'))</DotnetToolVersionIndex>
-      <DotnetToolCommandsIndex>$(DotnetToolHeader.IndexOf('Commands'))</DotnetToolCommandsIndex>
-      <DotnetToolManifestIndex>$(DotnetToolHeader.IndexOf('Manifest'))</DotnetToolManifestIndex>
+      <DotnetToolPackageIdIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderPackageIDColumnName)))</DotnetToolPackageIdIndex>
+      <DotnetToolVersionIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderVersionColumnName)))</DotnetToolVersionIndex>
+      <DotnetToolCommandsIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderCommandsColumnName)))</DotnetToolCommandsIndex>
+      <DotnetToolManifestIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderManifestColumnName)))</DotnetToolManifestIndex>
 
       <DotnetToolPackageIdLength>$([MSBuild]::Subtract($(DotnetToolVersionIndex), $(DotnetToolPackageIdIndex)))</DotnetToolPackageIdLength>
       <DotnetToolVersionLength>$([MSBuild]::Subtract($(DotnetToolCommandsIndex), $(DotnetToolVersionIndex)))</DotnetToolVersionLength>
