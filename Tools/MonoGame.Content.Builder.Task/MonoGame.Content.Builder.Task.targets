@@ -66,10 +66,10 @@
       <DotnetToolHeaderCommandsColumnName>$(ConsoleOutput.Split("      ", StringSplitOptions.RemoveEmptyEntries)[2])</DotnetToolHeaderCommandsColumnName>
       <DotnetToolHeaderManifestColumnName>$(ConsoleOutput.Split("      ", StringSplitOptions.RemoveEmptyEntries)[3])</DotnetToolHeaderManifestColumnName>
 
-      <DotnetToolPackageIdIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderPackageIDColumnName)))</DotnetToolPackageIdIndex>
-      <DotnetToolVersionIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderVersionColumnName)))</DotnetToolVersionIndex>
-      <DotnetToolCommandsIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderCommandsColumnName)))</DotnetToolCommandsIndex>
-      <DotnetToolManifestIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderManifestColumnName)))</DotnetToolManifestIndex>
+      <DotnetToolPackageIdIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderPackageIDColumnName)))</DotnetToolPackageIdIndex>
+      <DotnetToolVersionIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderVersionColumnName)))</DotnetToolVersionIndex>
+      <DotnetToolCommandsIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderCommandsColumnName)))</DotnetToolCommandsIndex>
+      <DotnetToolManifestIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderManifestColumnName)))</DotnetToolManifestIndex>
 
       <DotnetToolPackageIdLength>$([MSBuild]::Subtract($(DotnetToolVersionIndex), $(DotnetToolPackageIdIndex)))</DotnetToolPackageIdLength>
       <DotnetToolVersionLength>$([MSBuild]::Subtract($(DotnetToolCommandsIndex), $(DotnetToolVersionIndex)))</DotnetToolVersionLength>
