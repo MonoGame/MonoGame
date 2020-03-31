@@ -11,16 +11,9 @@ namespace MonoGame.Tools.Pipeline
     [CellAttribute(typeof(bool))]
     public class CellBool : CellBase
     {
-        private bool _draw;
-
-        public CellBool()
-        {
-            _draw = true;
-        }
-
         public override void Edit(PixelLayout control)
         {
-            _draw = false;
+            SkipCellDraw = true;
 
             var checkbox = new CheckBox();
             checkbox.Tag = this;
@@ -35,21 +28,15 @@ namespace MonoGame.Tools.Pipeline
 
             OnKill += delegate
             {
+                SkipCellDraw = false;
                 OnKill = null;
 
                 if (_eventHandler == null || checkbox.Checked == null)
                     return;
                 
-                _draw = true;
                 Value = checkbox.Checked;
                 _eventHandler(Value, EventArgs.Empty);
             };
-        }
-
-        public override void DrawCell(Graphics g, Rectangle rec, int separatorPos, bool selected)
-        {
-            if (_draw)
-                base.DrawCell(g, rec, separatorPos, selected);
         }
     }
 }

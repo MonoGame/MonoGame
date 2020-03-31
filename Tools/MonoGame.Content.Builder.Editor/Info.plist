@@ -8,7 +8,7 @@
         	<string>false</string>
     	</dict>
 	<key>CFBundleName</key>
-	<string>MonoGame Content Builder Editor</string>
+	<string>MGCB Editor</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSMinimumSystemVersion</key>
@@ -23,7 +23,7 @@
 	<string>net.monogame.mgcb-editor</string>
 	<key>CFBundleShortVersionString</key>
 	<string>3.3</string>
-	<key>CFBundleIconFile</key>
-	<string>App</string>
+    <key>CFBundleIconFile</key>
+    <string>Icon.icns</string>
 </dict>
 </plist>

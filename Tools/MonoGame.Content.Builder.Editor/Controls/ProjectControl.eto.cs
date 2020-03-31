@@ -77,8 +77,9 @@ namespace MonoGame.Tools.Pipeline
             _treeRoot.Tag = item;
             _treeRoot.Expanded = true;
 
-            _treeView.ReloadItem(_treeRoot);
             _treeView.ContextMenu = _contextMenu;
+            _treeView.DataStore = _treeBase;
+            _treeView.ReloadData();
         }
 
         public void AddItem(IProjectItem citem)
