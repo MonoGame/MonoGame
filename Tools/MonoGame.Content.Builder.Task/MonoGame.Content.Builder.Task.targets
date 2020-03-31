@@ -56,14 +56,20 @@
       <Output TaskParameter="ConsoleOutput" PropertyName="ConsoleOutput" />
     </Exec>
 
-    <!-- Get header indices, because the Manifest path may contain spaces or semicolons, which means we cannot simply split. -->
+    <!-- Get header indices.
+         The output of `dotnet tool list` (https://github.com/dotnet/cli/blob/master/src/dotnet/commands/dotnet-tool/list/ToolListGlobalOrToolPathCommand.cs) 
+         is formatted as a `PrintableTable` (https://github.com/dotnet/cli/blob/master/src/dotnet/PrintableTable.cs).
+         `PrintableTable` defines six consecutive spaces as its column delimiter (public const string ColumnDelimiter = "      ";)  -->
     <PropertyGroup>
-      <DotnetToolHeader>$(ConsoleOutput.Split(';')[0])</DotnetToolHeader>
+      <DotnetToolHeaderPackageIDColumnName>$(ConsoleOutput.Split("      ", StringSplitOptions.RemoveEmptyEntries)[0])</DotnetToolHeaderPackageIDColumnName>
+      <DotnetToolHeaderVersionColumnName>$(ConsoleOutput.Split("      ", StringSplitOptions.RemoveEmptyEntries)[1])</DotnetToolHeaderVersionColumnName>
+      <DotnetToolHeaderCommandsColumnName>$(ConsoleOutput.Split("      ", StringSplitOptions.RemoveEmptyEntries)[2])</DotnetToolHeaderCommandsColumnName>
+      <DotnetToolHeaderManifestColumnName>$(ConsoleOutput.Split("      ", StringSplitOptions.RemoveEmptyEntries)[3])</DotnetToolHeaderManifestColumnName>
 
-      <DotnetToolPackageIdIndex>$(DotnetToolHeader.IndexOf('Package Id'))</DotnetToolPackageIdIndex>
-      <DotnetToolVersionIndex>$(DotnetToolHeader.IndexOf('Version'))</DotnetToolVersionIndex>
-      <DotnetToolCommandsIndex>$(DotnetToolHeader.IndexOf('Commands'))</DotnetToolCommandsIndex>
-      <DotnetToolManifestIndex>$(DotnetToolHeader.IndexOf('Manifest'))</DotnetToolManifestIndex>
+      <DotnetToolPackageIdIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderPackageIDColumnName)))</DotnetToolPackageIdIndex>
+      <DotnetToolVersionIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderVersionColumnName)))</DotnetToolVersionIndex>
+      <DotnetToolCommandsIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderCommandsColumnName)))</DotnetToolCommandsIndex>
+      <DotnetToolManifestIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderManifestColumnName)))</DotnetToolManifestIndex>
 
       <DotnetToolPackageIdLength>$([MSBuild]::Subtract($(DotnetToolVersionIndex), $(DotnetToolPackageIdIndex)))</DotnetToolPackageIdLength>
       <DotnetToolVersionLength>$([MSBuild]::Subtract($(DotnetToolCommandsIndex), $(DotnetToolVersionIndex)))</DotnetToolVersionLength>
