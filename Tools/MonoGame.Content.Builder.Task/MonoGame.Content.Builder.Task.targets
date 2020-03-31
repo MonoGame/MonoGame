@@ -56,13 +56,15 @@
       <Output TaskParameter="ConsoleOutput" PropertyName="ConsoleOutput" />
     </Exec>
 
-    <!-- Get header indices, because the Manifest path may contain spaces or semicolons, which means we cannot simply split. -->
+    <!-- Get header indices.
+         The output of `dotnet tool list` (https://github.com/dotnet/cli/blob/master/src/dotnet/commands/dotnet-tool/list/ToolListGlobalOrToolPathCommand.cs) 
+         is formatted as a `PrintableTable` (https://github.com/dotnet/cli/blob/master/src/dotnet/PrintableTable.cs).
+         `PrintableTable` defines six consecutive spaces as its column delimiter (public const string ColumnDelimiter = "      ";)  -->
     <PropertyGroup>
-      <DotnetToolHeader>$(ConsoleOutput.Split(';')[0])</DotnetToolHeader>
-      <DotnetToolHeaderPackageIDColumnName>$(DotnetToolHeader.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0])</DotnetToolHeaderPackageIDColumnName>
-      <DotnetToolHeaderVersionColumnName>$(DotnetToolHeader.Split(' ', StringSplitOptions.RemoveEmptyEntries)[1])</DotnetToolHeaderVersionColumnName>
-      <DotnetToolHeaderCommandsColumnName>$(DotnetToolHeader.Split(' ', StringSplitOptions.RemoveEmptyEntries)[2])</DotnetToolHeaderCommandsColumnName>
-      <DotnetToolHeaderManifestColumnName>$(DotnetToolHeader.Split(' ', StringSplitOptions.RemoveEmptyEntries)[3])</DotnetToolHeaderManifestColumnName>
+      <DotnetToolHeaderPackageIDColumnName>$(ConsoleOutput.Split("      ")[0])</DotnetToolHeaderPackageIDColumnName>
+      <DotnetToolHeaderVersionColumnName>$(ConsoleOutput.Split("      ")[1])</DotnetToolHeaderVersionColumnName>
+      <DotnetToolHeaderCommandsColumnName>$(ConsoleOutput.Split("      ")[2])</DotnetToolHeaderCommandsColumnName>
+      <DotnetToolHeaderManifestColumnName>$(ConsoleOutput.Split("      ")[3])</DotnetToolHeaderManifestColumnName>
 
       <DotnetToolPackageIdIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderPackageIDColumnName)))</DotnetToolPackageIdIndex>
       <DotnetToolVersionIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderVersionColumnName)))</DotnetToolVersionIndex>
