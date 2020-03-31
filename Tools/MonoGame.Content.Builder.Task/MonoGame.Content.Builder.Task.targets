@@ -61,10 +61,10 @@
          is formatted as a `PrintableTable` (https://github.com/dotnet/cli/blob/master/src/dotnet/PrintableTable.cs).
          `PrintableTable` defines six consecutive spaces as its column delimiter (public const string ColumnDelimiter = "      ";)  -->
     <PropertyGroup>
-      <DotnetToolHeaderPackageIDColumnName>$(ConsoleOutput.Split("      ")[0])</DotnetToolHeaderPackageIDColumnName>
-      <DotnetToolHeaderVersionColumnName>$(ConsoleOutput.Split("      ")[1])</DotnetToolHeaderVersionColumnName>
-      <DotnetToolHeaderCommandsColumnName>$(ConsoleOutput.Split("      ")[2])</DotnetToolHeaderCommandsColumnName>
-      <DotnetToolHeaderManifestColumnName>$(ConsoleOutput.Split("      ")[3])</DotnetToolHeaderManifestColumnName>
+      <DotnetToolHeaderPackageIDColumnName>$(ConsoleOutput.Split("      ", StringSplitOptions.RemoveEmptyEntries)[0])</DotnetToolHeaderPackageIDColumnName>
+      <DotnetToolHeaderVersionColumnName>$(ConsoleOutput.Split("      ", StringSplitOptions.RemoveEmptyEntries)[1])</DotnetToolHeaderVersionColumnName>
+      <DotnetToolHeaderCommandsColumnName>$(ConsoleOutput.Split("      ", StringSplitOptions.RemoveEmptyEntries)[2])</DotnetToolHeaderCommandsColumnName>
+      <DotnetToolHeaderManifestColumnName>$(ConsoleOutput.Split("      ", StringSplitOptions.RemoveEmptyEntries)[3])</DotnetToolHeaderManifestColumnName>
 
       <DotnetToolPackageIdIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderPackageIDColumnName)))</DotnetToolPackageIdIndex>
       <DotnetToolVersionIndex>$(DotnetToolHeader.IndexOf($(DotnetToolHeaderVersionColumnName)))</DotnetToolVersionIndex>
