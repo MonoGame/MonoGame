@@ -48,9 +48,9 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitializeComponent()
         {
-            Title = "MonoGame Pipeline Tool";
+            Title = "MGCB Editor";
             Icon = Icon.FromResource("Icons.monogame.png");
-            Size = new Size(750, 550);
+            Size = new Size(900, 550);
             MinimumSize = new Size(400, 400);
 
             InitalizeCommands();
@@ -367,6 +367,7 @@ namespace MonoGame.Tools.Pipeline
 
             ToolBar = toolbar = new ToolBar();
             ToolBar.Style = "ToolBar";
+            
             ToolBar.Items.Add(cmdNew);
             ToolBar.Items.Add(cmdOpen);
             ToolBar.Items.Add(cmdSave);

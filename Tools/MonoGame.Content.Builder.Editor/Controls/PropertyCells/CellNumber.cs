@@ -40,6 +40,8 @@ namespace MonoGame.Tools.Pipeline
 
         public override void Edit(PixelLayout control)
         {
+            SkipCellDraw = true;
+
             var editText = new TextBox();
             editText.Tag = this;
             editText.Style = "OverrideSize";
@@ -55,6 +57,7 @@ namespace MonoGame.Tools.Pipeline
 
             OnKill += delegate
             {
+                SkipCellDraw = false;
                 OnKill = null;
 
                 if (_eventHandler == null)
