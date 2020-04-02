@@ -11,7 +11,7 @@ namespace MonoGame.Tools.Pipeline
         // System directories.
         private const string applicationDirectory = "/usr/share/applications";
         private const string iconRootDirectory = "/usr/share/icons/hicolor";
-        private const string iconScalableMimetypeSubdirectory = "scalable/mimetypes";
+        private const string iconType = "scalable/mimetypes";
 
         // Content files.
         private const string contentFolder = "Content";
@@ -19,6 +19,7 @@ namespace MonoGame.Tools.Pipeline
         private const string oldMimetypeFileName = "mgcb.xml";
         private const string newMimetypeFileName = "x-mgcb.xml";
         private const string desktopFileName = "MGCB Editor.desktop";
+        private const string mimetype = "text/x-mgcb";
 
         public static void Associate()
         {
@@ -44,24 +45,28 @@ namespace MonoGame.Tools.Pipeline
 
             // Copy the icon.
             var iconPath = Path.Join(contentDirectory, iconFileName);
-            var outputIconDirectory = Path.Join(iconRootDirectory, iconScalableMimetypeSubdirectory);
+            var outputIconDirectory = Path.Join(iconRootDirectory, iconType);
             var outputIconPath = Path.Join(outputIconDirectory, iconFileName);
             Directory.CreateDirectory(outputIconDirectory);
-            File.Copy(iconPath, outputIconPath);
+            File.Copy(iconPath, outputIconPath, true);
 
-            // Update the GTK icon cache.
-            var process = new Process
+            try
             {
-                StartInfo = new ProcessStartInfo
+                // Update the GTK icon cache.
+                var process = new Process
                 {
-                    FileName = "gtk-update-icon-cache",
-                    Arguments = $"{iconRootDirectory} -f",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                }
-            };
-            process.Start();
-            process.WaitForExit();
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "gtk-update-icon-cache",
+                        Arguments = $"{iconRootDirectory} -f",
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    }
+                };
+                process.Start();
+                process.WaitForExit();
+            }
+            catch { }
 
             Console.WriteLine("Installation complete!");
         }
@@ -99,7 +104,7 @@ namespace MonoGame.Tools.Pipeline
             // Write and install the .desktop file.
             var outputDesktopFilePath = Path.Join(applicationDirectory, desktopFileName);
             File.WriteAllText(outputDesktopFilePath, desktopFileContent);
-            RunXdgMime("default", $"\"{desktopFileName}\" text/mgcb");
+            RunXdgMime("default", $"\"{desktopFileName}\" {mimetype}");
 
             Console.WriteLine("Installation complete!");
         }
@@ -108,7 +113,7 @@ namespace MonoGame.Tools.Pipeline
         {
             Console.WriteLine("Uninstalling icon...");
 
-            var outputIconPath = Path.Join(iconRootDirectory, iconScalableMimetypeSubdirectory, iconFileName);
+            var outputIconPath = Path.Join(iconRootDirectory, iconType, iconFileName);
             File.Delete(outputIconPath);
 
             Console.WriteLine("Uninstallation complete!");
@@ -143,18 +148,11 @@ namespace MonoGame.Tools.Pipeline
                     FileName = "xdg-mime",
                     Arguments = $"{command} {arguments}",
                     CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
+                    UseShellExecute = false
                 }
             };
 
-            process.OutputDataReceived += (sender, eventArgs) => Console.WriteLine(eventArgs.Data);
-            process.ErrorDataReceived += (sender, eventArgs) => Console.Error.WriteLine(eventArgs.Data);
-
             process.Start();
-            process.BeginErrorReadLine();
-            process.BeginOutputReadLine();
             process.WaitForExit();
         }
     }

@@ -6,12 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace MonoGame.Tools.Pipeline.Utilities
 {
     static class ProcessStartInfoExtensions
     {
+        private static string[] defaultSearchPaths = new string[] { Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) };
+
         public static ProcessStartInfo ResolveDotnetApp(this ProcessStartInfo startInfo, IEnumerable<string> searchPaths = null)
         {
             string filePath = FindDotnetApp(startInfo.FileName, searchPaths);
@@ -34,7 +37,7 @@ namespace MonoGame.Tools.Pipeline.Utilities
         private static string FindDotnetApp(string fileName, IEnumerable<string> searchPaths = null)
         {
             string filePath = null;
-            searchPaths ??= new string[] { "" };
+            searchPaths ??= defaultSearchPaths;
             foreach (string searchPath in searchPaths)
             {
                 string testPath = Path.GetFullPath(Path.Combine(searchPath, fileName));
