@@ -6,7 +6,7 @@ namespace MonoGame.Effect.TPGParser
 {
     public class SamplerStateInfo
     {
-        private SamplerState _state;
+        private SamplerStateData _state;
         
         private bool _dirty;
 
@@ -146,7 +146,7 @@ namespace MonoGame.Effect.TPGParser
         {
             // Get the existing state or create it.
             if (_state == null)
-                _state = new SamplerState();
+                _state = new SamplerStateData();
 
             _state.AddressU = _addressU;
             _state.AddressV = _addressV;
@@ -196,7 +196,7 @@ namespace MonoGame.Effect.TPGParser
             _dirty = false;
         }
         
-        public SamplerState State
+        public SamplerStateData State
         {
             get
             {

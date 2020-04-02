@@ -2,7 +2,7 @@
 
 namespace MonoGame.Effect.TPGParser
 {
-    public class TechniqueInfo
+    internal class TechniqueInfo
     {
         public int startPos;
         public int length;

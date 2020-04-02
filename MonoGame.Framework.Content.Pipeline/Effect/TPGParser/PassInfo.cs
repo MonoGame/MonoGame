@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;
-using System.Globalization;
 
 namespace MonoGame.Effect.TPGParser
 {
-    public class PassInfo
+    internal class PassInfo
     {
         public string name;
 
@@ -15,9 +13,9 @@ namespace MonoGame.Effect.TPGParser
         public string psModel;
         public string psFunction;
 
-        public BlendState blendState;
-        public RasterizerState rasterizerState;
-        public DepthStencilState depthStencilState;
+        public BlendStateData blendState;
+        public RasterizerStateData rasterizerState;
+        public DepthStencilStateData depthStencilState;
 		
         private static Blend ToAlphaBlend(Blend blend)
         {
@@ -43,7 +41,7 @@ namespace MonoGame.Effect.TPGParser
                 {
                     if (blendState == null)
                     {
-                        blendState = new BlendState();
+                        blendState = new BlendStateData();
                         blendState.ColorSourceBlend = Blend.One;
                         blendState.AlphaSourceBlend = Blend.One;
                         blendState.ColorDestinationBlend = Blend.InverseSourceAlpha;
@@ -53,7 +51,7 @@ namespace MonoGame.Effect.TPGParser
                 else if (!value)
                 {
                     if (blendState == null)
-                        blendState = new BlendState();
+                        blendState = new BlendStateData();
                     blendState.ColorSourceBlend = Blend.One;
                     blendState.AlphaSourceBlend = Blend.One;
                     blendState.ColorDestinationBlend = Blend.Zero;
@@ -67,7 +65,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (rasterizerState == null)
-                    rasterizerState = new RasterizerState();
+                    rasterizerState = new RasterizerStateData();
                 rasterizerState.FillMode = value;             
             }
         }
@@ -77,7 +75,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (rasterizerState == null)
-                    rasterizerState = new RasterizerState();
+                    rasterizerState = new RasterizerStateData();
                 rasterizerState.CullMode = value;
             }
         }
@@ -87,7 +85,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (depthStencilState == null)
-                    depthStencilState = new DepthStencilState();
+                    depthStencilState = new DepthStencilStateData();
                 depthStencilState.DepthBufferEnable = value;
             }
         }
@@ -97,7 +95,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (depthStencilState == null)
-                    depthStencilState = new DepthStencilState();
+                    depthStencilState = new DepthStencilStateData();
                 depthStencilState.DepthBufferWriteEnable = value;
             }
         }
@@ -107,7 +105,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (depthStencilState == null)
-                    depthStencilState = new DepthStencilState();
+                    depthStencilState = new DepthStencilStateData();
                 depthStencilState.DepthBufferFunction = value;
             }
         }
@@ -117,7 +115,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (rasterizerState == null)
-                    rasterizerState = new RasterizerState();
+                    rasterizerState = new RasterizerStateData();
                 rasterizerState.MultiSampleAntiAlias = value;
             }
         }
@@ -127,7 +125,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (rasterizerState == null)
-                    rasterizerState = new RasterizerState();
+                    rasterizerState = new RasterizerStateData();
                 rasterizerState.ScissorTestEnable = value;
             }
         }
@@ -137,7 +135,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (depthStencilState == null)
-                    depthStencilState = new DepthStencilState();
+                    depthStencilState = new DepthStencilStateData();
                 depthStencilState.StencilEnable = value;
             }
         }
@@ -147,7 +145,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (depthStencilState == null)
-                    depthStencilState = new DepthStencilState();
+                    depthStencilState = new DepthStencilStateData();
                 depthStencilState.StencilFail = value;
             }
         }
@@ -157,7 +155,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (depthStencilState == null)
-                    depthStencilState = new DepthStencilState();
+                    depthStencilState = new DepthStencilStateData();
                 depthStencilState.StencilFunction = value;
             }
         }
@@ -167,7 +165,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (depthStencilState == null)
-                    depthStencilState = new DepthStencilState();
+                    depthStencilState = new DepthStencilStateData();
                 depthStencilState.StencilMask = value;
             }
         }
@@ -177,7 +175,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (depthStencilState == null)
-                    depthStencilState = new DepthStencilState();
+                    depthStencilState = new DepthStencilStateData();
                 depthStencilState.StencilPass = value;
             }
         }
@@ -187,7 +185,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (depthStencilState == null)
-                    depthStencilState = new DepthStencilState();
+                    depthStencilState = new DepthStencilStateData();
                 depthStencilState.ReferenceStencil = value;
             }
         }
@@ -197,7 +195,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (depthStencilState == null)
-                    depthStencilState = new DepthStencilState();
+                    depthStencilState = new DepthStencilStateData();
                 depthStencilState.StencilWriteMask = value;
             }
         }
@@ -207,7 +205,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (depthStencilState == null)
-                    depthStencilState = new DepthStencilState();
+                    depthStencilState = new DepthStencilStateData();
                 depthStencilState.StencilDepthBufferFail = value;
             }
         }
@@ -217,7 +215,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (blendState == null)
-                    blendState = new BlendState();
+                    blendState = new BlendStateData();
                 blendState.ColorSourceBlend = value;
                 blendState.AlphaSourceBlend = ToAlphaBlend(value);
             }
@@ -228,7 +226,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (blendState == null)
-                    blendState = new BlendState();
+                    blendState = new BlendStateData();
                 blendState.ColorDestinationBlend = value;
                 blendState.AlphaDestinationBlend = ToAlphaBlend(value);
             }
@@ -239,7 +237,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (blendState == null)
-                    blendState = new BlendState();
+                    blendState = new BlendStateData();
                 blendState.AlphaBlendFunction = value;
             }
         }
@@ -249,7 +247,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (blendState == null)
-                    blendState = new BlendState();
+                    blendState = new BlendStateData();
                 blendState.ColorWriteChannels = value;
             }    
         }
@@ -259,7 +257,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (rasterizerState == null)
-                    rasterizerState = new RasterizerState();
+                    rasterizerState = new RasterizerStateData();
                 rasterizerState.DepthBias = value;
             }
         }
@@ -269,7 +267,7 @@ namespace MonoGame.Effect.TPGParser
             set
             {
                 if (rasterizerState == null)
-                    rasterizerState = new RasterizerState();
+                    rasterizerState = new RasterizerStateData();
                 rasterizerState.SlopeScaleDepthBias = value;
             }
         }
