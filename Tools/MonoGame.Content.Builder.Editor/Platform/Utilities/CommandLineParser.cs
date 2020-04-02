@@ -15,6 +15,7 @@ namespace MonoGame.Tools.Pipeline.Utilities
     class CommandLineParser
     {
         private readonly Parser parser;
+        private Action runAction;
 
         public CommandLineParser(ICommandLineInterface commandLineInterface)
         {
@@ -25,7 +26,10 @@ namespace MonoGame.Tools.Pipeline.Utilities
             var rootCommand = new RootCommand()
             {
                 Name = "mgcb-editor",
-                Handler = CommandHandler.Create<InvocationContext, string>(commandLineInterface.Run)
+                Handler = CommandHandler.Create<InvocationContext, string>((context, project) =>
+                {
+                    runAction = () => commandLineInterface.Run(context, project);
+                })
             };
 
             var projectArgument = new Argument<string>("project")
@@ -64,9 +68,10 @@ namespace MonoGame.Tools.Pipeline.Utilities
                 .Build();
         }
 
-        public int Invoke(string[] args)
+        public void Invoke(string[] args)
         {
-            return parser.Invoke(args);
+            parser.Invoke(args);
+            runAction?.Invoke();
         }
 
         private void ShowVersion(InvocationContext context)

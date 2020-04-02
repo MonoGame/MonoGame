@@ -4,7 +4,6 @@
 
 using System;
 using System.CommandLine.Invocation;
-using System.Threading;
 using Eto;
 using Eto.Forms;
 using MonoGame.Tools.Pipeline.Utilities;
@@ -57,16 +56,6 @@ namespace MonoGame.Tools.Pipeline
             }
 
             public void Run(InvocationContext context, string project)
-            {
-                var thread = new Thread(() => LoadUserInterface(project));
-#if WPF
-                thread.SetApartmentState(ApartmentState.STA);
-#endif
-                thread.Start();
-                thread.Join();
-            }
-
-            private void LoadUserInterface(string project)
             {
                 Styles.Load();
 
