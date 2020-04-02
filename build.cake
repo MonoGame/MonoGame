@@ -82,6 +82,7 @@ Task("BuildCore")
     .IsDependentOn("Prep")
     .Does(() =>
 {
+    DotNetCoreRestore("MonoGame.Framework.Core/MonoGame.Framework.Core.csproj");
     PackProject("MonoGame.Framework.Core/MonoGame.Framework.Core.csproj");
 });
 
