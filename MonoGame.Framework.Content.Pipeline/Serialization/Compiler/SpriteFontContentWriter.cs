@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Content.Pipeline;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -36,10 +37,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <returns>Name of the runtime loader.</returns>
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
-            // Base the reader type string from a known public class in the same namespace in the same assembly
-            Type type = typeof(ContentReader);
-			string readerType = type.Namespace + ".SpriteFontReader, " + type.Assembly.FullName;
-            return readerType;
+			return RuntimeTypeStrings.GetAssemblyQualifiedName("SpriteFontReader");
         }
 
         /// <summary>
@@ -49,10 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <returns>The qualified name.</returns>
         public override string GetRuntimeType(TargetPlatform targetPlatform)
         {
-            // Base the reader type string from a known public class in the same namespace in the same assembly
-            Type type = typeof(ContentReader);
-			string readerType = type.Namespace + ".SpriteFontReader, " + type.AssemblyQualifiedName;
-            return readerType;
+			return RuntimeTypeStrings.GetAssemblyQualifiedName("SpriteFont");
         }
 
         /// <summary>

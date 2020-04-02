@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using MonoGame.Framework.Content.Pipeline;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -24,7 +25,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
-            return string.Concat(typeof(ContentTypeReader).Namespace,
+            return string.Concat(RuntimeTypeStrings.RuntimeContentNamespace,
                                     ".",
                                     "MultiArrayReader`1[[",
                                     _elementWriter.GetRuntimeType(targetPlatform),

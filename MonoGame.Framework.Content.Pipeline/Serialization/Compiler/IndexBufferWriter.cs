@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using MonoGame.Framework.Content.Pipeline;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -43,16 +44,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
-            var type = typeof(ContentReader);
-            var readerType = type.Namespace + ".IndexBufferReader, " + type.Assembly.FullName;
-            return readerType;
+            return RuntimeTypeStrings.GetAssemblyQualifiedName("IndexBufferReader");
         }
 
         public override string GetRuntimeType(TargetPlatform targetPlatform)
         {
-            var type = typeof(ContentReader);
-            var readerType = type.Namespace + ".IndexBufferReader, " + type.AssemblyQualifiedName;
-            return readerType;
+            return RuntimeTypeStrings.GetAssemblyQualifiedName("IndexBuffer");
         }
     }
 }
