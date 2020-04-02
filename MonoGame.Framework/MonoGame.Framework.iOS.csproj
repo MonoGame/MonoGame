@@ -16,6 +16,7 @@ This package provides you with MonoGame Framework that works on iOS.</Descriptio
 
   <ItemGroup>
     <Reference Include="System.Runtime.Serialization" />
+    <ProjectReference Include="..\MonoGame.Framework.Core\MonoGame.Framework.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
