@@ -18,7 +18,7 @@ namespace MonoGame.Tools.Pipeline
         public EventHandler<EventArgs> RecentChanged;
         public EventHandler<EventArgs> TitleChanged;
 #pragma warning restore 649
-        public const string TitleBase = "MonoGame Content Builder Editor";
+        public const string TitleBase = "MGCB Editor";
         public static MainWindow Instance;
 
         private List<Pad> _pads;

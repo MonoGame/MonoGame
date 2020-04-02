@@ -65,6 +65,9 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
+            if (ret)
+                drawable.Invalidate();
+
             return ret;
         }
 
@@ -229,6 +232,8 @@ namespace MonoGame.Tools.Pipeline
                     {
                         _selectedCell.Edit(pixel1);
                     }
+
+                    drawable.Invalidate();
                 });
 
 #if WINDOWS

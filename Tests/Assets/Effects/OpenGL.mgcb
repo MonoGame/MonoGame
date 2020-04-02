@@ -31,6 +31,12 @@
 /processorParam:DebugMode=Auto
 /build:ColorFlip.fx
 
+#begin CustomSpriteBatchEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:CustomSpriteBatchEffect.fx
+
 #begin Grayscale.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -60,16 +66,4 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:RainbowH.fx
-
-#begin CustomSpriteBatchEffect.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:CustomSpriteBatchEffect.fx
-
-#begin CustomSpriteBatchEffectComparisonSampler.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:CustomSpriteBatchEffectComparisonSampler.fx
 
