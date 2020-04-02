@@ -4,6 +4,8 @@
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <LangVersion>5</LangVersion>
 
+    <BaseOutputPath>..\Artifacts\MonoGame.Framework.Core</BaseOutputPath>
+
     <PackageId>MonoGame.Framework.Core</PackageId>
     <Description>Foundational shared classes from the MonoGame runtime. Reference this package for libraries or content pipeline extensions that do not require platform-specific bits from the runtime.</Description>
     <PackageTags>monogame</PackageTags>

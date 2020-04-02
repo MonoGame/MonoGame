@@ -78,8 +78,15 @@ Task("Prep")
     dnPackSettings.Configuration = configuration;
 });
 
-Task("BuildDesktopGL")
+Task("BuildCore")
     .IsDependentOn("Prep")
+    .Does(() =>
+{
+    PackProject("MonoGame.Framework.Core/MonoGame.Framework.Core.csproj");
+});
+
+Task("BuildDesktopGL")
+    .IsDependentOn("BuildCore")
     .Does(() =>
 {
     DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
@@ -100,7 +107,7 @@ Task("TestDesktopGL")
 });
 
 Task("BuildWindowsDX")
-    .IsDependentOn("Prep")
+    .IsDependentOn("BuildCore")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
@@ -122,7 +129,7 @@ Task("TestWindowsDX")
 });
 
 Task("BuildAndroid")
-    .IsDependentOn("Prep")
+    .IsDependentOn("BuildCore")
     .WithCriteria(() =>
 {
     if (IsRunningOnWindows())
@@ -136,7 +143,7 @@ Task("BuildAndroid")
 });
 
 Task("BuildiOS")
-    .IsDependentOn("Prep")
+    .IsDependentOn("BuildCore")
     .WithCriteria(() =>
 {
     return DirectoryExists("/Library/Frameworks/Xamarin.iOS.framework");
@@ -147,7 +154,7 @@ Task("BuildiOS")
 });
 
 Task("BuildUWP")
-    .IsDependentOn("Prep")
+    .IsDependentOn("BuildCore")
     .WithCriteria(() => GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.17763"))
     .Does(() =>
 {
@@ -156,7 +163,7 @@ Task("BuildUWP")
 });
 
 Task("BuildContentPipeline")
-    .IsDependentOn("Prep")
+    .IsDependentOn("BuildCore")
     .Does(() =>
 {
     DotNetCoreRestore("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj");
