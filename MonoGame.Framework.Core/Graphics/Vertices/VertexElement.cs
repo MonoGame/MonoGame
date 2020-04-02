@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// <summary>
     /// Defines a single element in a vertex.
     /// </summary>
-    public partial struct VertexElement : IEquatable<VertexElement>
+    public struct VertexElement : IEquatable<VertexElement>
     {
         private int _offset;
         private VertexElementFormat _format;
