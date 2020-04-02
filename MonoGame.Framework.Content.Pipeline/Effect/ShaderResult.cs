@@ -9,7 +9,7 @@ using MonoGame.Effect.TPGParser;
 
 namespace MonoGame.Effect
 {
-    public class ShaderResult
+    internal class ShaderResult
     {
         public ShaderInfo ShaderInfo { get; private set; }
 
