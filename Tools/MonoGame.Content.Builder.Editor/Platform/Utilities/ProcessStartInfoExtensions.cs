@@ -13,15 +13,6 @@ namespace MonoGame.Tools.Pipeline.Utilities
 {
     static class ProcessStartInfoExtensions
     {
-        private static string[] defaultSearchPaths = new string[]
-        {
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-#if MAC
-            // In case we're running in the .app/Contents/MacOS folder, search back up in the root folder
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../"),
-#endif
-        };
-
         /// <summary>
         /// Modifies the <see cref="ProcessStartInfo"/> FileName and Arguments to call the .NET Core App in the best way for the platform.
         /// A different method may be chosen if the caller intends to wait for the process to exit
@@ -48,7 +39,18 @@ namespace MonoGame.Tools.Pipeline.Utilities
 
         private static IEnumerable<string> GetSearchPaths(IEnumerable<string> extraSearchPaths)
         {
-            var searchPaths = new List<string>(defaultSearchPaths);
+            var searchPaths = new List<string>
+            {
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+            };
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                // In case we're running in the .app/Contents/MacOS folder, search back up in the root folder.
+                // Since the dotnet assemblies can be unpacked from the app in different locations, use the process file instead.
+                searchPaths.Add(Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "../../../"));
+            }
+
             if (extraSearchPaths != null)
             {
                 searchPaths.AddRange(extraSearchPaths);

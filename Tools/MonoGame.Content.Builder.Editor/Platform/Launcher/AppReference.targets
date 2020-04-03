@@ -39,8 +39,6 @@
       </AppReferenceContent>
     </ItemGroup>
 
-    <Message Importance="high" Text="APP CONTENT: %(AppReferenceContent.FullPath) == %(SubDir)%(RecursiveDir)%(Filename)%(Extension)" />
-
     <!-- Copy this content to the build output. -->
     <ItemGroup>
       <ContentWithTargetPath
