@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Tools.Tests", "Too
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Content.Builder.Editor.Linux", "Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.Linux.csproj", "{11B8224E-E56D-41E0-867C-DB5E2E757AB2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Core", "MonoGame.Framework.Core\MonoGame.Framework.Core.csproj", "{3482F1C5-112B-4305-A54A-33CCAEF91ECA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,18 @@ Global
 		{11B8224E-E56D-41E0-867C-DB5E2E757AB2}.Release|x64.Build.0 = Release|Any CPU
 		{11B8224E-E56D-41E0-867C-DB5E2E757AB2}.Release|x86.ActiveCfg = Release|Any CPU
 		{11B8224E-E56D-41E0-867C-DB5E2E757AB2}.Release|x86.Build.0 = Release|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Debug|x64.Build.0 = Debug|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Debug|x86.Build.0 = Debug|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Release|x64.ActiveCfg = Release|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Release|x64.Build.0 = Release|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Release|x86.ActiveCfg = Release|Any CPU
+		{3482F1C5-112B-4305-A54A-33CCAEF91ECA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

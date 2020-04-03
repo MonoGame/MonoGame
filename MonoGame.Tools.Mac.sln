@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Tools.Tests", "Too
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor.Mac", "Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.Mac.csproj", "{1853CCED-232C-4972-A2F2-D56F7F6DBEAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Core", "MonoGame.Framework.Core\MonoGame.Framework.Core.csproj", "{970C6490-6F60-42AD-8B67-33044C24886B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,5 +116,17 @@ Global
 		{1853CCED-232C-4972-A2F2-D56F7F6DBEAE}.Release|x64.Build.0 = Release|Any CPU
 		{1853CCED-232C-4972-A2F2-D56F7F6DBEAE}.Release|x86.ActiveCfg = Release|Any CPU
 		{1853CCED-232C-4972-A2F2-D56F7F6DBEAE}.Release|x86.Build.0 = Release|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Debug|x64.Build.0 = Debug|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Debug|x86.Build.0 = Debug|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Release|x64.ActiveCfg = Release|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Release|x64.Build.0 = Release|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Release|x86.ActiveCfg = Release|Any CPU
+		{970C6490-6F60-42AD-8B67-33044C24886B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
