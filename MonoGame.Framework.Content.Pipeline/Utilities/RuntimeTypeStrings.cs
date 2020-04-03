@@ -14,7 +14,7 @@ namespace MonoGame.Framework.Content.Pipeline
 
         public static string GetAssemblyQualifiedName(string typeName)
         {
-			return RuntimeTypeStrings.RuntimeContentNamespace + "." + typeName + ", " + RuntimeTypeStrings.RuntimeAssemblyFullName;
+            return RuntimeTypeStrings.RuntimeContentNamespace + "." + typeName + ", " + RuntimeTypeStrings.RuntimeAssemblyFullName;
         }
     }
 }

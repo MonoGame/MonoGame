@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <returns>Name of the runtime loader.</returns>
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
-			return RuntimeTypeStrings.GetAssemblyQualifiedName("SpriteFontReader");
+            return RuntimeTypeStrings.GetAssemblyQualifiedName("SpriteFontReader");
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <returns>The qualified name.</returns>
         public override string GetRuntimeType(TargetPlatform targetPlatform)
         {
-			return RuntimeTypeStrings.GetAssemblyQualifiedName("SpriteFont");
+            return RuntimeTypeStrings.GetAssemblyQualifiedName("SpriteFont");
         }
 
         /// <summary>

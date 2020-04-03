@@ -17,9 +17,9 @@ namespace MonoGame.Effect
         public Blend ColorDestinationBlend { get; set; }
         public Blend ColorSourceBlend { get; set; }
         private ColorWriteChannels[] _colorWriteChannels { get; set; } = new ColorWriteChannels[4];
-	    public Color BlendFactor { get; set; }
-	    public int MultiSampleMask { get; set; }
-	    public bool IndependentBlendEnable { get; set; }
+        public Color BlendFactor { get; set; }
+        public int MultiSampleMask { get; set; }
+        public bool IndependentBlendEnable { get; set; }
 
         public ColorWriteChannels ColorWriteChannels
         {
