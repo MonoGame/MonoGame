@@ -32,7 +32,9 @@
     </EmbeddedResource>
 
     <!-- Copy the template resources to the output -->
-    <Content Include="Templates\**\*" />
+    <Content Include="Templates\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
