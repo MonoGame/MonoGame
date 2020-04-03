@@ -1,7 +1,7 @@
-<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
-    <TargetFramework>uap10.0</TargetFramework>
+    <TargetFramework>uap10.0.16299</TargetFramework>
     <!-- TODO: NET45 is here for reflection API (Utilities\ReflectionHelpers), but does not make sense semantically -->
     <DefineConstants>WINDOWS_UAP;DIRECTX11_1;NET45;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
