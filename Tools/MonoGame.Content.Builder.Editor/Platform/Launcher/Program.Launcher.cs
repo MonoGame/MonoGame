@@ -30,13 +30,13 @@ namespace MonoGame.Tools.Pipeline
         /// </summary>
         private class CommandLineInterface : ICommandLineInterface
         {
-            public void Register(InvocationContext context) => Launch(context);
+            public void Register(InvocationContext context) => Launch(context, true);
 
-            public void Unregister(InvocationContext context) => Launch(context);
+            public void Unregister(InvocationContext context) => Launch(context, true);
 
-            public void Run(InvocationContext context, string project) => Launch(context, true);
+            public void Run(InvocationContext context, string project) => Launch(context);
 
-            private void Launch(InvocationContext context, bool detach = false)
+            private void Launch(InvocationContext context, bool waitForExit = false)
             {
                 // Assemble the platform app process with the same arguments.
                 var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
@@ -52,10 +52,10 @@ namespace MonoGame.Tools.Pipeline
                         Arguments = args,
                         CreateNoWindow = true,
                         UseShellExecute = false
-                    }.ResolveDotnetApp()
+                    }.ResolveDotnetApp(waitForExit: waitForExit)
                 };
 
-                if (!detach)
+                if (waitForExit)
                 {
                     // If we're not detaching, pipe output back to the console.
                     process.StartInfo.RedirectStandardOutput = true;
@@ -66,7 +66,7 @@ namespace MonoGame.Tools.Pipeline
 
                 process.Start();
 
-                if (!detach)
+                if (waitForExit)
                 {
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();

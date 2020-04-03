@@ -31,15 +31,12 @@ namespace MonoGame.Tools.Pipeline
         private static readonly string [] _mgcbSearchPaths = new []       
         {
 #if DEBUG
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "./"),
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../MonoGame.Content.Builder/Debug"),
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../../MonoGame.Content.Builder/Debug"),
 #else
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "./"),
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../MonoGame.Content.Builder/Release"),
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../../MonoGame.Content.Builder/Release"),
 #endif
-
         };
 
         public IEnumerable<ContentItemTemplate> Templates
@@ -511,7 +508,7 @@ namespace MonoGame.Tools.Pipeline
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         StandardOutputEncoding = encoding
-                    }.ResolveDotnetApp(_mgcbSearchPaths)
+                    }.ResolveDotnetApp(_mgcbSearchPaths, waitForExit: true)
                 };
                 _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
 

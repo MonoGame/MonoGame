@@ -7,6 +7,7 @@
     <DefineConstants>MONOMAC;MAC</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-mac</AssemblyName>
+    <MacBundleName>$(AssemblyName)</MacBundleName>
     <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
@@ -32,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="App.icns" />
+    <None Remove="Icon.icns" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Icon.icns" />

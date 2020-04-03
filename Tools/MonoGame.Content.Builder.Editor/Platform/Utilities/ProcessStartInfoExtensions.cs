@@ -13,68 +13,118 @@ namespace MonoGame.Tools.Pipeline.Utilities
 {
     static class ProcessStartInfoExtensions
     {
-        private static string[] defaultSearchPaths = new string[] { Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) };
-
-        public static ProcessStartInfo ResolveDotnetApp(this ProcessStartInfo startInfo, IEnumerable<string> searchPaths = null)
+        private static string[] defaultSearchPaths = new string[]
         {
-            string filePath = FindDotnetApp(startInfo.FileName, searchPaths);
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+#if MAC
+            // In case we're running in the .app/Contents/MacOS folder, search back up in the root folder
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../"),
+#endif
+        };
 
-            if (Path.GetExtension(filePath).Equals(".dll", StringComparison.OrdinalIgnoreCase))
+        /// <summary>
+        /// Modifies the <see cref="ProcessStartInfo"/> FileName and Arguments to call the .NET Core App in the best way for the platform.
+        /// A different method may be chosen if the caller intends to wait for the process to exit
+        /// (e.g. choosing a .app's inner executable on Mac).
+        /// </summary>
+        public static ProcessStartInfo ResolveDotnetApp(this ProcessStartInfo startInfo, IEnumerable<string> searchPaths = null, bool waitForExit = false)
+        {
+            // Resolve the app.
+            string appName = startInfo.FileName;
+            searchPaths = GetSearchPaths(searchPaths);
+            var (command, commandArgs) = ResolveCommand(appName, searchPaths, waitForExit);
+
+            // Set the command and arguments.
+            startInfo.FileName = command;
+            if (commandArgs != null)
             {
-                startInfo.FileName = DotNetMuxer.MuxerPathOrDefault();
                 startInfo.Arguments = string.IsNullOrEmpty(startInfo.Arguments)
-                    ? $"\"{filePath}\""
-                    : $"\"{filePath}\" {startInfo.Arguments}";
-            }
-            else
-            {
-                startInfo.FileName = filePath;
+                    ? commandArgs
+                    : $"{commandArgs} {startInfo.Arguments}";
             }
 
             return startInfo;
         }
 
-        private static string FindDotnetApp(string fileName, IEnumerable<string> searchPaths = null)
+        private static IEnumerable<string> GetSearchPaths(IEnumerable<string> extraSearchPaths)
         {
-            string filePath = null;
-            searchPaths ??= defaultSearchPaths;
+            var searchPaths = new List<string>(defaultSearchPaths);
+            if (extraSearchPaths != null)
+            {
+                searchPaths.AddRange(extraSearchPaths);
+            }
+
+            return searchPaths;
+        }
+
+        private static (string, string) ResolveCommand(string fileName, IEnumerable<string> searchPaths, bool waitForExit)
+        {
+            string appName = Path.ChangeExtension(fileName, null);
+
+            string command = null;
+            string commandArgs = null;
             foreach (string searchPath in searchPaths)
             {
-                string testPath = Path.GetFullPath(Path.Combine(searchPath, fileName));
-                string unixTestPath = Path.ChangeExtension(testPath, null);
-                string windowsTestPath = Path.ChangeExtension(testPath, "exe");
-                string dotnetTestPath = Path.ChangeExtension(testPath, "dll");
-                
+                string testPath = Path.GetFullPath(Path.Combine(searchPath, appName));
+
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
+                    string windowsTestPath = Path.ChangeExtension(testPath, "exe");
                     if (File.Exists(windowsTestPath))
                     {
-                        filePath = windowsTestPath;
+                        command = windowsTestPath;
                         break;
+                    }
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    string macTestPath = Path.ChangeExtension(testPath, "app");
+                    if (waitForExit)
+                    {
+                        // If waitForExit, get the executable out of the app contents.
+                        macTestPath = Path.Combine(macTestPath, "Contents", "MacOS", appName);
+                        if (File.Exists(macTestPath))
+                        {
+                            command = macTestPath;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // Otherwise use the .app itself.
+                        if (Directory.Exists(macTestPath))
+                        {
+                            command = "open";
+                            commandArgs = $"-n \"{macTestPath}\" --args";
+                            break;
+                        }
                     }
                 }
                 else
                 {
-                    if (File.Exists(unixTestPath))
+                    string linuxTestPath = Path.ChangeExtension(testPath, null);
+                    if (File.Exists(linuxTestPath))
                     {
-                        filePath = unixTestPath;
+                        command = linuxTestPath;
                         break;
                     }
                 }
 
+                string dotnetTestPath = Path.ChangeExtension(testPath, "dll");
                 if (File.Exists(dotnetTestPath))
                 {
-                    filePath = dotnetTestPath;
+                    command = DotNetMuxer.MuxerPathOrDefault();
+                    commandArgs = $"\"{dotnetTestPath}\"";
                     break;
                 }
             }
 
-            if (filePath == null)
+            if (command == null)
             {
-                throw new FileNotFoundException($"{fileName} is not in the search path!");
+                throw new FileNotFoundException($"{appName} is not in the search path!");
             }
 
-            return filePath;
+            return (command, commandArgs);
         }
 
         /// <summary>
