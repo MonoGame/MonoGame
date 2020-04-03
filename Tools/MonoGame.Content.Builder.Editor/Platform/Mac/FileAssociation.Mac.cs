@@ -23,7 +23,7 @@ namespace MonoGame.Tools.Pipeline
         private static void RunLsregister(string arguments)
         {
             // Assuming we're running in .app/Contents/MacOS, go back up to the .app
-            var appPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../.."));
+            var appPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "../.."));
             if (Path.GetExtension(appPath) != ".app")
             {
                 throw new FileNotFoundException("Not running from within the app package");
