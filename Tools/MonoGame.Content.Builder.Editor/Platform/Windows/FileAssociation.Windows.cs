@@ -35,14 +35,12 @@ namespace MonoGame.Tools.Pipeline
             var iconPath = $"{assembly.Location},0";
 
             SetWindowsAssociation(extension, progId, fileTypeDescription, iconPath, verb, commandText, command);
-            SetVSAssociation();
             RefreshEnvironment();
         }
 
         public static void Unassociate()
         {
             UnsetWindowsAssociation(extension, progId);
-            UnsetVSAssociation();
             RefreshEnvironment();
         }
 
@@ -60,11 +58,6 @@ namespace MonoGame.Tools.Pipeline
             return madeChanges;
         }
 
-        private static bool SetVSAssociation()
-        {
-            return false;
-        }
-
         private static bool UnsetWindowsAssociation(string extension, string progId)
         {
             var madeChanges = false;
@@ -73,11 +66,6 @@ namespace MonoGame.Tools.Pipeline
             madeChanges |= DeleteRegistryKeyTree($@"Software\Classes\{progId}");
             Console.WriteLine(madeChanges ? $"Unassociation complete!" : "No association found.");
             return madeChanges;
-        }
-
-        private static bool UnsetVSAssociation()
-        {
-            return false;
         }
 
         private static bool SetRegistryKey<T>(string keyPath, string name, T value, RegistryValueKind valueKind = RegistryValueKind.String)

@@ -81,7 +81,7 @@ namespace MonoGame.Tools.Pipeline.Utilities
                     string macTestPath = Path.ChangeExtension(testPath, "app");
                     if (waitForExit)
                     {
-                        // If waitForExit, get the executable out of the app contents.
+                        // If waitForExit, get the executable out of the app bundle.
                         macTestPath = Path.Combine(macTestPath, "Contents", "MacOS", appName);
                         if (File.Exists(macTestPath))
                         {
