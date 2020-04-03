@@ -13,6 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame.Framework.Core\MonoGame.Framework.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Effect\**\*.cs" />
   </ItemGroup>
   
