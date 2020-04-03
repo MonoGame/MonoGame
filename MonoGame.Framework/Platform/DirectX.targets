@@ -32,7 +32,6 @@
     <Compile Include="Platform\Graphics\Vertices\InputLayoutCache.cs" />
     <Compile Include="Platform\Graphics\Vertices\VertexBuffer.DirectX.cs" />
     <Compile Include="Platform\Graphics\Vertices\VertexBufferBindings.DirectX.cs" />
-    <Compile Include="Platform\Graphics\Vertices\VertexElement.DirectX.cs" />
     <Compile Include="Platform\Graphics\Vertices\VertexInputLayout.DirectX.cs" />
     <Compile Include="Platform\Windows\SharpDXHelper.cs" />
   </ItemGroup>
