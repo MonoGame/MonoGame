@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
-Name=MonoGame Content Builder Editor
-GenericName=MonoGame Content Builder Editor
+Name=MGCB Editor
+GenericName=MGCB Editor
 Comment=Creates platform specific content files.
 Exec={Exec}
 TryExec={TryExec}

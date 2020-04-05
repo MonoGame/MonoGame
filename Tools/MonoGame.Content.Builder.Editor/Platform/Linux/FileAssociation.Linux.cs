@@ -18,7 +18,7 @@ namespace MonoGame.Tools.Pipeline
         private const string iconFileName = "monogame.svg";
         private const string oldMimetypeFileName = "mgcb.xml";
         private const string newMimetypeFileName = "x-mgcb.xml";
-        private const string desktopFileName = "MGCB Editor.desktop";
+        private const string desktopFileName = "mgcb-editor.desktop";
         private const string mimetype = "text/x-mgcb";
 
         public static void Associate()
