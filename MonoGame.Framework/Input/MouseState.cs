@@ -149,6 +149,62 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
+        /// Returns a string describing the mouse state.
+        /// </summary>
+        public override string ToString()
+        {
+            string buttons;
+            if (_buttons == 0)
+                buttons = "None";
+            else
+            {
+                buttons = string.Empty;
+                if ((_buttons & LeftButtonFlag) == LeftButtonFlag)
+                {
+                    if (buttons.Length > 0)
+                        buttons += " Left";
+                    else
+                        buttons += "Left";
+                }
+                if ((_buttons & RightButtonFlag) == RightButtonFlag)
+                {
+                    if (buttons.Length > 0)
+                        buttons += " Right";
+                    else
+                        buttons += "Right";
+                }
+                if ((_buttons & MiddleButtonFlag) == MiddleButtonFlag)
+                {
+                    if (buttons.Length > 0)
+                        buttons += " Middle";
+                    else
+                        buttons += "Middle";
+                }
+                if ((_buttons & XButton1Flag) == XButton1Flag)
+                {
+                    if (buttons.Length > 0)
+                        buttons += " XButton1";
+                    else
+                        buttons += "XButton1";
+                }
+                if ((_buttons & XButton2Flag) == XButton2Flag)
+                {
+                    if (buttons.Length > 0)
+                        buttons += " XButton2";
+                    else
+                        buttons += "XButton2";
+                }
+            }
+
+            return  "[MouseState X=" + _x +
+                    ", Y=" + _y +
+                    ", Buttons=" + buttons +
+                    ", Wheel=" + _scrollWheelValue +
+                    ", HWheel=" + _horizontalScrollWheelValue +
+                    "]";
+        }
+
+        /// <summary>
         /// Gets horizontal position of the cursor in relation to the window.
         /// </summary>
         public int X
