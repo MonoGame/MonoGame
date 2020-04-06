@@ -173,6 +173,9 @@ Task("BuildTools")
     DotNetCoreRestore("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
     PackProject("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
     
+    DotNetCoreRestore("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
+    PackProject("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
+
     DotNetCoreRestore("Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.csproj");
     PackProject("Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.csproj");
 
