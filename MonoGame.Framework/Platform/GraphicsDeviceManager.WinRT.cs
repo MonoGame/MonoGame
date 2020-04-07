@@ -29,5 +29,10 @@ namespace Microsoft.Xna.Framework
                 presentationParameters.SwapChainPanel = null;
             }
         }
+
+        partial void PlatformApplyChanges()
+        {
+            ((UAPGameWindow)_game.Window).SetClientSize(_preferredBackBufferWidth, _preferredBackBufferHeight);
+        }
     }
 }

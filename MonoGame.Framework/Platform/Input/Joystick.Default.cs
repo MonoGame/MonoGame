@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickCapabilities()
             {
                 IsConnected = false,
+                DisplayName = string.Empty,
                 IsGamepad = false,
                 AxisCount = 0,
                 ButtonCount = 0,
@@ -25,6 +26,14 @@ namespace Microsoft.Xna.Framework.Input
         private static JoystickState PlatformGetState(int index)
         {
             return _defaultJoystickState;
+        }
+
+        private static int PlatformLastConnectedIndex
+        {
+            get
+            {
+                return -1;
+            }
         }
 
         private static void PlatformGetState(ref JoystickState joystickState, int index)

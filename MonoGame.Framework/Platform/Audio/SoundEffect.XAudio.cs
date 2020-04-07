@@ -152,8 +152,8 @@ namespace Microsoft.Xna.Framework.Audio
         {
             // NOTE: We make a copy here because old versions of 
             // DataStream.Create didn't work correctly for offsets.
-            var data = new byte[length - offset];
-            Buffer.BlockCopy(buffer, offset, data, 0, length - offset);
+            var data = new byte[length];
+            Buffer.BlockCopy(buffer, offset, data, 0, length);
 
             return DataStream.Create(data, true, false);
         }

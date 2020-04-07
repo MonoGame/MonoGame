@@ -30,6 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsNormalized = true;
 
             SupportsInstancing = true;
+            SupportsBaseIndexInstancing = true;
             SupportsSeparateBlendStates = true;
 
             MaxTextureAnisotropy = (device.GraphicsProfile == GraphicsProfile.Reach) ? 2 : 16;

@@ -14,9 +14,6 @@ namespace Microsoft.Xna.Framework.Content
 
             bool sixteenBits = input.ReadBoolean();
             int dataSize = input.ReadInt32();
-            byte[] data = input.ContentManager.GetScratchBuffer(dataSize);
-            input.Read(data, 0, dataSize);
-
             if (indexBuffer == null)
             {
                 indexBuffer = new IndexBuffer(input.GetGraphicsDevice(),
@@ -24,7 +21,11 @@ namespace Microsoft.Xna.Framework.Content
                     dataSize / (sixteenBits ? 2 : 4), BufferUsage.None);
             }
 
+            byte[] data = ContentManager.ScratchBufferPool.Get(dataSize);
+            input.Read(data, 0, dataSize);
             indexBuffer.SetData(data, 0, dataSize);
+            ContentManager.ScratchBufferPool.Return(data);
+
             return indexBuffer;
         }
     }

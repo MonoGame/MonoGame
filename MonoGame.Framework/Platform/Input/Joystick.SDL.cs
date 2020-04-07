@@ -10,6 +10,7 @@ namespace Microsoft.Xna.Framework.Input
     static partial class Joystick
     {
         internal static Dictionary<int, IntPtr> Joysticks = new Dictionary<int, IntPtr>();
+        private static int _lastConnectedIndex = -1;
 
         internal static void AddDevice(int deviceId)
         {
@@ -18,6 +19,9 @@ namespace Microsoft.Xna.Framework.Input
 
             while (Joysticks.ContainsKey(id))
                 id++;
+
+            if (id > _lastConnectedIndex)
+                _lastConnectedIndex = id;
 
             Joysticks.Add(id, jdevice);
 
@@ -31,8 +35,14 @@ namespace Microsoft.Xna.Framework.Input
             {
                 if (Sdl.Joystick.InstanceID(entry.Value) == instanceid)
                 {
+                    int key = entry.Key;
+
                     Sdl.Joystick.Close(Joysticks[entry.Key]);
                     Joysticks.Remove(entry.Key);
+
+                    if (key == _lastConnectedIndex)
+                        RecalculateLastConnectedIndex();
+
                     break;
                 }
             }
@@ -48,6 +58,21 @@ namespace Microsoft.Xna.Framework.Input
             Joysticks.Clear ();
         }
 
+        private static void RecalculateLastConnectedIndex()
+        {
+            _lastConnectedIndex = -1;
+            foreach (var entry in Joysticks)
+            {
+                if (entry.Key > _lastConnectedIndex)
+                    _lastConnectedIndex = entry.Key;
+            }
+        }
+
+        private static int PlatformLastConnectedIndex
+        {
+            get { return _lastConnectedIndex; }
+        }
+
         private const bool PlatformIsSupported = true;
 
         private static JoystickCapabilities PlatformGetCapabilities(int index)
@@ -57,6 +82,7 @@ namespace Microsoft.Xna.Framework.Input
                 return new JoystickCapabilities
                 {
                     IsConnected = false,
+                    DisplayName = string.Empty,
                     Identifier = "",
                     IsGamepad = false,
                     AxisCount = 0,
@@ -68,10 +94,11 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickCapabilities
             {
                 IsConnected = true,
+                DisplayName = Sdl.Joystick.GetJoystickName(jdevice),
                 Identifier = Sdl.Joystick.GetGUID(jdevice).ToString(),
                 IsGamepad = (Sdl.GameController.IsGameController(index) == 1),
                 AxisCount = Sdl.Joystick.NumAxes(jdevice),
-                ButtonCount = Sdl.Joystick.NumButtons(jdevice),
+                ButtonCount = Sdl.Joystick.NumButtons(jdevice), 
                 HatCount = Sdl.Joystick.NumHats(jdevice)
             };
         }

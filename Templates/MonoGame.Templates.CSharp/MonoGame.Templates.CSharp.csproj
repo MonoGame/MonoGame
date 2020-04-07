@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Templates.CSharp</BaseOutputPath>
+    <PackageType>Template</PackageType>
+    <Title>MonoGame project templates</Title>
+    <Description>A set of C# templates written for the MonoGame framework.</Description>
+    <PackageId>MonoGame.Templates.CSharp</PackageId>
+    <Authors>@MonoGameTeam</Authors>
+
+    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+
+    <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>
+    <PackageProjectUrl>http://monogame.net/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MonoGame/MonoGame</RepositoryUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="content\**\*" Exclude="content\**\.DS_Store;content\**\bin;content\**\obj" />
+    <Compile Remove="**\*" />
+  </ItemGroup>
+</Project>

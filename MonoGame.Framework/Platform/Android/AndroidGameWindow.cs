@@ -36,7 +36,8 @@ namespace Microsoft.Xna.Framework
             _game = game;
 
             Point size;
-            if (Build.VERSION.SdkInt < BuildVersionCodes.JellyBean)
+            // GetRealSize() was defined in JellyBeanMr1 / API 17 / Android 4.2
+            if (Build.VERSION.SdkInt < BuildVersionCodes.JellyBeanMr1)
             {
                 size.X = activity.Resources.DisplayMetrics.WidthPixels;
                 size.Y = activity.Resources.DisplayMetrics.HeightPixels;

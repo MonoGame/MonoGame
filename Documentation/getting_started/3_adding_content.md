@@ -42,7 +42,7 @@ public class Game1 : Game
     GraphicsDeviceManager graphics;
 ```
 
-Next find the Load Content method and use it to initialize the ball private variable:
+Next find the LoadContent method and use it to initialize the ballTexture private variable:
 
 ```csharp
 protected override void LoadContent()

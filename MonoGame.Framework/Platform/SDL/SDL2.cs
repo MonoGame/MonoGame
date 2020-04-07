@@ -15,50 +15,14 @@ internal static class Sdl
 
     private static IntPtr GetNativeLibrary()
     {
-        var ret = IntPtr.Zero;
-
-        // Load bundled library
-        var assemblyLocation = Path.GetDirectoryName(typeof(Sdl).Assembly.Location) ?? "./";
-        
-        if (CurrentPlatform.OS == OS.Windows && Environment.Is64BitProcess)
-            ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x64/SDL2.dll"));
-        else if (CurrentPlatform.OS == OS.Windows && !Environment.Is64BitProcess)
-            ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x86/SDL2.dll"));
-        else if (CurrentPlatform.OS == OS.Linux && Environment.Is64BitProcess)
-            ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x64/libSDL2-2.0.so.0"));
-        else if (CurrentPlatform.OS == OS.Linux && !Environment.Is64BitProcess)
-            ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x86/libSDL2-2.0.so.0"));
-        else if (CurrentPlatform.OS == OS.MacOSX)
-            ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "libSDL2-2.0.0.dylib"));
-
-        // Load system library
-        if (ret == IntPtr.Zero)
-        {
-            if (CurrentPlatform.OS == OS.Windows)
-                ret = FuncLoader.LoadLibrary("SDL2.dll");
-            else if (CurrentPlatform.OS == OS.Linux)
-                ret = FuncLoader.LoadLibrary("libSDL2-2.0.so.0");
-            else
-                ret = FuncLoader.LoadLibrary("libSDL2-2.0.0.dylib");
-        }
-
-        // Try extra locations for Windows because of .NET Core rids
         if (CurrentPlatform.OS == OS.Windows)
-        {
-            var rid = Environment.Is64BitProcess ? "win-x64" : "win-x86";
-
-            if (ret == IntPtr.Zero)
-                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "../../runtimes", rid, "native/SDL2.dll"));
-
-            if (ret == IntPtr.Zero)
-                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "runtimes", rid, "native/SDL2.dll"));
-        }
-
-        // Welp, all failed, PANIC!!!
-        if (ret == IntPtr.Zero)
-            throw new Exception("Failed to load SDL library.");
-
-        return ret;
+            return FuncLoader.LoadLibraryExt("SDL2.dll");
+        else if (CurrentPlatform.OS == OS.Linux)
+            return FuncLoader.LoadLibraryExt("libSDL2-2.0.so.0");
+        else if (CurrentPlatform.OS == OS.MacOSX)
+            return FuncLoader.LoadLibraryExt("libSDL2-2.0.0.dylib");
+        else
+            return FuncLoader.LoadLibraryExt("sdl2");
     }
 
     public static int Major;
@@ -834,6 +798,15 @@ internal static class Sdl
         public static d_sdl_joystickgetbutton GetButton = FuncLoader.LoadFunction<d_sdl_joystickgetbutton>(NativeLibrary, "SDL_JoystickGetButton");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate IntPtr d_sdl_joystickname(IntPtr joystick);
+        private static d_sdl_joystickname JoystickName = FuncLoader.LoadFunction<d_sdl_joystickname>(NativeLibrary, "SDL_JoystickName");
+
+        public static string GetJoystickName(IntPtr joystick)
+        {
+            return InteropHelpers.Utf8ToString(JoystickName(joystick));
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate Guid d_sdl_joystickgetguid(IntPtr joystick);
         public static d_sdl_joystickgetguid GetGUID = FuncLoader.LoadFunction<d_sdl_joystickgetguid>(NativeLibrary, "SDL_JoystickGetGUID");
 
@@ -935,6 +908,10 @@ internal static class Sdl
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_free(IntPtr ptr);
+        public static d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_gamecontrolleraddmapping(string mappingString);
         public static d_sdl_gamecontrolleraddmapping AddMapping = FuncLoader.LoadFunction<d_sdl_gamecontrolleraddmapping>(NativeLibrary, "SDL_GameControllerAddMapping");
 
@@ -982,7 +959,16 @@ internal static class Sdl
 
         public static string GetMapping(IntPtr gamecontroller)
         {
-            return InteropHelpers.Utf8ToString(SDL_GameControllerMapping(gamecontroller));
+            IntPtr nativeStr = SDL_GameControllerMapping(gamecontroller);
+            if (nativeStr == IntPtr.Zero)
+                return string.Empty;
+
+            string mappingStr = InteropHelpers.Utf8ToString(nativeStr);
+
+            //The mapping string returned by SDL is owned by us and thus must be freed
+            SDL_Free(nativeStr);
+
+            return mappingStr;
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

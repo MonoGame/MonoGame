@@ -38,6 +38,8 @@ namespace MonoGame.Framework.Utilities
                 return MonoGamePlatform.PlayStation4;
 #elif PSVITA
                 return MonoGamePlatform.PSVita;
+#elif STADIA
+                return MonoGamePlatform.Stadia;
 #endif
             }
         }
