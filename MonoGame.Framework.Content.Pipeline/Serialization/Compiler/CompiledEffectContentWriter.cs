@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using MonoGame.Framework.Content.Pipeline;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -18,8 +19,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
-            var type = typeof(ContentReader);
-            var readerType = type.Namespace + ".EffectReader, " + type.Assembly.FullName;
+            var readerType = RuntimeTypeStrings.GetAssemblyQualifiedName("EffectReader");
             return readerType;
         }
     }

@@ -21,7 +21,7 @@ namespace MonoGame.Effect
 			public string samplerName;
 			public string parameterName;
 			public int parameter;
-			public SamplerState state;
+			public SamplerStateData state;
 		}
 
 		public struct Attribute

@@ -77,18 +77,9 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
     </Reference>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(SolutionName)' != 'MonoGame.Framework.WindowsDX'">
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
-      <PrivateAssets>All</PrivateAssets>
-    </ProjectReference>
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework.Core\MonoGame.Framework.Core.csproj" />
   </ItemGroup>
-
-  <ItemGroup Condition="'$(SolutionName)' == 'MonoGame.Framework.WindowsDX'">
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj">
-      <PrivateAssets>All</PrivateAssets>
-    </ProjectReference>
-  </ItemGroup>
-
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />

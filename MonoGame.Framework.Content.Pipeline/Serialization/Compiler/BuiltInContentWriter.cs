@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using MonoGame.Framework.Content.Pipeline;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -67,7 +68,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
             // From looking at XNA-produced XNBs, it appears built-in
             // type readers don't need assembly qualification.
-            var readerNamespace = typeof(ContentTypeReader).Namespace;
+            var readerNamespace = RuntimeTypeStrings.RuntimeContentNamespace;
             return readerNamespace + "." + readerClassName;
         }
     }

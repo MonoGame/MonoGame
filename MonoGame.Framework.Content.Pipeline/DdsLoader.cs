@@ -121,11 +121,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     case FourCC.Dxt1:
                         return SurfaceFormat.Dxt1;
                     case FourCC.Dxt2:
-                        throw new ContentLoadException("Unsupported compression format DXT2");
+                        throw new InvalidContentException("Unsupported compression format DXT2");
                     case FourCC.Dxt3:
                         return SurfaceFormat.Dxt3;
                     case FourCC.Dxt4:
-                        throw new ContentLoadException("Unsupported compression format DXT4");
+                        throw new InvalidContentException("Unsupported compression format DXT4");
                     case FourCC.Dxt5:
                         return SurfaceFormat.Dxt5;
                 }
@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         rbSwap = pixelFormat.dwBBitMask == 0xFF;
                         return SurfaceFormat.Color;
                     }
-                    throw new ContentLoadException("Unsupported RGBA pixel format");
+                    throw new InvalidContentException("Unsupported RGBA pixel format");
                 }
                 else
                 {
@@ -171,14 +171,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         rbSwap = pixelFormat.dwBBitMask == 0xFF;
                         return SurfaceFormat.Color;
                     }
-                    throw new ContentLoadException("Unsupported RGB pixel format");
+                    throw new InvalidContentException("Unsupported RGB pixel format");
                 }
             }
             //else if (pixelFormat.dwFlags.HasFlag(Ddpf.Luminance))
             //{
             //    return SurfaceFormat.Alpha8;
             //}
-            throw new ContentLoadException("Unsupported pixel format");
+            throw new InvalidContentException("Unsupported pixel format");
         }
 
         static BitmapContent CreateBitmapContent(SurfaceFormat format, int width, int height)
@@ -209,7 +209,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 case SurfaceFormat.Vector4:
                     return new PixelBitmapContent<Vector4>(width, height);
             }
-            throw new ContentLoadException("Unsupported SurfaceFormat " + format);
+            throw new InvalidContentException("Unsupported SurfaceFormat " + format);
         }
 
         static int GetBitmapSize(SurfaceFormat format, int width, int height)
@@ -238,7 +238,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     break;
 
                 default:
-                    throw new ContentLoadException("Unsupported SurfaceFormat " + format);
+                    throw new InvalidContentException("Unsupported SurfaceFormat " + format);
             }
 
             return pitch * rows;
@@ -257,14 +257,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 valid = valid && reader.ReadByte() == 0x53;
                 valid = valid && reader.ReadByte() == 0x20;
                 if (!valid)
-                    throw new ContentLoadException("Invalid file signature");
+                    throw new InvalidContentException("Invalid file signature");
 
                 var header = new DdsHeader();
 
                 // Read DDS_HEADER
                 header.dwSize = reader.ReadUInt32();
                 if (header.dwSize != 124)
-                    throw new ContentLoadException("Invalid DDS_HEADER dwSize value");
+                    throw new InvalidContentException("Invalid DDS_HEADER dwSize value");
                 header.dwFlags = (Ddsd)reader.ReadUInt32();
                 header.dwHeight = reader.ReadUInt32();
                 header.dwWidth = reader.ReadUInt32();
@@ -277,7 +277,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // Read DDS_PIXELFORMAT
                 header.ddspf.dwSize = reader.ReadUInt32();
                 if (header.ddspf.dwSize != 32)
-                    throw new ContentLoadException("Invalid DDS_PIXELFORMAT dwSize value");
+                    throw new InvalidContentException("Invalid DDS_PIXELFORMAT dwSize value");
                 header.ddspf.dwFlags = (Ddpf)reader.ReadUInt32();
                 header.ddspf.dwFourCC = (FourCC)reader.ReadUInt32();
                 header.ddspf.dwRgbBitCount = reader.ReadUInt32();
@@ -298,7 +298,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // Check for the existence of the DDS_HEADER_DXT10 struct next
                 if (header.ddspf.dwFlags == Ddpf.FourCC && header.ddspf.dwFourCC == FourCC.Dx10)
                 {
-                    throw new ContentLoadException("Unsupported DDS_HEADER_DXT10 struct found");
+                    throw new InvalidContentException("Unsupported DDS_HEADER_DXT10 struct found");
                 }
 
                 int faceCount = 1;
@@ -306,7 +306,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (header.dwCaps2.HasFlag(DdsCaps2.Cubemap))
                 {
                     if (!header.dwCaps2.HasFlag(DdsCaps2.CubemapAllFaces))
-                        throw new ContentLoadException("Incomplete cubemap in DDS file");
+                        throw new InvalidContentException("Incomplete cubemap in DDS file");
                     faceCount = 6;
                     output = new TextureCubeContent() { Identity = identity };
                 }

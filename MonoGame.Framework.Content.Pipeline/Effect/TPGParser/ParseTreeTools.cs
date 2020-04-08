@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Xna.Framework;
 
 namespace MonoGame.Effect.TPGParser
 {
-	public static class ParseTreeTools
+	internal static class ParseTreeTools
 	{
         public static float ParseFloat(string value)
         {

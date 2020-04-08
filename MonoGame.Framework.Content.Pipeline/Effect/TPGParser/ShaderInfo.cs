@@ -8,7 +8,7 @@ using System.IO;
 
 namespace MonoGame.Effect.TPGParser
 {
-    public class ShaderInfo
+    internal class ShaderInfo
 	{
 		public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
 

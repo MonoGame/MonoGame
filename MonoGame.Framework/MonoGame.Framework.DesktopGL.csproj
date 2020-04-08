@@ -12,6 +12,10 @@ This package provides you with MonoGame Framework that uses OpenGL for rendering
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework.Core\MonoGame.Framework.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="obj\**\*" />
     <Compile Remove="Platform\**\*" />

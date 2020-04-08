@@ -332,9 +332,9 @@ namespace MonoGame.Effect
 			public uint state_count;
 		    public uint annotation_count = 0;
 
-			public BlendState blendState;
-			public DepthStencilState depthStencilState;
-			public RasterizerState rasterizerState;
+			public BlendStateData blendState;
+			public DepthStencilStateData depthStencilState;
+			public RasterizerStateData rasterizerState;
 
 			public d3dx_state[] states;
 		    public d3dx_parameter[] annotation_handles = null;

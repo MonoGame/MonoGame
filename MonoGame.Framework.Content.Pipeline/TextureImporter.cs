@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var fBitmap = FreeImage.Load(format, filename, 0);
             //if freeimage can not recognize the image type
             if(format == FREE_IMAGE_FORMAT.FIF_UNKNOWN)
-                throw new ContentLoadException("TextureImporter failed to load '" + filename + "'");
+                throw new InvalidContentException("TextureImporter failed to load '" + filename + "'");
             //if freeimage can recognize the file headers but can't read its contents
             else if(fBitmap == IntPtr.Zero)
                 throw new InvalidContentException("TextureImporter couldn't understand the contents of '" + filename + "'", output.Identity);
