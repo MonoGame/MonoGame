@@ -106,12 +106,12 @@ namespace Microsoft.Xna.Framework.Audio
         {
             // Stop the source and bind null buffer so that it can be recycled
             AL.GetError();
-            if (AL.IsSource(SourceId))
+            if (HasSourceId && AL.IsSource(SourceId))
             {
                 AL.SourceStop(SourceId);
                 AL.Source(SourceId, ALSourcei.Buffer, 0);
                 ALHelper.CheckError("Failed to stop the source.");
-                controller.RecycleSource(SourceId);
+                controller.FreeSource(this);
             }
             
             if (disposing)
