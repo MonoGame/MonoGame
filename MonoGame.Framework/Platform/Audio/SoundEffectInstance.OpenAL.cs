@@ -20,6 +20,8 @@ namespace Microsoft.Xna.Framework.Audio
         float filterQ;
         float frequency;
         int pauseCount;
+
+        internal readonly object sourceMutex = new object();
         
         internal OpenALSoundController controller;
         
@@ -173,24 +175,28 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void FreeSource()
         {
-            if (HasSourceId)
+            lock (sourceMutex)
             {
-                AL.SourceStop(SourceId);
-                ALHelper.CheckError("Failed to stop source.");
-
-                // Reset the SendFilter to 0 if we are NOT using reverb since 
-                // sources are recycled
-                if (OpenALSoundController.Instance.SupportsEfx)
+                if (HasSourceId)
                 {
-                    OpenALSoundController.Efx.BindSourceToAuxiliarySlot(SourceId, 0, 0, 0);
-                    ALHelper.CheckError("Failed to unset reverb.");
-                    AL.Source(SourceId, ALSourcei.EfxDirectFilter, 0);
-                    ALHelper.CheckError("Failed to unset filter.");
-                }
-                AL.Source(SourceId, ALSourcei.Buffer, 0);
-                ALHelper.CheckError("Failed to free source from buffer.");
+                    AL.SourceStop(SourceId);
+                    ALHelper.CheckError("Failed to stop source.");
 
-                controller.FreeSource(this);
+                    // Reset the SendFilter to 0 if we are NOT using reverb since 
+                    // sources are recycled
+                    if (OpenALSoundController.Instance.SupportsEfx)
+                    {
+                        OpenALSoundController.Efx.BindSourceToAuxiliarySlot(SourceId, 0, 0, 0);
+                        ALHelper.CheckError("Failed to unset reverb.");
+                        AL.Source(SourceId, ALSourcei.EfxDirectFilter, 0);
+                        ALHelper.CheckError("Failed to unset filter.");
+                    }
+
+                    AL.Source(SourceId, ALSourcei.Buffer, 0);
+                    ALHelper.CheckError("Failed to free source from buffer.");
+
+                    controller.FreeSource(this);
+                }
             }
         }
 
