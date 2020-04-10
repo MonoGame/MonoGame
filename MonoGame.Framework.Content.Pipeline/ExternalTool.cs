@@ -125,12 +125,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 return command;
 
             // For Linux check specific subfolder
-            if (CurrentPlatform.OS == OS.Linux)
-                return "linux/" + command;
+            var lincom = "linux/" + command;
+            if (CurrentPlatform.OS == OS.Linux && File.Exists(lincom))
+                return lincom;
 
             // For Mac check specific subfolder
-            if (CurrentPlatform.OS == OS.MacOSX)
-                return "osx/" + command;
+            var maccom = "osx/" + command;
+            if (CurrentPlatform.OS == OS.MacOSX && File.Exists(maccom))
+                return maccom;
 
             // We don't have a full path, so try running through the system path to find it.
             var paths = AppDomain.CurrentDomain.BaseDirectory +
