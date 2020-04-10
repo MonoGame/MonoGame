@@ -86,7 +86,17 @@ namespace MonoGame.Effect
 
         bool ParseArgument(string arg)
         {
-            if (arg.StartsWith("/"))
+            if (_requiredOptions.Count > 0)
+            {
+                // Parse the next non escaped argument.
+                var field = _requiredOptions.Peek();
+
+                if (!IsList(field))
+                    _requiredOptions.Dequeue();
+
+                return SetOption(field, arg);
+            }
+            else if (arg.StartsWith("/"))
             {
                 // After the first escaped argument we can no
                 // longer read non-escaped arguments.
@@ -110,21 +120,9 @@ namespace MonoGame.Effect
 
                 return SetOption(field, value);
             }
-            else if ( _requiredOptions.Count > 0 )
-            {
-                // Parse the next non escaped argument.
-                var field = _requiredOptions.Peek();
-
-                if (!IsList(field))
-                    _requiredOptions.Dequeue();
-
-                return SetOption(field, arg);
-            }
-            else
-            {
-                ShowError("Too many arguments");
-                return false;
-            }
+            
+            ShowError("Too many arguments");
+            return false;
         }
 
 

@@ -47,15 +47,6 @@ namespace MonoGame.Effect
         public byte FormatId { get; private set; }
 
         /// <summary>
-        /// Returns the correct profile for the named platform or
-        /// null if no supporting profile is found.
-        /// </summary>
-        public static ShaderProfile ForPlatform(string platform)
-        {
-            return _profiles.FirstOrDefault(p => p.Supports(platform));
-        }
-
-        /// <summary>
         /// Returns the profile by name or null if no match is found.
         /// </summary>
         public static ShaderProfile FromName(string name)
@@ -68,8 +59,6 @@ namespace MonoGame.Effect
         internal abstract void ValidateShaderModels(PassInfo pass);
 
         internal abstract ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings);
-
-        internal abstract bool Supports(string platform);
 
         protected static void ParseShaderModel(string text, Regex regex, out int major, out int minor)
         {

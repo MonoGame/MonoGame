@@ -61,15 +61,5 @@ namespace MonoGame.Effect
             effect.Shaders.Add(shaderData);
             return shaderData;
         }
-
-        internal override bool Supports(string platform)
-        {
-            if (platform == "Windows" ||
-                platform == "WindowsPhone8" ||
-                platform == "WindowsStoreApp")
-                return true;
-
-            return false;
-        }
     }
 }
