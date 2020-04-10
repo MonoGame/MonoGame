@@ -6,7 +6,7 @@
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Gtk</BaseOutputPath>
     <DefineConstants>GTK</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <AssemblyName>mgcb-editor</AssemblyName>
+    <AssemblyName>mgcb-editor-gtk</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,16 +17,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Global.Mac.cs" />
-    <Compile Remove="Global.Windows.cs" />
-    <Compile Remove="Styles.Mac.cs" />
-    <Compile Remove="Styles.Windows.cs" />
+    <None Remove="Platform\**\*" />
+    <Compile Remove="Platform\**\*" />
+
+    <Compile Include="Platform\Linux\**\*.cs" />
+    <Compile Include="Platform\Utilities\**\*.cs" />
+
+    <Content Include="Platform\Linux\Content\**\*">
+      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Eto.Forms" Version="2.5.0" />
     <PackageReference Include="Eto.Platform.Gtk" Version="2.5.0" />
     <PackageReference Include="GtkSharp" Version="3.22.25.56" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20158.1" />
   </ItemGroup>
 
   <ItemGroup>

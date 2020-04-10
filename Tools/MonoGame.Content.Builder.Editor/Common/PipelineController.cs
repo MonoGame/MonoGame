@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using MonoGame.Content.Builder;
+using MonoGame.Tools.Pipeline.Utilities;
 using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
@@ -36,7 +37,6 @@ namespace MonoGame.Tools.Pipeline
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../MonoGame.Content.Builder/Release"),
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../../MonoGame.Content.Builder/Release"),
 #endif
-
         };
 
         public IEnumerable<ContentItemTemplate> Templates
@@ -481,25 +481,6 @@ namespace MonoGame.Tools.Pipeline
             UpdateMenu();       
         }
 
-        private string FindMGCB()
-        {
-            foreach (var root in _mgcbSearchPaths)
-            {
-                var mgcbPath = Path.Combine(root, "mgcb.exe");
-                if (File.Exists(mgcbPath))
-                    return Path.GetFullPath(mgcbPath);
-
-                if (Global.Unix)
-                {
-                    mgcbPath = Path.Combine(root, "mgcb");
-                    if (File.Exists(mgcbPath))
-                        return Path.GetFullPath(mgcbPath);
-                }
-            }
-
-            throw new FileNotFoundException("mgcb is not in the search path!");
-        }
-
         private void DoBuild(string commands)
         {
             Encoding encoding;
@@ -515,16 +496,24 @@ namespace MonoGame.Tools.Pipeline
             try
             {
                 // Prepare the process.
-                _buildProcess = View.CreateProcess(FindMGCB(), commands);
-                _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.OriginalPath);
-                _buildProcess.StartInfo.CreateNoWindow = true;
-                _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                _buildProcess.StartInfo.UseShellExecute = false;
-                _buildProcess.StartInfo.RedirectStandardOutput = true;
-                _buildProcess.StartInfo.StandardOutputEncoding = encoding;
+                _buildProcess = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "mgcb",
+                        Arguments = commands,
+                        WorkingDirectory = Path.GetDirectoryName(_project.OriginalPath),
+                        CreateNoWindow = true,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        StandardOutputEncoding = encoding
+                    }.ResolveDotnetApp(_mgcbSearchPaths, waitForExit: true)
+                };
                 _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
 
                 // Fire off the process.
+                Console.WriteLine(_buildProcess.StartInfo.FileName + " " + _buildProcess.StartInfo.Arguments);
                 Environment.CurrentDirectory = _buildProcess.StartInfo.WorkingDirectory;
                 _buildProcess.Start();
                 _buildProcess.BeginOutputReadLine();

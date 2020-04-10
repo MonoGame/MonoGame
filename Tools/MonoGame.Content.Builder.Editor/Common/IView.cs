@@ -65,8 +65,6 @@ namespace MonoGame.Tools.Pipeline
 
         bool CopyOrLinkFolder(string folder, bool exists, out IncludeType action, out bool applyforall);
 
-        Process CreateProcess(string exe, string commands);
-
         void UpdateCommands(MenuInfo info);
 
         void UpdateRecentList(List<string> recentList);
