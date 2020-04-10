@@ -175,14 +175,17 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void FreeSource()
         {
+            if (!HasSourceId)
+                return;
+
             lock (sourceMutex)
             {
-                if (HasSourceId)
+                if (HasSourceId && AL.IsSource(SourceId))
                 {
                     AL.SourceStop(SourceId);
                     ALHelper.CheckError("Failed to stop source.");
 
-                    // Reset the SendFilter to 0 if we are NOT using reverb since 
+                    // Reset the SendFilter to 0 if we are NOT using reverb since
                     // sources are recycled
                     if (OpenALSoundController.Instance.SupportsEfx)
                     {
@@ -191,9 +194,6 @@ namespace Microsoft.Xna.Framework.Audio
                         AL.Source(SourceId, ALSourcei.EfxDirectFilter, 0);
                         ALHelper.CheckError("Failed to unset filter.");
                     }
-
-                    AL.Source(SourceId, ALSourcei.Buffer, 0);
-                    ALHelper.CheckError("Failed to free source from buffer.");
 
                     controller.FreeSource(this);
                 }
