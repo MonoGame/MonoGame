@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework
 
         private bool _shouldExit;
         private bool _suppressDraw;
-        private bool _exitAborted = true;
+        private bool _processExit;
 
         partial void PlatformConstruct();       
 
@@ -397,10 +397,10 @@ namespace Microsoft.Xna.Framework
                 break;
             case GameRunBehavior.Synchronous:
                 //True by default, we don't want to exit on launch
-                while (_exitAborted)
+                while (!_processExit)
                 {
-                    //We don't want to continue looping unless (on desktop platforms) the exit is terminated
-                    _exitAborted = false;
+                    //Next time an exit is requested we want to break out of this loop unless we're on a desktop platform and the exit is aborted in the OnBeforeExit event.
+                    _processExit = true;
 
                     // XNA runs one Update even before showing the window
                     DoUpdate(new GameTime());
@@ -726,7 +726,7 @@ namespace Microsoft.Xna.Framework
 
 #if (WINDOWS && DIRECTX) || DESKTOPGL
             //Only allow aborting of the exit process on desktop platforms where it is supported.
-            _exitAborted = args.Cancel;
+            _processExit = !args.Cancel;
 #endif
         }
 
