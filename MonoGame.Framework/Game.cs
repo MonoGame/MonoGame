@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework
 
         private bool _shouldExit;
         private bool _suppressDraw;
+        private bool _exitAborted = true;
 
         partial void PlatformConstruct();       
 
@@ -306,6 +307,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
         public event EventHandler<EventArgs> Disposed;
+        public event EventHandler<EventArgs> BeforeExit;
         public event EventHandler<EventArgs> Exiting;
 
 #if WINDOWS_UAP
@@ -394,12 +396,23 @@ namespace Microsoft.Xna.Framework
                 Platform.StartRunLoop();
                 break;
             case GameRunBehavior.Synchronous:
-                // XNA runs one Update even before showing the window
-                DoUpdate(new GameTime());
+                //True by default, we don't want to exit on launch
+                while (_exitAborted)
+                {
+                    //We don't want to continue looping unless (on desktop platforms) the exit is terminated
+                    _exitAborted = false;
 
-                Platform.RunLoop();
-                EndRun();
-				DoExiting();
+                    // XNA runs one Update even before showing the window
+                    DoUpdate(new GameTime());
+
+                    Platform.RunLoop();
+                    EndRun();
+
+                    //Raise the before exiting event and provide an opportunity for the exit to be prevented
+                    DoBeforeExit();
+                }
+
+                DoExiting();
                 break;
             default:
                 throw new ArgumentException(string.Format(
@@ -583,6 +596,11 @@ namespace Microsoft.Xna.Framework
             _updateables.ForEachFilteredItem(UpdateAction, gameTime);
 		}
 
+        protected virtual void OnBeforeExit(object sender, BeforeExitEventArgs args)
+        {
+            EventHelpers.Raise(sender,BeforeExit,args);
+        }
+
         protected virtual void OnExiting(object sender, EventArgs args)
         {
             EventHelpers.Raise(sender, Exiting, args);
@@ -699,6 +717,17 @@ namespace Microsoft.Xna.Framework
             CategorizeComponents();
             _components.ComponentAdded += Components_ComponentAdded;
             _components.ComponentRemoved += Components_ComponentRemoved;
+        }
+
+        internal void DoBeforeExit()
+        {
+            var args = new BeforeExitEventArgs();
+            OnBeforeExit(this, args);
+
+#if (WINDOWS && DIRECTX) || DESKTOPGL
+            //Only allow aborting of the exit process on desktop platforms where it is supported.
+            _exitAborted = args.Cancel;
+#endif
         }
 
 		internal void DoExiting()
@@ -1041,6 +1070,17 @@ namespace Microsoft.Xna.Framework
 
                 return object.Equals(Item, ((AddJournalEntry<T>)obj).Item);
             }
+        }
+
+        /// <summary>
+        /// Fired before breaking out of the game's run loop giving a chance for games to ignore the exit and continue running.
+        /// </summary>
+        protected class BeforeExitEventArgs : EventArgs
+        {
+            /// <summary>
+            /// Only available on WindowsDX and DesktopGL platforms, setting this value to true allows you to abort the exiting process and continue running the game
+            /// </summary>
+            public bool Cancel { get; set; }
         }
     }
 }
