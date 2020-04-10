@@ -396,21 +396,22 @@ namespace Microsoft.Xna.Framework
                 Platform.StartRunLoop();
                 break;
             case GameRunBehavior.Synchronous:
+                // XNA runs one Update even before showing the window
+                DoUpdate(new GameTime());
+
                 //True by default, we don't want to exit on launch
                 while (!_processExit)
                 {
                     //Next time an exit is requested we want to break out of this loop unless we're on a desktop platform and the exit is aborted in the OnBeforeExit event.
                     _processExit = true;
 
-                    // XNA runs one Update even before showing the window
-                    DoUpdate(new GameTime());
-
                     Platform.RunLoop();
-                    EndRun();
 
                     //Raise the before exiting event and provide an opportunity for the exit to be prevented
                     DoBeforeExit();
                 }
+
+                EndRun();
 
                 DoExiting();
                 break;
