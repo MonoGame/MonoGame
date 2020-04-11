@@ -104,19 +104,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose(bool disposing)
         {
-            // Stop the source and bind null buffer so that it can be recycled
-            AL.GetError();
-
-            lock (sourceMutex)
-            {
-                if (HasSourceId && AL.IsSource(SourceId))
-                {
-                    AL.SourceStop(SourceId);
-                    AL.Source(SourceId, ALSourcei.Buffer, 0);
-                    ALHelper.CheckError("Failed to stop the source.");
-                    controller.FreeSource(this);
-                }
-            }
+            // SFXI disposal handles buffer detachment and source recycling
+            base.Dispose(disposing);
 
             if (disposing)
             {
