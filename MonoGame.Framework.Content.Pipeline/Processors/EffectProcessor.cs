@@ -3,11 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Effect;
 using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
@@ -49,167 +49,46 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <remarks>If you get an error during processing, compilation stops immediately. The effect processor displays an error message. Once you fix the current error, it is possible you may get more errors on subsequent compilation attempts.</remarks>
         public override CompiledEffectContent Process(EffectContent input, ContentProcessorContext context)
         {
-            if (CurrentPlatform.OS != OS.Windows)
-                throw new NotImplementedException();
+            var mgfxc = Path.Combine(Path.GetDirectoryName(typeof(EffectProcessor).Assembly.Location), "mgfxc.dll");
+            var sourceFile = Path.GetTempFileName();
+            var destFile = Path.GetTempFileName();
+            var target = context.TargetPlatform.ToString().Contains("Windows");
+            
+            File.WriteAllText(sourceFile, input.EffectCode);
 
-            var options = new Options();
-            options.SourceFile = input.Identity.SourceFilename;
+            var proc = new Process();
+            proc.StartInfo.FileName = "dotnet";
+            proc.StartInfo.Arguments = "\"" + mgfxc + "\" \"" + sourceFile + "\" \"" + destFile + "\" /Profile:" + GetProfileForPlatform(context.TargetPlatform.ToString());
 
-            options.Profile = ShaderProfile.ForPlatform(context.TargetPlatform.ToString());
-            if (options.Profile == null)
-                throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
+            if (debugMode == EffectProcessorDebugMode.Debug)
+                proc.StartInfo.Arguments += " /Debug";
 
-            options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
-            options.Defines = Defines;
-            options.OutputFile = context.OutputFilename;
+            if (!string.IsNullOrWhiteSpace(defines))
+                proc.StartInfo.Arguments += " \"/Defines:" + defines + "\"";
 
-            // Parse the MGFX file expanding includes, macros, and returning the techniques.
-            ShaderResult shaderResult;
-            try
-            {
-                shaderResult = ShaderResult.FromFile(options.SourceFile, options, 
-                    new ContentPipelineEffectCompilerOutput(context));
+            proc.Start();
+            proc.WaitForExit();
 
-                // Add the include dependencies so that if they change
-                // it will trigger a rebuild of this effect.
-                foreach (var dep in shaderResult.Dependencies)
-                    context.AddDependency(dep);
-            }
-            catch (InvalidContentException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                // TODO: Extract good line numbers from mgfx parser!
-                throw new InvalidContentException(ex.Message, input.Identity, ex);
-            }
+            var success = proc.ExitCode == 0;
+            var ret = success ? new CompiledEffectContent(File.ReadAllBytes(destFile)) : null;
 
-            // Create the effect object.
-            EffectObject effect = null;
-            var shaderErrorsAndWarnings = string.Empty;
-            try
-            {
-                effect = EffectObject.CompileEffect(shaderResult, out shaderErrorsAndWarnings);
+            File.Delete(sourceFile);
+            File.Delete(destFile);
 
-                // If there were any additional output files we register
-                // them so that the cleanup process can manage them.
-                foreach (var outfile in shaderResult.AdditionalOutputFiles)
-                    context.AddOutputFile(outfile);
-            }
-            catch (ShaderCompilerException)
-            {
-                // This will log any warnings and errors and throw.
-                ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input, context);
-            }
+            if (!success)
+                throw new Exception("mgfxc exited with non 0 exit code.");
 
-            // Process any warning messages that the shader compiler might have produced.
-            ProcessErrorsAndWarnings(false, shaderErrorsAndWarnings, input, context);
-
-            // Write out the effect to a runtime format.
-            CompiledEffectContent result;
-            try
-            {
-                using (var stream = new MemoryStream())
-                {
-                    using (var writer = new BinaryWriter(stream))
-                        effect.Write(writer, options);
-
-                    result = new CompiledEffectContent(stream.GetBuffer());
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidContentException("Failed to serialize the effect!", input.Identity, ex);
-            }
-
-            return result;
+            return ret;
         }
 
-        private class ContentPipelineEffectCompilerOutput : IEffectCompilerOutput
+        private string GetProfileForPlatform(string platform)
         {
-            private readonly ContentProcessorContext _context;
+            if (platform == "Windows" ||
+                platform == "WindowsPhone8" ||
+                platform == "WindowsStoreApp")
+                return "DirectX_11";
 
-            public ContentPipelineEffectCompilerOutput(ContentProcessorContext context)
-            {
-                _context = context;
-            }
-
-            public void WriteWarning(string file, int line, int column, string message)
-            {
-                _context.Logger.LogWarning(null, CreateContentIdentity(file, line, column), message);
-            }
-
-            public void WriteError(string file, int line, int column, string message)
-            {
-                throw new InvalidContentException(message, CreateContentIdentity(file, line, column));
-            }
-
-            private static ContentIdentity CreateContentIdentity(string file, int line, int column)
-            {
-                return new ContentIdentity(file, null, line + "," + column);
-            }
-        }
-
-        private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
-        {
-            // Split the errors and warnings into individual lines.
-            var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] {"\n", "\r", Environment.NewLine},
-                                                                      StringSplitOptions.RemoveEmptyEntries);
-
-            var errorOrWarning = new Regex(@"(.*)\(([0-9]*(,[0-9]+(-[0-9]+)?)?)\)\s*:\s*(.*)", RegexOptions.Compiled);
-            ContentIdentity identity = null;
-            var allErrorsAndWarnings = string.Empty;
-
-            // Process all the lines.
-            for (var i = 0; i < errorsAndWarningArray.Length; i++)
-            {
-                var match = errorOrWarning.Match(errorsAndWarningArray[i]);
-                if (!match.Success || match.Groups.Count != 4)
-                {
-                    // Just log anything we don't recognize as a warning.
-                    if (buildFailed)
-                        allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
-                    else
-                        context.Logger.LogWarning(string.Empty, input.Identity, errorsAndWarningArray[i]);
-                        
-                    continue;
-                }
-
-                var fileName = match.Groups[1].Value;
-                var lineAndColumn = match.Groups[2].Value;
-                var message = match.Groups[3].Value;
-
-                // Try to ensure a good file name for the error message.
-                if (string.IsNullOrEmpty(fileName))
-                    fileName = input.Identity.SourceFilename;
-                else if (!File.Exists(fileName))
-                {
-                    var folder = Path.GetDirectoryName(input.Identity.SourceFilename);
-                    fileName = Path.Combine(folder, fileName);
-                }
-
-                // If we got an exception then we'll be throwing an exception 
-                // below, so just gather the lines to throw later.
-                if (buildFailed)
-                {
-                    if (identity == null)
-                    {
-                        identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
-                        allErrorsAndWarnings = errorsAndWarningArray[i] + Environment.NewLine;
-                    }
-                    else
-                        allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
-                }
-                else
-                {
-                    identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
-                    context.Logger.LogWarning(string.Empty, identity, message, string.Empty);
-                }
-            }
-
-            if (buildFailed)
-                throw new InvalidContentException(allErrorsAndWarnings, identity ?? input.Identity);
+            return "OpenGL";
         }
     }
 }

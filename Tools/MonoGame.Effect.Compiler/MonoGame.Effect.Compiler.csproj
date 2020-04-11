@@ -11,10 +11,6 @@
     <AssemblyName>mgfxc</AssemblyName>
     <UseAppHost>true</UseAppHost>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Effect\**\*.cs" />
-  </ItemGroup>
   
   <ItemGroup>
     <Compile Include="..\..\MonoGame.Framework\BoundingBox.cs" />

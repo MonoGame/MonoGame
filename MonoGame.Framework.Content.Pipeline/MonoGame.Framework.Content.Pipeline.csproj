@@ -266,6 +266,17 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>
+
+  <!-- Build and copy MFFXC, just don't reference it! -->
+  <ItemGroup>
+    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Target Name="BuildMFGXC" BeforeTargets="Restore">
+    <MSBuild Projects="..\Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj" Properties="Configuration=$(Configuration);UseAppHost=False" Targets="Restore" />
+    <MSBuild Projects="..\Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj" Properties="Configuration=$(Configuration);UseAppHost=False" Targets="Build" />
+  </Target>
   
   <Import Project="..\Stadia\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Stadia\MonoGame.Framework.Content.Pipeline.targets')" />
 
