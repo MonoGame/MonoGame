@@ -19,7 +19,7 @@ namespace MonoGame.Effect.Compiler
                 Console.Error.WriteLine("");
                 Console.Error.WriteLine("Setup instructions:");
                 Console.Error.WriteLine("- Create 64 bit wine prefix");
-                Console.Error.WriteLine("- Install d3dcompiler_42, d3dcompiler_43, d3dcompiler_47 using winetricks");
+                Console.Error.WriteLine("- Install d3dcompiler_47 using winetricks");
                 Console.Error.WriteLine("- Install .NET Core 3");
                 Console.Error.WriteLine("- Setup MGFXC_WINE_PATH environmental variable to point to a valid wine prefix");
                 Console.Error.WriteLine("");
@@ -27,6 +27,7 @@ namespace MonoGame.Effect.Compiler
             }
 
             Environment.SetEnvironmentVariable("WINEARCH", "win64");
+            Environment.SetEnvironmentVariable("WINEDLLOVERRIDES", "d3dcompiler_47=n");
             Environment.SetEnvironmentVariable("WINEPREFIX", mgfxcwine);
             Environment.SetEnvironmentVariable("WINEDEBUG", "-all");
 
@@ -72,8 +73,8 @@ namespace MonoGame.Effect.Compiler
         public static string ToPrefixPath(string localPath)
         {
             var proc = new Process();
-            proc.StartInfo.FileName = "winepath";
-            proc.StartInfo.Arguments = "-w \"" + localPath + "\"";
+            proc.StartInfo.FileName = "wine64";
+            proc.StartInfo.Arguments = "winepath.exe -w \"" + localPath + "\"";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.Start();
