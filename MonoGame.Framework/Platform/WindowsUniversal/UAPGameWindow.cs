@@ -334,12 +334,15 @@ namespace Microsoft.Xna.Framework
                 return;
 
             var asyncResult = _coreWindow.Dispatcher.RunIdleAsync( (e) =>
-           {
-               if (visible)
-                   _coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
-               else
-                   _coreWindow.PointerCursor = null;
-           });
+            {
+                if (visible)
+                    _coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
+                else
+                    _coreWindow.PointerCursor = null;
+
+                // On UAP platform it is also necessary to set the cursor of CoreIndependentInputSource in InputEvents
+                _inputEvents.CoreCursor = _coreWindow.PointerCursor;
+            });
         }
 
         internal void RunLoop()
