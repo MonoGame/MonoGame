@@ -88,7 +88,6 @@ Task("BuildDesktopGL")
 
 Task("TestDesktopGL")
     .IsDependentOn("BuildDesktopGL")
-    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/DesktopGL/Debug");

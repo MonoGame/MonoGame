@@ -471,7 +471,7 @@ object TestMac : BuildType({
             name = "Running Cake Script"
             path = "dotnet"
             arguments = "cake build.cake --build-target=Test"
-            formatStderrAsError = true
+            formatStderrAsError = false
         }
     }
 
