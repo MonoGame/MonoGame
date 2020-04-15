@@ -164,6 +164,7 @@ Task("BuildContentPipeline")
 
 Task("BuildTools")
     .IsDependentOn("Prep")
+    .WithCriteria(() => GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.18362"))
     .Does(() =>
 {
     DotNetCoreRestore("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
