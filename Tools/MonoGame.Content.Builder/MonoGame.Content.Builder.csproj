@@ -19,7 +19,7 @@
 
   <!-- Build and copy MGFXC, just don't reference it! -->
   <PropertyGroup>
-    <!-- NuGet warns if we copy assemblies, but don't reference them; we suppress those warning. -->
+    <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
     <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
   <ItemGroup>
