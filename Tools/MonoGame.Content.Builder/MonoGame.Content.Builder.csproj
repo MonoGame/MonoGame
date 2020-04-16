@@ -17,9 +17,15 @@
     <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj" />
   </ItemGroup>
 
-  <!-- Build and copy MFFXC, just don't reference it! -->
+  <!-- Build and copy MGFXC, just don't reference it! -->
+  <PropertyGroup>
+    <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
+    <NoWarn>NU5100</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
-    <Content Include="..\..\Artifacts\MonoGame.Effect.Compiler\Release\*" Visible="false">
+    <Content Include="..\..\Artifacts\MonoGame.Effect.Compiler\Release\*"
+             Exclude="..\..\Artifacts\MonoGame.Effect.Compiler\Release\*.nupkg"
+             Visible="false">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -267,13 +267,19 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
     </Compile>
   </ItemGroup>
 
-  <!-- Build and copy MFFXC, just don't reference it! -->
+  <!-- Build and copy MGFXC, just don't reference it! -->
+  <PropertyGroup>
+    <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
+    <NoWarn>NU5100</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
-    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\Release\*" Visible="false">
+    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\Release\*"
+             Exclude="..\Artifacts\MonoGame.Effect.Compiler\Release\*.nupkg"
+             Visible="false">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <Target Name="BuildMFGXC" BeforeTargets="Restore">
+  <Target Name="BuildMGFXC" BeforeTargets="Restore">
     <MSBuild Projects="..\Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj" Properties="Configuration=Release;UseAppHost=False" Targets="Restore" />
     <MSBuild Projects="..\Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj" Properties="Configuration=Release;UseAppHost=False" Targets="Build" />
   </Target>
