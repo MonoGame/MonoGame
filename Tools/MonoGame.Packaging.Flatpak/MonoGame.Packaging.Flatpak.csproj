@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Packaging.Flatpak</BaseOutputPath>
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
     <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>

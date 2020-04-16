@@ -17,9 +17,14 @@ MSBuildSettings msPackSettings, mdPackSettings;
 DotNetCoreMSBuildSettings dnBuildSettings;
 DotNetCorePackSettings dnPackSettings;
 
-private void PackProject(string filePath)
+private void PackMSBuild(string filePath)
 {
     MSBuild(filePath, msPackSettings);
+}
+
+private void PackDotnet(string filePath)
+{
+    DotNetCorePack(filePath, dnPackSettings);
 }
 
 private bool GetMSBuildWith(string requires)
@@ -60,6 +65,7 @@ Task("Prep")
     msPackSettings = new MSBuildSettings();
     msPackSettings.Verbosity = Verbosity.Minimal;
     msPackSettings.Configuration = configuration;
+    msPackSettings.Restore = true;
     msPackSettings.WithProperty("Version", version);
     msPackSettings.WithTarget("Pack");
 
@@ -83,7 +89,7 @@ Task("BuildDesktopGL")
     .Does(() =>
 {
     DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
-    PackProject("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
+    PackDotnet("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
 });
 
 Task("TestDesktopGL")
@@ -104,7 +110,7 @@ Task("BuildWindowsDX")
     .Does(() =>
 {
     DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
-    PackProject("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
+    PackDotnet("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
 });
 
 Task("TestWindowsDX")
@@ -130,8 +136,7 @@ Task("BuildAndroid")
     return DirectoryExists("/Library/Frameworks/Xamarin.Android.framework");
 }).Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.Android.csproj");
-    PackProject("MonoGame.Framework/MonoGame.Framework.Android.csproj");
+    PackMSBuild("MonoGame.Framework/MonoGame.Framework.Android.csproj");
 });
 
 Task("BuildiOS")
@@ -141,8 +146,7 @@ Task("BuildiOS")
     return DirectoryExists("/Library/Frameworks/Xamarin.iOS.framework");
 }).Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.iOS.csproj");
-    PackProject("MonoGame.Framework/MonoGame.Framework.iOS.csproj");
+    PackMSBuild("MonoGame.Framework/MonoGame.Framework.iOS.csproj");
 });
 
 Task("BuildUWP")
@@ -150,36 +154,29 @@ Task("BuildUWP")
     .WithCriteria(() => GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.17763"))
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
-    PackProject("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
+    PackMSBuild("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
 });
 
 Task("BuildContentPipeline")
     .IsDependentOn("Prep")
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj");
-    PackProject("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj");
+    PackDotnet("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj");
 });
 
 Task("BuildTools")
     .IsDependentOn("Prep")
     .Does(() =>
 {
-    DotNetCoreRestore("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
-    PackProject("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
+    PackDotnet("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
     
-    DotNetCoreRestore("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
-    PackProject("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
+    PackDotnet("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
     
-    DotNetCoreRestore("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
-    PackProject("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
+    PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
 
-    DotNetCoreRestore("Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.csproj");
-    PackProject("Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.csproj");
+    PackDotnet("Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.csproj");
 
-    DotNetCoreRestore("Tools/MonoGame.Packaging.Flatpak/MonoGame.Packaging.Flatpak.csproj");
-    PackProject("Tools/MonoGame.Packaging.Flatpak/MonoGame.Packaging.Flatpak.csproj");
+    PackDotnet("Tools/MonoGame.Packaging.Flatpak/MonoGame.Packaging.Flatpak.csproj");
 });
 
 Task("TestTools")
@@ -198,8 +195,7 @@ Task("PackDotNetTemplates")
     .IsDependentOn("Prep")
     .Does(() =>
 {
-    DotNetCoreRestore("Templates/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
-    PackProject("Templates/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
+    PackDotnet("Templates/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
 });
 
 Task("PackVSTemplates")
