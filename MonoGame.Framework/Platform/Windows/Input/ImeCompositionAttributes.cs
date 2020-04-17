@@ -3,7 +3,7 @@ namespace Microsoft.Xna.Framework.Windows.Input
     /// <summary>
     /// Winforms IME composition character attributes
     /// </summary>
-    public enum ImeCompositionAttributes
+    internal enum ImeCompositionAttributes
     {
         /// <summary>
         /// Character being entered by the user.
