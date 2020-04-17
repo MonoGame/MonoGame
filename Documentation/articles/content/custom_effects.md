@@ -34,14 +34,14 @@ If your game requires an extra little bit of performance you can easily hand edi
 To use a custom effect with MonoGame you must do one of the following (not both):
 
 * Run the effect file through the [MonoGame Effect content processor](~/articles/tools/mgcb.md) for loading via the `ContentManager` (Recommended).
-* Process your effect file with the [2MGFX tool](~/articles/tools/2mgfx.md) and load them yourself at runtime.
+* Process your effect file with the [MGFXC tool](~/articles/tools/2mgfx.md) and load them yourself at runtime.
 
-### Effect Writing Tips
+## Effect Writing Tips
 
 These are some tips for writing or converting effects for use with MonoGame.
 
 * The supported shader models when targeting DX are the following:
-  * `vs_4_0_level_9_1` and `ps_4_0_level_9_1` 
+  * `vs_4_0_level_9_1` and `ps_4_0_level_9_1`
   * `vs_4_0_level_9_3` and `ps_4_0_level_9_3`
   * `vs_4_0` and `ps_4_0` (requires `HiDef` `GraphicsProfile` at runtime)
   * `vs_4_1` and `ps_4_1` (requires `HiDef` `GraphicsProfile` at runtime)
@@ -75,7 +75,7 @@ These are some tips for writing or converting effects for use with MonoGame.
   };
   ```
 
-  Custom symbols can be defined from the [Pipeline Tool](~/articles/tools/pipeline.md) or via [2MGFX](~/articles/tools/2mgfx.md).
+Custom symbols can be defined from the [MGCB Editor](pipeline.md) or via [MGFXC](2mgfx.md).
 
 * Make sure the pixel shaders inputs **exactly match** the vertex shader outputs so the parameters are passed in the correct registers. The parameters need to have the same size and order. Omitting parameters might not break compilation, but can cause unexpected results.
 * Note that on GL platforms default values on Effect parameters do not work.  Either set the parameter from code or use a real constant like a #define.

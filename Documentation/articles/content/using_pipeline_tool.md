@@ -1,6 +1,6 @@
 # Using MGCB Editor
 
-The [Pipeline Tool](~/articles/tools/pipeline.md) is used to organize and build content for use with MonoGame. It is installed as part of the MonoGame SDK Installer or can be built [directly from source](https://github.com/mono/MonoGame/tree/develop/Tools/Pipeline) if needed.
+The [MGCB Editor](~/articles/tools/pipeline.md) is used to organize and build content for use with MonoGame. It is installed as part of the MonoGame SDK Installer or can be built [directly from source](https://github.com/mono/MonoGame/tree/develop/Tools/Pipeline) if needed.
 
 ## Create A Project
 
@@ -73,7 +73,6 @@ You will now see a file dialog from which you can add your content files.  Note 
 Once the files are added you need to select them all and change their build action to “Content” and “Copy if newer”.
 
 ![Copy if newer](~/images/copy_if_newer.png)
-
 
 ### Add With Wildcard
 

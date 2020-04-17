@@ -2,7 +2,15 @@
 
 The MonoGame Content Builder (MGCB.exe) is a command line tool for building XNB content on Windows, Mac, and Linux desktop systems.
 
-Typically it is executed by the [Pipeline GUI tool](pipeline.md) when editing content or indirectly from VisualStudio or MonoDevelop during the build process of a MonoGame project.  Alternatively you can use it yourself from the command line for specialized build pipelines or for debugging content processing.
+Typically it is executed by the [MGCB Editor](pipeline.md) when editing content or by `MonoGame.Content.Builder.Task` during the build process
+of a MonoGame project. Alternatively you can use it yourself from the command line for specialized build pipelines or for debugging content processing.
+
+## Installation
+
+MGCB can be installed as a [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
+Make sure you have the .NET Core SDK installed. You can download it [here](https://dotnet.microsoft.com/download).
+
+In a terminal run `dotnet tool install -g dotnet-mgcb` to install MGCB.
 
 ## Command Line Options
 
