@@ -7,16 +7,18 @@ using Microsoft.Xna.Framework.Input.Touch;
 using System;
 using System.ComponentModel;
 
-namespace Microsoft.Xna.Framework {
-	public abstract class GameWindow {
-		#region Properties
+namespace Microsoft.Xna.Framework
+{
+    public abstract class GameWindow
+    {
+        #region Properties
 
-		[DefaultValue(false)]
-		public abstract bool AllowUserResizing { get; set; }
+        [DefaultValue(false)]
+        public abstract bool AllowUserResizing { get; set; }
 
-		public abstract Rectangle ClientBounds { get; }
+        public abstract Rectangle ClientBounds { get; }
 
-	    internal bool _allowAltF4 = true;
+        internal bool _allowAltF4 = true;
 
         /// <summary>
         /// Gets or sets a bool that enables usage of Alt+F4 for window closing on desktop platforms. Value is true by default.
@@ -31,13 +33,13 @@ namespace Microsoft.Xna.Framework {
         public abstract Point Position { get; set; }
 #endif
 
-		public abstract DisplayOrientation CurrentOrientation { get; }
+        public abstract DisplayOrientation CurrentOrientation { get; }
 
-		public abstract IntPtr Handle { get; }
+        public abstract IntPtr Handle { get; }
 
-		public abstract string ScreenDeviceName { get; }
+        public abstract string ScreenDeviceName { get; }
 
-		private string _title;
+        private string _title;
         /// <summary>
         /// Gets or sets the title of the game window.
         /// </summary>
@@ -45,15 +47,18 @@ namespace Microsoft.Xna.Framework {
         /// For Windows 8 and Windows 10 UWP this has no effect. For these platforms the title should be
         /// set by using the DisplayName property found in the app manifest file.
         /// </remarks>
-        public string Title {
-			get { return _title; }
-			set {
-				if (_title != value) {
-					SetTitle(value);
-					_title = value;
-				}
-			}
-		}
+        public string Title
+        {
+            get { return _title; }
+            set
+            {
+                if (_title != value)
+                {
+                    SetTitle(value);
+                    _title = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Determines whether the border of the window is visible. Currently only supported on the WinDX and WinGL/Linux platforms.
@@ -73,42 +78,47 @@ namespace Microsoft.Xna.Framework {
             }
         }
 
+        /// <summary>
+        /// IME service to handle text compositions and inputs.
+        /// </summary>
+        public IImeService ImeService { get; private set; }
+
         internal MouseState MouseState;
-	    internal TouchPanelState TouchPanelState;
+        internal TouchPanelState TouchPanelState;
 
         protected GameWindow()
         {
             TouchPanelState = new TouchPanelState(this);
         }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Events
+        #region Events
 
-		public event EventHandler<EventArgs> ClientSizeChanged;
-		public event EventHandler<EventArgs> OrientationChanged;
-		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
+        public event EventHandler<EventArgs> ClientSizeChanged;
+        public event EventHandler<EventArgs> OrientationChanged;
+        public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
 
         /// <summary>
-		/// Use this event to retrieve text for objects like textbox's.
-		/// This event is not raised by noncharacter keys.
-		/// This event also supports key repeat.
-		/// For more information this event is based off:
-		/// http://msdn.microsoft.com/en-AU/library/system.windows.forms.control.keypress.aspx
-		/// </summary>
-		/// <remarks>
-		/// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
-		/// </remarks>
-		public event EventHandler<TextInputEventArgs> TextInput;
+        /// Use this event to retrieve text for objects like textbox's.
+        /// This event is not raised by noncharacter keys.
+        /// This event also supports key repeat.
+        /// For more information this event is based off:
+        /// http://msdn.microsoft.com/en-AU/library/system.windows.forms.control.keypress.aspx
+        /// </summary>
+        /// <remarks>
+        /// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
+        /// </remarks>
+        public event EventHandler<TextInputEventArgs> TextInput;
 
         internal bool IsTextInputHandled { get { return TextInput != null; } }
 
         /// <summary>
         /// Buffered keyboard KeyDown event.
         /// </summary>
-		public event EventHandler<InputKeyEventArgs> KeyDown;
+        public event EventHandler<InputKeyEventArgs> KeyDown;
 
         /// <summary>
         /// Buffered keyboard KeyUp event.
@@ -119,66 +129,68 @@ namespace Microsoft.Xna.Framework {
 
         #endregion Events
 
-        public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
+        public abstract void BeginScreenDeviceChange(bool willBeFullScreen);
 
-		public abstract void EndScreenDeviceChange (
-			string screenDeviceName, int clientWidth, int clientHeight);
+        public abstract void EndScreenDeviceChange(
+            string screenDeviceName, int clientWidth, int clientHeight);
 
-		public void EndScreenDeviceChange (string screenDeviceName)
-		{
-			EndScreenDeviceChange(screenDeviceName, ClientBounds.Width, ClientBounds.Height);
-		}
+        public void EndScreenDeviceChange(string screenDeviceName)
+        {
+            EndScreenDeviceChange(screenDeviceName, ClientBounds.Width, ClientBounds.Height);
+        }
 
-		protected void OnActivated ()
-		{
-		}
+        protected void OnActivated()
+        {
+        }
 
-		internal void OnClientSizeChanged ()
-		{
+        internal void OnClientSizeChanged()
+        {
             EventHelpers.Raise(this, ClientSizeChanged, EventArgs.Empty);
-		}
+        }
 
-		protected void OnDeactivated ()
-		{
-		}
-         
-		protected void OnOrientationChanged ()
-		{
+        protected void OnDeactivated()
+        {
+        }
+
+        protected void OnOrientationChanged()
+        {
             EventHelpers.Raise(this, OrientationChanged, EventArgs.Empty);
-		}
+        }
 
-		protected void OnPaint ()
-		{
-		}
+        protected void OnPaint()
+        {
+        }
 
-		protected void OnScreenDeviceNameChanged ()
-		{
+        protected void OnScreenDeviceNameChanged()
+        {
             EventHelpers.Raise(this, ScreenDeviceNameChanged, EventArgs.Empty);
-		}
+        }
 
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
-		internal void OnTextInput(TextInputEventArgs e)
-		{
+        internal void OnTextInput(TextInputEventArgs e)
+        {
             EventHelpers.Raise(this, TextInput, e);
-		}
+        }
         internal void OnKeyDown(InputKeyEventArgs e)
-	    {
+        {
             EventHelpers.Raise(this, KeyDown, e);
-	    }
+        }
         internal void OnKeyUp(InputKeyEventArgs e)
-	    {
+        {
             EventHelpers.Raise(this, KeyUp, e);
-	    }
+        }
 #endif
 
-        protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
-		protected abstract void SetTitle (string title);
+        protected internal abstract void SetSupportedOrientations(DisplayOrientation orientations);
+        protected abstract void SetTitle(string title);
 
 #if DIRECTX && WINDOWS
         public static GameWindow Create(Game game, int width, int height)
         {
             var window = new MonoGame.Framework.WinFormsGameWindow((MonoGame.Framework.WinFormsGamePlatform)game.Platform);
             window.Initialize(width, height);
+
+            window.ImeService = new Windows.Input.WinFormsImeHandler(game);
 
             return window;
         }
