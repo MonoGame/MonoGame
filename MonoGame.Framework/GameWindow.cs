@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// IME service to handle text compositions and inputs.
         /// </summary>
-        public IImeService ImeService { get; private set; }
+        public IImeService ImeService { get; internal set; }
 
         internal MouseState MouseState;
         internal TouchPanelState TouchPanelState;
