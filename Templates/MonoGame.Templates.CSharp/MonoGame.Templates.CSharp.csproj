@@ -17,4 +17,14 @@
     <Content Include="content\**\*" Exclude="content\**\.DS_Store;content\**\bin;content\**\obj" />
     <Compile Remove="**\*" />
   </ItemGroup>
+
+  <Target Name="SetMGPackageReferenceVersions" BeforeTargets="CoreBuild">
+    <ItemGroup>
+      <MGProjects Include="**\*.csproj" />
+    </ItemGroup>
+
+    <XmlPoke XmlInputPath="%(MGProjects.Identity)"
+        Query="Project/ItemGroup/PackageReference[starts-with(@Include, &quot;MonoGame&quot;)]/@Version"
+        Value="$(Version)" />
+  </Target>
 </Project>
