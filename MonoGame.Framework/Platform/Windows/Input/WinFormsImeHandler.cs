@@ -372,9 +372,6 @@ namespace Microsoft.Xna.Framework.Input
         {
             ClearComposition();
             ClearResult();
-
-            if (TextComposition != null)
-                TextComposition.Invoke(this, new TextCompositionEventArgs(CompositionString, CompositionCursorPos));
         }
 
         private void IMEComposition(int lParam)
