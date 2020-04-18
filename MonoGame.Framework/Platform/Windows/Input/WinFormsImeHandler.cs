@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         /// <param name="imeHandler">WinForms ime handler instance</param>
         /// <param name="handle">Handle of the window</param>
-        internal WinFormsImeHandler(Game game)
+        internal WinFormsImeHandler(Game game, IntPtr windowHandle)
         {
             this._context = IntPtr.Zero;
             this.Candidates = new string[0];
@@ -160,7 +160,7 @@ namespace Microsoft.Xna.Framework.Input
             this._resread = new ImeCompositionString(IMM.GCSResultReadStr);
             this._resreadclause = new ImeCompositionString(IMM.GCSResultReadClause);
 
-            AssignHandle(game.Window.Handle);
+            AssignHandle(windowHandle);
             game.Exiting += (o, e) =>
             {
                 this.Dispose();
