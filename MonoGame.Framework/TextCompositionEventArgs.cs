@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// The full string as it's composited by the IMM.
+        /// The full string as it's composed by the IMM.
         /// </summary>    
         public readonly string CompositionString;
 
