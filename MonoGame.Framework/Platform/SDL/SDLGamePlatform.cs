@@ -160,7 +160,9 @@ namespace Microsoft.Xna.Framework
                         unsafe
                         {
                             var cursorPosition = ev.Edit.Start;
-                            var compositionString = System.Text.Encoding.Unicode.GetString(ev.Edit.Text, 32);
+                            byte[] data = new byte[32];
+                            Marshal.Copy((IntPtr)ev.Edit.Text, data, 0, 32);
+                            var compositionString = System.Text.Encoding.Unicode.GetString(data);
                             _imeHandler.OnTextComposition(compositionString, cursorPosition);
                         }
                         break;
