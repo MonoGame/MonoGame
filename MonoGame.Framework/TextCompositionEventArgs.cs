@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// The candidate text list for the composition.
         /// This property is only supported on WindowsDX and WindowsUniversal.
-        /// It could be empty if compsition string does not generates candidates.
+        /// If the composition string does not generate candidates this array is empty.
         /// </summary>    
         public readonly string[] CandidateList;
 
