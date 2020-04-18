@@ -1,4 +1,4 @@
-namespace Microsoft.Xna.Framework.Windows.Input
+namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
     /// Winforms IME composition character attributes

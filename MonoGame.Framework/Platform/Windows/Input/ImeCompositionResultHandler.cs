@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Microsoft.Xna.Framework.Windows.Input
+namespace Microsoft.Xna.Framework.Input
 {
     internal abstract class ImeCompositionResultHandler
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.Xna.Framework.Windows.Input
+namespace Microsoft.Xna.Framework.Input
 {
     internal static class IMM
     {

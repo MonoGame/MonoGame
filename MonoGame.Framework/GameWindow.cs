@@ -190,7 +190,7 @@ namespace Microsoft.Xna.Framework
             var window = new MonoGame.Framework.WinFormsGameWindow((MonoGame.Framework.WinFormsGamePlatform)game.Platform);
             window.Initialize(width, height);
 
-            window.ImmService = new Windows.Input.WinFormsImeHandler(game);
+            window.ImmService = new Input.WinFormsImeHandler(game);
 
             return window;
         }

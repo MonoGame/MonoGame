@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 
-namespace Microsoft.Xna.Framework.Windows.Input
+namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
     /// Native window class that handles IME.
