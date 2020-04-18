@@ -11,7 +11,7 @@ using Android.Views;
 namespace Microsoft.Xna.Framework
 {
 	[CLSCompliant(false)]
-    public class AndroidGameActivity : Activity
+    public class AndroidGameActivity : Activity, ViewTreeObserver.IOnGlobalLayoutListener
     {
         internal Game Game { private get; set; }
 
@@ -20,6 +20,11 @@ namespace Microsoft.Xna.Framework
 
         public bool AutoPauseAndResumeMediaPlayer = true;
         public bool RenderOnUIThread = true; 
+
+        private Android.Graphics.Point _ScreenSize = new Android.Graphics.Point();
+        public Android.Graphics.Point ScreenSize { get { return _ScreenSize; } }
+        public Android.Graphics.Rect _KeyboardRect = new Android.Graphics.Rect();
+        public int KeyboardHeight { get { return _KeyboardRect.Height(); } }
 
 		/// <summary>
 		/// OnCreate called when the activity is launched from cold or after the app
@@ -91,6 +96,12 @@ namespace Microsoft.Xna.Framework
             Game = null;
 			base.OnDestroy ();
 		}
+
+        public void OnGlobalLayout()
+        {
+            WindowManager.DefaultDisplay.GetSize(_ScreenSize);
+            Window.DecorView.GetWindowVisibleDisplayFrame(_KeyboardRect);
+        }
     }
 
 	[CLSCompliant(false)]

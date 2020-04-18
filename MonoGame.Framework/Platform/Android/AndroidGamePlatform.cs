@@ -21,6 +21,7 @@ namespace Microsoft.Xna.Framework
 
             _gameWindow = new AndroidGameWindow(Game.Activity, game);
             Window = _gameWindow;
+            Window.ImmService = new Input.AndroidImeHandler();
 
             MediaLibrary.Context = Game.Activity;
         }

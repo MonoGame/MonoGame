@@ -44,6 +44,8 @@ This package provides you with MonoGame Framework that works on Android.</Descri
     <Compile Include="Platform\Android\Devices\Sensors\Compass.cs" />
     <Compile Include="Platform\Android\Input\Keyboard.cs" />
     <Compile Include="Platform\Android\Input\Touch\AndroidTouchEventManager.cs" />
+    <Compile Include="Platform\Android\Input\AndroidImeHandler.cs" />
+    <Compile Include="Platform\Input\KeyboardUtil.SDL.cs" />
     <Compile Include="Platform\Android\IResumeManager.cs" />
     <Compile Include="Platform\Android\MonoGameAndroidGameView.cs" />
     <Compile Include="Platform\Android\OrientationListener.cs" />
