@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework
         public readonly string CompositionString;
 
         /// <summary>
-        /// The position of the cursor inside the composited string.
+        /// The position of the cursor inside the composed string.
         /// </summary>    
         public readonly int CursorPosition;
 
