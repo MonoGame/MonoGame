@@ -22,6 +22,7 @@ namespace MonoGame.Framework
             : base(game)
         {
             _window = new WinFormsGameWindow(this);
+            _window.ImmService = new WinFormsImeHandler(game);
 
             Window = _window;
         }
