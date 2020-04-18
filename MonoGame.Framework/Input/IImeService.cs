@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework
         void Update(GameTime gameTime);
 
         /// <summary>
-        /// Return true if text input enabled else false;
+        /// Returns true if text input is enabled, else returns false.
         /// </summary>
         bool IsTextInputActive { get; }
 
