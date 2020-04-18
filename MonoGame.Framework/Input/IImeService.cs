@@ -47,10 +47,10 @@ namespace Microsoft.Xna.Framework
         bool IsTextInputActive { get; }
 
         /// <summary>
-        /// Set the position of Candiate Window rendered by the OS, supported platforms includes SDL and WindowsDX.
-        /// In SDL2 there's no API to get the candiate list. We have to use the candidate windows provided by the OS.
-        /// But, in windows SDL2 has bug that not showing the candidate window of the OS, so SDL2
-        /// platform was suggested not to use in Windows, use WindowsDX instead.
+        /// Set the position of the candidate window rendered by the OS.
+        /// Let the OS render the candidate window by setting <see cref="ShowOSImeWindow"/> to <c>true</c>.
+        ///
+        /// This API is supported on DesktopGL and WindowsDX.
         /// </summary>
         void SetTextInputRect(Rectangle rect);
 
