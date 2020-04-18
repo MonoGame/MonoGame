@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Interface to handle text composition.
     /// </summary>
-    public interface IImeService
+    public interface IImmService
     {
         /// <summary>
         /// Enable the system IMM service to support composited character input.

@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Windows.Input
     /// <summary>
     /// Native window class that handles IME.
     /// </summary>
-    internal sealed class WinFormsImeHandler : NativeWindow, IImeService, IDisposable
+    internal sealed class WinFormsImeHandler : NativeWindow, IImmService, IDisposable
     {
         private ImeCompositionString
             _compstr, _compclause, _compattr,

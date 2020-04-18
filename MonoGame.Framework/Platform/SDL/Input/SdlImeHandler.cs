@@ -5,7 +5,7 @@ namespace Microsoft.Xna.Framework.Input
     /// <summary>
     /// Integrate IME to DesktopGL(SDL2) platform.
     /// </summary>
-    internal class SdlImeHandler : IImeService
+    internal class SdlImeHandler : IImmService
     {
         private Game _game;
 

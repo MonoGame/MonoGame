@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// Arguments for the <see cref="IImeService.TextComposition" /> event.
+    /// Arguments for the <see cref="IImmService.TextComposition" /> event.
     /// </summary>
     public struct TextCompositionEventArgs
     {

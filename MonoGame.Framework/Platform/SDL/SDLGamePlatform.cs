@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework
             GamePad.InitDatabase();
             Window = _view = new SdlGameWindow(_game);
             _imeHandler = new SdlImeHandler(game);
-            Window.ImeService = _imeHandler;
+            Window.ImmService = _imeHandler;
         }
 
         public override void BeforeInitialize()
