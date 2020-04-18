@@ -24,9 +24,9 @@ namespace Microsoft.Xna.Framework
         void StopTextInput();
 
         /// <summary>
-        /// Show the Ime Candidate window renderer by the OS.
-        /// In SDL2 platform it's always true since there's no API to get candidate texts in SDL2.
-        /// In WindowsDX platform, it's possible to choose show candiate window renderer by the OS or render it yourself.
+        /// Show the Ime Candidate window rendered by the OS.
+        /// Set to <c>false</c> if you want to render the IME candidate list yourself.
+        /// On DesktopGL the candidate list is not exposed and this will always return <c>true</c>.
         /// </summary>
         bool ShowOSImeWindow { get; set; }
 
