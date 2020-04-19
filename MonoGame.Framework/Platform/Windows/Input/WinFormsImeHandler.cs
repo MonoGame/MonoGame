@@ -24,6 +24,8 @@ namespace Microsoft.Xna.Framework.Input
         private IntPtr _context;
         private bool _disposed;
 
+        private bool _compositionEnded;
+
         public bool IsTextInputActive { get; private set; }
         public event EventHandler<TextCompositionEventArgs> TextComposition;
         public event EventHandler<TextInputEventArgs> TextInput;
@@ -233,12 +235,14 @@ namespace Microsoft.Xna.Framework.Input
                     if (!ShowOSImeWindow) return true;
                     break;
                 case IMM.ImeStartCompostition:
+                    _compositionEnded = false;
                     IMEStartComposion(msg.LParam.ToInt32());
                     return true;
                 case IMM.ImeComposition:
                     IMEComposition(msg.LParam.ToInt32());
                     break;
                 case IMM.ImeEndComposition:
+                    _compositionEnded = true;
                     IMEEndComposition(msg.LParam.ToInt32());
                     if (!ShowOSImeWindow) return true;
                     break;
@@ -293,7 +297,10 @@ namespace Microsoft.Xna.Framework.Input
 
         private void IMEChangeCandidate()
         {
-            UpdateCandidates();
+            if (_compositionEnded)
+                IMECloseCandidate();
+            else
+                UpdateCandidates();
 
             if (TextComposition != null)
                 TextComposition.Invoke(this, new TextCompositionEventArgs(CompositionString, CompositionCursorPos,
@@ -325,15 +332,14 @@ namespace Microsoft.Xna.Framework.Input
 
                 Marshal.FreeHGlobal(pointer);
             }
+            else
+                IMECloseCandidate();
         }
 
         private void IMECloseCandidate()
         {
             CandidatesSelection = CandidatesPageStart = CandidatesPageSize = 0;
             Candidates = null;
-
-            if (TextComposition != null)
-                TextComposition.Invoke(this, new TextCompositionEventArgs(CompositionString, CompositionCursorPos));
         }
 
         private void IMEStartComposion(int lParam)
@@ -362,6 +368,7 @@ namespace Microsoft.Xna.Framework.Input
         private void IMEEndComposition(int lParam)
         {
             ClearComposition();
+            IMECloseCandidate();
 
             if (_resstr.Update(lParam))
             {
@@ -384,9 +391,6 @@ namespace Microsoft.Xna.Framework.Input
 
             if (TextInput != null)
                 TextInput.Invoke(this, new TextInputEventArgs(charInput, key));
-
-            if (IsTextInputActive)
-                IMECloseCandidate();
         }
 
         public void Dispose()
