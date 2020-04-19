@@ -170,6 +170,10 @@ namespace Microsoft.Xna.Framework.Windows
                 _window.TouchPanelState.AddEvent(id, state, vec, false);
             }
 
+            if (_window.ImmService != null)
+                if ((_window.ImmService as Input.WinFormsImeHandler).WndProc(ref m))
+                    return;
+
             base.WndProc(ref m);
         }
 

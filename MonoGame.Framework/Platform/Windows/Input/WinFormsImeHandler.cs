@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Input
     /// <summary>
     /// Native window class that handles IME.
     /// </summary>
-    internal sealed class WinFormsImeHandler : NativeWindow, IImmService, IDisposable
+    internal sealed class WinFormsImeHandler : IImmService
     {
         private ImeCompositionString
             _compstr, _compclause, _compattr,
@@ -17,8 +17,7 @@ namespace Microsoft.Xna.Framework.Input
             _resread, _resreadclause;
         private ImeCompositionInt _compcurpos;
 
-        private bool _disposed;
-
+        private IntPtr _windowHandle;
         private IntPtr _context;
 
         public bool IsTextInputActive { get; private set; }
@@ -142,10 +141,10 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Constructor, must be called when the window create.
         /// </summary>
-        /// <param name="imeHandler">WinForms ime handler instance</param>
-        /// <param name="handle">Handle of the window</param>
-        internal WinFormsImeHandler(Game game, IntPtr windowHandle)
+        /// <param name="windowHandle">Handle of the window</param>
+        internal WinFormsImeHandler(IntPtr windowHandle)
         {
+            this._windowHandle = windowHandle;
             this._context = IntPtr.Zero;
             this.Candidates = new string[0];
             this._compcurpos = new ImeCompositionInt(IMM.GCSCursorPos);
@@ -159,12 +158,6 @@ namespace Microsoft.Xna.Framework.Input
             this._resclause = new ImeCompositionString(IMM.GCSResultClause);
             this._resread = new ImeCompositionString(IMM.GCSResultReadStr);
             this._resreadclause = new ImeCompositionString(IMM.GCSResultReadClause);
-
-            AssignHandle(windowHandle);
-            game.Exiting += (o, e) =>
-            {
-                this.Dispose();
-            };
         }
 
         /// <summary>
@@ -173,18 +166,18 @@ namespace Microsoft.Xna.Framework.Input
         public void EnableIME()
         {
             IMM.DestroyCaret();
-            IMM.CreateCaret(Handle, IntPtr.Zero, 1, 1);
+            IMM.CreateCaret(_windowHandle, IntPtr.Zero, 1, 1);
 
-            _context = IMM.ImmGetContext(Handle);
+            _context = IMM.ImmGetContext(_windowHandle);
             if (_context != IntPtr.Zero)
             {
-                IMM.ImmAssociateContext(Handle, _context);
-                IMM.ImmReleaseContext(Handle, _context);
+                IMM.ImmAssociateContext(_windowHandle, _context);
+                IMM.ImmReleaseContext(_windowHandle, _context);
                 return;
             }
 
             // This fix the bug that _context is 0 on fullscreen mode.
-            ImeContext.Enable(Handle);
+            ImeContext.Enable(_windowHandle);
         }
 
         /// <summary>
@@ -194,7 +187,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             IMM.DestroyCaret();
 
-            IMM.ImmAssociateContext(Handle, IntPtr.Zero);
+            IMM.ImmAssociateContext(_windowHandle, IntPtr.Zero);
         }
 
         public void SetTextInputRect(Rectangle rect)
@@ -202,28 +195,16 @@ namespace Microsoft.Xna.Framework.Input
             if (!IsTextInputActive)
                 return;
 
-            _context = IMM.ImmGetContext(Handle);
+            _context = IMM.ImmGetContext(_windowHandle);
 
             var candidateForm = new IMM.CandidateForm(new IMM.Point(rect.X, rect.Y));
             IMM.ImmSetCandidateWindow(_context, ref candidateForm);
             IMM.SetCaretPos(rect.X, rect.Y);
 
-            IMM.ImmReleaseContext(Handle, _context);
+            IMM.ImmReleaseContext(_windowHandle, _context);
         }
 
-        /// <summary>
-        /// Dispose everything
-        /// </summary>
-        public void Dispose()
-        {
-            if (!_disposed)
-            {
-                ReleaseHandle();
-                _disposed = true;
-            }
-        }
-
-        protected override void WndProc(ref Message msg)
+        internal bool WndProc(ref Message msg)
         {
             switch (msg.Msg)
             {
@@ -237,30 +218,31 @@ namespace Microsoft.Xna.Framework.Input
                     }
                     break;
                 case IMM.InputLanguageChange:
-                    return;
+                    return true;
                 case IMM.ImeNotify:
                     IMENotify(msg.WParam.ToInt32());
-                    if (!ShowOSImeWindow) return;
+                    if (!ShowOSImeWindow) return true;
                     break;
                 case IMM.ImeStartCompostition:
                     IMEStartComposion(msg.LParam.ToInt32());
-                    return;
+                    return true;
                 case IMM.ImeComposition:
                     IMESetContextForAll();
                     IMEComposition(msg.LParam.ToInt32());
-                    IMM.ImmReleaseContext(Handle, _context);
+                    IMM.ImmReleaseContext(_windowHandle, _context);
                     break;
                 case IMM.ImeEndComposition:
                     IMESetContextForAll();
                     IMEEndComposition(msg.LParam.ToInt32());
-                    IMM.ImmReleaseContext(Handle, _context);
-                    if (!ShowOSImeWindow) return;
+                    IMM.ImmReleaseContext(_windowHandle, _context);
+                    if (!ShowOSImeWindow) return true;
                     break;
                 case IMM.Char:
                     CharEvent(msg.WParam.ToInt32());
                     break;
             }
-            base.WndProc(ref msg);
+
+            return false;
         }
 
         private void ClearComposition()
@@ -285,7 +267,7 @@ namespace Microsoft.Xna.Framework.Input
 
         private void IMESetContextForAll()
         {
-            _context = IMM.ImmGetContext(Handle);
+            _context = IMM.ImmGetContext(_windowHandle);
 
             _compcurpos.ImeContext = _context;
             _compstr.ImeContext = _context;
@@ -305,7 +287,7 @@ namespace Microsoft.Xna.Framework.Input
             switch (WParam)
             {
                 case IMM.ImnSetOpenStatus:
-                    _context = IMM.ImmGetContext(Handle);
+                    _context = IMM.ImmGetContext(_windowHandle);
                     IsIMEOpen = IMM.ImmGetOpenStatus(_context);
                     break;
                 case IMM.ImnOpenCandidate:
@@ -324,7 +306,7 @@ namespace Microsoft.Xna.Framework.Input
 
         private void IMEChangeCandidate()
         {
-            _context = IMM.ImmGetContext(Handle);
+            _context = IMM.ImmGetContext(_windowHandle);
 
             uint length = IMM.ImmGetCandidateList(_context, 0, IntPtr.Zero, 0);
             if (length > 0)
@@ -356,7 +338,7 @@ namespace Microsoft.Xna.Framework.Input
                 Marshal.FreeHGlobal(pointer);
             }
 
-            IMM.ImmReleaseContext(Handle, _context);
+            IMM.ImmReleaseContext(_windowHandle, _context);
         }
 
         private void IMECloseCandidate()
