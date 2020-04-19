@@ -74,6 +74,12 @@ namespace Microsoft.Xna.Framework.Input
         public static extern IntPtr ImmGetContext(IntPtr hWnd);
 
         [DllImport("imm32.dll", SetLastError = true)]
+        public static extern IntPtr ImmCreateContext();
+
+        [DllImport("imm32.dll", SetLastError = true)]
+        public static extern bool ImmDestroyContext(IntPtr hIMC);
+
+        [DllImport("imm32.dll", SetLastError = true)]
         public static extern bool ImmGetOpenStatus(IntPtr hIMC);
 
         [DllImport("user32.dll", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Auto)]
