@@ -13,7 +13,8 @@ namespace Microsoft.Xna.Framework.Input
         {
             _game = game;
 
-            StopTextInput(); // Force to stop text input by default
+            // Text input is enabled by default in SDL2 internally, we have to set this flag manually.
+            IsTextInputActive = true;
         }
 
         public bool IsTextInputActive { get; private set; }
