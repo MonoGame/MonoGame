@@ -160,9 +160,7 @@ namespace Microsoft.Xna.Framework
                         unsafe
                         {
                             var cursorPosition = ev.Edit.Start;
-                            byte[] data = new byte[32];
-                            Marshal.Copy((IntPtr)ev.Edit.Text, data, 0, 32);
-                            var compositionString = System.Text.Encoding.Unicode.GetString(data);
+                            var compositionString = SDLBufferToString(ev.Edit.Text);
                             _imeHandler.OnTextComposition(compositionString, cursorPosition);
                         }
                         break;
@@ -265,6 +263,23 @@ namespace Microsoft.Xna.Framework
                 return (byte1 % 0x8) * 0x40 * 0x40 * 0x40 + (byte2 % 0x40) * 0x40 * 0x40 + (byte3 % 0x40) * 0x40 + (byte4 % 0x40);
             else
                 return -1;
+        }
+
+        private unsafe string SDLBufferToString(byte* text, int size = 32)
+        {
+            byte[] sourceBytes = new byte[size];
+            int length = 0;
+
+            for (int i = 0; i < size; i++)
+            {
+                if (text[i] == 0)
+                    break;
+
+                sourceBytes[i] = text[i];
+                length++;
+            }
+
+            return System.Text.Encoding.UTF8.GetString(sourceBytes, 0, length);
         }
 
         public override void StartRunLoop()
