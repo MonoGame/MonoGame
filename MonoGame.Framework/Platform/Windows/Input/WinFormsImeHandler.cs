@@ -7,6 +7,9 @@ namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
     /// Native window class that handles IME.
+    /// Related Microsfot IME documentation links:
+    /// - https://docs.microsoft.com/en-us/windows/win32/dxtecharts/using-an-input-method-editor-in-a-game
+    /// - https://docs.microsoft.com/zh-cn/windows/win32/intl/about-input-method-manager
     /// </summary>
     internal sealed class WinFormsImeHandler : IImmService, IDisposable
     {
