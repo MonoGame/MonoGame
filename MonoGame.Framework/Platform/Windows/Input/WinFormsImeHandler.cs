@@ -293,6 +293,15 @@ namespace Microsoft.Xna.Framework.Input
 
         private void IMEChangeCandidate()
         {
+            UpdateCandidates();
+
+            if (TextComposition != null)
+                TextComposition.Invoke(this, new TextCompositionEventArgs(CompositionString, CompositionCursorPos,
+                    Candidates, CandidatesPageStart, CandidatesPageSize, CandidatesSelection));
+        }
+
+        private void UpdateCandidates()
+        {
             uint length = IMM.ImmGetCandidateList(_context, 0, IntPtr.Zero, 0);
             if (length > 0)
             {
@@ -312,13 +321,7 @@ namespace Microsoft.Xna.Framework.Input
                         int sOffset = Marshal.ReadInt32(pointer, 24 + 4 * i);
                         Candidates[i] = Marshal.PtrToStringUni(pointer + sOffset);
                     }
-
-                    if (TextComposition != null)
-                        TextComposition.Invoke(this, new TextCompositionEventArgs(CompositionString, CompositionCursorPos,
-                            Candidates, CandidatesPageStart, CandidatesPageSize, CandidatesSelection));
                 }
-                else
-                    IMECloseCandidate();
 
                 Marshal.FreeHGlobal(pointer);
             }
@@ -351,7 +354,8 @@ namespace Microsoft.Xna.Framework.Input
                 _compcurpos.Update();
 
                 if (TextComposition != null)
-                    TextComposition.Invoke(this, new TextCompositionEventArgs(CompositionString, CompositionCursorPos));
+                    TextComposition.Invoke(this, new TextCompositionEventArgs(CompositionString, CompositionCursorPos,
+                        Candidates, CandidatesPageStart, CandidatesPageSize, CandidatesSelection));
             }
         }
 
