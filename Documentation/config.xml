@@ -19,6 +19,7 @@
     
     <topic id="Introduction" name="Introduction" filename="introduction.md">
         <topic id="What_is_MonoGame" name="What is MonoGame" filename="what_is_monogame.md"/>
+        <topic id="Requirements" name="Requirements" filename="requirements.md"/>
         <topic id="Create_Project" name="Create a MonoGame Project" filename="create_project.md"/>
         <topic id="Target_Platforms" name="Target Platforms" filename="platforms.md"/>
         <topic id="MonoGame_FAQ" name="MonoGame FAQ" filename="monogame_faq.md"/>
@@ -41,6 +42,8 @@
         <topic id="Using_TrueType_Fonts" name="Using TrueType Fonts" filename="adding_ttf_fonts.md"/>
     <topic id="Localization" name="Localization" filename="localization.md" />
     </topic>
+
+    <topic id="Package games for distribution" name="Package games for distribution" filename="packaging_games.md"/>
 
     <topic id="Tools" name="Tools" filename="tools.md">
         <topic id="2MGFX" name="MGFXC" filename="2mgfx.md"/>

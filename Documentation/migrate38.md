@@ -1,6 +1,6 @@
 # Migrating to MonoGame 3.8
 
-Previously MonoGame installed on your machine, but from 3.8 onwards everything is installed through NuGet packages.
+Previously MonoGame installed on your machine through an installer, but from 3.8 onwards everything is installed through NuGet packages.
 
 ## WindowsDX and DesktopGL
 
