@@ -14,6 +14,7 @@ namespace Microsoft.Xna.Framework.Input
 
         private EditText editText;
         private InputMethodManager inputMethodManager;
+        private MonoGameAndroidGameView _gameView;
 
         private Android.Graphics.Point ScreenSize { get { return Game.Activity.ScreenSize; } }
         public bool IsTextInputActive { get; private set; }
@@ -22,9 +23,10 @@ namespace Microsoft.Xna.Framework.Input
         public event EventHandler<TextInputEventArgs> TextInput;
         public int VirtualKeyboardHeight { get { return Game.Activity.KeyboardHeight; } }
 
-        public AndroidImeHandler()
+        public AndroidImeHandler(MonoGameAndroidGameView gameView)
         {
             inputMethodManager = (InputMethodManager)Game.Activity.GetSystemService(Activity.InputMethodService);
+            _gameView = gameView;
 
             editText = new EditText(Game.Activity);
             editText.SetMaxLines(1);
@@ -36,7 +38,7 @@ namespace Microsoft.Xna.Framework.Input
             layoutParams.TopMargin = -200; // Move editText view off from screen.
             Game.Activity.AddContentView(editText, layoutParams);
 
-            Game.Activity.CurrentFocus.ViewTreeObserver.AddOnGlobalLayoutListener(Game.Activity);
+            _gameView.ViewTreeObserver.AddOnGlobalLayoutListener(Game.Activity);
             editText.TextChanged += EditText_TextChanged;
             editText.KeyPress += EditText_KeyPress;
         }
@@ -77,7 +79,7 @@ namespace Microsoft.Xna.Framework.Input
             if (!IsTextInputActive)
                 return;
 
-            inputMethodManager.HideSoftInputFromWindow(Game.Activity.CurrentFocus.WindowToken, HideSoftInputFlags.NotAlways);
+            inputMethodManager.HideSoftInputFromWindow(_gameView.WindowToken, HideSoftInputFlags.NotAlways);
             IsTextInputActive = false;
         }
 
