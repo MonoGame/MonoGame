@@ -81,6 +81,7 @@ namespace Microsoft.Xna.Framework.Input
 
             inputMethodManager.HideSoftInputFromWindow(_gameView.WindowToken, HideSoftInputFlags.NotAlways);
             IsTextInputActive = false;
+            _gameView.RequestFocus();
         }
 
         const int KeyboardHideOffset = 80;

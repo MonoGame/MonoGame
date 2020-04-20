@@ -23,8 +23,10 @@ namespace Microsoft.Xna.Framework
 
         private Android.Graphics.Point _ScreenSize = new Android.Graphics.Point();
         public Android.Graphics.Point ScreenSize { get { return _ScreenSize; } }
-        public Android.Graphics.Rect _KeyboardRect = new Android.Graphics.Rect();
-        public int KeyboardHeight { get { return _KeyboardRect.Height(); } }
+        private Point _gameViewSize;
+        private Android.Graphics.Rect _VisibleFrameRect = new Android.Graphics.Rect();
+        private int  _KeyboardHeight;
+        public int KeyboardHeight { get { return _KeyboardHeight; } }
 
 		/// <summary>
 		/// OnCreate called when the activity is launched from cold or after the app
@@ -100,7 +102,15 @@ namespace Microsoft.Xna.Framework
         public void OnGlobalLayout()
         {
             WindowManager.DefaultDisplay.GetSize(_ScreenSize);
-            Window.DecorView.GetWindowVisibleDisplayFrame(_KeyboardRect);
+            Window.DecorView.GetWindowVisibleDisplayFrame(_VisibleFrameRect);
+
+            if (CurrentFocus is MonoGameAndroidGameView)
+            {
+                var gameView = (CurrentFocus as MonoGameAndroidGameView);
+                _gameViewSize = new Point(gameView.Width, gameView.Height);
+            }
+
+            _KeyboardHeight = _gameViewSize.Y - _VisibleFrameRect.Height();
         }
     }
 
