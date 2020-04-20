@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
 
             UIKeyboard.Notifications.ObserveWillShow((s, e) =>
             {
-                _virtualKeyboardHeight = (int)e.FrameBegin.Height;
+                _virtualKeyboardHeight = (int)e.FrameEnd.Height;
             });
 
             UIKeyboard.Notifications.ObserveWillHide((s, e) =>
