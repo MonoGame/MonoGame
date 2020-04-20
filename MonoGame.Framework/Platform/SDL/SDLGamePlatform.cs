@@ -166,6 +166,9 @@ namespace Microsoft.Xna.Framework
                         break;
                     }
                     case Sdl.EventType.TextInput:
+                        // Mimic a CompositionEnd event
+                        _imeHandler.OnTextComposition(null, 0);
+
                         int len = 0;
                         int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
                         byte currentByte = 0;
