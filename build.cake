@@ -48,6 +48,23 @@ private bool GetMSBuildWith(string requires)
     return false;
 }
 
+private bool GetVsixPublisher(out string path)
+{
+    if (IsRunningOnWindows())
+    {
+        DirectoryPath vsLatest = VSWhereLatest();
+
+        if (vsLatest != null)
+        {
+            path = vsLatest.FullPath + "/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe";
+            return FileExists(path);
+        }
+    }
+
+    path = null;
+    return false;
+}
+
 //////////////////////////////////////////////////////////////////////
 // TASKS
 //////////////////////////////////////////////////////////////////////
@@ -215,17 +232,41 @@ Task("PackVSTemplates")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
-    var vsdirs = GetDirectories("./Templates/VisualStudio20*");
-    foreach (var vsdir in vsdirs)
-    {
-        DeleteFiles(vsdir.CombineWithFilePath("*.zip").FullPath);
-        var projdirs = GetDirectories(vsdir.CombineWithFilePath("*").FullPath);
-        foreach (var projdir in projdirs)
-        {
-            var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
-                Zip(projdir, outputPath);
-        }
-    }
+    var dotnet = Context.Tools.Resolve("dotnet.exe");
+    if (StartProcess(dotnet, "tool restore") != 0)
+        throw new Exception("dotnet tool restore failed.");
+
+    var result = StartProcess(
+        dotnet,
+        "vstemplate " +
+       $"-s Artifacts/MonoGame.Templates.CSharp/Release/MonoGame.Templates.CSharp.{version}.nupkg " +
+       $"--vsix Artifacts/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.{version}.vsix " +
+        "@Templates/VisualStudio/settings.rsp");
+
+    if (result != 0)
+        throw new Exception("dotnet-vstemplate failed to create VSIX.");
+});
+Task("PublishVSTemplates")
+    .IsDependentOn("PackVSTemplates")
+    .WithCriteria(() => IsRunningOnWindows())
+    .Does(() =>
+{
+    if (!GetVsixPublisher(out var vsixPublisher))
+        throw new Exception("Did not find VsixPublisher.exe.");
+
+    var pat = EnvironmentVariable("AZURE_DEVOPS_MARKETPLACE_PAT");
+
+    if (string.IsNullOrEmpty(pat))
+        throw new Exception("Azure DevOps Personal Access Token for VS Marketplace not set (AZURE_DEVOPS_MARKETPLACE_PAT).");
+
+    var result = StartProcess(vsixPublisher,
+        "publish " +
+       $"-payload Artifacts/MonoGame.Template.CSharp/MonoGame.Templates.CSharp.{version}.vsix " +
+        "-publishManifest Templates/VisualStudio/csharp-manifest.json " +
+       $"-personalAccessToken {pat}");
+
+    if (result != 0)
+        throw new Exception("VsixPublisher.exe publish failed.");
 });
 
 Task("PackVSMacTemplates")
@@ -253,13 +294,15 @@ Task("BuildAll")
 Task("Pack")
     .IsDependentOn("BuildAll")
     .IsDependentOn("PackDotNetTemplates")
-    .IsDependentOn("PackVSTemplates")
     .IsDependentOn("PackVSMacTemplates");
 
 Task("Test")
     .IsDependentOn("TestWindowsDX")
     .IsDependentOn("TestDesktopGL")
     .IsDependentOn("TestTools");
+
+Task("PublishStable")
+    .IsDependentOn("PublishVSTemplates");
 
 Task("Default")
     .IsDependentOn("Pack");
