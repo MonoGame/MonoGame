@@ -247,7 +247,8 @@ namespace Microsoft.Xna.Framework.Input
                     if (!ShowOSImeWindow) return true;
                     break;
                 case IMM.Char:
-                    CharEvent(msg.WParam.ToInt32());
+                    if (IsTextInputActive)
+                        CharEvent(msg.WParam.ToInt32());
                     break;
             }
 
