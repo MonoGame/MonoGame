@@ -6,7 +6,7 @@
         "internalName": "MonoGame-Templates-FSharp",
 	"displayName": "MonoGame F# Templates"
     },
-    "overview": "readme.md",
+    "overview": "readme-fs.md",
     "publisher": "MonoGame",
     "qna": false,
     "repo": "https://github.com/MonoGame/MonoGame"
