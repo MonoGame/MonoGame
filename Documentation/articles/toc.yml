@@ -1,0 +1,24 @@
+- name: Introduction
+  href: introduction/toc.yml
+  topicHref: introduction/introduction.md
+- name: Getting Started
+  href: getting_started/toc.yml
+  topicHref: getting_started/getting_started.md
+- name: Adding Content
+  href: content/toc.yml
+  topicHref: content/content.md
+- name: Tools
+  href: tools/toc.yml
+  topicHref: tools/tools.md
+- name: Platform-Specific Notes
+  href: platform_specific/toc.yml
+  topicHref: platform_specific/platform_specific.md
+- name: Porting from XNA to MonoGame
+  href: porting_xna.md
+- name: Samples and Demos
+  href: samples.md
+- name: Community Tutorials
+  href: tutorials.md
+- name: External Links
+  href: links.md
+
