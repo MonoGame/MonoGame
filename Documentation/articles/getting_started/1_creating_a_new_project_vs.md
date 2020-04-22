@@ -1,3 +1,5 @@
+# Creating a Project with Visual Studio
+
 Start up Visual Studio and select **New Project...** in the upper left corner.
 
 ![New Solution](~/images/getting_started/1_new_soulution_vs.png)

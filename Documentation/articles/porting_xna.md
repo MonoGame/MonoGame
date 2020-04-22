@@ -1,3 +1,5 @@
+# Porting from XNA to MonoGame
+
 MonoGame implements the same [API](https://en.wikipedia.org/wiki/Application_programming_interface)
 as XNA 4.0. That means you usually do not have to change your game code to port from XNA to
 MonoGame. There are however some exceptions and some things to keep in mind when porting to MonoGame.
@@ -29,11 +31,10 @@ DirectX platforms will ignore setting the `PreferHalfPixelOffset` flag and will
 always render with a half pixel offset compared to XNA. This is usually not noticeable.
 
 This value is passed to `UseHalfPixelOffset` in `GraphicsDevice`. If `UseHalfPixelOffset`
-is `true` you have to add half-pixel offset to a Projection matrix.
+is `true`, you have to add half-pixel offset to a Projection matrix.
 
 `SpriteBatch` rendering is not affected by the flag. Regardless of what value the flag has,
 `SpriteBatch` will render things exactly the same as in XNA.
 
 If you migrated your game from XNA and some things seem blurred out or very slightly offset,
 you may want to try to enable the `PreferHalfPixelOffset` flag.
-

@@ -1,3 +1,5 @@
+# Help and Support
+
 This section will provide help and support for MonoGame.
 
 ## Help

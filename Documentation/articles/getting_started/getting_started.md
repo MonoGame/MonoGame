@@ -1,3 +1,5 @@
+# Getting Started
+
 This section walks you through the basics of MonoGame and help you create your first game.
 
 - [Creating a New Project](1_creating_a_new_project.md)

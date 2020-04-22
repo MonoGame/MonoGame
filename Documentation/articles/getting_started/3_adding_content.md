@@ -1,12 +1,14 @@
+# Adding Content
+
 This file will go over adding content to your game. For help on creating a project please look at [Creating a New Project](1_creating_a_new_project.md)
 
-First of all you are gonna need some content for your game. For this tutorial use the following image of a ball:
+First, you are going to need some content for your game. For this tutorial use the following image of a ball:
 
 ![Open Content](~/images/getting_started/ball.png)
 
-Do **right-click > Save Image As** and save it somewhere with the name "ball.png".
+Do **right-click > Save Image As** and save it somewhere with the name “ball.png”.
 
-Now open up your game project and look at the left. You should see a solution explorer window. Expand the **Content** folder and open up **Content.mgcb** file by double clicking on it.
+Now open up your game project and look at the left. You should see a solution explorer window. Expand the **Content** folder and open up **Content.mgcb** file by double-clicking on it.
 
 ![Open Content](~/images/getting_started/3_open_content.png)
 
@@ -24,7 +26,7 @@ In our case let's use the **Add Existing Item** toolbar button.
 
 ![Add Content](~/images/getting_started/3_add_content.png)
 
-You should now be prompted to select a file. Select the "ball.png" that you have downloaded a moment ago. After that you will be asked on what action you want to do for adding the file. Just leave the it to default and click **OK**.
+You should now be prompted to select a file. Select the “ball.png” that you have downloaded a moment ago. After that you will be asked on what action you want to do for adding the file. Just leave it to default and click **OK**.
 
 ![Copy Content](~/images/getting_started/3_copy_content.png)
 
@@ -32,7 +34,7 @@ Now simply click **Save** toolbar button and close the tool.
 
 ![Save Content](~/images/getting_started/3_save_content.png)
 
-Now that we have added the content, it's time to load it. First declare a new variable so we can load the ball image into memory.
+Now that we have added the content, it's time to load it. First declare a new variable, so we can load the ball image into memory.
 
 ```csharp
 public class Game1 : Game

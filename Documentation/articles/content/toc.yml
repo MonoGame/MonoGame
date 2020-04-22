@@ -1,6 +1,6 @@
 - name: Using the Pipeline Tool
   href: using_pipeline_tool.md
-- name: Custom Effect
+- name: Effects
   href: custom_effects.md
 - name: TrueType fonts
   href: adding_ttf_fonts.md

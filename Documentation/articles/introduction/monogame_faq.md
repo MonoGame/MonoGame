@@ -1,6 +1,8 @@
+# Frequently Asked Questions
+
 This page contains a list of frequently asked questions.
 
-### What software do I need to start?
+## What software do I need to start?
 
 Depending on the platform you wish to develop for the following thing are needed:
 

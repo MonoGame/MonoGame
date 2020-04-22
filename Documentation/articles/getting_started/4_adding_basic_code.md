@@ -1,6 +1,8 @@
+# Adding Basic Code
+
 This file will go over adding basic logic to your game. Do note that this file continues where [Adding Content](3_adding_content.md) tutorial left off.
 
-First of all we need to add few new variables, one for position, and one for speed.
+First we need to add few new variables, one for position, and one for speed.
 
 ```csharp
 public class Game1 : Game
@@ -86,7 +88,7 @@ Next is just a simple check to see if the Up arrow key is pressed.
 if (kstate.IsKeyDown(Keys.Up))
 ```
 
-And last is a simple code for moving the ball by **ballSpeed**. The reason why **ballSpeed** is getting multiplied by **gameTime.ElapsedGameTime.TotalSeconds** is because Update is not usually fixed, that is the time between update calls is not the same, so in order to get smooth movement we multiple speed by the time since the last update method was called.
+And last is a simple code for moving the ball by **ballSpeed**. The reason why **ballSpeed** is getting multiplied by **gameTime.ElapsedGameTime.TotalSeconds** is because Update is not usually fixed, that is the time between update calls is not the same, so in order to get smooth movement we multiply speed by the time since the last update method was called.
 
 ```csharp
     ballPosition.Y -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -104,7 +106,7 @@ if(ballPosition.X > graphics.PreferredBackBufferWidth - ballTexture.Width / 2)
     ballPosition.X = graphics.PreferredBackBufferWidth - ballTexture.Width / 2;
 else if(ballPosition.X < ballTexture.Width / 2)
     ballPosition.X = ballTexture.Width / 2;
-            
+
 if(ballPosition.Y > graphics.PreferredBackBufferHeight - ballTexture.Height / 2)
     ballPosition.Y = graphics.PreferredBackBufferHeight - ballTexture.Height / 2;
 else if(ballPosition.Y < ballTexture.Height / 2)
