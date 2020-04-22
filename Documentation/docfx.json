@@ -1,0 +1,129 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "..",
+          "files": [ 
+            "MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj"
+          ]
+        }
+      ],
+
+      "dest": "obj/api/merged"
+    },
+    {
+      "src": [
+        {
+          "src": "..",
+          "files": [ 
+            "MonoGame.Framework/MonoGame.Framework.WindowsGL.csproj"
+          ]
+        }
+      ],
+      "dest": "obj/api/desktopgl"
+    }
+  ],
+  "merge": {
+    "content": [
+       {
+           "files": "*.yml",
+           "src": "obj/api/windx"
+       },
+       {
+           "files": "*.yml",
+           "src": "obj/api/desktopgl"
+       }
+     ],
+     "fileMetadata": {
+         "platform": {
+             "obj/api/windx/*.yml": [
+                 "windx"
+             ],
+             "obj/api/desktopgl/*.yml": [
+                 "desktopgl"
+             ]
+         }
+     },
+     "dest": "obj/api/merged"
+  },
+  "build": {
+    "content": [
+      {
+        "src": "obj/api/merged",
+        "dest": "api/",
+        "files": [
+          "**.yml",
+          "index.md"
+        ]
+      },
+      {
+        "files": [
+          "articles/**.md",
+          "articles/**/toc.yml",
+          "toc.yml",
+          "index.md"
+        ],
+        "exclude": [
+          "**/bin/**",
+          "**/obj/**",
+          "_site/**",
+          "_site_pdf/**",
+          "**~"
+        ]
+      },
+      {
+        "src": "..",
+        "files": [
+          "CHANGELOG.md"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "**/images/**"
+        ],
+        "exclude": [
+          "**/bin/**",
+          "**/obj/**",
+          "_site/**",
+          "_site_pdf/**",
+          "**~"
+        ]
+      }
+    ],
+    "xrefService": [
+      "https://xref.docs.microsoft.com/query?uid={uid}"
+    ],
+    "overwrite": [
+      {
+        "files": [
+          "apidoc/**.md"
+        ],
+        "exclude": [
+          "**/bin/**",
+          "**/obj/**",
+          "_site/**",
+          "_site_pdf/**",
+          "**~"
+        ]
+      }
+    ],
+    "dest": "_site",
+    "postProcessors": [
+    ],
+    "globalMetadata": {
+      "_appTitle": "MonoGame Documentation",
+      "baseDir": "MonoGame-docfx"
+    },
+    "fileMetadataFiles": [
+      "metadata.json"
+    ],
+    "template": [
+      "template-fresh"
+    ],
+    "noLangKeyword": false
+  }
+}
+
