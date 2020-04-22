@@ -1,9 +1,10 @@
-MonoGame distributes templates to set up a new project in two ways:
+MonoGame distributes templates for new projects in three ways:
 
-- For Visual Studio
-- For .NET Core CLI
+- For [Visual Studio](https://visualstudio.microsoft.com/vs/)
+- For [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/)
+- For [.NET Core CLI](https://docs.microsoft.com/en-us/dotnet/core/tools/)
 
-Once a project is created through either of these methods, it can be opened and built from any of the [compatible environments](requirements.md).
+Once a project is created through any of these methods, it can be opened and built from any of the [compatible environments](requirements.md).
 
 ## Visual Studio
 
@@ -17,7 +18,19 @@ MonoGame templates can be installed as a Visual Studio extension.
 
 When Visual Studio restarts, click Create a new project. The MonoGame templates should show up at the top, if not search for MonoGame in the search bar.
 
-You'll see a few different templates were installed. To know which one to use, please refer to overview of the [Target Platforms](Platforms.md).
+You'll see a few different templates were installed. To know which one to use, please refer to [Target Platforms](Platforms.md).
+
+## Visual Studio for Mac
+
+MonoGame templates can be installed as a VS for Mac extension.
+
+- Open VS for Mac and go to Visual Studio > Extensions...
+- Open the Gallery tab and search for MonoGame.
+- Select MonoGame Extension and click Install..., then Install again to confirm.
+
+You've now installed the MonoGame templates. Go to File > New Solution... to open the New Project
+dialog. You'll see the MonoGame templates in the list of templates.
+To know which template to use, check out [Target Platforms](Platforms.md).
 
 ## .NET Core CLI
 
