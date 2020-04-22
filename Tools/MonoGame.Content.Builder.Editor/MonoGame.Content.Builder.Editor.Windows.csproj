@@ -2,25 +2,27 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Wpf</BaseOutputPath>
     <DefineConstants>WINDOWS;WPF</DefineConstants>
     <ApplicationIcon>App.ico</ApplicationIcon>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <AssemblyName>mgcb-editor</AssemblyName>
+    <AssemblyName>mgcb-editor-wpf</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Global.Mac.cs" />
-    <Compile Remove="Global.Linux.cs" />
-    <Compile Remove="Styles.Mac.cs" />
-    <Compile Remove="Styles.Linux.cs" />
-    <Compile Remove="Properties\*.cs" />
+    <None Remove="Platform\**\*" />
+    <Compile Remove="Platform\**\*" />
+
+    <Compile Include="Platform\Windows\**\*.cs" />
+    <Compile Include="Platform\Utilities\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Eto.Forms" Version="2.5.0" />
     <PackageReference Include="Eto.Platform.Wpf" Version="2.5.0" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20158.1" />
   </ItemGroup>
 
   <ItemGroup>

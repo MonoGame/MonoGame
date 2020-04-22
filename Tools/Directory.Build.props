@@ -1,17 +1,3 @@
 <Project>
-
   <Import Project="..\MonoGame.props" />
-
-  <PropertyGroup>
-    <PackageIcon>Icon.png</PackageIcon>
-    <PackageProjectUrl>http://monogame.net</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/MonoGame/MonoGame</RepositoryUrl>
-    <Authors>MonoGame Team</Authors>
-    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)..\Images\Icon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
 </Project>
-

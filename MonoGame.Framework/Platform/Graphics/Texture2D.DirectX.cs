@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _shared;
         private bool _mipmap;
-        private SampleDescription _sampleDescription;
+        protected SampleDescription _sampleDescription;
 
         private SharpDX.Direct3D11.Texture2D _cachedStagingTexture;
 
@@ -36,6 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _shared = shared;
             _mipmap = mipmap;
+            _sampleDescription = new SampleDescription(1, 0);
         }
 
         private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount) where T : struct
@@ -129,12 +130,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.Format = SharpDXHelper.ToFormat(_format);
                 desc.BindFlags = BindFlags.None;
                 desc.CpuAccessFlags = CpuAccessFlags.Read;
-                desc.SampleDescription = CreateSampleDescription();
+                desc.SampleDescription = new SampleDescription(1, 0);
                 desc.Usage = ResourceUsage.Staging;
                 desc.OptionFlags = ResourceOptionFlags.None;
-
-                // Save sampling description.
-                _sampleDescription = desc.SampleDescription;
 
                 _cachedStagingTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
             }
@@ -223,7 +221,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Format = SharpDXHelper.ToFormat(_format);
             desc.BindFlags = BindFlags.ShaderResource;
             desc.CpuAccessFlags = CpuAccessFlags.None;
-            desc.SampleDescription = CreateSampleDescription();
+            desc.SampleDescription = SampleDescription;
             desc.Usage = ResourceUsage.Default;
             desc.OptionFlags = ResourceOptionFlags.None;
 
@@ -232,25 +230,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return desc;
         }
-        internal override Resource CreateTexture()
+
+        internal override void CreateTexture()
         {
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = GetTexture2DDescription();
-
-            // Save sampling description.
-            _sampleDescription = desc.SampleDescription;
-
-            return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
-        }
-
-        protected internal virtual SampleDescription CreateSampleDescription()
-        {
-            return new SampleDescription(1, 0);
-        }
-
-        internal SampleDescription GetTextureSampleDescription()
-        {
-            return _sampleDescription;
+            _texture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
         }
 
         private void PlatformReload(Stream textureStream)

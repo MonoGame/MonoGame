@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Tools.Tests", "Too
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor.Mac", "Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.Mac.csproj", "{1853CCED-232C-4972-A2F2-D56F7F6DBEAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor", "Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.csproj", "{F673A915-308F-4111-8950-A5755BE5CEEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,5 +116,17 @@ Global
 		{1853CCED-232C-4972-A2F2-D56F7F6DBEAE}.Release|x64.Build.0 = Release|Any CPU
 		{1853CCED-232C-4972-A2F2-D56F7F6DBEAE}.Release|x86.ActiveCfg = Release|Any CPU
 		{1853CCED-232C-4972-A2F2-D56F7F6DBEAE}.Release|x86.Build.0 = Release|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Debug|x64.Build.0 = Debug|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Debug|x86.Build.0 = Debug|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|x64.ActiveCfg = Release|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|x64.Build.0 = Release|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|x86.ActiveCfg = Release|Any CPU
+		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

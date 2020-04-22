@@ -13,6 +13,7 @@ namespace Microsoft.Xna.Framework.Media
     {
         private OggStream stream;
         private float _volume = 1f;
+        private readonly object _sourceMutex = new object();
 
         private void PlatformInitialize(string fileName)
         {
@@ -34,11 +35,14 @@ namespace Microsoft.Xna.Framework.Media
 		
         void PlatformDispose(bool disposing)
         {
-            if (stream == null)
-                return;
+            lock (_sourceMutex)
+            {
+                if (stream == null)
+                    return;
 
-            stream.Dispose();
-            stream = null;
+                stream.Dispose();
+                stream = null;
+            }
         }
 
         internal void Play(TimeSpan? startPosition)

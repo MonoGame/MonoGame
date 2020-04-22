@@ -64,17 +64,5 @@ namespace MonoGame.Effect
 
             return shaderData;
         }
-            
-        internal override bool Supports(string platform)
-        {
-            if (platform == "iOS" ||
-                platform == "Android" ||
-                platform == "DesktopGL" ||
-                platform == "MacOSX" ||
-                platform == "RaspberryPi")
-                return true;
-
-            return false;
-        }
     }
 }

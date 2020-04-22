@@ -428,13 +428,16 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
         public void RecycleSource(int sourceId)
-		{
+        {
+            AL.Source(sourceId, ALSourcei.Buffer, 0);
+            ALHelper.CheckError("Failed to free source from buffers.");
+
             lock (availableSourcesCollection)
             {
-                inUseSourcesCollection.Remove(sourceId);
-                availableSourcesCollection.Add(sourceId);
+                if (inUseSourcesCollection.Remove(sourceId))
+                    availableSourcesCollection.Add(sourceId);
             }
-		}
+        }
 
         public void FreeSource(SoundEffectInstance inst)
         {

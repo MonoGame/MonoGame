@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
+using StbImageSharp;
+using StbImageWriteSharp;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -36,16 +38,9 @@ namespace MonoGame.Tests.Graphics
             Assert.NotNull(_texture);
             try
             {
-
-                System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(filename);
-                System.Drawing.GraphicsUnit gu = System.Drawing.GraphicsUnit.Pixel;
-                System.Drawing.RectangleF rf = bitmap.GetBounds(ref gu);
-                Rectangle rt = _texture.Bounds;
-                Assert.AreEqual((int)rf.Bottom, rt.Bottom);
-                Assert.AreEqual((int)rf.Left, rt.Left);
-                Assert.AreEqual((int)rf.Right, rt.Right);
-                Assert.AreEqual((int)rf.Top, rt.Top);
-                bitmap.Dispose();
+                var bitmap = ImageResult.FromMemory(File.ReadAllBytes(filename), StbImageSharp.ColorComponents.RedGreenBlueAlpha);
+                Assert.AreEqual((int)bitmap.Height, _texture.Height);
+                Assert.AreEqual((int)bitmap.Width, _texture.Width);
             }//The dds file test case can't be checked with System.Drawing because it does not understand this format
             catch { }
             _texture.Dispose();
