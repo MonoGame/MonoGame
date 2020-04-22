@@ -15,7 +15,7 @@ MonoGame templates can be installed as a Visual Studio extension.
 - Select the MonoGame Project Templates extension and click Download.
 - Restart Visual Studio to install the extension.
 
-When Visual Studio restarts click Create a new project. The MonoGame templates should show up at the top, if not search for MonoGame in the search bar.
+When Visual Studio restarts, click Create a new project. The MonoGame templates should show up at the top, if not search for MonoGame in the search bar.
 
 You'll see a few different templates were installed. To know which one to use, please refer to overview of the [Target Platforms](Platforms.md).
 
@@ -23,7 +23,7 @@ You'll see a few different templates were installed. To know which one to use, p
 
 You can set up a project using the .NET Core CLI (Command Line Interface).
 If you don't have the .NET Core SDK installed, go get the latest version [here](https://dotnet.microsoft.com/download) (3.1 and up recommended).
-After installation you can run `dotnet --info` in a terminal to make sure the installation was successful.
+After installation, you can run `dotnet --info` in a terminal to make sure the installation was successful.
 
 MonoGame publishes templates for [dotnet new](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-new). To install the C# templates run `dotnet new -i MonoGame.Templates.CSharp`.
 

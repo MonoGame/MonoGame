@@ -6,7 +6,7 @@ To publish desktop games, it is recommended that you build your project as a [se
 
 ### Building and packaging for Windows
 
-From the .Net Core CLI:
+From the .NET Core CLI:
 
 `dotnet publish -c Release -r win-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
 
@@ -16,7 +16,7 @@ If you are targeting WindowsDX, note that players will need [the DirectX June 20
 
 ### Building and packaging for Linux
 
-From the .Net Core CLI:
+From the .NET Core CLI:
 
 `dotnet publish -c Release -r linux-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
 
@@ -26,7 +26,7 @@ We recommend using the .tar.gz archiving format to preserve the execution permis
 
 ### Build and packaging for macOS
 
-From the .Net Core CLI:
+From the .NET Core CLI:
 
 `dotnet publish -c Release -r osx-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
 
@@ -83,13 +83,13 @@ The Info.plist file is a standard macOS file containing metadata about your game
 
 For more information about Info.plist files, see the [documentation](https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Introduction/Introduction.html).
 
-After completing these steps, your .app folder should appears as an executable application on macOS.
+After completing these steps, your .app folder should appear as an executable application on macOS.
 
 For archiving, we recommend using the .tar.gz format to preserve the execution permissions.
 
-### Special notes about .Net Core parameters
+### Special notes about .NET Core parameters
 
-.Net Core proposes several parameters when publishing apps that may sound helpful, but have many issues when it comes to games (because they were never meant for games in the first place, but for small lightweight applications).
+.NET Core proposes several parameters when publishing apps that may sound helpful, but have many issues when it comes to games (because they were never meant for games in the first place, but for small lightweight applications).
 
 **ReadyToRun (R2R)**
 
@@ -112,7 +112,7 @@ MonoGame templates for .NET Core projects disable tiered compilation.
 
 SingleFilePublish packages your game into a single executable file with all dependencies and content integrated.
 
-While it sounds convenient, be aware that it's not magical and is in fact an hidden self-extracting zip archive. As such, it may make app startup take **a lot** longer if your game is large, and may fail to launch on systems where user permissions don't allow to extract files (or if there is not enough storage space available).
+While it sounds convenient, be aware that it's not magical and is in fact a hidden self-extracting zip archive. As such, it may make app startup take **a lot** longer if your game is large, and may fail to launch on systems where user permissions don't allow extracting files (or if there is not enough storage space available).
 
 We recommend not using it for better compatibility across systems.
 
