@@ -1,3 +1,10 @@
+/* Custom css for MG theme */
+
+/* hide logo in navbar */
+.navbar-header {
+  display: none;
+}
+
 /* COLOR VARIABLES*/
 :root {
   --header-bg-color: #e73c00;
