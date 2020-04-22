@@ -11,42 +11,8 @@
       ],
 
       "dest": "obj/api/merged"
-    },
-    {
-      "src": [
-        {
-          "src": "..",
-          "files": [ 
-            "MonoGame.Framework/MonoGame.Framework.WindowsGL.csproj"
-          ]
-        }
-      ],
-      "dest": "obj/api/desktopgl"
     }
   ],
-  "merge": {
-    "content": [
-       {
-           "files": "*.yml",
-           "src": "obj/api/windx"
-       },
-       {
-           "files": "*.yml",
-           "src": "obj/api/desktopgl"
-       }
-     ],
-     "fileMetadata": {
-         "platform": {
-             "obj/api/windx/*.yml": [
-                 "windx"
-             ],
-             "obj/api/desktopgl/*.yml": [
-                 "desktopgl"
-             ]
-         }
-     },
-     "dest": "obj/api/merged"
-  },
   "build": {
     "content": [
       {
@@ -68,7 +34,6 @@
           "**/bin/**",
           "**/obj/**",
           "_site/**",
-          "_site_pdf/**",
           "**~"
         ]
       },
@@ -82,13 +47,11 @@
     "resource": [
       {
         "files": [
-          "**/images/**"
+          "images/**"
         ],
         "exclude": [
           "**/bin/**",
           "**/obj/**",
-          "_site/**",
-          "_site_pdf/**",
           "**~"
         ]
       }
@@ -105,7 +68,6 @@
           "**/bin/**",
           "**/obj/**",
           "_site/**",
-          "_site_pdf/**",
           "**~"
         ]
       }
@@ -121,7 +83,7 @@
       "metadata.json"
     ],
     "template": [
-      "template-fresh"
+      "theme/material"
     ],
     "noLangKeyword": false
   }
