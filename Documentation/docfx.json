@@ -83,6 +83,7 @@
       "metadata.json"
     ],
     "template": [
+      "default",
       "theme/material"
     ],
     "noLangKeyword": false

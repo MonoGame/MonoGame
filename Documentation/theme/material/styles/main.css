@@ -1,9 +1,9 @@
 /* COLOR VARIABLES*/
 :root {
-  --header-bg-color: #0d47a1;
+  --header-bg-color: #e73c00;
   --header-ft-color: #fff;
-  --highlight-light: #5e92f3;
-  --highlight-dark: #003c8f;
+  --highlight-light: #ff6933;
+  --highlight-dark: #e73c00;
   --font-color: #34393e;
   --custom-box-shadow: 0 1px 2px 0 rgba(61, 65, 68, 0.06), 0 1px 3px 1px rgba(61, 65, 68, 0.16);
 }
@@ -33,9 +33,16 @@ a:focus {
   color: var(--highlight-light);
   text-decoration: none;
 }
+.affix > ul > li.active > a, .affix > ul > li.active > a::before {
+  color: var(--highlight-dark);
+}
 
 .toc .nav > li.active > a {
   color: var(--highlight-dark);
+}
+.toc .nav > li.active > a:hover
+.toc .nav > li.active > a:focus {
+  color: var(--highlight-light);
 }
 
 .toc .nav > li.active > a:hover,
