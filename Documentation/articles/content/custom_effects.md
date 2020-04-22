@@ -27,8 +27,8 @@ If your game requires an extra little bit of performance you can easily hand edi
 
 # Custom Effects
 To use a custom effect with MonoGame you must do one of the following (not both):
-* Run the effect file through the [MonoGame Effect content processor](mgcb.md) for loading via the `ContentManager` (Recommended).
-* Process your effect file with the [2MGFX tool](2mgfx.md) and load them yourself at runtime.
+* Run the effect file through the [MonoGame Effect content processor](~/articles/tools/mgcb.md) for loading via the `ContentManager` (Recommended).
+* Process your effect file with the [2MGFX tool](~/articles/tools/2mgfx.md) and load them yourself at runtime.
 
 
 ### Effect Writing Tips
@@ -67,7 +67,7 @@ These are some tips for writing or converting effects for use with MonoGame.
       }
   };
   ```
-  Custom symbols can be defined from the [Pipeline Tool](pipeline.md) or via [2MGFX](2mgfx.md).
+  Custom symbols can be defined from the [Pipeline Tool](~/articles/tools/pipeline.md) or via [2MGFX](~/articles/tools/2mgfx.md).
 * Make sure the pixel shaders inputs **exactly match** the vertex shader outputs so the parameters are passed in the correct registers. The parameters need to have the same size and order. Omitting parameters might not break compilation, but can cause unexpected results.
 * Note that on GL platforms default values on Effect parameters do not work.  Either set the parameter from code or use a real constant like a #define.
 * The effect compiler is aggressive about removing unused parameters, be sure the parameters you are setting are actually used.

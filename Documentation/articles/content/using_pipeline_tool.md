@@ -1,4 +1,4 @@
-The [Pipeline Tool](pipeline.md) is used to organize and build content for use with MonoGame. It is installed as part of the MonoGame SDK Installer or can be built [directly from source](https://github.com/mono/MonoGame/tree/develop/Tools/Pipeline) if needed.
+The [Pipeline Tool](~/articles/tools/pipeline.md) is used to organize and build content for use with MonoGame. It is installed as part of the MonoGame SDK Installer or can be built [directly from source](https://github.com/mono/MonoGame/tree/develop/Tools/Pipeline) if needed.
 
 ## Create A Project
 
@@ -7,7 +7,7 @@ To start a new project just select "New..." from the "File" menu.  This will giv
 If you are starting from an existing XNA project, the Pipeline Tool supports importing your existing .contentproj.  Again you can access this from the the "File" menu:
 
 <p align="center">
-<img src="images/pipeline_import.png"/>
+<img src="~/images/pipeline_import.png"/>
 </p>
 
 This creates a new project, adding all your content and content settings from the XNA project.  If you happened to be using custom processors you may need to edit the assembly references to link to the correct paths which we discuss next.
@@ -17,7 +17,7 @@ This creates a new project, adding all your content and content settings from th
 You can edit the content project settings directly from the property grid editor after selecting the project node in the tree view:
 
 <p align="center">
-<img src="images/pipeline_project.png"/>
+<img src="~/images/pipeline_project.png"/>
 </p>
 
 This is where you setup the folders for output, the platform to target, the assembly references for custom processors, etc.
@@ -30,13 +30,13 @@ Note that currently the Pipeline tool is not setup to support multiple target pl
 Once you have a project setup you can add content to it for building.  You can do this from the "Edit" menu:
 
 <p align="center">
-<img src="images/pipeline_items.png"/>
+<img src="~/images/pipeline_items.png"/>
 </p>
 
 Selecting "New Item..." will bring up the New Item dialog which displays a list of new items that can be created:
 
 <p align="center">
-<img src="images/pipeline_newitem.png"/>
+<img src="~/images/pipeline_newitem.png"/>
 </p>
 
 When you select "Existing Item..." you get to select an existing item from disk to add to the content project.
@@ -74,19 +74,19 @@ If you don't want to use the automated process, you can build the content projec
 If you are using Visual Studio you can simply add the xnb files to your C# game project.  Create a folder in the project called Content then right click on the folder and select Add -> Existing Item.
 
 <p align="center">
-<img src="images/existing_item.png"/>
+<img src="~/images/existing_item.png"/>
 </p>
 
 You will now see a file dialog from which you can add your content files.  Note that if you don't want Visual Studio to make a local copy of the files be sure to use "Add As Link".
 
 <p align="center">
-<img src="images/add_as_link.png"/>
+<img src="~/images/add_as_link.png"/>
 </p>
 
 Once the files are added you need to select them all and change their build action to "Content" and "Copy if newer".
 
 <p align="center">
-<img src="images/copy_if_newer.png"/>
+<img src="~/images/copy_if_newer.png"/>
 </p>
 
 

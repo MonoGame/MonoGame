@@ -2,7 +2,7 @@ This section will provide help and support for MonoGame.
 
 ## Help
 
-If you wish to learn how to use MonoGame, please checkout our [Tutorials page](tutorials.md). If you want to find an answer to a more specific problem, you can ask it on our [Community page](http://community.monogame.net/).
+If you wish to learn how to use MonoGame, please checkout our [Tutorials page](~/articles/tutorials.md). If you want to find an answer to a more specific problem, you can ask it on our [Community page](http://community.monogame.net/).
 
 ## Bugs and New Feature Requests
 

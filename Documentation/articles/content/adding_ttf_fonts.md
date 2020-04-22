@@ -7,11 +7,11 @@ Truetype fonts may be installed on the system, or added to the project manually 
 1. Create the .spritefont file.
 
 <p>
-<img src="images/adding_ttf_fonts_step_1.PNG"/>
+<img src="~/images/adding_ttf_fonts_step_1.PNG"/>
 </p>
 
 <p>
-<img src="images/adding_ttf_fonts_step_2.PNG"/>
+<img src="~/images/adding_ttf_fonts_step_2.PNG"/>
 </p>
 
 2- Open the newly created .spritefont file in your text editor of choice, find this line and change it to your selected .ttf font.

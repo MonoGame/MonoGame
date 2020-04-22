@@ -1,4 +1,4 @@
-This file will go over adding basic logic to your game. Do note that this file continues where [Adding Content](getting_started/3_adding_content.md) tutorial left off.
+This file will go over adding basic logic to your game. Do note that this file continues where [Adding Content](3_adding_content.md) tutorial left off.
 
 First of all we need to add few new variables, one for position, and one for speed.
 
@@ -29,7 +29,7 @@ spriteBatch.Draw(ballTexture, ballPosition, Color.White);
 
 Now run the game.
 
-![Draw Ball 1](images/getting_started/4_ball_not_center.png)
+![Draw Ball 1](~/images/getting_started/4_ball_not_center.png)
 
 As you can see the ball doesn't seem quite centered yet. This is happening because MonoGame uses (0, 0) as the origin point for drawing by default. We can modify this by doing the following:
 
@@ -49,7 +49,7 @@ spriteBatch.Draw(
 
 With this we are setting the origin to the center of the image. Now the image will get drawn to the center of the screen.
 
-![Draw Ball 2](images/getting_started/4_ball_center.png)
+![Draw Ball 2](~/images/getting_started/4_ball_center.png)
 
 Next let's setup some movement. Find the **Update** method and add:
 

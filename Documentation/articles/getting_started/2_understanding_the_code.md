@@ -1,5 +1,5 @@
 
-This file will go over the code that is getting created when you start a blank project. For help on creating a project please look at [Creating a New Project](getting_started/1_creating_a_new_project.md)
+This file will go over the code that is getting created when you start a blank project. For help on creating a project please look at [Creating a New Project](1_creating_a_new_project.md)
 
 **Using Statements**
 
@@ -100,4 +100,4 @@ protected override void Draw(GameTime gameTime)
 
 Similar to the Update method, it is also called multiple times per second.
 
-For the next part, look at [Adding Content](getting_started/3_adding_content.md) page.
+For the next part, look at [Adding Content](3_adding_content.md) page.

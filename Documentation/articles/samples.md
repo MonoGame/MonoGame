@@ -19,4 +19,4 @@ It also includes games such as:
 - Pacman
 - Role Playing Game
 ### Related
-[Tutorials](Documentation/tutorials.md)
+[Tutorials](tutorials.md)
