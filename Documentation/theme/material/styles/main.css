@@ -43,6 +43,9 @@ a:focus {
 .affix > ul > li.active > a, .affix > ul > li.active > a::before {
   color: var(--highlight-dark);
 }
+.affix ul > li.active > a, .affix ul > li.active > a::before {
+  color: var(--highlight-dark);
+}
 
 .toc .nav > li.active > a {
   color: var(--highlight-dark);
