@@ -88,6 +88,8 @@ namespace Microsoft.Xna.Framework.Input
 
         internal void Update()
         {
+            if (!IsTextInputActive) return;
+
             TouchCollection touchCollection = TouchPanel.GetState();
             foreach (TouchLocation touchLocation in touchCollection)
             {
