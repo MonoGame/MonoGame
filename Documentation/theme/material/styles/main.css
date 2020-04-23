@@ -1,8 +1,19 @@
 /* Custom css for MG theme */
 
 /* hide logo in navbar */
-.navbar-header {
+.navbar-brand {
   display: none;
+}
+.navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form {
+  border-top: none;
+}
+.navbar-inverse .navbar-toggle {
+  border-color: #fff3;
+}
+.navbar-inverse .navbar-toggle:focus,
+.navbar-inverse .navbar-toggle:hover {
+  border-color: #fff3;
+  background-color: #fff1;
 }
 
 /* COLOR VARIABLES*/
