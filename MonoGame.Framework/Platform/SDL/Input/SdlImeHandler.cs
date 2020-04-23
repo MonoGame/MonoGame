@@ -36,11 +36,6 @@ namespace Microsoft.Xna.Framework.Input
                 TextComposition.Invoke(this, new TextCompositionEventArgs(compositionString, cursorPosition));
         }
 
-        public void Update(GameTime gameTime)
-        {
-
-        }
-
         public void StartTextInput()
         {
             if (IsTextInputActive)

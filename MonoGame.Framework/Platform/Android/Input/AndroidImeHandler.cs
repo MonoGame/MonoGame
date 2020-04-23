@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Input
 
         const int KeyboardHideOffset = 80;
 
-        public void Update(GameTime gameTime)
+        internal void Update()
         {
             TouchCollection touchCollection = TouchPanel.GetState();
             foreach (TouchLocation touchLocation in touchCollection)

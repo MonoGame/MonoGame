@@ -62,6 +62,8 @@ namespace Microsoft.Xna.Framework
                 _initialized = true;
             }
 
+            (Window.ImmService as Input.AndroidImeHandler).Update();
+
             return true;
         }
 

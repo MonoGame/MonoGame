@@ -36,12 +36,6 @@ namespace Microsoft.Xna.Framework
         int VirtualKeyboardHeight { get; }
 
         /// <summary>
-        /// Update the Ime service. For instance, stop the text input when clicking on the other
-        /// screen area than the virtual keyboard poped up.
-        /// </summary>
-        void Update(GameTime gameTime);
-
-        /// <summary>
         /// Returns true if text input is enabled, else returns false.
         /// </summary>
         bool IsTextInputActive { get; }

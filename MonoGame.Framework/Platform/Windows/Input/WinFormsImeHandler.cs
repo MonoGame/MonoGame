@@ -52,11 +52,6 @@ namespace Microsoft.Xna.Framework.Input
 
         public int VirtualKeyboardHeight { get { return 0; } }
 
-        public void Update(GameTime gameTime)
-        {
-
-        }
-
         public bool IsIMEOpen { get; private set; }
 
         /// <summary>

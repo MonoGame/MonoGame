@@ -253,6 +253,8 @@ namespace Microsoft.Xna.Framework
             if (IsPlayingVideo)
                 return false;
 
+            (Window.ImmService as iOS.Input.iOSImeHandler).Update();
+
             return true;
         }
 
