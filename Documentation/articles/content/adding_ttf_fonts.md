@@ -9,11 +9,11 @@ Truetype fonts may be installed on the system, or added to the project manually 
 
 1. Create the .spritefont file.
 
-![Adding TTF fonts step 1]("~/images/adding_ttf_fonts_step_1.PNG")
+  ![Adding TTF fonts step 1](~/images/adding_ttf_fonts_step_1.PNG)
 
-![Adding TTF fonts step 2]("~/images/adding_ttf_fonts_step_2.PNG")
+  ![Adding TTF fonts step 2](~/images/adding_ttf_fonts_step_2.PNG)
 
-2- Open the newly created .spritefont file in your text editor of choice, find this line and change it to your selected .ttf font.
+2. Open the newly created .spritefont file in your text editor of choice, find this line and change it to your selected .ttf font.
 If the font is installed on the system, just type the name of the font.
 
 ```xml
@@ -46,4 +46,5 @@ spriteBatch.DrawString(font, "MonoGame Font Test", position, Color.White, 0, tex
 spriteBatch.End();
 ```
 
-If you want to know more, please refer to the [API Documentation](~/api/Microsoft.Xna.Framework.html)
+If you want to know more, please refer to the [API Documentation](xref:Microsoft.Xna.Framework).
+
