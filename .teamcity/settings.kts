@@ -200,14 +200,13 @@ object DevelopWin : BuildType({
 object GenerateDocumentation : BuildType({
     name = "Generate Documentation"
     description = "Generate the SDK documentation."
-    paused = true
 
     allowExternalStatus = true
-    artifactRules = """Documentation\Output=>Documentation.zip"""
+    artifactRules = """Documentation\_site=>Documentation.zip"""
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     vcs {
-        root(RelativeId("Develop"), "-:.", "+:Documentation", "+:CHANGELOG.md", "+:default.build", """+:ThirdParty\Dependencies\SharpDoc""")
+        root(RelativeId("Develop"))
 
         checkoutMode = CheckoutMode.ON_SERVER
         cleanCheckout = true
@@ -215,13 +214,19 @@ object GenerateDocumentation : BuildType({
     }
 
     steps {
-        script {
-            name = "Running SharpDoc"
-            scriptContent = """
-                rmdir .\Documentation\Output /s /q
-                ThirdParty\Dependencies\SharpDoc\SharpDoc.exe -config Documentation\config.xml
-            """.trimIndent()
+        exec {
+            name = "Running docfx metadata"
+            path = "docfx"
+            arguments = "metadata"
             formatStderrAsError = true
+            workingDir = "Documentation"
+        }
+        exec {
+            name = "Running docfx build"
+            path = "docfx"
+            arguments = "build"
+            formatStderrAsError = true
+            workingDir = "Documentation"
         }
     }
 
@@ -254,25 +259,11 @@ object GenerateDocumentation : BuildType({
                 onDependencyFailure = FailureAction.CANCEL
                 onDependencyCancel = FailureAction.CANCEL
             }
-
-            artifacts {
-                artifactRules = """
-                    MonoGame.Framework.zip!**
-                    MonoGame.Framework.Content.Pipeline.zip!**
-                """.trimIndent()
-            }
         }
         dependency(DevelopWin) {
             snapshot {
                 onDependencyFailure = FailureAction.CANCEL
                 onDependencyCancel = FailureAction.CANCEL
-            }
-
-            artifacts {
-                artifactRules = """
-                    MonoGame.Framework.zip!**
-                    MonoGame.Framework.Content.Pipeline.zip!**
-                """.trimIndent()
             }
         }
     }
