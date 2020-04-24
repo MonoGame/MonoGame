@@ -23,12 +23,6 @@
                                                         /
       CollectContentReferences -> PrepareContentBuilder
   -->
-  <PropertyGroup>
-    <BuildDependsOn>
-      IncludeContent;
-      $(BuildDependsOn);
-    </BuildDependsOn>
-  </PropertyGroup>
 
   <!--
     Calls 'dotnet tool' commands to parse information about any locally installed MGCB tools.
@@ -299,7 +293,8 @@
     Name="IncludeContent"
     DependsOnTargets="RunContentBuilder"
     Condition="'$(EnableMGCBItems)' == 'true' OR '@(MonoGameContentReference)' != ''"
-    Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)">
+    Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
+    BeforeTargets="PrepareForBuild">
 
     <!-- Call CreateItem on each piece of ExtraContent so it's easy to switch the item type by platform. -->
     <CreateItem
