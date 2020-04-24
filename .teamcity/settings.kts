@@ -215,8 +215,16 @@ object GenerateDocumentation : BuildType({
 
     steps {
         exec {
-            name = "Running docfx"
+            name = "Running docfx metadata"
             path = "docfx"
+            arguments = "metadata"
+            formatStderrAsError = true
+            workingDir = "Documentation"
+        }
+        exec {
+            name = "Running docfx build"
+            path = "docfx"
+            arguments = "build"
             formatStderrAsError = true
             workingDir = "Documentation"
         }
