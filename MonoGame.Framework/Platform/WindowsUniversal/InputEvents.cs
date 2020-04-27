@@ -35,22 +35,6 @@ namespace Microsoft.Xna.Framework
         // To convert from DIPs (device independent pixels) to actual screen resolution pixels.
         private static float _currentDipFactor;
 
-        private CoreIndependentInputSource _coreIndependentInputSource;
-
-        /// <summary>
-        /// Sets the cursor of <see cref="CoreIndependentInputSource"/> thread
-        /// </summary>
-        public CoreCursor CoreCursor
-        {
-            set
-            {
-                _coreIndependentInputSource.Dispatcher.TryRunAsync(
-                    CoreDispatcherPriority.Normal,
-                    () => _coreIndependentInputSource.PointerCursor = value)
-                    .GetAwaiter().GetResult();
-            }
-        }
-
         public InputEvents(CoreWindow window, UIElement inputElement, TouchQueue touchQueue)
         {
             _touchQueue = touchQueue;
@@ -74,17 +58,18 @@ namespace Microsoft.Xna.Framework
                 {
                     var inputDevices = CoreInputDeviceTypes.Mouse | CoreInputDeviceTypes.Pen | CoreInputDeviceTypes.Touch;
 
+                    CoreIndependentInputSource coreIndependentInputSource;
                     if (inputElement is SwapChainBackgroundPanel)
-                        _coreIndependentInputSource = ((SwapChainBackgroundPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
+                        coreIndependentInputSource = ((SwapChainBackgroundPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
                     else
-                        _coreIndependentInputSource = ((SwapChainPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
+                        coreIndependentInputSource = ((SwapChainPanel)inputElement).CreateCoreIndependentInputSource(inputDevices);
 
-                    _coreIndependentInputSource.PointerPressed += CoreWindow_PointerPressed;
-                    _coreIndependentInputSource.PointerMoved += CoreWindow_PointerMoved;
-                    _coreIndependentInputSource.PointerReleased += CoreWindow_PointerReleased;
-                    _coreIndependentInputSource.PointerWheelChanged += CoreWindow_PointerWheelChanged;
+                    coreIndependentInputSource.PointerPressed += CoreWindow_PointerPressed;
+                    coreIndependentInputSource.PointerMoved += CoreWindow_PointerMoved;
+                    coreIndependentInputSource.PointerReleased += CoreWindow_PointerReleased;
+                    coreIndependentInputSource.PointerWheelChanged += CoreWindow_PointerWheelChanged;
 
-                    _coreIndependentInputSource.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
+                    coreIndependentInputSource.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
                 });
                 var inputWorker = ThreadPool.RunAsync(workItemHandler, WorkItemPriority.High, WorkItemOptions.TimeSliced);
             }
