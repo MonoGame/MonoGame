@@ -16,6 +16,7 @@ PCL library projects get compiled into a library that can be referenced by almos
 
 ### Negative:
 - The target framework you select might not work on some platforms, so you have to be careful
+- You can't invoke any Native functions, but instead you will need to setup interfaces and assign them from outside the projct if you need to do so
 
 ## 2. Using a shared library project
 
