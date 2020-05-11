@@ -112,13 +112,9 @@ namespace MonoGame.Tools.Pipeline
             {
                 LoadTemplates(macPath);
             }
-            else if (Directory.Exists(windowsAndLinuxPath))
-            {
-                LoadTemplates(windowsAndLinuxPath);
-            }
             else
             {
-                throw new DirectoryNotFoundException("'Templates' or 'Resources' folder not found");
+                LoadTemplates(windowsAndLinuxPath);
             }
 
             UpdateMenu();
