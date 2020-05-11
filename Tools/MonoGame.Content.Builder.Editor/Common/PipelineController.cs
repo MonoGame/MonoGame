@@ -105,19 +105,22 @@ namespace MonoGame.Tools.Pipeline
 
             _templateItems = new List<ContentItemTemplate>();
             var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var macPath = Path.Combine(root, "..", "Resources");
+            var windowsAndLinuxPath = Path.Combine(root, "Templates");
 
-            // I do not understand why this piece of code is here. Is there a possibility where the "Templates" folder is actually called "Resources"?
-            // What I do know is that I don't have a folder called "Resources" in this commit, so to prevent the path to be renamed to "Resources" I commented it out instead of removing it
-            //if (Directory.Exists(Path.Combine (root, "..", "Resources", "Templates")))
-            //{
-            //    root = Path.Combine(root, "..", "Resources");
-            //}
+            if (Directory.Exists(macPath))
+            {
+                LoadTemplates(macPath);
+            }
+            else if (Directory.Exists(windowsAndLinuxPath))
+            {
+                LoadTemplates(windowsAndLinuxPath);
+            }
+            else
+            {
+                throw new DirectoryNotFoundException("'Templates' or 'Resources' folder not found");
+            }
 
-            // It seems obvious what this is supposed to do, but the resulting path, provided as parameter, does not exist in my case
-            //LoadTemplates(Path.Combine(root, "../../../Templates"));
-
-            // This way the templates folder can be found in my case
-            LoadTemplates(Path.Combine(root, "Templates"));
             UpdateMenu();
 
             view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
