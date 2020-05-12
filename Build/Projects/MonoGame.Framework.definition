@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS,PSVita,XBoxOne,Switch">
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS,PlayStation4,PSVita,XBoxOne,Switch">
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
     for backwards compatibility with existing users of MonoGame, and are not
