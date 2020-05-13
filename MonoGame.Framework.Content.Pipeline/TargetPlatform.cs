@@ -105,6 +105,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Google Stadia
         /// </summary>
         Stadia,
+
+        /// <summary>
+        /// WebAssembly and Bridge.NET
+        /// </summary>
+        Web
     }
 
 
