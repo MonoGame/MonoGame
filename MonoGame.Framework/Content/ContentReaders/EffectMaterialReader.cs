@@ -31,6 +31,9 @@ namespace Microsoft.Xna.Framework.Content
 					else if (ReflectionHelpers.IsAssignableFromType(typeof(int), itemType)) {
 						parameter.SetValue((int) item.Value);
 					}
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(int[]), itemType)) {
+						parameter.SetValue((int[]) item.Value);
+					}
 					else if (ReflectionHelpers.IsAssignableFromType(typeof(bool), itemType)) {
 						parameter.SetValue((bool) item.Value);
 					}
