@@ -1,4 +1,3 @@
 <Project>
   <Import Project="..\MonoGame.props" />
 </Project>
-
