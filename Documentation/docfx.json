@@ -77,6 +77,8 @@
     ],
     "globalMetadata": {
       "_appTitle": "MonoGame Documentation",
+      "_appLogoPath": "images/mg-logo-white.svg",
+      "_appFaviconPath": "images/favicon-192x192.png",
       "baseDir": "MonoGame-docfx"
     },
     "fileMetadataFiles": [
@@ -84,7 +86,8 @@
     ],
     "template": [
       "default",
-      "theme/material"
+      "theme/material",
+      "theme/monogame"
     ],
     "noLangKeyword": false
   }

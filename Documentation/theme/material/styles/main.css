@@ -1,9 +1,5 @@
 /* Custom css for MG theme */
 
-/* hide logo in navbar */
-.navbar-brand {
-  display: none;
-}
 .navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form {
   border-top: none;
 }
