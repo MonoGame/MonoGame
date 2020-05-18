@@ -1,8 +1,6 @@
 MGCB Editor is the front-end GUI editor for MonoGame content builder projects.
 
-<p align="center">
-<img src="images/pipeline.png"/>
-</p>
+[!MGCB Editor](~/images/pipeline.png)
 
 MGCB Editor has the following features:
 
@@ -25,5 +23,5 @@ In a terminal run `dotnet tool install -g dotnet-mgcb-editor` to install MGFXC.
 After installing `mgcb-editor` run `dotnet mgcb-editor --register` to register MGCB Editor as the default app for .mgcb
 files. This currently does not work on macOS.
 
-[Read detailed documentation](using_pipeline_tool.md)
+[Read detailed documentation](~/articles/content/using_pipeline_tool.md).
 

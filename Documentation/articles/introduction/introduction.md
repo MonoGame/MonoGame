@@ -5,7 +5,8 @@ This section will give you an overview of MonoGame including, what it contains, 
 This section will cover the following topics:
 
 - [What is MonoGame](what_is_monogame.md)
-- [System Requirements](system_requirements.md)
-- [Setting Up MonoGame](setting_up_monogame.md)
+- [Development Requirements](requirements.md)
+- [Create a MonoGame Project](create_project.md)
+- [Target Platforms](platforms.md)
 - [MonoGame FAQ](monogame_faq.md)
 - [Help and Support](help_and_support.md)

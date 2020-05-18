@@ -18,7 +18,7 @@ MonoGame templates can be installed as a Visual Studio extension.
 
 When Visual Studio restarts, click Create a new project. The MonoGame templates should show up at the top, if not search for MonoGame in the search bar.
 
-You'll see a few different templates were installed. To know which one to use, please refer to [Target Platforms](Platforms.md).
+You'll see a few different templates were installed. To know which one to use, please refer to [Target Platforms](platforms.md).
 
 ## Visual Studio for Mac
 
@@ -30,7 +30,7 @@ MonoGame templates can be installed as a VS for Mac extension.
 
 You've now installed the MonoGame templates. Go to File > New Solution... to open the New Project
 dialog. You'll see the MonoGame templates in the list of templates.
-To know which template to use, check out [Target Platforms](Platforms.md).
+To know which template to use, check out [Target Platforms](platforms.md).
 
 ## .NET Core CLI
 
@@ -45,4 +45,4 @@ Run `dotnet new <TemplateID> -o <ProjectName>` to create your project, where `<T
 
 For example: `dotnet new mgdesktopgl -o MyGame`.
 
-To know which platform identifier to use for your project, please refer to [Target Platforms](Platforms.md).
+To know which platform identifier to use for your project, please refer to [Target Platforms](platforms.md).
