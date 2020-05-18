@@ -1,10 +1,10 @@
+# Requirements
 
-Depending on the [platform](Platforms.md) that you are targeting, MonoGame has different sets of requirements.
+Depending on the [platform](platforms.md) that you are targeting, MonoGame has different sets of requirements.
 
 ## For desktop platforms
 
 MonoGame requires a .NET Core SDK (3.1 or up) installation.
-
 You can either install it [independently](https://dotnet.microsoft.com/download/dotnet-core), or by selecting the .NET Core payload when installing Visual Studio 2019 (version 15.4 and up required).
 
 If you are targeting WindowsDX, you are also going to need [the DirectX June 2010 runtime](https://www.microsoft.com/en-us/download/details.aspx?id=8109) for audio and gamepads to work properly.
@@ -16,9 +16,7 @@ Desktop development is possible from any operating system.
 ## For UWP platforms
 
 MonoGame requires the latest Windows 10 SDK.
-
 You can install it by selecting the Universal App payload when installing Visual Studio 2019.
-
 Building and publishing for UWP is only supported with Visual Studio 2019.
 
 UWP development is not possible from macOS or Linux.
