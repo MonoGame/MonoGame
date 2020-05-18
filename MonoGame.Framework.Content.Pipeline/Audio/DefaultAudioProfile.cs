@@ -22,7 +22,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     platform == TargetPlatform.Windows ||
                     platform == TargetPlatform.WindowsPhone8 ||
                     platform == TargetPlatform.WindowsStoreApp ||
-                    platform == TargetPlatform.iOS;
+                    platform == TargetPlatform.iOS ||
+                    platform == TargetPlatform.Web;
         }
 
         public override ConversionQuality ConvertAudio(TargetPlatform platform, ConversionQuality quality, AudioContent content)
@@ -52,6 +53,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
             else if (platform == TargetPlatform.DesktopGL)
                 targetFormat = ConversionFormat.Vorbis;
+            else if (platform == TargetPlatform.Web)
+                targetFormat = ConversionFormat.Mp3;
 
             // Get the song output path with the target format extension.
             outputFileName = Path.ChangeExtension(outputFileName, AudioHelper.GetExtension(targetFormat));
@@ -346,6 +349,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         // Vorbis
                         ffmpegCodecName = "libvorbis";
                         ffmpegMuxerName = "ogg";
+                        //format = 0x0000; /* WAVE_FORMAT_UNKNOWN */
+                        break;
+                    case ConversionFormat.Mp3:
+                        // Vorbis
+                        ffmpegCodecName = "libmp3lame";
+                        ffmpegMuxerName = "mp3";
                         //format = 0x0000; /* WAVE_FORMAT_UNKNOWN */
                         break;
                     default:
