@@ -1,16 +1,11 @@
 - name: What is MonoGame
   href: what_is_monogame.md
-- name: System Requirements
-  href: system_requirements.md
-- name: Setting up MonoGame
-  href: setting_up_monogame.md
-  items:
-  - name: Mac
-    href: setting_up_monogame_mac.md
-  - name: Linux
-    href: setting_up_monogame_linux.md
-  - name: From Source
-    href: setting_up_monogame_source.md
+- name: Requirements
+  href: requirements.md
+- name: Create a MonoGame Project
+  href: create_project.md
+- name: Target Platforms
+  href: platforms.md
 - name: MonoGame FAQ
   href: monogame_faq.md
 - name: Help and Support

@@ -13,6 +13,8 @@
 - name: Platform-Specific Notes
   href: platform_specific/toc.yml
   topicHref: platform_specific/platform_specific.md
+- name: Package games for distribution
+  href: packaging_games.md
 - name: Porting from XNA to MonoGame
   href: porting_xna.md
 - name: Samples and Demos
