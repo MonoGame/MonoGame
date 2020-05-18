@@ -5,7 +5,7 @@ The currently supported platforms are as follows.
 
 * Desktop PCs
   * Windows 10 Store Apps (UWP)
-  * Windows Win32 (OpenGL & DirectX)
+  * Windows Win32 (OpenGL or DirectX)
   * Linux (OpenGL)
   * macOS (OpenGL)
 * Mobile/Tablet Devices
@@ -25,3 +25,5 @@ developer programs.
   * Xbox One (both UWP and XDK) (ID@Xbox)
   * Nintendo Switch (Nintendo)
   * Stadia (Google)
+
+To access the MonoGame version of these consoles, please contact your console account manager(s) directly (the MonoGame team can't give you access without contacting them first).
