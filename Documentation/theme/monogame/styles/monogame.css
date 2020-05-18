@@ -22,7 +22,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .mg-link-block {
     display: none;
   }
