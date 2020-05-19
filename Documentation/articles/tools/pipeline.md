@@ -1,10 +1,10 @@
 # MGCB Editor
 
-The MonoGame Pipeline Tool (Pipeline.exe) is the front-end GUI editor for MonoGame content builder projects.
+MGCB Editor is the front-end GUI editor for MonoGame content builder projects.
 
-![MGCB Editor](~/images/pipeline.png)
+[!MGCB Editor](~/images/pipeline.png)
 
-The Pipeline Tool has the following features:
+MGCB Editor has the following features:
 
 * Create, open, and save MGCB projects.
 * Import existing XNA .contentproj.
@@ -17,6 +17,12 @@ The Pipeline Tool has the following features:
 * Support for custom importers/processors/writers.
 * Template format for adding new custom content types.
 
-The Pipeline Tool is included in the SDK installation.
+MGCB Editor can be installed as a [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
+Make sure you have the .NET Core SDK installed. You can download it [here](https://dotnet.microsoft.com/download).
 
-[Read detailed documentation](~/articles/content/using_pipeline_tool.md)
+In a terminal run `dotnet tool install -g dotnet-mgcb-editor` to install MGFXC.
+
+After installing `mgcb-editor` run `dotnet mgcb-editor --register` to register MGCB Editor as the default app for .mgcb
+files. This currently does not work on macOS.
+
+[Read detailed documentation](~/articles/content/using_pipeline_tool.md).

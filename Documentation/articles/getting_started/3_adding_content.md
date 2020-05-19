@@ -12,9 +12,9 @@ Now open up your game project and look at the left. You should see a solution ex
 
 ![Open Content](~/images/getting_started/3_open_content.png)
 
-You should now see a MonoGame Pipeline Tool window open up. In case it didn't get opened, you can right-click on **Content.mgcb**, select **open with** and then select **MonoGame Pipeline**.
+You should now see a MGCB Editor window open up. In case it didn't get opened, you can right-click on **Content.mgcb**, select **open with** and then select **MonoGame Pipeline**.
 
-![MonoGame Pipeline Tool](~/images/getting_started/3_pipeline_tool.png)
+![MGCB Editor](~/images/getting_started/3_pipeline_tool.png)
 
 Your game content is managed from this external tool. You can add content to your game in one of the following ways:
 
