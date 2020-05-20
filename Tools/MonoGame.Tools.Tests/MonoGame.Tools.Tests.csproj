@@ -34,6 +34,12 @@
     <Content Include="../../Tests/Assets/**/*" CopyToOutputDirectory="PreserveNewest">
       <Link>Assets/%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Content>
+    <Content Include="../../MonoGame.Framework/Platform/Graphics/Effect/Resources/*.fx" CopyToOutputDirectory="PreserveNewest">
+      <Link>Assets/Effects/Stock/%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="../../MonoGame.Framework/Platform/Graphics/Effect/Resources/*.fxh" CopyToOutputDirectory="PreserveNewest">
+      <Link>Assets/Effects/Stock/%(Filename)%(Extension)</Link>
+    </Content>
   </ItemGroup>
 
 </Project>

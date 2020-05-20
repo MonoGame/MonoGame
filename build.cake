@@ -54,6 +54,9 @@ private bool GetMSBuildWith(string requires)
 Task("Prep")
     .Does(() =>
 {
+    // Set MGFXC_WINE_PATH for building shaders on macOS and Linux
+    System.Environment.SetEnvironmentVariable("MGFXC_WINE_PATH", EnvironmentVariable("HOME") + "/.winemonogame");
+
     // We tag the version with the build branch to make it
     // easier to spot special builds in NuGet feeds.
     var branch = EnvironmentVariable("GIT_BRANCH") ?? string.Empty;
