@@ -128,11 +128,6 @@
   -->
   <Target Name="UpdateMGCB" Condition="'$(MGCBCommand)' == ''" DependsOnTargets="GetInstalledMGCB">
 
-    <!-- If the correct version is in the manifest, restore to ensure it's installed. -->
-    <Exec
-      Condition="$(MGCBInstalledVersion) == $(MGCBVersion)"
-      Command="$(DotnetCommand) tool restore" />
-
     <!-- If the correct version is not in the manifest, install the correct version. -->
     <CallTarget
       Condition="$(MGCBInstalledVersion) != $(MGCBVersion)"
