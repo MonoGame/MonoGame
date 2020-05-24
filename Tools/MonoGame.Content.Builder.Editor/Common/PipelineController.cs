@@ -105,11 +105,18 @@ namespace MonoGame.Tools.Pipeline
 
             _templateItems = new List<ContentItemTemplate>();
             var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (Directory.Exists(Path.Combine (root, "..", "Resources", "Templates")))
+            var macPath = Path.Combine(root, "..", "Resources");
+            var windowsAndLinuxPath = Path.Combine(root, "Templates");
+
+            if (Directory.Exists(macPath))
             {
-                root = Path.Combine(root, "..", "Resources");
+                LoadTemplates(macPath);
             }
-            LoadTemplates(Path.Combine(root, "../../../Templates"));
+            else
+            {
+                LoadTemplates(windowsAndLinuxPath);
+            }
+
             UpdateMenu();
 
             view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
