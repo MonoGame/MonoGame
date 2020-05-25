@@ -18,7 +18,6 @@ namespace MonoGame.Tools.Pipeline
             HoverTextColor = SystemColors.HighlightText;
             HoverBackColor = SystemColors.Highlight;
             DisabledTextColor = SystemColors.ControlText;
-            DisabledTextColor.A = 0.4f;
             BorderColor = Global.IsGtk ? SystemColors.WindowBackground : SystemColors.Control;
         }
 
