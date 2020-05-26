@@ -163,9 +163,7 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
-        /// The maximum number of game pads supported on this system.  Attempting to
-        /// access a gamepad index higher than this number will result in an <see cref="InvalidOperationException"/>
-        /// being thrown by the API.
+        /// The maximum number of game pads supported on this system.
         /// </summary>
         public static int MaximumGamePadCount
         {
