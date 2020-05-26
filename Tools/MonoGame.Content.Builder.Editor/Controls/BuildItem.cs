@@ -64,7 +64,7 @@ namespace MonoGame.Tools.Pipeline
                 if (_expanded)
                 {
                     _descriptionOffset = (_descSize - DrawInfo.TextHeight) / 2;
-                    Height = (int)(CellHeight + _descSize * _description.Count);
+                    Height = (int)(CellHeight + Margin + (_descSize * _description.Count));
 
                     foreach (var des in _description)
                     {
