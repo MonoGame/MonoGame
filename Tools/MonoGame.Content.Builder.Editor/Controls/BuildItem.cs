@@ -108,7 +108,7 @@ namespace MonoGame.Tools.Pipeline
             if (_expanded)
             {
                 for (int i = 0; i < _description.Count; i++)
-                    g.DrawText(SystemFonts.Default(), DrawInfo.DisabledTextColor, x + Spacing, y + CellHeight + _descriptionOffset + _descSize * i, _description[i]);
+                    g.DrawText(SystemFonts.Default(), DrawInfo.TextColor, x + Spacing, y + CellHeight + _descriptionOffset + _descSize * i, _description[i]);
             }
         }
     }
