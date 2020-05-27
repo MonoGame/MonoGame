@@ -408,7 +408,7 @@ namespace MonoGame.Tools.Pipeline
 
             // If the project itself was selected, just
             // rebuild the entire project
-            if (items.Contains(_project))
+            if (SelectedItems.Contains(_project))
             {
                 Build(true);
                 return;
