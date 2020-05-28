@@ -149,7 +149,7 @@
       - ExtraContent: built content files
         - ContentDir: the relative path of the embedded folder to contain the content files
   -->
-  <Target Name="RunContentBuilder" DependsOnTargets="UpdateMGCB;PrepareContentBuilder">
+  <Target Name="RunContentBuilder" DependsOnTargets="PrepareContentBuilder">
 
     <!-- Execute MGCB from the project directory so we use the correct manifest. -->
     <Exec
