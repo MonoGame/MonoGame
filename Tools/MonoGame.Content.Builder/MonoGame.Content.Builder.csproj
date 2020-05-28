@@ -13,26 +13,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
-    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj" />
+    <None Include="..\AppReference.targets" />
   </ItemGroup>
 
-  <!-- Build and copy MGFXC, just don't reference it! -->
-  <PropertyGroup>
-    <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
-    <NoWarn>NU5100</NoWarn>
-  </PropertyGroup>
   <ItemGroup>
-    <Content Include="..\..\Artifacts\MonoGame.Effect.Compiler\Release\*"
-             Exclude="..\..\Artifacts\MonoGame.Effect.Compiler\Release\*.nupkg"
-             Visible="false">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
+    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj" />
+    <ProjectReference Include="..\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <AppReference>true</AppReference>
+    </ProjectReference>
   </ItemGroup>
-  <Target Name="BuildMFGXC" BeforeTargets="Restore">
-    <MSBuild Projects="..\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj" Properties="Configuration=Release;UseAppHost=False" Targets="Restore" />
-    <MSBuild Projects="..\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj" Properties="Configuration=Release;UseAppHost=False" Targets="Build" />
-  </Target>
+
+  <Import Project="..\AppReference.targets" />
 
 </Project>
 

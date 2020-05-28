@@ -7,7 +7,7 @@
             See https://github.com/dotnet/sdk/issues/1675#issuecomment-346135772 -->
   <Target Name="CopyAppReferences" BeforeTargets="GetCopyToOutputDirectoryItems">
 
-    <!-- Get the output folders of all AppReferences. -->
+    <!-- Get the output file of this AppReference. -->
     <MSBuild Projects="%(ProjectReference.FullPath)"
              Targets="GetTargetPath"
              Properties="Configuration=$(Configuration)"
@@ -39,12 +39,11 @@
       </AppReferenceContent>
     </ItemGroup>
 
-    <!-- Copy this content to the build output. -->
+    <!-- Copy this content to the build and package output. -->
     <ItemGroup>
-      <ContentWithTargetPath
-        Include="%(AppReferenceContent.FullPath)"
-        TargetPath="%(SubDir)%(RecursiveDir)%(Filename)%(Extension)"
-        CopyToOutputDirectory="PreserveNewest" />
+      <TfmSpecificPackageFile Include="%(AppReferenceContent.FullPath)">
+        <PackagePath>tools\$(TargetFramework)\any\%(AppReferenceContent.SubDir)%(RecursiveDir)</PackagePath>
+      </TfmSpecificPackageFile>
     </ItemGroup>
 
   </Target>
