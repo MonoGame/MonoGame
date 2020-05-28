@@ -64,7 +64,7 @@ namespace MonoGame.Tools.Pipeline
                 if (_expanded)
                 {
                     _descriptionOffset = (_descSize - DrawInfo.TextHeight) / 2;
-                    Height = (int)(CellHeight + _descSize * _description.Count);
+                    Height = (int)(CellHeight + Margin + (_descSize * _description.Count));
 
                     foreach (var des in _description)
                     {
@@ -108,7 +108,7 @@ namespace MonoGame.Tools.Pipeline
             if (_expanded)
             {
                 for (int i = 0; i < _description.Count; i++)
-                    g.DrawText(SystemFonts.Default(), DrawInfo.DisabledTextColor, x + Spacing, y + CellHeight + _descriptionOffset + _descSize * i, _description[i]);
+                    g.DrawText(SystemFonts.Default(), DrawInfo.TextColor, x + Spacing, y + CellHeight + _descriptionOffset + _descSize * i, _description[i]);
             }
         }
     }
