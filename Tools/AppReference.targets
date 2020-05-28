@@ -7,7 +7,7 @@
             See https://github.com/dotnet/sdk/issues/1675#issuecomment-346135772 -->
   <Target Name="CopyAppReferences" BeforeTargets="GetCopyToOutputDirectoryItems">
 
-    <!-- Get the output file of this AppReference. -->
+    <!-- Get the output folders of all AppReferences. -->
     <MSBuild Projects="%(ProjectReference.FullPath)"
              Targets="GetTargetPath"
              Properties="Configuration=$(Configuration)"
@@ -41,9 +41,16 @@
 
     <!-- Copy this content to the build and package output. -->
     <ItemGroup>
-      <TfmSpecificPackageFile Include="%(AppReferenceContent.FullPath)">
-        <PackagePath>tools\$(TargetFramework)\any\%(AppReferenceContent.SubDir)%(RecursiveDir)</PackagePath>
-      </TfmSpecificPackageFile>
+      <ContentWithTargetPath
+        Include="%(AppReferenceContent.FullPath)"
+        TargetPath="%(AppReferenceContent.SubDir)%(RecursiveDir)%(Filename)%(Extension)"
+        CopyToOutputDirectory="PreserveNewest" />
+
+      <!-- This is required to include the files in a nupkg if the project isn't packed as a tool. -->
+      <TfmSpecificPackageFile
+        Include="%(AppReferenceContent.FullPath)"
+        PackagePath="tools\$(TargetFramework)\any\%(AppReferenceContent.SubDir)%(RecursiveDir)"
+        Condition="'$(PackAsTool)' != 'true'"/>
     </ItemGroup>
 
   </Target>
