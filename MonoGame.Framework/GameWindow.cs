@@ -83,6 +83,16 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public IImmService ImmService { get; internal set; }
 
+        /// <summary>
+        /// Enables text input.
+        /// </summary>
+        public void StartTextInput() { ImmService.StartTextInput(); }
+
+        /// <summary>
+        /// Disables text input.
+        /// </summary>
+        public void StopTextInput() { ImmService.StopTextInput(); }
+
         internal MouseState MouseState;
         internal TouchPanelState TouchPanelState;
 
