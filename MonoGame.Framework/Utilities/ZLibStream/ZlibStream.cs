@@ -3038,7 +3038,8 @@ namespace MonoGame.Utilities
                         // compute minimum size table less than or equal to l bits
                         z = g - w;
                         z = (z > l) ? l : z; // table size upper limit
-                        if ((f = 1 << (j = k - w)) > a + 1)
+                        j = k - w;
+                        if ((f = 1 << j) > a + 1)
                         {
                             // try a k-w bit table
                             // too few codes for k-w bit table
