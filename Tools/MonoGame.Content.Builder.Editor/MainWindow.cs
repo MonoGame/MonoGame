@@ -371,11 +371,11 @@ namespace MonoGame.Tools.Pipeline
             AddContextMenu(cmOpenItem, ref sep);
             AddContextMenu(cmOpenItemWith, ref sep);
             AddContextMenu(cmAdd, ref sep);
+            AddContextMenu(cmRebuildItem, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmOpenItemLocation, ref sep);
             AddContextMenu(cmOpenOutputItemLocation, ref sep);
             AddContextMenu(cmCopyAssetPath, ref sep);
-            AddContextMenu(cmRebuildItem, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmExclude, ref sep);
             AddSeparator(ref sep);
