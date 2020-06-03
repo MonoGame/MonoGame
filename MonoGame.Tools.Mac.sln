@@ -1,23 +1,29 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.DesktopGL", "MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj", "{5B5871CA-AD66-4B5E-B097-B7144CF1B570}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Framework.DesktopGL", "MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj", "{5B5871CA-AD66-4B5E-B097-B7144CF1B570}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Content.Pipeline", "MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj", "{EE9F056F-8B59-4F41-9AC4-B54E43CD89B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Framework.Content.Pipeline", "MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj", "{EE9F056F-8B59-4F41-9AC4-B54E43CD89B5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1CCEF3CE-3E70-4A17-BCBD-73137881CEEB} = {1CCEF3CE-3E70-4A17-BCBD-73137881CEEB}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder", "Tools\MonoGame.Content.Builder\MonoGame.Content.Builder.csproj", "{B3201192-46D5-40C5-A24E-493EC66D8C9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Content.Builder", "Tools\MonoGame.Content.Builder\MonoGame.Content.Builder.csproj", "{B3201192-46D5-40C5-A24E-493EC66D8C9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Effect.Compiler", "Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj", "{1CCEF3CE-3E70-4A17-BCBD-73137881CEEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Effect.Compiler", "Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj", "{1CCEF3CE-3E70-4A17-BCBD-73137881CEEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Task", "Tools\MonoGame.Content.Builder.Task\MonoGame.Content.Builder.Task.csproj", "{BC63B70D-1F03-4FF3-B823-12642D52CB74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Content.Builder.Task", "Tools\MonoGame.Content.Builder.Task\MonoGame.Content.Builder.Task.csproj", "{BC63B70D-1F03-4FF3-B823-12642D52CB74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Tools.Tests", "Tools\MonoGame.Tools.Tests\MonoGame.Tools.Tests.csproj", "{0029401D-131E-41CB-8D77-4D8DDD00513D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Tools.Tests", "Tools\MonoGame.Tools.Tests\MonoGame.Tools.Tests.csproj", "{0029401D-131E-41CB-8D77-4D8DDD00513D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor.Mac", "Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.Mac.csproj", "{1853CCED-232C-4972-A2F2-D56F7F6DBEAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Content.Builder.Editor.Mac", "Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.Mac.csproj", "{1853CCED-232C-4972-A2F2-D56F7F6DBEAE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B3201192-46D5-40C5-A24E-493EC66D8C9B} = {B3201192-46D5-40C5-A24E-493EC66D8C9B}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor", "Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.csproj", "{F673A915-308F-4111-8950-A5755BE5CEEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Content.Builder.Editor", "Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.csproj", "{F673A915-308F-4111-8950-A5755BE5CEEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,9 +33,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{5B5871CA-AD66-4B5E-B097-B7144CF1B570}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -128,5 +131,11 @@ Global
 		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|x64.Build.0 = Release|Any CPU
 		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|x86.ActiveCfg = Release|Any CPU
 		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1F3D65DD-4771-4627-84FB-4A001F338B6C}
 	EndGlobalSection
 EndGlobal

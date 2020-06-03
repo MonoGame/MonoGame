@@ -267,22 +267,18 @@ This package provides you with the content pipeline for Windows, Mac and Linux w
     </Compile>
   </ItemGroup>
 
-  <!-- Build and copy MGFXC, just don't reference it! -->
   <PropertyGroup>
     <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
     <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
+  
   <ItemGroup>
-    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\Release\*"
-             Exclude="..\Artifacts\MonoGame.Effect.Compiler\Release\*.nupkg"
+    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*"
+             Exclude="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*.nupkg"
              Visible="false">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <Target Name="BuildMGFXC" BeforeTargets="Restore">
-    <MSBuild Projects="..\Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj" Properties="Configuration=Release;UseAppHost=False" Targets="Restore" />
-    <MSBuild Projects="..\Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj" Properties="Configuration=Release;UseAppHost=False" Targets="Build" />
-  </Target>
   
   <Import Project="..\Stadia\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Stadia\MonoGame.Framework.Content.Pipeline.targets')" />
 
