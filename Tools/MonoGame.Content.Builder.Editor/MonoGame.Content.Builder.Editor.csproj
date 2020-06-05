@@ -42,7 +42,7 @@
     <None Remove="**\*" />
     <Compile Remove="**\*" />
 
-    <None Include="Platform\Launcher\AppReference.targets" />
+    <None Include="..\AppReference.targets" />
     <Compile Include="Platform\Launcher\**\*.cs" />
     <Compile Include="Platform\Utilities\**\*.cs" />
   </ItemGroup>
@@ -73,6 +73,6 @@
     </ProjectReference>
   </ItemGroup>
 
-  <Import Project="Platform\Launcher\AppReference.targets" />
+  <Import Project="..\AppReference.targets" />
 
 </Project>

@@ -11,140 +11,18 @@
   </PropertyGroup>
 
   <!--
-    Target flow diagram
-    * - only run if necessary
-
-                                      InstallMGCB*
-                                           ^
-                                           |
-         GetInstalledMGCB*     ->     UpdateMGCB*
-                                                        \
-                                                          -> RunContentBuilder -> IncludeContent
-                                                        /
-      CollectContentReferences -> PrepareContentBuilder
+    Target flow
+      1. CollectContentReferences
+      2. PrepareContentBuilder
+      3. RunContentBuilder
+      4. IncludeContent
   -->
 
   <!--
-    Calls 'dotnet tool' commands to parse information about any locally installed MGCB tools.
+    ========================
+    CollectContentReferences
+    ========================
 
-    Outputs:
-      - MGCBInstalledVersion: the version of an installed MGCB tool, or empty string
-      - MGCBInstalledFolder: the folder with a locally installed MGCB tool, or empty string
-
-    Example:
-      - Given the following output from 'dotnet tool list -local':
-          Package Id       Version      Commands      Manifest
-          - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-          dotnet-mgcb      2.0.0        mgcb          C:\Game\Game.DesktopGL\.config\dotnet-tools.json
-      - Output
-        - MGCBInstalledVersion: 2.0.0
-        - MGCBInstalledFolder: C:\Game\Game.DesktopGL
-  -->
-  <Target Name="GetInstalledMGCB">
-
-    <!-- List dotnet tools. -->
-    <Exec
-      WorkingDirectory="$(MSBuildProjectDirectory)"
-      Command="$(DotnetCommand) tool list --local"
-      ConsoleToMSBuild="true">
-      <Output TaskParameter="ConsoleOutput" PropertyName="ConsoleOutput" />
-    </Exec>
-
-    <!-- Get header indices.
-         The output of `dotnet tool list` (https://github.com/dotnet/cli/blob/master/src/dotnet/commands/dotnet-tool/list/ToolListGlobalOrToolPathCommand.cs) 
-         is formatted as a `PrintableTable` (https://github.com/dotnet/cli/blob/master/src/dotnet/PrintableTable.cs).
-         `PrintableTable` defines six consecutive spaces as its column delimiter (public const string ColumnDelimiter = "      ";).
-         However MSBuild will automatically convert a string to a char[] if there is an available overload,
-         so Split can only be called with multiple character delimiters and not with a string delimiter.
-         Therefore first replace the string delimiter with a single character delimiter. -->
-    <PropertyGroup>
-
-      <HeaderLine>$(ConsoleOutput.Split(';')[0].Replace("      ", ","))</HeaderLine>
-
-      <DotnetToolHeaderPackageIDColumnName>$(HeaderLine.Split(",", StringSplitOptions.RemoveEmptyEntries)[0].Trim())</DotnetToolHeaderPackageIDColumnName>
-      <DotnetToolHeaderVersionColumnName>$(HeaderLine.Split(",", StringSplitOptions.RemoveEmptyEntries)[1].Trim())</DotnetToolHeaderVersionColumnName>
-      <DotnetToolHeaderCommandsColumnName>$(HeaderLine.Split(",", StringSplitOptions.RemoveEmptyEntries)[2].Trim())</DotnetToolHeaderCommandsColumnName>
-      <DotnetToolHeaderManifestColumnName>$(HeaderLine.Split(",", StringSplitOptions.RemoveEmptyEntries)[3].Trim())</DotnetToolHeaderManifestColumnName>
-
-      <DotnetToolPackageIdIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderPackageIDColumnName)))</DotnetToolPackageIdIndex>
-      <DotnetToolVersionIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderVersionColumnName)))</DotnetToolVersionIndex>
-      <DotnetToolCommandsIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderCommandsColumnName)))</DotnetToolCommandsIndex>
-      <DotnetToolManifestIndex>$(ConsoleOutput.IndexOf($(DotnetToolHeaderManifestColumnName)))</DotnetToolManifestIndex>
-
-      <DotnetToolPackageIdLength>$([MSBuild]::Subtract($(DotnetToolVersionIndex), $(DotnetToolPackageIdIndex)))</DotnetToolPackageIdLength>
-      <DotnetToolVersionLength>$([MSBuild]::Subtract($(DotnetToolCommandsIndex), $(DotnetToolVersionIndex)))</DotnetToolVersionLength>
-      <DotnetToolCommandsLength>$([MSBuild]::Subtract($(DotnetToolManifestIndex), $(DotnetToolCommandsIndex)))</DotnetToolCommandsLength>
-
-    </PropertyGroup>
-
-    <!-- Get metadata from output. Note: the header and horizontal line will be present here too, but they should not interfere with anything. -->
-    <ItemGroup>
-      <ConsoleLine Include="$(ConsoleOutput.Split(';'))" />
-      <DotnetTool Include="%(ConsoleLine.Identity)" Condition="'%(Identity)' != ''">
-        <PackageId>$([System.String]::Copy("%(Identity)").Substring($(DotnetToolPackageIdIndex), $(DotnetToolPackageIdLength)).Trim())</PackageId>
-        <Version>$([System.String]::Copy("%(Identity)").Substring($(DotnetToolVersionIndex), $(DotnetToolVersionLength)).Trim())</Version>
-        <Commands>$([System.String]::Copy("%(Identity)").Substring($(DotnetToolCommandsIndex), $(DotnetToolCommandsLength)).Trim())</Commands>
-        <Manifest>$([System.String]::Copy("%(Identity)").Substring($(DotnetToolManifestIndex)).Trim())</Manifest>
-      </DotnetTool>
-    </ItemGroup>
-
-    <!-- Get metadata for the MGCB tool, if present. -->
-    <PropertyGroup>
-      <MGCBInstalledVersion Condition="'%(PackageId)' == '$(MGCBPackageId)'">%(DotnetTool.Version)</MGCBInstalledVersion>
-      <MGCBInstalledFolder Condition="'%(PackageId)' == '$(MGCBPackageId)'">$([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetDirectoryName(%(DotnetTool.Manifest)))))</MGCBInstalledFolder>
-    </PropertyGroup>
-
-  </Target>
-
-  <!--
-    Ensures a tools manifest exists in the project directory with the correct version of the MGCB tool installed.
-  -->
-  <Target Name="InstallMGCB">
-
-    <!-- Ensure there is a manifest for the project. -->
-    <Exec
-      WorkingDirectory="$(MSBuildProjectDirectory)"
-      Command="$(DotnetCommand) new tool-manifest"
-      ContinueOnError="true" />
-
-    <!-- If there is a version of MGCB installed in the project directory, uninstall it. -->
-    <Exec
-      Condition="'$(MGCBInstalledFolder)' == '$(MSBuildProjectDirectory)'"
-      WorkingDirectory="$(MSBuildProjectDirectory)"
-      Command="$(DotnetCommand) tool uninstall $(MGCBPackageId)" />
-
-    <!-- Install the correct version of MGCB. -->
-    <Exec
-      WorkingDirectory="$(MSBuildProjectDirectory)"
-      Command="$(DotnetCommand) tool install $(MGCBPackageId) --version $(MGCBVersion)" />
-
-  </Target>
-
-  <!--
-    Restores or installs the correct version of the MGCB tool if MGCBCommand is not already defined.
-
-    Outputs:
-      - MGCBCommand: the command to run the MGCB tool without any arguments
-  -->
-  <Target Name="UpdateMGCB" Condition="'$(MGCBCommand)' == ''" DependsOnTargets="GetInstalledMGCB">
-
-    <!-- If the correct version is in the manifest, restore to ensure it's installed. -->
-    <Exec
-      Condition="$(MGCBInstalledVersion) == $(MGCBVersion)"
-      Command="$(DotnetCommand) tool restore" />
-
-    <!-- If the correct version is not in the manifest, install the correct version. -->
-    <CallTarget
-      Condition="$(MGCBInstalledVersion) != $(MGCBVersion)"
-      Targets="InstallMGCB" />
-
-    <PropertyGroup>
-      <MGCBCommand>$(DotnetCommand) tool run mgcb</MGCBCommand>
-    </PropertyGroup>
-
-  </Target>
-
-  <!--
     Converts MonoGameContentReference items to ContentReference items, deriving the necessary metadata.
 
     Outputs:
@@ -158,7 +36,7 @@
       - Given the following file setup:
         - C:\Game\Game.Shared\Content.mgcb
         - C:\Game\Game.DesktopGL\Game.DesktopGL.csproj
-          - MonoGameContentReference: ..\Content\Content.mgcb
+          - MonoGameContentReference: ..\Game.Shared\Content.mgcb
       - Output:
         - ContentReference
           - FullDir: C:/Game/Game.Shared/
@@ -205,6 +83,10 @@
   </Target>
 
   <!--
+    =====================
+    PrepareContentBuilder
+    =====================
+
     Set and validate properties, and create folders for content output.
 
     Outputs:
@@ -257,18 +139,22 @@
   </Target>
 
   <!--
+    =================
+    RunContentBuilder
+    =================
+
     Run MGCB to build content and include it as ExtraContent.
 
     Outputs:
       - ExtraContent: built content files
         - ContentDir: the relative path of the embedded folder to contain the content files
   -->
-  <Target Name="RunContentBuilder" DependsOnTargets="UpdateMGCB;PrepareContentBuilder">
+  <Target Name="RunContentBuilder" DependsOnTargets="PrepareContentBuilder">
 
     <!-- Execute MGCB from the project directory so we use the correct manifest. -->
     <Exec
       Condition="'%(ContentReference.FullPath)' != ''"
-      Command="$(MGCBCommand) $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
+      Command="$(DotnetCommand) $(MGCBPath) $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
       WorkingDirectory="$(MSBuildProjectDirectory)" />
 
     <ItemGroup>
@@ -282,6 +168,10 @@
   </Target>
 
   <!--
+    ==============
+    IncludeContent
+    ==============
+
     Include ExtraContent as platform-specific content in the project output.
 
     Outputs:

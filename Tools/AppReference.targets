@@ -39,12 +39,18 @@
       </AppReferenceContent>
     </ItemGroup>
 
-    <!-- Copy this content to the build output. -->
+    <!-- Copy this content to the build and package output. -->
     <ItemGroup>
       <ContentWithTargetPath
         Include="%(AppReferenceContent.FullPath)"
-        TargetPath="%(SubDir)%(RecursiveDir)%(Filename)%(Extension)"
+        TargetPath="%(AppReferenceContent.SubDir)%(RecursiveDir)%(Filename)%(Extension)"
         CopyToOutputDirectory="PreserveNewest" />
+
+      <!-- This is required to include the files in a nupkg if the project isn't packed as a tool. -->
+      <TfmSpecificPackageFile
+        Include="%(AppReferenceContent.FullPath)"
+        PackagePath="tools\$(TargetFramework)\any\%(AppReferenceContent.SubDir)%(RecursiveDir)"
+        Condition="'$(PackAsTool)' != 'true'"/>
     </ItemGroup>
 
   </Target>
