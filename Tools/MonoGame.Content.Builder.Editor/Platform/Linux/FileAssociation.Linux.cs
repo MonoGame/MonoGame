@@ -9,8 +9,8 @@ namespace MonoGame.Tools.Pipeline
     public static class FileAssociation
     {
         // System directories.
-        private const string applicationDirectory = "/usr/share/applications";
-        private const string iconRootDirectory = "/usr/share/icons/hicolor";
+        private static readonly string applicationDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".local/share/applications");
+        private static readonly string iconRootDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".local/share/icons/hicolor");
         private const string iconType = "scalable/mimetypes";
 
         // Content files.
