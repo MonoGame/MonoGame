@@ -164,15 +164,17 @@ Task("BuildContentPipeline")
     .IsDependentOn("Prep")
     .Does(() =>
 {
+    PackDotnet("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
+
     PackDotnet("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj");
 });
 
 Task("BuildTools")
-    .IsDependentOn("Prep")
+    .IsDependentOn("BuildContentPipeline")
     .Does(() =>
 {
     PackDotnet("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
-    
+
     PackDotnet("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
     
     PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
@@ -186,11 +188,12 @@ Task("TestTools")
     .IsDependentOn("BuildTools")
     .Does(() =>
 {
-    CreateDirectory("Artifacts/Tests/Tools/Debug");
+    CreateDirectory("Artifacts/Tests/Tools/" + configuration);
     DotNetCoreRun("../../../../Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj", "", new DotNetCoreRunSettings
     {
-        WorkingDirectory = "Artifacts/Tests/Tools/Debug",
-	    ArgumentCustomization = args => args.Append("--teamcity")
+        WorkingDirectory = "Artifacts/Tests/Tools/" + configuration,
+	    ArgumentCustomization = args => args.Append("--teamcity"),
+        Configuration = configuration
     });
 });
 
