@@ -11,15 +11,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
-	internal class CharReader : ContentTypeReader<char>
+	internal class CharReader : ContentTypeReader<CharEx>
     {
         public CharReader()
         {
         }
 
-        protected internal override char Read(ContentReader input, char existingInstance)
+        protected internal override CharEx Read(ContentReader input, CharEx existingInstance)
         {
-            return input.ReadChar();
+            return input.ReadCharEx();
         }
     }
 }

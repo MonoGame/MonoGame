@@ -579,11 +579,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
-
+            var charArray = CharEx.ToArray(text);
             fixed (SpriteFont.Glyph* pGlyphs = spriteFont.Glyphs)
-            for (var i = 0; i < text.Length; ++i)
+            for (var i = 0; i < charArray.Length; ++i)
             {
-                var c = text[i];
+                var c = charArray[i];
 
                 if (c == '\r')
                     continue;
@@ -746,11 +746,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
-
+            var charArray = CharEx.ToArray(text);
             fixed (SpriteFont.Glyph* pGlyphs = spriteFont.Glyphs)
             for (var i = 0; i < text.Length; ++i)
             {
-                var c = text[i];
+                var c = charArray[i];
 
                 if (c == '\r')
                     continue;
@@ -862,11 +862,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
-
+            var charArray = CharEx.ToArray(text.ToString());
             fixed (SpriteFont.Glyph* pGlyphs = spriteFont.Glyphs)
             for (var i = 0; i < text.Length; ++i)
             {
-                var c = text[i];
+                var c = charArray[i];
 
                 if (c == '\r')
                     continue;
@@ -1028,11 +1028,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
-
+            var charArray = CharEx.ToArray(text.ToString());
             fixed (SpriteFont.Glyph* pGlyphs = spriteFont.Glyphs)
             for (var i = 0; i < text.Length; ++i)
             {
-                var c = text[i];
+
+                var c = charArray[i];
 
                 if (c == '\r')
                     continue;

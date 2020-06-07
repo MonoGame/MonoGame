@@ -70,10 +70,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 // Scan each string from the .resx file.
                 foreach (XmlNode xmlNode in xmlDocument.SelectNodes("root/data/value"))
                 {
-                    string resourceString = xmlNode.InnerText;
+                    var resourceString = CharEx.ToArray(xmlNode.InnerText);
 
                     // Scan each character of the string.
-                    foreach (char usedCharacter in resourceString)
+                    foreach (CharEx usedCharacter in resourceString)
                     {
                         if (!input.Characters.Contains (usedCharacter))
                             input.Characters.Add(usedCharacter);
