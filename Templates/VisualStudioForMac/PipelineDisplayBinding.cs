@@ -25,12 +25,15 @@ namespace MonoGame.IDE.VisualStudioForMac {
 
 	}
 
-	class PipelineDesktopApplication : MonoDevelop.Ide.Desktop.DesktopApplication {
+	class PipelineDesktopApplication : MonoDevelop.Ide.Desktop.DesktopApplication
+	{
+		private readonly static string appPath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "Applications/MGCB Editor.app");
+
 		MonoDevelop.Projects.Project project;
 		string filename;
 
 		public PipelineDesktopApplication (string filename, MonoDevelop.Projects.Project ownerProject)
-			: base ("MonoGamePipelineTool", "MonoGame Pipeline Tool", true)
+			: base ("MGCBEditor", "MGCB Editor", true)
 		{
 			this.project = ownerProject;
 			this.filename = filename;
@@ -39,20 +42,9 @@ namespace MonoGame.IDE.VisualStudioForMac {
 		public override void Launch (params string [] files)
 		{
 			var process = new Process ();
-			if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
-				process.StartInfo.FileName = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ProgramFilesX86), @"MSBuild\MonoGame\v3.0\Tools", "Pipeline.exe");
-				process.StartInfo.Arguments = string.Format ("\"{0}\"", filename);
-			} else {
-				if (Directory.Exists ("/Applications/Pipeline.app")) {
-					process.StartInfo.FileName = "open";
-					process.StartInfo.EnvironmentVariables.Add ("MONOGAME_PIPELINE_PROJECT", Path.GetFullPath (filename));
-					process.StartInfo.Arguments = string.Format ("-b com.monogame.pipeline --args \"{0}\"", Path.GetFullPath (filename));
-				} else {
-					// figure out linix 
-					process.StartInfo.FileName = "monogame-pipeline-tool";
-					process.StartInfo.Arguments = string.Format ("\"{0}\"", filename);
-				}
-			}
+			process.StartInfo.FileName = "open";
+			process.StartInfo.Arguments = string.Format("\"{0}\"", appPath);
+			process.StartInfo.EnvironmentVariables.Add("MONOGAME_PIPELINE_PROJECT", Path.GetFullPath(filename));
 			process.StartInfo.CreateNoWindow = true;
 			process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 			process.StartInfo.UseShellExecute = false;

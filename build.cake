@@ -1,5 +1,6 @@
 #tool nuget:?package=vswhere&version=2.6.7
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
+#addin nuget:?package=Cake.FileHelpers&version=3.2.1
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -176,12 +177,17 @@ Task("BuildTools")
     PackDotnet("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
 
     PackDotnet("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
-    
-    PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
 
     PackDotnet("Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.csproj");
 
     PackDotnet("Tools/MonoGame.Packaging.Flatpak/MonoGame.Packaging.Flatpak.csproj");
+    
+    var versionReg = @"<key>CFBundleShortVersionString<\/key>\s*<string>([^\s]*)<\/string>";
+    var plistPath = "Tools/MonoGame.Content.Builder.Editor/Info.plist";
+    var newVersion = "<key>CFBundleShortVersionString</key>\n\t<string>" + version + "</string>";
+    ReplaceRegexInFiles(plistPath, versionReg, newVersion, System.Text.RegularExpressions.RegexOptions.Singleline);
+    
+    PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
 });
 
 Task("TestTools")
