@@ -50,8 +50,12 @@ namespace MonoGame.Tools.Pipeline
         {
             Title = "MGCB Editor";
             Icon = Icon.FromResource("Icons.monogame.png");
-            Bounds = new Rectangle(PipelineSettings.Default.WindowPosition.X, PipelineSettings.Default.WindowPosition.Y,
+
+            if(!PipelineSettings.Default.WindowMaximized)
+                Bounds = new Rectangle(PipelineSettings.Default.WindowPosition.X, PipelineSettings.Default.WindowPosition.Y,
                                    PipelineSettings.Default.WindowSize.Width, PipelineSettings.Default.WindowSize.Height);
+            else
+                this.WindowState = WindowState.Maximized;            
 
             MinimumSize = new Size(400, 400);
 
