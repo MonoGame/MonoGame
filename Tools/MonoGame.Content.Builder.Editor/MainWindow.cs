@@ -81,6 +81,17 @@ namespace MonoGame.Tools.Pipeline
         {
             e.Cancel = !PipelineController.Instance.Exit();
 
+            if(WindowState != WindowState.Minimized)
+            {
+                PipelineSettings.Default.WindowSize.Width = Bounds.Width;
+                PipelineSettings.Default.WindowSize.Height = Bounds.Height;
+                PipelineSettings.Default.WindowPosition.X = Bounds.X;
+                PipelineSettings.Default.WindowPosition.Y = Bounds.Y;
+                PipelineSettings.Default.VSeparator = splitterVertical.Position;
+                PipelineSettings.Default.HSeparator = splitterHorizontal.Position;
+                PipelineSettings.Default.Save();
+            }
+
             base.OnClosing(e);
         }
 

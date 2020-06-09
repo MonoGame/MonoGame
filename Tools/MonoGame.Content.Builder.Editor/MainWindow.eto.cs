@@ -50,7 +50,9 @@ namespace MonoGame.Tools.Pipeline
         {
             Title = "MGCB Editor";
             Icon = Icon.FromResource("Icons.monogame.png");
-            Size = new Size(900, 550);
+            Bounds = new Rectangle(PipelineSettings.Default.WindowPosition.X, PipelineSettings.Default.WindowPosition.Y,
+                                   PipelineSettings.Default.WindowSize.Width, PipelineSettings.Default.WindowSize.Height);
+
             MinimumSize = new Size(400, 400);
 
             InitalizeCommands();
@@ -60,13 +62,13 @@ namespace MonoGame.Tools.Pipeline
 
             splitterHorizontal = new Splitter();
             splitterHorizontal.Orientation = Orientation.Horizontal;
-            splitterHorizontal.Position = 200;
+            splitterHorizontal.Position = PipelineSettings.Default.HSeparator;
             splitterHorizontal.Panel1MinimumSize = 100;
             splitterHorizontal.Panel2MinimumSize = 100;
 
             splitterVertical = new Splitter();
             splitterVertical.Orientation = Orientation.Vertical;
-            splitterVertical.Position = 230;
+            splitterVertical.Position = PipelineSettings.Default.VSeparator;
             splitterVertical.FixedPanel = SplitterFixedPanel.None;
             splitterVertical.Panel1MinimumSize = 100;
             splitterVertical.Panel2MinimumSize = 100;
