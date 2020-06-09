@@ -37,6 +37,7 @@ cp -f "$SCRIPT_DIR/firefox_data/core/d3dcompiler_47.dll" "$WINEPREFIX/drive_c/wi
 
 # append MGFXC_WINE_PATH env variable
 echo "export MGFXC_WINE_PATH=$HOME/.winemonogame" >> ~/.profile
+echo "export MGFXC_WINE_PATH=$HOME/.winemonogame" >> ~/.zprofile
 
 # cleanup
 rm -rf "$SCRIPT_DIR"
