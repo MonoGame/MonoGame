@@ -1488,7 +1488,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex,
-            int primitiveCount, int instanceCount, int baseInstance = 0)
+            int primitiveCount, int baseInstance, int instanceCount)
         {
             lock (_d3dContext)
             {
