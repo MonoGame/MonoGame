@@ -63,7 +63,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal int EffectIndex { get; set; }
 		
 		internal ModelMesh parent;
-        
-        internal ModelMeshPart() { }
+
+        /// <summary>
+        /// Using this constructor is strongly discouraged. Adding meshes to models at runtime is
+        /// not supported and may lead to <see cref="NullReferenceException"/>s if parent is not set.
+        /// </summary>
+        [Obsolete("This constructor is deprecated and will be made internal in a future release.")]
+        public ModelMeshPart() { }
 	}
 }
