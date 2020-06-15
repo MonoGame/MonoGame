@@ -14,4 +14,4 @@ not be available in the current stable release
 
 Truly great open source projects require high quality documentation.  This is call for volunteers to help us make the MonoGame documentation truly great.  If you can help write tutorials, guides, code snippets, reference docs, video walkthroughs or just any improvement to our current documentation we could use your help!
 
-Check out the [README on GitHub](https://github.com/mono/MonoGame/blob/develop/Documentation/README.md) or [talk with us on the community site](http://community.monogame.net/t/lets-improve-the-monogame-documentation/916) to learn how to help!
+Check out the [README on GitHub](https://github.com/MonoGame/MonoGame/blob/develop/README.md) or [talk with us on the community site](http://community.monogame.net/t/lets-improve-the-monogame-documentation/916) to learn how to help!
