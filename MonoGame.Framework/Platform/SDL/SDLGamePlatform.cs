@@ -132,6 +132,22 @@ namespace Microsoft.Xna.Framework
                         Window.MouseState.X = ev.Motion.X;
                         Window.MouseState.Y = ev.Motion.Y;
                         break;
+                    case Sdl.EventType.MouseButtonDown:
+                        if (_view.IsLeftButtonInputHandled
+                            && ev.Button.Button == Sdl.Mouse.ButtonOrdinal.Left)
+                            _view.OnLeftButtonInput(ButtonState.Pressed);
+                        else if (_view.IsRightButtonInputHandled
+                                 && ev.Button.Button == Sdl.Mouse.ButtonOrdinal.Right)
+                            _view.OnRightButtonInput(ButtonState.Pressed);
+                        break;
+                    case Sdl.EventType.MouseButtonup:
+                        if (_view.IsLeftButtonInputHandled
+                            && ev.Button.Button == Sdl.Mouse.ButtonOrdinal.Left)
+                            _view.OnLeftButtonInput(ButtonState.Released);
+                        else if (_view.IsRightButtonInputHandled
+                                 && ev.Button.Button == Sdl.Mouse.ButtonOrdinal.Right)
+                            _view.OnRightButtonInput(ButtonState.Released);
+                        break;
                     case Sdl.EventType.KeyDown:
                     {
                         var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);

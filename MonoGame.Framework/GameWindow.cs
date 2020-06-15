@@ -117,6 +117,28 @@ namespace Microsoft.Xna.Framework {
 
 #endif
 
+#if DESKTOPGL
+        /// <summary>
+        /// Use this event to receive all left mouse button presses and releases.
+        /// This includes sub-frame events. Handlers are called at the beginning of a frame, before game updates.
+        /// <remarks>
+        /// This event is only supported on the DesktopGL platforms.
+        /// </remarks>
+        /// </summary>
+        public event EventHandler<ButtonState> LeftButtonInput;
+
+        /// <summary>
+        /// Use this event to receive all right mouse button presses and releases.
+        /// This includes sub-frame events. Handlers are called at the beginning of a frame, before game updates.
+        /// <remarks>
+        /// This event is only supported on the DesktopGL platforms.
+        /// </remarks>
+        /// </summary>
+        public event EventHandler<ButtonState> RightButtonInput;
+        internal bool IsLeftButtonInputHandled { get { return LeftButtonInput != null; } }
+        internal bool IsRightButtonInputHandled { get { return RightButtonInput != null; } }
+#endif
+
         #endregion Events
 
         public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
@@ -169,6 +191,17 @@ namespace Microsoft.Xna.Framework {
 	    {
             EventHelpers.Raise(this, KeyUp, e);
 	    }
+#endif
+
+#if DESKTOPGL
+        internal void OnLeftButtonInput(ButtonState e)
+        {
+            EventHelpers.Raise(this, LeftButtonInput, e);
+        }
+        internal void OnRightButtonInput(ButtonState e)
+        {
+            EventHelpers.Raise(this, RightButtonInput, e);
+        }
 #endif
 
         protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);

@@ -123,6 +123,8 @@ internal static class Sdl
         public Joystick.DeviceEvent JoystickDevice;
         [FieldOffset(0)]
         public GameController.DeviceEvent ControllerDevice;
+        [FieldOffset(0)]
+        public Mouse.ButtonEvent Button;
     }
 
     public struct Rectangle
@@ -598,6 +600,21 @@ internal static class Sdl
             X2Mask = 1 << 4
         }
 
+        public enum ButtonOrdinal : byte
+        {
+            Left = 1,
+            Middle = 2,
+            Right = 3,
+            X1 = 4,
+            X2 = 5,
+        }
+
+        public enum ButtonState : byte
+        {
+            Released = 0,
+            Pressed = 1,
+        }
+
         public enum SystemCursor
         {
             Arrow,
@@ -629,6 +646,20 @@ internal static class Sdl
             public int Y;
             public int Xrel;
             public int Yrel;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct ButtonEvent
+        {
+            public EventType Type;
+            public uint TimeStamp;
+            public uint WindowId;
+            public uint Which;
+            public ButtonOrdinal Button;
+            public ButtonState State;
+            public byte Clicks;
+            public int X;
+            public int Y;
         }
 
         [StructLayout(LayoutKind.Sequential)]
