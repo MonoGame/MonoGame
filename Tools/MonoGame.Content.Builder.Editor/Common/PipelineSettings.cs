@@ -19,8 +19,8 @@ namespace MonoGame.Tools.Pipeline
 
         public List<string> ProjectHistory;
         public string StartupProject;
-        public System.Drawing.Size WindowSize;
-        public System.Drawing.Point WindowPosition;
+        public int WindowWidth, WindowHeight;
+        public int WindowPositionX, WindowPositionY;
         public bool WindowMaximized;
         public int HSeparator, VSeparator;
         public bool Maximized, DebugMode, PropertyGroupSort;
@@ -43,8 +43,10 @@ namespace MonoGame.Tools.Pipeline
             FilterShowCleaned = true;
             AutoScrollBuildOutput = true;
 
-            WindowSize = new System.Drawing.Size(900, 550);
-            WindowPosition = new System.Drawing.Point(182, 182);
+            WindowWidth = 900;
+            WindowHeight = 550;
+            WindowPositionX = 182;
+            WindowPositionY = 182;
             WindowMaximized = false;
             HSeparator = 200;
             VSeparator = 230;

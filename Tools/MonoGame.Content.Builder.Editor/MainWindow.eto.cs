@@ -52,8 +52,8 @@ namespace MonoGame.Tools.Pipeline
             Icon = Icon.FromResource("Icons.monogame.png");
 
             if(!PipelineSettings.Default.WindowMaximized)
-                Bounds = new Rectangle(PipelineSettings.Default.WindowPosition.X, PipelineSettings.Default.WindowPosition.Y,
-                                   PipelineSettings.Default.WindowSize.Width, PipelineSettings.Default.WindowSize.Height);
+                Bounds = new Rectangle(PipelineSettings.Default.WindowPositionX, PipelineSettings.Default.WindowPositionY,
+                                   PipelineSettings.Default.WindowWidth, PipelineSettings.Default.WindowHeight);
             else
                 this.WindowState = WindowState.Maximized;            
 
