@@ -20,7 +20,7 @@ namespace MonoGame.Tools.Pipeline
         public List<string> ProjectHistory;
         public string StartupProject;
         public int WindowWidth, WindowHeight;
-        public int WindowPositionX, WindowPositionY;
+        public int WindowPositionX, WindowPositionY, WindowMaximizedPositionX, WindowMaximizedPositionY;
         public bool WindowMaximized;
         public int HSeparator, VSeparator;
         public bool Maximized, DebugMode, PropertyGroupSort;
@@ -47,6 +47,8 @@ namespace MonoGame.Tools.Pipeline
             WindowHeight = 550;
             WindowPositionX = 182;
             WindowPositionY = 182;
+            WindowMaximizedPositionX = 0;
+            WindowMaximizedPositionY = 0;
             WindowMaximized = false;
             HSeparator = 200;
             VSeparator = 230;

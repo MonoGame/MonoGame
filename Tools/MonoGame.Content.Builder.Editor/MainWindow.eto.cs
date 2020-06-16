@@ -55,7 +55,12 @@ namespace MonoGame.Tools.Pipeline
                 Bounds = new Rectangle(PipelineSettings.Default.WindowPositionX, PipelineSettings.Default.WindowPositionY,
                                    PipelineSettings.Default.WindowWidth, PipelineSettings.Default.WindowHeight);
             else
-                this.WindowState = WindowState.Maximized;            
+            {
+                Location = new Point(PipelineSettings.Default.WindowMaximizedPositionX, PipelineSettings.Default.WindowMaximizedPositionY);
+                WindowState = WindowState.Maximized;
+            }
+                
+            
 
             MinimumSize = new Size(400, 400);
 
@@ -75,7 +80,7 @@ namespace MonoGame.Tools.Pipeline
             splitterVertical.Position = PipelineSettings.Default.VSeparator;
             splitterVertical.FixedPanel = SplitterFixedPanel.None;
             splitterVertical.Panel1MinimumSize = 100;
-            splitterVertical.Panel2MinimumSize = 100;
+            splitterVertical.Panel2MinimumSize = 100;           
 
             projectControl = new ProjectControl();
             _pads.Add(projectControl);
