@@ -53,12 +53,11 @@ namespace MonoGame.Tools.Pipeline
 
             if (!PipelineSettings.Default.WindowMaximized)
             {
-#if GTK
-                Size = new Size(PipelineSettings.Default.WindowWidth, PipelineSettings.Default.WindowHeight);
-#else
-                Bounds = new Rectangle(PipelineSettings.Default.WindowPositionX, PipelineSettings.Default.WindowPositionY,
-                                   PipelineSettings.Default.WindowWidth, PipelineSettings.Default.WindowHeight);
-#endif
+                if(Global.Linux)
+                    Size = new Size(PipelineSettings.Default.WindowWidth, PipelineSettings.Default.WindowHeight);
+                else
+                    Bounds = new Rectangle(PipelineSettings.Default.WindowPositionX, PipelineSettings.Default.WindowPositionY,
+                                           PipelineSettings.Default.WindowWidth, PipelineSettings.Default.WindowHeight);
             }
             else
             {
