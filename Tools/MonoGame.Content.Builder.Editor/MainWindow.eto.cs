@@ -51,15 +51,20 @@ namespace MonoGame.Tools.Pipeline
             Title = "MGCB Editor";
             Icon = Icon.FromResource("Icons.monogame.png");
 
-            if(!PipelineSettings.Default.WindowMaximized)
+            if (!PipelineSettings.Default.WindowMaximized)
+            {
+#if GTK
+                Size = new Size(PipelineSettings.Default.WindowWidth, PipelineSettings.Default.WindowHeight);
+#else
                 Bounds = new Rectangle(PipelineSettings.Default.WindowPositionX, PipelineSettings.Default.WindowPositionY,
                                    PipelineSettings.Default.WindowWidth, PipelineSettings.Default.WindowHeight);
+#endif
+            }
             else
             {
                 Location = new Point(PipelineSettings.Default.WindowMaximizedPositionX, PipelineSettings.Default.WindowMaximizedPositionY);
                 WindowState = WindowState.Maximized;
             }
-                
             
 
             MinimumSize = new Size(400, 400);
@@ -80,7 +85,7 @@ namespace MonoGame.Tools.Pipeline
             splitterVertical.Position = PipelineSettings.Default.VSeparator;
             splitterVertical.FixedPanel = SplitterFixedPanel.None;
             splitterVertical.Panel1MinimumSize = 100;
-            splitterVertical.Panel2MinimumSize = 100;           
+            splitterVertical.Panel2MinimumSize = 100;
 
             projectControl = new ProjectControl();
             _pads.Add(projectControl);

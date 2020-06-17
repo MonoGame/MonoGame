@@ -91,10 +91,15 @@ namespace MonoGame.Tools.Pipeline
                 }
                 else
                 {
+#if GTK
+                    PipelineSettings.Default.WindowWidth = ClientSize.Width;
+                    PipelineSettings.Default.WindowHeight = ClientSize.Height;
+#else
                     PipelineSettings.Default.WindowWidth = Bounds.Width;
                     PipelineSettings.Default.WindowHeight = Bounds.Height;
                     PipelineSettings.Default.WindowPositionX = Bounds.X;
                     PipelineSettings.Default.WindowPositionY = Bounds.Y;
+#endif
                     PipelineSettings.Default.WindowMaximized = false;
                 }
                 PipelineSettings.Default.VSeparator = splitterVertical.Position;
@@ -105,7 +110,7 @@ namespace MonoGame.Tools.Pipeline
             base.OnClosing(e);
         }
 
-        #region IView implements
+#region IView implements
 
         public void Attach(IController controller)
         {
@@ -467,9 +472,9 @@ namespace MonoGame.Tools.Pipeline
             _clipboard.Text = text;
         }
 
-        #endregion
+#endregion
 
-        #region Commands
+#region Commands
 
         private void CmdNew_Executed(object sender, EventArgs e)
         {
@@ -656,7 +661,7 @@ namespace MonoGame.Tools.Pipeline
             PipelineController.Instance.RebuildItems();
         }
 
-        #endregion
+#endregion
 
     }
 }
