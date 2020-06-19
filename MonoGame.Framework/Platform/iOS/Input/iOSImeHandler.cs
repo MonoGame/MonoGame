@@ -99,8 +99,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
 
         private bool TextField_ShouldReturn(UITextField textfield)
         {
-            // Not found, so remove keyboard.
-            textfield.ResignFirstResponder();
+            StopTextInput();
 
             // We do not want UITextField to insert line-breaks.
             return false;
