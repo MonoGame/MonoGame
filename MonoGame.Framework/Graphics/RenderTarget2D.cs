@@ -23,7 +23,20 @@ namespace Microsoft.Xna.Framework.Graphics
             return ContentLost != null;
         }
 
-	    public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared, int arraySize)
+        public static RenderTarget2D FromNativeHandle(GraphicsDevice graphicsDevice, IntPtr handle, int width, int height)
+        {
+            return FromNativeHandle(graphicsDevice, handle, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
+        }
+
+        public static RenderTarget2D FromNativeHandle(GraphicsDevice graphicsDevice, IntPtr handle, int width, int height, bool mipMap, SurfaceFormat surfaceFormat, DepthFormat depthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+        {
+            RenderTarget2D rt = new RenderTarget2D(graphicsDevice, width, height, mipMap, surfaceFormat, depthFormat, preferredMultiSampleCount, usage, SurfaceType.SwapChainRenderTarget);
+            rt.PlatformFromNativeHandle(graphicsDevice, handle, surfaceFormat, depthFormat, preferredMultiSampleCount);
+
+            return rt;
+        }
+
+        public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared, int arraySize)
 	        : this(graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage, SurfaceType.RenderTarget, shared, arraySize)
 	    {
 	    }

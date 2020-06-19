@@ -4,6 +4,7 @@
 
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -23,6 +24,56 @@ namespace Microsoft.Xna.Framework.Graphics
             MultiSampleCount = _sampleDescription.Count;
 
             GenerateIfRequired();
+        }
+
+        private void PlatformFromNativeHandle(GraphicsDevice graphicsDevice, IntPtr handle, SurfaceFormat surfaceFormat, DepthFormat depthFormat, int preferredMultiSampleCount)
+        {
+            var dxgiFormat = surfaceFormat == SurfaceFormat.Color ? SharpDX.DXGI.Format.B8G8R8A8_UNorm : SharpDXHelper.ToFormat(surfaceFormat);
+
+            var multisampleDesc = new SampleDescription(1, 0);
+            if (preferredMultiSampleCount > 1)
+            {
+                multisampleDesc.Count = preferredMultiSampleCount;
+                multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
+            }
+
+            var d3dDevice = graphicsDevice._d3dDevice;
+
+            SharpDX.Direct3D11.Resource resource = new SharpDX.Direct3D11.Resource(handle);
+
+            _texture = resource;
+
+            RenderTargetViewDescription desc = new RenderTargetViewDescription()
+            {
+                Format = dxgiFormat,
+                Dimension = RenderTargetViewDimension.Texture2D
+            };
+
+            _renderTargetViews = new[] { new RenderTargetView(d3dDevice, resource, desc) };
+
+            // Create the depth buffer if we need it.
+            if (depthFormat != DepthFormat.None)
+            {
+                dxgiFormat = SharpDXHelper.ToFormat(depthFormat);
+
+                // Allocate a 2-D surface as the depth/stencil buffer.
+                using (
+                    var depthBuffer = new SharpDX.Direct3D11.Texture2D(d3dDevice,
+                                                                       new Texture2DDescription()
+                                                                       {
+                                                                           Format = dxgiFormat,
+                                                                           ArraySize = 1,
+                                                                           MipLevels = 1,
+                                                                           Width = width,
+                                                                           Height = height,
+                                                                           SampleDescription = multisampleDesc,
+                                                                           Usage = ResourceUsage.Default,
+                                                                           BindFlags = BindFlags.DepthStencil,
+                                                                       }))
+
+                    // Create a DepthStencil view on this surface to use on bind.
+                    _depthStencilView = new DepthStencilView(d3dDevice, depthBuffer);
+            }
         }
 
         private void GenerateIfRequired()
@@ -154,6 +205,10 @@ namespace Microsoft.Xna.Framework.Graphics
         internal override void CreateTexture()
         {
             var desc = GetTexture2DDescription();
+
+            // override sample description with ours
+            desc.SampleDescription = _sampleDescription;
+
             desc.BindFlags |= BindFlags.RenderTarget;
             if (Mipmap)
                 desc.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;

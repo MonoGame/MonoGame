@@ -18,9 +18,13 @@ namespace Microsoft.Xna.Framework.Graphics
             RenderTargetUsage usage, 
             bool shared)
         {
+        }	
+		
+        private void PlatformFromNativeHandle(GraphicsDevice graphicsDevice, IntPtr handle, SurfaceFormat surfaceFormat, DepthFormat depthFormat, int preferredMultiSampleCount)
+        {
             throw new NotImplementedException();
         }
-
+		
         private void PlatformGraphicsDeviceResetting()
         {
             throw new NotImplementedException();

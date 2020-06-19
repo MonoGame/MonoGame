@@ -40,6 +40,11 @@ namespace Microsoft.Xna.Framework.Graphics
             
         }
 
+        private void PlatformFromNativeHandle(GraphicsDevice graphicsDevice, IntPtr handle, SurfaceFormat surfaceFormat, DepthFormat depthFormat, int preferredMultiSampleCount)
+        {
+            throw new NotImplementedException();
+        }
+
         private void PlatformGraphicsDeviceResetting()
         {
         }
