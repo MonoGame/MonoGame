@@ -206,9 +206,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var desc = GetTexture2DDescription();
 
-            // override sample description with ours
-            desc.SampleDescription = _sampleDescription;
-
             desc.BindFlags |= BindFlags.RenderTarget;
             if (Mipmap)
                 desc.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;

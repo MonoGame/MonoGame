@@ -112,10 +112,6 @@ namespace Microsoft.Xna.Framework.Graphics
             this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
             this.ArraySize = arraySize;
 
-            // Texture will be assigned by the swap chain.
-		    if (type == SurfaceType.SwapChainRenderTarget)
-		        return;
-
             PlatformConstruct(width, height, mipmap, format, type, shared);
         }
 

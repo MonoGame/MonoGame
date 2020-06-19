@@ -34,9 +34,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
+            _sampleDescription = new SampleDescription(1, 0);
+
+            if (type == SurfaceType.SwapChainRenderTarget)
+                return;
+
             _shared = shared;
             _mipmap = mipmap;
-            _sampleDescription = new SampleDescription(1, 0);
         }
 
         private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount) where T : struct
