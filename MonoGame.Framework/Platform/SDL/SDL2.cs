@@ -646,12 +646,20 @@ internal static class Sdl
             public uint TimeStamp;
             public uint WindowId;
             public uint Which;
-            public Button Button;
+            private byte _button;
             public ButtonState State;
             public byte Clicks;
             private byte _padding1;
             public int X;
             public int Y;
+
+            public Button Button
+            {
+                get
+                {
+                    return (Button)(1 << _button);
+                }
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
