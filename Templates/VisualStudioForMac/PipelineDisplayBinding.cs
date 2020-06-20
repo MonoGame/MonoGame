@@ -43,13 +43,11 @@ namespace MonoGame.IDE.VisualStudioForMac {
 		{
 			var process = new Process ();
 			process.StartInfo.FileName = "open";
-			process.StartInfo.Arguments = string.Format("\"{0}\"", appPath);
-			process.StartInfo.EnvironmentVariables.Add("MONOGAME_PIPELINE_PROJECT", Path.GetFullPath(filename));
+			process.StartInfo.Arguments = string.Format("-a \"{0}\" \"{1}\"", appPath, filename);
 			process.StartInfo.CreateNoWindow = true;
 			process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 			process.StartInfo.UseShellExecute = false;
 
-			// Fire off the process.
 			process.Start ();
 		}
 	}
