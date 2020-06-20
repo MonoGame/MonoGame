@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
 
             UIKeyboard.Notifications.ObserveWillShow((s, e) =>
             {
-                _virtualKeyboardHeight = (int)e.FrameEnd.Height;
+                _virtualKeyboardHeight = (int)(e.FrameEnd.Height * UIScreen.MainScreen.Scale);
             });
 
             UIKeyboard.Notifications.ObserveWillHide((s, e) =>
@@ -140,7 +140,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
             IsTextInputActive = false;
         }
 
-        const int KeyboardHideOffset = 80;
+        const int KeyboardHideOffset = 20;
 
         internal void Update()
         {
@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
             {
                 if (TouchLocationState.Pressed == touchLocation.State)
                 {
-                    if (touchLocation.Position.Y < ((mainWindow.GetFrame().Y - _virtualKeyboardHeight) - KeyboardHideOffset))
+                    if (touchLocation.Position.Y < ((mainWindow.GetFrame().Height * UIScreen.MainScreen.Scale - _virtualKeyboardHeight) - KeyboardHideOffset))
                         StopTextInput();
                 }
             }
