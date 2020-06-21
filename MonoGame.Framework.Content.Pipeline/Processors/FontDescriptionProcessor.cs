@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					var texRect = new Rectangle(glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height);
 					output.Glyphs.Add(texRect);
 
-					var cropping = new Rectangle(0, (int)(glyph.YOffset - yOffsetMin), (int)glyph.XAdvance, output.VerticalLineSpacing);
+					var cropping = new Rectangle((int)(glyph.XAdvance + glyph.XOffset), (int)(glyph.YOffset - yOffsetMin), (int)glyph.XAdvance, output.VerticalLineSpacing);
 					output.Cropping.Add(cropping);
 
 					// Set the optional character kerning.
