@@ -101,9 +101,6 @@ namespace MonoGame.Tools.Pipeline
                     };
 #endif
 
-                    if (string.IsNullOrEmpty(project) && Global.Unix && !Global.Linux)
-                        project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
-
                     if (!string.IsNullOrEmpty(project))
                         controller.OpenProject(project);
 
