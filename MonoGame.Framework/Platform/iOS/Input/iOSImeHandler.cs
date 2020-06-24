@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
         // elements of the list change.
         public event DeleteBackwardEventHandler DeleteBackwardPressed;
         public event EventHandler TextChanged;
+        public event EventHandler TextCompositionChanged;
 
         private bool UIBackwardsTextField_ShouldChangeCharacters(UITextField textField, NSRange range, string replacementString)
         {
@@ -40,6 +41,11 @@ namespace Microsoft.Xna.Framework.iOS.Input
             {
                 if (TextChanged != null)
                     TextChanged(null, null);
+            }
+            else
+            {
+                if (TextCompositionChanged != null)
+                    TextCompositionChanged(null, null);
             }
         }
 
@@ -74,7 +80,8 @@ namespace Microsoft.Xna.Framework.iOS.Input
             textField.KeyboardType = UIKeyboardType.Default;
             textField.ReturnKeyType = UIReturnKeyType.Done;
             textField.DeleteBackwardPressed += TextField_DeleteBackward;
-            textField.TextChanged += TextField_TextChanged; ;
+            textField.TextChanged += TextField_TextChanged;
+            textField.TextCompositionChanged += TextField_TextCompositionChanged;
             textField.ShouldReturn += TextField_ShouldReturn;
 
             gameViewController.Add(textField);
@@ -107,11 +114,25 @@ namespace Microsoft.Xna.Framework.iOS.Input
 
         private void TextField_TextChanged(object sender, EventArgs e)
         {
+            // Mimic a CompositionEnd event
+            if (TextComposition != null)
+                TextComposition.Invoke(this, new TextCompositionEventArgs(null, 0));
+
             foreach (var c in textField.Text)
                 if (TextInput != null)
                     TextInput.Invoke(this, new TextInputEventArgs(c, KeyboardUtil.ToXna(c)));
 
             textField.Text = string.Empty;
+        }
+
+        const char SIX_PER_EM_SPACE = (char)8198;
+        private void TextField_TextCompositionChanged(object sender, EventArgs e)
+        {
+            var textRange = textField.MarkedTextRange;
+            var compStr = textField.TextInRange(textRange);
+                compStr = compStr.Replace(SIX_PER_EM_SPACE, ' ');
+            if (TextComposition != null)
+                TextComposition.Invoke(this, new TextCompositionEventArgs(compStr, compStr.Length));
         }
 
         private void TextField_DeleteBackward(object sender, EventArgs e)
