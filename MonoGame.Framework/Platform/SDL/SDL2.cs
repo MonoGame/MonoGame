@@ -657,7 +657,7 @@ internal static class Sdl
             {
                 get
                 {
-                    return (Button)(1 << _button);
+                    return (Button)(1 << (_button - 1));
                 }
             }
         }
