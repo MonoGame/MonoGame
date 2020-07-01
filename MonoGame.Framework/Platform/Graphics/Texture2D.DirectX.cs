@@ -34,9 +34,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
+            //Make sure there is always a valid SampleDescription, otherwise a SharpDX exception
+            //is thrown when creating a SwapChainRenderTarget
+            _sampleDescription = new SampleDescription(1, 0);
+
+            // Texture will be assigned by the swap chain.
+            if (type == SurfaceType.SwapChainRenderTarget)
+                return;
+
             _shared = shared;
             _mipmap = mipmap;
-            _sampleDescription = new SampleDescription(1, 0);
         }
 
         private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount) where T : struct
@@ -176,7 +183,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         for (var row = 0; row < rows; row++)
                         {
                             int i;
-                            int maxElements =  (row + 1) * rowSize / elementSizeInByte;
+                            int maxElements = (row + 1) * rowSize / elementSizeInByte;
                             for (i = row * rowSize / elementSizeInByte; i < maxElements; i++)
                                 data[i + startIndex] = stream.Read<T>();
 
@@ -189,7 +196,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 finally
                 {
-                    SharpDX.Utilities.Dispose( ref stream);
+                    SharpDX.Utilities.Dispose(ref stream);
 
                     d3dContext.UnmapSubresource(_cachedStagingTexture, 0);
                 }
