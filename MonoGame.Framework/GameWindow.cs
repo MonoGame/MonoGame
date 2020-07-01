@@ -102,11 +102,24 @@ namespace Microsoft.Xna.Framework {
 		/// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
+
+        internal bool IsTextInputHandled { get { return TextInput != null; } }
+
+        /// <summary>
+        /// Buffered keyboard KeyDown event.
+        /// </summary>
+		public event EventHandler<InputKeyEventArgs> KeyDown;
+
+        /// <summary>
+        /// Buffered keyboard KeyUp event.
+        /// </summary>
+        public event EventHandler<InputKeyEventArgs> KeyUp;
+
 #endif
 
-		#endregion Events
+        #endregion Events
 
-		public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
+        public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
 
 		public abstract void EndScreenDeviceChange (
 			string screenDeviceName, int clientWidth, int clientHeight);
@@ -144,13 +157,21 @@ namespace Microsoft.Xna.Framework {
 		}
 
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
-		protected void OnTextInput(object sender, TextInputEventArgs e)
+		internal void OnTextInput(TextInputEventArgs e)
 		{
             EventHelpers.Raise(this, TextInput, e);
 		}
+        internal void OnKeyDown(InputKeyEventArgs e)
+	    {
+            EventHelpers.Raise(this, KeyDown, e);
+	    }
+        internal void OnKeyUp(InputKeyEventArgs e)
+	    {
+            EventHelpers.Raise(this, KeyUp, e);
+	    }
 #endif
 
-		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
+        protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 		protected abstract void SetTitle (string title);
 
 #if DIRECTX && WINDOWS

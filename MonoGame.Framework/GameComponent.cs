@@ -58,12 +58,12 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void OnUpdateOrderChanged(object sender, EventArgs args)
         {
-            EventHelpers.Raise(this, UpdateOrderChanged, args);
+            EventHelpers.Raise(sender, UpdateOrderChanged, args);
         }
 
         protected virtual void OnEnabledChanged(object sender, EventArgs args)
         {
-            EventHelpers.Raise(this, EnabledChanged, args);
+            EventHelpers.Raise(sender, EnabledChanged, args);
         }
 
         /// <summary>

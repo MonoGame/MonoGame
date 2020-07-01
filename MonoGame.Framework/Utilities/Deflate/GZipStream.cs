@@ -641,7 +641,7 @@ namespace MonoGame.Utilities.Deflate
                 {
                     if (disposing && (this._baseStream != null))
                     {
-                        this._baseStream.Close();
+                        this._baseStream.Dispose();
                         this._Crc32 = _baseStream.Crc32;
                     }
                     _disposed = true;

@@ -1,0 +1,49 @@
+<Project>
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);DIRECTX</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Platform\Graphics\GraphicsAdapter.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Effect\EffectResource.DirectX.cs" />
+    <Compile Include="Platform\Graphics\GraphicsCapabilities.DirectX.cs" />
+    <Compile Include="Platform\Graphics\GraphicsDebug.DirectX.cs" />
+    <Compile Include="Platform\Graphics\GraphicsDevice.DirectX.cs" />
+    <Compile Include="Platform\Graphics\IRenderTarget.DirectX.cs" />
+    <Compile Include="Platform\Graphics\OcclusionQuery.DirectX.cs" />
+    <Compile Include="Platform\Graphics\RenderTarget2D.DirectX.cs" />
+    <Compile Include="Platform\Graphics\RenderTarget3D.DirectX.cs" />
+    <Compile Include="Platform\Graphics\RenderTargetCube.DirectX.cs" />
+    <Compile Include="Platform\Graphics\SamplerStateCollection.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Shader\ConstantBuffer.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Shader\Shader.DirectX.cs" />
+    <Compile Include="Platform\Graphics\States\BlendState.DirectX.cs" />
+    <Compile Include="Platform\Graphics\States\DepthStencilState.DirectX.cs" />
+    <Compile Include="Platform\Graphics\States\RasterizerState.DirectX.cs" />
+    <Compile Include="Platform\Graphics\States\SamplerState.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Texture.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Texture2D.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Texture3D.DirectX.cs" />
+    <Compile Include="Platform\Graphics\TextureCollection.DirectX.cs" />
+    <Compile Include="Platform\Graphics\TextureCube.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Vertices\ImmutableVertexInputLayout.cs" />
+    <Compile Include="Platform\Graphics\Vertices\IndexBuffer.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Vertices\InputLayoutCache.cs" />
+    <Compile Include="Platform\Graphics\Vertices\VertexBuffer.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Vertices\VertexBufferBindings.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Vertices\VertexElement.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Vertices\VertexInputLayout.DirectX.cs" />
+    <Compile Include="Platform\Windows\SharpDXHelper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\AlphaTestEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\BasicEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\DualTextureEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\EnvironmentMapEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SkinnedEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo" />
+  </ItemGroup>
+
+</Project>

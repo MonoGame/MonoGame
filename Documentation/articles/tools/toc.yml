@@ -1,0 +1,6 @@
+- name: MGFXC
+  href: 2mgfx.md
+- name: MGCB
+  href: mgcb.md
+- name: MGCB Editor
+  href: pipeline.md

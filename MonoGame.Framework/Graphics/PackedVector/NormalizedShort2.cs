@@ -92,7 +92,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             short2Packed = PackInTwo(vector.X, vector.Y);
 		}
 
-		Vector4 IPackedVector.ToVector4 ()
+        /// <summary>
+        /// Gets the packed vector in Vector4 format.
+        /// </summary>
+        /// <returns>The packed vector in Vector4 format</returns>
+		public Vector4 ToVector4 ()
 		{
             const float maxVal = 0x7FFF;
 

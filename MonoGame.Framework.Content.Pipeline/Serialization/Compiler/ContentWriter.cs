@@ -56,6 +56,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'v', // PSVita
             'O', // XboxOne
             'S', // Nintendo Switch
+            'G', // Google Stadia
+            'b', // WebAssembly and Bridge.NET
         };
 
         /// <summary>

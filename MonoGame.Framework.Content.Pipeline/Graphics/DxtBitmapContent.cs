@@ -4,17 +4,20 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using Nvidia.TextureTools;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     public abstract class DxtBitmapContent : BitmapContent
     {
-        internal byte[] _bitmapData;
-        internal int _blockSize;
+        private byte[] _bitmapData;
+        private int _blockSize;
+        private SurfaceFormat _format;
 
-        internal SurfaceFormat _format;
+        private int _nvttWriteOffset;
 
-        public DxtBitmapContent(int blockSize)
+        protected DxtBitmapContent(int blockSize)
         {
             if (!((blockSize == 8) || (blockSize == 16)))
                 throw new ArgumentException("Invalid block size");
@@ -22,7 +25,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             TryGetFormat(out _format);
         }
 
-        public DxtBitmapContent(int blockSize, int width, int height)
+        protected DxtBitmapContent(int blockSize, int width, int height)
             : this(blockSize)
         {
             Width = width;
@@ -37,6 +40,54 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public override void SetPixelData(byte[] sourceData)
         {
             _bitmapData = sourceData;
+        }
+
+        private void NvttBeginImage(int size, int width, int height, int depth, int face, int miplevel)
+        {
+            _bitmapData = new byte[size];
+            _nvttWriteOffset = 0;
+        }
+
+        private bool NvttWriteImage(IntPtr data, int length)
+        {
+            Marshal.Copy(data, _bitmapData, _nvttWriteOffset, length);
+            _nvttWriteOffset += length;
+            return true;
+        }
+
+        private void NvttEndImage()
+        {
+        }
+        
+        private static void PrepareNVTT(byte[] data)
+        {
+            for (var x = 0; x < data.Length; x += 4)
+            {
+                // NVTT wants BGRA where our source is RGBA so
+                // we swap the red and blue channels.
+                data[x] ^= data[x + 2];
+                data[x + 2] ^= data[x];
+                data[x] ^= data[x + 2];
+            }
+        }
+
+        private static void PrepareNVTT_DXT1(byte[] data, out bool hasTransparency)
+        {
+            hasTransparency = false;
+
+            for (var x = 0; x < data.Length; x += 4)
+            {
+                // NVTT wants BGRA where our source is RGBA so
+                // we swap the red and blue channels.
+                data[x] ^= data[x + 2];
+                data[x + 2] ^= data[x];
+                data[x] ^= data[x + 2];
+
+                // Look for non-opaque pixels.
+                var alpha = data[x + 3];
+                if (alpha < 255)
+                    hasTransparency = true;
+            }
         }
 
         protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
@@ -55,6 +106,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return true;
             }
 
+            // TODO: Add a XNA unit test to see what it does
+            // my guess is that this is invalid for DXT.
+            //
             // Destination region copy is not yet supported
             if (destinationRegion != new Rectangle(0, 0, Width, Height))
                 return false;
@@ -73,46 +127,83 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            // set squish format
-            TextureSquish.CompressionMode outputFormat = TextureSquish.CompressionMode.Dxt1;
+            // NVTT wants 8bit data in BGRA format.
+            var colorBitmap = new PixelBitmapContent<Color>(sourceBitmap.Width, sourceBitmap.Height);
+            BitmapContent.Copy(sourceBitmap, colorBitmap);
+            var sourceData = colorBitmap.GetPixelData();
+            var dataHandle = GCHandle.Alloc(sourceData, GCHandleType.Pinned);
+
+            AlphaMode alphaMode;
+            Format outputFormat;
+            var alphaDither = false;
             switch (format)
             {
                 case SurfaceFormat.Dxt1:
-                    outputFormat = TextureSquish.CompressionMode.Dxt1;
-                    break;
                 case SurfaceFormat.Dxt1SRgb:
-                    outputFormat = TextureSquish.CompressionMode.Dxt1;
+                {
+                    bool hasTransparency;
+                    PrepareNVTT_DXT1(sourceData, out hasTransparency);
+                    outputFormat = hasTransparency ? Format.DXT1a : Format.DXT1;
+                    alphaMode = hasTransparency ? AlphaMode.Transparency : AlphaMode.None;
+                    alphaDither = true;
                     break;
+                }
                 case SurfaceFormat.Dxt3:
-                    outputFormat = TextureSquish.CompressionMode.Dxt3;
-                    break;
                 case SurfaceFormat.Dxt3SRgb:
-                    outputFormat = TextureSquish.CompressionMode.Dxt3;
+                {
+                    PrepareNVTT(sourceData);
+                    outputFormat = Format.DXT3;
+                    alphaMode = AlphaMode.Transparency;
                     break;
+                }
                 case SurfaceFormat.Dxt5:
-                    outputFormat = TextureSquish.CompressionMode.Dxt5;
-                    break;
                 case SurfaceFormat.Dxt5SRgb:
-                    outputFormat = TextureSquish.CompressionMode.Dxt5;
+                {
+                    PrepareNVTT(sourceData);
+                    outputFormat = Format.DXT5;
+                    alphaMode = AlphaMode.Transparency;
                     break;
+                }
                 default:
-                    return false;
+                    throw new InvalidOperationException("Invalid DXT surface format!");
             }
 
-            // libsquish requires RGBA8888
-            var colorBitmap = new PixelBitmapContent<Color>(sourceBitmap.Width, sourceBitmap.Height);
-            BitmapContent.Copy(sourceBitmap, colorBitmap);            
+            // Do all the calls to the NVTT wrapper within this handler
+            // so we properly clean up if things blow up.
+            try
+            {
+                var dataPtr = dataHandle.AddrOfPinnedObject();
 
-            var sourceTexture = new TextureSquish.Bitmap(colorBitmap.GetPixelData(), sourceBitmap.Width, sourceBitmap.Height);            
+                var inputOptions = new InputOptions();
+                inputOptions.SetTextureLayout(TextureType.Texture2D, colorBitmap.Width, colorBitmap.Height, 1);
+                inputOptions.SetMipmapData(dataPtr, colorBitmap.Width, colorBitmap.Height, 1, 0, 0);
+                inputOptions.SetMipmapGeneration(false);
+                inputOptions.SetGamma(1.0f, 1.0f);
+                inputOptions.SetAlphaMode(alphaMode);
 
-            // set quality
-            outputFormat |= TextureSquish.CompressionMode.ColourIterativeClusterFit;
+                var compressionOptions = new CompressionOptions();
+                compressionOptions.SetFormat(outputFormat);
+                compressionOptions.SetQuality(Quality.Normal);
 
-            // use multithreading for faster compression
-            outputFormat |= TextureSquish.CompressionMode.UseParallelProcessing;            
+                // TODO: This isn't working which keeps us from getting the
+                // same alpha dither behavior on DXT1 as XNA.
+                //
+                // See https://github.com/MonoGame/MonoGame/issues/6259
+                //
+                //if (alphaDither)
+                    //compressionOptions.SetQuantization(false, false, true);
 
-            var data = sourceTexture.Compress(outputFormat);
-            this.SetPixelData(data);            
+                var outputOptions = new OutputOptions();
+                outputOptions.SetOutputHeader(false);
+                outputOptions.SetOutputOptionsOutputHandler(NvttBeginImage, NvttWriteImage, NvttEndImage);
+
+                var dxtCompressor = new Compressor();
+                dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
+            }
+            finally
+            {
+                dataHandle.Free();
+            }
 
             return true;
         }

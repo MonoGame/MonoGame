@@ -1,0 +1,33 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <!-- Select correct MSBuild task assembly. -->
+    <MGFlatpakFoler Condition=" '$(MSBuildRuntimeType)' == 'Core' ">netstandard2.0</MGFlatpakFoler>
+    <MGFlatpakFoler Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net46</MGFlatpakFoler>
+    <MGFlatpakTaskAssembly>$(MSBuildThisFileDirectory)..\tasks\$(MGFlatpakFoler)\MonoGame.Packaging.Flatpak.dll</MGFlatpakTaskAssembly>
+
+    <!-- Init task properties -->
+    <MGFlatpakIntermediateDir Condition=" '$(MGFlatpakIntermediateDir)' == '' ">$(IntermediateOutputPath)</MGFlatpakIntermediateDir>
+    <MGFlatpakOutputPath Condition=" '$(MGFlatpakOutputPath)' == '' ">$(OutputPath)</MGFlatpakOutputPath>
+    <MGFlatpakProjectDir Condition=" '$(MGFlatpakProjectDir)' == '' ">$(ProjectDir)</MGFlatpakProjectDir>
+    <MGFlatpakPublishDir Condition=" '$(MGFlatpakPublishDir)' == '' ">$(PublishDir)</MGFlatpakPublishDir>
+    <MGFlatpakAssemblyName Condition=" '$(MGFlatpakAssemblyName)' == '' ">$(AssemblyName)</MGFlatpakAssemblyName>
+    <MGFlatpakTitle Condition=" '$(MGFlatpakTitle)' == '' ">$(AssemblyTitle)</MGFlatpakTitle>
+    <MGFlatpakId Condition=" '$(MGFlatpakId)' == '' ">com.$(Company).$(AssemblyName)</MGFlatpakId>
+    <MGFlatpakIcon Condition=" '$(MGFlatpakIcon)' == '' ">Icon.png</MGFlatpakIcon>
+  </PropertyGroup>
+
+  <UsingTask TaskName="MonoGame.Packaging.BuildFlatpakTask" AssemblyFile="$(MGFlatpakTaskAssembly)" />
+
+  <Target Name="PackageFlatpak" AfterTargets="Publish" Condition=" '$(RuntimeIdentifier)'=='linux-x64' ">
+    <BuildFlatpakTask IntermediateDir="$(MGFlatpakIntermediateDir)"
+                    OutputPath="$(MGFlatpakOutputPath)"
+                    ProjectDir="$(MGFlatpakProjectDir)"
+                    PublishDir="$(MGFlatpakPublishDir)"
+                    AssemblyName="$(MGFlatpakAssemblyName)"
+                    Title="$(MGFlatpakTitle)"
+                    Id="$(MGFlatpakId)"
+                    IconPath="$(MGFlatpakIcon)" />
+  </Target>
+
+</Project>

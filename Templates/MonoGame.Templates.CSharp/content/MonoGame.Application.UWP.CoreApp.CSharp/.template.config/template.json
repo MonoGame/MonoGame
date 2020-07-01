@@ -1,0 +1,22 @@
+{
+    "author": "MonoGame Team",
+    "classifications": [
+        "MonoGame"
+    ],
+    "name": "MonoGame Windows Universal Application (CoreApp)",
+    "groupIdentity": "MonoGame.Application.UWP.CoreApp",
+    "identity": "MonoGame.Application.UWP.CoreApp.CSharp",
+    "shortName": "mguwpcore",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [
+        {
+            "path": "MGNamespace.csproj"
+        }
+    ],
+    "sourceName": "MGNamespace",
+    "preferNameDirectory": "true",
+    "description": "A MonoGame game project for Windows Universal using DirectX and setup as a Core Application."
+}

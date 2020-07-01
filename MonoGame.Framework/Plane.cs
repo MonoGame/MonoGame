@@ -80,6 +80,21 @@ namespace Microsoft.Xna.Framework
 
         }
 
+        /// <summary>
+        /// Create a <see cref="Plane"/> that contains the specified point and has the specified <see cref="Normal"/> vector.
+        /// </summary>
+        /// <param name="pointOnPlane">A point the created <see cref="Plane"/> should contain.</param>
+        /// <param name="normal">The normal of the plane.</param>
+        public Plane(Vector3 pointOnPlane, Vector3 normal)
+        {
+            Normal = normal;
+            D = -(
+                pointOnPlane.X * normal.X +
+                pointOnPlane.Y * normal.Y +
+                pointOnPlane.Z * normal.Z
+            );
+        }
+
         #endregion Constructors
 
 

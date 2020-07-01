@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using Microsoft.Xna.Framework.Content;
 
-namespace Microsoft.Xna.Framework.Utilities
+namespace MonoGame.Utilities
 {
     internal class LzxDecoderStream : Stream
     {

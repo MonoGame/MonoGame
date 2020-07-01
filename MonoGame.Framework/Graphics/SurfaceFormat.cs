@@ -36,13 +36,13 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// DXT5. Texture format with compression. Surface dimensions must be a multiple 4.
         /// </summary>
-        Dxt5 = 6,
+        Dxt5,
         /// <summary>
         /// Signed 16-bit bump-map format for store 8 bits for <c>u</c> and <c>v</c> data.
         /// </summary>
         NormalizedByte2,
         /// <summary>
-        /// Signed 16-bit bump-map format for store 8 bits per channel.
+        /// Signed 32-bit bump-map format for store 8 bits per channel.
         /// </summary>
         NormalizedByte4,
         /// <summary>
@@ -158,6 +158,31 @@ namespace Microsoft.Xna.Framework.Graphics
         /// ATC/ATITC compression (Android)
         /// </summary>
         RgbaAtcInterpolatedAlpha = 81,
+
+		/// <summary>
+        /// Etc2 RGB8 (Android/iOS withh OpenglES 3.0)
+		/// </summary>
+        Rgb8Etc2 = 90,
+		/// <summary>
+        /// Etc2 SRGB8 (Android/iOS withh OpenglES 3.0)
+		/// </summary>
+        Srgb8Etc2 = 91,
+		/// <summary>
+        /// Etc2 RGB8A1 (Android/iOS withh OpenglES 3.0)
+		/// </summary>
+        Rgb8A1Etc2 = 92,
+		/// <summary>
+        /// Etc2 SRGB8A1 (Android/iOS withh OpenglES 3.0)
+		/// </summary>
+        Srgb8A1Etc2 = 93,
+		/// <summary>
+        /// Etc2 RGBA8 EAC (Android/iOS withh OpenglES 3.0)
+		/// </summary>
+        Rgba8Etc2 = 94,
+		/// <summary>
+        /// Etc2 SRGB8A8 EAC (Android/iOS withh OpenglES 3.0)
+		/// </summary>
+        SRgb8A8Etc2 = 95,
 
         #endregion
     }

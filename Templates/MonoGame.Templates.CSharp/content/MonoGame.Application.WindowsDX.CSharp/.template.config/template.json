@@ -1,0 +1,29 @@
+{
+    "author": "MonoGame Team",
+    "classifications": [
+        "MonoGame"
+    ],
+    "name": "MonoGame Windows Desktop Application (Windows DirectX)",
+    "groupIdentity": "MonoGame.Application.WindowsDX",
+    "identity": "MonoGame.Application.WindowsDX.CSharp",
+    "shortName": "mgwindowsdx",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [
+        {
+            "path": "MGNamespace.csproj"
+        }
+    ],
+    "sourceName": "MGNamespace",
+    "preferNameDirectory": "true",
+    "description": "A MonoGame game project for Windows using DirectX.",
+    "symbols": {
+        "framework": {
+            "type": "parameter",
+            "defaultValue": "netcoreapp3.1",
+            "replaces": "netcoreapp3.1"
+        }
+    }
+}

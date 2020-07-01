@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <MonoGamePlatform>iOS</MonoGamePlatform>
+  </PropertyGroup>
+</Project>
+

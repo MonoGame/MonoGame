@@ -303,6 +303,41 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Round the members of this <see cref="Vector3"/> towards positive infinity.
+        /// </summary>
+        public void Ceiling()
+        {
+            X = (float)Math.Ceiling(X);
+            Y = (float)Math.Ceiling(Y);
+            Z = (float)Math.Ceiling(Z);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        public static Vector3 Ceiling(Vector3 value)
+        {
+            value.X = (float)Math.Ceiling(value.X);
+            value.Y = (float)Math.Ceiling(value.Y);
+            value.Z = (float)Math.Ceiling(value.Z);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector3"/>.</param>
+        public static void Ceiling(ref Vector3 value, out Vector3 result)
+        {
+            result.X = (float)Math.Ceiling(value.X);
+            result.Y = (float)Math.Ceiling(value.Y);
+            result.Z = (float)Math.Ceiling(value.Z);
+        }
+
+        /// <summary>
         /// Clamps the specified value within a range.
         /// </summary>
         /// <param name="value1">The value to clamp.</param>
@@ -514,6 +549,41 @@ namespace Microsoft.Xna.Framework
             return  X == other.X && 
                     Y == other.Y &&
                     Z == other.Z;
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector3"/> towards negative infinity.
+        /// </summary>
+        public void Floor()
+        {
+            X = (float)Math.Floor(X);
+            Y = (float)Math.Floor(Y);
+            Z = (float)Math.Floor(Z);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        public static Vector3 Floor(Vector3 value)
+        {
+            value.X = (float)Math.Floor(value.X);
+            value.Y = (float)Math.Floor(value.Y);
+            value.Z = (float)Math.Floor(value.Z);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector3"/>.</param>
+        public static void Floor(ref Vector3 value, out Vector3 result)
+        {
+            result.X = (float)Math.Floor(value.X);
+            result.Y = (float)Math.Floor(value.Y);
+            result.Z = (float)Math.Floor(value.Z);
         }
 
         /// <summary>
@@ -851,6 +921,41 @@ namespace Microsoft.Xna.Framework
             result.X = vector.X - (2.0f * normal.X) * dotProduct;
             result.Y = vector.Y - (2.0f * normal.Y) * dotProduct;
             result.Z = vector.Z - (2.0f * normal.Z) * dotProduct;
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector3"/> towards the nearest integer value.
+        /// </summary>
+        public void Round()
+        {
+            X = (float)Math.Round(X);
+            Y = (float)Math.Round(Y);
+            Z = (float)Math.Round(Z);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the nearest integer value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        public static Vector3 Round(Vector3 value)
+        {
+            value.X = (float)Math.Round(value.X);
+            value.Y = (float)Math.Round(value.Y);
+            value.Z = (float)Math.Round(value.Z);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the nearest integer value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector3"/>.</param>
+        public static void Round(ref Vector3 value, out Vector3 result)
+        {
+            result.X = (float)Math.Round(value.X);
+            result.Y = (float)Math.Round(value.Y);
+            result.Z = (float)Math.Round(value.Z);
         }
 
         /// <summary>

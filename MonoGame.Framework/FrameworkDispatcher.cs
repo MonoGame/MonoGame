@@ -38,9 +38,6 @@ namespace Microsoft.Xna.Framework
 
         private static void Initialize()
         {
-            // Initialize sound system
-            SoundEffect.InitializeSoundEffect();
-
             _initialized = true;
         }
     }

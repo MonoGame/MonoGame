@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     internal class SpriteFontReader : ContentTypeReader<SpriteFont>
     {
-        internal SpriteFontReader()
+        public SpriteFontReader()
         {
         }
 

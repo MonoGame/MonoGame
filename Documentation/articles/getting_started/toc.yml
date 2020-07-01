@@ -1,0 +1,13 @@
+- name: Creating a New Project
+  href: 1_creating_a_new_project.md
+  items:
+  - name: Visual Studio
+    href: 1_creating_a_new_project_vs.md
+  - name: MonoDevelop / Xamarin Studio
+    href: 1_creating_a_new_project_md.md
+- name: Understanding the Code
+  href: 2_understanding_the_code.md
+- name: Adding Content
+  href: 3_adding_content.md
+- name: Adding Basic Code
+  href: 4_adding_basic_code.md

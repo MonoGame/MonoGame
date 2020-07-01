@@ -1,0 +1,139 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
+    <DefineConstants>OPENGL;OPENAL;XNADESIGNPROVIDED;LINUX;DESKTOPGL;SUPPORTS_EFX;NETSTANDARD;STBSHARP_INTERNAL</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
+
+This package provides you with MonoGame Framework that uses OpenGL for rendering and works on Windows, Linux and MacOS.</Description>
+    <PackageTags>monogame;.net core;core;.net standard;standard;desktopgl</PackageTags>
+    <PackageId>MonoGame.Framework.DesktopGL</PackageId>
+  </PropertyGroup>
+
+  <!-- NETFX reference assemblies let us target .NET Framework on Mac/Linux without Mono -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\**\*" />
+    <Compile Remove="obj\**\*" />
+    <Compile Remove="Platform\**\*" />
+    <Compile Remove="Properties\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Platform\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Graphics\GraphicsAdapter.cs" />
+    <Compile Remove="Media\Video.cs" />
+    <Compile Remove="Media\VideoPlayer.cs" />
+    <Compile Remove="Content\ContentReaders\VideoReader.cs" />
+    <Compile Remove="Input\MessageBox.cs" />
+    <Compile Remove="Input\KeyboardInput.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Platform\TitleContainer.Desktop.cs" />
+    <Compile Include="Platform\Audio\OggStream.cs" />
+    <Compile Include="Platform\Graphics\OpenGL.Common.cs" />
+    <Compile Include="Platform\Graphics\Texture2D.StbSharp.cs" />    
+    <Compile Include="Platform\SDL\SDL2.cs" />
+    <Compile Include="Platform\SDL\SDLGamePlatform.cs" />
+    <Compile Include="Platform\SDL\SDLGameWindow.cs" />
+    <Compile Include="Platform\Utilities\AssemblyHelper.cs" />
+    <Compile Include="Platform\Utilities\CurrentPlatform.cs" />
+    <Compile Include="Platform\Utilities\FuncLoader.Desktop.cs" />
+    <Compile Include="Platform\Utilities\InteropHelpers.cs" />
+    <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
+    <Compile Include="Platform\Media\MediaLibrary.Default.cs" />
+    <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
+    <Compile Include="Platform\Media\Song.NVorbis.cs" />
+    <Compile Include="Platform\Input\GamePad.SDL.cs" />
+    <Compile Include="Platform\Input\InputKeyEventArgs.cs" />
+    <Compile Include="Platform\Input\Joystick.SDL.cs" />
+    <Compile Include="Platform\Input\Keyboard.SDL.cs" />
+    <Compile Include="Platform\Input\KeyboardUtil.SDL.cs" />
+    <Compile Include="Platform\Input\KeysHelper.cs" />
+    <Compile Include="Platform\Input\Mouse.SDL.cs" />
+    <Compile Include="Platform\Input\MouseCursor.SDL.cs" />
+    <Compile Include="Platform\Graphics\GraphicsContext.SDL.cs" />
+    <Compile Include="Platform\Graphics\OpenGL.SDL.cs" />
+    <Compile Include="Platform\Graphics\WindowInfo.SDL.cs" />
+    <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
+    <Compile Include="Platform\GamePlatform.Desktop.cs" />
+    <Compile Include="Platform\GraphicsDeviceManager.SDL.cs" />
+    
+    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp" />
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
+
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\**\*.cs" LinkBase="ThirdParty\NVorbis" />
+    <Compile Remove="..\ThirdParty\NVorbis\NVorbis\Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="MonoGame.bmp">
+      <LogicalName>MonoGame.bmp</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\ThirdParty\SDL_GameControllerDB\gamecontrollerdb.txt">
+      <LogicalName>gamecontrollerdb.txt</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll">
+      <Link>x86\soft_oal.dll</Link>
+      <PackagePath>runtimes\win-x86\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SDL\Windows\x86\SDL2.dll">
+      <Link>x86\SDL2.dll</Link>
+      <PackagePath>runtimes\win-x86\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
+      <Link>x64\soft_oal.dll</Link>
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
+      <Link>x64\SDL2.dll</Link>
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
+      <Link>x64\libopenal.so.1</Link>
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
+      <Link>x64\libSDL2-2.0.so.0</Link>
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib">
+      <Link>libopenal.1.dylib</Link>
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib">
+      <Link>libSDL2-2.0.0.dylib</Link>
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="MonoGame.Framework.DesktopGL.targets" PackagePath="build" />
+  </ItemGroup>
+
+  <Import Project="Platform\OpenGL.targets" />
+  <Import Project="Platform\OpenAL.targets" />
+</Project>

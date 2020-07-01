@@ -1,0 +1,40 @@
+<Project>
+
+  <ItemGroup>
+    <Compile Include="..\MonoGame.Content.Builder\CommandLineParser.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\LICENSE.txt">
+      <Link>LICENSE.txt</Link>
+      <LogicalName>LICENSE.txt</LogicalName>
+    </EmbeddedResource>
+
+    <!-- The resources for icons and buttons -->
+    <EmbeddedResource Include="App.ico" />
+    <EmbeddedResource Include="Icons\*">
+      <LogicalName>Icons.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+
+    <!-- The resources for treeview -->
+    <EmbeddedResource Include="Icons\TreeView\*">
+      <LogicalName>TreeView.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    
+    <!-- The resources for output filtering -->
+    <EmbeddedResource Include="Icons\Build\*">
+      <LogicalName>Build.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+
+    <!-- The resources for menubar and toolbar -->
+    <EmbeddedResource Include="Icons\Commands\*">
+      <LogicalName>Commands.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+
+    <!-- Copy the template resources to the output -->
+    <Content Include="Templates\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

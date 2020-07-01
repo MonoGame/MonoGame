@@ -23,26 +23,30 @@ namespace Microsoft.Xna.Framework.Graphics
 		Effect _effect;
         bool _beginCalled;
 
-		Effect _spriteEffect;
-	    readonly EffectParameter _matrixTransform;
+		SpriteEffect _spriteEffect;
         readonly EffectPass _spritePass;
 
-		Matrix? _matrix;
-	    private Viewport _lastViewport;
-	    private Matrix _projection;
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
 		Vector2 _texCoordBR = new Vector2 (0,0);
         #endregion
 
-        internal static bool NeedsHalfPixelOffset;
+        /// <summary>
+        /// Constructs a <see cref="SpriteBatch"/>.
+        /// </summary>
+        /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>        
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
+        public SpriteBatch(GraphicsDevice graphicsDevice) : this(graphicsDevice, 0)
+        {            
+        }
 
         /// <summary>
         /// Constructs a <see cref="SpriteBatch"/>.
         /// </summary>
         /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>
+        /// <param name="capacity">The initial capacity of the internal array holding batch items (the value will be rounded to the next multiple of 64).</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
-        public SpriteBatch (GraphicsDevice graphicsDevice)
+        public SpriteBatch (GraphicsDevice graphicsDevice, int capacity)
 		{
 			if (graphicsDevice == null)
             {
@@ -51,12 +55,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			this.GraphicsDevice = graphicsDevice;
 
-            // Use a custom SpriteEffect so we can control the transformation matrix
-            _spriteEffect = new Effect(graphicsDevice, EffectResource.SpriteEffect.Bytecode);
-            _matrixTransform = _spriteEffect.Parameters["MatrixTransform"];
+            _spriteEffect = new SpriteEffect(graphicsDevice);
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
-            _batcher = new SpriteBatcher(graphicsDevice);
+            _batcher = new SpriteBatcher(graphicsDevice, capacity);
 
             _beginCalled = false;
 		}
@@ -95,7 +97,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _depthStencilState = depthStencilState ?? DepthStencilState.None;
             _rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
             _effect = effect;
-            _matrix = transformMatrix;
+            _spriteEffect.TransformMatrix = transformMatrix;
 
             // Setup things now so a user can change them.
             if (sortMode == SpriteSortMode.Immediate)
@@ -130,29 +132,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			gd.DepthStencilState = _depthStencilState;
 			gd.RasterizerState = _rasterizerState;
 			gd.SamplerStates[0] = _samplerState;
-			
-			var vp = gd.Viewport;
-            if ((vp.Width != _lastViewport.Width) || (vp.Height != _lastViewport.Height))
-            {
-                // Normal 3D cameras look into the -z direction (z = 1 is in font of z = 0). The
-                // sprite batch layer depth is the opposite (z = 0 is in front of z = 1).
-                // --> We get the correct matrix with near plane 0 and far plane -1.
-                Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out _projection);
-
-                // Some platforms require a half pixel offset to match DX.
-                if (NeedsHalfPixelOffset)
-                {
-                    _projection.M41 += -0.5f * _projection.M11;
-                    _projection.M42 += -0.5f * _projection.M22;
-                }
-
-                _lastViewport = vp;
-            }
-
-            if (_matrix.HasValue)
-                _matrixTransform.SetValue(_matrix.GetValueOrDefault() * _projection);
-            else
-                _matrixTransform.SetValue(_projection);
 
             _spritePass.Apply();
 		}
@@ -183,59 +162,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("text");
             if (!_beginCalled)
                 throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
-        }
-
-        /// <summary>
-        /// Submit a sprite for drawing in the current batch.
-        /// </summary>
-        /// <param name="texture">A texture.</param>
-        /// <param name="position">The drawing location on screen or null if <paramref name="destinationRectangle"> is used.</paramref></param>
-        /// <param name="destinationRectangle">The drawing bounds on screen or null if <paramref name="position"> is used.</paramref></param>
-        /// <param name="sourceRectangle">An optional region on the texture which will be rendered. If null - draws full texture.</param>
-        /// <param name="origin">An optional center of rotation. Uses <see cref="Vector2.Zero"/> if null.</param>
-        /// <param name="rotation">An optional rotation of this sprite. 0 by default.</param>
-        /// <param name="scale">An optional scale vector. Uses <see cref="Vector2.One"/> if null.</param>
-        /// <param name="color">An optional color mask. Uses <see cref="Color.White"/> if null.</param>
-        /// <param name="effects">The optional drawing modificators. <see cref="SpriteEffects.None"/> by default.</param>
-        /// <param name="layerDepth">An optional depth of the layer of this sprite. 0 by default.</param>
-        /// <exception cref="InvalidOperationException">Throwns if both <paramref name="position"/> and <paramref name="destinationRectangle"/> been used.</exception>
-        /// <remarks>This overload uses optional parameters. This overload requires only one of <paramref name="position"/> and <paramref name="destinationRectangle"/> been used.</remarks>
-        [Obsolete("In future versions this method can be removed.")]
-        public void Draw (Texture2D texture,
-                Vector2? position = null,
-                Rectangle? destinationRectangle = null,
-                Rectangle? sourceRectangle = null,
-                Vector2? origin = null,
-                float rotation = 0f,
-                Vector2? scale = null,
-                Color? color = null,
-                SpriteEffects effects = SpriteEffects.None,
-                float layerDepth = 0f)
-        {
-
-            // Assign default values to null parameters here, as they are not compile-time constants
-            if(!color.HasValue)
-                color = Color.White;
-            if(!origin.HasValue)
-                origin = Vector2.Zero;
-            if(!scale.HasValue)
-                scale = Vector2.One;
-
-            // If both drawRectangle and position are null, or if both have been assigned a value, raise an error
-            if((destinationRectangle.HasValue) == (position.HasValue))
-            {
-                throw new InvalidOperationException("Expected drawRectangle or position, but received neither or both.");
-            }
-            else if(position != null)
-            {
-                // Call Draw() using position
-                Draw(texture, (Vector2)position, sourceRectangle, (Color)color, rotation, (Vector2)origin, (Vector2)scale, effects, layerDepth);
-            }
-            else
-            {
-                // Call Draw() using drawRectangle
-                Draw(texture, (Rectangle)destinationRectangle, sourceRectangle, (Color)color, rotation, (Vector2)origin, effects, layerDepth);
-            }
         }
 
         /// <summary>

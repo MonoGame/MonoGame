@@ -14,11 +14,12 @@ namespace Microsoft.Xna.Framework.Content
             var declaration = input.ReadRawObject<VertexDeclaration>();
             var vertexCount = (int)input.ReadUInt32();
             int dataSize = vertexCount * declaration.VertexStride;
-            byte[] data = input.ContentManager.GetScratchBuffer(dataSize);
+            byte[] data = ContentManager.ScratchBufferPool.Get(dataSize);
             input.Read(data, 0, dataSize);
 
-            var buffer = new VertexBuffer(input.GraphicsDevice, declaration, vertexCount, BufferUsage.None);
+            var buffer = new VertexBuffer(input.GetGraphicsDevice(), declaration, vertexCount, BufferUsage.None);
             buffer.SetData(data, 0, dataSize);
+            ContentManager.ScratchBufferPool.Return(data);
             return buffer;
         }
     }

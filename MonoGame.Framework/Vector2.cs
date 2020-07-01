@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -204,6 +205,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector2"/> on the left of the div sign.</param>
         /// <param name="value2">Divisor <see cref="Vector2"/> on the right of the div sign.</param>
         /// <returns>The result of dividing the vectors.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 operator /(Vector2 value1, Vector2 value2)
         {
             value1.X /= value2.X;
@@ -217,6 +219,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector2"/> on the left of the div sign.</param>
         /// <param name="divider">Divisor scalar on the right of the div sign.</param>
         /// <returns>The result of dividing a vector by a scalar.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 operator /(Vector2 value1, float divider)
         {
             float factor = 1 / divider;
@@ -338,6 +341,38 @@ namespace Microsoft.Xna.Framework
         {
             result.X = MathHelper.CatmullRom(value1.X, value2.X, value3.X, value4.X, amount);
             result.Y = MathHelper.CatmullRom(value1.Y, value2.Y, value3.Y, value4.Y, amount);
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector2"/> towards positive infinity.
+        /// </summary>
+        public void Ceiling()
+        {
+            X = (float)Math.Ceiling(X);
+            Y = (float)Math.Ceiling(Y);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <returns>The rounded <see cref="Vector2"/>.</returns>
+        public static Vector2 Ceiling(Vector2 value)
+        {
+            value.X = (float)Math.Ceiling(value.X);
+            value.Y = (float)Math.Ceiling(value.Y);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector2"/>.</param>
+        public static void Ceiling(ref Vector2 value, out Vector2 result)
+        {
+            result.X = (float)Math.Ceiling(value.X);
+            result.Y = (float)Math.Ceiling(value.Y);
         }
 
         /// <summary>
@@ -512,6 +547,38 @@ namespace Microsoft.Xna.Framework
         public bool Equals(Vector2 other)
         {
             return (X == other.X) && (Y == other.Y);
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector2"/> towards negative infinity.
+        /// </summary>
+        public void Floor()
+        {
+            X = (float)Math.Floor(X);
+            Y = (float)Math.Floor(Y);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <returns>The rounded <see cref="Vector2"/>.</returns>
+        public static Vector2 Floor(Vector2 value)
+        {
+            value.X = (float)Math.Floor(value.X);
+            value.Y = (float)Math.Floor(value.Y);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector2"/>.</param>
+        public static void Floor(ref Vector2 value, out Vector2 result)
+        {
+            result.X = (float)Math.Floor(value.X);
+            result.Y = (float)Math.Floor(value.Y);
         }
 
         /// <summary>
@@ -815,6 +882,38 @@ namespace Microsoft.Xna.Framework
             float val = 2.0f * ((vector.X * normal.X) + (vector.Y * normal.Y));
             result.X = vector.X - (normal.X * val);
             result.Y = vector.Y - (normal.Y * val);
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector2"/> to the nearest integer value.
+        /// </summary>
+        public void Round()
+        {
+            X = (float)Math.Round(X);
+            Y = (float)Math.Round(Y);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded to the nearest integer value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <returns>The rounded <see cref="Vector2"/>.</returns>
+        public static Vector2 Round(Vector2 value)
+        {
+            value.X = (float)Math.Round(value.X);
+            value.Y = (float)Math.Round(value.Y);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded to the nearest integer value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector2"/>.</param>
+        public static void Round(ref Vector2 value, out Vector2 result)
+        {
+            result.X = (float)Math.Round(value.X);
+            result.Y = (float)Math.Round(value.Y);
         }
 
         /// <summary>

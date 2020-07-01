@@ -74,11 +74,37 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="deadZoneMode">Enumerated value that specifies what dead zone type to use.</param>
         /// <returns>The state of the controller.</returns>
         public static GamePadState GetState(int index, GamePadDeadZone deadZoneMode)
+        {           
+            return GetState(index, deadZoneMode, deadZoneMode);
+        }
+
+        /// <summary>
+        /// Gets the current state of a game pad controller, using a specified dead zone
+        /// on analog stick positions.
+        /// </summary>
+        /// <param name="playerIndex">Player index for the controller you want to query.</param>
+        /// <param name="leftDeadZoneMode">Enumerated value that specifies what dead zone type to use for the left stick.</param>
+        /// <param name="rightDeadZoneMode">Enumerated value that specifies what dead zone type to use for the right stick.</param>
+        /// <returns>The state of the controller.</returns>
+        public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
+        {
+            return GetState((int)playerIndex, leftDeadZoneMode, rightDeadZoneMode);
+        }
+
+        /// <summary>
+        /// Gets the current state of a game pad controller, using a specified dead zone
+        /// on analog stick positions.
+        /// </summary>
+        /// <param name="index">Index for the controller you want to query.</param>
+        /// <param name="leftDeadZoneMode">Enumerated value that specifies what dead zone type to use for the left stick.</param>
+        /// <param name="rightDeadZoneMode">Enumerated value that specifies what dead zone type to use for the right stick.</param>
+        /// <returns>The state of the controller.</returns>
+        public static GamePadState GetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
             if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
                 return GamePadState.Default;
-            
-            return PlatformGetState(index, deadZoneMode);
+
+            return PlatformGetState(index, leftDeadZoneMode, rightDeadZoneMode);
         }
 
         /// <summary>
@@ -90,7 +116,21 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>Returns true if the vibration motors were set.</returns>
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
         {
-            return SetVibration((int)playerIndex, leftMotor, rightMotor);
+            return SetVibration((int)playerIndex, leftMotor, rightMotor, 0.0f, 0.0f);
+        }
+
+        /// <summary>
+        /// Sets the vibration motor speeds on the controller device if supported.
+        /// </summary>
+        /// <param name="playerIndex">Player index that identifies the controller to set.</param>
+        /// <param name="leftMotor">The speed of the left motor, between 0.0 and 1.0. This motor is a low-frequency motor.</param>
+        /// <param name="rightMotor">The speed of the right motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <param name="leftTrigger">(Xbox One controller only) The speed of the left trigger motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <param name="rightTrigger">(Xbox One controller only) The speed of the right trigger motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <returns>Returns true if the vibration motors were set.</returns>
+        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
+        {
+            return SetVibration((int)playerIndex, leftMotor, rightMotor, leftTrigger, rightTrigger);
         }
 
         /// <summary>
@@ -101,17 +141,29 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="rightMotor">The speed of the right motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
         /// <returns>Returns true if the vibration motors were set.</returns>
         public static bool SetVibration(int index, float leftMotor, float rightMotor)
-        {
-            if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
-                return false;
-            
-            return PlatformSetVibration(index, MathHelper.Clamp(leftMotor, 0.0f, 1.0f), MathHelper.Clamp(rightMotor, 0.0f, 1.0f));
+        {           
+            return SetVibration(index, leftMotor, rightMotor, 0.0f, 0.0f);
         }
 
         /// <summary>
-        /// The maximum number of game pads supported on this system.  Attempting to
-        /// access a gamepad index higher than this number will result in an <see cref="InvalidOperationException"/>
-        /// being thrown by the API.
+        /// Sets the vibration motor speeds on the controller device if supported.
+        /// </summary>
+        /// <param name="index">Index for the controller you want to query.</param>
+        /// <param name="leftMotor">The speed of the left motor, between 0.0 and 1.0. This motor is a low-frequency motor.</param>
+        /// <param name="rightMotor">The speed of the right motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <param name="leftTrigger">(Xbox One controller only) The speed of the left trigger motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <param name="rightTrigger">(Xbox One controller only) The speed of the right trigger motor, between 0.0 and 1.0. This motor is a high-frequency motor.</param>
+        /// <returns>Returns true if the vibration motors were set.</returns>
+        public static bool SetVibration(int index, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
+        {
+            if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
+                return false;
+
+            return PlatformSetVibration(index, MathHelper.Clamp(leftMotor, 0.0f, 1.0f), MathHelper.Clamp(rightMotor, 0.0f, 1.0f), MathHelper.Clamp(leftTrigger, 0.0f, 1.0f), MathHelper.Clamp(rightTrigger, 0.0f, 1.0f));
+        }
+
+        /// <summary>
+        /// The maximum number of game pads supported on this system.
         /// </summary>
         public static int MaximumGamePadCount
         {

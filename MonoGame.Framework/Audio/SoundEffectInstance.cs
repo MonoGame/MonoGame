@@ -146,6 +146,12 @@ namespace Microsoft.Xna.Framework.Audio
             if (State == SoundState.Playing)
                 return;
 
+            if (State == SoundState.Paused)
+            {
+                Resume();
+                return;
+            }
+
             // We don't need to check if we're at the instance play limit
             // if we're resuming from a paused state.
             if (State != SoundState.Paused)

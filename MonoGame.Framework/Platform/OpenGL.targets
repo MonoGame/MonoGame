@@ -1,0 +1,53 @@
+<Project>
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);OPENGL</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- TODO we should either implement or provide a Null implementation (stubs) to include RT3D in the API -->
+    <Compile Remove="Graphics\RenderTarget3D.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Platform\Graphics\Effect\EffectResource.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\GraphicsCapabilities.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\GraphicsDebug.Default.cs" />
+    <Compile Include="Platform\Graphics\GraphicsDevice.OpenGL.FramebufferHelper.cs" />
+    <Compile Include="Platform\Graphics\GraphicsDevice.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\IRenderTarget.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\IGraphicsContext.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\IWindowInfo.OpenGL.cs" />    
+    <Compile Include="Platform\Graphics\OcclusionQuery.OpenGL.cs" Condition="'$(MGOpenGL)' != 'GLES'"/>
+    <Compile Include="Platform\Graphics\OpenGL.cs" />
+    <Compile Include="Platform\Graphics\RenderTarget2D.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\RenderTargetCube.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\SamplerStateCollection.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\Shader\ConstantBuffer.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\Shader\Shader.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\Shader\ShaderProgramCache.cs" />
+    <Compile Include="Platform\Graphics\States\BlendState.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\States\DepthStencilState.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\States\RasterizerState.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\States\SamplerState.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\Texture.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\Texture2D.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\Texture3D.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\TextureCollection.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\TextureCube.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\Vertices\IndexBuffer.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\Vertices\VertexBuffer.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\Vertices\VertexDeclaration.OpenGL.cs" />
+    <Compile Include="Platform\Threading.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\BasicEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo" />
+  </ItemGroup>
+
+</Project>

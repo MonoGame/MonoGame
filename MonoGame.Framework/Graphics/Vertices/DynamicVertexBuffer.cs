@@ -3,7 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.InteropServices;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            var elementSizeInBytes = Utilities.ReflectionHelpers.SizeOf<T>.Get();
+            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
             base.SetDataInternal<T>(0, data, startIndex, elementCount, elementSizeInBytes, options);
         }
     }
