@@ -48,23 +48,6 @@ private bool GetMSBuildWith(string requires)
     return false;
 }
 
-private bool GetVsixPublisher(out string path)
-{
-    if (IsRunningOnWindows())
-    {
-        DirectoryPath vsLatest = VSWhereLatest();
-
-        if (vsLatest != null)
-        {
-            path = vsLatest.FullPath + "/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe";
-            return FileExists(path);
-        }
-    }
-
-    path = null;
-    return false;
-}
-
 //////////////////////////////////////////////////////////////////////
 // TASKS
 //////////////////////////////////////////////////////////////////////
@@ -246,28 +229,6 @@ Task("PackVSTemplates")
     if (result != 0)
         throw new Exception("dotnet-vstemplate failed to create VSIX.");
 });
-Task("PublishVSTemplates")
-    .IsDependentOn("PackVSTemplates")
-    .WithCriteria(() => IsRunningOnWindows())
-    .Does(() =>
-{
-    if (!GetVsixPublisher(out var vsixPublisher))
-        throw new Exception("Did not find VsixPublisher.exe.");
-
-    var pat = EnvironmentVariable("AZURE_DEVOPS_MARKETPLACE_PAT");
-
-    if (string.IsNullOrEmpty(pat))
-        throw new Exception("Azure DevOps Personal Access Token for VS Marketplace not set (AZURE_DEVOPS_MARKETPLACE_PAT).");
-
-    var result = StartProcess(vsixPublisher,
-        "publish " +
-       $"-payload Artifacts/MonoGame.Template.CSharp/MonoGame.Templates.CSharp.{version}.vsix " +
-        "-publishManifest Templates/VisualStudio/csharp-manifest.json " +
-       $"-personalAccessToken {pat}");
-
-    if (result != 0)
-        throw new Exception("VsixPublisher.exe publish failed.");
-});
 
 Task("PackVSMacTemplates")
     .IsDependentOn("PackDotNetTemplates")
@@ -294,15 +255,13 @@ Task("BuildAll")
 Task("Pack")
     .IsDependentOn("BuildAll")
     .IsDependentOn("PackDotNetTemplates")
-    .IsDependentOn("PackVSMacTemplates");
+    .IsDependentOn("PackVSMacTemplates")
+    .IsDependentOn("PackVSTemplates");
 
 Task("Test")
     .IsDependentOn("TestWindowsDX")
     .IsDependentOn("TestDesktopGL")
     .IsDependentOn("TestTools");
-
-Task("PublishStable")
-    .IsDependentOn("PublishVSTemplates");
 
 Task("Default")
     .IsDependentOn("Pack");
