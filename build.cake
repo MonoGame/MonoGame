@@ -215,17 +215,19 @@ Task("PackVSTemplates")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
-    var vsdirs = GetDirectories("./Templates/VisualStudio20*");
-    foreach (var vsdir in vsdirs)
-    {
-        DeleteFiles(vsdir.CombineWithFilePath("*.zip").FullPath);
-        var projdirs = GetDirectories(vsdir.CombineWithFilePath("*").FullPath);
-        foreach (var projdir in projdirs)
-        {
-            var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
-                Zip(projdir, outputPath);
-        }
-    }
+    var dotnet = Context.Tools.Resolve("dotnet.exe");
+    if (StartProcess(dotnet, "tool restore") != 0)
+        throw new Exception("dotnet tool restore failed.");
+
+    var result = StartProcess(
+        dotnet,
+        "vstemplate " +
+       $"-s Artifacts/MonoGame.Templates.CSharp/Release/MonoGame.Templates.CSharp.{version}.nupkg " +
+       $"--vsix Artifacts/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.{version}.vsix " +
+        "@Templates/VisualStudio/settings.rsp");
+
+    if (result != 0)
+        throw new Exception("dotnet-vstemplate failed to create VSIX.");
 });
 
 Task("PackVSMacTemplates")
@@ -253,8 +255,8 @@ Task("BuildAll")
 Task("Pack")
     .IsDependentOn("BuildAll")
     .IsDependentOn("PackDotNetTemplates")
-    .IsDependentOn("PackVSTemplates")
-    .IsDependentOn("PackVSMacTemplates");
+    .IsDependentOn("PackVSMacTemplates")
+    .IsDependentOn("PackVSTemplates");
 
 Task("Test")
     .IsDependentOn("TestWindowsDX")
