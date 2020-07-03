@@ -49,15 +49,6 @@ namespace MonoGame.Packaging
                     return false;
                 }
 
-                // Ensure that flatpak runtimes are installed
-                if (!AreFlatpakRuntimesInstalled())
-                {
-                    Log.LogMessage(MessageImportance.High, "Error, the requred flatpak runtime components were not found:");
-                    Log.LogMessage(MessageImportance.High, " - org.freedesktop.Platform/x86_64/1.6");
-                    Log.LogMessage(MessageImportance.High, " - org.freedesktop.Sdk/x86_64/1.6");
-                    return false;
-                }
-
                 // Setup intermediate directory
                 var objpath = Path.Combine(ProjectDir, IntermediateDir, "Flatpak");
                 if (Directory.Exists(objpath))
@@ -147,32 +138,10 @@ namespace MonoGame.Packaging
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.Start();
+            proc.WaitForExit();
             proc.StandardOutput.ReadToEnd();
 
             return proc.ExitCode == 0;
-        }
-
-        private bool AreFlatpakRuntimesInstalled()
-        {
-            var rt = false;
-            var rtsdk = false;
-            var proc = new Process();
-            proc.StartInfo.FileName = "flatpak";
-            proc.StartInfo.Arguments = "list";
-            proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.RedirectStandardOutput = true;
-            proc.Start();
-
-            while (!proc.StandardOutput.EndOfStream)
-            {
-                var line = proc.StandardOutput.ReadLine();
-                if (line.Contains("org.freedesktop.Platform/x86_64/1.6"))
-                    rt = true;
-                else if (line.Contains("org.freedesktop.Sdk/x86_64/1.6"))
-                    rtsdk = true;
-            }
-
-            return rt && rtsdk;
         }
 
         private void CallFlatpak(string args)
@@ -183,6 +152,7 @@ namespace MonoGame.Packaging
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.Start();
+            proc.WaitForExit();
 
             while (!proc.StandardOutput.EndOfStream)
                 Log.LogMessage(MessageImportance.Normal, proc.StandardOutput.ReadLine());
