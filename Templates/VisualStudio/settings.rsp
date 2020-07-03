@@ -6,7 +6,6 @@
 --getting-started https://monogame.net
 
 --type-tags
-  library
   games
   MonoGame
   *Android*=mobile
@@ -32,4 +31,7 @@
   *DesktopGL*=Templates/VisualStudio/icons/desktopgl.png
   *UWP*=Templates/VisualStudio/icons/uwp.png
   Images/Icon.png
+
+--default-name
+  Game
 
