@@ -44,10 +44,11 @@ namespace Microsoft.Xna.Framework
         {
             set
             {
-                _coreIndependentInputSource.Dispatcher.TryRunAsync(
-                    CoreDispatcherPriority.Normal,
-                    () => _coreIndependentInputSource.PointerCursor = value)
-                    .GetAwaiter().GetResult();
+                if (_coreIndependentInputSource != null)
+                    _coreIndependentInputSource.Dispatcher.TryRunAsync(
+                          CoreDispatcherPriority.Normal,
+                        () => _coreIndependentInputSource.PointerCursor = value)
+                        .GetAwaiter().GetResult();
             }
         }
 

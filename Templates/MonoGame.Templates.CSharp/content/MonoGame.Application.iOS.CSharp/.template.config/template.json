@@ -18,5 +18,8 @@
     ],
     "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
-    "description": "A MonoGame game project for iOS."
+    "description": "A MonoGame game project for iOS.",
+    "guids": [
+        "CA7AB65C-57DE-412C-AF42-E7E6EDDF2D5F"
+    ]
 }

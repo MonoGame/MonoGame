@@ -1,0 +1,37 @@
+--license-file LICENSE.txt
+--package-icon Images/Icon.png
+--preview-img Templates/VisualStudio/icons/preview.png
+--package-tags Game MonoGame
+--more-info https://monogame.net
+--getting-started https://monogame.net
+
+--type-tags
+  games
+  MonoGame
+  *Android*=mobile
+  *iOS*=mobile
+  *DesktopGL*=desktop
+  *WindowsDX*=desktop
+  *UWP*=uwp
+
+--platform-tags
+  *WindowsDX*=windows
+  *DesktopGL*=windows
+  *DesktopGL*=macos
+  *DesktopGL*=linux
+  *Android*=android
+  *iOS*=ios
+  *UWP*=windows
+  *UWP*=xbox
+
+--template-icon
+  *Android*=Templates/VisualStudio/icons/android.png
+  *iOS*=Templates/VisualStudio/icons/ios.png
+  *WindowsDX*=Templates/VisualStudio/icons/windowsdx.png
+  *DesktopGL*=Templates/VisualStudio/icons/desktopgl.png
+  *UWP*=Templates/VisualStudio/icons/uwp.png
+  Images/Icon.png
+
+--default-name
+  Game
+

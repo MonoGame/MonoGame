@@ -1,0 +1,3 @@
+VsixPublisher.exe createPublisher -publisherName MonoGame -displayName "MonoGame Team" -personalAccessToken ***
+VsixPublisher.exe publish -publisherName MonoGame -displayName "MonoGame Team" -personalAccessToken ***
+

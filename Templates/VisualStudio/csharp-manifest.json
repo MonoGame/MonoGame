@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json.schemastore.org/vsix-publish",
+    "type": "tools",
+    "categories": [ "other" ],
+    "identity": {
+        "internalName": "MonoGame-Templates-CSharp",
+	"displayName": "MonoGame C# Templates"
+    },
+    "overview": "readme-cs.md",
+    "publisher": "MonoGame",
+    "qna": false,
+    "repo": "https://github.com/MonoGame/MonoGame"
+}
+
