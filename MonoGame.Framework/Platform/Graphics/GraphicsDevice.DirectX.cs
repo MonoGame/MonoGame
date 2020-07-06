@@ -187,6 +187,30 @@ namespace Microsoft.Xna.Framework.Graphics
                 creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
             }
 
+#if WINDOWS_UAP
+            // Check if tearing is supported
+            if (PresentationParameters.PresentationInterval == PresentInterval.Immediate)
+            {
+                RawBool allowTearing;
+                using (var dxgiFactory2 = new Factory2())
+                {
+                    unsafe
+                    {
+                        var factory5 = dxgiFactory2.QueryInterface<Factory5>();
+                        try
+                        {
+                            factory5.CheckFeatureSupport(SharpDX.DXGI.Feature.PresentAllowTearing, new IntPtr(&allowTearing), sizeof(RawBool));
+                        }
+                        catch (SharpDXException ex)
+                        {
+                            PresentationParameters.PresentationInterval = PresentInterval.Default;
+                        }
+                    }
+                }
+            }
+#endif
+
+
             // Pass the preferred feature levels based on the
             // target profile that may have been set by the user.
             FeatureLevel[] featureLevels;
@@ -317,11 +341,19 @@ namespace Microsoft.Xna.Framework.Graphics
             // If the swap chain already exists... update it.
             if (_swapChain != null)
             {
+                var swapChainFlags = SwapChainFlags.None;
+#if WINDOWS_UAP
+                if (PresentationParameters.PresentationInterval == PresentInterval.Immediate)
+                {
+                    swapChainFlags = SwapChainFlags.AllowTearing;
+                }    
+#endif
+
                 _swapChain.ResizeBuffers(   2,
                                             PresentationParameters.BackBufferWidth,
                                             PresentationParameters.BackBufferHeight,
-                                            format, 
-                                            SwapChainFlags.None);
+                                            format,
+                                            swapChainFlags);
            }
 
             // Otherwise, create a new swap chain.
@@ -344,6 +376,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     // rectangle to function more like a WP7 game.
                     Scaling = SharpDX.DXGI.Scaling.Stretch,
                 };
+
+#if WINDOWS_UAP
+                desc.Flags = PresentationParameters.PresentationInterval == PresentInterval.Immediate ? SwapChainFlags.AllowTearing : SwapChainFlags.None;
+#endif
 
                 // Once the desired swap chain description is configured, it must be created on the same adapter as our D3D Device
 
@@ -1004,21 +1040,24 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformPresent()
         {
 #if WINDOWS_UAP
-            // The application may optionally specify "dirty" or "scroll" rects to improve efficiency
-            // in certain scenarios.  In this sample, however, we do not utilize those features.
-            var parameters = new SharpDX.DXGI.PresentParameters();
-            
             try
             {
-                // TODO: Hook in PresentationParameters here!
-
                 // The first argument instructs DXGI to block until VSync, putting the application
                 // to sleep until the next VSync. This ensures we don't waste any cycles rendering
                 // frames that will never be displayed to the screen.
                 lock (_d3dContext)
-                    _swapChain.Present(1, PresentFlags.None, parameters);
+                {
+                    if (PresentationParameters.PresentationInterval == PresentInterval.Immediate)
+                    {
+                        _swapChain.Present(0, PresentFlags.AllowTearing);
+                    }
+                    else
+                    {
+                        _swapChain.Present(1, PresentFlags.None);
+                    }
+                }
             }
-            catch (SharpDX.SharpDXException)
+            catch (SharpDX.SharpDXException ex)
             {
                 // TODO: How should we deal with a device lost case here?
                 /*               
