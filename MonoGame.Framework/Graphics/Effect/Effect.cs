@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 9;
+            public const int MGFXVersion = 10;
 
             public int Signature;
             public int Version;
@@ -67,7 +67,6 @@ namespace Microsoft.Xna.Framework.Graphics
             : this(graphicsDevice, effectCode, 0, effectCode.Length)
         {
         }
-
 
         public Effect (GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
             : this(graphicsDevice)
@@ -322,7 +321,25 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (shaderIndex != 255)
                     pixelShader = shaders[shaderIndex];
 
-				BlendState blend = null;
+                // Get the hull shader.
+                Shader hullShader = null;
+                shaderIndex = (int)reader.ReadByte();
+                if (shaderIndex != 255)
+                    hullShader = shaders[shaderIndex];
+
+                // Get the domain shader.
+                Shader domainShader = null;
+                shaderIndex = (int)reader.ReadByte();
+                if (shaderIndex != 255)
+                    domainShader = shaders[shaderIndex];
+
+                // Get the geometry shader.
+                Shader geometryShader = null;
+                shaderIndex = (int)reader.ReadByte();
+                if (shaderIndex != 255)
+                    geometryShader = shaders[shaderIndex];
+
+                BlendState blend = null;
 				DepthStencilState depth = null;
 				RasterizerState raster = null;
 				if (reader.ReadBoolean())
@@ -378,7 +395,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					};
 				}
 
-                passes[i] = new EffectPass(effect, name, vertexShader, pixelShader, blend, depth, raster, annotations);
+                passes[i] = new EffectPass(effect, name, vertexShader, pixelShader, hullShader, domainShader, geometryShader, blend, depth, raster, annotations);
 			}
 
             return new EffectPassCollection(passes);

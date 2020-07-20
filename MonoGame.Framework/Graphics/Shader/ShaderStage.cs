@@ -4,5 +4,8 @@
     {
         Vertex,
         Pixel,
+        Hull,
+        Domain,
+        Geometry,
     }
 }
