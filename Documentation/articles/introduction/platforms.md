@@ -24,19 +24,34 @@ Below is a list of public platforms with the corresponding NuGet package, the `d
 - [Android](#android)
 - [iOS](#ios)
 
-## WindowsDX
+## Platform definitions list
 
-**Supported Systems**: Windows
-**NuGet Package**: MonoGame.Framework.WindowsDX
-**Template ID**: mgwindowsdx
+| **Platform/Project Type** |**Supported Systems**|**NuGet Package**|**Template ID**|
+|-|-|-|-|
+| WindowsDX | Windows | MonoGame.Framework.WindowsDX | mgwindowsdx |
+| DesktopGL | Windows, macOS, Linux | MonoGame.Framework.DesktopGL | mgdesktopgl |
+| WindowsUniversal | Windows 10, Xbox One (UWP-only, not XDK) | MonoGame.Framework.WindowsUniversal || mguwpcore (core app, no xaml), mguwpxaml (xaml app) |
+| Android |Android | MonoGame.Framework.Android | mgandroid |
+| iOS | iOS | MonoGame.Framework.iOS | mgios |
+| NetStandard Library | N/A | N/A | mgnetstandard |
+| Pipeline Extension | N/A | MonoGame.Framework.Content.Pipeline | mgpipeline |
+| Shared Library | N/A | N/A | mgshared |
+
+## Platforms
+
+### WindowsDX
+
+|**Supported Systems**|**NuGet Package**|**Template ID**|
+|-|-|-|
+| Windows | MonoGame.Framework.WindowsDX | mgwindowsdx |
 
 WindowsDX uses WinForms to manage the game window, DirectX (9.0c or newer) is used for graphics, and XAudio is used for audio. You can target Windows Vista and up with this platform.
 
-## DesktopGL
+### DesktopGL
 
-**Supported Systems**: Windows, macOS, Linux
-**NuGet Package**: MonoGame.Framework.DesktopGL
-**Template ID**: mgdesktopgl
+|**Supported Systems**|**NuGet Package**|**Template ID**|
+|-|-|-|
+| Windows, macOS, Linux | MonoGame.Framework.DesktopGL | mgdesktopgl |
 
 DesktopGL uses SDL for windowing. OpenGL is used for graphics, and OpenAL-Soft for audio. DesktopGL supports Windows (Vista and up), macOS (High Sierra 10.13 and up) and Linux (64bit-only).
 
@@ -46,11 +61,11 @@ DesktopGL is a convenient way to publish builds for Windows, macOS, and Linux fr
 
 DesktopGL currently does not have a `VideoPlayer` implementation.
 
-## WindowsUniversal
+### WindowsUniversal
 
-**Supported Systems**: Windows 10, Xbox One (UWP-only, not XDK)
-**NuGet Package**: MonoGame.Framework.WindowsUniversal
-**Template ID**: mguwpcore, mguwpxaml
+|**Supported Systems**|**NuGet Package**|**Template ID**|
+|-|-|-|
+| Windows 10, Xbox One (UWP-only, not XDK) | MonoGame.Framework.WindowsUniversal | mguwpcore (core app, no xaml), mguwpxaml (xaml app) |
 
 The WindowsUniversal platform runs on [Universal Windows Platform (UWP)](https://docs.microsoft.com/en-us/windows/uwp/get-started/universal-application-platform-guide).
 WindowsUniversal uses DirectX for graphics, and XAudio for audio just like the WindowsDX platform.
@@ -59,20 +74,46 @@ This platform is meant to publish games on the Windows Store, for both Windows a
 
 Note that UWP games running on Xbox One get [restricted access](https://docs.microsoft.com/en-us/windows/uwp/xbox-apps/system-resource-allocation) to the console capabilities. To unlock those restrictions, MonoGame has a dedicated Xbox One platform for registered [ID@Xbox](https://www.xbox.com/en-US/Developers/id) developers targeting the XDK (this platform is private and requires you to contact your ID@Xbox manager).
 
-## Android
+### Android
 
-**Supported Systems**: Android
-**NuGet Package**: MonoGame.Framework.Android
-**Template ID**: mgandroid
+|**Supported Systems**|**NuGet Package**|**Template ID**|
+|-|-|-|
+|Android | MonoGame.Framework.Android | mgandroid |
 
 The Android platform uses [Xamarin.Android](https://docs.microsoft.com/en-us/xamarin/android/).
 OpenGL is used for graphics, and OpenAL for audio.
 
-## iOS
+### iOS
 
-**Supported Systems**: iOS
-**NuGet Package**: MonoGame.Framework.iOS
-**Template ID**: mgios
+|**Supported Systems**|**NuGet Package**|**Template ID**|
+|-|-|-|
+| iOS | MonoGame.Framework.iOS | mgios |
 
 The iOS platform uses [Xamarin.iOS](https://docs.microsoft.com/en-us/xamarin/ios/).
 OpenGL is used for graphics, and OpenAL for audio.
+
+### NetStandard Library
+
+|**Supported Systems**|**NuGet Package**|**Template ID**|
+|-|-|-|
+| N/A | N/A | mgnetstandard |
+
+A project template that implements as a [NetStandard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) library to support cross-platform development.
+
+### MonoGame Pipeline Extension
+
+|**Supported Systems**|**NuGet Package**|**Template ID**|
+|-|-|-|
+| N/A | MonoGame.Framework.Content.Pipeline | mgpipeline |
+
+A project template that provides a Content Pipeline Extension for use in Content projects to enable advanced asset importing / manipulation functions.
+
+For example, using XML to drive the importing of multiple assets and / or classes.
+
+### MonoGame Shared Library Project
+
+|**Supported Systems**|**NuGet Package**|**Template ID**|
+|-|-|-|
+| N/A | N/A | mgshared |
+
+A project template that implements as a Xamarin Shared project library to support cross-platform development.

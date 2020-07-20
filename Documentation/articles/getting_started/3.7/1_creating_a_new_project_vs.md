@@ -1,5 +1,35 @@
 # Creating a Project with Visual Studio
 
+MonoGame is available on Windows for development using the instructions below to get started with **MonoGame 3.7**.
+
+> Note, For Visual Studio 2019 and above it is recommended to use [MonoGame 3.8 and above](../3.8/1_creating_a_new_project_vs.md).  While it is possible to copy over the project templates to VS 2019 from the VS 2017 installer, it is not advised.
+
+## Prerequisites
+
+You will need a copy of [Visual Studio 2017](https://visualstudio.microsoft.com/downloads/) or earlier installed (any edition, including Community) before installing MonoGame.  
+
+## [Download MonoGame](https://www.monogame.net/downloads/)
+
+Visit the [MonoGame downloads](https://www.monogame.net/downloads/) page and chose the edition of MonoGame you wish to install.
+
+![Versions Image](~/images/getting_started/1_MonoGameVersions.png)
+
+From there select the edition for your Operating system and download them to your machine, in ths case:
+
+* MonoGame 3.7.1 for Visual Studio
+
+![Releases Image](~/images/getting_started/1_Installers_vs.png)
+
+## Run Installer
+
+Once downloaded, run the installers and install MonoGame to your preferred install location.
+
+![Installer](~/images/getting_started/1_installer_vs.png)
+
+Once the installation is complete, your MonoGame experience is ready on your PC.
+
+## Create Project
+
 Start up Visual Studio and select **New Project...** in the upper left corner.
 
 ![New Solution](~/images/getting_started/1_new_soulution_vs.png)

@@ -1,10 +1,17 @@
-- name: Creating a New Project
-  href: 1_creating_a_new_project.md
+- name: Getting Started
+  href: getting_started.md
+- name: Creating a New Project with MonoGame 3.8
   items:
   - name: Visual Studio
-    href: 1_creating_a_new_project_vs.md
+    href: 3.8/1_creating_a_new_project_vs.md
+  - name: Visual Studio for Mac
+    href: 3.8/1_creating_a_new_project_md.md
+- name: Creating a New Project with MonoGame 3.7
+  items:
+  - name: Visual Studio
+    href: 3.7/1_creating_a_new_project_vs.md
   - name: MonoDevelop / Xamarin Studio
-    href: 1_creating_a_new_project_md.md
+    href: 3.7/1_creating_a_new_project_md.md
 - name: Understanding the Code
   href: 2_understanding_the_code.md
 - name: Adding Content
