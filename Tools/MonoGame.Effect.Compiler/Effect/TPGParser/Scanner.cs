@@ -82,6 +82,18 @@ namespace MonoGame.Effect.TPGParser
             Patterns.Add(TokenType.PixelShader, regex);
             Tokens.Add(TokenType.PixelShader);
 
+            regex = new Regex(@"HullShader", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.HullShader, regex);
+            Tokens.Add(TokenType.HullShader);
+
+            regex = new Regex(@"DomainShader", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.DomainShader, regex);
+            Tokens.Add(TokenType.DomainShader);
+
+            regex = new Regex(@"GeometryShader", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.GeometryShader, regex);
+            Tokens.Add(TokenType.GeometryShader);
+
             regex = new Regex(@"register", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.Register, regex);
             Tokens.Add(TokenType.Register);
@@ -891,7 +903,13 @@ namespace MonoGame.Effect.TPGParser
             InvDestColor= 222,
             SrcAlphaSat= 223,
             BlendFactor= 224,
-            InvBlendFactor= 225
+            InvBlendFactor= 225,
+            HullShader = 226,
+            DomainShader = 227,
+            GeometryShader = 228,
+            HullShader_Pass_Expression = 229,
+            DomainShader_Pass_Expression = 230,
+            GeometryShader_Pass_Expression = 231,
     }
 
     public class Token

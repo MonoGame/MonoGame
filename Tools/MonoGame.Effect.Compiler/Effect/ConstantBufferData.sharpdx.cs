@@ -9,7 +9,7 @@ namespace MonoGame.Effect
     {
         public ConstantBufferData(SharpDX.D3DCompiler.ConstantBuffer cb)
         {
-            Name = string.Empty;
+            Name = cb.Description.Name;
             Size = cb.Description.Size;
 
             ParameterIndex = new List<int>();
