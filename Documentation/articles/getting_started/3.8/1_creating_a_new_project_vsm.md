@@ -6,15 +6,18 @@ MonoGame is available on Mac for development using the instructions below to get
 
 ## Prerequisites
 
-You will need a copy of [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/) installed before installing MonoGame.  
+You will need a copy of [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/) installed before installing MonoGame.
+
+If you also need the Content Pipeline tool to use a GUI to manage your content you will need to install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
+
 
 ## Install MonoGame Templates
 
-From MonoGame 3.8, we no longer use MSI Installers for deploying the framework and templates as this creates hard dependencies to specific machine setups or DLL locations.  Instead MonoGame now uses NuGet and the DotNet deployment platform to reference a specific version of MonoGame online.
+From MonoGame 3.8, we no longer use Installers for deploying the framework and templates as this creates hard dependencies to specific machine setups or DLL locations.  Instead MonoGame now uses NuGet and the DotNet deployment platform to reference a specific version of MonoGame online.
 
 To create new projects from within Visual Studio, you will need to install the Visual Studio for Mac extension which can be found in "Visual Studio -> Extensions..." in the menu bar.
 
-![Visual Studio Extension Manager](~/images/getting_started/1_VisualStudioExtensionManager.png)
+![Visual Studio Extension Manager](~/images/getting_started/1_VisualStudioMacExtensionManager.png)
 
 Once open, simply search for **MonoGame** in the top right search window (as shown above) and install the "MonoGame project templates".  You now have the MonoGame templates installed ready to create new projects.
 
@@ -25,9 +28,10 @@ The content pipeline tool which was previously available inside the MonoGame ins
 ```
 dotnet tool install -g dotnet-mgcb
 ```
+
 > For development branches you will also need to include the version number in the command, e.g. 'dotnet tool install -g dotnet-mgcb-editor --version 3.8.0.1375-develop'
 
-Once installed, you also need to register the MCGB tool with Visual Studio with the additional command from the command prompt:
+Once installed, you also need to register the Pipeline tool with Visual Studio with the additional command from the command prompt:
 
 ```
 mgcb-editor --register
@@ -59,4 +63,4 @@ You should now see your game window running.
 
 ![Game](~/images/getting_started/1_game_md.png)
 
-Currently it's just clearing the surface with blue color. For further information on creating your game, please look at the [Understanding the Code](2_understanding_the_code.md).
+Currently it is just clearing the surface with blue color. For further information on creating your game, please look at the [Understanding the Code](/getting_started/2_understanding_the_code.md).

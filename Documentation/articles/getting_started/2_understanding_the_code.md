@@ -1,6 +1,26 @@
 # Understanding the Code
 
-This file will go over the code that is getting created when you start a blank project. For help on creating a project please look at [Creating a New Project](1_creating_a_new_project.md).
+This tutorial will go over the code that is getting created when you start a blank project. For help on creating a project please look at the [Creating a New Project](getting_started.md) of the Getting Started guide.
+
+Within the Game.cs class file, which is the core of any MonoGame project, you will find several critical sections necessary for your game to run, namely:
+
+* Using Statements - which add references to the various components of MonoGame.
+
+* The Game Class definition - the heart of any MonoGame project.
+
+* The Game constructor and key variables - which tell the project how to start.
+
+* The Initialize method - to define the starting point when the game runs.
+
+* The Load and Unload Content methods - which are used to add and remove assets from the running game from the [Content project](3_adding_content).
+
+* The Update method - which is called on a regular interval to update your game state, e.g. take player input, move ships or animate entities.
+
+* The Draw method - which is called on a regular interval to take the current game state and draw your game entities to the screen.
+
+Read further for more detail and examples while looking through the code of your new project.
+
+---
 
 ## Using Statements
 

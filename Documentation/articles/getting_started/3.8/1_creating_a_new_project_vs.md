@@ -31,13 +31,10 @@ The content pipeline tool which was previously available inside the MonoGame ins
 ```
 dotnet tool install -g dotnet-mgcb
 ```
+
 > For development branches you will also need to include the version number in the command, e.g. 'dotnet tool install -g dotnet-mgcb-editor --version 3.8.0.1375-develop'
 
-Once installed, you also need to register the MCGB tool with Visual Studio with the additional command from the command prompt:
-
-```
-mgcb-editor --register
-```
+> Currently, the Pipeline tool cannot be registered with Visual Studio for Mac, so the content project has to be opened manually outside of Visual Studio.
 
 For more details on the [MonoGame tools check here](/tools/tools.md).
 
@@ -59,4 +56,4 @@ You should now see your game window running.
 
 ![Game](~/images/getting_started/1_game_vs.png)
 
-Currently it's just clearing the surface with blue color. For further information on creating your game, please look at the [Understanding the Code](2_understanding_the_code.md).
+Currently it is just clearing the surface with blue color. For further information on creating your game, please look at the [Understanding the Code](/getting_started/2_understanding_the_code.md).
