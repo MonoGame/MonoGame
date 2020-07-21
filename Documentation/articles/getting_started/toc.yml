@@ -6,6 +6,8 @@
     href: 3.8/1_creating_a_new_project_vs.md
   - name: Visual Studio for Mac
     href: 3.8/1_creating_a_new_project_md.md
+  - name: MonoGame netcore CLI
+    href: 3.8/1_creating_a_new_project_netcore.md    
 - name: Creating a New Project with MonoGame 3.7
   items:
   - name: Visual Studio
