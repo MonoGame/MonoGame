@@ -19,10 +19,10 @@ namespace Microsoft.Xna.Framework.Graphics
             SwapChainRenderTarget,
         }
 
-		internal int width;
-		internal int height;
+        internal int width;
+        internal int height;
         internal int ArraySize;
-                
+
         internal float TexelWidth { get; private set; }
         internal float TexelHeight { get; private set; }
 
@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-				return new Rectangle(0, 0, this.width, this.height);
+                return new Rectangle(0, 0, this.width, this.height);
             }
         }
 
@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, int arraySize)
             : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, arraySize)
         {
-            
+
         }
 
         /// <summary>
@@ -90,15 +90,15 @@ namespace Microsoft.Xna.Framework.Graphics
             : this(graphicsDevice, width, height, mipmap, format, type, false, 1)
         {
         }
-        
+
         protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared, int arraySize)
-		{
+        {
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
             if (width <= 0)
-                throw new ArgumentOutOfRangeException("width","Texture width must be greater than zero");
+                throw new ArgumentOutOfRangeException("width", "Texture width must be greater than zero");
             if (height <= 0)
-                throw new ArgumentOutOfRangeException("height","Texture height must be greater than zero");
+                throw new ArgumentOutOfRangeException("height", "Texture height must be greater than zero");
             if (arraySize > 1 && !graphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
                 throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySize");
 
@@ -111,10 +111,6 @@ namespace Microsoft.Xna.Framework.Graphics
             this._format = format;
             this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
             this.ArraySize = arraySize;
-
-            // Texture will be assigned by the swap chain.
-		    if (type == SurfaceType.SwapChainRenderTarget)
-		        return;
 
             PlatformConstruct(width, height, mipmap, format, type, shared);
         }
@@ -169,7 +165,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">New data for the texture</param>
         /// <param name="startIndex">Start position of data</param>
         /// <param name="elementCount"></param>
-        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
+        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             Rectangle checkedRect;
             ValidateParams(level, 0, rect, data, startIndex, elementCount, out checkedRect);
@@ -193,13 +189,13 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformSetData(0, data, startIndex, elementCount);
         }
 
-		/// <summary>
+        /// <summary>
         /// Changes the texture's pixels
         /// </summary>
         /// <typeparam name="T">New data for the texture</typeparam>
         /// <param name="data"></param>
-		public void SetData<T>(T[] data) where T : struct
-		{
+        public void SetData<T>(T[] data) where T : struct
+        {
             Rectangle checkedRect;
             ValidateParams(0, 0, null, data, 0, data.Length, out checkedRect);
             PlatformSetData(0, data, 0, data.Length);
@@ -250,9 +246,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="startIndex">First position in data where to write the pixel data</param>
         /// <param name="elementCount">Number of pixels to read</param>
 		public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
-		{
-			this.GetData(0, null, data, startIndex, elementCount);
-		}
+        {
+            this.GetData(0, null, data, startIndex, elementCount);
+        }
 
         /// <summary>
         /// Retrieves the contents of the texture
@@ -261,12 +257,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data">Destination array for the texture data</param>
-        public void GetData<T> (T[] data) where T : struct
-		{
-		    if (data == null)
-		        throw new ArgumentNullException("data");
-			this.GetData(0, null, data, 0, data.Length);
-		}
+        public void GetData<T>(T[] data) where T : struct
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            this.GetData(0, null, data, 0, data.Length);
+        }
 
         /// <summary>
         /// Creates a <see cref="Texture2D"/> from a file, supported formats bmp, gif, jpg, png, tif and dds (only for simple textures).
@@ -301,7 +297,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// result in black color data.
         /// </remarks>
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
-		{
+        {
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
             if (stream == null)
@@ -311,7 +307,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 return PlatformFromStream(graphicsDevice, stream);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new InvalidOperationException("This image format is not supported", e);
             }

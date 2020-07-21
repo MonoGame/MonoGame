@@ -4,6 +4,7 @@
 
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -140,6 +141,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void ResolveSubresource()
         {
+            // An MSAA SwapChainRenderTarget doesn't need a _resolvedTexture
+            if (this is SwapChainRenderTarget)
+                return;
+
             lock (GraphicsDevice._d3dContext)
             {
                 GraphicsDevice._d3dContext.ResolveSubresource(
@@ -164,17 +169,21 @@ namespace Microsoft.Xna.Framework.Graphics
             // we store the resolved texture in _texture and the multi sampled texture
             // in _msTexture when MSAA is enabled
             if (MultiSampleCount > 1)
-            {
-                desc = GetTexture2DDescription();
-                desc.BindFlags |= BindFlags.RenderTarget;
-                // the multi sampled texture can never be bound directly
-                desc.BindFlags &= ~BindFlags.ShaderResource;
-                desc.SampleDescription = _sampleDescription;
-                // mip mapping is applied to the resolved texture, not the multisampled texture
-                desc.MipLevels = 1;
-                var descr = desc;
-                _msTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, descr);
-            }
+                CreateResolvedTexture();
+        }
+
+        internal void CreateResolvedTexture()
+        {
+            Debug.Assert(_msTexture == null, "The resolved texture was already created.");
+
+            var desc = GetTexture2DDescription();
+            desc.BindFlags |= BindFlags.RenderTarget;
+            // the multi sampled texture can never be bound directly
+            desc.BindFlags &= ~BindFlags.ShaderResource;
+            desc.SampleDescription = _sampleDescription;
+            // mip mapping is applied to the resolved texture, not the multisampled texture
+            desc.MipLevels = 1;
+            _msTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
         }
     }
 }

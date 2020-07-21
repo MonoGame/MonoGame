@@ -17,34 +17,35 @@ namespace Microsoft.Xna.Framework.Graphics
     public class SwapChainRenderTarget : RenderTarget2D
     {
         private SwapChain _swapChain;
+        private SharpDX.Direct3D11.Texture2D _backBuffer;
 
         public PresentInterval PresentInterval;
 
-        public SwapChainRenderTarget(   GraphicsDevice graphicsDevice,
+        public SwapChainRenderTarget(GraphicsDevice graphicsDevice,
                                         IntPtr windowHandle,
                                         int width,
                                         int height)
-            : this( 
-                graphicsDevice, 
-                windowHandle, 
-                width, 
-                height, 
-                false, 
+            : this(
+                graphicsDevice,
+                windowHandle,
+                width,
+                height,
+                false,
                 SurfaceFormat.Color,
                 DepthFormat.Depth24,
-                0, 
+                0,
                 RenderTargetUsage.DiscardContents,
                 PresentInterval.Default)
         {
         }
 
-        public SwapChainRenderTarget(   GraphicsDevice graphicsDevice,
-                                        IntPtr windowHandle,                                     
+        public SwapChainRenderTarget(GraphicsDevice graphicsDevice,
+                                        IntPtr windowHandle,
                                         int width,
                                         int height,
                                         bool mipMap,
                                         SurfaceFormat surfaceFormat,
-                                        DepthFormat depthFormat,                                        
+                                        DepthFormat depthFormat,
                                         int preferredMultiSampleCount,
                                         RenderTargetUsage usage,
                                         PresentInterval presentInterval)
@@ -63,12 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
                              ? SharpDX.DXGI.Format.B8G8R8A8_UNorm
                              : SharpDXHelper.ToFormat(surfaceFormat);
 
-            var multisampleDesc = new SampleDescription(1, 0);
-            if (preferredMultiSampleCount > 1)
-            {
-                multisampleDesc.Count = preferredMultiSampleCount;
-                multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
-            }
+            var multisampleDesc = graphicsDevice.GetSupportedSampleDescription(dxgiFormat, preferredMultiSampleCount);
 
             var desc = new SwapChainDescription()
             {
@@ -104,16 +100,22 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Obtain the backbuffer for this window which will be the final 3D rendertarget.
-            var backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0);
+            // store the backbuffer in a field so it can be disposed later
+            _backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0);
 
             // Create a view interface on the rendertarget to use on bind.
-            _renderTargetViews = new[] { new RenderTargetView(d3dDevice, backBuffer) };
+            _renderTargetViews = new[] { new RenderTargetView(d3dDevice, _backBuffer) };
 
             // Get the rendertarget dimensions for later.
-            var backBufferDesc = backBuffer.Description;
+            var backBufferDesc = _backBuffer.Description;
             var targetSize = new Point(backBufferDesc.Width, backBufferDesc.Height);
 
-            _texture = backBuffer;
+            // setting the _texture causes rendering issues with MSAA.
+            //_texture = backBuffer;
+
+            // MSAA RT needs another non-MSAA texture where it is resolved
+            if (preferredMultiSampleCount > 1)
+                CreateResolvedTexture();
 
             // Create the depth buffer if we need it.
             if (depthFormat != DepthFormat.None)
@@ -124,16 +126,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (
                     var depthBuffer = new SharpDX.Direct3D11.Texture2D(d3dDevice,
                                                                        new Texture2DDescription()
-                                                                           {
-                                                                               Format = dxgiFormat,
-                                                                               ArraySize = 1,
-                                                                               MipLevels = 1,
-                                                                               Width = targetSize.X,
-                                                                               Height = targetSize.Y,
-                                                                               SampleDescription = multisampleDesc,
-                                                                               Usage = ResourceUsage.Default,
-                                                                               BindFlags = BindFlags.DepthStencil,
-                                                                           }))
+                                                                       {
+                                                                           Format = dxgiFormat,
+                                                                           ArraySize = 1,
+                                                                           MipLevels = 1,
+                                                                           Width = targetSize.X,
+                                                                           Height = targetSize.Y,
+                                                                           SampleDescription = multisampleDesc,
+                                                                           Usage = ResourceUsage.Default,
+                                                                           BindFlags = BindFlags.DepthStencil,
+                                                                       }))
 
                     // Create a DepthStencil view on this surface to use on bind.
                     _depthStencilView = new DepthStencilView(d3dDevice, depthBuffer);
@@ -165,6 +167,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (disposing)
             {
+                SharpDX.Utilities.Dispose(ref _backBuffer);
                 SharpDX.Utilities.Dispose(ref _swapChain);
             }
 
