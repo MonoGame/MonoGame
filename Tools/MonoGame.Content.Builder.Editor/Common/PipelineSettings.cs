@@ -19,7 +19,9 @@ namespace MonoGame.Tools.Pipeline
 
         public List<string> ProjectHistory;
         public string StartupProject;
-        public Microsoft.Xna.Framework.Point Size;
+        public int WindowWidth, WindowHeight;
+        public int WindowPositionX, WindowPositionY, WindowMaximizedPositionX, WindowMaximizedPositionY;
+        public bool WindowMaximized;
         public int HSeparator, VSeparator;
         public bool Maximized, DebugMode, PropertyGroupSort;
         public bool FilterOutput, FilterShowSkipped, FilterShowSuccessful, FilterShowCleaned, AutoScrollBuildOutput;
@@ -40,6 +42,16 @@ namespace MonoGame.Tools.Pipeline
             FilterShowSuccessful = true;
             FilterShowCleaned = true;
             AutoScrollBuildOutput = true;
+
+            WindowWidth = 900;
+            WindowHeight = 550;
+            WindowPositionX = 182;
+            WindowPositionY = 182;
+            WindowMaximizedPositionX = 0;
+            WindowMaximizedPositionY = 0;
+            WindowMaximized = false;
+            HSeparator = 200;
+            VSeparator = 230;
 
             try
             {

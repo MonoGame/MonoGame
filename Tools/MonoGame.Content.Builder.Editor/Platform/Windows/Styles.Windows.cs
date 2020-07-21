@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Eto;
+using Eto.Forms;
 using Eto.Wpf.Forms;
 using Eto.Wpf.Forms.Menu;
 using Eto.Wpf.Forms.ToolBar;
@@ -13,6 +14,26 @@ namespace MonoGame.Tools.Pipeline
     {
         public static void Load()
         {
+            Style.Add<FormHandler>("MainWindow", h =>
+            {
+                var displayBounds = Eto.Forms.Screen.DisplayBounds;
+
+                if(h.Location.X < displayBounds.Left || h.Location.X > displayBounds.Right ||
+                   h.Location.Y < displayBounds.Top || h.Location.Y > displayBounds.Bottom)
+                {
+                    h.WindowState = Eto.Forms.WindowState.Normal;
+                    h.Location = new Eto.Drawing.Point(182, 182);
+                    h.Size = new Eto.Drawing.Size(900, 550);
+
+                    var splitterEnumerator = h.Widget.Children.GetEnumerator();
+                    if( splitterEnumerator.MoveNext() == true && splitterEnumerator.Current is Splitter)
+                        ((Splitter)splitterEnumerator.Current).Position = 200;
+
+                    if (splitterEnumerator.MoveNext() == true && splitterEnumerator.Current is Splitter)
+                        ((Splitter)splitterEnumerator.Current).Position = 230;
+                }
+            });
+
             Style.Add<MenuBarHandler>("MenuBar", h =>
             {
                 h.Control.Background = System.Windows.SystemColors.ControlLightLightBrush;
