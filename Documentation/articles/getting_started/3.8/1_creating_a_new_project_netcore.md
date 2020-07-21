@@ -30,7 +30,7 @@ dotnet tool install -g dotnet-mgcb
 
 > For development branches you will also need to include the version number in the command, e.g. 'dotnet tool install -g dotnet-mgcb-editor --version 3.8.0.1375-develop'
 
-For more details on the [MonoGame tools check here](/tools/tools.md).
+For more details on the [MonoGame tools check here](~/articles/tools/tools.md).
 
 ## Create a MonoGame Project
 

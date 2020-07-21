@@ -20,7 +20,7 @@ Now open up your game project and look at the Solution explorer window. Expand t
 
 You should now see the Pipeline Editor window open up. If it does not open up (you see a text file open), then you can right-click on **Content.mgcb** and select **Open With**, then select **MonoGame Pipeline** in the list, click **Set as Default** and then click **OK**.
 
-> If you do not see the **MonoGame Pipeline Tool** option when you right-click and select **Open With**, then please review the [Tools documentation](/tools/tools.md) for installing the Pipeline tool for your operating system.
+> If you do not see the **MonoGame Pipeline Tool** option when you right-click and select **Open With**, then please review the [Tools documentation](~/articles/tools/tools.md) for installing the Pipeline tool for your operating system.
 
 ![Pipeline Editor](~/images/getting_started/3_pipeline_tool.png)
 
@@ -77,7 +77,7 @@ Finally, find the Draw method, and let us draw the ball onto the screen. This is
 
 - Then finally closing the SpriteBatch to commit the textures we want drawn to the screen.
 
-> **Note**, if you add multiple images, they will be drawn in the order you place them from back to font (each drawn on top of each other).
+> **Note**, if you add multiple images, they will be drawn in the order you place them from back to front (each drawn on top of each other).
 
 As shown below:
 

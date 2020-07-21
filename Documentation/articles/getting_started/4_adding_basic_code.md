@@ -6,7 +6,7 @@ This tutorial will go over adding basic logic to your game. This tutorial contin
 
 ## Positioning the content
 
-First we need to add few new variables in the Game1.cs class file, one for position, and one for speed.
+First, we need to add few new variables in the Game1.cs class file, one for position and one for speed.
 
 ```csharp
 public class Game1 : Game
@@ -27,7 +27,7 @@ ballSpeed = 100f;
 base.Initialize();
 ```
 
-With this we are setting the ball starting position to the center of the screen based off the dimensions of the screen determined by the current **BackBufferWidth** and **BackBufferHeight**.
+With this, we are setting the ball starting position to the center of the screen based off the dimensions of the screen determined by the current **BackBufferWidth** and **BackBufferHeight**.
 
 The last thing we need to do is modify the position the ball is getting drawn to. 
 
@@ -41,7 +41,7 @@ Now run the game.
 
 ![Draw Ball 1](~/images/getting_started/4_ball_not_center.png)
 
-As you can see the ball is not quite centered yet. This is because MonoGame uses (0, 0) as the origin point of the image for drawing by default (Top Left hand corner). We can modify this by taking in to account the height and width of the image when drawing, as follows:
+As you can see the ball is not quite centered yet. This is because MonoGame uses (0, 0) as the origin point of the image for drawing by default (Top Left hand corner). We can modify this by taking into account the height and width of the image when drawing, as follows:
 
 ```csharp
 spriteBatch.Draw(
