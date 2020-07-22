@@ -20,12 +20,12 @@ dotnet new -i MonoGame.Templates.CSharp
 
 > For development branches you will also need to include the version number in the command, e.g. 'dotnet new --install MonoGame.Templates.CSharp::3.8.0.1375-develop'
 
-## MonoGame Content Pipeline Tool
+## MonoGame Content Pipeline Tool (MGCB Editor)
 
-The content pipeline tool is also now published to the .NET tools library. To install the pipeline tool simply open a command prompt and run the following dotnet command (if you get an error, please ensure you have installed the .[NETCore SDK](https://dotnet.microsoft.com/download) listed above):
+The MGCB Editor is also now published to the .NET tools library. To install the MGCB Editor, simply open a command prompt and run the following dotnet command (if you get an error, please ensure you have installed the .[NETCore SDK](https://dotnet.microsoft.com/download) listed above):
 
 ```
-dotnet tool install -g dotnet-mgcb
+dotnet tool install -g dotnet-mgcb-editor
 ```
 
 > For development branches you will also need to include the version number in the command, e.g. 'dotnet tool install -g dotnet-mgcb-editor --version 3.8.0.1375-develop'

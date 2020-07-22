@@ -8,7 +8,7 @@ MonoGame is available on Mac for development using the instructions below to get
 
 You will need a copy of [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/) installed before installing MonoGame.
 
-If you also need the Content Pipeline tool to use a GUI to manage your content you will need to install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
+If you also need the MGCB Editor to use a GUI to manage your content you will need to install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
 
 
 ## Install MonoGame Templates
@@ -21,17 +21,17 @@ To create new projects from within Visual Studio, you will need to install the V
 
 Once open, simply search for **MonoGame** in the top right search window (as shown above) and install the "MonoGame project templates".  You now have the MonoGame templates installed ready to create new projects.
 
-## MonoGame Content Pipeline Tool
+## MonoGame Content Pipeline Tool (MGCB Editor)
 
-The content pipeline tool which was previously available inside the MonoGame installer is now published to the .NET tools library. To install the pipeline tool simply open a command prompt and run the following dotnet command (if you get an error, please ensure you have installed the .NETCore SDK listed above):
+The MGCB Editor which was previously available inside the MonoGame installer is now published to the .NET tools library. To install the MGCB Editor, simply open a command prompt and run the following dotnet command (if you get an error, please ensure you have installed the .NETCore SDK listed above):
 
 ```
-dotnet tool install -g dotnet-mgcb
+dotnet tool install -g dotnet-mgcb-editor
 ```
 
 > For development branches you will also need to include the version number in the command, e.g. 'dotnet tool install -g dotnet-mgcb-editor --version 3.8.0.1375-develop'
 
-Once installed, you also need to register the Pipeline tool with Visual Studio with the additional command from the command prompt:
+Once installed, you also need to register the MGCB Editor with Visual Studio with the additional command from the command prompt:
 
 ```
 mgcb-editor --register
