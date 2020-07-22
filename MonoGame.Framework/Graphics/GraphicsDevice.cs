@@ -1167,6 +1167,14 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_indexBuffer == null)
                 throw new InvalidOperationException("Index buffer must be set before calling DrawIndexedPrimitives.");
 
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
+
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
 
@@ -1223,7 +1231,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
 
             if (_hullShader != null && !isPatchPrimitives)
-                throw new ArgumentException("If a hull shader is active the primitive type must be set to a patch type");
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
@@ -1258,6 +1266,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
+
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
@@ -1331,6 +1347,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
+
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
 
             if (indexOffset + GetElementCountArray(primitiveType, primitiveCount) > indexData.Length)
                 throw new ArgumentOutOfRangeException("primitiveCount");
@@ -1412,6 +1436,14 @@ namespace Microsoft.Xna.Framework.Graphics
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
 
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
+
             if (indexOffset + GetElementCountArray(primitiveType, primitiveCount) > indexData.Length)
                 throw new ArgumentOutOfRangeException("primitiveCount");
 
@@ -1482,6 +1514,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_indexBuffer == null)
                 throw new InvalidOperationException("Index buffer must be set before calling DrawInstancedPrimitives.");
+
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
 
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
