@@ -67,6 +67,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             File.Delete(destFile);
 
+            var stdOutLines = stdout.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            foreach (var line in stdOutLines)
+            {
+                if (line.StartsWith("Dependency:") && line.Length > 12)
+                {
+                    context.AddDependency(line.Substring(12));
+                }
+            }
+
             ProcessErrorsAndWarnings(!success, stderr, input, context);
 
             return ret;
