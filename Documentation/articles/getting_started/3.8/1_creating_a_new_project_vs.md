@@ -32,9 +32,19 @@ The MGCB Editor which was previously available inside the MonoGame installer is 
 dotnet tool install -g dotnet-mgcb-editor
 ```
 
-> For development branches you will also need to include the version number in the command, e.g. 'dotnet tool install -g dotnet-mgcb-editor --version 3.8.0.1375-develop'
+> For development branches, you will need to ensure you have the dev channel NuGet registered and include the version number in the command, for example:
+>
+> ```
+> dotnet nuget add source -n MonoGame http://teamcity.monogame.net/guestAuth/app/nuget/feed/_Root/default/v3/index.json
+> 
+> dotnet tool install --global dotnet-mgcb-editor --version 3.8.0.1476-develop
+> ```
 
-> Currently, the MGCB Editor cannot be registered with Visual Studio for Mac, so the content project has to be opened manually outside of Visual Studio.
+Once installed, you also need to register the MGCB Editor with Visual Studio with the additional command from the command prompt:
+
+```
+mgcb-editor --register
+```
 
 For more details on the [MonoGame tools check here](~/articles/tools/tools.md).
 
