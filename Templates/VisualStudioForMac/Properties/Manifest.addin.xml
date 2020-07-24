@@ -56,7 +56,7 @@
 			_overrideDescription="A MonoGame NetStandard project. Use this project to share game code between platforms."
 			category="monogame/library/general"/>
 		<Template
-			id="MonoGame.Pipeline.Extension.CSharp"
+			id="MonoGame.Library.Pipeline.Extension.CSharp"
 			path="Templates/MonoGame.Templates.CSharp.nupkg"
 			icon="md-monogame-project"
 			imageId="md-monogame-template"
