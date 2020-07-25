@@ -303,10 +303,12 @@ namespace Microsoft.Xna.Framework
 
         #region Events
 
+        private readonly ExitingEventArgs _exitingEventArgs = new ExitingEventArgs();
+
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
         public event EventHandler<EventArgs> Disposed;
-        public event EventHandler<EventArgs> Exiting;
+        public event EventHandler<ExitingEventArgs> Exiting;
 
 #if WINDOWS_UAP
         [CLSCompliant(false)]
@@ -398,8 +400,6 @@ namespace Microsoft.Xna.Framework
                 DoUpdate(new GameTime());
 
                 Platform.RunLoop();
-                EndRun();
-				DoExiting();
                 break;
             default:
                 throw new ArgumentException(string.Format(
@@ -521,8 +521,17 @@ namespace Microsoft.Xna.Framework
 
             if (_shouldExit)
             {
-                Platform.Exit();
-                _shouldExit = false; //prevents perpetual exiting on platforms supporting resume.
+                _exitingEventArgs.Cancel = false;
+                OnExiting(this, _exitingEventArgs);
+
+                if (!_exitingEventArgs.Cancel)
+                {
+                    Platform.Exit();
+                    EndRun();
+                    UnloadContent();
+                }
+
+                _shouldExit = false;
             }
         }
 
@@ -583,7 +592,7 @@ namespace Microsoft.Xna.Framework
             _updateables.ForEachFilteredItem(UpdateAction, gameTime);
 		}
 
-        protected virtual void OnExiting(object sender, EventArgs args)
+        protected virtual void OnExiting(object sender, ExitingEventArgs args)
         {
             EventHelpers.Raise(sender, Exiting, args);
         }
@@ -625,8 +634,6 @@ namespace Microsoft.Xna.Framework
 
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
-            EndRun();
-			DoExiting();
         }
 
         #endregion Event Handlers
@@ -700,12 +707,6 @@ namespace Microsoft.Xna.Framework
             _components.ComponentAdded += Components_ComponentAdded;
             _components.ComponentRemoved += Components_ComponentRemoved;
         }
-
-		internal void DoExiting()
-		{
-			OnExiting(this, EventArgs.Empty);
-			UnloadContent();
-		}
 
         #endregion Internal Methods
 
