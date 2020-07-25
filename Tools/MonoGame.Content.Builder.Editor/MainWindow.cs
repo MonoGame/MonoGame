@@ -12,8 +12,20 @@ using System.Reflection;
 
 namespace MonoGame.Tools.Pipeline
 {
+#if IDE
+    partial class MainWindow : DynamicLayout, IView
+    {
+        public string Title { get; set; }
+
+        public Icon Icon { get; set; }
+
+        public MenuBar Menu { get; set; }
+
+        public ToolBar ToolBar { get; set; }
+#else
     partial class MainWindow : Form, IView
     {
+#endif
 #pragma warning disable 649
         public EventHandler<EventArgs> RecentChanged;
         public EventHandler<EventArgs> TitleChanged;
@@ -58,7 +70,7 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            #if MONOMAC
+#if MONOMAC
             splitterVertical.PositionChanged += delegate {
                 setw++;
                 if (setw > 2)
@@ -67,7 +79,7 @@ namespace MonoGame.Tools.Pipeline
                     setw = 0;
                 }
             };
-            #endif
+#endif
 
             _contextMenu = new ContextMenu();
             projectControl.SetContextMenu(_contextMenu);
@@ -77,14 +89,16 @@ namespace MonoGame.Tools.Pipeline
             _xnaFileFilter = new FileFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
         }
 
+#if !IDE
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = !PipelineController.Instance.Exit();
 
             base.OnClosing(e);
         }
+#endif
 
-        #region IView implements
+#region IView implements
 
         public void Attach(IController controller)
         {
@@ -446,9 +460,9 @@ namespace MonoGame.Tools.Pipeline
             _clipboard.Text = text;
         }
 
-        #endregion
+#endregion
 
-        #region Commands
+#region Commands
 
         private void CmdNew_Executed(object sender, EventArgs e)
         {
@@ -635,7 +649,7 @@ namespace MonoGame.Tools.Pipeline
             PipelineController.Instance.RebuildItems();
         }
 
-        #endregion
+#endregion
 
     }
 }

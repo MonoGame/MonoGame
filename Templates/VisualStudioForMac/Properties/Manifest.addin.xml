@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ExtensionModel>
 	<Runtime>
 	</Runtime>
@@ -88,11 +88,15 @@
 		<StockIcon stockid="md-monogame-preview-project" resource="monogame-preview.png" size="Dnd" />
 	</Extension>
 	<Extension path="/MonoDevelop/Core/MimeTypes">
-		<MimeType id="text/x-mgcb" _description="MonoGame Content Build File" icon="monogame-project-icon" isText="false">
+		<MimeType id="x-mgcb" _description="MonoGame Content Build File" icon="monogame-project-icon" isText="false">
 			<File pattern="*.mgcb" />
 		</MimeType>
 	</Extension>
 	<Extension path="/MonoDevelop/Ide/DisplayBindings">
-		<DisplayBinding id="MonoGamePipeline" insertbefore="DefaultDisplayBinding" class="MonoGame.IDE.VisualStudioForMac.PipelineDisplayBinding" />
+        <DisplayBinding id="MGCBPadBinding" insertbefore="DefaultDisplayBinding" class="MonoGame.IDE.VisualStudioForMac.MGCBPadBinding" />
+		<DisplayBinding id="MGCBEditorBinding" insertbefore="DefaultDisplayBinding" class="MonoGame.IDE.VisualStudioForMac.MGCBEditorBinding" />
 	</Extension>
+    <Extension path = "/MonoDevelop/Ide/Pads">
+       <Pad id = "MGPad" _label = "MonoGame Content" icon="monogame-project-icon-16" group="MonoGame" class="MonoGame.IDE.VisualStudioForMac.MGPad" defaultPlacement="Left" defaultLayout="*"/>
+    </Extension>
 </ExtensionModel>

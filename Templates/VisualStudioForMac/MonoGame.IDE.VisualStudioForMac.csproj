@@ -2,20 +2,16 @@
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
     <BaseOutputPath>..\..\Artifacts\VisualStudioForMac</BaseOutputPath>
-    <AssemblySearchPaths>$(AssemblySearchPaths);{GAC}</AssemblySearchPaths>
+    <DefineConstants>IDE;MONOMAC;MAC</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="MonoDevelop.Addins" Version="0.4.7" />
+    <PackageReference Include="Eto.Forms" Version="2.5.3" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Templates\" />
+    <Folder Include="PropertyGridCells\" />
+    <Folder Include="Platform\Linux\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="monogame-project-32.png" />
@@ -133,6 +129,74 @@
     <AddinFile Include="..\..\Artifacts\MonoGame.Templates.CSharp\Release\*.nupkg">
       <Link>Templates\MonoGame.Templates.CSharp.nupkg</Link>
     </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\Effect.fx">
+      <Link>Templates\Effect.fx</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\Effect.png">
+      <Link>Templates\Effect.png</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\Effect.template">
+      <Link>Templates\Effect.template</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\Font.png">
+      <Link>Templates\Font.png</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\LocalizedSpriteFont.spritefont">
+      <Link>Templates\LocalizedSpriteFont.spritefont</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\LocalizedSpriteFont.template">
+      <Link>Templates\LocalizedSpriteFont.template</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\SpriteEffect.fx">
+      <Link>Templates\SpriteEffect.fx</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\SpriteEffect.template">
+      <Link>Templates\SpriteEffect.template</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\SpriteFont.spritefont">
+      <Link>Templates\SpriteFont.spritefont</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\SpriteFont.template">
+      <Link>Templates\SpriteFont.template</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\Xml.png">
+      <Link>Templates\Xml.png</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\XmlContent.template">
+      <Link>Templates\XmlContent.template</Link>
+    </AddinFile>
+    <AddinFile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Templates\XmlContent.xml">
+      <Link>Templates\XmlContent.xml</Link>
+    </AddinFile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Tools\MonoGame.Content.Builder.Editor\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Remove="..\..\Tools\MonoGame.Content.Builder.Editor\obj\**\*.cs" />
+    <Compile Remove="..\..\Tools\MonoGame.Content.Builder.Editor\Platform\**\*.cs" />
+    <Compile Remove="..\..\Tools\MonoGame.Content.Builder.Editor\Program.cs" />
+    <Compile Remove="..\..\Tools\MonoGame.Content.Builder.Editor\LogWindow.cs" />
+    <Compile Remove="..\..\Tools\MonoGame.Content.Builder.Editor\LogWindow.eto.cs" />
+    <Compile Include="..\..\Tools\MonoGame.Content.Builder.Editor\Platform\Mac\Global.Mac.cs">
+      <Link>Global.Mac.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
+    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
+      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="..\..\Tools\MonoGame.Content.Builder.Editor\Platform\Mac\Global.Mac.cs">
+      <Link>Global.Mac.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Eto.XamMac2">
+      <HintPath>..\..\ThirdParty\Dependencies\Eto\Eto.XamMac2.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Target Name="_GenerateAddinInfo" BeforeTargets="CoreCompile">
      <PropertyGroup>
@@ -151,4 +215,5 @@
      </ItemGroup>
      <WriteLinesToFile File="Properties\AddinInfo.cs" Lines="@(AddinInfo)" Overwrite="true" />
   </Target>
+  <Import Project="..\..\Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.targets" />
 </Project>

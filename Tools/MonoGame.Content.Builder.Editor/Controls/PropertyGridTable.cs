@@ -121,6 +121,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void SetCursor(CursorType cursor)
         {
+            Cursor = new Cursor(cursor);
             if (_currentCursor != cursor)
             {
                 _currentCursor = cursor;
@@ -153,13 +154,10 @@ namespace MonoGame.Tools.Pipeline
             if (_cells.Count == 0)
             {
                 if (_height != 10)
-                    drawable.Height = _height = 10;
+                    drawable.Height = Math.Max(_height = 10, Height);
 
                 return;
             }
-
-            // Draw separator for not filled rows
-            g.FillRectangle(DrawInfo.BorderColor, _separatorPos - 1, 0, 1, Height);
 
             foreach (var c in _cells)
             {
@@ -189,9 +187,12 @@ namespace MonoGame.Tools.Pipeline
                 rec.Y += c.Height + _spacing;
             }
 
+            // Draw separator for not filled rows
+            g.FillRectangle(DrawInfo.BorderColor, _separatorPos - 1, rec.Y, 1, Height);
+
             if (_height != rec.Y + 1)
             {
-                drawable.Height = _height = rec.Y + 1;
+                drawable.Height = _height = Math.Max(rec.Y + 1, Height);
                 SetWidth();
             }
 

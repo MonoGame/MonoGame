@@ -79,6 +79,11 @@ namespace MonoGame.Tools.Pipeline
             CanUndo = _undoStack.Any();
             CanRedo = _redoStack.Any();
             _controller.UpdateMenu();
+
+#if IDE
+            if (_controller.ProjectOpen && _controller.ProjectDirty)
+                _controller.SaveProject(false);
+#endif
         }
     }
 }
