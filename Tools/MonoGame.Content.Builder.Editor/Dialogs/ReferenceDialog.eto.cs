@@ -18,7 +18,9 @@ namespace MonoGame.Tools.Pipeline
         private void InitializeComponent()
         {
             Title = "Reference Editor";
-#if !IDE
+#if IDE
+            DisplayMode = DialogDisplayMode.Separate;
+#else
             DisplayMode = DialogDisplayMode.Attached;
 #endif
             Resizable = true;

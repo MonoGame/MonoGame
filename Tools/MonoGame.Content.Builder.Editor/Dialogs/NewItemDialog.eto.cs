@@ -19,7 +19,9 @@ namespace MonoGame.Tools.Pipeline
         private void InitializeComponent()
         {
             Title = "New File";
-#if !IDE
+#if IDE
+            DisplayMode = DialogDisplayMode.Separate;
+#else
             DisplayMode = DialogDisplayMode.Attached;
 #endif
             Size = new Size(370, 285);
