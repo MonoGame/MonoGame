@@ -4,6 +4,7 @@
 
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -14,6 +15,50 @@ namespace Microsoft.Xna.Framework.Graphics
         private SharpDX.Direct3D11.Texture2D _msTexture;
 
         private SampleDescription _msSampleDescription;
+
+
+        private void PlatformFromNativeHandle(IntPtr handle)
+        {
+            var dxgiFormat = Format == SurfaceFormat.Color ? SharpDX.DXGI.Format.B8G8R8A8_UNorm : SharpDXHelper.ToFormat(Format);
+
+            RenderTargetViewDescription desc = new RenderTargetViewDescription()
+            {
+                Format = dxgiFormat,
+                Dimension = RenderTargetViewDimension.Texture2D
+            };
+
+            _texture = new SharpDX.Direct3D11.Resource(handle);
+            _renderTargetViews = new[] { new RenderTargetView(GraphicsDevice._d3dDevice, _texture, desc) };
+
+            // Create the depth buffer if we need it.
+            if (DepthStencilFormat != DepthFormat.None)
+            {
+                dxgiFormat = SharpDXHelper.ToFormat(DepthStencilFormat);
+
+                var multisampleDesc = new SampleDescription(1, 0);
+                if (MultiSampleCount > 1)
+                {
+                    multisampleDesc.Count = MultiSampleCount;
+                    multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
+                }
+
+                // Create a DepthStencil view on this surface to use on bind.
+                using (var depthBuffer = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, new Texture2DDescription
+                {
+                    Format = dxgiFormat,
+                    ArraySize = 1,
+                    MipLevels = 1,
+                    Width = width,
+                    Height = height,
+                    SampleDescription = multisampleDesc,
+                    Usage = ResourceUsage.Default,
+                    BindFlags = BindFlags.DepthStencil,
+                }))
+                {
+                    _depthStencilView = new DepthStencilView(GraphicsDevice._d3dDevice, depthBuffer);
+                }
+            }
+        }
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
