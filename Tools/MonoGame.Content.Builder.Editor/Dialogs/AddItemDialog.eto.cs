@@ -17,7 +17,9 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitializeComponent()
         {
+#if !IDE
             DisplayMode = DialogDisplayMode.Attached;
+#endif
             Width = 400;
             Height = 250;
 
