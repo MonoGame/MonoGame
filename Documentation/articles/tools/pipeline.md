@@ -26,10 +26,12 @@ In a terminal run the following to install the MGCB Editor:
 dotnet tool install -g dotnet-mgcb-editor
 ```
 
-> For development branches you will also need to include the version number in the command, e.g.
+> For development branches, you will need to ensure you have the dev channel NuGet registered and include the version number in the command, for example:
 >
 > ```
-> dotnet tool install -g dotnet-mgcb-editor --version 3.8.0.1375-develop
+> dotnet nuget add source -n MonoGame http://teamcity.monogame.net/guestAuth/app/nuget/feed/_Root/default/v3/index.json
+> 
+> dotnet tool install --global dotnet-mgcb-editor --version 3.8.0.1476-develop
 > ```
 
 After installing `mgcb-editor` run the following to register the MGCB Editor as the default app for .mgcb files.
