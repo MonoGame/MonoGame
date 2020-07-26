@@ -30,7 +30,7 @@ Below is a list of public platforms with the corresponding NuGet package, the `d
 |-|-|-|-|
 | WindowsDX | Windows | MonoGame.Framework.WindowsDX | mgwindowsdx |
 | DesktopGL | Windows, macOS, Linux | MonoGame.Framework.DesktopGL | mgdesktopgl |
-| WindowsUniversal | Windows 10, Xbox One (UWP-only, not XDK) | MonoGame.Framework.WindowsUniversal || mguwpcore (core app, no xaml), mguwpxaml (xaml app) |
+| WindowsUniversal | Windows 10, Xbox One (UWP-only, not XDK) | MonoGame.Framework.WindowsUniversal | mguwpcore (core app, no xaml), mguwpxaml (xaml app) |
 | Android |Android | MonoGame.Framework.Android | mgandroid |
 | iOS | iOS | MonoGame.Framework.iOS | mgios |
 | NetStandard Library | N/A | N/A | mgnetstandard |
