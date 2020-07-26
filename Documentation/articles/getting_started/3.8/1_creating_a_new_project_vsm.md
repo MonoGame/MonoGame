@@ -8,7 +8,7 @@ MonoGame is available on Mac for development using the instructions below to get
 
 You will need a copy of [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/) installed before installing MonoGame.
 
-If you also need the MGCB Editor to use a GUI to manage your content you will need to install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
+If you also need the [MGCB Editor](#monogame-content-pipeline-tool-mgcb-editor) to use a GUI to manage your content you will need to install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
 
 
 ## Install MonoGame Templates
@@ -37,7 +37,11 @@ dotnet tool install -g dotnet-mgcb-editor
 > dotnet tool install --global dotnet-mgcb-editor --version 3.8.0.1476-develop
 > ```
 
-***Currently, the MGCB Editor cannot be registered with Visual Studio for Mac, so the content project has to be opened manually outside of Visual Studio***
+Once installed, you also need to register the MGCB Editor with Visual Studio for Mac with the additional command from the command prompt:
+
+```
+mgcb-editor --register
+```
 
 For more details on the [MonoGame tools check here](~/articles/tools/tools.md).
 

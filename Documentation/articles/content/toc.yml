@@ -1,5 +1,20 @@
 - name: Using MGCB Editor
   href: using_mgcb-editor.md
+  items:
+  - name: Image Files
+    href: using_mgcb-editor.md#Images
+  - name: Audio Files
+    href: using_mgcb-editor.md#Audio
+  - name: Model Files
+    href: using_mgcb-editor.md#Models
+  - name: Font Files
+    href: using_mgcb-editor.md#Fonts
+  - name: Effect Files (shaders)
+    href: using_mgcb-editor.md#Effects
+  - name: Video Files
+    href: using_mgcb-editor.md#Video
+  - name: Text Files (data)
+    href: using_mgcb-editor.md#Text
 - name: Effects
   href: custom_effects.md
 - name: TrueType fonts

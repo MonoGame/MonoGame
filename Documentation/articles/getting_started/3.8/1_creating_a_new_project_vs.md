@@ -6,7 +6,13 @@ MonoGame is available on Windows for development using the instructions below to
 
 ## Prerequisites
 
-You will need a copy of [Visual Studio 2019](https://www.monogame.net/downloads/) or later installed (any edition, including Community) before installing MonoGame.
+You will need a copy of [Visual Studio 2019](https://www.monogame.net/downloads/) or later installed (any edition, including Community) before installing MonoGame, with the following components (depending on your target platform):
+
+![Visual Studio optional components](~/images/getting_started/1_installer_vs_components.png)
+
+* .Net Desktop Development - For Windows GL / DX platforms
+* Mobile Development with .NET - For Android / iOS platforms
+* Universal Windows Platform development - For Windows 10 / Xbox UWP
 
 When installing Visual Studio, it also is recommended to include the "**.NET Core cross-platform development" components:
 

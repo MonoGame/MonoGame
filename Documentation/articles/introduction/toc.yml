@@ -3,7 +3,7 @@
 - name: Requirements
   href: requirements.md
 - name: Create a MonoGame Project
-  href: create_project.md
+  href: ../getting_started/getting_started.md
 - name: Target Platforms
   href: platforms.md
 - name: MonoGame FAQ
