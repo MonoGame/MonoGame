@@ -88,11 +88,11 @@
 		<StockIcon stockid="md-monogame-preview-project" resource="monogame-preview.png" size="Dnd" />
 	</Extension>
 	<Extension path="/MonoDevelop/Core/MimeTypes">
-		<MimeType id="text/x-mgcb" _description="MonoGame Content Build File" icon="monogame-project-icon" isText="false">
+		<MimeType id="x-mgcb" _description="MonoGame Content Build File" icon="monogame-project-icon" isText="false">
 			<File pattern="*.mgcb" />
 		</MimeType>
 	</Extension>
 	<Extension path="/MonoDevelop/Ide/DisplayBindings">
-		<DisplayBinding id="MonoGamePipeline" insertbefore="DefaultDisplayBinding" class="MonoGame.IDE.VisualStudioForMac.PipelineDisplayBinding" />
+		<DisplayBinding id="MGCBEditorBinding" insertbefore="DefaultDisplayBinding" class="MonoGame.IDE.VisualStudioForMac.MGCBEditorBinding" />
 	</Extension>
 </ExtensionModel>
