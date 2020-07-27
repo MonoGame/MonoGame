@@ -28,6 +28,7 @@ namespace MonoGame.Tools.Pipeline
         private int _moveSeparator;
         private int _height;
         private bool _skipEdit;
+        private Cursor _cursorNormal, _cursorResize;
 
         public PropertyGridTable()
         {
@@ -39,6 +40,8 @@ namespace MonoGame.Tools.Pipeline
             _cells = new List<CellBase>();
             _moveSeparator = -_separatorWidth / 2 - 1;
             _skipEdit = false;
+            _cursorResize = new Cursor(CursorType.VerticalSplit);
+            _cursorNormal = new Cursor(CursorType.Default);
 
             Group = true;
         }
@@ -121,10 +124,18 @@ namespace MonoGame.Tools.Pipeline
 
         private void SetCursor(CursorType cursor)
         {
-            if (_currentCursor != cursor)
+            if (_currentCursor == cursor)
+                return;
+
+            _currentCursor = cursor;
+            switch (cursor)
             {
-                _currentCursor = cursor;
-                Cursor = new Cursor(cursor);
+                case CursorType.VerticalSplit:
+                    drawable.Cursor = _cursorResize;
+                    break;
+                default:
+                    drawable.Cursor = _cursorNormal;
+                    break;
             }
         }
 
@@ -149,17 +160,6 @@ namespace MonoGame.Tools.Pipeline
             _selectedCell = null;
 
             g.Clear(DrawInfo.BackColor);
-
-            if (_cells.Count == 0)
-            {
-                if (_height != 10)
-                    drawable.Height = _height = 10;
-
-                return;
-            }
-
-            // Draw separator for not filled rows
-            g.FillRectangle(DrawInfo.BorderColor, _separatorPos - 1, 0, 1, Height);
 
             foreach (var c in _cells)
             {
@@ -189,9 +189,14 @@ namespace MonoGame.Tools.Pipeline
                 rec.Y += c.Height + _spacing;
             }
 
-            if (_height != rec.Y + 1)
+            // Draw separator for not filled rows
+            g.FillRectangle(DrawInfo.BorderColor, _separatorPos - 1, rec.Y, 1, Height);
+
+            // Set Height
+            var newHeight = Math.Max(rec.Y + 1, Height);
+            if (_height != newHeight)
             {
-                drawable.Height = _height = rec.Y + 1;
+                drawable.Height = _height = newHeight;
                 SetWidth();
             }
 
@@ -225,8 +230,6 @@ namespace MonoGame.Tools.Pipeline
                         pixel1.Add(drawable, 0, 0);
                         _selectedCell.Edit(pixel1);
                         Content = pixel1;
-
-                        pixel1.Style = "Stretch";
                     }
                     else
                     {
@@ -265,19 +268,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void PropertyGridTable_SizeChanged(object sender, EventArgs e)
         {
-#if WINDOWS
             SetWidth();
-#endif
-
-#if GTK
-            // force size reallocation
-            drawable.Width = pixel1.Width - 2;
-
-            foreach (var child in pixel1.Children)
-                if (child != drawable)
-                    child.Width = drawable.Width - _separatorPos;
-#endif
-
             drawable.Invalidate();
         }
 
@@ -287,7 +278,7 @@ namespace MonoGame.Tools.Pipeline
             var action = new Action(() =>
             {
                 var scrollsize = (_height >= Height) ? System.Windows.SystemParameters.VerticalScrollBarWidth : 0.0;
-                drawable.Width = (int)(Width - scrollsize - System.Windows.SystemParameters.BorderWidth * 2);
+                drawable.Width = pixel1.Width = (int)(Width - scrollsize - System.Windows.SystemParameters.BorderWidth * 2);
 
                 foreach (var child in pixel1.Children)
                     if (child != drawable)
@@ -296,9 +287,12 @@ namespace MonoGame.Tools.Pipeline
 
             (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action,
                 System.Windows.Threading.DispatcherPriority.ContextIdle, null);
+#else
+            drawable.Width = pixel1.Width = Width - 2;
 
-#elif MONOMAC
-            drawable.Width = Width; // TODO: Subtract sctollbar size
+            foreach (var child in pixel1.Children)
+                if (child != drawable)
+                    child.Width = drawable.Width - _separatorPos;
 #endif
         }
     }
