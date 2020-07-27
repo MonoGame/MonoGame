@@ -6,7 +6,7 @@ This section will provide help and support for MonoGame.
 
 If you want to find an answer to a more specific problem, you can ask it on our [Community page](https://community.monogame.net/).
 
-You can also chat to the members of the MonoGame community via Gitter or Discord using the links below
+You can also chat to the members of the MonoGame community via [Gitter](https://gitter.im/MonoGame/MonoGame) or [Discord](https://discord.gg/xCehJFD) using the links below
 
 | | |
 |--|--|

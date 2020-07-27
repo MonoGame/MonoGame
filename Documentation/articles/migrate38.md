@@ -1,13 +1,14 @@
 # Migrating to MonoGame 3.8
 
-Previously MonoGame installed on your machine through an installer, but from 3.8 onwards everything is installed through NuGet packages.
+Previously MonoGame installed on your machine through an installer, but from 3.8 onwards everything is installed through NuGet packages and Visual Studio Extensions.
 
 ## WindowsDX and DesktopGL
 
 WindowsDX and DesktopGL templates now use SDK-style projects.
 To migrate old projects we recommend creating a new project with the 3.8+ templates and
-copying the csproj to your project folder. Make sure you back up your old project.
-For more information about SDK-style projects see the [docs](https://docs.microsoft.com/en-us/dotnet/core/tools/csproj).
+copying the csproj to your project folder.  Make sure you back up your old project.
+
+> For more information about SDK-style projects see the [documentation](https://docs.microsoft.com/en-us/dotnet/core/tools/csproj).
 
 ## Other Platforms
 

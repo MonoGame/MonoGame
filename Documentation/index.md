@@ -26,8 +26,8 @@ In the articles section, you will find resources and guides for how to make the 
   * [Requirements](/articles/introduction/requirements.md)
   * [Platforms](/articles/introduction/platforms.md)
   * [Help and Support](/articles/introduction/help_and_support.md)
-  * [FAQ](/articles/introduction/monogame_faq.md)
   * [External Links](/articles/links.md)
+  * [FAQ](/articles/introduction/monogame_faq.md)
 
 * [Getting Started guides](/articles/getting_started/getting_started.md)
 
