@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace MonoGame.Utilities
+namespace MonoGame.Framework.Utilities
 {
     internal class FuncLoader
     {
