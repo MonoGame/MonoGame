@@ -14,42 +14,42 @@ not be available in the current stable release.
 
 ## Site Index
 
-The documentation site is made up of several major parts which are available as links at the top of the page.  If you are new to MonoGame, we highly recommend walking through the **[Getting Started](/articles/getting_started/getting_started.md)** section to Install MonoGame and build your first game.
+The documentation site is made up of several major parts which are available as links at the top of the page.  If you are new to MonoGame, we highly recommend walking through the **[Getting Started](articles/getting_started/getting_started)** section to Install MonoGame and build your first game.
 
 ### [Articles](/articles/introduction/introduction.md)
 
 In the articles section, you will find resources and guides for how to make the most out of the MonoGame Framework, this includes:
 
-* [Introductions](/articles/introduction/introduction.md)
+* [Introductions](articles/introduction/introduction.md)
 
-  * [What is MonoGame?](/articles/introduction/introduction.md)
-  * [Requirements](/articles/introduction/requirements.md)
-  * [Platforms](/articles/introduction/platforms.md)
-  * [Help and Support](/articles/introduction/help_and_support.md)
-  * [External Links](/articles/links.md)
-  * [FAQ](/articles/introduction/monogame_faq.md)
+  * [What is MonoGame?](articles/introduction/introduction.md)
+  * [Requirements](articles/introduction/requirements.md)
+  * [Platforms]/articles/introduction/platforms.md)
+  * [Help and Support](articles/introduction/help_and_support.md)
+  * [External Links](articles/links.md)
+  * [FAQ](articles/introduction/monogame_faq.md)
 
-* [Getting Started guides](/articles/getting_started/getting_started.md)
+* [Getting Started guides](articles/getting_started/getting_started.md)
 
-  * [Getting started with MonoGame](/articles/getting_started/getting_started.md)
-  * [MonoGame game class walk-through](/articles/getting_started/2_understanding_the_code.md)
-  * [Adding Content](/articles/getting_started/3_adding_content.md)
-  * [Build a simple game](/articles/getting_started/4_adding_basic_code.md)
-  * [Migrating from MonoGame 3.7 to 3.8](/articles/migrate38.md)
-  * [Packaging guides for building games](/articles/packaging_games.md)
+  * [Getting started with MonoGame](articles/getting_started/getting_started.md)
+  * [MonoGame game class walk-through](articles/getting_started/2_understanding_the_code.md)
+  * [Adding Content](articles/getting_started/3_adding_content.md)
+  * [Build a simple game](articles/getting_started/4_adding_basic_code.md)
+  * [Migrating from MonoGame 3.7 to 3.8](articles/migrate38.md)
+  * [Packaging guides for building games](articles/packaging_games.md)
 
-* [Platform Specific help](/articles/platform_specific/platform_specific.md)
+* [Platform Specific help](articles/platform_specific/platform_specific.md)
 
-  * [Android](/articles/platform_specific/android.md)
-  * [Windows Universal Platform (UWP)](/articles/platform_specific/UWP.md)
+  * [Android](articles/platform_specific/android.md)
+  * [Windows Universal Platform (UWP)](articles/platform_specific/UWP.md)
 
-* [MonoGame Tools](/articles/tools/tools.md)
+* [MonoGame Tools](articles/tools/tools.md)
 
-  * [MonoGame Content Builder (MGCB)](/articles/tools/mgcb.md)
-  * [MonoGame Content Builder Editor (MGCB-Editor)](/articles/tools/pipeline.md)
-  * [MonoGame FX Builder (MGFX)](/articles/tools/2mgfx.md)
+  * [MonoGame Content Builder (MGCB)](articles/tools/mgcb.md)
+  * [MonoGame Content Builder Editor (MGCB-Editor)](articles/tools/pipeline.md)
+  * [MonoGame FX Builder (MGFX)](articles/tools/2mgfx.md)
 
-> Also check out the [official MonoGame full game samples](/articles/samples.md) and the recognized [contributor blogs and tutorials](/articles/tutorials.md).
+> Also check out the [official MonoGame full game samples](articles/samples.md) and the recognized [contributor blogs and tutorials](articles/tutorials.md).
 
 ---
 
@@ -58,7 +58,7 @@ In the articles section, you will find resources and guides for how to make the 
 The API section contains more specific technical information on the MonoGame API.  This is auto-generated from the MonoGame codebase.
 
 #### MonoGame XNA Framework
-These API namespaces cover the original XNA Framework namespaces and provide 
+These API namespaces cover the original XNA Framework namespaces and provide detailed technical information on the MonoGame Framework API.
 
 * [MonoGame.Xna.Framework](https://docs.monogame.net/api/Microsoft.Xna.Framework.html)
 * [MonoGame.Xna.Framework.Audio](https://docs.monogame.net/api/Microsoft.Xna.Framework.Audio.html)
@@ -71,7 +71,7 @@ These API namespaces cover the original XNA Framework namespaces and provide
 
 #### MonoGame specific functionality
 
-* [MonoGame.Utilities](https://docs.monogame.net/api/MonoGame.Utilities.html)
+* [MonoGame.Framework.Utilities](https://docs.monogame.net/api/MonoGame.Framework.Utilities.html)
 
 ---
 

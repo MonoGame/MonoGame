@@ -30,13 +30,13 @@ Links to various tutorials and articles to help you get started with MonoGame.
 
 ## Darkside of MonoGame video series
 
-* [Getting Started with MonoGame on Visual Studio 2017](https://www.youtube.com/watch?v=zphaylhOrm0)
-* [Getting Started with MonoGame on Visual Studio 2019]() (Coming soon)
-* [Getting Started with MonoGame using 2D](https://www.youtube.com/watch?v=6inkDfpUxAU)
-* [Getting Started with MonoGame using XML](https://www.youtube.com/watch?v=wCc_rLrqsIo)
-* [Getting the most out of your assets–The MonoGame Content Pipeline](https://www.youtube.com/watch?v=5mEQqCgTaLU)
-* [MonoGame - Building multi-platform solutions](https://www.youtube.com/watch?v=WonVmlpPBuU&t=735s)
-* [Building apps & games for Xbox One using UWP](https://www.youtube.com/watch?v=AAMToCwPy8s&t=1s)
+- [Getting Started with MonoGame on Visual Studio 2017](https://www.youtube.com/watch?v=zphaylhOrm0)
+- [Getting Started with MonoGame on Visual Studio 2019]() (Coming soon)
+- [Getting Started with MonoGame using 2D](https://www.youtube.com/watch?v=6inkDfpUxAU)
+- [Getting Started with MonoGame using XML](https://www.youtube.com/watch?v=wCc_rLrqsIo)
+- [Getting the most out of your assets–The MonoGame Content Pipeline](https://www.youtube.com/watch?v=5mEQqCgTaLU)
+- [MonoGame - Building multi-platform solutions](https://www.youtube.com/watch?v=WonVmlpPBuU&t=735s)
+- [Building apps & games for Xbox One using UWP](https://www.youtube.com/watch?v=AAMToCwPy8s&t=1s)
 
 ## Video Tutorials
 
@@ -45,6 +45,7 @@ Links to various tutorials and articles to help you get started with MonoGame.
 - [Desenvolvendo jogos multiplataforma em C# com MonoGame - Alexandre Chohfi (Portuguese)](http://channel9.msdn.com/Blogs/MSDN-Brasil-Cursos-de-Desenvolvimento/Desenvolvendo-jogos-multiplataforma-em-C-com-MonoGame)
 - [Desenvolvimento de jogos para Windows 8 com XNA - Alexandre Chohfi (Portuguese)](https://www.youtube.com/watch?v=gM5pRnYV1tA)
 - [Batholith Entertainment Game dev tutorials](https://www.youtube.com/playlist?list=PLZ6ofHM1rvK8lQSoKX1USZstM-ZXikFHp)
+- [Let's Code: The T-Rex Runner Game with MonoGame](https://www.youtube.com/watch?v=DJCQVJ83J1U)
 
 ## Others
 
@@ -62,5 +63,3 @@ Links to various tutorials and articles to help you get started with MonoGame.
 - [Solving Resolution Independent Rendering And 2D Camera Using Monogame](http://blog.roboblob.com/2013/07/27/solving-resolution-independent-rendering-and-2d-camera-using-monogame/)
 - [XNA is Dead; Long Live the New XNA, MonoGame](http://www.codemag.com/Article/1411081)
 - [Running MonoGame on Android Wear](http://crossplatform.io/running-monogame-on-android-wear/)
-
-
