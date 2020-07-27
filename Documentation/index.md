@@ -1,4 +1,4 @@
-# Welcome to the MonoGame game library documentation hub.
+# Welcome to the MonoGame game library documentation hub
 
 This area of the site contains the documentation on the API of MonoGame as well as how to use it to create great games.
 
