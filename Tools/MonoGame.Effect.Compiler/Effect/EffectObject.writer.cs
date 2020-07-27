@@ -131,7 +131,7 @@ namespace MonoGame.Effect
 
                 // Calculate a hash code from memory stream
                 // and write it to the header.
-                var effectKey = MonoGame.Utilities.Hash.ComputeHash(memStream);
+                var effectKey = MonoGame.Framework.Utilities.Hash.ComputeHash(memStream);
                 writer.Write((Int32)effectKey);
 
                 //write content from memory stream to final stream.

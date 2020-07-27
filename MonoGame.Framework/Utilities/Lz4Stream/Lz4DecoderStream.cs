@@ -9,7 +9,7 @@
 using System;
 using System.IO;
 
-namespace MonoGame.Utilities
+namespace MonoGame.Framework.Utilities
 {
 	internal class Lz4DecoderStream : Stream
 	{
