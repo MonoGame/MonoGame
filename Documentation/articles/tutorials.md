@@ -63,3 +63,4 @@ Links to various tutorials and articles to help you get started with MonoGame.
 - [Solving Resolution Independent Rendering And 2D Camera Using Monogame](http://blog.roboblob.com/2013/07/27/solving-resolution-independent-rendering-and-2d-camera-using-monogame/)
 - [XNA is Dead; Long Live the New XNA, MonoGame](http://www.codemag.com/Article/1411081)
 - [Running MonoGame on Android Wear](http://crossplatform.io/running-monogame-on-android-wear/)
+- [Text rendering in MonoGame](https://roy-t.nl/2018/07/04/Text-Rendering.html)
