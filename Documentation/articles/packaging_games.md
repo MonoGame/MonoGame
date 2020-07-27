@@ -1,10 +1,14 @@
+# Packaging games built with MonoGame
+
 Once your game is ready to be published, it is recommended that you package it properly for consumption by players.
 
 ## Desktop games
 
 To publish desktop games, it is recommended that you build your project as a [self-contained](https://docs.microsoft.com/en-us/dotnet/core/deploying/#publish-self-contained) .NET Core app. As such, your game will require absolutely no external dependencies and should run out-of-the-box as-is.
 
-### Building and packaging for Windows
+---
+
+## Building and packaging for Windows
 
 From the .NET Core CLI:
 
@@ -14,7 +18,9 @@ You can then zip the content of the publish folder and distribute the archive as
 
 If you are targeting WindowsDX, note that players will need [the DirectX June 2010 runtime](https://www.microsoft.com/en-us/download/details.aspx?id=8109) to be installed on their machine for audio and gamepads to work properly.
 
-### Building and packaging for Linux
+---
+
+## Building and packaging for Linux
 
 From the .NET Core CLI:
 
@@ -24,7 +30,9 @@ You can then archive the content of the publish folder and distribute the archiv
 
 We recommend using the .tar.gz archiving format to preserve the execution permissions.
 
-### Build and packaging for macOS
+---
+
+## Build and packaging for macOS
 
 From the .NET Core CLI:
 
@@ -87,7 +95,9 @@ After completing these steps, your .app folder should appear as an executable ap
 
 For archiving, we recommend using the .tar.gz format to preserve the execution permissions.
 
-### Special notes about .NET Core parameters
+---
+
+## Special notes about .NET Core parameters
 
 .NET Core proposes several parameters when publishing apps that may sound helpful, but have many issues when it comes to games (because they were never meant for games in the first place, but for small lightweight applications).
 

@@ -1,11 +1,13 @@
 # Porting from XNA to MonoGame
 
 MonoGame implements the same [API](https://en.wikipedia.org/wiki/Application_programming_interface)
-as XNA 4.0. That means you usually do not have to change your game code to port from XNA to
+as [XNA 4.0](https://docs.microsoft.com/en-us/previous-versions/windows/xna/bb200104(v=xnagamestudio.41)). That means you usually do not have to change your game code to port from XNA to
 MonoGame. There are however some exceptions and some things to keep in mind when porting to MonoGame.
 
-If your game targets XNA 3.1, you might want to use this archived migration cheatsheet to upgrade
-to 4.0: [http://www.nelxon.com/blog/xna-3-1-to-xna-4-0-cheatsheet/](https://web.archive.org/web/20110217153321/http://www.nelxon.com/blog/xna-3-1-to-xna-4-0-cheatsheet/).
+> If your game targets XNA 3.1, you might want to use this archived migration cheatsheet to upgrade
+to 4.0:
+>
+> [http://www.nelxon.com/blog/xna-3-1-to-xna-4-0-cheatsheet/](https://web.archive.org/web/20110217153321/http://www.nelxon.com/blog/xna-3-1-to-xna-4-0-cheatsheet/)
 
 ## Missing/removed API
 
@@ -17,6 +19,7 @@ in providing the GamerServices API for different platforms.
 
 MonoGame does not use the legacy fxc compiler for effects that XNA used. Instead MonoGame uses the DX11 compiler.
 The way MonoGame handles shaders imposes some restrictions and causes some caveats in what is and is not supported.
+
 This is all documented in the [custom effects](content/custom_effects.md) documentation page.
 
 ## Half pixel offset

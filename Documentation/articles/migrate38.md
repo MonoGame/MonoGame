@@ -48,6 +48,4 @@ NuGet package that automatically builds your content when building your game.
 - [MGCB Editor](~/articles/tools/pipeline.md) (Previously Pipeline Tool): `dotnet tool install -g dotnet-mgcb-editor`
 
 After installing `mgcb-editor` run `mgcb-editor --register` to register Pipeline Editor as the default app for mgcb
-files. 
-
-> This currently does not work on Mac.
+files.
