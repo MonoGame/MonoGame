@@ -5,7 +5,7 @@
 using System;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Audio;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 using System.IO;
 
 namespace MonoGame.OpenAL

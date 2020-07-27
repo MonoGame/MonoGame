@@ -3,10 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.IO;
-using System.Diagnostics;
 using System.Collections.Generic;
-using MonoGame.Utilities;
+using System.Diagnostics;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {

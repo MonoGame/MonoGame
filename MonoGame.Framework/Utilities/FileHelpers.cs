@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MonoGame.Utilities
+namespace MonoGame.Framework.Utilities
 {
     internal static class FileHelpers
     {

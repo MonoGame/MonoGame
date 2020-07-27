@@ -446,7 +446,7 @@ namespace Microsoft.Xna.Framework
                 var sleepTime = (TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
                 // We only have a precision timer on Windows, so other platforms may still overshoot
 #if WINDOWS && !DESKTOPGL
-                MonoGame.Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
+                MonoGame.Framework.Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
 #elif WINDOWS_UAP
                 lock (_locker)
                     if (sleepTime >= 2.0)

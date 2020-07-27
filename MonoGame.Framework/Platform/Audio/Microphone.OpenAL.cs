@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 #if OPENAL
 using MonoGame.OpenAL;

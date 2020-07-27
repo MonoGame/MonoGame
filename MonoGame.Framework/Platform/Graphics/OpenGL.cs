@@ -8,7 +8,7 @@ using System.Text;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Diagnostics;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 #if __IOS__ || __TVOS__ || MONOMAC
 using ObjCRuntime;
