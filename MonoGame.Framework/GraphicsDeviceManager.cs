@@ -166,7 +166,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        #region IGraphicsDeviceService Members
+        #region Events
 
         /// <inheritdoc />
         public event EventHandler<EventArgs> DeviceCreated;
@@ -175,10 +175,19 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> DeviceDisposing;
 
         /// <inheritdoc />
-        public event EventHandler<EventArgs> DeviceReset;
+        public event EventHandler<EventArgs> DeviceResetting;
 
         /// <inheritdoc />
-        public event EventHandler<EventArgs> DeviceResetting;
+        public event EventHandler<EventArgs> DeviceReset;
+
+        /// <summary>
+        /// Called when a <see cref="GraphicsDevice"/> is created. Raises the <see cref="DeviceCreated"/> event.
+        /// </summary>
+        /// <param name="e"></param>
+        protected void OnDeviceCreated(EventArgs e)
+        {
+            EventHelpers.Raise(this, DeviceCreated, e);
+        }
 
         /// <summary>
         /// Called when a <see cref="GraphicsDevice"/> is disposed. Raises the <see cref="DeviceDisposing"/> event.
@@ -199,24 +208,15 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, DeviceResetting, e);
         }
 
-        internal void OnDeviceReset(EventArgs e)
+        /// <summary>
+        /// Called after a <see cref="Graphics.GraphicsDevice"/> is reset.
+        /// Raises the <see cref="DeviceReset"/> event.
+        /// </summary>
+        /// <param name="e"></param>
+        protected void OnDeviceReset(EventArgs e)
         {
             EventHelpers.Raise(this, DeviceReset, e);
         }
-
-        internal void OnDeviceCreated(EventArgs e)
-        {
-            EventHelpers.Raise(this, DeviceCreated, e);
-        }
-
-        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
-            where TEventArgs : EventArgs
-        {
-            if (handler != null)
-                handler(this, e);
-        }
-
-        #endregion
 
         /// <summary>
         /// Raised by <see cref="CreateDevice()"/> or <see cref="ApplyChanges"/>. Allows users
@@ -253,6 +253,8 @@ namespace Microsoft.Xna.Framework
 
             return gdi;
         }
+
+        #endregion
 
         #region IDisposable Members
 

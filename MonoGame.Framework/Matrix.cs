@@ -189,7 +189,7 @@ namespace Microsoft.Xna.Framework
         #region Indexers
 
         /// <summary>
-        /// Get or set the matrix element at row index / 4 and column index % 4.
+        /// Get or set the matrix element at the given index, indexed in row major order.
         /// </summary>
         /// <param name="index">The linearized, zero-based index of the matrix element.</param>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -247,7 +247,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Get or set the index at the specified row and column (indices are zero-based).
+        /// Get or set the value at the specified row and column (indices are zero-based).
         /// </summary>
         /// <param name="row">The row of the element.</param>
         /// <param name="column">The column of the element.</param>

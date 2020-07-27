@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Create a <see cref="DrawableGameComponent"/>.
         /// </summary>
-        /// <param name="game">The game that this <see cref="DrawableGameComponent"/> this component belongs to.</param>
+        /// <param name="game">The game that this component will belong to.</param>
         public DrawableGameComponent(Game game)
             : base(game)
         {

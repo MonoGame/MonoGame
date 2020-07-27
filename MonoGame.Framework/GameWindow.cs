@@ -48,9 +48,11 @@ namespace Microsoft.Xna.Framework
 		public abstract DisplayOrientation CurrentOrientation { get; }
 
 	    /// <summary>
-	    /// The handle to the window used by the backend windowing service. Note that this is not
-	    /// always the native window handle, for example in a DesktopGL application this is the SDL
-	    /// window handle.
+	    /// The handle to the window used by the backend windowing service.
+		///
+		/// For WindowsDX this is the Win32 window handle (HWND).
+		/// For DesktopGL this is the SDL window handle.
+		/// For UWP this is a handle to an IUnknown interface for the CoreWindow.
 	    /// </summary>
 		public abstract IntPtr Handle { get; }
 
@@ -64,7 +66,7 @@ namespace Microsoft.Xna.Framework
         /// Gets or sets the title of the game window.
         /// </summary>
         /// <remarks>
-        /// For Windows 8 and Windows 10 UWP this has no effect. For these platforms the title should be
+        /// For UWP this has no effect. The title should be
         /// set by using the DisplayName property found in the app manifest file.
         /// </remarks>
         public string Title {
@@ -78,10 +80,10 @@ namespace Microsoft.Xna.Framework
 		}
 
         /// <summary>
-        /// Determines whether the border of the window is visible. Currently only supported on the WinDX and WinGL/Linux platforms.
+        /// Determines whether the border of the window is visible. Currently only supported on the WindowsDX and DesktopGL platforms.
         /// </summary>
         /// <exception cref="System.NotImplementedException">
-        /// Thrown when trying to use this property on a platform other than the WinDX and WinGL/Linux platforms.
+        /// Thrown when trying to use this property on a platform other than WinowsDX or DesktopGL.
         /// </exception>
         public virtual bool IsBorderless
         {
@@ -129,14 +131,13 @@ namespace Microsoft.Xna.Framework
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
 
         /// <summary>
-		/// Use this event to retrieve text for objects like textbox's.
-		/// This event is not raised by noncharacter keys.
+		/// Use this event to user text input.
+		/// 
+		/// This event is not raised by noncharacter keys except control characters such as backspace, tab, carriage return and escape.
 		/// This event also supports key repeat.
-		/// For more information this event is based off:
-		/// http://msdn.microsoft.com/en-AU/library/system.windows.forms.control.keypress.aspx
 		/// </summary>
 		/// <remarks>
-		/// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
+		/// This event is only supported on desktop platforms.
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
 

@@ -18,8 +18,8 @@ using Microsoft.Xna.Framework.Input.Touch;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// A class that is the entry point for most games. Handles setting up
-    /// a window and graphics and runs a game loop that calls.
+    /// This class is the entry point for most games. Handles setting up
+    /// a window and graphics and runs a game loop that calls <see cref="Update"/> and <see cref="Draw"/>.
     /// </summary>
     public partial class Game : IDisposable
     {
@@ -268,6 +268,7 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// Indicates if this game is running with a fixed time between frames.
+        /// 
         /// When set to <code>true</code> the target time between frames is
         /// given by <see cref="TargetElapsedTime"/>.
         /// </summary>
@@ -497,7 +498,9 @@ namespace Microsoft.Xna.Framework
 #endif
 
         /// <summary>
-        /// One iteration of the game loop. Makes at least one call to <see cref="Update"/>
+        /// Run one iteration of the game loop.
+        ///
+        /// Makes at least one call to <see cref="Update"/>
         /// and exactly one call to <see cref="Draw"/> if drawing is not supressed.
         /// When <see cref="IsFixedTimeStep"/> is set to <code>false</code> this will
         /// make exactly one call to <see cref="Update"/>.
@@ -655,8 +658,9 @@ namespace Microsoft.Xna.Framework
         protected virtual void UnloadContent() { }
 
         /// <summary>
-        /// Initializes attached <see cref="GameComponent"/> instances and calls <see cref="LoadContent"/>.
         /// Override this to initialize the game and load any needed non-graphical resources.
+        ///
+        /// Initializes attached <see cref="GameComponent"/> instances and calls <see cref="LoadContent"/>.
         /// </summary>
         protected virtual void Initialize()
         {
@@ -687,10 +691,11 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// Called when the game should draw a frame.
+        ///
         /// Draws the <see cref="DrawableGameComponent"/> instances attached to this game.
         /// Override this to render your game.
         /// </summary>
-        /// <param name="gameTime">The elapsed time since the last call to <see cref="Draw"/>.</param>
+        /// <param name="gameTime">A <see cref="GameTime"/> instance containing the elapsed time since the last call to <see cref="Draw"/> and the total time elapsed since the game started.</param>
         protected virtual void Draw(GameTime gameTime)
         {
 
@@ -702,6 +707,7 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// Called when the game should update.
+        ///
         /// Updates the <see cref="GameComponent"/> instances attached to this game.
         /// Override this to update your game.
         /// </summary>

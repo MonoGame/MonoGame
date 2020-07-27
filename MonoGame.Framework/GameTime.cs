@@ -23,6 +23,10 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// Indicates whether the <see cref="Game"/> is running slowly.
+        ///
+        /// This flag is set to <c>true</c> when <see cref="Game.IsFixedTimeStep"/> is set to <c>true</c>
+        /// and a tick of the game loop takes longer than <see cref="Game.TargetElapsedTime"/> for
+        /// a few frames in a row.
         /// </summary>
         public bool IsRunningSlowly { get; set; }
 

@@ -7,8 +7,8 @@ using System;
 namespace Microsoft.Xna.Framework
 {   
     /// <summary>
-    /// An object that can be attached to a <see cref="Game"/> and have its <see cref="Update"/>
-    /// method called by that <see cref="Game"/>.
+    /// An object that can be attached to a <see cref="Microsoft.Xna.Framework.Game"/> and have its <see cref="Update"/>
+    /// method called when <see cref="Microsoft.Xna.Framework.Game.Update"/> is called.
     /// </summary>
     public class GameComponent : IGameComponent, IUpdateable, IDisposable
     {
@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Create a <see cref="GameComponent"/>.
         /// </summary>
-        /// <param name="game">The game that this <see cref="GameComponent"/> this component belongs to.</param>
+        /// <param name="game">The game that this component will belong to.</param>
         public GameComponent(Game game)
         {
             this.Game = game;
