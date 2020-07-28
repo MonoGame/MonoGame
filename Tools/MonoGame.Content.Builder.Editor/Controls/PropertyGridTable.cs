@@ -193,7 +193,7 @@ namespace MonoGame.Tools.Pipeline
             g.FillRectangle(DrawInfo.BorderColor, _separatorPos - 1, rec.Y, 1, Height);
 
             // Set Height
-            var newHeight = Math.Max(rec.Y + 1, Height);
+            var newHeight = Math.Max(rec.Y + 1, Height - 2);
             if (_height != newHeight)
             {
                 drawable.Height = _height = newHeight;
