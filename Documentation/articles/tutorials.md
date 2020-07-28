@@ -64,3 +64,4 @@ Links to various tutorials and articles to help you get started with MonoGame.
 - [XNA is Dead; Long Live the New XNA, MonoGame](http://www.codemag.com/Article/1411081)
 - [Running MonoGame on Android Wear](http://crossplatform.io/running-monogame-on-android-wear/)
 - [Text rendering in MonoGame](https://roy-t.nl/2018/07/04/Text-Rendering.html)
+- [Randomchaos-MonoGame-Samples](https://github.com/NemoKradXNA/Randomchaos-MonoGame-Samples)
