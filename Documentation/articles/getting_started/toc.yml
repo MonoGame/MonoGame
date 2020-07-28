@@ -1,12 +1,12 @@
 - name: Getting Started
   href: getting_started.md
-- name: Creating a New Project with MonoGame 3.8
+- name: Creating a new project
   items:
   - name: Visual Studio
     href: 1_creating_a_new_project_vs.md
   - name: Visual Studio for Mac
     href: 1_creating_a_new_project_vsm.md
-  - name: MonoGame netcore CLI
+  - name: DotNet core CLI
     href: 1_creating_a_new_project_netcore.md    
 - name: Understanding the Code
   href: 2_understanding_the_code.md

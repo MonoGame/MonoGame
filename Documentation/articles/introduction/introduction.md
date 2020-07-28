@@ -8,5 +8,4 @@ This section will cover the following topics:
 - [Development Requirements](requirements.md)
 - [Create a MonoGame Project](create_project.md)
 - [Target Platforms](platforms.md)
-- [MonoGame FAQ](monogame_faq.md)
 - [Help and Support](help_and_support.md)
