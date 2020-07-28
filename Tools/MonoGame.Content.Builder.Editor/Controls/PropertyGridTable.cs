@@ -24,8 +24,8 @@ namespace MonoGame.Tools.Pipeline
         private CellBase _selectedCell;
         private List<CellBase> _cells;
         private Point _mouseLocation;
-        private int _separatorPos;
-        private int _moveSeparator;
+        private int _separatorPos, _moveSeparatorAmount;
+        private bool _moveSeparator;
         private int _height;
         private bool _skipEdit;
         private Cursor _cursorNormal, _cursorResize;
@@ -38,7 +38,7 @@ namespace MonoGame.Tools.Pipeline
             _separatorPos = 100;
             _mouseLocation = new Point(-1, -1);
             _cells = new List<CellBase>();
-            _moveSeparator = -_separatorWidth / 2 - 1;
+            _moveSeparator = false;
             _skipEdit = false;
             _cursorResize = new Cursor(CursorType.VerticalSplit);
             _cursorNormal = new Cursor(CursorType.Arrow);
@@ -212,14 +212,15 @@ namespace MonoGame.Tools.Pipeline
         {
             _skipEdit = ClearChildren();
             if (_currentCursor == CursorType.VerticalSplit)
-                _moveSeparator = (int)e.Location.X - _separatorPos;
+            {
+                _moveSeparator = true;
+                _moveSeparatorAmount = (int)e.Location.X - _separatorPos;
+            }
         }
 
         private void Drawable_MouseUp(object sender, MouseEventArgs e)
         {
-            _moveSeparator = -_separatorWidth / 2 - 1;
-
-            if (e.Location.X >= _separatorPos && _selectedCell != null && _selectedCell.Editable && !_skipEdit)
+            if (!_moveSeparator && e.Location.X >= _separatorPos && _selectedCell != null && _selectedCell.Editable && !_skipEdit)
             {
                 var action = new Action(() =>
                 {
@@ -246,14 +247,18 @@ namespace MonoGame.Tools.Pipeline
                 action.Invoke();
 #endif
             }
+            else
+            {
+                _moveSeparator = false;
+            }
         }
 
         private void Drawable_MouseMove(object sender, MouseEventArgs e)
         {
             _mouseLocation = new Point((int)e.Location.X, (int)e.Location.Y);
 
-            if (_moveSeparator > -_separatorWidth / 2 - 1)
-                _separatorPos = _moveSeparator + _mouseLocation.X;
+            if (_moveSeparator)
+                _separatorPos = _moveSeparatorAmount + _mouseLocation.X;
 
             drawable.Invalidate();
         }
@@ -261,9 +266,8 @@ namespace MonoGame.Tools.Pipeline
         private void Drawable_MouseLeave(object sender, MouseEventArgs e)
         {
             _mouseLocation = new Point(-1, -1);
+            _moveSeparator = false;
             drawable.Invalidate();
-
-            _moveSeparator = -_separatorWidth / 2 - 1;
         }
 
         private void PropertyGridTable_SizeChanged(object sender, EventArgs e)
