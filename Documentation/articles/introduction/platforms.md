@@ -92,6 +92,10 @@ OpenGL is used for graphics, and OpenAL for audio.
 The iOS platform uses [Xamarin.iOS](https://docs.microsoft.com/en-us/xamarin/ios/).
 OpenGL is used for graphics, and OpenAL for audio.
 
+## Additional Project types
+
+MonoGame includes several other project types to support cross-platform development and the building of Content Pipeline extensions, which are listed here for convenience.
+
 ### NetStandard Library
 
 |**Supported Systems**|**NuGet Package**|**Template ID**|
@@ -99,6 +103,14 @@ OpenGL is used for graphics, and OpenAL for audio.
 | N/A | N/A | mgnetstandard |
 
 A project template that implements as a [NetStandard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) library to support cross-platform development.
+
+### MonoGame Shared Library Project
+
+|**Supported Systems**|**NuGet Package**|**Template ID**|
+|-|-|-|
+| N/A | N/A | mgshared |
+
+A project template that implements as a Xamarin Shared project library to support cross-platform development.
 
 ### MonoGame Pipeline Extension
 
@@ -109,11 +121,3 @@ A project template that implements as a [NetStandard](https://docs.microsoft.com
 A project template that provides a Content Pipeline Extension for use in Content projects to enable advanced asset importing / manipulation functions.
 
 For example, using XML to drive the importing of multiple assets and / or classes.
-
-### MonoGame Shared Library Project
-
-|**Supported Systems**|**NuGet Package**|**Template ID**|
-|-|-|-|
-| N/A | N/A | mgshared |
-
-A project template that implements as a Xamarin Shared project library to support cross-platform development.

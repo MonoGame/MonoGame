@@ -8,8 +8,9 @@ If you want to find an answer to a more specific problem, you can ask it on our 
 
 You can also chat to the members of the MonoGame community via [Gitter](https://gitter.im/MonoGame/MonoGame) or [Discord](https://discord.gg/xCehJFD) using the links below
 
-|[![Gitter](~/images/third_party/gitterlogo.jpg)](https://gitter.im/MonoGame/MonoGame) |[![Discord](~/images/third_party/discordlogo.png)](https://discord.gg/xCehJFD) |
-|--|--|
+[![Gitter](~/images/third_party/gitterlogo.jpg)](https://gitter.im/MonoGame/MonoGame)
+
+[![Discord](~/images/third_party/discordlogo.png)](https://discord.gg/xCehJFD)
 
 ## Tutorials
 

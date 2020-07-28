@@ -21,13 +21,17 @@ Building and publishing for UWP is only supported with Visual Studio 2019.
 
 UWP development is not possible from macOS or Linux.
 
+## For Mac platforms
+
+You will need a copy of [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/) installed before installing MonoGame.
+
+If you also need the [MGCB Editor](#monogame-content-pipeline-tool-mgcb-editor) GUI to manage your content you will need to install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
+
 ## For mobile platforms
 
-MonoGame requires either Xamarin.iOS or Xamarin.Android depending on the target.
+MonoGame requires either the iOS or Android components for Visual Studio depending on the target.
 
-In Visual Studio you can install both by selecting the 'Mobile development with .NET' workload.
-In Visual Studio for Mac you can install the iOS and Android workload separately.
+* In Visual Studio you can install both by selecting the 'Mobile development with .NET' workload.
+* In Visual Studio for Mac you can install the iOS and Android workload separately.
 
-Only Visual Studio 2019 or Visual Studio 2019 for Mac are supported in those contexts.
-
-Mobile development is not possible from Linux.
+> Only Visual Studio 2019 or Visual Studio 2019 for Mac are supported in those contexts, **Mobile development is not possible from Linux.**

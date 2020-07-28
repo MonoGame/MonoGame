@@ -7,17 +7,15 @@ with [XNA](https://msdn.microsoft.com/en-us/library/bb203940.aspx) even down to 
 
 The documentation site is made up of several major parts which are available as links at the top of the page.  
 
-> If you are new to MonoGame, we highly recommend walking through the **[Getting Started](articles/getting_started/getting_started.md)** section to Install MonoGame and build your first game.
-
 * [Introduction to MonoGame](articles/introduction/introduction.md)
   
   Provides helpful information and requirements for developing games with MonoGame.
 
-* [Getting Started guides](articles/getting_started/getting_started.md)
+* [Getting Started](articles/getting_started/getting_started.md)
 
   Provides introductory information about installing and getting started with developing games using MonoGame.
 
-* [Platform Specific help](articles/platform_specific/platform_specific.md)
+* [Platform Notes](articles/platform_specific/platform_specific.md)
 
   Detailed information for specific platforms when building MonoGame projects.
 
@@ -33,11 +31,17 @@ The documentation site is made up of several major parts which are available as 
 
   The MonoGame Framework class library is a library of classes, interfaces, and value types that are included in MonoGame.
 
-* [Changelog](https://docs.monogame.net/CHANGELOG.html)
+* [MonoGame Release History](https://docs.monogame.net/CHANGELOG.html)
 
-  For full details on the [MonoGame release history](https://docs.monogame.net/CHANGELOG.html), all the way back to the beginnings of MonoGame.
+  Release details and changes for the full lifecycle of the MonoGame Framework.
 
-> Don't forget to check out the [official MonoGame full game samples](articles/samples.md) and the recognized [contributor blogs and tutorials](articles/tutorials.md).
+* [Samples and Demos](articles/samples.md)
+  
+  The official set of MonoGame game samples, built for every platform that MonoGame supports.
+
+* [Community Tutorials](articles/tutorials.md)
+
+  Check out the awesome work of the larger MonoGame community with their own style of tutorials, blogs and videos.
 
 ## We Need Your Help!
 

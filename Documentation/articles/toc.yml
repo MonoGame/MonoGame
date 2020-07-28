@@ -10,7 +10,7 @@
 - name: Tools
   href: tools/toc.yml
   topicHref: tools/tools.md
-- name: Platform-Specific Notes
+- name: Platform Notes
   href: platform_specific/toc.yml
   topicHref: platform_specific/platform_specific.md
 - name: Package games for distribution

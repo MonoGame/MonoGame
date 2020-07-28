@@ -1,15 +1,12 @@
 # Creating a Project with Visual Studio for Mac
 
-MonoGame is available on Mac for development using the instructions below to get started with MonoGame 3.7.
-
-> Note, MonoDevelop and Xamarin Studio are no longer available for download today, so these instructions only apply if you have a pre-existing installation of MonoDevelop.  For Visual Studio for Mac, please use [MonoGame 3.8 and above](../3.8/1_creating_a_new_project_vsm.md).
+MonoGame is available on Mac for development using the instructions below to get started with MonoGame 3.8.
 
 ## Prerequisites
 
-You will need a copy of [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/) installed before installing MonoGame.
+* You will need a copy of [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/) installed before installing MonoGame.
 
-If you also need the [MGCB Editor](#monogame-content-pipeline-tool-mgcb-editor) to use a GUI to manage your content you will need to install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
-
+* If you also need the [MGCB Editor](#monogame-content-pipeline-tool-mgcb-editor) GUI to manage your content you will need to install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
 
 ## Install MonoGame Templates
 

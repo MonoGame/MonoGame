@@ -2,7 +2,7 @@
 
 MonoGame is available on Windows for development using the instructions below to get started with MonoGame 3.8.
 
-> Note, MonoGame 3.8 projects are no longer compatible with earlier versions of MonoGame.  If you wish to work on or build older MonoGame projects, then you will still need to install [MonoGame 3.7.1](../3.7/1_creating_a_new_project_vs.md) or earlier to open them.
+> Note, MonoGame 3.8 projects are no longer compatible with earlier versions of MonoGame.  If you wish to work on or build older MonoGame projects, then you will still need to install [MonoGame 3.7.1](https://www.monogame.net/downloads/) or earlier to open them.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ When installing Visual Studio, it also is recommended to include the "**.NET Cor
 
 ![DotNet Core component](~/images/getting_started/1_netcorecomponet.png)
 
-Alternatively, you can specifically install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
+> Alternatively, you can specifically install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
 
 ## Install MonoGame Templates
 
