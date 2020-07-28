@@ -187,29 +187,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
             }
 
-#if WINDOWS_UAP
-            // Check if tearing is supported
-            if (PresentationParameters.PresentationInterval == PresentInterval.Immediate)
-            {
-                RawBool allowTearing;
-                using (var dxgiFactory2 = new Factory2())
-                {
-                    unsafe
-                    {
-                        var factory5 = dxgiFactory2.QueryInterface<Factory5>();
-                        try
-                        {
-                            factory5.CheckFeatureSupport(SharpDX.DXGI.Feature.PresentAllowTearing, new IntPtr(&allowTearing), sizeof(RawBool));
-                        }
-                        catch (SharpDXException ex)
-                        {
-                            PresentationParameters.PresentationInterval = PresentInterval.Default;
-                        }
-                    }
-                }
-            }
-#endif
-
 
             // Pass the preferred feature levels based on the
             // target profile that may have been set by the user.
@@ -275,6 +252,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void CreateSizeDependentResources()
         {
+#if WINDOWS_UAP
+            // Check if tearing is supported
+            if (PresentationParameters.PresentationInterval == PresentInterval.Immediate)
+            {
+                RawBool allowTearing;
+                using (var dxgiFactory2 = new Factory2())
+                {
+                    unsafe
+                    {
+                        var factory5 = dxgiFactory2.QueryInterface<Factory5>();
+                        try
+                        {
+                            factory5.CheckFeatureSupport(SharpDX.DXGI.Feature.PresentAllowTearing, new IntPtr(&allowTearing), sizeof(RawBool));
+                        }
+                        catch (SharpDXException ex)
+                        {
+                            PresentationParameters.PresentationInterval = PresentInterval.Default;
+                        }
+                    }
+                }
+            }
+#endif
+
             // Clamp MultiSampleCount
             PresentationParameters.MultiSampleCount =
                 GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
