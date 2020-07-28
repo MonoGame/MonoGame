@@ -41,7 +41,7 @@ namespace MonoGame.Tools.Pipeline
             _moveSeparator = -_separatorWidth / 2 - 1;
             _skipEdit = false;
             _cursorResize = new Cursor(CursorType.VerticalSplit);
-            _cursorNormal = new Cursor(CursorType.Default);
+            _cursorNormal = new Cursor(CursorType.Arrow);
 
             Group = true;
         }
@@ -201,11 +201,11 @@ namespace MonoGame.Tools.Pipeline
             }
 
             if (overGroup) // TODO: Group collapsing/expanding?
-                SetCursor(CursorType.Default);
+                SetCursor(CursorType.Arrow);
             else if ((new Rectangle(_separatorPos - _separatorWidth / 2, 0, _separatorWidth, Height)).Contains(_mouseLocation))
                 SetCursor(CursorType.VerticalSplit);
             else
-                SetCursor(CursorType.Default);
+                SetCursor(CursorType.Arrow);
         }
 
         private void Drawable_MouseDown(object sender, MouseEventArgs e)
