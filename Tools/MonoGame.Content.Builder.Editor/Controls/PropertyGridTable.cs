@@ -141,11 +141,8 @@ namespace MonoGame.Tools.Pipeline
 
         private void DrawGroup(Graphics g, Rectangle rec, string text)
         {
-            var font = SystemFonts.Default();
-            font = new Font(font.Family, font.Size, FontStyle.Bold);
-
             g.FillRectangle(DrawInfo.BorderColor, rec);
-            g.DrawText(SystemFonts.Default(), DrawInfo.TextColor, rec.X + 1, rec.Y + (rec.Height - font.LineHeight) / 2, text);
+            g.DrawText(DrawInfo.TextFont, DrawInfo.TextColor, rec.X + 1, rec.Y + (rec.Height - DrawInfo.TextFont.LineHeight) / 2, text);
         }
 
         private void Drawable_Paint(object sender, PaintEventArgs e)
