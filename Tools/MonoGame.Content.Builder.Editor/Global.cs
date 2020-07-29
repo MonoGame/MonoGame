@@ -111,6 +111,24 @@ namespace MonoGame.Tools.Pipeline
 
             return Icon.FromResource(resource);
         }
+
+        public static T Show<T>(this Eto.Forms.Dialog<T> dialog, Eto.Forms.Control parent)
+        {
+#if IDE
+            return dialog.ShowModal(null);
+#else
+            return dialog.ShowModal(parent);
+#endif
+        }
+
+        public static Eto.Forms.DialogResult Show(this Eto.Forms.CommonDialog dialog, Eto.Forms.Control parent)
+        {
+#if IDE
+            return dialog.ShowDialog(null);
+#else
+            return dialog.ShowDialog(parent);
+#endif
+        }
     }
 }
 

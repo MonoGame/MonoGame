@@ -46,6 +46,7 @@
     <None Include="..\AppReference.targets" />
     <Compile Include="Platform\Launcher\**\*.cs" />
     <Compile Include="Platform\Utilities\**\*.cs" />
+    <Compile Include="Common\ProcessStartInfoExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>

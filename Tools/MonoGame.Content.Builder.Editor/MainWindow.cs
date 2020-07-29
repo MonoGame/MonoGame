@@ -12,8 +12,20 @@ using System.Reflection;
 
 namespace MonoGame.Tools.Pipeline
 {
+#if IDE
+    partial class MainWindow : DynamicLayout, IView
+    {
+        public string Title { get; set; }
+
+        public Icon Icon { get; set; }
+
+        public MenuBar Menu { get; set; }
+
+        public ToolBar ToolBar { get; set; }
+#else
     partial class MainWindow : Form, IView
     {
+#endif
 #pragma warning disable 649
         public EventHandler<EventArgs> RecentChanged;
         public EventHandler<EventArgs> TitleChanged;
@@ -64,12 +76,14 @@ namespace MonoGame.Tools.Pipeline
             _xnaFileFilter = new FileFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
         }
 
+#if !IDE
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = !PipelineController.Instance.Exit();
 
             base.OnClosing(e);
         }
+#endif
 
         #region IView implements
 
@@ -109,7 +123,7 @@ namespace MonoGame.Tools.Pipeline
             dialog.Filters.Add(_allFileFilter);
             dialog.CurrentFilter = _mgcbFileFilter;
 
-            if (dialog.ShowDialog(this) == DialogResult.Ok)
+            if (dialog.Show(this) == DialogResult.Ok)
             {
                 filePath = dialog.FileName;
                 if (dialog.CurrentFilter == _mgcbFileFilter && !filePath.EndsWith(".mgcb"))
@@ -128,7 +142,7 @@ namespace MonoGame.Tools.Pipeline
             dialog.Filters.Add(_allFileFilter);
             dialog.CurrentFilter = _mgcbFileFilter;
 
-            if (dialog.ShowDialog(this) == DialogResult.Ok)
+            if (dialog.Show(this) == DialogResult.Ok)
             {
                 projectFilePath = dialog.FileName;
                 return true;
@@ -145,7 +159,7 @@ namespace MonoGame.Tools.Pipeline
             dialog.Filters.Add(_allFileFilter);
             dialog.CurrentFilter = _xnaFileFilter;
 
-            if (dialog.ShowDialog(this) == DialogResult.Ok)
+            if (dialog.Show(this) == DialogResult.Ok)
             {
                 projectFilePath = dialog.FileName;
                 return true;
@@ -213,13 +227,13 @@ namespace MonoGame.Tools.Pipeline
         public bool ShowDeleteDialog(List<IProjectItem> items)
         {
             var dialog = new DeleteDialog(PipelineController.Instance, items);
-            return dialog.ShowModal(this);
+            return dialog.Show(this);
         }
 
         public bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname)
         {
             var dialog = new EditDialog(title, text, oldname, file);
-            var result = dialog.ShowModal(this);
+            var result = dialog.Show(this);
 
             newname = dialog.Text;
 
@@ -234,7 +248,7 @@ namespace MonoGame.Tools.Pipeline
             dialog.Filters.Add(_allFileFilter);
             dialog.CurrentFilter = _allFileFilter;
 
-            var result = dialog.ShowDialog(this) == DialogResult.Ok;
+            var result = dialog.Show(this) == DialogResult.Ok;
 
             files = new List<string>();
             files.AddRange(dialog.Filenames);
@@ -247,7 +261,7 @@ namespace MonoGame.Tools.Pipeline
             var dialog = new SelectFolderDialog();
             dialog.Directory = initialDirectory;
 
-            var result = dialog.ShowDialog(this) == DialogResult.Ok;
+            var result = dialog.Show(this) == DialogResult.Ok;
             if (result)
                 folder = dialog.Directory;
             else
@@ -259,7 +273,7 @@ namespace MonoGame.Tools.Pipeline
         public bool ChooseItemTemplate(string folder, out ContentItemTemplate template, out string name)
         {
             var dialog = new NewItemDialog(PipelineController.Instance.Templates.GetEnumerator(), folder);
-            var result = dialog.ShowModal(this);
+            var result = dialog.Show(this);
 
             template = dialog.Selected;
             name = dialog.Name + Path.GetExtension(template.TemplateFile);
@@ -270,7 +284,7 @@ namespace MonoGame.Tools.Pipeline
         public bool CopyOrLinkFile(string file, bool exists, out IncludeType action, out bool applyforall)
         {
             var dialog = new AddItemDialog(file, exists, FileType.File);
-            var result = dialog.ShowModal(this);
+            var result = dialog.Show(this);
 
             action = dialog.Responce;
             applyforall = dialog.ApplyForAll;
@@ -283,7 +297,7 @@ namespace MonoGame.Tools.Pipeline
             var afd = new AddItemDialog(folder, exists, FileType.Folder);
             applyforall = false;
 
-            if (afd.ShowModal(this))
+            if (afd.Show(this))
             {
                 action = afd.Responce;
                 return true;
@@ -295,6 +309,10 @@ namespace MonoGame.Tools.Pipeline
 
         public void UpdateCommands(MenuInfo info)
         {
+#if IDE
+            info.RebuildItem = false;
+#endif
+
             // Title
 
             if (TitleChanged != null)
@@ -558,7 +576,7 @@ namespace MonoGame.Tools.Pipeline
                 using (var reader = new StreamReader(stream))
                     adialog.License = reader.ReadToEnd();
 
-            adialog.ShowDialog(this);
+            adialog.Show(this);
         }
 
         private void CmdOpenItem_Executed(object sender, EventArgs e)
@@ -578,7 +596,7 @@ namespace MonoGame.Tools.Pipeline
                 {
                     var filepath = PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath);
                     var dialog = new OpenWithDialog(filepath);
-                    dialog.ShowDialog(this);
+                    dialog.Show(this);
                 }
                 catch
                 {
