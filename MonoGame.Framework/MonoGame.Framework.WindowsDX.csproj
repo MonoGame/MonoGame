@@ -4,7 +4,8 @@
     <TargetFrameworks>net452;netcoreapp3.1</TargetFrameworks>
     <DefineConstants>WINDOWS;XNADESIGNPROVIDED;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>This package provides you with MonoGame Framework that uses DirectX for rendering and works on Windows.
+    <UseWindowsForms>true</UseWindowsForms>
+    <Description>MonoGame Framework built for DirectX targetting Windows
     
     For more details about MonoGame please visit https://MonoGame.Net</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;windowsdx</PackageTags>
