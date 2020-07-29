@@ -4,11 +4,10 @@
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <DefineConstants>OPENGL;OPENAL;XNADESIGNPROVIDED;LINUX;DESKTOPGL;SUPPORTS_EFX;NETSTANDARD;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>This package provides you with MonoGame Framework that uses OpenGL for rendering and works on Windows, Linux and MacOS.
-    
-    For more details about MonoGame please visit https://MonoGame.Net</Description>
+    <Description>This package contains the core runtime assemblies for the MonoGame framework that uses OpenGL for rendering and targets Windows, Linux and MacOS.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;desktopgl</PackageTags>
     <PackageId>MonoGame.Framework.DesktopGL</PackageId>
+    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
 
   <!-- NETFX reference assemblies let us target .NET Framework on Mac/Linux without Mono -->

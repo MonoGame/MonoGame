@@ -5,11 +5,10 @@
     <DefineConstants>ANDROID;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
-    <Description>This package provides you with MonoGame Framework that works on Android.
-    
-    For more details about MonoGame please visit https://MonoGame.Net</Description>
+    <Description>This package contains the core runtime assemblies for the MonoGame framework to support Android 4.2 or newer devices.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;android</PackageTags>
     <PackageId>MonoGame.Framework.Android</PackageId>
+    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 

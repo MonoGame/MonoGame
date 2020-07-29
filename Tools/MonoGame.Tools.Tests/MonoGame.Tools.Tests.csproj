@@ -3,9 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Description>This package contains all the Unit Tests for the MonoGame Framework.
-    
-    For more details about MonoGame please visit https://MonoGame.Net</Description>
+    <Description>This package contains all the Unit Tests for the MonoGame Framework.</Description>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
@@ -13,6 +11,7 @@
     <BaseOutputPath>..\..\Artifacts\Tests\Tools</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <UseAppHost>true</UseAppHost>
+    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -3,9 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Description>This package provides you with MonoGame Framework Effect Compiler (MGFX) tool used for packaging content in to xnb files.
-    
-    For more details about MonoGame please visit https://MonoGame.Net</Description>
+    <Description>This package provides you with MonoGame Framework Effect Compiler (MGFX) tool used for packaging content in to xnb files.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Effect.Compiler</BaseOutputPath>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>mgfxc</ToolCommandName>
@@ -13,6 +11,7 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgfxc</AssemblyName>
     <UseAppHost>true</UseAppHost>
+    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
   
   <ItemGroup>

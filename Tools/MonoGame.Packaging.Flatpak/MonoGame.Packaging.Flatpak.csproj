@@ -5,14 +5,13 @@
     <BaseOutputPath>..\..\Artifacts\MonoGame.Packaging.Flatpak</BaseOutputPath>
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
     <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>
-    <PackageProjectUrl>http://monogame.net</PackageProjectUrl>
+    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/MonoGame/MonoGame.git</RepositoryUrl>
-    <Description>This package allows you to package up your MonoGame game into a flatpak installer for Linux.
-    
-    For more details about MonoGame please visit https://MonoGame.Net</Description>
+    <Description>This package allows you to package up your MonoGame game into a flatpak installer for Linux.</Description>
     <PackageTags>monogame;.net core;core;packaging;flatpak</PackageTags>
     <Authors>MonoGame Team</Authors>
     <PackageId>MonoGame.Packaging.Flatpak</PackageId>
+    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

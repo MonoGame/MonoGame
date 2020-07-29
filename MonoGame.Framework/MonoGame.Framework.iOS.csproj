@@ -5,13 +5,11 @@
     <DefineConstants>IOS;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
-
-    <Description>This package provides you with MonoGame Framework that works on iOS.
-    
-    For more details about MonoGame please visit https://MonoGame.Net</Description>
+    <Description>This package contains the core runtime assemblies for the MonoGame framework to support iOS Versions 10 and above </Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;ios</PackageTags>
     <PackageId>MonoGame.Framework.iOS</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
