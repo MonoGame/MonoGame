@@ -25,7 +25,11 @@ namespace Microsoft.Xna.Framework
         private static readonly Vector2 unitVector = new Vector2(1f, 1f);
         private static readonly Vector2 unitXVector = new Vector2(1f, 0f);
         private static readonly Vector2 unitYVector = new Vector2(0f, 1f);
-
+        
+        private static readonly Vector2 rightVector = new Vector2(1f,0f);
+        private static readonly Vector2 leftVector = new Vector2(-1f,0f);
+        private static readonly Vector2 upVector = new Vector2(0f,-1f);
+        private static readonly Vector2 downVector = new Vector2(0f,1f);
         #endregion
 
         #region Public Fields
@@ -61,7 +65,7 @@ namespace Microsoft.Xna.Framework
         {
             get { return unitVector; }
         }
-
+       
         /// <summary>
         /// Returns a <see cref="Vector2"/> with components 1, 0.
         /// </summary>
@@ -77,7 +81,35 @@ namespace Microsoft.Xna.Framework
         {
             get { return unitYVector; }
         }
+        
+        /// <summary>
+        /// Return the right direction <see cref="Vector2"/>.
+        /// </summary>
+        public static Vector2 Right{
+            get {return rightVector; }
+        }
+        
+        /// <summary>
+        /// Return the left direction <see cref="Vector2"/>.
+        /// </summary>
+        public static Vector2 Left{
+            get {return leftVector; }
+        }
 
+        /// <summary>
+        /// Return the up direction <see cref="Vector2"/>.
+        /// </summary>
+        public static Vector2 Up{
+            get {return upVector; }
+        }
+        
+        /// <summary>
+        /// Return the down direction <see cref="Vector2"/>.
+        /// </summary>
+        public static Vector2 down{
+            get {return downVector; }
+        }
+        
         #endregion
 
         #region Internal Properties
@@ -92,7 +124,7 @@ namespace Microsoft.Xna.Framework
                 );
             }
         }
-
+        
         #endregion
 
         #region Constructors
