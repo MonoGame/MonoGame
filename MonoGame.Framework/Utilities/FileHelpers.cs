@@ -67,8 +67,8 @@ namespace MonoGame.Framework.Utilities
             // correct platform specific separator.
             return TrimPath(NormalizeFilePathSeparators(localPath));
         }
-		
-		internal static string UrlEncode(string url)
+
+        internal static string UrlEncode(string url)
         {
             var encoder = new UTF8Encoding();
             var safeline = new StringBuilder(encoder.GetByteCount(url) * 3);
