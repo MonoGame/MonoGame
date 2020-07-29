@@ -3,9 +3,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
-
-This package provides you with MonoGame Framework Effect Compiler (MGFX) tool used for packaging content in to xnb files.</Description>
+    <Description>This package provides you with MonoGame Framework Effect Compiler (MGFX) tool used for packaging content in to xnb files.
+    
+    For more details about MonoGame please visit https://MonoGame.Net</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Effect.Compiler</BaseOutputPath>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>mgfxc</ToolCommandName>

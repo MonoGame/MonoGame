@@ -7,9 +7,9 @@
     <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>
     <PackageProjectUrl>http://monogame.net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/MonoGame/MonoGame.git</RepositoryUrl>
-    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
-
-This package allows you to package up your MonoGame game into a flatpak installer for Linux.</Description>
+    <Description>This package allows you to package up your MonoGame game into a flatpak installer for Linux.
+    
+    For more details about MonoGame please visit https://MonoGame.Net</Description>
     <PackageTags>monogame;.net core;core;packaging;flatpak</PackageTags>
     <Authors>MonoGame Team</Authors>
     <PackageId>MonoGame.Packaging.Flatpak</PackageId>

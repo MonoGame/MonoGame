@@ -5,10 +5,9 @@
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Task</BaseOutputPath>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
-
-This package provides additionjal functionality for the content pipeline to process content.</Description>
-
+    <Description>This package provides additionjal functionality for the content pipeline to process content.
+    
+    For more details about MonoGame please visit https://MonoGame.Net</Description>
   </PropertyGroup>
 
   <ItemGroup>
