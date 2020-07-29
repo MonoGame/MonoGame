@@ -32,8 +32,6 @@ namespace MonoGame.Tools.Pipeline
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mono"),
         };
 
-        int setw = 0;
-
         public MainWindow()
         {
             _pads = new List<Pad>();
@@ -57,17 +55,6 @@ namespace MonoGame.Tools.Pipeline
                     menuView.Items.Add(menu);
                 }
             }
-
-            #if MONOMAC
-            splitterVertical.PositionChanged += delegate {
-                setw++;
-                if (setw > 2)
-                {
-                    propertyGridControl.SetWidth();
-                    setw = 0;
-                }
-            };
-            #endif
 
             _contextMenu = new ContextMenu();
             projectControl.SetContextMenu(_contextMenu);
