@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework
     {
         static partial void PlatformInit();
 
-        static TitleContainer() 
+        static TitleContainer()
         {
             Location = string.Empty;
             PlatformInit();
