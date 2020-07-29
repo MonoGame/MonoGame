@@ -3,6 +3,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
+
+This package provides you with MonoGame Framework Content Builder (MGCB) tool used for packaging content in to xnb files.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder</BaseOutputPath>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>mgcb</ToolCommandName>

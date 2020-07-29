@@ -4,6 +4,9 @@
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
+
+This package provides you with a graphical editor for the MonoGame Framework Content Builder, used for editing your content projects ready for processing.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Wpf</BaseOutputPath>
     <DefineConstants>WINDOWS;WPF</DefineConstants>
     <ApplicationIcon>App.ico</ApplicationIcon>
