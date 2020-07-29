@@ -54,11 +54,11 @@
     <Compile Include="..\..\MonoGame.Framework\Design\Vector4TypeConverter.cs" />
     <Compile Include="..\..\MonoGame.Framework\Design\VectorConversion.cs" />
     <Compile Include="..\..\MonoGame.Framework\Graphics\PackedVector\IPackedVector.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Utilities\BinaryWriterEx.cs" />
     <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs" />
     <Compile Include="..\..\MonoGame.Framework\Platform\Utilities\CurrentPlatform.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\LoadedTypeCollection.cs" />
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Utilities\BinaryWriterEx.cs" />
   </ItemGroup>
 
   <ItemGroup>
