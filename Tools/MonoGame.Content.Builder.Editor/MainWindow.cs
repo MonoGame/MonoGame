@@ -32,8 +32,6 @@ namespace MonoGame.Tools.Pipeline
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mono"),
         };
 
-        int setw = 0;
-
         public MainWindow()
         {
             _pads = new List<Pad>();
@@ -57,17 +55,6 @@ namespace MonoGame.Tools.Pipeline
                     menuView.Items.Add(menu);
                 }
             }
-
-            #if MONOMAC
-            splitterVertical.PositionChanged += delegate {
-                setw++;
-                if (setw > 2)
-                {
-                    propertyGridControl.SetWidth();
-                    setw = 0;
-                }
-            };
-            #endif
 
             _contextMenu = new ContextMenu();
             projectControl.SetContextMenu(_contextMenu);
@@ -557,7 +544,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdHelp_Executed(object sender, EventArgs e)
         {
-            Process.Start("http://www.monogame.net/documentation/?page=Pipeline");
+            Process.Start(new ProcessStartInfo() { FileName = "https://docs.monogame.net/articles/tools/pipeline.html", UseShellExecute = true, Verb = "open" });
         }
 
         private void CmdAbout_Executed(object sender, EventArgs e)
@@ -577,7 +564,10 @@ namespace MonoGame.Tools.Pipeline
         private void CmdOpenItem_Executed(object sender, EventArgs e)
         {
             if (PipelineController.Instance.SelectedItem is ContentItem)
-                Process.Start(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath));
+            {
+                var filePath = PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath);
+                Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+            }
         }
 
         private void CmdOpenItemWith_Executed(object sender, EventArgs e)
@@ -600,7 +590,10 @@ namespace MonoGame.Tools.Pipeline
         private void CmdOpenItemLocation_Executed(object sender, EventArgs e)
         {
             if (PipelineController.Instance.SelectedItem != null)
-                Process.Start(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.Location));
+            {
+                var filePath = PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.Location);
+                Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+            }
         }
 
         private void CmdOpenOutputItemLocation_Executed(object sender, EventArgs e)
@@ -619,7 +612,7 @@ namespace MonoGame.Tools.Pipeline
                 dir = dir.Replace("$(Profile)", PipelineController.Instance.ProjectItem.Profile.ToString());
 
                 if (Directory.Exists(dir))
-                    Process.Start(dir);
+                    Process.Start(new ProcessStartInfo() { FileName = dir, UseShellExecute = true, Verb = "open" });
                 else
                     ShowError("Directory Not Found", "The project output directory was not found, did you forget to build the project?");
             }

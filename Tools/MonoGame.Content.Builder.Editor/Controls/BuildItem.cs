@@ -39,10 +39,10 @@ namespace MonoGame.Tools.Pipeline
 
         public BuildItem()
         {
-            _arrowWidth = SystemFonts.Default().MeasureString(ArrowExpand).Width;
+            _arrowWidth = DrawInfo.TextFont.MeasureString(ArrowExpand).Width;
             _textOffset = (CellHeight - DrawInfo.TextHeight) / 2;
             _imageOffset = (CellHeight - 16) / 2;
-            _descSize = SystemFonts.Default().LineHeight + 4;
+            _descSize = DrawInfo.TextFont.LineHeight + 4;
 
             _description = new List<string>();
 
@@ -68,7 +68,7 @@ namespace MonoGame.Tools.Pipeline
 
                     foreach (var des in _description)
                     {
-                        var width = SystemFonts.Default().MeasureString(des).Width + 4 * Spacing + 16;
+                        var width = DrawInfo.TextFont.MeasureString(des).Width + 4 * Spacing + 16;
                         if (width > RequestedWidth)
                             RequestedWidth = (int)width;
                     }
@@ -95,20 +95,20 @@ namespace MonoGame.Tools.Pipeline
             x += 16 + Spacing;
 
             // Draw Text
-            g.DrawText(SystemFonts.Default(), DrawInfo.GetTextColor(_selected, false), x, y + _textOffset, Text);
+            g.DrawText(DrawInfo.TextFont, DrawInfo.GetTextColor(_selected, false), x, y + _textOffset, Text);
 
             // Draw Expander
             if (_description.Count != 0)
             {
                 //g.FillRectangle(_expandSelected ? DrawInfo.HoverBackColor : DrawInfo.BorderColor, rectangle);
-                g.DrawText(SystemFonts.Default(), DrawInfo.GetTextColor(_selected, false), width - Margin - _arrowWidth, y + _textOffset, _expanded ? ArrowCollapse : ArrowExpand);
+                g.DrawText(DrawInfo.TextFont, DrawInfo.GetTextColor(_selected, false), width - Margin - _arrowWidth, y + _textOffset, _expanded ? ArrowCollapse : ArrowExpand);
             }
 
             // Draw Description
             if (_expanded)
             {
                 for (int i = 0; i < _description.Count; i++)
-                    g.DrawText(SystemFonts.Default(), DrawInfo.TextColor, x + Spacing, y + CellHeight + _descriptionOffset + _descSize * i, _description[i]);
+                    g.DrawText(DrawInfo.TextFont, DrawInfo.TextColor, x + Spacing, y + CellHeight + _descriptionOffset + _descSize * i, _description[i]);
             }
         }
     }

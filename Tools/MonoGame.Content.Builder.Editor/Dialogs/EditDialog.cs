@@ -37,6 +37,7 @@ namespace MonoGame.Tools.Pipeline
         {
             base.OnShown(e);
 
+            textBox1.Focus();
             var index = textBox1.Text.IndexOf('.');
             if (_file && index != -1)
                 textBox1.Selection = new Range<int>(0, index - 1);
