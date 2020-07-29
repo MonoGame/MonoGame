@@ -3,7 +3,7 @@
     <TargetFramework>net471</TargetFramework>
     <BaseOutputPath>..\..\Artifacts\VisualStudioForMac</BaseOutputPath>
     <AssemblySearchPaths>$(AssemblySearchPaths);{GAC}</AssemblySearchPaths>
-    <Description>A set of C# templates written for the MonoGame framework.</Description>    
+    <Description>This package contains a set of C# templates written for the MonoGame framework.</Description>    
     <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
