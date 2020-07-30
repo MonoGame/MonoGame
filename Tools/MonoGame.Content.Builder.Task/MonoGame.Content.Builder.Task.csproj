@@ -5,7 +5,7 @@
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Task</BaseOutputPath>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <Description>This package provides additionjal functionality for the content pipeline to process content.</Description>
+    <Description>MSBuild task to automatically build content for MonoGame.</Description>
     <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
 

@@ -5,7 +5,7 @@
     <DefineConstants>WINDOWS;XNADESIGNPROVIDED;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>true</UseWindowsForms>
-    <Description>This package contains the core runtime assemblies for the MonoGame framework that uses DirectX for rendering and targets Windows</Description>
+    <Description>A MonoGame runtime for Windows. Uses DirectX API's.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;windowsdx</PackageTags>
     <PackageId>MonoGame.Framework.WindowsDX</PackageId>
     <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
