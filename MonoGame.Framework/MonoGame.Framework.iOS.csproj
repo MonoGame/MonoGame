@@ -5,11 +5,10 @@
     <DefineConstants>IOS;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
-    <Description>The MonoGame runtime for iOS which supports iOS Versions 10 and above </Description>
+    <Description>The MonoGame runtime for iOS which supports iOS Versions 10 and above. </Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;ios</PackageTags>
     <PackageId>MonoGame.Framework.iOS</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

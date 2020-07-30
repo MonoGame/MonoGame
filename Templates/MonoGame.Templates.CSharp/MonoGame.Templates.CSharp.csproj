@@ -10,7 +10,6 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <ContentTargetFolders>content</ContentTargetFolders>
     <NoWarn>NU5128</NoWarn>
-    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="content\**\*" Exclude="content\**\.DS_Store;content\**\bin;content\**\obj" />

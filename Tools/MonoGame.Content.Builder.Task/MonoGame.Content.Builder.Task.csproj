@@ -6,7 +6,6 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <Description>MSBuild task to automatically build content for MonoGame.</Description>
-    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

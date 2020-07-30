@@ -8,7 +8,6 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>mgcb-editor</ToolCommandName>
     <PackageId>dotnet-mgcb-editor</PackageId>
-    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor</AssemblyName>
 

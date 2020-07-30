@@ -8,7 +8,6 @@
     <DefineConstants>GTK</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-gtk</AssemblyName>
-    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

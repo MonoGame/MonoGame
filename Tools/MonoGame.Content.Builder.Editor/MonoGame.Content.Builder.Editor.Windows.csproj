@@ -10,7 +10,6 @@
     <ApplicationIcon>App.ico</ApplicationIcon>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-wpf</AssemblyName>
-    <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
