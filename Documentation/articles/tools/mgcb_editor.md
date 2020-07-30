@@ -1,6 +1,6 @@
-# MonoGame  Editor
+# MGCB Editor
 
-MGCB Content Builder (MGCB) Editor  is the front-end GUI editor for MonoGame content builder projects.
+MonoGame Content Builder (MGCB) Editor is the front-end GUI editor for MonoGame content builder projects.
 
 ![MCGB Editor](~/images/MGCB-editor.png)
 
@@ -34,12 +34,8 @@ dotnet tool install -g dotnet-mgcb-editor
 > dotnet tool install --global dotnet-mgcb-editor --version 3.8.0.1476-develop
 > ```
 
-After installing `mgcb-editor` run the following to register the MGCB Editor as the default app for .mgcb files.
+After installing `mgcb-editor` run the following to register the MGCB Editor as the default app for mgcb files.
 
 ```
-dotnet mgcb-editor --register
+mgcb-editor --register
 ```
-
-> This currently does not work on macOS.
-
-[Read detailed documentation](~/articles/content/using_pipeline_tool.md).
