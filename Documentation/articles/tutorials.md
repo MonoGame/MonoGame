@@ -4,10 +4,6 @@ Links to various tutorials and articles to help you get started with MonoGame.
 
 > If you have a blog or article on MonoGame and wish to have it recognized here, reach out to the MonoGame team using the [support links listed on the help page](/articles/introduction/help_and_support.md).
 
-## MonoGame official
-
-- [MonoGame Samples repo](https://github.com/MonoGame/MonoGame.Samples)
-
 ## Microsoft
 
 - [Archived XNA Game Studio documentation](https://docs.microsoft.com/en-us/previous-versions/windows/xna/bb200104(v=xnagamestudio.41))
@@ -31,7 +27,6 @@ Links to various tutorials and articles to help you get started with MonoGame.
 ## Darkside of MonoGame video series
 
 - [Getting Started with MonoGame on Visual Studio 2017](https://www.youtube.com/watch?v=zphaylhOrm0)
-- [Getting Started with MonoGame on Visual Studio 2019]() (Coming soon)
 - [Getting Started with MonoGame using 2D](https://www.youtube.com/watch?v=6inkDfpUxAU)
 - [Getting Started with MonoGame using XML](https://www.youtube.com/watch?v=wCc_rLrqsIo)
 - [Getting the most out of your assets–The MonoGame Content Pipeline](https://www.youtube.com/watch?v=5mEQqCgTaLU)
