@@ -93,6 +93,10 @@
 		</MimeType>
 	</Extension>
 	<Extension path="/MonoDevelop/Ide/DisplayBindings">
+        <DisplayBinding id="MGCBPadBinding" insertbefore="DefaultDisplayBinding" class="MonoGame.IDE.VisualStudioForMac.MGCBPadBinding" />
 		<DisplayBinding id="MGCBEditorBinding" insertbefore="DefaultDisplayBinding" class="MonoGame.IDE.VisualStudioForMac.MGCBEditorBinding" />
 	</Extension>
+    <Extension path = "/MonoDevelop/Ide/Pads">
+       <Pad id = "MGPad" _label = "MonoGame Content" icon="monogame-project-icon-16" group="MonoGame" class="MonoGame.IDE.VisualStudioForMac.MGPad" defaultPlacement="Left" defaultLayout="*"/>
+    </Extension>
 </ExtensionModel>

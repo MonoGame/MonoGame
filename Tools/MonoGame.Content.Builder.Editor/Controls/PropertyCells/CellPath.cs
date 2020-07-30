@@ -21,7 +21,7 @@ namespace MonoGame.Tools.Pipeline
         public override void Edit(PixelLayout control)
         {
             var dialog = new PathDialog(PipelineController.Instance, Value.ToString());
-            if (dialog.ShowModal(control) && _eventHandler != null)
+            if (dialog.Show(control) && _eventHandler != null)
                 _eventHandler(dialog.Path, EventArgs.Empty);
         }
     }
