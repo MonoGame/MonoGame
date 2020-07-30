@@ -6,7 +6,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <BaseOutputPath>..\Artifacts\MonoGame.Framework.Content.Pipeline</BaseOutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>The MonoGame content pipeline for Windows, Mac and Linux. Used to compile content to xnb files.</Description>
+    <Description>The Monogame Content Pipeline for Windows, Mac and Linux is used to compile raw content to xnb files.</Description>
     <PackageTags>monogame;content;content pipeline</PackageTags>
     <PackageId>MonoGame.Framework.Content.Pipeline</PackageId>
     <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
