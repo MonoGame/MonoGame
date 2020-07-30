@@ -2,10 +2,14 @@
 
 This area of the site contains the documentation on the API of MonoGame as well as how to use it to create great games.
 
+MonoGame is an open source implementation of the Microsoft XNA 4 Framework. Our goal is to allow people to make great games using a simple API.
+
 If you cannot find what you need here you can also look at the [Microsoft XNA documentation](https://msdn.microsoft.com/en-us/library/bb200104.aspx). MonoGame is API compatible
-with [XNA](https://msdn.microsoft.com/en-us/library/bb203940.aspx) even down to the namespaces. So usually what works for XNA will work for MonoGame too.
+with XNA even down to the namespaces. So usually what works for XNA will work for MonoGame too.
 
 The documentation site is made up of several major parts which are available as links at the top of the page.  
+
+## Quick links
 
 * [Introduction to MonoGame](articles/introduction/introduction.md)
   
@@ -25,15 +29,7 @@ The documentation site is made up of several major parts which are available as 
 
 * [MonoGame Tools](articles/tools/tools.md)
 
-  Information on how to get access to and install MonoGame tools.
-
-* [MonoGame Framework Class Library](https://docs.monogame.net/api/Microsoft.Xna.Framework.html)
-
-  The MonoGame Framework class library is a library of classes, interfaces, and value types that are included in MonoGame.
-
-* [MonoGame Release History](https://docs.monogame.net/CHANGELOG.html)
-
-  Release details and changes for the full lifecycle of the MonoGame Framework.
+  Information on how to install and use MonoGame tools.
 
 * [Samples and Demos](articles/samples.md)
   

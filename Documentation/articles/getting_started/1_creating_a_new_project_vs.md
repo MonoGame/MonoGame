@@ -72,4 +72,4 @@ You should now see your game window running.
 
 ![Game](~/images/getting_started/1_game_vs.png)
 
-Currently, it is just clearing the surface with blue color. For further information on creating your game, please look at the [Understanding the Code](../2_understanding_the_code.md).
+Currently, it is just clearing the surface with blue color. For further information on creating your game, please look at the [Understanding the Code](2_understanding_the_code.md).

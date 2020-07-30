@@ -4,12 +4,12 @@
 - name: Getting Started
   href: getting_started/toc.yml
   topicHref: getting_started/getting_started.md
-- name: Adding Content
-  href: content/toc.yml
-  topicHref: content/content.md
 - name: Tools
   href: tools/toc.yml
   topicHref: tools/tools.md
+- name: Adding Content
+  href: content/toc.yml
+  topicHref: content/content.md
 - name: Platform Notes
   href: platform_specific/toc.yml
   topicHref: platform_specific/platform_specific.md
@@ -21,5 +21,3 @@
   href: samples.md
 - name: Community Tutorials
   href: tutorials.md
-- name: External Links
-  href: links.md
