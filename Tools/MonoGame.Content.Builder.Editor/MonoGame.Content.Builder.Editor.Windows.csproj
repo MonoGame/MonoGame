@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Wpf</BaseOutputPath>
     <DefineConstants>WINDOWS;WPF</DefineConstants>
     <ApplicationIcon>App.ico</ApplicationIcon>
