@@ -2,7 +2,7 @@
 
 The MonoGame Content Builder is a command line tool for building XNB content on Windows, Mac, and Linux desktop systems.
 
-Typically, it is executed by the [MGCB Editor](pipeline.md) when editing content or by `MonoGame.Content.Builder.Task` during the build process
+Typically, it is executed by the [MGCB Editor](mgcb_editor.md) when editing content or by `MonoGame.Content.Builder.Task` during the build process
 of a MonoGame project. Alternatively you can use it yourself from the command line for specialized build pipelines or for debugging content processing.
 
 ## Installation

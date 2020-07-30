@@ -75,7 +75,7 @@ These are some tips for writing or converting effects for use with MonoGame.
   };
   ```
 
-Custom symbols can be defined from the [MGCB Editor](~/articles/tools/pipeline.md) or via [MGFXC](~/articles/tools/2mgfx.md).
+Custom symbols can be defined from the [MGCB Editor](~/articles/tools/mgcb_editor.md) or via [MGFXC](~/articles/tools/2mgfx.md).
 
 * Make sure the pixel shaders inputs **exactly match** the vertex shader outputs so the parameters are passed in the correct registers. The parameters need to have the same size and order. Omitting parameters might not break compilation, but can cause unexpected results.
 * Note that on GL platforms default values on Effect parameters do not work.  Either set the parameter from code or use a real constant like a #define.
