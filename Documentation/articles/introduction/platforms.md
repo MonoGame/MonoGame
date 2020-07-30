@@ -24,18 +24,11 @@ Below is a list of public platforms with the corresponding NuGet package, the `d
 - [Android](#android)
 - [iOS](#ios)
 
-## Platform definitions list
+MonoGame provides additional templates for shared game logic and extensions to the MonoGame Content Pipeline.
 
-| **Platform/Project Type** |**Supported Systems**|**NuGet Package**|**Template ID**|
-|-|-|-|-|
-| WindowsDX | Windows | MonoGame.Framework.WindowsDX | mgwindowsdx |
-| DesktopGL | Windows, macOS, Linux | MonoGame.Framework.DesktopGL | mgdesktopgl |
-| WindowsUniversal | Windows 10, Xbox One (UWP-only, not XDK) | MonoGame.Framework.WindowsUniversal | mguwpcore (core app, no xaml), mguwpxaml (xaml app) |
-| Android |Android | MonoGame.Framework.Android | mgandroid |
-| iOS | iOS | MonoGame.Framework.iOS | mgios |
-| NetStandard Library | N/A | N/A | mgnetstandard |
-| Pipeline Extension | N/A | MonoGame.Framework.Content.Pipeline | mgpipeline |
-| Shared Library | N/A | N/A | mgshared |
+- [.NET Standard Library](#net-standard-library)
+- [Shared Project](#shared-project)
+- [Content Pipeline Extension](#content-pipeline-extension)
 
 ## Platforms
 
@@ -92,32 +85,22 @@ OpenGL is used for graphics, and OpenAL for audio.
 The iOS platform uses [Xamarin.iOS](https://docs.microsoft.com/en-us/xamarin/ios/).
 OpenGL is used for graphics, and OpenAL for audio.
 
-## Additional Project types
+## Other templates
 
-MonoGame includes several other project types to support cross-platform development and the building of Content Pipeline extensions, which are listed here for convenience.
+### .NET Standard Library
 
-### NetStandard Library
+**Template ID**: mgnetstandard
 
-|**Supported Systems**|**NuGet Package**|**Template ID**|
-|-|-|-|
-| N/A | N/A | mgnetstandard |
+A project template with a [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) project to share game logic for cross-platform development.
 
-A project template that implements as a [NetStandard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) library to support cross-platform development.
+### Shared Project
 
-### MonoGame Shared Library Project
+**Template ID**: mgshared
 
-|**Supported Systems**|**NuGet Package**|**Template ID**|
-|-|-|-|
-| N/A | N/A | mgshared |
+A project template with a [shared project](https://docs.microsoft.com/en-us/xamarin/cross-platform/app-fundamentals/shared-projects) library to support cross-platform development.
 
-A project template that implements as a Xamarin Shared project library to support cross-platform development.
+### Content Pipeline Extension
 
-### MonoGame Pipeline Extension
+**Template ID**: mgpipeline
 
-|**Supported Systems**|**NuGet Package**|**Template ID**|
-|-|-|-|
-| N/A | MonoGame.Framework.Content.Pipeline | mgpipeline |
-
-A project template that provides a Content Pipeline Extension for use in Content projects to enable advanced asset importing / manipulation functions.
-
-For example, using XML to drive the importing of multiple assets and / or classes.
+A project template for writing custom logic for handling content and building it into xnb files.
