@@ -1,4 +1,4 @@
-# Effects
+# Custom Effects
 
 A core element of Microsoft XNA is the effect system which is used for all rendering.
 
@@ -25,15 +25,15 @@ MonoGame has the following effects built-in and fully supported on current platf
 * EnvironmentMapEffect
 * SkinnedEffect
 
-Under the hood these effects use the same system and tools as one would for a custom Effect.  The source and pre-compiled versions of these effects can be found in the ['MonoGame.Framework\Graphics\Effect\Resources'](https://github.com/MonoGame/MonoGame/tree/develop/MonoGame.Framework/Graphics/Effect/Resources) folder.
+Under the hood these effects use the same system and tools as one would for a custom Effect.  The source and pre-compiled versions of these effects can be found in the ['MonoGame.Framework\Platform\Graphics\Effect\Resources'](https://github.com/MonoGame/MonoGame/tree/develop/MonoGame.Framework/Graphics/Effect/Resources) folder.
 
 If your game requires an extra little bit of performance you can easily hand edit the existing effects to remove unnecessary features or optimize for specific hardware and rebuild them with the MGFX tool.
 
 ## Custom Effects
 
-To use a custom effect with MonoGame you must do one of the following (not both):
+To use a custom effect with MonoGame you must do one of the following:
 
-* Run the effect file through the [MonoGame Effect content processor](~/articles/tools/mgcb.md) for loading via the `ContentManager` (Recommended).
+* Run the effect file through the [MonoGame Effect content processor](~/articles/tools/mgcb.md) for loading via the [`ContentManager`](xref:Microsoft.Xna.Framework.Content.ContentManager) (Recommended).
 * Process your effect file with the [MGFXC tool](~/articles/tools/mgfxc.md) and load them yourself at runtime.
 
 ## Effect Writing Tips

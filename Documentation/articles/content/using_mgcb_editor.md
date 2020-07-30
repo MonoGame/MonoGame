@@ -168,7 +168,7 @@ The MGCB Editor has 3 actions related to building content: Build, Rebuild and Cl
 
 ## Linking Content To Your Game
 
-Once you have built your content, you have a few different ways to add it to your game project. They all have the same goal, to get the built XNB's in your project output folder so a [ContentManager](xref:Microsoft.Xna.Framework.Content.ContentManager) can easily find and load them.
+Once you have built your content, you have a few different ways to add it to your game project. They all have the same goal, to get the built XNB's in your project output folder so a [`ContentManager`](xref:Microsoft.Xna.Framework.Content.ContentManager) can easily find and load them.
 
 ### MonoGameContentReference
 
