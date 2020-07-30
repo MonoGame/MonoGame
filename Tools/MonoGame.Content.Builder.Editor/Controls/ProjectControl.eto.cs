@@ -31,6 +31,11 @@ namespace MonoGame.Tools.Pipeline
             _iconRoot = Bitmap.FromResource("TreeView.Root.png").WithSize(16, 16);
 
             _treeView.SelectionChanged += TreeView_SelectedItemChanged;
+            _treeView.SizeChanged += (o, e) =>
+            {
+                if (!Global.Unix && _treeView.Columns[0].Width < _treeView.Width - 2)
+                    _treeView.Columns[0].Width = _treeView.Width - 2;
+            };
         }
 
         private void TreeView_SelectedItemChanged(object sender, EventArgs e)

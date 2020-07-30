@@ -8,7 +8,7 @@ using MonoGame.Framework.Utilities;
 
 namespace FreeImageAPI
 {
-    public enum FREE_IMAGE_TYPE
+    internal enum FREE_IMAGE_TYPE
     {
         FIT_UNKNOWN,
         FIT_BITMAP,
@@ -25,7 +25,7 @@ namespace FreeImageAPI
         FIT_RGBAF
     }
 
-    public enum FREE_IMAGE_FILTER
+    internal enum FREE_IMAGE_FILTER
     {
         FILTER_BOX,
         FILTER_BICUBIC,
@@ -35,7 +35,7 @@ namespace FreeImageAPI
         FILTER_LANCZOS3
     }
 
-    public enum FREE_IMAGE_FORMAT
+    internal enum FREE_IMAGE_FORMAT
     {
         FIF_UNKNOWN = -1,
         FIF_BMP,
@@ -78,7 +78,7 @@ namespace FreeImageAPI
         FIF_JXR
     }
 
-    public enum FREE_IMAGE_COLOR_CHANNEL
+    internal enum FREE_IMAGE_COLOR_CHANNEL
     {
         FICC_RGB,
         FICC_RED,

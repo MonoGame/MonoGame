@@ -7,11 +7,13 @@ namespace MonoGame.Tools.Pipeline
     {
         private static bool once;
 
+        public static Font TextFont;
         public static int TextHeight;
         public static Color TextColor, BackColor, HoverTextColor, HoverBackColor, DisabledTextColor, BorderColor;
 
         static DrawInfo()
         {
+            TextFont = SystemFonts.Default();
             TextHeight = (int)SystemFonts.Default().LineHeight;
             TextColor = SystemColors.ControlText;
             BackColor = SystemColors.ControlBackground;

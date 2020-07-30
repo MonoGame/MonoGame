@@ -5,7 +5,8 @@
         {
           "src": "..",
           "files": [ 
-            "MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj"
+            "MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj",
+            "MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj"
           ]
         }
       ],
