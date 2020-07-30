@@ -164,13 +164,13 @@ After you have done these fixes, you should be able to add these new processors 
 
 The MGCB Editor has 3 actions related to building content: Build, Rebuild and Clean:
 
-- Build will build all content that needs to be built and put the xnb's in the output directory (bin by default). Content will be skipped if it hasn't changed since the last build. The time source content was last edited is saved in the intermediate directory (obj by default) to determine if content changed since the last build.
+- Build will build all content that needs to be built and put the's in the output directory (bin by default). Content will be skipped if it hasn't changed since the last build. The time source content was last edited is saved in the intermediate directory (obj by default) to determine if content changed since the last build.
 - Rebuild will first Clean and then Build.
 - Clean will empty the output and intermediate directories.
 
 ## Linking Content To Your Game
 
-Once you have built your content, you have a few different ways to add the xnb's to your game project. They all have the same goal, to get the built xnb's in your project output folder so a ContentManager can easily find and load them.
+Once you have built your content, you have a few different ways to add the's to your game project. They all have the same goal, to get the built's in your project output folder so a ContentManager can easily find and load them.
 
 ### MonoGameContentReference
 
@@ -180,17 +180,17 @@ The simplest method is to set up your game project from one of the templates tha
 
 > This build action is defined in the .targets file [here](https://github.com/MonoGame/MonoGame/blob/develop/Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.targets).
 
-The *MonoGameContentReference* is set up so that when the project is built, the MGCB will automatically build any new/modified content and copy the resulting xnb's to the project output directory, so they can be used in the project. This way you don't even have to manually build the content with the MGCB Editor. 
+The *MonoGameContentReference* is set up so that when the project is built, the MGCB will automatically build any new/modified content and copy the resulting's to the project output directory, so they can be used in the project. This way you don't even have to manually build the content with the MGCB Editor. 
 
 Just add your content to the .mgcb with the MGCB Editor and the rest will happen when you build your project. The content files do not need to be added to your project.
 
 ### Manual Copy
 
-If you don't want to use the automated process, you can build the content project with the MGCB Editor and copy the xnb's to the output folder of your project manually.
+If you don't want to use the automated process, you can build the content project with the MGCB Editor and copy the's to the output folder of your project manually.
 
 ### Add As Content
 
-If you are using Visual Studio, you can simply add the xnb files to your C# game project.  Create a folder in the project called Content then right-click on the folder and select Add > Existing Item.
+If you are using Visual Studio, you can simply add the files to your C# game project.  Create a folder in the project called Content then right-click on the folder and select Add > Existing Item.
 
 ![Add existing item](~/images/content/existing_item.png)
 

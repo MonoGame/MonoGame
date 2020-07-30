@@ -103,4 +103,4 @@ A project template with a [shared project](https://docs.microsoft.com/en-us/xama
 
 **Template ID**: mgpipeline
 
-A project template for writing custom logic for handling content and building it into xnb files.
+A project template for writing custom logic for handling content and building it into XNB files.
