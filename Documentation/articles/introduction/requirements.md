@@ -1,4 +1,4 @@
-# Requirements
+# Development requirements
 
 Depending on the [platform](platforms.md) that you are targeting, MonoGame has different sets of requirements.
 

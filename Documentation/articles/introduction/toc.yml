@@ -1,4 +1,4 @@
-- name: Requirements
+- name: Development requirements
   href: requirements.md
 - name: Target Platforms
   href: platforms.md
