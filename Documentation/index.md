@@ -2,6 +2,8 @@
 
 This area of the site contains the documentation on the API of MonoGame as well as how to use it to create great games.
 
+MonoGame is an open source implementation of the Microsoft XNA 4 Framework. Our goal is to allow people to make great games using a simple API.
+
 If you cannot find what you need here you can also look at the [Microsoft XNA documentation](https://msdn.microsoft.com/en-us/library/bb200104.aspx). MonoGame is API compatible
 with XNA even down to the namespaces. So usually what works for XNA will work for MonoGame too.
 
