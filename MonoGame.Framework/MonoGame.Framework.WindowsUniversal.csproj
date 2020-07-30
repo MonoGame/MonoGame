@@ -7,7 +7,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
-    <Description>This package contains the core runtime assemblies for the MonoGame framework to support Windows 10 and Xbox One using UWP(Universal Windows Platform).</Description>
+    <Description>The MonoGame runtime for UWP (Universal Windows Platform). Supports Windows 10 and Xbox One.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;uwp</PackageTags>
     <PackageId>MonoGame.Framework.WindowsUniversal</PackageId>
     <PackageProjectUrl>https://www.monogame.net/</PackageProjectUrl>
@@ -83,4 +83,3 @@
   <Import Project="Platform\DirectX.targets" />
   <Import Project="Platform\XAudio.targets" />
 </Project>
-
