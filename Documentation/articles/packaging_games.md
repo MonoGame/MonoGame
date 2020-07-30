@@ -1,4 +1,4 @@
-# Packaging games built with MonoGame
+# Package games for distribution
 
 Once your game is ready to be published, it is recommended that you package it properly for consumption by players.
 
