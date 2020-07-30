@@ -70,7 +70,7 @@ An optional parameter which adds an assembly reference which contains importers,
 /platform:<target_Platform>
 ```
 
-Set the target platform for this build. It must be a member of the [TargetPlatform](~/api/Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform.md) enum:
+Set the target platform for this build. It must be a member of the [TargetPlatform](xref:Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform) enum:
 
 * Windows
 * iOS
@@ -96,7 +96,7 @@ NOTE: PlayStation 4, Xbox One, PS Vita, and Switch support is only available to 
 /profile:<graphics_Profile>
 ```
 
-Set the target graphics profile for this build. It must be a member of the [GraphicsProfile](~/api/Microsoft.Xna.Framework.Graphics.GraphicsProfile.md) enum:
+Set the target graphics profile for this build. It must be a member of the [GraphicsProfile](xref:Microsoft.Xna.Framework.Graphics.GraphicsProfile) enum:
 * HiDef
 * Reach
 

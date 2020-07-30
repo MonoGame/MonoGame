@@ -6,7 +6,7 @@ MonoGame implements its own content pipeline for transforming your unoptimized a
 
 This section will cover the following topics:
 
-- [Using MGCB Editor](using_pipeline_tool.md)
+- [Using MGCB Editor](using_mgcb_editor.md)
 - [TrueType Fonts](adding_ttf_fonts.md)
 - [Custom Effects](custom_effects.md)
 - [Localization](localization.md)

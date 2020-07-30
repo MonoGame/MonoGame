@@ -39,3 +39,5 @@ After installing `mgcb-editor` run the following to register the MGCB Editor as 
 ```
 mgcb-editor --register
 ```
+
+See [Using MGCB Editor](~/articles/content/using_mgcb_editor.md) for more information.
