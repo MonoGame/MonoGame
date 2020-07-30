@@ -6,4 +6,4 @@ Installation and usage instructions are on the following pages:
 
 - [MonoGame Content Builder](mgcb.md) (MGCB): used to build content pipeline content.
 - [MGCB Editor](mgcb_editor.md): The MonoGame Content Builder (MGCB) Editor is a graphical front end to edit mgcb files.
-- [MonoGame Effect Compiler](2mgfx.md) (MGFXC): used to compile stand alone effects (shaders).
+- [MonoGame Effect Compiler](mgfxc.md) (MGFXC): used to compile stand alone effects (shaders).

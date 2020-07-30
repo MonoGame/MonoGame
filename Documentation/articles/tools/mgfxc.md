@@ -4,7 +4,7 @@ The MGFXC tool is used to compile [DirectX Effect files](https://docs.microsoft.
 for usage with MonoGame.
 
 The MGCB Editor uses MGFXC to compile effects and wrap them into an file, so they can be loaded using the `ContentManager`.
-If you compile effects directly with MGFXC you can load effects using the `Microsoft.Framework.Xna.Graphics.Effect` constructor that takes a byte array with the effect code. 
+If you compile effects directly with MGFXC you can load effects using the `Microsoft.Framework.Xna.Graphics.Effect` constructor that takes a byte array with the effect code.
 
 Effects compiled directly are not files and can not be loaded by the `ContentManager`.
 

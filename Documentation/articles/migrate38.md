@@ -46,7 +46,7 @@ NuGet package that automatically builds your content when building your game.
 
 - [MonoGame Content Builder](~/articles/tools/mgcb.md) (MGCB): `dotnet tool install -g dotnet-mgcb`
 - [MGCB Editor](~/articles/tools/mgcb_editor.md) (Previously Pipeline Tool): `dotnet tool install -g dotnet-mgcb-editor`
-- [MonoGame Effect Compiler](~/articles/tools/2mgfx.md) (MGFXC; previously 2MGFX): `dotnet tool install -g dotnet-mgfxc`
+- [MonoGame Effect Compiler](~/articles/tools/mgfxc.md) (MGFXC; previously 2MGFX): `dotnet tool install -g dotnet-mgfxc`
 
 After installing `mgcb-editor` run `mgcb-editor --register` to register MGCB Editor as the default app for mgcb
 files.
