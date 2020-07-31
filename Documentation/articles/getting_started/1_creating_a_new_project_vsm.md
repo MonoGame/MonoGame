@@ -1,6 +1,6 @@
 # Creating a Project with Visual Studio for Mac
 
-MonoGame is available on Mac for development using the instructions below to get started with MonoGame 3.8.
+This guide will walk you through building a starter game with MonoGame using a Mac and Visual Studio for Mac.
 
 ## Prerequisites
 

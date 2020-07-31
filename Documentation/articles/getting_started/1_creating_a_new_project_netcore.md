@@ -1,6 +1,6 @@
 ## .NET Core CLI
 
-From MonoGame 3.8, the project supports creating solutions directly from the command-line and using lightweight tools such as [Visual Studio Code](https://code.visualstudio.com/) to edit the solution.
+This guide will walk you through building a starter game with MonoGame using only the command line/terminal on your operating system and lightweight coding tool of choice (such as [Visual Studio Code](https://code.visualstudio.com/).
 
 ## Prerequisites
 
