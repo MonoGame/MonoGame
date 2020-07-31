@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// This class is used for the game window's TextInput event as EventArgs.
+    /// This class is used in the <see cref="GameWindow.TextInput"/> event as <see cref="EventArgs"/>.
     /// </summary>
     public struct TextInputEventArgs
     {
@@ -17,7 +17,15 @@ namespace Microsoft.Xna.Framework
             Character = character;
             Key = key;
         }
+
+        /// <summary>
+        /// The character for the key that was pressed.
+        /// </summary>
         public readonly char Character;
+
+        /// <summary>
+        /// The pressed key.
+        /// </summary>
         public readonly Keys Key;
     }
 }

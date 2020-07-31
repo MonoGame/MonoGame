@@ -5,7 +5,7 @@
 using System.Runtime.InteropServices;
 using System;
 
-namespace MonoGame.Utilities
+namespace MonoGame.Framework.Utilities
 {
     internal enum OS
     {

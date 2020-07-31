@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MonoGame.Utilities
+namespace MonoGame.Framework.Utilities
 {
     internal static class FileHelpers
     {
@@ -68,26 +68,7 @@ namespace MonoGame.Utilities
             return TrimPath(NormalizeFilePathSeparators(localPath));
         }
 
-        private static string TrimPath(string filePath)
-        {
-            // Remove . in filePath
-
-            while (filePath.Contains("/./"))
-                filePath = filePath.Replace("/./", "/");
-
-            while (filePath.Contains(@"\.\"))
-                filePath = filePath.Replace(@"\.\", @"\");
-
-            filePath = Regex.Replace(filePath, @"^\.(\/|\\)", string.Empty);
-
-            // Remove .. in filePath
-
-            filePath = Regex.Replace(filePath, @"[^\/\\]+(\/|\\)\.\.(\/|\\)", string.Empty);
-
-            return filePath;
-        }
-
-        private static string UrlEncode(string url)
+        internal static string UrlEncode(string url)
         {
             var encoder = new UTF8Encoding();
             var safeline = new StringBuilder(encoder.GetByteCount(url) * 3);
@@ -109,6 +90,25 @@ namespace MonoGame.Utilities
             }
 
             return safeline.ToString();
+        }
+
+        private static string TrimPath(string filePath)
+        {
+            // Remove . in filePath
+
+            while (filePath.Contains("/./"))
+                filePath = filePath.Replace("/./", "/");
+
+            while (filePath.Contains(@"\.\"))
+                filePath = filePath.Replace(@"\.\", @"\");
+
+            filePath = Regex.Replace(filePath, @"^\.(\/|\\)", string.Empty);
+
+            // Remove .. in filePath
+
+            filePath = Regex.Replace(filePath, @"[^\/\\]+(\/|\\)\.\.(\/|\\)", string.Empty);
+
+            return filePath;
         }
     }
 }

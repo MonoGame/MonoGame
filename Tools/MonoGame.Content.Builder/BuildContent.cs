@@ -306,7 +306,7 @@ namespace MonoGame.Content.Builder
             // so it can resolve importers, processors, writers, and types.
             foreach (var r in References)
             {
-                var assembly = r;
+                var assembly = ReplaceSymbols(r);
                 if (!Path.IsPathRooted(assembly))
                     assembly = Path.GetFullPath(Path.Combine(projectDirectory, assembly));
                 _manager.AddAssembly(assembly);

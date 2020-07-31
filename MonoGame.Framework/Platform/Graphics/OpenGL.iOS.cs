@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using ObjCRuntime;
 using System.Security;
 using OpenGLES;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace MonoGame.OpenGL
 {

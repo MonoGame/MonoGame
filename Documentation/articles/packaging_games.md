@@ -41,7 +41,7 @@ YourGame.app                    (this is your root folder)
             - Content           (this is where all your content and XNB's should go)
             - YourGame.icns     (this is your app icon, in ICNS format)
         - MacOS                 (this is where your game belongs, except for content files)
-    - Info.plist                (the metadata of your app)
+        - Info.plist             (the metadata of your app)
 ```
 
 The Info.plist file is a standard macOS file containing metadata about your game. Here's an example file with required and recommended values set:

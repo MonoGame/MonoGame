@@ -6,7 +6,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace MonoGame.Utilities
+namespace MonoGame.Framework.Utilities
 {
     internal static class InteropHelpers
     {

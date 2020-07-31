@@ -26,12 +26,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 return resource.SharedHandle;
         }
 
-        internal abstract void CreateTexture();
+        internal abstract Resource CreateTexture();
 
         internal Resource GetTexture()
         {
             if (_texture == null)
-                CreateTexture();
+                _texture = CreateTexture();
 
             return _texture;
         }

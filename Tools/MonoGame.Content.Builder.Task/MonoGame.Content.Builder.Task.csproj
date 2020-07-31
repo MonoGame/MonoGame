@@ -5,6 +5,7 @@
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Task</BaseOutputPath>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <Description>MSBuild task to automatically build content for MonoGame.</Description>
   </PropertyGroup>
 
   <ItemGroup>
