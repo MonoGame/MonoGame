@@ -1,7 +1,5 @@
 # Creating a Project with Visual Studio
 
-MonoGame is available on Windows for development using the instructions below to get started with MonoGame 3.8.
-
 > Note, MonoGame 3.8 projects are no longer compatible with earlier versions of MonoGame.  If you wish to work on or build older MonoGame projects, then you will still need to install [MonoGame 3.7.1](https://www.monogame.net/downloads/) or earlier to open them.
 
 ## Prerequisites
@@ -21,8 +19,6 @@ When installing Visual Studio, it also is recommended to include the "**.NET Cor
 > Alternatively, you can specifically install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
 
 ## Install MonoGame Templates
-
-From MonoGame 3.8, we no longer use MSI Installers for deploying the framework and templates as this creates hard dependencies to specific machine setups or DLL locations.  Instead, MonoGame now uses NuGet and the DotNet deployment platform to reference a specific version of MonoGame online.
 
 To create new projects from within Visual Studio, you will need to install the Visual Studio 2019 extension which can be found in "Extensions -> Manage Extensions" in the Visual Studio menu bar.
 
