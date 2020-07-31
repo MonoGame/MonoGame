@@ -4,9 +4,7 @@ From MonoGame 3.8, the project supports creating solutions directly from the com
 
 ## Prerequisites
 
-You need to install the [.NET Core SDK from here](https://dotnet.microsoft.com/download) to be able to run the necessary commands to create and build projects.
-
-After installation, you can run `dotnet --info` in a terminal to make sure the installation was successful.
+Please ensure your development environment meets the prerequisites listed on the [MonoGame requirements guide](~/articles/introduction/requirements.md).
 
 ## Download MonoGame Templates
 
@@ -48,4 +46,4 @@ Once created, you can open your code editor of choice in the new folder and begi
 
 ## Next steps
 
-Currently, when you do run your game, it is just clearing the surface with blue color. For further information on developing your game, please look at the [Understanding the Code](2_understanding_the_code.md).
+Currently, when you do run your game, is just clearing the surface with blue color. For further information on creating your game, please look at the [Understanding the Code](2_understanding_the_code.md).

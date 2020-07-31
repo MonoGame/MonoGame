@@ -4,9 +4,7 @@ MonoGame is available on Mac for development using the instructions below to get
 
 ## Prerequisites
 
-* You will need a copy of [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/) installed before installing MonoGame.
-
-* If you also need the [MGCB Editor](#monogame-content-pipeline-tool-mgcb-editor) GUI to manage your content you will need to install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
+Please ensure your development environment meets the prerequisites listed on the [MonoGame requirements guide](~/articles/introduction/requirements.md).
 
 ## Install MonoGame Templates
 
