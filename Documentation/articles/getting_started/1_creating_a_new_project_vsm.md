@@ -18,30 +18,6 @@ To create new projects from within Visual Studio, you will need to install the V
 
 Once open, simply search for **MonoGame** in the top right search window (as shown above) and install the "MonoGame project templates".  You now have the MonoGame templates installed ready to create new projects.
 
-## MonoGame Content Pipeline Tool (MGCB Editor)
-
-The MGCB Editor which was previously available inside the MonoGame installer is now published to the .NET tools library. To install the MGCB Editor, simply open a command prompt and run the following dotnet command (if you get an error, please ensure you have installed the .NETCore SDK listed above):
-
-```
-dotnet tool install -g dotnet-mgcb-editor
-```
-
-> For development branches, you will need to ensure you have the dev channel NuGet registered and include the version number in the command, for example:
->
-> ```
-> dotnet nuget add source -n MonoGame http://teamcity.monogame.net/guestAuth/app/nuget/feed/_Root/default/v3/index.json
-> 
-> dotnet tool install --global dotnet-mgcb-editor --version 3.8.0.1476-develop
-> ```
-
-Once installed, you also need to register the MGCB Editor with Visual Studio for Mac with the additional command from the command prompt:
-
-```
-mgcb-editor --register
-```
-
-For more details on the [MonoGame tools check here](~/articles/tools/tools.md).
-
 ## Create Project
 
 Start MonoDevelop / Xamarin Studio and select **New...** in the upper left corner.
@@ -66,4 +42,6 @@ You should now see your game window running.
 
 ![Game](~/images/getting_started/1_game_md.png)
 
-Currently, it is just clearing the surface with blue color. For further information on creating your game, please look at the [Understanding the Code](2_understanding_the_code.md).
+## Next steps
+
+Currently, it is just clearing the surface with blue color. For further information on developing your game, please look at the [Understanding the Code](2_understanding_the_code.md).

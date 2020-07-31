@@ -20,30 +20,6 @@ dotnet new -i MonoGame.Templates.CSharp
 
 > For development branches you will also need to include the version number in the command, e.g. 'dotnet new --install MonoGame.Templates.CSharp::3.8.0.1375-develop'
 
-## MonoGame Content Pipeline Tool (MGCB Editor)
-
-The MGCB Editor is also now published to the .NET tools library. To install the MGCB Editor, simply open a command prompt and run the following dotnet command (if you get an error, please ensure you have installed the .[NETCore SDK](https://dotnet.microsoft.com/download) listed above):
-
-```
-dotnet tool install -g dotnet-mgcb-editor
-```
-
-> For development branches, you will need to ensure you have the dev channel NuGet registered and include the version number in the command, for example:
->
-> ```
-> dotnet nuget add source -n MonoGame http://teamcity.monogame.net/guestAuth/app/nuget/feed/_Root/default/v3/index.json
-> 
-> dotnet tool install --global dotnet-mgcb-editor --version 3.8.0.1476-develop
-> ```
-
-Once installed, you can optionally register the MGCB Editor with the file system so that it opens automatically with the additional command from the command prompt:
-
-```
-mgcb-editor --register
-```
-
-For more details on the [MonoGame tools check here](~/articles/tools/tools.md).
-
 ## Create a MonoGame Project
 
 You can now create new MonoGame projects. To do that:
@@ -67,3 +43,9 @@ dotnet new mgdesktopgl -o MyGame
 > ```
 
 Once created, you can open your code editor of choice in the new folder and begin editing.
+
+> To run your project, check the instructions for [packaging your game](~/articles/packaging_games.md) to build the executable using the .NET tooling.
+
+## Next steps
+
+Currently, when you do run your game, it is just clearing the surface with blue color. For further information on developing your game, please look at the [Understanding the Code](2_understanding_the_code.md).

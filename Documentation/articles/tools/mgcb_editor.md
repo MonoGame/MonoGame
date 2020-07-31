@@ -17,10 +17,11 @@ The MGCB Editor has the following features:
 * Support for custom importers/processors/writers.
 * Template format for adding new custom content types.
 
-The MGCB Editor can be installed as a [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
-Make sure you have the .NET Core SDK installed. You can download it [here](https://dotnet.microsoft.com/download).
+## Installation Instructions
 
-In a terminal run the following to install the MGCB Editor:
+The MGCB Editor is published as a [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools), Make sure you have the .NET Core SDK installed if you wish to install the editor. You can download it [here](https://dotnet.microsoft.com/download).
+
+In a command prompt/terminal window, run the following command to install the MGCB Editor:
 
 ```
 dotnet tool install -g dotnet-mgcb-editor

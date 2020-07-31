@@ -4,9 +4,13 @@ This tutorial will go over adding content to your game.
 
 > For help on creating a project please look at the [Creating a New Project](getting_started.md) of the Getting Started guide.
 
----
+## MonoGame Content Builder Tool (MGCB Editor)
 
-## The Content Pipeline tool
+If you have not already, you will need to install the MGCB-Editor for managing your content, for details on getting access to the tool, see the [installation instructions here](~/articles/tools/mgcb_editor.md).
+
+> This is optional, as you can edit the .mgcb files manually if you wish, however, it is recommended to use the tool for the extra features it gives.
+
+## Adding content
 
 First, you are going to need some content for your game. For this tutorial use the following image of a ball:
 
