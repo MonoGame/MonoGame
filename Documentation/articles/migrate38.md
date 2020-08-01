@@ -1,13 +1,16 @@
 # Migrating to MonoGame 3.8
 
-Previously MonoGame installed on your machine through an installer, but from 3.8 onwards everything is installed through NuGet packages.
+Previously MonoGame installed on your machine through an installer, but from 3.8 onwards everything is installed through NuGet packages and Visual Studio Extensions.
+
+> **Note** MonoGame 3.8 project templates are not compatible with earlier versions of MonoGame.  If you wish to work on or build older MonoGame projects, then you will still need to install [MonoGame 3.7.1](https://www.monogame.net/downloads/) or earlier to open them.
 
 ## WindowsDX and DesktopGL
 
 WindowsDX and DesktopGL templates now use SDK-style projects.
 To migrate old projects we recommend creating a new project with the 3.8+ templates and
-copying the csproj to your project folder. Make sure you back up your old project.
-For more information about SDK-style projects see the [docs](https://docs.microsoft.com/en-us/dotnet/core/tools/csproj).
+copying the csproj to your project folder.  Make sure you back up your old project.
+
+> For more information about SDK-style projects see the [documentation](https://docs.microsoft.com/en-us/dotnet/core/tools/csproj).
 
 ## Other Platforms
 
@@ -43,9 +46,9 @@ MonoGame tools are now distributed as [.NET Core Tools](https://docs.microsoft.c
 You do not need the tools to build content for your games. The templates reference the `MonoGame.Content.Builder.Task`
 NuGet package that automatically builds your content when building your game.
 
-- [MonoGame Content Builder](tools/mgcb.md) (MGCB): `dotnet tool install -g dotnet-mgcb`
-- [MonoGame Effect Compiler](tools/2mgfx.md) (MGFXC; previously 2MGFX): `dotnet tool install -g dotnet-mgfxc`
-- [MGCB Editor](tools/pipeline.md) (Previously Pipeline Tool): `dotnet tool install -g dotnet-mgcb-editor`
+- [MonoGame Content Builder](~/articles/tools/mgcb.md) (MGCB): `dotnet tool install -g dotnet-mgcb`
+- [MGCB Editor](~/articles/tools/mgcb_editor.md) (Previously Pipeline Tool): `dotnet tool install -g dotnet-mgcb-editor`
+- [MonoGame Effect Compiler](~/articles/tools/mgfxc.md) (MGFXC; previously 2MGFX): `dotnet tool install -g dotnet-mgfxc`
 
-After installing `mgcb-editor` run `dotnet mgcb-editor --register` to register MGCB Editor as the default app for mgcb
-files. This currently does not work on Mac.
+After installing `mgcb-editor` run `mgcb-editor --register` to register MGCB Editor as the default app for mgcb
+files.

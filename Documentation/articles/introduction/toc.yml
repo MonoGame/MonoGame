@@ -1,12 +1,6 @@
-- name: What is MonoGame
-  href: what_is_monogame.md
-- name: Requirements
+- name: Development requirements
   href: requirements.md
-- name: Create a MonoGame Project
-  href: create_project.md
 - name: Target Platforms
   href: platforms.md
-- name: MonoGame FAQ
-  href: monogame_faq.md
 - name: Help and Support
   href: help_and_support.md

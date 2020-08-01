@@ -6,13 +6,19 @@ Samples and Demos of MonoGame projects can be found at the following locations:
 
 These are the official samples that contain the following:
 
-- Platformer 2D
-- SpaceWar
-- NeonShooter
+- [Platformer 2D](https://github.com/MonoGame/MonoGame.Samples/tree/develop/Platformer2D)
+- [NeonShooter](https://github.com/MonoGame/MonoGame.Samples/tree/develop/NeonShooter)
+- [SpaceWar](https://github.com/MonoGame/MonoGame.Samples/tree/develop/SpaceWar)
 
-## [MonoGame.Extended Samples](https://github.com/craftworkgames/MonoGame.Extended)
+## XNA Game Studio Archive
 
-MonoGame.Extended is an extension for MonoGame that makes it easier to make games.  They have [demos](https://github.com/craftworkgames/MonoGame.Extended/tree/develop/Source/Demos) and [games](https://github.com/craftworkgames/MonoGame.Extended/tree/develop/Source/Games) that can be tried out.
+The [XNA Game Studio archive](https://github.com/SimonDarksideJ/XNAGameStudio) contains all of the original XNA sample content. This contains a vast array of samples demonstrating almost every feature of XNA, which is easily translatable to MonoGame.
+
+There are pre-converted samples available on the repository as well.
+
+## MonoGame.Extended Samples
+
+[MonoGame.Extended](https://github.com/craftworkgames/MonoGame.Extended) is an extension for MonoGame that makes it easier to make games. They have [demos](https://github.com/craftworkgames/MonoGame.Extended/tree/develop/Source/Demos) and [games](https://github.com/craftworkgames/MonoGame.Extended/tree/develop/Source/Games) that can be tried out.
 
 ## [CartBlanche's Samples](https://github.com/CartBlanche/MonoGame-Samples)
 
@@ -26,7 +32,3 @@ It also includes games such as:
 - Tetris
 - Pacman
 - Role Playing Game
-
-### Related
-
-[Tutorials](tutorials.md)
