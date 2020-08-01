@@ -2757,7 +2757,9 @@ namespace MonoGame.Utilities
             // two codes of non zero frequency.
             while (s.heap_len < 2)
             {
-                node = s.heap[++s.heap_len] = (max_code < 2 ? ++max_code : 0);
+                int code = (max_code < 2 ? ++max_code : 0);
+                s.heap[++s.heap_len] = code;
+                node = code;
                 tree[node * 2] = 1;
                 s.depth[node] = 0;
                 s.opt_len--;
@@ -3038,7 +3040,8 @@ namespace MonoGame.Utilities
                         // compute minimum size table less than or equal to l bits
                         z = g - w;
                         z = (z > l) ? l : z; // table size upper limit
-                        if ((f = 1 << (j = k - w)) > a + 1)
+                        j = k - w;
+                        if ((f = 1 << j) > a + 1)
                         {
                             // try a k-w bit table
                             // too few codes for k-w bit table
