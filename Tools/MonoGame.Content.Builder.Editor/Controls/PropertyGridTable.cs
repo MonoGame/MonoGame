@@ -134,7 +134,11 @@ namespace MonoGame.Tools.Pipeline
                     drawable.Cursor = _cursorResize;
                     break;
                 default:
+#if IDE
+                    drawable.Cursor = null;
+#else
                     drawable.Cursor = _cursorNormal;
+#endif
                     break;
             }
         }

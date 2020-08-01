@@ -60,8 +60,13 @@ namespace MonoGame.Tools.Pipeline
 
             combo.Style = "OverrideSize";
             combo.Width = _lastRec.Width;
+
+#if IDE
+            control.Add(combo, _lastRec.X, _lastRec.Y - 3);
+#else
             combo.Height = _lastRec.Height;
             control.Add(combo, _lastRec.X, _lastRec.Y);
+#endif
 
             OnKill += delegate
             {
