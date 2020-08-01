@@ -311,6 +311,7 @@ namespace MonoGame.Tools.Pipeline
         {
 #if IDE
             info.RebuildItem = false;
+            info.OpenItemWith = false;
 #endif
 
             // Title
