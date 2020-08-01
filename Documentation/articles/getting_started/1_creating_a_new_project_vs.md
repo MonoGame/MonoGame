@@ -2,7 +2,7 @@
 
 This guide will walk you through building a starter game with MonoGame using a Windows and Visual Studio 2019.
 
-> Note, MonoGame 3.8 projects are no longer compatible with earlier versions of MonoGame.  If you wish to work on or build older MonoGame projects, then you will still need to install [MonoGame 3.7.1](https://www.monogame.net/downloads/) or earlier to open them.
+> Note, Please check the [migration guide](~/articles/migrate38.md) for any projects still based on MonoGame 3.7 or below.
 
 ## Prerequisites
 

@@ -2,6 +2,8 @@
 
 This guide will walk you through building a starter game with MonoGame using a Mac and Visual Studio for Mac.
 
+> Note, Please check the [migration guide](~/articles/migrate38.md) for any projects still based on MonoGame 3.7 or below.
+
 ## Prerequisites
 
 Please ensure your development environment meets the prerequisites listed on the [MonoGame requirements guide](~/articles/introduction/requirements.md).
