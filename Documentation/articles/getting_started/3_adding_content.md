@@ -22,11 +22,11 @@ Now open up your game project and look at the Solution explorer window. Expand t
 
 ![Open Content](~/images/getting_started/3_open_content.png)
 
-You should now see the Pipeline Editor window open up. If it does not open up (you see a text file open), then you can right-click on **Content.mgcb** and select **Open With**, then select **MonoGame Pipeline** in the list, click **Set as Default** and then click **OK**.
+You should now see the MGCB Editor window open up. If it does not open up (you see a text file open), then you can right-click on **Content.mgcb** and select **Open With**, then select **mgcb-editor-wpf** in the list, click **Set as Default** and then click **OK**.
 
-> If you do not see the **MonoGame Pipeline Tool** option when you right-click and select **Open With**, then please review the [Tools documentation](~/articles/tools/tools.md) for installing the Pipeline tool for your operating system.
+> If you do not see the **mgcb-editor-wpf** option when you right-click and select **Open With**, then please review the [Tools documentation](~/articles/tools/tools.md) for installing the MGCB Editor tool for your operating system.
 
-![Pipeline Editor](~/images/getting_started/3_pipeline_tool.png)
+![MGCB Editor](~/images/getting_started/3_mgcb_editor_tool.png)
 
 Your game content is managed from this external tool. You can add content to your game in one of the following ways:
 
@@ -42,7 +42,7 @@ You should now be prompted to select a file. Select the “ball.png” image tha
 
 ![Copy Content](~/images/getting_started/3_copy_content.png)
 
-Now click **Save** toolbar button and close the Pipeline tool.
+Now click **Save** toolbar button and close the MGCB Editor tool.
 
 ![Save Content](~/images/getting_started/3_save_content.png)
 
@@ -57,7 +57,8 @@ public class Game1 : Game
 {
     Texture2D ballTexture;
 
-    GraphicsDeviceManager graphics;
+    private GraphicsDeviceManager _graphics;
+    private SpriteBatch _spriteBatch;
 ```
 
 Next find the LoadContent method and use it to retrieve the "ball" sprite from the Content project into the **ballTexture** private variable using the **Content.Load()** method and specifying the type of data we are requesting, in this case a Texture2D image:
@@ -66,7 +67,7 @@ Next find the LoadContent method and use it to retrieve the "ball" sprite from t
 protected override void LoadContent()
 {
     // Create a new SpriteBatch, which can be used to draw textures.
-    spriteBatch = new SpriteBatch(GraphicsDevice);
+    _spriteBatch = new SpriteBatch(GraphicsDevice);
 
     // TODO: use this.Content to load your game content here
     ballTexture = Content.Load<Texture2D>("ball");
@@ -91,9 +92,9 @@ protected override void Draw(GameTime gameTime)
     graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
     // TODO: Add your drawing code here
-    spriteBatch.Begin();
-    spriteBatch.Draw(ballTexture, new Vector2(0, 0), Color.White);
-    spriteBatch.End();
+    _spriteBatch.Begin();
+    _spriteBatch.Draw(ballTexture, new Vector2(0, 0), Color.White);
+    _spriteBatch.End();
 
     base.Draw(gameTime);
 }

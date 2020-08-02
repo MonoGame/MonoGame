@@ -28,7 +28,7 @@ You will need a copy of [Visual Studio for Mac](https://visualstudio.microsoft.c
 
 Additionally, you will need to install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
 
-For editing content you also need the [MGCB Editor](#monogame-content-pipeline-tool-mgcb-editor) GUI to manage your content.
+For editing content you also need the [MGCB Editor](~/articles/tools/mgcb_editor.md) GUI to manage your content.
 
 ## For desktop platforms using only the CLI (all supported operating systems)
 
