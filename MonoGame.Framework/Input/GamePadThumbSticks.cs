@@ -42,10 +42,47 @@ namespace Microsoft.Xna.Framework.Input
             get { return _right; }
         }
 
+        public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, float leftDeadZoneAmount, float rightDeadZoneAmount)
+            : this(leftPosition, rightPosition, GamePadDeadZone.None, GamePadDeadZone.None, leftDeadZoneAmount, rightDeadZoneAmount)
+        {
+            
+        }
+
         public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition)
             : this(leftPosition, rightPosition, GamePadDeadZone.None, GamePadDeadZone.None)
         {
-            
+
+        }
+
+        internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode, float leftDeadZone, float rightDeadZone) : this()
+        {
+            // Apply dead zone
+            _left = ApplyDeadZone(leftDeadZoneMode, leftDeadZoneAmount, leftPosition);
+            _right = ApplyDeadZone(rightDeadZoneMode, rightDeadZoneAmount, rightPosition);
+
+            // VirtualButtons should always behave like deadzone is IndependentAxes. 
+            // This is consistent with XNA behaviour and generally most convenient (e.g. for menu navigation)
+            _virtualButtons = 0;
+
+            if (leftPosition.X < -leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickLeft;
+            else if (leftPosition.X > leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickRight;
+
+            if (leftPosition.Y < -leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickDown;
+            else if (leftPosition.Y > leftThumbDeadZone)
+                _virtualButtons |= Buttons.LeftThumbstickUp;
+
+            if (rightPosition.X < -rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickLeft;
+            else if (rightPosition.X > rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickRight;
+
+            if (rightPosition.Y < -rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickDown;
+            else if (rightPosition.Y > rightThumbDeadZone)
+                _virtualButtons |= Buttons.RightThumbstickUp;
         }
 
         internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode) : this()
