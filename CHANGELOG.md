@@ -5,6 +5,7 @@
 ### Added
  - New Plane constructor. [#6085](https://github.com/MonoGame/MonoGame/pull/6085)
  - Round, Ceiling, Floor functions for Vector2/3/4. [#6318](https://github.com/MonoGame/MonoGame/pull/6318)
+ - Dotnet templating templates. [#6494](https://github.com/MonoGame/MonoGame/pull/6494)
  - TransformMatrix for SpriteEffect. [#6623](https://github.com/MonoGame/MonoGame/pull/6623)
  - SpriteBatch constructor overload with capacity parameter. [#6682](https://github.com/MonoGame/MonoGame/pull/6682)
  - [OpenGL] Support for separate blend states per render target. [#6343](https://github.com/MonoGame/MonoGame/pull/6343)
@@ -43,8 +44,6 @@
 
 ### Changed
  - OpenAssetImporter Improvements and FbxImporter Unit Tests. [#6158](https://github.com/MonoGame/MonoGame/pull/6158)
- - Refreshed all templates to new dotnet format. [#6494](https://github.com/MonoGame/MonoGame/pull/6494)
- - Changed TimerHelper namespace to MonoGame Utilities. [#6587](https://github.com/MonoGame/MonoGame/pull/6587)
  - Made sound system optional. [#6629](https://github.com/MonoGame/MonoGame/pull/6629)
  - [UWP] Do not set minimum window size. [#6763](https://github.com/MonoGame/MonoGame/pull/6763)
  - Added Cake build script to replace NANT. [#6776](https://github.com/MonoGame/MonoGame/pull/6776)
@@ -59,8 +58,6 @@
  - Reduced garbage in Direct X-specific SetRenderTargets methods. [#7034](https://github.com/MonoGame/MonoGame/pull/7034)
  - MouseState Improvements. [#6973](https://github.com/MonoGame/MonoGame/pull/6973)
  - KeyboardState Improvements. [#6972](https://github.com/MonoGame/MonoGame/pull/6972)
- - Made audio duration unit tests a bit more fuzzy. [#7037](https://github.com/MonoGame/MonoGame/pull/7037)
- - Improve native library loading. [#7063](https://github.com/MonoGame/MonoGame/pull/7063)
  - [SDL] Updated controller DB. [#7124](https://github.com/MonoGame/MonoGame/pull/7124)
  - We now pool ContentManager scratch buffers. [#5921](https://github.com/MonoGame/MonoGame/pull/5921)
  - [OpenAL] Clean up sound disposal. [#7097](https://github.com/MonoGame/MonoGame/pull/7097)
@@ -69,9 +66,6 @@
  - [SDL] Bump dependencies to SDL 2.0.12. [#7133](https://github.com/MonoGame/MonoGame/pull/7133)
  - [Docs] Update for 3.8. [#7117](https://github.com/MonoGame/MonoGame/pull/7117) [#7240](https://github.com/MonoGame/MonoGame/pull/7240)
  - [MGCB Editor] Changed position for context menu item Rebuild. [#7176](https://github.com/MonoGame/MonoGame/pull/7176)
- - [MGCB] We now use AssimpNet from NuGet. [#7184](https://github.com/MonoGame/MonoGame/pull/7184)
- - Moved all types from MonoGame.Utilities to MonoGame.Framework.Utilities. [#7257](https://github.com/MonoGame/MonoGame/pull/7257)
- - We now generate Content Pipeline API docs. [#7261](https://github.com/MonoGame/MonoGame/pull/7261)
  - [MGCB] Replace symbols for assembly references. [#7272](https://github.com/MonoGame/MonoGame/pull/7272)
 
 ### Fixed
