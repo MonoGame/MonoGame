@@ -20,8 +20,8 @@ Next let us initialize them. Find the **Initialize** method and add the followin
 
 ```csharp
 // TODO: Add your initialization logic here
-ballPosition = new Vector2(graphics.PreferredBackBufferWidth / 2,
-    graphics.PreferredBackBufferHeight / 2);
+ballPosition = new Vector2(_graphics.PreferredBackBufferWidth / 2,
+_graphics.PreferredBackBufferHeight / 2);
 ballSpeed = 100f;
 
 base.Initialize();
@@ -34,7 +34,7 @@ The last thing we need to do is modify the position the ball is getting drawn to
 Find the **Draw** method and update the **spriteBatch.Draw** call to:
 
 ```csharp
-spriteBatch.Draw(ballTexture, ballPosition, Color.White);
+_spriteBatch.Draw(ballTexture, ballPosition, Color.White);
 ```
 
 Now run the game.
@@ -44,7 +44,7 @@ Now run the game.
 As you can see the ball is not quite centered yet. This is because MonoGame uses (0, 0) as the origin point of the image for drawing by default (Top Left hand corner). We can modify this by taking into account the height and width of the image when drawing, as follows:
 
 ```csharp
-spriteBatch.Draw(
+_spriteBatch.Draw(
     ballTexture,
     ballPosition,
     null,
