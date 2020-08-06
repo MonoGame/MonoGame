@@ -580,7 +580,7 @@ namespace MonoGame.Tools.Pipeline
             adialog.Show(this);
         }
 
-        private void CmdOpenItem_Executed(object sender, EventArgs e)
+        public void CmdOpenItem_Executed(object sender, EventArgs e)
         {
             if (PipelineController.Instance.SelectedItem is ContentItem)
             {
