@@ -585,7 +585,12 @@ namespace MonoGame.Tools.Pipeline
             if (PipelineController.Instance.SelectedItem is ContentItem)
             {
                 var filePath = PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath);
+
+#if IDE
+                MonoDevelop.Ide.IdeApp.Workbench.OpenDocument(filePath, MonoDevelop.Ide.Gui.OpenDocumentOptions.Default);
+#else
                 Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+#endif
             }
         }
 
