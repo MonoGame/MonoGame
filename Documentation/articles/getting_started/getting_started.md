@@ -21,3 +21,7 @@ By the end of this tutorial set, you will have a working project to start buildi
 ## Migrating from MonoGame 3.7 to 3.8
 
 If you currently have a MonoGame 3.7 project and wish to upgrade it to MonoGame 3.8, please check our handy [Upgrade Guide](~/articles/migrate38.md).
+
+## Migrating from XNA to MonoGame
+
+If you currently have an XNA project or sample and wish to upgrade it to MonoGame, please check our handy [Porting guide for XNA](~/articles/porting_xna.md)

@@ -12,3 +12,7 @@
   href: 3_adding_content.md
 - name: Adding Basic Code
   href: 4_adding_basic_code.md
+- name: Migrating from 3.7
+  href: migrate_37.md
+- name: Migrating from XNA
+  href: migrate_xna.md
