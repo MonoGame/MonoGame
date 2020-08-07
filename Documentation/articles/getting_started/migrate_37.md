@@ -1,4 +1,4 @@
-# Migrating from MonoGame 3.7
+# Migrating from 3.7
 
 Previously MonoGame installed on your machine through an installer, but from 3.8 onwards everything is installed through NuGet packages and Visual Studio Extensions.
 
