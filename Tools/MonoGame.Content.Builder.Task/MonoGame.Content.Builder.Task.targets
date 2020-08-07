@@ -105,33 +105,16 @@
     </PropertyGroup>
 
     <Error
-      Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsStoreApp, WindowsPhone8, MacOSX, iOS, Linux, DesktopGL, RaspberryPi, Android, Ouya, NativeClient, PlayStation4, PSVita, XboxOne, Switch or PlayStationMobile."
-      Condition="'$(MonoGamePlatform)' != 'Windows' And
-                 '$(MonoGamePlatform)' != 'iOS' And       
-                 '$(MonoGamePlatform)' != 'Android' And       
-                 '$(MonoGamePlatform)' != 'Linux' And           
-                 '$(MonoGamePlatform)' != 'DesktopGL' And           
-                 '$(MonoGamePlatform)' != 'MacOSX' And       
-                 '$(MonoGamePlatform)' != 'WindowsStoreApp' And       
-                 '$(MonoGamePlatform)' != 'NativeClient' And       
-                 '$(MonoGamePlatform)' != 'PlayStationMobile' And       
-                 '$(MonoGamePlatform)' != 'WindowsPhone8' And       
-                 '$(MonoGamePlatform)' != 'RaspberryPi' And       
-                 '$(MonoGamePlatform)' != 'PlayStation4' And       
-                 '$(MonoGamePlatform)' != 'PSVita' And       
-                 '$(MonoGamePlatform)' != 'XboxOne' And
-                 '$(MonoGamePlatform)' != 'Switch' And
-                 '$(MonoGamePlatform)' != 'WindowsGL'" />
+      Text="The MonoGamePlatform property was not defined in the project!"
+      Condition="'$(MonoGamePlatform)' == ''" />
 
     <Warning
       Text="No Content References Found. Please make sure your .mgcb file has a build action of MonoGameContentReference"
-      Condition="'%(ContentReference.FullPath)' == ''"
-    />
+      Condition="'%(ContentReference.FullPath)' == ''" />
 
     <Warning
       Text="Content Reference output directory contains '..' which may cause content to be placed outside of the output directory. Please set ContentFolder on your MonoGameContentReference '%(ContentReference.Filename)' to enforce the correct content output location."
-      Condition="$([System.String]::Copy('%(ContentReference.ContentDir)').Contains('..'))"
-    />
+      Condition="$([System.String]::Copy('%(ContentReference.ContentDir)').Contains('..'))" />
 
     <MakeDir Directories="%(ContentReference.ContentOutputDir)"/>
     <MakeDir Directories="%(ContentReference.ContentIntermediateOutputDir)"/>
