@@ -2,7 +2,7 @@
 
 This tutorial will go over adding content to your game.
 
-> For help on creating a project please look at the [Creating a New Project](getting_started.md) of the Getting Started guide.
+> For help on creating a project please look at the [Creating a New Project](0_getting_started.md) of the Getting Started guide.
 
 ## MonoGame Content Builder Tool (MGCB Editor)
 
@@ -104,4 +104,4 @@ Now run the game and you should get the following:
 
 ![Game](~/images/getting_started/3_game.png)
 
-For the next part, look at [Adding Basic Code](4_adding_basic_code.md) page.
+**Next up:** [Adding Basic Code](5_adding_basic_code.md)

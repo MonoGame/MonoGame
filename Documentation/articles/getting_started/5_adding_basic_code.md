@@ -1,6 +1,6 @@
 # Adding Basic Code
 
-This tutorial will go over adding basic logic to your game. This tutorial continues where [Adding Content](3_adding_content.md) left off.
+This tutorial will go over adding basic logic to your game. This tutorial continues where [Adding Content](4_adding_content.md) left off.
 
 ---
 
@@ -29,7 +29,7 @@ base.Initialize();
 
 With this, we are setting the ball starting position to the center of the screen based off the dimensions of the screen determined by the current **BackBufferWidth** and **BackBufferHeight**.
 
-The last thing we need to do is modify the position the ball is getting drawn to. 
+The last thing we need to do is modify the position the ball is getting drawn to.
 
 Find the **Draw** method and update the **spriteBatch.Draw** call to:
 
@@ -112,7 +112,7 @@ If the Up Arrow key is pressed, we move the ball by the value we set **ballSpeed
 
 The sections repeat the above for the Down, Left and Right arrow keys.
 
-If you now run the game and you should be able to move the ball with the arrow keys. 
+If you now run the game and you should be able to move the ball with the arrow keys.
 
 You will probably notice that you can get out of the window, so let's make it so that the ball can not escape the window. We will do this by setting bounds onto the ballPosition after it has already been moved to ensure it cannot go further than the width or height of the screen.
 

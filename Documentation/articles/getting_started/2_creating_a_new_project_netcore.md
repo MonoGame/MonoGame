@@ -1,22 +1,6 @@
-## .NET Core CLI
+# .NET Core CLI
 
 This guide will walk you through building a starter game with MonoGame using only the command line/terminal on your operating system and lightweight coding tool of choice (such as [Visual Studio Code](https://code.visualstudio.com/).
-
-## Prerequisites
-
-Please ensure your development environment meets the prerequisites listed on the [MonoGame requirements guide](~/articles/introduction/requirements.md).
-
-## Download MonoGame Templates
-
-MonoGame now publishes project templates for [dotnet new](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-new) to the dotnet registry.
-
-To install the C# templates run the following from the command-line or the Terminal window in your code editor:
-
-```
-dotnet new -i MonoGame.Templates.CSharp
-```
-
-> For development branches you will also need to include the version number in the command, e.g. 'dotnet new --install MonoGame.Templates.CSharp::3.8.0.1375-develop'
 
 ## Create a MonoGame Project
 
@@ -44,6 +28,4 @@ Once created, you can open your code editor of choice in the new folder and begi
 
 > To run your project, check the instructions for [packaging your game](~/articles/packaging_games.md) to build the executable using the .NET tooling.
 
-## Next steps
-
-Currently, when you do run your game, is just clearing the surface with blue color. For further information on creating your game, please look at the [Understanding the Code](2_understanding_the_code.md).
+**Next up:** [Understanding the code](3_understanding_the_code.md)
