@@ -1,5 +1,3 @@
-- name: Welcome
-  href: 0_welcome.md
 - name: Setting up your Development Environment
   items:
   - name: Windows

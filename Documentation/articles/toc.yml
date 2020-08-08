@@ -2,14 +2,16 @@
   href: ../index.md
 - name: Getting Started
   href: getting_started/toc.yml
+  topicHref: getting_started/0_getting_started.md
 - name: Tools
   href: tools/toc.yml
   topicHref: tools/tools.md
 - name: Adding Content
   href: content/toc.yml
   topicHref: content/content.md
-- name: Platform Notes
-  href: platform_notes/toc.yml
+- name: Platforms
+  href: platforms/toc.yml
+  topicHref: platforms/0_platforms.md
 - name: Migrating from 3.7
   href: migrate_37.md
 - name: Migrating from XNA

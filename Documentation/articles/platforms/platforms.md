@@ -1,4 +1,4 @@
-# Supported Platforms
+# Platforms
 
 MonoGame supports the following systems:
 
