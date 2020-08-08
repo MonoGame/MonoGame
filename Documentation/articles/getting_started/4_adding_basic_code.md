@@ -139,6 +139,6 @@ Happy Coding ^^
 
 ## Further Reading
 
-Check out the [Tutorials section](/tutorials.md) for many more helpful guides and tutorials on building games with MonoGame.  We have an expansive library of helpful content all provided by other MonoGame developers in the community.
+Check out the [Tutorials section](~/articles/tutorials.md) for many more helpful guides and tutorials on building games with MonoGame.  We have an expansive library of helpful content all provided by other MonoGame developers in the community.
 
-Additionally, be sure to check out the official [MonoGame Samples](/samples.md) page for fully built sample projects built with MonoGame and targeting our most common platforms.
+Additionally, be sure to check out the official [MonoGame Samples](~/articles/samples.md) page for fully built sample projects built with MonoGame and targeting our most common platforms.
