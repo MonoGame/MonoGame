@@ -1,6 +1,5 @@
 - name: Introduction
-  href: introduction/toc.yml
-  topicHref: introduction/introduction.md
+  href: introduction.md
 - name: Getting Started
   href: getting_started/toc.yml
   topicHref: getting_started/getting_started.md
