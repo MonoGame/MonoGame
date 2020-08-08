@@ -85,3 +85,5 @@ Create wineprefix:
 wget -qO- https://raw.githubusercontent.com/MonoGame/MonoGame/develop/Tools/MonoGame.Effect.Compiler/mgfxc_wine_setup.sh | bash
 ```
 If you ever need to undo the script, simply delete the `.winemonogame` folder in your home directory.
+
+**Next up:** [Creating a new project](2_creating_a_new_project_netcore.md)

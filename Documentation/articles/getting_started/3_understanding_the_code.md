@@ -123,3 +123,5 @@ protected override void Draw(GameTime gameTime)
 ```
 
 Similar to the Update method, it is also called multiple times per second.
+
+**Next up:** [Adding Content](4_adding_content.md)

@@ -21,3 +21,5 @@ If everything went correctly, you should see a **Pong** project open up like in 
 You should now see your game window running.
 
 ![ ](~/images/getting_started/vsmac-mg-new-5.png)
+
+**Next up:** [Understanding the Code](3_understanding_the_code.md)

@@ -37,3 +37,5 @@ If everything went correctly, you should see an **ExampleGame** project open up 
 You should now see your game window running.
 
 ![Game](~/images/getting_started/1_game_vs.png)
+
+**Next up:** [Understanding the code](3_understanding_the_code.md)

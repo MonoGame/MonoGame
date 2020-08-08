@@ -27,3 +27,5 @@ dotnet new mgdesktopgl -o MyGame
 Once created, you can open your code editor of choice in the new folder and begin editing.
 
 > To run your project, check the instructions for [packaging your game](~/articles/packaging_games.md) to build the executable using the .NET tooling.
+
+**Next up:** [Understanding the code](3_understanding_the_code.md)

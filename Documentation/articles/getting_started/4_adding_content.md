@@ -103,3 +103,5 @@ protected override void Draw(GameTime gameTime)
 Now run the game and you should get the following:
 
 ![Game](~/images/getting_started/3_game.png)
+
+**Next up:** [Adding Basic Code](5_adding_basic_code.md)
