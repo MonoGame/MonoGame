@@ -13,9 +13,9 @@
   href: platform_specific/toc.yml
   topicHref: platform_specific/platform_specific.md
 - name: Migrating from 3.7
-  href: getting_started/migrate_37.md
+  href: migrate_37.md
 - name: Migrating from XNA
-  href: getting_started/migrate_xna.md
+  href: migrate_xna.md
 - name: Package games for distribution
   href: packaging_games.md
 - name: Samples and Demos
