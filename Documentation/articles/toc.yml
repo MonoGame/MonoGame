@@ -9,7 +9,7 @@
   href: content/toc.yml
   topicHref: content/content.md
 - name: Platform Notes
-  href: platform_specific/toc.yml
+  href: platform_notes/toc.yml
 - name: Migrating from 3.7
   href: migrate_37.md
 - name: Migrating from XNA
