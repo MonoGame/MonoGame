@@ -21,7 +21,3 @@ If everything went correctly, you should see a **Pong** project open up like in 
 You should now see your game window running.
 
 ![ ](~/images/getting_started/vsmac-mg-new-5.png)
-
-## Next steps
-
-Currently, it is just clearing the surface with blue color. For further information on developing your game, please look at the [Understanding the Code](2_understanding_the_code.md).
