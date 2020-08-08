@@ -18,6 +18,10 @@ By the end of this tutorial set, you will have a working project to start buildi
 - [Adding Content](3_adding_content.md)
 - [Adding Basic Code](4_adding_basic_code.md)
 
-## Migrating from MonoGame 3.7 to 3.8
+## Migrating from 3.7
 
 If you currently have a MonoGame 3.7 project and wish to upgrade it to MonoGame 3.8, please check our handy [Upgrade Guide](~/articles/migrate38.md).
+
+## Migrating from XNA
+
+If you currently have an XNA project or sample and wish to upgrade it to MonoGame, please check our handy [Migration guide for XNA](~/articles/migrate_xna.md)

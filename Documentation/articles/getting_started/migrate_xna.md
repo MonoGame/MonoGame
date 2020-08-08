@@ -1,4 +1,4 @@
-# Porting from XNA to MonoGame
+# Migrating from XNA
 
 MonoGame implements the same [API](https://en.wikipedia.org/wiki/Application_programming_interface)
 as [XNA 4.0](https://docs.microsoft.com/en-us/previous-versions/windows/xna/bb200104(v=xnagamestudio.41)). That means you usually do not have to change your game code to port from XNA to
