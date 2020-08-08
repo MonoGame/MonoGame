@@ -6,14 +6,20 @@ First, select the toolset and operating system you will be working with to creat
 
 By the end of this tutorial set, you will have a working project to start building from for your target platform and be ready to tackle your next steps.
 
+## Setting up your development environment
+
+- [Windows](1_setting_up_your_development_environment_windows.md)
+- [macOS](1_setting_up_your_development_environment_macos.md)
+- [Ubuntu](1_setting_up_your_development_environment_ubuntu.md)
+
 ## Creating a new project
 
-- [Visual Studio](1_creating_a_new_project_vs.md)
-- [Visual Studio for Mac](1_creating_a_new_project_vsm.md)
-- [DotNet core CLI](1_creating_a_new_project_netcore.md)
+- [Visual Studio](2_creating_a_new_project_vs.md)
+- [Visual Studio for Mac](2_creating_a_new_project_vsm.md)
+- [DotNet core CLI](2_creating_a_new_project_netcore.md)
 
 ## Building your game
 
-- [Understanding the Code](2_understanding_the_code.md)
-- [Adding Content](3_adding_content.md)
-- [Adding Basic Code](4_adding_basic_code.md)
+- [Understanding the Code](3_understanding_the_code.md)
+- [Adding Content](4_adding_content.md)
+- [Adding Basic Code](5_adding_basic_code.md)

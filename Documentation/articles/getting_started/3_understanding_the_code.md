@@ -2,7 +2,7 @@
 
 This tutorial will go over the code that is getting created when you start a blank project.
 
-> For help on creating a project please look at the [Creating a New Project](getting_started.md) of the Getting Started guide.
+> For help on creating a project please look at the Creating a New Project of the [Getting Started guide](0_welcome.md).
 
 Within the Game.cs class file, which is the core of any MonoGame project, you will find several critical sections necessary for your game to run, namely:
 
@@ -14,7 +14,7 @@ Within the Game.cs class file, which is the core of any MonoGame project, you wi
 
 * The Initialize method - to define the starting point when the game runs.
 
-* The Load and Unload Content methods - which are used to add and remove assets from the running game from the [Content project](3_adding_content.md).
+* The Load and Unload Content methods - which are used to add and remove assets from the running game from the [Content project](4_adding_content.md).
 
 * The Update method - which is called on a regular interval to update your game state, e.g. take player input, move ships or animate entities.
 
@@ -123,5 +123,3 @@ protected override void Draw(GameTime gameTime)
 ```
 
 Similar to the Update method, it is also called multiple times per second.
-
-For the next part, look at [Adding Content](3_adding_content.md) page.

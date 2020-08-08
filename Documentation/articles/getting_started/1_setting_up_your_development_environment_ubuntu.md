@@ -56,7 +56,7 @@ code --install-extension ms-dotnettools.csharp
 
 ## Install MonoGame templates
 
-This will install templates for .NET CLI tools and Rider IDE. There is no template support for MonoDevelop.
+This will install templates for .NET Core CLI and Rider IDE. There is no template support for MonoDevelop.
 
 ```sh
 dotnet new --install MonoGame.Templates.CSharp
@@ -71,7 +71,7 @@ dotnet tool install --global dotnet-mgcb-editor
 mgcb-editor --register
 ```
 
-## [Optional] Setup Wine for effect compilation
+## [Optional] Set up Wine for effect compilation
 
 Effect compilation requires access to some DirectX compiler stuff so it can't nativly work on Linux systems, however we can use it through Wine.
 
