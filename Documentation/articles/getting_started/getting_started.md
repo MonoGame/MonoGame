@@ -24,4 +24,4 @@ If you currently have a MonoGame 3.7 project and wish to upgrade it to MonoGame 
 
 ## Migrating from XNA
 
-If you currently have an XNA project or sample and wish to upgrade it to MonoGame, please check our handy [Porting guide for XNA](~/articles/porting_xna.md)
+If you currently have an XNA project or sample and wish to upgrade it to MonoGame, please check our handy [Migration guide for XNA](~/articles/migrate_xna.md)
