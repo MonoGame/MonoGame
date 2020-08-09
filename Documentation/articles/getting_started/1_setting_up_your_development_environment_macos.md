@@ -11,16 +11,20 @@ Go to the following URL to download and install Visual Studio for Mac: https://v
 Download the MonoGame extension for Visual Studio for Mac from the following page: https://www.monogame.net/downloads/
 
 Open up Visual Studio for Mac and you should be able to see a window like so:
-![ ](~/images/getting_started/vsmac-mg-install-1.png)
+
+![VS for Mac installer](~/images/getting_started/vsmac-mg-install-1.png)
 
 In the menu bar, click on **Visual Studio**, and then click on the **Extensions...** menu item.
-![ ](~/images/getting_started/vsmac-mg-install-2.png)
+
+![Launch Extensions manager](~/images/getting_started/vsmac-mg-install-2.png)
 
 Next, click on the **Install from file...** button in the bottom left and select the extension file we downloaded in the previous step.
-![ ](~/images/getting_started/vsmac-mg-install-3.png)
+
+![Import VSM extension](~/images/getting_started/vsmac-mg-install-3.png)
 
 And finally click on the Install button once again.
-![ ](~/images/getting_started/vsmac-mg-install-4.png)
+
+![Install VSM extension](~/images/getting_started/vsmac-mg-install-4.png)
 
 ## [Optional] Install MonoGame templates for .NET Core CLI or Rider IDE
 
@@ -44,21 +48,25 @@ mgcb-editor --register
 Effect compilation requires access to some DirectX compiler stuff so it can't natively work on macOS systems, however we can use it through Wine.
 
 Install brew
-```
+
+```sh
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 ```
 
 Install wine64:
-```
+
+```sh
 brew cask install xquartz
 brew cask install wine-stable
 brew install p7zip
 ```
 
 Create wine prefix:
-```
+
+```sh
 wget -qO- https://raw.githubusercontent.com/MonoGame/MonoGame/develop/Tools/MonoGame.Effect.Compiler/mgfxc_wine_setup.sh | bash
 ```
+
 If you ever need to undo the script, simply delete the `.winemonogame` folder in your home directory.
 
 **Next up:** [Creating a new project](2_creating_a_new_project_vsm.md)
