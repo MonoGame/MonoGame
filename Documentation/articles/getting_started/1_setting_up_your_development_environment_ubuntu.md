@@ -73,14 +73,14 @@ mgcb-editor --register
 
 ## [Optional] Set up Wine for effect compilation
 
-Effect compilation requires access to some DirectX compiler stuff so it can't nativly work on Linux systems, however we can use it through Wine.
+Effect compilation requires access to some DirectX compiler stuff so it can't natively work on Linux systems, however we can use it through Wine.
 
 Install wine64:
 ```
 sudo apt install wine64 p7zip-full
 ```
 
-Create wineprefix:
+Create wine prefix:
 ```
 wget -qO- https://raw.githubusercontent.com/MonoGame/MonoGame/develop/Tools/MonoGame.Effect.Compiler/mgfxc_wine_setup.sh | bash
 ```

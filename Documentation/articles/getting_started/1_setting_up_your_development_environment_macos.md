@@ -16,10 +16,10 @@ Open up Visual Studio for Mac and you should be able to see a window like so:
 In the menu bar, click on **Visual Studio**, and then click on the **Extensions...** menu item.
 ![ ](~/images/getting_started/vsmac-mg-install-2.png)
 
-Next, click on the **Install from file...** button in the bottom left and select the .mpack file we downloaded in the previous step.
+Next, click on the **Install from file...** button in the bottom left and select the extension file we downloaded in the previous step.
 ![ ](~/images/getting_started/vsmac-mg-install-3.png)
 
-And finally click on the Install buton once again.
+And finally click on the Install button once again.
 ![ ](~/images/getting_started/vsmac-mg-install-4.png)
 
 ## [Optional] Install MonoGame templates for .NET Core CLI or Rider IDE
@@ -41,7 +41,7 @@ mgcb-editor --register
 
 ## [Optional] Set up Wine for effect compilation
 
-Effect compilation requires access to some DirectX compiler stuff so it can't nativly work on macOS systems, however we can use it through Wine.
+Effect compilation requires access to some DirectX compiler stuff so it can't natively work on macOS systems, however we can use it through Wine.
 
 Install brew
 ```
@@ -55,7 +55,7 @@ brew cask install wine-stable
 brew install p7zip
 ```
 
-Create wineprefix:
+Create wine prefix:
 ```
 wget -qO- https://raw.githubusercontent.com/MonoGame/MonoGame/develop/Tools/MonoGame.Effect.Compiler/mgfxc_wine_setup.sh | bash
 ```
