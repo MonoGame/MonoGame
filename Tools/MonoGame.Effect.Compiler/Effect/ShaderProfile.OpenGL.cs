@@ -12,6 +12,8 @@ namespace MonoGame.Effect
 {
     class OpenGLShaderProfile : ShaderProfile
     {
+        const bool UseMojo = false;
+
         private static readonly Regex GlslPixelShaderRegex = new Regex(@"^ps_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
         private static readonly Regex GlslVertexShaderRegex = new Regex(@"^vs_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
 
@@ -23,7 +25,23 @@ namespace MonoGame.Effect
         internal override void AddMacros(Dictionary<string, string> macros)
         {
             macros.Add("GLSL", "1");
-            macros.Add("OPENGL", "1");                
+            macros.Add("OPENGL", "1");
+
+            if(!UseMojo)
+                macros.Add("SM4", "1");
+        }
+
+        internal override Regex GetShaderModelRegex(ShaderStage stage)
+        {
+            switch (stage)
+            {
+                case ShaderStage.VertexShader:
+                    return GlslVertexShaderRegex;
+                case ShaderStage.PixelShader:
+                    return GlslPixelShaderRegex;
+                default:
+                    throw new Exception("GetShaderModelRegex: Unknown shader stage");
+            }
         }
 
         internal override void ValidateShaderModels(PassInfo pass)
@@ -47,22 +65,43 @@ namespace MonoGame.Effect
 
         internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ShaderStage shaderStage, EffectObject effect, ref string errorsAndWarnings)
         {
-            // For now GLSL is only supported via translation
-            // using MojoShader which works from HLSL bytecode.
-            var bytecode = EffectObject.CompileHLSL(shaderResult, shaderFunction, shaderProfile, ref errorsAndWarnings);
-
-            // First look to see if we already created this same shader.
-            foreach (var shader in effect.Shaders)
+            if (UseMojo)
             {
-                if (bytecode.SequenceEqual(shader.Bytecode))
-                    return shader;
+                // For now GLSL is only supported via translation
+                // using MojoShader which works from HLSL bytecode.
+                var bytecode = EffectObject.CompileHLSL(shaderResult, shaderFunction, shaderProfile, ref errorsAndWarnings);
+
+                // First look to see if we already created this same shader.
+                foreach (var shader in effect.Shaders)
+                {
+                    if (bytecode.SequenceEqual(shader.Bytecode))
+                        return shader;
+                }
+
+                var shaderInfo = shaderResult.ShaderInfo;
+                var shaderData = ShaderData.CreateGLSLMojo(bytecode, shaderStage, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);
+                effect.Shaders.Add(shaderData);
+
+                return shaderData;
             }
+            else
+            {
+                ParseShaderModel(shaderProfile, GetShaderModelRegex(shaderStage), out int smMajor, out int smMinor);
 
-            var shaderInfo = shaderResult.ShaderInfo;
-            var shaderData = ShaderData.CreateGLSL(bytecode, shaderStage, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);
-            effect.Shaders.Add(shaderData);
+                var shaderInfo = shaderResult.ShaderInfo;
+                var sourceCode = shaderResult.FileContent;
+                var shaderData = ShaderData.CreateGLSL(sourceCode, shaderFunction, shaderStage, smMajor, smMinor, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);
 
-            return shaderData;
+                // See if we already created this same shader.
+                foreach (var shader in effect.Shaders)
+                {
+                    if (shaderData.ShaderCode.SequenceEqual(shader.ShaderCode))
+                        return shader;
+                }
+
+                effect.Shaders.Add(shaderData);
+                return shaderData;
+            }
         }
     }
 }

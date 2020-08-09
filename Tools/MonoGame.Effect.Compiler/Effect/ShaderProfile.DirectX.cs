@@ -29,6 +29,25 @@ namespace MonoGame.Effect
             macros.Add("SM4", "1");
         }
 
+        internal override Regex GetShaderModelRegex(ShaderStage stage)
+        {
+            switch (stage)
+            {
+                case ShaderStage.VertexShader:
+                    return HlslVertexShaderRegex;
+                case ShaderStage.PixelShader:
+                    return HlslPixelShaderRegex;
+                case ShaderStage.HullShader:
+                    return HlslHullShaderRegex;
+                case ShaderStage.DomainShader:
+                    return HlslDomainShaderRegex;
+                case ShaderStage.GeometryShader:
+                    return HlslGeometryShaderRegex;
+                default:
+                    throw new Exception("GetShaderModelRegex: Unknown shader stage");
+            }
+        }
+
         internal override void ValidateShaderModels(PassInfo pass)
         {
             int major, minor;
