@@ -38,7 +38,7 @@ To create new projects from within Visual Studio, you will need to install the V
 
 Once open, simply search for **MonoGame** in the top right search window (as shown above) and install the "MonoGame project templates".  You now have the MonoGame templates installed ready to create new projects.
 
-## [Optional] Install MonoGame templates for .NET Core CLI, VSCode or Rider IDE
+## [Optional] Install MonoGame templates for .NET Core CLI or Rider IDE
 
 ```sh
 dotnet new --install MonoGame.Templates.CSharp
@@ -48,7 +48,7 @@ dotnet new --install MonoGame.Templates.CSharp
 
 MGCB Editor is a tool for editing the .mgcb files, which are used for building the content.
 
-If you plan on using Visual Studio for Mac, the extension we installed already contains an integrated version of this tool so you can skip this step.
+To register the MGCB Editor tool with Windows and Visual Studio 2019, run the following from the Command-Prompt.
 
 ```sh
 dotnet tool install --global dotnet-mgcb-editor
