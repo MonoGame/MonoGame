@@ -30,7 +30,7 @@ ColorPair ComputeLights(float3 eyeVector, float3 worldNormal, uniform int numLig
         halfVectors[i] = normalize(eyeVector - lightDirections[i]);
     }
 
-    float3 dotL = mul(-lightDirections, worldNormal);
+    float3 dotL = mul(lightDirections*-1, worldNormal);
     float3 dotH = mul(halfVectors, worldNormal);
     
     float3 zeroL = step(float3(0,0,0), dotL);
