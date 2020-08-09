@@ -30,7 +30,7 @@ MonoGame provides additional templates for shared game logic and extensions to t
 - [Shared Project](#shared-project)
 - [Content Pipeline Extension](#content-pipeline-extension)
 
-## Platforms
+## Platform details
 
 ### WindowsDX
 

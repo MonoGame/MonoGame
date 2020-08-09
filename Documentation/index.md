@@ -16,17 +16,16 @@ MonoGame is a simple and powerful .NET library for creating games for desktop PC
 
 Based on [Microsoft's XNA Framework](https://msdn.microsoft.com/en-us/library/bb200104.aspx) it provides the following features:
 
-  - Game framework
-  - 2D and 3D rendering
-  - Sound effect and music playback
-  - Keyboard, mouse, touch, and controller inputs
-  - Content building and optimization
-  - Math library optimized for games
+- Game framework
+- 2D and 3D rendering
+- Sound effect and music playback
+- Keyboard, mouse, touch, and controller inputs
+- Content building and optimization
+- Math library optimized for games
 
 This documentation helps you getting started, provides overviews of key features and tools, and the complete API reference.
 
 Please use the links at the top and left to navigate the documentation sections.
-
 
 ## We Need Your Help!
 

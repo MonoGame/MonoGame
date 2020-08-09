@@ -8,7 +8,7 @@
     href: 1_setting_up_your_development_environment_ubuntu.md
 - name: Creating a new project
   items:
-  - name: Visual Studio
+  - name: Visual Studio 2019
     href: 2_creating_a_new_project_vs.md
   - name: Visual Studio for Mac
     href: 2_creating_a_new_project_vsm.md

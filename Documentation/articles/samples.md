@@ -1,6 +1,6 @@
 # Samples & Demos
 
-The samples and dmeos below are recommened for learning how to use MonoGame.
+The samples and demos below are recommend for learning how to use MonoGame.
 
 ## Official MonoGame Samples
 
@@ -23,6 +23,8 @@ There are pre-converted samples available on the repository as well.
 ## CartBlanche's Samples
 
 This is a [large library of MonoGame samples](https://github.com/CartBlanche/MonoGame-Samples) covering a large range of topics, including:
+
+> Will require MonoGame 3.7 or earlier installed to open.
 
 - Physics
 - P2P Networking
