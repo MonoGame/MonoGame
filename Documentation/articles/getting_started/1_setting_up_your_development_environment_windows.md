@@ -2,8 +2,6 @@
 
 This guide will walk you through building a starter game with MonoGame using a Windows and Visual Studio 2019.
 
-> Note, Please check the [migration guide](~/articles/migrate38.md) for any projects still based on MonoGame 3.7 or below.
-
 ## Install Visual Studio 2019
 
 You will need a copy of [Visual Studio 2019](https://www.monogame.net/downloads/) or later installed (any edition, including Community) before installing MonoGame, with the following components (depending on your target platform):
