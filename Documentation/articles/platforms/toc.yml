@@ -1,5 +1,5 @@
 - name: Supported Platforms
-  href: supported_platforms.md
+  href: 0_platforms.md
 - name: Android
   href: android.md
 - name: UWP
