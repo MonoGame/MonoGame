@@ -128,6 +128,7 @@ namespace MonoGame.OpenGL
     {
         ArrayBuffer = 0x8892,
         ElementArrayBuffer = 0x8893,
+        UniformBuffer = 0x8A11,
     }
 
     internal enum RenderbufferTarget
@@ -739,6 +740,12 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
+        internal delegate void BindBufferBaseDelegate(BufferTarget target, int index, int buffer);
+        internal static BindBufferBaseDelegate BindBufferBase;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
         internal delegate void DrawElementsDelegate(GLPrimitiveType primitiveType, int count, DrawElementsType elementType, IntPtr offset);
         internal static DrawElementsDelegate DrawElements;
 
@@ -971,6 +978,12 @@ namespace MonoGame.OpenGL
         internal delegate int GetUniformLocationDelegate(int programId, string name);
         internal static GetUniformLocationDelegate GetUniformLocation;
 
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
+        internal delegate int GetUniformBlockIndexDelegate(int programId, string name);
+        internal static GetUniformBlockIndexDelegate GetUniformBlockIndex;
+        
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
@@ -1298,6 +1311,7 @@ namespace MonoGame.OpenGL
             PolygonOffset = LoadFunction<PolygonOffsetDelegate> ("glPolygonOffset");
 
             BindBuffer = LoadFunction<BindBufferDelegate> ("glBindBuffer");
+            BindBufferBase = LoadFunction<BindBufferBaseDelegate>("glBindBufferBase");
             DrawBuffers = LoadFunction<DrawBuffersDelegate> ("glDrawBuffers");
             DrawElements = LoadFunction<DrawElementsDelegate> ("glDrawElements");
             DrawArrays = LoadFunction<DrawArraysDelegate> ("glDrawArrays");
@@ -1344,6 +1358,7 @@ namespace MonoGame.OpenGL
             DeleteShader = LoadFunction<DeleteShaderDelegate> ("glDeleteShader");
             GetAttribLocation = LoadFunction<GetAttribLocationDelegate> ("glGetAttribLocation");
             GetUniformLocation = LoadFunction<GetUniformLocationDelegate> ("glGetUniformLocation");
+            GetUniformBlockIndex = LoadFunction<GetUniformBlockIndexDelegate>("glGetUniformBlockIndex");
 
             IsProgram = LoadFunction<IsProgramDelegate> ("glIsProgram");
             DeleteProgram = LoadFunction<DeleteProgramDelegate> ("glDeleteProgram");

@@ -10,32 +10,25 @@ namespace Microsoft.Xna.Framework.Graphics
     internal partial class ConstantBuffer
     {
         private ShaderProgram _shaderProgram = null;
-        private int _location;
+        private int _glBuffer = -1;
 
         static ConstantBuffer _lastConstantBufferApplied = null;
 
-        /// <summary>
-        /// A hash value which can be used to compare constant buffers.
-        /// </summary>
-        internal int HashKey { get; private set; }
-
         private void PlatformInitialize()
         {
-            var data = new byte[_parameters.Length];
-            for (var i = 0; i < _parameters.Length; i++)
-            {
-                unchecked
-                {
-                    data[i] = (byte)(_parameters[i] | _offsets[i]);
-                }
-            }
-
-            HashKey = MonoGame.Utilities.Hash.ComputeHash(data);
+            GL.GenBuffers(1, out _glBuffer);
+            GraphicsExtensions.CheckGLError();
         }
 
         private void PlatformClear()
         {
-            // Force the uniform location to be looked up again
+            if (_glBuffer >= 0)
+            {
+                GL.DeleteBuffers(1, ref _glBuffer);
+                GraphicsExtensions.CheckGLError();
+            }
+
+            _glBuffer = -1;
             _shaderProgram = null;
         }
 
@@ -44,16 +37,10 @@ namespace Microsoft.Xna.Framework.Graphics
             // NOTE: We assume here the program has 
             // already been set on the device.
 
-            // If the program changed then lookup the
-            // uniform again and apply the state.
+            // If the program changed then apply the state.
             if (_shaderProgram != program)
             {
-                var location = program.GetUniformLocation(_name);
-                if (location == -1)
-                    return;
-
                 _shaderProgram = program;
-                _location = location;
                 _dirty = true;
             }
 
@@ -66,13 +53,21 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!_dirty)
                 return;
 
-            fixed (byte* bytePtr = _buffer)
-            {
-                // TODO: We need to know the type of buffer float/int/bool
-                // and cast this correctly... else it doesn't work as i guess
-                // GL is checking the type of the uniform.
+            int uniformBlockIndex = GL.GetUniformBlockIndex(program.Program, _name);
+            GraphicsExtensions.CheckGLError();
 
-                GL.Uniform4(_location, _buffer.Length / 16, (float*)bytePtr);
+            if (uniformBlockIndex >= 0)
+            {
+                GL.BindBuffer(BufferTarget.UniformBuffer, _glBuffer);
+                GraphicsExtensions.CheckGLError();
+
+                fixed (byte* bytePtr = _buffer)
+                {
+                    GL.BufferData(BufferTarget.UniformBuffer, (IntPtr)_buffer.Length, (IntPtr)bytePtr, BufferUsageHint.StreamDraw);
+                    GraphicsExtensions.CheckGLError();
+                }
+
+                GL.BindBufferBase(BufferTarget.UniformBuffer, uniformBlockIndex, _glBuffer);
                 GraphicsExtensions.CheckGLError();
             }
 
@@ -80,6 +75,14 @@ namespace Microsoft.Xna.Framework.Graphics
             _dirty = false;
 
             _lastConstantBufferApplied = this;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                PlatformClear();
+
+            base.Dispose(disposing);
         }
     }
 }
