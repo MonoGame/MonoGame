@@ -2,7 +2,7 @@
 
 This tutorial will go over the code that is getting created when you start a blank project.
 
-> For help on creating a project please look at the Creating a New Project of the [Getting Started guide](0_welcome.md).
+> For help on creating a project please look at the Creating a New Project of the [Getting Started guide](0_getting_started.md).
 
 Within the Game.cs class file, which is the core of any MonoGame project, you will find several critical sections necessary for your game to run, namely:
 

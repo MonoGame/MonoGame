@@ -14,7 +14,7 @@ By the end of this tutorial set, you will have a working project to start buildi
 
 ## Creating a new project
 
-- [Visual Studio](2_creating_a_new_project_vs.md)
+- [Visual Studio 2019](2_creating_a_new_project_vs.md)
 - [Visual Studio for Mac](2_creating_a_new_project_vsm.md)
 - [DotNet core CLI](2_creating_a_new_project_netcore.md)
 
