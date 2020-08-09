@@ -14,7 +14,7 @@ We now support [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/introduc
 
 ## NuGet Distribution
 
-With this release MonoGame has moved away from transitional installers and has opted for using [NuGet](https://www.nuget.org/profiles/MonoGame) for all distribution of assemblies and tools.  This also includes the new Visual Studio templates which are a VS extension.
+With this release MonoGame has moved away from traditional installers and has opted for using [NuGet](https://www.nuget.org/profiles/MonoGame) for all distribution of assemblies and tools.  This also includes the new Visual Studio templates which are a VS extension.
 
 ## SDK-Style Projects in the repository
 
