@@ -1,3 +1,8 @@
+---
+uid: index.md
+title: Introduction
+---
+
 <p align="center">
 <br/>
   <img src="https://raw.githubusercontent.com/Mono-Game/MonoGame.Logo/master/FullColorOnLight/HorizontalLogo_128px.png"/>
