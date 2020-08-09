@@ -7,10 +7,10 @@ The MonoGame 3.8 release marks some big changes in how we build and distribute.
 ## .NET Core Support
 We now support [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/introduction) in addition to .NET 4.5 target frameworks.  This brings us up to date with the latest improvements in the .NET ecosystem and allow for exciting new features like XXXX and XXXX.
 
-## Removed Protobuild
+## SDK-Style Projects
 [Protobuild](https://github.com/Protobuild/Protobuild) served us well in helping avoid manual syncronzation of all our different platform projects.  With the new [SDK-style projects](https://docs.microsoft.com/en-us/dotnet/core/project-sdk/overview#project-files) supported in .NET Core, VS2017, and VS2019 we can now easily maintain the projects and solutions in the repo.
 
-## Removed Installers
+## NuGet Distribution
 With this release MonoGame has moved away from tranditional installers and has opted for using [NuGet](https://www.nuget.org/profiles/MonoGame) for all distribution of assemblies and tools.  This also includes the new Visual Studio templates which are a VS extension.
 
 ## Removed Portable Assemblies
