@@ -2,7 +2,8 @@
 
 The MonoGame 3.8 release marks some big changes in how we build and distribute.
 
-> Refer to the [Changelog](../../CHANGELOG.md) for a more complete list of changes.
+> [!NOTE]
+> <Refer to the [Changelog](../../CHANGELOG.md) for a more complete list of changes.>
 
 ## .NET Core Support
 We now support [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/introduction) in addition to .NET 4.5 target frameworks.  This brings us up to date with the latest improvements in the .NET ecosystem and allow for exciting new features like XXXX and XXXX.
