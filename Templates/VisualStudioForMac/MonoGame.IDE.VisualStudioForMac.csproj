@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="MonoDevelop.Addins" Version="0.4.7" />
     <PackageReference Include="Eto.Forms" Version="2.5.3" />
+    <PackageReference Include="Eto.Platform.Gtk2" Version="2.5.3" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Templates\" />
@@ -192,11 +193,6 @@
     <Compile Update="..\..\Tools\MonoGame.Content.Builder.Editor\Platform\Mac\Global.Mac.cs">
       <Link>Global.Mac.cs</Link>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Eto.XamMac2">
-      <HintPath>..\..\ThirdParty\Dependencies\Eto\Eto.XamMac2.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Target Name="_GenerateAddinInfo" BeforeTargets="CoreCompile">
      <PropertyGroup>

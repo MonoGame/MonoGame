@@ -311,6 +311,7 @@ namespace MonoGame.Tools.Pipeline
         {
 #if IDE
             info.RebuildItem = false;
+            info.OpenItemWith = false;
 #endif
 
             // Title
@@ -579,12 +580,17 @@ namespace MonoGame.Tools.Pipeline
             adialog.Show(this);
         }
 
-        private void CmdOpenItem_Executed(object sender, EventArgs e)
+        public void CmdOpenItem_Executed(object sender, EventArgs e)
         {
             if (PipelineController.Instance.SelectedItem is ContentItem)
             {
                 var filePath = PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath);
+
+#if IDE
+                MonoDevelop.Ide.IdeApp.Workbench.OpenDocument(filePath, MonoDevelop.Ide.Gui.OpenDocumentOptions.Default);
+#else
                 Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+#endif
             }
         }
 

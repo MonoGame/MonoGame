@@ -64,7 +64,7 @@ namespace MonoGame.Tools.Pipeline
         public virtual void Draw(Graphics g, Rectangle rec, int separatorPos, bool selected)
         {
             if (selected)
-                g.FillRectangle(SystemColors.Highlight, rec);
+                g.FillRectangle(DrawInfo.HoverBackColor, rec);
 
             g.DrawText(DrawInfo.TextFont, DrawInfo.GetTextColor(selected, false), rec.X + 5, rec.Y + (rec.Height - Height) / 2, Text);
             g.FillRectangle(DrawInfo.GetBackgroundColor(selected), separatorPos - 6, rec.Y, rec.Width, rec.Height);
