@@ -2,8 +2,6 @@
 
 There is a wealth of [community created content, blogs and tutorials](tutorials.md) available.
 
-> If you have a blog or article on MonoGame and wish to have it recognized here, reach out to the MonoGame team using the support links above.
-
 If you want to find an answer to a more specific problem, you can ask it on our [community site](https://community.monogame.net/).
 
 You can also chat to other MonoGame users via [Gitter](https://gitter.im/MonoGame/MonoGame) or [Discord](https://discord.gg/xCehJFD) using the links below
