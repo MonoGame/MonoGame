@@ -115,6 +115,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
+                SoundEffect.Initialize();                
                 if (_allMicrophones == null)
                     _allMicrophones = new List<Microphone>();
                 return new ReadOnlyCollection<Microphone>(_allMicrophones);
@@ -128,7 +129,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         public static Microphone Default
         {
-            get { return _default; }
+            get { SoundEffect.Initialize(); return _default; }
         }       
 
         #endregion

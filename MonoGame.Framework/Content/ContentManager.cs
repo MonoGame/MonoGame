@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 
@@ -25,14 +25,14 @@ namespace Microsoft.Xna.Framework.Content
 
 		private string _rootDirectory = string.Empty;
 		private IServiceProvider serviceProvider;
-		private IGraphicsDeviceService graphicsDeviceService;
         private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
-        private byte[] scratchBuffer;
 
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
+
+        internal static readonly ByteBufferPool ScratchBufferPool = new ByteBufferPool(1024 * 1024, Environment.ProcessorCount);
 
         private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
@@ -51,6 +51,8 @@ namespace Microsoft.Xna.Framework.Content
             'v', // PSVita
             'O', // XboxOne
             'S', // Nintendo Switch
+            'G', // Google Stadia
+            'b', // WebAssembly and Bridge.NET
 
             // NOTE: There are additional idenfiers for consoles that 
             // are not defined in this repository.  Be sure to ask the
@@ -191,7 +193,6 @@ namespace Microsoft.Xna.Framework.Content
                     Unload();
                 }
 
-                scratchBuffer = null;
 				disposed = true;
 			}
 		}
@@ -314,15 +315,6 @@ namespace Microsoft.Xna.Framework.Content
 			string originalAssetName = assetName;
 			object result = null;
 
-			if (this.graphicsDeviceService == null)
-			{
-				this.graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-				if (this.graphicsDeviceService == null)
-				{
-					throw new InvalidOperationException("No Graphics Device Service");
-				}
-			}
-			
             // Try to load as XNB file
             var stream = OpenStream(assetName);
             using (var xnbReader = new BinaryReader(stream))
@@ -389,7 +381,7 @@ namespace Microsoft.Xna.Framework.Content
                 decompressedStream = stream;
             }
 
-            var reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
+            var reader = new ContentReader(this, decompressedStream,
                                                         originalAssetName, version, recordDisposableObject);
             
             return reader;
@@ -438,15 +430,6 @@ namespace Microsoft.Xna.Framework.Content
 			if (disposed)
 			{
 				throw new ObjectDisposedException("ContentManager");
-			}
-
-			if (this.graphicsDeviceService == null)
-			{
-				this.graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-				if (this.graphicsDeviceService == null)
-				{
-					throw new InvalidOperationException("No Graphics Device Service");
-				}
 			}
 
             var stream = OpenStream(assetName);
@@ -498,13 +481,5 @@ namespace Microsoft.Xna.Framework.Content
 				return this.serviceProvider;
 			}
 		}
-
-        internal byte[] GetScratchBuffer(int size)
-        {            
-            size = Math.Max(size, 1024 * 1024);
-            if (scratchBuffer == null || scratchBuffer.Length < size)
-                scratchBuffer = new byte[size];
-            return scratchBuffer;
-        }
-	}
+    }
 }

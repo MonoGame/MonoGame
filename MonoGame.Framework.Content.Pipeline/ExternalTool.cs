@@ -6,7 +6,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -124,6 +124,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             if (File.Exists(command))
                 return command;
 
+            // For Linux check specific subfolder
+            var lincom = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "linux", command);
+            if (CurrentPlatform.OS == OS.Linux && File.Exists(lincom))
+                return lincom;
+
+            // For Mac check specific subfolder
+            var maccom = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "osx", command);
+            if (CurrentPlatform.OS == OS.MacOSX && File.Exists(maccom))
+                return maccom;
+
             // We don't have a full path, so try running through the system path to find it.
             var paths = AppDomain.CurrentDomain.BaseDirectory +
                 Path.PathSeparator +
@@ -155,14 +165,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="path">The full path to the executable.</param> 
         private static void EnsureExecutable(string path)
         {
-#if LINUX || MACOS
-            if (path == "/bin/bash")
+            if (!path.StartsWith("/home") && !path.StartsWith("/Users"))
                 return;
 
             try
             {
-
-                var p = Process.Start("chmod", "u+x '" + path + "'");
+                var p = Process.Start("chmod", "u+x \"" + path + "\"");
                 p.WaitForExit();
             }
             catch
@@ -170,7 +178,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // This platform may not have chmod in the path, in which case we can't 
                 // do anything reasonable here. 
             }
-#endif
         }
 
         /// <summary>

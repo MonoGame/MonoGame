@@ -38,7 +38,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             this.packedValue = HalfTypeHelper.Convert(vector.X);
         }
 
-        Vector4 IPackedVector.ToVector4()
+        /// <summary>
+        /// Gets the packed vector in Vector4 format.
+        /// </summary>
+        /// <returns>The packed vector in Vector4 format</returns>
+        public Vector4 ToVector4()
         {
             return new Vector4(this.ToSingle(), 0f, 0f, 1f);
         }

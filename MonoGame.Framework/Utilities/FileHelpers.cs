@@ -5,8 +5,9 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
-namespace MonoGame.Utilities
+namespace MonoGame.Framework.Utilities
 {
     internal static class FileHelpers
     {
@@ -41,6 +42,11 @@ namespace MonoGame.Utilities
         {
             // Uri accepts forward slashes
             filePath = filePath.Replace(BackwardSlash, ForwardSlash);
+            relativeFile = relativeFile.Replace(BackwardSlash, ForwardSlash);
+
+            // Sanitize the path of double slashes, they confuse Uri
+            while (filePath.Contains("//"))
+                filePath = filePath.Replace("//", "/");
 
             bool hasForwardSlash = filePath.StartsWith(ForwardSlashString);
             if (!hasForwardSlash)
@@ -50,7 +56,6 @@ namespace MonoGame.Utilities
             var src = new Uri("file://" + UrlEncode(filePath));
 
             var dst = new Uri(src, UrlEncode(relativeFile));
-
             // The uri now contains the path to the relativeFile with 
             // relative addresses resolved... get the local path.
             var localPath = dst.LocalPath;
@@ -60,10 +65,10 @@ namespace MonoGame.Utilities
 
             // Convert the directory separator characters to the 
             // correct platform specific separator.
-            return NormalizeFilePathSeparators(localPath);
+            return TrimPath(NormalizeFilePathSeparators(localPath));
         }
 
-        private static string UrlEncode(string url)
+        internal static string UrlEncode(string url)
         {
             var encoder = new UTF8Encoding();
             var safeline = new StringBuilder(encoder.GetByteCount(url) * 3);
@@ -85,6 +90,25 @@ namespace MonoGame.Utilities
             }
 
             return safeline.ToString();
+        }
+
+        private static string TrimPath(string filePath)
+        {
+            // Remove . in filePath
+
+            while (filePath.Contains("/./"))
+                filePath = filePath.Replace("/./", "/");
+
+            while (filePath.Contains(@"\.\"))
+                filePath = filePath.Replace(@"\.\", @"\");
+
+            filePath = Regex.Replace(filePath, @"^\.(\/|\\)", string.Empty);
+
+            // Remove .. in filePath
+
+            filePath = Regex.Replace(filePath, @"[^\/\\]+(\/|\\)\.\.(\/|\\)", string.Empty);
+
+            return filePath;
         }
     }
 }

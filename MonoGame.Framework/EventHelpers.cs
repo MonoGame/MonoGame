@@ -22,7 +22,6 @@ namespace Microsoft.Xna.Framework
         /// <param name="handler"><see cref="EventHandler{TEventArgs}"/> to be invoked</param>
         /// <param name="e">The <typeparamref name="TEventArgs"/> passed to <see cref="EventHandler{TEventArgs}"/></param>
         internal static void Raise<TEventArgs>(object sender, EventHandler<TEventArgs> handler, TEventArgs e)
-            where TEventArgs : EventArgs
         {
             if (handler != null)
                 handler(sender, e);

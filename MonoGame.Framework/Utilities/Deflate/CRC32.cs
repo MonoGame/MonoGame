@@ -28,7 +28,7 @@
 
 using System;
 
-namespace MonoGame.Utilities.Deflate
+namespace MonoGame.Framework.Utilities.Deflate
 {
     /// <summary>
     ///   Computes a CRC-32. The CRC-32 algorithm is parameterized - you
@@ -490,7 +490,7 @@ namespace MonoGame.Utilities.Deflate
     /// DotNetZip library.
     /// </para>
     /// </remarks>
-    public class CrcCalculatorStream : System.IO.Stream, System.IDisposable
+    public class CrcCalculatorStream : System.IO.Stream
     {
         private static readonly Int64 UnsetLengthLimit = -99;
 
@@ -653,7 +653,7 @@ namespace MonoGame.Utilities.Deflate
         /// </summary>
         /// <remarks>
         ///   <para>
-        ///     Set this at any point before calling <see cref="Close()"/>.
+        ///     Set this at any point before calling Close()/>.
         ///   </para>
         /// </remarks>
         public bool LeaveOpen
@@ -787,22 +787,17 @@ namespace MonoGame.Utilities.Deflate
             throw new NotSupportedException();
         }
 
-
-        void IDisposable.Dispose()
-        {
-            Close();
-        }
-
         /// <summary>
         /// Closes the stream.
         /// </summary>
-        public override void Close()
+        protected override void Dispose(bool disposing)
         {
-            base.Close();
-            if (!_leaveOpen)
-                _innerStream.Close();
+            if (disposing)
+            {
+                if (!_leaveOpen)
+                    _innerStream.Dispose();
+            }
         }
-
     }
 
 }

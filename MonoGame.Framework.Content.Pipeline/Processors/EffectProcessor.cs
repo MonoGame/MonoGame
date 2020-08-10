@@ -3,13 +3,12 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
-#if WINDOWS
-using TwoMGFX;
-#endif
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -50,115 +49,62 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <remarks>If you get an error during processing, compilation stops immediately. The effect processor displays an error message. Once you fix the current error, it is possible you may get more errors on subsequent compilation attempts.</remarks>
         public override CompiledEffectContent Process(EffectContent input, ContentProcessorContext context)
         {
-#if WINDOWS
-            var options = new Options();
-            options.SourceFile = input.Identity.SourceFilename;
+            var mgfxc = Path.Combine(Path.GetDirectoryName(typeof(EffectProcessor).Assembly.Location), "mgfxc.dll");
+            var sourceFile = input.Identity.SourceFilename;
+            var destFile = Path.GetTempFileName();
+            var arguments = "\"" + mgfxc + "\" \"" + sourceFile + "\" \"" + destFile + "\" /Profile:" + GetProfileForPlatform(context.TargetPlatform);
 
-            options.Profile = ShaderProfile.ForPlatform(context.TargetPlatform.ToString());
-            if (options.Profile == null)
-                throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
+            if (debugMode == EffectProcessorDebugMode.Debug)
+                arguments += " /Debug";
 
-            options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
-            options.Defines = Defines;
-            options.OutputFile = context.OutputFilename;
+            if (!string.IsNullOrWhiteSpace(defines))
+                arguments += " \"/Defines:" + defines + "\"";
 
-            // Parse the MGFX file expanding includes, macros, and returning the techniques.
-            ShaderResult shaderResult;
-            try
+            string stdout, stderr;
+
+            var success = ExternalTool.Run("dotnet", arguments, out stdout, out stderr) == 0;
+            var ret = success ? new CompiledEffectContent(File.ReadAllBytes(destFile)) : null;
+
+            File.Delete(destFile);
+
+            var stdOutLines = stdout.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            foreach (var line in stdOutLines)
             {
-                shaderResult = ShaderResult.FromFile(options.SourceFile, options, 
-                    new ContentPipelineEffectCompilerOutput(context));
-
-                // Add the include dependencies so that if they change
-                // it will trigger a rebuild of this effect.
-                foreach (var dep in shaderResult.Dependencies)
-                    context.AddDependency(dep);
-            }
-            catch (InvalidContentException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                // TODO: Extract good line numbers from mgfx parser!
-                throw new InvalidContentException(ex.Message, input.Identity, ex);
-            }
-
-            // Create the effect object.
-            EffectObject effect = null;
-            var shaderErrorsAndWarnings = string.Empty;
-            try
-            {
-                effect = EffectObject.CompileEffect(shaderResult, out shaderErrorsAndWarnings);
-
-                // If there were any additional output files we register
-                // them so that the cleanup process can manage them.
-                foreach (var outfile in shaderResult.AdditionalOutputFiles)
-                    context.AddOutputFile(outfile);
-            }
-            catch (ShaderCompilerException)
-            {
-                // This will log any warnings and errors and throw.
-                ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input, context);
-            }
-
-            // Process any warning messages that the shader compiler might have produced.
-            ProcessErrorsAndWarnings(false, shaderErrorsAndWarnings, input, context);
-
-            // Write out the effect to a runtime format.
-            CompiledEffectContent result;
-            try
-            {
-                using (var stream = new MemoryStream())
+                if (line.StartsWith("Dependency:") && line.Length > 12)
                 {
-                    using (var writer = new BinaryWriter(stream))
-                        effect.Write(writer, options);
-
-                    result = new CompiledEffectContent(stream.GetBuffer());
+                    context.AddDependency(line.Substring(12));
                 }
             }
-            catch (Exception ex)
-            {
-                throw new InvalidContentException("Failed to serialize the effect!", input.Identity, ex);
-            }
 
-            return result;
-#else
-            throw new NotImplementedException();
-#endif
+            ProcessErrorsAndWarnings(!success, stderr, input, context);
+
+            return ret;
         }
 
-#if WINDOWS
-        private class ContentPipelineEffectCompilerOutput : IEffectCompilerOutput
+        private string GetProfileForPlatform(TargetPlatform platform)
         {
-            private readonly ContentProcessorContext _context;
-
-            public ContentPipelineEffectCompilerOutput(ContentProcessorContext context)
+            switch (platform)
             {
-                _context = context;
+                case TargetPlatform.Windows:
+                case TargetPlatform.WindowsPhone8:
+                case TargetPlatform.WindowsStoreApp:
+                    return "DirectX_11";
+                case TargetPlatform.iOS:
+                case TargetPlatform.Android:
+                case TargetPlatform.DesktopGL:
+                case TargetPlatform.MacOSX:
+                case TargetPlatform.RaspberryPi:
+                case TargetPlatform.Web:
+                    return "OpenGL";
             }
 
-            public void WriteWarning(string file, int line, int column, string message)
-            {
-                _context.Logger.LogWarning(null, CreateContentIdentity(file, line, column), message);
-            }
-
-            public void WriteError(string file, int line, int column, string message)
-            {
-                throw new InvalidContentException(message, CreateContentIdentity(file, line, column));
-            }
-
-            private static ContentIdentity CreateContentIdentity(string file, int line, int column)
-            {
-                return new ContentIdentity(file, null, line + "," + column);
-            }
+            return platform.ToString();
         }
-#endif
 
         private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
         {
             // Split the errors and warnings into individual lines.
-            var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] {"\n", "\r", Environment.NewLine},
+            var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] { "\n", "\r", Environment.NewLine },
                                                                       StringSplitOptions.RemoveEmptyEntries);
 
             var errorOrWarning = new Regex(@"(.*)\(([0-9]*(,[0-9]+(-[0-9]+)?)?)\)\s*:\s*(.*)", RegexOptions.Compiled);
@@ -176,7 +122,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
                     else
                         context.Logger.LogWarning(string.Empty, input.Identity, errorsAndWarningArray[i]);
-                        
+
                     continue;
                 }
 

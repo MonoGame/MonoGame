@@ -62,7 +62,7 @@
 
 
 using System;
-namespace MonoGame.Utilities.Deflate
+namespace MonoGame.Framework.Utilities.Deflate
 {
         
         sealed class InfTree

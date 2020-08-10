@@ -1,0 +1,18 @@
+<Project>
+
+  <Import Project="..\MonoGame.props" />
+
+  <PropertyGroup>
+    <MonoGamePlatform>$(MSBuildProjectName.Substring(19))</MonoGamePlatform>
+    <BaseIntermediateOutputPath>obj\$(MonoGamePlatform)</BaseIntermediateOutputPath>
+    <BaseOutputPath>..\Artifacts\MonoGame.Framework\$(MonoGamePlatform)</BaseOutputPath>
+    <AssemblyName>MonoGame.Framework</AssemblyName>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <LangVersion>5</LangVersion>
+  </PropertyGroup>
+
+</Project>
+

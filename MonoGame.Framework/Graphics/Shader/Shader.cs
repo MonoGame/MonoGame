@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Attributes[a].location = reader.ReadInt16();
             }
 
-            PlatformConstruct(isVertexShader, shaderBytecode);
+            PlatformConstruct(Stage, shaderBytecode);
         }
 
         internal protected override void GraphicsDeviceResetting()

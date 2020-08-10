@@ -1,0 +1,8 @@
+- name: Using MGCB Editor
+  href: using_mgcb_editor.md
+- name: Custom Effects
+  href: custom_effects.md
+- name: TrueType fonts
+  href: adding_ttf_fonts.md
+- name: Localization
+  href: localization.md

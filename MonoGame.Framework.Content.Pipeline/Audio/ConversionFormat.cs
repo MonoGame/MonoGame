@@ -43,5 +43,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// Vorbis open, patent-free audio encoding
         /// </summary>
         Vorbis,
+
+        /// <summary>
+        /// mp3 audio format
+        /// </summary>
+        Mp3
     }
 }

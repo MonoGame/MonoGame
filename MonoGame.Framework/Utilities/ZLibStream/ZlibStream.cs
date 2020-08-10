@@ -91,7 +91,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace MonoGame.Utilities
+namespace MonoGame.Framework.Utilities
 {
 
     /// <summary>

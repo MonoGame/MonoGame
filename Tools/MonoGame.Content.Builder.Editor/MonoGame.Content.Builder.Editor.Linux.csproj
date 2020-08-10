@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Gtk</BaseOutputPath>
+    <DefineConstants>GTK</DefineConstants>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>mgcb-editor-gtk</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="**\*.glade" />
+    <EmbeddedResource Include="**\*.glade">
+      <LogicalName>%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Platform\**\*" />
+    <Compile Remove="Platform\**\*" />
+
+    <Compile Include="Platform\Linux\**\*.cs" />
+    <Compile Include="Platform\Utilities\**\*.cs" />
+
+    <Content Include="Platform\Linux\Content\**\*">
+      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Eto.Forms" Version="2.5.2" />
+    <PackageReference Include="Eto.Platform.Gtk" Version="2.5.2" />
+    <PackageReference Include="GtkSharp" Version="3.22.25.98" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20158.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
+    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
+      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Import Project="MonoGame.Content.Builder.Editor.targets" />
+
+</Project>

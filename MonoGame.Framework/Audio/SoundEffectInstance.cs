@@ -146,14 +146,18 @@ namespace Microsoft.Xna.Framework.Audio
             if (State == SoundState.Playing)
                 return;
 
+            if (State == SoundState.Paused)
+            {
+                Resume();
+                return;
+            }
+
             // We don't need to check if we're at the instance play limit
             // if we're resuming from a paused state.
             if (State != SoundState.Paused)
             {
                 if (!SoundEffectInstancePool.SoundsAvailable)
                     throw new InstancePlayLimitException();
-
-                SoundEffectInstancePool.Remove(this);
             }
             
             // For non-XAct sounds we need to be sure the latest
@@ -162,6 +166,7 @@ namespace Microsoft.Xna.Framework.Audio
                 PlatformSetVolume(_volume * SoundEffect.MasterVolume);
 
             PlatformPlay();
+            SoundEffectInstancePool.Remove(this);
         }
 
         /// <summary>Resumes playback for a SoundEffectInstance.</summary>

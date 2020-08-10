@@ -4,10 +4,13 @@
 
 using System;
 using System.IO;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
+    /// <summary>
+    /// Provides functionality for opening a stream in the title storage area.
+    /// </summary>
     public static partial class TitleContainer
     {
         static partial void PlatformInit();
@@ -21,7 +24,7 @@ namespace Microsoft.Xna.Framework
         static internal string Location { get; private set; }
 
         /// <summary>
-        /// Returns an open stream to an exsiting file in the title storage area.
+        /// Returns an open stream to an existing file in the title storage area.
         /// </summary>
         /// <param name="name">The filepath relative to the title storage area.</param>
         /// <returns>A open stream or null if the file is not found.</returns>
@@ -65,7 +68,7 @@ namespace Microsoft.Xna.Framework
 
         internal static string NormalizeRelativePath(string name)
         {
-            var uri = new Uri("file:///" + name);
+            var uri = new Uri("file:///" + FileHelpers.UrlEncode(name));
             var path = uri.LocalPath;
             path = path.Substring(1);
             return path.Replace(FileHelpers.NotSeparator, FileHelpers.Separator);

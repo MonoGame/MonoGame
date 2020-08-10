@@ -160,7 +160,7 @@ namespace Microsoft.Xna.Framework.Content
                 if (existingInstance != null)
                     continue;
 
-				ModelMesh mesh = new ModelMesh(reader.GraphicsDevice, parts);
+				ModelMesh mesh = new ModelMesh(reader.GetGraphicsDevice(), parts);
 
                 // Tag reassignment
                 mesh.Tag = meshTag;
@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework.Content
             // Read the final pieces of model data.
             var rootBoneIndex = ReadBoneReference(reader, boneCount);
 
-            Model model = new Model(reader.GraphicsDevice, bones, meshes);
+            Model model = new Model(reader.GetGraphicsDevice(), bones, meshes);
 
             model.Root = bones[rootBoneIndex];
 		

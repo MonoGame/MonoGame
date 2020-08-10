@@ -39,7 +39,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return vector;
         }
 
-        Vector4 IPackedVector.ToVector4()
+        /// <summary>
+        /// Gets the packed vector in Vector4 format.
+        /// </summary>
+        /// <returns>The packed vector in Vector4 format</returns>
+        public Vector4 ToVector4()
         {
             Vector2 vector = this.ToVector2();
             return new Vector4(vector.X, vector.Y, 0f, 1f);

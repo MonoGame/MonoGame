@@ -7,7 +7,7 @@ using System.Collections;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -19,11 +19,12 @@ namespace Microsoft.Xna.Framework.Content
 
         private Dictionary<Type, ContentTypeReader> _contentReaders;
 
-		private static readonly string _assemblyName;
-		
+        private static readonly string _assemblyName;
 
-		static ContentTypeReaderManager()
-		{
+        private static readonly bool _isRunningOnNetCore = Type.GetType("System.Private.CoreLib") != null;
+
+        static ContentTypeReaderManager()
+        {
             _locker = new object();
             _contentReadersCache = new Dictionary<Type, ContentTypeReader>(255);
             _assemblyName = ReflectionHelpers.GetAssembly(typeof(ContentTypeReaderManager)).FullName;
@@ -44,7 +45,7 @@ namespace Microsoft.Xna.Framework.Content
         // Trick to prevent the linker removing the code, but not actually execute the code
         static bool falseflag = false;
 
-		internal ContentTypeReader[] LoadAssetReaders(ContentReader reader)
+        internal ContentTypeReader[] LoadAssetReaders(ContentReader reader)
         {
 #pragma warning disable 0219, 0649
             // Trick to prevent the linker removing the code, but not actually execute the code
@@ -64,7 +65,7 @@ namespace Microsoft.Xna.Framework.Content
                 var hRectangleArrayReader = new ArrayReader<Rectangle>();
                 var hVector3ListReader = new ListReader<Vector3>();
                 var hStringListReader = new ListReader<StringReader>();
-				var hIntListReader = new ListReader<Int32>();
+                var hIntListReader = new ListReader<Int32>();
                 var hSpriteFontReader = new SpriteFontReader();
                 var hTexture2DReader = new Texture2DReader();
                 var hCharReader = new CharReader();
@@ -87,8 +88,8 @@ namespace Microsoft.Xna.Framework.Content
                 var hArrayMatrixReader = new ArrayReader<Matrix>();
                 var hEnumBlendReader = new EnumReader<Graphics.Blend>();
                 var hNullableRectReader = new NullableReader<Rectangle>();
-				var hEffectMaterialReader = new EffectMaterialReader();
-				var hExternalReferenceReader = new ExternalReferenceReader();
+                var hEffectMaterialReader = new EffectMaterialReader();
+                var hExternalReferenceReader = new ExternalReferenceReader();
                 var hSoundEffectReader = new SoundEffectReader();
                 var hSongReader = new SongReader();
                 var hModelReader = new ModelReader();
@@ -104,7 +105,7 @@ namespace Microsoft.Xna.Framework.Content
             }
 #pragma warning restore 0219, 0649
 
-		    // The first content byte i read tells me the number of content readers in this XNB file
+            // The first content byte i read tells me the number of content readers in this XNB file
             var numberOfReaders = reader.Read7BitEncodedInt();
             var contentReaders = new ContentTypeReader[numberOfReaders];
             var needsInitialize = new BitArray(numberOfReaders);
@@ -189,44 +190,49 @@ namespace Microsoft.Xna.Framework.Content
 
             } // lock (_locker)
 
-		    return contentReaders;
+            return contentReaders;
         }
-		
-		/// <summary>
-		/// Removes Version, Culture and PublicKeyToken from a type string.
-		/// </summary>
-		/// <remarks>
-        /// Supports multiple generic types (e.g. Dictionary&lt;TKey,TValue&gt;) and nested generic types (e.g. List&lt;List&lt;int&gt;&gt;).
-		/// </remarks> 
-		/// <param name="type">
-		/// A <see cref="System.String"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="System.String"/>
-		/// </returns>
-		public static string PrepareType(string type)
-		{			
-			//Needed to support nested types
-			int count = type.Split(new[] {"[["}, StringSplitOptions.None).Length - 1;
-			
-			string preparedType = type;
-			
-			for(int i=0; i<count; i++)
-			{
-				preparedType = Regex.Replace(preparedType, @"\[(.+?), Version=.+?\]", "[$1]");
-			}
-						
-			//Handle non generic types
-			if(preparedType.Contains("PublicKeyToken"))
-				preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
 
-			// TODO: For WinRT this is most likely broken!
-			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
+        /// <summary>
+        /// Removes Version, Culture and PublicKeyToken from a type string.
+        /// </summary>
+        /// <remarks>
+        /// Supports multiple generic types (e.g. Dictionary&lt;TKey,TValue&gt;) and nested generic types (e.g. List&lt;List&lt;int&gt;&gt;).
+        /// </remarks> 
+        /// <param name="type">
+        /// A <see cref="System.String"/>
+        /// </param>
+        /// <returns>
+        /// A <see cref="System.String"/>
+        /// </returns>
+        public static string PrepareType(string type)
+        {
+            //Needed to support nested types
+            int count = type.Split(new[] { "[[" }, StringSplitOptions.None).Length - 1;
+
+            string preparedType = type;
+
+            for (int i = 0; i < count; i++)
+            {
+                preparedType = Regex.Replace(preparedType, @"\[(.+?), Version=.+?\]", "[$1]");
+            }
+
+            //Handle non generic types
+            if (preparedType.Contains("PublicKeyToken"))
+                preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
+
+            // TODO: For WinRT this is most likely broken!
+            preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", _assemblyName));
-			
-			return preparedType;
-		}
+
+            if (_isRunningOnNetCore)
+                preparedType = preparedType.Replace("mscorlib", "System.Private.CoreLib");
+            else
+                preparedType = preparedType.Replace("System.Private.CoreLib", "mscorlib");
+
+            return preparedType;
+        }
 
         // Static map of type names to creation functions. Required as iOS requires all types at compile time
         private static Dictionary<string, Func<ContentTypeReader>> typeCreators = new Dictionary<string, Func<ContentTypeReader>>();

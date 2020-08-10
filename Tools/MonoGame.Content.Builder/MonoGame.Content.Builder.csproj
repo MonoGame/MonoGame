@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Description>The MonoGame Content Builder (MGCB) command line tool is used for optimizing content for runtime use.</Description>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder</BaseOutputPath>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>mgcb</ToolCommandName>
+    <PackageId>dotnet-mgcb</PackageId>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>mgcb</AssemblyName>
+    <UseAppHost>true</UseAppHost>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\AppReference.targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
+    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj" />
+    <ProjectReference Include="..\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <AppReference>true</AppReference>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Import Project="..\AppReference.targets" />
+
+</Project>
+

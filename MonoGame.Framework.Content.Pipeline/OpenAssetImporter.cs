@@ -11,7 +11,7 @@ using System.Reflection;
 using Assimp;
 using Assimp.Unmanaged;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {

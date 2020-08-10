@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Target Name="_IncludeMono" AfterTargets="_CompileToNative">
-    <Copy SourceFiles="/Library/Frameworks/Mono.framework/Commands/mono;..\..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib"
-      DestinationFolder="$(_AppBundlePath)Contents\MonoBundle" />
-  </Target>
-</Project>

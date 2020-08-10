@@ -6,11 +6,18 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {   
-    public class GameComponent : IGameComponent, IUpdateable, IComparable<GameComponent>, IDisposable
+    /// <summary>
+    /// An object that can be attached to a <see cref="Microsoft.Xna.Framework.Game"/> and have its <see cref="Update"/>
+    /// method called when <see cref="Microsoft.Xna.Framework.Game.Update"/> is called.
+    /// </summary>
+    public class GameComponent : IGameComponent, IUpdateable, IDisposable
     {
         bool _enabled = true;
         int _updateOrder;
 
+        /// <summary>
+        /// The <see cref="Game"/> that owns this <see cref="GameComponent"/>.
+        /// </summary>
         public Game Game { get; private set; }
 
         public bool Enabled
@@ -39,9 +46,16 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <inheritdoc />
         public event EventHandler<EventArgs> EnabledChanged;
+
+        /// <inheritdoc />
         public event EventHandler<EventArgs> UpdateOrderChanged;
 
+        /// <summary>
+        /// Create a <see cref="GameComponent"/>.
+        /// </summary>
+        /// <param name="game">The game that this component will belong to.</param>
         public GameComponent(Game game)
         {
             this.Game = game;
@@ -54,13 +68,27 @@ namespace Microsoft.Xna.Framework
 
         public virtual void Initialize() { }
 
+        /// <summary>
+        /// Update the component.
+        /// </summary>
+        /// <param name="gameTime"><see cref="GameTime"/> of the <see cref="Game"/>.</param>
         public virtual void Update(GameTime gameTime) { }
 
+        /// <summary>
+        /// Called when <see cref="UpdateOrder"/> changed. Raises the <see cref="UpdateOrderChanged"/> event.
+        /// </summary>
+        /// <param name="sender">This <see cref="GameComponent"/>.</param>
+        /// <param name="args">Arguments to the <see cref="UpdateOrderChanged"/> event.</param>
         protected virtual void OnUpdateOrderChanged(object sender, EventArgs args)
         {
             EventHelpers.Raise(sender, UpdateOrderChanged, args);
         }
 
+        /// <summary>
+        /// Called when <see cref="Enabled"/> changed. Raises the <see cref="EnabledChanged"/> event.
+        /// </summary>
+        /// <param name="sender">This <see cref="GameComponent"/>.</param>
+        /// <param name="args">Arguments to the <see cref="EnabledChanged"/> event.</param>
         protected virtual void OnEnabledChanged(object sender, EventArgs args)
         {
             EventHelpers.Raise(sender, EnabledChanged, args);
@@ -80,13 +108,5 @@ namespace Microsoft.Xna.Framework
             GC.SuppressFinalize(this);
         }
 
-        #region IComparable<GameComponent> Members
-        // TODO: Should be removed, as it is not part of XNA 4.0
-        public int CompareTo(GameComponent other)
-        {
-            return other.UpdateOrder - this.UpdateOrder;
-        }
-
-        #endregion
     }
 }

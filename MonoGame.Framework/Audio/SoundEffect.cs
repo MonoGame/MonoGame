@@ -29,6 +29,10 @@ namespace Microsoft.Xna.Framework.Audio
         // Only used from SoundEffect.FromStream.
         private SoundEffect(Stream stream)
         {
+            Initialize();
+            if (_systemState != SoundSystemState.Initialized)
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
+
             /*
               The Stream object must point to the head of a valid PCM wave file. Also, this wave file must be in the RIFF bitstream format.
               The audio format has the following restrictions:
@@ -44,6 +48,10 @@ namespace Microsoft.Xna.Framework.Audio
         // Only used from SoundEffectReader.
         internal SoundEffect(byte[] header, byte[] buffer, int bufferSize, int durationMs, int loopStart, int loopLength)
         {
+            Initialize();
+            if (_systemState != SoundSystemState.Initialized)
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
+
             _duration = TimeSpan.FromMilliseconds(durationMs);
 
             // Peek at the format... handle regular PCM data.
@@ -64,6 +72,10 @@ namespace Microsoft.Xna.Framework.Audio
         // Only used from XACT WaveBank.
         internal SoundEffect(MiniFormatTag codec, byte[] buffer, int channels, int sampleRate, int blockAlignment, int loopStart, int loopLength)
         {
+            Initialize();
+            if (_systemState != SoundSystemState.Initialized)
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
+
             // Handle the common case... the rest is platform specific.
             if (codec == MiniFormatTag.Pcm)
             {
@@ -73,6 +85,41 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             PlatformInitializeXact(codec, buffer, channels, sampleRate, blockAlignment, loopStart, loopLength, out _duration);
+        }
+
+        #endregion
+
+        #region Audio System Initialization
+
+        internal enum SoundSystemState
+        {
+            NotInitialized,
+            Initialized,
+            FailedToInitialized
+        }
+
+        internal static SoundSystemState _systemState = SoundSystemState.NotInitialized;
+
+        /// <summary>
+        /// Initializes the sound system for SoundEffect support.
+        /// This method is automatically called when a SoundEffect is loaded, a DynamicSoundEffectInstance is created, or Microphone.All is queried.
+        /// You can however call this method manually (preferably in, or before the Game constructor) to catch any Exception that may occur during the sound system initialization (and act accordingly).
+        /// </summary>
+        public static void Initialize()
+        {
+            if (_systemState != SoundSystemState.NotInitialized)
+                return;
+
+            try
+            {
+                PlatformInitialize();
+                _systemState = SoundSystemState.Initialized;
+            }
+            catch (Exception)
+            {
+                _systemState = SoundSystemState.FailedToInitialized;
+                throw;
+            }
         }
 
         #endregion
@@ -104,6 +151,10 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>This only supports uncompressed 16bit PCM wav data.</remarks>
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
+            Initialize();
+            if (_systemState != SoundSystemState.Initialized)
+                throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
+
             if (sampleRate < 8000 || sampleRate > 48000)
                 throw new ArgumentOutOfRangeException("sampleRate");
             if ((int)channels != 1 && (int)channels != 2)
@@ -113,7 +164,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new ArgumentException("Ensure that the buffer length is non-zero.", "buffer");
 
             var blockAlign = (int)channels * 2;
-            if ((buffer.Length % blockAlign) != 0)
+            if ((count % blockAlign) != 0)
                 throw new ArgumentException("Ensure that the buffer meets the block alignment requirements for the number of channels.", "buffer");
 
             if (count <= 0)
@@ -126,7 +177,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (((ulong)count + (ulong)offset) > (ulong)buffer.Length)
                 throw new ArgumentException("Ensure that the offset+count region lines within the buffer.", "offset");
 
-            var totalSamples = buffer.Length / blockAlign;
+            var totalSamples = count / blockAlign;
 
             if (loopStart < 0)
                 throw new ArgumentException("The loopStart cannot be negative.", "loopStart");
@@ -177,6 +228,33 @@ namespace Microsoft.Xna.Framework.Audio
             inst._effect = this;
 
             return inst;
+        }
+
+        /// <summary>
+        /// Creates a new SoundEffect object based on the specified data stream.
+        /// This internally calls <see cref="FromStream"/>.
+        /// </summary>
+        /// <param name="path">The path to the audio file.</param>
+        /// <returns>The <see cref="SoundEffect"/> loaded from the given file.</returns>
+        /// <remarks>The stream must point to the head of a valid wave file in the RIFF bitstream format.  The formats supported are:
+        /// <list type="bullet">
+        /// <item>
+        /// <description>8-bit unsigned PCM</description>
+        /// <description>16-bit signed PCM</description>
+        /// <description>24-bit signed PCM</description>
+        /// <description>32-bit IEEE float PCM</description>
+        /// <description>MS-ADPCM 4-bit compressed</description>
+        /// <description>IMA/ADPCM (IMA4) 4-bit compressed</description>
+        /// </item>
+        /// </list>
+        /// </remarks>
+        public static SoundEffect FromFile(string path)
+        {
+            if (path == null)
+                throw new ArgumentNullException("path");
+
+            using (var stream = File.OpenRead(path))
+                return FromStream(stream);
         }
 
         /// <summary>
@@ -379,7 +457,7 @@ namespace Microsoft.Xna.Framework.Audio
             set
             {
                 if (value <= 0f)
-                    throw new ArgumentOutOfRangeException ("value of DistanceScale");
+                    throw new ArgumentOutOfRangeException ("value", "value of DistanceScale");
 
                 _distanceScale = value;
             }
@@ -403,7 +481,7 @@ namespace Microsoft.Xna.Framework.Audio
                 //   although the documentation does not say it throws an error we will anyway
                 //   just so it is like the DistanceScale
                 if (value < 0.0f)
-                    throw new ArgumentOutOfRangeException ("value of DopplerScale");
+                    throw new ArgumentOutOfRangeException ("value", "value of DopplerScale");
 
                 _dopplerScale = value;
             }

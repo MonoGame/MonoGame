@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Task</BaseOutputPath>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <Description>MSBuild task to automatically build content for MonoGame.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="MonoGame.Content.Builder.Task.props" PackagePath="build" />
+    <Content Include="MonoGame.Content.Builder.Task.targets" PackagePath="build" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\AppReference.targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Content.Builder\MonoGame.Content.Builder.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <AppReference>true</AppReference>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Import Project="..\AppReference.targets" />
+
+</Project>

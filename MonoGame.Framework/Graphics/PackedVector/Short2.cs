@@ -91,7 +91,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 			_short2Packed = Short2.PackInTwo (vector.X, vector.Y);
 		}
 
-		Vector4 IPackedVector.ToVector4 ()
+        /// <summary>
+        /// Gets the packed vector in Vector4 format.
+        /// </summary>
+        /// <returns>The packed vector in Vector4 format</returns>
+		public Vector4 ToVector4 ()
 		{
 			var v4 = new Vector4 (0,0,0,1);
 			v4.X = (short)(_short2Packed & 0xFFFF);
