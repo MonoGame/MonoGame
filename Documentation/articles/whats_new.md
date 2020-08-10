@@ -4,17 +4,17 @@ The MonoGame 3.8 release marks some big changes in how we build and distribute.
 
 > [!NOTE] Refer to the [Changelog](../../CHANGELOG.md) for a more complete list of changes.
 
-## Visual Studio 2019 and .NET Core CLI templates
-
-We now have templates for both Windows and macOS versions of Visual Studio 2019 as well as templates for the .NET Core CLI tools.
-
 ## .NET Core Support
 
-We now support [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/introduction) in addition to .NET 4.5 target frameworks.  This brings us up to date with the latest improvements in the .NET ecosystem and allow for exciting new features like corert and much easier distribution of your games for Windows, macOS and Linux.
+We now support [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/introduction) in addition to .NET 4.5 target frameworks.  This brings us up to date with the latest improvements in the .NET ecosystem and allow for exciting new features like [.NET Core Runtime](https://github.com/dotnet/corert) and much easier distribution of your games for Windows, macOS and Linux.
 
 ## NuGet Distribution
 
 With this release MonoGame has moved away from traditional installers and has opted for using [NuGet](https://www.nuget.org/profiles/MonoGame) for all distribution of assemblies and tools.  This also includes the new Visual Studio templates which are a VS extension.
+
+## Visual Studio 2019 and .NET Core CLI templates
+
+We now have templates for both Windows and macOS versions of Visual Studio 2019 as well as templates for the .NET Core CLI tools.
 
 ## SDK-Style Projects in the repository
 
