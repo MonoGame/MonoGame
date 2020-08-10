@@ -66,6 +66,7 @@ object DevelopMac : BuildType({
     allowExternalStatus = true
     artifactRules = """
         Artifacts/**/iOS/**/*.nupkg
+        Artifacts/**/Android/**/*.nupkg
         Artifacts/**/*.mpack
     """.trimIndent()
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
