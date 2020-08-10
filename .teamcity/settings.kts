@@ -71,7 +71,7 @@ object DevelopMac : BuildType({
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     params {
-        param("env.GIT_BRANCH", "%teamcity.build,branch%")
+        param("env.GIT_BRANCH", "%teamcity.build.branch%")
         param("env.BUILD_NUMBER", "%build.number%")
     }
 
@@ -145,7 +145,7 @@ object DevelopWin : BuildType({
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     params {
-        param("env.GIT_BRANCH", "%teamcity.build,branch%")
+        param("env.GIT_BRANCH", "%teamcity.build.branch%")
         param("env.BUILD_NUMBER", "%build.number%")
     }
 
@@ -456,7 +456,7 @@ object TestMac : BuildType({
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     params {
-        param("env.GIT_BRANCH", "%teamcity.build,branch%")
+        param("env.GIT_BRANCH", "%teamcity.build.branch%")
         param("env.BUILD_NUMBER", "%build.number%")
     }
 
@@ -558,7 +558,7 @@ object TestWindows : BuildType({
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     params {
-        param("env.GIT_BRANCH", "%teamcity.build,branch%")
+        param("env.GIT_BRANCH", "%teamcity.build.branch%")
         param("env.BUILD_NUMBER", "%build.number%")
     }
 
