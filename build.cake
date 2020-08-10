@@ -60,10 +60,11 @@ Task("Prep")
 
     // We tag the version with the build branch to make it
     // easier to spot special builds in NuGet feeds.
-    var branch = EnvironmentVariable("GIT_BRANCH") ?? string.Empty;
-    if (branch == "develop")
+    var branch = EnvironmentVariable("GIT_BRANCH") ?? string.Empty;    
+    if (!branch.Contains("master"))
 	version += "-develop";
-
+	
+    Console.WriteLine("Build Branch: {0}", branch);
     Console.WriteLine("Build Version: {0}", version);
 
     msPackSettings = new MSBuildSettings();
