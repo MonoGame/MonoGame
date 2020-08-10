@@ -8,7 +8,7 @@ Go to the following URL to download and install Visual Studio for Mac: https://v
 
 ## Install MonoGame extension for Visual Studio for Mac
 
-Download the MonoGame extension for Visual Studio for Mac from the following page: https://www.monogame.net/downloads/
+Download the MonoGame extension for Visual Studio for Mac from the following link: https://github.com/MonoGame/MonoGame/releases/download/v3.8/MonoDevelop.MonoGame_IDE_VisualStudioForMac_3.8.0.1641.mpack
 
 Open up Visual Studio for Mac and you should be able to see a window like so:
 
