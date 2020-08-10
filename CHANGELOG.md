@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## 3.8 Unreleased - 2020-08-??
+## 3.8 Release - 2020-08-10
 
 ### Added
  - New Plane constructor. [#6085](https://github.com/MonoGame/MonoGame/pull/6085)
