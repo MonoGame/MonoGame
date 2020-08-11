@@ -1598,12 +1598,16 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (primitiveType)
             {
                 case PrimitiveType.LineList:
+                case PrimitiveType.LineListWithAdjacency:
                     return primitiveCount * 2;
                 case PrimitiveType.LineStrip:
+                case PrimitiveType.LineStripWithAdjacency:
                     return primitiveCount + 1;
                 case PrimitiveType.TriangleList:
+                case PrimitiveType.TriangleListWithAdjacency:
                     return primitiveCount * 3;
                 case PrimitiveType.TriangleStrip:
+                case PrimitiveType.TriangleStripWithAdjacency:
                     return primitiveCount + 2;
                 case PrimitiveType.PointList:
                     return primitiveCount;

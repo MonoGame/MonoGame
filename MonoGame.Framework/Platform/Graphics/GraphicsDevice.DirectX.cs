@@ -1246,6 +1246,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     return PrimitiveTopology.TriangleStrip;
                 case PrimitiveType.PointList:
                     return PrimitiveTopology.PointList;
+                case PrimitiveType.LineListWithAdjacency:
+                    return PrimitiveTopology.LineListWithAdjacency;
+                case PrimitiveType.LineStripWithAdjacency:
+                    return PrimitiveTopology.LineStripWithAdjacency;
+                case PrimitiveType.TriangleListWithAdjacency:
+                    return PrimitiveTopology.TriangleListWithAdjacency;
+                case PrimitiveType.TriangleStripWithAdjacency:
+                    return PrimitiveTopology.TriangleStripWithAdjacency;
                 case PrimitiveType.PatchListWith1ControlPoints:
                     return PrimitiveTopology.PatchListWith1ControlPoints;
                 case PrimitiveType.PatchListWith2ControlPoints:

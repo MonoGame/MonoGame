@@ -35,6 +35,26 @@ namespace Microsoft.Xna.Framework.Graphics
         PointList,
 
         /// <summary>
+        /// Like LineList but includes adjacent vertices for geometry shaders.
+        /// </summary>
+        LineListWithAdjacency,
+
+        /// <summary>
+        /// Like LineStrip but includes adjacent vertices for geometry shaders.
+        /// </summary>
+        LineStripWithAdjacency,
+
+        /// <summary>
+        /// Like TriangleList but includes adjacent vertices for geometry shaders.
+        /// </summary>
+        TriangleListWithAdjacency,
+
+        /// <summary>
+        /// Like TriangleStrip but includes adjacent vertices for geometry shaders.
+        /// </summary>
+        TriangleStripWithAdjacency,
+
+        /// <summary>
         /// Interpretes the vertices as a list of patches. Each group of 1 vertices defines a patch. Must be used in combination with a hull shader.  
         /// </summary>
         PatchListWith1ControlPoints,
