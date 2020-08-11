@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework.Graphics;
+
 namespace MonoGame.Effect.TPGParser
 {
     #region ParseTree
@@ -950,11 +951,11 @@ namespace MonoGame.Effect.TPGParser
               node.Eval(tree, pass);
         
            // We need to have at least one shader to keep this pass.
-           if (!string.IsNullOrEmpty(pass.psFunction) || 
-        	!string.IsNullOrEmpty(pass.vsFunction) ||
-        	!string.IsNullOrEmpty(pass.hsFunction) ||
-        	!string.IsNullOrEmpty(pass.dsFunction) ||
-        	!string.IsNullOrEmpty(pass.gsFunction))
+           if (!string.IsNullOrEmpty(pass.psFunction) ||
+               !string.IsNullOrEmpty(pass.vsFunction) ||
+               !string.IsNullOrEmpty(pass.hsFunction) ||
+               !string.IsNullOrEmpty(pass.dsFunction) ||
+               !string.IsNullOrEmpty(pass.gsFunction))
            {
               var technique = paramlist[0] as TechniqueInfo;
               technique.Passes.Add(pass);
@@ -978,29 +979,28 @@ namespace MonoGame.Effect.TPGParser
            pass.psFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
            return null;
         }
-
         protected virtual object EvalHullShader_Pass_Expression(ParseTree tree, params object[] paramlist)
         {
             var pass = paramlist[0] as PassInfo;
-           pass.hsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
-           pass.hsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
-           return null;
+            pass.hsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
+            pass.hsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
+            return null;
         }
 
         protected virtual object EvalDomainShader_Pass_Expression(ParseTree tree, params object[] paramlist)
         {
             var pass = paramlist[0] as PassInfo;
-           pass.dsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
-           pass.dsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
-           return null;
+            pass.dsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
+            pass.dsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
+            return null;
         }
 
         protected virtual object EvalGeometryShader_Pass_Expression(ParseTree tree, params object[] paramlist)
         {
             var pass = paramlist[0] as PassInfo;
-           pass.gsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
-           pass.gsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
-           return null;
+            pass.gsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
+            pass.gsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
+            return null;
         }
 
         protected virtual object EvalAddressMode_Clamp(ParseTree tree, params object[] paramlist)
