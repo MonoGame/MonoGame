@@ -18,7 +18,7 @@ For example:
 dotnet new mgdesktopgl -o MyGame
 ```
 
-> To know which platform identifier (short name) to use for your project, please refer to [Target Platforms](/articles/introduction/platforms.md) or type the following command to the command prompt to list the installed templates and their corresponding short names:
+> To know which platform identifier (short name) to use for your project, please refer to [Target Platforms](~/articles/platforms/0_platforms.md) or type the following command to the command prompt to list the installed templates and their corresponding short names:
 > 
 > ```
 > dotnet new -l
