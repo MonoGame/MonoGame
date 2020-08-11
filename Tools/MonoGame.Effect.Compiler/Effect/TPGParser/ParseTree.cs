@@ -950,8 +950,12 @@ namespace MonoGame.Effect.TPGParser
            foreach (var node in Nodes)
               node.Eval(tree, pass);
         
-           // We need to have a pixel or vertex shader to keep this pass.
-           if (!string.IsNullOrEmpty(pass.psFunction) || !string.IsNullOrEmpty(pass.vsFunction))
+           // We need to have at least one shader to keep this pass.
+           if (!string.IsNullOrEmpty(pass.psFunction) ||
+               !string.IsNullOrEmpty(pass.vsFunction) ||
+               !string.IsNullOrEmpty(pass.hsFunction) ||
+               !string.IsNullOrEmpty(pass.dsFunction) ||
+               !string.IsNullOrEmpty(pass.gsFunction))
            {
               var technique = paramlist[0] as TechniqueInfo;
               technique.Passes.Add(pass);
