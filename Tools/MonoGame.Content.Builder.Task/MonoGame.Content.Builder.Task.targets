@@ -137,7 +137,7 @@
     <!-- Execute MGCB from the project directory so we use the correct manifest. -->
     <Exec
       Condition="'%(ContentReference.FullPath)' != ''"
-      Command="$(DotnetCommand) $(MGCBPath) $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
+      Command="$(DotnetCommand) &quot;$(MGCBPath)&quot; $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
       WorkingDirectory="$(MSBuildProjectDirectory)" />
 
     <ItemGroup>
