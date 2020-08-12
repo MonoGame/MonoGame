@@ -1,32 +1,21 @@
 # Setting up your development environment for Windows
 
-This guide will walk you through building a starter game with MonoGame using a Windows and Visual Studio 2019.
+In this section we will go over setting up your development environment for Windows.
 
 ## Install Visual Studio 2019
 
-You will need a copy of [Visual Studio 2019](https://www.monogame.net/downloads/) or later installed (any edition, including Community) before installing MonoGame, with the following components (depending on your target platform):
+You will need a copy of [Visual Studio 2019](https://visualstudio.microsoft.com/vs/) or later installed (any edition, including Community) before installing MonoGame, with the following components (depending on your target platform):
+
+* .NET Core cross-platform development - For Desktop OpenGL and DirectX platforms
+* Mobile Development with .NET - For Android and iOS platforms
+* Universal Windows Platform development - For Windows 10 and Xbox UWP platforms
+* .Net Desktop Development - For Desktop OpenGL and DirectX platforms to target normal .NET Framework
 
 ![Visual Studio optional components](~/images/getting_started/1_installer_vs_components.png)
 
-* .NET Core cross-platform development - For Windows GL (.NET Core) / DX (NetStandard) platforms
-* Mobile Development with .NET - For Android / iOS platforms
-* Universal Windows Platform development - For Windows 10 / Xbox UWP
-
-> You can also optionally install the ".Net Desktop Development - For Windows GL / DX platforms" to support older MonoGame projects.  See the migration guide on the steps to upgrade projects.
-
-When installing Visual Studio, it also is recommended to include the "**" components:
-
 ![.NET Desktop component](~/images/getting_started/1_netdesktopcomponet.png)
 
-> Alternatively, you can specifically install the [.NET Core SDK from here](https://dotnet.microsoft.com/download), SDK Versions 3.1 and above.
-
-If you are targeting WindowsDX, you are also going to need [the DirectX June 2010 runtime](https://www.microsoft.com/en-us/download/details.aspx?id=8109) for audio and gamepads to work properly.
-
-## For UWP platforms
-
-MonoGame requires the latest Windows 10 SDK.
-You can install it by selecting the Universal App payload when installing Visual Studio 2019.
-Building and publishing for UWP is only supported with Visual Studio 2019.
+If you are targeting standard Windows DirectX backend, you are also going to need [the DirectX June 2010 runtime](https://www.microsoft.com/en-us/download/details.aspx?id=8109) for audio and gamepads to work properly.
 
 ## Install MonoGame extension for Visual Studio 2019
 
