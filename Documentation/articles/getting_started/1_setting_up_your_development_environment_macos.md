@@ -58,7 +58,7 @@ Install wine64:
 ```sh
 brew cask install xquartz
 brew cask install wine-stable
-brew install p7zip
+brew install p7zip wget
 ```
 
 Create wine prefix:
