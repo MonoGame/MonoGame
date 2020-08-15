@@ -6,43 +6,21 @@ namespace MonoGame.Tools.Pipeline
 {
     public static class FileAssociation
     {
-        private readonly static string appPath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "Applications/MGCB Editor.app");
+        private static readonly string _localAppPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "../.."));
+        private static readonly string _systemAppPath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "Applications/MGCB Editor.app");
 
         public static void Associate()
         {
-            InstallApplication();
+            if (Path.GetExtension(_localAppPath) != ".app")
+                throw new FileNotFoundException("Not running from within the app package");
+
+            CopyDirectory(_localAppPath, _systemAppPath);
         }
 
         public static void Unassociate()
         {
-            UninstallApplication();
-        }
-
-        private static void InstallApplication()
-        {
-            Console.WriteLine("Installing application...");
-
-            var baseAppPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "../.."));
-            if (Path.GetExtension(baseAppPath) != ".app")
-            {
-                throw new FileNotFoundException("Not running from within the app package");
-            }
-
-            CopyDirectory(baseAppPath, appPath);
-
-            Console.WriteLine("Installation complete!");
-        }
-
-        private static void UninstallApplication()
-        {
-            Console.WriteLine("Uninstalling aplication...");
-
-            if (Directory.Exists(appPath))
-            {
-                Directory.Delete(appPath, true);
-            }
-
-            Console.WriteLine("Uninstallation complete!");
+            if (Directory.Exists(_systemAppPath))
+                Directory.Delete(_systemAppPath, true);
         }
 
         private static void CopyDirectory(string sourceDirName, string destDirName)
