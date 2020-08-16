@@ -325,7 +325,7 @@ Render_State_Expression ->
 				Render_State_StencilWriteMask |
 				Render_State_StencilZFail;
 
-Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression | Render_State_Expression)* CloseBracket 
+Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression | HullShader_Pass_Expression | DomainShader_Pass_Expression | GeometryShader_Pass_Expression | Render_State_Expression)* CloseBracket 
 { 
    var pass = new PassInfo();
    pass.name = $Identifier as string ?? string.Empty;
@@ -333,8 +333,12 @@ Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression |
    foreach (var node in Nodes)
       node.Eval(tree, pass);
 
-   // We need to have a pixel or vertex shader to keep this pass.
-   if (!string.IsNullOrEmpty(pass.psFunction) || !string.IsNullOrEmpty(pass.vsFunction))
+   // We need to have at least one shader to keep this pass.
+   if (!string.IsNullOrEmpty(pass.psFunction) || 
+	!string.IsNullOrEmpty(pass.vsFunction) ||
+	!string.IsNullOrEmpty(pass.hsFunction) ||
+	!string.IsNullOrEmpty(pass.dsFunction) ||
+	!string.IsNullOrEmpty(pass.gsFunction))
    {
       var technique = paramlist[0] as TechniqueInfo;
       technique.Passes.Add(pass);
