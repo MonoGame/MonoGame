@@ -8,6 +8,7 @@
     <DefineConstants>GTK</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-gtk</AssemblyName>
+    <AssemblyTitle>MGCB Editor</AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>
