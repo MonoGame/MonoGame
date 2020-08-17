@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StbImageSharp;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace MonoGame.Framework.Graphics
 {
@@ -128,60 +129,36 @@ namespace MonoGame.Framework.Graphics
         /// <returns></returns>
         public unsafe static Image2D FromStream(Stream stream)
         {
-            byte[] bytes;
-
             // Rewind stream if it is at end
             if (stream.CanSeek && stream.Length == stream.Position)
             {
                 stream.Seek(0, SeekOrigin.Begin);
             }
 
-            // Copy it's data to memory
-            // As some platforms dont provide full stream functionality and thus streams can't be read as it is
-            using (var ms = new MemoryStream())
+            ImageResult result;
+            if (stream.CanSeek)
             {
-                stream.CopyTo(ms);
-                bytes = ms.ToArray();
+                result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+            }
+            else
+            {
+                // If stream doesnt provide seek functionaly, use MemoryStream instead
+                using (var ms = new MemoryStream())
+                {
+                    stream.CopyTo(ms);
+                    ms.Seek(0, SeekOrigin.Begin);
+                    result = ImageResult.FromStream(ms, ColorComponents.RedGreenBlueAlpha);
+                }
             }
 
-            byte* result = null;
-            try
+            // Convert to managed color array
+            var data = new Color[result.Width * result.Height];
+            fixed (Color* dest = data)
             {
-                // Load image
-                int x, y, comp;
-                fixed (byte* b = bytes)
-                {
-                    result = StbImage.stbi_load_from_memory(b, bytes.Length, &x, &y, &comp, StbImage.STBI_rgb_alpha);
-                }
-
-                if (result == null)
-                {
-                    throw new InvalidOperationException(StbImage.LastError);
-                }
-
-                // Convert to managed color array
-                byte* src = result;
-                var data = new Color[x * y];
-                fixed (Color* dest = data)
-                {
-                    for (var i = 0; i < data.Length; ++i)
-                    {
-                        dest[i].R = *src++;
-                        dest[i].G = *src++;
-                        dest[i].B = *src++;
-                        dest[i].A = *src++;
-                    }
-                }
-
-                return new Image2D(x, y, data);
+                Marshal.Copy(result.Data, 0, new IntPtr(dest), result.Data.Length);
             }
-            finally
-            {
-                if (result != null)
-                {
-                    CRuntime.free(result);
-                }
-            }
+
+            return new Image2D(result.Width, result.Height, data);
         }
     }
 }
