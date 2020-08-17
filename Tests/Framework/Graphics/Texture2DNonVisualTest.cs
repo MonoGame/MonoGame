@@ -9,7 +9,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Graphics;
 
-using MonoGame.Utilities;
 using NUnit.Framework;
 using StbImageSharp;
 using StbImageWriteSharp;
