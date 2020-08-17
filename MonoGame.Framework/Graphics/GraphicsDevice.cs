@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 using System.Runtime.InteropServices;
 
 

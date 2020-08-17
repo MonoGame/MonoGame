@@ -6,6 +6,9 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
+    /// <summary>
+    /// A <see cref="GameComponent"/> that is drawn when its <see cref="Game"/> is drawn.
+    /// </summary>
     public class DrawableGameComponent : GameComponent, IDrawable
     {
         private bool _initialized;
@@ -13,6 +16,9 @@ namespace Microsoft.Xna.Framework
         private int _drawOrder;
         private bool _visible = true;
 
+        /// <summary>
+        /// Get the <see cref="GraphicsDevice"/> that this <see cref="DrawableGameComponent"/> uses for drawing.
+        /// </summary>
         public Graphics.GraphicsDevice GraphicsDevice
         {
             get { return this.Game.GraphicsDevice; } 
@@ -44,9 +50,16 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <inheritdoc />
         public event EventHandler<EventArgs> DrawOrderChanged;
+
+        /// <inheritdoc />
         public event EventHandler<EventArgs> VisibleChanged;
 
+        /// <summary>
+        /// Create a <see cref="DrawableGameComponent"/>.
+        /// </summary>
+        /// <param name="game">The game that this component will belong to.</param>
         public DrawableGameComponent(Game game)
             : base(game)
         {
@@ -70,17 +83,37 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// Load graphical resources needed by this component.
+        /// </summary>
         protected virtual void LoadContent() { }
 
+        /// <summary>
+        /// Unload graphical resources needed by this component.
+        /// </summary>
         protected virtual void UnloadContent () { }
 
+        /// <summary>
+        /// Draw this component.
+        /// </summary>
+        /// <param name="gameTime">The time elapsed since the last call to <see cref="Draw"/>.</param>
         public virtual void Draw(GameTime gameTime) { }
 
+        /// <summary>
+        /// Called when <see cref="Visible"/> changed.
+        /// </summary>
+        /// <param name="sender">This <see cref="DrawableGameComponent"/>.</param>
+        /// <param name="args">Arguments to the <see cref="VisibleChanged"/> event.</param>
         protected virtual void OnVisibleChanged(object sender, EventArgs args)
         {
             EventHelpers.Raise(sender, VisibleChanged, args);
         }
 
+        /// <summary>
+        /// Called when <see cref="DrawOrder"/> changed.
+        /// </summary>
+        /// <param name="sender">This <see cref="DrawableGameComponent"/>.</param>
+        /// <param name="args">Arguments to the <see cref="DrawOrderChanged"/> event.</param>
         protected virtual void OnDrawOrderChanged(object sender, EventArgs args)
         {
             EventHelpers.Raise(sender, DrawOrderChanged, args);

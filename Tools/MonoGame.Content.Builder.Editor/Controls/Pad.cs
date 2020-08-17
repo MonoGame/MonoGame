@@ -38,7 +38,11 @@ namespace MonoGame.Tools.Pipeline
 
         public void CreateContent(Control control)
         {
+#if IDE
+            Content = control;
+#else
             layout.AddRow(control);
+#endif
         }
 
         public void AddCommand(Command com)

@@ -4,9 +4,8 @@
     <TargetFrameworks>net452;netcoreapp3.1</TargetFrameworks>
     <DefineConstants>WINDOWS;XNADESIGNPROVIDED;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
-
-This package provides you with MonoGame Framework that uses DirectX for rendering and works on Windows.</Description>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Description>The MonoGame runtime for Windows using DirectX API's.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;windowsdx</PackageTags>
     <PackageId>MonoGame.Framework.WindowsDX</PackageId>
   </PropertyGroup>
@@ -56,7 +55,7 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
 
   <ItemGroup>
     <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp" />
-    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,6 +67,10 @@ This package provides you with MonoGame Framework that uses DirectX for renderin
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Version="4.0.1" Include="SharpDX" />
     <PackageReference Version="4.0.1" Include="SharpDX.Direct2D1" />
     <PackageReference Version="4.0.1" Include="SharpDX.Direct3D11" />

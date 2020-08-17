@@ -1,8 +1,8 @@
-# MGCB
+# MonoGame Content Builder (MGCB)
 
-The MonoGame Content Builder (MGCB.exe) is a command line tool for building XNB content on Windows, Mac, and Linux desktop systems.
+The MonoGame Content Builder is a command line tool for building XNB content on Windows, Mac, and Linux desktop systems.
 
-Typically it is executed by the [MGCB Editor](pipeline.md) when editing content or by `MonoGame.Content.Builder.Task` during the build process
+Typically, it is executed by the [MGCB Editor](mgcb_editor.md) when editing content or by `MonoGame.Content.Builder.Task` during the build process
 of a MonoGame project. Alternatively you can use it yourself from the command line for specialized build pipelines or for debugging content processing.
 
 ## Installation
@@ -10,11 +10,11 @@ of a MonoGame project. Alternatively you can use it yourself from the command li
 MGCB can be installed as a [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
 Make sure you have the .NET Core SDK installed. You can download it [here](https://dotnet.microsoft.com/download).
 
-In a terminal run `dotnet tool install -g dotnet-mgcb` to install MGCB.
+In a terminal run `dotnet tool install -g dotnet-mgcb` to install MGCB. Then you can execute MGCB by simply running `mgcb`.
 
 ## Command Line Options
 
-The options are processed "left to right".  When an option is repeated the last option always wins.
+The options are processed “left to right”. When an option is repeated, it is overwritten.
 
 ### Output Directory
 
@@ -22,7 +22,7 @@ The options are processed "left to right".  When an option is repeated the last 
 /outputDir:<directory_path>
 ```
 
-It specifies the directory where all content is written.  If this option is omitted the output will be put into the current working directory.
+Specifies the directory where all content is written. Defaults to the current working directory.
 
 ### Intermediate Directory
 
@@ -30,15 +30,15 @@ It specifies the directory where all content is written.  If this option is omit
 /intermediateDir:<directory_path>
 ```
 
-It specifies the directory where all intermediate files are written.  If this option is omitted the intermediate data will be put into the current working directory.
+Specifies the directory where all intermediate files are written. Defaults to the current working directory.
 
 ### Rebuild Content
 
 ```
-/rebuild 
+/rebuild
 ```
 
-An optional parameter which forces a full rebuild of all content.
+Force a full rebuild of all content.
 
 ### Clean Content
 
@@ -46,7 +46,7 @@ An optional parameter which forces a full rebuild of all content.
 /clean
 ```
 
-Delete all previously built content and intermediate files.  Only the `/intermediateDir` and `/outputDir` need to be defined for clean to do its job.
+Delete all previously built content and intermediate files. Only the `/intermediateDir` and `/outputDir` need to be defined for clean to do its job.
 
 ### Incremental Build
 
@@ -54,7 +54,7 @@ Delete all previously built content and intermediate files.  Only the `/intermed
 /incremental
 ```
 
-Skip cleaning files not included in the current build.  Useful for custom tools which only require a subset of the game content built.
+Only build content that changed since the last build.
 
 ### Assembly Reference
 
@@ -70,7 +70,7 @@ An optional parameter which adds an assembly reference which contains importers,
 /platform:<target_Platform>
 ```
 
-Set the target platform for this build. It must be a member of the TargetPlatform enum:
+Set the target platform for this build. It must be a member of the [TargetPlatform](xref:Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform) enum:
 
 * Windows
 * iOS
@@ -96,7 +96,7 @@ NOTE: PlayStation 4, Xbox One, PS Vita, and Switch support is only available to 
 /profile:<graphics_Profile>
 ```
 
-Set the target graphics profile for this build. It must be a member of the GraphicsProfile enum:
+Set the target graphics profile for this build. It must be a member of the [GraphicsProfile](xref:Microsoft.Xna.Framework.Graphics.GraphicsProfile) enum:
 * HiDef
 * Reach
 
@@ -108,7 +108,7 @@ If not set, it will default to HiDef.
 /config:<build_config>
 ```
 
-The optional build configuration name from the build system.  This is sometimes used as a hint in content processors.
+The optional build configuration name from the build system. This is sometimes used as a hint in content processors.
 
 ### Content Compression
 
@@ -116,7 +116,7 @@ The optional build configuration name from the build system.  This is sometimes 
 /compress
 ```
 
-Uses LZ4 compression to compress the contents of the XNB files.  Content build times will increase with this option enabled.  Compression is not recommended for platforms such as Android, Windows Phone 8 and Windows 8 as the app package is already compressed.  This is not compatible with LZX compression used in XNA content.
+Uses LZ4 compression to compress the contents of the XNB files. Content build times will increase with this option enabled. Compression is not recommended for Android as the app package is already compressed. This is not compatible with LZX compression used in XNA content.
 
 ### Content Importer Name
 
@@ -124,7 +124,7 @@ Uses LZ4 compression to compress the contents of the XNB files.  Content build t
 /importer:<class_name>
 ```
 
-An optional parameter which defines the class name of the content importer for reading source content.  If the option is omitted or used without a class name the default content importer for the source type is used.
+An optional parameter which defines the class name of the content importer for reading source content. If the option is omitted or used without a class name the default content importer for the source type is used.
 
 ### Content Processor Name
 
@@ -132,7 +132,7 @@ An optional parameter which defines the class name of the content importer for r
 /processor:<class_name>
 ```
 
-An optional parameter which defines the class name of the content processor for processing imported content.  If the option is omitted used without a class name the default content processor for the imported content is used.
+An optional parameter which defines the class name of the content processor for processing imported content. If the option is omitted used without a class name the default content processor for the imported content is used.
 
 Note that when you change the processor all previously defined `/processorParam` are cleared.
 
@@ -153,7 +153,15 @@ Note all defined processor parameters are cleared when the `/processor` is set.
 /build:<content_filepath>;<destination_filepath>
 ```
 
-Instructs the content builder to build the specified content file using the previously set switches and options. Optional destination path may be specified if you want to change the output filepath.
+Instructs the content builder to build the specified content file using the previously set switches and options. Optional destination path may be specified if you want to change the output file path.
+
+### Launch Debugger
+
+```
+/launchdebugger
+```
+
+Allows a debugger to attach to the MGCB executable before content is built.
 
 ### Response File
 
@@ -163,7 +171,7 @@ Instructs the content builder to build the specified content file using the prev
 
 This defines a text response file (sometimes called a command file) that contains the same options and switches you would normally find on the command line.
 
-Each switch is specified on a new line.  Comment lines are prefixed with #. These lines are removed by a preprocessor. You can specify multiple response files or mix normal command line switches with response files.
+Each switch is specified on a new line. Comment lines are prefixed with #. These lines are ignored. You can specify multiple response files or mix normal command line switches with response files.
 
 An example response file could look like this:
 
@@ -183,30 +191,14 @@ An example response file could look like this:
 /build:Textures\plastic.png
 ```
 
-### Launch Debugger
+#### Preprocessor Macros
 
-```
-/launchdebugger
-```
-
-Allows a debugger to attach to the MGCB executable before content is built.
-
-### Define Preprocessor Parameter
-
-```
-/define <name>=<value>
-```
-
-Sets or creates a preprocessor parameter with the given name and value.
-
-### Preprocessor Macros
+Response files support preprocessor macros to allow conditionals within a response file.
 
 ```
 $if <name>=<value>
 $endif
 ```
-
-Preprocessor macros are intended to allow conditionals within a response file.
 
 Preprocessor symbols can be defined from the command line with the `define` option or in a response file with the `$set` directive.
 
@@ -245,21 +237,21 @@ $endif
 
 ### Customizing your Build Process
 
-When building content from your project via `msbuild`, there are a few ways to can hook into the build process. The `MonoGame.Content.Builder.targets` runs a target called
-`BuildContent` just before your project builds. If you want to do any processing before or after this process you can use the `BeforeTargets` and `AfterTargets` mechanism provided
+When building content from your project with `MonoGame.Content.Builder.Task`, there are a few ways to hook into the build process. `MonoGame.Content.Builder.Task` runs a target called
+`RunContentBuilder` just before your project builds. If you want to do any processing before or after this process you can use the `BeforeTargets` and `AfterTargets` mechanism provided
 by `msbuild` to run your own targets.
 
 ```
-<Target Name="MyBeforeTarget" BeforeTargets="BuildContent">
+<Target Name="MyBeforeTarget" BeforeTargets="RunContentBuilder">
    <Message Text="MyBeforeTarget Ran"/>
 </Target>
-<Target Name="MyAfterTarget" AfterTargets="BuildContent">
+<Target Name="MyAfterTarget" AfterTargets="RunContentBuilder">
    <Message Text="MyAfterTarget Ran"/>
 </Target>
 ```
 
-If you want to customise the arguements sent to the `MGCB.exe` as part of the build process you can use the `<MonoGameMGCBAdditionalArguments>` property to define those.
-For example if you wanted to pass in the current project configuration you could define
+If you want to customize the arguments sent to the `MGCB.exe` as part of the build process you can use the `<MonoGameMGCBAdditionalArguments>` property to define those.
+For example to pass in the current project configuration you could include the following code in a PropertyGroup in your .csproj file.
 
 ```
 <MonoGameMGCBAdditionalArguments>-config:$(Configuration)</MonoGameMGCBAdditionalArguments>

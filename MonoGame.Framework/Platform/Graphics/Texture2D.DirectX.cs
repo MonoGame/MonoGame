@@ -5,7 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _shared;
         private bool _mipmap;
-        protected SampleDescription _sampleDescription;
+        private SampleDescription _sampleDescription;
 
         private SharpDX.Direct3D11.Texture2D _cachedStagingTexture;
 
@@ -130,9 +130,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.Format = SharpDXHelper.ToFormat(_format);
                 desc.BindFlags = BindFlags.None;
                 desc.CpuAccessFlags = CpuAccessFlags.Read;
-                desc.SampleDescription = new SampleDescription(1, 0);
+                desc.SampleDescription = SampleDescription;
                 desc.Usage = ResourceUsage.Staging;
                 desc.OptionFlags = ResourceOptionFlags.None;
+
 
                 _cachedStagingTexture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
             }
@@ -230,12 +231,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return desc;
         }
-
-        internal override void CreateTexture()
+        internal override Resource CreateTexture()
         {
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = GetTexture2DDescription();
-            _texture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+            return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
         }
 
         private void PlatformReload(Stream textureStream)

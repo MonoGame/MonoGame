@@ -15,6 +15,7 @@ namespace MonoGame.Tools.Pipeline
         private void InitializeComponent()
         {
             BackgroundColor = DrawInfo.BackColor;
+            ExpandContentWidth = true;
 
             pixel1 = new PixelLayout();
             pixel1.BackgroundColor = DrawInfo.BackColor;
@@ -25,13 +26,6 @@ namespace MonoGame.Tools.Pipeline
 
             Content = pixel1;
 
-            pixel1.Style = "Stretch";
-            drawable.Style = "Stretch";
-
-#if MONOMAC
-            drawable.Width = 10;
-#endif
-
             drawable.Paint += Drawable_Paint;
             drawable.MouseDown += Drawable_MouseDown;
             drawable.MouseUp += Drawable_MouseUp;
@@ -41,4 +35,3 @@ namespace MonoGame.Tools.Pipeline
         }
     }
 }
-

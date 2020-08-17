@@ -1,6 +1,6 @@
 {
   "_disableAffix": {
-    "articles/**": true
+    "index.md": true
   },
   "_disableContribution": {
     "../CHANGELOG.md": true

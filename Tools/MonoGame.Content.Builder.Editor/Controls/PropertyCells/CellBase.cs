@@ -64,9 +64,9 @@ namespace MonoGame.Tools.Pipeline
         public virtual void Draw(Graphics g, Rectangle rec, int separatorPos, bool selected)
         {
             if (selected)
-                g.FillRectangle(SystemColors.Highlight, rec);
+                g.FillRectangle(DrawInfo.HoverBackColor, rec);
 
-            g.DrawText(SystemFonts.Default(), DrawInfo.GetTextColor(selected, false), rec.X + 5, rec.Y + (rec.Height - Height) / 2, Text);
+            g.DrawText(DrawInfo.TextFont, DrawInfo.GetTextColor(selected, false), rec.X + 5, rec.Y + (rec.Height - Height) / 2, Text);
             g.FillRectangle(DrawInfo.GetBackgroundColor(selected), separatorPos - 6, rec.Y, rec.Width, rec.Height);
             
             if (!SkipCellDraw)
@@ -79,7 +79,7 @@ namespace MonoGame.Tools.Pipeline
             _lastRec.X += separatorPos;
             _lastRec.Width -= separatorPos - 1;
 
-            g.DrawText(SystemFonts.Default(), DrawInfo.GetTextColor(selected, !Editable), separatorPos + 5, rec.Y + (rec.Height - Height) / 2, DisplayValue);
+            g.DrawText(DrawInfo.TextFont, DrawInfo.GetTextColor(selected, !Editable), separatorPos + 5, rec.Y + (rec.Height - Height) / 2, DisplayValue);
         }
     }
 }

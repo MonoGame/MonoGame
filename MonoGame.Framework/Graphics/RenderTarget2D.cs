@@ -24,9 +24,29 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 	    public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared, int arraySize)
-	        : this(graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage, SurfaceType.RenderTarget, shared, arraySize)
+	        : base(graphicsDevice, width, height, mipMap, QuerySelectedFormat(graphicsDevice, preferredFormat), SurfaceType.RenderTarget, shared, arraySize)
 	    {
+            DepthStencilFormat = preferredDepthFormat;
+            MultiSampleCount = graphicsDevice.GetClampedMultisampleCount(preferredMultiSampleCount);
+            RenderTargetUsage = usage;
+
+            PlatformConstruct(graphicsDevice, width, height, mipMap, preferredDepthFormat, preferredMultiSampleCount, usage, shared);
 	    }
+        
+        protected static SurfaceFormat QuerySelectedFormat(GraphicsDevice graphicsDevice, SurfaceFormat preferredFormat)
+        {
+			SurfaceFormat selectedFormat = preferredFormat;
+			DepthFormat selectedDepthFormat;
+			int selectedMultiSampleCount;
+
+            if (graphicsDevice != null)
+            {
+                graphicsDevice.Adapter.QueryRenderTargetFormat(graphicsDevice.GraphicsProfile, preferredFormat, DepthFormat.None, 0,
+                    out selectedFormat, out selectedDepthFormat, out selectedMultiSampleCount);
+            }
+            
+            return selectedFormat;
+        }
 
         public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
 			: this(graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage, shared, 1)
@@ -46,7 +66,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents) 
 		{}
 
-        internal RenderTarget2D(GraphicsDevice graphicsDevice,
+        /// <summary>
+        /// Allows child class to specify the surface type, eg: a swap chain.
+        /// </summary>        
+        protected RenderTarget2D(GraphicsDevice graphicsDevice,
                         int width,
                         int height,
                         bool mipMap,
@@ -55,47 +78,12 @@ namespace Microsoft.Xna.Framework.Graphics
                         int preferredMultiSampleCount,
                         RenderTargetUsage usage,
                         SurfaceType surfaceType)
-            : this(graphicsDevice, width, height, mipMap, format, depthFormat, preferredMultiSampleCount, usage, surfaceType, false, 1)
-        {
-        }
-
-        /// <summary>
-        /// Allows child class to specify the surface type, eg: a swap chain.
-        /// </summary>        
-        internal RenderTarget2D(GraphicsDevice graphicsDevice,
-                        int width,
-                        int height,
-                        bool mipMap,
-                        SurfaceFormat preferredFormat,
-                        DepthFormat depthFormat,
-                        int preferredMultiSampleCount,
-                        RenderTargetUsage usage,
-                        SurfaceType surfaceType,
-                        bool shared,
-                        int arraySize)
-            : base(graphicsDevice, width, height, mipMap, QuerySelectedFormat(graphicsDevice, preferredFormat), surfaceType, shared, arraySize)
+            : base(graphicsDevice, width, height, mipMap, format, surfaceType)
         {
             DepthStencilFormat = depthFormat;
-            RenderTargetUsage = usage;
             MultiSampleCount = preferredMultiSampleCount;
-
-            PlatformConstruct(graphicsDevice, width, height, mipMap, depthFormat, preferredMultiSampleCount, usage, shared);
-        }
-
-        protected static SurfaceFormat QuerySelectedFormat(GraphicsDevice graphicsDevice, SurfaceFormat preferredFormat)
-        {
-			SurfaceFormat selectedFormat = preferredFormat;
-			DepthFormat selectedDepthFormat;
-			int selectedMultiSampleCount;
-
-            if (graphicsDevice != null)
-            {
-                graphicsDevice.Adapter.QueryRenderTargetFormat(graphicsDevice.GraphicsProfile, preferredFormat, DepthFormat.None, 0,
-                    out selectedFormat, out selectedDepthFormat, out selectedMultiSampleCount);
-            }
-
-            return selectedFormat;
-        }
+            RenderTargetUsage = usage;
+		}
 
         protected internal override void GraphicsDeviceResetting()
         {

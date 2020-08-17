@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 using MonoGame.OpenAL;
 using MonoGame.OpenGL;
 

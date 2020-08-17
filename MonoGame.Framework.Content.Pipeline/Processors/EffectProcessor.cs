@@ -8,7 +8,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -66,6 +66,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var ret = success ? new CompiledEffectContent(File.ReadAllBytes(destFile)) : null;
 
             File.Delete(destFile);
+
+            var stdOutLines = stdout.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            foreach (var line in stdOutLines)
+            {
+                if (line.StartsWith("Dependency:") && line.Length > 12)
+                {
+                    context.AddDependency(line.Substring(12));
+                }
+            }
 
             ProcessErrorsAndWarnings(!success, stderr, input, context);
 

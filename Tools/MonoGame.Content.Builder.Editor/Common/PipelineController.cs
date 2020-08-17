@@ -108,6 +108,9 @@ namespace MonoGame.Tools.Pipeline
             var macPath = Path.Combine(root, "..", "Resources");
             var windowsAndLinuxPath = Path.Combine(root, "Templates");
 
+#if IDE
+            LoadTemplates(root);
+#else
             if (Directory.Exists(macPath))
             {
                 LoadTemplates(macPath);
@@ -116,6 +119,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 LoadTemplates(windowsAndLinuxPath);
             }
+#endif
 
             UpdateMenu();
 

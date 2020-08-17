@@ -1,3 +1,5 @@
+# Package games for distribution
+
 Once your game is ready to be published, it is recommended that you package it properly for consumption by players.
 
 ## Desktop games
@@ -39,7 +41,7 @@ YourGame.app                    (this is your root folder)
             - Content           (this is where all your content and XNB's should go)
             - YourGame.icns     (this is your app icon, in ICNS format)
         - MacOS                 (this is where your game belongs, except for content files)
-    - Info.plist                (the metadata of your app)
+        - Info.plist             (the metadata of your app)
 ```
 
 The Info.plist file is a standard macOS file containing metadata about your game. Here's an example file with required and recommended values set:
@@ -87,11 +89,11 @@ After completing these steps, your .app folder should appear as an executable ap
 
 For archiving, we recommend using the .tar.gz format to preserve the execution permissions.
 
-### Special notes about .NET Core parameters
+## Special notes about .NET Core parameters
 
 .NET Core proposes several parameters when publishing apps that may sound helpful, but have many issues when it comes to games (because they were never meant for games in the first place, but for small lightweight applications).
 
-**ReadyToRun (R2R)**
+### ReadyToRun (R2R)
 
 [ReadyToRun](https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-core-3-0#readytorun-images) is advertised as improving application startup time, but slightly increasing binary size. We recommend not using it for games, because it produces micro stutters when your game is running.
 
@@ -101,14 +103,14 @@ Disabling ReadyToRun solves this issue (at the cost of a slightly longer startup
 
 ReadyToRun is disabled by default. You can configure it by setting the `PublishReadyToRun` property in your csproj file. MonoGame templates for .NET Core projects explicitly set this to `false`.
 
-**Tiered compilation**
+### Tiered compilation
 
 [Tiered compilation](https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-core-3-0#tiered-compilation) is a companion system to ReadyToRun and works on the same principle to enhance startup time. We suggest disabling it to avoid any stutter while your game is running.
 
 Tiered compilation is **enabled by default**. To disable it set the `TieredCompilation` property to `false` in your csproj.
 MonoGame templates for .NET Core projects disable tiered compilation.
 
-**SingleFilePublish**
+### SingleFilePublish
 
 SingleFilePublish packages your game into a single executable file with all dependencies and content integrated.
 
