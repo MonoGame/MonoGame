@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal override void ResolveSubresource()
         {
-            // Using a multisampled SwapChainRenderTarget as a source Texture is not supporter.
+            // Using a multisampled SwapChainRenderTarget as a source Texture is not supported.
             //base.ResolveSubresource();
         }
 
@@ -192,4 +192,3 @@ namespace Microsoft.Xna.Framework.Graphics
 
     }
 }
-
