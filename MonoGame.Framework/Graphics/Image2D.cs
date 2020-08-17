@@ -12,7 +12,7 @@ namespace MonoGame.Framework.Graphics
     /// </summary>
     public class Image2D
     {
-        private readonly Color[] _data;
+        private readonly byte[] _data;
 
         /// <summary>
         /// Width of the image
@@ -25,9 +25,9 @@ namespace MonoGame.Framework.Graphics
         public int Height { get; private set; }
 
         /// <summary>
-        /// Data of the image
+        /// Data of the image in the RGBA format
         /// </summary>
-        public Color[] Data
+        public byte[] Data
         {
             get { return _data; }
         }
@@ -42,12 +42,20 @@ namespace MonoGame.Framework.Graphics
         {
             get
             {
-                return _data[y * Width + x];
+                var basePos = (y * Width + x) * 4;
+                return new Color(_data[basePos],
+                    _data[basePos + 1],
+                    _data[basePos + 2],
+                    _data[basePos + 3]);
             }
 
             set
             {
-                _data[y * Width + x] = value;
+                var basePos = (y * Width + x) * 4;
+                _data[basePos] = value.R;
+                _data[basePos + 1] = value.G;
+                _data[basePos + 2] = value.B;
+                _data[basePos + 3] = value.A;
             }
         }
 
@@ -72,7 +80,7 @@ namespace MonoGame.Framework.Graphics
             Width = width;
             Height = height;
 
-            _data = new Color[width * height];
+            _data = new byte[width * height * 4];
         }
 
         /// <summary>
@@ -81,7 +89,7 @@ namespace MonoGame.Framework.Graphics
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="data"></param>
-        public Image2D(int width, int height, Color[] data)
+        public Image2D(int width, int height, byte[] data)
         {
             if (width <= 0)
             {
@@ -98,7 +106,7 @@ namespace MonoGame.Framework.Graphics
                 throw new ArgumentNullException("data");
             }
 
-            var length = width * height;
+            var length = width * height * 4;
             if (data.Length != length)
             {
                 throw new ArgumentException(string.Format("Inconsistent data length: expected={0}, provided={1}", length,
@@ -151,14 +159,7 @@ namespace MonoGame.Framework.Graphics
                 }
             }
 
-            // Convert to managed color array
-            var data = new Color[result.Width * result.Height];
-            fixed (Color* dest = data)
-            {
-                Marshal.Copy(result.Data, 0, new IntPtr(dest), result.Data.Length);
-            }
-
-            return new Image2D(result.Width, result.Height, data);
+            return new Image2D(result.Width, result.Height, result.Data);
         }
     }
 }
