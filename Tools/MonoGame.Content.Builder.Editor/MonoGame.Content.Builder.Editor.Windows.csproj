@@ -10,6 +10,7 @@
     <ApplicationIcon>App.ico</ApplicationIcon>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-wpf</AssemblyName>
+    <AssemblyTitle>MGCB Editor</AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>

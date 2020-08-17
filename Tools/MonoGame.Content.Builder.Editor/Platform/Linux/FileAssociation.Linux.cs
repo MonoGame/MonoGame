@@ -8,135 +8,87 @@ namespace MonoGame.Tools.Pipeline
 {
     public static class FileAssociation
     {
-        // System directories.
-        private static readonly string applicationDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".local/share/applications");
-        private static readonly string iconRootDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".local/share/icons/hicolor");
-        private const string iconType = "scalable/mimetypes";
-
-        // Content files.
-        private const string contentFolder = "Content";
-        private const string iconFileName = "monogame.svg";
-        private const string oldMimetypeFileName = "mgcb.xml";
-        private const string newMimetypeFileName = "x-mgcb.xml";
-        private const string desktopFileName = "mgcb-editor.desktop";
-        private const string mimetype = "text/x-mgcb";
+        private static readonly string _localPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Content");
+        private static readonly string _localIconPath = Path.Combine(_localPath, "monogame.svg");
+        private static readonly string _localMimePath = Path.Combine(_localPath, "x-mgcb.xml");
+        private static readonly string _localOldMimePath = Path.Combine(_localPath, "mgcb.xml");
+        private static readonly string _localDesktopFilePath = Path.Combine(_localPath, "mgcb-editor.desktop");
+        private static readonly string _systemIconPath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".local/share/icons/hicolor/scalable/mimetypes/monogame.svg");
+        private static readonly string _systemDesktopFilePath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".local/share/applications/mgcb-editor.desktop");
 
         public static void Associate()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var contentDirectory = Path.Join(Path.GetDirectoryName(assembly.Location), contentFolder);
-            InstallIcon(contentDirectory);
-            InstallMimetype(contentDirectory);
-            InstallApplication(contentDirectory, assembly);
+            InstallIcon();
+            InstallMimetype();
+            InstallDesktopFile();
         }
 
         public static void Unassociate()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var contentDirectory = Path.Join(Path.GetDirectoryName(assembly.Location), contentFolder);
             UninstallIcon();
-            UninstallMimetype(contentDirectory);
-            UninstallApplication();
+            UninstallMimetype();
+            UninstallDesktopFile();
         }
 
-        private static void InstallIcon(string contentDirectory)
+        private static void InstallIcon()
         {
-            Console.WriteLine("Installing icon...");
+            Directory.CreateDirectory(Path.GetDirectoryName(_systemIconPath));
+            File.Copy(_localIconPath, _systemIconPath);
 
-            // Copy the icon.
-            var iconPath = Path.Join(contentDirectory, iconFileName);
-            var outputIconDirectory = Path.Join(iconRootDirectory, iconType);
-            var outputIconPath = Path.Join(outputIconDirectory, iconFileName);
-            Directory.CreateDirectory(outputIconDirectory);
-            File.Copy(iconPath, outputIconPath, true);
-
-            try
+            var process = new Process
             {
-                // Update the GTK icon cache.
-                var process = new Process
+                StartInfo = new ProcessStartInfo
                 {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "gtk-update-icon-cache",
-                        Arguments = $"{iconRootDirectory} -f",
-                        CreateNoWindow = true,
-                        UseShellExecute = false
-                    }
-                };
-                process.Start();
-                process.WaitForExit();
-            }
-            catch { }
-
-            Console.WriteLine("Installation complete!");
-        }
-
-        private static void InstallMimetype(string contentDirectory)
-        {
-            Console.WriteLine("Installing mimetype...");
-
-            var oldMimetypePath = Path.Join(contentDirectory, oldMimetypeFileName);
-            var newMimetypePath = Path.Join(contentDirectory, newMimetypeFileName);
-
-            RunXdgMime("uninstall", oldMimetypePath);
-            RunXdgMime("install", newMimetypePath);
-
-            Console.WriteLine("Installation complete!");
-        }
-
-        private static void InstallApplication(string contentDirectory, Assembly assembly)
-        {
-            Console.WriteLine("Installing application...");
-
-            // Resolve a dotnet ProcessStartInfo to get the commands and arguments to register.
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = assembly.GetName().Name,
-                Arguments = "%F"
-            }.ResolveDotnetApp();
-
-            // Read and update the .desktop file.
-            var desktopFilePath = Path.Join(contentDirectory, desktopFileName);
-            var desktopFileContent = File.ReadAllText(desktopFilePath)
-                .Replace("{Exec}", $"\"{startInfo.FileName}\" {startInfo.Arguments}")
-                .Replace("{TryExec}", startInfo.FileName);
-
-            // Write and install the .desktop file.
-            var outputDesktopFilePath = Path.Join(applicationDirectory, desktopFileName);
-            File.WriteAllText(outputDesktopFilePath, desktopFileContent);
-            RunXdgMime("default", $"\"{desktopFileName}\" {mimetype}");
-
-            Console.WriteLine("Installation complete!");
+                    FileName = "gtk-update-icon-cache",
+                    Arguments = "~/.local/share/icons -f",
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                }
+            };
+            process.Start();
+            process.WaitForExit();
         }
 
         private static void UninstallIcon()
         {
-            Console.WriteLine("Uninstalling icon...");
-
-            var outputIconPath = Path.Join(iconRootDirectory, iconType, iconFileName);
-            File.Delete(outputIconPath);
-
-            Console.WriteLine("Uninstallation complete!");
+            if (File.Exists(_systemIconPath))
+                File.Delete(_systemIconPath);
         }
 
-        private static void UninstallMimetype(string contentDirectory)
+        private static void InstallMimetype()
         {
-            Console.WriteLine("Uninstalling mimetype...");
-
-            var newMimetypePath = Path.Join(contentDirectory, newMimetypeFileName);
-            RunXdgMime("uninstall", newMimetypePath);
-
-            Console.WriteLine("Uninstallation complete!");
+            RunXdgMime("install", _localMimePath);
         }
 
-        private static void UninstallApplication()
+        private static void UninstallMimetype()
         {
-            Console.WriteLine("Uninstalling aplication...");
+            RunXdgMime("uninstall", _localOldMimePath);
+            RunXdgMime("uninstall", _localMimePath);
+        }
 
-            var outputDesktopFilePath = Path.Join(applicationDirectory, desktopFileName);
-            File.Delete(outputDesktopFilePath);
+        private static void InstallDesktopFile()
+        {
+            // Resolve a dotnet ProcessStartInfo to get the commands and arguments to register.
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = Assembly.GetExecutingAssembly().GetName().Name,
+                Arguments = "%F"
+            }.ResolveDotnetApp();
 
-            Console.WriteLine("Uninstallation complete!");
+            // Read and update the .desktop file.
+            var desktopFileContent = File.ReadAllText(_localDesktopFilePath)
+                .Replace("{Exec}", $"\"{startInfo.FileName}\" {startInfo.Arguments}")
+                .Replace("{TryExec}", startInfo.FileName);
+
+            // Write and install the .desktop file.
+            File.WriteAllText(_systemDesktopFilePath, desktopFileContent);
+            RunXdgMime("default", Path.GetFileName(_systemDesktopFilePath) + " text/x-mgcb");
+        }
+
+        private static void UninstallDesktopFile()
+        {
+            if (File.Exists(_systemDesktopFilePath))
+                File.Delete(_systemDesktopFilePath);
         }
 
         private static void RunXdgMime(string command, string arguments)
