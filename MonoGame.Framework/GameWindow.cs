@@ -97,6 +97,11 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// IME service to handle text compositions and inputs.
+        /// </summary>
+        public IImmService ImmService { get; internal set; }
+
         internal MouseState MouseState;
 	    internal TouchPanelState TouchPanelState;
 
@@ -259,5 +264,15 @@ namespace Microsoft.Xna.Framework
             return window;
         }
 #endif
+
+        /// <summary>
+        /// Enables text input.
+        /// </summary>
+        public void StartTextInput() { ImmService.StartTextInput(); }
+
+        /// <summary>
+        /// Disables text input.
+        /// </summary>
+        public void StopTextInput() { ImmService.StopTextInput(); }
     }
 }

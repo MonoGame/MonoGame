@@ -62,6 +62,8 @@ namespace Microsoft.Xna.Framework
                 _initialized = true;
             }
 
+            (Window.ImmService as Input.AndroidImeHandler).Update();
+
             return true;
         }
 
@@ -93,6 +95,7 @@ namespace Microsoft.Xna.Framework
 
             // Run it as fast as we can to allow for more response on threaded GPU resource creation
             _gameWindow.GameView.Run();
+            Window.ImmService = new Input.AndroidImeHandler((Window as AndroidGameWindow).GameView);
 
             return false;
         }

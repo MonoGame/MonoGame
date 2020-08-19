@@ -119,6 +119,8 @@ namespace Microsoft.Xna.Framework
 
             _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
 
+            Window.ImmService = new iOS.Input.iOSImeHandler(game);
+
             //(SJ) Why is this called here when it's not in any other project
             //Guide.Initialise(game);
         }
@@ -250,6 +252,8 @@ namespace Microsoft.Xna.Framework
         {
             if (IsPlayingVideo)
                 return false;
+
+            (Window.ImmService as iOS.Input.iOSImeHandler).Update();
 
             return true;
         }
