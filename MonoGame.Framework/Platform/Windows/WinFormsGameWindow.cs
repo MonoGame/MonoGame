@@ -335,7 +335,7 @@ namespace MonoGame.Framework
         }
 
         [DllImport("user32.dll")]
-        private static extern short VkKeyScanEx(char ch, IntPtr dwhkl);
+        internal static extern short VkKeyScanEx(char ch, IntPtr dwhkl);
 
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
@@ -477,6 +477,9 @@ namespace MonoGame.Framework
                 Game.Tick();
             }
             while (!PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0) && Form != null && Form.IsDisposed == false);
+
+            if (ImmService != null)
+                ImeSharp.InputMethod.PumpMessage();
         }
 
         internal void UpdateWindows()

@@ -12,6 +12,9 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public struct TextInputEventArgs
     {
+        /// <summary>
+        /// Construct a text input event.
+        /// </summary>
         public TextInputEventArgs(char character, Keys key = Keys.None)
         {
             Character = character;
