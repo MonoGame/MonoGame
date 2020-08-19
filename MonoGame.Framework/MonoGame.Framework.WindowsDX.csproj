@@ -82,6 +82,8 @@
     <PackageReference Version="4.0.1" Include="SharpDX.MediaFoundation" />
     <PackageReference Version="4.0.1" Include="SharpDX.XAudio2" />
     <PackageReference Version="4.0.1" Include="SharpDX.XInput" />
+
+    <PackageReference Version="1.0.0" Include="ImeSharp" />
   </ItemGroup>
 
   <Import Project="Platform\DirectX.targets" />
