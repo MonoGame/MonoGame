@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
             public int Version;
             public int Profile;
             public int EffectKey;
-            public int HeaderSize;
+            public int HeaderSize;  
         }
 
         public EffectParameterCollection Parameters { get; private set; }
@@ -42,6 +42,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public EffectTechnique CurrentTechnique { get; set; }
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
+
+        internal bool _isMojoShader;
 
         private Shader[] _shaders;
 
@@ -229,18 +231,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private void ReadEffect (BinaryReaderEx reader)
 		{
-			// TODO: Maybe we should be reading in a string 
-			// table here to save some bytes in the file.
+            // TODO: Maybe we should be reading in a string 
+            // table here to save some bytes in the file.
 
-			// Read in all the constant buffers.
-			var buffers = (int)reader.ReadByte ();
+            // Read if compiled with MojoShader or ShaderConductor 
+            _isMojoShader = reader.ReadBoolean();
+
+            // Read in all the constant buffers.
+            var buffers = (int)reader.ReadByte ();
 			ConstantBuffers = new ConstantBuffer[buffers];
-			for (var c = 0; c < buffers; c++) 
+            for (var c = 0; c < buffers; c++) 
             {				
-				var name = reader.ReadString ();               
+				var name = reader.ReadString ();
+                var instanceName = reader.ReadString();
 
-				// Create the backing system memory buffer.
-				var sizeInBytes = (int)reader.ReadInt16 ();
+                // Create the backing system memory buffer.
+                var sizeInBytes = (int)reader.ReadInt16 ();
 
 				// Read the parameter index values.
 				var parameters = new int[reader.ReadByte ()];
@@ -255,7 +261,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				                                sizeInBytes,
 				                                parameters,
 				                                offsets,
-				                                name);
+				                                name,
+                                                instanceName,
+                                                this);
+
                 ConstantBuffers[c] = buffer;
             }
 
@@ -266,7 +275,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _shaders[s] = new Shader(GraphicsDevice, reader);
 
             // Read in the parameters.
-            Parameters = ReadParameters(reader);
+            Parameters = ReadParameters(reader, _isMojoShader);
 
             // Read the techniques.
             var techniqueCount = (int)reader.ReadByte();
@@ -401,7 +410,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return new EffectPassCollection(passes);
 		}
 
-		private static EffectParameterCollection ReadParameters(BinaryReaderEx reader)
+		private static EffectParameterCollection ReadParameters(BinaryReaderEx reader, bool useMojoLayout)
 		{
 			var count = reader.Read7BitEncodedInt();
             if (count == 0)
@@ -418,8 +427,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				var rowCount = (int)reader.ReadByte();
 				var columnCount = (int)reader.ReadByte();
 
-				var elements = ReadParameters(reader);
-				var structMembers = ReadParameters(reader);
+				var elements = ReadParameters(reader, useMojoLayout);
+				var structMembers = ReadParameters(reader, useMojoLayout);
 
 				object data = null;
 				if (elements.Count == 0 && structMembers.Count == 0)
@@ -467,7 +476,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				parameters[i] = new EffectParameter(
 					class_, type, name, rowCount, columnCount, semantic, 
-					annotations, elements, structMembers, data);
+					annotations, elements, structMembers, data, useMojoLayout);
 			}
 
 			return new EffectParameterCollection(parameters);

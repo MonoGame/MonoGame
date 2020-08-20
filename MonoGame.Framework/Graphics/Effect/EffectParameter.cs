@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -23,7 +24,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                     EffectAnnotationCollection annotations,
                                     EffectParameterCollection elements,
                                     EffectParameterCollection structMembers,
-                                    object data )
+                                    object data,
+                                    bool mojoDataLayout)
         {
             ParameterClass = class_;
             ParameterType = type;
@@ -40,6 +42,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Data = data;
             StateKey = unchecked(NextStateKey++);
+
+            MojoDataLayout = mojoDataLayout;
         }
 
         internal EffectParameter(EffectParameter cloneSource)
@@ -52,6 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             RowCount = cloneSource.RowCount;
             ColumnCount = cloneSource.ColumnCount;
+            MojoDataLayout = cloneSource.MojoDataLayout;
 
             // Clone the mutable types.
             Elements = cloneSource.Elements.Clone();
@@ -94,6 +99,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// if the parameter value has been changed.
         /// </summary>
         internal ulong StateKey { get; private set; }
+
+        internal bool MojoDataLayout;
 
         /// <summary>
         /// Property referenced by the DebuggerDisplayAttribute.
@@ -175,10 +182,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             // MojoShader encodes even booleans into a float.
-            return ((float[])Data)[0] != 0.0f;
-#else
-            return ((int[])Data)[0] != 0;
+            if (MojoDataLayout)
+                return ((float[])Data)[0] != 0.0f;
+            else
 #endif
+                return ((int[])Data)[0] != 0;
         }
 
         /*
@@ -195,10 +203,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             // MojoShader encodes integers into a float.
-            return (int)((float[])Data)[0];
-#else
-            return ((int[])Data)[0];
+            if (MojoDataLayout)
+                return (int)((float[])Data)[0];
+            else
 #endif
+                return ((int[])Data)[0];
         }
 
         public int[] GetValueInt32Array()
@@ -232,18 +241,20 @@ namespace Microsoft.Xna.Framework.Graphics
             if (RowCount != 4 || ColumnCount != 4)
                 throw new InvalidCastException();
 
-            var floatData = (float[])Data;
-
-            var mat = new Matrix(floatData[0], floatData[4], floatData[8], floatData[12],
-                                 floatData[1], floatData[5], floatData[9], floatData[13],
-                                 floatData[2], floatData[6], floatData[10], floatData[14],
-                                 floatData[3], floatData[7], floatData[11], floatData[15]);
-
-            // OpenGL matrices are column major, DirectX matrices are row major 
+            var floatData = (float[])Data;  
 #if OpenGL
-            mat = Matrix.Transpose(mat);
+            // OpenGL matrices are transposed compared to DX 
+            if(!MojoDataLayout) 
+                return new Matrix(floatData[0], floatData[1], floatData[2], floatData[3],
+                                  floatData[4], floatData[5], floatData[6], floatData[7],
+                                  floatData[8], floatData[9], floatData[10], floatData[11],
+                                  floatData[12], floatData[13], floatData[14], floatData[15]);
+            else
 #endif
-            return mat;
+                return new Matrix(floatData[0], floatData[4], floatData[8], floatData[12],
+                                  floatData[1], floatData[5], floatData[9], floatData[13],
+                                  floatData[2], floatData[6], floatData[10], floatData[14],
+                                  floatData[3], floatData[7], floatData[11], floatData[15]);
         }
 
         public Matrix[] GetValueMatrixArray (int count)
@@ -255,11 +266,6 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < count; i++)
             {
                 ret[i] = Elements[i].GetValueMatrix();
-
-                // OpenGL matrices are column major, DirectX matrices are row major 
-#if OpenGL
-                ret[i] = Matrix.Transpose(ret[i]);
-#endif
             }
 
             return ret;
@@ -442,10 +448,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             // MojoShader encodes even booleans into a float.
-            ((float[])Data)[0] = value ? 1 : 0;
-#else
-            ((int[])Data)[0] = value ? 1 : 0;
+            if (MojoDataLayout)
+                ((float[])Data)[0] = value ? 1 : 0;
+            else
 #endif
+                ((int[])Data)[0] = value ? 1 : 0;
 
             StateKey = unchecked(NextStateKey++);
         }
@@ -464,10 +471,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             // MojoShader encodes integers into a float.
-            ((float[])Data)[0] = value;
-#else
-            ((int[])Data)[0] = value;
+            if (MojoDataLayout)
+                ((float[])Data)[0] = value;
+            else
 #endif
+                ((int[])Data)[0] = value;
+
             StateKey = unchecked(NextStateKey++);
         }
 
@@ -481,29 +490,69 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetValue(Matrix value)
         {
-            // OpenGL matrices are column major, DirectX matrices are row major 
+            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
+                throw new InvalidCastException();
 #if OPENGL
-            SetMatrixTranspose(value);
-#else
-            SetMatrix(value);
+            // OpenGL matrices are transposed compared to DX 
+            if (!MojoDataLayout)
+                SetMatrixTranspose(value);
+            else
 #endif
+                SetMatrix(value);
+
+            StateKey = unchecked(NextStateKey++);
         }
 
         public void SetValueTranspose(Matrix value)
         {
-            // OpenGL matrices are column major, DirectX matrices are row major 
+            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
+                throw new InvalidCastException();
 #if OPENGL
-            SetMatrix(value);
-#else
-            SetMatrixTranspose(value);
+            // OpenGL matrices are transposed compared to DX 
+            if (!MojoDataLayout)
+                SetMatrix(value); 
+            else
 #endif
+                SetMatrixTranspose(value);
+
+            StateKey = unchecked(NextStateKey++);
         }
 
-        private void SetMatrix(Matrix value)
+        public void SetValue (Matrix[] value)
         {
             if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
+#if OPENGL
+            // OpenGL matrices are transposed compared to DX 
+            if (!MojoDataLayout)
+                SetMatrixArrayTransposed(value);
+            else
+#endif
+                SetMatrixArray(value);
+
+            StateKey = unchecked(NextStateKey++);
+        }
+
+        public void SetValueTranspose(Matrix[] value)
+        {
+            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
+                throw new InvalidCastException();
+
+#if OPENGL
+            // OpenGL matrices are transposed compared to DX 
+            if (!MojoDataLayout)
+                SetMatrixArray(value);
+            else
+#endif
+                SetMatrixArrayTransposed(value);
+
+            StateKey = unchecked(NextStateKey++);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetMatrix(Matrix value)
+        {
             // HLSL expects matrices to be transposed by default.
             // These unrolled loops do the transpose during assignment.
             if (RowCount == 4 && ColumnCount == 4)
@@ -597,15 +646,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 fData[4] = value.M22;
                 fData[5] = value.M32;
             }
-
-            StateKey = unchecked(NextStateKey++);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetMatrixTranspose(Matrix value)
         {
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
             // HLSL expects matrices to be transposed by default, so copying them straight
             // from the in-memory version effectively transposes them back to row-major.
             if (RowCount == 4 && ColumnCount == 4)
@@ -699,20 +744,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 fData[4] = value.M22;
                 fData[5] = value.M23;
             }
-
-            StateKey = unchecked(NextStateKey++);
         }
 
-        public void SetValue (Matrix[] value)
+        private void SetMatrixArray(Matrix[] value)
         {
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            // OpenGL matrices are column major, DirectX matrices are row major 
-#if OPENGL
-            throw new NotImplementedException("OpenGL matrices need to be transposed");
-#endif
-
             if (RowCount == 4 && ColumnCount == 4)
             {
                 for (var i = 0; i < value.Length; i++)
@@ -819,8 +854,118 @@ namespace Microsoft.Xna.Framework.Graphics
                     fData[5] = value[i].M32;
                 }
             }
+        }
 
-            StateKey = unchecked(NextStateKey++);
+        private void SetMatrixArrayTransposed(Matrix[] value)
+        {
+            // HLSL expects matrices to be transposed by default, so copying them straight
+            // from the in-memory version effectively transposes them back to row-major.
+            if (RowCount == 4 && ColumnCount == 4)
+            {
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var fData = (float[])Data;
+
+                    fData[0] = value[i].M11;
+                    fData[1] = value[i].M12;
+                    fData[2] = value[i].M13;
+                    fData[3] = value[i].M14;
+
+                    fData[4] = value[i].M21;
+                    fData[5] = value[i].M22;
+                    fData[6] = value[i].M23;
+                    fData[7] = value[i].M24;
+
+                    fData[8] = value[i].M31;
+                    fData[9] = value[i].M32;
+                    fData[10] = value[i].M33;
+                    fData[11] = value[i].M34;
+
+                    fData[12] = value[i].M41;
+                    fData[13] = value[i].M42;
+                    fData[14] = value[i].M43;
+                    fData[15] = value[i].M44;
+                }
+            }
+            else if (RowCount == 4 && ColumnCount == 3)
+            {
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var fData = (float[])Data;
+
+                    fData[0] = value[i].M11;
+                    fData[1] = value[i].M12;
+                    fData[2] = value[i].M13;
+
+                    fData[3] = value[i].M21;
+                    fData[4] = value[i].M22;
+                    fData[5] = value[i].M23;
+
+                    fData[6] = value[i].M31;
+                    fData[7] = value[i].M32;
+                    fData[8] = value[i].M33;
+
+                    fData[9] = value[i].M41;
+                    fData[10] = value[i].M42;
+                    fData[11] = value[i].M43;
+                }
+            }
+            else if (RowCount == 3 && ColumnCount == 4)
+            {
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var fData = (float[])Data;
+
+                    fData[0] = value[i].M11;
+                    fData[1] = value[i].M12;
+                    fData[2] = value[i].M13;
+                    fData[3] = value[i].M14;
+
+                    fData[4] = value[i].M21;
+                    fData[5] = value[i].M22;
+                    fData[6] = value[i].M23;
+                    fData[7] = value[i].M24;
+
+                    fData[8] =  value[i].M31;
+                    fData[9] =  value[i].M32;
+                    fData[10] = value[i].M33;
+                    fData[11] = value[i].M34;
+                }
+            }
+            else if (RowCount == 3 && ColumnCount == 3)
+            {
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var fData = (float[])Data;
+
+                    fData[0] = value[i].M11;
+                    fData[1] = value[i].M12;
+                    fData[2] = value[i].M13;
+
+                    fData[3] = value[i].M21;
+                    fData[4] = value[i].M22;
+                    fData[5] = value[i].M23;
+
+                    fData[6] = value[i].M31;
+                    fData[7] = value[i].M32;
+                    fData[8] = value[i].M33;
+                }
+            }
+            else if (RowCount == 3 && ColumnCount == 2)
+            {
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var fData = (float[])Data;
+
+                    fData[0] = value[i].M11;
+                    fData[1] = value[i].M12;
+                    fData[2] = value[i].M13;
+
+                    fData[3] = value[i].M21;
+                    fData[4] = value[i].M22;
+                    fData[5] = value[i].M23;
+                }
+            }
         }
 
         public void SetValue (Quaternion value)

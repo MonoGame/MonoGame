@@ -11,13 +11,18 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private ShaderProgram _shaderProgram = null;
         private int _glBuffer = -1;
+        private int _globalsArrayLocationMojo;  // MojoShader uses one big float4 array for all parameters
+        private int[] _parameterLocations = null; // If uniform buffers are not available parameters need to be updated individually
 
         static ConstantBuffer _lastConstantBufferApplied = null;
 
         private void PlatformInitialize()
         {
-            GL.GenBuffers(1, out _glBuffer);
-            GraphicsExtensions.CheckGLError();
+            if (!_effect._isMojoShader)
+            {
+                GL.GenBuffers(1, out _glBuffer);
+                GraphicsExtensions.CheckGLError();
+            }
         }
 
         private void PlatformClear()
@@ -40,6 +45,15 @@ namespace Microsoft.Xna.Framework.Graphics
             // If the program changed then apply the state.
             if (_shaderProgram != program)
             {
+                if (_effect._isMojoShader)
+                {
+                    var location = program.GetUniformLocation(_name);
+                    if (location == -1)
+                        return;
+
+                    _globalsArrayLocationMojo = location;
+                }
+
                 _shaderProgram = program;
                 _dirty = true;
             }
@@ -53,28 +67,125 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!_dirty)
                 return;
 
-            int uniformBlockIndex = GL.GetUniformBlockIndex(program.Program, _name);
-            GraphicsExtensions.CheckGLError();
-
-            if (uniformBlockIndex >= 0)
+            if (_effect._isMojoShader)
             {
-                GL.BindBuffer(BufferTarget.UniformBuffer, _glBuffer);
-                GraphicsExtensions.CheckGLError();
-
                 fixed (byte* bytePtr = _buffer)
                 {
-                    GL.BufferData(BufferTarget.UniformBuffer, (IntPtr)_buffer.Length, (IntPtr)bytePtr, BufferUsageHint.StreamDraw);
+                    // TODO: We need to know the type of buffer float/int/bool
+                    // and cast this correctly... else it doesn't work as i guess
+                    // GL is checking the type of the uniform.
+                    GL.Uniform4(_globalsArrayLocationMojo, _buffer.Length / 16, (float*)bytePtr);
                     GraphicsExtensions.CheckGLError();
                 }
-
-                GL.BindBufferBase(BufferTarget.UniformBuffer, uniformBlockIndex, _glBuffer);
-                GraphicsExtensions.CheckGLError();
             }
+            else 
+            {
+                int uniformBlockIndex = GL.GetUniformBlockIndex(program.Program, _name);
+                GraphicsExtensions.CheckGLError();
 
+                if (uniformBlockIndex >= 0)
+                {
+                    GL.BindBuffer(BufferTarget.UniformBuffer, _glBuffer);
+                    GraphicsExtensions.CheckGLError();
+
+                    fixed (byte* bytePtr = _buffer)
+                    {
+                        GL.BufferData(BufferTarget.UniformBuffer, (IntPtr)_buffer.Length, (IntPtr)bytePtr, BufferUsageHint.StreamDraw);
+                        GraphicsExtensions.CheckGLError();
+                    }
+
+                    GL.BindBufferBase(BufferTarget.UniformBuffer, uniformBlockIndex, _glBuffer);
+                    GraphicsExtensions.CheckGLError();
+                }
+                else // uniform buffers are not available, we have to update the parameters one by one
+                    UpdateParametersIndividually(program);
+            }
+            
             // Clear the dirty flag.
             _dirty = false;
 
             _lastConstantBufferApplied = this;
+        }
+
+        private unsafe void UpdateParametersIndividually(ShaderProgram program)
+        {
+            if (_parameterLocations == null)
+            {
+                _parameterLocations = new int[_parameters.Length];
+
+                for (int i = 0; i < _parameters.Length; i++)
+                {
+                    int paramIndex = _parameters[i];
+                    var param = _effect.Parameters[paramIndex];
+                    _parameterLocations[i] = program.GetUniformLocation(_instanceName + "." + param.Name); 
+                }
+            }
+
+            for (int i = 0; i < _parameters.Length; i++)
+            {
+                int location = _parameterLocations[i];
+                if (location < 0)
+                    continue;
+
+                int paramIndex = _parameters[i];
+                var param = _effect.Parameters[paramIndex];
+
+                fixed (byte* bytePtr = &_buffer[_offsets[paramIndex]])
+                {
+                    if (param.ParameterType == EffectParameterType.Int32 || param.ParameterType == EffectParameterType.Bool)
+                        GL.Uniform1i(location, *(int*)bytePtr);
+                    else
+                    {
+                        switch (param.ParameterClass)
+                        {
+                            case EffectParameterClass.Scalar:
+                                GL.Uniform1fv(location, 1, (float*)bytePtr);
+                                break;
+
+                            case EffectParameterClass.Vector:
+                                switch (param.ColumnCount)
+                                {
+                                    case 2: GL.Uniform2fv(location, 1, (float*)bytePtr); break;
+                                    case 3: GL.Uniform3fv(location, 1, (float*)bytePtr); break;
+                                    case 4: GL.Uniform4fv(location, 1, (float*)bytePtr); break;
+                                }
+                                break;
+
+                            case EffectParameterClass.Matrix:
+                                switch (param.RowCount)
+                                {
+                                    case 2:
+                                        switch (param.ColumnCount)
+                                        {
+                                            case 2: GL.UniformMatrix2fv  (location, 1, false, (float*)bytePtr); break;
+                                            case 3: GL.UniformMatrix2x3fv(location, 1, false, (float*)bytePtr); break;
+                                            case 4: GL.UniformMatrix2x4fv(location, 1, false, (float*)bytePtr); break;
+                                        }
+                                        break;
+                                    case 3:
+                                        switch (param.ColumnCount)
+                                        {
+                                            case 2: GL.UniformMatrix3x2fv(location, 1, false, (float*)bytePtr); break;
+                                            case 3: GL.UniformMatrix3fv  (location, 1, false, (float*)bytePtr); break;
+                                            case 4: GL.UniformMatrix3x4fv(location, 1, false, (float*)bytePtr); break;
+                                        }
+                                        break;
+                                    case 4:
+                                        switch (param.ColumnCount)
+                                        {
+                                            case 2: GL.UniformMatrix4x2fv(location, 1, false, (float*)bytePtr); break;
+                                            case 3: GL.UniformMatrix4x3fv(location, 1, false, (float*)bytePtr); break;
+                                            case 4: GL.UniformMatrix4fv  (location, 1, false, (float*)bytePtr); break;
+                                        }
+                                        break;
+                                }
+                                break;
+                        }
+                    }
+                }
+
+                GraphicsExtensions.CheckGLError();
+            }
         }
 
         protected override void Dispose(bool disposing)
