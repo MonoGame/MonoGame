@@ -8,7 +8,8 @@ namespace MonoGame.Effect
     {
         public ConstantBufferData (ShaderConductor.UniformBuffer ub)
 		{
-            Name = ub.name;
+            Name = ub.blockName;
+            InstanceName = ub.instanceName;
             Size = ub.byteSize;
 
             ParameterIndex = new List<int>();

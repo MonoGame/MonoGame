@@ -57,8 +57,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (debugMode == EffectProcessorDebugMode.Debug)
                 arguments += " /Debug";
 
-            if (!string.IsNullOrWhiteSpace(defines))
-                arguments += " \"/Defines:" + defines + "\"";
+            string defineArgument = defines == null ? "" : defines;
+            string platformDefines = AddDefinesForPlatform(context.TargetPlatform, ref defineArgument);
+
+            if (defineArgument != "")
+                arguments += " \"/Defines:" + defineArgument + "\"";
 
             string stdout, stderr;
 
@@ -99,6 +102,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             return platform.ToString();
+        }
+
+        private string AddDefinesForPlatform(TargetPlatform platform, ref string defines)
+        {
+            switch (platform)
+            {
+                case TargetPlatform.iOS:
+                case TargetPlatform.Android:
+                    defines += "ESSL;";
+                    break;
+            }
+
+            return defines;
         }
 
         private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)

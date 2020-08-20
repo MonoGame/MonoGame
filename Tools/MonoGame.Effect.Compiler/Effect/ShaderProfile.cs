@@ -54,7 +54,7 @@ namespace MonoGame.Effect
             return _profiles.FirstOrDefault(p => p.Name == name);
         }
 
-        internal abstract void AddMacros(Dictionary<string, string> macros);
+        internal abstract void AddMacros(Dictionary<string, string> macros, Options options);
 
         internal abstract void ValidateShaderModels(PassInfo pass);
 
@@ -62,18 +62,20 @@ namespace MonoGame.Effect
 
         internal abstract Regex GetShaderModelRegex(ShaderStage stage);
 
-        protected static void ParseShaderModel(string text, Regex regex, out int major, out int minor)
+        protected static void ParseShaderModel(string text, Regex regex, out int major, out int minor, out string extension)
         {
             var match = regex.Match(text);
             if (!match.Success)
             {
                 major = 0;
                 minor = 0;
+                extension = "";
                 return;
             }
 
             major = int.Parse(match.Groups["major"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
             minor = int.Parse(match.Groups["minor"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
+            extension = match.Groups["exctension"].Value;
         }
 
         private class StringConverter : TypeConverter

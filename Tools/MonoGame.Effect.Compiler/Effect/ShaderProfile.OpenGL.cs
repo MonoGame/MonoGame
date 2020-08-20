@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using MonoGame.Effect.TPGParser;
@@ -12,22 +13,30 @@ namespace MonoGame.Effect
 {
     class OpenGLShaderProfile : ShaderProfile
     {
-        const bool UseMojo = false;
+        private bool _isESSL;
+        private bool _useMojo;
 
-        private static readonly Regex GlslPixelShaderRegex = new Regex(@"^ps_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
-        private static readonly Regex GlslVertexShaderRegex = new Regex(@"^vs_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
+        private static readonly Regex GlslPixelShaderRegex = DirectX11ShaderProfile.HlslPixelShaderRegex;
+        private static readonly Regex GlslVertexShaderRegex = DirectX11ShaderProfile.HlslVertexShaderRegex;
+        private static readonly Regex GlslHullShaderRegex = DirectX11ShaderProfile.HlslHullShaderRegex;
+        private static readonly Regex GlslDomainShaderRegex = DirectX11ShaderProfile.HlslDomainShaderRegex;
+        private static readonly Regex GlslGeometryShaderRegex = DirectX11ShaderProfile.HlslGeometryShaderRegex;
 
         public OpenGLShaderProfile()
             : base("OpenGL", 0)
-        {                
+        {
+            //
         }
 
-        internal override void AddMacros(Dictionary<string, string> macros)
+        internal override void AddMacros(Dictionary<string, string> macros, Options options)
         {
             macros.Add("GLSL", "1");
             macros.Add("OPENGL", "1");
 
-            if(!UseMojo)
+            _isESSL = options.IsDefined("ESSL");
+            _useMojo = options.IsDefined("MOJO");
+
+            if (!_useMojo)
                 macros.Add("SM4", "1");
         }
 
@@ -46,26 +55,31 @@ namespace MonoGame.Effect
 
         internal override void ValidateShaderModels(PassInfo pass)
         {
-            int major, minor;
-
-            if (!string.IsNullOrEmpty(pass.vsFunction))
+            int maxSM = _useMojo ? 3 : 5;
+            if (_useMojo)
             {
-                ParseShaderModel(pass.vsModel, GlslVertexShaderRegex, out major, out minor);
-                if (major > 3)
-                    throw new Exception(String.Format("Invalid profile '{0}'. Vertex shader '{1}' must be SM 3.0 or lower!", pass.vsModel, pass.vsFunction));
-            }
+                int major, minor;
+                string extension;
 
-            if (!string.IsNullOrEmpty(pass.psFunction))
-            {
-                ParseShaderModel(pass.psModel, GlslPixelShaderRegex, out major, out minor);
-                if (major > 3)
-                    throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be SM 3.0 or lower!", pass.vsModel, pass.psFunction));
+                if (!string.IsNullOrEmpty(pass.vsFunction))
+                {
+                    ParseShaderModel(pass.vsModel, GlslVertexShaderRegex, out major, out minor, out extension);
+                    if (major > maxSM)
+                        throw new Exception(String.Format("Invalid profile '{0}'. Vertex shader '{1}' must be SM {2}.0 or lower!", pass.vsModel, pass.vsFunction, maxSM));
+                }
+
+                if (!string.IsNullOrEmpty(pass.psFunction))
+                {
+                    ParseShaderModel(pass.psModel, GlslPixelShaderRegex, out major, out minor, out extension);
+                    if (major > maxSM)
+                        throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be SM {2}.0 or lower!", pass.vsModel, pass.psFunction, maxSM));
+                }
             }
         }
 
         internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ShaderStage shaderStage, EffectObject effect, ref string errorsAndWarnings)
         {
-            if (UseMojo)
+            if (_useMojo)
             {
                 // For now GLSL is only supported via translation
                 // using MojoShader which works from HLSL bytecode.
@@ -79,18 +93,23 @@ namespace MonoGame.Effect
                 }
 
                 var shaderInfo = shaderResult.ShaderInfo;
-                var shaderData = ShaderData.CreateGLSLMojo(bytecode, shaderStage, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);
+                var shaderData = ShaderData.CreateGLSL_Mojo(bytecode, shaderStage, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);
                 effect.Shaders.Add(shaderData);
 
                 return shaderData;
             }
             else
             {
-                ParseShaderModel(shaderProfile, GetShaderModelRegex(shaderStage), out int smMajor, out int smMinor);
+                ParseShaderModel(shaderProfile, GetShaderModelRegex(shaderStage), out int smMajor, out int smMinor, out string smExtension);
 
                 var shaderInfo = shaderResult.ShaderInfo;
                 var sourceCode = shaderResult.FileContent;
-                var shaderData = ShaderData.CreateGLSL(sourceCode, shaderFunction, shaderStage, smMajor, smMinor, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);
+
+                var shaderData = ShaderData.CreateGLSL_Conductor(sourceCode,
+                    shaderStage, shaderFunction,
+                    smMajor, smMinor, smExtension,
+                    effect.Shaders.Count, effect.ConstantBuffers, shaderInfo.SamplerStates, 
+                    shaderResult.Debug, _isESSL);
 
                 // See if we already created this same shader.
                 foreach (var shader in effect.Shaders)
