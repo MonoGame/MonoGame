@@ -5,7 +5,7 @@ namespace Microsoft.Xna.Framework.Input
     /// <summary>
     /// Integrate IME to DesktopGL(SDL2) platform.
     /// </summary>
-    internal class SdlImeHandler : IImmService
+    internal class SdlImeHandler : ImmService
     {
         private Game _game;
 
@@ -15,14 +15,11 @@ namespace Microsoft.Xna.Framework.Input
 
             // Text input is enabled by default in SDL2 internally, we have to set this flag manually.
             IsTextInputActive = true;
+            VirtualKeyboardHeight = 0;
         }
 
-        public bool IsTextInputActive { get; private set; }
-        public event EventHandler<TextCompositionEventArgs> TextComposition;
-        public event EventHandler<TextInputEventArgs> TextInput;
-
-        public bool ShowOSImeWindow { get; set; }
-        public int VirtualKeyboardHeight { get { return 0; } }
+        public override event EventHandler<TextCompositionEventArgs> TextComposition;
+        public override event EventHandler<TextInputEventArgs> TextInput;
 
         public void OnTextInput(char charInput, Keys key)
         {
@@ -30,13 +27,13 @@ namespace Microsoft.Xna.Framework.Input
                 TextInput.Invoke(this, new TextInputEventArgs(charInput, key));
         }
 
-        public void OnTextComposition(string compositionString, int cursorPosition)
+        public void OnTextComposition(IMEString compositionText, int cursorPosition)
         {
             if (TextComposition != null)
-                TextComposition.Invoke(this, new TextCompositionEventArgs(compositionString, cursorPosition));
+                TextComposition.Invoke(this, new TextCompositionEventArgs(compositionText, cursorPosition));
         }
 
-        public void StartTextInput()
+        public override void StartTextInput()
         {
             if (IsTextInputActive)
                 return;
@@ -45,7 +42,7 @@ namespace Microsoft.Xna.Framework.Input
             IsTextInputActive = true;
         }
 
-        public void StopTextInput()
+        public override void StopTextInput()
         {
             if (!IsTextInputActive)
                 return;
@@ -54,7 +51,7 @@ namespace Microsoft.Xna.Framework.Input
             IsTextInputActive = false;
         }
 
-        public void SetTextInputRect(Rectangle rect)
+        public override void SetTextInputRect(Rectangle rect)
         {
             var sdlRect = new Sdl.Rectangle() { X = rect.X, Y = rect.Y, Width = rect.Width, Height = rect.Height };
             Sdl.SetTextInputRect(ref sdlRect);

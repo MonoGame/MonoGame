@@ -160,18 +160,18 @@ namespace Microsoft.Xna.Framework
                         unsafe
                         {
                             var cursorPosition = ev.Edit.Start;
-                            var compositionString = SDLBufferToString(ev.Edit.Text);
-                            _imeHandler.OnTextComposition(compositionString, cursorPosition);
+                            var compositionText = SDLBufferToIMEString(ev.Edit.Text);
+                            _imeHandler.OnTextComposition(compositionText, cursorPosition);
                         }
                         break;
                     }
                     case Sdl.EventType.TextInput:
                         // Mimic a CompositionEnd event
-                        _imeHandler.OnTextComposition(null, 0);
+                        _imeHandler.OnTextComposition(IMEString.Empty, 0);
 
                         unsafe
                         {
-                            var text = SDLBufferToString(ev.Text.Text); // This way to support emoji.
+                            var text = SDLBufferToIMEString(ev.Text.Text); // This way to support emoji.
                             foreach (var c in text)
                             {
                                 _imeHandler.OnTextInput(c, KeyboardUtil.ToXna(c));
@@ -236,21 +236,32 @@ namespace Microsoft.Xna.Framework
                 return -1;
         }
 
-        private unsafe string SDLBufferToString(byte* text, int size = 32)
-        {
-            byte[] sourceBytes = new byte[size];
-            int length = 0;
+        const int BufferSize = 1024;
+        private byte[] _byteBuffer = new byte[BufferSize];
+        private int _byteCount;
 
-            for (int i = 0; i < size; i++)
+        private char[] _charBuffer = new char[BufferSize / 2];
+        private int _charCount;
+
+        private unsafe IMEString SDLBufferToIMEString(byte* text, int maxSize = 32)
+        {
+            Array.Clear(_byteBuffer, 0, _byteCount);
+
+            _byteCount = 0;
+            for (int i = 0; i < maxSize; i++)
             {
                 if (text[i] == 0)
                     break;
 
-                sourceBytes[i] = text[i];
-                length++;
+                _byteBuffer[i] = text[i];
+                _byteCount++;
             }
 
-            return System.Text.Encoding.UTF8.GetString(sourceBytes, 0, length);
+            Array.Clear(_charBuffer, 0, _charCount);
+
+            _charCount = System.Text.Encoding.Unicode.GetChars(_byteBuffer, 0, _byteCount, _charBuffer, 0);
+
+            return new IMEString(_charBuffer, _charCount);
         }
 
         public override void StartRunLoop()
