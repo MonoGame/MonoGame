@@ -8,7 +8,7 @@ using Android.App;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public class AndroidImeHandler : IImmService
+    public class AndroidImeHandler : ImmService
     {
         private const int IME_FLAG_NO_EXTRACT_UI = 0x10000000;
 
@@ -17,11 +17,10 @@ namespace Microsoft.Xna.Framework.Input
         private MonoGameAndroidGameView _gameView;
 
         private Android.Graphics.Point ScreenSize { get { return Game.Activity.ScreenSize; } }
-        public bool IsTextInputActive { get; private set; }
-        public bool ShowOSImeWindow { get { return true; } set { } }
-        public event EventHandler<TextCompositionEventArgs> TextComposition;
-        public event EventHandler<TextInputEventArgs> TextInput;
-        public int VirtualKeyboardHeight { get { return Game.Activity.KeyboardHeight; } }
+
+        public override event EventHandler<TextCompositionEventArgs> TextComposition;
+        public override event EventHandler<TextInputEventArgs> TextInput;
+        public override int VirtualKeyboardHeight { get { return Game.Activity.KeyboardHeight; } }
 
         public AndroidImeHandler(MonoGameAndroidGameView gameView)
         {
@@ -64,7 +63,7 @@ namespace Microsoft.Xna.Framework.Input
             editText.TextChanged += EditText_TextChanged;
         }
 
-        public void StartTextInput()
+        public override void StartTextInput()
         {
             if (IsTextInputActive)
                 return;
@@ -74,7 +73,7 @@ namespace Microsoft.Xna.Framework.Input
             IsTextInputActive = true;
         }
 
-        public void StopTextInput()
+        public override void StopTextInput()
         {
             if (!IsTextInputActive)
                 return;
@@ -101,7 +100,7 @@ namespace Microsoft.Xna.Framework.Input
             }
         }
 
-        public void SetTextInputRect(Rectangle rect)
+        public override void SetTextInputRect(Rectangle rect)
         {
         }
     }
