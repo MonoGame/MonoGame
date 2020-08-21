@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework
         ///
         /// This API is supported on DesktopGL and WindowsDX.
         /// </summary>
-        public abstract void SetTextInputRect(Rectangle rect);
+        public virtual void SetTextInputRect(Rectangle rect) {}
 
         /// <summary>
         /// Invoked when the IMM service is enabled and a character composition is changed.

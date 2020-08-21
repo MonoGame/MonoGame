@@ -175,9 +175,5 @@ namespace Microsoft.Xna.Framework.iOS.Input
                 }
             }
         }
-
-        public override void SetTextInputRect(Rectangle rect)
-        {
-        }
     }
 }

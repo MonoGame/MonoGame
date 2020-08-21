@@ -53,6 +53,9 @@ namespace Microsoft.Xna.Framework.Input
 
         public override void SetTextInputRect(Rectangle rect)
         {
+            if (!IsTextInputActive)
+                return;
+
             var sdlRect = new Sdl.Rectangle() { X = rect.X, Y = rect.Y, Width = rect.Width, Height = rect.Height };
             Sdl.SetTextInputRect(ref sdlRect);
         }

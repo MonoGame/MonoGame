@@ -99,9 +99,5 @@ namespace Microsoft.Xna.Framework.Input
                 }
             }
         }
-
-        public override void SetTextInputRect(Rectangle rect)
-        {
-        }
     }
 }
