@@ -51,9 +51,6 @@
     <Compile Include="Platform\Windows\WinFormsGameForm.cs" />
     <Compile Include="Platform\Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Platform\Windows\WinFormsGameWindow.cs" />
-    <Compile Include="Platform\Windows\Input\ImeCompositionAttributes.cs" />
-    <Compile Include="Platform\Windows\Input\ImeCompositionResultHandler.cs" />
-    <Compile Include="Platform\Windows\Input\ImeNativeMethods.cs" />
     <Compile Include="Platform\Windows\Input\WinFormsImeHandler.cs" />
   </ItemGroup> 
 
