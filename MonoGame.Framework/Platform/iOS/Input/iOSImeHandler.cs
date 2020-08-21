@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
         }
     }
 
-    public class iOSImeHandler : IImmService
+    public class iOSImeHandler : ImmService
     {
         private UIWindow mainWindow;
         private UIViewController gameViewController;
@@ -97,12 +97,10 @@ namespace Microsoft.Xna.Framework.iOS.Input
             });
         }
 
-        public bool IsTextInputActive { get; private set; }
-        public event EventHandler<TextCompositionEventArgs> TextComposition;
-        public event EventHandler<TextInputEventArgs> TextInput;
+        public override event EventHandler<TextCompositionEventArgs> TextComposition;
+        public override event EventHandler<TextInputEventArgs> TextInput;
 
-        public bool ShowOSImeWindow { get { return true; } set { } }
-        public int VirtualKeyboardHeight { get { return _virtualKeyboardHeight; } }
+        public override int VirtualKeyboardHeight { get { return _virtualKeyboardHeight; } }
 
         private bool TextField_ShouldReturn(UITextField textfield)
         {
@@ -116,7 +114,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
         {
             // Mimic a CompositionEnd event
             if (TextComposition != null)
-                TextComposition.Invoke(this, new TextCompositionEventArgs(null, 0));
+                TextComposition.Invoke(this, new TextCompositionEventArgs(IMEString.Empty, 0));
 
             foreach (var c in textField.Text)
                 if (TextInput != null)
@@ -132,7 +130,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
             var compStr = textField.TextInRange(textRange);
                 compStr = compStr.Replace(SIX_PER_EM_SPACE, ' ');
             if (TextComposition != null)
-                TextComposition.Invoke(this, new TextCompositionEventArgs(compStr, compStr.Length));
+                TextComposition.Invoke(this, new TextCompositionEventArgs(new IMEString(compStr), compStr.Length));
         }
 
         private void TextField_DeleteBackward(object sender, EventArgs e)
@@ -142,7 +140,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
                 TextInput.Invoke(this, new TextInputEventArgs((char)key, key));
         }
 
-        public void StartTextInput()
+        public override void StartTextInput()
         {
             if (IsTextInputActive)
                 return;
@@ -151,7 +149,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
             IsTextInputActive = true;
         }
 
-        public void StopTextInput()
+        public override void StopTextInput()
         {
             if (!IsTextInputActive)
                 return;
@@ -178,7 +176,7 @@ namespace Microsoft.Xna.Framework.iOS.Input
             }
         }
 
-        public void SetTextInputRect(Rectangle rect)
+        public override void SetTextInputRect(Rectangle rect)
         {
         }
     }
