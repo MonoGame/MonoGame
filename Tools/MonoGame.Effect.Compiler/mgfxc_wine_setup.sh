@@ -36,7 +36,9 @@ curl $FIREFOX_URL --output "$SCRIPT_DIR/firefox.exe"
 cp -f "$SCRIPT_DIR/firefox_data/core/d3dcompiler_47.dll" "$WINEPREFIX/drive_c/windows/system32/d3dcompiler_47.dll"
 
 # append MGFXC_WINE_PATH env variable
+echo "" >> ~/.profile
 echo "export MGFXC_WINE_PATH=$HOME/.winemonogame" >> ~/.profile
+echo "" >> ~/.zprofile
 echo "export MGFXC_WINE_PATH=$HOME/.winemonogame" >> ~/.zprofile
 
 # cleanup
