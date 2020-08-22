@@ -410,7 +410,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return new EffectPassCollection(passes);
 		}
 
-		private static EffectParameterCollection ReadParameters(BinaryReaderEx reader, bool useMojoLayout)
+		private static EffectParameterCollection ReadParameters(BinaryReaderEx reader, bool isMojo)
 		{
 			var count = reader.Read7BitEncodedInt();
             if (count == 0)
@@ -427,8 +427,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				var rowCount = (int)reader.ReadByte();
 				var columnCount = (int)reader.ReadByte();
 
-				var elements = ReadParameters(reader, useMojoLayout);
-				var structMembers = ReadParameters(reader, useMojoLayout);
+				var elements = ReadParameters(reader, isMojo);
+				var structMembers = ReadParameters(reader, isMojo);
 
 				object data = null;
 				if (elements.Count == 0 && structMembers.Count == 0)
@@ -437,20 +437,22 @@ namespace Microsoft.Xna.Framework.Graphics
 					{						
                         case EffectParameterType.Bool:
                         case EffectParameterType.Int32:
-#if !OPENGL
-                            // Under most platforms we properly store integers and 
-                            // booleans in an integer type.
-                            //
-                            // MojoShader on the otherhand stores everything in float
-                            // types which is why this code is disabled under OpenGL.
-					        {
-					            var buffer = new int[rowCount * columnCount];								
+                            {
+#if OPENGL
+                                // Under most platforms we properly store integers and 
+                                // booleans in an integer type.
+                                //
+                                // MojoShader on the otherhand stores everything in float
+                                // types which is why we redirect to the EffectParameterType.Single case
+                                if (isMojo)
+                                    goto case EffectParameterType.Single;
+#endif
+                                var buffer = new int[rowCount * columnCount];
                                 for (var j = 0; j < buffer.Length; j++)
                                     buffer[j] = reader.ReadInt32();
                                 data = buffer;
                                 break;
-					        }
-#endif
+                            }
 
 						case EffectParameterType.Single:
 							{
@@ -476,7 +478,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				parameters[i] = new EffectParameter(
 					class_, type, name, rowCount, columnCount, semantic, 
-					annotations, elements, structMembers, data, useMojoLayout);
+					annotations, elements, structMembers, data, isMojo);
 			}
 
 			return new EffectParameterCollection(parameters);

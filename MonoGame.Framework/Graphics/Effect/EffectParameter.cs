@@ -646,6 +646,29 @@ namespace Microsoft.Xna.Framework.Graphics
                 fData[4] = value.M22;
                 fData[5] = value.M32;
             }
+            else if (RowCount == 2 && ColumnCount == 3)
+            {
+                var fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M21;
+
+                fData[2] = value.M12;
+                fData[3] = value.M22;
+
+                fData[4] = value.M13;
+                fData[5] = value.M23;
+            }
+            else if (RowCount == 2 && ColumnCount == 2)
+            {
+                var fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M21;
+
+                fData[2] = value.M12;
+                fData[3] = value.M22;
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -738,11 +761,34 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 fData[0] = value.M11;
                 fData[1] = value.M12;
+
+                fData[2] = value.M21;
+                fData[3] = value.M22;
+
+                fData[4] = value.M31;
+                fData[5] = value.M32;
+            }
+            else if (RowCount == 2 && ColumnCount == 3)
+            {
+                var fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M12;
                 fData[2] = value.M13;
 
                 fData[3] = value.M21;
                 fData[4] = value.M22;
                 fData[5] = value.M23;
+            }
+            else if (RowCount == 2 && ColumnCount == 2)
+            {
+                var fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M12;
+
+                fData[2] = value.M21;
+                fData[3] = value.M22;
             }
         }
 
@@ -852,6 +898,35 @@ namespace Microsoft.Xna.Framework.Graphics
                     fData[3] = value[i].M12;
                     fData[4] = value[i].M22;
                     fData[5] = value[i].M32;
+                }
+            }
+            else if (RowCount == 2 && ColumnCount == 3)
+            {
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var fData = (float[])Data;
+
+                    fData[0] = value[i].M11;
+                    fData[1] = value[i].M21;
+
+                    fData[2] = value[i].M12;
+                    fData[3] = value[i].M22;
+
+                    fData[4] = value[i].M13;
+                    fData[5] = value[i].M23;
+                }
+            }
+            else if (RowCount == 2 && ColumnCount == 2)
+            {
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var fData = (float[])Data;
+
+                    fData[0] = value[i].M11;
+                    fData[1] = value[i].M21;
+
+                    fData[2] = value[i].M12;
+                    fData[3] = value[i].M22;
                 }
             }
         }
@@ -964,6 +1039,34 @@ namespace Microsoft.Xna.Framework.Graphics
                     fData[3] = value[i].M21;
                     fData[4] = value[i].M22;
                     fData[5] = value[i].M23;
+                }
+            }
+            else if (RowCount == 2 && ColumnCount == 3)
+            {
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var fData = (float[])Data;
+
+                    fData[0] = value[i].M11;
+                    fData[1] = value[i].M12;
+                    fData[2] = value[i].M13;
+
+                    fData[3] = value[i].M21;
+                    fData[4] = value[i].M22;
+                    fData[5] = value[i].M23;
+                }
+            }
+            else if (RowCount == 2 && ColumnCount == 2)
+            {
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var fData = (float[])Data;
+
+                    fData[0] = value[i].M11;
+                    fData[1] = value[i].M12;
+
+                    fData[2] = value[i].M21;
+                    fData[3] = value[i].M22;
                 }
             }
         }

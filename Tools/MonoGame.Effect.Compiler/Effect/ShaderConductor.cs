@@ -8,9 +8,6 @@ namespace MonoGame.Effect
 {
     internal static class ShaderConductor
     {
-        //==============================================================
-        // Native C++ functions
-        //==============================================================
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void Compile([In] ref SourceDesc source, [In] ref OptionsDesc options, [In] ref TargetDesc target, out ResultDesc result);
 
@@ -30,29 +27,29 @@ namespace MonoGame.Effect
         public static extern int GetShaderConductorBlobSize(IntPtr blob);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int GetStageInputCount([In] ref ResultDesc result);
+        public static extern int GetStageInputCount([In] ref ResultDesc result);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int GetUniformBufferCount([In] ref ResultDesc result);
+        public static extern void GetStageInput([In] ref ResultDesc result, int stageInputIndex, byte[] name, int maxNameLength, out int location);
+
+        [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int GetUniformBufferCount([In] ref ResultDesc result);
+
+        [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void GetUniformBuffer([In] ref ResultDesc result, int bufferIndex, byte[] blockName, byte[] instanceName, int maxNameLength, out int byteSize, out int parameterCount);
+
+        [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void GetParameter([In] ref ResultDesc result, int bufferIndex, int parameterIndex, byte[] name, int maxNameLength, out int type, out int rows, out int columns, out int byteOffset, out int arrayDimensions);
+
+        [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void GetParameterArraySize([In] ref ResultDesc result, int bufferIndex, int parameterIndex, int dimension, out int arraySize);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int GetSamplerCount([In] ref ResultDesc result);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void GetStageInput([In] ref ResultDesc result, int stageInputIndex, byte[] name, int maxNameLength, out int location);
-
-        [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void GetUniformBuffer([In] ref ResultDesc result, int bufferIndex, byte[] blockName, byte[] instanceName, int maxNameLength, out int byteSize, out int parameterCount);
-
-        [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void GetParameter([In] ref ResultDesc result, int bufferIndex, int parameterIndex, byte[] name, int maxNameLength, out int type, out int rows, out int columns, out int byteOffset);
-
-        [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void GetSampler([In] ref ResultDesc result, int samplerIndex, byte[] name, byte[] originalName, byte[] textureName, int maxNameLength, out int type, out int slot);
 
-        //==============================================================
-        // Cross Compile API
-        //==============================================================
         public enum ShaderStage
         {
             VertexShader,
@@ -197,6 +194,8 @@ namespace MonoGame.Effect
             public int rows;
             public int columns;
             public int offset;
+            public int arrayDimensions; // 0 = no array, 1 = 1D array, 2 = 2D array, ...
+            public List<int> arraySize; // one entry for each array dimension
         }
 
         public struct Sampler
@@ -254,15 +253,25 @@ namespace MonoGame.Effect
 
                 for (int i = 0; i < parameterCount; i++)
                 {
-                    GetParameter(ref result, bufInd, i, parameterNameBuffer, MaxNameLength, out int type, out int rows, out int columns, out int offset);
-                    parameters.Add(new Parameter
+                    GetParameter(ref result, bufInd, i, parameterNameBuffer, MaxNameLength, out int type, out int rows, out int columns, out int offset, out int arrayDimensions);
+                    var param = new Parameter
                     {
                         name = ByteBufferToString(parameterNameBuffer),
                         type = type,
                         rows = rows,
                         columns = columns,
                         offset = offset,
-                    });
+                        arrayDimensions = arrayDimensions,
+                        arraySize = new List<int>(),
+                    };
+
+                    for (int dim = 0; dim < arrayDimensions; dim++)
+                    {
+                        GetParameterArraySize(ref result, bufInd, i, dim, out int arraySize);
+                        param.arraySize.Add(arraySize);
+                    }
+
+                    parameters.Add(param);
                 }
 
                 buffers.Add(new UniformBuffer

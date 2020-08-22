@@ -41,7 +41,7 @@ namespace MonoGame.Effect
             string glslVersion = "";
             switch (shaderModelMajor)
             {   
-                case 0: //                                    GLSL    ESSL                  OpenGL (Shader)       OpenGL ES (Shader)                                                            
+                case 0: //                                   GLSL    ESSL                 OpenGL (Shader)       OpenGL ES (Shader)                                                            
                 case 1:                                                                          
                 case 2:             glslVersion = !isESSL ? "110" : "100";    break; //   2.0                   2.0
                 case 3:             glslVersion = !isESSL ? "110" : "100";    break; //   2.0                   2.0
@@ -105,12 +105,12 @@ namespace MonoGame.Effect
                 // Apply some fixes to the GLSL code, then add it to shaderData
                 //==============================================================
                 if (isESSL)
-                    GLSLConverter.RemoveVersionHeader(ref glsl);
+                    GLSLManipulator.RemoveVersionHeader(ref glsl);
 
                 if (shaderStage == ShaderStage.VertexShader)
                 {
-                    GLSLConverter.RemoveGlPerVertex(ref glsl);
-                    GLSLConverter.AddPosFixupUniformAndCode(ref glsl);
+                    GLSLManipulator.RemoveGlPerVertex(ref glsl);
+                    GLSLManipulator.AddPosFixupUniformAndCode(ref glsl);
                 }
 
                 shaderData.ShaderCode = Encoding.ASCII.GetBytes(glsl);
@@ -184,7 +184,7 @@ namespace MonoGame.Effect
             }
 
             //==============================================================
-            // cleanup
+            // Cleanup
             //==============================================================
             ShaderConductor.DestroyShaderConductorBlob(result.target);
             ShaderConductor.DestroyShaderConductorBlob(result.errorWarningMsg);

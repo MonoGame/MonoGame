@@ -74,7 +74,7 @@ namespace MonoGame.Effect
             newFile = Preprocessor.Preprocess(effectSource, fullPath, macros, dependencies, output);
 
             // Parse the resulting file for techniques and passes.  
-            var tree = new ParserFX(new Scanner()).Parse(newFile, fullPath);
+            var tree = new Parser(new Scanner()).Parse(newFile, fullPath);
             HandleParseErrors(tree);
 
             // Evaluate the results of the parse tree.
@@ -85,12 +85,6 @@ namespace MonoGame.Effect
             var cleanFile = newFile;
             WhitespaceNodes(TokenType.Technique_Declaration, tree.Nodes, ref cleanFile);
             WhitespaceNodes(TokenType.Sampler_Declaration_States, tree.Nodes, ref cleanFile);
-
-            // ShaderConductor doesn't like deprecated DX9 HLSL
-            // Let's fix things up as much as possible to maintain compatibility
-            // bool needsDX9toDX10Conversion = options.Profile is OpenGLShaderProfile && !OpenGLShaderProfile.UseMojo;
-            // if (needsDX9toDX10Conversion)
-            //    HLSLVersionConverter.ConvertFromDX9toDX10(ref cleanFile, shaderInfo, tree);
 
             // Setup the rest of the shader info.
             ShaderResult result = new ShaderResult();

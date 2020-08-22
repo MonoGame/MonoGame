@@ -5,7 +5,7 @@ using MonoGame.Effect.TPGParser;
 
 namespace MonoGame.Effect
 {
-    internal static class GLSLConverter
+    internal static class GLSLManipulator
     {
         static char[] lineEnder = { '\n', '\0' };
 
