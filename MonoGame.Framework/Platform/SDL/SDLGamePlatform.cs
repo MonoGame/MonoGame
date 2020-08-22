@@ -145,7 +145,13 @@ namespace Microsoft.Xna.Framework
                         char character = (char)ev.Key.Keysym.Sym;
                         _view.OnKeyDown(new InputKeyEventArgs(key));
                         if (char.IsControl(character))
-                            _view.OnTextInput(new TextInputEventArgs(character, key));
+                        {
+                            if (_view.IsTextInputHandled)
+                                _view.OnTextInput(new TextInputEventArgs(character, key));
+
+                            if (_imeHandler.IsTextInputActive)
+                                _imeHandler.OnTextInput(character, key);
+                        }
                         break;
                     }
                     case Sdl.EventType.KeyUp:
