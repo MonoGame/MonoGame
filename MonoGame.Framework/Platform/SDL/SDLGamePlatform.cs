@@ -259,7 +259,7 @@ namespace Microsoft.Xna.Framework
 
             Array.Clear(_charBuffer, 0, _charCount);
 
-            _charCount = System.Text.Encoding.Unicode.GetChars(_byteBuffer, 0, _byteCount, _charBuffer, 0);
+            _charCount = System.Text.Encoding.UTF8.GetChars(_byteBuffer, 0, _byteCount, _charBuffer, 0);
 
             return new IMEString(_charBuffer, _charCount);
         }
