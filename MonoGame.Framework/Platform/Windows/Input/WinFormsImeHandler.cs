@@ -35,7 +35,10 @@ namespace Microsoft.Xna.Framework.Input
         internal WinFormsImeHandler(IntPtr windowHandle)
         {
             _windowHandle = windowHandle;
-            InputMethod.Initialize(windowHandle, ShowOSImeWindow);
+
+            // Only initialize InputMethod once
+            if (InputMethod.WindowHandle == IntPtr.Zero)
+                InputMethod.Initialize(windowHandle, ShowOSImeWindow);
 
             InputMethod.TextInputCallback = OnTextInput;
             InputMethod.TextCompositionCallback = OnTextComposition;
