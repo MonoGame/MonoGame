@@ -243,7 +243,7 @@ namespace Microsoft.Xna.Framework
         private char[] _charBuffer = new char[BufferSize / 2];
         private int _charCount;
 
-        private unsafe IMEString SDLBufferToIMEString(byte* text, int maxSize = 32)
+        private unsafe IMEString SDLBufferToIMEString(byte* text, int maxSize = 128)
         {
             Array.Clear(_byteBuffer, 0, _byteCount);
 
