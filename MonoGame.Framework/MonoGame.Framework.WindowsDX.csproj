@@ -80,7 +80,7 @@
     <PackageReference Version="4.0.1" Include="SharpDX.XAudio2" />
     <PackageReference Version="4.0.1" Include="SharpDX.XInput" />
 
-    <PackageReference Version="1.2.1" Include="ImeSharp" />
+    <PackageReference Version="1.2.3" Include="ImeSharp" />
   </ItemGroup>
 
   <Import Project="Platform\DirectX.targets" />
