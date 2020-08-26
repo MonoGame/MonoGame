@@ -37,6 +37,8 @@ namespace Microsoft.Xna.Framework
 
         private CoreIndependentInputSource _coreIndependentInputSource;
 
+        private Windows.System.DispatcherQueueTimer _textInputTimer;
+
         /// <summary>
         /// Sets the cursor of <see cref="CoreIndependentInputSource"/> thread
         /// </summary>
@@ -64,6 +66,10 @@ namespace Microsoft.Xna.Framework
             window.VisibilityChanged += CoreWindow_VisibilityChanged;
             window.Activated += CoreWindow_Activated;
             window.SizeChanged += CoreWindow_SizeChanged;
+            _textInputTimer = window.DispatcherQueue.CreateTimer();
+            _textInputTimer.Interval = new TimeSpan(0, 0, 0, 0, 5);
+            _textInputTimer.IsRepeating = false;
+            _textInputTimer.Tick += (o, e) => { TextQueue.Enqueue(_lastEnqueuedKeyChar); };
 
             DisplayInformation.GetForCurrentView().DpiChanged += InputEvents_DpiChanged;
             _currentDipFactor = DisplayInformation.GetForCurrentView().LogicalDpi / 96.0f;
@@ -252,7 +258,7 @@ namespace Microsoft.Xna.Framework
             else
                 verticalScrollDelta = state.MouseWheelDelta;
 
-            Mouse.PrimaryWindow.MouseState = new MouseState(x, y, 
+            Mouse.PrimaryWindow.MouseState = new MouseState(x, y,
                 Mouse.PrimaryWindow.MouseState.ScrollWheelValue + verticalScrollDelta,
                 state.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released,
                 state.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released,
@@ -307,7 +313,10 @@ namespace Microsoft.Xna.Framework
 
             _lastEnqueuedKeyChar = new KeyChar();
             _lastEnqueuedKeyChar.Key = xnaKey;
-            TextQueue.Enqueue(_lastEnqueuedKeyChar);
+
+            // Use a timer to ensure _lastEnqueuedKeyChar.Character is set
+            if (!_textInputTimer.IsRunning)
+                _textInputTimer.Start();
         }
 
         private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)

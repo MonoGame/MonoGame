@@ -132,6 +132,7 @@ namespace Microsoft.Xna.Framework
 
             SetCursor(false);
 
+            ImmService = new UapImeHandler(_coreWindow);
         }
 
         internal void RegisterCoreWindowService()
@@ -374,6 +375,7 @@ namespace Microsoft.Xna.Framework
                 while (_inputEvents.TextQueue.TryDequeue(out ch))
                 {
                     OnTextInput(new TextInputEventArgs(ch.Character, ch.Key));
+                    (ImmService as UapImeHandler).OnTextInput(ch.Character, ch.Key);
                 }
             }
 
