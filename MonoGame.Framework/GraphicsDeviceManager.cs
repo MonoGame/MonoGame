@@ -375,11 +375,15 @@ namespace Microsoft.Xna.Framework
             var presentationParameters = new PresentationParameters();
             PreparePresentationParameters(presentationParameters);
 
+            EventHelpers.Raise(this, BeforeDeviceCreated, presentationParameters);
+
             // Allow for any per-platform changes to the presentation.
             PlatformInitialize(presentationParameters);
 
             _initialized = true;
         }
+
+        public event EventHandler<PresentationParameters> BeforeDeviceCreated;
 
         private void UpdateTouchPanel(object sender, EventArgs eventArgs)
         {
