@@ -32,7 +32,6 @@ namespace Microsoft.Xna.Framework
         private GraphicsProfile _graphicsProfile;
         // dirty flag for ApplyChanges
         private bool _shouldApplyChanges;
-        private int? _initMultiSampleCount;
 
         /// <summary>
         /// The default back buffer width.
@@ -97,12 +96,6 @@ namespace Microsoft.Xna.Framework
             _game.Services.AddService(typeof(IGraphicsDeviceService), this);
         }
 
-        public GraphicsDeviceManager(Game game, int multiSampleCount) : this(game)
-        {
-            _initMultiSampleCount = multiSampleCount;
-            PreferMultiSampling = true;
-        }
-
         ~GraphicsDeviceManager()
         {
             Dispose(false);
@@ -115,10 +108,11 @@ namespace Microsoft.Xna.Framework
 
             try
             {
-                if (!_initialized)
-                    Initialize();
-
                 var gdi = DoPreparingDeviceSettings();
+
+                if (!_initialized)
+                    Initialize(gdi);
+
                 CreateDevice(gdi);
             }
             catch (NoSuitableGraphicsDeviceException)
@@ -375,18 +369,12 @@ namespace Microsoft.Xna.Framework
 
         partial void PlatformInitialize(PresentationParameters presentationParameters);
 
-        private void Initialize()
+        private void Initialize(GraphicsDeviceInformation gdi)
         {
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
-            var presentationParameters = new PresentationParameters();
-            PreparePresentationParameters(presentationParameters);
-
-            if (_initMultiSampleCount.HasValue)
-                presentationParameters.MultiSampleCount = _initMultiSampleCount.Value;
-
             // Allow for any per-platform changes to the presentation.
-            PlatformInitialize(presentationParameters);
+            PlatformInitialize(gdi.PresentationParameters);
 
             _initialized = true;
         }
