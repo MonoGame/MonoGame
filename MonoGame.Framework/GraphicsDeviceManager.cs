@@ -32,6 +32,7 @@ namespace Microsoft.Xna.Framework
         private GraphicsProfile _graphicsProfile;
         // dirty flag for ApplyChanges
         private bool _shouldApplyChanges;
+        private int? _initMultiSampleCount;
 
         /// <summary>
         /// The default back buffer width.
@@ -94,6 +95,12 @@ namespace Microsoft.Xna.Framework
 
             _game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             _game.Services.AddService(typeof(IGraphicsDeviceService), this);
+        }
+
+        public GraphicsDeviceManager(Game game, int multiSampleCount) : this(game)
+        {
+            _initMultiSampleCount = multiSampleCount;
+            PreferMultiSampling = true;
         }
 
         ~GraphicsDeviceManager()
@@ -375,15 +382,14 @@ namespace Microsoft.Xna.Framework
             var presentationParameters = new PresentationParameters();
             PreparePresentationParameters(presentationParameters);
 
-            EventHelpers.Raise(this, BeforeDeviceCreated, presentationParameters);
+            if (_initMultiSampleCount.HasValue)
+                presentationParameters.MultiSampleCount = _initMultiSampleCount.Value;
 
             // Allow for any per-platform changes to the presentation.
             PlatformInitialize(presentationParameters);
 
             _initialized = true;
         }
-
-        public event EventHandler<PresentationParameters> BeforeDeviceCreated;
 
         private void UpdateTouchPanel(object sender, EventArgs eventArgs)
         {
