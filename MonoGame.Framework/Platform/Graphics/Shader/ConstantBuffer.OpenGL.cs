@@ -130,24 +130,30 @@ namespace Microsoft.Xna.Framework.Graphics
                 int paramIndex = _parameters[i];
                 var param = _effect.Parameters[paramIndex];
 
-                fixed (byte* bytePtr = &_buffer[_offsets[paramIndex]])
+                if (param.ParameterType == EffectParameterType.Int32 || param.ParameterType == EffectParameterType.Bool)
                 {
-                    if (param.ParameterType == EffectParameterType.Int32 || param.ParameterType == EffectParameterType.Bool)
-                        GL.Uniform1i(location, *(int*)bytePtr);
-                    else
+                    GL.Uniform1i(location, ((int[])param.Data)[0]);
+                }
+                else
+                {
+                    fixed (float* floatPtr = &((float[])param.Data)[0])
                     {
+                        fixed (byte* bytePtr = &_buffer[_offsets[paramIndex]])
+                        {
+                            float* f = (float*)bytePtr;
+                        }
                         switch (param.ParameterClass)
                         {
                             case EffectParameterClass.Scalar:
-                                GL.Uniform1fv(location, 1, (float*)bytePtr);
+                                GL.Uniform1fv(location, 1, floatPtr);
                                 break;
 
                             case EffectParameterClass.Vector:
                                 switch (param.ColumnCount)
                                 {
-                                    case 2: GL.Uniform2fv(location, 1, (float*)bytePtr); break;
-                                    case 3: GL.Uniform3fv(location, 1, (float*)bytePtr); break;
-                                    case 4: GL.Uniform4fv(location, 1, (float*)bytePtr); break;
+                                    case 2: GL.Uniform2fv(location, 1, floatPtr); break;
+                                    case 3: GL.Uniform3fv(location, 1, floatPtr); break;
+                                    case 4: GL.Uniform4fv(location, 1, floatPtr); break;
                                 }
                                 break;
 
@@ -157,25 +163,25 @@ namespace Microsoft.Xna.Framework.Graphics
                                     case 2:
                                         switch (param.ColumnCount)
                                         {
-                                            case 2: GL.UniformMatrix2fv  (location, 1, false, (float*)bytePtr); break;
-                                            case 3: GL.UniformMatrix2x3fv(location, 1, false, (float*)bytePtr); break;
-                                            case 4: GL.UniformMatrix2x4fv(location, 1, false, (float*)bytePtr); break;
+                                            case 2: GL.UniformMatrix2fv(location, 1, false, floatPtr); break;
+                                            case 3: GL.UniformMatrix2x3fv(location, 1, false, floatPtr); break;
+                                            case 4: GL.UniformMatrix2x4fv(location, 1, false, floatPtr); break;
                                         }
                                         break;
                                     case 3:
                                         switch (param.ColumnCount)
                                         {
-                                            case 2: GL.UniformMatrix3x2fv(location, 1, false, (float*)bytePtr); break;
-                                            case 3: GL.UniformMatrix3fv  (location, 1, false, (float*)bytePtr); break;
-                                            case 4: GL.UniformMatrix3x4fv(location, 1, false, (float*)bytePtr); break;
+                                            case 2: GL.UniformMatrix3x2fv(location, 1, false, floatPtr); break;
+                                            case 3: GL.UniformMatrix3fv(location, 1, false, floatPtr); break;
+                                            case 4: GL.UniformMatrix3x4fv(location, 1, false, floatPtr); break;
                                         }
                                         break;
                                     case 4:
                                         switch (param.ColumnCount)
                                         {
-                                            case 2: GL.UniformMatrix4x2fv(location, 1, false, (float*)bytePtr); break;
-                                            case 3: GL.UniformMatrix4x3fv(location, 1, false, (float*)bytePtr); break;
-                                            case 4: GL.UniformMatrix4fv  (location, 1, false, (float*)bytePtr); break;
+                                            case 2: GL.UniformMatrix4x2fv(location, 1, false, floatPtr); break;
+                                            case 3: GL.UniformMatrix4x3fv(location, 1, false, floatPtr); break;
+                                            case 4: GL.UniformMatrix4fv(location, 1, false, floatPtr); break;
                                         }
                                         break;
                                 }

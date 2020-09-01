@@ -48,7 +48,7 @@ namespace MonoGame.Effect
         private static extern int GetSamplerCount([In] ref ResultDesc result);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void GetSampler([In] ref ResultDesc result, int samplerIndex, byte[] name, byte[] originalName, byte[] textureName, int maxNameLength, out int type, out int slot);
+        private static extern void GetSampler([In] ref ResultDesc result, int samplerIndex, byte[] name, byte[] originalName, byte[] textureName, int maxNameLength, out int type, out int slot, out int textureSlot);
 
         public enum ShaderStage
         {
@@ -201,9 +201,10 @@ namespace MonoGame.Effect
         public struct Sampler
         {
             public string name;
-            public string parameterName;
+            public string originalName;
             public string textureName;
             public int slot;
+            public int textureSlot;
             public int type; // 1=1D, 2=2D, 3=3D, 4=Cube
         }
 
@@ -296,18 +297,42 @@ namespace MonoGame.Effect
 
             int samplerCount = GetSamplerCount(ref result);
 
+            var samplerSlotToSampler = new Dictionary<int, Sampler>();
+            var textureSlotToTextureName = new Dictionary<int, string>();
+
             for (int i = 0; i < samplerCount; i++)
             {
-                GetSampler(ref result, i, nameBuffer, originalNameBuffer, textureNameBuffer, MaxNameLength, out int type, out int slot);
+                GetSampler(ref result, i, nameBuffer, originalNameBuffer, textureNameBuffer, MaxNameLength, out int type, out int slot, out int textureSlot);
 
-                samplers.Add(new Sampler
+                var sampler = new Sampler
                 {
                     name = ByteBufferToString(nameBuffer),
-                    parameterName = ByteBufferToString(originalNameBuffer),
+                    originalName = ByteBufferToString(originalNameBuffer),
                     textureName = ByteBufferToString(textureNameBuffer),
                     slot = slot,
+                    textureSlot = textureSlot,
                     type = type,
-                });
+                };
+
+                samplers.Add(sampler);
+
+                // make sure there are no overlap conflicts with the sampler and texture slots
+                if (samplerSlotToSampler.TryGetValue(slot, out Sampler s))
+                {
+                    if (sampler.originalName == s.originalName)
+                        throw new Exception("Sampler '" + sampler.originalName + "' is used to sample from multiple textures. You may only assign a register slot to a sampler if it samples from one texture only.");
+                    else
+                        throw new Exception("Sampler '" + sampler.originalName + "' and sampler '" + s.originalName + "' are assigned to the same register slot " + slot);
+                }
+
+                if (textureSlotToTextureName.TryGetValue(textureSlot, out string texName))
+                {
+                    if (sampler.textureName != texName)
+                        throw new Exception("Texture '" + sampler.textureName + "' and texture '" + texName + "' can not be assigned to the same register slot " + textureSlot);
+                }
+
+                samplerSlotToSampler[slot] = sampler;
+                textureSlotToTextureName[textureSlot] = sampler.textureName;
             }
 
             return samplers;

@@ -185,8 +185,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (MojoDataLayout)
                 return ((float[])Data)[0] != 0.0f;
             else
-#endif
                 return ((int[])Data)[0] != 0;
+#else
+            return ((int[])Data)[0] != 0;
+#endif
         }
 
         /*
@@ -206,8 +208,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (MojoDataLayout)
                 return (int)((float[])Data)[0];
             else
-#endif
                 return ((int[])Data)[0];
+#else
+            return ((int[])Data)[0];
+#endif
         }
 
         public int[] GetValueInt32Array()
@@ -241,7 +245,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (RowCount != 4 || ColumnCount != 4)
                 throw new InvalidCastException();
 
-            var floatData = (float[])Data;  
+            var floatData = (float[])Data;
 #if OpenGL
             // OpenGL matrices are transposed compared to DX 
             if(!MojoDataLayout) 
@@ -250,11 +254,16 @@ namespace Microsoft.Xna.Framework.Graphics
                                   floatData[8], floatData[9], floatData[10], floatData[11],
                                   floatData[12], floatData[13], floatData[14], floatData[15]);
             else
-#endif
                 return new Matrix(floatData[0], floatData[4], floatData[8], floatData[12],
                                   floatData[1], floatData[5], floatData[9], floatData[13],
                                   floatData[2], floatData[6], floatData[10], floatData[14],
                                   floatData[3], floatData[7], floatData[11], floatData[15]);
+#else
+            return new Matrix(floatData[0], floatData[4], floatData[8], floatData[12],
+                              floatData[1], floatData[5], floatData[9], floatData[13],
+                              floatData[2], floatData[6], floatData[10], floatData[14],
+                              floatData[3], floatData[7], floatData[11], floatData[15]);
+#endif
         }
 
         public Matrix[] GetValueMatrixArray (int count)
@@ -451,9 +460,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (MojoDataLayout)
                 ((float[])Data)[0] = value ? 1 : 0;
             else
-#endif
                 ((int[])Data)[0] = value ? 1 : 0;
-
+#else
+            ((int[])Data)[0] = value ? 1 : 0;
+#endif
             StateKey = unchecked(NextStateKey++);
         }
 
@@ -474,9 +484,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (MojoDataLayout)
                 ((float[])Data)[0] = value;
             else
-#endif
                 ((int[])Data)[0] = value;
-
+#else
+            ((int[])Data)[0] = value;
+#endif
             StateKey = unchecked(NextStateKey++);
         }
 
@@ -497,9 +508,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!MojoDataLayout)
                 SetMatrixTranspose(value);
             else
-#endif
                 SetMatrix(value);
-
+#else
+            SetMatrix(value);
+#endif
             StateKey = unchecked(NextStateKey++);
         }
 
@@ -512,9 +524,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!MojoDataLayout)
                 SetMatrix(value); 
             else
-#endif
                 SetMatrixTranspose(value);
-
+#else
+            SetMatrixTranspose(value);
+#endif
             StateKey = unchecked(NextStateKey++);
         }
 
@@ -528,9 +541,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!MojoDataLayout)
                 SetMatrixArrayTransposed(value);
             else
-#endif
                 SetMatrixArray(value);
-
+#else
+            SetMatrixArray(value);
+#endif
             StateKey = unchecked(NextStateKey++);
         }
 
@@ -544,9 +558,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!MojoDataLayout)
                 SetMatrixArray(value);
             else
-#endif
                 SetMatrixArrayTransposed(value);
-
+#else
+            SetMatrixArrayTransposed(value);
+#endif
             StateKey = unchecked(NextStateKey++);
         }
 

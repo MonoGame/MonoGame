@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _dirty; }
         }
 
-        public ConstantBuffer(ConstantBuffer cloneSource)
+        public ConstantBuffer(ConstantBuffer cloneSource, Effect effect)
         {
             GraphicsDevice = cloneSource.GraphicsDevice;
 
@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _instanceName = cloneSource._instanceName;
             _parameters = cloneSource._parameters;
             _offsets = cloneSource._offsets;
-            _effect = cloneSource._effect;
+            _effect = effect;
 
             // Clone the mutable types.
             _buffer = (byte[])cloneSource._buffer.Clone();

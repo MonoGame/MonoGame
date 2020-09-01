@@ -73,14 +73,14 @@ namespace MonoGame.Effect
             string newWorkingDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             // Change working directory, otherwise ShaderConductor can't load dlls
-            System.IO.Directory.SetCurrentDirectory(newWorkingDir); 
+            System.IO.Directory.SetCurrentDirectory(newWorkingDir);
 
             ShaderConductor.Compile(ref sourceDesc, ref options, ref target, out ShaderConductor.ResultDesc result);
 
             System.IO.Directory.SetCurrentDirectory(previousWorkingDir); 
 
             //==============================================================
-            // Handle compiler result
+            // Handle compiler errors
             //==============================================================
             if (result.hasError)
             {
@@ -104,7 +104,7 @@ namespace MonoGame.Effect
                 //==============================================================
                 // Apply some fixes to the GLSL code, then add it to shaderData
                 //==============================================================
-                if (isESSL)
+                if (isESSL && !glslVersion.Contains("es"))
                     GLSLManipulator.RemoveVersionHeader(ref glsl);
 
                 if (shaderStage == ShaderStage.VertexShader)
@@ -174,11 +174,11 @@ namespace MonoGame.Effect
                     shaderData._samplers[i].samplerName = samplers[i].name;
                     shaderData._samplers[i].parameterName = samplers[i].textureName;
                     shaderData._samplers[i].samplerSlot = samplers[i].slot;
-                    shaderData._samplers[i].textureSlot = samplers[i].slot;
+                    shaderData._samplers[i].textureSlot = samplers[i].textureSlot;
                     shaderData._samplers[i].type = ConvertSamplerTypeToMojo(samplers[i]);
                     shaderData._samplers[i].parameter = -1; //sampler mapping to parameter is unknown atm
 
-                    if (samplerStates.TryGetValue(samplers[i].parameterName, out SamplerStateInfo state))
+                    if (samplerStates.TryGetValue(samplers[i].originalName, out SamplerStateInfo state))
                         shaderData._samplers[i].state = state.State;
                 }
             }

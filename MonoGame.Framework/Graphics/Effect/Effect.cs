@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Make a copy of the immutable constant buffers.
             ConstantBuffers = new ConstantBuffer[cloneSource.ConstantBuffers.Length];
             for (var i = 0; i < cloneSource.ConstantBuffers.Length; i++)
-                ConstantBuffers[i] = new ConstantBuffer(cloneSource.ConstantBuffers[i]);
+                ConstantBuffers[i] = new ConstantBuffer(cloneSource.ConstantBuffers[i], this);
 
             // Find and set the current technique.
             for (var i = 0; i < cloneSource.Techniques.Count; i++)

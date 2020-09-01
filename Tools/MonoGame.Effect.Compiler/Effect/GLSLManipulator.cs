@@ -46,7 +46,7 @@ namespace MonoGame.Effect
                 // The final change to gl_Position.z is needed because OpenGL uses a -1..1 clipspace, while DX uses 0..1
                 string posFixupCode =
                 "    gl_Position.y = gl_Position.y * posFixup.y;\n" +
-                "gl_Position.xy += posFixup.zw * gl_Position.ww;\n" +
+                "    gl_Position.xy += posFixup.zw * gl_Position.ww;\n" +
                 "    gl_Position.z = gl_Position.z * 2.0 - gl_Position.w;\n";
 
                 // the assumption here is that the final closing brace belongs to the main vertex shader function, let's hope for the best.
