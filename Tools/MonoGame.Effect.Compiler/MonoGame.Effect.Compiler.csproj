@@ -66,21 +66,24 @@
     <None Include="..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\ShaderConductor\dxcompiler.dll" Link="dxcompiler.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\ShaderConductor\ShaderConductor.dll" Link="ShaderConductor.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\ShaderConductor\ShaderConductorWrapper.dll" Link="ShaderConductorWrapper.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" />
     <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" />
     <Reference Include="..\..\ThirdParty\Dependencies\CppNet\CppNet.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="dxcompiler.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ShaderConductor.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ShaderConductorWrapper.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Import Project="..\..\Stadia\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Stadia\MonoGame.Effect.Compiler.targets')" />
