@@ -4,8 +4,8 @@
 
 #include "include.fxh"
 
-sampler s0;
-Texture2D tex;
+sampler s0 : register(s0);
+Texture2D tex : register(t0);
 
 float4 PixelShaderFunction( float4 inPosition : SV_Position,
 			    float4 inColor : COLOR0,

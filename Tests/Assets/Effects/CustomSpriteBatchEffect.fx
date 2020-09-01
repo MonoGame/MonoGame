@@ -4,11 +4,11 @@
 
 #include "include.fxh"
 
-Texture2D SourceTexture;
-Texture2D OtherTexture;
+Texture2D SourceTexture : register(t0);
+Texture2D OtherTexture : register(t1);
 
-sampler SourceSampler;
-sampler OtherSampler;
+sampler SourceSampler : register(s0);
+sampler OtherSampler : register(s1);
 
 float4 PS_Main(float2 uv : TEXCOORD0) : SV_TARGET
 {

@@ -4,8 +4,8 @@
 
 #include "include.fxh"
 
-sampler s0;
-Texture2D tex;
+sampler s0 : register(s0);
+Texture2D tex : register(t0);
 
 float4 red    = float4(1,0,0,1);
 float4 orange = float4(1,.5,0,1);
