@@ -1587,7 +1587,7 @@ namespace MonoGame.OpenGL
         {
             int length = 0;
             GetProgram(programId, GetProgramParameterName.LogLength, out length);
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(length, length);
             GetProgramInfoLogInternal (programId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
@@ -1595,7 +1595,7 @@ namespace MonoGame.OpenGL
         internal static string GetShaderInfoLog (int shaderId) {
             int length = 0;
             GetShader(shaderId, ShaderParameter.LogLength, out length);
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(length, length);
             GetShaderInfoLogInternal (shaderId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
