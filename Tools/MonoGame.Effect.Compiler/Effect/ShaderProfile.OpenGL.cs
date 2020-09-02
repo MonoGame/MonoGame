@@ -13,8 +13,9 @@ namespace MonoGame.Effect
 {
     class OpenGLShaderProfile : ShaderProfile
     {
-        private bool _isESSL;
         private bool _useMojo;
+
+        protected virtual bool IsESSL => false;
 
         private static readonly Regex GlslPixelShaderRegex = DirectX11ShaderProfile.HlslPixelShaderRegex;
         private static readonly Regex GlslVertexShaderRegex = DirectX11ShaderProfile.HlslVertexShaderRegex;
@@ -25,7 +26,11 @@ namespace MonoGame.Effect
         public OpenGLShaderProfile()
             : base("OpenGL", 0)
         {
-            //
+        }
+
+        protected OpenGLShaderProfile(string name)
+            : base(name, 0)
+        {
         }
 
         internal override void AddMacros(Dictionary<string, string> macros, Options options)
@@ -33,9 +38,7 @@ namespace MonoGame.Effect
             macros.Add("GLSL", "1");
             macros.Add("OPENGL", "1");
 
-            _isESSL = options.IsDefined("ESSL");
             _useMojo = options.IsDefined("MOJO");
-
             if (!_useMojo)
                 macros.Add("SM4", "1");
         }
@@ -108,8 +111,8 @@ namespace MonoGame.Effect
                 var shaderData = ShaderData.CreateGLSL_Conductor(sourceCode,
                     shaderStage, shaderFunction,
                     smMajor, smMinor, smExtension,
-                    effect.Shaders.Count, effect.ConstantBuffers, shaderInfo.SamplerStates, 
-                    shaderResult.Debug, _isESSL);
+                    effect.Shaders.Count, effect.ConstantBuffers, shaderInfo.SamplerStates,
+                    shaderResult.Debug, IsESSL);
 
                 // See if we already created this same shader.
                 foreach (var shader in effect.Shaders)
@@ -121,6 +124,22 @@ namespace MonoGame.Effect
                 effect.Shaders.Add(shaderData);
                 return shaderData;
             }
+        }
+    }
+
+    class OpenGLESShaderProfile : OpenGLShaderProfile
+    {
+        protected override bool IsESSL => true;
+
+        public OpenGLESShaderProfile()
+            : base("OpenGLES")
+        {
+        }
+
+        internal override void AddMacros(Dictionary<string, string> macros, Options options)
+        {
+            base.AddMacros(macros, options);
+            macros.Add("ESSL", "1");
         }
     }
 }

@@ -57,11 +57,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (debugMode == EffectProcessorDebugMode.Debug)
                 arguments += " /Debug";
 
-            string defineArgument = defines == null ? "" : defines;
-            string platformDefines = AddDefinesForPlatform(context.TargetPlatform, ref defineArgument);
-
-            if (defineArgument != "")
-                arguments += " \"/Defines:" + defineArgument + "\"";
+            if (!string.IsNullOrWhiteSpace(defines))
+                arguments += " \"/Defines:" + defines + "\"";
 
             string stdout, stderr;
 
@@ -92,29 +89,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 case TargetPlatform.WindowsPhone8:
                 case TargetPlatform.WindowsStoreApp:
                     return "DirectX_11";
-                case TargetPlatform.iOS:
-                case TargetPlatform.Android:
                 case TargetPlatform.DesktopGL:
                 case TargetPlatform.MacOSX:
                 case TargetPlatform.RaspberryPi:
                 case TargetPlatform.Web:
                     return "OpenGL";
+                case TargetPlatform.iOS:
+                case TargetPlatform.Android:
+                    return "OpenGLES";
             }
 
             return platform.ToString();
-        }
-
-        private string AddDefinesForPlatform(TargetPlatform platform, ref string defines)
-        {
-            switch (platform)
-            {
-                case TargetPlatform.iOS:
-                case TargetPlatform.Android:
-                    defines += "ESSL;";
-                    break;
-            }
-
-            return defines;
         }
 
         private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
