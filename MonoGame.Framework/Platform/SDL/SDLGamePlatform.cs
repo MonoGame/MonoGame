@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.Utilities;
+using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
@@ -25,6 +26,9 @@ namespace Microsoft.Xna.Framework
 
         private int _isExiting;
         private SdlGameWindow _view;
+
+        private readonly bool _multidropSupported;
+        private readonly List<string> _dropList;
 
         public SdlGamePlatform(Game game)
             : base(game)
@@ -48,6 +52,11 @@ namespace Microsoft.Xna.Framework
             // Needed so VS can debug the project on Windows
             if (version >= 205 && CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
                 Sdl.SetHint("SDL_WINDOWS_DISABLE_THREAD_NAMING", "1");
+
+            // https://wiki.libsdl.org/SDL_DropEvent
+            // SDL_DROPTEXT, SDL_DROPBEGIN, and SDL_DROPCOMPLETE are available since SDL 2.0.5. 
+            _multidropSupported = version >= 205;
+            _dropList = _multidropSupported ? new List<string>() : null;
 
             Sdl.Init((int)(
                 Sdl.InitFlags.Video |
@@ -232,6 +241,50 @@ namespace Microsoft.Xna.Framework
                                 _isExiting++;
                                 break;
                         }
+                        break;
+
+                    case Sdl.EventType.DropFile:
+                        if (ev.Drop.WindowId != _view.Id)
+                            break;
+
+                        if (!_view.IsFileDropHandled)
+                            break;
+
+                        unsafe
+                        {
+                            byte* ptr = (byte*)ev.Drop.File;
+
+                            int len = 0;
+                            while (*(ptr + len) != 0) ++len;
+
+                            byte[] buffer = new byte[len];
+                            Marshal.Copy((IntPtr)ptr, buffer, 0, buffer.Length);
+
+                            string path = Encoding.UTF8.GetString(buffer, 0, len);
+                            Sdl.Drop.SDL_Free(ev.Drop.File);
+
+                            if (_multidropSupported) _dropList.Add(path);
+                            else _view.OnFileDrop(new FileDropEventArgs(new string[] { path }));
+                        }
+
+                        break;
+
+                    case Sdl.EventType.DropComplete:
+                        if (ev.Drop.WindowId != _view.Id)
+                            break;
+
+                        if (!_view.IsFileDropHandled)
+                            break;
+
+                        if (!_multidropSupported) //should not happen
+                            break;
+
+                        if (_dropList.Count > 0)
+                        {
+                            _view.OnFileDrop(new FileDropEventArgs(_dropList.ToArray()));
+                            _dropList.Clear();
+                        }
+
                         break;
                 }
             }
