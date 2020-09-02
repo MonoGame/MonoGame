@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private ShaderProgram _shaderProgram = null;
         private int _glBuffer = -1;
         private int _globalsArrayLocationMojo;  // MojoShader uses one big float4 array for all parameters
-        private int[] _parameterLocations = null; // If uniform buffers are not available parameters need to be updated individually
+        private string[] _parameterShaderNames = null; // If uniform buffers are not available parameters need to be updated individually by name 
 
         static ConstantBuffer _lastConstantBufferApplied = null;
 
@@ -109,26 +109,38 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private unsafe void UpdateParametersIndividually(ShaderProgram program)
         {
-            if (_parameterLocations == null)
+            if (_parameterShaderNames == null)
             {
-                _parameterLocations = new int[_parameters.Length];
+                _parameterShaderNames = new string[_parameters.Length];
 
                 for (int i = 0; i < _parameters.Length; i++)
                 {
                     int paramIndex = _parameters[i];
                     var param = _effect.Parameters[paramIndex];
-                    _parameterLocations[i] = program.GetUniformLocation(_instanceName + "." + param.Name); 
+
+                    _parameterShaderNames[i] = _instanceName + "." + param.Name;
+
+                    //if (param.Elements.Count > 1) // array
+                    //    _parameterShaderNames[i] += "[0]";
                 }
             }
 
             for (int i = 0; i < _parameters.Length; i++)
             {
-                int location = _parameterLocations[i];
-                if (location < 0)
-                    continue;
-
                 int paramIndex = _parameters[i];
                 var param = _effect.Parameters[paramIndex];
+
+                if (param.ParameterType == EffectParameterType.Texture ||
+                    param.ParameterType == EffectParameterType.Texture1D ||
+                    param.ParameterType == EffectParameterType.Texture2D ||
+                    param.ParameterType == EffectParameterType.Texture3D ||
+                    param.ParameterType == EffectParameterType.TextureCube ||
+                    param.Elements.Count > 0)   // no arrays for now
+                    continue;
+
+                int location = program.GetUniformLocation(_parameterShaderNames[i]);
+                if (location < 0)
+                    continue;
 
                 if (param.ParameterType == EffectParameterType.Int32 || param.ParameterType == EffectParameterType.Bool)
                 {
@@ -138,10 +150,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     fixed (float* floatPtr = &((float[])param.Data)[0])
                     {
-                        fixed (byte* bytePtr = &_buffer[_offsets[paramIndex]])
-                        {
-                            float* f = (float*)bytePtr;
-                        }
                         switch (param.ParameterClass)
                         {
                             case EffectParameterClass.Scalar:
