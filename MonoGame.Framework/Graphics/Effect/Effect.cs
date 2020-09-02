@@ -173,6 +173,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Take a reference to the original shader list.
             _shaders = cloneSource._shaders;
+
+            _isMojoShader = cloneSource._isMojoShader;
         }
 
         /// <summary>
