@@ -7,7 +7,7 @@ matrix WorldViewProj;
 float HeightMapSize;
 Texture2D HeightMapTexture;
 
-sampler2D HeightMapSampler = sampler_state
+sampler HeightMapSampler = sampler_state
 {
     Texture = (HeightMapTexture);
     MinFilter = POINT;
@@ -23,7 +23,7 @@ struct VSOutput
 
 VSOutput VS_Main(float2 xy : POSITION)
 {
-    float height = HeightMapTexture.SampleLevel(HeightMapSampler, (xy + float2(0.5, 0.5)) / HeightMapSize, 0)).r;
+    float height = HeightMapTexture.SampleLevel(HeightMapSampler, (xy + 0.5) / HeightMapSize, 0).r;
     float3 worldPosition = float3(xy.x, height, xy.y);
 
     VSOutput output;
