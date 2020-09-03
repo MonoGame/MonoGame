@@ -26,6 +26,8 @@ namespace MonoGame.Effect
 
         public static readonly ShaderProfile OpenGL = FromName("OpenGL");
 
+        public static readonly ShaderProfile OpenGL = FromName("OpenGLES");
+
         public static readonly ShaderProfile DirectX_11 = FromName("DirectX_11");
 
         /// <summary>
