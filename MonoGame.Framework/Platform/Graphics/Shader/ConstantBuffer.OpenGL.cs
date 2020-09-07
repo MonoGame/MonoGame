@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else 
             {
-                int uniformBlockIndex = GL.GetUniformBlockIndex(program.Program, _name);
+                int uniformBlockIndex = GL.GetUniformBlockIndex == null ? -1 : GL.GetUniformBlockIndex(program.Program, _name);
                 GraphicsExtensions.CheckGLError();
 
                 if (uniformBlockIndex >= 0)

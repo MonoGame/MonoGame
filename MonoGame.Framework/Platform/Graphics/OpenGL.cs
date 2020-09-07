@@ -1444,7 +1444,6 @@ namespace MonoGame.OpenGL
             DeleteShader = LoadFunction<DeleteShaderDelegate> ("glDeleteShader");
             GetAttribLocation = LoadFunction<GetAttribLocationDelegate> ("glGetAttribLocation");
             GetUniformLocation = LoadFunction<GetUniformLocationDelegate> ("glGetUniformLocation");
-            GetUniformBlockIndex = LoadFunction<GetUniformBlockIndexDelegate>("glGetUniformBlockIndex");
 
             IsProgram = LoadFunction<IsProgramDelegate> ("glIsProgram");
             DeleteProgram = LoadFunction<DeleteProgramDelegate> ("glDeleteProgram");
@@ -1583,6 +1582,10 @@ namespace MonoGame.OpenGL
             if (GL.BlendEquationSeparatei == null && Extensions.Contains("GL_ARB_draw_buffers_blend"))
             {
                 GL.BlendEquationSeparatei = LoadFunction<GL.BlendEquationSeparateiDelegate>("BlendEquationSeparateiARB");
+            }
+            if (GL.GetUniformBlockIndex == null && Extensions.Contains("GL_ARB_uniform_buffer_object"))
+            {
+                GL.GetUniformBlockIndex = LoadFunction<GL.GetUniformBlockIndexDelegate>("glGetUniformBlockIndex");
             }
         }
 
