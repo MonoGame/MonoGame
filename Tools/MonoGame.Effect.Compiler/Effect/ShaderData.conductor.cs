@@ -104,12 +104,19 @@ namespace MonoGame.Effect
                 //==============================================================
                 // Apply some fixes to the GLSL code, then add it to shaderData
                 //==============================================================
+
+                // version header for old OpenGL versions can make OpenGL ES crash.
                 if (isESSL && !glslVersion.Contains("es"))
                     GLSLManipulator.RemoveVersionHeader(ref glsl);
 
+                // remove separate shader objects extension requirement, older OpenGL versions may not support it
+                GLSLManipulator.RemoveARBSeparateShaderObjects(ref glsl);
+
                 if (shaderStage == ShaderStage.VertexShader)
                 {
+                    // The gl_PerVertex declaration can make OpenGL crash.
                     GLSLManipulator.RemoveGlPerVertex(ref glsl);
+                    // Add posFixup code, so we can compensate for differences btw DirectX and OpenGL
                     GLSLManipulator.AddPosFixupUniformAndCode(ref glsl);
                 }
 

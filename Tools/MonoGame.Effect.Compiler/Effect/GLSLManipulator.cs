@@ -11,7 +11,6 @@ namespace MonoGame.Effect
 
         public static void RemoveVersionHeader(ref string glsl)
         {
-            // version header can make OpenGL crash.
             int version = glsl.IndexOf("#version");
             if (version >= 0)
             {
@@ -20,9 +19,13 @@ namespace MonoGame.Effect
             }
         }
 
+        public static void RemoveARBSeparateShaderObjects(ref string glsl)
+        {
+            glsl = glsl.Replace("#extension GL_ARB_separate_shader_objects : require\n", "");
+        }
+
         public static void RemoveGlPerVertex(ref string glsl)
         {
-            // The gl_PerVertex declaration can make OpenGL crash.
             string gl_PerVertex = "\nout gl_PerVertex\n{\n    vec4 gl_Position;\n};\n";
             glsl = glsl.Replace(gl_PerVertex, "");
         }
