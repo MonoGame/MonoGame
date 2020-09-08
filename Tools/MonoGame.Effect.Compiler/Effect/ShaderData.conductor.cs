@@ -109,8 +109,11 @@ namespace MonoGame.Effect
                 if (isESSL && !glslVersion.Contains("es"))
                     GLSLManipulator.RemoveVersionHeader(ref glsl);
 
-                // remove separate shader objects extension requirement, older OpenGL versions may not support it
-                GLSLManipulator.RemoveARBSeparateShaderObjects(ref glsl);
+                // remove separate shader objects extension requirement for OpenGL 2
+                if (glslVersion.StartsWith("10") ||
+                    glslVersion.StartsWith("11") ||
+                    glslVersion.StartsWith("12"))
+                    GLSLManipulator.RemoveARBSeparateShaderObjects(ref glsl);
 
                 if (shaderStage == ShaderStage.VertexShader)
                 {
