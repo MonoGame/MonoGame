@@ -13,3 +13,6 @@ url=https://github.com/MrHelmut/NVorbis.git
 [submodule "ThirdParty/StbImageWriteSharp"]
 	path = ThirdParty/StbImageWriteSharp
 	url = https://github.com/StbSharp/StbImageWriteSharp.git
+[submodule "ThirdParty/ImeSharp"]
+	path = ThirdParty/ImeSharp
+	url = https://github.com/ryancheung/ImeSharp.git
