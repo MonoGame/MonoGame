@@ -62,22 +62,14 @@ namespace Microsoft.Xna.Framework.Input
                 TextInput.Invoke(this, new TextInputEventArgs(charInput, key));
         }
 
-        private void OnTextComposition(ImeSharp.IMEString compositionText, int cursorPosition,
-            ImeSharp.IMEString[] candidateList, int candidatePageStart, int candidatePageSize, int candidateSelection)
+        private void OnTextComposition(IMEString compositionText, int cursorPosition,
+            IMEString[] candidateList, int candidatePageStart, int candidatePageSize, int candidateSelection)
         {
             if (TextComposition == null)
                 return;
 
-            IMEString[] candidates = null;
-            if (candidateList != null)
-            {
-                candidates = new IMEString[candidateList.Length];
-                for (int i = 0; i < candidateList.Length; i++)
-                    candidates[i] = new IMEString(candidateList[i].ToIntPtr());
-            }
-
-            TextComposition.Invoke(this, new TextCompositionEventArgs(new IMEString(compositionText.ToIntPtr()), cursorPosition,
-                candidates, candidatePageStart, candidatePageSize, candidateSelection));
+            TextComposition.Invoke(this, new TextCompositionEventArgs(compositionText, cursorPosition,
+                candidateList, candidatePageStart, candidatePageSize, candidateSelection));
         }
     }
 }
