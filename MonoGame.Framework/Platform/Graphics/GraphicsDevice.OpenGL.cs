@@ -257,6 +257,9 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
+            GL.GetInteger(GetPName.MaxVertexTextureImageUnits, out MaxVertexTextureSlots);
+            GraphicsExtensions.CheckGLError();           
+
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
@@ -877,6 +880,49 @@ namespace Microsoft.Xna.Framework.Graphics
                     return GLPrimitiveType.Triangles;
                 case PrimitiveType.TriangleStrip:
                     return GLPrimitiveType.TriangleStrip;
+                case PrimitiveType.PointList:
+                    return GLPrimitiveType.Points;
+                case PrimitiveType.LineListWithAdjacency:
+                    return GLPrimitiveType.LinesAdjacency;
+                case PrimitiveType.LineStripWithAdjacency:
+                    return GLPrimitiveType.LineStripAdjacency;
+                case PrimitiveType.TriangleListWithAdjacency:
+                    return GLPrimitiveType.TrianglesAdjacency;
+                case PrimitiveType.TriangleStripWithAdjacency:
+                    return GLPrimitiveType.TriangleStripAdjacency;
+                case PrimitiveType.PatchListWith1ControlPoints:
+                case PrimitiveType.PatchListWith2ControlPoints:
+                case PrimitiveType.PatchListWith3ControlPoints:
+                case PrimitiveType.PatchListWith4ControlPoints:
+                case PrimitiveType.PatchListWith5ControlPoints:
+                case PrimitiveType.PatchListWith6ControlPoints:
+                case PrimitiveType.PatchListWith7ControlPoints:
+                case PrimitiveType.PatchListWith8ControlPoints:
+                case PrimitiveType.PatchListWith9ControlPoints:
+                case PrimitiveType.PatchListWith10ControlPoints:
+                case PrimitiveType.PatchListWith11ControlPoints:
+                case PrimitiveType.PatchListWith12ControlPoints:
+                case PrimitiveType.PatchListWith13ControlPoints:
+                case PrimitiveType.PatchListWith14ControlPoints:
+                case PrimitiveType.PatchListWith15ControlPoints:
+                case PrimitiveType.PatchListWith16ControlPoints:
+                case PrimitiveType.PatchListWith17ControlPoints:
+                case PrimitiveType.PatchListWith18ControlPoints:
+                case PrimitiveType.PatchListWith19ControlPoints:
+                case PrimitiveType.PatchListWith20ControlPoints:
+                case PrimitiveType.PatchListWith21ControlPoints:
+                case PrimitiveType.PatchListWith22ControlPoints:
+                case PrimitiveType.PatchListWith23ControlPoints:
+                case PrimitiveType.PatchListWith24ControlPoints:
+                case PrimitiveType.PatchListWith25ControlPoints:
+                case PrimitiveType.PatchListWith26ControlPoints:
+                case PrimitiveType.PatchListWith27ControlPoints:
+                case PrimitiveType.PatchListWith28ControlPoints:
+                case PrimitiveType.PatchListWith29ControlPoints:
+                case PrimitiveType.PatchListWith30ControlPoints:
+                case PrimitiveType.PatchListWith31ControlPoints:
+                case PrimitiveType.PatchListWith32ControlPoints:
+                    return GLPrimitiveType.Patches;
             }
 
             throw new ArgumentException();
@@ -888,7 +934,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private unsafe void ActivateShaderProgram()
         {
             // Lookup the shader program.
-            var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader);
+            var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader, HullShader, DomainShader, GeometryShader);
             if (shaderProgram.Program == -1)
                 return;
             // Set the new program if it has changed.
@@ -1012,8 +1058,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("A vertex shader must be set!");
             if (_pixelShader == null)
                 throw new InvalidOperationException("A pixel shader must be set!");
+            if (_hullShader != null && _domainShader == null)
+                throw new InvalidOperationException("If a hull shader is set a domain shader must also be set!");
+            if (_domainShader != null && _hullShader == null)
+                throw new InvalidOperationException("If a domain shader is set a hull shader must also be set!");
 
-            if (_vertexShaderDirty || _pixelShaderDirty)
+            if (_vertexShaderDirty || _pixelShaderDirty || _hullShaderDirty || _domainShaderDirty || _geometryShaderDirty)
             {
                 ActivateShaderProgram();
 
@@ -1033,14 +1083,49 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                 }
 
-                _vertexShaderDirty = _pixelShaderDirty = false;
+                if (_hullShaderDirty)
+                {
+                    unchecked
+                    {
+                        _graphicsMetrics._hullShaderCount++;
+                    }
+                }
+
+                if (_domainShaderDirty)
+                {
+                    unchecked
+                    {
+                        _graphicsMetrics._domainShaderCount++;
+                    }
+                }
+
+                if (_geometryShaderDirty)
+                {
+                    unchecked
+                    {
+                        _graphicsMetrics._geometryShaderCount++;
+                    }
+                }
+
+                _vertexShaderDirty = _pixelShaderDirty = _hullShaderDirty = _domainShaderDirty = _geometryShaderDirty = false;
             }
 
             _vertexConstantBuffers.SetConstantBuffers(this, _shaderProgram);
             _pixelConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+            _hullConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+            _domainConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+            _geometryConstantBuffers.SetConstantBuffers(this, _shaderProgram);
 
             Textures.SetTextures(this);
             SamplerStates.PlatformSetSamplers(this);
+            VertexTextures.SetTextures(this);
+            VertexSamplerStates.PlatformSetSamplers(this);
+            HullTextures.SetTextures(this);
+            HullSamplerStates.PlatformSetSamplers(this);
+            DomainTextures.SetTextures(this);
+            DomainSamplerStates.PlatformSetSamplers(this);
+            GeometryTextures.SetTextures(this);
+            GeometrySamplerStates.PlatformSetSamplers(this);
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)

@@ -109,7 +109,6 @@ namespace MonoGame.Tests.ContentPipeline
             BuildEffect(effectFile, TargetPlatform.Windows);
         }
 
-#if DIRECTX
         [Test]
         [TestCase("Assets/Effects/HullShader.fx")]
         [TestCase("Assets/Effects/DomainShader.fx")]
@@ -118,7 +117,6 @@ namespace MonoGame.Tests.ContentPipeline
         {
             BuildEffect(effectFile, TargetPlatform.Windows);
         }
-#endif
 
         private void BuildEffect(string effectFile, TargetPlatform targetPlatform, string defines = null)
         {

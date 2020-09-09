@@ -24,9 +24,15 @@ namespace MonoGame.Effect
             glsl = glsl.Replace("#extension GL_ARB_separate_shader_objects : require\n", "");
         }
 
-        public static void RemoveGlPerVertex(ref string glsl)
+        public static void RemoveOutGlPerVertex(ref string glsl)
         {
             string gl_PerVertex = "\nout gl_PerVertex\n{\n    vec4 gl_Position;\n};\n";
+            glsl = glsl.Replace(gl_PerVertex, "");
+        }
+
+        public static void RemoveInGlPerVertex(ref string glsl)
+        {
+            string gl_PerVertex = "\nin gl_PerVertex\n{\n    vec4 gl_Position;\n};\n";
             glsl = glsl.Replace(gl_PerVertex, "");
         }
 

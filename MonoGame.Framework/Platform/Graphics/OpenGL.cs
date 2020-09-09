@@ -42,6 +42,9 @@ namespace MonoGame.OpenGL
     {
         VertexShader = 0x8B31,
         FragmentShader = 0x8B30,
+        TesselationControlShader = 0x8E88,
+        TesselationEvaluationShader = 0x8E87,
+        GeometryShader = 0x8DD9,
     }
 
     internal enum ShaderParameter
@@ -317,6 +320,7 @@ namespace MonoGame.OpenGL
         ArrayBufferBinding = 0x8894,
         MaxTextureImageUnits = 0x8872,
         MaxCombinedTextureImageUnits = 0x8B4D,
+        MaxVertexTextureImageUnits = 0x8B4C,
         MaxVertexAttribs = 0x8869,
         MaxTextureSize = 0x0D33,
         MaxDrawBuffers = 0x8824,
@@ -346,10 +350,20 @@ namespace MonoGame.OpenGL
 
     internal enum GLPrimitiveType
     {
+        Points = 0x0000,
         Lines = 0x0001,
         LineStrip = 0x0003,
         Triangles = 0x0004,
         TriangleStrip = 0x0005,
+        TriangleFan = 0x0006,
+        Quads = 0x0007,
+        QuadStrip = 0x0008,
+        Polygon = 0x0009,
+        LinesAdjacency = 0x000A,
+        LineStripAdjacency = 0x000B,
+        TrianglesAdjacency = 0x000C,
+        TriangleStripAdjacency = 0x000D,
+        Patches = 0x000E,
     }
 
     [Flags]

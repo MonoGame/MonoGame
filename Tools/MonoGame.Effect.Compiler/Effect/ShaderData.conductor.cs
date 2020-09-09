@@ -117,10 +117,17 @@ namespace MonoGame.Effect
 
                 if (shaderStage == ShaderStage.VertexShader)
                 {
-                    // The gl_PerVertex declaration can make OpenGL crash.
-                    GLSLManipulator.RemoveGlPerVertex(ref glsl);
+                    // OpenGL doesn't like the gl_PerVertex declaration.
+                    GLSLManipulator.RemoveOutGlPerVertex(ref glsl);
                     // Add posFixup code, so we can compensate for differences btw DirectX and OpenGL
                     GLSLManipulator.AddPosFixupUniformAndCode(ref glsl);
+                }
+
+                if (shaderStage == ShaderStage.GeometryShader ||
+                    shaderStage == ShaderStage.HullShader)
+                {
+                    // OpenGL doesn't like the gl_PerVertex declaration.
+                    GLSLManipulator.RemoveInGlPerVertex(ref glsl);
                 }
 
                 shaderData.ShaderCode = Encoding.ASCII.GetBytes(glsl);

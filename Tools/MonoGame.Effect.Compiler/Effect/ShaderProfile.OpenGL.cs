@@ -51,6 +51,12 @@ namespace MonoGame.Effect
                     return GlslVertexShaderRegex;
                 case ShaderStage.PixelShader:
                     return GlslPixelShaderRegex;
+                case ShaderStage.HullShader:
+                    return GlslHullShaderRegex;
+                case ShaderStage.DomainShader:
+                    return GlslDomainShaderRegex;
+                case ShaderStage.GeometryShader:
+                    return GlslGeometryShaderRegex;
                 default:
                     throw new Exception("GetShaderModelRegex: Unknown shader stage");
             }
