@@ -155,8 +155,7 @@ namespace Microsoft.Xna.Framework.Input
             if (TextComposition == null)
                 return;
 
-            TextComposition.Invoke(this, new TextCompositionEventArgs(new IMEString(compositionText), cursorPosition,
-                null, 0, 0, 0));
+            TextComposition.Invoke(this, new TextCompositionEventArgs(new IMEString(compositionText), cursorPosition));
         }
 
         private void RemoveInternalFocusWorker()
