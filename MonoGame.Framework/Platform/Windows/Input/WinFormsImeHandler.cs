@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework.Input
                 return;
 
             TextComposition.Invoke(this, new TextCompositionEventArgs(compositionText, cursorPosition,
-                candidateList, candidatePageStart, candidatePageSize, candidateSelection));
+                candidateList, candidatePageSize, candidateSelection));
         }
     }
 }

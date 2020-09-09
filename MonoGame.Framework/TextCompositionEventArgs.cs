@@ -18,7 +18,6 @@ namespace Microsoft.Xna.Framework
         public TextCompositionEventArgs(IMEString compositionText,
                                         int cursorPosition,
                                         IMEString[] candidateList = null,
-                                        int candidatePageStart = 0,
                                         int candidatePageSize = 0,
                                         int candidateSelection = 0)
         {
@@ -26,7 +25,6 @@ namespace Microsoft.Xna.Framework
             CursorPosition = cursorPosition;
 
             CandidateList = candidateList;
-            CandidatePageStart = candidatePageStart;
             CandidatePageSize = candidatePageSize;
             CandidateSelection = candidateSelection;
         }
@@ -43,18 +41,14 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// The candidate text list for the composition.
-        /// This property is only supported on WindowsDX and WindowsUniversal.
+        /// This property is only supported on WindowsDX.
         /// If the composition string does not generate candidates this array is empty.
+        /// NOTE This array is pooled, its actual length is <see cref="CandidatePageSize" />.
         /// </summary>    
         public readonly IMEString[] CandidateList;
 
         /// <summary>
-        /// First candidate index of current page.
-        /// </summary>
-        public readonly int CandidatePageStart;
-
-        /// <summary>
-        /// How many candidates should display per page.
+        /// How many candidates displayed in this page.
         /// </summary>
         public readonly int CandidatePageSize;
 
