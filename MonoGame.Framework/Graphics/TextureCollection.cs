@@ -10,14 +10,12 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private readonly GraphicsDevice _graphicsDevice;
         private readonly Texture[] _textures;
-        private readonly ShaderStage _shaderStage;
         private int _dirty;
 
-        internal TextureCollection(GraphicsDevice graphicsDevice, int maxTextures, ShaderStage shaderStage)
+        internal TextureCollection(GraphicsDevice graphicsDevice, int maxTextures)
         {
             _graphicsDevice = graphicsDevice;
             _textures = new Texture[maxTextures];
-            _shaderStage = shaderStage;
             _dirty = int.MaxValue;
             PlatformInit();
         }
@@ -30,9 +28,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             set
             {
-                if (_shaderStage != ShaderStage.Pixel && !_graphicsDevice.GraphicsCapabilities.SupportsVertexTextures)
-                    throw new NotSupportedException("Vertex textures are not supported on this device.");
-
                 if (_textures[index] == value)
                     return;
 
@@ -56,13 +51,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void Dirty()
         {
             _dirty = int.MaxValue;
-        }
-
-        internal void SetTextures(GraphicsDevice device)
-        {
-            if (_shaderStage != ShaderStage.Pixel && !device.GraphicsCapabilities.SupportsVertexTextures)
-                return;
-            PlatformSetTextures(device);
         }
     }
 }

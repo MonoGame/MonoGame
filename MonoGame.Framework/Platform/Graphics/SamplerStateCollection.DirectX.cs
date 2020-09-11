@@ -25,36 +25,14 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dDirty = int.MaxValue;
         }
 
-        internal void PlatformSetSamplers(GraphicsDevice device)
+        internal void PlatformSetSamplers(GraphicsDevice device, SharpDX.Direct3D11.CommonShaderStage shaderStageDX)
         {
-            if (_shaderStage != ShaderStage.Pixel && !device.GraphicsCapabilities.SupportsVertexTextures)
-                return;
-
             // Skip out if nothing has changed.
             if (_d3dDirty == 0)
                 return;
 
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
-            SharpDX.Direct3D11.CommonShaderStage shaderStageDX = null;
-            switch (_shaderStage)
-            {
-                case ShaderStage.Vertex:
-                    shaderStageDX = device._d3dContext.VertexShader;
-                    break;
-                case ShaderStage.Pixel:
-                    shaderStageDX = device._d3dContext.PixelShader;
-                    break;
-                case ShaderStage.Hull:
-                    shaderStageDX = device._d3dContext.HullShader;
-                    break;
-                case ShaderStage.Domain:
-                    shaderStageDX = device._d3dContext.DomainShader;
-                    break;
-                case ShaderStage.Geometry:
-                    shaderStageDX = device._d3dContext.GeometryShader;
-                    break;
-            }
 
             for (var i = 0; i < _actualSamplers.Length; i++)
             {

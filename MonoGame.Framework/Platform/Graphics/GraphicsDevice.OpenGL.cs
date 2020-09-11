@@ -1067,44 +1067,18 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 ActivateShaderProgram();
 
-                if (_vertexShaderDirty)
+                unchecked
                 {
-                    unchecked
-                    {
+                    if (_vertexShaderDirty)
                         _graphicsMetrics._vertexShaderCount++;
-                    }
-                }
-
-                if (_pixelShaderDirty)
-                {
-                    unchecked
-                    {
-                        _graphicsMetrics._pixelShaderCount++;
-                    }
-                }
-
-                if (_hullShaderDirty)
-                {
-                    unchecked
-                    {
-                        _graphicsMetrics._hullShaderCount++;
-                    }
-                }
-
-                if (_domainShaderDirty)
-                {
-                    unchecked
-                    {
-                        _graphicsMetrics._domainShaderCount++;
-                    }
-                }
-
-                if (_geometryShaderDirty)
-                {
-                    unchecked
-                    {
-                        _graphicsMetrics._geometryShaderCount++;
-                    }
+                    if (_pixelShaderDirty)
+                            _graphicsMetrics._pixelShaderCount++;
+                    if (_hullShaderDirty)
+                            _graphicsMetrics._hullShaderCount++;
+                    if (_domainShaderDirty)
+                            _graphicsMetrics._domainShaderCount++;
+                    if (_geometryShaderDirty)
+                            _graphicsMetrics._geometryShaderCount++;
                 }
 
                 _vertexShaderDirty = _pixelShaderDirty = _hullShaderDirty = _domainShaderDirty = _geometryShaderDirty = false;
@@ -1116,16 +1090,19 @@ namespace Microsoft.Xna.Framework.Graphics
             _domainConstantBuffers.SetConstantBuffers(this, _shaderProgram);
             _geometryConstantBuffers.SetConstantBuffers(this, _shaderProgram);
 
-            Textures.SetTextures(this);
-            SamplerStates.PlatformSetSamplers(this);
-            VertexTextures.SetTextures(this);
-            VertexSamplerStates.PlatformSetSamplers(this);
-            HullTextures.SetTextures(this);
-            HullSamplerStates.PlatformSetSamplers(this);
-            DomainTextures.SetTextures(this);
-            DomainSamplerStates.PlatformSetSamplers(this);
-            GeometryTextures.SetTextures(this);
-            GeometrySamplerStates.PlatformSetSamplers(this);
+            SamplerStates.PlatformSetSamplers(this, _pixelShader);
+
+            if (GraphicsCapabilities.SupportsVertexTextures)
+            {
+                if (_vertexShader != null)
+                    VertexSamplerStates.PlatformSetSamplers(this, _vertexShader);
+                if (_hullShader != null)
+                    HullSamplerStates.PlatformSetSamplers(this, _hullShader);
+                if (_domainShader != null)
+                    DomainSamplerStates.PlatformSetSamplers(this, _domainShader);
+                if (_geometryShader != null)
+                    GeometrySamplerStates.PlatformSetSamplers(this, _geometryShader);
+            }
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)

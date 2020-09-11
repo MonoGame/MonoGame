@@ -86,6 +86,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
 
+        public TextureCollection Textures { get; private set; }
+
         public TextureCollection VertexTextures { get; private set; }
 
         public TextureCollection HullTextures { get; private set; }
@@ -93,6 +95,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public TextureCollection DomainTextures { get; private set; }
 
         public TextureCollection GeometryTextures { get; private set; }
+
+        public SamplerStateCollection SamplerStates { get; private set; }
 
         public SamplerStateCollection VertexSamplerStates { get; private set; }
 
@@ -102,9 +106,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public SamplerStateCollection GeometrySamplerStates { get; private set; }
 
-        public TextureCollection Textures { get; private set; }
-
-        public SamplerStateCollection SamplerStates { get; private set; }
+      
 
         /// <summary>
         /// Get or set the color a <see cref="RenderTarget2D"/> is cleared to when it is set.
@@ -341,19 +343,36 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformSetup();
 
-            Textures = new TextureCollection(this, MaxTextureSlots, ShaderStage.Pixel);
-            VertexTextures = new TextureCollection(this, MaxVertexTextureSlots, ShaderStage.Vertex);
-            HullTextures = new TextureCollection(this, MaxVertexTextureSlots, ShaderStage.Hull);
-            DomainTextures = new TextureCollection(this, MaxVertexTextureSlots, ShaderStage.Domain);
-            GeometryTextures = new TextureCollection(this, MaxVertexTextureSlots, ShaderStage.Geometry);
-            Textures = new TextureCollection(this, MaxTextureSlots, ShaderStage.Pixel);
+            Textures = new TextureCollection(this, MaxTextureSlots);
+            SamplerStates = new SamplerStateCollection(this, MaxTextureSlots);
 
-            SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, ShaderStage.Pixel);
-            VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, ShaderStage.Vertex);
-            HullSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, ShaderStage.Hull);
-            DomainSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, ShaderStage.Domain);
-            GeometrySamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, ShaderStage.Geometry);
-            SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, ShaderStage.Pixel);
+            // In DirectX we use separate texture/sampler collections for every shader stage.
+            // In OpenGL we use one big texture/sampler collection for all stages.
+#if OPENGL
+            VertexTextures = Textures;
+            HullTextures = Textures;
+            DomainTextures = Textures;
+            GeometryTextures = Textures;
+            Textures = Textures;
+
+            VertexSamplerStates = SamplerStates;
+            HullSamplerStates = SamplerStates;
+            DomainSamplerStates = SamplerStates;
+            GeometrySamplerStates = SamplerStates;
+            SamplerStates = SamplerStates;
+#else
+            VertexTextures = new TextureCollection(this, MaxVertexTextureSlots);
+            HullTextures = new TextureCollection(this, MaxVertexTextureSlots);
+            DomainTextures = new TextureCollection(this, MaxVertexTextureSlots);
+            GeometryTextures = new TextureCollection(this, MaxVertexTextureSlots);
+            Textures = new TextureCollection(this, MaxTextureSlots);
+
+            VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots);
+            HullSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots);
+            DomainSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots);
+            GeometrySamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots);
+            SamplerStates = new SamplerStateCollection(this, MaxTextureSlots);
+#endif
 
             _blendStateAdditive = BlendState.Additive.Clone();
             _blendStateAlphaBlend = BlendState.AlphaBlend.Clone();
@@ -417,7 +436,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clear the texture and sampler collections forcing
             // the state to be reapplied.
-            Textures.Clear();
+            Textures.Clear();         
             VertexTextures.Clear();
             HullTextures.Clear();
             DomainTextures.Clear();

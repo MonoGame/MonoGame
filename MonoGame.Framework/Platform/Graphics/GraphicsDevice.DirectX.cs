@@ -1176,8 +1176,15 @@ namespace Microsoft.Xna.Framework.Graphics
             // to the device as a texture resource.
             lock (_d3dContext)
             {
-                VertexTextures.ClearTargets(this, _currentRenderTargetBindings);
-                Textures.ClearTargets(this, _currentRenderTargetBindings);
+                Textures.ClearTargets(_currentRenderTargetBindings, _d3dContext.PixelShader);
+
+                if (GraphicsCapabilities.SupportsVertexTextures)
+                {
+                    VertexTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.VertexShader);
+                    HullTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.HullShader);
+                    DomainTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.DomainShader);
+                    GeometryTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.GeometryShader);
+                }
             }
 
             for (var i = 0; i < _currentRenderTargetCount; i++)
@@ -1499,16 +1506,20 @@ namespace Microsoft.Xna.Framework.Graphics
             _domainConstantBuffers.SetConstantBuffers(this);
             _geometryConstantBuffers.SetConstantBuffers(this);
 
-            VertexTextures.SetTextures(this);
-            VertexSamplerStates.PlatformSetSamplers(this);
-            Textures.SetTextures(this);
-            SamplerStates.PlatformSetSamplers(this);
-            HullTextures.SetTextures(this);
-            HullSamplerStates.PlatformSetSamplers(this);
-            DomainTextures.SetTextures(this);
-            DomainSamplerStates.PlatformSetSamplers(this);
-            GeometryTextures.SetTextures(this);
-            GeometrySamplerStates.PlatformSetSamplers(this);
+            Textures.PlatformSetTextures(this, _d3dContext.PixelShader);
+            SamplerStates.PlatformSetSamplers(this, _d3dContext.PixelShader);
+
+            if (GraphicsCapabilities.SupportsVertexTextures)
+            {
+                VertexTextures.PlatformSetTextures(this, _d3dContext.VertexShader);
+                VertexSamplerStates.PlatformSetSamplers(this, _d3dContext.VertexShader);
+                HullTextures.PlatformSetTextures(this, _d3dContext.HullShader);
+                HullSamplerStates.PlatformSetSamplers(this, _d3dContext.HullShader);
+                DomainTextures.PlatformSetTextures(this, _d3dContext.DomainShader);
+                DomainSamplerStates.PlatformSetSamplers(this, _d3dContext.DomainShader);
+                GeometryTextures.PlatformSetTextures(this, _d3dContext.GeometryShader);
+                GeometrySamplerStates.PlatformSetSamplers(this, _d3dContext.GeometryShader);
+            }
         }
 
         private int SetUserVertexBuffer<T>(T[] vertexData, int vertexOffset, int vertexCount, VertexDeclaration vertexDecl)
