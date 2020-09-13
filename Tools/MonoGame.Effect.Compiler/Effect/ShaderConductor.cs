@@ -297,9 +297,6 @@ namespace MonoGame.Effect
 
             int samplerCount = GetSamplerCount(ref result);
 
-            var samplerSlotToSampler = new Dictionary<int, Sampler>();
-            var textureSlotToTextureName = new Dictionary<int, string>();
-
             for (int i = 0; i < samplerCount; i++)
             {
                 GetSampler(ref result, i, nameBuffer, originalNameBuffer, textureNameBuffer, MaxNameLength, out int type, out int slot, out int textureSlot);
@@ -315,24 +312,6 @@ namespace MonoGame.Effect
                 };
 
                 samplers.Add(sampler);
-
-                // make sure there are no overlap conflicts with the sampler and texture slots
-                if (samplerSlotToSampler.TryGetValue(slot, out Sampler s))
-                {
-                    if (sampler.originalName == s.originalName)
-                        throw new Exception("Sampler '" + sampler.originalName + "' is used to sample from multiple textures. You may only assign a register slot to a sampler if it samples from one texture only.");
-                    else
-                        throw new Exception("Sampler '" + sampler.originalName + "' and sampler '" + s.originalName + "' are assigned to the same register slot " + slot);
-                }
-
-                if (textureSlotToTextureName.TryGetValue(textureSlot, out string texName))
-                {
-                    if (sampler.textureName != texName)
-                        throw new Exception("Texture '" + sampler.textureName + "' and texture '" + texName + "' can not be assigned to the same register slot " + textureSlot);
-                }
-
-                samplerSlotToSampler[slot] = sampler;
-                textureSlotToTextureName[textureSlot] = sampler.textureName;
             }
 
             return samplers;

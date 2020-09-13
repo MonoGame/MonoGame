@@ -10,10 +10,10 @@ namespace MonoGame.Effect
 {
 	internal partial class ShaderData
 	{
-        public static ShaderData CreateGLSL_Conductor(string sourceCode,
+        public static ShaderData CreateGLSL_Conductor(string sourceCode, int sharedIndex, 
             ShaderStage shaderStage, string shaderFunction,
             int shaderModelMajor, int shaderModelMinor, string shaderModelExtension,
-            int sharedIndex, List<ConstantBufferData> cbuffers, Dictionary<string, SamplerStateInfo> samplerStates,
+            List<ConstantBufferData> cbuffers, Dictionary<string, SamplerStateInfo> samplerStates,
             bool debug, bool isESSL)
         {
             var shaderData = new ShaderData(shaderStage, sharedIndex, new byte[0]);
@@ -51,7 +51,7 @@ namespace MonoGame.Effect
                         case "9_1": glslVersion = !isESSL ? "110" : "100";    break; //   2.0                   2.0
                         case "9_2": glslVersion = !isESSL ? "110" : "100";    break; //   2.0                   2.0
                         case "9_3": glslVersion = !isESSL ? "110" : "100";    break; //   2.0                   2.0            
-                        case "":    glslVersion = !isESSL ? "330" : "300 es"; break; //   3.3 (GS, TESS)        3.0              
+                        default:    glslVersion = !isESSL ? "330" : "300 es"; break; //   3.3 (GS, TESS)        3.0              
                     }
                     break;
                 default:            glslVersion = !isESSL ? "430" : "320 es"; break; //   4.3 (GS, TESS, CS)    3.2 (GS, TESS, CS)       
@@ -68,11 +68,11 @@ namespace MonoGame.Effect
             // Cross compile HLSL source code to GLSL using ShaderConductor
             // 1.) DirectXShaderCompiler converts HLSL to SPIR-V
             // 2.) SPIRV-CROSS converts SPIR-V to GLSL
-            //==============================================================  
-            string previousWorkingDir = System.IO.Directory.GetCurrentDirectory();
-            string newWorkingDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            //==============================================================
 
             // Change working directory, otherwise ShaderConductor can't load dlls
+            string previousWorkingDir = System.IO.Directory.GetCurrentDirectory();
+            string newWorkingDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             System.IO.Directory.SetCurrentDirectory(newWorkingDir);
 
             ShaderConductor.Compile(ref sourceDesc, ref options, ref target, out ShaderConductor.ResultDesc result);

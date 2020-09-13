@@ -114,10 +114,10 @@ namespace MonoGame.Effect
                 var shaderInfo = shaderResult.ShaderInfo;
                 var sourceCode = shaderResult.FileContent;
 
-                var shaderData = ShaderData.CreateGLSL_Conductor(sourceCode,
+                var shaderData = ShaderData.CreateGLSL_Conductor(sourceCode, effect.Shaders.Count,
                     shaderStage, shaderFunction,
                     smMajor, smMinor, smExtension,
-                    effect.Shaders.Count, effect.ConstantBuffers, shaderInfo.SamplerStates,
+                    effect.ConstantBuffers, shaderInfo.SamplerStates,
                     shaderResult.Debug, IsESSL);
 
                 // See if we already created this same shader.
@@ -129,6 +129,61 @@ namespace MonoGame.Effect
 
                 effect.Shaders.Add(shaderData);
                 return shaderData;
+            }
+        }
+
+        internal void MakeSeparateSamplersForDifferentTextures(List<ShaderData> shaders)
+        {
+            // MojoShader handles this differently
+            if (_useMojo)
+                return;
+
+            // When a sampler samples from multiple textures, we have to create separate samplers for every texture.
+            // Each of these samplers needs a unique sampler slot assigned.
+            // The samplerSlotMapping dictionary maps from (originalDXSamplerSlot, textureSlot) to uniqueSamplerSlot.
+            var samplerSlotMapping = new Dictionary<(int, int), int>();
+
+            // Assign sampler slots in two passes.
+            // In the first pass we fill up the samplerSlotMapping dictionary with original DX sampler slots only.
+            // Original DX sampler slots have priority over newly created sampler slots, because we want to keep DX register bindings intact.
+            // In the second pass we will then also add new sampler slots for multi-texture samplers.
+            for (int pass = 0; pass < 2; pass++)
+            {
+                foreach (var shader in shaders)
+                {
+                    for (int i = 0; i < shader._samplers.Length; i++)
+                    {
+                        var sampler = shader._samplers[i];
+
+                        // Check if we already assigned a unique slot index to the current sampler-texture combination, if not, assign one.
+                        if (!samplerSlotMapping.TryGetValue((sampler.samplerSlot, sampler.textureSlot), out int uniqueSamplerSlot))
+                        {
+                            // If the original DX sampler slot is still available, keep it, that way we keep register bindings intact.
+                            if (!samplerSlotMapping.ContainsValue(sampler.samplerSlot))
+                            {
+                                uniqueSamplerSlot = sampler.samplerSlot;
+                                samplerSlotMapping.Add((sampler.samplerSlot, sampler.textureSlot), uniqueSamplerSlot);
+                            }
+                            else
+                            {
+                                // The original DX sampler slot is already used by another sampler-texture combination
+                                // We have to find a new free sampler slot, but only in the 2nd pass. 
+                                if (pass == 1)
+                                {
+                                    uniqueSamplerSlot = 1;
+                                    while (samplerSlotMapping.ContainsValue(uniqueSamplerSlot))
+                                        uniqueSamplerSlot++;
+
+                                    samplerSlotMapping.Add((sampler.samplerSlot, sampler.textureSlot), uniqueSamplerSlot);
+                                }
+                            }
+                        }
+
+                        // assign new slots in 2nd pass
+                        if (pass == 1)  
+                            sampler.samplerSlot = uniqueSamplerSlot;
+                    }
+                }
             }
         }
     }

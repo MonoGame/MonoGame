@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 
                 if (samplerState != null && texture != null)
                 {
-                    GL.ActiveTexture(TextureUnit.Texture0 + samplerInfo.textureSlot);
+                    GL.ActiveTexture(TextureUnit.Texture0 + samplerInfo.samplerSlot);
                     GraphicsExtensions.CheckGLError();
 
                     GL.BindTexture(texture.glTarget, texture.glTexture);
