@@ -452,16 +452,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetValue (bool value)
         {
-            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Bool)
+#if OPENGL
+            if (ParameterClass != EffectParameterClass.Scalar || (ParameterType != EffectParameterType.Bool && ParameterType != EffectParameterType.Int32))
                 throw new InvalidCastException();
 
-#if OPENGL
             // MojoShader encodes even booleans into a float.
             if (MojoDataLayout)
                 ((float[])Data)[0] = value ? 1 : 0;
             else
                 ((int[])Data)[0] = value ? 1 : 0;
 #else
+            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Bool)
+                throw new InvalidCastException();
             ((int[])Data)[0] = value ? 1 : 0;
 #endif
             StateKey = unchecked(NextStateKey++);

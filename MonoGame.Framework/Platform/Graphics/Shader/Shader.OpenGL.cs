@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 if (loc != -1)
                 {
-                    GL.Uniform1(loc, sampler.textureSlot);
+                    GL.Uniform1(loc, sampler.samplerSlot);
                     GraphicsExtensions.CheckGLError();
                 }
             }
