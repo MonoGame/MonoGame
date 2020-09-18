@@ -143,13 +143,23 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                if (_vertexShader == null && _pixelShader == null)
+                if (_vertexShader == null && _pixelShader == null && _hullShader == null && _domainShader == null && _geometryShader == null)
                     throw new InvalidOperationException("There is no shader bound!");
-                if (_vertexShader == null)
-                    return _pixelShader.HashKey;
-                if (_pixelShader == null)
-                    return _vertexShader.HashKey;
-                return _vertexShader.HashKey ^ _pixelShader.HashKey;
+
+                int hash = 0;
+
+                if (_vertexShader != null)
+                    hash ^= _vertexShader.HashKey;
+                if (_pixelShader != null)
+                    hash ^= _pixelShader.HashKey;
+                if (_hullShader != null)
+                    hash ^= _hullShader.HashKey;
+                if (_domainShader != null)
+                    hash ^= _domainShader.HashKey;
+                if (_geometryShader != null)
+                    hash ^= _geometryShader.HashKey;
+
+                return hash;
             }
         }
 

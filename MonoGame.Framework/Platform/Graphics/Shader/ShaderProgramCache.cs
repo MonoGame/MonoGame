@@ -69,11 +69,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // buffers here as well.  This would allow us to optimize
             // setting uniforms to only when a constant buffer changes.
 
-            var key = vertexShader.HashKey | pixelShader.HashKey;
+            var key = vertexShader.HashKey ^ pixelShader.HashKey;
             if (hullShader != null && domainShader != null)
-                key |= hullShader.HashKey | domainShader.HashKey;
+                key ^= hullShader.HashKey ^ domainShader.HashKey;
             if (geometryShader != null)
-                key |= geometryShader.HashKey;
+                key ^= geometryShader.HashKey;
 
             if (!_programCache.ContainsKey(key))
             {
@@ -123,8 +123,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             vertexShader.GetVertexAttributeLocations(program);
 
+            vertexShader.ApplySamplerTextureUnits(program);
             pixelShader.ApplySamplerTextureUnits(program);
-
+            
             if (hullShader != null && domainShader != null)
             {
                 hullShader.ApplySamplerTextureUnits(program);
