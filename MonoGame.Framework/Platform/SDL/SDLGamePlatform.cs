@@ -259,7 +259,7 @@ namespace Microsoft.Xna.Framework
                             string path = Encoding.UTF8.GetString(buffer, 0, len);
                             Sdl.Drop.SDL_Free(ev.Drop.File);
 
-                            _view.OnFileDrop(new FileDropEventArgs(new string[] { path }));
+                            _dropList.Add(path);
                         }
 
                         break;
