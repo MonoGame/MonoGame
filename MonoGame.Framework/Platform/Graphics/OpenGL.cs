@@ -325,6 +325,7 @@ namespace MonoGame.OpenGL
         MaxTextureSize = 0x0D33,
         MaxDrawBuffers = 0x8824,
         TextureBinding2D = 0x8069,
+        TextureBinding2DArray = 0x8C1D,
         MaxTextureMaxAnisotropyExt = 0x84FF,
         MaxSamples = 0x8D57,
     }
@@ -387,6 +388,7 @@ namespace MonoGame.OpenGL
     internal enum TextureTarget
     {
         Texture2D = 0x0DE1,
+        Texture2DArray = 0x8C1A,
         Texture3D = 0x806F,
         TextureCubeMap = 0x8513,
         TextureCubeMapPositiveX = 0x8515,
