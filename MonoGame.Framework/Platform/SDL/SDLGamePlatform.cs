@@ -27,7 +27,6 @@ namespace Microsoft.Xna.Framework
         private int _isExiting;
         private SdlGameWindow _view;
 
-        private readonly bool _multidropSupported;
         private readonly List<string> _dropList;
 
         public SdlGamePlatform(Game game)
@@ -53,10 +52,7 @@ namespace Microsoft.Xna.Framework
             if (version >= 205 && CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
                 Sdl.SetHint("SDL_WINDOWS_DISABLE_THREAD_NAMING", "1");
 
-            // https://wiki.libsdl.org/SDL_DropEvent
-            // SDL_DROPTEXT, SDL_DROPBEGIN, and SDL_DROPCOMPLETE are available since SDL 2.0.5. 
-            _multidropSupported = version >= 205;
-            _dropList = _multidropSupported ? new List<string>() : null;
+            _dropList = new List<string>();
 
             Sdl.Init((int)(
                 Sdl.InitFlags.Video |
@@ -263,8 +259,7 @@ namespace Microsoft.Xna.Framework
                             string path = Encoding.UTF8.GetString(buffer, 0, len);
                             Sdl.Drop.SDL_Free(ev.Drop.File);
 
-                            if (_multidropSupported) _dropList.Add(path);
-                            else _view.OnFileDrop(new FileDropEventArgs(new string[] { path }));
+                            _view.OnFileDrop(new FileDropEventArgs(new string[] { path }));
                         }
 
                         break;
@@ -274,9 +269,6 @@ namespace Microsoft.Xna.Framework
                             break;
 
                         if (!_view.IsFileDropHandled)
-                            break;
-
-                        if (!_multidropSupported) //should not happen
                             break;
 
                         if (_dropList.Count > 0)

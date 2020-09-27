@@ -155,8 +155,6 @@ namespace Microsoft.Xna.Framework
 
 #endif
 
-#if WINDOWS || DESKTOPGL || ANGLE
-
         /// <summary>
         /// This event is raised when user drops a file into the game window
         /// </summary>
@@ -166,7 +164,6 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<FileDropEventArgs> FileDrop;
 
         internal bool IsFileDropHandled { get { return FileDrop != null; } }
-#endif
 
         #endregion Events
 
