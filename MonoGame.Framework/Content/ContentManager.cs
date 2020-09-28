@@ -220,7 +220,7 @@ namespace Microsoft.Xna.Framework.Content
             return Load<T> (assetName);
         }
 
-        public virtual T Load<T>(string assetName, Stream streamData=null)
+        public virtual T Load<T>(string assetName, Stream streamData=null, ContentResolver contentResolver=null)
         {
             if (string.IsNullOrEmpty(assetName))
             {
@@ -252,7 +252,7 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             // Load the asset.
-            result = ReadAsset<T>(assetName, null, streamData);
+            result = ReadAsset<T>(assetName, null, streamData, contentResolver);
 
             loadedAssets[key] = result;
             return result;
@@ -301,7 +301,7 @@ namespace Microsoft.Xna.Framework.Content
 			return stream;
 		}
 
-		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject,Stream streamData=null)
+		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject,Stream streamData=null, ContentResolver contentResolver=null)
 		{
 			if (string.IsNullOrEmpty(assetName))
 			{
@@ -319,7 +319,7 @@ namespace Microsoft.Xna.Framework.Content
             var stream = streamData ?? OpenStream(assetName);
             using (var xnbReader = new BinaryReader(stream))
             {
-                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
+                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject, contentResolver))
                 {
                     result = reader.ReadAsset<T>();
                     if (result is GraphicsResource)
@@ -333,7 +333,12 @@ namespace Microsoft.Xna.Framework.Content
 			return (T)result;
 		}
 
-        private ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
+        /// <summary>
+        /// resolvers for reloading content
+        /// </summary>
+        protected Dictionary<string, ContentResolver> ContentResolversForReload = new Dictionary<string, ContentResolver>();
+
+        private ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject, ContentResolver contentResolver=null)
         {
             // The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
             byte x = xnbReader.ReadByte();
@@ -381,8 +386,17 @@ namespace Microsoft.Xna.Framework.Content
                 decompressedStream = stream;
             }
 
+            if (contentResolver != null)
+            {
+                if (ContentResolversForReload.ContainsKey(originalAssetName))
+                {
+                    ContentResolversForReload.Remove(originalAssetName);
+                }
+                ContentResolversForReload.Add(originalAssetName, contentResolver);
+            }
+
             var reader = new ContentReader(this, decompressedStream,
-                                                        originalAssetName, version, recordDisposableObject);
+                                                        originalAssetName, version, recordDisposableObject, contentResolver);
             
             return reader;
         }
@@ -447,10 +461,16 @@ namespace Microsoft.Xna.Framework.Content
 				throw new ObjectDisposedException("ContentManager");
 			}
 
+            ContentResolver contentResolver = null;
+            if(ContentResolversForReload.ContainsKey(originalAssetName))
+            {
+                contentResolver = ContentResolversForReload[originalAssetName];
+            }
+
             var stream = OpenStream(assetName);
             using (var xnbReader = new BinaryReader(stream))
             {
-                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, null))
+                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, null, contentResolver))
                 {
                     reader.ReadAsset<T>(currentAsset);
                 }
