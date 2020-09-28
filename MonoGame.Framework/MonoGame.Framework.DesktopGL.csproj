@@ -7,8 +7,8 @@
     <Description>The MonoGame runtime supporting Windows, Linux and macOS using SDL2 and OpenGL.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;desktopgl</PackageTags>
     <PackageId>MonoGame.Framework.DesktopGL</PackageId>
-    <Version>3.8.0.11</Version>
-    <AssemblyVersion>3.8.0.11</AssemblyVersion>
+    <Version>3.8.0.1700</Version>
+    <AssemblyVersion>3.8.0.1700</AssemblyVersion>
   </PropertyGroup>
 
   <!-- NETFX reference assemblies let us target .NET Framework on Mac/Linux without Mono -->
