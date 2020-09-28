@@ -7,7 +7,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
@@ -129,7 +129,7 @@ namespace Microsoft.Xna.Framework
 
             _handle = Sdl.Window.Create("", 0, 0,
                 GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight,
-                Sdl.Window.State.Hidden);
+                Sdl.Window.State.Hidden | Sdl.Window.State.FullscreenDesktop);
         }
 
         internal void CreateWindow()
@@ -153,8 +153,13 @@ namespace Microsoft.Xna.Framework
                 winy |= GetMouseDisplay();
             }
 
-            _handle = Sdl.Window.Create(AssemblyHelper.GetDefaultWindowTitle(),
-                winx, winy, _width, _height, initflags);
+            _width = GraphicsDeviceManager.DefaultBackBufferWidth;
+            _height = GraphicsDeviceManager.DefaultBackBufferHeight;
+
+            _handle = Sdl.Window.Create(
+                AssemblyHelper.GetDefaultWindowTitle(),
+                winx, winy, _width, _height, initflags
+            );
 
             Id = Sdl.Window.GetWindowId(_handle);
 

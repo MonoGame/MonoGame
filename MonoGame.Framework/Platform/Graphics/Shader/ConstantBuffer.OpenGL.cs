@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            HashKey = MonoGame.Utilities.Hash.ComputeHash(data);
+            HashKey = MonoGame.Framework.Utilities.Hash.ComputeHash(data);
         }
 
         private void PlatformClear()

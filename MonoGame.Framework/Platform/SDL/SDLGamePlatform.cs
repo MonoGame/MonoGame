@@ -9,7 +9,7 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
@@ -206,6 +206,12 @@ namespace Microsoft.Xna.Framework
                         }
                         break;
                     case Sdl.EventType.WindowEvent:
+
+                        // If the ID is not the same as our main window ID
+                        // that means that we received an event from the
+                        // dummy window, so don't process the event.
+                        if (ev.Window.WindowID != _view.Id)
+                            break;
 
                         switch (ev.Window.EventID)
                         {

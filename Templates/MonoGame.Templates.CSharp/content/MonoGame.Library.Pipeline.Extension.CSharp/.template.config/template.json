@@ -22,7 +22,7 @@
     "symbols": {
         "framework": {
             "type": "parameter",
-            "defaultValue": "net45",
+            "defaultValue": "netstandard2.0",
             "replaces": "netstandard2.0"
         }
     }

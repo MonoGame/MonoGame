@@ -1,0 +1,58 @@
+<Project>
+
+  <!-- Copy all output files of ProjectReferences that have the 'AppReference' metadata.
+       This ensures we copy
+         1. The app's dlls and dependencies (that would normally be copied if 'ReferenceOutputAssembly' were true)
+         2. The extra *.deps.json and *.runtimeconfig.json files that require a custom target to copy anyway.
+            See https://github.com/dotnet/sdk/issues/1675#issuecomment-346135772 -->
+  <Target Name="CopyAppReferences" BeforeTargets="GetCopyToOutputDirectoryItems">
+
+    <!-- Get the output folders of all AppReferences. -->
+    <MSBuild Projects="%(ProjectReference.FullPath)"
+             Targets="GetTargetPath"
+             Properties="Configuration=$(Configuration)"
+             Condition="'%(ProjectReference.AppReference)' != ''">
+      <Output TaskParameter="TargetOutputs"
+              ItemName="AppReferenceTarget" />
+    </MSBuild>
+
+    <ItemGroup>
+      <AppReferenceTarget>
+        <MacAppBundle>$([System.IO.Path]::ChangeExtension(%(AppReferenceTarget.FullPath), "app"))</MacAppBundle>
+      </AppReferenceTarget>
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Include the entire output folder except for publish artifacts, pack artifacts, and dev configs. -->
+      <AppReferenceContent Condition="!Exists(%(AppReferenceTarget.MacAppBundle))"
+                           Include="%(RootDir)%(Directory)\**\*"
+                           Exclude="%(RootDir)%(Directory)\publish\**\*;
+                                    %(RootDir)%(Directory)\*.nupkg;
+                                    %(RootDir)%(Directory)\*.runtimeconfig.dev.json">
+        <SubDir></SubDir>
+      </AppReferenceContent>
+
+      <!-- For Mac app bundles, simply include the entire app bundle. -->
+      <AppReferenceContent Condition="Exists(%(AppReferenceTarget.MacAppBundle))"
+                           Include="%(AppReferenceTarget.MacAppBundle)\**\*">
+        <SubDir>$([System.IO.Path]::GetFileName(%(AppReferenceTarget.MacAppBundle)))\</SubDir>
+      </AppReferenceContent>
+    </ItemGroup>
+
+    <!-- Copy this content to the build and package output. -->
+    <ItemGroup>
+      <ContentWithTargetPath
+        Include="%(AppReferenceContent.FullPath)"
+        TargetPath="%(AppReferenceContent.SubDir)%(RecursiveDir)%(Filename)%(Extension)"
+        CopyToOutputDirectory="PreserveNewest" />
+
+      <!-- This is required to include the files in a nupkg if the project isn't packed as a tool. -->
+      <TfmSpecificPackageFile
+        Include="%(AppReferenceContent.FullPath)"
+        PackagePath="tools\$(TargetFramework)\any\%(AppReferenceContent.SubDir)%(RecursiveDir)"
+        Condition="'$(PackAsTool)' != 'true'"/>
+    </ItemGroup>
+
+  </Target>
+
+</Project>

@@ -254,9 +254,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Context.MakeCurrent(windowInfo);
 #endif
-            MaxTextureSlots = 16;
-
-            GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
+            GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
@@ -415,13 +413,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-#if MONOMAC
+#if MONOMAC || IOS
             if (GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt) == FramebufferErrorCode.FramebufferComplete)
             {
 #endif
                 GL.Clear(bufferMask);
                 GraphicsExtensions.CheckGLError();
-#if MONOMAC
+#if MONOMAC || IOS
             }
 #endif
            		
@@ -1175,7 +1173,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vbHandle.Free();
         }
 
-        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount, int baseInstance = 0)
+        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int baseInstance, int instanceCount)
         {
             if (!GraphicsCapabilities.SupportsInstancing)
                 throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2 or GLES 3.2. Try upgrading your graphics card drivers.");

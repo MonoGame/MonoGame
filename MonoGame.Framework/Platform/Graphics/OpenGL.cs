@@ -8,7 +8,7 @@ using System.Text;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Diagnostics;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 #if __IOS__ || __TVOS__ || MONOMAC
 using ObjCRuntime;
@@ -315,6 +315,7 @@ namespace MonoGame.OpenGL
     {
         ArrayBufferBinding = 0x8894,
         MaxTextureImageUnits = 0x8872,
+        MaxCombinedTextureImageUnits = 0x8B4D,
         MaxVertexAttribs = 0x8869,
         MaxTextureSize = 0x0D33,
         MaxDrawBuffers = 0x8824,
@@ -1586,7 +1587,7 @@ namespace MonoGame.OpenGL
         {
             int length = 0;
             GetProgram(programId, GetProgramParameterName.LogLength, out length);
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(length, length);
             GetProgramInfoLogInternal (programId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
@@ -1594,7 +1595,7 @@ namespace MonoGame.OpenGL
         internal static string GetShaderInfoLog (int shaderId) {
             int length = 0;
             GetShader(shaderId, ShaderParameter.LogLength, out length);
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(length, length);
             GetShaderInfoLogInternal (shaderId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }

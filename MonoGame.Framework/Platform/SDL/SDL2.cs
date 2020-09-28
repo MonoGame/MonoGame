@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 internal static class Sdl
 {
@@ -15,56 +15,14 @@ internal static class Sdl
 
     private static IntPtr GetNativeLibrary()
     {
-        var ret = IntPtr.Zero;
-
-        // Load bundled library
-        var assemblyLocation = Path.GetDirectoryName(typeof(Sdl).Assembly.Location) ?? "./";
-        
-        if (CurrentPlatform.OS == OS.Windows && Environment.Is64BitProcess)
-            ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x64/SDL2.dll"));
-        else if (CurrentPlatform.OS == OS.Windows && !Environment.Is64BitProcess)
-            ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x86/SDL2.dll"));
-        else if (CurrentPlatform.OS == OS.Linux && Environment.Is64BitProcess)
-            ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x64/libSDL2-2.0.so.0"));
-        else if (CurrentPlatform.OS == OS.Linux && !Environment.Is64BitProcess)
-            ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x86/libSDL2-2.0.so.0"));
-        else if (CurrentPlatform.OS == OS.MacOSX)
-        {
-            ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "libSDL2-2.0.0.dylib"));
-
-            //Look in Frameworks for .app bundles
-            if (ret == IntPtr.Zero)
-                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "..", "Frameworks", "libSDL2-2.0.0.dylib"));
-        }
-
-        // Load system library
-        if (ret == IntPtr.Zero)
-        {
-            if (CurrentPlatform.OS == OS.Windows)
-                ret = FuncLoader.LoadLibrary("SDL2.dll");
-            else if (CurrentPlatform.OS == OS.Linux)
-                ret = FuncLoader.LoadLibrary("libSDL2-2.0.so.0");
-            else
-                ret = FuncLoader.LoadLibrary("libSDL2-2.0.0.dylib");
-        }
-
-        // Try extra locations for Windows because of .NET Core rids
         if (CurrentPlatform.OS == OS.Windows)
-        {
-            var rid = Environment.Is64BitProcess ? "win-x64" : "win-x86";
-
-            if (ret == IntPtr.Zero)
-                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "../../runtimes", rid, "native/SDL2.dll"));
-
-            if (ret == IntPtr.Zero)
-                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "runtimes", rid, "native/SDL2.dll"));
-        }
-
-        // Welp, all failed, PANIC!!!
-        if (ret == IntPtr.Zero)
-            throw new Exception("Failed to load SDL library.");
-
-        return ret;
+            return FuncLoader.LoadLibraryExt("SDL2.dll");
+        else if (CurrentPlatform.OS == OS.Linux)
+            return FuncLoader.LoadLibraryExt("libSDL2-2.0.so.0");
+        else if (CurrentPlatform.OS == OS.MacOSX)
+            return FuncLoader.LoadLibraryExt("libSDL2-2.0.0.dylib");
+        else
+            return FuncLoader.LoadLibraryExt("sdl2");
     }
 
     public static int Major;

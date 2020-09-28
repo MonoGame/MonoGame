@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -30,6 +30,9 @@ namespace Microsoft.Xna.Framework.Content
 					}
 					else if (ReflectionHelpers.IsAssignableFromType(typeof(int), itemType)) {
 						parameter.SetValue((int) item.Value);
+					}
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(int[]), itemType)) {
+						parameter.SetValue((int[]) item.Value);
 					}
 					else if (ReflectionHelpers.IsAssignableFromType(typeof(bool), itemType)) {
 						parameter.SetValue((bool) item.Value);

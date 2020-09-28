@@ -4,14 +4,20 @@
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <DefineConstants>OPENGL;OPENAL;XNADESIGNPROVIDED;LINUX;DESKTOPGL;SUPPORTS_EFX;NETSTANDARD;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
-
-This package provides you with MonoGame Framework that uses OpenGL for rendering and works on Windows, Linux and MacOS.</Description>
+    <Description>The MonoGame runtime supporting Windows, Linux and macOS using SDL2 and OpenGL.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;desktopgl</PackageTags>
     <PackageId>MonoGame.Framework.DesktopGL</PackageId>
     <Version>3.8.0.11</Version>
     <AssemblyVersion>3.8.0.11</AssemblyVersion>
   </PropertyGroup>
+
+  <!-- NETFX reference assemblies let us target .NET Framework on Mac/Linux without Mono -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="bin\**\*" />

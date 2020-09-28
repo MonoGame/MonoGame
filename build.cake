@@ -1,5 +1,6 @@
 #tool nuget:?package=vswhere&version=2.6.7
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
+#addin nuget:?package=Cake.FileHelpers&version=3.2.1
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -17,9 +18,14 @@ MSBuildSettings msPackSettings, mdPackSettings;
 DotNetCoreMSBuildSettings dnBuildSettings;
 DotNetCorePackSettings dnPackSettings;
 
-private void PackProject(string filePath)
+private void PackMSBuild(string filePath)
 {
     MSBuild(filePath, msPackSettings);
+}
+
+private void PackDotnet(string filePath)
+{
+    DotNetCorePack(filePath, dnPackSettings);
 }
 
 private bool GetMSBuildWith(string requires)
@@ -49,17 +55,22 @@ private bool GetMSBuildWith(string requires)
 Task("Prep")
     .Does(() =>
 {
+    // Set MGFXC_WINE_PATH for building shaders on macOS and Linux
+    System.Environment.SetEnvironmentVariable("MGFXC_WINE_PATH", EnvironmentVariable("HOME") + "/.winemonogame");
+
     // We tag the version with the build branch to make it
     // easier to spot special builds in NuGet feeds.
-    var branch = EnvironmentVariable("GIT_BRANCH") ?? string.Empty;
-    if (branch == "develop")
+    var branch = EnvironmentVariable("GIT_BRANCH") ?? string.Empty;    
+    if (!branch.Contains("master"))
 	version += "-develop";
-
+	
+    Console.WriteLine("Build Branch: {0}", branch);
     Console.WriteLine("Build Version: {0}", version);
 
     msPackSettings = new MSBuildSettings();
     msPackSettings.Verbosity = Verbosity.Minimal;
     msPackSettings.Configuration = configuration;
+    msPackSettings.Restore = true;
     msPackSettings.WithProperty("Version", version);
     msPackSettings.WithTarget("Pack");
 
@@ -83,12 +94,11 @@ Task("BuildDesktopGL")
     .Does(() =>
 {
     DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
-    PackProject("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
+    PackDotnet("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
 });
 
 Task("TestDesktopGL")
     .IsDependentOn("BuildDesktopGL")
-    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/DesktopGL/Debug");
@@ -105,7 +115,7 @@ Task("BuildWindowsDX")
     .Does(() =>
 {
     DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
-    PackProject("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
+    PackDotnet("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
 });
 
 Task("TestWindowsDX")
@@ -131,8 +141,7 @@ Task("BuildAndroid")
     return DirectoryExists("/Library/Frameworks/Xamarin.Android.framework");
 }).Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.Android.csproj");
-    PackProject("MonoGame.Framework/MonoGame.Framework.Android.csproj");
+    PackMSBuild("MonoGame.Framework/MonoGame.Framework.Android.csproj");
 });
 
 Task("BuildiOS")
@@ -142,8 +151,7 @@ Task("BuildiOS")
     return DirectoryExists("/Library/Frameworks/Xamarin.iOS.framework");
 }).Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.iOS.csproj");
-    PackProject("MonoGame.Framework/MonoGame.Framework.iOS.csproj");
+    PackMSBuild("MonoGame.Framework/MonoGame.Framework.iOS.csproj");
 });
 
 Task("BuildUWP")
@@ -151,45 +159,48 @@ Task("BuildUWP")
     .WithCriteria(() => GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.17763"))
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
-    PackProject("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
+    PackMSBuild("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
 });
 
 Task("BuildContentPipeline")
     .IsDependentOn("Prep")
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj");
-    PackProject("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj");
+    PackDotnet("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
+
+    PackDotnet("MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj");
 });
 
 Task("BuildTools")
-    .IsDependentOn("Prep")
+    .IsDependentOn("BuildContentPipeline")
     .Does(() =>
 {
-    DotNetCoreRestore("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
-    PackProject("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
-    
-    DotNetCoreRestore("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
-    PackProject("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
-    
-    DotNetCoreRestore("Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.csproj");
-    PackProject("Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.csproj");
+    PackDotnet("Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj");
 
-    DotNetCoreRestore("Tools/MonoGame.Packaging.Flatpak/MonoGame.Packaging.Flatpak.csproj");
-    PackProject("Tools/MonoGame.Packaging.Flatpak/MonoGame.Packaging.Flatpak.csproj");
+    PackDotnet("Tools/MonoGame.Effect.Compiler/MonoGame.Effect.Compiler.csproj");
+
+    PackDotnet("Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.csproj");
+
+    PackDotnet("Tools/MonoGame.Packaging.Flatpak/MonoGame.Packaging.Flatpak.csproj");
+    
+    var versionReg = @"<key>CFBundleShortVersionString<\/key>\s*<string>([^\s]*)<\/string>";
+    var plistPath = "Tools/MonoGame.Content.Builder.Editor/Info.plist";
+    var newVersion = "<key>CFBundleShortVersionString</key>\n\t<string>" + version + "</string>";
+    ReplaceRegexInFiles(plistPath, versionReg, newVersion, System.Text.RegularExpressions.RegexOptions.Singleline);
+    
+    PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
 });
 
 Task("TestTools")
     .IsDependentOn("BuildTools")
-    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
-    CreateDirectory("Artifacts/Tests/Tools/Debug");
+    CreateDirectory("Artifacts/Tests/Tools/" + configuration);
     DotNetCoreRun("../../../../Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj", "", new DotNetCoreRunSettings
     {
-        WorkingDirectory = "Artifacts/Tests/Tools/Debug",
-	    ArgumentCustomization = args => args.Append("--teamcity")
+        WorkingDirectory = "Artifacts/Tests/Tools/" + configuration,
+	    ArgumentCustomization = args => args.Append("--teamcity"),
+        Configuration = configuration
     });
 });
 
@@ -197,8 +208,7 @@ Task("PackDotNetTemplates")
     .IsDependentOn("Prep")
     .Does(() =>
 {
-    DotNetCoreRestore("Templates/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
-    PackProject("Templates/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
+    PackDotnet("Templates/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.csproj");
 });
 
 Task("PackVSTemplates")
@@ -206,17 +216,19 @@ Task("PackVSTemplates")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
-    var vsdirs = GetDirectories("./Templates/VisualStudio20*");
-    foreach (var vsdir in vsdirs)
-    {
-        DeleteFiles(vsdir.CombineWithFilePath("*.zip").FullPath);
-        var projdirs = GetDirectories(vsdir.CombineWithFilePath("*").FullPath);
-        foreach (var projdir in projdirs)
-        {
-            var outputPath = vsdir.CombineWithFilePath(projdir.GetDirectoryName() + ".zip");
-                Zip(projdir, outputPath);
-        }
-    }
+    var dotnet = Context.Tools.Resolve("dotnet.exe");
+    if (StartProcess(dotnet, "tool restore") != 0)
+        throw new Exception("dotnet tool restore failed.");
+
+    var result = StartProcess(
+        dotnet,
+        "vstemplate " +
+       $"-s Artifacts/MonoGame.Templates.CSharp/Release/MonoGame.Templates.CSharp.{version}.nupkg " +
+       $"--vsix Artifacts/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.{version}.vsix " +
+        "@Templates/VisualStudio/settings.rsp");
+
+    if (result != 0)
+        throw new Exception("dotnet-vstemplate failed to create VSIX.");
 });
 
 Task("PackVSMacTemplates")
@@ -244,8 +256,8 @@ Task("BuildAll")
 Task("Pack")
     .IsDependentOn("BuildAll")
     .IsDependentOn("PackDotNetTemplates")
-    .IsDependentOn("PackVSTemplates")
-    .IsDependentOn("PackVSMacTemplates");
+    .IsDependentOn("PackVSMacTemplates")
+    .IsDependentOn("PackVSTemplates");
 
 Task("Test")
     .IsDependentOn("TestWindowsDX")

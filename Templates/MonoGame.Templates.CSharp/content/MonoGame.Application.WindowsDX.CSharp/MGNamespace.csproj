@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -18,11 +19,11 @@
 
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.*" />
-    <PackageReference Include="MonoGame.Content.Builder" Version="3.8.*" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*" />
   </ItemGroup>
 
   <ItemGroup>
-    <MonoGameContentReference Include="Content\Content.mgcb" Visible="false" />
+    <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
 
 </Project>

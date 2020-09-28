@@ -30,7 +30,18 @@ namespace MonoGame.Tools.Pipeline
 
             _iconRoot = Bitmap.FromResource("TreeView.Root.png").WithSize(16, 16);
 
+            _treeView.Activated += TreeView_Activated;
             _treeView.SelectionChanged += TreeView_SelectedItemChanged;
+            _treeView.SizeChanged += (o, e) =>
+            {
+                if (!Global.Unix && _treeView.Columns[0].Width < _treeView.Width - 2)
+                    _treeView.Columns[0].Width = _treeView.Width - 2;
+            };
+        }
+
+        private void TreeView_Activated(object sender, EventArgs e)
+        {
+            MainWindow.Instance.CmdOpenItem_Executed(sender, e);
         }
 
         private void TreeView_SelectedItemChanged(object sender, EventArgs e)
@@ -77,8 +88,9 @@ namespace MonoGame.Tools.Pipeline
             _treeRoot.Tag = item;
             _treeRoot.Expanded = true;
 
-            _treeView.ReloadItem(_treeRoot);
             _treeView.ContextMenu = _contextMenu;
+            _treeView.DataStore = _treeBase;
+            _treeView.ReloadData();
         }
 
         public void AddItem(IProjectItem citem)

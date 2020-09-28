@@ -5,7 +5,7 @@
 using System;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Audio;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 using System.IO;
 
 namespace MonoGame.OpenAL
@@ -195,53 +195,17 @@ namespace MonoGame.OpenAL
 
         private static IntPtr GetNativeLibrary()
         {
-            var ret = IntPtr.Zero;
-
 #if DESKTOPGL
-            // Load bundled library
-            var assemblyLocation = Path.GetDirectoryName(typeof(AL).Assembly.Location) ?? "./";
-
-            if (CurrentPlatform.OS == OS.Windows && Environment.Is64BitProcess)
-                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x64/soft_oal.dll"));
-            else if (CurrentPlatform.OS == OS.Windows && !Environment.Is64BitProcess)
-                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x86/soft_oal.dll"));
-            else if (CurrentPlatform.OS == OS.Linux && Environment.Is64BitProcess)
-                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x64/libopenal.so.1"));
-            else if (CurrentPlatform.OS == OS.Linux && !Environment.Is64BitProcess)
-                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "x86/libopenal.so.1"));
-            else if (CurrentPlatform.OS == OS.MacOSX)
-            {
-                ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "libopenal.1.dylib"));
-
-                //Look in Frameworks for .app bundles
-                if (ret == IntPtr.Zero)
-                    ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "..", "Frameworks", "libopenal.1.dylib"));
-            }
-
-            // Load system library
-            if (ret == IntPtr.Zero)
-            {
-                if (CurrentPlatform.OS == OS.Windows)
-                    ret = FuncLoader.LoadLibrary("soft_oal.dll");
-                else if (CurrentPlatform.OS == OS.Linux)
-                    ret = FuncLoader.LoadLibrary("libopenal.so.1");
-                else
-                    ret = FuncLoader.LoadLibrary("libopenal.1.dylib");
-            }
-
-            // Try extra locations for Windows because of .NET Core rids
             if (CurrentPlatform.OS == OS.Windows)
-            {
-                var rid = Environment.Is64BitProcess ? "win-x64" : "win-x86";
-
-                if (ret == IntPtr.Zero)
-                    ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "../../runtimes", rid, "native/soft_oal.dll"));
-
-                if (ret == IntPtr.Zero)
-                    ret = FuncLoader.LoadLibrary(Path.Combine(assemblyLocation, "runtimes", rid, "native/soft_oal.dll"));
-            }
+                return FuncLoader.LoadLibraryExt("soft_oal.dll");
+            else if (CurrentPlatform.OS == OS.Linux)
+                return FuncLoader.LoadLibraryExt("libopenal.so.1");
+            else if (CurrentPlatform.OS == OS.MacOSX)
+                return FuncLoader.LoadLibraryExt("libopenal.1.dylib");
+            else
+                return FuncLoader.LoadLibraryExt("openal");
 #elif ANDROID
-            ret = FuncLoader.LoadLibrary("libopenal32.so");
+            var ret = FuncLoader.LoadLibrary("libopenal32.so");
 
             if (ret == IntPtr.Zero)
             {
@@ -251,11 +215,11 @@ namespace MonoGame.OpenAL
 
                 ret = FuncLoader.LoadLibrary(lib);
             }
-#else
-            ret = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenAL.framework/OpenAL");
-#endif
 
             return ret;
+#else
+            return FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenAL.framework/OpenAL");
+#endif
         }
 
         [CLSCompliant(false)]

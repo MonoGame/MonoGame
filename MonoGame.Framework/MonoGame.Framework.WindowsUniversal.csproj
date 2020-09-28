@@ -1,24 +1,21 @@
-<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
     <TargetFramework>uap10.0</TargetFramework>
     <!-- TODO: NET45 is here for reflection API (Utilities\ReflectionHelpers), but does not make sense semantically -->
-    <DefineConstants>WINDOWS_UAP;DIRECTX11_1;NET45</DefineConstants>
+    <DefineConstants>WINDOWS_UAP;DIRECTX11_1;NET45;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
-    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
-
-This package provides you with MonoGame Framework that works on Windows 10, Windows Phone 10 and Xbox One using UWP(Universal Windows Platform).</Description>
+    <TargetPlatformVersion>10.0.18362.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
+    <Description>The MonoGame runtime for UWP (Universal Windows Platform) which supports Windows 10 and Xbox One.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;uwp</PackageTags>
     <PackageId>MonoGame.Framework.WindowsUniversal</PackageId>
-
     <SharpDXVersion>4.0.1</SharpDXVersion>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <SDKReference Include="WindowsMobile, Version=10.0.17763.0">
+    <SDKReference Include="WindowsMobile, Version=10.0.18362.0">
       <Name>Windows Mobile Extensions for the UWP</Name>
     </SDKReference>
   </ItemGroup>
@@ -65,8 +62,8 @@ This package provides you with MonoGame Framework that works on Windows 10, Wind
     <Compile Include="Platform\WindowsUniversal\XamlGame.cs" />
     <Compile Include="Platform\WindowsUniversal\InputEvents.cs" />
 
-    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
-    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -85,4 +82,3 @@ This package provides you with MonoGame Framework that works on Windows 10, Wind
   <Import Project="Platform\DirectX.targets" />
   <Import Project="Platform\XAudio.targets" />
 </Project>
-

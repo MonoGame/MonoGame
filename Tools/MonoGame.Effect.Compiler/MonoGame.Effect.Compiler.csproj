@@ -2,18 +2,16 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Description>The MonoGame Framework Effect Compiler (MGFXC) command line tool is used to compile shaders.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Effect.Compiler</BaseOutputPath>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>mgfxc</ToolCommandName>
     <PackageId>dotnet-mgfxc</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgfxc</AssemblyName>
+    <UseAppHost>true</UseAppHost>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Effect\**\*.cs" />
-  </ItemGroup>
   
   <ItemGroup>
     <Compile Include="..\..\MonoGame.Framework\BoundingBox.cs" />
@@ -57,6 +55,7 @@
     <Compile Include="..\..\MonoGame.Framework\Design\Vector4TypeConverter.cs" />
     <Compile Include="..\..\MonoGame.Framework\Design\VectorConversion.cs" />
     <Compile Include="..\..\MonoGame.Framework\Graphics\PackedVector\IPackedVector.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Utilities\BinaryWriterEx.cs" />
     <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs" />
     <Compile Include="..\..\MonoGame.Framework\Platform\Utilities\CurrentPlatform.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs" />
@@ -74,6 +73,8 @@
     <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" />
     <Reference Include="..\..\ThirdParty\Dependencies\CppNet\CppNet.dll" />
   </ItemGroup>
+
+  <Import Project="..\..\Stadia\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Stadia\MonoGame.Effect.Compiler.targets')" />
 
 </Project>
 

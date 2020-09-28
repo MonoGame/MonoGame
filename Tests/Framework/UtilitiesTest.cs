@@ -1,4 +1,4 @@
-﻿using MonoGame.Utilities;
+﻿using MonoGame.Framework.Utilities;
 using NUnit.Framework;
 using System.IO;
 

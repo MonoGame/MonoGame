@@ -23,6 +23,11 @@ namespace MonoGame.Effect.Compiler
 
             if (!parser.ParseCommandLine(args))
                 return 1;
+            
+            // We don't support running MGFXC on Unix platforms
+            // however Wine can be used to make it work so lets try that.
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+                return WineHelper.Run(options);
 
             // Validate the input file exits.
             if (!File.Exists(options.SourceFile))
@@ -41,6 +46,9 @@ namespace MonoGame.Effect.Compiler
             try
             {
                 shaderResult = ShaderResult.FromFile(options.SourceFile, options, new ConsoleEffectCompilerOutput());
+
+                foreach (var dependency in shaderResult.Dependencies)
+                    Console.WriteLine("Dependency: " + dependency);
             }
             catch (Exception ex)
             {

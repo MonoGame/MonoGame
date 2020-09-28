@@ -9,7 +9,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {

@@ -1,12 +1,9 @@
 ﻿<Project>
 
-  <Import Project="$(MSBuildThisFileDirectory)/version/**/Version.props" />
-  
   <PropertyGroup>
     <DotnetCommand Condition="'$(DotnetCommand)' == ''">dotnet</DotnetCommand>
-    <MGCBPackageId Condition="'$(MGCBPackageId)' == ''">dotnet-mgcb</MGCBPackageId>
-    <MGCBVersion Condition="'$(MGCBVersion)' == ''">$(MonoGameContentBuilderVersion)</MGCBVersion>
     <EnableMGCBItems Condition="'$(EnableMGCBItems)' == ''">true</EnableMGCBItems>
+    <MGCBPath Condition="'$(MGCBPath)' == ''">$(MSBuildThisFileDirectory)\..\tools\netcoreapp3.1\any\mgcb.dll</MGCBPath>
   </PropertyGroup>
 
 </Project>

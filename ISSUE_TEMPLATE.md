@@ -4,6 +4,10 @@
 #
 # You can download the development build installer from:
 # http://www.monogame.net/downloads/
+#
+# GitHub issues are only for bug reports / feature requests
+# if you have a question, ask it on the community site:
+# https://community.monogame.net
 -->
 
 <!-- Write your issue below -->

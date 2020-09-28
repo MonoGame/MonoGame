@@ -66,7 +66,7 @@
 
 using System;
 
-namespace MonoGame.Utilities.Deflate
+namespace MonoGame.Framework.Utilities.Deflate
 {
     /// <summary>
     /// Encoder and Decoder for ZLIB and DEFLATE (IETF RFC1950 and RFC1951).

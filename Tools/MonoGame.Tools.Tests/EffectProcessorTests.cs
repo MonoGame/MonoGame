@@ -10,9 +10,6 @@ using TwoMGFX;
 
 namespace MonoGame.Tests.ContentPipeline
 {
-#if DESKTOPGL
-    [Ignore("Building effects is only supported on Windows.")]
-#endif
     class EffectProcessorTests
     {
         class ImporterContext : ContentImporterContext

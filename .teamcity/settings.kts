@@ -65,14 +65,14 @@ object DevelopMac : BuildType({
 
     allowExternalStatus = true
     artifactRules = """
-        Artifacts/**/*.nupkg
-        Artifacts/**/*.vsix
+        Artifacts/**/iOS/**/*.nupkg
+        Artifacts/**/Android/**/*.nupkg
         Artifacts/**/*.mpack
     """.trimIndent()
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     params {
-        param("env.GIT_BRANCH", "%vcsroot.branch%")
+        param("env.GIT_BRANCH", "%teamcity.build.branch%")
         param("env.BUILD_NUMBER", "%build.number%")
     }
 
@@ -85,6 +85,12 @@ object DevelopMac : BuildType({
     }
 
     steps {
+        exec {
+            name = "dotnet tool restore"
+            path = "dotnet"
+            arguments = "tool restore"
+            formatStderrAsError = true
+        }
         exec {
             name = "Running Cake Script"
             path = "dotnet"
@@ -140,7 +146,7 @@ object DevelopWin : BuildType({
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     params {
-        param("env.GIT_BRANCH", "%vcsroot.branch%")
+        param("env.GIT_BRANCH", "%teamcity.build.branch%")
         param("env.BUILD_NUMBER", "%build.number%")
     }
 
@@ -153,6 +159,12 @@ object DevelopWin : BuildType({
     }
 
     steps {
+        exec {
+            name = "dotnet tool restore"
+            path = "dotnet"
+            arguments = "tool restore"
+            formatStderrAsError = true
+        }
         exec {
             name = "Running Cake Script"
             path = "dotnet-cake"
@@ -200,14 +212,13 @@ object DevelopWin : BuildType({
 object GenerateDocumentation : BuildType({
     name = "Generate Documentation"
     description = "Generate the SDK documentation."
-    paused = true
 
     allowExternalStatus = true
-    artifactRules = """Documentation\Output=>Documentation.zip"""
+    artifactRules = """Documentation\_site=>Documentation.zip"""
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     vcs {
-        root(RelativeId("Develop"), "-:.", "+:Documentation", "+:CHANGELOG.md", "+:default.build", """+:ThirdParty\Dependencies\SharpDoc""")
+        root(RelativeId("Develop"))
 
         checkoutMode = CheckoutMode.ON_SERVER
         cleanCheckout = true
@@ -215,13 +226,19 @@ object GenerateDocumentation : BuildType({
     }
 
     steps {
-        script {
-            name = "Running SharpDoc"
-            scriptContent = """
-                rmdir .\Documentation\Output /s /q
-                ThirdParty\Dependencies\SharpDoc\SharpDoc.exe -config Documentation\config.xml
-            """.trimIndent()
+        exec {
+            name = "Running docfx metadata"
+            path = "docfx"
+            arguments = "metadata"
             formatStderrAsError = true
+            workingDir = "Documentation"
+        }
+        exec {
+            name = "Running docfx build"
+            path = "docfx"
+            arguments = "build"
+            formatStderrAsError = true
+            workingDir = "Documentation"
         }
     }
 
@@ -254,25 +271,11 @@ object GenerateDocumentation : BuildType({
                 onDependencyFailure = FailureAction.CANCEL
                 onDependencyCancel = FailureAction.CANCEL
             }
-
-            artifacts {
-                artifactRules = """
-                    MonoGame.Framework.zip!**
-                    MonoGame.Framework.Content.Pipeline.zip!**
-                """.trimIndent()
-            }
         }
         dependency(DevelopWin) {
             snapshot {
                 onDependencyFailure = FailureAction.CANCEL
                 onDependencyCancel = FailureAction.CANCEL
-            }
-
-            artifacts {
-                artifactRules = """
-                    MonoGame.Framework.zip!**
-                    MonoGame.Framework.Content.Pipeline.zip!**
-                """.trimIndent()
             }
         }
     }
@@ -454,7 +457,7 @@ object TestMac : BuildType({
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     params {
-        param("env.GIT_BRANCH", "%vcsroot.branch%")
+        param("env.GIT_BRANCH", "%teamcity.build.branch%")
         param("env.BUILD_NUMBER", "%build.number%")
     }
 
@@ -468,10 +471,16 @@ object TestMac : BuildType({
 
     steps {
         exec {
+            name = "dotnet tool restore"
+            path = "dotnet"
+            arguments = "tool restore"
+            formatStderrAsError = true
+        }
+        exec {
             name = "Running Cake Script"
             path = "dotnet"
             arguments = "cake build.cake --build-target=Test"
-            formatStderrAsError = true
+            formatStderrAsError = false
         }
     }
 
@@ -550,7 +559,7 @@ object TestWindows : BuildType({
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
     params {
-        param("env.GIT_BRANCH", "%vcsroot.branch%")
+        param("env.GIT_BRANCH", "%teamcity.build.branch%")
         param("env.BUILD_NUMBER", "%build.number%")
     }
 
@@ -563,6 +572,12 @@ object TestWindows : BuildType({
     }
 
     steps {
+        exec {
+            name = "dotnet tool restore"
+            path = "dotnet"
+            arguments = "tool restore"
+            formatStderrAsError = true
+        }
         exec {
             name = "Running Cake Script"
             path = "dotnet-cake"
@@ -644,7 +659,7 @@ object Version : BuildType({
               regex = """^\d+${'$'}""")
         text("VersionMinor", "8", label = "Minor Version Number", description = "The minor version number.",
               regex = """^\d+${'$'}""")
-        text("VersionPatch", "0", label = "Patch Version Number", description = "The patch version number or zero.",
+        text("VersionPatch", "1", label = "Patch Version Number", description = "The patch version number or zero.",
               regex = """^\d+${'$'}""")
         text("VersionBuildCounter", "%build.counter%", label = "Version Build Counter", description = "This should be a unique number which increments with each build.", allowEmpty = false)
     }

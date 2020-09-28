@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using ObjCRuntime;
 using System.Security;
 using OpenGLES;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace MonoGame.OpenGL
 {
@@ -35,12 +35,15 @@ namespace MonoGame.OpenGL
     {
         public GraphicsContext ()
         {
-            var ios7OrAbove = UIKit.UIDevice.CurrentDevice.CheckSystemVersion(7, 0);
-
-            if (ios7OrAbove)
+            try
+            {
                 Context = new EAGLContext(EAGLRenderingAPI.OpenGLES3);
-            else
+            }
+            catch
+            {
+                // Fall back to GLES 2.0
                 Context = new EAGLContext(EAGLRenderingAPI.OpenGLES2);
+            }
         }
 
         public bool IsCurrent {

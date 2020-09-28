@@ -2,12 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>monoandroid90</TargetFramework>
-    <DefineConstants>ANDROID;GLES</DefineConstants>
+    <DefineConstants>ANDROID;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
-    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
-
-This package provides you with MonoGame Framework that works on Android.</Description>
+    <Description>The MonoGame runtime for Android which supports Android 4.2 and newer.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;android</PackageTags>
     <PackageId>MonoGame.Framework.Android</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
@@ -72,8 +70,8 @@ This package provides you with MonoGame Framework that works on Android.</Descri
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
     
-    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
-    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -99,4 +97,3 @@ This package provides you with MonoGame Framework that works on Android.</Descri
   <Import Project="Platform\OpenAL.targets" />
   <Import Project="Platform\Microsoft.Devices.Sensors.targets" />
 </Project>
-

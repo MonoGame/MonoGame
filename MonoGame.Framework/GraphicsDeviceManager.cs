@@ -108,10 +108,11 @@ namespace Microsoft.Xna.Framework
 
             try
             {
-                if (!_initialized)
-                    Initialize();
-
                 var gdi = DoPreparingDeviceSettings();
+
+                if (!_initialized)
+                    Initialize(gdi);
+
                 CreateDevice(gdi);
             }
             catch (NoSuitableGraphicsDeviceException)
@@ -166,34 +167,69 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        #region IGraphicsDeviceService Members
+        #region Events
 
+        /// <inheritdoc />
         public event EventHandler<EventArgs> DeviceCreated;
-        public event EventHandler<EventArgs> DeviceDisposing;
-        public event EventHandler<EventArgs> DeviceReset;
-        public event EventHandler<EventArgs> DeviceResetting;
-        public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
-        public event EventHandler<EventArgs> Disposed;
 
+        /// <inheritdoc />
+        public event EventHandler<EventArgs> DeviceDisposing;
+
+        /// <inheritdoc />
+        public event EventHandler<EventArgs> DeviceResetting;
+
+        /// <inheritdoc />
+        public event EventHandler<EventArgs> DeviceReset;
+
+        /// <summary>
+        /// Called when a <see cref="GraphicsDevice"/> is created. Raises the <see cref="DeviceCreated"/> event.
+        /// </summary>
+        /// <param name="e"></param>
+        protected void OnDeviceCreated(EventArgs e)
+        {
+            EventHelpers.Raise(this, DeviceCreated, e);
+        }
+
+        /// <summary>
+        /// Called when a <see cref="GraphicsDevice"/> is disposed. Raises the <see cref="DeviceDisposing"/> event.
+        /// </summary>
+        /// <param name="e"></param>
         protected void OnDeviceDisposing(EventArgs e)
         {
             EventHelpers.Raise(this, DeviceDisposing, e);
         }
 
+        /// <summary>
+        /// Called before a <see cref="Graphics.GraphicsDevice"/> is reset.
+        /// Raises the <see cref="DeviceResetting"/> event.
+        /// </summary>
+        /// <param name="e"></param>
         protected void OnDeviceResetting(EventArgs e)
         {
             EventHelpers.Raise(this, DeviceResetting, e);
         }
 
-        internal void OnDeviceReset(EventArgs e)
+        /// <summary>
+        /// Called after a <see cref="Graphics.GraphicsDevice"/> is reset.
+        /// Raises the <see cref="DeviceReset"/> event.
+        /// </summary>
+        /// <param name="e"></param>
+        protected void OnDeviceReset(EventArgs e)
         {
             EventHelpers.Raise(this, DeviceReset, e);
         }
 
-        internal void OnDeviceCreated(EventArgs e)
-        {
-            EventHelpers.Raise(this, DeviceCreated, e);
-        }
+        /// <summary>
+        /// Raised by <see cref="CreateDevice()"/> or <see cref="ApplyChanges"/>. Allows users
+        /// to override the <see cref="PresentationParameters"/> to pass to the
+        /// <see cref="Graphics.GraphicsDevice"/>.
+        /// </summary>
+        public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
+
+        /// <summary>
+        /// Raised when this <see cref="GraphicsDeviceManager"/> is disposed.
+        /// </summary>
+        public event EventHandler<EventArgs> Disposed;
 
         /// <summary>
         /// This populates a GraphicsDeviceInformation instance and invokes PreparingDeviceSettings to
@@ -333,15 +369,12 @@ namespace Microsoft.Xna.Framework
 
         partial void PlatformInitialize(PresentationParameters presentationParameters);
 
-        private void Initialize()
+        private void Initialize(GraphicsDeviceInformation gdi)
         {
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
-            var presentationParameters = new PresentationParameters();
-            PreparePresentationParameters(presentationParameters);
-
             // Allow for any per-platform changes to the presentation.
-            PlatformInitialize(presentationParameters);
+            PlatformInitialize(gdi.PresentationParameters);
 
             _initialized = true;
         }

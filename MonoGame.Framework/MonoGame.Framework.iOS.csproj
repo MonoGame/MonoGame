@@ -2,13 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>xamarinios10</TargetFramework>
-    <DefineConstants>IOS;GLES</DefineConstants>
+    <DefineConstants>IOS;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
-
-    <Description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework. The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
-
-This package provides you with MonoGame Framework that works on iOS.</Description>
+    <Description>The MonoGame runtime for iOS which supports iOS Versions 10 and above. </Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;ios</PackageTags>
     <PackageId>MonoGame.Framework.iOS</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
@@ -68,8 +65,8 @@ This package provides you with MonoGame Framework that works on iOS.</Descriptio
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
 
-    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
-    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
   </ItemGroup>
 
   <ItemGroup>

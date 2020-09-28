@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Audio
 {

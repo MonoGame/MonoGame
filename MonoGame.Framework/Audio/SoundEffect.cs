@@ -457,7 +457,7 @@ namespace Microsoft.Xna.Framework.Audio
             set
             {
                 if (value <= 0f)
-                    throw new ArgumentOutOfRangeException ("value of DistanceScale");
+                    throw new ArgumentOutOfRangeException ("value", "value of DistanceScale");
 
                 _distanceScale = value;
             }
@@ -481,7 +481,7 @@ namespace Microsoft.Xna.Framework.Audio
                 //   although the documentation does not say it throws an error we will anyway
                 //   just so it is like the DistanceScale
                 if (value < 0.0f)
-                    throw new ArgumentOutOfRangeException ("value of DopplerScale");
+                    throw new ArgumentOutOfRangeException ("value", "value of DopplerScale");
 
                 _dopplerScale = value;
             }

@@ -1,5 +1,0 @@
-﻿<Project>
-  <PropertyGroup>
-    <MonoGameContentBuilderVersion>$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(MSBuildThisFileFullPath)))))</MonoGameContentBuilderVersion>
-  </PropertyGroup>
-</Project>

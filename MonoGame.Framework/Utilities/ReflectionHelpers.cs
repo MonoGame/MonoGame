@@ -5,7 +5,7 @@
 using System;
 using System.Reflection;
 
-namespace MonoGame.Utilities
+namespace MonoGame.Framework.Utilities
 {
     internal static partial class ReflectionHelpers
     {

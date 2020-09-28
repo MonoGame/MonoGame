@@ -87,7 +87,7 @@ namespace MonoGame.Tools.Pipeline
             dialog.Filters.Add(_allFileFilter);
             dialog.CurrentFilter = _dllFileFilter;
 
-            if (dialog.ShowDialog(this) == DialogResult.Ok)
+            if (dialog.Show(this) == DialogResult.Ok)
                 foreach (var fileName in dialog.Filenames)
                     _dataStore.Add(new RefItem(Path.GetFileName(fileName), fileName));
         }

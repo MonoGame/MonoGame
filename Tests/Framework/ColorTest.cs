@@ -195,11 +195,10 @@ namespace MonoGame.Tests.Framework
 
 #if !XNA
         [Test]
-        public void Deconstruct()
+        public void DeconstructBytes()
         {
             Color color = new Color(255, 255, 255);
-
-            float r, g, b;
+            byte r, g, b;
 
             color.Deconstruct(out r, out g, out b);
 
@@ -209,7 +208,7 @@ namespace MonoGame.Tests.Framework
 
             Color color2 = new Color(255, 255, 255, 255);
 
-            float r2, g2, b2, a2;
+            byte r2, g2, b2, a2;
 
             color2.Deconstruct(out r2, out g2, out b2, out a2);
 
@@ -217,6 +216,30 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(g2, color2.G);
             Assert.AreEqual(b2, color2.B);
             Assert.AreEqual(a2, color2.A);
+        }
+
+        [Test]
+        public void DeconstructFloats()
+        {
+            Color color = new Color(255, 255, 255);
+            float r, g, b;
+
+            color.Deconstruct(out r, out g, out b);
+
+            Assert.AreEqual(r, color.R / 255f);
+            Assert.AreEqual(g, color.G / 255f);
+            Assert.AreEqual(b, color.B / 255f);
+
+            Color color2 = new Color(255, 255, 255, 255);
+
+            float r2, g2, b2, a2;
+
+            color2.Deconstruct(out r2, out g2, out b2, out a2);
+
+            Assert.AreEqual(r2, color2.R / 255f);
+            Assert.AreEqual(g2, color2.G / 255f);
+            Assert.AreEqual(b2, color2.B / 255f);
+            Assert.AreEqual(a2, color2.A / 255f);
         }
 #endif
     }

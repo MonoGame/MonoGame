@@ -28,7 +28,7 @@
 
 using System;
 
-namespace MonoGame.Utilities.Deflate
+namespace MonoGame.Framework.Utilities.Deflate
 {
     /// <summary>
     ///   Computes a CRC-32. The CRC-32 algorithm is parameterized - you
@@ -653,7 +653,7 @@ namespace MonoGame.Utilities.Deflate
         /// </summary>
         /// <remarks>
         ///   <para>
-        ///     Set this at any point before calling <see cref="Close()"/>.
+        ///     Set this at any point before calling Close()/>.
         ///   </para>
         /// </remarks>
         public bool LeaveOpen

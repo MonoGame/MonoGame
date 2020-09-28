@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        internal override SharpDX.Direct3D11.Resource CreateTexture()
+        internal override Resource CreateTexture()
         {
             var description = new Texture3DDescription
             {

@@ -18,5 +18,8 @@
     ],
     "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
-    "description": "A MonoGame game project for Android using OpenGL."
+    "description": "A MonoGame game project for Android using OpenGL.",
+    "guids": [
+        "410C0262-131C-4D0E-910D-D01B4F7143E0"
+    ]
 }

@@ -6,7 +6,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -125,12 +125,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 return command;
 
             // For Linux check specific subfolder
-            if (CurrentPlatform.OS == OS.Linux)
-                return "linux/" + command;
+            var lincom = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "linux", command);
+            if (CurrentPlatform.OS == OS.Linux && File.Exists(lincom))
+                return lincom;
 
             // For Mac check specific subfolder
-            if (CurrentPlatform.OS == OS.MacOSX)
-                return "osx/" + command;
+            var maccom = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "osx", command);
+            if (CurrentPlatform.OS == OS.MacOSX && File.Exists(maccom))
+                return maccom;
 
             // We don't have a full path, so try running through the system path to find it.
             var paths = AppDomain.CurrentDomain.BaseDirectory +
@@ -163,7 +165,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="path">The full path to the executable.</param> 
         private static void EnsureExecutable(string path)
         {
-            if (path == "/bin/bash")
+            if (!path.StartsWith("/home") && !path.StartsWith("/Users"))
                 return;
 
             try

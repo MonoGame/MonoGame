@@ -22,7 +22,9 @@ namespace MonoGame.Tools.Pipeline
 
         public override void Edit(PixelLayout control)
         {
+            SkipCellDraw = true;
             var combo = new DropDown();
+            combo.Tag = this;
 
             if (_type.IsSubclassOf(typeof(Enum)))
             {
@@ -58,8 +60,19 @@ namespace MonoGame.Tools.Pipeline
 
             combo.Style = "OverrideSize";
             combo.Width = _lastRec.Width;
+
+#if IDE
+            control.Add(combo, _lastRec.X, _lastRec.Y - 3);
+#else
             combo.Height = _lastRec.Height;
             control.Add(combo, _lastRec.X, _lastRec.Y);
+#endif
+
+            OnKill += delegate
+            {
+                SkipCellDraw = false;
+                OnKill = null;
+            };
 
             combo.SelectedIndexChanged += delegate
             {
