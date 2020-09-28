@@ -20,8 +20,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!_effect._isMojoShader)
             {
-                GL.GenBuffers(1, out _glBuffer);
-                GraphicsExtensions.CheckGLError();
+                Threading.BlockOnUIThread(() =>
+                {
+                    GL.GenBuffers(1, out _glBuffer);
+                    GraphicsExtensions.CheckGLError();
+                });
             }
         }
 
@@ -29,8 +32,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_glBuffer >= 0)
             {
-                GL.DeleteBuffers(1, ref _glBuffer);
-                GraphicsExtensions.CheckGLError();
+                Threading.BlockOnUIThread(() =>
+                {
+                    GL.DeleteBuffers(1, ref _glBuffer);
+                    GraphicsExtensions.CheckGLError();
+                });
             }
 
             _glBuffer = -1;
