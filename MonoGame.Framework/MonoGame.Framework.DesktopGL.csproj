@@ -71,7 +71,7 @@
     <Compile Include="Platform\GraphicsDeviceManager.SDL.cs" />
     
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="ThirdParty\StbImageSharp" />
-    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="ThirdParty\StbImageWriteSharp" />
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="ThirdParty\StbImageWriteSharp" />
     <Compile Include="..\ThirdParty\NVorbis\NVorbis\**\*.cs" LinkBase="ThirdParty\NVorbis" />
     <Compile Remove="..\ThirdParty\NVorbis\NVorbis\Properties\AssemblyInfo.cs" />
   </ItemGroup>
