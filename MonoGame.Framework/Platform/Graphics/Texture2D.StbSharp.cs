@@ -11,22 +11,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D
     {
-        private static byte ApplyAlpha(byte color, byte alpha)
-        {
-            var fc = color / 255.0f;
-            var fa = alpha / 255.0f;
-            var fr = (int)(255.0f * fc * fa);
-            if (fr < 0)
-            {
-                fr = 0;
-            }
-            if (fr > 255)
-            {
-                fr = 255;
-            }
-            return (byte)fr;
-        }
-
         private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, Func<Color, Color> colorProcessor)
         {
             // Rewind stream if it is at end
