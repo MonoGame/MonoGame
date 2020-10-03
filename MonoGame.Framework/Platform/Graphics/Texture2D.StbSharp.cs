@@ -37,7 +37,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (colorProcessor != null)
             {
-                // XNA blacks out any pixels with an alpha of zero.
                 fixed (byte* b = &result.Data[0])
                 {
                     for (var i = 0; i < result.Data.Length; i += 4)
