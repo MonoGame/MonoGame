@@ -280,13 +280,13 @@ namespace Microsoft.Xna.Framework.Graphics
         /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
         /// result in black color data.
         /// </remarks>
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string path)
+        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string path, Texture2DLoadFlags flags = Texture2DLoadFlags.ZeroTransparentPixels)
         {
             if (path == null)
                 throw new ArgumentNullException("path");
 
             using (var stream = File.OpenRead(path))
-                return FromStream(graphicsDevice, stream);
+                return FromStream(graphicsDevice, stream, flags);
         }
 
         /// <summary>
@@ -300,7 +300,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
         /// result in black color data.
         /// </remarks>
-        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, Texture2DLoadFlags flags = Texture2DLoadFlags.ZeroTransparentPixels)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
@@ -309,7 +309,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             try
             {
-                return PlatformFromStream(graphicsDevice, stream);
+                return PlatformFromStream(graphicsDevice, stream, flags);
             }
             catch(Exception e)
             {

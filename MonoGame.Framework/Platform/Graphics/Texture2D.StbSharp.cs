@@ -11,7 +11,23 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D
     {
-        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
+        private static byte ApplyAlpha(byte color, byte alpha)
+        {
+            var fc = color / 255.0f;
+            var fa = alpha / 255.0f;
+            var fr = (int)(255.0f * fc * fa);
+            if (fr < 0)
+            {
+                fr = 0;
+            }
+            if (fr > 255)
+            {
+                fr = 255;
+            }
+            return (byte)fr;
+        }
+
+        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, Texture2DLoadFlags flags)
         {
             // Rewind stream if it is at end
             if (stream.CanSeek && stream.Length == stream.Position)
@@ -35,16 +51,33 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            // XNA blacks out any pixels with an alpha of zero.
-            fixed (byte* b = &result.Data[0])
+            if ((flags & Texture2DLoadFlags.ZeroTransparentPixels) == Texture2DLoadFlags.ZeroTransparentPixels)
             {
-                for (var i = 0; i < result.Data.Length; i += 4)
+                // XNA blacks out any pixels with an alpha of zero.
+                fixed (byte* b = &result.Data[0])
                 {
-                    if (b[i + 3] == 0)
+                    for (var i = 0; i < result.Data.Length; i += 4)
                     {
-                        b[i + 0] = 0;
-                        b[i + 1] = 0;
-                        b[i + 2] = 0;
+                        if (b[i + 3] == 0)
+                        {
+                            b[i + 0] = 0;
+                            b[i + 1] = 0;
+                            b[i + 2] = 0;
+                        }
+                    }
+                }
+            }
+
+            if ((flags & Texture2DLoadFlags.PremultiplyAlpha) == Texture2DLoadFlags.PremultiplyAlpha)
+            {
+                fixed (byte* b = &result.Data[0])
+                {
+                    for (var i = 0; i < result.Data.Length; i += 4)
+                    {
+                        var a = b[i + 3];
+                        b[i] = ApplyAlpha(b[i], a);
+                        b[i + 1] = ApplyAlpha(b[i + 1], a);
+                        b[i + 2] = ApplyAlpha(b[i + 2], a);
                     }
                 }
             }
