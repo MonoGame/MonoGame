@@ -275,7 +275,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="graphicsDevice">The graphics device to use to create the texture.</param>
         /// <param name="path">The path to the image file.</param>
-        /// <param name="colorProcessor">Color processor that is applied to every pixel before the texture is sent to video memory</param>
+        /// <param name="colorProcessor">Color processor that is applied to every pixel before the texture is sent to video memory. Could be null(no processing then).</param>
         /// <returns>The <see cref="Texture2D"/> created from the given file.</returns>
         /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
         /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
@@ -313,7 +313,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="graphicsDevice">The graphics device to use to create the texture.</param>
         /// <param name="stream">The stream from which to read the image data.</param>
-        /// <param name="colorProcessor">Color processor that is applied to every pixel before the texture is sent to video memory</param>
+        /// <param name="colorProcessor">Color processor that is applied to every pixel before the texture is sent to video memory. Could be null(no processing then).</param>
         /// <returns>The <see cref="Texture2D"/> created from the image stream.</returns>
         /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
         /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
