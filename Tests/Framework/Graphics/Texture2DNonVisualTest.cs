@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
@@ -70,6 +71,51 @@ namespace MonoGame.Tests.Graphics
             // XNA misses this check and throws a NullReferenceException
             Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(null, new MemoryStream()));
 #endif
+        }
+
+        [Test]
+        public void FromStreamCustomProcessor()
+        {
+            // This test sets the color of every other color to custom color
+            var customValue = Color.BurlyWood;
+
+            var cnt = 0;
+            using (var stream = File.OpenRead("Assets/Textures/red_128.png"))
+            using (var texture = Texture2D.FromStream(gd, stream, c =>
+            {
+                if (cnt % 2 != 0)
+                {
+                    c = customValue;
+                }
+                cnt++;
+                return c;
+            }))
+            {
+                Assert.AreEqual(8, texture.Width);
+                Assert.AreEqual(8, texture.Height);
+                Assert.AreEqual(1, texture.LevelCount);
+                var pngData = new Color[8 * 8];
+                texture.GetData(pngData);
+
+                cnt = 0;
+                for (var i = 0; i < pngData.Length; i++)
+                {
+                    if (cnt % 2 == 0)
+                    {
+                        // Value unchanged
+                        Assert.AreEqual(255, pngData[i].R);
+                        Assert.AreEqual(0, pngData[i].G);
+                        Assert.AreEqual(0, pngData[i].B);
+                        Assert.AreEqual(128, pngData[i].A);
+                    } else
+                    {
+                        // Custom processor
+                        Assert.AreEqual(customValue, pngData[i]);
+                    }
+
+                    cnt++;
+                }
+            }
         }
 
         [TestCase]

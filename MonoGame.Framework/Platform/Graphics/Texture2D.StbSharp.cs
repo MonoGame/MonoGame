@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return (byte)fr;
         }
 
-        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, Texture2DLoadFlags flags)
+        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, Func<Color, Color> colorProcessor)
         {
             // Rewind stream if it is at end
             if (stream.CanSeek && stream.Length == stream.Position)
@@ -51,33 +51,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            if ((flags & Texture2DLoadFlags.ZeroTransparentPixels) == Texture2DLoadFlags.ZeroTransparentPixels)
+            if (colorProcessor != null)
             {
                 // XNA blacks out any pixels with an alpha of zero.
                 fixed (byte* b = &result.Data[0])
                 {
                     for (var i = 0; i < result.Data.Length; i += 4)
                     {
-                        if (b[i + 3] == 0)
-                        {
-                            b[i + 0] = 0;
-                            b[i + 1] = 0;
-                            b[i + 2] = 0;
-                        }
-                    }
-                }
-            }
-
-            if ((flags & Texture2DLoadFlags.PremultiplyAlpha) == Texture2DLoadFlags.PremultiplyAlpha)
-            {
-                fixed (byte* b = &result.Data[0])
-                {
-                    for (var i = 0; i < result.Data.Length; i += 4)
-                    {
-                        var a = b[i + 3];
-                        b[i] = ApplyAlpha(b[i], a);
-                        b[i + 1] = ApplyAlpha(b[i + 1], a);
-                        b[i + 2] = ApplyAlpha(b[i + 2], a);
+                        Color c = new Color(b[i], b[i + 1], b[i + 2], b[i + 3]);
+                        c = colorProcessor(c);
+                        b[i] = c.R;
+                        b[i + 1] = c.G;
+                        b[i + 2] = c.B;
+                        b[i + 3] = c.A;
                     }
                 }
             }
