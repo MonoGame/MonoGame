@@ -109,7 +109,7 @@ namespace MonoGame.Tests.Graphics
                         Assert.AreEqual(128, pngData[i].A);
                     } else
                     {
-                        // Custom processor
+                        // Custom value
                         Assert.AreEqual(customValue, pngData[i]);
                     }
 
