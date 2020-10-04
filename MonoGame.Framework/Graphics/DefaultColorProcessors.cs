@@ -2,6 +2,8 @@
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    public delegate void ColorProcessorDelegate(ref byte r, ref byte g, ref byte b, ref byte a);
+
     public static class DefaultColorProcessors
     {
         private static byte ApplyAlpha(byte color, byte alpha)
@@ -16,26 +18,22 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Zeroes RGB of pixels having zero alpha(standard XNA behavior)
         /// </summary>
-        public static readonly Func<Color, Color> ZeroTransparentPixels = c =>
+        public static readonly ColorProcessorDelegate ZeroTransparentPixels = (ref byte r, ref byte g, ref byte b, ref byte a) =>
         {
-            if (c.A == 0)
+            if (a == 0)
             {
-                c.R = c.G = c.B = 0;
+                r = g = b = 0;
             }
-
-            return c;
         };
 
         /// <summary>
         /// Premultiplies RGB of pixels by its alpha
         /// </summary>
-        public static readonly Func<Color, Color> PremultiplyAlpha = c =>
+        public static readonly ColorProcessorDelegate PremultiplyAlpha = (ref byte r, ref byte g, ref byte b, ref byte a) =>
         {
-            c.R = ApplyAlpha(c.R, c.A);
-            c.G = ApplyAlpha(c.G, c.A);
-            c.B = ApplyAlpha(c.B, c.A);
-
-            return c;
+            r = ApplyAlpha(r, a);
+            g = ApplyAlpha(g, a);
+            b = ApplyAlpha(b, a);
         };
     }
 }

@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D
     {
-        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, Func<Color, Color> colorProcessor)
+        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, ColorProcessorDelegate colorProcessor)
         {
             // Rewind stream if it is at end
             if (stream.CanSeek && stream.Length == stream.Position)
@@ -41,12 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     for (var i = 0; i < result.Data.Length; i += 4)
                     {
-                        Color c = new Color(b[i], b[i + 1], b[i + 2], b[i + 3]);
-                        c = colorProcessor(c);
-                        b[i] = c.R;
-                        b[i + 1] = c.G;
-                        b[i + 2] = c.B;
-                        b[i + 3] = c.A;
+                        colorProcessor(ref b[i], ref b[i + 1], ref b[i + 2], ref b[i + 3]);
                     }
                 }
             }

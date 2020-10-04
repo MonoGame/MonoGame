@@ -81,14 +81,16 @@ namespace MonoGame.Tests.Graphics
 
             var cnt = 0;
             using (var stream = File.OpenRead("Assets/Textures/red_128.png"))
-            using (var texture = Texture2D.FromStream(gd, stream, c =>
+            using (var texture = Texture2D.FromStream(gd, stream, (ref byte r, ref byte g, ref byte b, ref byte a) =>
             {
                 if (cnt % 2 != 0)
                 {
-                    c = customValue;
+                    r = customValue.R;
+                    g = customValue.G;
+                    b = customValue.B;
+                    a = customValue.A;
                 }
                 cnt++;
-                return c;
             }))
             {
                 Assert.AreEqual(8, texture.Width);

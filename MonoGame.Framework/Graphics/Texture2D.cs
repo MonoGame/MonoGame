@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
         /// the images should be identical.
         /// </remarks>
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string path, Func<Color, Color> colorProcessor)
+        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string path, ColorProcessorDelegate colorProcessor)
         {
             if (path == null)
                 throw new ArgumentNullException("path");
@@ -317,7 +317,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
         /// the images should be identical.
         /// </remarks>
-        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, Func<Color, Color> colorProcessor)
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, ColorProcessorDelegate colorProcessor)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
