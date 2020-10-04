@@ -278,8 +278,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="colorProcessor">Color processor that is applied to every pixel before the texture is sent to video memory. Could be null(no processing then).</param>
         /// <returns>The <see cref="Texture2D"/> created from the given file.</returns>
         /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
-        /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
-        /// result in black color data.
+        /// the images should be identical.
         /// </remarks>
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string path, Func<Color, Color> colorProcessor)
         {
@@ -316,8 +315,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="colorProcessor">Color processor that is applied to every pixel before the texture is sent to video memory. Could be null(no processing then).</param>
         /// <returns>The <see cref="Texture2D"/> created from the image stream.</returns>
         /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
-        /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
-        /// result in black color data.
+        /// the images should be identical.
         /// </remarks>
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, Func<Color, Color> colorProcessor)
 		{
