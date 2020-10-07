@@ -1,6 +1,6 @@
 # Why use the Content Pipeline
 
-The MonoGame team has been putting a lot of effort into a cross-platform content pipeline, but would you use the **Content Pipeline** when MonoGame also supports loading assets natively, like .png, .mp3, .wav? Well, it all boils down to a couple of words, performance and efficiency.
+The MonoGame team has been putting a lot of effort into a cross-platform content pipeline, but would you use the Content Pipeline when MonoGame also supports loading assets natively, like .png, .mp3, .wav? Well, it all boils down to a couple of words, performance and efficiency.
 
 ## Textures
 
@@ -10,11 +10,11 @@ For example, most GPUs have specific hardware supported compressed formats for t
 
 If we have a 256×256 32 bit .png texture that we are using in our game, why should a developer bother with compiling to .xnb's, they just want to use the texture as a raw .png file. On disk .png is very impressive in its size, that image probably only takes up 2-5 kb on disk, keeping your application package size down. Great!
 
-However, what happens when we load this .png from storage onto a device at runtime (like an iPhone).  The texture is loaded from storage into memory and decompressed/unpacked from its compressed png format into raw bytes. This is done because the GPU on your device does not know how to use a png image directly, it can only use certain types of compression. With the image loaded into memory, this takes up 262,144 bytes (256x256x4, the x4 is because we have 1 byte per channel Red, Green, Blue, and Alpha).
+However, when we load the .png from storage at runtime, the texture is then loaded into memory and decompressed/unpacked from its compressed png format into raw bytes.
 
 > Note that 262 KB  is quite a bit bigger than the compressed size.
 
-Next a texture is created for that data because your device cannot decompress on the fly (yet) so it has to use that data as is. Creating the texture uses 262kb  of graphics memory on the GPU. That doesn’t sound too bad, but if you are using larger textures say 1024×1024 then you are using 4 MB or more of GPU memory for that one texture. Multiply that over the number of textures in your game and you soon run out of texture memory on the GPU. Then the GPU has to swap that data out into system memory (if it supports that) or throw an error when you try to create textures that won’t fit into available memory.
+A new texture is then created for that data because your device cannot decompress on the fly (yet) so it has to use that data as is. Creating the texture uses 262kb of graphics memory on the GPU. That does not sound too bad, but if you are using larger textures say 1024×1024, then you are using 4 MB or more of GPU memory for that one texture. Multiply that over the number of textures in your game and you soon run out of texture memory on the GPU. If this happens then the GPU has to swap that data out into system memory (if it supports that) or throw an error when you try to create textures that will not fit into available memory.
 
 > So to sum up:
 >
@@ -26,7 +26,7 @@ If you pre-process the texture using the content pipeline, because we know that 
 >
 > **compressed textures** = larger package size (maybe) & lower runtime memory usage & more textures
 
-This example is for the iOS platform, but the same applies to desktop environments as most desktop GPUs support DXT texture compression, so the content pipeline will produce DXT compressed textures which can be loaded and used directly. The Android platform currently does not have consistent support for compressed textures at the moment so MonoGame has to decompress DXT textures on the device and use it directly, when this changes MonoGame will adapt.
+This applies to all platforms as most desktop GPUs support DXT texture compression, so the content pipeline will produce DXT compressed textures which can be loaded and used directly. The Android platform currently does not have consistent support for compressed textures at the moment so MonoGame has to decompress DXT textures on the device and use it directly, when this changes MonoGame will adapt.
 
 In the Content Pipeline tool, MonoGame will automatically pick the correct texture format to use, so for opaque textures, it will use ETC1 (which is supported on all android devices but does not support alpha channels) but for textures with an alpha channel, it will use RGBA4444 (dithered). It will also allow the user to override this default and enable picking from a wide variety of compression options manually such as PVRTC, ATITC, DXT/S3TC, ETC1, and RGBA4444. This will give the developer the choice of what to use/support.
 
