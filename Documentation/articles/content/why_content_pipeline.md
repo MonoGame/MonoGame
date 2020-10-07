@@ -4,13 +4,9 @@ The MonoGame team has been putting a lot of effort into a cross-platform content
 
 ## Textures
 
-Most texture formats (like PNGs) are generally not optimized for games.
+Most texture formats (like PNGs) are generally not optimized for games, most GPUs have specific hardware supported compressed formats for textures. PNGs or JPEGs just get uncompressed when passed to the GPU. By using the hardware compression you often get 4x to 8x more textures space for your game as well as faster load times and smaller packages.
 
-For example, most GPUs have specific hardware supported compressed formats for textures. PNGs or JPEGs just get uncompressed when passed to the GPU. By using the hardware compression you often get 4x to 8x more textures space for your game as well as faster load times and smaller packages.
-
-If we have a 256×256 32 bit .png texture that we are using in our game, why should a developer bother with compiling to .xnb's, they just want to use the texture as a raw .png file. On disk .png is very impressive in its size, that image probably only takes up 2-5 kb on disk, keeping your application package size down. Great!
-
-However, when we load the .png from storage at runtime, the texture is then loaded into memory and decompressed/unpacked from its compressed png format into raw bytes.
+When we load the .png from storage at runtime, the texture is then loaded into memory and decompressed/unpacked from its compressed png format into raw bytes.
 
 > Note that 262 KB  is quite a bit bigger than the compressed size.
 
