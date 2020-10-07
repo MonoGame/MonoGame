@@ -4,7 +4,7 @@ The MonoGame team has been putting a lot of effort into a cross-platform content
 
 ## Textures
 
-Most texture formats (like PNGs) are generally not optimized for games, most GPUs have specific hardware supported compressed formats for textures. PNGs or JPEGs just get uncompressed when passed to the GPU. By using the hardware compression you often get 4x to 8x more textures space for your game as well as faster load times and smaller packages.
+Most image formats (like PNGs) are generally not optimized for games, most GPUs have specific hardware supported compressed formats for textures. PNGs or JPEGs just get uncompressed when passed to the GPU. By using the hardware compression you often get 4x to 8x more textures space for your game as well as faster load times and smaller packages.
 
 When we load the .png from storage at runtime, the texture is then loaded into memory and decompressed/unpacked from its compressed png format into raw bytes.
 
