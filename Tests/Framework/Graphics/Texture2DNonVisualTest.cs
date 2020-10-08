@@ -3,14 +3,12 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 using StbImageSharp;
-using StbImageWriteSharp;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -79,18 +77,22 @@ namespace MonoGame.Tests.Graphics
             // This test sets the color of every other color to custom color
             var customValue = Color.BurlyWood;
 
-            var cnt = 0;
+            var flag = false;
             using (var stream = File.OpenRead("Assets/Textures/red_128.png"))
-            using (var texture = Texture2D.FromStream(gd, stream, (ref byte r, ref byte g, ref byte b, ref byte a) =>
+            using (var texture = Texture2D.FromStream(gd, stream, data =>
             {
-                if (cnt % 2 != 0)
+                for(var i = 0; i < data.Length; i += 4)
                 {
-                    r = customValue.R;
-                    g = customValue.G;
-                    b = customValue.B;
-                    a = customValue.A;
+                    if (flag)
+                    {
+                        data[i + 0] = customValue.R;
+                        data[i + 1] = customValue.G;
+                        data[i + 2] = customValue.B;
+                        data[i + 3] = customValue.A;
+                    }
+
+                    flag = !flag;
                 }
-                cnt++;
             }))
             {
                 Assert.AreEqual(8, texture.Width);
@@ -99,10 +101,10 @@ namespace MonoGame.Tests.Graphics
                 var pngData = new Color[8 * 8];
                 texture.GetData(pngData);
 
-                cnt = 0;
+                flag = false;
                 for (var i = 0; i < pngData.Length; i++)
                 {
-                    if (cnt % 2 == 0)
+                    if (!flag)
                     {
                         // Value unchanged
                         Assert.AreEqual(255, pngData[i].R);
@@ -115,7 +117,7 @@ namespace MonoGame.Tests.Graphics
                         Assert.AreEqual(customValue, pngData[i]);
                     }
 
-                    cnt++;
+                    flag = !flag;
                 }
             }
         }

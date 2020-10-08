@@ -275,12 +275,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="graphicsDevice">The graphics device to use to create the texture.</param>
         /// <param name="path">The path to the image file.</param>
-        /// <param name="colorProcessor">Color processor that is applied to every pixel before the texture is sent to video memory. Could be null(no processing then).</param>
+        /// <param name="colorProcessor">Function that is applied to the data in RGBA format before the texture is sent to video memory. Could be null(no processing then).</param>
         /// <returns>The <see cref="Texture2D"/> created from the given file.</returns>
         /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
         /// the images should be identical.
         /// </remarks>
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string path, ColorProcessorDelegate colorProcessor)
+        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string path, Action<byte[]> colorProcessor)
         {
             if (path == null)
                 throw new ArgumentNullException("path");
@@ -312,12 +312,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="graphicsDevice">The graphics device to use to create the texture.</param>
         /// <param name="stream">The stream from which to read the image data.</param>
-        /// <param name="colorProcessor">Color processor that is applied to every pixel before the texture is sent to video memory. Could be null(no processing then).</param>
+        /// <param name="colorProcessor">Function that is applied to the data in RGBA format before the texture is sent to video memory. Could be null(no processing then).</param>
         /// <returns>The <see cref="Texture2D"/> created from the image stream.</returns>
         /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
         /// the images should be identical.
         /// </remarks>
-        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, ColorProcessorDelegate colorProcessor)
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, Action<byte[]> colorProcessor)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
