@@ -61,7 +61,7 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
 ```
 
-Next, find the LoadContent method. Here, retrieve the "ball" sprite from the Content project and store it in the **ballTexture** private variable using the **Content.Load()** method, with the type of content you're loading specified in the angle brackets—in this case, a Texture2D image:
+Next, find the LoadContent method. Here, use **Content.Load()** to load the "ball" sprite and store it in **ballTexture**. **Content.Load()** requires you to specify what type of content you're trying to load in, and in this case it's a Texture2D.
 
 ```csharp
 protected override void LoadContent()
