@@ -10,11 +10,11 @@ You should see the "Create a new project" dialog pop up. From here, select the *
 
 ![New Template](~/images/getting_started/vswin-mg-new-2.png)
 
-Next, type in a name for your project. For this tutorial, **Pong** will be used (note: project names cannot contain spaces). After you've entered the name, click on the **...** button next to the Location text field and choose a directory to contain your project. Finally, click **OK** to create the project.
+Next, type in a name for your project. For this tutorial, **Pong** will be used (note: project names cannot contain spaces). After you've entered the name, click on the **...** button next to the Location text field and choose the folder you want to save the project in. Finally, click **OK** to create the project.
 
 ![Project Name](~/images/getting_started/vswin-mg-new-3.png)
 
-If everything went correctly, you should see a project named **Pong** (or whatever name you decided on) open up like in the picture below. To run your game, simply press the big **Play Button** in the toolbar, or press **F5**.
+If everything went correctly, you should see a project named **Pong** open up like in the picture below. To run your game, simply press the big **Play Button** in the toolbar, or press **F5**.
 
 ![Project Start](~/images/getting_started/vswin-mg-new-4.png)
 
