@@ -23,7 +23,7 @@ Based on [Microsoft's XNA Framework](https://msdn.microsoft.com/en-us/library/bb
 - Content building and optimization
 - Math library optimized for games
 
-This documentation helps you get started, providing both overviews of key features and tools and a complete API reference.
+This documentation helps you get started, providing overviews of key features and tools and a complete API reference.
 
 Please use the links at the top and left to navigate the documentation sections.
 
