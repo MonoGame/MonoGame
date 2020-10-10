@@ -1,6 +1,6 @@
 # Setting up your development environment for Ubuntu 20.04
 
-In this section we will go over setting up your development environment for Ubuntu 20.04.
+This section provides a step-by-step guide for setting up your development environment for Ubuntu 20.04.
 
 ## Install .NET Core SDK
 
@@ -21,7 +21,7 @@ sudo apt-get install -y dotnet-sdk-3.1
 
 ## [Optional] Install mono
 
-Mono is a C# runtime, just like .NET Core, and it is not necessary to install it if you are just targeting Linux, however if you want to target some other platforms, like Android, it will be required.
+Mono is a C# runtime, just like .NET Core. If you're targeting Linux only, it's unnecessary, but if you're targeting some other platforms like Android, it's required.
 
 Add repository:
 
@@ -63,7 +63,7 @@ code --install-extension ms-dotnettools.csharp
 
 ## Install MonoGame templates
 
-This will install templates for .NET Core CLI and Rider IDE. There is no template support for MonoDevelop.
+This will install templates for .NET Core CLI and the Rider IDE. There is no template support for MonoDevelop.
 
 ```sh
 dotnet new --install MonoGame.Templates.CSharp
@@ -71,7 +71,7 @@ dotnet new --install MonoGame.Templates.CSharp
 
 ## Install MGCB Editor
 
-MGCB Editor is a tool for editing the .mgcb files, which are used for building the content.
+MGCB Editor is a tool for editing .mgcb files, which are used for building content.
 
 ```sh
 dotnet tool install --global dotnet-mgcb-editor
@@ -80,7 +80,7 @@ mgcb-editor --register
 
 ## [Optional] Set up Wine for effect compilation
 
-Effect compilation requires access to some DirectX compiler stuff so it can't natively work on Linux systems, however we can use it through Wine.
+Effect compilation requires access to DirectX, so it won't work natively on Linux systems, but it can be used through Wine.
 
 Install wine64:
 
