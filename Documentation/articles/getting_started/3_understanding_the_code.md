@@ -20,7 +20,7 @@ Within the Game.cs class file, which is the core of any MonoGame project, you wi
 
 * The Draw method - which is called on a regular interval to take the current game state and draw your game entities to the screen.
 
-Read further for more detail and examples while looking through the code of your new project.
+Read further for more details and examples while looking through the code of your new project.
 
 ---
 
@@ -35,7 +35,7 @@ using Microsoft.Xna.Framework.Input;
 
 These using statements make it easier to use the code that MonoGame has to offer.
 
-They are prefixed with Microsoft.Xna.Framework because MonoGame is an open source implementation of Microsoft's XNA framework, and in order to maintain compatibility with the XNA code, it is using the same namespaces.
+They are prefixed with Microsoft.Xna.Framework because MonoGame is an open source implementation of Microsoft's XNA framework, and in order to maintain compatibility with the XNA code, it uses the same namespaces.
 
 ## The Game1 Class
 
