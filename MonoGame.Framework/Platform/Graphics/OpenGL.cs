@@ -550,6 +550,11 @@ namespace MonoGame.OpenGL
         ClampToBorder = 0x812D,
     }
 
+    internal enum PatchParameterName
+    {
+        PatchVertices = 0x8E72,
+    }
+
     internal partial class ColorFormat
     {
         internal ColorFormat (int r, int g, int b, int a)
@@ -1333,6 +1338,12 @@ namespace MonoGame.OpenGL
         internal delegate void VertexAttribDivisorDelegate(int location, int frequency);
         internal static VertexAttribDivisorDelegate VertexAttribDivisor;
 
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
+        internal delegate void PatchParameteriDelegate(PatchParameterName name, int value);
+        internal static PatchParameteriDelegate PatchParameteri;
+
 #if DEBUG
         [UnmanagedFunctionPointer (CallingConvention.StdCall)]
         delegate void DebugMessageCallbackProc (int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam);
@@ -1415,8 +1426,8 @@ namespace MonoGame.OpenGL
             UniformMatrix3x2fv = LoadFunction<UniformMatrix3x2fvDelegate> ("glUniformMatrix3x2fv"); 
             UniformMatrix3x4fv = LoadFunction<UniformMatrix3x4fvDelegate> ("glUniformMatrix3x4fv");
             UniformMatrix4x2fv = LoadFunction<UniformMatrix4x2fvDelegate> ("glUniformMatrix4x2fv");
-            UniformMatrix4x3fv = LoadFunction<UniformMatrix4x3fvDelegate> ("glUniformMatrix4x3fv"); 
-            
+            UniformMatrix4x3fv = LoadFunction<UniformMatrix4x3fvDelegate> ("glUniformMatrix4x3fv");        
+
             ReadPixelsInternal = LoadFunction<ReadPixelsDelegate> ("glReadPixels");
 
             ReadBuffer = LoadFunction<ReadBufferDelegate> ("glReadBuffer");
@@ -1503,6 +1514,8 @@ namespace MonoGame.OpenGL
             DeleteBuffers = LoadFunction<DeleteBuffersDelegate> ("glDeleteBuffers");
 
             VertexAttribPointer = LoadFunction<VertexAttribPointerDelegate> ("glVertexAttribPointer");
+
+            PatchParameteri = LoadFunction<PatchParameteriDelegate>("glPatchParameteri");
 
             // Instanced drawing requires GL 3.2 or up, if the either of the following entry points can not be loaded
             // this will get flagged by setting SupportsInstancing in GraphicsCapabilities to false.

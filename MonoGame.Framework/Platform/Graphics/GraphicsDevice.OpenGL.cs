@@ -136,6 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private Vector4 _lastClearColor = Vector4.Zero;
         private float _lastClearDepth = 1.0f;
         private int _lastClearStencil = 0;
+        private int _lastPatchVertexCount = -1;
 
         // Get a hashed value based on the currently bound shaders
         // throws an exception if no shaders are bound
@@ -1125,11 +1126,16 @@ namespace Microsoft.Xna.Framework.Graphics
             var indexElementSize = shortIndices ? 2 : 4;
 			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
 			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
-			var target = PrimitiveTypeGL(primitiveType);
 
             ApplyAttribs(_vertexShader, baseVertex);
 
-            GL.DrawElements(target,
+            // Set vertex count for tesselation patch
+            var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+            if (primitiveTypeGL == GLPrimitiveType.Patches)
+                SetTesselationPatchVertexCount(primitiveType);
+
+            // Draw
+            GL.DrawElements(primitiveTypeGL,
                                      indexElementCount,
                                      indexElementType,
                                      indexOffsetInBytes);
@@ -1154,8 +1160,13 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject(), ShaderProgramHash);
 
+            // Set vertex count for tesselation patch
+            var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+            if (primitiveTypeGL == GLPrimitiveType.Patches)
+                SetTesselationPatchVertexCount(primitiveType);
+
             //Draw
-            GL.DrawArrays(PrimitiveTypeGL(primitiveType),
+            GL.DrawArrays(primitiveTypeGL,
                           vertexOffset,
                           vertexCount);
             GraphicsExtensions.CheckGLError();
@@ -1173,7 +1184,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertexStart < 0)
                 vertexStart = 0;
 
-			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
+            // Set vertex count for tesselation patch
+            var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+            if (primitiveTypeGL == GLPrimitiveType.Patches)
+                SetTesselationPatchVertexCount(primitiveType);
+
+            // Draw
+            GL.DrawArrays(primitiveTypeGL,
 			              vertexStart,
 			              vertexCount);
             GraphicsExtensions.CheckGLError();
@@ -1200,8 +1217,13 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply(_vertexShader, vertexAddr, ShaderProgramHash);
 
+            // Set vertex count for tesselation patch
+            var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+            if (primitiveTypeGL == GLPrimitiveType.Patches)
+                SetTesselationPatchVertexCount(primitiveType);
+
             //Draw
-            GL.DrawElements(    PrimitiveTypeGL(primitiveType),
+            GL.DrawElements(    primitiveTypeGL,
                                 GetElementCountArray(primitiveType, primitiveCount),
                                 DrawElementsType.UnsignedShort,
                                 (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(short))));
@@ -1233,8 +1255,13 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply(_vertexShader, vertexAddr, ShaderProgramHash);
 
+            // Set vertex count for tesselation patch
+            var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+            if (primitiveTypeGL == GLPrimitiveType.Patches)
+                SetTesselationPatchVertexCount(primitiveType);
+
             //Draw
-            GL.DrawElements(    PrimitiveTypeGL(primitiveType),
+            GL.DrawElements(    primitiveTypeGL,
                                 GetElementCountArray(primitiveType, primitiveCount),
                                 DrawElementsType.UnsignedInt,
                                 (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(int))));
@@ -1257,16 +1284,20 @@ namespace Microsoft.Xna.Framework.Graphics
             var indexElementSize = shortIndices ? 2 : 4;
             var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
             var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
-            var target = PrimitiveTypeGL(primitiveType);
 
             ApplyAttribs(_vertexShader, baseVertex);
+
+            // Set vertex count for tesselation patch
+            var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+            if (primitiveTypeGL == GLPrimitiveType.Patches)
+                SetTesselationPatchVertexCount(primitiveType);
 
             if (baseInstance > 0)
             {
                 if (!GraphicsCapabilities.SupportsBaseIndexInstancing)
                     throw new PlatformNotSupportedException("Instanced geometry drawing with base instance requires at least OpenGL 4.2. Try upgrading your graphics card drivers.");
 
-                GL.DrawElementsInstancedBaseInstance(target,
+                GL.DrawElementsInstancedBaseInstance(primitiveTypeGL,
                                           indexElementCount,
                                           indexElementType,
                                           indexOffsetInBytes,
@@ -1274,13 +1305,23 @@ namespace Microsoft.Xna.Framework.Graphics
                                           baseInstance);
             }
             else
-                GL.DrawElementsInstanced(target,
+                GL.DrawElementsInstanced(primitiveTypeGL,
                                      indexElementCount,
                                      indexElementType,
                                      indexOffsetInBytes,
                                      instanceCount);
 
             GraphicsExtensions.CheckGLError();
+        }
+        private void SetTesselationPatchVertexCount(PrimitiveType primitiveType)
+        {
+            int patchVertexCount = primitiveType - PrimitiveType.PatchListWith1ControlPoints + 1;
+            if (patchVertexCount != _lastPatchVertexCount)
+            {
+                GL.PatchParameteri(PatchParameterName.PatchVertices, patchVertexCount);
+                GraphicsExtensions.CheckGLError();
+                _lastPatchVertexCount = patchVertexCount;
+            }
         }
 
         private void PlatformGetBackBufferData<T>(Rectangle? rectangle, T[] data, int startIndex, int count) where T : struct
