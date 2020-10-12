@@ -105,30 +105,30 @@ namespace MonoGame.Effect
                 // Apply some fixes to the GLSL code, then add it to shaderData
                 //==============================================================
 
-                // version header for old OpenGL versions can make OpenGL ES crash.
+                // OpenGL ES doesn't like the version header to be present for old GLSL versions without es in the name.
                 if (isESSL && !glslVersion.Contains("es"))
                     GLSLManipulator.RemoveVersionHeader(ref glsl);
 
-                // remove separate shader objects extension requirement for OpenGL 2
+                // Remove separate shader objects extension requirement for OpenGL 2.
+                // Trying to remove this also from newer OpenGL versions failed,
+                // because some parameters wouldn't get passed from one shader stage to the next anymore.
                 if (glslVersion.StartsWith("10") ||
                     glslVersion.StartsWith("11") ||
                     glslVersion.StartsWith("12"))
                     GLSLManipulator.RemoveARBSeparateShaderObjects(ref glsl);
 
-                if (shaderStage == ShaderStage.VertexShader)
-                {
-                    // OpenGL doesn't like the gl_PerVertex declaration.
-                    GLSLManipulator.RemoveOutGlPerVertex(ref glsl);
-                    // Add posFixup code, so we can compensate for differences btw DirectX and OpenGL
-                    GLSLManipulator.AddPosFixupUniformAndCode(ref glsl);
-                }
+                // Shaders that output or input SV_POSITION contain a gl_PerVertex declaration.
+                // Having an explicit gl_PerVertex declaration is not necessary as it's automatically defined anyway.
+                // In fact shader compilation will fail if it's present, so remove it.
+                GLSLManipulator.RemoveInGlPerVertex(ref glsl);
+                bool outGlPerVertexRemoved = GLSLManipulator.RemoveOutGlPerVertex(ref glsl);
 
-                if (shaderStage == ShaderStage.GeometryShader ||
-                    shaderStage == ShaderStage.HullShader)
-                {
-                    // OpenGL doesn't like the gl_PerVertex declaration.
-                    GLSLManipulator.RemoveInGlPerVertex(ref glsl);
-                }
+                // Add posFixup code, so we can compensate for differences btw DirectX and OpenGL.
+                // This is only needed if the output contains SV_POSITION.
+                // We know the output contains SV_POSITION when a gl_PerVertex declaration was present.
+                // For hull shaders this is not necessary, as hull shaders are always follwed by a domain shader, which can't access SV_POSITION.
+                if (outGlPerVertexRemoved && !(shaderStage == ShaderStage.HullShader))
+                    GLSLManipulator.AddPosFixupUniformAndCode(ref glsl);
 
                 shaderData.ShaderCode = Encoding.ASCII.GetBytes(glsl);
 
