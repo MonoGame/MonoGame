@@ -1,8 +1,6 @@
 # Getting Started
 
-This section walks you through the basics of MonoGame and helps you create your first game.
-
-First, select the toolset and operating system you will be working with to create your first MonoGame project, then continue reading to understand the basic layout of a MonoGame project.
+To get started, first, select the toolset and operating system you will be working with to create your first MonoGame project, then continue reading to understand the basic layout of a MonoGame project.
 
 By the end of this tutorial set, you will have a working project to build off of for your target platform and will be ready to tackle your next steps.
 
@@ -23,3 +21,23 @@ By the end of this tutorial set, you will have a working project to build off of
 - [Understanding the Code](3_understanding_the_code.md)
 - [Adding Content](4_adding_content.md)
 - [Adding Basic Code](5_adding_basic_code.md)
+
+## Development Builds
+
+Add our [develop branch NuGet feed](http://teamcity.monogame.net/guestAuth/app/nuget/feed/_Root/default/v3/index.json) to your IDE for the very latest assemblies or for pre-release assemblies on NuGet.
+
+We find these releases to be generally stable, but if you do run into a bug [please report it](https://github.com/mono/MonoGame/issues) to us.
+
+## Source Code
+
+If you want to get hold of the latest source code you can get that from our [Github page](https://github.com/mono/MonoGame). The [master branch](https://github.com/mono/MonoGame/tree/master) contains the latest stable release. Finally if you want to get the latest features and fixes you can download our [develop branch](https://github.com/mono/MonoGame/tree/develop).
+
+There are [several tags](https://github.com/mono/MonoGame/tags) to get access to the snap shots of previous MonoGame releases.
+
+## Previous Releases
+
+If you are looking for old MonoGame releases you can find them listed [here](https://community.monogame.net/c/releases/30).
+
+## Logos
+
+Looking for logos to promote the fact that your game was written using MonoGame? Get them from [GitHub](https://github.com/Mono-Game/MonoGame.Logo).
