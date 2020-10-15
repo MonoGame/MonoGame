@@ -1,5 +1,7 @@
 # Getting Started
 
+This section walks you through the basics of MonoGame and helps you create your first game.  We have also included some additional information related to the MonoGame project for developers.
+
 To get started, first, select the toolset and operating system you will be working with to create your first MonoGame project, then continue reading to understand the basic layout of a MonoGame project.
 
 By the end of this tutorial set, you will have a working project to build off of for your target platform and will be ready to tackle your next steps.
