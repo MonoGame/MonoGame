@@ -20,14 +20,23 @@ namespace Microsoft.Xna.Framework
     internal class Threading
     {
         public const int kMaxWaitForUIThread = 750; // In milliseconds
-        public const int MaxPooledResetEvents = 16;
+        public const int MaxPooledResetEvents = 16; // Throw away objects when above this amount
 
-        static int mainThreadId;
+        static int _mainThreadId;
 
-        static Stack<ManualResetEventSlim> resetEventPool = new Stack<ManualResetEventSlim>();
-        static List<Action> queuedActions = new List<Action>();
-        readonly static Action<Action> MetaAction = (a) => a();
+        static Stack<ManualResetEventSlim> _resetEventPool = new Stack<ManualResetEventSlim>();
 
+        // Storing non-generic dequeue actions allows us to preserve invocation order.
+        static List<Action> _queuedActions = new List<Action>();
+
+        // Used to share one implementation for both generic and non-generic actions.
+        readonly static Action<Action> _metaAction = (a) => a();
+
+        /// <summary>
+        /// Static helper that provides a generic action queue
+        /// but a non-generic dequeue-and-invoke <see cref="Action"/>.
+        /// </summary>
+        /// <typeparam name="TState"></typeparam>
         static class StateActionHelper<TState>
         {
             public static readonly Queue<QueuedAction<TState>> Queue = new Queue<QueuedAction<TState>>();
@@ -57,7 +66,7 @@ namespace Microsoft.Xna.Framework
 
         static Threading()
         {
-            mainThreadId = Thread.CurrentThread.ManagedThreadId;
+            _mainThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
 #if ANDROID
@@ -73,7 +82,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>true if the code is currently running on the UI thread.</returns>
         public static bool IsOnUIThread()
         {
-            return mainThreadId == Thread.CurrentThread.ManagedThreadId;
+            return _mainThreadId == Thread.CurrentThread.ManagedThreadId;
         }
 
         /// <summary>
@@ -96,7 +105,7 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action");
 
-            BlockOnUIThread(MetaAction, action);
+            BlockOnUIThread(_metaAction, action);
         }
 
         /// <summary>
@@ -128,10 +137,10 @@ namespace Microsoft.Xna.Framework
                 State = state
             };
 
-            lock (queuedActions)
+            lock (_queuedActions)
             {
                 StateActionHelper<TState>.Queue.Enqueue(queuedAction);
-                queuedActions.Add(StateActionHelper<TState>.DequeueAction);
+                _queuedActions.Add(StateActionHelper<TState>.DequeueAction);
             }
             resetEvent.Wait();
             ReturnResetEvent(resetEvent);
@@ -140,10 +149,10 @@ namespace Microsoft.Xna.Framework
 
         static ManualResetEventSlim RentResetEvent()
         {
-            lock (resetEventPool)
+            lock (_resetEventPool)
             {
-                if (resetEventPool.Count > 0)
-                    return resetEventPool.Pop();
+                if (_resetEventPool.Count > 0)
+                    return _resetEventPool.Pop();
             }
             return new ManualResetEventSlim();
         }
@@ -152,10 +161,10 @@ namespace Microsoft.Xna.Framework
         {
             resetEvent.Reset();
 
-            lock (resetEventPool)
+            lock (_resetEventPool)
             {
-                if (resetEventPool.Count < MaxPooledResetEvents)
-                    resetEventPool.Push(resetEvent);
+                if (_resetEventPool.Count < MaxPooledResetEvents)
+                    _resetEventPool.Push(resetEvent);
             }
         }
 
@@ -174,9 +183,9 @@ namespace Microsoft.Xna.Framework
                     EAGLContext.SetCurrentContext(BackgroundContext);
 #endif
 
-            lock (queuedActions)
+            lock (_queuedActions)
             {
-                foreach (Action queuedAction in queuedActions)
+                foreach (Action queuedAction in _queuedActions)
                 {
 #if ANDROID
                     //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
@@ -185,7 +194,7 @@ namespace Microsoft.Xna.Framework
 
                     queuedAction.Invoke();
                 }
-                queuedActions.Clear();
+                _queuedActions.Clear();
             }
 
 #if IOS
