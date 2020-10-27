@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework
 #if ANDROID
         internal static void ResetThread (int id)
         {
-            mainThreadId = id;
+            _mainThreadId = id;
         }
 #endif
 
