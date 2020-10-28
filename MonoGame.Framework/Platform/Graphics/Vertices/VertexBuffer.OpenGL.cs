@@ -84,9 +84,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Copy from the temporary buffer to the destination array
                 var tmpHandle = GCHandle.Alloc(tmp, GCHandleType.Pinned);
-                var tmpPtr = tmpHandle.AddrOfPinnedObject();
                 try
                 {
+                    var tmpPtr = tmpHandle.AddrOfPinnedObject();
                     for (var i = 0; i < elementCount; i++)
                     {
                         data[startIndex + i] = (T)Marshal.PtrToStructure(tmpPtr, typeof(T));

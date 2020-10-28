@@ -234,15 +234,27 @@ namespace MonoGame.OpenAL
         internal static void BufferData(int bid, ALFormat format, byte[] data, int size, int freq)
         {
             var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            alBufferData((uint)bid, (int)format, handle.AddrOfPinnedObject(), size, freq);
-            handle.Free();
+            try
+            {
+                alBufferData((uint)bid, (int)format, handle.AddrOfPinnedObject(), size, freq);
+            }
+            finally
+            {
+                handle.Free();
+            }
         }
 
         internal static void BufferData(int bid, ALFormat format, short[] data, int size, int freq)
         {
             var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            alBufferData((uint)bid, (int)format, handle.AddrOfPinnedObject(), size, freq);
-            handle.Free();
+            try
+            {
+                alBufferData((uint)bid, (int)format, handle.AddrOfPinnedObject(), size, freq);
+            }
+            finally
+            {
+                handle.Free();
+            }
         }
 
         [CLSCompliant(false)]
