@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework
 {
     internal class Threading
     {
-        public const int kMaxWaitForUIThread = 750; // In milliseconds
+        public const int MaxWaitForUIThread = 1000; // In milliseconds
         public const int MaxPooledResetEvents = 32; // Throw away objects when above this amount
 
         static int _mainThreadId;
@@ -139,8 +139,16 @@ namespace Microsoft.Xna.Framework
                 StateActionHelper<TState>.Queue.Enqueue(queuedAction);
                 _queuedActions.Add(StateActionHelper<TState>.DequeueAction);
             }
-            resetEvent.Wait();
-            ReturnResetEvent(resetEvent);
+
+            try
+            {
+                if (!resetEvent.Wait(MaxWaitForUIThread))
+                    throw new TimeoutException();
+            }
+            finally
+            {
+                ReturnResetEvent(resetEvent);
+            }
 #endif
         }
 
