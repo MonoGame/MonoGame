@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Audio
                             operation,
                             string.Format(errorFmt, error)));
         }
-       
+
         internal static void PopulateCaptureDevices()
         {
             // clear microphones
@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Audio
             // The native string is a null-char separated list of known capture device specifiers ending with an empty string
 
             while (true)
-            {  
+            {
                 var deviceIdentifier = InteropHelpers.Utf8ToString(deviceList);
 
                 if (string.IsNullOrEmpty(deviceIdentifier))
@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 _state = MicrophoneState.Started;
             }
-			else
+            else
             {
                 throw new NoMicrophoneConnectedException("Failed to open capture device.");
             }
@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (GetQueuedSampleCount() > 0)
             {
-                BufferReady.Invoke(this, EventArgs.Empty);                
+                BufferReady.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -150,11 +150,16 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (sampleCount > 0)
             {
-                GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-                Alc.CaptureSamples(_captureDevice, handle.AddrOfPinnedObject() + offset, sampleCount);
-                handle.Free();
-
-                CheckALCError("Failed to capture samples.");
+                var handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+                try
+                {
+                    Alc.CaptureSamples(_captureDevice, handle.AddrOfPinnedObject() + offset, sampleCount);
+                    CheckALCError("Failed to capture samples.");
+                }
+                finally
+                {
+                    handle.Free();
+                }
 
                 return sampleCount * 2; // 16bit adjust
             }
