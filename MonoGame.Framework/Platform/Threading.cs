@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework
     internal class Threading
     {
         public const int kMaxWaitForUIThread = 750; // In milliseconds
-        public const int MaxPooledResetEvents = 16; // Throw away objects when above this amount
+        public const int MaxPooledResetEvents = 32; // Throw away objects when above this amount
 
         static int _mainThreadId;
 
@@ -39,25 +39,22 @@ namespace Microsoft.Xna.Framework
         /// <typeparam name="TState"></typeparam>
         static class StateActionHelper<TState>
         {
-            public static readonly Queue<QueuedAction<TState>> Queue = new Queue<QueuedAction<TState>>();
+            public static readonly Queue<QueuedAction> Queue = new Queue<QueuedAction>();
             public static readonly Action DequeueAction = Dequeue;
 
             public static void Dequeue()
             {
-                if (Queue.Count > 0)
-                {
-                    var item = Queue.Dequeue();
-                    item.Action.Invoke(item.State);
-                    item.ResetEvent.Set();
-                }
+                var item = Queue.Dequeue();
+                item.Action.Invoke(item.State);
+                item.ResetEvent.Set();
             }
-        }
 
-        struct QueuedAction<TState>
-        {
-            public ManualResetEventSlim ResetEvent;
-            public Action<TState> Action;
-            public TState State;
+            public struct QueuedAction
+            {
+                public ManualResetEventSlim ResetEvent;
+                public Action<TState> Action;
+                public TState State;
+            }
         }
 
 #if IOS
@@ -130,7 +127,7 @@ namespace Microsoft.Xna.Framework
             }
 
             ManualResetEventSlim resetEvent = RentResetEvent();
-            var queuedAction = new QueuedAction<TState>
+            var queuedAction = new StateActionHelper<TState>.QueuedAction
             {
                 ResetEvent = resetEvent,
                 Action = action,
@@ -164,8 +161,13 @@ namespace Microsoft.Xna.Framework
             lock (_resetEventPool)
             {
                 if (_resetEventPool.Count < MaxPooledResetEvents)
+                {
                     _resetEventPool.Push(resetEvent);
+                    return; // return here to skip dispose
+                }
             }
+
+            resetEvent.Dispose();
         }
 
         /// <summary>
