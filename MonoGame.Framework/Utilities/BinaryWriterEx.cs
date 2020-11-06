@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.IO;
 using System.Text;
 
@@ -28,6 +29,23 @@ namespace MonoGame.Framework.Utilities
         public new void Write7BitEncodedInt(int value)
         {
             base.Write7BitEncodedInt(value);
+        }
+
+        public void WriteCount(int count)
+        {
+            if (count < 0) throw new ArgumentOutOfRangeException("count");
+            this.Write(count);
+        }
+
+        public void WriteIndex(int index)
+        {
+            if (index < 0) throw new ArgumentOutOfRangeException("index");
+            this.Write(index);
+        }
+
+        public void WriteSignedIndex(int index)
+        {
+            this.Write(index);
         }
     }
 }
