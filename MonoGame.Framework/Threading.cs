@@ -93,16 +93,28 @@ namespace Microsoft.Xna.Framework
             }
 #else
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
+            Exception thrown = null;
             Add(() =>
             {
+                try
+                {
 #if ANDROID
-                //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
-                ((AndroidGameWindow)Game.Instance.Window).GameView.MakeCurrent();
+                    //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
+                    ((AndroidGameWindow)Game.Instance.Window).GameView.MakeCurrent();
 #endif
-                action();
-                resetEvent.Set();
+                    action();
+                    resetEvent.Set();
+                }
+                catch (Exception ex)
+                {
+                    thrown = ex;
+                }
             });
             resetEvent.Wait();
+            if (thrown != null)
+            {
+                throw thrown;
+            }
 #endif
 #endif
         }
