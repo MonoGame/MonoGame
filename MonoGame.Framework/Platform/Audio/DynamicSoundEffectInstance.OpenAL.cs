@@ -89,9 +89,9 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             // Queue the buffer
+            _queuedBuffers.Enqueue(oalBuffer);
             AL.SourceQueueBuffer(SourceId, oalBuffer.OpenALDataBuffer);
             ALHelper.CheckError();
-            _queuedBuffers.Enqueue(oalBuffer);
 
             // If the source has run out of buffers, restart it
             var sourceState = AL.GetSourceState(SourceId);
