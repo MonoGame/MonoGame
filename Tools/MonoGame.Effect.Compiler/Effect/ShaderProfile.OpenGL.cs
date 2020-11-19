@@ -180,8 +180,8 @@ namespace MonoGame.Effect
                         }
 
                         // assign new slots in 2nd pass
-                        if (pass == 1)  
-                            sampler.samplerSlot = uniqueSamplerSlot;
+                        if (pass == 1)
+                            shader._samplers[i].samplerSlot = uniqueSamplerSlot;
                     }
                 }
             }
