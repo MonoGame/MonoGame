@@ -464,9 +464,7 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var t = 0; t < techniques.Length; t++)
             {
                 var name = reader.ReadString();
-
                 var annotations = ReadAnnotations(reader);
-
                 var passes = ReadPasses(reader, this, _shaders);
 
                 techniques[t] = new EffectTechnique(this, name, passes, annotations);
