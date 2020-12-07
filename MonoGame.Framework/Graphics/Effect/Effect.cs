@@ -11,6 +11,30 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
     {
+        struct MGFXHeader 
+        {
+            /// <summary>
+            /// The MonoGame Effect file format header identifier ("MGFX"). 
+            /// </summary>
+            public static readonly int MGFXSignature = (BitConverter.IsLittleEndian) ? 0x5846474D: 0x4D474658;
+
+            /// <summary>
+            /// The current MonoGame Effect file format versions
+            /// used to detect old packaged content.
+            /// </summary>
+            /// <remarks>
+            /// We should avoid supporting old versions for very long if at all 
+            /// as users should be rebuilding content when packaging their game.
+            /// </remarks>
+            public const int MGFXVersion = 10;
+
+            public int Signature;
+            public int Version;
+            public int Profile;
+            public int EffectKey;
+            public int HeaderSize;
+        }
+
         public EffectParameterCollection Parameters { get; private set; }
 
         public EffectTechniqueCollection Techniques { get; private set; }
@@ -67,7 +91,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// effects without any shared instance state.
  
             //Read the header
-            MGFXHeader header = MGFXHeader.ReadHeader(effectCode, index);
+            MGFXHeader header = ReadHeader(effectCode, index);
 			var effectKey = header.EffectKey;
 			int headerSize = header.HeaderSize;
 
@@ -80,15 +104,12 @@ namespace Microsoft.Xna.Framework.Graphics
             	using (var reader = new BinaryReaderEx(stream))
             {
                 // Create one.
-                    cloneSource = new Effect(graphicsDevice);
+                cloneSource = new Effect(graphicsDevice);
                     cloneSource.ReadEffect(reader);
 
                 // Check file tail to ensure we parsed the content correctly.
-                    if (header.Version == MGFXHeader.MGFXVersion)
-                    {
-                        var tail = reader.ReadInt32();
-                        if (tail != MGFXHeader.MGFXSignature) throw new ArgumentException("The MGFX effect code was not parsed correctly.", "effectCode");
-                    }
+                    var tail = reader.ReadInt32();
+                    if (tail != MGFXHeader.MGFXSignature) throw new ArgumentException("The MGFX effect code was not parsed correctly.", "effectCode");                    
 
                 // Cache the effect for later in its original unmodified state.
                     graphicsDevice.EffectCache.Add(effectKey, cloneSource);
@@ -100,7 +121,27 @@ namespace Microsoft.Xna.Framework.Graphics
             Clone(cloneSource);
         }
 
-        
+        private MGFXHeader ReadHeader(byte[] effectCode, int index)
+        {
+            MGFXHeader header;
+            header.Signature = BitConverter.ToInt32(effectCode, index); index += 4;
+            header.Version = (int)effectCode[index++];
+            header.Profile = (int)effectCode[index++];
+            header.EffectKey = BitConverter.ToInt32(effectCode, index); index += 4;
+            header.HeaderSize = index;
+
+            if (header.Signature != MGFXHeader.MGFXSignature)
+                throw new Exception("This does not appear to be a MonoGame MGFX file!");
+            if (header.Version < MGFXHeader.MGFXVersion)
+                throw new Exception("This MGFX effect is for an older release of MonoGame and needs to be rebuilt.");
+            if (header.Version > MGFXHeader.MGFXVersion)
+                throw new Exception("This MGFX effect seems to be for a newer release of MonoGame.");
+
+            if (header.Profile != Shader.Profile)
+                throw new Exception("This MGFX effect was built for a different platform!");          
+            
+            return header;
+        }
 
         /// <summary>
         /// Clone the source into this existing object.
@@ -191,53 +232,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Effect File Reader
 
-        struct MGFXHeader
-        {
-            /// <summary>
-            /// The MonoGame Effect file format header identifier ("MGFX"). 
-            /// </summary>
-            public static readonly int MGFXSignature = (BitConverter.IsLittleEndian) ? 0x5846474D : 0x4D474658;
+		private void ReadEffect (BinaryReaderEx reader)
+		{
+			// TODO: Maybe we should be reading in a string 
+			// table here to save some bytes in the file.
 
-            /// <summary>
-            /// The current MonoGame Effect file format version.            
-            /// </summary>            
-            public const int MGFXVersion = 10;            
-
-            public int Signature;
-            public int Version;
-            public int Profile;
-            public int EffectKey;
-            public int HeaderSize;
-
-            public static MGFXHeader ReadHeader(byte[] effectCode, int index)
-            {
-                MGFXHeader header;
-                header.Signature = BitConverter.ToInt32(effectCode, index); index += 4;
-                header.Version = (int)effectCode[index++];
-                header.Profile = (int)effectCode[index++];
-                header.EffectKey = BitConverter.ToInt32(effectCode, index); index += 4;
-                header.HeaderSize = index;
-
-                if (header.Signature != MGFXSignature)
-                    throw new Exception("This does not appear to be a MonoGame MGFX file!");
-                if (header.Version < MGFXHeader.MGFXVersion)
-                    throw new Exception("This MGFX effect is for an older release of MonoGame and needs to be rebuilt.");
-                if (header.Version > MGFXVersion)
-                    throw new Exception("This MGFX effect seems to be for a newer release of MonoGame.");
-
-                if (header.Profile != Shader.Profile)
-                    throw new Exception("This MGFX effect was built for a different platform!");
-
-                return header;
-            }
-        }
-
-        private void ReadEffect (BinaryReaderEx reader)
-        {
-            // TODO: Maybe we should be reading in a string 
-            // table here to save some bytes in the file.
-
-            // Read in all the constant buffers.
+			// Read in all the constant buffers.
             ConstantBuffers = ReadConstantBuffers(reader, GraphicsDevice);
 
             // Read in all the shader objects.
@@ -254,7 +254,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static ConstantBuffer[] ReadConstantBuffers(BinaryReaderEx reader, GraphicsDevice graphics)
         {
-            var constantBuffers = new ConstantBuffer[reader.ReadCount()];
+            var constantBuffers = new ConstantBuffer[reader.ReadInt32()];
 
             for (var c = 0; c < constantBuffers.Length; c++)
             {
@@ -264,11 +264,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 var sizeInBytes = (int)reader.ReadInt16();
 
                 // Read the parameter index values.
-                var parameters = new int[reader.ReadCount()];
+                var parameters = new int[reader.ReadInt32()];
                 var offsets = new int[parameters.Length];
                 for (var i = 0; i < parameters.Length; i++)
                 {
-                    parameters[i] = reader.ReadIndex();
+                    parameters[i] = reader.ReadInt32();
                     offsets[i] = (int)reader.ReadUInt16();
                 }
 
@@ -285,7 +285,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static Shader[] ReadShaders(BinaryReaderEx reader, GraphicsDevice graphics)
         {
-            var shaders = new Shader[reader.ReadCount()];
+            var shaders = new Shader[reader.ReadInt32()];
 
             for (var s = 0; s < shaders.Length; s++)
                 shaders[s] = new Shader(graphics, reader);
@@ -295,7 +295,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static EffectAnnotationCollection ReadAnnotations(BinaryReaderEx reader)
         {
-            var count = reader.ReadCount();
+            var count = reader.ReadInt32();
             if (count == 0)
                 return EffectAnnotationCollection.Empty;
 
@@ -308,7 +308,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static EffectPassCollection ReadPasses(BinaryReaderEx reader, Effect effect, Shader[] shaders)
         {
-            var passes = new EffectPass[reader.ReadCount()];
+            var passes = new EffectPass[reader.ReadInt32()];
 
             for (var i = 0; i < passes.Length; i++)
             {
@@ -316,11 +316,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 var annotations = ReadAnnotations(reader);
 
                 // Get the vertex shader.
-                var shaderIndex = reader.ReadSignedIndex();
+                var shaderIndex = reader.ReadInt32();
                 Shader vertexShader = shaderIndex < 0 ? null : shaders[shaderIndex];
 
                 // Get the pixel shader.
-                shaderIndex = reader.ReadSignedIndex();
+                shaderIndex = reader.ReadInt32();
                 Shader pixelShader = shaderIndex < 0 ? null : shaders[shaderIndex];
 
 				BlendState blend = null;
@@ -387,7 +387,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private static EffectParameterCollection ReadParameters(BinaryReaderEx reader)
 		{
-            var count = reader.ReadCount();
+            var count = reader.ReadInt32();
             if (count == 0)
                 return EffectParameterCollection.Empty;
 
@@ -459,7 +459,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private EffectTechniqueCollection ReadTechniques(BinaryReaderEx reader)
         {
-            var techniques = new EffectTechnique[reader.ReadCount()];
+            var techniques = new EffectTechnique[reader.ReadInt32()];
 
             for (var t = 0; t < techniques.Length; t++)
             {

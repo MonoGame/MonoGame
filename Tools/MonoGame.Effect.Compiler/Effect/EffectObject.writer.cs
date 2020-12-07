@@ -34,12 +34,12 @@ namespace MonoGame.Effect
             using(BinaryWriterEx memWriter = new BinaryWriterEx(memStream))
             {
             // Write all the constant buffers.
-                memWriter.WriteCount(ConstantBuffers.Count);
+                memWriter.Write(ConstantBuffers.Count);
             foreach (var cbuffer in ConstantBuffers)
                     cbuffer.Write(memWriter, options);
 
             // Write all the shaders.
-                memWriter.WriteCount(Shaders.Count);
+                memWriter.Write(Shaders.Count);
             foreach (var shader in Shaders)
                     shader.Write(memWriter, options);
 
@@ -47,14 +47,14 @@ namespace MonoGame.Effect
                 WriteParameters(memWriter, Parameters, Parameters.Length);
 
             // Write the techniques.
-                memWriter.WriteCount(Techniques.Length);
+                memWriter.Write(Techniques.Length);
             foreach (var technique in Techniques)
             {
                     memWriter.Write(technique.name);
                     WriteAnnotations(memWriter, technique.annotation_handles);
 
                 // Write the passes.
-                    memWriter.WriteCount((int)technique.pass_count);
+                    memWriter.Write((int)technique.pass_count);
                 for (var p = 0; p < technique.pass_count; p++)
                 {
                     var pass = technique.pass_handles[p];
@@ -65,8 +65,8 @@ namespace MonoGame.Effect
                     // Write the index for the vertex and pixel shaders.
                     var vertexShader = GetShaderIndex(STATE_CLASS.VERTEXSHADER, pass.states);
                     var pixelShader = GetShaderIndex(STATE_CLASS.PIXELSHADER, pass.states);
-                        memWriter.WriteSignedIndex(vertexShader);
-                        memWriter.WriteSignedIndex(pixelShader);
+                        memWriter.Write(vertexShader);
+                        memWriter.Write(pixelShader);
 
                     // Write the state objects too!
 					if (pass.blendState != null)
@@ -144,7 +144,7 @@ namespace MonoGame.Effect
 
         private static void WriteParameters(BinaryWriterEx writer, d3dx_parameter[] parameters, int count)
         {
-            writer.WriteCount(count);
+            writer.Write(count);
             for (var i = 0; i < count; i++)
                 WriteParameter(writer, parameters[i]);
         }
@@ -183,7 +183,7 @@ namespace MonoGame.Effect
         private static void WriteAnnotations(BinaryWriterEx writer, d3dx_parameter[] annotations)
         {
             var count = annotations == null ? 0 : annotations.Length;
-            writer.WriteCount(count);
+            writer.Write(count);
             for (var i = 0; i < count; i++)
                 WriteParameter(writer, annotations[i]);
         }
