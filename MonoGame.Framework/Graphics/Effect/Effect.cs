@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!graphicsDevice.EffectCache.TryGetValue(effectKey, out cloneSource))
             {
                 using (var stream = new MemoryStream(effectCode, index + headerSize, count - headerSize, false))
-            	using (var reader = new BinaryReaderEx(stream, header.Version))
+            	using (var reader = new BinaryReaderEx(stream))
             {
                 // Create one.
                     cloneSource = new Effect(graphicsDevice);
@@ -201,16 +201,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// <summary>
             /// The current MonoGame Effect file format version.            
             /// </summary>            
-            public const int MGFXVersion = 10;
-
-            /// <summary>
-            /// The minimum MonoGame Effect file format version supported (inclusive).
-            /// </summary>
-            /// <remarks>
-            /// We should avoid supporting old versions for very long if at all 
-            /// as users should be rebuilding content when packaging their game.
-            /// </remarks>
-            public const int MGFXMinVersion = 9;
+            public const int MGFXVersion = 10;            
 
             public int Signature;
             public int Version;
@@ -227,11 +218,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 header.EffectKey = BitConverter.ToInt32(effectCode, index); index += 4;
                 header.HeaderSize = index;
 
-                if (header.Signature != MGFXHeader.MGFXSignature)
+                if (header.Signature != MGFXSignature)
                     throw new Exception("This does not appear to be a MonoGame MGFX file!");
-                if (header.Version < MGFXHeader.MGFXMinVersion)
+                if (header.Version < MGFXHeader.MGFXVersion)
                     throw new Exception("This MGFX effect is for an older release of MonoGame and needs to be rebuilt.");
-                if (header.Version > MGFXHeader.MGFXVersion)
+                if (header.Version > MGFXVersion)
                     throw new Exception("This MGFX effect seems to be for a newer release of MonoGame.");
 
                 if (header.Profile != Shader.Profile)
@@ -396,7 +387,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private static EffectParameterCollection ReadParameters(BinaryReaderEx reader)
 		{
-            var count = reader.MGFXVersion == 9 ? reader.Read7BitEncodedInt() : reader.ReadCount();
+            var count = reader.ReadCount();
             if (count == 0)
                 return EffectParameterCollection.Empty;
 

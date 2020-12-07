@@ -9,13 +9,8 @@ namespace MonoGame.Framework.Utilities
 {
     public class BinaryReaderEx : BinaryReader
     {
-        private readonly int _EffectMgfxVersion;
-
-        public int MGFXVersion { get { return _EffectMgfxVersion; } }
-
-        public BinaryReaderEx(Stream input, int mgfxVersion) : base(input)
-        {
-            _EffectMgfxVersion = mgfxVersion;
+        public BinaryReaderEx(Stream input) : base(input)
+        {            
         }
 
         public BinaryReaderEx(Stream input, Encoding encoding) : base(input, encoding)
@@ -41,11 +36,6 @@ namespace MonoGame.Framework.Utilities
         /// <returns>An integer value</returns>
         public int ReadCount()
         {
-            if (_EffectMgfxVersion == 9)
-            {
-                return (int)ReadByte();
-            }
-
             return ReadInt32();
         }
 
@@ -55,11 +45,6 @@ namespace MonoGame.Framework.Utilities
         /// <returns>An integer value</returns>
         public int ReadIndex()
         {
-            if (_EffectMgfxVersion == 9)
-            {
-                return (int)ReadByte();
-            }
-
             return ReadInt32();
         }
 
@@ -68,14 +53,7 @@ namespace MonoGame.Framework.Utilities
         /// </summary>
         /// <returns>An integer value</returns>
         public int ReadSignedIndex()
-        {            
-            if (_EffectMgfxVersion == 9)
-            {
-                int idx = (int)ReadByte();
-                if (idx == 255) idx = -1;
-                return idx;
-            }
-
+        {
             return ReadInt32();            
         }        
     }
