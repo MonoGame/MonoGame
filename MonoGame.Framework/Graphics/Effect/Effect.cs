@@ -236,27 +236,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			// TODO: Maybe we should be reading in a string 
 			// table here to save some bytes in the file.
+			
+            ConstantBuffers = new ConstantBuffer[reader.ReadInt32()];
 
-			// Read in all the constant buffers.
-            ConstantBuffers = ReadConstantBuffers(reader, GraphicsDevice);
-
-            // Read in all the shader objects.
-            _shaders = ReadShaders(reader, GraphicsDevice);
-
-            // Read in the parameters.
-            Parameters = ReadParameters(reader);
-
-            // Read the techniques.
-            Techniques = ReadTechniques(reader);
-
-            CurrentTechnique = Techniques[0];
-        }
-
-        private static ConstantBuffer[] ReadConstantBuffers(BinaryReaderEx reader, GraphicsDevice graphics)
-        {
-            var constantBuffers = new ConstantBuffer[reader.ReadInt32()];
-
-            for (var c = 0; c < constantBuffers.Length; c++)
+            for (var c = 0; c < ConstantBuffers.Length; c++)
             {
                 var name = reader.ReadString();
 
@@ -272,25 +255,22 @@ namespace Microsoft.Xna.Framework.Graphics
                     offsets[i] = (int)reader.ReadUInt16();
                 }
 
-                var buffer = new ConstantBuffer(graphics,
+                ConstantBuffers[c] = new ConstantBuffer(GraphicsDevice,
                                                 sizeInBytes,
                                                 parameters,
                                                 offsets,
-                                                name);
-                constantBuffers[c] = buffer;
+                                                name);                 
             }
 
-            return constantBuffers;
-        }
+            _shaders = new Shader[reader.ReadInt32()];
 
-        private static Shader[] ReadShaders(BinaryReaderEx reader, GraphicsDevice graphics)
-        {
-            var shaders = new Shader[reader.ReadInt32()];
+            for (var s = 0; s < _shaders.Length; s++)
+                _shaders[s] = new Shader(GraphicsDevice, reader);
 
-            for (var s = 0; s < shaders.Length; s++)
-                shaders[s] = new Shader(graphics, reader);
+            Parameters = ReadParameters(reader);            
+            Techniques = ReadTechniques(reader);
 
-            return shaders;
+            CurrentTechnique = Techniques[0];
         }
 
         private static EffectAnnotationCollection ReadAnnotations(BinaryReaderEx reader)
