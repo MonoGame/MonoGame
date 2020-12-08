@@ -232,7 +232,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Effect File Reader
 
-		private void ReadEffect (BinaryReaderEx reader)
+		private void ReadEffect (BinaryReader reader)
 		{
 			// TODO: Maybe we should be reading in a string 
 			// table here to save some bytes in the file.
@@ -267,13 +267,25 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var s = 0; s < _shaders.Length; s++)
                 _shaders[s] = new Shader(GraphicsDevice, reader);
 
-            Parameters = ReadParameters(reader);            
-            Techniques = ReadTechniques(reader);
+            Parameters = ReadParameters(reader);
+
+            var techniques = new EffectTechnique[reader.ReadInt32()];
+
+            for (var t = 0; t < techniques.Length; t++)
+            {
+                var name = reader.ReadString();
+                var annotations = ReadAnnotations(reader);
+                var passes = ReadPasses(reader, this, _shaders);
+
+                techniques[t] = new EffectTechnique(this, name, passes, annotations);
+            }
+
+            Techniques = new EffectTechniqueCollection(techniques);
 
             CurrentTechnique = Techniques[0];
         }
 
-        private static EffectAnnotationCollection ReadAnnotations(BinaryReaderEx reader)
+        private static EffectAnnotationCollection ReadAnnotations(BinaryReader reader)
         {
             var count = reader.ReadInt32();
             if (count == 0)
@@ -286,7 +298,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return new EffectAnnotationCollection(annotations);
         }
 
-        private static EffectPassCollection ReadPasses(BinaryReaderEx reader, Effect effect, Shader[] shaders)
+        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, Shader[] shaders)
         {
             var passes = new EffectPass[reader.ReadInt32()];
 
@@ -365,7 +377,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return new EffectPassCollection(passes);
 		}
 
-		private static EffectParameterCollection ReadParameters(BinaryReaderEx reader)
+		private static EffectParameterCollection ReadParameters(BinaryReader reader)
 		{
             var count = reader.ReadInt32();
             if (count == 0)
@@ -436,22 +448,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			return new EffectParameterCollection(parameters);
 		}
-
-        private EffectTechniqueCollection ReadTechniques(BinaryReaderEx reader)
-        {
-            var techniques = new EffectTechnique[reader.ReadInt32()];
-
-            for (var t = 0; t < techniques.Length; t++)
-            {
-                var name = reader.ReadString();
-                var annotations = ReadAnnotations(reader);
-                var passes = ReadPasses(reader, this, _shaders);
-
-                techniques[t] = new EffectTechnique(this, name, passes, annotations);
-            }
-
-            return new EffectTechniqueCollection(techniques);
-        }
 
         #endregion // Effect File Reader
     }
