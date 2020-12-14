@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public struct Quaternion : IEquatable<Quaternion>
+    public partial struct Quaternion : IEquatable<Quaternion>
     {
         #region Private Fields
 

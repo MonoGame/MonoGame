@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public struct Plane : IEquatable<Plane>
+    public partial struct Plane : IEquatable<Plane>
     {
         #region Public Fields
 

@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public struct Matrix : IEquatable<Matrix>
+    public partial struct Matrix : IEquatable<Matrix>
     {
         #region Public Constructors
 

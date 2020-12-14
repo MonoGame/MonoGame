@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework
 #endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public struct Vector3 : IEquatable<Vector3>
+    public partial struct Vector3 : IEquatable<Vector3>
     {
         #region Private Fields
 

@@ -1,4 +1,4 @@
-<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
     <TargetFramework>monoandroid90</TargetFramework>
@@ -13,6 +13,9 @@
 
   <ItemGroup>
     <Reference Include="System.Runtime.Serialization" />
+    <!-- System.Numerics.Vectors relationship with Android is a bit special;
+    the nuget is just a facade that points to the Android reference -->
+    <Reference Include="System.Numerics" />
   </ItemGroup>
 
   <ItemGroup>
