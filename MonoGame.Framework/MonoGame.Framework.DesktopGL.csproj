@@ -16,8 +16,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-
-  <!-- NetCore3.1, NetStandard2.1 and Net5 onwards already include Vectors-->
+  
   <ItemGroup>
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
   </ItemGroup>
