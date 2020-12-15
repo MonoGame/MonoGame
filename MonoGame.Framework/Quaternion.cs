@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public partial struct Quaternion : IEquatable<Quaternion>
+    public struct Quaternion : IEquatable<Quaternion>
     {
         #region Private Fields
 
@@ -1021,9 +1021,26 @@ namespace Microsoft.Xna.Framework
             w = W;
         }
 
+        /// <summary>
+        /// Returns a <see cref="System.Numerics.Quaternion"/>.
+        /// </summary>
+        public System.Numerics.Quaternion ToNumerics()
+        {
+            return new System.Numerics.Quaternion(this.X, this.Y, this.Z, this.W);
+        }
+
         #endregion
 
         #region Operators
+
+        /// <summary>
+        /// Constructs a 3d vector from a <see cref="System.Numerics.Quaternion"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        public static implicit operator Quaternion(System.Numerics.Quaternion value)
+        {
+            return new Quaternion(value.X, value.Y, value.Z, value.W);
+        }
 
         /// <summary>
         /// Adds two quaternions.

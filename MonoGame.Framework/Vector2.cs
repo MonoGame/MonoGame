@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework
 #endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public partial struct Vector2 : IEquatable<Vector2>
+    public struct Vector2 : IEquatable<Vector2>
     {
         #region Private Fields
 
@@ -121,6 +121,15 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         #region Operators
+
+        /// <summary>
+        /// Constructs a 2d vector from a <see cref="System.Numerics.Vector2"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        public static implicit operator Vector2(System.Numerics.Vector2 value)
+        {
+            return new Vector2(value.X, value.Y);
+        }
 
         /// <summary>
         /// Inverts values in the specified <see cref="Vector2"/>.
@@ -1254,6 +1263,14 @@ namespace Microsoft.Xna.Framework
         {
             x = X;
             y = Y;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.Numerics.Vector2"/>.
+        /// </summary>
+        public System.Numerics.Vector2 ToNumerics()
+        {
+            return new System.Numerics.Vector2(this.X, this.Y);
         }
 
         #endregion

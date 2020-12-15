@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework
 #endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public partial struct Vector4 : IEquatable<Vector4>
+    public struct Vector4 : IEquatable<Vector4>
     {
         #region Private Fields
 
@@ -1261,9 +1261,26 @@ namespace Microsoft.Xna.Framework
             w = W;
         }
 
+        /// <summary>
+        /// Returns a <see cref="System.Numerics.Vector4"/>.
+        /// </summary>
+        public System.Numerics.Vector4 ToNumerics()
+        {
+            return new System.Numerics.Vector4(this.X, this.Y, this.Z, this.W);
+        }
+
         #endregion
 
         #region Operators
+
+        /// <summary>
+        /// Constructs a 3d vector from a <see cref="System.Numerics.Vector4"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        public static implicit operator Vector4(System.Numerics.Vector4 value)
+        {
+            return new Vector4(value.X, value.Y, value.Z, value.W);
+        }
 
         /// <summary>
         /// Inverts values in the specified <see cref="Vector4"/>.

@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public partial struct Plane : IEquatable<Plane>
+    public struct Plane : IEquatable<Plane>
     {
         #region Public Fields
 
@@ -469,6 +469,27 @@ namespace Microsoft.Xna.Framework
         {
             normal = Normal;
             d = D;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.Numerics.Plane"/>.
+        /// </summary>
+        public System.Numerics.Plane ToNumerics()
+        {
+            return new System.Numerics.Plane(this.Normal.X, this.Normal.Y, this.Normal.Z, this.D);
+        }
+
+        #endregion
+
+        #region Operators
+
+        /// <summary>
+        /// Constructs a 3d vector from a <see cref="System.Numerics.Plane"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        public static implicit operator Plane(System.Numerics.Plane value)
+        {
+            return new Plane(value.Normal, value.D);
         }
 
         #endregion
