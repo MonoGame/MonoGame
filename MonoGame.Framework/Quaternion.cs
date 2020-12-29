@@ -1034,7 +1034,7 @@ namespace Microsoft.Xna.Framework
         #region Operators
 
         /// <summary>
-        /// Constructs a 3d vector from a <see cref="System.Numerics.Quaternion"/>.
+        /// Converts a <see cref="System.Numerics.Quaternion"/> to a <see cref="Quaternion"/>.
         /// </summary>
         /// <param name="value">The converted value.</param>
         public static implicit operator Quaternion(System.Numerics.Quaternion value)

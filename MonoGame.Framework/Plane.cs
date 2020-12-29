@@ -484,7 +484,7 @@ namespace Microsoft.Xna.Framework
         #region Operators
 
         /// <summary>
-        /// Constructs a 3d vector from a <see cref="System.Numerics.Plane"/>.
+        /// Converts a <see cref="System.Numerics.Plane"/> to a <see cref="Plane"/>.
         /// </summary>
         /// <param name="value">The converted value.</param>
         public static implicit operator Plane(System.Numerics.Plane value)

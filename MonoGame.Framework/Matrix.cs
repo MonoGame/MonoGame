@@ -2059,7 +2059,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs a 3d vector from a <see cref="System.Numerics.Matrix4x4"/>.
+        /// Converts a <see cref="System.Numerics.Matrix4x4"/> to a <see cref="Matrix"/>.
         /// </summary>
         /// <param name="value">The converted value.</param>
         public static implicit operator Matrix(System.Numerics.Matrix4x4 value)

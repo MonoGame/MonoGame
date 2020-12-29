@@ -123,7 +123,7 @@ namespace Microsoft.Xna.Framework
         #region Operators
 
         /// <summary>
-        /// Constructs a 2d vector from a <see cref="System.Numerics.Vector2"/>.
+        /// Converts a <see cref="System.Numerics.Vector2"/> to a <see cref="Vector2"/>.
         /// </summary>
         /// <param name="value">The converted value.</param>
         public static implicit operator Vector2(System.Numerics.Vector2 value)

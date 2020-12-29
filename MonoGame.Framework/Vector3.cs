@@ -1348,7 +1348,7 @@ namespace Microsoft.Xna.Framework
         #region Operators
 
         /// <summary>
-        /// Constructs a 3d vector from a <see cref="System.Numerics.Vector3"/>.
+        /// Converts a <see cref="System.Numerics.Vector3"/> to a <see cref="Vector3"/>.
         /// </summary>
         /// <param name="value">The converted value.</param>
         public static implicit operator Vector3(System.Numerics.Vector3 value)
