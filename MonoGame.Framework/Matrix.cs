@@ -2059,6 +2059,19 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Converts a <see cref="System.Numerics.Matrix4x4"/> to a <see cref="Matrix"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        public static implicit operator Matrix(System.Numerics.Matrix4x4 value)
+        {
+            return new Matrix(
+                value.M11, value.M12, value.M13, value.M14,
+                value.M21, value.M22, value.M23, value.M24,
+                value.M31, value.M32, value.M33, value.M34,
+                value.M41, value.M42, value.M43, value.M44);
+        }
+
+        /// <summary>
         /// Adds two matrixes.
         /// </summary>
         /// <param name="matrix1">Source <see cref="Matrix"/> on the left of the add sign.</param>
@@ -2451,10 +2464,23 @@ namespace Microsoft.Xna.Framework
             
             result = ret;
         }
+
+        /// <summary>
+        /// Returns a <see cref="System.Numerics.Matrix4x4"/>.
+        /// </summary>
+        public System.Numerics.Matrix4x4 ToNumerics()
+        {
+            return new System.Numerics.Matrix4x4(
+                this.M11, this.M12, this.M13, this.M14,
+                this.M21, this.M22, this.M23, this.M24,
+                this.M31, this.M32, this.M33, this.M34,
+                this.M41, this.M42, this.M43, this.M44);
+        }
+
         #endregion
-		
-		#region Private Static Methods
-        
+
+        #region Private Static Methods
+
         /// <summary>
         /// Helper method for using the Laplace expansion theorem using two rows expansions to calculate major and 
         /// minor determinants of a 4x4 matrix. This method is used for inverting a matrix.

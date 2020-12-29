@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Numerics" />
   </ItemGroup>
 
   <ItemGroup>
