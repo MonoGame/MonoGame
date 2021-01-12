@@ -73,7 +73,11 @@
     <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" />
     <Reference Include="..\..\ThirdParty\Dependencies\CppNet\CppNet.dll" />
   </ItemGroup>
-
+  
+  <Import Project="..\..\Switch\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Switch\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\..\XBoxOne\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\XBoxOne\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\..\PlayStation4\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\PlayStation4\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\..\PSVita\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\PSVita\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\Stadia\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Stadia\MonoGame.Effect.Compiler.targets')" />
 
 </Project>

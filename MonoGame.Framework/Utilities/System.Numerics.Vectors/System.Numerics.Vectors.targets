@@ -1,0 +1,12 @@
+<Project>
+
+  <ItemGroup>
+    <Compile Include="Matrix4x4.cs" />
+    <Compile Include="Plane.cs" />
+    <Compile Include="Quaternion.cs" />
+    <Compile Include="Vector2.cs" />
+    <Compile Include="Vector3.cs" />
+    <Compile Include="Vector4.cs" />
+  </ItemGroup>
+
+</Project>
