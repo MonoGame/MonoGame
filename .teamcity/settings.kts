@@ -184,7 +184,7 @@ object DevelopWin : BuildType({
     features {
         feature {
             type = "teamcity.github.status"
-            param("guthub_context", "Build Windows, Web, Android, and OUYA")
+            param("guthub_context", "Build Windows, Web, and Android")
             param("guthub_owner", "MonoGame")
             param("guthub_authentication_type", "token")
             param("guthub_guest", "true")
