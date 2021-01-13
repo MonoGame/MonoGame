@@ -216,12 +216,16 @@ namespace MonoGame.Tools.Pipeline
 
         public void OutputAppend(string text)
         {
+#if !IDE
             Application.Instance.AsyncInvoke(() => buildOutput.WriteLine(text));
+#endif
         }
 
         public void OutputClear()
         {
+#if !IDE
             Application.Instance.Invoke(() => buildOutput.ClearOutput());
+#endif
         }
 
         public bool ShowDeleteDialog(List<IProjectItem> items)
