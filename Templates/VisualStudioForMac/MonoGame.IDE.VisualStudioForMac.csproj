@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <BaseOutputPath>..\..\Artifacts\VisualStudioForMac</BaseOutputPath>
     <DefineConstants>IDE;MONOMAC;MAC</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MonoDevelop.Addins" Version="0.4.7" />
-    <PackageReference Include="Eto.Forms" Version="2.5.6" />
-    <PackageReference Include="Eto.Platform.Gtk2" Version="2.5.6" />
+    <PackageReference Include="Eto.Forms" Version="2.5.10" />
+    <PackageReference Include="Eto.Platform.Gtk2" Version="2.5.10" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Templates\" />
