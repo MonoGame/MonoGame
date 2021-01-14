@@ -49,6 +49,8 @@ namespace Microsoft.Xna.Framework.Windows
 
         public const int WM_SYSCOMMAND = 0x0112;
 
+        public const int WM_ACTIVATE = 0x0006;
+
         public bool AllowAltF4 = true;
 
         internal bool IsResizing { get; set; }
@@ -114,6 +116,14 @@ namespace Microsoft.Xna.Framework.Windows
                 case WM_KEYUP:
                 case WM_SYSKEYUP:
                     HandleKeyMessage(ref m);
+                    break;
+                case WM_ACTIVATE:
+                    bool minimized = ((m.WParam.ToInt32() & 0xFFFF0000) >> 16) != 0;
+                    bool activated = m.WParam != IntPtr.Zero;
+
+                    if (activated && !minimized)
+                        _window.OnActivated(this, null);
+
                     break;
 #endif
                 case WM_SYSCOMMAND:

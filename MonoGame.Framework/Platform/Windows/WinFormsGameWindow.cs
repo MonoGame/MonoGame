@@ -162,7 +162,6 @@ namespace MonoGame.Framework
             _resizeTickTimer = new System.Timers.Timer(1) { SynchronizingObject = Form, AutoReset = false };
             _resizeTickTimer.Elapsed += OnResizeTick;
 
-            Form.Activated += OnActivated;
             Form.Deactivate += OnDeactivate;
             Form.Resize += OnResize;
             Form.ResizeBegin += OnResizeBegin;
@@ -234,7 +233,7 @@ namespace MonoGame.Framework
             }
         }
 
-        private void OnActivated(object sender, EventArgs eventArgs)
+        internal void OnActivated(object sender, EventArgs eventArgs)
         {
             _platform.IsActive = true;
             Keyboard.SetActive(true);
