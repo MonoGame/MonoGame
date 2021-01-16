@@ -65,6 +65,11 @@ namespace MonoGame.Framework.Utilities
             if (ret == IntPtr.Zero)
                 ret = LoadLibrary(Path.Combine(assemblyLocation, libname));
 
+            // Try alternate way of checking current folder
+            // assemblyLocation is null if we are inside macOS app bundle
+            if (ret == IntPtr.Zero)
+                ret = LoadLibrary(Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, libname));
+
             // Try loading system library
             if (ret == IntPtr.Zero)
                 ret = LoadLibrary(libname);

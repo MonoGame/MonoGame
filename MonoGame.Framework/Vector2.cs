@@ -123,6 +123,15 @@ namespace Microsoft.Xna.Framework
         #region Operators
 
         /// <summary>
+        /// Converts a <see cref="System.Numerics.Vector2"/> to a <see cref="Vector2"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        public static implicit operator Vector2(System.Numerics.Vector2 value)
+        {
+            return new Vector2(value.X, value.Y);
+        }
+
+        /// <summary>
         /// Inverts values in the specified <see cref="Vector2"/>.
         /// </summary>
         /// <param name="value">Source <see cref="Vector2"/> on the right of the sub sign.</param>
@@ -1254,6 +1263,14 @@ namespace Microsoft.Xna.Framework
         {
             x = X;
             y = Y;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.Numerics.Vector2"/>.
+        /// </summary>
+        public System.Numerics.Vector2 ToNumerics()
+        {
+            return new System.Numerics.Vector2(this.X, this.Y);
         }
 
         #endregion
