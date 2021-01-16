@@ -25,7 +25,7 @@ SCRIPT_DIR="$TEMP_DIR/winemg2"
 mkdir -p "$SCRIPT_DIR"
 
 # get dotnet
-DOTNET_URL="https://download.visualstudio.microsoft.com/download/pr/adeab8b1-1c44-41b2-b12a-156442f307e9/65ebf805366410c63edeb06e53959383/dotnet-sdk-3.1.201-win-x64.zip"
+DOTNET_URL="https://download.visualstudio.microsoft.com/download/pr/4263dc3b-dc67-4f11-8d46-cc0ae86a232e/66782bbd04c53651f730b2e30a873f18/dotnet-sdk-5.0.203-win-x64.exe"
 curl $DOTNET_URL --output "$SCRIPT_DIR/dotnet-sdk.zip"
 7z x "$SCRIPT_DIR/dotnet-sdk.zip" -o"$WINEPREFIX/drive_c/windows/system32/"
 

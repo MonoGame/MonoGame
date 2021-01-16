@@ -23,11 +23,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Content.Builder.Ed
 		{B3201192-46D5-40C5-A24E-493EC66D8C9B} = {B3201192-46D5-40C5-A24E-493EC66D8C9B}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Content.Builder.Editor", "Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.csproj", "{F673A915-308F-4111-8950-A5755BE5CEEA}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{856138C5-73E5-4FAD-9F07-BDEEFAFD8285}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Packaging.Flatpak", "Tools\MonoGame.Packaging.Flatpak\MonoGame.Packaging.Flatpak.csproj", "{2AAE746F-0EBE-48B4-8657-2B469B3E1C8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor.Launcher", "Tools\MonoGame.Content.Builder.Editor.Launcher\MonoGame.Content.Builder.Editor.Launcher.csproj", "{E0804E98-4464-4E27-BEA8-3F223F7F0F00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -147,6 +147,18 @@ Global
 		{2AAE746F-0EBE-48B4-8657-2B469B3E1C8F}.Release|x64.Build.0 = Release|Any CPU
 		{2AAE746F-0EBE-48B4-8657-2B469B3E1C8F}.Release|x86.ActiveCfg = Release|Any CPU
 		{2AAE746F-0EBE-48B4-8657-2B469B3E1C8F}.Release|x86.Build.0 = Release|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Debug|x64.Build.0 = Debug|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Debug|x86.Build.0 = Debug|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Release|x64.ActiveCfg = Release|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Release|x64.Build.0 = Release|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Release|x86.ActiveCfg = Release|Any CPU
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -156,5 +168,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2AAE746F-0EBE-48B4-8657-2B469B3E1C8F} = {856138C5-73E5-4FAD-9F07-BDEEFAFD8285}
+		{E0804E98-4464-4E27-BEA8-3F223F7F0F00} = {856138C5-73E5-4FAD-9F07-BDEEFAFD8285}
 	EndGlobalSection
 EndGlobal
