@@ -75,7 +75,7 @@
       <ContentReference>
         <ContentDir>%(ContentFolder)/</ContentDir>
         <ContentOutputDir>%(FullDir)bin/$(MonoGamePlatform)/%(OutputFolder)</ContentOutputDir>
-        <ContentIntermediateOutputDir>%(FullDir)obj/$(MonoGamePlatform)/%(OutputFolder)</ContentIntermediateOutputDir>
+        <ContentIntermediateOutputDir>%(FullDir)obj/$(MonoGamePlatform)/$(TargetFramework)/%(OutputFolder)</ContentIntermediateOutputDir>
       </ContentReference>
 
     </ItemGroup>
