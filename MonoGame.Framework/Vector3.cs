@@ -307,9 +307,9 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Ceiling()
         {
-            X = (float)Math.Ceiling(X);
-            Y = (float)Math.Ceiling(Y);
-            Z = (float)Math.Ceiling(Z);
+            X = MathF.Ceiling(X);
+            Y = MathF.Ceiling(Y);
+            Z = MathF.Ceiling(Z);
         }
 
         /// <summary>
@@ -319,9 +319,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector3"/>.</returns>
         public static Vector3 Ceiling(Vector3 value)
         {
-            value.X = (float)Math.Ceiling(value.X);
-            value.Y = (float)Math.Ceiling(value.Y);
-            value.Z = (float)Math.Ceiling(value.Z);
+            value.X = MathF.Ceiling(value.X);
+            value.Y = MathF.Ceiling(value.Y);
+            value.Z = MathF.Ceiling(value.Z);
             return value;
         }
 
@@ -332,9 +332,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The rounded <see cref="Vector3"/>.</param>
         public static void Ceiling(ref Vector3 value, out Vector3 result)
         {
-            result.X = (float)Math.Ceiling(value.X);
-            result.Y = (float)Math.Ceiling(value.Y);
-            result.Z = (float)Math.Ceiling(value.Z);
+            result.X = MathF.Ceiling(value.X);
+            result.Y = MathF.Ceiling(value.Y);
+            result.Z = MathF.Ceiling(value.Z);
         }
 
         /// <summary>
@@ -404,7 +404,7 @@ namespace Microsoft.Xna.Framework
         {
             float result;
             DistanceSquared(ref value1, ref value2, out result);
-            return (float)Math.Sqrt(result);
+            return MathF.Sqrt(result);
         }
 
         /// <summary>
@@ -416,7 +416,7 @@ namespace Microsoft.Xna.Framework
         public static void Distance(ref Vector3 value1, ref Vector3 value2, out float result)
         {
             DistanceSquared(ref value1, ref value2, out result);
-            result = (float)Math.Sqrt(result);
+            result = MathF.Sqrt(result);
         }
 
         /// <summary>
@@ -556,9 +556,9 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Floor()
         {
-            X = (float)Math.Floor(X);
-            Y = (float)Math.Floor(Y);
-            Z = (float)Math.Floor(Z);
+            X = MathF.Floor(X);
+            Y = MathF.Floor(Y);
+            Z = MathF.Floor(Z);
         }
 
         /// <summary>
@@ -568,9 +568,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector3"/>.</returns>
         public static Vector3 Floor(Vector3 value)
         {
-            value.X = (float)Math.Floor(value.X);
-            value.Y = (float)Math.Floor(value.Y);
-            value.Z = (float)Math.Floor(value.Z);
+            value.X = MathF.Floor(value.X);
+            value.Y = MathF.Floor(value.Y);
+            value.Z = MathF.Floor(value.Z);
             return value;
         }
 
@@ -581,9 +581,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The rounded <see cref="Vector3"/>.</param>
         public static void Floor(ref Vector3 value, out Vector3 result)
         {
-            result.X = (float)Math.Floor(value.X);
-            result.Y = (float)Math.Floor(value.Y);
-            result.Z = (float)Math.Floor(value.Z);
+            result.X = MathF.Floor(value.X);
+            result.Y = MathF.Floor(value.Y);
+            result.Z = MathF.Floor(value.Z);
         }
 
         /// <summary>
@@ -638,7 +638,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The length of this <see cref="Vector3"/>.</returns>
         public float Length()
         {
-            return (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z));
+            return MathF.Sqrt((X * X) + (Y * Y) + (Z * Z));
         }
 
         /// <summary>
@@ -850,7 +850,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Normalize()
         {
-            float factor = (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z));
+            float factor = MathF.Sqrt((X * X) + (Y * Y) + (Z * Z));
             factor = 1f / factor;
             X *= factor;
             Y *= factor;
@@ -864,7 +864,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector3 Normalize(Vector3 value)
         {
-            float factor = (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z));
+            float factor = MathF.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z));
             factor = 1f / factor;
             return new Vector3(value.X * factor, value.Y * factor, value.Z * factor);
         }
@@ -876,7 +876,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Unit vector as an output parameter.</param>
         public static void Normalize(ref Vector3 value, out Vector3 result)
         {
-            float factor = (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z));
+            float factor = MathF.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z));
             factor = 1f / factor;
             result.X = value.X * factor;
             result.Y = value.Y * factor;
@@ -928,9 +928,9 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Round()
         {
-            X = (float)Math.Round(X);
-            Y = (float)Math.Round(Y);
-            Z = (float)Math.Round(Z);
+            X = MathF.Round(X);
+            Y = MathF.Round(Y);
+            Z = MathF.Round(Z);
         }
 
         /// <summary>
@@ -940,9 +940,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector3"/>.</returns>
         public static Vector3 Round(Vector3 value)
         {
-            value.X = (float)Math.Round(value.X);
-            value.Y = (float)Math.Round(value.Y);
-            value.Z = (float)Math.Round(value.Z);
+            value.X = MathF.Round(value.X);
+            value.Y = MathF.Round(value.Y);
+            value.Z = MathF.Round(value.Z);
             return value;
         }
 
@@ -953,9 +953,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The rounded <see cref="Vector3"/>.</param>
         public static void Round(ref Vector3 value, out Vector3 result)
         {
-            result.X = (float)Math.Round(value.X);
-            result.Y = (float)Math.Round(value.Y);
-            result.Z = (float)Math.Round(value.Z);
+            result.X = MathF.Round(value.X);
+            result.Y = MathF.Round(value.Y);
+            result.Z = MathF.Round(value.Z);
         }
 
         /// <summary>
