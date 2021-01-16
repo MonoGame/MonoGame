@@ -128,10 +128,6 @@ namespace Microsoft.Xna.Framework
                         Mouse.ScrollY += ev.Wheel.Y * wheelDelta;
                         Mouse.ScrollX += ev.Wheel.X * wheelDelta;
                         break;
-                    case Sdl.EventType.MouseMotion:
-                        Window.MouseState.X = ev.Motion.X;
-                        Window.MouseState.Y = ev.Motion.Y;
-                        break;
                     case Sdl.EventType.KeyDown:
                     {
                         var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);

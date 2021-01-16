@@ -25,26 +25,19 @@ namespace Microsoft.Xna.Framework.Input
             int x, y;
             var winFlags = Sdl.Window.GetWindowFlags(window.Handle);
             var state = Sdl.Mouse.GetGlobalState(out x, out y);
+            var clientBounds = window.ClientBounds;
 
-            if ((winFlags & Sdl.Window.State.MouseFocus) != 0)
-            {
-                // Window has mouse focus, position will be set from the motion event
-                window.MouseState.LeftButton = (state & Sdl.Mouse.Button.Left) != 0 ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.MiddleButton = (state & Sdl.Mouse.Button.Middle) != 0 ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.RightButton = (state & Sdl.Mouse.Button.Right) != 0 ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.XButton1 = (state & Sdl.Mouse.Button.X1Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.XButton2 = (state & Sdl.Mouse.Button.X2Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.LeftButton = (state & Sdl.Mouse.Button.Left) != 0 ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.MiddleButton = (state & Sdl.Mouse.Button.Middle) != 0 ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.RightButton = (state & Sdl.Mouse.Button.Right) != 0 ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.XButton1 = (state & Sdl.Mouse.Button.X1Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.XButton2 = (state & Sdl.Mouse.Button.X2Mask) != 0 ? ButtonState.Pressed : ButtonState.Released;
 
-                window.MouseState.HorizontalScrollWheelValue = ScrollX;
-                window.MouseState.ScrollWheelValue = ScrollY;
-            }
-            else
-            {
-                // Window does not have mouse focus, we need to manually get the position
-                var clientBounds = window.ClientBounds;
-                window.MouseState.X = x - clientBounds.X;
-                window.MouseState.Y = y - clientBounds.Y;
-            }
+            window.MouseState.HorizontalScrollWheelValue = ScrollX;
+            window.MouseState.ScrollWheelValue = ScrollY;
+
+            window.MouseState.X = x - clientBounds.X;
+            window.MouseState.Y = y - clientBounds.Y;
 
             return window.MouseState;
         }
