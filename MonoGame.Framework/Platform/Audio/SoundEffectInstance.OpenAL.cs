@@ -170,6 +170,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformStop(bool immediate)
         {
             FreeSource();
+            pauseCount = 0;
             SoundState = SoundState.Stopped;
         }
 
