@@ -19,6 +19,6 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// The paths of dropped files
         /// </summary>
-        public readonly string[] Files;
+        public string[] Files { get; private set; }
     }
 }
