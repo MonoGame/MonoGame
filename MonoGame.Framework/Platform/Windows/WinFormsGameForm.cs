@@ -214,8 +214,6 @@ namespace Microsoft.Xna.Framework.Windows
 
         void HandleDropMessage(ref Message m)
         {
-            if (!_window.IsFileDropHandled) return;
-
             IntPtr hdrop = m.WParam;
             StringBuilder builder = new StringBuilder();
 

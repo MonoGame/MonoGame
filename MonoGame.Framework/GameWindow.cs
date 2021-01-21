@@ -163,8 +163,6 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public event EventHandler<FileDropEventArgs> FileDrop;
 
-        internal bool IsFileDropHandled { get { return FileDrop != null; } }
-
         #endregion Events
 
         /// <summary>
