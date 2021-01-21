@@ -307,7 +307,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
             // which avoids the native call and is actually more accurate.
-             var pitch = MathF.Pow(2.0f, value);
+             var pitch = (float)Math.Pow(2.0, value);
              _voice.SetFrequencyRatio(pitch);
         }
 
