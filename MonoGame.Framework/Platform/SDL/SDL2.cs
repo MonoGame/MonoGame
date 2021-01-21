@@ -83,6 +83,9 @@ internal static class Sdl
         ClipboardUpdate = 0x900,
 
         DropFile = 0x1000,
+        DropText = 0x1001,
+        DropBegin = 0x1002,
+        DropComplete = 0x1003,
 
         AudioDeviceAdded = 0x1100,
         AudioDeviceRemoved = 0x1101,
@@ -123,6 +126,8 @@ internal static class Sdl
         public Joystick.DeviceEvent JoystickDevice;
         [FieldOffset(0)]
         public GameController.DeviceEvent ControllerDevice;
+        [FieldOffset(0)]
+        public Drop.Event Drop;
     }
 
     public struct Rectangle
@@ -1105,5 +1110,21 @@ internal static class Sdl
         {
             GetError(SDL_HapticUpdateEffect(haptic, effect, ref data));
         }
+    }
+
+    public static class Drop
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Event
+        {
+            public EventType Type;
+            public uint TimeStamp;
+            public IntPtr File;
+            public uint WindowId;
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public unsafe delegate void d_sdl_free(IntPtr ptr);
+        public static d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
     }
 }

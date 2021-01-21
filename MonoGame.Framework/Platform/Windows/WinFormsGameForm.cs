@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input.Touch;
 using MonoGame.Framework;
@@ -46,6 +48,7 @@ namespace Microsoft.Xna.Framework.Windows
 
         public const int WM_ENTERSIZEMOVE = 0x0231;
         public const int WM_EXITSIZEMOVE = 0x0232;
+        public const int WM_DROPFILES = 0x0233;
 
         public const int WM_SYSCOMMAND = 0x0112;
 
@@ -114,6 +117,10 @@ namespace Microsoft.Xna.Framework.Windows
                 case WM_KEYUP:
                 case WM_SYSKEYUP:
                     HandleKeyMessage(ref m);
+                    break;
+
+                case WM_DROPFILES:
+                    HandleDropMessage(ref m);
                     break;
 #endif
                 case WM_SYSCOMMAND:
@@ -199,6 +206,29 @@ namespace Microsoft.Xna.Framework.Windows
                 }
             }
 
+        }
+
+        [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+        private static extern uint DragQueryFile(IntPtr hDrop, uint iFile,
+            [Out] StringBuilder lpszFile, uint cch);
+
+        void HandleDropMessage(ref Message m)
+        {
+            IntPtr hdrop = m.WParam;
+            StringBuilder builder = new StringBuilder();
+
+            uint count = DragQueryFile(hdrop, uint.MaxValue, null, 0);
+
+            string[] files = new string[count];
+            for (uint i = 0; i < count; i++)
+            {
+                DragQueryFile(hdrop, i, builder, int.MaxValue);
+                files[i] = builder.ToString();
+                builder.Clear();
+            }
+
+            _window.OnFileDrop(new FileDropEventArgs(files));
+            m.Result = IntPtr.Zero;
         }
 
         private static Microsoft.Xna.Framework.Input.Keys KeyCodeTranslate(
