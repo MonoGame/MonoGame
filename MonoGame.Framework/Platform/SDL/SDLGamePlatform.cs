@@ -243,23 +243,14 @@ namespace Microsoft.Xna.Framework
                         if (ev.Drop.WindowId != _view.Id)
                             break;
 
-                        if (!_view.IsFileDropHandled)
-                            break;
-
-                        unsafe
-                        {
-                            string path = InteropHelpers.Utf8ToString((IntPtr)ev.Drop.File);
-                            Sdl.Drop.SDL_Free(ev.Drop.File);
-                            _dropList.Add(path);
-                        }
+                        string path = InteropHelpers.Utf8ToString(ev.Drop.File);
+                        Sdl.Drop.SDL_Free(ev.Drop.File);
+                        _dropList.Add(path);
 
                         break;
 
                     case Sdl.EventType.DropComplete:
                         if (ev.Drop.WindowId != _view.Id)
-                            break;
-
-                        if (!_view.IsFileDropHandled)
                             break;
 
                         if (_dropList.Count > 0)

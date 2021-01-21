@@ -1119,12 +1119,12 @@ internal static class Sdl
         {
             public EventType Type;
             public uint TimeStamp;
-            public char* File;
+            public IntPtr File;
             public uint WindowId;
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public unsafe delegate void d_sdl_free(void* ptr);
+        public unsafe delegate void d_sdl_free(IntPtr ptr);
         public static d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
     }
 }
