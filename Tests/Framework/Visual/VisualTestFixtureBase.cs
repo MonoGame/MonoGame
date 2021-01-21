@@ -194,7 +194,7 @@ namespace MonoGame.Tests.Visual {
 				var b = FramePixelData.FromFile (result.CapturedImagePath);
 				var diff = CreateDiff (a, b);
 				Normalize (diff);
-				diff.Save (diffOutputPath);
+				diff.Save (diffOutputPath, "Diff");
 			}
 		}
 

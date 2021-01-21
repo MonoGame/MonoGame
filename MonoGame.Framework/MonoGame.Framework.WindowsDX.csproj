@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <TargetFrameworks>net452;netcoreapp3.1</TargetFrameworks>
@@ -78,6 +78,10 @@
     <PackageReference Version="4.0.1" Include="SharpDX.MediaFoundation" />
     <PackageReference Version="4.0.1" Include="SharpDX.XAudio2" />
     <PackageReference Version="4.0.1" Include="SharpDX.XInput" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
   </ItemGroup>
 
   <Import Project="Platform\DirectX.targets" />

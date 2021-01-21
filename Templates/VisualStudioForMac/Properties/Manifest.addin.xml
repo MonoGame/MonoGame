@@ -91,6 +91,9 @@
 		<MimeType id="x-mgcb" _description="MonoGame Content Build File" icon="monogame-project-icon" isText="false">
 			<File pattern="*.mgcb" />
 		</MimeType>
+        <MimeType id="text/x-spritefont" _description="MonoGame Sprite Font Configuration File" baseType="application/xml" insertbefore="application/xml">
+            <File pattern="*.spritefont" />
+        </MimeType>
 	</Extension>
 	<Extension path="/MonoDevelop/Ide/DisplayBindings">
         <DisplayBinding id="MGCBPadBinding" insertbefore="DefaultDisplayBinding" class="MonoGame.IDE.VisualStudioForMac.MGCBPadBinding" />

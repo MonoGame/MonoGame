@@ -1,6 +1,6 @@
 # .NET Core CLI
 
-This guide will walk you through building a starter game with MonoGame using only the command line/terminal on your operating system and lightweight coding tool of choice (such as [Visual Studio Code](https://code.visualstudio.com/).
+This guide will walk you through building a starter game with MonoGame using only the command line/terminal on your operating system and a lightweight coding tool of your choice (such as [Visual Studio Code](https://code.visualstudio.com/).
 
 ## Create a MonoGame Project
 
@@ -18,7 +18,7 @@ For example:
 dotnet new mgdesktopgl -o MyGame
 ```
 
-> To know which platform identifier (short name) to use for your project, please refer to [Target Platforms](~/articles/platforms/0_platforms.md) or type the following command to the command prompt to list the installed templates and their corresponding short names:
+> To know which platform identifier (short name) to use for your project, please refer to [Target Platforms](~/articles/platforms/0_platforms.md), or type the following command into the command prompt to list the installed templates and their corresponding short names:
 > 
 > ```
 > dotnet new -l

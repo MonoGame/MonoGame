@@ -30,8 +30,8 @@ namespace Microsoft.Xna.Framework
         public static float PerpendicularDistance(ref Vector3 point, ref Plane plane)
         {
             // dist = (ax + by + cz + d) / sqrt(a*a + b*b + c*c)
-            return (float)Math.Abs((plane.Normal.X * point.X + plane.Normal.Y * point.Y + plane.Normal.Z * point.Z)
-                                    / Math.Sqrt(plane.Normal.X * plane.Normal.X + plane.Normal.Y * plane.Normal.Y + plane.Normal.Z * plane.Normal.Z));
+            return Math.Abs((plane.Normal.X * point.X + plane.Normal.Y * point.Y + plane.Normal.Z * point.Z)
+                            / MathF.Sqrt(plane.Normal.X * plane.Normal.X + plane.Normal.Y * plane.Normal.Y + plane.Normal.Z * plane.Normal.Z));
         }
     }
 	
@@ -469,6 +469,27 @@ namespace Microsoft.Xna.Framework
         {
             normal = Normal;
             d = D;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.Numerics.Plane"/>.
+        /// </summary>
+        public System.Numerics.Plane ToNumerics()
+        {
+            return new System.Numerics.Plane(this.Normal.X, this.Normal.Y, this.Normal.Z, this.D);
+        }
+
+        #endregion
+
+        #region Operators
+
+        /// <summary>
+        /// Converts a <see cref="System.Numerics.Plane"/> to a <see cref="Plane"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        public static implicit operator Plane(System.Numerics.Plane value)
+        {
+            return new Plane(value.Normal, value.D);
         }
 
         #endregion

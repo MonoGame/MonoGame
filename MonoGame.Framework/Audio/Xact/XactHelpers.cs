@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Audio
         public static float ParseVolumeFromDecibels(float decibles)
         {
             // Convert from decibles to linear volume.
-            return (float)Math.Pow(10.0, decibles / 20.0);
+            return MathF.Pow(10.0f, decibles / 20.0f);
         }
 	}
 }

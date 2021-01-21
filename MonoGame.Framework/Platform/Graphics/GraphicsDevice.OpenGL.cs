@@ -116,6 +116,7 @@ namespace Microsoft.Xna.Framework.Graphics
         static readonly float[] _posFixup = new float[4];
 
         private static BufferBindingInfo[] _bufferBindingInfos;
+        private static int _activeBufferBindingInfosCount;
         private static bool[] _newEnabledVertexAttributes;
         internal static readonly List<int> _enabledVertexAttributes = new List<int>();
         internal static bool _attribsDirty;
@@ -187,6 +188,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var offset = (IntPtr)(vertexDeclaration.VertexStride * (baseVertex + vertexBufferBinding.VertexOffset));
 
                 if (!_attribsDirty &&
+                    slot < _activeBufferBindingInfosCount &&
                     _bufferBindingInfos[slot].VertexOffset == offset &&
                     ReferenceEquals(_bufferBindingInfos[slot].AttributeInfo, attrInfo) &&
                     _bufferBindingInfos[slot].InstanceFrequency == vertexBufferBinding.InstanceFrequency &&
@@ -234,6 +236,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     foreach (var element in _bufferBindingInfos[slot].AttributeInfo.Elements)
                         _newEnabledVertexAttributes[element.AttributeLocation] = true;
                 }
+                _activeBufferBindingInfosCount = _vertexBuffers.Count;
             }
             SetVertexAttributeArray(_newEnabledVertexAttributes);
         }
