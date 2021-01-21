@@ -248,17 +248,8 @@ namespace Microsoft.Xna.Framework
 
                         unsafe
                         {
-                            byte* ptr = (byte*)ev.Drop.File;
-
-                            int len = 0;
-                            while (*(ptr + len) != 0) ++len;
-
-                            byte[] buffer = new byte[len];
-                            Marshal.Copy((IntPtr)ptr, buffer, 0, buffer.Length);
-
-                            string path = Encoding.UTF8.GetString(buffer, 0, len);
+                            string path = InteropHelpers.Utf8ToString((IntPtr)ev.Drop.File);
                             Sdl.Drop.SDL_Free(ev.Drop.File);
-
                             _dropList.Add(path);
                         }
 
