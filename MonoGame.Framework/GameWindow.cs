@@ -252,12 +252,10 @@ namespace Microsoft.Xna.Framework
 	    }
 #endif
 
-#if WINDOWS || DESKTOPGL || ANGLE
         internal void OnFileDrop(FileDropEventArgs e)
         {
             EventHelpers.Raise(this, FileDrop, e);
         }
-#endif
 
         protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 
