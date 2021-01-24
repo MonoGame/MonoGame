@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Graphics;
 using StbImageSharp;
 using StbImageWriteSharp;
 using System;
@@ -13,12 +14,6 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-            // Rewind stream if it is at end
-            if (stream.CanSeek && stream.Length == stream.Position)
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-            }
-
             ImageResult result;
             if (stream.CanSeek)
             {
