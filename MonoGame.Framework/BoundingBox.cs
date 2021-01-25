@@ -142,7 +142,14 @@ namespace Microsoft.Xna.Framework
 
             }
 
-            // If we get here, then we know all the points were outside the box, and therefore Disjoint
+            // If we get here, then we know all the points were outside the box. It's possible that the box is actually
+            // contained inside the Fustrum, so we check for that intersection here
+            var thisBox = this;
+            frustum.Contains(ref thisBox, out contained);
+            if (contained != ContainmentType.Disjoint)
+                return ContainmentType.Intersects;
+
+            //If the box is not inside the Fustrum, and the Fustrum is fully outside the box, they are definitely Disjoint
             return ContainmentType.Disjoint;
         }
 
