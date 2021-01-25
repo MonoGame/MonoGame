@@ -130,7 +130,7 @@ namespace Microsoft.Xna.Framework
                 return ContainmentType.Intersects;
 
 
-            // If we get here it means the first (and only) point we checked was outside the frustum, so we assume
+            // If we get here it means the first (and only) point we checked was outside the bounding box, so we assume
             // that all other points will be as well.
             // If one of the points is contained, we can exit immediately saying that the result is Intersects
             i++;
@@ -142,7 +142,7 @@ namespace Microsoft.Xna.Framework
 
             }
 
-            // If we get here, then we know all the points were actually contained, therefore result is Contains
+            // If we get here, then we know all the points were outside the box, and therefore Disjoint
             return ContainmentType.Disjoint;
         }
 
