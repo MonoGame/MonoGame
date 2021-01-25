@@ -4,7 +4,6 @@
 
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using MonoGame.Framework.Utilities;
 
@@ -19,10 +18,10 @@ namespace Microsoft.Xna.Framework.Graphics
             SwapChainRenderTarget,
         }
 
-		internal int width;
-		internal int height;
+        internal int width;
+        internal int height;
         internal int ArraySize;
-                
+
         internal float TexelWidth { get; private set; }
         internal float TexelHeight { get; private set; }
 
@@ -33,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-				return new Rectangle(0, 0, this.width, this.height);
+                return new Rectangle(0, 0, this.width, this.height);
             }
         }
 
@@ -74,7 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, int arraySize)
             : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, arraySize)
         {
-            
+
         }
 
         /// <summary>
@@ -90,15 +89,15 @@ namespace Microsoft.Xna.Framework.Graphics
             : this(graphicsDevice, width, height, mipmap, format, type, false, 1)
         {
         }
-        
+
         protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared, int arraySize)
-		{
+        {
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
             if (width <= 0)
-                throw new ArgumentOutOfRangeException("width","Texture width must be greater than zero");
+                throw new ArgumentOutOfRangeException("width", "Texture width must be greater than zero");
             if (height <= 0)
-                throw new ArgumentOutOfRangeException("height","Texture height must be greater than zero");
+                throw new ArgumentOutOfRangeException("height", "Texture height must be greater than zero");
             if (arraySize > 1 && !graphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
                 throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySize");
 
@@ -113,8 +112,8 @@ namespace Microsoft.Xna.Framework.Graphics
             this.ArraySize = arraySize;
 
             // Texture will be assigned by the swap chain.
-		    if (type == SurfaceType.SwapChainRenderTarget)
-		        return;
+            if (type == SurfaceType.SwapChainRenderTarget)
+                return;
 
             PlatformConstruct(width, height, mipmap, format, type, shared);
         }
@@ -169,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">New data for the texture</param>
         /// <param name="startIndex">Start position of data</param>
         /// <param name="elementCount"></param>
-        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
+        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             Rectangle checkedRect;
             ValidateParams(level, 0, rect, data, startIndex, elementCount, out checkedRect);
@@ -186,20 +185,20 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">New data for the texture</param>
         /// <param name="startIndex">Start position of data</param>
         /// <param name="elementCount"></param>
-		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
             Rectangle checkedRect;
             ValidateParams(0, 0, null, data, startIndex, elementCount, out checkedRect);
             PlatformSetData(0, data, startIndex, elementCount);
         }
 
-		/// <summary>
+        /// <summary>
         /// Changes the texture's pixels
         /// </summary>
         /// <typeparam name="T">New data for the texture</typeparam>
         /// <param name="data"></param>
-		public void SetData<T>(T[] data) where T : struct
-		{
+        public void SetData<T>(T[] data) where T : struct
+        {
             Rectangle checkedRect;
             ValidateParams(0, 0, null, data, 0, data.Length, out checkedRect);
             PlatformSetData(0, data, 0, data.Length);
@@ -249,10 +248,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">Destination array for the texture data</param>
         /// <param name="startIndex">First position in data where to write the pixel data</param>
         /// <param name="elementCount">Number of pixels to read</param>
-		public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
-		{
-			this.GetData(0, null, data, startIndex, elementCount);
-		}
+        public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+            this.GetData(0, null, data, startIndex, elementCount);
+        }
 
         /// <summary>
         /// Retrieves the contents of the texture
@@ -261,12 +260,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data">Destination array for the texture data</param>
-        public void GetData<T> (T[] data) where T : struct
-		{
-		    if (data == null)
-		        throw new ArgumentNullException("data");
-			this.GetData(0, null, data, 0, data.Length);
-		}
+        public void GetData<T>(T[] data) where T : struct
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            this.GetData(0, null, data, 0, data.Length);
+        }
 
         /// <summary>
         /// Creates a <see cref="Texture2D"/> from a file, supported formats bmp, gif, jpg, png, tif and dds (only for simple textures).
@@ -301,7 +300,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// result in black color data.
         /// </remarks>
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
-		{
+        {
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
             if (stream == null)
@@ -311,7 +310,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 return PlatformFromStream(graphicsDevice, stream);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new InvalidOperationException("This image format is not supported", e);
             }
@@ -357,8 +356,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void ValidateParams<T>(int level, int arraySlice, Rectangle? rect, T[] data,
-            int startIndex, int elementCount, out Rectangle checkedRect) where T : struct
+        private void ValidateParams<T>(
+            int level, int arraySlice, Rectangle? rect, out int tSize, out int dataByteSize, out Rectangle checkedRect)
+            where T : struct
         {
             var textureBounds = new Rectangle(0, 0, Math.Max(width >> level, 1), Math.Max(height >> level, 1));
             checkedRect = rect ?? textureBounds;
@@ -370,18 +370,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("arraySlice must be smaller than the ArraySize of this texture and larger than 0.", "arraySlice");
             if (!textureBounds.Contains(checkedRect) || checkedRect.Width <= 0 || checkedRect.Height <= 0)
                 throw new ArgumentException("Rectangle must be inside the texture bounds", "rect");
-            if (data == null)
-                throw new ArgumentNullException("data");
-            var tSize = ReflectionHelpers.SizeOf<T>.Get();
+
+            tSize = ReflectionHelpers.SizeOf<T>.Get();
             var fSize = Format.GetSize();
             if (tSize > fSize || fSize % tSize != 0)
                 throw new ArgumentException("Type T is of an invalid size for the format of this texture.", "T");
-            if (startIndex < 0 || startIndex >= data.Length)
-                throw new ArgumentException("startIndex must be at least zero and smaller than data.Length.", "startIndex");
-            if (data.Length < startIndex + elementCount)
-                throw new ArgumentException("The data array is too small.");
 
-            int dataByteSize;
             if (Format.IsCompressedFormat())
             {
                 int blockWidth, blockHeight;
@@ -418,171 +412,251 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 dataByteSize = checkedRect.Width * checkedRect.Height * fSize;
             }
-            if (elementCount * tSize != dataByteSize)
-                throw new ArgumentException(string.Format("elementCount is not the right size, " +
-                                            "elementCount * sizeof(T) is {0}, but data size is {1}.",
-                                            elementCount * tSize, dataByteSize), "elementCount");
         }
 
-        internal Color[] GetColorData()
+        private void ValidateParams<T>(
+            int level, int arraySlice, Rectangle? rect, T[] data,
+            int startIndex, int elementCount, out Rectangle checkedRect)
+            where T : struct
         {
-            int colorDataLength = Width * Height;
-            var colorData = new Color[colorDataLength];
+            if (data == null)
+                throw new ArgumentNullException("data");
+
+            int tSize;
+            int dataByteSize;
+            ValidateParams<T>(level, arraySlice, rect, out tSize, out dataByteSize, out checkedRect);
+
+            if (startIndex < 0 || startIndex >= data.Length)
+                throw new ArgumentException("startIndex must be at least zero and smaller than data.Length.", "startIndex");
+            if (data.Length < startIndex + elementCount)
+                throw new ArgumentException("The data array is too small.");
+
+            if (elementCount * tSize != dataByteSize)
+            {
+                throw new ArgumentException(string.Format(
+                    "elementCount is not the right size, " +
+                    "elementCount * sizeof(T) is {0}, but data size is {1}.",
+                    elementCount * tSize, dataByteSize), "elementCount");
+            }
+        }
+
+        internal unsafe void GetColorData(int level, int arraySlice, Color[] buffer, Rectangle rectangle)
+        {
+            if (buffer == null)
+                throw new ArgumentNullException("buffer");
+
+            int pixelCount = rectangle.Width * rectangle.Height;
+
+            // Only pin buffers after GetData so we don't put extra strain on GC
+            // (GetData allocates a lot right now)
 
             switch (Format)
             {
-                case SurfaceFormat.Single:
-                    var floatData = new float[colorDataLength];
-                    GetData(floatData);
+                case SurfaceFormat.Color:
+                    GetData(level, arraySlice, rectangle, buffer, 0, buffer.Length);
+                    break;
 
-                    for (int i = 0; i < colorDataLength; i++)
+                case SurfaceFormat.Single:
+                {
+                    float[] sourceData = new float[pixelCount];
+                    GetData(level, arraySlice, rectangle, sourceData, 0, sourceData.Length);
+                    fixed (float* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        float brightness = floatData[i];
-                        // Export as a greyscale image.
-                        colorData[i] = new Color(brightness, brightness, brightness);
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            float brightness = sourceData[i];
+                            // Export as a greyscale image.
+                            dst[i] = new Color(brightness, brightness, brightness);
+                        }
                     }
                     break;
-
-                case SurfaceFormat.Color:
-                    GetData(colorData);
-                    break;
+                }
 
                 case SurfaceFormat.Alpha8:
-                    var alpha8Data = new Alpha8[colorDataLength];
-                    GetData(alpha8Data);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    Alpha8[] sourceData = new Alpha8[pixelCount];
+                    GetData(sourceData);
+                    fixed (Alpha8* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(alpha8Data[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(
+                                byte.MaxValue, byte.MaxValue, byte.MaxValue, sourceData[i].PackedValue);
+                        }
                     }
-
                     break;
+                }
 
                 case SurfaceFormat.Bgr565:
-                    var bgr565Data = new Bgr565[colorDataLength];
-                    GetData(bgr565Data);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    Bgr565[] sourceData = new Bgr565[pixelCount];
+                    GetData(sourceData);
+                    fixed (Bgr565* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(bgr565Data[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(sourceData[i].ToVector4());
+                        }
                     }
-
                     break;
+                }
 
                 case SurfaceFormat.Bgra4444:
-                    var bgra4444Data = new Bgra4444[colorDataLength];
-                    GetData(bgra4444Data);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    Bgra4444[] sourceData = new Bgra4444[pixelCount];
+                    GetData(sourceData);
+                    fixed (Bgra4444* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(bgra4444Data[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(sourceData[i].ToVector4());
+                        }
                     }
-
                     break;
+                }
 
                 case SurfaceFormat.Bgra5551:
-                    var bgra5551Data = new Bgra5551[colorDataLength];
-                    GetData(bgra5551Data);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    Bgra5551[] sourceData = new Bgra5551[pixelCount];
+                    GetData(sourceData);
+                    fixed (Bgra5551* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(bgra5551Data[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(sourceData[i].ToVector4());
+                        }
                     }
                     break;
+                }
 
                 case SurfaceFormat.HalfSingle:
-                    var halfSingleData = new HalfSingle[colorDataLength];
-                    GetData(halfSingleData);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    HalfSingle[] sourceData = new HalfSingle[pixelCount];
+                    GetData(sourceData);
+                    fixed (HalfSingle* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(halfSingleData[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(sourceData[i].ToVector4());
+                        }
                     }
-
                     break;
+                }
 
                 case SurfaceFormat.HalfVector2:
-                    var halfVector2Data = new HalfVector2[colorDataLength];
-                    GetData(halfVector2Data);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    HalfVector2[] sourceData = new HalfVector2[pixelCount];
+                    GetData(sourceData);
+                    fixed (HalfVector2* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(halfVector2Data[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(sourceData[i].ToVector4());
+                        }
                     }
-
                     break;
+                }
 
                 case SurfaceFormat.HalfVector4:
-                    var halfVector4Data = new HalfVector4[colorDataLength];
-                    GetData(halfVector4Data);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    HalfVector4[] sourceData = new HalfVector4[pixelCount];
+                    GetData(sourceData);
+                    fixed (HalfVector4* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(halfVector4Data[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(sourceData[i].ToVector4());
+                        }
                     }
-
                     break;
+                }
 
                 case SurfaceFormat.NormalizedByte2:
-                    var normalizedByte2Data = new NormalizedByte2[colorDataLength];
-                    GetData(normalizedByte2Data);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    NormalizedByte2[] sourceData = new NormalizedByte2[pixelCount];
+                    GetData(sourceData);
+                    fixed (NormalizedByte2* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(normalizedByte2Data[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(sourceData[i].ToVector4());
+                        }
                     }
-
                     break;
+                }
 
                 case SurfaceFormat.NormalizedByte4:
-                    var normalizedByte4Data = new NormalizedByte4[colorDataLength];
-                    GetData(normalizedByte4Data);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    NormalizedByte4[] sourceData = new NormalizedByte4[pixelCount];
+                    GetData(sourceData);
+                    fixed (NormalizedByte4* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(normalizedByte4Data[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(sourceData[i].ToVector4());
+                        }
                     }
-
                     break;
+                }
 
                 case SurfaceFormat.Rg32:
-                    var rg32Data = new Rg32[colorDataLength];
-                    GetData(rg32Data);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    Rg32[] sourceData = new Rg32[pixelCount];
+                    GetData(sourceData);
+                    fixed (Rg32* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(rg32Data[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(sourceData[i].ToVector4());
+                        }
                     }
-
                     break;
+                }
 
                 case SurfaceFormat.Rgba64:
-                    var rgba64Data = new Rgba64[colorDataLength];
-                    GetData(rgba64Data);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    Rgba64[] sourceData = new Rgba64[pixelCount];
+                    GetData(sourceData);
+                    fixed (Rgba64* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(rgba64Data[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(sourceData[i].ToVector4());
+                        }
                     }
-
                     break;
+                }
 
                 case SurfaceFormat.Rgba1010102:
-                    var rgba1010102Data = new Rgba1010102[colorDataLength];
-                    GetData(rgba1010102Data);
-
-                    for (int i = 0; i < colorDataLength; i++)
+                {
+                    Rgba1010102[] sourceData = new Rgba1010102[pixelCount];
+                    GetData(sourceData);
+                    fixed (Rgba1010102* src = sourceData)
+                    fixed (Color* dst = buffer)
                     {
-                        colorData[i] = new Color(rgba1010102Data[i].ToVector4());
+                        for (int i = 0; i < pixelCount; i++)
+                        {
+                            dst[i] = new Color(sourceData[i].ToVector4());
+                        }
                     }
-
                     break;
+                }
 
                 default:
                     throw new Exception("Texture surface format not supported");
             }
-
-            return colorData;
         }
     }
 }
