@@ -13,6 +13,12 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
+            // Rewind stream if it is at end
+            if (stream.CanSeek && stream.Length == stream.Position)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+            
             using (Image2D image = Image2D.FromStream(stream))
             {
                 // XNA blacks out any pixels with an alpha of zero.

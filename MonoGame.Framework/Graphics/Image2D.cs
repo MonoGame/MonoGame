@@ -118,6 +118,12 @@ namespace MonoGame.Framework.Graphics
         /// </summary>
         public unsafe static Image2D FromStream(Stream stream)
         {
+            // Rewind stream if it is at end
+            if (stream.CanSeek && stream.Length == stream.Position)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
             // TODO: reduce allocations here by not using seeking at all
 
             ImageResult result;
