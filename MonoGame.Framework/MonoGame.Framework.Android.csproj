@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Xamarin.Legacy.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-android</TargetFramework>
+    <TargetFrameworks>monoandroid90;net6.0-android</TargetFrameworks>
     <DefineConstants>ANDROID;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
@@ -9,6 +9,7 @@
     <PackageTags>monogame;.net core;core;.net standard;standard;android</PackageTags>
     <PackageId>MonoGame.Framework.Android</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -73,7 +74,7 @@
     <Compile Include="Platform\Utilities\FuncLoader.Android.cs" />
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
-    
+
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
   </ItemGroup>

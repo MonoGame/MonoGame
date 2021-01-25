@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Xamarin.Legacy.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-ios</TargetFramework>
+    <TargetFrameworks>xamarinios10;net6.0-ios</TargetFrameworks>
     <DefineConstants>IOS;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
