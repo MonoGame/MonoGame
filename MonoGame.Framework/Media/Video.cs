@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             FileName = fileName;
 
-#if !WINDOWS_UAP
+#if !WINDOWS_UAP && !OPENGL
             PlatformInitialize();
 #endif
         }
