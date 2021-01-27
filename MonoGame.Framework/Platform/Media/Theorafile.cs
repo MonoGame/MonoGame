@@ -25,6 +25,7 @@
  */
 
 #region Using Statements
+using MonoGame.Framework.Utilities;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -36,14 +37,46 @@ public static class Theorafile
 
 	const string nativeLibName = "libtheorafile";
 
-	#endregion
+    private static IntPtr NativeLibrary = GetNativeLibrary();
 
-	#region UTF8 Marshaling
+    private static IntPtr GetNativeLibrary()
+    {
+        
+#if DESKTOPGL
+        if (CurrentPlatform.OS == OS.Windows)
+            return FuncLoader.LoadLibraryExt("libtheorafile.dll");
+        else if (CurrentPlatform.OS == OS.Linux)
+            return FuncLoader.LoadLibraryExt("libtheorafile.so");
+        else if (CurrentPlatform.OS == OS.MacOSX)
+            return FuncLoader.LoadLibraryExt("libtheorafile.dylib");
+        else
+            return FuncLoader.LoadLibraryExt("libtheorafile");
+#elif ANDROID
+            var ret = FuncLoader.LoadLibrary("libtheorafile.so");
 
-	/* Used for heap allocated string marshaling
+            if (ret == IntPtr.Zero)
+            {
+                var appFilesDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                var appDir = Path.GetDirectoryName(appFilesDir);
+                var lib = Path.Combine(appDir, "lib", "libtheorafile.so");
+
+                ret = FuncLoader.LoadLibrary(lib);
+            }
+
+            return ret;
+#else
+            return IntPtr.Zero;
+#endif
+    }
+
+    #endregion
+
+    #region UTF8 Marshaling
+
+    /* Used for heap allocated string marshaling
 	 * Returned byte* must be free'd with FreeHGlobal.
 	 */
-	private static unsafe byte* Utf8Encode(string str)
+    private static unsafe byte* Utf8Encode(string str)
 	{
 		int bufferSize = (str.Length * 4) + 1;
 		byte* buffer = (byte*)Marshal.AllocHGlobal(bufferSize);
@@ -122,84 +155,98 @@ public static class Theorafile
 		public close_func close_func;
 	}
 
-	#endregion
+    #endregion
 
-	#region Theorafile Implementation
+    #region Theorafile Implementation
 
-	[DllImport(nativeLibName, EntryPoint = "tf_open_callbacks", CallingConvention = CallingConvention.Cdecl)]
-	private static extern int INTERNAL_tf_open_callbacks(
-		IntPtr datasource,
-		IntPtr file,
-		tf_callbacks io
-	);
-	public static int tf_open_callbacks(
-		IntPtr datasource,
-		out IntPtr file,
-		tf_callbacks io
-	)
-	{
-		file = AllocTheoraFile();
-		return INTERNAL_tf_open_callbacks(datasource, file, io);
-	}
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate int tf_open_callbacks (
+        IntPtr datasource,
+        IntPtr file,
+        tf_callbacks io
+    );
+    internal static tf_open_callbacks INTERNAL_tf_open_callbacks = FuncLoader.LoadFunction<tf_open_callbacks>(NativeLibrary, "tf_open_callbacks");
 
-	[DllImport(nativeLibName, EntryPoint = "tf_fopen", CallingConvention = CallingConvention.Cdecl)]
-	private static extern unsafe int INTERNAL_tf_fopen(
-		byte* fname,
-		IntPtr file
-	);
-	public static unsafe int tf_fopen(string fname, out IntPtr file)
-	{
-		file = AllocTheoraFile();
+    public static int OpenCallbacks(IntPtr datasource,
+        out IntPtr file,
+        tf_callbacks io)
+    {
+        file = AllocTheoraFile();
+        return INTERNAL_tf_open_callbacks(datasource, file, io);
+    }
 
-		byte* utf8Fname = Utf8Encode(fname);
-		int result = INTERNAL_tf_fopen(utf8Fname, file);
-		Marshal.FreeHGlobal((IntPtr)utf8Fname);
-		return result;
-	}
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal unsafe delegate int tf_fopen (
+        byte* fname,
+        IntPtr file
+    );
+    internal static tf_fopen INTERNAL_tf_fopen = FuncLoader.LoadFunction<tf_fopen>(NativeLibrary, "tf_fopen");
 
-	[DllImport(nativeLibName, EntryPoint = "tf_close", CallingConvention = CallingConvention.Cdecl)]
-	private static extern int INTERNAL_tf_close(IntPtr file);
-	public static int tf_close(ref IntPtr file)
-	{
-		int result = INTERNAL_tf_close(file);
-		Marshal.FreeHGlobal(file);
-		file = IntPtr.Zero;
-		return result;
-	}
+    public static unsafe int OpenFile(string fname, out IntPtr file)
+    {
+        file = AllocTheoraFile();
 
-	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-	public static extern int tf_hasaudio(IntPtr file);
+        byte* utf8Fname = Utf8Encode(fname);
+        int result = INTERNAL_tf_fopen(utf8Fname, file);
+        Marshal.FreeHGlobal((IntPtr)utf8Fname);
+        return result;
+    }
 
-	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-	public static extern int tf_hasvideo(IntPtr file);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate int tf_close(
+        IntPtr file
+    );
+    internal static tf_close INTERNAL_tf_close = FuncLoader.LoadFunction<tf_close>(NativeLibrary, "tf_close");
 
-	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-	public static extern void tf_videoinfo(
-		IntPtr file,
-		out int width,
-		out int height,
-		out double fps,
-		out th_pixel_fmt fmt
-	);
+    public static int CloseFile(ref IntPtr file)
+    {
+        int result = INTERNAL_tf_close(file);
+        Marshal.FreeHGlobal(file);
+        file = IntPtr.Zero;
+        return result;
+    }
 
-	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-	public static extern void tf_audioinfo(
-		IntPtr file,
-		out int channels,
-		out int samplerate
-	);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int tf_hasaudio(IntPtr file);
+    public static tf_hasaudio HasAudio = FuncLoader.LoadFunction<tf_hasaudio>(NativeLibrary, "tf_hasaudio");
 
-	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-	public static extern int tf_eos(IntPtr file);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int tf_hasvideo(IntPtr file);
+    public static tf_hasvideo HasVideo = FuncLoader.LoadFunction<tf_hasvideo>(NativeLibrary, "tf_hasvideo");
 
-	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-	public static extern void tf_reset(IntPtr file);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void tf_videoinfo(
+        IntPtr file,
+        out int width,
+        out int height,
+        out double fps,
+        out th_pixel_fmt fmt
+    );
+    public static tf_videoinfo VideoInfo = FuncLoader.LoadFunction<tf_videoinfo>(NativeLibrary, "tf_videoinfo");
 
-	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-	public static extern int tf_readvideo(IntPtr file, IntPtr buffer, int numframes);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void tf_audioinfo(
+        IntPtr file,
+        out int channels,
+        out int samplerate
+    );
+    public static tf_audioinfo AudioInfo = FuncLoader.LoadFunction<tf_audioinfo>(NativeLibrary, "tf_audioinfo");
 
-	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-	public static extern int tf_readaudio(IntPtr file, IntPtr buffer, int length);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate int tf_eos(IntPtr file);
+    internal static tf_eos EndOfStream = FuncLoader.LoadFunction<tf_eos>(NativeLibrary, "tf_eos");
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void tf_reset(IntPtr file);
+    public static tf_reset Reset = FuncLoader.LoadFunction<tf_reset>(NativeLibrary, "tf_reset");
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int tf_readvideo(IntPtr file, IntPtr buffer, int numframes);
+    public static tf_readvideo ReadVideo = FuncLoader.LoadFunction<tf_readvideo>(NativeLibrary, "tf_readvideo");
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int tf_readaudio(IntPtr file, IntPtr buffer, int length);
+    public static tf_readaudio ReadAudio = FuncLoader.LoadFunction<tf_readaudio>(NativeLibrary, "tf_readaudio");
 
 	#endregion
 

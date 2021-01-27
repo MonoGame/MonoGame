@@ -42,11 +42,11 @@ namespace Microsoft.Xna.Framework.Media
 			// MG Note: we double check that the metadata in the XNB matches
 			//          what Theorafile reads from the actual video file
 
-			Theorafile.tf_fopen(FileName, out theora);
+			Theorafile.OpenFile(FileName, out theora);
 			int width, height;
 			double fps;
-			Theorafile.th_pixel_fmt th_Pixel_Fmt;
-			Theorafile.tf_videoinfo(theora, out width, out height, out fps, out th_Pixel_Fmt);
+            Theorafile.th_pixel_fmt th_Pixel_Fmt;
+			Theorafile.VideoInfo(theora, out width, out height, out fps, out th_Pixel_Fmt);
 
             /* If you got here, you've still got the XNB file! Well done!
 			 * Except if you're running FNA, you're not using the WMV anymore.
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Media
 		{
 			if (theora != IntPtr.Zero)
 			{
-				Theorafile.tf_close(ref theora);
+				Theorafile.CloseFile(ref theora);
 			}
 		}
 

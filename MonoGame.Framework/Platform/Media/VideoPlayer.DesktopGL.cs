@@ -258,7 +258,7 @@ namespace Microsoft.Xna.Framework.Media
             // Be sure we can even get something from Theorafile...
             if (State == MediaState.Stopped ||
                 Video.theora == IntPtr.Zero ||
-                Theorafile.tf_hasvideo(Video.theora) == 0)
+                Theorafile.HasVideo(Video.theora) == 0)
             {
                 // Screw it, give them the old one.
                 return videoTexture;
@@ -268,7 +268,7 @@ namespace Microsoft.Xna.Framework.Media
             if (thisFrame > currentFrame)
             {
                 // Only update the textures if we need to!
-                if (Theorafile.tf_readvideo(
+                if (Theorafile.ReadVideo(
                     Video.theora,
                     yuvData,
                     thisFrame - currentFrame
@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework.Media
             }
 
             // Check for the end...
-            bool ended = Theorafile.tf_eos(Video.theora) == 1;
+            bool ended = Theorafile.EndOfStream(Video.theora) == 1;
             if (audioStream != null)
             {
                 ended &= audioStream.PendingBufferCount == 0;
@@ -307,7 +307,7 @@ namespace Microsoft.Xna.Framework.Media
                 }
 
                 // Reset the stream no matter what happens next
-                Theorafile.tf_reset(Video.theora);
+                Theorafile.Reset(Video.theora);
 
                 // If looping, go back to the start. Otherwise, we'll be exiting.
                 if (IsLooped)
@@ -368,7 +368,7 @@ namespace Microsoft.Xna.Framework.Media
             InitializeTheoraStream();
 
             // Set up the texture data
-            if (Theorafile.tf_hasvideo(Video.theora) == 1)
+            if (Theorafile.HasVideo(Video.theora) == 1)
             {
                 // The VideoPlayer will use the GraphicsDevice that is set now.
                 GraphicsDevice _currentDevice = Game.Instance.GraphicsDevice;
@@ -431,7 +431,7 @@ namespace Microsoft.Xna.Framework.Media
                 audioStream.Dispose();
                 audioStream = null;
             }
-            Theorafile.tf_reset(Video.theora);
+            Theorafile.Reset(Video.theora);
         }
 
         private void PlatformPause()
@@ -476,7 +476,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private void OnBufferRequest(object sender, EventArgs args)
         {
-            int samples = Theorafile.tf_readaudio(
+            int samples = Theorafile.ReadAudio(
                 Video.theora,
                 audioDataPtr,
                 AUDIO_BUFFER_SIZE
@@ -485,7 +485,7 @@ namespace Microsoft.Xna.Framework.Media
             {
                 audioStream.SubmitFloatBuffer(audioDataPtr, audioData, 0);
             }
-            else if (Theorafile.tf_eos(Video.theora) == 1)
+            else if (Theorafile.EndOfStream(Video.theora) == 1)
             {
                 // Okay, we ran out. No need for this!
                 audioStream.BufferNeeded -= OnBufferRequest;
@@ -532,13 +532,13 @@ namespace Microsoft.Xna.Framework.Media
         private void InitializeTheoraStream()
         {
             // Grab the first video frame ASAP.
-            while (Theorafile.tf_readvideo(Video.theora, yuvData, 1) == 0) ;
+            while (Theorafile.ReadVideo(Video.theora, yuvData, 1) == 0) ;
 
             // Grab the first bit of audio. We're trying to start the decoding ASAP.
-            if (Theorafile.tf_hasaudio(Video.theora) == 1)
+            if (Theorafile.HasAudio(Video.theora) == 1)
             {
                 int channels, samplerate;
-                Theorafile.tf_audioinfo(Video.theora, out channels, out samplerate);
+                Theorafile.AudioInfo(Video.theora, out channels, out samplerate);
                 audioStream = new DynamicSoundEffectInstance(
                     samplerate,
                     (AudioChannels)channels
