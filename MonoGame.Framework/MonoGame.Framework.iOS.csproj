@@ -8,7 +8,7 @@
     <Description>The MonoGame runtime for iOS which supports iOS Versions 10 and above. </Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;ios</PackageTags>
     <PackageId>MonoGame.Framework.iOS</PackageId>
-    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <AppendTargetFrameworkToOutputPath>True</AppendTargetFrameworkToOutputPath>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
