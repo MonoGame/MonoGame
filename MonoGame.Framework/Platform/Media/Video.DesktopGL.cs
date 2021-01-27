@@ -31,13 +31,11 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public int UvHeight { get; set; }
 
-        public GraphicsDevice GraphicsDevice { get; internal set; }
-
         #endregion
 
         #region Internal Constructors
 
-        public void PlatformInitialize()
+        private void PlatformInitialize()
 		{
 			// MG Note: we double check that the metadata in the XNB matches
 			//          what Theorafile reads from the actual video file
