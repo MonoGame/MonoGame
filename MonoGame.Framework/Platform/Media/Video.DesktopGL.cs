@@ -20,7 +20,6 @@ namespace Microsoft.Xna.Framework.Media
 		#region Internal Variables: Theorafile
 
 		internal IntPtr theora;
-		internal bool needsDurationHack;
 
         /// Gets the width of this video, in pixels.
         /// </summary>
@@ -30,6 +29,10 @@ namespace Microsoft.Xna.Framework.Media
         /// Gets the height of this video, in pixels.
         /// </summary>
         public int UvHeight { get; set; }
+
+        //hack as my test videos (compiled with VLC) with sound always return Theorafile.EndOfStream(Video.theora) == 1,
+        //and the audiostream is left with a PendingBufferCount of 1 for up to ~20 seconds after the actual sound has stopped
+        public bool UseElapsedTimeForStop = true;
 
         #endregion
 
@@ -85,8 +88,6 @@ namespace Microsoft.Xna.Framework.Media
 					" FPS: " + FramesPerSecond.ToString()
 				);
 			}
-
-			needsDurationHack = false;
 		}
 
         #endregion

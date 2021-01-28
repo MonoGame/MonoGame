@@ -281,19 +281,17 @@ namespace Microsoft.Xna.Framework.Media
 
             // Check for the end...
             bool ended = Theorafile.EndOfStream(Video.theora) == 1;
+
             if (audioStream != null)
             {
                 ended &= audioStream.PendingBufferCount == 0;
             }
 
+            if (Video.UseElapsedTimeForStop && State == MediaState.Playing)
+                ended |= timer.Elapsed.TotalMilliseconds > Video.Duration.TotalMilliseconds;
+
             if (ended)
             {
-                // FIXME: This is part of the Duration hack!
-                if (Video.needsDurationHack)
-                {
-                    Video.Duration = timer.Elapsed; // FIXME: Frames * FPS? -flibit
-                }
-
                 // Stop and reset the timer. If we're looping, the loop will start it again.
                 timer.Stop();
                 timer.Reset();
@@ -337,14 +335,6 @@ namespace Microsoft.Xna.Framework.Media
         private void PlatformPlay()
         {
             checkDisposed();
-
-            // We need to assign this regardless of what happens next.
-
-            // FIXME: This is a part of the Duration hack!
-            if (Video.needsDurationHack)
-            {
-                Video.Duration = TimeSpan.MaxValue;
-            }
 
             // Check the player state before attempting anything.
             if (State != MediaState.Stopped)
