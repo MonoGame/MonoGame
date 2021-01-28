@@ -29,8 +29,7 @@ namespace Microsoft.Xna.Framework.Content
 #if NET45
             PropertyInfo[] infos= type.GetTypeInfo().DeclaredProperties.ToArray();
             var nonStaticPropertyInfos = from p in infos
-                                         where (p.GetMethod != null) && (!p.GetMethod.IsStatic) &&
-                                         (p.GetMethod == p.GetMethod.GetRuntimeBaseDefinition())
+                                         where (p.GetMethod != null) && (!p.GetMethod.IsStatic)
                                          select p;
             return nonStaticPropertyInfos.ToArray();
 #else
