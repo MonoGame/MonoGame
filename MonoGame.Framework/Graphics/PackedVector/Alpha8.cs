@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static byte Pack(float alpha)
         {
-            return (byte) Math.Round(
+            return (byte) MathF.Round(
                 MathHelper.Clamp(alpha, 0, 1) * 255.0f
             );
         }

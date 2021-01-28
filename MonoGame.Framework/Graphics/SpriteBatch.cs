@@ -261,8 +261,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         -origin.Y,
                         w,
                         h,
-                        (float)Math.Sin(rotation),
-                        (float)Math.Cos(rotation),
+                        MathF.Sin(rotation),
+                        MathF.Cos(rotation),
                         color,
                         _texCoordTL,
                         _texCoordBR,
@@ -398,8 +398,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         -origin.Y,
                         destinationRectangle.Width,
                         destinationRectangle.Height,
-                        (float)Math.Sin(rotation),
-                        (float)Math.Cos(rotation),
+                        MathF.Sin(rotation),
+                        MathF.Cos(rotation),
                         color,
                         _texCoordTL,
                         _texCoordBR,
@@ -734,8 +734,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                cos = (float)Math.Cos(rotation);
-                sin = (float)Math.Sin(rotation);
+                cos = MathF.Cos(rotation);
+                sin = MathF.Sin(rotation);
                 transformation.M11 = (flippedHorz ? -scale.X : scale.X) * cos;
                 transformation.M12 = (flippedHorz ? -scale.X : scale.X) * sin;
                 transformation.M21 = (flippedVert ? -scale.Y : scale.Y) * (-sin);
@@ -1016,8 +1016,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                cos = (float)Math.Cos(rotation);
-                sin = (float)Math.Sin(rotation);
+                cos = MathF.Cos(rotation);
+                sin = MathF.Sin(rotation);
                 transformation.M11 = (flippedHorz ? -scale.X : scale.X) * cos;
                 transformation.M12 = (flippedHorz ? -scale.X : scale.X) * sin;
                 transformation.M21 = (flippedVert ? -scale.Y : scale.Y) * (-sin);
