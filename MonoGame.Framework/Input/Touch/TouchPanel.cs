@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		public static GestureSample ReadGesture()
         {
             // Return the next gesture.
-            return PrimaryWindow.TouchPanelState.GestureList.Dequeue();			
+            return PrimaryWindow.TouchPanelState.ReadGesture();			
         }
 
         /// <summary>
