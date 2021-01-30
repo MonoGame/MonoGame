@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
         // Despite XNA4 using Purple here, we use black (in Release) to avoid
         // performance warnings on Intel/Mesa
 #if DEBUG
-        private static Color _discardColor = new Color(0, 0, 0, 255);
+        private static Color _discardColor = new Color(68, 34, 136, 255);
 #else
         private static Color _discardColor = new Color(0, 0, 0, 255);
 #endif
