@@ -39,6 +39,7 @@ namespace MonoGame.Tests.Audio
                 //Test Initial State
                 Assert.AreEqual(SoundState.Stopped, instance.State);
 
+                //Test calling pause multiple times
                 instance.Play();
                 Assert.AreEqual(SoundState.Playing, instance.State);
                 instance.Pause();
