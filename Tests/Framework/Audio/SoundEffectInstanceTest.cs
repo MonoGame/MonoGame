@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Threading;
 
 namespace MonoGame.Tests.Audio
 {
@@ -26,9 +27,6 @@ namespace MonoGame.Tests.Audio
         /// is called after calling Pause(), Stop().
         /// </summary>
         [Test]
-#if !DESKTOPGL
-        [Ignore("bug is platform specific to GLDesktop")]
-#endif
         public void SoundEffectPauseStopPlay()
         {
 
@@ -38,15 +36,31 @@ namespace MonoGame.Tests.Audio
             {
                 instance.IsLooped = true; //ensures that the sound effect does not stop unless Stop() is called.
 
+                //Test Initial State
+                Assert.AreEqual(SoundState.Stopped, instance.State);
+
                 instance.Play();
                 Assert.AreEqual(SoundState.Playing, instance.State);
-
+                instance.Pause();
+                Assert.AreEqual(SoundState.Paused, instance.State);
                 instance.Stop();
+                SleepWhileDispatching(10);// XNA Requires Dispatcher to be updated
                 Assert.AreEqual(SoundState.Stopped, instance.State);
                 instance.Play();
                 Assert.AreEqual(SoundState.Playing, instance.State);
                 instance.Pause();
                 Assert.AreEqual(SoundState.Paused, instance.State);
+            }
+        }
+
+
+        private static void SleepWhileDispatching(int ms)
+        {
+            int cycles = ms / 10;
+            for (int i = 0; i < cycles; i++)
+            {
+                FrameworkDispatcher.Update();
+                Thread.Sleep(10);
             }
         }
 

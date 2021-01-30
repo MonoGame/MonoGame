@@ -213,7 +213,7 @@ namespace Microsoft.Xna.Framework.Audio
                         _voice.Stop((int)PlayFlags.Tails);
                 }
             }
-
+            
             _paused = false;
         }
 
