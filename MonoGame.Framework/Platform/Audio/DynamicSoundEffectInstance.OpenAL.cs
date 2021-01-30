@@ -128,8 +128,6 @@ namespace Microsoft.Xna.Framework.Audio
         {
             var format = _channels == AudioChannels.Mono ? ALFormat.MonoFloat32 : ALFormat.StereoFloat32;
 
-            IntPtr dataPtr = new IntPtr(buffer.Length * sizeof(float) + sampleOffset);
-
             AlSubmitBuffer(audioDataPtr, buffer.Length, format);
         }
 
