@@ -278,7 +278,7 @@ namespace Microsoft.Xna.Framework
             var window = new MonoGame.Framework.WinFormsGameWindow((MonoGame.Framework.WinFormsGamePlatform)game.Platform);
             window.Initialize(width, height);
             if(show.HasValue)
-                window.Form.Visible = show;
+                window.Form.Visible = show.Value;
 
             return window;
         }
