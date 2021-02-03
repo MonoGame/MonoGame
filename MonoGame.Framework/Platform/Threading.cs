@@ -193,15 +193,15 @@ namespace Microsoft.Xna.Framework
                     EAGLContext.SetCurrentContext(BackgroundContext);
 #endif
 
+#if ANDROID
+            //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
+                ((AndroidGameWindow)Game.Instance.Window).GameView.MakeCurrent();
+#endif
+
             lock (_queuedActions)
             {
                 foreach (Action queuedAction in _queuedActions)
                 {
-#if ANDROID
-                    //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
-                        ((AndroidGameWindow)Game.Instance.Window).GameView.MakeCurrent();
-#endif
-
                     queuedAction.Invoke();
                 }
                 _queuedActions.Clear();
