@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             Threading.BlockOnUIThread(() =>
             {
-                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                var elementSizeInByte = Marshal.SizeOf<T>();
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
 
