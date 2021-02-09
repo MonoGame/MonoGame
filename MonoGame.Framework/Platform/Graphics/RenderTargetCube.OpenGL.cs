@@ -2,12 +2,16 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTargetCube
     {
+        private static Action<RenderTargetCube> DisposeAction =
+            (t) => t.GraphicsDevice.PlatformDeleteRenderTarget(t);
+
         int IRenderTarget.GLTexture
         {
             get { return glTexture; }
@@ -27,11 +31,13 @@ namespace Microsoft.Xna.Framework.Graphics
             return TextureTarget.TextureCubeMapPositiveX + renderTargetBinding.ArraySlice;
         }
 
-        private void PlatformConstruct(GraphicsDevice graphicsDevice, bool mipMap, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+        private void PlatformConstruct(
+            GraphicsDevice graphicsDevice, bool mipMap, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
         {
             Threading.BlockOnUIThread(() =>
             {
-                graphicsDevice.PlatformCreateRenderTarget(this, size, size, mipMap, this.Format, preferredDepthFormat, preferredMultiSampleCount, usage);
+                graphicsDevice.PlatformCreateRenderTarget(
+                    this, size, size, mipMap, this.Format, preferredDepthFormat, preferredMultiSampleCount, usage);
             });
         }
 
@@ -41,10 +47,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (GraphicsDevice != null)
                 {
-                    Threading.BlockOnUIThread(() =>
-                    {
-                        this.GraphicsDevice.PlatformDeleteRenderTarget(this);
-                    });
+                    Threading.BlockOnUIThread(DisposeAction, this);
                 }
             }
 

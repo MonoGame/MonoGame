@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        private void PlatformSetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
             GenerateIfRequired();
 
