@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // Work out how big the output bitmap should be.
             int guessedWidth = GuessOutputWidth(sourceGlyphs);
-            var rectPacker = new MaxRectsBin(guessedWidth, 64, GrowRule.Height, 32);
+            var rectPacker = new MaxRectsBin(guessedWidth, 1024 * 16, GrowRule.Height);
 
             for (int i = 0; i < glyphs.Count; i++)
             {
