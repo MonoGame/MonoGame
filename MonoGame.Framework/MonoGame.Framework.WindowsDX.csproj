@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <None Remove="Platform\**\*" />
+    <None Remove="Utilities\System.Numerics.Vectors\**\*" />
   </ItemGroup>
 
   <ItemGroup>
