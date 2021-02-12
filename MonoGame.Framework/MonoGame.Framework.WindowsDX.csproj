@@ -15,6 +15,7 @@
     <Compile Remove="obj\**\*" />
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
+    <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
   </ItemGroup>
 
   <ItemGroup>

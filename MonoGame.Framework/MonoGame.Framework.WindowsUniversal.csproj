@@ -28,6 +28,7 @@
     <!-- System.ComponentModel is not in WinRT APIs, so we can't use TypeConverter -->
     <Compile Remove="Design\**\*" />
     <Compile Remove="Content\ResourceContentManager.cs" />
+    <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
   </ItemGroup>
 
   <ItemGroup>
