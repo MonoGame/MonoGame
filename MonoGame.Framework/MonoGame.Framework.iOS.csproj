@@ -46,6 +46,7 @@
     <Compile Include="Platform\iOS\iOSGameWindow.cs" />
     <Compile Include="Platform\iOS\OrientationConverter.cs" />
 
+    <Compile Include="Platform\Audio\Xact\WaveBank.Default.cs" />
     <Compile Include="Platform\GamePlatform.Mobile.cs" />
     <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
     <Compile Include="Platform\Graphics\OpenGL.iOS.cs" />
