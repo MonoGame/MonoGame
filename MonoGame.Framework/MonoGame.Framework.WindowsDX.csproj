@@ -15,13 +15,16 @@
     <Compile Remove="obj\**\*" />
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
+    <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Platform\**\*" />
+    <None Remove="Utilities\System.Numerics.Vectors\**\*" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Platform\Audio\Xact\WaveBank.Default.cs" />
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
     <Compile Include="Platform\Graphics\SwapChainRenderTarget.cs" />
     <Compile Include="Platform\Graphics\Texture2D.StbSharp.cs" />
