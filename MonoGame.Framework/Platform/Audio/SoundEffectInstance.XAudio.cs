@@ -94,9 +94,10 @@ namespace Microsoft.Xna.Framework.Audio
             //
             // Programmer Notes:         
             //  According to this description the z-axis (forward vector) is inverted between these two coordinate systems.
-            //  Therefore, we need to negate the z component of any position/velocity values, and negate any forward vectors.
+            //  Therefore, we need to negate the z component of any position/directions/velocity values.
 
-            forward *= -1.0f;
+            forward.Z *= -1.0f;
+            up.Z *= -1.0f;
             pos.Z *= -1.0f;
             vel.Z *= -1.0f;
 
@@ -132,9 +133,10 @@ namespace Microsoft.Xna.Framework.Audio
             //
             // Programmer Notes:         
             //  According to this description the z-axis (forward vector) is inverted between these two coordinate systems.
-            //  Therefore, we need to negate the z component of any position/velocity values, and negate any forward vectors.
+            //  Therefore, we need to negate the z component of any position/directions/velocity values.
 
-            forward *= -1.0f;
+            forward.Z *= -1.0f;
+            up.Z *= -1.0f;
             pos.Z *= -1.0f;
             vel.Z *= -1.0f;
 
@@ -204,7 +206,12 @@ namespace Microsoft.Xna.Framework.Audio
                     _voice.FlushSourceBuffers();
                 }
                 else
-                    _voice.Stop((int)PlayFlags.Tails);
+                {
+                    if (_loop)
+                        _voice.ExitLoop();
+                    else
+                        _voice.Stop((int)PlayFlags.Tails);
+                }
             }
 
             _paused = false;

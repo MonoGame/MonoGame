@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     // TODO : [TypeConverter(typeof(ExpandableObjectConverter))]
     [DataContract]
-    public class Curve
+    public class Curve : ICurveEvaluator<float>
     {
         #region Private Fields
 

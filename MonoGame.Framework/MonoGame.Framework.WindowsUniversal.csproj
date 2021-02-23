@@ -28,13 +28,16 @@
     <!-- System.ComponentModel is not in WinRT APIs, so we can't use TypeConverter -->
     <Compile Remove="Design\**\*" />
     <Compile Remove="Content\ResourceContentManager.cs" />
+    <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Platform\**\*" />
+    <None Remove="Utilities\System.Numerics.Vectors\**\*" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Platform\Audio\Xact\WaveBank.Default.cs" />
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
     <Compile Include="Platform\GraphicsDeviceManager.WinRT.cs" />
     <Compile Include="Platform\Graphics\Texture2D.StbSharp.cs" />
@@ -62,8 +65,8 @@
     <Compile Include="Platform\WindowsUniversal\XamlGame.cs" />
     <Compile Include="Platform\WindowsUniversal\InputEvents.cs" />
 
-    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
-    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
   </ItemGroup>
 
   <ItemGroup>

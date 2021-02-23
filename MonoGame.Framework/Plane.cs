@@ -471,6 +471,27 @@ namespace Microsoft.Xna.Framework
             d = D;
         }
 
+        /// <summary>
+        /// Returns a <see cref="System.Numerics.Plane"/>.
+        /// </summary>
+        public System.Numerics.Plane ToNumerics()
+        {
+            return new System.Numerics.Plane(this.Normal.X, this.Normal.Y, this.Normal.Z, this.D);
+        }
+
+        #endregion
+
+        #region Operators
+
+        /// <summary>
+        /// Converts a <see cref="System.Numerics.Plane"/> to a <see cref="Plane"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        public static implicit operator Plane(System.Numerics.Plane value)
+        {
+            return new Plane(value.Normal, value.D);
+        }
+
         #endregion
     }
 }

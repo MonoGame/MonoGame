@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class IndexBuffer
     {
-		internal int ibo;	
+        internal int ibo;
 
         private void PlatformConstruct(IndexElementSize indexElementSize, int indexCount)
         {
@@ -50,8 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
             // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
             throw new NotSupportedException("Index buffers are write-only on OpenGL ES platforms");
-#endif
-#if !GLES
+#else
             if (Threading.IsOnUIThread())
             {
                 GetBufferData(offsetInBytes, data, startIndex, elementCount);
@@ -68,11 +67,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
             GraphicsExtensions.CheckGLError();
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var elementSizeInByte = Marshal.SizeOf<T>();
             IntPtr ptr = GL.MapBuffer(BufferTarget.ElementArrayBuffer, BufferAccess.ReadOnly);
             // Pointer to the start of data to read in the index buffer
             ptr = new IntPtr(ptr.ToInt64() + offsetInBytes);
-			if (typeof(T) == typeof(byte))
+            if (typeof(T) == typeof(byte))
             {
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
@@ -93,46 +92,54 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
-        private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        private void PlatformSetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options)
+            where T : struct
         {
-            if (Threading.IsOnUIThread())
+            Threading.BlockOnUIThread(SetDataState<T>.Action, new SetDataState<T>
             {
-                BufferData(offsetInBytes, data, startIndex, elementCount, options);
-            }
-            else
-            {
-                Threading.BlockOnUIThread(() => BufferData(offsetInBytes, data, startIndex, elementCount, options));
-            }
+                buffer = this,
+                offsetInBytes = offsetInBytes,
+                data = data,
+                startIndex = startIndex,
+                elementCount = elementCount,
+                options = options
+            });
         }
 
-        private void BufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        private void PlatformSetDataBody<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
             GenerateIfRequired();
-            
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+
+            var elementSizeInByte = Marshal.SizeOf<T>();
             var sizeInBytes = elementSizeInByte * elementCount;
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
-            var bufferSize = IndexCount * (IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
-            
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-            GraphicsExtensions.CheckGLError();
-            
-            if (options == SetDataOptions.Discard)
+            try
             {
-                // By assigning NULL data to the buffer this gives a hint
-                // to the device to discard the previous content.
-                GL.BufferData(  BufferTarget.ElementArrayBuffer,
-                              (IntPtr)bufferSize,
-                              IntPtr.Zero,
-                              _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+                var bufferSize = IndexCount * (IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
+
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                GraphicsExtensions.CheckGLError();
+
+                if (options == SetDataOptions.Discard)
+                {
+                    // By assigning NULL data to the buffer this gives a hint
+                    // to the device to discard the previous content.
+                    GL.BufferData(
+                        BufferTarget.ElementArrayBuffer,
+                        (IntPtr)bufferSize,
+                        IntPtr.Zero,
+                        _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                    GraphicsExtensions.CheckGLError();
+                }
+
+                GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
                 GraphicsExtensions.CheckGLError();
             }
-            
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
-            GraphicsExtensions.CheckGLError();
-            
-            dataHandle.Free();
+            finally
+            {
+                dataHandle.Free();
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -144,5 +151,19 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             base.Dispose(disposing);
         }
-	}
+
+        struct SetDataState<T>
+            where T : struct
+        {
+            public IndexBuffer buffer;
+            public int offsetInBytes;
+            public T[] data;
+            public int startIndex;
+            public int elementCount;
+            public SetDataOptions options;
+
+            public static Action<SetDataState<T>> Action =
+                (s) => s.buffer.PlatformSetDataBody(s.offsetInBytes, s.data, s.startIndex, s.elementCount, s.options);
+        }
+    }
 }

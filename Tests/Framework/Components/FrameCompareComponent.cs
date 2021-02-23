@@ -355,7 +355,7 @@ namespace MonoGame.Tests.Components {
 
 					if (workItem.FrameOutputPath != null) {
 						try {
-							framePixelData.Save (workItem.FrameOutputPath);
+							framePixelData.Save (workItem.FrameOutputPath, "Output");
 						} catch (IOException) {
 							// FIXME: Report this error somehow.
 						}

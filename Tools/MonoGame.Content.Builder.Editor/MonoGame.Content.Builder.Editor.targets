@@ -30,11 +30,6 @@
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)\Icons\Commands\*">
       <LogicalName>Commands.%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
-
-    <!-- Copy the template resources to the output -->
-    <Content Include="$(MSBuildThisFileDirectory)\Templates\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
 </Project>

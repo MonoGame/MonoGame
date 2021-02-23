@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 10;
+            public const int MGFXVersion = 11;
 
             public int Signature;
             public int Version;
@@ -107,6 +107,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Create one.
                 cloneSource = new Effect(graphicsDevice);
                     cloneSource.ReadEffect(reader);
+
+                // Check file tail to ensure we parsed the content correctly.
+                    var tail = reader.ReadInt32();
+                    if (tail != MGFXHeader.MGFXSignature) throw new ArgumentException("The MGFX effect code was not parsed correctly.", "effectCode");                    
 
                 // Cache the effect for later in its original unmodified state.
                     graphicsDevice.EffectCache.Add(effectKey, cloneSource);
@@ -231,7 +235,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Effect File Reader
 
-		private void ReadEffect (BinaryReaderEx reader)
+		private void ReadEffect (BinaryReader reader)
 		{
             // TODO: Maybe we should be reading in a string 
             // table here to save some bytes in the file.
@@ -239,10 +243,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // Read if compiled with MojoShader or ShaderConductor 
             _isMojoShader = reader.ReadBoolean();
 
-            // Read in all the constant buffers.
-            var buffers = (int)reader.ReadByte ();
-			ConstantBuffers = new ConstantBuffer[buffers];
-            for (var c = 0; c < buffers; c++) 
+            ConstantBuffers = new ConstantBuffer[reader.ReadInt32()];
+
+            for (var c = 0; c < ConstantBuffers.Length; c++)
             {				
 				var name = reader.ReadString ();
                 var instanceName = reader.ReadString();
@@ -250,56 +253,50 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Create the backing system memory buffer.
                 var sizeInBytes = (int)reader.ReadInt16 ();
 
-				// Read the parameter index values.
-				var parameters = new int[reader.ReadByte ()];
-				var offsets = new int[parameters.Length];
-				for (var i = 0; i < parameters.Length; i++) 
+                // Read the parameter index values.
+                var parameters = new int[reader.ReadInt32()];
+                var offsets = new int[parameters.Length];
+                for (var i = 0; i < parameters.Length; i++)
                 {
-					parameters [i] = (int)reader.ReadByte ();
-					offsets [i] = (int)reader.ReadUInt16 ();
-				}
+                    parameters[i] = reader.ReadInt32();
+                    offsets[i] = (int)reader.ReadUInt16();
+                }
 
-                var buffer = new ConstantBuffer(GraphicsDevice,
-				                                sizeInBytes,
-				                                parameters,
-				                                offsets,
-				                                name,
+                ConstantBuffers[c] = new ConstantBuffer(GraphicsDevice,
+                                                sizeInBytes,
+                                                parameters,
+                                                offsets,
+                                                name,
                                                 instanceName,
                                                 this);
-
-                ConstantBuffers[c] = buffer;
             }
 
-            // Read in all the shader objects.
-            var shaders = (int)reader.ReadByte();
-            _shaders = new Shader[shaders];
-            for (var s = 0; s < shaders; s++)
+            _shaders = new Shader[reader.ReadInt32()];
+
+            for (var s = 0; s < _shaders.Length; s++)
                 _shaders[s] = new Shader(GraphicsDevice, reader);
 
-            // Read in the parameters.
             Parameters = ReadParameters(reader, _isMojoShader);
 
-            // Read the techniques.
-            var techniqueCount = (int)reader.ReadByte();
-            var techniques = new EffectTechnique[techniqueCount];
-            for (var t = 0; t < techniqueCount; t++)
+            var techniques = new EffectTechnique[reader.ReadInt32()];
+
+            for (var t = 0; t < techniques.Length; t++)
             {
                 var name = reader.ReadString();
-
                 var annotations = ReadAnnotations(reader);
-
                 var passes = ReadPasses(reader, this, _shaders);
 
                 techniques[t] = new EffectTechnique(this, name, passes, annotations);
             }
 
             Techniques = new EffectTechniqueCollection(techniques);
+
             CurrentTechnique = Techniques[0];
         }
 
         private static EffectAnnotationCollection ReadAnnotations(BinaryReader reader)
         {
-            var count = (int)reader.ReadByte();
+            var count = reader.ReadInt32();
             if (count == 0)
                 return EffectAnnotationCollection.Empty;
 
@@ -312,43 +309,32 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, Shader[] shaders)
         {
-            var count = (int)reader.ReadByte();
-            var passes = new EffectPass[count];
+            var passes = new EffectPass[reader.ReadInt32()];
 
-            for (var i = 0; i < count; i++)
+            for (var i = 0; i < passes.Length; i++)
             {
                 var name = reader.ReadString();
                 var annotations = ReadAnnotations(reader);
 
                 // Get the vertex shader.
-                Shader vertexShader = null;
-                var shaderIndex = (int)reader.ReadByte();
-                if (shaderIndex != 255)
-                    vertexShader = shaders[shaderIndex];
+                var shaderIndex = reader.ReadInt32();
+                Shader vertexShader = shaderIndex < 0 ? null : shaders[shaderIndex];
 
                 // Get the pixel shader.
-                Shader pixelShader = null;
-                shaderIndex = (int)reader.ReadByte();
-                if (shaderIndex != 255)
-                    pixelShader = shaders[shaderIndex];
+                shaderIndex = reader.ReadInt32();
+                Shader pixelShader = shaderIndex < 0 ? null : shaders[shaderIndex];
 
                 // Get the hull shader.
-                Shader hullShader = null;
-                shaderIndex = (int)reader.ReadByte();
-                if (shaderIndex != 255)
-                    hullShader = shaders[shaderIndex];
+                shaderIndex = (int)reader.ReadInt32();
+                Shader hullShader = shaderIndex < 0 ? null : shaders[shaderIndex];
 
                 // Get the domain shader.
-                Shader domainShader = null;
-                shaderIndex = (int)reader.ReadByte();
-                if (shaderIndex != 255)
-                    domainShader = shaders[shaderIndex];
+                shaderIndex = (int)reader.ReadInt32();
+                Shader domainShader = shaderIndex < 0 ? null : shaders[shaderIndex];
 
                 // Get the geometry shader.
-                Shader geometryShader = null;
-                shaderIndex = (int)reader.ReadByte();
-                if (shaderIndex != 255)
-                    geometryShader = shaders[shaderIndex];
+                shaderIndex = (int)reader.ReadInt32();
+                Shader geometryShader = shaderIndex < 0 ? null : shaders[shaderIndex];
 
                 BlendState blend = null;
 				DepthStencilState depth = null;
@@ -412,9 +398,9 @@ namespace Microsoft.Xna.Framework.Graphics
             return new EffectPassCollection(passes);
 		}
 
-		private static EffectParameterCollection ReadParameters(BinaryReaderEx reader, bool isMojo)
+		private static EffectParameterCollection ReadParameters(BinaryReader reader, bool isMojo)
 		{
-			var count = reader.Read7BitEncodedInt();
+            var count = reader.ReadInt32();
             if (count == 0)
                 return EffectParameterCollection.Empty;
 
@@ -485,6 +471,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			return new EffectParameterCollection(parameters);
 		}
+
         #endregion // Effect File Reader
-	}
+    }
 }

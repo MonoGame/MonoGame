@@ -26,7 +26,10 @@ Check out the awesome work of the larger MonoGame community with their own tutor
 
 ## Darkside of MonoGame video series
 
-- [Getting Started with MonoGame on Visual Studio 2017](https://www.youtube.com/watch?v=zphaylhOrm0)
+- [Getting Started with MonoGame using Visual Studio 2019](https://www.youtube.com/watch?v=BahlvXQcJw4)
+- [Getting Started with MonoGame using Visual Studio for Mac](https://www.youtube.com/watch?v=Hxo9A0-qcVo)
+- [Getting Started with MonoGame using the command-line](https://www.youtube.com/watch?v=MOcZriFLt7c)
+- [Walk-through setting up your Mac for MonoGame CLI](https://www.youtube.com/watch?v=2c_41vMhDYo)
 - [Getting Started with MonoGame using 2D](https://www.youtube.com/watch?v=6inkDfpUxAU)
 - [Getting Started with MonoGame using XML](https://www.youtube.com/watch?v=wCc_rLrqsIo)
 - [Getting the most out of your assets–The MonoGame Content Pipeline](https://www.youtube.com/watch?v=5mEQqCgTaLU)

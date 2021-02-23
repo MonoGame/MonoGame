@@ -190,6 +190,9 @@ namespace MonoGame.Framework
         [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
         internal static extern int MapWindowPoints(HandleRef hWndFrom, HandleRef hWndTo, out POINTSTRUCT pt, int cPoints);
 
+        [DllImport("shell32.dll")]
+        private static extern void DragAcceptFiles(IntPtr hwnd, bool fAccept);
+
         private void SetIcon()
         {
             // When running unit tests this can return null.
@@ -238,6 +241,8 @@ namespace MonoGame.Framework
         {
             _platform.IsActive = true;
             Keyboard.SetActive(true);
+
+            DragAcceptFiles(Handle, true); //allows drag and dropping
         }
 
         private void OnDeactivate(object sender, EventArgs eventArgs)

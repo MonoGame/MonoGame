@@ -3,14 +3,14 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
+using MonoGame.Framework.Utilities;
 using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public partial class Texture3D : Texture
-	{
+    public partial class Texture3D : Texture
+    {
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
         {
@@ -38,25 +38,32 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        private void PlatformSetData<T>(int level,
-                                     int left, int top, int right, int bottom, int front, int back,
-                                     T[] data, int startIndex, int elementCount, int width, int height, int depth)
+        private void PlatformSetData<T>(
+            int level,
+            int left, int top, int right, int bottom, int front, int back,
+            T[] data, int startIndex, int elementCount, int width, int height, int depth)
         {
 #if GLES
             throw new NotSupportedException("OpenGL ES 2.0 doesn't support 3D textures.");
 #else
             Threading.BlockOnUIThread(() =>
             {
-                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                var elementSizeInByte = Marshal.SizeOf<T>();
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+                try
+                {
+                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
 
-                GL.BindTexture(glTarget, glTexture);
-                GraphicsExtensions.CheckGLError();
-                GL.TexSubImage3D(glTarget, level, left, top, front, width, height, depth, glFormat, glType, dataPtr);
-                GraphicsExtensions.CheckGLError();
+                    GL.BindTexture(glTarget, glTexture);
+                    GraphicsExtensions.CheckGLError();
 
-                dataHandle.Free();
+                    GL.TexSubImage3D(glTarget, level, left, top, front, width, height, depth, glFormat, glType, dataPtr);
+                    GraphicsExtensions.CheckGLError();
+                }
+                finally
+                {
+                    dataHandle.Free();
+                }
             });
 #endif
         }
@@ -67,6 +74,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotImplementedException();
         }
-	}
+    }
 }
 

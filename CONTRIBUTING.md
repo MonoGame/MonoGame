@@ -55,6 +55,13 @@ If you did not write the code, you do not have ownership of the code and you sho
 
 If we find a contribution to be in violation of copyright, it will be immediately removed.  We will bar that contributor from the MonoGame project.
 
+## Code guidelines
+
+Due to limitations on private target platforms, MonoGame enforces the use of C# 5.0 features.
+
+It is however allowed to use the latest class library, but if contributions make use of classes which are not present in .NET 4.5, it will be required from the contribution to implement backward compatible switches.
+
+These limitations should be lifted at some point.
 
 ## Licensing
 

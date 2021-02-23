@@ -29,6 +29,7 @@ namespace MonoGame.Tests.Graphics
         [TestCase("Assets/Textures/8bit.png")]
         [TestCase("Assets/Textures/24bit.png")]
         [TestCase("Assets/Textures/32bit.png")]
+        [TestCase("Assets/Textures/sample_1280x853.hdr")]
         public void FromStreamShouldWorkTest(string filename)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))

@@ -216,12 +216,16 @@ namespace MonoGame.Tools.Pipeline
 
         public void OutputAppend(string text)
         {
+#if !IDE
             Application.Instance.AsyncInvoke(() => buildOutput.WriteLine(text));
+#endif
         }
 
         public void OutputClear()
         {
+#if !IDE
             Application.Instance.Invoke(() => buildOutput.ClearOutput());
+#endif
         }
 
         public bool ShowDeleteDialog(List<IProjectItem> items)
@@ -563,7 +567,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdHelp_Executed(object sender, EventArgs e)
         {
-            Process.Start(new ProcessStartInfo() { FileName = "https://docs.monogame.net/articles/tools/pipeline.html", UseShellExecute = true, Verb = "open" });
+            Process.Start(new ProcessStartInfo() { FileName = "https://docs.monogame.net/articles/tools/mgcb_editor.html", UseShellExecute = true, Verb = "open" });
         }
 
         private void CmdAbout_Executed(object sender, EventArgs e)
