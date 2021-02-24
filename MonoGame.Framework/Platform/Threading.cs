@@ -19,9 +19,6 @@ namespace Microsoft.Xna.Framework
 {
     internal class Threading
     {
-        public const int MaxWaitForUIThread = 1000; // In milliseconds
-        public const int MaxPooledResetEvents = 32; // Throw away objects when above this amount
-
         static int _mainThreadId;
 
         static Stack<ManualResetEventSlim> _resetEventPool = new Stack<ManualResetEventSlim>();
@@ -142,8 +139,7 @@ namespace Microsoft.Xna.Framework
 
             try
             {
-                if (!resetEvent.Wait(MaxWaitForUIThread))
-                    throw new TimeoutException();
+                resetEvent.Wait(); // we don't know how much time the operation will take, so let's wait indefinitely
             }
             finally
             {
@@ -168,11 +164,8 @@ namespace Microsoft.Xna.Framework
 
             lock (_resetEventPool)
             {
-                if (_resetEventPool.Count < MaxPooledResetEvents)
-                {
-                    _resetEventPool.Push(resetEvent);
-                    return; // return here to skip dispose
-                }
+                _resetEventPool.Push(resetEvent);
+                return; // return here to skip dispose
             }
 
             resetEvent.Dispose();
