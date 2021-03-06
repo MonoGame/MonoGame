@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// Allows child class to specify the surface type, eg: a swap chain.
-        /// </summary>        
+        /// </summary>
         protected RenderTarget2D(GraphicsDevice graphicsDevice,
                         int width,
                         int height,
@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
             : base(graphicsDevice, width, height, mipMap, format, surfaceType)
         {
             DepthStencilFormat = depthFormat;
-            MultiSampleCount = preferredMultiSampleCount;
+            MultiSampleCount = graphicsDevice.GetClampedMultisampleCount(preferredMultiSampleCount);
             RenderTargetUsage = usage;
 		}
 

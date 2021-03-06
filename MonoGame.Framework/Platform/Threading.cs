@@ -19,14 +19,40 @@ namespace Microsoft.Xna.Framework
 {
     internal class Threading
     {
-        public const int kMaxWaitForUIThread = 750; // In milliseconds
+        static int _mainThreadId;
 
-        static int mainThreadId;
+        static Stack<ManualResetEventSlim> _resetEventPool = new Stack<ManualResetEventSlim>();
 
-#if ANDROID || WINDOWS || DESKTOPGL || ANGLE || IOS
-        static List<Action> actions = new List<Action>();
-        //static Mutex actionsMutex = new Mutex();
-#endif
+        // Storing non-generic dequeue actions allows us to preserve invocation order.
+        static List<Action> _queuedActions = new List<Action>();
+
+        // Used to share one implementation for both generic and non-generic actions.
+        readonly static Action<Action> _metaAction = (a) => a();
+
+        /// <summary>
+        /// Static helper that provides a generic action queue
+        /// but a non-generic dequeue-and-invoke <see cref="Action"/>.
+        /// </summary>
+        /// <typeparam name="TState"></typeparam>
+        static class StateActionHelper<TState>
+        {
+            public static readonly Queue<QueuedAction> Queue = new Queue<QueuedAction>();
+            public static readonly Action DequeueAction = Dequeue;
+
+            public static void Dequeue()
+            {
+                var item = Queue.Dequeue();
+                item.Action.Invoke(item.State);
+                item.ResetEvent.Set();
+            }
+
+            public struct QueuedAction
+            {
+                public ManualResetEventSlim ResetEvent;
+                public Action<TState> Action;
+                public TState State;
+            }
+        }
 
 #if IOS
         public static EAGLContext BackgroundContext;
@@ -34,21 +60,23 @@ namespace Microsoft.Xna.Framework
 
         static Threading()
         {
-            mainThreadId = Thread.CurrentThread.ManagedThreadId;
+            _mainThreadId = Thread.CurrentThread.ManagedThreadId;
         }
+
 #if ANDROID
         internal static void ResetThread (int id)
         {
-            mainThreadId = id;
+            _mainThreadId = id;
         }
 #endif
+
         /// <summary>
         /// Checks if the code is currently running on the UI thread.
         /// </summary>
         /// <returns>true if the code is currently running on the UI thread.</returns>
         public static bool IsOnUIThread()
         {
-            return mainThreadId == Thread.CurrentThread.ManagedThreadId;
+            return _mainThreadId == Thread.CurrentThread.ManagedThreadId;
         }
 
         /// <summary>
@@ -71,41 +99,80 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action");
 
+            BlockOnUIThread(_metaAction, action);
+        }
+
+        /// <summary>
+        /// Runs the given action on the UI thread and blocks the current thread while the action is running.
+        /// If the current thread is the UI thread, the action will run immediately.
+        /// </summary>
+        /// <param name="action">The action to be run on the UI thread</param>
+        /// <param name="state">The data to pass to <paramref name="action"/></param>.
+        internal static void BlockOnUIThread<TState>(Action<TState> action, TState state)
+        {
+            if (action == null)
+                throw new ArgumentNullException("action");
+
 #if DIRECTX || PSM
-            action();
+            action(state);
 #else
             // If we are already on the UI thread, just call the action and be done with it
             if (IsOnUIThread())
             {
-                action();
+                action(state);
                 return;
             }
 
-            ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
-            Add(() =>
+            ManualResetEventSlim resetEvent = RentResetEvent();
+            var queuedAction = new StateActionHelper<TState>.QueuedAction
             {
-#if ANDROID
-                //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
-                ((AndroidGameWindow)Game.Instance.Window).GameView.MakeCurrent();
-#endif
-                action();
-                resetEvent.Set();
-            });
-            resetEvent.Wait();
+                ResetEvent = resetEvent,
+                Action = action,
+                State = state
+            };
+
+            lock (_queuedActions)
+            {
+                StateActionHelper<TState>.Queue.Enqueue(queuedAction);
+                _queuedActions.Add(StateActionHelper<TState>.DequeueAction);
+            }
+
+            try
+            {
+                resetEvent.Wait(); // we don't know how much time the operation will take, so let's wait indefinitely
+            }
+            finally
+            {
+                ReturnResetEvent(resetEvent);
+            }
 #endif
         }
 
-#if ANDROID || WINDOWS || DESKTOPGL || ANGLE || IOS
-        static void Add(Action action)
+        static ManualResetEventSlim RentResetEvent()
         {
-            lock (actions)
+            lock (_resetEventPool)
             {
-                actions.Add(action);
+                if (_resetEventPool.Count > 0)
+                    return _resetEventPool.Pop();
             }
+            return new ManualResetEventSlim();
+        }
+
+        static void ReturnResetEvent(ManualResetEventSlim resetEvent)
+        {
+            resetEvent.Reset();
+
+            lock (_resetEventPool)
+            {
+                _resetEventPool.Push(resetEvent);
+                return; // return here to skip dispose
+            }
+
+            resetEvent.Dispose();
         }
 
         /// <summary>
-        /// Runs all pending actions.  Must be called from the UI thread.
+        /// Runs all pending actions. Must be called from the UI thread.
         /// </summary>
         internal static void Run()
         {
@@ -119,14 +186,19 @@ namespace Microsoft.Xna.Framework
                     EAGLContext.SetCurrentContext(BackgroundContext);
 #endif
 
-                lock (actions)
+#if ANDROID
+            //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
+                ((AndroidGameWindow)Game.Instance.Window).GameView.MakeCurrent();
+#endif
+
+            lock (_queuedActions)
+            {
+                foreach (Action queuedAction in _queuedActions)
                 {
-                    foreach (Action action in actions)
-                    {
-                        action();
-                    }
-                    actions.Clear();
+                    queuedAction.Invoke();
                 }
+                _queuedActions.Clear();
+            }
 
 #if IOS
                 // Must flush the GL calls so the GPU asset is ready for the main context to use it
@@ -135,6 +207,5 @@ namespace Microsoft.Xna.Framework
             }
 #endif
         }
-#endif
     }
 }

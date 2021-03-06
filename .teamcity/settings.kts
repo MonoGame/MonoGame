@@ -184,7 +184,7 @@ object DevelopWin : BuildType({
     features {
         feature {
             type = "teamcity.github.status"
-            param("guthub_context", "Build Windows, Web, Android, and OUYA")
+            param("guthub_context", "Build Windows, Web, and Android")
             param("guthub_owner", "MonoGame")
             param("guthub_authentication_type", "token")
             param("guthub_guest", "true")
@@ -659,7 +659,7 @@ object Version : BuildType({
               regex = """^\d+${'$'}""")
         text("VersionMinor", "8", label = "Minor Version Number", description = "The minor version number.",
               regex = """^\d+${'$'}""")
-        text("VersionPatch", "0", label = "Patch Version Number", description = "The patch version number or zero.",
+        text("VersionPatch", "1", label = "Patch Version Number", description = "The patch version number or zero.",
               regex = """^\d+${'$'}""")
         text("VersionBuildCounter", "%build.counter%", label = "Version Build Counter", description = "This should be a unique number which increments with each build.", allowEmpty = false)
     }

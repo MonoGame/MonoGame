@@ -24,7 +24,7 @@ namespace MonoGame.Tests
 			return frame;
         }
 
-        public unsafe void Save(string filename)
+        public unsafe void Save(string filename, string attachmentDescription = null)
         {
 			using (var stream = new FileStream(filename, FileMode.Create))
 			{
@@ -34,6 +34,11 @@ namespace MonoGame.Tests
 					writer.WriteBmp(ptr, Width, Height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream);
 				}
 			}
+
+            if (attachmentDescription != null)
+            {
+                NUnit.Framework.TestContext.AddTestAttachment(filename, attachmentDescription);
+            }
         }
     }
 }

@@ -199,8 +199,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             ImageResult result;
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                var imageLoader = new ImageStreamLoader();
-                result = imageLoader.Load(stream, ColorComponents.RedGreenBlueAlpha);
+                result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
             }
 
             var face = new PixelBitmapContent<Color>(result.Width, result.Height);

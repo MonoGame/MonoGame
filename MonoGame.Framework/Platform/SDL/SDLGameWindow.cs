@@ -153,8 +153,13 @@ namespace Microsoft.Xna.Framework
                 winy |= GetMouseDisplay();
             }
 
-            _handle = Sdl.Window.Create(AssemblyHelper.GetDefaultWindowTitle(),
-                winx, winy, _width, _height, initflags);
+            _width = GraphicsDeviceManager.DefaultBackBufferWidth;
+            _height = GraphicsDeviceManager.DefaultBackBufferHeight;
+
+            _handle = Sdl.Window.Create(
+                AssemblyHelper.GetDefaultWindowTitle(),
+                winx, winy, _width, _height, initflags
+            );
 
             Id = Sdl.Window.GetWindowId(_handle);
 

@@ -8,6 +8,7 @@
     <DefineConstants>GTK</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-gtk</AssemblyName>
+    <AssemblyTitle>MGCB Editor</AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,16 +24,22 @@
 
     <Compile Include="Platform\Linux\**\*.cs" />
     <Compile Include="Platform\Utilities\**\*.cs" />
+  </ItemGroup>
 
+  <ItemGroup>
     <Content Include="Platform\Linux\Content\**\*">
       <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Templates\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Templates\%(Filename)%(Extension)</Link>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Eto.Forms" Version="2.5.2" />
-    <PackageReference Include="Eto.Platform.Gtk" Version="2.5.2" />
+    <PackageReference Include="Eto.Forms" Version="2.5.10" />
+    <PackageReference Include="Eto.Platform.Gtk" Version="2.5.10" />
     <PackageReference Include="GtkSharp" Version="3.22.25.98" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20158.1" />
   </ItemGroup>

@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public abstract partial class Texture
     {
-        internal Resource _texture;
+        private Resource _texture;
 
         private ShaderResourceView _resourceView;
 
@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </returns>
         public IntPtr GetSharedHandle()
         {
-            using (var resource = _texture.QueryInterface<SharpDX.DXGI.Resource>())
+            using (var resource = GetTexture().QueryInterface<SharpDX.DXGI.Resource>())
                 return resource.SharedHandle;
         }
 

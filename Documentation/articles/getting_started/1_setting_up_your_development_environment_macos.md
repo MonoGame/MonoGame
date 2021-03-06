@@ -1,6 +1,5 @@
 # Setting up your development environment for macOS
-
-In this section we will go over setting up your development environment for macOS.
+This section provides a step-by-step guide for setting up your development environment for macOS.
 
 ## Install Visual Studio for Mac
 
@@ -8,7 +7,7 @@ Go to the following URL to download and install Visual Studio for Mac: https://v
 
 ## Install MonoGame extension for Visual Studio for Mac
 
-Download the MonoGame extension for Visual Studio for Mac from the following page: https://www.monogame.net/downloads/
+Download the MonoGame extension for Visual Studio for Mac from the following link: https://github.com/MonoGame/MonoGame/releases/download/v3.8/MonoDevelop.MonoGame_IDE_VisualStudioForMac_3.8.0.1641.mpack
 
 Open up Visual Studio for Mac and you should be able to see a window like so:
 
@@ -18,11 +17,11 @@ In the menu bar, click on **Visual Studio**, and then click on the **Extensions.
 
 ![Launch Extensions manager](~/images/getting_started/vsmac-mg-install-2.png)
 
-Next, click on the **Install from file...** button in the bottom left and select the extension file we downloaded in the previous step.
+Next, click on the **Install from file...** button in the bottom left and select the extension file you downloaded in the previous step.
 
 ![Import VSM extension](~/images/getting_started/vsmac-mg-install-3.png)
 
-And finally click on the Install button once again.
+Finally, click on the Install button once again.
 
 ![Install VSM extension](~/images/getting_started/vsmac-mg-install-4.png)
 
@@ -34,9 +33,9 @@ dotnet new --install MonoGame.Templates.CSharp
 
 ## [Optional] Install MGCB Editor
 
-MGCB Editor is a tool for editing the .mgcb files, which are used for building the content.
+MGCB Editor is a tool for editing .mgcb files, which are used for building content.
 
-If you plan on using Visual Studio for Mac, the extension we installed already contains an integrated version of this tool so you can skip this step.
+If you plan on using Visual Studio for Mac, the extension you installed already contains an integrated version of this tool, so you can skip this step.
 
 ```sh
 dotnet tool install --global dotnet-mgcb-editor
@@ -45,7 +44,7 @@ mgcb-editor --register
 
 ## [Optional] Set up Wine for effect compilation
 
-Effect compilation requires access to some DirectX compiler stuff so it can't natively work on macOS systems, however we can use it through Wine.
+Effect compilation requires access to DirectX, so it won't work natively on macOS systems, but it can be used through Wine.
 
 Install brew
 
@@ -58,7 +57,7 @@ Install wine64:
 ```sh
 brew cask install xquartz
 brew cask install wine-stable
-brew install p7zip
+brew install p7zip wget
 ```
 
 Create wine prefix:

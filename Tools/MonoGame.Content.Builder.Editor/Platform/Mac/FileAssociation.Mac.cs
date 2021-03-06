@@ -6,46 +6,24 @@ namespace MonoGame.Tools.Pipeline
 {
     public static class FileAssociation
     {
-        private readonly static string appPath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "Applications/MGCB Editor.app");
+        private static readonly string _localAppPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "../.."));
+        private static readonly string _systemAppPath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "Applications/MGCB Editor.app");
 
         public static void Associate()
         {
-            InstallApplication();
+            if (Path.GetExtension(_localAppPath) != ".app")
+                throw new FileNotFoundException("Not running from within the app package");
+
+            InstallApp(_localAppPath, _systemAppPath);
         }
 
         public static void Unassociate()
         {
-            UninstallApplication();
+            if (Directory.Exists(_systemAppPath))
+                Directory.Delete(_systemAppPath, true);
         }
 
-        private static void InstallApplication()
-        {
-            Console.WriteLine("Installing application...");
-
-            var baseAppPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "../.."));
-            if (Path.GetExtension(baseAppPath) != ".app")
-            {
-                throw new FileNotFoundException("Not running from within the app package");
-            }
-
-            CopyDirectory(baseAppPath, appPath);
-
-            Console.WriteLine("Installation complete!");
-        }
-
-        private static void UninstallApplication()
-        {
-            Console.WriteLine("Uninstalling aplication...");
-
-            if (Directory.Exists(appPath))
-            {
-                Directory.Delete(appPath, true);
-            }
-
-            Console.WriteLine("Uninstallation complete!");
-        }
-
-        private static void CopyDirectory(string sourceDirName, string destDirName)
+        private static void InstallApp(string sourceDirName, string destDirName)
         {
             var dir = new DirectoryInfo(sourceDirName);
 
@@ -53,10 +31,14 @@ namespace MonoGame.Tools.Pipeline
                 Directory.CreateDirectory(destDirName);
 
             foreach (var file in dir.GetFiles())
-                file.CopyTo(Path.Combine(destDirName, file.Name), false);
+            {
+                // We change the name of the .app file so we also need to change the names of related files inside the bundle
+                var fileName = file.Name.Replace(Path.GetFileNameWithoutExtension(_localAppPath), Path.GetFileNameWithoutExtension(_systemAppPath));
+                file.CopyTo(Path.Combine(destDirName, fileName), false);
+            }
 
             foreach (var subdir in dir.GetDirectories())
-                CopyDirectory(subdir.FullName, Path.Combine(destDirName, subdir.Name));
+                InstallApp(subdir.FullName, Path.Combine(destDirName, subdir.Name));
         }
     }
 }

@@ -914,7 +914,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
         /// <param name="nearPlaneDistance">Distance to the near plane.</param>
-        /// <param name="farPlaneDistance">Distance to the far plane.</param>
+        /// <param name="farPlaneDistance">Distance to the far plane, or <see cref="float.PositiveInfinity"/>.</param>
         /// <param name="result">The new projection <see cref="Matrix"/> for perspective view as an output parameter.</param>
         public static void CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
         {
@@ -930,15 +930,18 @@ namespace Microsoft.Xna.Framework
 		    {
 		        throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
 		    }
-		    result.M11 = (2f * nearPlaneDistance) / width;
-		    result.M12 = result.M13 = result.M14 = 0f;
-		    result.M22 = (2f * nearPlaneDistance) / height;
-		    result.M21 = result.M23 = result.M24 = 0f;
-		    result.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
-		    result.M31 = result.M32 = 0f;
-		    result.M34 = -1f;
-		    result.M41 = result.M42 = result.M44 = 0f;
-		    result.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
+
+            var negFarRange = float.IsPositiveInfinity(farPlaneDistance) ? -1.0f : farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+
+            result.M11 = (2.0f * nearPlaneDistance) / width;
+            result.M12 = result.M13 = result.M14 = 0.0f;
+            result.M22 = (2.0f * nearPlaneDistance) / height;
+            result.M21 = result.M23 = result.M24 = 0.0f;            
+            result.M33 = negFarRange;
+            result.M31 = result.M32 = 0.0f;
+            result.M34 = -1.0f;
+            result.M41 = result.M42 = result.M44 = 0.0f;
+            result.M43 = nearPlaneDistance * negFarRange;
         }
 
         /// <summary>
@@ -947,7 +950,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="fieldOfView">Field of view in the y direction in radians.</param>
         /// <param name="aspectRatio">Width divided by height of the viewing volume.</param>
         /// <param name="nearPlaneDistance">Distance to the near plane.</param>
-        /// <param name="farPlaneDistance">Distance to the far plane.</param>
+        /// <param name="farPlaneDistance">Distance to the far plane, or <see cref="float.PositiveInfinity"/>.</param>
         /// <returns>The new projection <see cref="Matrix"/> for perspective view with FOV.</returns>
         public static Matrix CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
         {
@@ -962,7 +965,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="fieldOfView">Field of view in the y direction in radians.</param>
         /// <param name="aspectRatio">Width divided by height of the viewing volume.</param>
         /// <param name="nearPlaneDistance">Distance of the near plane.</param>
-        /// <param name="farPlaneDistance">Distance of the far plane.</param>
+        /// <param name="farPlaneDistance">Distance of the far plane, or <see cref="float.PositiveInfinity"/>.</param>
         /// <param name="result">The new projection <see cref="Matrix"/> for perspective view with FOV as an output parameter.</param>
         public static void CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
         {
@@ -982,17 +985,20 @@ namespace Microsoft.Xna.Framework
 		    {
 		        throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
 		    }
-		    float num = 1f / ((float) Math.Tan((double) (fieldOfView * 0.5f)));
-		    float num9 = num / aspectRatio;
-		    result.M11 = num9;
-		    result.M12 = result.M13 = result.M14 = 0;
-		    result.M22 = num;
-		    result.M21 = result.M23 = result.M24 = 0;
-		    result.M31 = result.M32 = 0f;
-		    result.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
-		    result.M34 = -1;
-		    result.M41 = result.M42 = result.M44 = 0;
-		    result.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
+
+            var yScale = 1.0f / (float)Math.Tan((double)fieldOfView * 0.5f);
+            var xScale = yScale / aspectRatio;
+            var negFarRange = float.IsPositiveInfinity(farPlaneDistance) ? -1.0f : farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+
+            result.M11 = xScale;
+            result.M12 = result.M13 = result.M14 = 0.0f;
+            result.M22 = yScale;
+            result.M21 = result.M23 = result.M24 = 0.0f;
+            result.M31 = result.M32 = 0.0f;            
+            result.M33 = negFarRange;
+            result.M34 = -1.0f;
+            result.M41 = result.M42 = result.M44 = 0.0f;
+            result.M43 = nearPlaneDistance * negFarRange;
         }
 
         /// <summary>
@@ -2053,6 +2059,19 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Converts a <see cref="System.Numerics.Matrix4x4"/> to a <see cref="Matrix"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        public static implicit operator Matrix(System.Numerics.Matrix4x4 value)
+        {
+            return new Matrix(
+                value.M11, value.M12, value.M13, value.M14,
+                value.M21, value.M22, value.M23, value.M24,
+                value.M31, value.M32, value.M33, value.M34,
+                value.M41, value.M42, value.M43, value.M44);
+        }
+
+        /// <summary>
         /// Adds two matrixes.
         /// </summary>
         /// <param name="matrix1">Source <see cref="Matrix"/> on the left of the add sign.</param>
@@ -2445,10 +2464,23 @@ namespace Microsoft.Xna.Framework
             
             result = ret;
         }
+
+        /// <summary>
+        /// Returns a <see cref="System.Numerics.Matrix4x4"/>.
+        /// </summary>
+        public System.Numerics.Matrix4x4 ToNumerics()
+        {
+            return new System.Numerics.Matrix4x4(
+                this.M11, this.M12, this.M13, this.M14,
+                this.M21, this.M22, this.M23, this.M24,
+                this.M31, this.M32, this.M33, this.M34,
+                this.M41, this.M42, this.M43, this.M44);
+        }
+
         #endregion
-		
-		#region Private Static Methods
-        
+
+        #region Private Static Methods
+
         /// <summary>
         /// Helper method for using the Laplace expansion theorem using two rows expansions to calculate major and 
         /// minor determinants of a 4x4 matrix. This method is used for inverting a matrix.

@@ -5,7 +5,7 @@ MonoGame is API compatible with [XNA 4.0](https://docs.microsoft.com/en-us/previ
 > If your game targets XNA 3.1, you might want to use this archived migration cheatsheet to upgrade
 to 4.0:
 >
-> [http://www.nelxon.com/blog/xna-3-1-to-xna-4-0-cheatsheet/](https://web.archive.org/web/20110217153321/http://www.nelxon.com/blog/xna-3-1-to-xna-4-0-cheatsheet/)
+> [http://www.nelxon.com/blog/xna-3-1-to-xna-4-0-cheatsheet/](https://www.nelsonhurst.com/xna-cheatsheet/)
 
 ## Missing/removed API
 

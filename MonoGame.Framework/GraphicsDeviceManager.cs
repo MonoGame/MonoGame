@@ -108,10 +108,11 @@ namespace Microsoft.Xna.Framework
 
             try
             {
-                if (!_initialized)
-                    Initialize();
-
                 var gdi = DoPreparingDeviceSettings();
+
+                if (!_initialized)
+                    Initialize(gdi);
+
                 CreateDevice(gdi);
             }
             catch (NoSuitableGraphicsDeviceException)
@@ -368,15 +369,12 @@ namespace Microsoft.Xna.Framework
 
         partial void PlatformInitialize(PresentationParameters presentationParameters);
 
-        private void Initialize()
+        private void Initialize(GraphicsDeviceInformation gdi)
         {
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
-            var presentationParameters = new PresentationParameters();
-            PreparePresentationParameters(presentationParameters);
-
             // Allow for any per-platform changes to the presentation.
-            PlatformInitialize(presentationParameters);
+            PlatformInitialize(gdi.PresentationParameters);
 
             _initialized = true;
         }

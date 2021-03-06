@@ -28,5 +28,4 @@ An example on how to set it up can be found in the templates with "MonoGame NetS
 
 ## Compile Effects via Wine
 
-We've added a script and made fixes so that [MGFXC](tools/mgfxc.md) can run on Mac and Linux under Wine. For more information checkout the setting up the development environment for [macOS](getting_started/1_setting_up_your_development_environment_macos.md) and [Ubuntu](getting_started/1_setting_up_your_development_environment_ubuntu..md)
-
+We've added a script and made fixes so that [MGFXC](tools/mgfxc.md) can run on Mac and Linux under Wine. For more information checkout the setting up the development environment for [macOS](getting_started/1_setting_up_your_development_environment_macos.md) and [Ubuntu](getting_started/1_setting_up_your_development_environment_ubuntu.md)
