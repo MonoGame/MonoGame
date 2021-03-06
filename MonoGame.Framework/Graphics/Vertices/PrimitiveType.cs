@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// Defines how vertex data is ordered.
     /// </summary>
 	public enum PrimitiveType
-	{
+    {
         /// <summary>
         /// Renders the specified vertices as a sequence of isolated triangles. Each group of three vertices defines a separate triangle. Back-face culling is affected by the current winding-order render state.
         /// </summary>
@@ -28,5 +28,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Renders the vertices as a single polyline; the count may be any positive integer.
         /// </summary>
 		LineStrip,
-	}
+
+        /// <summary>
+        /// Renders the vertices as individual points; the count may be any positive integer.
+        /// </summary>
+        PointList
+    }
 }
