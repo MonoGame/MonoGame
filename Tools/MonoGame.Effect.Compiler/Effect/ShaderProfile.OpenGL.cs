@@ -118,7 +118,8 @@ namespace MonoGame.Effect
                     shaderStage, shaderFunction,
                     smMajor, smMinor, smExtension,
                     effect.ConstantBuffers, shaderInfo.SamplerStates,
-                    shaderResult.Debug, IsESSL);
+                    shaderResult.Debug, IsESSL,
+                    ref errorsAndWarnings);
 
                 // See if we already created this same shader.
                 foreach (var shader in effect.Shaders)

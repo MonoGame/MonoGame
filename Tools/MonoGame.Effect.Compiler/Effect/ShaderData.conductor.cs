@@ -14,7 +14,8 @@ namespace MonoGame.Effect
             ShaderStage shaderStage, string shaderFunction,
             int shaderModelMajor, int shaderModelMinor, string shaderModelExtension,
             List<ConstantBufferData> cbuffers, Dictionary<string, SamplerStateInfo> samplerStates,
-            bool debug, bool isESSL)
+            bool debug, bool isESSL,
+            ref string errorsAndWarnings)
         {
             var shaderData = new ShaderData(shaderStage, sharedIndex, new byte[0]);
 
@@ -80,126 +81,127 @@ namespace MonoGame.Effect
             System.IO.Directory.SetCurrentDirectory(previousWorkingDir); 
 
             //==============================================================
-            // Handle compiler errors
+            // Handle compiler errors and warnings
             //==============================================================
+            IntPtr errorBlob = ShaderConductor.GetShaderConductorBlobData(result.errorWarningMsg);
+            int errorBlobSize = ShaderConductor.GetShaderConductorBlobSize(result.errorWarningMsg);
+            string errorMsg = Marshal.PtrToStringAnsi(errorBlob, errorBlobSize);
+
+            // avoid duplicate warnings (we get the same warnings for every shader stage)
+            if (!errorsAndWarnings.Contains(errorMsg))
+                errorsAndWarnings += errorMsg;
+
             if (result.hasError)
+                throw new ShaderCompilerException();
+
+            if (!result.isText)
+                throw new Exception("ShaderConductor result is not text");
+
+            //==============================================================
+            // Get the GLSL code out of the ShaderConductor blob
+            //==============================================================
+            var targetBlob = ShaderConductor.GetShaderConductorBlobData(result.target);
+            int targetBlobSize = ShaderConductor.GetShaderConductorBlobSize(result.target);
+            string glsl = Marshal.PtrToStringAnsi(targetBlob, targetBlobSize);
+
+            //==============================================================
+            // Apply some fixes to the GLSL code, then add it to shaderData
+            //==============================================================
+
+            // OpenGL ES doesn't like the version header to be present for old GLSL versions without es in the name.
+            if (isESSL && !glslVersion.Contains("es"))
+                GLSLManipulator.RemoveVersionHeader(ref glsl);
+
+            // Remove separate shader objects extension requirement for OpenGL 2.
+            // Trying to remove this also from newer OpenGL versions failed,
+            // because some parameters wouldn't get passed from one shader stage to the next anymore.
+            if (glslVersion.StartsWith("10") ||
+                glslVersion.StartsWith("11") ||
+                glslVersion.StartsWith("12"))
+                GLSLManipulator.RemoveARBSeparateShaderObjects(ref glsl);
+
+            // Shaders that output or input SV_POSITION contain a gl_PerVertex declaration.
+            // Having an explicit gl_PerVertex declaration is not necessary as it's automatically defined anyway.
+            // In fact shader compilation will fail if it's present, so remove it.
+            GLSLManipulator.RemoveInGlPerVertex(ref glsl);
+            bool outGlPerVertexRemoved = GLSLManipulator.RemoveOutGlPerVertex(ref glsl);
+
+            // Add posFixup code, so we can compensate for differences btw DirectX and OpenGL.
+            // This is only needed if the output contains SV_POSITION.
+            // We know the output contains SV_POSITION when a gl_PerVertex declaration was present.
+            // For hull shaders this is not necessary, as hull shaders are always follwed by a domain shader, which can't access SV_POSITION.
+            if (outGlPerVertexRemoved && !(shaderStage == ShaderStage.HullShader))
+                GLSLManipulator.AddPosFixupUniformAndCode(ref glsl);
+
+            shaderData.ShaderCode = Encoding.ASCII.GetBytes(glsl);
+
+            //==============================================================
+            // Add attributes (stage inputs) to shaderData
+            //==============================================================
+            if (shaderStage == ShaderStage.VertexShader)
             {
-                IntPtr errorBlob = ShaderConductor.GetShaderConductorBlobData(result.errorWarningMsg);
-                int errorBlobSize = ShaderConductor.GetShaderConductorBlobSize(result.errorWarningMsg);
-                string errorMsg = Marshal.PtrToStringAnsi(errorBlob, errorBlobSize);
-                throw new Exception(errorMsg);
+                var stageInputs = ShaderConductor.GetStageInputs(result);
+                shaderData._attributes = new Attribute[stageInputs.Count];
+
+                for (int i = 0; i < stageInputs.Count; i++)
+                {
+                    shaderData._attributes[i].name = stageInputs[i].name;
+                    shaderData._attributes[i].location = stageInputs[i].location;
+                    shaderData._attributes[i].usage = GetVertexElementUsageFromStageInput(stageInputs[i]);
+                    shaderData._attributes[i].index = stageInputs[i].index;
+                }
             }
             else
+                shaderData._attributes = new Attribute[0];
+
+            //==============================================================
+            // Add constant buffers (uniform buffers) to shaderData
+            //==============================================================
+            var uniformBuffers = ShaderConductor.GetUniformBuffers(result);
+            shaderData._cbuffers = new int[uniformBuffers.Count];
+
+            for (var i = 0; i < uniformBuffers.Count; i++)
             {
-                if (!result.isText)
-                    throw new Exception("ShaderConductor result is not text");
+                var cb = new ConstantBufferData(uniformBuffers[i]);
 
-                //==============================================================
-                // Get the GLSL code out of the ShaderConductor blob
-                //==============================================================
-                var targetBlob = ShaderConductor.GetShaderConductorBlobData(result.target);
-                int targetBlobSize = ShaderConductor.GetShaderConductorBlobSize(result.target);
-                string glsl = Marshal.PtrToStringAnsi(targetBlob, targetBlobSize);
-
-                //==============================================================
-                // Apply some fixes to the GLSL code, then add it to shaderData
-                //==============================================================
-
-                // OpenGL ES doesn't like the version header to be present for old GLSL versions without es in the name.
-                if (isESSL && !glslVersion.Contains("es"))
-                    GLSLManipulator.RemoveVersionHeader(ref glsl);
-
-                // Remove separate shader objects extension requirement for OpenGL 2.
-                // Trying to remove this also from newer OpenGL versions failed,
-                // because some parameters wouldn't get passed from one shader stage to the next anymore.
-                if (glslVersion.StartsWith("10") ||
-                    glslVersion.StartsWith("11") ||
-                    glslVersion.StartsWith("12"))
-                    GLSLManipulator.RemoveARBSeparateShaderObjects(ref glsl);
-
-                // Shaders that output or input SV_POSITION contain a gl_PerVertex declaration.
-                // Having an explicit gl_PerVertex declaration is not necessary as it's automatically defined anyway.
-                // In fact shader compilation will fail if it's present, so remove it.
-                GLSLManipulator.RemoveInGlPerVertex(ref glsl);
-                bool outGlPerVertexRemoved = GLSLManipulator.RemoveOutGlPerVertex(ref glsl);
-
-                // Add posFixup code, so we can compensate for differences btw DirectX and OpenGL.
-                // This is only needed if the output contains SV_POSITION.
-                // We know the output contains SV_POSITION when a gl_PerVertex declaration was present.
-                // For hull shaders this is not necessary, as hull shaders are always follwed by a domain shader, which can't access SV_POSITION.
-                if (outGlPerVertexRemoved && !(shaderStage == ShaderStage.HullShader))
-                    GLSLManipulator.AddPosFixupUniformAndCode(ref glsl);
-
-                shaderData.ShaderCode = Encoding.ASCII.GetBytes(glsl);
-
-                //==============================================================
-                // Add attributes (stage inputs) to shaderData
-                //==============================================================
-                if (shaderStage == ShaderStage.VertexShader)
+                // Look for a duplicate cbuffer in the list
+                for (var c = 0; c < cbuffers.Count; c++)
                 {
-                    var stageInputs = ShaderConductor.GetStageInputs(result);
-                    shaderData._attributes = new Attribute[stageInputs.Count];
-
-                    for (int i = 0; i < stageInputs.Count; i++)
+                    if (cb.SameAs(cbuffers[c]))
                     {
-                        shaderData._attributes[i].name = stageInputs[i].name;
-                        shaderData._attributes[i].location = stageInputs[i].location;
-                        shaderData._attributes[i].usage = GetVertexElementUsageFromStageInput(stageInputs[i]);
-                        shaderData._attributes[i].index = stageInputs[i].index;
-                    }
-                }
-                else
-                    shaderData._attributes = new Attribute[0];
-
-                //==============================================================
-                // Add constant buffers (uniform buffers) to shaderData
-                //==============================================================
-                var uniformBuffers = ShaderConductor.GetUniformBuffers(result);
-                shaderData._cbuffers = new int[uniformBuffers.Count];
-
-                for (var i = 0; i < uniformBuffers.Count; i++)
-                {
-                    var cb = new ConstantBufferData(uniformBuffers[i]);
-
-                    // Look for a duplicate cbuffer in the list
-                    for (var c = 0; c < cbuffers.Count; c++)
-                    {
-                        if (cb.SameAs(cbuffers[c]))
-                        {
-                            cb = null;
-                            shaderData._cbuffers[i] = c;
-                            break;
-                        }
-                    }
-
-                    // Add a new cbuffer
-                    if (cb != null)
-                    {
-                        shaderData._cbuffers[i] = cbuffers.Count;
-                        cbuffers.Add(cb);
+                        cb = null;
+                        shaderData._cbuffers[i] = c;
+                        break;
                     }
                 }
 
-                //==============================================================
-                // Add samplers to shaderData
-                //==============================================================
-                var samplers = ShaderConductor.GetSamplers(result);
-                shaderData._samplers = new Sampler[samplers.Count];
-
-                for (int i = 0; i < samplers.Count; i++)
+                // Add a new cbuffer
+                if (cb != null)
                 {
-                    shaderData._samplers[i].samplerName = samplers[i].name;
-                    shaderData._samplers[i].parameterName = samplers[i].textureName;
-                    shaderData._samplers[i].samplerSlot = samplers[i].slot;
-                    shaderData._samplers[i].textureSlot = samplers[i].textureSlot;
-                    shaderData._samplers[i].type = ConvertSamplerTypeToMojo(samplers[i]);
-                    shaderData._samplers[i].parameter = -1; //sampler mapping to parameter is unknown atm
-
-                    if (samplerStates.TryGetValue(samplers[i].originalName, out SamplerStateInfo state))
-                        shaderData._samplers[i].state = state.State;
+                    shaderData._cbuffers[i] = cbuffers.Count;
+                    cbuffers.Add(cb);
                 }
             }
 
+            //==============================================================
+            // Add samplers to shaderData
+            //==============================================================
+            var samplers = ShaderConductor.GetSamplers(result);
+            shaderData._samplers = new Sampler[samplers.Count];
+
+            for (int i = 0; i < samplers.Count; i++)
+            {
+                shaderData._samplers[i].samplerName = samplers[i].name;
+                shaderData._samplers[i].parameterName = samplers[i].textureName;
+                shaderData._samplers[i].samplerSlot = samplers[i].slot;
+                shaderData._samplers[i].textureSlot = samplers[i].textureSlot;
+                shaderData._samplers[i].type = ConvertSamplerTypeToMojo(samplers[i]);
+                shaderData._samplers[i].parameter = -1; //sampler mapping to parameter is unknown atm
+
+                if (samplerStates.TryGetValue(samplers[i].originalName, out SamplerStateInfo state))
+                    shaderData._samplers[i].state = state.State;
+            }
+            
             //==============================================================
             // Cleanup
             //==============================================================
