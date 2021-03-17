@@ -78,18 +78,21 @@ namespace MonoGame.Effect
 
             ShaderConductor.Compile(ref sourceDesc, ref options, ref target, out ShaderConductor.ResultDesc result);
 
-            System.IO.Directory.SetCurrentDirectory(previousWorkingDir); 
+            System.IO.Directory.SetCurrentDirectory(previousWorkingDir);
 
             //==============================================================
             // Handle compiler errors and warnings
             //==============================================================
-            IntPtr errorBlob = ShaderConductor.GetShaderConductorBlobData(result.errorWarningMsg);
-            int errorBlobSize = ShaderConductor.GetShaderConductorBlobSize(result.errorWarningMsg);
-            string errorMsg = Marshal.PtrToStringAnsi(errorBlob, errorBlobSize);
+            if (result.errorWarningMsg != IntPtr.Zero)
+            {
+                IntPtr errorBlob = ShaderConductor.GetShaderConductorBlobData(result.errorWarningMsg);
+                int errorBlobSize = ShaderConductor.GetShaderConductorBlobSize(result.errorWarningMsg);
+                string errorMsg = Marshal.PtrToStringAnsi(errorBlob, errorBlobSize);
 
-            // avoid duplicate warnings (we get the same warnings for every shader stage)
-            if (!errorsAndWarnings.Contains(errorMsg))
-                errorsAndWarnings += errorMsg;
+                // avoid duplicate warnings (we get the same warnings for every shader stage)
+                if (!errorsAndWarnings.Contains(errorMsg))
+                    errorsAndWarnings += errorMsg;
+            }
 
             if (result.hasError)
                 throw new ShaderCompilerException();
