@@ -1,5 +1,5 @@
 ﻿Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2020 The MonoGame Team
+MonoGame - Copyright © 2009-2021 The MonoGame Team
 
 All rights reserved.
 
