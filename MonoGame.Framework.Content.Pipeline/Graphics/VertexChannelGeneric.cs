@@ -89,6 +89,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             TypeDescriptor.AddAttributes(typeof(Vector3), new TypeConverterAttribute(typeof(Vector3TypeConverter)));
             TypeDescriptor.AddAttributes(typeof(Vector4), new TypeConverterAttribute(typeof(Vector4TypeConverter)));
             //TypeDescriptor.AddAttributes(typeof(IPackedVector), new TypeConverterAttribute(typeof(PackedVectorTypeConverter)));
+            TypeDescriptor.AddAttributes(typeof(Byte4), new TypeConverterAttribute(typeof(Byte4TypeConverter)));
         }
 
         /// <summary>
