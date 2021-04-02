@@ -22,9 +22,7 @@ namespace Microsoft.Xna.Framework.Input
         internal static void AddDevice(int deviceId)
         {
             var jdevice = Sdl.Joystick.Open(deviceId);
-            foreach (var entry in Joysticks)
-                if (jdevice == entry.Value)
-                    return;
+            if (Joysticks.ContainsValue(jdevice)) return;
 
             var id = 0;
 
