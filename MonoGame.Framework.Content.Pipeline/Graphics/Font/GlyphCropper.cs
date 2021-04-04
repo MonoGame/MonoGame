@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			{
 				glyph.Subrect.X++;
 				glyph.Subrect.Width--;
-                glyph.CharacterWidths.B -= 1;
+				glyph.CharacterWidths.B -= 1;
 				glyph.CharacterWidths.A += 1;
 				glyph.XOffset++;
 			}
@@ -41,8 +41,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			while ((glyph.Subrect.Width > 1) && BitmapUtils.IsAlphaEntirely(0, glyph.Bitmap, new Rectangle(glyph.Subrect.Right - 1, glyph.Subrect.Y, 1, glyph.Subrect.Height)))
 			{
 				glyph.Subrect.Width--;
-                glyph.CharacterWidths.B -= 1;
-				glyph.CharacterWidths.C -= 1;
+				glyph.CharacterWidths.B -= 1;
 				glyph.XAdvance++;
 			}
 		}
