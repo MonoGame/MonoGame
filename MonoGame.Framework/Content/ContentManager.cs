@@ -245,7 +245,14 @@ namespace Microsoft.Xna.Framework.Content
             object asset = null;
             if (loadedAssets.TryGetValue(key, out asset))
             {
-                if (asset is T)
+                // Check if we're retrieving a disposed asset
+                // and if so, let's reload it instead
+                bool assetDisposed = false;
+                var disposable = asset as IDisposable;
+                if (disposable != null && disposable.IsDisposed)
+                    assetDisposed = true;
+                
+                if (asset is T && !assetDisposed)
                 {
                     return (T)asset;
                 }
