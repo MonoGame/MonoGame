@@ -214,7 +214,7 @@ namespace Microsoft.Xna.Framework
 
         private void Dispatcher_AcceleratorKeyActivated(CoreDispatcher sender, AcceleratorKeyEventArgs args)
         {
-            // NOTE: Dispatcher event is used becuase KeyDown event doesn't handle Alt key
+            // NOTE: Dispatcher event is used because KeyDown event doesn't handle Alt key
             var key = InputEvents.KeyTranslate(args.VirtualKey, args.KeyStatus);
             switch (args.EventType)
             {
