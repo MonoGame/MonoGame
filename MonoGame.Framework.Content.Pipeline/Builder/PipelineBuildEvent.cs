@@ -299,5 +299,5 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             var typeConverter = TypeDescriptor.GetConverter(value.GetType());
             return typeConverter.ConvertToInvariantString(value);
         }
-    };
+    }
 }
