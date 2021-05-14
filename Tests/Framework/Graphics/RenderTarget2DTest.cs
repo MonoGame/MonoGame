@@ -157,10 +157,11 @@ namespace MonoGame.Tests.Graphics
         }
 
 #if DIRECTX
-        [Test]
-        public void GetSharedHandle()
+        [TestCase(1)]
+        [TestCase(2)]
+        public void GetSharedHandle(int preferredMultiSampleCount)
         {
-            var rt = new RenderTarget2D(gd, 16, 16, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PlatformContents, true);            
+            var rt = new RenderTarget2D(gd, 16, 16, false, SurfaceFormat.Color, DepthFormat.None, preferredMultiSampleCount, RenderTargetUsage.PlatformContents, true);            
             var sharedHandle = rt.GetSharedHandle();
             Assert.AreNotEqual(sharedHandle, IntPtr.Zero);
 
