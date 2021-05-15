@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework.Content.Pipeline;
 
@@ -122,7 +123,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             PipelineBuildEvent pipelineEvent;
             try
             {
-                using (var textReader = new StreamReader(fullFilePath))
+                using (var textReader = new XmlTextReader(fullFilePath))
                     pipelineEvent = (PipelineBuildEvent) deserializer.Deserialize(textReader);
             }
             catch (Exception)
