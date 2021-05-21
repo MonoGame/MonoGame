@@ -159,9 +159,8 @@ namespace Microsoft.Xna.Framework.Media
         // Todo: 1000 is a hack to handle sample rate conversion to ms (this var is 4096 * 2 in XNA FNA).
         // probably better to change the dynamicsoundeffectinstance to poll less frequently
         private const int AUDIO_BUFFER_SIZE = 4096 * 2 * 1000; 
-        private static readonly float[] audioData = new float[AUDIO_BUFFER_SIZE];
-        private static GCHandle audioHandle = GCHandle.Alloc(audioData, GCHandleType.Pinned);
-        private IntPtr audioDataPtr = audioHandle.AddrOfPinnedObject();
+        private static float[] audioData = new float[AUDIO_BUFFER_SIZE];
+        private IntPtr audioDataPtr = IntPtr.Zero;
 
         #endregion
 
@@ -240,6 +239,13 @@ namespace Microsoft.Xna.Framework.Media
             {
                 Marshal.FreeHGlobal(yuvData);
                 yuvData = IntPtr.Zero;
+            }
+
+            // Free the audio buffer
+            if (audioDataPtr != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(audioDataPtr);
+                audioDataPtr = IntPtr.Zero;
             }
 
             // Okay, we out.
@@ -527,12 +533,23 @@ namespace Microsoft.Xna.Framework.Media
             // Grab the first bit of audio. We're trying to start the decoding ASAP.
             if (Theorafile.HasAudio(Video.theora) == 1)
             {
+                if (audioDataPtr != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(audioDataPtr);
+                    audioDataPtr = IntPtr.Zero;
+                }
+
                 int channels, samplerate;
                 Theorafile.AudioInfo(Video.theora, out channels, out samplerate);
                 audioStream = new DynamicSoundEffectInstance(
                     samplerate,
                     (AudioChannels)channels
                 );
+
+                audioData = new float[AUDIO_BUFFER_SIZE];
+                GCHandle audioHandle = GCHandle.Alloc(audioData, GCHandleType.Pinned);
+                audioDataPtr = audioHandle.AddrOfPinnedObject();
+
                 audioStream.BufferNeeded += OnBufferRequest;
                 UpdateVolume();
 
