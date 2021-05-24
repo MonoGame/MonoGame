@@ -872,6 +872,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             switch (primitiveType)
             {
+                case PrimitiveType.PointList:
+                    return GLPrimitiveType.Points;
                 case PrimitiveType.LineList:
                     return GLPrimitiveType.Lines;
                 case PrimitiveType.LineStrip:

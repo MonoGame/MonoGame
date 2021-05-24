@@ -1239,6 +1239,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return PrimitiveTopology.TriangleList;
                 case PrimitiveType.TriangleStrip:
                     return PrimitiveTopology.TriangleStrip;
+                case PrimitiveType.PointList:
+                    return PrimitiveTopology.PointList;
             }
 
             throw new ArgumentException();
