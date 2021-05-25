@@ -22,8 +22,8 @@
     "symbols": {
         "framework": {
             "type": "parameter",
-            "defaultValue": "net5.0",
-            "replaces": "net5.0"
+            "defaultValue": "net5.0-windows",
+            "replaces": "net5.0-windows"
         }
     }
 }
