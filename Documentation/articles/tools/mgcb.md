@@ -7,8 +7,8 @@ of a MonoGame project. Alternatively you can use it yourself from the command li
 
 ## Installation
 
-MGCB can be installed as a [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
-Make sure you have the .NET Core SDK installed. You can download it [here](https://dotnet.microsoft.com/download).
+MGCB can be installed as a [.NET tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
+Make sure you have the .NET SDK installed. You can download it [here](https://dotnet.microsoft.com/download).
 
 In a terminal run `dotnet tool install -g dotnet-mgcb` to install MGCB. Then you can execute MGCB by simply running `mgcb`.
 

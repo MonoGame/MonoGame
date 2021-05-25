@@ -12,7 +12,7 @@
     href: 2_creating_a_new_project_vs.md
   - name: Visual Studio for Mac
     href: 2_creating_a_new_project_vsm.md
-  - name: .NET Core CLI
+  - name: .NET CLI
     href: 2_creating_a_new_project_netcore.md
 - name: Understanding the Code
   href: 3_understanding_the_code.md

@@ -1,5 +1,5 @@
 #tool nuget:?package=vswhere&version=2.6.7
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0
 #addin nuget:?package=Cake.FileHelpers&version=3.3.0
 
 //////////////////////////////////////////////////////////////////////
@@ -99,6 +99,7 @@ Task("BuildDesktopGL")
 
 Task("TestDesktopGL")
     .IsDependentOn("BuildDesktopGL")
+    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/DesktopGL/Debug");
