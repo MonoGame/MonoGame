@@ -25,7 +25,7 @@ Finally, click on the Install button once again.
 
 ![Install VSM extension](~/images/getting_started/vsmac-mg-install-4.png)
 
-## [Optional] Install MonoGame templates for .NET Core CLI or Rider IDE
+## [Optional] Install MonoGame templates for .NET CLI or Rider IDE
 
 ```sh
 dotnet new --install MonoGame.Templates.CSharp

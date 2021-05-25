@@ -19,7 +19,7 @@ The MGCB Editor has the following features:
 
 ## Installation Instructions
 
-The MGCB Editor is published as a [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools), Make sure you have the .NET Core SDK installed if you wish to install the editor. You can download it [here](https://dotnet.microsoft.com/download).
+The MGCB Editor is published as a [.NET tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools), Make sure you have the .NET SDK installed if you wish to install the editor. You can download it [here](https://dotnet.microsoft.com/download).
 
 In a command prompt/terminal window, run the following command to install the MGCB Editor:
 

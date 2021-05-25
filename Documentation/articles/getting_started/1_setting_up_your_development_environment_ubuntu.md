@@ -2,7 +2,7 @@
 
 This section provides a step-by-step guide for setting up your development environment for Ubuntu 20.04.
 
-## Install .NET Core SDK
+## Install .NET SDK
 
 Add repository:
 
@@ -16,12 +16,12 @@ Install packages:
 
 ```sh
 sudo apt-get install -y apt-transport-https
-sudo apt-get install -y dotnet-sdk-3.1
+sudo apt-get install -y dotnet-sdk-5.0
 ```
 
 ## [Optional] Install mono
 
-Mono is a C# runtime, just like .NET Core. If you're targeting Linux only, it's unnecessary, but if you're targeting some other platforms like Android, it's required.
+Mono is a C# runtime, just like .NET. If you're targeting Linux only, it's unnecessary, but if you're targeting some other platforms like Android, it's required.
 
 Add repository:
 
@@ -63,7 +63,7 @@ code --install-extension ms-dotnettools.csharp
 
 ## Install MonoGame templates
 
-This will install templates for .NET Core CLI and the Rider IDE. There is no template support for MonoDevelop.
+This will install templates for .NET CLI and the Rider IDE. There is no template support for MonoDevelop.
 
 ```sh
 dotnet new --install MonoGame.Templates.CSharp
