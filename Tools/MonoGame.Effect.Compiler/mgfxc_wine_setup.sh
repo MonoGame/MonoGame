@@ -24,6 +24,17 @@ TEMP_DIR="${TMPDIR:-/tmp}"
 SCRIPT_DIR="$TEMP_DIR/winemg2"
 mkdir -p "$SCRIPT_DIR"
 
+# disable wine crash dialog
+cat > "$SCRIPT_DIR"/crashdialog.reg <<_EOF_
+REGEDIT4
+[HKEY_CURRENT_USER\\Software\\Wine\\WineDbg]
+"ShowCrashDialog"=dword:00000000
+_EOF_
+
+pushd $SCRIPT_DIR
+wine64 regedit crashdialog.reg
+popd
+
 # get dotnet
 DOTNET_URL="https://download.visualstudio.microsoft.com/download/pr/46b35cfe-4b3f-4e69-8831-0937196699b1/221f862c003a0175722c131b0941e3c4/dotnet-sdk-5.0.203-win-x64.zip"
 curl $DOTNET_URL --output "$SCRIPT_DIR/dotnet-sdk.zip"
