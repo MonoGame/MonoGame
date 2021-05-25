@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,26 +9,31 @@ using System.CommandLine.Invocation;
 using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
-namespace MonoGame.Tools.Pipeline.Utilities
+namespace MonoGame.Content.Builder.Editor.Launcher
 {
-    class CommandLineParser
+    public static class Program
     {
-        private readonly Parser parser;
-        private Action runAction;
-
-        public CommandLineParser(ICommandLineInterface commandLineInterface)
+        [STAThread]
+        public static void Main(string[] args)
         {
-            // Build the parser with a handler, arguments, options, and middleware.
-            // Parameters to the handler are matched by name to the arguments and options below.
-            // https://github.com/dotnet/command-line-api/wiki/How-To#Pass-parameters-to-a-method
+            IPlatform platform;
 
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                platform = new MacPlatform();
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                platform = new WindowsPlatform();
+            else
+                platform = new LinuxPlatform();
+
+            Action runAction = null;
             var rootCommand = new RootCommand()
             {
                 Name = "mgcb-editor",
                 Handler = CommandHandler.Create<InvocationContext, string>((context, project) =>
                 {
-                    runAction = () => commandLineInterface.Run(context, project);
+                    runAction = () => platform.Run(context, project);
                 })
             };
 
@@ -56,35 +61,31 @@ namespace MonoGame.Tools.Pipeline.Utilities
                 Description = "Show version information."
             };
 
-            parser = new CommandLineBuilder(rootCommand)
+            var parser = new CommandLineBuilder(rootCommand)
                 .AddArgument(projectArgument)
                 .AddOption(registerOption)
                 .AddOption(unregisterOption)
                 .AddOption(versionOption)
-                .UseMiddleware(CreateShortCircuitMiddleware(registerOption, commandLineInterface.Register))
-                .UseMiddleware(CreateShortCircuitMiddleware(unregisterOption, commandLineInterface.Unregister))
+                .UseMiddleware(CreateShortCircuitMiddleware(registerOption, platform.Register))
+                .UseMiddleware(CreateShortCircuitMiddleware(unregisterOption, platform.Unregister))
                 .UseMiddleware(CreateShortCircuitMiddleware(versionOption, ShowVersion))
                 .UseDefaults()
-                .Build();
-        }
+                .Build()
+                .Invoke(args);
 
-        public void Invoke(string[] args)
-        {
-            parser.Invoke(args);
             runAction?.Invoke();
         }
 
-        private void ShowVersion(InvocationContext context)
+        private static void ShowVersion(InvocationContext context)
         {
             var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
             context.Console.Out.WriteLine(version);
         }
 
-        private InvocationMiddleware CreateShortCircuitMiddleware(Option option, Action<InvocationContext> action)
+        private static InvocationMiddleware CreateShortCircuitMiddleware(Option option, Action<InvocationContext> action)
         {
             return async (context, next) =>
             {
-
                 if (context.ParseResult.HasOption(option))
                 {
                     action(context);

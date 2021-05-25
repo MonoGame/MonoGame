@@ -1,35 +1,42 @@
-﻿using MonoGame.Tools.Pipeline.Utilities;
 using System;
+using System.CommandLine.Invocation;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using Process = System.Diagnostics.Process;
 
-namespace MonoGame.Tools.Pipeline
+namespace MonoGame.Content.Builder.Editor.Launcher
 {
-    public static class FileAssociation
+    public class LinuxPlatform : IPlatform
     {
-        private static readonly string _localPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Content");
+        private static readonly string _localPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mgcb-editor-linux");
+        private static readonly string _localApp = Path.Combine(_localPath, "mgcb-editor-linux.dll");
         private static readonly string _localIconPath = Path.Combine(_localPath, "monogame.svg");
         private static readonly string _localMimePath = Path.Combine(_localPath, "x-mgcb.xml");
         private static readonly string _localOldMimePath = Path.Combine(_localPath, "mgcb.xml");
         private static readonly string _localDesktopFilePath = Path.Combine(_localPath, "mgcb-editor.desktop");
         private static readonly string _systemIconPath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".local/share/icons/hicolor/scalable/mimetypes/monogame.svg");
         private static readonly string _systemDesktopFilePath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".local/share/applications/mgcb-editor.desktop");
-
-        public static void Associate()
+        
+        public void Register(InvocationContext context)
         {
             InstallIcon();
             InstallMimetype();
             InstallDesktopFile();
         }
 
-        public static void Unassociate()
+        public void Unregister(InvocationContext context)
         {
             UninstallIcon();
             UninstallMimetype();
             UninstallDesktopFile();
         }
 
+        public void Run(InvocationContext context, string project)
+        {
+            Process.Start("dotnet", $"\"{_localApp}\" \"{project}\"");
+        }
+        
         private static void InstallIcon()
         {
             Directory.CreateDirectory(Path.GetDirectoryName(_systemIconPath));
@@ -57,6 +64,7 @@ namespace MonoGame.Tools.Pipeline
 
         private static void InstallMimetype()
         {
+            RunXdgMime("uninstall", _localOldMimePath);
             RunXdgMime("install", _localMimePath);
         }
 
@@ -71,9 +79,9 @@ namespace MonoGame.Tools.Pipeline
             // Resolve a dotnet ProcessStartInfo to get the commands and arguments to register.
             var startInfo = new ProcessStartInfo
             {
-                FileName = Assembly.GetExecutingAssembly().GetName().Name,
-                Arguments = "%F"
-            }.ResolveDotnetApp();
+                FileName = "dotnet",
+                Arguments = $"\"{_localApp}\" %F"
+            };
 
             // Read and update the .desktop file.
             var desktopFileContent = File.ReadAllText(_localDesktopFilePath)

@@ -53,7 +53,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>net.monogame.mgcb-editor</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.3</string>
+	<string>3.8.0.1-develop</string>
 	<key>CFBundleIconFile</key>
 	<string>Icon.icns</string>
 </dict>

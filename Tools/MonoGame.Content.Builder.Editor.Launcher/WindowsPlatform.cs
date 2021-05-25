@@ -1,14 +1,14 @@
-﻿using Microsoft.Win32;
-using MonoGame.Tools.Pipeline.Utilities;
 using System;
-using System.Diagnostics;
+using System.CommandLine.Invocation;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using Microsoft.Win32;
+using Process = System.Diagnostics.Process;
 
-namespace MonoGame.Tools.Pipeline
+namespace MonoGame.Content.Builder.Editor.Launcher
 {
     [ComImport]
     [Guid("00021401-0000-0000-C000-000000000046")]
@@ -41,7 +41,7 @@ namespace MonoGame.Tools.Pipeline
         void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
     }
 
-    public static class FileAssociation
+    public class WindowsPlatform : IPlatform
     {
         // Used to refresh Explorer windows after the registry is updated.
         [DllImport("Shell32.dll")]
@@ -56,35 +56,34 @@ namespace MonoGame.Tools.Pipeline
         private const string verb = "open";
         private const string commandText = "Open with MGCB Editor";
 
-        private readonly static string startMenuLink = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "MGCB Editor.lnk");
+        private readonly static string _executablePath = Path.Combine(Path.GetDirectoryName(typeof(WindowsPlatform).Assembly.Location), "mgcb-editor-windows", "mgcb-editor-windows.exe");
+        private readonly static string _startMenuLink = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "MGCB Editor.lnk");
 
-        public static void Associate()
+        public void Register(InvocationContext context)
         {
-            // Resolve a dotnet ProcessStartInfo to get the commands and arguments to register.
-            var assembly = Assembly.GetExecutingAssembly();
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = assembly.GetName().Name,
-                Arguments = "\"%1\""
-            }.ResolveDotnetApp();
-            var command = $"\"{startInfo.FileName}\" {startInfo.Arguments}";
-            var iconPath = $"{assembly.Location},0";
+            var command = $"\"{_executablePath}\" \"%1\"";
+            var iconPath = $"{_executablePath},0";
 
             var link = (IShellLink)new ShellLink();
-            link.SetPath(Path.Combine(Path.GetDirectoryName(typeof(FileAssociation).Assembly.Location), "mgcb-editor-wpf.exe"));
-            ((IPersistFile)link).Save(startMenuLink, false);
+            link.SetPath(_executablePath);
+            ((IPersistFile)link).Save(_startMenuLink, false);
 
             SetWindowsAssociation(extension, progId, fileTypeDescription, iconPath, verb, commandText, command);
             RefreshEnvironment();
         }
 
-        public static void Unassociate()
+        public void Unregister(InvocationContext context)
         {
-            if (File.Exists(startMenuLink))
-                File.Delete(startMenuLink);
+            if (File.Exists(_startMenuLink))
+                File.Delete(_startMenuLink);
 
             UnsetWindowsAssociation(extension, progId);
             RefreshEnvironment();
+        }
+
+        public void Run(InvocationContext context, string project)
+        {
+            Process.Start(_executablePath, $"\"{project}\"");
         }
 
         private static void SetWindowsAssociation(string extension, string progId, string fileTypeDescription, string icon, string verb, string commandText, string command)

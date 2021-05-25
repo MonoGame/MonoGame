@@ -4,9 +4,9 @@
 
 using System.CommandLine.Invocation;
 
-namespace MonoGame.Tools.Pipeline.Utilities
+namespace MonoGame.Content.Builder.Editor.Launcher
 {
-    interface ICommandLineInterface
+    interface IPlatform
     {
         void Register(InvocationContext context);
 

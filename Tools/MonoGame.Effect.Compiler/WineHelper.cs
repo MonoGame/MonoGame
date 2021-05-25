@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace MonoGame.Effect.Compiler
 {
@@ -47,6 +48,9 @@ namespace MonoGame.Effect.Compiler
 
             proc.Start();
             proc.WaitForExit();
+
+            if (!File.Exists(options.OutputFile) || (new FileInfo(options.OutputFile)).Length == 0)
+                return 1;
 
             return proc.ExitCode;
         }
