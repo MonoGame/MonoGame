@@ -45,16 +45,12 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>Gets or sets the pitch adjustment.</summary>
-        /// <value>Pitch adjustment, ranging from -1.0 (down an octave) to 0.0 (no change) to 1.0 (up an octave). Values outside of this range will throw an Exception.</value>
+        /// <value>Pitch adjustment, ranging from -1.0 (down an octave) to 0.0 (no change) to 1.0 (up an octave).</value>
         public float Pitch
         {
             get { return _pitch; }
             set
             {
-                // XAct sounds effects don't have pitch limits
-                if (!_isXAct && (value < -1.0f || value > 1.0f))
-                    throw new ArgumentOutOfRangeException();
-
                 _pitch = value;
                 PlatformSetPitch(value);
             }
