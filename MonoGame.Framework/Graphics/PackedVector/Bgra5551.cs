@@ -127,10 +127,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         private static UInt16 Pack(float x, float y, float z, float w)
         {
             return (UInt16) (
-                (((int) Math.Round(MathHelper.Clamp(x, 0, 1) * 31.0f) & 0x1F) << 10) |
-                (((int) Math.Round(MathHelper.Clamp(y, 0, 1) * 31.0f) & 0x1F) << 5) |
-                (((int) Math.Round(MathHelper.Clamp(z, 0, 1) * 31.0f) & 0x1F) << 0) |
-                ((((int) Math.Round(MathHelper.Clamp(w, 0, 1)) & 0x1) << 15))
+                (((int) MathF.Round(MathHelper.Clamp(x, 0, 1) * 31.0f) & 0x1F) << 10) |
+                (((int) MathF.Round(MathHelper.Clamp(y, 0, 1) * 31.0f) & 0x1F) << 5) |
+                (((int) MathF.Round(MathHelper.Clamp(z, 0, 1) * 31.0f) & 0x1F) << 0) |
+                ((((int) MathF.Round(MathHelper.Clamp(w, 0, 1)) & 0x1) << 15))
             );
         }
     }
