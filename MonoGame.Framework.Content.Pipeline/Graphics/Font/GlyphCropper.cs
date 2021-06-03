@@ -2,15 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using Microsoft.Xna.Framework;
-
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
 	// Crops unused space from around the edge of a glyph bitmap.
 	internal static class GlyphCropper
 	{
-		public static void Crop(Glyph glyph)
+		public static void Crop(GlyphData glyph)
 		{
 			// Crop the top.
 			while ((glyph.Subrect.Height > 1) && BitmapUtils.IsAlphaEntirely(0, glyph.Bitmap, new Rectangle(glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, 1)))

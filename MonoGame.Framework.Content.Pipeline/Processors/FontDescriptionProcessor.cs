@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
                 foreach (var dir in directories)
                 {
-                    foreach(var ext in extensions)
+                    foreach (var ext in extensions)
                     {
                         fontFile = Path.Combine(dir, input.FontName + ext);
                         if (File.Exists(fontFile))
@@ -65,61 +65,69 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (!File.Exists(fontFile))
                 throw new FileNotFoundException("Could not find \"" + input.FontName + "\" font file.");
 
-			context.Logger.LogMessage ("Building Font {0}", fontFile);
-            
+            context.Logger.LogMessage("Building Font {0}", fontFile);
+
             // Get the platform specific texture profile.
             var texProfile = TextureProfile.ForPlatform(context.TargetPlatform);
 
             {
-				if (!File.Exists(fontFile)) {
-					throw new Exception(string.Format("Could not load {0}", fontFile));
-				}
-				var lineSpacing = 0f;
-				int yOffsetMin = 0;
-				var glyphs = ImportFont(input, out lineSpacing, out yOffsetMin, context, fontFile);
+                if (!File.Exists(fontFile))
+                {
+                    throw new Exception(string.Format("Could not load {0}", fontFile));
+                }
+                var lineSpacing = 0f;
+                int yOffsetMin = 0;
+                var glyphs = ImportFont(input, out lineSpacing, out yOffsetMin, context, fontFile);
 
-				// Optimize.
-				foreach (Glyph glyph in glyphs)
-				{
-					GlyphCropper.Crop(glyph);
-				}
+                var glyphData = new HashSet<GlyphData>(glyphs.Select(x => x.Data));
+
+                // Optimize.
+                foreach (GlyphData glyph in glyphData)
+                {
+                    GlyphCropper.Crop(glyph);
+                }
 
                 // We need to know how to pack the glyphs.
                 bool requiresPot, requiresSquare;
                 texProfile.Requirements(context, TextureFormat, out requiresPot, out requiresSquare);
 
-                var face = GlyphPacker.ArrangeGlyphs(glyphs, requiresPot, requiresSquare);
+                var face = GlyphPacker.ArrangeGlyphs(glyphData.ToArray(), requiresPot, requiresSquare);
 
-				// Adjust line and character spacing.
-				lineSpacing += input.Spacing;
-				output.VerticalLineSpacing = (int)lineSpacing;
+                // Adjust line and character spacing.
+                lineSpacing += input.Spacing;
+                output.VerticalLineSpacing = (int)lineSpacing;
 
-				foreach (var glyph in glyphs)
-				{
+                foreach (Glyph glyph in glyphs)
+                {
                     output.CharacterMap.Add(glyph.Character);
 
-					var texRect = new Rectangle(glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height);
-					output.Glyphs.Add(texRect);
+                    var texRect = glyph.Data.Subrect;
+                    output.Glyphs.Add(texRect);
 
-					var cropping = new Rectangle(0, (int)(glyph.YOffset - yOffsetMin), (int)glyph.XAdvance, output.VerticalLineSpacing);
-					output.Cropping.Add(cropping);
+                    var cropping = new Rectangle(0, (int)(glyph.Data.YOffset - yOffsetMin), (int)glyph.Data.XAdvance, output.VerticalLineSpacing);
+                    output.Cropping.Add(cropping);
 
-					// Set the optional character kerning.
-					if (input.UseKerning)
-						output.Kerning.Add(new Vector3(glyph.CharacterWidths.A, glyph.CharacterWidths.B, glyph.CharacterWidths.C));
-					else
-						output.Kerning.Add(new Vector3(0, texRect.Width, 0));
-				}
+                    // Set the optional character kerning.
+                    if (input.UseKerning)
+                    {
+                        ABCFloat widths = glyph.Data.CharacterWidths;
+                        output.Kerning.Add(new Vector3(widths.A, widths.B, widths.C));
+                    }
+                    else
+                    {
+                        output.Kerning.Add(new Vector3(0, texRect.Width, 0));
+                    }
+                }
 
-                output.Texture.Faces[0].Add(face);            
-			}
+                output.Texture.Faces[0].Add(face);
+            }
 
             if (PremultiplyAlpha)
             {
                 var bmp = output.Texture.Faces[0][0];
                 var data = bmp.GetPixelData();
                 var idx = 0;
-                for (; idx < data.Length; )
+                for (; idx < data.Length;)
                 {
                     var r = data[idx];
 
@@ -139,7 +147,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 var bmp = output.Texture.Faces[0][0];
                 var data = bmp.GetPixelData();
                 var idx = 0;
-                for (; idx < data.Length; )
+                for (; idx < data.Length;)
                 {
                     var r = data[idx];
 
@@ -156,71 +164,71 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             // Perform the final texture conversion.
-            texProfile.ConvertTexture(context, output.Texture, TextureFormat, true);    
+            texProfile.ConvertTexture(context, output.Texture, TextureFormat, true);
 
             return output;
         }
 
-		private static Glyph[] ImportFont(FontDescription options, out float lineSpacing, out int yOffsetMin, ContentProcessorContext context, string fontName)
-		{
-			// Which importer knows how to read this source font?
-			IFontImporter importer;
+        private static Glyph[] ImportFont(FontDescription options, out float lineSpacing, out int yOffsetMin, ContentProcessorContext context, string fontName)
+        {
+            // Which importer knows how to read this source font?
+            IFontImporter importer;
 
-			var TrueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
-			//var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
+            var TrueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
+            //var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
 
-			string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
+            string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
 
-			//			if (BitmapFileExtensions.Contains(fileExtension))
-			//			{
-			//				importer = new BitmapImporter();
-			//			}
-			//			else
-			//			{
-			if (!TrueTypeFileExtensions.Contains(fileExtension)) 
+            //			if (BitmapFileExtensions.Contains(fileExtension))
+            //			{
+            //				importer = new BitmapImporter();
+            //			}
+            //			else
+            //			{
+            if (!TrueTypeFileExtensions.Contains(fileExtension))
                 throw new PipelineException("Unknown file extension " + fileExtension);
 
-			importer = new SharpFontImporter();
+            importer = new SharpFontImporter();
 
-			// Import the source font data.
-			importer.Import(options, fontName);
+            // Import the source font data.
+            importer.Import(options, fontName);
 
-			lineSpacing = importer.LineSpacing;
-			yOffsetMin = importer.YOffsetMin;
+            lineSpacing = importer.LineSpacing;
+            yOffsetMin = importer.YOffsetMin;
 
-			// Get all glyphs
-			var glyphs = new List<Glyph>(importer.Glyphs);
+            // Get all glyphs
+            var glyphs = new List<Glyph>(importer.Glyphs);
 
-			// Validate.
-			if (glyphs.Count == 0)
-			{
-				throw new Exception("Font does not contain any glyphs.");
-			}
+            // Validate.
+            if (glyphs.Count == 0)
+            {
+                throw new Exception("Font does not contain any glyphs.");
+            }
 
-			// Sort the glyphs
-			glyphs.Sort((left, right) => left.Character.CompareTo(right.Character));
+            // Sort the glyphs
+            glyphs.Sort((left, right) => left.Character.CompareTo(right.Character));
 
 
-			// Check that the default character is part of the glyphs
-			if (options.DefaultCharacter != null)
-			{
-				bool defaultCharacterFound = false;
-				foreach (var glyph in glyphs)
-				{
-					if (glyph.Character == options.DefaultCharacter)
-					{
-						defaultCharacterFound = true;
-						break;
-					}
-				}
-				if (!defaultCharacterFound)
-				{
-					throw new InvalidOperationException("The specified DefaultCharacter is not part of this font.");
-				}
-			}
+            // Check that the default character is part of the glyphs
+            if (options.DefaultCharacter != null)
+            {
+                bool defaultCharacterFound = false;
+                foreach (var glyph in glyphs)
+                {
+                    if (glyph.Character == options.DefaultCharacter)
+                    {
+                        defaultCharacterFound = true;
+                        break;
+                    }
+                }
+                if (!defaultCharacterFound)
+                {
+                    throw new InvalidOperationException("The specified DefaultCharacter is not part of this font.");
+                }
+            }
 
-			return glyphs.ToArray();
-		}
+            return glyphs.ToArray();
+        }
 
         private string FindFont(string name, string style)
         {
