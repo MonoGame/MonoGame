@@ -99,8 +99,6 @@ namespace Microsoft.Xna.Framework.Media
 			if (theora != IntPtr.Zero)
 			{
 				Theorafile.CloseFile(ref theora);
-                Marshal.FreeHGlobal(theora);
-                theora = IntPtr.Zero;
 			}
 		}
 
