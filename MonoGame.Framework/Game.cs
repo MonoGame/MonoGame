@@ -257,6 +257,10 @@ namespace Microsoft.Xna.Framework
                     throw new ArgumentOutOfRangeException(
                         "The time must be positive and non-zero.", default(Exception));
 
+                if (value > _maxElapsedTime)
+                    throw new ArgumentOutOfRangeException(
+                        "_targetElapsedTime can not be larger than _maxElapsedTime", default(Exception));
+
                 if (value != _targetElapsedTime)
                 {
                     _targetElapsedTime = value;
@@ -551,10 +555,6 @@ namespace Microsoft.Xna.Framework
             // Do not allow any update to take longer than our maximum.
             if (_accumulatedElapsedTime > _maxElapsedTime)
                 _accumulatedElapsedTime = _maxElapsedTime;
-            
-            // TargetElapsedTime can not be greater than our maximum.
-            if (_TargetElapsedTime > _maxElapsedTime)
-                _TargetElapsedTime = _maxElapsedTime;
 
             if (IsFixedTimeStep)
             {
