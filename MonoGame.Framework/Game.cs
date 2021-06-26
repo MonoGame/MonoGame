@@ -551,6 +551,10 @@ namespace Microsoft.Xna.Framework
             // Do not allow any update to take longer than our maximum.
             if (_accumulatedElapsedTime > _maxElapsedTime)
                 _accumulatedElapsedTime = _maxElapsedTime;
+            
+            // TargetElapsedTime can not be greater than our maximum.
+            if (_TargetElapsedTime > _maxElapsedTime)
+                _TargetElapsedTime = _maxElapsedTime;
 
             if (IsFixedTimeStep)
             {
