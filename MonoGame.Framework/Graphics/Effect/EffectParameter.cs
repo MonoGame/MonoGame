@@ -921,7 +921,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 for (var i = 0; i < value.Length; i++)
                 {
-                    var fData = (float[])Data;
+                    var fData = (float[])Elements[i].Data;
 
                     fData[0] = value[i].M11;
                     fData[1] = value[i].M21;
@@ -937,7 +937,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 for (var i = 0; i < value.Length; i++)
                 {
-                    var fData = (float[])Data;
+                    var fData = (float[])Elements[i].Data;
 
                     fData[0] = value[i].M11;
                     fData[1] = value[i].M21;
@@ -956,7 +956,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 for (var i = 0; i < value.Length; i++)
                 {
-                    var fData = (float[])Data;
+                    var fData = (float[])Elements[i].Data;
 
                     fData[0] = value[i].M11;
                     fData[1] = value[i].M12;
@@ -983,7 +983,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 for (var i = 0; i < value.Length; i++)
                 {
-                    var fData = (float[])Data;
+                    var fData = (float[])Elements[i].Data;
 
                     fData[0] = value[i].M11;
                     fData[1] = value[i].M12;
@@ -1006,7 +1006,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 for (var i = 0; i < value.Length; i++)
                 {
-                    var fData = (float[])Data;
+                    var fData = (float[])Elements[i].Data;
 
                     fData[0] = value[i].M11;
                     fData[1] = value[i].M12;
@@ -1028,7 +1028,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 for (var i = 0; i < value.Length; i++)
                 {
-                    var fData = (float[])Data;
+                    var fData = (float[])Elements[i].Data;
 
                     fData[0] = value[i].M11;
                     fData[1] = value[i].M12;
@@ -1047,7 +1047,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 for (var i = 0; i < value.Length; i++)
                 {
-                    var fData = (float[])Data;
+                    var fData = (float[])Elements[i].Data;
 
                     fData[0] = value[i].M11;
                     fData[1] = value[i].M12;
@@ -1062,7 +1062,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 for (var i = 0; i < value.Length; i++)
                 {
-                    var fData = (float[])Data;
+                    var fData = (float[])Elements[i].Data;
 
                     fData[0] = value[i].M11;
                     fData[1] = value[i].M12;
@@ -1077,7 +1077,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 for (var i = 0; i < value.Length; i++)
                 {
-                    var fData = (float[])Data;
+                    var fData = (float[])Elements[i].Data;
 
                     fData[0] = value[i].M11;
                     fData[1] = value[i].M12;
