@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Content.Builder.Ed
 		{B3201192-46D5-40C5-A24E-493EC66D8C9B} = {B3201192-46D5-40C5-A24E-493EC66D8C9B}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Content.Builder.Editor", "Tools\MonoGame.Content.Builder.Editor\MonoGame.Content.Builder.Editor.csproj", "{F673A915-308F-4111-8950-A5755BE5CEEA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{4B466A7B-6CC3-4E58-B3D7-8A95CDC827B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor.Launcher", "Tools\MonoGame.Content.Builder.Editor.Launcher\MonoGame.Content.Builder.Editor.Launcher.csproj", "{EF930FA9-8109-4869-A435-AE52213EABA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -131,11 +133,26 @@ Global
 		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|x64.Build.0 = Release|Any CPU
 		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|x86.ActiveCfg = Release|Any CPU
 		{F673A915-308F-4111-8950-A5755BE5CEEA}.Release|x86.Build.0 = Release|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Debug|x64.Build.0 = Debug|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Debug|x86.Build.0 = Debug|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Release|x64.ActiveCfg = Release|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Release|x64.Build.0 = Release|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Release|x86.ActiveCfg = Release|Any CPU
+		{EF930FA9-8109-4869-A435-AE52213EABA4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51ECE597-0299-4753-B7F5-4E8EDECD7BB4}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EF930FA9-8109-4869-A435-AE52213EABA4} = {4B466A7B-6CC3-4E58-B3D7-8A95CDC827B1}
 	EndGlobalSection
 EndGlobal

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Description>The MonoGame Framework Effect Compiler (MGFXC) command line tool is used to compile shaders.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Effect.Compiler</BaseOutputPath>
     <PackAsTool>true</PackAsTool>

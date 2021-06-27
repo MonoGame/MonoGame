@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Description>The MonoGame Content Builder (MGCB) command line tool is used for optimizing content for runtime use.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder</BaseOutputPath>
     <PackAsTool>true</PackAsTool>

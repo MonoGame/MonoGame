@@ -3,10 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.CommandLine.Invocation;
 using Eto;
 using Eto.Forms;
-using MonoGame.Tools.Pipeline.Utilities;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -18,100 +16,68 @@ namespace MonoGame.Tools.Pipeline
         [STAThread]
         public static void Main(string[] args)
         {
-            new CommandLineParser(new CommandLineInterface()).Invoke(args);
-        }
+            string project = null;
 
-        private class CommandLineInterface : ICommandLineInterface
-        {
-            public void Register(InvocationContext context)
-            {
-                try
-                {
-                    FileAssociation.Unassociate();
-                    FileAssociation.Associate();
-                    Console.WriteLine("Registered MGCB Editor!");
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine("Failed to register MGCB Editor due to:" + Environment.NewLine + ex);
-                    throw;
-                }
-            }
+            if (args.Length == 1)
+                project = args[0];
 
-            public void Unregister(InvocationContext context)
-            {
-                try
-                {
-                    FileAssociation.Unassociate();
-                    Console.WriteLine("Unregistered MGCB Editor!");
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine("Failed to unregister MGCB Editor due to:" + Environment.NewLine + ex);
-                    throw;
-                }
-            }
-
-            public void Run(InvocationContext context, string project)
-            {
-                Styles.Load();
+            Styles.Load();
 
 #if GTK
-                var app = new Application(Platforms.Gtk);
+            var app = new Application(Platforms.Gtk);
 #elif WPF
-                var app = new Application(Platforms.Wpf);
+            var app = new Application(Platforms.Wpf);
 #else
-                var app = new Application(Platforms.Mac64);
+            var app = new Application(Platforms.Mac64);
 #endif
 
-                app.Style = "PipelineTool";
+            app.Style = "PipelineTool";
 
-                PipelineSettings.Default.Load();
+            PipelineSettings.Default.Load();
 
-                if (!string.IsNullOrEmpty(PipelineSettings.Default.ErrorMessage))
-                {
-                    var logwin = new LogWindow();
-                    logwin.LogText = PipelineSettings.Default.ErrorMessage;
-                    app.Run(logwin);
-                    return;
-                }
+            if (!string.IsNullOrEmpty(PipelineSettings.Default.ErrorMessage))
+            {
+                var logwin = new LogWindow();
+                logwin.LogText = PipelineSettings.Default.ErrorMessage;
+                app.Run(logwin);
+                return;
+            }
 
 #if !DEBUG
-                try
+            try
 #endif
-                {
-                    var win = new MainWindow();
-                    var controller = PipelineController.Create(win);
+            {
+                var win = new MainWindow();
+                var controller = PipelineController.Create(win);
 
 #if GTK
-                    Global.Application.AddWindow(win.ToNative() as Gtk.Window);
+                Global.Application.AddWindow(win.ToNative() as Gtk.Window);
 #endif
 
 #if GTK && !DEBUG
-                    GLib.ExceptionManager.UnhandledException += (e) =>
-                    {
-                        var logwin = new LogWindow();
-                        logwin.LogText = e.ExceptionObject.ToString();
-
-                        logwin.Show();
-                        win.Close();
-                    };
-#endif
-
-                    if (!string.IsNullOrEmpty(project))
-                        controller.OpenProject(project);
-
-                    app.Run(win);
-                }
-#if !DEBUG
-                catch (Exception ex)
+                GLib.ExceptionManager.UnhandledException += (e) =>
                 {
-                    PipelineSettings.Default.ErrorMessage = ex.ToString();
-                    PipelineSettings.Default.Save();
-                    app.Restart();
-                }
+                    var logwin = new LogWindow();
+                    logwin.LogText = e.ExceptionObject.ToString();
+
+                    logwin.Show();
+                    win.Close();
+                };
 #endif
+
+                if (!string.IsNullOrEmpty(project))
+                    controller.OpenProject(project);
+
+                app.Run(win);
             }
+#if !DEBUG
+            catch (Exception ex)
+            {
+                PipelineSettings.Default.ErrorMessage = ex.ToString();
+                PipelineSettings.Default.Save();
+                app.Restart();
+            }
+#endif
         }
     }
 }

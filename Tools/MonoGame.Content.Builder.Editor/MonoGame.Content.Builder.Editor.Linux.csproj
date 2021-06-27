@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
-    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Gtk</BaseOutputPath>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Linux</BaseOutputPath>
     <DefineConstants>GTK</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <AssemblyName>mgcb-editor-gtk</AssemblyName>
+    <AssemblyName>mgcb-editor-linux</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
   </PropertyGroup>
 
@@ -23,14 +23,9 @@
     <Compile Remove="Platform\**\*" />
 
     <Compile Include="Platform\Linux\**\*.cs" />
-    <Compile Include="Platform\Utilities\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Platform\Linux\Content\**\*">
-      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Templates\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>Templates\%(Filename)%(Extension)</Link>
@@ -40,8 +35,7 @@
   <ItemGroup>
     <PackageReference Include="Eto.Forms" Version="2.5.10" />
     <PackageReference Include="Eto.Platform.Gtk" Version="2.5.10" />
-    <PackageReference Include="GtkSharp" Version="3.22.25.98" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20158.1" />
+    <PackageReference Include="GtkSharp" Version="3.24.24.34" />
   </ItemGroup>
 
   <ItemGroup>

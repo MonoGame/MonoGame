@@ -1,6 +1,6 @@
 #tool nuget:?package=vswhere&version=2.6.7
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
-#addin nuget:?package=Cake.FileHelpers&version=3.2.1
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0
+#addin nuget:?package=Cake.FileHelpers&version=3.3.0
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -99,6 +99,7 @@ Task("BuildDesktopGL")
 
 Task("TestDesktopGL")
     .IsDependentOn("BuildDesktopGL")
+    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/DesktopGL/Debug");
@@ -188,7 +189,16 @@ Task("BuildTools")
     var newVersion = "<key>CFBundleShortVersionString</key>\n\t<string>" + version + "</string>";
     ReplaceRegexInFiles(plistPath, versionReg, newVersion, System.Text.RegularExpressions.RegexOptions.Singleline);
     
-    PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
+    if (IsRunningOnWindows())
+        PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Windows.csproj");
+    
+    PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj");
+    
+    // if (IsRunningOnMacOs()) TODO: Update CAKE
+    if (IsRunningOnUnix() && DirectoryExists("/Applications"))
+        PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj");
+
+    PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.csproj");
 });
 
 Task("TestTools")

@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor.Launcher</BaseOutputPath>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>mgcb-editor</ToolCommandName>
+    <PackageId>dotnet-mgcb-editor</PackageId>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>mgcb-editor</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Mac\Release\MGCB Editor.app\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>MGCB Editor.app\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Linux\Release\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>mgcb-editor-linux\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="mgcb-editor-linux\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>mgcb-editor-linux\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Windows\Release\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>mgcb-editor-windows\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20158.1" />
+  </ItemGroup>
+
+</Project>

@@ -292,10 +292,10 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Ceiling()
         {
-            X = (float)Math.Ceiling(X);
-            Y = (float)Math.Ceiling(Y);
-            Z = (float)Math.Ceiling(Z);
-            W = (float)Math.Ceiling(W);
+            X = MathF.Ceiling(X);
+            Y = MathF.Ceiling(Y);
+            Z = MathF.Ceiling(Z);
+            W = MathF.Ceiling(W);
         }
 
         /// <summary>
@@ -305,10 +305,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector4"/>.</returns>
         public static Vector4 Ceiling(Vector4 value)
         {
-            value.X = (float)Math.Ceiling(value.X);
-            value.Y = (float)Math.Ceiling(value.Y);
-            value.Z = (float)Math.Ceiling(value.Z);
-            value.W = (float)Math.Ceiling(value.W);
+            value.X = MathF.Ceiling(value.X);
+            value.Y = MathF.Ceiling(value.Y);
+            value.Z = MathF.Ceiling(value.Z);
+            value.W = MathF.Ceiling(value.W);
             return value;
         }
 
@@ -319,10 +319,10 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The rounded <see cref="Vector4"/>.</param>
         public static void Ceiling(ref Vector4 value, out Vector4 result)
         {
-            result.X = (float)Math.Ceiling(value.X);
-            result.Y = (float)Math.Ceiling(value.Y);
-            result.Z = (float)Math.Ceiling(value.Z);
-            result.W = (float)Math.Ceiling(value.W);
+            result.X = MathF.Ceiling(value.X);
+            result.Y = MathF.Ceiling(value.Y);
+            result.Z = MathF.Ceiling(value.Z);
+            result.W = MathF.Ceiling(value.W);
         }
 
         /// <summary>
@@ -364,7 +364,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The distance between two vectors.</returns>
         public static float Distance(Vector4 value1, Vector4 value2)
         {
-            return (float)Math.Sqrt(DistanceSquared(value1, value2));
+            return MathF.Sqrt(DistanceSquared(value1, value2));
         }
 
         /// <summary>
@@ -375,7 +375,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The distance between two vectors as an output parameter.</param>
         public static void Distance(ref Vector4 value1, ref Vector4 value2, out float result)
         {
-            result = (float)Math.Sqrt(DistanceSquared(value1, value2));
+            result = MathF.Sqrt(DistanceSquared(value1, value2));
         }
 
         /// <summary>
@@ -516,10 +516,10 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Floor()
         {
-            X = (float)Math.Floor(X);
-            Y = (float)Math.Floor(Y);
-            Z = (float)Math.Floor(Z);
-            W = (float)Math.Floor(W);
+            X = MathF.Floor(X);
+            Y = MathF.Floor(Y);
+            Z = MathF.Floor(Z);
+            W = MathF.Floor(W);
         }
 
         /// <summary>
@@ -529,10 +529,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector4"/>.</returns>
         public static Vector4 Floor(Vector4 value)
         {
-            value.X = (float)Math.Floor(value.X);
-            value.Y = (float)Math.Floor(value.Y);
-            value.Z = (float)Math.Floor(value.Z);
-            value.W = (float)Math.Floor(value.W);
+            value.X = MathF.Floor(value.X);
+            value.Y = MathF.Floor(value.Y);
+            value.Z = MathF.Floor(value.Z);
+            value.W = MathF.Floor(value.W);
             return value;
         }
 
@@ -543,10 +543,10 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The rounded <see cref="Vector4"/>.</param>
         public static void Floor(ref Vector4 value, out Vector4 result)
         {
-            result.X = (float)Math.Floor(value.X);
-            result.Y = (float)Math.Floor(value.Y);
-            result.Z = (float)Math.Floor(value.Z);
-            result.W = (float)Math.Floor(value.W);
+            result.X = MathF.Floor(value.X);
+            result.Y = MathF.Floor(value.Y);
+            result.Z = MathF.Floor(value.Z);
+            result.W = MathF.Floor(value.W);
         }
 
         /// <summary>
@@ -605,7 +605,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The length of this <see cref="Vector4"/>.</returns>
         public float Length()
         {
-            return (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z) + (W * W));
+            return MathF.Sqrt((X * X) + (Y * Y) + (Z * Z) + (W * W));
         }
 
         /// <summary>
@@ -830,7 +830,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Normalize()
         {
-            float factor = (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z) + (W * W));
+            float factor = MathF.Sqrt((X * X) + (Y * Y) + (Z * Z) + (W * W));
             factor = 1f / factor;
             X *= factor;
             Y *= factor;
@@ -845,7 +845,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector4 Normalize(Vector4 value)
         {
-            float factor = (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z) + (value.W * value.W));
+            float factor = MathF.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z) + (value.W * value.W));
             factor = 1f / factor;
             return new Vector4(value.X*factor,value.Y*factor,value.Z*factor,value.W*factor);
         }
@@ -857,7 +857,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Unit vector as an output parameter.</param>
         public static void Normalize(ref Vector4 value, out Vector4 result)
         {
-            float factor = (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z) + (value.W * value.W));
+            float factor = MathF.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z) + (value.W * value.W));
             factor = 1f / factor;
             result.W = value.W * factor;
             result.X = value.X * factor;
@@ -870,10 +870,10 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Round()
         {
-            X = (float)Math.Round(X);
-            Y = (float)Math.Round(Y);
-            Z = (float)Math.Round(Z);
-            W = (float)Math.Round(W);
+            X = MathF.Round(X);
+            Y = MathF.Round(Y);
+            Z = MathF.Round(Z);
+            W = MathF.Round(W);
         }
 
         /// <summary>
@@ -883,10 +883,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector4"/>.</returns>
         public static Vector4 Round(Vector4 value)
         {
-            value.X = (float)Math.Round(value.X);
-            value.Y = (float)Math.Round(value.Y);
-            value.Z = (float)Math.Round(value.Z);
-            value.W = (float)Math.Round(value.W);
+            value.X = MathF.Round(value.X);
+            value.Y = MathF.Round(value.Y);
+            value.Z = MathF.Round(value.Z);
+            value.W = MathF.Round(value.W);
             return value;
         }
 
@@ -897,10 +897,10 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The rounded <see cref="Vector4"/>.</param>
         public static void Round(ref Vector4 value, out Vector4 result)
         {
-            result.X = (float)Math.Round(value.X);
-            result.Y = (float)Math.Round(value.Y);
-            result.Z = (float)Math.Round(value.Z);
-            result.W = (float)Math.Round(value.W);
+            result.X = MathF.Round(value.X);
+            result.Y = MathF.Round(value.Y);
+            result.Z = MathF.Round(value.Z);
+            result.W = MathF.Round(value.W);
         }
 
         /// <summary>

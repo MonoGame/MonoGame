@@ -1,4 +1,4 @@
-# .NET Core CLI
+# .NET CLI
 
 This guide will walk you through building a starter game with MonoGame using only the command line/terminal on your operating system and a lightweight coding tool of your choice (such as [Visual Studio Code](https://code.visualstudio.com/).
 

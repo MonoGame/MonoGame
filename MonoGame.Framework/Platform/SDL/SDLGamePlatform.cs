@@ -115,7 +115,7 @@ namespace Microsoft.Xna.Framework
                         _isExiting++;
                         break;
                     case Sdl.EventType.JoyDeviceAdded:
-                        Joystick.AddDevice(ev.JoystickDevice.Which);
+                        Joystick.AddDevices();
                         break;
                     case Sdl.EventType.JoyDeviceRemoved:
                         Joystick.RemoveDevice(ev.JoystickDevice.Which);
