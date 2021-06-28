@@ -130,7 +130,7 @@ namespace MonoGame.Effect
                 {
                     var defaultInstance = new OptionsDesc();
 
-                    defaultInstance.packMatricesInRowMajor = true;
+                    defaultInstance.packMatricesInRowMajor = false;
                     defaultInstance.enable16bitTypes = false;
                     defaultInstance.enableDebugInfo = false;
                     defaultInstance.disableOptimizations = false;

@@ -246,24 +246,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidCastException();
 
             var floatData = (float[])Data;
-#if OpenGL
-            // OpenGL matrices are transposed compared to DX 
-            if(!MojoDataLayout) 
-                return new Matrix(floatData[0], floatData[1], floatData[2], floatData[3],
-                                  floatData[4], floatData[5], floatData[6], floatData[7],
-                                  floatData[8], floatData[9], floatData[10], floatData[11],
-                                  floatData[12], floatData[13], floatData[14], floatData[15]);
-            else
-                return new Matrix(floatData[0], floatData[4], floatData[8], floatData[12],
-                                  floatData[1], floatData[5], floatData[9], floatData[13],
-                                  floatData[2], floatData[6], floatData[10], floatData[14],
-                                  floatData[3], floatData[7], floatData[11], floatData[15]);
-#else
+
             return new Matrix(floatData[0], floatData[4], floatData[8], floatData[12],
                               floatData[1], floatData[5], floatData[9], floatData[13],
                               floatData[2], floatData[6], floatData[10], floatData[14],
                               floatData[3], floatData[7], floatData[11], floatData[15]);
-#endif
         }
 
         public Matrix[] GetValueMatrixArray (int count)
@@ -505,71 +492,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
-#if OPENGL
-            // OpenGL matrices are transposed compared to DX 
-            if (!MojoDataLayout)
-                SetMatrixTranspose(value);
-            else
-                SetMatrix(value);
-#else
-            SetMatrix(value);
-#endif
-            StateKey = unchecked(NextStateKey++);
-        }
 
-        public void SetValueTranspose(Matrix value)
-        {
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-#if OPENGL
-            // OpenGL matrices are transposed compared to DX 
-            if (!MojoDataLayout)
-                SetMatrix(value); 
-            else
-                SetMatrixTranspose(value);
-#else
-            SetMatrixTranspose(value);
-#endif
-            StateKey = unchecked(NextStateKey++);
-        }
-
-        public void SetValue (Matrix[] value)
-        {
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-#if OPENGL
-            // OpenGL matrices are transposed compared to DX 
-            if (!MojoDataLayout)
-                SetMatrixArrayTransposed(value);
-            else
-                SetMatrixArray(value);
-#else
-            SetMatrixArray(value);
-#endif
-            StateKey = unchecked(NextStateKey++);
-        }
-
-        public void SetValueTranspose(Matrix[] value)
-        {
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-#if OPENGL
-            // OpenGL matrices are transposed compared to DX 
-            if (!MojoDataLayout)
-                SetMatrixArray(value);
-            else
-                SetMatrixArrayTransposed(value);
-#else
-            SetMatrixArrayTransposed(value);
-#endif
-            StateKey = unchecked(NextStateKey++);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void SetMatrix(Matrix value)
-        {
             // HLSL expects matrices to be transposed by default.
             // These unrolled loops do the transpose during assignment.
             if (RowCount == 4 && ColumnCount == 4)
@@ -686,11 +609,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 fData[2] = value.M12;
                 fData[3] = value.M22;
             }
+
+            StateKey = unchecked(NextStateKey++);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void SetMatrixTranspose(Matrix value)
+        public void SetValueTranspose(Matrix value)
         {
+            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
+                throw new InvalidCastException();
+
             // HLSL expects matrices to be transposed by default, so copying them straight
             // from the in-memory version effectively transposes them back to row-major.
             if (RowCount == 4 && ColumnCount == 4)
@@ -807,10 +734,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 fData[2] = value.M21;
                 fData[3] = value.M22;
             }
+
+            StateKey = unchecked(NextStateKey++);
         }
 
-        private void SetMatrixArray(Matrix[] value)
+        public void SetValue (Matrix[] value)
         {
+            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
+                throw new InvalidCastException();
+
             if (RowCount == 4 && ColumnCount == 4)
             {
                 for (var i = 0; i < value.Length; i++)
@@ -946,10 +878,15 @@ namespace Microsoft.Xna.Framework.Graphics
                     fData[3] = value[i].M22;
                 }
             }
+
+            StateKey = unchecked(NextStateKey++);
         }
 
-        private void SetMatrixArrayTransposed(Matrix[] value)
+        public void SetValueTranspose(Matrix[] value)
         {
+            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
+                throw new InvalidCastException();
+
             // HLSL expects matrices to be transposed by default, so copying them straight
             // from the in-memory version effectively transposes them back to row-major.
             if (RowCount == 4 && ColumnCount == 4)
@@ -1018,8 +955,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     fData[6] = value[i].M23;
                     fData[7] = value[i].M24;
 
-                    fData[8] =  value[i].M31;
-                    fData[9] =  value[i].M32;
+                    fData[8] = value[i].M31;
+                    fData[9] = value[i].M32;
                     fData[10] = value[i].M33;
                     fData[11] = value[i].M34;
                 }
@@ -1086,6 +1023,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     fData[3] = value[i].M22;
                 }
             }
+
+            StateKey = unchecked(NextStateKey++);
         }
 
         public void SetValue (Quaternion value)
