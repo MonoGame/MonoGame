@@ -29,6 +29,7 @@ namespace MonoGame.Effect
             public string name;
             public VertexElementUsage usage;
 			public int index;
+            public int size;
 #pragma warning disable 649
             public int location;
 #pragma warning restore 649

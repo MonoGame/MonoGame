@@ -47,8 +47,9 @@ namespace MonoGame.Effect
 				for (var i = 0; i < attributes.Length; i++) {
 					dxshader._attributes [i].name = attributes [i].name;
 					dxshader._attributes [i].index = attributes [i].index;
-					dxshader._attributes [i].usage = EffectObject.ToXNAVertexElementUsage (attributes [i].usage);
-				}
+                    dxshader._attributes [i].usage = EffectObject.ToXNAVertexElementUsage (attributes [i].usage);
+                    dxshader._attributes [i].size = 1;
+                }
 			}
 
 			var symbols = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol> (

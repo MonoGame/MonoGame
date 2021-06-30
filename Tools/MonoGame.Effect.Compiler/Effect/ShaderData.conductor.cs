@@ -150,6 +150,7 @@ namespace MonoGame.Effect
                 {
                     shaderData._attributes[i].name = stageInputs[i].name;
                     shaderData._attributes[i].location = stageInputs[i].location;
+                    shaderData._attributes[i].size = stageInputs[i].columns;
                     shaderData._attributes[i].usage = GetVertexElementUsageFromStageInput(stageInputs[i]);
                     shaderData._attributes[i].index = stageInputs[i].index;
                 }

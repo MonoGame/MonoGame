@@ -72,8 +72,12 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             for (int i = 0; i < Attributes.Length; ++i)
             {
-                if ((Attributes[i].usage == usage) && (Attributes[i].index == index))
-                    return Attributes[i].location;
+                if (Attributes[i].usage == usage)
+                {
+                    int offset = index - Attributes[i].index;
+                    if (offset < Attributes[i].size)
+                        return Attributes[i].location + offset;
+                }
             }
             return -1;
         }

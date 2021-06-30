@@ -37,6 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public int index;
         public string name;
         public int location;
+        public int size;
     }
 
     internal partial class Shader : GraphicsResource
@@ -110,6 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Attributes[a].usage = (VertexElementUsage)reader.ReadByte();
                 Attributes[a].index = reader.ReadByte();
                 Attributes[a].location = reader.ReadInt16();
+                Attributes[a].size = reader.ReadByte();
             }
 
             PlatformConstruct(Stage, shaderBytecode);

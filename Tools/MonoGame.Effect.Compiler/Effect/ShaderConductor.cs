@@ -30,7 +30,7 @@ namespace MonoGame.Effect
         public static extern int GetStageInputCount([In] ref ResultDesc result);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void GetStageInput([In] ref ResultDesc result, int stageInputIndex, byte[] name, int maxNameLength, out int location);
+        public static extern void GetStageInput([In] ref ResultDesc result, int stageInputIndex, byte[] name, int maxNameLength, out int location, out int rows, out int columns);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int GetUniformBufferCount([In] ref ResultDesc result);
@@ -175,6 +175,8 @@ namespace MonoGame.Effect
         {
             public string name;
             public int location;
+            public int rows;
+            public int columns;
             public string usage;
             public int index;
         }
@@ -217,7 +219,7 @@ namespace MonoGame.Effect
 
             for (int i = 0; i < stageInputCount; i++)
             {
-                GetStageInput(ref result, i, nameBuffer, MaxNameLength, out int location);
+                GetStageInput(ref result, i, nameBuffer, MaxNameLength, out int location, out int rows, out int columns);
 
                 string name = ByteBufferToString(nameBuffer);
                 ExtractUsageAndIndexFromName(name, out string usage, out int index);
@@ -226,6 +228,8 @@ namespace MonoGame.Effect
                 {
                     name = name,
                     location = location,
+                    rows = rows,
+                    columns = columns,
                     usage = usage,
                     index = index,
                 });
