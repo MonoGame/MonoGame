@@ -1,3 +1,5 @@
+- name: Why use the Content Pipeline
+  href: why_content_pipeline.md
 - name: Using MGCB Editor
   href: using_mgcb_editor.md
 - name: Custom Effects
