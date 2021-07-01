@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
+    <TrimmerRootAssembly Include="MonoGame.Framework" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
