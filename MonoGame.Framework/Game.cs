@@ -262,7 +262,7 @@ namespace Microsoft.Xna.Framework
 
                 if (value > _maxElapsedTime)
                     throw new ArgumentOutOfRangeException(
-                        "The time can not be larger than maxElapsedTime", default(Exception));
+                        "The time can not be larger than MaxElapsedTime", default(Exception));
 
                 if (value != _targetElapsedTime)
                 {
