@@ -195,7 +195,27 @@ namespace Microsoft.Xna.Framework.Input
         {
             return InternalGetKey(key);
         }
-
+        
+        // Store the already pressed keys
+        private List<Keys> _keyDownFlags = new List<Keys>();
+        
+        /// <summary>
+        /// Gets true in the first frame that the key is pressed.
+        /// </summary>
+        /// <param name="key">The key to query.</param>
+        /// <returns>true in the frame in which the key was pressed.</returns>
+        public bool IsKeyDownInThisFrame(Keys key)
+        {
+            if (!IsKeyDown(key))
+                _keyDownFlags.Remove(key);
+            if (IsKeyDown(key) && !_keyDownFlags.Contains(key))
+            {
+                _keyDownFlags.Add(key);
+                return true;
+            }
+            return false;
+        }
+        
         /// <summary>
         /// Gets whether given key is currently being not pressed.
         /// </summary>
@@ -204,6 +224,26 @@ namespace Microsoft.Xna.Framework.Input
         public bool IsKeyUp(Keys key)
         {
             return !InternalGetKey(key);
+        }
+        
+        // Store the already released keys
+        private List<Keys> _keyUpFlags = new List<Keys>();
+        
+        /// <summary>
+        /// Gets true in the first frame that the key is released.
+        /// </summary>
+        /// <param name="key">The key to query.</param>
+        /// <returns>true in the frame in which the key was released.</returns>
+        public bool IsKeyUpInThisFrame(Keys key)
+        {
+            if (!IsKeyUp(key))
+                _keyUpFlags.Remove(key);
+            if (IsKeyUp(key) && !_keyUpFlags.Contains(key))
+            {
+                _keyUpFlags.Add(key);
+                return true;
+            }
+            return false;
         }
 
         #endregion
