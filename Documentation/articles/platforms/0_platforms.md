@@ -8,7 +8,6 @@ MonoGame supports the following systems:
 - Android
 - iOS
 - PlayStation 4
-- PlayStation Vita
 - Xbox One
 - Nintendo Switch
 - Google Stadia

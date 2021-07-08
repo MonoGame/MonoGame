@@ -89,6 +89,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// PlayStation Vita
         /// </summary>
+		[Obsolete("PS Vita is no longer supported")]
         PSVita,
        
         /// <summary>
