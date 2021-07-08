@@ -10,6 +10,7 @@ using System.Reflection;
 using MonoGame.Framework.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
+using System.Linq.Expressions;
 
 #if !WINDOWS_UAP
 using Microsoft.Xna.Framework.Audio;
@@ -220,8 +221,8 @@ namespace Microsoft.Xna.Framework.Content
             return Load<T> (assetName);
         }
 
-		public virtual T Load<T>(string assetName)
-		{
+        public virtual T Load<T>(string assetName, Stream streamData=null, ContentResolver contentResolver=null)
+        {
             if (string.IsNullOrEmpty(assetName))
             {
                 throw new ArgumentNullException("assetName");
@@ -232,7 +233,7 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             T result = default(T);
-            
+
             // On some platforms, name and slash direction matter.
             // We store the asset by a /-seperating key rather than how the
             // path to the file was passed to us to avoid
@@ -252,11 +253,11 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             // Load the asset.
-            result = ReadAsset<T>(assetName, null);
+            result = ReadAsset<T>(assetName, null, streamData, contentResolver);
 
             loadedAssets[key] = result;
             return result;
-		}
+        }
 		
 		protected virtual Stream OpenStream(string assetName)
 		{
@@ -301,7 +302,7 @@ namespace Microsoft.Xna.Framework.Content
 			return stream;
 		}
 
-		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
+		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject,Stream streamData=null, ContentResolver contentResolver=null)
 		{
 			if (string.IsNullOrEmpty(assetName))
 			{
@@ -316,10 +317,10 @@ namespace Microsoft.Xna.Framework.Content
 			object result = null;
 
             // Try to load as XNB file
-            var stream = OpenStream(assetName);
+            var stream = streamData ?? OpenStream(assetName);
             using (var xnbReader = new BinaryReader(stream))
             {
-                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
+                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject, contentResolver))
                 {
                     result = reader.ReadAsset<T>();
                     if (result is GraphicsResource)
@@ -333,7 +334,12 @@ namespace Microsoft.Xna.Framework.Content
 			return (T)result;
 		}
 
-        private ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
+        /// <summary>
+        /// resolvers for reloading content
+        /// </summary>
+        protected Dictionary<string, ContentResolver> ContentResolversForReload = new Dictionary<string, ContentResolver>();
+
+        private ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject, ContentResolver contentResolver=null)
         {
             // The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
             byte x = xnbReader.ReadByte();
@@ -381,8 +387,17 @@ namespace Microsoft.Xna.Framework.Content
                 decompressedStream = stream;
             }
 
+            if (contentResolver != null)
+            {
+                if (ContentResolversForReload.ContainsKey(originalAssetName))
+                {
+                    ContentResolversForReload.Remove(originalAssetName);
+                }
+                ContentResolversForReload.Add(originalAssetName, contentResolver);
+            }
+
             var reader = new ContentReader(this, decompressedStream,
-                                                        originalAssetName, version, recordDisposableObject);
+                                                        originalAssetName, version, recordDisposableObject, contentResolver);
             
             return reader;
         }
@@ -405,7 +420,7 @@ namespace Microsoft.Xna.Framework.Content
             get { return loadedAssets; }
         }
 
-		protected virtual void ReloadGraphicsAssets()
+        protected virtual void ReloadGraphicsAssets()
         {
             foreach (var asset in LoadedAssets)
             {
@@ -414,11 +429,26 @@ namespace Microsoft.Xna.Framework.Content
                 if (asset.Key == null)
                     ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()));
 
-                var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), "ReloadAsset");
-                var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
-                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) }); 
+                Delegate reloadAssetCompiled = null;
+                if (!ReloadAssetDelegateCache.TryGetValue(asset.Key, out reloadAssetCompiled))
+                {
+                    var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), "ReloadAsset");
+                    var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
+
+                    var originalAssetName = Expression.Parameter(typeof(string));
+                    var currentAsset = Expression.Parameter(asset.Value.GetType());
+
+                    var ReloadAssetCall = Expression.Call(Expression.Constant(this), methodInfo, originalAssetName, currentAsset);
+
+                    reloadAssetCompiled = Expression.Lambda(ReloadAssetCall, originalAssetName, currentAsset).Compile();
+                    ReloadAssetDelegateCache.Add(asset.Key, reloadAssetCompiled);
+                }
+
+                reloadAssetCompiled.DynamicInvoke(asset.Key, asset.Value);
             }
         }
+
+        private static Dictionary<string, Delegate> ReloadAssetDelegateCache = new Dictionary<string, Delegate>();
 
         protected virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
         {
@@ -432,10 +462,16 @@ namespace Microsoft.Xna.Framework.Content
 				throw new ObjectDisposedException("ContentManager");
 			}
 
+            ContentResolver contentResolver = null;
+            if(ContentResolversForReload.ContainsKey(originalAssetName))
+            {
+                contentResolver = ContentResolversForReload[originalAssetName];
+            }
+
             var stream = OpenStream(assetName);
             using (var xnbReader = new BinaryReader(stream))
             {
-                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, null))
+                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, null, contentResolver))
                 {
                     reader.ReadAsset<T>(currentAsset);
                 }
