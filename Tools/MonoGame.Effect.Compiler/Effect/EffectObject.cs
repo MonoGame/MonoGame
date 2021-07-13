@@ -911,8 +911,15 @@ namespace MonoGame.Effect
 
         private d3dx_state CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ShaderStage shaderStage, ref string errorsAndWarnings)
         {
-            // Compile and create the shader.
-            var shaderData = shaderResult.Profile.CreateShader(shaderResult, shaderFunction, shaderProfile, shaderStage, this, ref errorsAndWarnings);
+            // Check if this shader has already been created.
+            var shaderData = Shaders.Find(shader => shader.ShaderFunctionName == shaderFunction && shader.ShaderProfile == shaderProfile);
+            if (shaderData == null)
+            {
+                // Compile and create the shader.
+                shaderData = shaderResult.Profile.CreateShader(shaderResult, shaderFunction, shaderProfile, shaderStage, this, ref errorsAndWarnings);
+                shaderData.ShaderFunctionName = shaderFunction;
+                shaderData.ShaderProfile = shaderProfile;
+            }
 
             var state = new d3dx_state();
             state.index = 0;
