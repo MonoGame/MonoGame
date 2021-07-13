@@ -36,7 +36,7 @@ namespace MonoGame.Effect
         public static extern int GetUniformBufferCount([In] ref ResultDesc result);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void GetUniformBuffer([In] ref ResultDesc result, int bufferIndex, byte[] blockName, byte[] instanceName, int maxNameLength, out int byteSize, out int parameterCount);
+        public static extern void GetUniformBuffer([In] ref ResultDesc result, int bufferIndex, byte[] blockName, byte[] instanceName, int maxNameLength, out int byteSize, out int slot, out int parameterCount);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void GetParameter([In] ref ResultDesc result, int bufferIndex, int parameterIndex, byte[] name, int maxNameLength, out int type, out int rows, out int columns, out int byteOffset, out int arrayDimensions);
@@ -49,6 +49,12 @@ namespace MonoGame.Effect
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void GetSampler([In] ref ResultDesc result, int samplerIndex, byte[] name, byte[] originalName, byte[] textureName, int maxNameLength, out int type, out int slot, out int textureSlot);
+
+        [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int GetStorageBufferCount([In] ref ResultDesc result);
+
+        [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void GetStorageBuffer([In] ref ResultDesc result, int bufferIndex, byte[] blockName, byte[] instanceName, int maxNameLength, out int byteSize, out int slot, out bool readOnly);
 
         public enum ShaderStage
         {
@@ -186,6 +192,7 @@ namespace MonoGame.Effect
             public string blockName;
             public string instanceName;
             public int byteSize;
+            public int slot; // register binding
             public List<Parameter> parameters;
         }
 
@@ -208,6 +215,15 @@ namespace MonoGame.Effect
             public int slot;
             public int textureSlot;
             public int type; // 1=1D, 2=2D, 3=3D, 4=Cube
+        }
+
+        public struct StorageBuffer
+        {
+            public string blockName;
+            public string instanceName;
+            public int byteSize;
+            public int slot; // register binding
+            public bool readOnly;
         }
 
         public static List<StageInput> GetStageInputs(ResultDesc result)
@@ -249,7 +265,7 @@ namespace MonoGame.Effect
 
             for (int bufInd = 0; bufInd < bufferCount; bufInd++)
             {
-                GetUniformBuffer(ref result, bufInd, blockNameBuffer, instanceNameBuffer, MaxNameLength, out int byteSize, out int parameterCount);
+                GetUniformBuffer(ref result, bufInd, blockNameBuffer, instanceNameBuffer, MaxNameLength, out int byteSize, out int slot, out int parameterCount);
 
                 string blockName = ByteBufferToString(blockNameBuffer);
                 string instanceName = ByteBufferToString(instanceNameBuffer);
@@ -284,6 +300,7 @@ namespace MonoGame.Effect
                     blockName = blockName,
                     instanceName = instanceName,
                     byteSize = byteSize,
+                    slot = slot,
                     parameters = parameters,
                 });
             }
@@ -319,6 +336,34 @@ namespace MonoGame.Effect
             }
 
             return samplers;
+        }
+
+        public static List<StorageBuffer> GetStorageBuffers(ResultDesc result)
+        {
+            var buffers = new List<StorageBuffer>();
+
+            byte[] blockNameBuffer = new byte[MaxNameLength];
+            byte[] instanceNameBuffer = new byte[MaxNameLength];
+
+            int bufferCount = GetStorageBufferCount(ref result);
+
+            for (int i = 0; i < bufferCount; i++)
+            {
+                GetStorageBuffer(ref result, i, blockNameBuffer, instanceNameBuffer, MaxNameLength, out int byteSize, out int slot, out bool readOnly);
+
+                var buffer = new StorageBuffer
+                {
+                    blockName = ByteBufferToString(blockNameBuffer),
+                    instanceName = ByteBufferToString(instanceNameBuffer),
+                    byteSize = byteSize,
+                    slot = slot,
+                    readOnly = readOnly,
+                };
+
+                buffers.Add(buffer);
+            }
+
+            return buffers;
         }
 
         private static void ExtractUsageAndIndexFromName(string stageInputName, out string usage, out int index)

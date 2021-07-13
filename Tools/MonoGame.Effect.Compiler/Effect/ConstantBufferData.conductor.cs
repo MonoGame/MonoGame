@@ -11,6 +11,7 @@ namespace MonoGame.Effect
             Name = ub.blockName;
             InstanceName = ub.instanceName;
             Size = ub.byteSize;
+            BindingSlot = ub.slot;
 
             ParameterIndex = new List<int>();
             var parameters = new List<EffectObject.d3dx_parameter>();

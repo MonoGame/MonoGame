@@ -10,7 +10,8 @@ namespace MonoGame.Effect
 {
 	internal partial class ShaderData
 	{
-        public static ShaderData CreateGLSL_Conductor(string sourceCode, int sharedIndex, 
+        public static ShaderData CreateGLSL_Conductor(
+            string sourceCode, int sharedIndex, 
             ShaderStage shaderStage, string shaderFunction,
             int shaderModelMajor, int shaderModelMinor, string shaderModelExtension,
             List<ConstantBufferData> cbuffers, Dictionary<string, SamplerStateInfo> samplerStates,
@@ -205,7 +206,22 @@ namespace MonoGame.Effect
                 if (samplerStates.TryGetValue(samplers[i].originalName, out SamplerStateInfo state))
                     shaderData._samplers[i].state = state.State;
             }
-            
+
+            //==============================================================
+            // Add storage buffers to shaderData
+            //==============================================================
+            var storageBuffers = ShaderConductor.GetStorageBuffers(result);
+            shaderData._bufferResources = new BufferResourceData[storageBuffers.Count];
+
+            for (int i = 0; i < storageBuffers.Count; i++)
+            {
+                shaderData._bufferResources[i].Name = storageBuffers[i].blockName;
+                shaderData._bufferResources[i].InstanceName = storageBuffers[i].instanceName;
+                shaderData._bufferResources[i].Size = storageBuffers[i].byteSize;
+                shaderData._bufferResources[i].Slot = storageBuffers[i].slot;
+                shaderData._bufferResources[i].Type = storageBuffers[i].readOnly ? BufferType.Structured : BufferType.RWStructured;
+            }
+
             //==============================================================
             // Cleanup
             //==============================================================
@@ -227,6 +243,7 @@ namespace MonoGame.Effect
                 case Effect.ShaderStage.HullShader: return ShaderConductor.ShaderStage.HullShader;
                 case Effect.ShaderStage.DomainShader: return ShaderConductor.ShaderStage.DomainShader;
                 case Effect.ShaderStage.GeometryShader: return ShaderConductor.ShaderStage.GeometryShader;
+                case Effect.ShaderStage.ComputeShader: return ShaderConductor.ShaderStage.ComputeShader;
                 default:
                     throw new Exception("Shader stage conversion failed.");
             }

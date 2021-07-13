@@ -17,6 +17,7 @@ namespace MonoGame.Effect
         internal static readonly Regex HlslHullShaderRegex = new Regex(@"^hs_(?<major>1|2|3|4|5)_(?<minor>0|1|)(_level_(?<exctension>9_1|9_2|9_3))?$", RegexOptions.Compiled);
         internal static readonly Regex HlslDomainShaderRegex = new Regex(@"^ds_(?<major>1|2|3|4|5)_(?<minor>0|1|)(_level_(?<exctension>9_1|9_2|9_3))?$", RegexOptions.Compiled);
         internal static readonly Regex HlslGeometryShaderRegex = new Regex(@"^gs_(?<major>1|2|3|4|5)_(?<minor>0|1|)(_level_(?<exctension>9_1|9_2|9_3))?$", RegexOptions.Compiled);
+        internal static readonly Regex HlslComputeShaderRegex = new Regex(@"^cs_(?<major>1|2|3|4|5)_(?<minor>0|1|)(_level_(?<exctension>9_1|9_2|9_3))?$", RegexOptions.Compiled);
 
         public DirectX11ShaderProfile()
             : base("DirectX_11", 1)
@@ -43,6 +44,8 @@ namespace MonoGame.Effect
                     return HlslDomainShaderRegex;
                 case ShaderStage.GeometryShader:
                     return HlslGeometryShaderRegex;
+                case ShaderStage.ComputeShader:
+                    return HlslComputeShaderRegex;
                 default:
                     throw new Exception("GetShaderModelRegex: Unknown shader stage");
             }
@@ -86,6 +89,13 @@ namespace MonoGame.Effect
                 ParseShaderModel(pass.gsModel, HlslGeometryShaderRegex, out major, out minor, out extension);
                 if (major <= 3)
                     throw new Exception(String.Format("Invalid profile '{0}'. Geometry shader '{1}' must be SM 4.0 or higher!", pass.gsModel, pass.gsFunction));
+            }
+
+            if (!string.IsNullOrEmpty(pass.csFunction))
+            {
+                ParseShaderModel(pass.csModel, HlslComputeShaderRegex, out major, out minor, out extension);
+                if (major <= 4)
+                    throw new Exception(String.Format("Invalid profile '{0}'. Compute shader '{1}' must be SM 5.0 or higher!", pass.csModel, pass.csFunction));
             }
         }
 

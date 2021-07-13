@@ -13,7 +13,7 @@ namespace MonoGame.Effect
 	{
 
         private const string Header = "MGFX";
-        private const int Version = 11;
+        private const int Version = 12;
 
         /// <summary>
         /// Writes the effect for loading later.
@@ -35,6 +35,7 @@ namespace MonoGame.Effect
             {
                 // Write MojoShader flag
                 memWriter.Write(options.IsDefined("MOJO"));
+
                 // Write all the constant buffers.
                 memWriter.Write(ConstantBuffers.Count);
                 foreach (var cbuffer in ConstantBuffers)
@@ -70,12 +71,14 @@ namespace MonoGame.Effect
                         var hullShader = GetShaderIndex(STATE_CLASS.HULLSHADER, pass.states);
                         var domainShader = GetShaderIndex(STATE_CLASS.DOMAINSHADER, pass.states);
                         var geometryShader = GetShaderIndex(STATE_CLASS.GEOMETRYSHADER, pass.states);
+                        var computeShader = GetShaderIndex(STATE_CLASS.COMPUTESHADER, pass.states);
 
                         memWriter.Write(vertexShader);
                         memWriter.Write(pixelShader);
                         memWriter.Write(hullShader);
                         memWriter.Write(domainShader);
                         memWriter.Write(geometryShader);
+                        memWriter.Write(computeShader);
 
                         // Write the state objects too!
                         if (pass.blendState != null)

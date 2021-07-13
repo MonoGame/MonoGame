@@ -120,6 +120,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return ShaderType.TesselationEvaluationShader;
                 case ShaderStage.Geometry:
                     return ShaderType.GeometryShader;
+                case ShaderStage.Compute:
+                    return ShaderType.ComputeShader;
                 default:
                     throw new ArgumentException("ShaderStage not supported: " + stage);
             }

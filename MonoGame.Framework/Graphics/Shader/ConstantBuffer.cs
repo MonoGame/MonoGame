@@ -14,6 +14,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly int[] _offsets;
 
+        private readonly int _bindingSlot;
+
         private readonly string _name;
 
         private readonly string _instanceName;
@@ -35,6 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Share the immutable types.
             _name = cloneSource._name;
             _instanceName = cloneSource._instanceName;
+            _bindingSlot = cloneSource._bindingSlot;
             _parameters = cloneSource._parameters;
             _offsets = cloneSource._offsets;
             _effect = effect;
@@ -46,6 +49,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public ConstantBuffer(GraphicsDevice device,
                               int sizeInBytes,
+                              int bindingSlot,
                               int[] parameterIndexes,
                               int[] parameterOffsets,
                               string name,
@@ -55,6 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsDevice = device;
 
             _buffer = new byte[sizeInBytes];
+            _bindingSlot = bindingSlot;
             _parameters = parameterIndexes;
             _offsets = parameterOffsets;
             _name = name;

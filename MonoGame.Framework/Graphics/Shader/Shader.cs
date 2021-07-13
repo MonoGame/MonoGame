@@ -31,6 +31,18 @@ namespace Microsoft.Xna.Framework.Graphics
         public int parameter;
     }
 
+    internal struct BufferInfo
+    {
+        public string name;
+        public string instanceName;
+        public int size;
+        public int slot;
+        public bool writeAccess;
+
+        // TODO: This should be moved to EffectPass.
+        public int parameter;
+    }
+
     internal struct VertexAttribute
     {
         public VertexElementUsage usage;
@@ -55,6 +67,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public SamplerInfo[] Samplers { get; private set; }
 
 	    public int[] CBuffers { get; private set; }
+
+        public BufferInfo[] BuffersResources { get; private set; }
 
         public ShaderStage Stage { get; private set; }
 
@@ -112,6 +126,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 Attributes[a].index = reader.ReadByte();
                 Attributes[a].location = reader.ReadInt16();
                 Attributes[a].size = reader.ReadByte();
+            }
+
+            var bufferResourceCount = (int)reader.ReadByte();
+            BuffersResources = new BufferInfo[bufferResourceCount];
+            for (var b = 0; b < bufferResourceCount; b++)
+            {
+                BuffersResources[b].name = reader.ReadString();
+                BuffersResources[b].instanceName = reader.ReadString();
+                BuffersResources[b].size = reader.ReadUInt16();
+                BuffersResources[b].slot = reader.ReadByte();
+                BuffersResources[b].writeAccess = reader.ReadByte() == 1;
+                BuffersResources[b].parameter = reader.ReadByte();
             }
 
             PlatformConstruct(Stage, shaderBytecode);

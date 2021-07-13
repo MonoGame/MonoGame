@@ -21,6 +21,7 @@
 [IgnoreCase] HullShader -> @"HullShader";
 [IgnoreCase] DomainShader -> @"DomainShader";
 [IgnoreCase] GeometryShader -> @"GeometryShader";
+[IgnoreCase] ComputeShader -> @"ComputeShader";
 [IgnoreCase] Register -> @"register";
 [IgnoreCase] Boolean -> @"true|false|0|1";
 Number -> @"[+-]? ?[0-9]?\.?[0-9]+[fF]?";
@@ -325,7 +326,7 @@ Render_State_Expression ->
 				Render_State_StencilWriteMask |
 				Render_State_StencilZFail;
 
-Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression | HullShader_Pass_Expression | DomainShader_Pass_Expression | GeometryShader_Pass_Expression | Render_State_Expression)* CloseBracket 
+Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression | HullShader_Pass_Expression | DomainShader_Pass_Expression | GeometryShader_Pass_Expression | ComputeShader_Pass_Expression | Render_State_Expression)* CloseBracket 
 { 
    var pass = new PassInfo();
    pass.name = $Identifier as string ?? string.Empty;
@@ -338,7 +339,8 @@ Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression |
 	!string.IsNullOrEmpty(pass.vsFunction) ||
 	!string.IsNullOrEmpty(pass.hsFunction) ||
 	!string.IsNullOrEmpty(pass.dsFunction) ||
-	!string.IsNullOrEmpty(pass.gsFunction))
+	!string.IsNullOrEmpty(pass.gsFunction) ||
+	!string.IsNullOrEmpty(pass.csFunction))
    {
       var technique = paramlist[0] as TechniqueInfo;
       technique.Passes.Add(pass);
@@ -384,6 +386,14 @@ GeometryShader_Pass_Expression -> GeometryShader Equals Compile ShaderModel Iden
    var pass = paramlist[0] as PassInfo;
    pass.gsModel = $ShaderModel as string;
    pass.gsFunction = $Identifier as string;
+   return null;
+};
+
+ComputeShader_Pass_Expression -> ComputeShader Equals Compile ShaderModel Identifier OpenParenthesis CloseParenthesis Semicolon
+{
+   var pass = paramlist[0] as PassInfo;
+   pass.csModel = $ShaderModel as string;
+   pass.csFunction = $Identifier as string;
    return null;
 };
 

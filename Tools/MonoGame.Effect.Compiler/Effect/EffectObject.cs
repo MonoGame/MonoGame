@@ -199,6 +199,7 @@ namespace MonoGame.Effect
             GEOMETRYSHADER,
             HULLSHADER,
             DOMAINSHADER,
+            COMPUTESHADER,
             UNSUPPORTED,
 			FORCE_DWORD = 0x7fffffff,
 		}
@@ -241,6 +242,7 @@ namespace MonoGame.Effect
             GEOMETRYSHADER,
             HULLSHADER,
             DOMAINSHADER,
+            COMPUTESHADER,
             UNKNOWN,
 		};
 
@@ -287,6 +289,9 @@ namespace MonoGame.Effect
             DSFLOAT,
             DSBOOL,
             DSINT,
+            CSFLOAT,
+            CSBOOL,
+            CSINT,
         }
 
 		public enum STATE_TYPE
@@ -340,8 +345,8 @@ namespace MonoGame.Effect
 		    public uint state_count = 0;
 		    public d3dx_state[] states = null;
 		}
-		
-		public class d3dx_pass
+
+        public class d3dx_pass
 		{
 			public string name;
 			public uint state_count;
@@ -548,6 +553,8 @@ namespace MonoGame.Effect
             new state_info(STATE_CLASS.DOMAINSHADER, 0, "DomainShader"),
             /* HullShader */
             new state_info(STATE_CLASS.HULLSHADER, 0, "HullShader"),
+            /* ComputerShader */
+            new state_info(STATE_CLASS.COMPUTESHADER, 0, "ComputeShader"),
 			/* Shader constants */
 			new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.VSFLOAT, "VertexShaderConstantF"),
 			new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.VSBOOL,  "VertexShaderConstantB"),
@@ -589,6 +596,14 @@ namespace MonoGame.Effect
             new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.GSFLOAT, "GeometryShaderConstant2"),
             new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.GSFLOAT, "GeometryShaderConstant3"),
             new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.GSFLOAT, "GeometryShaderConstant4"),
+            new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.CSFLOAT, "ComputeShaderConstantF"),
+            new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.CSBOOL,  "ComputeShaderConstantB"),
+            new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.CSINT,   "ComputeShaderConstantI"),
+            new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.CSFLOAT, "ComputeShaderConstant"),
+            new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.CSFLOAT, "ComputeShaderConstant1"),
+            new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.CSFLOAT, "ComputeShaderConstant2"),
+            new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.CSFLOAT, "ComputeShaderConstant3"),
+            new state_info(STATE_CLASS.SHADERCONST, (uint)SHADER_CONSTANT_TYPE.CSFLOAT, "ComputeShaderConstant4"),
 			/* Texture */
 			new state_info(STATE_CLASS.TEXTURE, 0, "Texture"),
 			/* Sampler states */
@@ -651,6 +666,8 @@ namespace MonoGame.Effect
 				    return EffectParameterType.Texture3D;
 			    case D3DXPARAMETER_TYPE.TEXTURECUBE:
 				    return  EffectParameterType.TextureCube;
+                case D3DXPARAMETER_TYPE.VOID:
+                    return EffectParameterType.Void;
                 default:
                     throw new NotImplementedException();
 			}
@@ -727,7 +744,7 @@ namespace MonoGame.Effect
                     pass.rasterizerState = pinfo.rasterizerState;
 
                     pass.state_count = 0;
-                    var tempstate = new d3dx_state[5];
+                    var tempstate = new d3dx_state[6];
 
                     shaderResult.Profile.ValidateShaderModels(pinfo);
 
@@ -759,6 +776,12 @@ namespace MonoGame.Effect
                     {
                         pass.state_count += 1;
                         tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.gsFunction, pinfo.gsModel, ShaderStage.GeometryShader, ref errorsAndWarnings);
+                    }
+
+                    if (!string.IsNullOrEmpty(pinfo.csFunction))
+                    {
+                        pass.state_count += 1;
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.csFunction, pinfo.csModel, ShaderStage.ComputeShader, ref errorsAndWarnings);
                     }
 
                     pass.states = new d3dx_state[pass.state_count];
@@ -850,6 +873,33 @@ namespace MonoGame.Effect
                 }
             }
 
+            // Add the buffer parameters.
+            foreach (var shader in effect.Shaders)
+            {
+                for (var s = 0; s < shader._bufferResources.Length; s++)
+                {
+                    var buffer = shader._bufferResources[s];
+
+                    var match = parameters.FindIndex(e => e.name == buffer.Name);
+                    if (match == -1)
+                    {
+                        // Store the index for runtime lookup.
+                        shader._bufferResources[s].Parameter = parameters.Count;
+
+                        var param = new d3dx_parameter();
+                        param.class_ = D3DXPARAMETER_CLASS.OBJECT;
+                        param.name = buffer.InstanceName;
+                        param.semantic = string.Empty;
+
+                        parameters.Add(param);
+                    }
+                    else
+                    {
+                        shader._bufferResources[s].Parameter = match;
+                    }
+                }
+            }
+
             // TODO: Annotations are part of the .FX format and
             // not a part of shaders... we need to implement them
             // in our mgfx parser if we want them back.
@@ -896,6 +946,10 @@ namespace MonoGame.Effect
                 case ShaderStage.DomainShader:
                     state.operation = (uint)149;
                     state.parameter.type = D3DXPARAMETER_TYPE.DOMAINSHADER;
+                    break;
+                case ShaderStage.ComputeShader:
+                    state.operation = (uint)151;
+                    state.parameter.type = D3DXPARAMETER_TYPE.COMPUTESHADER;
                     break;
             }
 

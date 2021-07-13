@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         GraphicsExtensions.CheckGLError();
                     }
 
-                    GL.BindBufferBase(BufferTarget.UniformBuffer, uniformBlockIndex, _glBuffer);
+                    GL.BindBufferBase(BufferTarget.UniformBuffer, _bindingSlot, _glBuffer);
                     GraphicsExtensions.CheckGLError();
                 }
                 else // uniform buffers are not available, we have to update the parameters one by one

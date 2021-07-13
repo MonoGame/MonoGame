@@ -113,6 +113,7 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCase("Assets/Effects/HullShader.fx")]
         [TestCase("Assets/Effects/DomainShader.fx")]
         [TestCase("Assets/Effects/GeometryShader.fx")]
+        [TestCase("Assets/Effects/ComputeShader.fx")]
         public void BuildShaderStageEffec(string effectFile)
         {
             BuildEffect(effectFile, TargetPlatform.Windows);

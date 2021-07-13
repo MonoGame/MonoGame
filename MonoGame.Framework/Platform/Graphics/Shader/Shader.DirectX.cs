@@ -14,6 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private HullShader _hullShader;
         private DomainShader _domainShader;
         private GeometryShader _geometryShader;
+        private ComputeShader _computeShader;
 
         private byte[] _shaderBytecode;
 
@@ -80,6 +81,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        internal ComputeShader ComputeShader
+        {
+            get
+            {
+                if (_computeShader == null)
+                    CreateComputeShader();
+                return _computeShader;
+            }
+        }
+
         private static int PlatformProfile()
         {
             return 1;
@@ -110,6 +121,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 case ShaderStage.Geometry:
                     CreateGeometryShader();
                     break;
+                case ShaderStage.Compute:
+                    CreateComputeShader();
+                    break;
             }
         }
 
@@ -120,6 +134,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SharpDX.Utilities.Dispose(ref _hullShader);
             SharpDX.Utilities.Dispose(ref _domainShader);
             SharpDX.Utilities.Dispose(ref _geometryShader);
+            SharpDX.Utilities.Dispose(ref _computeShader);
             SharpDX.Utilities.Dispose(ref _inputLayouts);
         }
 
@@ -132,6 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 SharpDX.Utilities.Dispose(ref _hullShader);
                 SharpDX.Utilities.Dispose(ref _domainShader);
                 SharpDX.Utilities.Dispose(ref _geometryShader);
+                SharpDX.Utilities.Dispose(ref _computeShader);
                 SharpDX.Utilities.Dispose(ref _inputLayouts);
             }
 
@@ -166,6 +182,12 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             System.Diagnostics.Debug.Assert(Stage == ShaderStage.Geometry);
             _geometryShader = new GeometryShader(GraphicsDevice._d3dDevice, _shaderBytecode);
+        }
+
+        private void CreateComputeShader()
+        {
+            System.Diagnostics.Debug.Assert(Stage == ShaderStage.Compute);
+            _computeShader = new ComputeShader(GraphicsDevice._d3dDevice, _shaderBytecode);
         }
     }
 }

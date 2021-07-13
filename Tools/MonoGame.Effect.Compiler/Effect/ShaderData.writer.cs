@@ -54,6 +54,10 @@ namespace MonoGame.Effect
                 writer.Write((short)attrib.location);
                 writer.Write((byte)attrib.size);
             }
+
+            writer.Write((byte)_bufferResources.Length);
+            foreach (var buffer in _bufferResources)
+                buffer.Write(writer, options);
         }
     }
 }

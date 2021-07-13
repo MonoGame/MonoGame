@@ -28,5 +28,10 @@
         /// For every input primitive a geometry shader usually generates multiple output primitives, but it's also posiible to dicard geometry by generating no output primitives. 
         /// </summary>
         Geometry,
+
+        /// <summary>
+        /// Compute shaders perform general purpose calculations on the GPU.
+        /// </summary>
+        Compute,
     }
 }

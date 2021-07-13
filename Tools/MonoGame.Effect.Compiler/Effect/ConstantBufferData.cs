@@ -10,6 +10,8 @@ namespace MonoGame.Effect
 
         public int Size { get; private set; }
 
+        public int BindingSlot { get; private set; }
+
         public List<int> ParameterIndex { get; private set; }
 
         public List<int> ParameterOffset { get; private set; }
@@ -35,9 +37,13 @@ namespace MonoGame.Effect
             if (Name != other.Name)
                 return false;
 
+            if (InstanceName != other.InstanceName)
+                return false;
+
             // Do we have the same count of parameters and size?
             if (    Size != other.Size ||
-                    Parameters.Count != other.Parameters.Count)
+                    Parameters.Count != other.Parameters.Count ||
+                    BindingSlot != other.BindingSlot)
                 return false;
             
             // Compare the parameters themselves.

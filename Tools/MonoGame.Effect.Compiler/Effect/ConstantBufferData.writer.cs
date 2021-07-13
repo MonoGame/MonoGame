@@ -12,6 +12,7 @@ namespace MonoGame.Effect
             writer.Write(InstanceName ?? "");
 
             writer.Write((ushort)Size);
+            writer.Write((byte)BindingSlot);
 
             writer.Write(ParameterIndex.Count);
             for (var i=0; i < ParameterIndex.Count; i++)

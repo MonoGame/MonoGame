@@ -23,6 +23,7 @@
     <Compile Include="Platform\Graphics\RenderTarget2D.OpenGL.cs" />
     <Compile Include="Platform\Graphics\RenderTargetCube.OpenGL.cs" />
     <Compile Include="Platform\Graphics\SamplerStateCollection.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\BufferResource.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Shader\ConstantBuffer.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Shader\Shader.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Shader\ShaderProgramCache.cs" />
@@ -36,7 +37,6 @@
     <Compile Include="Platform\Graphics\TextureCollection.OpenGL.cs" />
     <Compile Include="Platform\Graphics\TextureCube.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Vertices\IndexBuffer.OpenGL.cs" />
-    <Compile Include="Platform\Graphics\Vertices\VertexBuffer.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Vertices\VertexDeclaration.OpenGL.cs" />
     <Compile Include="Platform\Threading.cs" />
   </ItemGroup>

@@ -9,5 +9,6 @@ namespace MonoGame.Effect
         HullShader,
         DomainShader,
         GeometryShader,
+        ComputeShader,
     }
 }

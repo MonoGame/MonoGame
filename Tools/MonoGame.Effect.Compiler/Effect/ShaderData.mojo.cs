@@ -98,9 +98,9 @@ namespace MonoGame.Effect
 					}
 				}
 			}
-
-			// Get the samplers.
-			var samplers = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler> (
+            
+            // Get the samplers.
+            var samplers = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler> (
 					parseData.samplers, parseData.sampler_count);
 			dxshader._samplers = new Sampler[samplers.Length];
 			for (var i = 0; i < samplers.Length; i++) 
@@ -162,7 +162,10 @@ namespace MonoGame.Effect
 			}
 			dxshader._cbuffers = cbuffer_index.ToArray ();
 
-			var glslCode = parseData.output;
+            // MojoShader doesnt' support buffer resources
+            dxshader._bufferResources = new BufferResourceData[0];
+
+            var glslCode = parseData.output;
 
 			// TODO: This sort of sucks... why does MojoShader not produce
 			// code valid for GLES out of the box?

@@ -22,6 +22,7 @@ namespace MonoGame.Effect
         private static readonly Regex GlslHullShaderRegex = DirectX11ShaderProfile.HlslHullShaderRegex;
         private static readonly Regex GlslDomainShaderRegex = DirectX11ShaderProfile.HlslDomainShaderRegex;
         private static readonly Regex GlslGeometryShaderRegex = DirectX11ShaderProfile.HlslGeometryShaderRegex;
+        private static readonly Regex GlslComputeShaderRegex = DirectX11ShaderProfile.HlslComputeShaderRegex;
 
         public OpenGLShaderProfile()
             : base("OpenGL", 0)
@@ -57,6 +58,8 @@ namespace MonoGame.Effect
                     return GlslDomainShaderRegex;
                 case ShaderStage.GeometryShader:
                     return GlslGeometryShaderRegex;
+                case ShaderStage.ComputeShader:
+                    return GlslComputeShaderRegex;
                 default:
                     throw new Exception("GetShaderModelRegex: Unknown shader stage");
             }
@@ -114,7 +117,8 @@ namespace MonoGame.Effect
                 var shaderInfo = shaderResult.ShaderInfo;
                 var sourceCode = shaderResult.FileContent;
 
-                var shaderData = ShaderData.CreateGLSL_Conductor(sourceCode, effect.Shaders.Count,
+                var shaderData = ShaderData.CreateGLSL_Conductor(
+                    sourceCode, effect.Shaders.Count,
                     shaderStage, shaderFunction,
                     smMajor, smMinor, smExtension,
                     effect.ConstantBuffers, shaderInfo.SamplerStates,

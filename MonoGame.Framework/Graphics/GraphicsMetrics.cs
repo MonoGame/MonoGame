@@ -20,6 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal long _geometryShaderCount;
         internal long _domainShaderCount;
         internal long _hullShaderCount;
+        internal long _computeShaderCount;
 
         /// <summary>
         /// Number of times Clear was called.
@@ -76,6 +77,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public long GeometryShaderCount { get { return _geometryShaderCount; } }
 
+        /// <summary>
+        /// Number of times the compute shader was changed on the GPU.
+        /// </summary>
+        public long ComputeShaderCount { get { return _computeShaderCount; } }
+
 
         /// <summary>
         /// Returns the difference between two sets of metrics.
@@ -98,6 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _hullShaderCount = value1._hullShaderCount - value2._hullShaderCount,
                 _domainShaderCount = value1._domainShaderCount - value2._domainShaderCount,
                 _geometryShaderCount = value1._geometryShaderCount - value2._geometryShaderCount,
+                _computeShaderCount = value1._computeShaderCount - value2._computeShaderCount,
             };
         }
 
@@ -122,6 +129,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _hullShaderCount = value1._hullShaderCount + value2._hullShaderCount,
                 _domainShaderCount = value1._domainShaderCount + value2._domainShaderCount,
                 _geometryShaderCount = value1._geometryShaderCount + value2._geometryShaderCount,
+                _computeShaderCount = value1._computeShaderCount + value2._computeShaderCount,
             };
         }
     }

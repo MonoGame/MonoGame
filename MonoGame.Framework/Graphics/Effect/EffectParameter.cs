@@ -347,6 +347,14 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
+        public BufferResource GetValueBuffer()
+        {
+            if (ParameterClass != EffectParameterClass.Object || ParameterType != EffectParameterType.Void)
+                throw new InvalidCastException();
+
+            return (BufferResource)Data;
+        }
+
         public TextureCube GetValueTextureCube ()
         {
             if (ParameterClass != EffectParameterClass.Object || ParameterType != EffectParameterType.TextureCube)
@@ -1080,6 +1088,15 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 throw new InvalidCastException();
             }
+
+            Data = value;
+            StateKey = unchecked(NextStateKey++);
+        }
+
+        public void SetValue(BufferResource value)
+        {
+            if (ParameterClass != EffectParameterClass.Object || ParameterType != EffectParameterType.Void)
+                throw new InvalidCastException();
 
             Data = value;
             StateKey = unchecked(NextStateKey++);

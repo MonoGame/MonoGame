@@ -1180,6 +1180,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     HullTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.HullShader);
                     DomainTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.DomainShader);
                     GeometryTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.GeometryShader);
+                    ComputeTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.ComputeShader);
                 }
             }
 
@@ -1340,6 +1341,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return _d3dContext.DomainShader;
                 case ShaderStage.Geometry:
                     return _d3dContext.GeometryShader;
+                case ShaderStage.Compute:
+                    return _d3dContext.ComputeShader;
                 default:
                     throw new ArgumentException();
             }
@@ -1683,6 +1686,33 @@ namespace Microsoft.Xna.Framework.Graphics
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 int indexCount = GetElementCountArray(primitiveType, primitiveCount);
                 _d3dContext.DrawIndexedInstanced(indexCount, instanceCount, startIndex, baseVertex, baseInstance);
+            }
+        }
+
+        private void PlatformDispatchCompute(int threadGroupCountX, int threadGroupCountY, int threadGroupCountZ)
+        {
+            PlatformBeginApplyState();
+
+            lock (_d3dContext)
+            {
+                if (_computeShaderDirty)
+                {
+                    _d3dContext.ComputeShader.Set(_computeShader == null ? null : _computeShader.ComputeShader);
+                    _computeShaderDirty = false;
+
+                    unchecked
+                    {
+                        _graphicsMetrics._computeShaderCount++;
+                    }
+                }
+
+                _computeConstantBuffers.SetConstantBuffers(this);
+                _computeBufferResources.SetBufferResources(this);
+
+                ComputeTextures.PlatformSetTextures(this, _d3dContext.ComputeShader);
+                ComputeSamplerStates.PlatformSetSamplers(this, _d3dContext.ComputeShader);
+
+                _d3dContext.Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
             }
         }
 

@@ -7,11 +7,13 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class VertexBuffer
+    public partial class BufferResource
     {
         private SharpDX.Direct3D11.Buffer _buffer;
-
         private SharpDX.Direct3D11.Buffer _cachedStagingBuffer;
+       
+        private SharpDX.Direct3D11.ShaderResourceView _shaderResourceView;
+        private SharpDX.Direct3D11.UnorderedAccessView _unorderedAccessView;
 
         internal SharpDX.Direct3D11.Buffer Buffer
         {
@@ -20,6 +22,42 @@ namespace Microsoft.Xna.Framework.Graphics
                 GenerateIfRequired();
                 return _buffer;
             }
+        }
+
+        internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
+        {
+            if (_shaderResourceView == null)
+                _shaderResourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, Buffer);
+
+            return _shaderResourceView;
+        }
+
+        internal SharpDX.Direct3D11.UnorderedAccessView GetUnorderedAccessView()
+        {
+            if (_unorderedAccessView == null) {
+                if ((BufferOptions & Options.GPUWrite) == 0)
+                    throw new InvalidOperationException("The buffer requires GPU write access, but was created without it");
+
+                var desc = new SharpDX.Direct3D11.UnorderedAccessViewDescription
+                {
+                    Dimension = SharpDX.Direct3D11.UnorderedAccessViewDimension.Buffer,
+                    Format = SharpDX.DXGI.Format.Unknown,
+                    Buffer = new SharpDX.Direct3D11.UnorderedAccessViewDescription.BufferResource
+                    {
+                        FirstElement = 0,
+                        ElementCount = this.ElementCount,
+                    },
+                };
+
+                // This is a Raw Buffer
+                //desc.Format = DXGI_FORMAT_R32_TYPELESS; // Format must be DXGI_FORMAT_R32_TYPELESS, when creating Raw Unordered Access View
+                //desc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
+                //desc.Buffer.NumElements = descBuf.ByteWidth / 4;
+
+                _unorderedAccessView = new SharpDX.Direct3D11.UnorderedAccessView(GraphicsDevice._d3dDevice, Buffer, desc);
+            }
+
+            return _unorderedAccessView;
         }
 
         private void PlatformConstruct()
@@ -42,21 +80,30 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
             var usage = SharpDX.Direct3D11.ResourceUsage.Default;
+            var bindFlags = SharpDX.Direct3D11.BindFlags.None;
+            var resourceOptions = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
-            if (_isDynamic)
+            if ((BufferOptions & Options.BufferVertex) != 0)
+                bindFlags |= SharpDX.Direct3D11.BindFlags.VertexBuffer;
+            if ((BufferOptions & Options.BufferStructured) != 0)
+                resourceOptions |= SharpDX.Direct3D11.ResourceOptionFlags.BufferStructured;
+            if ((BufferOptions & Options.GPURead) != 0)
+                bindFlags |= SharpDX.Direct3D11.BindFlags.ShaderResource;
+            if ((BufferOptions & Options.GPUWrite) != 0)
+                bindFlags |= SharpDX.Direct3D11.BindFlags.UnorderedAccess;
+            if ((BufferOptions & Options.Dynamic) != 0)
             {
                 accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
                 usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
             }
 
             _buffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice,
-                                                        VertexDeclaration.VertexStride * VertexCount,
-                                                        usage,
-                                                        SharpDX.Direct3D11.BindFlags.VertexBuffer,
-                                                        accessflags,
-                                                        SharpDX.Direct3D11.ResourceOptionFlags.None,
-                                                        0  // StructureSizeInBytes
-                                                        );
+                                                    ElementStride * ElementCount,
+                                                    usage,
+                                                    bindFlags,
+                                                    accessflags,
+                                                    resourceOptions,
+                                                    ElementStride);
         }
 
         void CreatedCachedStagingBuffer()
@@ -77,7 +124,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             GenerateIfRequired();
 
-            if (_isDynamic)
+            if ((BufferOptions & Options.Dynamic) != 0)
             {
                 throw new NotImplementedException();
             }
@@ -129,7 +176,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             GenerateIfRequired();
 
-            if (_isDynamic)
+            if ((BufferOptions & Options.Dynamic) != 0)
             {
                 // We assume discard by default.
                 var mode = SharpDX.Direct3D11.MapMode.WriteDiscard;
@@ -208,6 +255,23 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     dataHandle.Free();
                 }
+            }
+        }
+
+        internal void PlatformApply(GraphicsDevice device, ShaderStage stage, int slot, bool writeAcess)
+        {
+            var shaderStageDX = device.GetDXShaderStage(stage);
+
+            if (writeAcess)
+            {
+                if (stage != ShaderStage.Compute)
+                    throw new InvalidOperationException("Only compute shader can have write access to buffer");
+
+                (shaderStageDX as SharpDX.Direct3D11.ComputeShaderStage).SetUnorderedAccessView(slot, GetUnorderedAccessView());
+            }
+            else
+            {
+                shaderStageDX.SetShaderResource(slot, GetShaderResourceView());
             }
         }
 

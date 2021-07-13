@@ -124,10 +124,16 @@ namespace MonoGame.Effect
                     dxshader._samplers = samplers.ToArray();
 
                     // Gather all the constant buffers used by this shader.
-                    dxshader._cbuffers = new int[refelect.Description.ConstantBuffers];
+                    var bufInds = new List<int>();
+
                     for (var i = 0; i < refelect.Description.ConstantBuffers; i++)
                     {
-                        var cb = new ConstantBufferData(refelect.GetConstantBuffer(i));
+                        var constBufDX = refelect.GetConstantBuffer(i);
+                        if (constBufDX.Description.Type != SharpDX.D3DCompiler.ConstantBufferType.ConstantBuffer)
+                            continue;
+
+                        var cb = new ConstantBufferData(constBufDX);
+                        int bufferIndex = cbuffers.Count;
 
                         // Look for a duplicate cbuffer in the list.
                         for (var c = 0; c < cbuffers.Count; c++)
@@ -135,18 +141,51 @@ namespace MonoGame.Effect
                             if (cb.SameAs(cbuffers[c]))
                             {
                                 cb = null;
-                                dxshader._cbuffers[i] = c;
-                                break;
+                                bufferIndex = c;
                             }
                         }
 
+                        bufInds.Add(bufferIndex);
+
                         // Add a new cbuffer.
                         if (cb != null)
-                        {
-                            dxshader._cbuffers[i] = cbuffers.Count;
                             cbuffers.Add(cb);
-                        }
                     }
+
+                    dxshader._cbuffers = bufInds.ToArray();
+
+                    // Gather all the buffer resources used by this shader.
+                    var bufferResources = new List<BufferResourceData>();
+
+                    for (var i = 0; i < refelect.Description.BoundResources; i++)
+                    {
+                        var rdesc = refelect.GetResourceBindingDescription(i);
+                        BufferType bufferType;
+
+                        switch (rdesc.Type)
+                        {
+                            case SharpDX.D3DCompiler.ShaderInputType.Structured:
+                                bufferType = BufferType.Structured;
+                                break;
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWStructured:
+                                bufferType = BufferType.RWStructured;
+                                break;
+                            default:
+                                continue;
+                        }
+
+                        var buffer = new BufferResourceData {
+                            Name = rdesc.Name,
+                            InstanceName = rdesc.Name,
+                            Size = 0,
+                            Slot = rdesc.BindPoint,
+                            Type = bufferType,
+                        };
+
+                        bufferResources.Add(buffer);
+                    }
+
+                    dxshader._bufferResources = bufferResources.ToArray();
                 }
             }
 

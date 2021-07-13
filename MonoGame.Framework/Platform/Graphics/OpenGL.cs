@@ -45,6 +45,7 @@ namespace MonoGame.OpenGL
         TesselationControlShader = 0x8E88,
         TesselationEvaluationShader = 0x8E87,
         GeometryShader = 0x8DD9,
+        ComputeShader = 0x91B9,
     }
 
     internal enum ShaderParameter
@@ -132,6 +133,7 @@ namespace MonoGame.OpenGL
         ArrayBuffer = 0x8892,
         ElementArrayBuffer = 0x8893,
         UniformBuffer = 0x8A11,
+        ShaderStorageBuffer = 0x90D2,
     }
 
     internal enum RenderbufferTarget
@@ -157,6 +159,11 @@ namespace MonoGame.OpenGL
         DepthComponent24Oes = 0x81A6,
         Depth24Stencil8Oes = 0x88F0,
         StencilIndex8 = 0x8D48,
+    }
+
+    internal enum ProgramInterface
+    {
+        ShaderStorageBlock = 0x92E6,
     }
 
     internal enum EnableCap : int
@@ -849,6 +856,12 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
+        internal delegate void DispatchComputeDelegate(int numGroupsX, int numGroupsY, int numGroupsZ);
+        internal static DispatchComputeDelegate DispatchCompute;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
         internal delegate void GenRenderbuffersDelegate(int count, [Out] out int buffer);
         internal static GenRenderbuffersDelegate GenRenderbuffers;
 
@@ -1074,7 +1087,19 @@ namespace MonoGame.OpenGL
         [MonoNativeFunctionWrapper]
         internal delegate int GetUniformBlockIndexDelegate(int programId, string name);
         internal static GetUniformBlockIndexDelegate GetUniformBlockIndex;
-        
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
+        internal delegate int GetProgramResourceIndexDelegate(int programId, ProgramInterface programInterface, string name);
+        internal static GetProgramResourceIndexDelegate GetProgramResourceIndex;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
+        internal delegate void ShaderStorageBlockBindingDelegate(int programId, int storageBlockIndex, int storageBlockBinding);
+        internal static ShaderStorageBlockBindingDelegate ShaderStorageBlockBinding;
+
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
@@ -1613,6 +1638,18 @@ namespace MonoGame.OpenGL
             if (GL.GetUniformBlockIndex == null && Extensions.Contains("GL_ARB_uniform_buffer_object"))
             {
                 GL.GetUniformBlockIndex = LoadFunction<GL.GetUniformBlockIndexDelegate>("glGetUniformBlockIndex");
+            }
+            if (GL.GetProgramResourceIndex == null && Extensions.Contains("GL_ARB_shader_storage_buffer_object"))
+            {
+                GL.GetProgramResourceIndex = LoadFunction<GL.GetProgramResourceIndexDelegate>("glGetProgramResourceIndex");
+            }
+            if (GL.ShaderStorageBlockBinding == null && Extensions.Contains("GL_ARB_shader_storage_buffer_object"))
+            {
+                GL.ShaderStorageBlockBinding = LoadFunction<GL.ShaderStorageBlockBindingDelegate>("glShaderStorageBlockBinding");
+            }
+            if (GL.DispatchCompute == null && Extensions.Contains("GL_ARB_compute_shader"))
+            {
+                GL.DispatchCompute = LoadFunction<GL.DispatchComputeDelegate>("glDispatchCompute");
             }
         }
 

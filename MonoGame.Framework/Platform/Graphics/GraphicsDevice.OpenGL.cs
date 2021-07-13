@@ -145,7 +145,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                if (_vertexShader == null && _pixelShader == null && _hullShader == null && _domainShader == null && _geometryShader == null)
+                if (_vertexShader == null && _pixelShader == null && _hullShader == null && _domainShader == null && _geometryShader == null && _computeShader == null)
                     throw new InvalidOperationException("There is no shader bound!");
 
                 int hash = 0;
@@ -160,6 +160,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     hash ^= _domainShader.HashKey;
                 if (_geometryShader != null)
                     hash ^= _geometryShader.HashKey;
+                if (_computeShader != null)
+                    hash ^= _computeShader.HashKey;
 
                 return hash;
             }
@@ -203,12 +205,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     _bufferBindingInfos[slot].VertexOffset == offset &&
                     ReferenceEquals(_bufferBindingInfos[slot].AttributeInfo, attrInfo) &&
                     _bufferBindingInfos[slot].InstanceFrequency == vertexBufferBinding.InstanceFrequency &&
-                    _bufferBindingInfos[slot].Vbo == vertexBufferBinding.VertexBuffer.vbo)
+                    _bufferBindingInfos[slot].Vbo == vertexBufferBinding.VertexBuffer.buffer)
                     continue;
 
                 bindingsChanged = true;
 
-                GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferBinding.VertexBuffer.vbo);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferBinding.VertexBuffer.buffer);
                 GraphicsExtensions.CheckGLError();
 
                 // If instancing is not supported, but InstanceFrequency of the buffer is not zero, throw an exception
@@ -234,7 +236,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _bufferBindingInfos[slot].VertexOffset = offset;
                 _bufferBindingInfos[slot].AttributeInfo = attrInfo;
                 _bufferBindingInfos[slot].InstanceFrequency = vertexBufferBinding.InstanceFrequency;
-                _bufferBindingInfos[slot].Vbo = vertexBufferBinding.VertexBuffer.vbo;
+                _bufferBindingInfos[slot].Vbo = vertexBufferBinding.VertexBuffer.buffer;
             }
 
             _attribsDirty = false;
@@ -948,7 +950,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private unsafe void ActivateShaderProgram()
         {
             // Lookup the shader program.
-            var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader, HullShader, DomainShader, GeometryShader);
+            var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader, HullShader, DomainShader, GeometryShader, ComputeShader);
             if (shaderProgram.Program == -1)
                 return;
             // Set the new program if it has changed.
@@ -1086,13 +1088,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (_vertexShaderDirty)
                         _graphicsMetrics._vertexShaderCount++;
                     if (_pixelShaderDirty)
-                            _graphicsMetrics._pixelShaderCount++;
+                        _graphicsMetrics._pixelShaderCount++;
                     if (_hullShaderDirty)
-                            _graphicsMetrics._hullShaderCount++;
+                        _graphicsMetrics._hullShaderCount++;
                     if (_domainShaderDirty)
-                            _graphicsMetrics._domainShaderCount++;
+                        _graphicsMetrics._domainShaderCount++;
                     if (_geometryShaderDirty)
-                            _graphicsMetrics._geometryShaderCount++;
+                        _graphicsMetrics._geometryShaderCount++;
                 }
 
                 _vertexShaderDirty = _pixelShaderDirty = _hullShaderDirty = _domainShaderDirty = _geometryShaderDirty = false;
@@ -1344,6 +1346,30 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 _lastPatchVertexCount = patchVertexCount;
             }
+        }
+
+        private void PlatformDispatchCompute(int threadGroupCountX, int threadGroupCountY, int threadGroupCountZ)
+        {
+            PlatformBeginApplyState();
+
+            if(_computeShaderDirty)
+            {
+                ActivateShaderProgram();
+                _computeShaderDirty = false;
+            }
+
+            _computeConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+            _computeBufferResources.SetBufferResources(this, _shaderProgram);
+
+            ComputeSamplerStates.PlatformSetSamplers(this, _computeShader);
+
+            unchecked
+            {
+                _graphicsMetrics._computeShaderCount++;
+            }
+
+            GL.DispatchCompute(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
+            GraphicsExtensions.CheckGLError();
         }
 
         private void PlatformGetBackBufferData<T>(Rectangle? rectangle, T[] data, int startIndex, int count) where T : struct

@@ -8,10 +8,10 @@ using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class VertexBuffer
+    public partial class BufferResource
     {
         //internal uint vao;
-        internal int vbo;
+        internal int buffer;
 
         private void PlatformConstruct()
         {
@@ -20,25 +20,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGraphicsDeviceResetting()
         {
-            vbo = 0;
+            buffer = 0;
         }
 
+        BufferTarget bufferTarget { get { return BufferOptions == Options.BufferVertex ? BufferTarget.ArrayBuffer : BufferTarget.ShaderStorageBuffer; } }
+
         /// <summary>
-        /// If the VBO does not exist, create it.
+        /// If the buffer does not exist, create it.
         /// </summary>
         void GenerateIfRequired()
         {
-            if (vbo == 0)
+            if (buffer == 0)
             {
-                //GLExt.Oes.GenVertexArrays(1, out this.vao);
-                //GLExt.Oes.BindVertexArray(this.vao);
-                GL.GenBuffers(1, out this.vbo);
+                GL.GenBuffers(1, out this.buffer);
                 GraphicsExtensions.CheckGLError();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
+                GL.BindBuffer(bufferTarget, this.buffer);
                 GraphicsExtensions.CheckGLError();
-                GL.BufferData(BufferTarget.ArrayBuffer,
-                              new IntPtr(VertexDeclaration.VertexStride * VertexCount), IntPtr.Zero,
-                              _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                GL.BufferData(bufferTarget,
+                              new IntPtr(ElementStride * ElementCount), IntPtr.Zero,
+                              (BufferOptions & Options.Dynamic) != 0 ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
                 GraphicsExtensions.CheckGLError();
             }
         }
@@ -60,11 +60,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride)
             where T : struct
         {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            GL.BindBuffer(bufferTarget, buffer);
             GraphicsExtensions.CheckGLError();
 
             // Pointer to the start of data in the vertex buffer
-            var ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
+            var ptr = GL.MapBuffer(bufferTarget, BufferAccess.ReadOnly);
             GraphicsExtensions.CheckGLError();
 
             ptr = (IntPtr)(ptr.ToInt64() + offsetInBytes);
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            GL.UnmapBuffer(BufferTarget.ArrayBuffer);
+            GL.UnmapBuffer(bufferTarget);
             GraphicsExtensions.CheckGLError();
         }
 
@@ -129,7 +129,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             GenerateIfRequired();
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            GL.BindBuffer(bufferTarget, buffer);
             GraphicsExtensions.CheckGLError();
 
             if (options == SetDataOptions.Discard)
@@ -137,10 +137,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 // By assigning NULL data to the buffer this gives a hint
                 // to the device to discard the previous content.
                 GL.BufferData(
-                    BufferTarget.ArrayBuffer,
+                    bufferTarget,
                     (IntPtr)bufferSize,
                     IntPtr.Zero,
-                    _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                    (BufferOptions & Options.Dynamic) != 0 ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
                 GraphicsExtensions.CheckGLError();
             }
 
@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInBytes);
 
-                    GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)(elementSizeInBytes * elementCount), dataPtr);
+                    GL.BufferSubData(bufferTarget, (IntPtr)offsetInBytes, (IntPtr)(elementSizeInBytes * elementCount), dataPtr);
                     GraphicsExtensions.CheckGLError();
                 }
                 finally
@@ -172,7 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     for (int i = 0; i < elementCount; i++)
                     {
-                        GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)dstOffset, (IntPtr)elementSizeInByte, dataPtr);
+                        GL.BufferSubData(bufferTarget, (IntPtr)dstOffset, (IntPtr)elementSizeInByte, dataPtr);
                         GraphicsExtensions.CheckGLError();
 
                         dstOffset += vertexStride;
@@ -187,12 +187,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
         }
 
+        internal void PlatformApply(GraphicsDevice device, ShaderProgram program, string paramName, int bindingSlot, bool writeAcess)
+        {
+            //bindingSlot = paramName == "type_StructuredBuffer_Input" ? 2 : 3;
+            int blockIndex = GL.GetProgramResourceIndex(program.Program, ProgramInterface.ShaderStorageBlock, paramName);
+            GraphicsExtensions.CheckGLError();
+
+            if (blockIndex < 0)
+                throw new InvalidOperationException("The active shader effect does not contain a buffer named " + paramName);
+
+            // not needed if hardcoded in shader:    layout (std430, binding=2) buffer shader_data
+            // GL.ShaderStorageBlockBinding(program.Program, blockIndex, bindingSlot);
+            // GraphicsExtensions.CheckGLError();
+
+            GL.BindBufferBase(BufferTarget.ShaderStorageBuffer, bindingSlot, buffer);
+            GraphicsExtensions.CheckGLError();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
             {
                 if (GraphicsDevice != null)
-                    GraphicsDevice.DisposeBuffer(vbo);
+                    GraphicsDevice.DisposeBuffer(buffer);
             }
             base.Dispose(disposing);
         }
@@ -200,7 +217,7 @@ namespace Microsoft.Xna.Framework.Graphics
         struct SetDataState<T>
             where T : struct
         {
-            public VertexBuffer buffer;
+            public BufferResource buffer;
             public int offsetInBytes;
             public T[] data;
             public int startIndex;

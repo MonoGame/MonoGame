@@ -434,6 +434,9 @@ namespace MonoGame.Effect.TPGParser
                 case TokenType.GeometryShader_Pass_Expression:
                     Value = EvalGeometryShader_Pass_Expression(tree, paramlist);
                     break;
+                case TokenType.ComputeShader_Pass_Expression:
+                    Value = EvalComputeShader_Pass_Expression(tree, paramlist);
+                    break;
                 case TokenType.AddressMode_Clamp:
                     Value = EvalAddressMode_Clamp(tree, paramlist);
                     break;
@@ -955,7 +958,8 @@ namespace MonoGame.Effect.TPGParser
                !string.IsNullOrEmpty(pass.vsFunction) ||
                !string.IsNullOrEmpty(pass.hsFunction) ||
                !string.IsNullOrEmpty(pass.dsFunction) ||
-               !string.IsNullOrEmpty(pass.gsFunction))
+               !string.IsNullOrEmpty(pass.gsFunction) ||
+               !string.IsNullOrEmpty(pass.csFunction))
            {
               var technique = paramlist[0] as TechniqueInfo;
               technique.Passes.Add(pass);
@@ -1000,6 +1004,14 @@ namespace MonoGame.Effect.TPGParser
             var pass = paramlist[0] as PassInfo;
             pass.gsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
             pass.gsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
+            return null;
+        }
+
+        protected virtual object EvalComputeShader_Pass_Expression(ParseTree tree, params object[] paramlist)
+        {
+            var pass = paramlist[0] as PassInfo;
+            pass.csModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
+            pass.csFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
             return null;
         }
 

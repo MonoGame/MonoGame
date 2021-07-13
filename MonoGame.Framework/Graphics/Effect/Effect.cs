@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 11;
+            public const int MGFXVersion = 12;
 
             public int Signature;
             public int Version;
@@ -251,7 +251,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 var instanceName = reader.ReadString();
 
                 // Create the backing system memory buffer.
-                var sizeInBytes = (int)reader.ReadInt16 ();
+                var sizeInBytes = (int)reader.ReadInt16();
+                var bindingSlot = (int)reader.ReadByte();
 
                 // Read the parameter index values.
                 var parameters = new int[reader.ReadInt32()];
@@ -264,6 +265,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 ConstantBuffers[c] = new ConstantBuffer(GraphicsDevice,
                                                 sizeInBytes,
+                                                bindingSlot,
                                                 parameters,
                                                 offsets,
                                                 name,
@@ -336,6 +338,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 shaderIndex = (int)reader.ReadInt32();
                 Shader geometryShader = shaderIndex < 0 ? null : shaders[shaderIndex];
 
+                // Get the compute shader.
+                shaderIndex = (int)reader.ReadInt32();
+                Shader computeShader = shaderIndex < 0 ? null : shaders[shaderIndex];
+
                 BlendState blend = null;
 				DepthStencilState depth = null;
 				RasterizerState raster = null;
@@ -392,7 +398,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					};
 				}
 
-                passes[i] = new EffectPass(effect, name, vertexShader, pixelShader, hullShader, domainShader, geometryShader, blend, depth, raster, annotations);
+                passes[i] = new EffectPass(effect, name, vertexShader, pixelShader, hullShader, domainShader, geometryShader, computeShader, blend, depth, raster, annotations);
 			}
 
             return new EffectPassCollection(passes);
