@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework
         protected override void OnPause()
         {
             base.OnPause();
-            EventHelpers.Raise(this, Paused, EventArgs.Empty);
+            //EventHelpers.Raise(this, Paused, EventArgs.Empty);
 
             if (_orientationListener.CanDetectOrientation())
                 _orientationListener.Disable();
