@@ -7,7 +7,7 @@ using System;
 namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed partial class BufferResourceCollection
-    { 
+    {
         struct BufferInfo
         {
             public BufferResource buffer;
@@ -19,18 +19,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private ShaderStage _stage;
 
-        internal BufferResourceCollection(ShaderStage stage, int maxBuffers)
+        public int MaxReadleBuffers { get { return _readonlyBuffers.Length; } }
+        public int MaxWriteableBuffers { get { return _writeableBuffers.Length; } }
+
+        internal BufferResourceCollection(ShaderStage stage, int maxReadableBuffers, int maxWriteableBuffers)
 		{
             _stage = stage;
 
-            _readonlyBuffers = new BufferInfo[maxBuffers];
-            _writeableBuffers = new BufferInfo[maxBuffers];
+            _readonlyBuffers = new BufferInfo[maxReadableBuffers];
+            _writeableBuffers = new BufferInfo[maxWriteableBuffers];
         }
 
         public void SetBufferAtIndex(BufferResource buffer, string bufferName, int index, bool writeAccess)
         {
             if (writeAccess && _stage != ShaderStage.Compute)
-                throw new ArgumentException("Only compute shaders have write access to buffers");
+                throw new ArgumentException("Only a compute shader can use RWStructuredBuffer currently. Uae a regular StructuredBuffer instead and assign it the same buffer.");
 
             var buffers = writeAccess ? _writeableBuffers : _readonlyBuffers;
 

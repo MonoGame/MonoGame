@@ -32,6 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal SharpDX.Direct3D11.RenderTargetView _renderTargetView;
         internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
         private int _vertexBufferSlotsUsed;
+        private bool _bufferResourcesSetForCompute; // keep track of who is setting buffer resources: normal draw or compute
 
 #if WINDOWS_UAP
 
@@ -1505,6 +1506,13 @@ namespace Microsoft.Xna.Framework.Graphics
             _domainConstantBuffers.SetConstantBuffers(this);
             _geometryConstantBuffers.SetConstantBuffers(this);
 
+            _vertexBufferResources.SetBufferResources(this);
+            _pixelBufferResources.SetBufferResources(this);
+            _hullBufferResources.SetBufferResources(this);
+            _domainBufferResources.SetBufferResources(this);
+            _geometryBufferResources.SetBufferResources(this);
+            _bufferResourcesSetForCompute = false;
+
             Textures.PlatformSetTextures(this, _d3dContext.PixelShader);
             SamplerStates.PlatformSetSamplers(this, _d3dContext.PixelShader);
 
@@ -1706,6 +1714,20 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                 }
 
+                // If the device was just used for normal drawing, rather than compute, we need to unbind the buffers from non-compute stages.
+                // This is neccessary to make sure buffers that are written to in compute shaders,
+                // are not still set as inputs in other shader stages, as this is not allowed.
+                if (!_bufferResourcesSetForCompute)
+                {
+                    ClearBufferResourcesForShaderStage(ShaderStage.Vertex,  _vertexBufferResources);
+                    ClearBufferResourcesForShaderStage(ShaderStage.Pixel, _pixelBufferResources);
+                    ClearBufferResourcesForShaderStage(ShaderStage.Hull, _hullBufferResources);
+                    ClearBufferResourcesForShaderStage(ShaderStage.Domain, _domainBufferResources);
+                    ClearBufferResourcesForShaderStage(ShaderStage.Geometry, _geometryBufferResources);
+
+                    _bufferResourcesSetForCompute = true;
+                }
+
                 _computeConstantBuffers.SetConstantBuffers(this);
                 _computeBufferResources.SetBufferResources(this);
 
@@ -1713,7 +1735,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 ComputeSamplerStates.PlatformSetSamplers(this, _d3dContext.ComputeShader);
 
                 _d3dContext.Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
+
+                // Unbind all buffers (UAV's), otherwise they could not be used as shader inputs
+                var computeStage = (GetDXShaderStage(ShaderStage.Compute) as SharpDX.Direct3D11.ComputeShaderStage);
+                for (int i = 0; i < _computeBufferResources.MaxWriteableBuffers; i++)
+                    computeStage.SetUnorderedAccessView(i, null);
             }
+        }
+
+        private void ClearBufferResourcesForShaderStage(ShaderStage stage, BufferResourceCollection bufferCollection)
+        {
+            var dxStage = GetDXShaderStage(stage);
+            for (int i = 0; i < bufferCollection.MaxReadleBuffers; i++)
+                dxStage.SetShaderResource(i, null);
         }
 
         private void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct

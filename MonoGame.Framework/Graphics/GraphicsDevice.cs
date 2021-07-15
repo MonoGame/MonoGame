@@ -87,27 +87,17 @@ namespace Microsoft.Xna.Framework.Graphics
         internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
 
         public TextureCollection Textures { get; private set; }
-
         public TextureCollection VertexTextures { get; private set; }
-
         public TextureCollection HullTextures { get; private set; }
-
         public TextureCollection DomainTextures { get; private set; }
-
         public TextureCollection GeometryTextures { get; private set; }
-
         public TextureCollection ComputeTextures { get; private set; }
 
         public SamplerStateCollection SamplerStates { get; private set; }
-
         public SamplerStateCollection VertexSamplerStates { get; private set; }
-
         public SamplerStateCollection HullSamplerStates { get; private set; }
-
         public SamplerStateCollection DomainSamplerStates { get; private set; }
-
         public SamplerStateCollection GeometrySamplerStates { get; private set; }
-
         public SamplerStateCollection ComputeSamplerStates { get; private set; }
 
 
@@ -186,7 +176,12 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly ConstantBufferCollection _geometryConstantBuffers = new ConstantBufferCollection(ShaderStage.Geometry, 16);
         private readonly ConstantBufferCollection _computeConstantBuffers = new ConstantBufferCollection(ShaderStage.Compute, 16);
 
-        private readonly BufferResourceCollection _computeBufferResources = new BufferResourceCollection(ShaderStage.Compute, 16);
+        private readonly BufferResourceCollection _vertexBufferResources = new BufferResourceCollection(ShaderStage.Vertex, 16, 8);
+        private readonly BufferResourceCollection _pixelBufferResources = new BufferResourceCollection(ShaderStage.Pixel, 16, 8);
+        private readonly BufferResourceCollection _hullBufferResources = new BufferResourceCollection(ShaderStage.Hull, 16, 8);
+        private readonly BufferResourceCollection _domainBufferResources = new BufferResourceCollection(ShaderStage.Domain, 16, 8);
+        private readonly BufferResourceCollection _geometryBufferResources = new BufferResourceCollection(ShaderStage.Geometry, 16, 8);
+        private readonly BufferResourceCollection _computeBufferResources = new BufferResourceCollection(ShaderStage.Compute, 16, 8);
 
         /// <summary>
         /// The cache of effects from unique byte streams.
@@ -479,6 +474,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _computeConstantBuffers.Clear();
 
             // Clear buffer resources
+            _vertexBufferResources.Clear();
+            _pixelBufferResources.Clear();
+            _hullBufferResources.Clear();
+            _domainBufferResources.Clear();
+            _geometryBufferResources.Clear();
             _computeBufferResources.Clear();
 
             // Force set the buffers and shaders on next ApplyState() call
@@ -1093,6 +1093,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _vertexShader = value;
                 _vertexConstantBuffers.Clear();
+                _vertexBufferResources.Clear();
                 _vertexShaderDirty = true;
             }
         }
@@ -1107,6 +1108,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _pixelShader = value;
                 _pixelConstantBuffers.Clear();
+                _pixelBufferResources.Clear();
                 _pixelShaderDirty = true;
             }
         }
@@ -1121,6 +1123,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _hullShader = value;
                 _hullConstantBuffers.Clear();
+                _hullBufferResources.Clear();
                 _hullShaderDirty = true;
             }
         }
@@ -1135,6 +1138,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _domainShader = value;
                 _domainConstantBuffers.Clear();
+                _domainBufferResources.Clear();
                 _domainShaderDirty = true;
             }
         }
@@ -1149,6 +1153,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _geometryShader = value;
                 _geometryConstantBuffers.Clear();
+                _geometryBufferResources.Clear();
                 _geometryShaderDirty = true;
             }
         }
@@ -1199,6 +1204,21 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             switch (stage)
             {
+                case ShaderStage.Vertex:
+                    _vertexBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
+                    break;
+                case ShaderStage.Pixel:
+                    _pixelBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
+                    break;
+                case ShaderStage.Hull:
+                    _hullBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
+                    break;
+                case ShaderStage.Domain:
+                    _domainBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
+                    break;
+                case ShaderStage.Geometry:
+                    _geometryBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
+                    break;
                 case ShaderStage.Compute:
                     _computeBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
                     break;
@@ -1620,7 +1640,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DispatchCompute(int threadGroupCountX, int threadGroupCountY, int threadGroupCountZ)
         {
             if (_computeShader == null)
-                throw new InvalidOperationException("Compute shader must be set before calling DispatchCompute.");
+                return;
 
             if (threadGroupCountX <= 0)
                 throw new ArgumentOutOfRangeException("threadGroupCountX");

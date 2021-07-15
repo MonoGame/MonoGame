@@ -263,16 +263,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var shaderStageDX = device.GetDXShaderStage(stage);
 
             if (writeAcess)
-            {
-                if (stage != ShaderStage.Compute)
-                    throw new InvalidOperationException("Only compute shader can have write access to buffer");
-
                 (shaderStageDX as SharpDX.Direct3D11.ComputeShaderStage).SetUnorderedAccessView(slot, GetUnorderedAccessView());
-            }
             else
-            {
                 shaderStageDX.SetShaderResource(slot, GetShaderResourceView());
-            }
         }
 
         protected override void Dispose(bool disposing)

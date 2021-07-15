@@ -96,14 +96,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				// Update the texture parameters.
                 SetShaderSamplers(_vertexShader, device.VertexTextures, device.VertexSamplerStates);
-
-                // Update the constant buffers.
-                for (var c = 0; c < _vertexShader.CBuffers.Length; c++)
-                {
-                    var cb = _effect.ConstantBuffers[_vertexShader.CBuffers[c]];
-                    cb.Update(_effect.Parameters);
-                    device.SetConstantBuffer(ShaderStage.Vertex, c, cb);
-                }
+                SetConstantBuffers(_vertexShader, device);
+                SetBufferResources(_vertexShader, device);
             }
 
             if (_pixelShader != null)
@@ -112,14 +106,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Update the texture parameters.
                 SetShaderSamplers(_pixelShader, device.Textures, device.SamplerStates);
-                
-                // Update the constant buffers.
-                for (var c = 0; c < _pixelShader.CBuffers.Length; c++)
-                {
-                    var cb = _effect.ConstantBuffers[_pixelShader.CBuffers[c]];
-                    cb.Update(_effect.Parameters);
-                    device.SetConstantBuffer(ShaderStage.Pixel, c, cb);
-                }
+                SetConstantBuffers(_pixelShader, device);
+                SetBufferResources(_pixelShader, device);
             }
 
             device.HullShader = _hullShader;
@@ -128,14 +116,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Update the texture parameters.
                 SetShaderSamplers(_hullShader, device.HullTextures, device.HullSamplerStates);
-
-                // Update the constant buffers.
-                for (var c = 0; c < _hullShader.CBuffers.Length; c++)
-                {
-                    var cb = _effect.ConstantBuffers[_hullShader.CBuffers[c]];
-                    cb.Update(_effect.Parameters);
-                    device.SetConstantBuffer(ShaderStage.Hull, c, cb);
-                }
+                SetConstantBuffers(_hullShader, device);
+                SetBufferResources(_hullShader, device);
             }
 
             device.DomainShader = _domainShader;
@@ -144,14 +126,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Update the texture parameters.
                 SetShaderSamplers(_domainShader, device.DomainTextures, device.DomainSamplerStates);
-
-                // Update the constant buffers.
-                for (var c = 0; c < _domainShader.CBuffers.Length; c++)
-                {
-                    var cb = _effect.ConstantBuffers[_domainShader.CBuffers[c]];
-                    cb.Update(_effect.Parameters);
-                    device.SetConstantBuffer(ShaderStage.Domain, c, cb);
-                }
+                SetConstantBuffers(_domainShader, device);
+                SetBufferResources(_domainShader, device);
             }
 
             device.GeometryShader = _geometryShader;
@@ -160,14 +136,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Update the texture parameters.
                 SetShaderSamplers(_geometryShader, device.GeometryTextures, device.GeometrySamplerStates);
-
-                // Update the constant buffers.
-                for (var c = 0; c < _geometryShader.CBuffers.Length; c++)
-                {
-                    var cb = _effect.ConstantBuffers[_geometryShader.CBuffers[c]];
-                    cb.Update(_effect.Parameters);
-                    device.SetConstantBuffer(ShaderStage.Geometry, c, cb);
-                }
+                SetConstantBuffers(_geometryShader, device);
+                SetBufferResources(_geometryShader, device);
             }
 
             // no compute shader during normal rendering, compute shader is set in ApplyCompute()
@@ -182,10 +152,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.DepthStencilState = _depthStencilState;
         }
 
-        public bool ApplyCompute()
+        public void ApplyCompute()
         {
-            var device = _effect.GraphicsDevice;
+            if (_computeShader == null)
+                return;
 
+            var device = _effect.GraphicsDevice;
             device.ComputeShader = _computeShader;
             device.VertexShader = null;
             device.PixelShader = null;
@@ -193,30 +165,10 @@ namespace Microsoft.Xna.Framework.Graphics
             device.DomainShader = null;
             device.GeometryShader = null;
 
-            if (_computeShader == null)
-                return false;
-
             // Update the texture parameters.
             SetShaderSamplers(_computeShader, device.ComputeTextures, device.ComputeSamplerStates);
-
-            // Update the constant buffers.
-            for (var c = 0; c < _computeShader.CBuffers.Length; c++)
-            {
-                var cb = _effect.ConstantBuffers[_computeShader.CBuffers[c]];
-                cb.Update(_effect.Parameters);
-                device.SetConstantBuffer(ShaderStage.Compute, c, cb);
-            }
-
-            // Update the buffer resources.
-            for (var e = 0; e < _computeShader.BuffersResources.Length; e++)
-            {
-                var eb = _computeShader.BuffersResources[e];
-                var param = _effect.Parameters[eb.parameter];
-                var buffer = param.Data as BufferResource;
-                device.SetBufferResource(ShaderStage.Compute, eb.slot, buffer, eb.name, eb.writeAccess);
-            }
-
-            return true;
+            SetConstantBuffers(_computeShader, device);
+            SetBufferResources(_computeShader, device);
         }
 
         private void SetShaderSamplers(Shader shader, TextureCollection textures, SamplerStateCollection samplerStates)
@@ -231,6 +183,27 @@ namespace Microsoft.Xna.Framework.Graphics
                 // If there is a sampler state set it.
                 if (sampler.state != null)
                     samplerStates[sampler.samplerSlot] = sampler.state;
+            }
+        }
+
+        private void SetConstantBuffers(Shader shader, GraphicsDevice device)
+        {
+            for (var c = 0; c < shader.CBuffers.Length; c++)
+            {
+                var cb = _effect.ConstantBuffers[shader.CBuffers[c]];
+                cb.Update(_effect.Parameters);
+                device.SetConstantBuffer(shader.Stage, c, cb);
+            }
+        }
+
+        private void SetBufferResources(Shader shader, GraphicsDevice device)
+        {
+            for (var b = 0; b < shader.BuffersResources.Length; b++)
+            {
+                var br = shader.BuffersResources[b];
+                var param = _effect.Parameters[br.parameter];
+                var buffer = param.Data as BufferResource;
+                device.SetBufferResource(shader.Stage, br.slot, buffer, br.name, br.writeAccess);
             }
         }
     }

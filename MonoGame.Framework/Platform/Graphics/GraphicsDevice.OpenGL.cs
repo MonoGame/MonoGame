@@ -1106,6 +1106,12 @@ namespace Microsoft.Xna.Framework.Graphics
             _domainConstantBuffers.SetConstantBuffers(this, _shaderProgram);
             _geometryConstantBuffers.SetConstantBuffers(this, _shaderProgram);
 
+            _vertexBufferResources.SetBufferResources(this, _shaderProgram);
+            _pixelBufferResources.SetBufferResources(this, _shaderProgram);
+            _hullBufferResources.SetBufferResources(this, _shaderProgram);
+            _domainBufferResources.SetBufferResources(this, _shaderProgram);
+            _geometryBufferResources.SetBufferResources(this, _shaderProgram);
+
             SamplerStates.PlatformSetSamplers(this, _pixelShader);
 
             if (GraphicsCapabilities.SupportsVertexTextures)
