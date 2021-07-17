@@ -13,11 +13,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - uses: nelonoel/branch-name@v1.0.1
       - uses: paulhatch/semantic-version@v4.0.2
         id: semantic-version
         with:
           tag_prefix: "v"
-          format: "3.8.1.${patch}-develop"
+          format: "3.8.1.${patch}"
           short_tags: true
           bump_each_commit: true
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
@@ -31,7 +32,7 @@ jobs:
       - name: Restore dotnet tools
         run: dotnet tool restore
       - name: Run build.cake
-        run: dotnet cake build.cake "--build-version=${{ steps.semantic-version.outputs.version }}"
+        run: dotnet cake build.cake "--build-version=${{ steps.semantic-version.outputs.version }}-${BRANCH_NAME}"
         env:
           GITHUB_ACTIONS: true
       - uses: actions/upload-artifact@main
