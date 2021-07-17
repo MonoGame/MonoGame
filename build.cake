@@ -69,6 +69,12 @@ Task("Prep")
         Console.WriteLine("Build Branch: {0}", branch);
         Console.WriteLine("Build Version: {0}", version);
     }
+    else
+    {
+        var branch = EnvironmentVariable("BRANCH_NAME") ?? string.Empty;    
+        if (!branch.Contains("master"))
+            version += "-" + branch;
+    }
 
     msPackSettings = new MSBuildSettings();
     msPackSettings.Verbosity = Verbosity.Minimal;

@@ -32,7 +32,7 @@ jobs:
       - name: Restore dotnet tools
         run: dotnet tool restore
       - name: Run build.cake
-        run: dotnet cake build.cake "--build-version=${{ steps.semantic-version.outputs.version }}-${BRANCH_NAME}"
+        run: dotnet cake build.cake "--build-version=${{ steps.semantic-version.outputs.version }}"
         env:
           GITHUB_ACTIONS: true
       - uses: actions/upload-artifact@main
