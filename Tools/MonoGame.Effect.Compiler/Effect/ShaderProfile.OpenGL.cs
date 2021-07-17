@@ -68,11 +68,12 @@ namespace MonoGame.Effect
         internal override void ValidateShaderModels(PassInfo pass)
         {
             int maxSM = _useMojo ? 3 : 5;
+
+            int major, minor;
+            string extension;
+
             if (_useMojo)
             {
-                int major, minor;
-                string extension;
-
                 if (!string.IsNullOrEmpty(pass.vsFunction))
                 {
                     ParseShaderModel(pass.vsModel, GlslVertexShaderRegex, out major, out minor, out extension);
@@ -85,6 +86,36 @@ namespace MonoGame.Effect
                     ParseShaderModel(pass.psModel, GlslPixelShaderRegex, out major, out minor, out extension);
                     if (major > maxSM)
                         throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be SM {2}.0 or lower!", pass.vsModel, pass.psFunction, maxSM));
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(pass.hsFunction))
+                {
+                    ParseShaderModel(pass.hsModel, GlslHullShaderRegex, out major, out minor, out extension);
+                    if (major <= 4)
+                        throw new Exception(String.Format("Invalid profile '{0}'. Hull shader '{1}' must be SM 5.0!", pass.hsModel, pass.hsFunction));
+                }
+
+                if (!string.IsNullOrEmpty(pass.dsFunction))
+                {
+                    ParseShaderModel(pass.dsModel, GlslDomainShaderRegex, out major, out minor, out extension);
+                    if (major <= 4)
+                        throw new Exception(String.Format("Invalid profile '{0}'. Domain shader '{1}' must be SM 5.0!", pass.vsModel, pass.dsFunction));
+                }
+
+                if (!string.IsNullOrEmpty(pass.gsFunction))
+                {
+                    ParseShaderModel(pass.gsModel, GlslGeometryShaderRegex, out major, out minor, out extension);
+                    if (major <= 3)
+                        throw new Exception(String.Format("Invalid profile '{0}'. Geometry shader '{1}' must be SM 4.0 or higher!", pass.gsModel, pass.gsFunction));
+                }
+
+                if (!string.IsNullOrEmpty(pass.csFunction))
+                {
+                    ParseShaderModel(pass.csModel, GlslComputeShaderRegex, out major, out minor, out extension);
+                    if (major <= 4)
+                        throw new Exception(String.Format("Invalid profile '{0}'. Compute shader '{1}' must be SM 5.0 or higher!", pass.csModel, pass.csFunction));
                 }
             }
         }
