@@ -11,12 +11,12 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         public new int ElementCount { get { return base.ElementCount; } }
 
-        public StructuredBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage, bool gpuWriteAccess=true) :
+        public StructuredBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage, ShaderAccess shaderAccess) :
             base(graphicsDevice,
                 vertexCount,
                 ReflectionHelpers.ManagedSizeOf(type),
                 bufferUsage,
-                Options.BufferStructured | Options.GPURead | (gpuWriteAccess ? Options.GPUWrite : Options.None))
+                Options.BufferStructured | Options.GPURead | (shaderAccess == ShaderAccess.ReadWrite ? Options.GPUWrite : Options.None))
         {
         }
     }

@@ -31,16 +31,18 @@ namespace Microsoft.Xna.Framework.Graphics
         public int parameter;
     }
 
-    internal struct BufferInfo
+    internal struct ShaderResourceInfo
     {
         public string name;
         public string instanceName;
         public int size;
         public int slot;
-        public bool writeAccess;
+        public ShaderResourceType type;
 
         // TODO: This should be moved to EffectPass.
         public int parameter;
+
+        public bool writeAccess { get { return ShaderResource.IsResourceTypeWriteable(type); } }
     }
 
     internal struct VertexAttribute
@@ -68,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public int[] CBuffers { get; private set; }
 
-        public BufferInfo[] BuffersResources { get; private set; }
+        public ShaderResourceInfo[] ShaderResources { get; private set; }
 
         public ShaderStage Stage { get; private set; }
 
@@ -128,16 +130,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 Attributes[a].size = reader.ReadByte();
             }
 
-            var bufferResourceCount = (int)reader.ReadByte();
-            BuffersResources = new BufferInfo[bufferResourceCount];
-            for (var b = 0; b < bufferResourceCount; b++)
+            var shaderResourceCount = (int)reader.ReadByte();
+            ShaderResources = new ShaderResourceInfo[shaderResourceCount];
+            for (var b = 0; b < shaderResourceCount; b++)
             {
-                BuffersResources[b].name = reader.ReadString();
-                BuffersResources[b].instanceName = reader.ReadString();
-                BuffersResources[b].size = reader.ReadUInt16();
-                BuffersResources[b].slot = reader.ReadByte();
-                BuffersResources[b].writeAccess = reader.ReadByte() == 1;
-                BuffersResources[b].parameter = reader.ReadByte();
+                ShaderResources[b].name = reader.ReadString();
+                ShaderResources[b].instanceName = reader.ReadString();
+                ShaderResources[b].size = reader.ReadUInt16();
+                ShaderResources[b].slot = reader.ReadByte();
+                ShaderResources[b].type = (ShaderResourceType)reader.ReadByte();
+                ShaderResources[b].parameter = reader.ReadByte();
             }
 
             PlatformConstruct(Stage, shaderBytecode);

@@ -873,29 +873,30 @@ namespace MonoGame.Effect
                 }
             }
 
-            // Add the buffer parameters.
+            // Add the shader resource parameters.
             foreach (var shader in effect.Shaders)
             {
-                for (var s = 0; s < shader._bufferResources.Length; s++)
+                for (var s = 0; s < shader._shaderResources.Length; s++)
                 {
-                    var buffer = shader._bufferResources[s];
+                    var buffer = shader._shaderResources[s];
 
                     var match = parameters.FindIndex(e => e.name == buffer.Name);
                     if (match == -1)
                     {
                         // Store the index for runtime lookup.
-                        shader._bufferResources[s].Parameter = parameters.Count;
+                        shader._shaderResources[s].Parameter = parameters.Count;
 
                         var param = new d3dx_parameter();
                         param.class_ = D3DXPARAMETER_CLASS.OBJECT;
                         param.name = buffer.InstanceName;
                         param.semantic = string.Empty;
+                        param.type = buffer.Type == ShaderResourceType.RWTexture ? D3DXPARAMETER_TYPE.TEXTURE2D : D3DXPARAMETER_TYPE.VOID;
 
                         parameters.Add(param);
                     }
                     else
                     {
-                        shader._bufferResources[s].Parameter = match;
+                        shader._shaderResources[s].Parameter = match;
                     }
                 }
             }

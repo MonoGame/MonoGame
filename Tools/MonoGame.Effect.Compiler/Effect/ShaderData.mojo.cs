@@ -163,7 +163,7 @@ namespace MonoGame.Effect
 			dxshader._cbuffers = cbuffer_index.ToArray ();
 
             // MojoShader doesnt' support buffer resources
-            dxshader._bufferResources = new BufferResourceData[0];
+            dxshader._shaderResources = new ShaderResourceData[0];
 
             var glslCode = parseData.output;
 

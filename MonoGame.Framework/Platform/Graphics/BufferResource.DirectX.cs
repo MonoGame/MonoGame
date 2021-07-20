@@ -258,7 +258,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal void PlatformApply(GraphicsDevice device, ShaderStage stage, int slot, bool writeAcess)
+        internal override void PlatformApply(GraphicsDevice device, ShaderStage stage, int slot, bool writeAcess)
         {
             var shaderStageDX = device.GetDXShaderStage(stage);
 

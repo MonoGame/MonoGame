@@ -12,6 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private Resource _texture;
 
         private ShaderResourceView _resourceView;
+        private UnorderedAccessView _unorderedAccessView;
 
         /// <summary>
         /// Gets the handle to a shared resource.
@@ -42,6 +43,26 @@ namespace Microsoft.Xna.Framework.Graphics
                 _resourceView = new ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
 
             return _resourceView;
+        }
+
+        internal UnorderedAccessView GetUnorderedAccessView()
+        {
+            if (_unorderedAccessView == null)
+                _unorderedAccessView = new UnorderedAccessView(GraphicsDevice._d3dDevice, GetTexture(), GetUnorderedAccessViewDescription(0));
+
+            return _unorderedAccessView;
+        }
+
+        internal abstract UnorderedAccessViewDescription GetUnorderedAccessViewDescription(int mipSlice);
+
+        internal override void PlatformApply(GraphicsDevice device, ShaderStage stage, int slot, bool writeAcess)
+        {
+            var shaderStageDX = device.GetDXShaderStage(stage);
+
+            if (writeAcess)
+                (shaderStageDX as SharpDX.Direct3D11.ComputeShaderStage).SetUnorderedAccessView(slot, GetUnorderedAccessView());
+            else
+                shaderStageDX.SetShaderResource(slot, GetShaderResourceView());
         }
 
         private void PlatformGraphicsDeviceResetting()

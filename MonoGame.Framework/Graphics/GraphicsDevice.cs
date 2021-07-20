@@ -176,12 +176,12 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly ConstantBufferCollection _geometryConstantBuffers = new ConstantBufferCollection(ShaderStage.Geometry, 16);
         private readonly ConstantBufferCollection _computeConstantBuffers = new ConstantBufferCollection(ShaderStage.Compute, 16);
 
-        private readonly BufferResourceCollection _vertexBufferResources = new BufferResourceCollection(ShaderStage.Vertex, 16, 8);
-        private readonly BufferResourceCollection _pixelBufferResources = new BufferResourceCollection(ShaderStage.Pixel, 16, 8);
-        private readonly BufferResourceCollection _hullBufferResources = new BufferResourceCollection(ShaderStage.Hull, 16, 8);
-        private readonly BufferResourceCollection _domainBufferResources = new BufferResourceCollection(ShaderStage.Domain, 16, 8);
-        private readonly BufferResourceCollection _geometryBufferResources = new BufferResourceCollection(ShaderStage.Geometry, 16, 8);
-        private readonly BufferResourceCollection _computeBufferResources = new BufferResourceCollection(ShaderStage.Compute, 16, 8);
+        private readonly ShaderResourceCollection _vertexShaderResources = new ShaderResourceCollection(ShaderStage.Vertex, 16, 8);
+        private readonly ShaderResourceCollection _pixelShaderResources = new ShaderResourceCollection(ShaderStage.Pixel, 16, 8);
+        private readonly ShaderResourceCollection _hullShaderResources = new ShaderResourceCollection(ShaderStage.Hull, 16, 8);
+        private readonly ShaderResourceCollection _domainShaderResources = new ShaderResourceCollection(ShaderStage.Domain, 16, 8);
+        private readonly ShaderResourceCollection _geometryShaderResources = new ShaderResourceCollection(ShaderStage.Geometry, 16, 8);
+        private readonly ShaderResourceCollection _computeShaderResources = new ShaderResourceCollection(ShaderStage.Compute, 16, 8);
 
         /// <summary>
         /// The cache of effects from unique byte streams.
@@ -474,12 +474,12 @@ namespace Microsoft.Xna.Framework.Graphics
             _computeConstantBuffers.Clear();
 
             // Clear buffer resources
-            _vertexBufferResources.Clear();
-            _pixelBufferResources.Clear();
-            _hullBufferResources.Clear();
-            _domainBufferResources.Clear();
-            _geometryBufferResources.Clear();
-            _computeBufferResources.Clear();
+            _vertexShaderResources.Clear();
+            _pixelShaderResources.Clear();
+            _hullShaderResources.Clear();
+            _domainShaderResources.Clear();
+            _geometryShaderResources.Clear();
+            _computeShaderResources.Clear();
 
             // Force set the buffers and shaders on next ApplyState() call
             _vertexBuffers = new VertexBufferBindings(_maxVertexBufferSlots);
@@ -1093,7 +1093,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _vertexShader = value;
                 _vertexConstantBuffers.Clear();
-                _vertexBufferResources.Clear();
+                _vertexShaderResources.Clear();
                 _vertexShaderDirty = true;
             }
         }
@@ -1108,7 +1108,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _pixelShader = value;
                 _pixelConstantBuffers.Clear();
-                _pixelBufferResources.Clear();
+                _pixelShaderResources.Clear();
                 _pixelShaderDirty = true;
             }
         }
@@ -1123,7 +1123,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _hullShader = value;
                 _hullConstantBuffers.Clear();
-                _hullBufferResources.Clear();
+                _hullShaderResources.Clear();
                 _hullShaderDirty = true;
             }
         }
@@ -1138,7 +1138,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _domainShader = value;
                 _domainConstantBuffers.Clear();
-                _domainBufferResources.Clear();
+                _domainShaderResources.Clear();
                 _domainShaderDirty = true;
             }
         }
@@ -1153,7 +1153,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _geometryShader = value;
                 _geometryConstantBuffers.Clear();
-                _geometryBufferResources.Clear();
+                _geometryShaderResources.Clear();
                 _geometryShaderDirty = true;
             }
         }
@@ -1168,7 +1168,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _computeShader = value;
                 _computeConstantBuffers.Clear();
-                _computeBufferResources.Clear();
+                _computeShaderResources.Clear();
                 _computeShaderDirty = true;
             }
         }
@@ -1200,27 +1200,27 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal void SetBufferResource(ShaderStage stage, int slot, BufferResource buffer, string bufferName, bool writeAcess)
+        internal void SetShaderResource(ShaderStage stage, int slot, ShaderResource resource, string resourceName, bool writeAcess)
         {
             switch (stage)
             {
                 case ShaderStage.Vertex:
-                    _vertexBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
+                    _vertexShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
                     break;
                 case ShaderStage.Pixel:
-                    _pixelBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
+                    _pixelShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
                     break;
                 case ShaderStage.Hull:
-                    _hullBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
+                    _hullShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
                     break;
                 case ShaderStage.Domain:
-                    _domainBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
+                    _domainShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
                     break;
                 case ShaderStage.Geometry:
-                    _geometryBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
+                    _geometryShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
                     break;
                 case ShaderStage.Compute:
-                    _computeBufferResources.SetBufferAtIndex(buffer, bufferName, slot, writeAcess);
+                    _computeShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
                     break;
                 default:
                     throw new ArgumentException();

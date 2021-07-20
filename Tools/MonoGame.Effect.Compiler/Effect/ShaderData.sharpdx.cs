@@ -154,27 +154,30 @@ namespace MonoGame.Effect
 
                     dxshader._cbuffers = bufInds.ToArray();
 
-                    // Gather all the buffer resources used by this shader.
-                    var bufferResources = new List<BufferResourceData>();
+                    // Gather all the shader resources.
+                    var shaderResources = new List<ShaderResourceData>();
 
                     for (var i = 0; i < refelect.Description.BoundResources; i++)
                     {
                         var rdesc = refelect.GetResourceBindingDescription(i);
-                        BufferType bufferType;
+                        ShaderResourceType bufferType;
 
                         switch (rdesc.Type)
                         {
                             case SharpDX.D3DCompiler.ShaderInputType.Structured:
-                                bufferType = BufferType.Structured;
+                                bufferType = ShaderResourceType.Structured;
                                 break;
                             case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWStructured:
-                                bufferType = BufferType.RWStructured;
+                                bufferType = ShaderResourceType.RWStructured;
+                                break;
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWTyped:
+                                bufferType = ShaderResourceType.RWTexture;
                                 break;
                             default:
                                 continue;
                         }
 
-                        var buffer = new BufferResourceData {
+                        var buffer = new ShaderResourceData {
                             Name = rdesc.Name,
                             InstanceName = rdesc.Name,
                             Size = 0,
@@ -182,10 +185,10 @@ namespace MonoGame.Effect
                             Type = bufferType,
                         };
 
-                        bufferResources.Add(buffer);
+                        shaderResources.Add(buffer);
                     }
 
-                    dxshader._bufferResources = bufferResources.ToArray();
+                    dxshader._shaderResources = shaderResources.ToArray();
                 }
             }
 

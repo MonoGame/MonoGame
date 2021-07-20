@@ -41,7 +41,7 @@ namespace MonoGame.Effect
 		/// </summary>
 		public int[] _cbuffers;
 
-        public BufferResourceData[] _bufferResources;
+        public ShaderResourceData[] _shaderResources;
 
 		public Sampler[] _samplers;
 

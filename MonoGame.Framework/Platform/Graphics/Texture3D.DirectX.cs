@@ -148,6 +148,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
-	}
+
+        internal override UnorderedAccessViewDescription GetUnorderedAccessViewDescription(int mipSlice)
+        {
+            throw new InvalidOperationException("Texture3D with write access from shaders is currently not supported.");
+            /*
+            return new UnorderedAccessViewDescription
+            {
+                Dimension = UnorderedAccessViewDimension.Texture3D,
+                Format = SharpDXHelper.ToFormat(_format),
+                Texture3D = new UnorderedAccessViewDescription.Texture3DResource
+                {
+                    MipSlice = mipSlice,
+                    FirstWSlice = 0,
+                    WSize = Depth
+                }
+            };
+            */
+        }
+    }
 }
 

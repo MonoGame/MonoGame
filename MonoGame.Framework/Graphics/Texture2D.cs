@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="width"></param>
         /// <param name="height"></param>
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
-            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture, false, 1)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture, false, 1, ShaderAccess.Read)
         {
         }
 
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="mipmap"></param>
         /// <param name="format"></param>
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
-            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, 1)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, 1, ShaderAccess.Read)
         {
         }
 
@@ -72,9 +72,23 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="format"></param>
         /// <param name="arraySize"></param>
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, int arraySize)
-            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, arraySize)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, arraySize, ShaderAccess.Read)
         {
-            
+        }
+
+        /// <summary>
+        /// Creates a new texture array of a given size with a surface format and optional mipmaps.
+        /// Throws ArgumentException if the current GraphicsDevice can't work with texture arrays
+        /// </summary>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="mipmap"></param>
+        /// <param name="format"></param>
+        /// <param name="shaderAccess"></param>
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, ShaderAccess shaderAccess)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, 1, shaderAccess)
+        {
         }
 
         /// <summary>
@@ -87,11 +101,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="format"></param>
         /// <param name="type"></param>
         internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
-            : this(graphicsDevice, width, height, mipmap, format, type, false, 1)
+            : this(graphicsDevice, width, height, mipmap, format, type, false, 1, ShaderAccess.Read)
         {
         }
         
-        protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared, int arraySize)
+        protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared, int arraySize, ShaderAccess shaderAccess)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
@@ -110,6 +124,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             this._format = format;
             this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
+            this._shaderAccess = shaderAccess;
             this.ArraySize = arraySize;
 
             // Texture will be assigned by the swap chain.

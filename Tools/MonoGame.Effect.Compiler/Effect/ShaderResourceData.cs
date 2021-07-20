@@ -3,19 +3,20 @@ using System.IO;
 
 namespace MonoGame.Effect
 {
-    public enum BufferType
+    public enum ShaderResourceType
     {
         Structured = 0,
         RWStructured = 1,
+        RWTexture = 2,
     }
 
-    public struct BufferResourceData
+    public struct ShaderResourceData
     {
         public string Name;
         public string InstanceName;
         public int Size;
         public int Slot;
-        public BufferType Type;
+        public ShaderResourceType Type;
         public int Parameter;
 
         public void Write(BinaryWriter writer, Options options)

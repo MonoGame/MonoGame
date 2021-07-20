@@ -211,15 +211,15 @@ namespace MonoGame.Effect
             // Add storage buffers to shaderData
             //==============================================================
             var storageBuffers = ShaderConductor.GetStorageBuffers(result);
-            shaderData._bufferResources = new BufferResourceData[storageBuffers.Count];
+            shaderData._shaderResources = new ShaderResourceData[storageBuffers.Count];
 
             for (int i = 0; i < storageBuffers.Count; i++)
             {
-                shaderData._bufferResources[i].Name = storageBuffers[i].blockName;
-                shaderData._bufferResources[i].InstanceName = storageBuffers[i].instanceName;
-                shaderData._bufferResources[i].Size = storageBuffers[i].byteSize;
-                shaderData._bufferResources[i].Slot = storageBuffers[i].slot;
-                shaderData._bufferResources[i].Type = storageBuffers[i].readOnly ? BufferType.Structured : BufferType.RWStructured;
+                shaderData._shaderResources[i].Name = storageBuffers[i].blockName;
+                shaderData._shaderResources[i].InstanceName = storageBuffers[i].instanceName;
+                shaderData._shaderResources[i].Size = storageBuffers[i].byteSize;
+                shaderData._shaderResources[i].Slot = storageBuffers[i].slot;
+                shaderData._shaderResources[i].Type = storageBuffers[i].readOnly ? ShaderResourceType.Structured : ShaderResourceType.RWStructured;
             }
 
             //==============================================================

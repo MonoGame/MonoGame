@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				// Update the texture parameters.
                 SetShaderSamplers(_vertexShader, device.VertexTextures, device.VertexSamplerStates);
                 SetConstantBuffers(_vertexShader, device);
-                SetBufferResources(_vertexShader, device);
+                SetShaderResources(_vertexShader, device);
             }
 
             if (_pixelShader != null)
@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Update the texture parameters.
                 SetShaderSamplers(_pixelShader, device.Textures, device.SamplerStates);
                 SetConstantBuffers(_pixelShader, device);
-                SetBufferResources(_pixelShader, device);
+                SetShaderResources(_pixelShader, device);
             }
 
             device.HullShader = _hullShader;
@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Update the texture parameters.
                 SetShaderSamplers(_hullShader, device.HullTextures, device.HullSamplerStates);
                 SetConstantBuffers(_hullShader, device);
-                SetBufferResources(_hullShader, device);
+                SetShaderResources(_hullShader, device);
             }
 
             device.DomainShader = _domainShader;
@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Update the texture parameters.
                 SetShaderSamplers(_domainShader, device.DomainTextures, device.DomainSamplerStates);
                 SetConstantBuffers(_domainShader, device);
-                SetBufferResources(_domainShader, device);
+                SetShaderResources(_domainShader, device);
             }
 
             device.GeometryShader = _geometryShader;
@@ -137,7 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Update the texture parameters.
                 SetShaderSamplers(_geometryShader, device.GeometryTextures, device.GeometrySamplerStates);
                 SetConstantBuffers(_geometryShader, device);
-                SetBufferResources(_geometryShader, device);
+                SetShaderResources(_geometryShader, device);
             }
 
             // no compute shader during normal rendering, compute shader is set in ApplyCompute()
@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Update the texture parameters.
             SetShaderSamplers(_computeShader, device.ComputeTextures, device.ComputeSamplerStates);
             SetConstantBuffers(_computeShader, device);
-            SetBufferResources(_computeShader, device);
+            SetShaderResources(_computeShader, device);
         }
 
         private void SetShaderSamplers(Shader shader, TextureCollection textures, SamplerStateCollection samplerStates)
@@ -196,14 +196,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void SetBufferResources(Shader shader, GraphicsDevice device)
+        private void SetShaderResources(Shader shader, GraphicsDevice device)
         {
-            for (var b = 0; b < shader.BuffersResources.Length; b++)
+            for (var b = 0; b < shader.ShaderResources.Length; b++)
             {
-                var br = shader.BuffersResources[b];
-                var param = _effect.Parameters[br.parameter];
-                var buffer = param.Data as BufferResource;
-                device.SetBufferResource(shader.Stage, br.slot, buffer, br.name, br.writeAccess);
+                var sr = shader.ShaderResources[b];
+                var param = _effect.Parameters[sr.parameter];
+                var resource = param.Data as ShaderResource;
+                device.SetShaderResource(shader.Stage, sr.slot, resource, sr.name, sr.writeAccess);
             }
         }
     }

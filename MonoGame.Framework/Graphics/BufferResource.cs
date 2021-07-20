@@ -7,7 +7,7 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class BufferResource : GraphicsResource
+    public partial class BufferResource : ShaderResource
     {
         [Flags]
         protected internal enum Options
