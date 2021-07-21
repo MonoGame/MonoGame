@@ -9,6 +9,7 @@ namespace MonoGame.Effect
         public void Write(BinaryWriter writer, Options options)
         {
             writer.Write(Name);
+            writer.Write(InstanceName ?? "");
 
             writer.Write((ushort)Size);
 

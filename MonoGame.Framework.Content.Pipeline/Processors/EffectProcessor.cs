@@ -76,7 +76,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 }
             }
 
-            ProcessErrorsAndWarnings(!success, stderr, input, context);
+            // ShaderConductor outputs errors and warnings different compared to the DX compiler,
+            // so let's use separate code paths for error processing.
+            var profile = GetProfileForPlatform(context.TargetPlatform);
+            bool isOpenGL = profile == "OpenGL" || profile == "OpenGLES";
+            bool isMojoShader = isOpenGL && Defines != null && Defines.Contains("MOJO");
+            bool isShaderConductor = isOpenGL && !isMojoShader;
+
+            if (isShaderConductor)
+                ProcessErrorsAndWarningsSC(!success, stderr, input, context);
+            else
+                ProcessErrorsAndWarningsDX(!success, stderr, input, context);
 
             return ret;
         }
@@ -89,19 +99,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 case TargetPlatform.WindowsPhone8:
                 case TargetPlatform.WindowsStoreApp:
                     return "DirectX_11";
-                case TargetPlatform.iOS:
-                case TargetPlatform.Android:
                 case TargetPlatform.DesktopGL:
                 case TargetPlatform.MacOSX:
                 case TargetPlatform.RaspberryPi:
                 case TargetPlatform.Web:
                     return "OpenGL";
+                case TargetPlatform.iOS:
+                case TargetPlatform.Android:
+                    return "OpenGLES";
             }
 
             return platform.ToString();
         }
 
-        private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
+        private static void ProcessErrorsAndWarningsDX(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
         {
             // Split the errors and warnings into individual lines.
             var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] { "\n", "\r", Environment.NewLine },
@@ -113,7 +124,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             // Process all the lines.
             for (var i = 0; i < errorsAndWarningArray.Length; i++)
-            {
+            {    
                 var match = errorOrWarning.Match(errorsAndWarningArray[i]);
                 if (!match.Success || match.Groups.Count != 4)
                 {
@@ -125,7 +136,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
                     continue;
                 }
-
+            
                 var fileName = match.Groups[1].Value;
                 var lineAndColumn = match.Groups[2].Value;
                 var message = match.Groups[3].Value;
@@ -160,6 +171,62 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             if (buildFailed)
                 throw new InvalidContentException(allErrorsAndWarnings, identity ?? input.Identity);
+        }
+
+        private static void ProcessErrorsAndWarningsSC(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
+        {
+            // Split the errors and warnings into individual lines.
+            var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] { "\n", "\r", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            var errorOrWarningRegex = new Regex(@"(.*):(([0-9]+):([0-9]+)):\s*(error|warning):\s*(.*)", RegexOptions.Compiled);
+
+            string unhandledMessages = "";
+            bool errorOrWarningHappend = false;
+
+            // Process all the lines.
+            for (var i = 0; i < errorsAndWarningArray.Length; i++)
+            {
+                var line = errorsAndWarningArray[i];
+                var match = errorOrWarningRegex.Match(line);
+
+                if (match.Success)
+                {
+                    // This line is an error or warning.
+                    // Create an error string that looks like an error message from DX,
+                    // so we don't need a separate code path for ShaderConductor errors in the MGCB Editor
+                    var fileName = match.Groups[1].Value;
+                    var lineAndColumn = match.Groups[2].Value.Replace(':', ','); // Replace ShaderConductor's colon with a comma to make it look like DX
+                    var errorOrWarning = match.Groups[5].Value;
+                    var message = match.Groups[6].Value;
+                    var errorCode = "S0000"; // DX outputs error codes, ShaderConductor doesn't. We'll always use this generic code
+                    var msg = fileName + "(" + lineAndColumn + "): " + errorOrWarning + " " + errorCode + ": " + message;
+
+                    context.Logger.LogWarning(string.Empty, input.Identity, msg);
+                    errorOrWarningHappend = true;
+                }
+                else
+                {
+                    // ShaderConductor outputs additional info in the lines following the actual error/warning message.
+                    // If the previous lines contained an error we will simply log all the following lines.
+                    if (errorOrWarningHappend)
+                    {
+                        // ShaderConductor outputs the faulty line, plus a pointer character in the following line, which points at the exact character location of the error.
+                        // This only works for monospace fonts. The MGCB editor doesn't use a momospace font currently for displaying errors and warnings,
+                        // so there's no point in logging the line containing this pointer.
+                        bool isPointer = line.EndsWith("^") && String.IsNullOrWhiteSpace(line.Substring(0, line.Length - 1));
+                        if (!isPointer)
+                            context.Logger.LogMessage(line);
+                    }
+                    else
+                    {
+                        // If the previous lines didn't contain an error, it's probably an exception message. We don't log those messages now,
+                        // instead we'll throw an exception in the end with those messages attached.   
+                        unhandledMessages += line + Environment.NewLine;
+                    }
+                }
+            }
+
+            if (buildFailed)
+                throw new InvalidContentException(unhandledMessages, input.Identity);
         }
     }
 }

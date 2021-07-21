@@ -6,7 +6,7 @@ namespace MonoGame.Effect
     {
         public void Write(BinaryWriter writer, Options options)
         {
-            writer.Write(IsVertexShader);
+            writer.Write((int)ShaderStage);
 
             writer.Write(ShaderCode.Length);
             writer.Write(ShaderCode);
@@ -52,6 +52,7 @@ namespace MonoGame.Effect
                 writer.Write((byte)attrib.usage);
                 writer.Write((byte)attrib.index);
                 writer.Write((short)attrib.location);
+                writer.Write((byte)attrib.size);
             }
         }
     }
