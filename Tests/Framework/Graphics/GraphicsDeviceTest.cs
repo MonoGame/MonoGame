@@ -767,13 +767,13 @@ namespace MonoGame.Tests.Graphics
 
             int vbo;
             GL.GetInteger(GetPName.ArrayBufferBinding, out vbo);
-            Assert.AreEqual(vb1.vbo, vbo);
+            Assert.AreEqual(vb1.buffer, vbo);
 
             gd.SetVertexBuffer(vb2);
             gd.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
 
             GL.GetInteger(GetPName.ArrayBufferBinding, out vbo);
-            Assert.AreEqual(vb2.vbo, vbo);
+            Assert.AreEqual(vb2.buffer, vbo);
 
             se.Dispose();
             vb1.Dispose();

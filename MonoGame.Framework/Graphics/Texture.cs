@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public abstract partial class Texture : GraphicsResource
+	public abstract partial class Texture : ShaderResource
 	{
 		internal SurfaceFormat _format;
 		internal int _levelCount;

@@ -6,8 +6,12 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private readonly Effect _effect;
 
-		private readonly Shader _pixelShader;
         private readonly Shader _vertexShader;
+        private readonly Shader _pixelShader;
+        private readonly Shader _hullShader;
+        private readonly Shader _domainShader;
+        private readonly Shader _geometryShader;
+        private readonly Shader _computeShader;
 
         private readonly BlendState _blendState;
         private readonly DepthStencilState _depthStencilState;
@@ -20,7 +24,11 @@ namespace Microsoft.Xna.Framework.Graphics
         internal EffectPass(    Effect effect, 
                                 string name,
                                 Shader vertexShader, 
-                                Shader pixelShader, 
+                                Shader pixelShader,  
+                                Shader hullShader,
+                                Shader domainShader,
+                                Shader geometryShader,
+                                Shader computeShader,
                                 BlendState blendState, 
                                 DepthStencilState depthStencilState, 
                                 RasterizerState rasterizerState,
@@ -35,6 +43,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _vertexShader = vertexShader;
             _pixelShader = pixelShader;
+            _hullShader = hullShader;
+            _domainShader = domainShader;
+            _geometryShader = geometryShader;
+            _computeShader = computeShader;
 
             _blendState = blendState;
             _depthStencilState = depthStencilState;
@@ -58,6 +70,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             _vertexShader = cloneSource._vertexShader;
             _pixelShader = cloneSource._pixelShader;
+            _hullShader = cloneSource._hullShader;
+            _domainShader = cloneSource._domainShader;
+            _geometryShader = cloneSource._geometryShader;
+            _computeShader = cloneSource._computeShader;
         }
 
         public void Apply()
@@ -80,14 +96,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				// Update the texture parameters.
                 SetShaderSamplers(_vertexShader, device.VertexTextures, device.VertexSamplerStates);
-
-                // Update the constant buffers.
-                for (var c = 0; c < _vertexShader.CBuffers.Length; c++)
-                {
-                    var cb = _effect.ConstantBuffers[_vertexShader.CBuffers[c]];
-                    cb.Update(_effect.Parameters);
-                    device.SetConstantBuffer(ShaderStage.Vertex, c, cb);
-                }
+                SetConstantBuffers(_vertexShader, device);
+                SetShaderResources(_vertexShader, device);
             }
 
             if (_pixelShader != null)
@@ -96,15 +106,42 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Update the texture parameters.
                 SetShaderSamplers(_pixelShader, device.Textures, device.SamplerStates);
-                
-                // Update the constant buffers.
-                for (var c = 0; c < _pixelShader.CBuffers.Length; c++)
-                {
-                    var cb = _effect.ConstantBuffers[_pixelShader.CBuffers[c]];
-                    cb.Update(_effect.Parameters);
-                    device.SetConstantBuffer(ShaderStage.Pixel, c, cb);
-                }
+                SetConstantBuffers(_pixelShader, device);
+                SetShaderResources(_pixelShader, device);
             }
+
+            device.HullShader = _hullShader;
+
+            if (_hullShader != null)
+            {
+                // Update the texture parameters.
+                SetShaderSamplers(_hullShader, device.HullTextures, device.HullSamplerStates);
+                SetConstantBuffers(_hullShader, device);
+                SetShaderResources(_hullShader, device);
+            }
+
+            device.DomainShader = _domainShader;
+
+            if (_domainShader != null)
+            {
+                // Update the texture parameters.
+                SetShaderSamplers(_domainShader, device.DomainTextures, device.DomainSamplerStates);
+                SetConstantBuffers(_domainShader, device);
+                SetShaderResources(_domainShader, device);
+            }
+
+            device.GeometryShader = _geometryShader;
+
+            if (_geometryShader != null)
+            {
+                // Update the texture parameters.
+                SetShaderSamplers(_geometryShader, device.GeometryTextures, device.GeometrySamplerStates);
+                SetConstantBuffers(_geometryShader, device);
+                SetShaderResources(_geometryShader, device);
+            }
+
+            // no compute shader during normal rendering, compute shader is set in ApplyCompute()
+            device.ComputeShader = null;
 
             // Set the render states if we have some.
             if (_rasterizerState != null)
@@ -113,6 +150,25 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.BlendState = _blendState;
             if (_depthStencilState != null)
                 device.DepthStencilState = _depthStencilState;
+        }
+
+        public void ApplyCompute()
+        {
+            if (_computeShader == null)
+                return;
+
+            var device = _effect.GraphicsDevice;
+            device.ComputeShader = _computeShader;
+            device.VertexShader = null;
+            device.PixelShader = null;
+            device.HullShader = null;
+            device.DomainShader = null;
+            device.GeometryShader = null;
+
+            // Update the texture parameters.
+            SetShaderSamplers(_computeShader, device.ComputeTextures, device.ComputeSamplerStates);
+            SetConstantBuffers(_computeShader, device);
+            SetShaderResources(_computeShader, device);
         }
 
         private void SetShaderSamplers(Shader shader, TextureCollection textures, SamplerStateCollection samplerStates)
@@ -127,6 +183,27 @@ namespace Microsoft.Xna.Framework.Graphics
                 // If there is a sampler state set it.
                 if (sampler.state != null)
                     samplerStates[sampler.samplerSlot] = sampler.state;
+            }
+        }
+
+        private void SetConstantBuffers(Shader shader, GraphicsDevice device)
+        {
+            for (var c = 0; c < shader.CBuffers.Length; c++)
+            {
+                var cb = _effect.ConstantBuffers[shader.CBuffers[c]];
+                cb.Update(_effect.Parameters);
+                device.SetConstantBuffer(shader.Stage, c, cb);
+            }
+        }
+
+        private void SetShaderResources(Shader shader, GraphicsDevice device)
+        {
+            for (var b = 0; b < shader.ShaderResources.Length; b++)
+            {
+                var sr = shader.ShaderResources[b];
+                var param = _effect.Parameters[sr.parameter];
+                var resource = param.Data as ShaderResource;
+                device.SetShaderResource(shader.Stage, sr.slot, resource, sr.name, sr.writeAccess);
             }
         }
     }

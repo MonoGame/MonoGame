@@ -497,13 +497,19 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
         const SurfaceFormat InvalidFormat = (SurfaceFormat)int.MaxValue;
-		internal static void GetGLFormat (this SurfaceFormat format,
+        internal static void GetGLFormat (this SurfaceFormat format,
             GraphicsDevice graphicsDevice,
+            bool isWriteable,
             out PixelInternalFormat glInternalFormat,
             out PixelFormat glFormat,
             out PixelType glType)
 		{
-			glInternalFormat = PixelInternalFormat.Rgba;
+            // Textures that can be written to from a shader require a sized internal format like PixelInternalFormat.Rgba8,
+            // base internal formats like PixelInternalFormat.Rgba are not allowed.
+            // Could we replace base formats with sized formats generally, or are the base formats needed for something?
+            // It is unclear at this point if the used compressed formats will work for writeable textures.
+            // This needs more testing/research.
+            glInternalFormat = isWriteable ? PixelInternalFormat.Rgba8 : PixelInternalFormat.Rgba;
 			glFormat = PixelFormat.Rgba;
 			glType = PixelType.UnsignedByte;
 
@@ -520,38 +526,42 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			switch (format) {
 			case SurfaceFormat.Color:
-				glInternalFormat = PixelInternalFormat.Rgba;
+				glInternalFormat = isWriteable ? PixelInternalFormat.Rgba8 : PixelInternalFormat.Rgba;
 				glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedByte;
 				break;
             case SurfaceFormat.ColorSRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Color;
-                glInternalFormat = PixelInternalFormat.Srgb;
+                glInternalFormat = isWriteable ? PixelInternalFormat.Srgb8 : PixelInternalFormat.Srgb;
                 glFormat = PixelFormat.Rgba;
                 glType = PixelType.UnsignedByte;
                 break;
 			case SurfaceFormat.Bgr565:
+                if (isWriteable)
+                    goto case InvalidFormat;
 				glInternalFormat = PixelInternalFormat.Rgb;
 				glFormat = PixelFormat.Rgb;
 				glType = PixelType.UnsignedShort565;
 				break;
 			case SurfaceFormat.Bgra4444:
 #if IOS || ANDROID
-				glInternalFormat = PixelInternalFormat.Rgba;
+				glInternalFormat = isWriteable ? PixelInternalFormat.Rgba4 : PixelInternalFormat.Rgba;
 #else
-				glInternalFormat = PixelInternalFormat.Rgba4;
+                glInternalFormat = PixelInternalFormat.Rgba4;
 #endif
 				glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedShort4444;
 				break;
 			case SurfaceFormat.Bgra5551:
-				glInternalFormat = PixelInternalFormat.Rgba;
+				glInternalFormat = isWriteable ? PixelInternalFormat.Rgb5A1 : PixelInternalFormat.Rgba;
 				glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedShort5551;
 				break;
 			case SurfaceFormat.Alpha8:
-				glInternalFormat = PixelInternalFormat.Luminance;
+                if (isWriteable)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Luminance;
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
 				break;
@@ -767,7 +777,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-                    public static int GetSyncInterval(this PresentInterval interval)
+        public static int GetSyncInterval(this PresentInterval interval)
         {
             switch (interval)
             {
@@ -964,7 +974,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		[DebuggerHidden]
         public static void CheckGLError()
         {
-           var error = GL.GetError();
+            var error = GL.GetError();
             //Console.WriteLine(error);
             if (error != ErrorCode.NoError)
                 throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
