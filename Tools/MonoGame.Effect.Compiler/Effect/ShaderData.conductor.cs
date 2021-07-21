@@ -208,10 +208,12 @@ namespace MonoGame.Effect
             }
 
             //==============================================================
-            // Add storage buffers to shaderData
+            // Add storage buffers and storage images to shaderData
             //==============================================================
             var storageBuffers = ShaderConductor.GetStorageBuffers(result);
-            shaderData._shaderResources = new ShaderResourceData[storageBuffers.Count];
+            var storageImages = ShaderConductor.GetStorageImages(result);
+
+            shaderData._shaderResources = new ShaderResourceData[storageBuffers.Count + storageImages.Count];
 
             for (int i = 0; i < storageBuffers.Count; i++)
             {
@@ -220,6 +222,16 @@ namespace MonoGame.Effect
                 shaderData._shaderResources[i].Size = storageBuffers[i].byteSize;
                 shaderData._shaderResources[i].Slot = storageBuffers[i].slot;
                 shaderData._shaderResources[i].Type = storageBuffers[i].readOnly ? ShaderResourceType.Structured : ShaderResourceType.RWStructured;
+            }
+
+            for (int i = 0; i < storageImages.Count; i++)
+            {
+                int r = storageBuffers.Count + i;
+                shaderData._shaderResources[r].Name = storageImages[i].name;
+                shaderData._shaderResources[r].InstanceName = storageImages[i].name;
+                shaderData._shaderResources[r].Size = 0;
+                shaderData._shaderResources[r].Slot = storageImages[i].slot;
+                shaderData._shaderResources[r].Type = ShaderResourceType.RWTexture;
             }
 
             //==============================================================

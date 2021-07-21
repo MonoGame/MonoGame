@@ -55,14 +55,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal abstract UnorderedAccessViewDescription GetUnorderedAccessViewDescription(int mipSlice);
 
-        internal override void PlatformApply(GraphicsDevice device, ShaderStage stage, int slot, bool writeAcess)
+        internal override void PlatformApply(GraphicsDevice device, ShaderStage stage, int bindingSlot, bool writeAcess)
         {
             var shaderStageDX = device.GetDXShaderStage(stage);
 
             if (writeAcess)
-                (shaderStageDX as SharpDX.Direct3D11.ComputeShaderStage).SetUnorderedAccessView(slot, GetUnorderedAccessView());
+                (shaderStageDX as SharpDX.Direct3D11.ComputeShaderStage).SetUnorderedAccessView(bindingSlot, GetUnorderedAccessView());
             else
-                shaderStageDX.SetShaderResource(slot, GetShaderResourceView());
+                shaderStageDX.SetShaderResource(bindingSlot, GetShaderResourceView());
         }
 
         private void PlatformGraphicsDeviceResetting()

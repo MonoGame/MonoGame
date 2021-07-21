@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -18,6 +19,17 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformGraphicsDeviceResetting()
         {
             DeleteGLTexture();
+        }
+
+        internal override void PlatformApply(GraphicsDevice device, ShaderProgram program, string paramName, int bindingSlot, bool writeAcess)
+        {
+            if (glTexture < 0)
+                throw new InvalidOperationException("No valid texture");
+
+            var bufferAccess = _shaderAccess == ShaderAccess.ReadWrite ? BufferAccess.ReadWrite : BufferAccess.ReadOnly;
+
+            GL.BindImageTexture(bindingSlot, glTexture, 0, false, 0, bufferAccess, glInternalFormat);
+            GraphicsExtensions.CheckGLError();
         }
 
         protected override void Dispose(bool disposing)

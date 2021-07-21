@@ -1738,7 +1738,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Unbind all buffers (UAV's), otherwise they could not be used as shader inputs
                 var computeStage = (GetDXShaderStage(ShaderStage.Compute) as SharpDX.Direct3D11.ComputeShaderStage);
-                for (int i = 0; i < _computeShaderResources.MaxWriteableBuffers; i++)
+                for (int i = 0; i < _computeShaderResources.MaxWriteableResources; i++)
                     computeStage.SetUnorderedAccessView(i, null);
             }
         }
@@ -1746,7 +1746,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void ClearShaderResourcesForStage(ShaderStage stage, ShaderResourceCollection resourceCollection)
         {
             var dxStage = GetDXShaderStage(stage);
-            for (int i = 0; i < resourceCollection.MaxReadableBuffers; i++)
+            for (int i = 0; i < resourceCollection.MaxReadableResources; i++)
                 dxStage.SetShaderResource(i, null);
         }
 

@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
         RWTexture = 2,
     }
 
-    public class ShaderResource : GraphicsResource
+    public abstract class ShaderResource : GraphicsResource
     {
         protected internal ShaderAccess _shaderAccess;
 
@@ -29,13 +29,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if OPENGL || WEB
-        internal virtual void PlatformApply(GraphicsDevice device, ShaderProgram program, string paramName, int bindingSlot, bool writeAcess)
-        {
-        }
+        internal abstract void PlatformApply(GraphicsDevice device, ShaderProgram program, string paramName, int bindingSlot, bool writeAcess);
 #else
-        internal virtual void PlatformApply(GraphicsDevice device, ShaderStage stage, int slot, bool writeAcess)
-        {
-        }
+        internal abstract void PlatformApply(GraphicsDevice device, ShaderStage stage, int bindingSlot, bool writeAcess);
 #endif
     }
 }

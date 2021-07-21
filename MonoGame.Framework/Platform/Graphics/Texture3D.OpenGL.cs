@@ -19,6 +19,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             this.glTarget = TextureTarget.Texture3D;
 
+            bool isWriteable = _shaderAccess != ShaderAccess.Read;
+            if (isWriteable)
+                throw new InvalidOperationException("Texture3D with write access from shaders is currently not supported");
+
             Threading.BlockOnUIThread(() =>
             {
                 GL.GenTextures(1, out this.glTexture);
@@ -27,7 +31,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindTexture(glTarget, glTexture);
                 GraphicsExtensions.CheckGLError();
 
-                format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
+                format.GetGLFormat(GraphicsDevice, isWriteable, out glInternalFormat, out glFormat, out glType);
 
                 GL.TexImage3D(glTarget, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, IntPtr.Zero);
                 GraphicsExtensions.CheckGLError();

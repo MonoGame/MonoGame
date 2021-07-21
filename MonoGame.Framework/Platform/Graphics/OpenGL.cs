@@ -19,6 +19,8 @@ namespace MonoGame.OpenGL
     internal enum BufferAccess
     {
         ReadOnly = 0x88B8,
+        WriteOnly = 0x88B9,
+        ReadWrite = 0x88BA,
     }
 
     internal enum BufferUsageHint
@@ -409,6 +411,7 @@ namespace MonoGame.OpenGL
         Rgba = 0x1908,
         Rgb = 0x1907,
         Rgba4 = 0x8056,
+        Rgba8 = 0x8058,
         Luminance = 0x1909,
         CompressedRgbS3tcDxt1Ext = 0x83F0,
         CompressedSrgbS3tcDxt1Ext = 0x8C4C,
@@ -429,6 +432,7 @@ namespace MonoGame.OpenGL
         Rgba16ui = 0x8D76,
         Rgb10A2ui = 0x906F,
         Rgba16 = 0x805B,
+        Rgb5A1  = 0x8057,
         // PVRTC
         CompressedRgbPvrtc2Bppv1Img = 0x8C01,
         CompressedRgbPvrtc4Bppv1Img = 0x8C00,
@@ -440,7 +444,7 @@ namespace MonoGame.OpenGL
         // ETC1
         Etc1 = 0x8D64,
         Srgb = 0x8C40,
-
+        Srgb8 = 0x8C41,
         // ETC2 RGB8A1
         Etc2Rgb8 = 0x9274,
         Etc2Srgb8 = 0x9275,
@@ -840,6 +844,12 @@ namespace MonoGame.OpenGL
         [MonoNativeFunctionWrapper]
         internal delegate void BindBufferBaseDelegate(BufferTarget target, int index, int buffer);
         internal static BindBufferBaseDelegate BindBufferBase;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
+        internal delegate void BindImageTextureDelegate(int imageUnit, int texture, int level, bool layered, int layer, BufferAccess access, PixelInternalFormat format);
+        internal static BindImageTextureDelegate BindImageTexture;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
@@ -1650,6 +1660,10 @@ namespace MonoGame.OpenGL
             if (GL.DispatchCompute == null && Extensions.Contains("GL_ARB_compute_shader"))
             {
                 GL.DispatchCompute = LoadFunction<GL.DispatchComputeDelegate>("glDispatchCompute");
+            }
+            if (GL.BindImageTexture == null && Extensions.Contains("GL_ARB_shader_image_load_store"))
+            {
+                GL.BindImageTexture = LoadFunction<GL.BindImageTextureDelegate>("glBindImageTexture");
             }
         }
 

@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
         struct ResourceInfo
         {
             public ShaderResource resource;
-            public string bufferName;
+            public string name;
         }
 
         private readonly ResourceInfo[] _readonlyResources;
@@ -20,18 +20,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private ShaderStage _stage;
 
-        public int MaxReadableBuffers { get { return _readonlyResources.Length; } }
-        public int MaxWriteableBuffers { get { return _writeableResources.Length; } }
+        public int MaxReadableResources { get { return _readonlyResources.Length; } }
+        public int MaxWriteableResources { get { return _writeableResources.Length; } }
 
-        internal ShaderResourceCollection(ShaderStage stage, int maxReadableBuffers, int maxWriteableBuffers)
+        internal ShaderResourceCollection(ShaderStage stage, int maxReadableResources, int maxWriteableResources)
 		{
             _stage = stage;
 
-            _readonlyResources = new ResourceInfo[maxReadableBuffers];
-            _writeableResources = new ResourceInfo[maxWriteableBuffers];
+            _readonlyResources = new ResourceInfo[maxReadableResources];
+            _writeableResources = new ResourceInfo[maxWriteableResources];
         }
 
-        public void SetResourceAtIndex(ShaderResource buffer, string bufferName, int index, bool writeAccess)
+        public void SetResourceAtIndex(ShaderResource buffer, string resourceName, int index, bool writeAccess)
         {
             if (writeAccess && _stage != ShaderStage.Compute)
                 throw new ArgumentException("Only a compute shader can use RWStructuredBuffer currently. Uae a regular StructuredBuffer instead and assign it the same buffer.");
@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
             resources[index] = new ResourceInfo
             {
                 resource = buffer,
-                bufferName = bufferName,
+                name = resourceName,
             };
         }
 
@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (resource != null && !resource.IsDisposed)
                 {
 #if OPENGL || WEB
-                    resource.PlatformApply(device, shaderProgram, _readonlyResources[i].bufferName, i, false);
+                    resource.PlatformApply(device, shaderProgram, _readonlyResources[i].name, i, false);
 #else
                     resource.PlatformApply(device, _stage, i, false);
 #endif
@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (resource != null && !resource.IsDisposed)
                 {
 #if OPENGL || WEB
-                    resource.PlatformApply(device, shaderProgram, _writeableResources[i].bufferName, i, true);
+                    resource.PlatformApply(device, shaderProgram, _writeableResources[i].name, i, true);
 #else
                     resource.PlatformApply(device, _stage, i, true);
 #endif

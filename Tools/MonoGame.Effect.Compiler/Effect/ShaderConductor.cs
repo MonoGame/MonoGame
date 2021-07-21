@@ -56,6 +56,12 @@ namespace MonoGame.Effect
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void GetStorageBuffer([In] ref ResultDesc result, int bufferIndex, byte[] blockName, byte[] instanceName, int maxNameLength, out int byteSize, out int slot, out bool readOnly);
 
+        [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int GetStorageImageCount([In] ref ResultDesc result);
+
+        [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void GetStorageImage([In] ref ResultDesc result, int imageIndex, byte[] name, int maxNameLength, out int slot);
+
         public enum ShaderStage
         {
             VertexShader,
@@ -226,6 +232,12 @@ namespace MonoGame.Effect
             public bool readOnly;
         }
 
+        public struct StorageImage
+        {
+            public string name;
+            public int slot; // register binding
+        }
+
         public static List<StageInput> GetStageInputs(ResultDesc result)
         {
             byte[] nameBuffer = new byte[MaxNameLength];
@@ -364,6 +376,30 @@ namespace MonoGame.Effect
             }
 
             return buffers;
+        }
+
+        public static List<StorageImage> GetStorageImages(ResultDesc result)
+        {
+            var images = new List<StorageImage>();
+
+            byte[] name = new byte[MaxNameLength];
+
+            int imageCount = GetStorageImageCount(ref result);
+
+            for (int i = 0; i < imageCount; i++)
+            {
+                GetStorageImage(ref result, i, name, MaxNameLength, out int slot);
+
+                var buffer = new StorageImage
+                {
+                    name = ByteBufferToString(name),
+                    slot = slot,
+                };
+
+                images.Add(buffer);
+            }
+
+            return images;
         }
 
         private static void ExtractUsageAndIndexFromName(string stageInputName, out string usage, out int index)
