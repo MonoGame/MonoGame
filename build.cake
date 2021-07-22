@@ -58,14 +58,23 @@ Task("Prep")
     // Set MGFXC_WINE_PATH for building shaders on macOS and Linux
     System.Environment.SetEnvironmentVariable("MGFXC_WINE_PATH", EnvironmentVariable("HOME") + "/.winemonogame");
 
-    // We tag the version with the build branch to make it
-    // easier to spot special builds in NuGet feeds.
-    var branch = EnvironmentVariable("GIT_BRANCH") ?? string.Empty;    
-    if (!branch.Contains("master"))
-	version += "-develop";
+    if (string.IsNullOrEmpty(EnvironmentVariable("GITHUB_ACTIONS")))
+    {
+        // We tag the version with the build branch to make it
+        // easier to spot special builds in NuGet feeds.
+        var branch = EnvironmentVariable("GIT_BRANCH") ?? string.Empty;    
+        if (!branch.Contains("master"))
+            version += "-develop";
 	
-    Console.WriteLine("Build Branch: {0}", branch);
-    Console.WriteLine("Build Version: {0}", version);
+        Console.WriteLine("Build Branch: {0}", branch);
+        Console.WriteLine("Build Version: {0}", version);
+    }
+    else
+    {
+        var branch = EnvironmentVariable("BRANCH_NAME") ?? string.Empty;    
+        if (!branch.Contains("master"))
+            version += "-" + branch;
+    }
 
     msPackSettings = new MSBuildSettings();
     msPackSettings.Verbosity = Verbosity.Minimal;
