@@ -42,11 +42,10 @@ The `/Profile` option defines the platform we're targeting with this effect file
 - DirectX_11
 - OpenGL
 - PlayStation4
-- PSVita
 - XboxOne
 - Switch
 
-NOTE: PlayStation 4, Xbox One, PS Vita, and Switch support is only available to licensed console developers.
+NOTE: PlayStation 4, Xbox One, and Switch support is only available to licensed console developers.
 
 ### Help
 

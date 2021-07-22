@@ -39,7 +39,6 @@ We support a growing list of platforms across the desktop, mobile, and console s
    * Windows Phone 10 (UWP)
  * Consoles (for registered developers)
    * PlayStation 4
-   * PlayStation Vita
    * Xbox One (both UWP and XDK)
    * Nintendo Switch
    * Google Stadia

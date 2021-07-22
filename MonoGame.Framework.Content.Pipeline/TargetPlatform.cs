@@ -63,13 +63,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         NativeClient,
 
         /// <summary>
-        /// Sony PlayStation Mobile (PS Vita)
-        /// (MonoGame)
-        /// </summary>
-        [Obsolete("PlayStation Mobile is no longer supported")]
-        PlayStationMobile,
-
-        /// <summary>
         /// Windows Phone 8
         /// (MonoGame)
         /// </summary>
@@ -85,11 +78,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Sony PlayStation4
         /// </summary>
         PlayStation4,
-
-        /// <summary>
-        /// PlayStation Vita
-        /// </summary>
-        PSVita,
        
         /// <summary>
         /// Xbox One
