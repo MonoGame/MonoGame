@@ -91,6 +91,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (uniformBlockIndex >= 0)
                 {
+                    GL.UniformBlockBinding(program.Program, uniformBlockIndex, _bindingSlot);
+                    GraphicsExtensions.CheckGLError();
+
                     GL.BindBuffer(BufferTarget.UniformBuffer, _glBuffer);
                     GraphicsExtensions.CheckGLError();
 
@@ -100,7 +103,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         GraphicsExtensions.CheckGLError();
                     }
 
-                    GL.BindBufferBase(BufferTarget.UniformBuffer, uniformBlockIndex, _glBuffer);
+                    GL.BindBufferBase(BufferTarget.UniformBuffer, _bindingSlot, _glBuffer);
                     GraphicsExtensions.CheckGLError();
                 }
                 else // uniform buffers are not available, we have to update the parameters one by one

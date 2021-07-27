@@ -252,6 +252,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Create the backing system memory buffer.
                 var sizeInBytes = (int)reader.ReadInt16 ();
+                var bindingSlot = (int)reader.ReadByte();
 
                 // Read the parameter index values.
                 var parameters = new int[reader.ReadInt32()];
@@ -264,6 +265,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 ConstantBuffers[c] = new ConstantBuffer(GraphicsDevice,
                                                 sizeInBytes,
+                                                bindingSlot,
                                                 parameters,
                                                 offsets,
                                                 name,

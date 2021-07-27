@@ -1078,6 +1078,12 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
+        internal delegate int UniformBlockBindingDelegate(int programId, int blockIndex, int blockBinding);
+        internal static UniformBlockBindingDelegate UniformBlockBinding;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
         internal delegate bool IsProgramDelegate(int programId);
         internal static IsProgramDelegate IsProgram;
 
@@ -1613,6 +1619,10 @@ namespace MonoGame.OpenGL
             if (GL.GetUniformBlockIndex == null && Extensions.Contains("GL_ARB_uniform_buffer_object"))
             {
                 GL.GetUniformBlockIndex = LoadFunction<GL.GetUniformBlockIndexDelegate>("glGetUniformBlockIndex");
+            }
+            if (GL.UniformBlockBinding == null && Extensions.Contains("GL_ARB_uniform_buffer_object"))
+            {
+                GL.UniformBlockBinding = LoadFunction<GL.UniformBlockBindingDelegate>("glUniformBlockBinding");
             }
         }
 

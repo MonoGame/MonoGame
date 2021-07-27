@@ -36,7 +36,7 @@ namespace MonoGame.Effect
         public static extern int GetUniformBufferCount([In] ref ResultDesc result);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void GetUniformBuffer([In] ref ResultDesc result, int bufferIndex, byte[] blockName, byte[] instanceName, int maxNameLength, out int byteSize, out int parameterCount);
+        public static extern void GetUniformBuffer([In] ref ResultDesc result, int bufferIndex, byte[] blockName, byte[] instanceName, int maxNameLength, out int byteSize, out int slot, out int parameterCount);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void GetParameter([In] ref ResultDesc result, int bufferIndex, int parameterIndex, byte[] name, int maxNameLength, out int type, out int rows, out int columns, out int byteOffset, out int arrayDimensions);
@@ -186,6 +186,7 @@ namespace MonoGame.Effect
             public string blockName;
             public string instanceName;
             public int byteSize;
+            public int slot; // register binding
             public List<Parameter> parameters;
         }
 
@@ -249,7 +250,7 @@ namespace MonoGame.Effect
 
             for (int bufInd = 0; bufInd < bufferCount; bufInd++)
             {
-                GetUniformBuffer(ref result, bufInd, blockNameBuffer, instanceNameBuffer, MaxNameLength, out int byteSize, out int parameterCount);
+                GetUniformBuffer(ref result, bufInd, blockNameBuffer, instanceNameBuffer, MaxNameLength, out int byteSize, out int slot, out int parameterCount);
 
                 string blockName = ByteBufferToString(blockNameBuffer);
                 string instanceName = ByteBufferToString(instanceNameBuffer);
@@ -284,6 +285,7 @@ namespace MonoGame.Effect
                     blockName = blockName,
                     instanceName = instanceName,
                     byteSize = byteSize,
+                    slot = slot,
                     parameters = parameters,
                 });
             }
