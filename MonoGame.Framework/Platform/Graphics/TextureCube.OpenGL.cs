@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             this.glTarget = TextureTarget.TextureCubeMap;
 
-            bool isWriteable = _shaderAccess != ShaderAccess.Read;
+            bool isWriteable = ShaderAccess == ShaderAccess.ReadWrite;
             if (isWriteable)
                 throw new InvalidOperationException("TextureCube with write access from shaders is not supported");
 

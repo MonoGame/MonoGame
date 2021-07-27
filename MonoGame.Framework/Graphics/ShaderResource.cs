@@ -8,24 +8,27 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public enum ShaderAccess
     {
+        None,
         Read,
         ReadWrite,
     }
 
     internal enum ShaderResourceType
     {
-        Structured = 0,
-        RWStructured = 1,
-        RWTexture = 2,
+        StructuredBuffer = 0,
+        RWStructuredBuffer = 1,
+        ByteBuffer = 2,
+        RWByteBuffer = 3,
+        RWTexture = 4,
     }
 
     public abstract class ShaderResource : GraphicsResource
     {
-        protected internal ShaderAccess _shaderAccess;
+        public ShaderAccess ShaderAccess { get; private set; }
 
-        internal static bool IsResourceTypeWriteable(ShaderResourceType type)
+        public ShaderResource(ShaderAccess shaderAccess)
         {
-            return type == ShaderResourceType.RWStructured || type == ShaderResourceType.RWTexture;
+            ShaderAccess = shaderAccess;
         }
 
 #if OPENGL || WEB
@@ -33,5 +36,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
         internal abstract void PlatformApply(GraphicsDevice device, ShaderStage stage, int bindingSlot, bool writeAcess);
 #endif
+
+        internal static bool IsResourceTypeWriteable(ShaderResourceType type)
+        {
+            return type == ShaderResourceType.RWStructuredBuffer ||
+                   type == ShaderResourceType.RWTexture ||
+                   type == ShaderResourceType.RWByteBuffer;
+        }
     }
 }

@@ -165,13 +165,19 @@ namespace MonoGame.Effect
                         switch (rdesc.Type)
                         {
                             case SharpDX.D3DCompiler.ShaderInputType.Structured:
-                                bufferType = ShaderResourceType.Structured;
+                                bufferType = ShaderResourceType.StructuredBuffer;
                                 break;
                             case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWStructured:
-                                bufferType = ShaderResourceType.RWStructured;
+                                bufferType = ShaderResourceType.RWStructuredBuffer;
                                 break;
                             case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWTyped:
                                 bufferType = ShaderResourceType.RWTexture;
+                                break;
+                            case SharpDX.D3DCompiler.ShaderInputType.ByteAddress:
+                                bufferType = ShaderResourceType.ByteBuffer;
+                                break;
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWByteAddress:
+                                bufferType = ShaderResourceType.RWByteBuffer;
                                 break;
                             default:
                                 continue;

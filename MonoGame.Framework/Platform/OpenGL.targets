@@ -36,7 +36,6 @@
     <Compile Include="Platform\Graphics\Texture3D.OpenGL.cs" />
     <Compile Include="Platform\Graphics\TextureCollection.OpenGL.cs" />
     <Compile Include="Platform\Graphics\TextureCube.OpenGL.cs" />
-    <Compile Include="Platform\Graphics\Vertices\IndexBuffer.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Vertices\VertexDeclaration.OpenGL.cs" />
     <Compile Include="Platform\Threading.cs" />
   </ItemGroup>

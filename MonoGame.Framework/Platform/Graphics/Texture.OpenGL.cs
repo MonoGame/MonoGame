@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (glTexture < 0)
                 throw new InvalidOperationException("No valid texture");
 
-            var bufferAccess = _shaderAccess == ShaderAccess.ReadWrite ? BufferAccess.ReadWrite : BufferAccess.ReadOnly;
+            var bufferAccess = ShaderAccess == ShaderAccess.ReadWrite ? BufferAccess.ReadWrite : BufferAccess.ReadOnly;
 
             GL.BindImageTexture(bindingSlot, glTexture, 0, false, 0, bufferAccess, glInternalFormat);
             GraphicsExtensions.CheckGLError();

@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             this.glTarget = TextureTarget.Texture3D;
 
-            bool isWriteable = _shaderAccess != ShaderAccess.Read;
+            bool isWriteable = ShaderAccess == ShaderAccess.ReadWrite;
             if (isWriteable)
                 throw new InvalidOperationException("Texture3D with write access from shaders is currently not supported");
 

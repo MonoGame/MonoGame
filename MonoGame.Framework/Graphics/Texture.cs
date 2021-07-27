@@ -39,6 +39,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			get { return _levelCount; }
 		}
 
+        public Texture(ShaderAccess shaderAcess) :
+            base(shaderAcess)
+        {
+        }
+
         internal static int CalculateMipLevels(int width, int height = 0, int depth = 0)
         {
             int levels = 1;

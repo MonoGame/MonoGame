@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             this.glTarget = TextureTarget.Texture2D;
 
-            bool isWriteable = _shaderAccess != ShaderAccess.Read;
+            bool isWriteable = ShaderAccess == ShaderAccess.ReadWrite;
             format.GetGLFormat(GraphicsDevice, isWriteable, out glInternalFormat, out glFormat, out glType);
 
             Threading.BlockOnUIThread(() =>

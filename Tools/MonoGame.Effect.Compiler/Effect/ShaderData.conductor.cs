@@ -221,7 +221,7 @@ namespace MonoGame.Effect
                 shaderData._shaderResources[i].InstanceName = storageBuffers[i].instanceName;
                 shaderData._shaderResources[i].Size = storageBuffers[i].byteSize;
                 shaderData._shaderResources[i].Slot = storageBuffers[i].slot;
-                shaderData._shaderResources[i].Type = storageBuffers[i].readOnly ? ShaderResourceType.Structured : ShaderResourceType.RWStructured;
+                shaderData._shaderResources[i].Type = storageBuffers[i].readOnly ? ShaderResourceType.StructuredBuffer : ShaderResourceType.RWStructuredBuffer;
             }
 
             for (int i = 0; i < storageImages.Count; i++)

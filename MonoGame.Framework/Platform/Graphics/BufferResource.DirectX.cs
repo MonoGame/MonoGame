@@ -35,24 +35,22 @@ namespace Microsoft.Xna.Framework.Graphics
         internal SharpDX.Direct3D11.UnorderedAccessView GetUnorderedAccessView()
         {
             if (_unorderedAccessView == null) {
-                if ((BufferOptions & Options.GPUWrite) == 0)
+                if (ShaderAccess != ShaderAccess.ReadWrite)
                     throw new InvalidOperationException("The buffer requires GPU write access, but was created without it");
+
+                bool isStructured = BufferType == BufferType.StructuredBuffer;
 
                 var desc = new SharpDX.Direct3D11.UnorderedAccessViewDescription
                 {
                     Dimension = SharpDX.Direct3D11.UnorderedAccessViewDimension.Buffer,
-                    Format = SharpDX.DXGI.Format.Unknown,
+                    Format = isStructured ? SharpDX.DXGI.Format.Unknown : SharpDX.DXGI.Format.R32_Typeless,
                     Buffer = new SharpDX.Direct3D11.UnorderedAccessViewDescription.BufferResource
                     {
                         FirstElement = 0,
-                        ElementCount = this.ElementCount,
+                        ElementCount = isStructured ? this.ElementCount : this.ElementCount * this.ElementStride / 4,  // for ByteAddressBuffers one element is 4 bytes
+                        Flags = isStructured ? SharpDX.Direct3D11.UnorderedAccessViewBufferFlags.None : SharpDX.Direct3D11.UnorderedAccessViewBufferFlags.Raw,
                     },
                 };
-
-                // This is a Raw Buffer
-                //desc.Format = DXGI_FORMAT_R32_TYPELESS; // Format must be DXGI_FORMAT_R32_TYPELESS, when creating Raw Unordered Access View
-                //desc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
-                //desc.Buffer.NumElements = descBuf.ByteWidth / 4;
 
                 _unorderedAccessView = new SharpDX.Direct3D11.UnorderedAccessView(GraphicsDevice._d3dDevice, Buffer, desc);
             }
@@ -83,15 +81,19 @@ namespace Microsoft.Xna.Framework.Graphics
             var bindFlags = SharpDX.Direct3D11.BindFlags.None;
             var resourceOptions = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
-            if ((BufferOptions & Options.BufferVertex) != 0)
+            if (BufferType == BufferType.VertexBuffer)
                 bindFlags |= SharpDX.Direct3D11.BindFlags.VertexBuffer;
-            if ((BufferOptions & Options.BufferStructured) != 0)
+            if (BufferType == BufferType.IndexBuffer)
+                bindFlags |= SharpDX.Direct3D11.BindFlags.IndexBuffer;
+            if (BufferType == BufferType.StructuredBuffer)
                 resourceOptions |= SharpDX.Direct3D11.ResourceOptionFlags.BufferStructured;
-            if ((BufferOptions & Options.GPURead) != 0)
+            if ((BufferType == BufferType.VertexBuffer || BufferType == BufferType.IndexBuffer) && ShaderAccess != ShaderAccess.None)
+                resourceOptions |= SharpDX.Direct3D11.ResourceOptionFlags.BufferAllowRawViews;
+            if (ShaderAccess != ShaderAccess.None)
                 bindFlags |= SharpDX.Direct3D11.BindFlags.ShaderResource;
-            if ((BufferOptions & Options.GPUWrite) != 0)
+            if (ShaderAccess == ShaderAccess.ReadWrite)
                 bindFlags |= SharpDX.Direct3D11.BindFlags.UnorderedAccess;
-            if ((BufferOptions & Options.Dynamic) != 0)
+            if (_isDynamic)
             {
                 accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
                 usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
@@ -120,11 +122,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _cachedStagingBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, stagingDesc);
         }
 
-        private void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
+        internal void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int elementStride) where T : struct
         {
             GenerateIfRequired();
 
-            if ((BufferOptions & Options.Dynamic) != 0)
+            if (_isDynamic)
             {
                 throw new NotImplementedException();
             }
@@ -151,14 +153,14 @@ namespace Microsoft.Xna.Framework.Graphics
                         // Map the staging resource to a CPU accessible memory
                         var box = deviceContext.MapSubresource(_cachedStagingBuffer, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
 
-                        if (vertexStride == TsizeInBytes)
+                        if (elementStride == TsizeInBytes)
                         {
-                            SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer + offsetInBytes, vertexStride * elementCount);
+                            SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer + offsetInBytes, elementStride * elementCount);
                         }
                         else
                         {
                             for (int i = 0; i < elementCount; i++)
-                                SharpDX.Utilities.CopyMemory(dataPtr + i * TsizeInBytes, box.DataPointer + i * vertexStride + offsetInBytes, TsizeInBytes);
+                                SharpDX.Utilities.CopyMemory(dataPtr + i * TsizeInBytes, box.DataPointer + i * elementStride + offsetInBytes, TsizeInBytes);
                         }
 
                         // Make sure that we unmap the resource in case of an exception
@@ -172,11 +174,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformSetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options, int bufferSize, int elementSizeInBytes) where T : struct
+        internal void PlatformSetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int elementStride, SetDataOptions options, int bufferSize, int elementSizeInBytes) where T : struct
         {
             GenerateIfRequired();
 
-            if ((BufferOptions & Options.Dynamic) != 0)
+            if (_isDynamic)
             {
                 // We assume discard by default.
                 var mode = SharpDX.Direct3D11.MapMode.WriteDiscard;
@@ -187,14 +189,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (d3dContext)
                 {
                     var dataBox = d3dContext.MapSubresource(_buffer, 0, mode, SharpDX.Direct3D11.MapFlags.None);
-                    if (vertexStride == elementSizeInBytes)
+                    if (elementStride == elementSizeInBytes)
 					{
                         SharpDX.Utilities.Write(dataBox.DataPointer + offsetInBytes, data, startIndex, elementCount);
                     }
                     else
                     {
                         for (int i = 0; i < elementCount; i++)
-                            SharpDX.Utilities.Write(dataBox.DataPointer + offsetInBytes + i * vertexStride, data, startIndex + i, 1);
+                            SharpDX.Utilities.Write(dataBox.DataPointer + offsetInBytes + i * elementStride, data, startIndex + i, 1);
                     }
 
                     d3dContext.UnmapSubresource(_buffer, 0);
@@ -210,7 +212,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     var d3dContext = GraphicsDevice._d3dContext;
 
-                    if (vertexStride == elementSizeInBytes)
+                    if (elementStride == elementSizeInBytes)
                     {
                         var box = new SharpDX.DataBox(dataPtr, elementCount * elementSizeInBytes, 0);
 
@@ -240,7 +242,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                             for (int i = 0; i < elementCount; i++)
                                 SharpDX.Utilities.CopyMemory(
-                                    box.DataPointer + i * vertexStride + offsetInBytes,
+                                    box.DataPointer + i * elementStride + offsetInBytes,
                                     dataPtr + i * elementSizeInBytes, elementSizeInBytes);
 
                             // Make sure that we unmap the resource in case of an exception

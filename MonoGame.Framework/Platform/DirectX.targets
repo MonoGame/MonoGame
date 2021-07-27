@@ -29,7 +29,6 @@
     <Compile Include="Platform\Graphics\TextureCollection.DirectX.cs" />
     <Compile Include="Platform\Graphics\TextureCube.DirectX.cs" />
     <Compile Include="Platform\Graphics\Vertices\ImmutableVertexInputLayout.cs" />
-    <Compile Include="Platform\Graphics\Vertices\IndexBuffer.DirectX.cs" />
     <Compile Include="Platform\Graphics\Vertices\InputLayoutCache.cs" />
     <Compile Include="Platform\Graphics\Vertices\VertexBufferBindings.DirectX.cs" />
     <Compile Include="Platform\Graphics\Vertices\VertexElement.DirectX.cs" />

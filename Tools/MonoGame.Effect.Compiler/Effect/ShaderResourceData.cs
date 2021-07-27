@@ -5,9 +5,11 @@ namespace MonoGame.Effect
 {
     public enum ShaderResourceType
     {
-        Structured = 0,
-        RWStructured = 1,
-        RWTexture = 2,
+        StructuredBuffer = 0,
+        RWStructuredBuffer = 1,
+        ByteBuffer = 2,
+        RWByteBuffer = 3,
+        RWTexture = 4,
     }
 
     public struct ShaderResourceData

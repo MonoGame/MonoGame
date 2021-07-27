@@ -1064,7 +1064,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (_indexBuffer != null)
                 {
-                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer.ibo);
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer.buffer);
                     GraphicsExtensions.CheckGLError();
                 }
                 _indexBufferDirty = false;

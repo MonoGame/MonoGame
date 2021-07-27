@@ -229,7 +229,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_shared)
                 desc.OptionFlags |= ResourceOptionFlags.Shared;
 
-            if (_shaderAccess == ShaderAccess.ReadWrite)
+            if (ShaderAccess == ShaderAccess.ReadWrite)
                 desc.BindFlags |= BindFlags.UnorderedAccess;
 
             return desc;
