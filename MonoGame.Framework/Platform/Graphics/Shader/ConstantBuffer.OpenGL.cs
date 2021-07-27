@@ -91,6 +91,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (uniformBlockIndex >= 0)
                 {
+                    GL.UniformBlockBinding(program.Program, uniformBlockIndex, _bindingSlot);
+                    GraphicsExtensions.CheckGLError();
+
                     GL.BindBuffer(BufferTarget.UniformBuffer, _glBuffer);
                     GraphicsExtensions.CheckGLError();
 
