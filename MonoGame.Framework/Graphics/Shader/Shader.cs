@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         public string name;
         public string instanceName;
-        public int size;
+        public int elementSize;
         public int slot;
         public ShaderResourceType type;
 
@@ -136,7 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 ShaderResources[b].name = reader.ReadString();
                 ShaderResources[b].instanceName = reader.ReadString();
-                ShaderResources[b].size = reader.ReadUInt16();
+                ShaderResources[b].elementSize = reader.ReadUInt16();
                 ShaderResources[b].slot = reader.ReadByte();
                 ShaderResources[b].type = (ShaderResourceType)reader.ReadByte();
                 ShaderResources[b].parameter = reader.ReadByte();

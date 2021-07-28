@@ -219,7 +219,7 @@ namespace MonoGame.Effect
             {
                 shaderData._shaderResources[i].Name = storageBuffers[i].blockName;
                 shaderData._shaderResources[i].InstanceName = storageBuffers[i].instanceName;
-                shaderData._shaderResources[i].Size = storageBuffers[i].byteSize;
+                shaderData._shaderResources[i].ElementSize = storageBuffers[i].byteSize;
                 shaderData._shaderResources[i].Slot = storageBuffers[i].slot;
                 shaderData._shaderResources[i].Type = storageBuffers[i].readOnly ? ShaderResourceType.StructuredBuffer : ShaderResourceType.RWStructuredBuffer;
             }
@@ -229,7 +229,7 @@ namespace MonoGame.Effect
                 int r = storageBuffers.Count + i;
                 shaderData._shaderResources[r].Name = storageImages[i].name;
                 shaderData._shaderResources[r].InstanceName = storageImages[i].name;
-                shaderData._shaderResources[r].Size = 0;
+                shaderData._shaderResources[r].ElementSize = 0;
                 shaderData._shaderResources[r].Slot = storageImages[i].slot;
                 shaderData._shaderResources[r].Type = ShaderResourceType.RWTexture;
             }

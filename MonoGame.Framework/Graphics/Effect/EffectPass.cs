@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -203,6 +204,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 var sr = shader.ShaderResources[b];
                 var param = _effect.Parameters[sr.parameter];
                 var resource = param.Data as ShaderResource;
+#if DEBUG
+                var bufferResource = resource as StructuredBuffer;
+                if (bufferResource != null && bufferResource.ElementStride != sr.elementSize)
+                { 
+                    throw new InvalidOperationException("Struct layout for StructuredBuffer doesn't match the layout defined in the shader for shader parameter '" + param.Name + "'\n"
+                        + "CPU struct size: " + bufferResource.ElementStride + " bytes, shader struct size: " + sr.elementSize + " bytes.\n"
+                        + "Beware that shader structs can be padded automatically, e.g. to align fields to 4 byte boundaries. You may need to mimic this padding in your CPU structs.");
+                }
+#endif
                 device.SetShaderResource(shader.Stage, sr.slot, resource, sr.name, sr.writeAccess);
             }
         }

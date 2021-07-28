@@ -16,7 +16,7 @@ namespace MonoGame.Effect
     {
         public string Name;
         public string InstanceName;
-        public int Size;
+        public int ElementSize;
         public int Slot;
         public ShaderResourceType Type;
         public int Parameter;
@@ -25,7 +25,7 @@ namespace MonoGame.Effect
         {
             writer.Write(Name);
             writer.Write(InstanceName);
-            writer.Write((ushort)Size);
+            writer.Write((ushort)ElementSize);
             writer.Write((byte)Slot);
             writer.Write((byte)Type);
             writer.Write((byte)Parameter);

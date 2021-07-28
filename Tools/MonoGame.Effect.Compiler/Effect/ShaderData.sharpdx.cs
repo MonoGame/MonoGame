@@ -186,7 +186,7 @@ namespace MonoGame.Effect
                         var buffer = new ShaderResourceData {
                             Name = rdesc.Name,
                             InstanceName = rdesc.Name,
-                            Size = 0,
+                            ElementSize = rdesc.NumSamples > 0 ? rdesc.NumSamples : 0, // NumSamples is the struct size for buffers
                             Slot = rdesc.BindPoint,
                             Type = bufferType,
                         };
