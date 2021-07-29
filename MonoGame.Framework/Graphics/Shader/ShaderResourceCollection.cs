@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
         struct ResourceInfo
         {
             public ShaderResource resource;
-            public string name;
+            public string blockName;
         }
 
         private readonly ResourceInfo[] _readonlyResources;
@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _writeableResources = new ResourceInfo[maxWriteableResources];
         }
 
-        public void SetResourceAtIndex(ShaderResource buffer, string resourceName, int index, bool writeAccess)
+        public void SetResourceAtIndex(ShaderResource buffer, string blockName, int index, bool writeAccess)
         {
             if (writeAccess && _stage != ShaderStage.Compute)
                 throw new ArgumentException("Only a compute shader can use RWStructuredBuffer currently. Uae a regular StructuredBuffer instead and assign it the same buffer.");
@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
             resources[index] = new ResourceInfo
             {
                 resource = buffer,
-                name = resourceName,
+                blockName = blockName,
             };
         }
 
@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (resource != null && !resource.IsDisposed)
                 {
 #if OPENGL || WEB
-                    resource.PlatformApply(device, shaderProgram, _readonlyResources[i].name, i, false);
+                    resource.PlatformApply(device, shaderProgram, _readonlyResources[i].blockName, i, false);
 #else
                     resource.PlatformApply(device, _stage, i, false);
 #endif
@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (resource != null && !resource.IsDisposed)
                 {
 #if OPENGL || WEB
-                    resource.PlatformApply(device, shaderProgram, _writeableResources[i].name, i, true);
+                    resource.PlatformApply(device, shaderProgram, _writeableResources[i].blockName, i, true);
 #else
                     resource.PlatformApply(device, _stage, i, true);
 #endif

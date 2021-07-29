@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if OPENGL || WEB
-        internal abstract void PlatformApply(GraphicsDevice device, ShaderProgram program, string paramName, int bindingSlot, bool writeAcess);
+        internal abstract void PlatformApply(GraphicsDevice device, ShaderProgram program, string blockName, int bindingSlot, bool writeAcess);
 #else
         internal abstract void PlatformApply(GraphicsDevice device, ShaderStage stage, int bindingSlot, bool writeAcess);
 #endif

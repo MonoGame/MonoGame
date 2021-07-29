@@ -213,7 +213,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         + "Beware that shader structs can be padded automatically, e.g. to align fields to 4 byte boundaries. You may need to mimic this padding in your CPU structs.");
                 }
 #endif
-                device.SetShaderResource(shader.Stage, sr.slot, resource, sr.name, sr.writeAccess);
+                device.SetShaderResource(shader.Stage, sr.slot, resource, sr.blockName, sr.writeAccess);
             }
         }
     }

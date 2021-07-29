@@ -201,13 +201,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         }
 
-        internal override void PlatformApply(GraphicsDevice device, ShaderProgram program, string paramName, int bindingSlot, bool writeAcess)
+        internal override void PlatformApply(GraphicsDevice device, ShaderProgram program, string blockName, int bindingSlot, bool writeAcess)
         {
-            int blockIndex = GL.GetProgramResourceIndex(program.Program, ProgramInterface.ShaderStorageBlock, paramName);
+            int blockIndex = GL.GetProgramResourceIndex(program.Program, ProgramInterface.ShaderStorageBlock, blockName);
             GraphicsExtensions.CheckGLError();
 
             if (blockIndex < 0)
-                throw new InvalidOperationException("The active shader effect does not contain a buffer named " + paramName);
+                throw new InvalidOperationException("The active shader effect does not contain a buffer named " + blockName);
 
             GL.BindBufferBase(BufferTarget.ShaderStorageBuffer, bindingSlot, buffer);
             GraphicsExtensions.CheckGLError();

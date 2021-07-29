@@ -888,7 +888,7 @@ namespace MonoGame.Effect
 
                         var param = new d3dx_parameter();
                         param.class_ = D3DXPARAMETER_CLASS.OBJECT;
-                        param.name = buffer.InstanceName;
+                        param.name = buffer.Name;
                         param.semantic = string.Empty;
                         param.type = buffer.Type == ShaderResourceType.RWTexture ? D3DXPARAMETER_TYPE.TEXTURE2D : D3DXPARAMETER_TYPE.VOID;
 

@@ -15,7 +15,7 @@ namespace MonoGame.Effect
     public struct ShaderResourceData
     {
         public string Name;
-        public string InstanceName;
+        public string BlockName; // OpenGL block name
         public int ElementSize;
         public int Slot;
         public ShaderResourceType Type;
@@ -24,7 +24,7 @@ namespace MonoGame.Effect
         public void Write(BinaryWriter writer, Options options)
         {
             writer.Write(Name);
-            writer.Write(InstanceName);
+            writer.Write(BlockName);
             writer.Write((ushort)ElementSize);
             writer.Write((byte)Slot);
             writer.Write((byte)Type);

@@ -1200,27 +1200,27 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal void SetShaderResource(ShaderStage stage, int slot, ShaderResource resource, string resourceName, bool writeAcess)
+        internal void SetShaderResource(ShaderStage stage, int slot, ShaderResource resource, string blockName, bool writeAcess)
         {
             switch (stage)
             {
                 case ShaderStage.Vertex:
-                    _vertexShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
+                    _vertexShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
                     break;
                 case ShaderStage.Pixel:
-                    _pixelShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
+                    _pixelShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
                     break;
                 case ShaderStage.Hull:
-                    _hullShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
+                    _hullShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
                     break;
                 case ShaderStage.Domain:
-                    _domainShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
+                    _domainShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
                     break;
                 case ShaderStage.Geometry:
-                    _geometryShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
+                    _geometryShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
                     break;
                 case ShaderStage.Compute:
-                    _computeShaderResources.SetResourceAtIndex(resource, resourceName, slot, writeAcess);
+                    _computeShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
                     break;
                 default:
                     throw new ArgumentException();
