@@ -11,11 +11,14 @@ namespace Microsoft.Xna.Framework.Graphics
         struct ResourceInfo
         {
             public ShaderResource resource;
-            public string blockName;
+            public string blockName; // name of the OpenGL block
         }
 
         private readonly ResourceInfo[] _readonlyResources;
         private readonly ResourceInfo[] _writeableResources;
+
+        private int _readonlyValid;
+        private int _writeableValid;
 
         private ShaderStage _stage;
 
@@ -30,7 +33,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _writeableResources = new ResourceInfo[maxWriteableResources];
         }
 
-        public void SetResourceAtIndex(ShaderResource buffer, string blockName, int index, bool writeAccess)
+        public void SetResourceAtIndex(ShaderResource resource, string blockName, int index, bool writeAccess)
         {
             if (writeAccess && _stage != ShaderStage.Compute)
                 throw new ArgumentException("Only a compute shader can use RWStructuredBuffer currently. Uae a regular StructuredBuffer instead and assign it the same buffer.");
@@ -39,9 +42,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             resources[index] = new ResourceInfo
             {
-                resource = buffer,
+                resource = resource,
                 blockName = blockName,
             };
+
+            if (writeAccess)
+                _writeableValid |= 1 << index;
+            else
+                _readonlyValid |= 1 << index;
         }
 
         internal void Clear()
@@ -51,6 +59,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             for (var i = 0; i < _writeableResources.Length; i++)
                 _writeableResources[i] = new ResourceInfo();
+
+            _readonlyValid = 0;
+            _writeableValid = 0;
         }
 
 #if WEB
@@ -61,29 +72,49 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void SetShaderResources(GraphicsDevice device)
 #endif
         {
-            for (var i = 0; i < _readonlyResources.Length; i++)
+            if (_readonlyValid != 0) // If there are no readable resources then skip it.
             {
-                var resource = _readonlyResources[i].resource;
-                if (resource != null && !resource.IsDisposed)
+                int valid = _readonlyValid;
+
+                for (var i = 0; i < _readonlyResources.Length; i++)
                 {
+                    var resource = _readonlyResources[i].resource;
+                    if (resource != null && !resource.IsDisposed)
+                    {
 #if OPENGL || WEB
-                    resource.PlatformApply(device, shaderProgram, _readonlyResources[i].blockName, i, false);
+                        resource.PlatformApply(device, shaderProgram, _readonlyResources[i].blockName, i, false);
 #else
-                    resource.PlatformApply(device, _stage, i, false);
+                        resource.PlatformApply(device, _stage, i, false);
 #endif
+                    }
+
+                    // Early out if this is the last one.
+                    valid &= ~(1 << i);
+                    if (valid == 0)
+                        break;
                 }
             }
 
-            for (var i = 0; i < _writeableResources.Length; i++)
+            if (_writeableValid != 0) // If there are no writeable resources then skip it.
             {
-                var resource = _writeableResources[i].resource;
-                if (resource != null && !resource.IsDisposed)
+                int valid = _writeableValid;
+
+                for (var i = 0; i < _writeableResources.Length; i++)
                 {
+                    var resource = _writeableResources[i].resource;
+                    if (resource != null && !resource.IsDisposed)
+                    {
 #if OPENGL || WEB
-                    resource.PlatformApply(device, shaderProgram, _writeableResources[i].blockName, i, true);
+                        resource.PlatformApply(device, shaderProgram, _writeableResources[i].blockName, i, true);
 #else
-                    resource.PlatformApply(device, _stage, i, true);
+                        resource.PlatformApply(device, _stage, i, true);
 #endif
+                    }
+
+                    // Early out if this is the last one.
+                    valid &= ~(1 << i);
+                    if (valid == 0)
+                        break;
                 }
             }
         }
