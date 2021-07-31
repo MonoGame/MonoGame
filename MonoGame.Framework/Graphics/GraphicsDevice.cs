@@ -1205,22 +1205,22 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (stage)
             {
                 case ShaderStage.Vertex:
-                    _vertexShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
+                    _vertexShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
                     break;
                 case ShaderStage.Pixel:
-                    _pixelShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
+                    _pixelShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
                     break;
                 case ShaderStage.Hull:
-                    _hullShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
+                    _hullShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
                     break;
                 case ShaderStage.Domain:
-                    _domainShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
+                    _domainShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
                     break;
                 case ShaderStage.Geometry:
-                    _geometryShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
+                    _geometryShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
                     break;
                 case ShaderStage.Compute:
-                    _computeShaderResources.SetResourceAtIndex(resource, blockName, slot, writeAcess);
+                    _computeShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
                     break;
                 default:
                     throw new ArgumentException();

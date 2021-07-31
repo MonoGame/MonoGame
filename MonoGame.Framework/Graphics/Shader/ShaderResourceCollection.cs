@@ -12,6 +12,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             public ShaderResource resource;
             public string blockName; // name of the OpenGL block
+#if OPENGL
+            public int bindingSlot;
+#endif
         }
 
         private readonly ResourceInfo[] _readonlyResources;
@@ -33,18 +36,31 @@ namespace Microsoft.Xna.Framework.Graphics
             _writeableResources = new ResourceInfo[maxWriteableResources];
         }
 
-        public void SetResourceAtIndex(ShaderResource resource, string blockName, int index, bool writeAccess)
+        public void SetResourceForBindingSlot(ShaderResource resource, string blockName, int index, bool writeAccess)
         {
             if (writeAccess && _stage != ShaderStage.Compute)
                 throw new ArgumentException("Only a compute shader can use RWStructuredBuffer currently. Uae a regular StructuredBuffer instead and assign it the same buffer.");
 
             var resources = writeAccess ? _writeableResources : _readonlyResources;
 
+#if OPENGL
+            // DX uses u-registers in shaders for writeable buffers and textures, and t-registers for readonly buffers and textures.
+            // OpenGL doesn't separate register types like this. If a shader resource is assigned to register u0e, and another resource is assigned to register t0,
+            // things are fine in DX, but in GL we have a binding slot conflict. To resolve this u-registers have been shifted by 16, if set explicitly (see ShaderConductor shiftAllUABuffersBindings option in MGFXC).
+            // Unshift those binding slots now, to avoid an array index overflow.
+            resources[index % 16] = new ResourceInfo
+            {
+                resource = resource,
+                blockName = blockName,
+                bindingSlot = index,
+            };
+#else
             resources[index] = new ResourceInfo
             {
                 resource = resource,
                 blockName = blockName,
             };
+#endif
 
             if (writeAccess)
                 _writeableValid |= 1 << index;
@@ -78,11 +94,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 for (var i = 0; i < _readonlyResources.Length; i++)
                 {
-                    var resource = _readonlyResources[i].resource;
+                    var resourceInfo = _readonlyResources[i];
+                    var resource = resourceInfo.resource;
                     if (resource != null && !resource.IsDisposed)
                     {
 #if OPENGL || WEB
-                        resource.PlatformApply(device, shaderProgram, _readonlyResources[i].blockName, i, false);
+                        resource.PlatformApply(device, shaderProgram, resourceInfo.blockName, resourceInfo.bindingSlot, false);
 #else
                         resource.PlatformApply(device, _stage, i, false);
 #endif
@@ -101,11 +118,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 for (var i = 0; i < _writeableResources.Length; i++)
                 {
-                    var resource = _writeableResources[i].resource;
+                    var resourceInfo = _writeableResources[i];
+                    var resource = resourceInfo.resource;
                     if (resource != null && !resource.IsDisposed)
                     {
 #if OPENGL || WEB
-                        resource.PlatformApply(device, shaderProgram, _writeableResources[i].blockName, i, true);
+                        resource.PlatformApply(device, shaderProgram, resourceInfo.blockName, resourceInfo.bindingSlot, true);
 #else
                         resource.PlatformApply(device, _stage, i, true);
 #endif

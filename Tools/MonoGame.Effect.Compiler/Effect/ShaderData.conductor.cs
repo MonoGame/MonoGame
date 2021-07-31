@@ -36,6 +36,7 @@ namespace MonoGame.Effect
             var options = ShaderConductor.OptionsDesc.Default;
             options.enableDebugInfo = false;
             options.shaderModel = new ShaderConductor.ShaderModel(shaderModelMajorDX, shaderModelMinorDX);
+            options.shiftAllUABuffersBindings = 16; // avoid conflict between u-registers (writeable buffers and textures) and t-registers (readonly buffers and textures)
 
             //==============================================================
             // Choose best GLSL/ESSL target version based on DX shader model
