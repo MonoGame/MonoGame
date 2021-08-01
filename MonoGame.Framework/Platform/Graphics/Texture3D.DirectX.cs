@@ -57,6 +57,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
+            if (ShaderAccess == ShaderAccess.ReadWrite)
+                description.BindFlags |= BindFlags.UnorderedAccess;
+
             return new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, description);
         }
 
@@ -149,22 +152,19 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal override UnorderedAccessViewDescription GetUnorderedAccessViewDescription(int mipSlice)
+        internal override UnorderedAccessViewDescription GetUnorderedAccessViewDescription(int mipLevel)
         {
-            throw new InvalidOperationException("Texture3D with write access from shaders is currently not supported.");
-            /*
             return new UnorderedAccessViewDescription
             {
                 Dimension = UnorderedAccessViewDimension.Texture3D,
                 Format = SharpDXHelper.ToFormat(_format),
                 Texture3D = new UnorderedAccessViewDescription.Texture3DResource
                 {
-                    MipSlice = mipSlice,
+                    MipSlice = mipLevel,
                     FirstWSlice = 0,
                     WSize = Depth
                 }
             };
-            */
         }
     }
 }

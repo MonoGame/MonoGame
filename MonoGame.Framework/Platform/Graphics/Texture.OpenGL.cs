@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var bufferAccess = ShaderAccess == ShaderAccess.ReadWrite ? BufferAccess.ReadWrite : BufferAccess.ReadOnly;
 
-            GL.BindImageTexture(bindingSlot, glTexture, 0, false, 0, bufferAccess, glInternalFormat);
+            GL.BindImageTexture(bindingSlot, glTexture, 0, true, 0, bufferAccess, glInternalFormat);
             GraphicsExtensions.CheckGLError();
         }
 
