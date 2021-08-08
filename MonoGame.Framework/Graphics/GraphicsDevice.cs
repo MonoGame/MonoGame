@@ -1632,6 +1632,71 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
+        /// Draw instanced geometry from the bound vertex buffers.
+        /// The draw parameters are provided by a buffer, rather than passed directly as function parameters.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives to draw.</param>
+        /// <param name="indirectDrawBuffer">The buffer containing the draw arguments (VertexCountPerInstance, InstanceCount, ...) 
+        /// <param name="alignedByteOffsetForArgs">The offset for the indirect draw buffer in bytes from where to start reading the parameters.</param>
+        public void DrawInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs = 0)
+        {
+            if (_vertexShader == null)
+                throw new InvalidOperationException("Vertex shader must be set before calling DrawInstancedPrimitivesIndirect.");
+
+            if (_vertexBuffers.Count == 0)
+                throw new InvalidOperationException("Vertex buffer must be set before calling DrawInstancedPrimitives.");
+
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
+
+            PlatformDrawInstancedPrimitivesIndirect(primitiveType, indirectDrawBuffer, alignedByteOffsetForArgs);
+
+            unchecked
+            {
+                _graphicsMetrics._drawCount++;
+            }
+        }
+
+        /// <summary>
+        /// Draw instanced geometry from the bound vertex and index buffer.
+        /// The draw parameters are provided by a buffer, rather than passed directly as function parameters.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives in the index buffer.</param>
+        /// <param name="indirectDrawBuffer">The buffer containing the draw arguments (IndexCountPerInstance, InstanceCount, ...) 
+        /// <param name="alignedByteOffsetForArgs">The offset for the indirect draw buffer in bytes from where to start reading the parameters.</param>
+        public void DrawIndexedInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs = 0)
+        {
+            if (_vertexShader == null)
+                throw new InvalidOperationException("Vertex shader must be set before calling DrawInstancedPrimitives.");
+
+            if (_vertexBuffers.Count == 0)
+                throw new InvalidOperationException("Vertex buffer must be set before calling DrawInstancedPrimitives.");
+
+            if (_indexBuffer == null)
+                throw new InvalidOperationException("Index buffer must be set before calling DrawInstancedPrimitives.");
+
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                 throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                 throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
+
+            PlatformDrawIndexedInstancedPrimitivesIndirect(primitiveType, indirectDrawBuffer, alignedByteOffsetForArgs);
+
+            unchecked
+            {
+                _graphicsMetrics._drawCount++;
+            }
+        }
+
+        /// <summary>
         /// Execute the currently bound compute shader.
         /// </summary>
         /// <param name="threadGroupCountX">The number of thread groups dispatched in the x direction.</param>
@@ -1650,6 +1715,20 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentOutOfRangeException("threadGroupCountZ");
 
             PlatformDispatchCompute(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
+        }
+
+        /// <summary>
+        /// Execute the currently bound compute shader.
+        /// The group count parameters are provided by a buffer, rather than passed directly as function parameters.
+        /// </summary>
+        /// <param name="indirectDrawBuffer">The buffer containing the group count x, y, z parameters.
+        /// <param name="alignedByteOffsetForArgs">The offset for the indirect draw buffer in bytes from where to start reading the parameters.</param>
+        public void DispatchComputeIndirect(IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs = 0)
+        {
+            if (_computeShader == null)
+                return;
+
+            PlatformDispatchComputeIndirect(indirectDrawBuffer, alignedByteOffsetForArgs);
         }
 
         /// <summary>

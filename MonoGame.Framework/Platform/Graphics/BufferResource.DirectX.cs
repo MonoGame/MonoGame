@@ -38,17 +38,39 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (ShaderAccess != ShaderAccess.ReadWrite)
                     throw new InvalidOperationException("The buffer requires GPU write access, but was created without it");
 
-                bool isStructured = BufferType == BufferType.StructuredBuffer;
+                int elementCount = 0;
+                SharpDX.DXGI.Format format;
+                var flags = SharpDX.Direct3D11.UnorderedAccessViewBufferFlags.None;
+
+                switch (BufferType)
+                {
+                    case BufferType.StructuredBuffer:
+                        elementCount = this.ElementCount;
+                        format = SharpDX.DXGI.Format.Unknown;
+                        break;
+                    case BufferType.VertexBuffer:
+                    case BufferType.IndexBuffer:
+                        elementCount = this.ElementCount * this.ElementStride / 4; // for ByteAddressBuffers one element is 4 bytes
+                        format = SharpDX.DXGI.Format.R32_Typeless;
+                        flags |= SharpDX.Direct3D11.UnorderedAccessViewBufferFlags.Raw;
+                        break;
+                    case BufferType.IndirectDrawBuffer:
+                        elementCount = this.ElementCount;
+                        format = SharpDX.DXGI.Format.R32_UInt;
+                        break;
+                    default:
+                        throw new Exception("invalid buffer type");
+                }
 
                 var desc = new SharpDX.Direct3D11.UnorderedAccessViewDescription
                 {
                     Dimension = SharpDX.Direct3D11.UnorderedAccessViewDimension.Buffer,
-                    Format = isStructured ? SharpDX.DXGI.Format.Unknown : SharpDX.DXGI.Format.R32_Typeless,
+                    Format = format,
                     Buffer = new SharpDX.Direct3D11.UnorderedAccessViewDescription.BufferResource
                     {
                         FirstElement = 0,
-                        ElementCount = isStructured ? this.ElementCount : this.ElementCount * this.ElementStride / 4,  // for ByteAddressBuffers one element is 4 bytes
-                        Flags = isStructured ? SharpDX.Direct3D11.UnorderedAccessViewBufferFlags.None : SharpDX.Direct3D11.UnorderedAccessViewBufferFlags.Raw,
+                        ElementCount = elementCount,
+                        Flags = flags,
                     },
                 };
 
@@ -87,6 +109,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 bindFlags |= SharpDX.Direct3D11.BindFlags.IndexBuffer;
             if (BufferType == BufferType.StructuredBuffer)
                 resourceOptions |= SharpDX.Direct3D11.ResourceOptionFlags.BufferStructured;
+            if (BufferType == BufferType.IndirectDrawBuffer)
+                resourceOptions |= SharpDX.Direct3D11.ResourceOptionFlags.DrawIndirectArguments;
             if ((BufferType == BufferType.VertexBuffer || BufferType == BufferType.IndexBuffer) && ShaderAccess != ShaderAccess.None)
                 resourceOptions |= SharpDX.Direct3D11.ResourceOptionFlags.BufferAllowRawViews;
             if (ShaderAccess != ShaderAccess.None)

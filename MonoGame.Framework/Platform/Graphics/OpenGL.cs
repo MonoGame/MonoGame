@@ -136,6 +136,8 @@ namespace MonoGame.OpenGL
         ElementArrayBuffer = 0x8893,
         UniformBuffer = 0x8A11,
         ShaderStorageBuffer = 0x90D2,
+        IndirectDrawBuffer = 0x8F3F,
+        IndirectDispatchBuffer = 0x90EE,
     }
 
     internal enum RenderbufferTarget
@@ -404,6 +406,7 @@ namespace MonoGame.OpenGL
         TextureCubeMapNegativeX = 0x8516,
         TextureCubeMapNegativeY = 0x8518,
         TextureCubeMapNegativeZ = 0x851A,
+        TextureBuffer = 0x8C2A,
     }
 
     internal enum PixelInternalFormat
@@ -564,6 +567,13 @@ namespace MonoGame.OpenGL
     internal enum PatchParameterName
     {
         PatchVertices = 0x8E72,
+    }
+
+    [Flags]
+    internal enum MemoryBarrierBits : uint
+    {
+        ShaderStorage = 0x00002000,
+        All = 0xFFFFFFFF,
     }
 
     internal partial class ColorFormat
@@ -866,8 +876,26 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
+        internal delegate void DrawElementsIndirectDelegate(GLPrimitiveType primitiveType, DrawElementsType elementType, IntPtr byteOffset);
+        internal static DrawElementsIndirectDelegate DrawElementsIndirect;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
+        internal delegate void DrawArraysIndirectDelegate(GLPrimitiveType primitiveType, IntPtr byteOffset);
+        internal static DrawArraysIndirectDelegate DrawArraysIndirect;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
         internal delegate void DispatchComputeDelegate(int numGroupsX, int numGroupsY, int numGroupsZ);
         internal static DispatchComputeDelegate DispatchCompute;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
+        internal delegate void DispatchComputeIndirectDelegate(IntPtr byteOffset);
+        internal static DispatchComputeIndirectDelegate DispatchComputeIndirect;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
@@ -1385,6 +1413,12 @@ namespace MonoGame.OpenGL
         internal delegate void PatchParameteriDelegate(PatchParameterName name, int value);
         internal static PatchParameteriDelegate PatchParameteri;
 
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
+        internal delegate void MemoryBarrierDelegate(MemoryBarrierBits barriers);
+        internal static MemoryBarrierDelegate MemoryBarrier;
+
 #if DEBUG
         [UnmanagedFunctionPointer (CallingConvention.StdCall)]
         delegate void DebugMessageCallbackProc (int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam);
@@ -1674,6 +1708,22 @@ namespace MonoGame.OpenGL
             if (GL.BindImageTexture == null && Extensions.Contains("GL_ARB_shader_image_load_store"))
             {
                 GL.BindImageTexture = LoadFunction<GL.BindImageTextureDelegate>("glBindImageTexture");
+            }
+            if (GL.DrawElementsIndirect == null && Extensions.Contains("GL_ARB_draw_indirect"))
+            {
+                GL.DrawElementsIndirect = LoadFunction<GL.DrawElementsIndirectDelegate>("glDrawElementsIndirect");
+            }
+            if (GL.DrawArraysIndirect == null && Extensions.Contains("GL_ARB_draw_indirect"))
+            {
+                GL.DrawArraysIndirect = LoadFunction<GL.DrawArraysIndirectDelegate>("glDrawArraysIndirect");
+            }
+            if (GL.DispatchComputeIndirect == null && Extensions.Contains("GL_ARB_compute_shader"))
+            {
+                GL.DispatchComputeIndirect = LoadFunction<GL.DispatchComputeIndirectDelegate>("glDispatchComputeIndirect");
+            }
+            if (GL.MemoryBarrier == null && Extensions.Contains("GL_ARB_shader_image_load_store"))
+            {
+                GL.MemoryBarrier = LoadFunction<GL.MemoryBarrierDelegate>("glMemoryBarrier");
             }
         }
 

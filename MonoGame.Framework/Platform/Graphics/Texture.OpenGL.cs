@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
             DeleteGLTexture();
         }
 
-        internal override void PlatformApply(GraphicsDevice device, ShaderProgram program, string blockName, int bindingSlot, bool writeAcess)
+        internal override void PlatformApply(GraphicsDevice device, ShaderProgram program, int bindingSlot, bool writeAcess)
         {
             if (glTexture < 0)
                 throw new InvalidOperationException("No valid texture");

@@ -1506,13 +1506,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _domainConstantBuffers.SetConstantBuffers(this);
             _geometryConstantBuffers.SetConstantBuffers(this);
 
-            _vertexShaderResources.SetShaderResources(this);
-            _pixelShaderResources.SetShaderResources(this);
-            _hullShaderResources.SetShaderResources(this);
-            _domainShaderResources.SetShaderResources(this);
-            _geometryShaderResources.SetShaderResources(this);
-            _shaderResourcesSetForCompute = false;
-
             Textures.PlatformSetTextures(this, _d3dContext.PixelShader);
             SamplerStates.PlatformSetSamplers(this, _d3dContext.PixelShader);
 
@@ -1527,6 +1520,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 GeometryTextures.PlatformSetTextures(this, _d3dContext.GeometryShader);
                 GeometrySamplerStates.PlatformSetSamplers(this, _d3dContext.GeometryShader);
             }
+
+            _vertexShaderResources.SetShaderResources(this);
+            _pixelShaderResources.SetShaderResources(this);
+            _hullShaderResources.SetShaderResources(this);
+            _domainShaderResources.SetShaderResources(this);
+            _geometryShaderResources.SetShaderResources(this);
+            _shaderResourcesSetForCompute = false;
         }
 
         private int SetUserVertexBuffer<T>(T[] vertexData, int vertexOffset, int vertexCount, VertexDeclaration vertexDecl)
@@ -1697,49 +1697,90 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformDispatchCompute(int threadGroupCountX, int threadGroupCountY, int threadGroupCountZ)
+        private void PlatformDrawInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+        {
+            lock (_d3dContext)
+            {
+                ApplyState(true);
+
+                _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
+                _d3dContext.DrawInstancedIndirect(indirectDrawBuffer.Buffer, alignedByteOffsetForArgs);
+            }
+        }
+
+        private void PlatformDrawIndexedInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+        {
+            lock (_d3dContext)
+            {
+                ApplyState(true);
+
+                _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
+                _d3dContext.DrawIndexedInstancedIndirect(indirectDrawBuffer.Buffer, alignedByteOffsetForArgs);
+            }
+        }
+
+        private void ApplyComputeState()
         {
             PlatformBeginApplyState();
 
+            if (_computeShaderDirty)
+            {
+                _d3dContext.ComputeShader.Set(_computeShader == null ? null : _computeShader.ComputeShader);
+                _computeShaderDirty = false;
+
+                unchecked
+                {
+                    _graphicsMetrics._computeShaderCount++;
+                }
+            }
+
+            // If the device was just used for normal drawing, rather than compute, we need to unbind the buffers from non-compute stages.
+            // This is neccessary to make sure buffers that are written to in compute shaders,
+            // are not still set as inputs in other shader stages, as this is not allowed.
+            if (!_shaderResourcesSetForCompute)
+            {
+                ClearShaderResourcesForStage(ShaderStage.Vertex, _vertexShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Pixel, _pixelShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Hull, _hullShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Domain, _domainShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Geometry, _geometryShaderResources);
+
+                _shaderResourcesSetForCompute = true;
+            }
+
+            _computeConstantBuffers.SetConstantBuffers(this);
+
+            ComputeTextures.PlatformSetTextures(this, _d3dContext.ComputeShader);
+            ComputeSamplerStates.PlatformSetSamplers(this, _d3dContext.ComputeShader);
+
+            _computeShaderResources.SetShaderResources(this);
+        }
+
+        private void UnbindWriteableComputeResources()
+        {
+            // Unbind all buffers (UAV's), otherwise they could not be used as shader inputs
+            var computeStage = (GetDXShaderStage(ShaderStage.Compute) as SharpDX.Direct3D11.ComputeShaderStage);
+            for (int i = 0; i < _computeShaderResources.MaxWriteableResources; i++)
+                computeStage.SetUnorderedAccessView(i, null);
+        }
+
+        private void PlatformDispatchCompute(int threadGroupCountX, int threadGroupCountY, int threadGroupCountZ)
+        {
             lock (_d3dContext)
             {
-                if (_computeShaderDirty)
-                {
-                    _d3dContext.ComputeShader.Set(_computeShader == null ? null : _computeShader.ComputeShader);
-                    _computeShaderDirty = false;
-
-                    unchecked
-                    {
-                        _graphicsMetrics._computeShaderCount++;
-                    }
-                }
-
-                // If the device was just used for normal drawing, rather than compute, we need to unbind the buffers from non-compute stages.
-                // This is neccessary to make sure buffers that are written to in compute shaders,
-                // are not still set as inputs in other shader stages, as this is not allowed.
-                if (!_shaderResourcesSetForCompute)
-                {
-                    ClearShaderResourcesForStage(ShaderStage.Vertex,  _vertexShaderResources);
-                    ClearShaderResourcesForStage(ShaderStage.Pixel, _pixelShaderResources);
-                    ClearShaderResourcesForStage(ShaderStage.Hull, _hullShaderResources);
-                    ClearShaderResourcesForStage(ShaderStage.Domain, _domainShaderResources);
-                    ClearShaderResourcesForStage(ShaderStage.Geometry, _geometryShaderResources);
-
-                    _shaderResourcesSetForCompute = true;
-                }
-
-                _computeConstantBuffers.SetConstantBuffers(this);
-                _computeShaderResources.SetShaderResources(this);
-
-                ComputeTextures.PlatformSetTextures(this, _d3dContext.ComputeShader);
-                ComputeSamplerStates.PlatformSetSamplers(this, _d3dContext.ComputeShader);
-
+                ApplyComputeState();
                 _d3dContext.Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
+                UnbindWriteableComputeResources();
+            }
+        }
 
-                // Unbind all buffers (UAV's), otherwise they could not be used as shader inputs
-                var computeStage = (GetDXShaderStage(ShaderStage.Compute) as SharpDX.Direct3D11.ComputeShaderStage);
-                for (int i = 0; i < _computeShaderResources.MaxWriteableResources; i++)
-                    computeStage.SetUnorderedAccessView(i, null);
+        private void PlatformDispatchComputeIndirect(IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+        {
+            lock (_d3dContext)
+            {
+                ApplyComputeState();
+                _d3dContext.DispatchIndirect(indirectDrawBuffer.Buffer, alignedByteOffsetForArgs);
+                UnbindWriteableComputeResources();
             }
         }
 

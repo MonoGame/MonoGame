@@ -11,9 +11,9 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         public new int ElementCount { get { return base.ElementCount; } }
 
-        public StructuredBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage, ShaderAccess shaderAccess) :
+        public StructuredBuffer(GraphicsDevice graphicsDevice, Type type, int elementCount, BufferUsage bufferUsage, ShaderAccess shaderAccess) :
             base(graphicsDevice,
-                vertexCount,
+                elementCount,
                 ReflectionHelpers.ManagedSizeOf(type),
                 bufferUsage,
                 false,
@@ -144,8 +144,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (structureStride == 0)
                 structureStride = elementSizeInBytes;
 
-            var vertexByteSize = ElementCount * ElementStride;
-            if (structureStride > vertexByteSize)
+            var byteSize = ElementCount * ElementStride;
+            if (structureStride > byteSize)
                 throw new ArgumentOutOfRangeException("structureStride", "Structure stride can not be larger than the buffer size.");
 
             if (startIndex + elementCount > data.Length || elementCount <= 0)

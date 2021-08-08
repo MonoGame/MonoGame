@@ -32,8 +32,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 case BufferType.VertexBuffer:
                 case BufferType.IndexBuffer:
                     return BufferTarget.ArrayBuffer;
-                case BufferType.IndirectArgumentsBuffer:
-                    throw new NotImplementedException();
+                case BufferType.IndirectDrawBuffer:
+                    return BufferTarget.IndirectDrawBuffer;
                 default:
                     throw new InvalidOperationException("Unknown BufferType");
             }
@@ -198,17 +198,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     dataHandle.Free();
                 }
             }
-
         }
 
-        internal override void PlatformApply(GraphicsDevice device, ShaderProgram program, string blockName, int bindingSlot, bool writeAcess)
+        internal override void PlatformApply(GraphicsDevice device, ShaderProgram program, int bindingSlot, bool writeAcess)
         {
-            int blockIndex = GL.GetProgramResourceIndex(program.Program, ProgramInterface.ShaderStorageBlock, blockName);
-            GraphicsExtensions.CheckGLError();
-
-            if (blockIndex < 0)
-                throw new InvalidOperationException("The active shader effect does not contain a buffer named " + blockName);
-
             GL.BindBufferBase(BufferTarget.ShaderStorageBuffer, bindingSlot, buffer);
             GraphicsExtensions.CheckGLError();
         }

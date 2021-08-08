@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
         StructuredBuffer,
         VertexBuffer,
         IndexBuffer,
-        IndirectArgumentsBuffer,
+        IndirectDrawBuffer,
     }
 
     public partial class BufferResource : ShaderResource

@@ -1095,7 +1095,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetValue(BufferResource value)
         {
-            if (ParameterClass != EffectParameterClass.Object || ParameterType != EffectParameterType.Void)
+            if (ParameterClass != EffectParameterClass.Object)
                 throw new InvalidCastException();
 
             Data = value;

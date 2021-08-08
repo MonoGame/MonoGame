@@ -11,7 +11,6 @@ namespace Microsoft.Xna.Framework.Graphics
         struct ResourceInfo
         {
             public ShaderResource resource;
-            public string blockName; // name of the OpenGL block
 #if OPENGL
             public int bindingSlot;
 #endif
@@ -51,14 +50,12 @@ namespace Microsoft.Xna.Framework.Graphics
             resources[index % 16] = new ResourceInfo
             {
                 resource = resource,
-                blockName = blockName,
                 bindingSlot = index,
             };
 #else
             resources[index] = new ResourceInfo
             {
                 resource = resource,
-                blockName = blockName,
             };
 #endif
 
@@ -99,7 +96,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (resource != null && !resource.IsDisposed)
                     {
 #if OPENGL || WEB
-                        resource.PlatformApply(device, shaderProgram, resourceInfo.blockName, resourceInfo.bindingSlot, false);
+                        resource.PlatformApply(device, shaderProgram, resourceInfo.bindingSlot, false);
 #else
                         resource.PlatformApply(device, _stage, i, false);
 #endif
@@ -123,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (resource != null && !resource.IsDisposed)
                     {
 #if OPENGL || WEB
-                        resource.PlatformApply(device, shaderProgram, resourceInfo.blockName, resourceInfo.bindingSlot, true);
+                        resource.PlatformApply(device, shaderProgram, resourceInfo.bindingSlot, true);
 #else
                         resource.PlatformApply(device, _stage, i, true);
 #endif

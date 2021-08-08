@@ -1343,6 +1343,33 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GraphicsExtensions.CheckGLError();
         }
+
+        private void PlatformDrawInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+        {
+            if (!GraphicsCapabilities.SupportsInstancing)
+                throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2 or GLES 3.2. Try upgrading your graphics card drivers.");
+
+            ApplyState(true);
+
+            ApplyAttribs(_vertexShader, 0);
+
+            // Set vertex count for tesselation patch
+            var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+            if (primitiveTypeGL == GLPrimitiveType.Patches)
+                SetTesselationPatchVertexCount(primitiveType);
+
+            GL.BindBuffer(BufferTarget.IndirectDrawBuffer, indirectDrawBuffer.buffer);
+            GraphicsExtensions.CheckGLError();
+
+            GL.DrawArraysIndirect(primitiveTypeGL, (IntPtr)alignedByteOffsetForArgs);
+            GraphicsExtensions.CheckGLError();
+        }
+
+        private void PlatformDrawIndexedInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+        {
+            throw new Exception();
+        }
+
         private void SetTesselationPatchVertexCount(PrimitiveType primitiveType)
         {
             int patchVertexCount = primitiveType - PrimitiveType.PatchListWith1ControlPoints + 1;
@@ -1356,9 +1383,38 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDispatchCompute(int threadGroupCountX, int threadGroupCountY, int threadGroupCountZ)
         {
+            ApplyComputeState();
+
+            GL.DispatchCompute(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
+            GraphicsExtensions.CheckGLError();
+
+            // The memory barrier will ensure that data written by the compute shader will be visible when other shaders read that data later.
+            // Better performance can probably be achievable by using only the required bits, and only when it's actually neccessary. 
+            GL.MemoryBarrier(MemoryBarrierBits.All);
+            GraphicsExtensions.CheckGLError();
+        }
+
+        private void PlatformDispatchComputeIndirect(IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+        {
+            ApplyComputeState();
+
+            GL.BindBuffer(BufferTarget.IndirectDispatchBuffer, indirectDrawBuffer.buffer);
+            GraphicsExtensions.CheckGLError();
+
+            GL.DispatchComputeIndirect((IntPtr)alignedByteOffsetForArgs);
+            GraphicsExtensions.CheckGLError();
+
+            // The memory barrier will ensure that data written by the compute shader will be visible when other shaders read that data later.
+            // Better performance can probably be achievable by using only the required bits, and only when it's actually neccessary. 
+            GL.MemoryBarrier(MemoryBarrierBits.All);
+            GraphicsExtensions.CheckGLError();
+        }
+
+        private void ApplyComputeState()
+        {
             PlatformBeginApplyState();
 
-            if(_computeShaderDirty)
+            if (_computeShaderDirty)
             {
                 ActivateShaderProgram();
                 _computeShaderDirty = false;
@@ -1373,9 +1429,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _graphicsMetrics._computeShaderCount++;
             }
-
-            GL.DispatchCompute(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
-            GraphicsExtensions.CheckGLError();
         }
 
         private void PlatformGetBackBufferData<T>(Rectangle? rectangle, T[] data, int startIndex, int count) where T : struct
