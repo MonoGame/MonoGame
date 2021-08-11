@@ -81,6 +81,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 return data;
             }
         }
+
+        public int ElementCount { get { return base.ElementCount; } }
         
         public IndirectDrawBuffer(GraphicsDevice graphicsDevice, BufferUsage bufferUsage, ShaderAccess shaderAccess, int elementCount = 5) :
             base(graphicsDevice, elementCount, sizeof(uint), bufferUsage, false, BufferType.IndirectDrawBuffer, shaderAccess)

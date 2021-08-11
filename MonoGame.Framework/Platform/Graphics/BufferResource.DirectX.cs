@@ -24,10 +24,27 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
+        internal virtual SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
         {
             if (_shaderResourceView == null)
-                _shaderResourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, Buffer);
+            {
+                if (BufferType != BufferType.IndirectDrawBuffer)
+                    _shaderResourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, Buffer);
+                else
+                {
+                    _shaderResourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, Buffer, new SharpDX.Direct3D11.ShaderResourceViewDescription
+                    {
+                        Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.ExtendedBuffer,
+                        Format = SharpDX.DXGI.Format.R32_Typeless,
+                        BufferEx = new SharpDX.Direct3D11.ShaderResourceViewDescription.ExtendedBufferResource
+                        {
+                            FirstElement = 0,
+                            ElementCount = this.ElementCount,
+                            Flags = SharpDX.Direct3D11.ShaderResourceViewExtendedBufferFlags.Raw,
+                        }
+                    });
+                }
+            }
 
             return _shaderResourceView;
         }
@@ -50,13 +67,10 @@ namespace Microsoft.Xna.Framework.Graphics
                         break;
                     case BufferType.VertexBuffer:
                     case BufferType.IndexBuffer:
+                    case BufferType.IndirectDrawBuffer:
                         elementCount = this.ElementCount * this.ElementStride / 4; // for ByteAddressBuffers one element is 4 bytes
                         format = SharpDX.DXGI.Format.R32_Typeless;
                         flags |= SharpDX.Direct3D11.UnorderedAccessViewBufferFlags.Raw;
-                        break;
-                    case BufferType.IndirectDrawBuffer:
-                        elementCount = this.ElementCount;
-                        format = SharpDX.DXGI.Format.R32_UInt;
                         break;
                     default:
                         throw new Exception("invalid buffer type");
@@ -111,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 resourceOptions |= SharpDX.Direct3D11.ResourceOptionFlags.BufferStructured;
             if (BufferType == BufferType.IndirectDrawBuffer)
                 resourceOptions |= SharpDX.Direct3D11.ResourceOptionFlags.DrawIndirectArguments;
-            if ((BufferType == BufferType.VertexBuffer || BufferType == BufferType.IndexBuffer) && ShaderAccess != ShaderAccess.None)
+            if ((BufferType == BufferType.VertexBuffer || BufferType == BufferType.IndexBuffer || BufferType == BufferType.IndirectDrawBuffer) && ShaderAccess != ShaderAccess.None)
                 resourceOptions |= SharpDX.Direct3D11.ResourceOptionFlags.BufferAllowRawViews;
             if (ShaderAccess != ShaderAccess.None)
                 bindFlags |= SharpDX.Direct3D11.BindFlags.ShaderResource;
