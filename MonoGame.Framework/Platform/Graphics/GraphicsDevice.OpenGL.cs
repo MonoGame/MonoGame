@@ -1367,7 +1367,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawIndexedInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
         {
-            throw new Exception();
+            if (!GraphicsCapabilities.SupportsInstancing)
+                throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2 or GLES 3.2. Try upgrading your graphics card drivers.");
+
+            ApplyState(true);
+
+            var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
+            var indexElementType = shortIndices ? DrawElementsType.UnsignedShort : DrawElementsType.UnsignedInt;
+
+            ApplyAttribs(_vertexShader, 0);
+
+            // Set vertex count for tesselation patch
+            var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+            if (primitiveTypeGL == GLPrimitiveType.Patches)
+                SetTesselationPatchVertexCount(primitiveType);
+
+            GL.BindBuffer(BufferTarget.IndirectDrawBuffer, indirectDrawBuffer.buffer);
+            GraphicsExtensions.CheckGLError();
+
+            GL.DrawElementsIndirect(primitiveTypeGL, indexElementType, (IntPtr)alignedByteOffsetForArgs);
+            GraphicsExtensions.CheckGLError();
         }
 
         private void SetTesselationPatchVertexCount(PrimitiveType primitiveType)
