@@ -205,20 +205,4 @@ namespace MonoGame.Effect
             }
         }
     }
-
-    class OpenGLESShaderProfile : OpenGLShaderProfile
-    {
-        protected override bool IsESSL => true;
-
-        public OpenGLESShaderProfile()
-            : base("OpenGLES")
-        {
-        }
-
-        internal override void AddMacros(Dictionary<string, string> macros, Options options)
-        {
-            base.AddMacros(macros, options);
-            macros.Add("ESSL", "1");
-        }
-    }
 }
