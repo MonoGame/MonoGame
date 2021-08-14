@@ -251,7 +251,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var instanceName = reader.ReadString();
 
                 // Create the backing system memory buffer.
-                var sizeInBytes = (int)reader.ReadInt16();
+                var sizeInBytes = (int)reader.ReadInt16 ();
                 var bindingSlot = (int)reader.ReadByte();
 
                 // Read the parameter index values.
