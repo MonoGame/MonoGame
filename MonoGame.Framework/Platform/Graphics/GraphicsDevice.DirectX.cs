@@ -1521,11 +1521,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 GeometrySamplerStates.PlatformSetSamplers(this, _d3dContext.GeometryShader);
             }
 
-            _vertexShaderResources.SetShaderResources(this);
-            _pixelShaderResources.SetShaderResources(this);
-            _hullShaderResources.SetShaderResources(this);
-            _domainShaderResources.SetShaderResources(this);
-            _geometryShaderResources.SetShaderResources(this);
+            _vertexShaderResources.ApplyAllResourcesToDevice(this);
+            _pixelShaderResources.ApplyAllResourcesToDevice(this);
+            _hullShaderResources.ApplyAllResourcesToDevice(this);
+            _domainShaderResources.ApplyAllResourcesToDevice(this);
+            _geometryShaderResources.ApplyAllResourcesToDevice(this);
             _shaderResourcesSetForCompute = false;
         }
 
@@ -1753,7 +1753,7 @@ namespace Microsoft.Xna.Framework.Graphics
             ComputeTextures.PlatformSetTextures(this, _d3dContext.ComputeShader);
             ComputeSamplerStates.PlatformSetSamplers(this, _d3dContext.ComputeShader);
 
-            _computeShaderResources.SetShaderResources(this);
+            _computeShaderResources.ApplyAllResourcesToDevice(this);
         }
 
         private void UnbindWriteableComputeResources()

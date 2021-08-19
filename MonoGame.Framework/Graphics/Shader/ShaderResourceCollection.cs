@@ -78,11 +78,11 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if WEB
-        internal void SetShaderResources(GraphicsDevice device, int shaderProgram)
+        internal void ApplyAllResourcesToDevice(GraphicsDevice device, int shaderProgram)
 #elif OPENGL
-        internal void SetShaderResources(GraphicsDevice device, ShaderProgram shaderProgram)
+        internal void ApplyAllResourcesToDevice(GraphicsDevice device, ShaderProgram shaderProgram)
 #else
-        internal void SetShaderResources(GraphicsDevice device)
+        internal void ApplyAllResourcesToDevice(GraphicsDevice device)
 #endif
         {
             if (_readonlyValid != 0) // If there are no readable resources then skip it.

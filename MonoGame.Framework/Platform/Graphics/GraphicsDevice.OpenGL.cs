@@ -1106,11 +1106,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _domainConstantBuffers.SetConstantBuffers(this, _shaderProgram);
             _geometryConstantBuffers.SetConstantBuffers(this, _shaderProgram);
 
-            _vertexShaderResources.SetShaderResources(this, _shaderProgram);
-            _pixelShaderResources.SetShaderResources(this, _shaderProgram);
-            _hullShaderResources.SetShaderResources(this, _shaderProgram);
-            _domainShaderResources.SetShaderResources(this, _shaderProgram);
-            _geometryShaderResources.SetShaderResources(this, _shaderProgram);
+            _vertexShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
+            _pixelShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
+            _hullShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
+            _domainShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
+            _geometryShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
 
             SamplerStates.PlatformSetSamplers(this, _pixelShader);
 
@@ -1440,7 +1440,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             _computeConstantBuffers.SetConstantBuffers(this, _shaderProgram);
-            _computeShaderResources.SetShaderResources(this, _shaderProgram);
+            _computeShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
 
             ComputeSamplerStates.PlatformSetSamplers(this, _computeShader);
 
