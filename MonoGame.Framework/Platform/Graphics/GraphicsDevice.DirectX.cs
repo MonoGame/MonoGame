@@ -1537,9 +1537,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _vertexShaderResources.ApplyAllResourcesToDevice(this);
             _pixelShaderResources.ApplyAllResourcesToDevice(this);
-            _hullShaderResources.ApplyAllResourcesToDevice(this);
-            _domainShaderResources.ApplyAllResourcesToDevice(this);
-            _geometryShaderResources.ApplyAllResourcesToDevice(this);
+
+            if (_hullShader != null)
+                _hullShaderResources.ApplyAllResourcesToDevice(this);
+            if (_domainShader != null)
+                _domainShaderResources.ApplyAllResourcesToDevice(this);
+            if (_geometryShader != null)
+                _geometryShaderResources.ApplyAllResourcesToDevice(this);
+
             _shaderResourcesSetForCompute = false;
         }
 

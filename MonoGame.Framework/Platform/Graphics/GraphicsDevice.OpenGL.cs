@@ -1112,9 +1112,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _vertexShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
             _pixelShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
-            _hullShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
-            _domainShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
-            _geometryShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
+
+            if (_hullShader != null)
+                _hullShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
+            if (_domainShader != null)
+                _domainShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
+            if (_geometryShader != null)
+                _geometryShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
 
             SamplerStates.PlatformSetSamplers(this, _pixelShader);
 
