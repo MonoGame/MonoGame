@@ -1498,9 +1498,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _vertexConstantBuffers.SetConstantBuffers(this);
             _pixelConstantBuffers.SetConstantBuffers(this);
-            _hullConstantBuffers.SetConstantBuffers(this);
-            _domainConstantBuffers.SetConstantBuffers(this);
-            _geometryConstantBuffers.SetConstantBuffers(this);
+
+            if (_hullShader != null)
+                _hullConstantBuffers.SetConstantBuffers(this);
+            if (_domainShader != null)
+                _domainConstantBuffers.SetConstantBuffers(this);
+            if (_geometryShader != null)
+                _geometryConstantBuffers.SetConstantBuffers(this);
 
             Textures.PlatformSetTextures(this, _d3dContext.PixelShader);
             SamplerStates.PlatformSetSamplers(this, _d3dContext.PixelShader);
@@ -1509,12 +1513,22 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 VertexTextures.PlatformSetTextures(this, _d3dContext.VertexShader);
                 VertexSamplerStates.PlatformSetSamplers(this, _d3dContext.VertexShader);
-                HullTextures.PlatformSetTextures(this, _d3dContext.HullShader);
-                HullSamplerStates.PlatformSetSamplers(this, _d3dContext.HullShader);
-                DomainTextures.PlatformSetTextures(this, _d3dContext.DomainShader);
-                DomainSamplerStates.PlatformSetSamplers(this, _d3dContext.DomainShader);
-                GeometryTextures.PlatformSetTextures(this, _d3dContext.GeometryShader);
-                GeometrySamplerStates.PlatformSetSamplers(this, _d3dContext.GeometryShader);
+
+                if (_hullShader != null)
+                {
+                    HullTextures.PlatformSetTextures(this, _d3dContext.HullShader);
+                    HullSamplerStates.PlatformSetSamplers(this, _d3dContext.HullShader);
+                }
+                if (_domainShader != null)
+                {
+                    DomainTextures.PlatformSetTextures(this, _d3dContext.DomainShader);
+                    DomainSamplerStates.PlatformSetSamplers(this, _d3dContext.DomainShader);
+                }
+                if (_geometryShader != null)
+                {
+                    GeometryTextures.PlatformSetTextures(this, _d3dContext.GeometryShader);
+                    GeometrySamplerStates.PlatformSetSamplers(this, _d3dContext.GeometryShader);
+                }
             }
         }
 

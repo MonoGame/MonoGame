@@ -1100,9 +1100,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _vertexConstantBuffers.SetConstantBuffers(this, _shaderProgram);
             _pixelConstantBuffers.SetConstantBuffers(this, _shaderProgram);
-            _hullConstantBuffers.SetConstantBuffers(this, _shaderProgram);
-            _domainConstantBuffers.SetConstantBuffers(this, _shaderProgram);
-            _geometryConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+
+            if (_hullShader != null)
+                _hullConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+            if (_domainShader != null)
+                _domainConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+            if (_geometryShader != null)
+                _geometryConstantBuffers.SetConstantBuffers(this, _shaderProgram);
 
             SamplerStates.PlatformSetSamplers(this, _pixelShader);
 
