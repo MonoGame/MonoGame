@@ -34,7 +34,6 @@ namespace Microsoft.Xna.Framework.Graphics
     internal struct ShaderResourceInfo
     {
         public string name;
-        public string blockName;
         public int elementSize;
         public int slot;
         public ShaderResourceType type;
@@ -135,7 +134,6 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var b = 0; b < shaderResourceCount; b++)
             {
                 ShaderResources[b].name = reader.ReadString();
-                ShaderResources[b].blockName = reader.ReadString();
                 ShaderResources[b].elementSize = reader.ReadUInt16();
                 ShaderResources[b].slot = reader.ReadByte();
                 ShaderResources[b].type = (ShaderResourceType)reader.ReadByte();

@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _writeableResources = new ResourceInfo[maxWriteableResources];
         }
 
-        public void SetResourceForBindingSlot(ShaderResource resource, string blockName, int index, bool writeAccess)
+        public void SetResourceForBindingSlot(ShaderResource resource, int index, bool writeAccess)
         {
             if (writeAccess && _stage != ShaderStage.Compute)
                 throw new ArgumentException("Only a compute shader can use RWStructuredBuffer currently. Uae a regular StructuredBuffer instead and assign it the same buffer.");

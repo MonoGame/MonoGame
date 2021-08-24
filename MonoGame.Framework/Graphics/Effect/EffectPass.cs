@@ -214,7 +214,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         + "16 byte alignment is generally most efficient" );
                 }
 #endif
-                device.SetShaderResource(shader.Stage, sr.slot, resource, sr.blockName, sr.writeAccess);
+                device.SetShaderResource(shader.Stage, sr.slot, resource, sr.writeAccess);
             }
         }
     }

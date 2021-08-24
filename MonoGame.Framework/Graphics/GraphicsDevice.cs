@@ -1200,27 +1200,27 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal void SetShaderResource(ShaderStage stage, int slot, ShaderResource resource, string blockName, bool writeAcess)
+        internal void SetShaderResource(ShaderStage stage, int slot, ShaderResource resource, bool writeAcess)
         {
             switch (stage)
             {
                 case ShaderStage.Vertex:
-                    _vertexShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
+                    _vertexShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
                     break;
                 case ShaderStage.Pixel:
-                    _pixelShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
+                    _pixelShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
                     break;
                 case ShaderStage.Hull:
-                    _hullShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
+                    _hullShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
                     break;
                 case ShaderStage.Domain:
-                    _domainShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
+                    _domainShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
                     break;
                 case ShaderStage.Geometry:
-                    _geometryShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
+                    _geometryShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
                     break;
                 case ShaderStage.Compute:
-                    _computeShaderResources.SetResourceForBindingSlot(resource, blockName, slot, writeAcess);
+                    _computeShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
                     break;
                 default:
                     throw new ArgumentException();

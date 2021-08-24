@@ -54,7 +54,7 @@ namespace MonoGame.Effect
         private static extern int GetStorageBufferCount([In] ref ResultDesc result);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void GetStorageBuffer([In] ref ResultDesc result, int bufferIndex, byte[] blockName, byte[] instanceName, int maxNameLength, out int byteSize, out int slot, out bool readOnly);
+        private static extern void GetStorageBuffer([In] ref ResultDesc result, int bufferIndex, byte[] name, int maxNameLength, out int byteSize, out int slot, out bool readOnly);
 
         [DllImport("ShaderConductorWrapper.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int GetStorageImageCount([In] ref ResultDesc result);
@@ -225,8 +225,7 @@ namespace MonoGame.Effect
 
         public struct StorageBuffer
         {
-            public string blockName;
-            public string instanceName;
+            public string name;
             public int byteSize;
             public int slot; // register binding
             public bool readOnly;
@@ -353,20 +352,18 @@ namespace MonoGame.Effect
         public static List<StorageBuffer> GetStorageBuffers(ResultDesc result)
         {
             var buffers = new List<StorageBuffer>();
-
-            byte[] blockNameBuffer = new byte[MaxNameLength];
-            byte[] instanceNameBuffer = new byte[MaxNameLength];
-
             int bufferCount = GetStorageBufferCount(ref result);
+
+            byte[] nameBuffer = new byte[MaxNameLength];
+       
 
             for (int i = 0; i < bufferCount; i++)
             {
-                GetStorageBuffer(ref result, i, blockNameBuffer, instanceNameBuffer, MaxNameLength, out int byteSize, out int slot, out bool readOnly);
+                GetStorageBuffer(ref result, i, nameBuffer, MaxNameLength, out int byteSize, out int slot, out bool readOnly);
 
                 var buffer = new StorageBuffer
                 {
-                    blockName = ByteBufferToString(blockNameBuffer),
-                    instanceName = ByteBufferToString(instanceNameBuffer),
+                    name = ByteBufferToString(nameBuffer),
                     byteSize = byteSize,
                     slot = slot,
                     readOnly = readOnly,
@@ -424,6 +421,6 @@ namespace MonoGame.Effect
 
         const int MaxNameLength = 1024;
 
-        private static Regex usageRegex = new Regex(@"in_var_(?<usage>[A-Za-z]+)(?<index>[0-9]*)", RegexOptions.Compiled);
+        private static Regex usageRegex = new Regex(@"in.var.(?<usage>[A-Za-z]+)(?<index>[0-9]*)", RegexOptions.Compiled);
     }
 }
