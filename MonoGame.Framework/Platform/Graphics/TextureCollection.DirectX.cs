@@ -21,7 +21,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 ClearTargets(targets, device._d3dContext.PixelShader);
         }
 
-
         private void ClearTargets(RenderTargetBinding[] targets, SharpDX.Direct3D11.CommonShaderStage shaderStage)
         {
             // NOTE: We make the assumption here that the caller has
