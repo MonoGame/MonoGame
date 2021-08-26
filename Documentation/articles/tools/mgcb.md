@@ -82,13 +82,12 @@ Set the target platform for this build. It must be a member of the [TargetPlatfo
 * PlayStation4
 * WindowsPhone8
 * RaspberryPi
-* PSVita
 * XboxOne
 * Switch
 
 If not set, it will default to Windows.
 
-NOTE: PlayStation 4, Xbox One, PS Vita, and Switch support is only available to licensed console developers.
+NOTE: PlayStation 4, Xbox One, and Switch support is only available to licensed console developers.
 
 ### Target Graphics Profile
 

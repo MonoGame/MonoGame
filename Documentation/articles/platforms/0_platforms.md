@@ -8,7 +8,6 @@ MonoGame supports the following systems:
 - Android
 - iOS
 - PlayStation 4
-- PlayStation Vita
 - Xbox One
 - Nintendo Switch
 - Google Stadia
@@ -104,3 +103,13 @@ A project template with a [shared project](https://docs.microsoft.com/en-us/xama
 **Template ID**: mgpipeline
 
 A project template for writing custom logic for handling content and building it into XNB files.
+
+## Deprecated platforms
+
+### PS Vita
+
+MonoGame used to support targeting the PS Vita through the official SDK. The platform has been deprecated since Sony has ended all support for the console and closed new game/patch applications.
+
+For reference, you can visit this [GitHub tag](https://github.com/MonoGame/MonoGame/tree/last_psvita) which points to the latest supported branch. However, the public repository only contains links and references. The actual implementation is private and limited to Sony's registered developers.
+
+Please note that this deprecated support is not an homebrew support and can't be used for that purpose per Sony's term of use of the official SDK. It can't be made public either.
