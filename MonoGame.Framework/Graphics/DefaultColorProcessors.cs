@@ -6,11 +6,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private static byte ApplyAlpha(byte color, byte alpha)
         {
-            var fc = color / 255.0f;
-            var fa = alpha / 255.0f;
-            var fr = (int)(255.0f * fc * fa);
-
-            return (byte)MathHelper.Clamp(fr, byte.MinValue, byte.MaxValue);
+            return (byte)MathHelper.Clamp(color * alpha / 255, byte.MinValue, byte.MaxValue);
         }
 
         /// <summary>
