@@ -33,9 +33,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 for (var i = 0; i < data.Length; i += 4, ptr += 4)
                 {
                     var falpha = ptr[3] / 255.0f;
-                    ptr[i] = (byte)(ptr[0] * falpha);
-                    ptr[i + 1] = (byte)(ptr[1] * falpha);
-                    ptr[i + 2] = (byte)(ptr[2] * falpha);
+                    ptr[0] = (byte)(ptr[0] * falpha);
+                    ptr[1] = (byte)(ptr[1] * falpha);
+                    ptr[2] = (byte)(ptr[2] * falpha);
                 }
             }
         };
