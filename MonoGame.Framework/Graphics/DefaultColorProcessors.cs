@@ -32,10 +32,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 byte* ptr = b;
                 for (var i = 0; i < data.Length; i += 4, ptr += 4)
                 {
-                    var falpha = ptr[i + 3] / 255.0f;
-                    ptr[i] = (byte)(ptr[i] * falpha);
-                    ptr[i + 1] = (byte)(ptr[i + 1] * falpha);
-                    ptr[i + 2] = (byte)(ptr[i + 2] * falpha);
+                    var falpha = ptr[3] / 255.0f;
+                    ptr[i] = (byte)(ptr[0] * falpha);
+                    ptr[i + 1] = (byte)(ptr[1] * falpha);
+                    ptr[i + 2] = (byte)(ptr[2] * falpha);
                 }
             }
         };
