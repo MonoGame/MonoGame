@@ -196,8 +196,12 @@ namespace Microsoft.Xna.Framework.Graphics
         internal event EventHandler<PresentationEventArgs> PresentationChanged;
 
         private int _maxVertexBufferSlots;
+
         internal int MaxTextureSlots;
         internal int MaxVertexTextureSlots;
+        internal int MaxHullTextureSlots;
+        internal int MaxDomainTextureSlots;
+        internal int MaxGeometryTextureSlots;
 
         public bool IsDisposed
         {
@@ -353,25 +357,21 @@ namespace Microsoft.Xna.Framework.Graphics
             HullTextures = Textures;
             DomainTextures = Textures;
             GeometryTextures = Textures;
-            Textures = Textures;
 
             VertexSamplerStates = SamplerStates;
             HullSamplerStates = SamplerStates;
             DomainSamplerStates = SamplerStates;
             GeometrySamplerStates = SamplerStates;
-            SamplerStates = SamplerStates;
 #else
             VertexTextures = new TextureCollection(this, MaxVertexTextureSlots);
-            HullTextures = new TextureCollection(this, MaxVertexTextureSlots);
-            DomainTextures = new TextureCollection(this, MaxVertexTextureSlots);
-            GeometryTextures = new TextureCollection(this, MaxVertexTextureSlots);
-            Textures = new TextureCollection(this, MaxTextureSlots);
+            HullTextures = new TextureCollection(this, MaxHullTextureSlots);
+            DomainTextures = new TextureCollection(this, MaxDomainTextureSlots);
+            GeometryTextures = new TextureCollection(this, MaxGeometryTextureSlots);
 
             VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots);
-            HullSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots);
-            DomainSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots);
-            GeometrySamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots);
-            SamplerStates = new SamplerStateCollection(this, MaxTextureSlots);
+            HullSamplerStates = new SamplerStateCollection(this, MaxHullTextureSlots);
+            DomainSamplerStates = new SamplerStateCollection(this, MaxDomainTextureSlots);
+            GeometrySamplerStates = new SamplerStateCollection(this, MaxGeometryTextureSlots);
 #endif
 
             _blendStateAdditive = BlendState.Additive.Clone();

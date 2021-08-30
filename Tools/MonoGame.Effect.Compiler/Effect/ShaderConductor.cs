@@ -345,6 +345,6 @@ namespace MonoGame.Effect
 
         const int MaxNameLength = 1024;
 
-        private static Regex usageRegex = new Regex(@"in_var_(?<usage>[A-Za-z]+)(?<index>[0-9]*)", RegexOptions.Compiled);
+        private static Regex usageRegex = new Regex(@"in.var.(?<usage>[A-Za-z]+)(?<index>[0-9]*)", RegexOptions.Compiled);
     }
 }

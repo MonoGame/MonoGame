@@ -272,7 +272,13 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             GL.GetInteger(GetPName.MaxVertexTextureImageUnits, out MaxVertexTextureSlots);
-            GraphicsExtensions.CheckGLError();           
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxTessControlTextureImageUnits, out MaxHullTextureSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxTessEvaluationTextureImageUnits, out MaxDomainTextureSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxGeometryTextureImageUnits, out MaxGeometryTextureSlots);
+            GraphicsExtensions.CheckGLError(); 
 
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
@@ -1086,13 +1092,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (_vertexShaderDirty)
                         _graphicsMetrics._vertexShaderCount++;
                     if (_pixelShaderDirty)
-                            _graphicsMetrics._pixelShaderCount++;
+                        _graphicsMetrics._pixelShaderCount++;
                     if (_hullShaderDirty)
-                            _graphicsMetrics._hullShaderCount++;
+                        _graphicsMetrics._hullShaderCount++;
                     if (_domainShaderDirty)
-                            _graphicsMetrics._domainShaderCount++;
+                        _graphicsMetrics._domainShaderCount++;
                     if (_geometryShaderDirty)
-                            _graphicsMetrics._geometryShaderCount++;
+                        _graphicsMetrics._geometryShaderCount++;
                 }
 
                 _vertexShaderDirty = _pixelShaderDirty = _hullShaderDirty = _domainShaderDirty = _geometryShaderDirty = false;
@@ -1110,17 +1116,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             SamplerStates.PlatformSetSamplers(this, _pixelShader);
 
-            if (GraphicsCapabilities.SupportsVertexTextures)
-            {
-                if (_vertexShader != null)
-                    VertexSamplerStates.PlatformSetSamplers(this, _vertexShader);
-                if (_hullShader != null)
-                    HullSamplerStates.PlatformSetSamplers(this, _hullShader);
-                if (_domainShader != null)
-                    DomainSamplerStates.PlatformSetSamplers(this, _domainShader);
-                if (_geometryShader != null)
-                    GeometrySamplerStates.PlatformSetSamplers(this, _geometryShader);
-            }
+            if (GraphicsCapabilities.SupportsVertexTextures && _vertexShader != null)
+                VertexSamplerStates.PlatformSetSamplers(this, _vertexShader);
+            if (GraphicsCapabilities.SupportsHullTextures && _hullShader != null)
+                HullSamplerStates.PlatformSetSamplers(this, _hullShader);
+            if (GraphicsCapabilities.SupportsDomainTextures && _domainShader != null)
+                DomainSamplerStates.PlatformSetSamplers(this, _domainShader);
+            if (GraphicsCapabilities.SupportsGeometryTextures && _geometryShader != null)
+                GeometrySamplerStates.PlatformSetSamplers(this, _geometryShader);
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
