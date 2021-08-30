@@ -274,7 +274,15 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             GL.GetInteger(GetPName.MaxVertexTextureImageUnits, out MaxVertexTextureSlots);
-            GraphicsExtensions.CheckGLError();           
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxTessControlTextureImageUnits, out MaxHullTextureSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxTessEvaluationTextureImageUnits, out MaxDomainTextureSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxGeometryTextureImageUnits, out MaxGeometryTextureSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxComputeTextureImageUnits, out MaxComputeTextureSlots);
+            GraphicsExtensions.CheckGLError();
 
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
@@ -1122,17 +1130,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             SamplerStates.PlatformSetSamplers(this, _pixelShader);
 
-            if (GraphicsCapabilities.SupportsVertexTextures)
-            {
-                if (_vertexShader != null)
-                    VertexSamplerStates.PlatformSetSamplers(this, _vertexShader);
-                if (_hullShader != null)
-                    HullSamplerStates.PlatformSetSamplers(this, _hullShader);
-                if (_domainShader != null)
-                    DomainSamplerStates.PlatformSetSamplers(this, _domainShader);
-                if (_geometryShader != null)
-                    GeometrySamplerStates.PlatformSetSamplers(this, _geometryShader);
-            }
+            if (GraphicsCapabilities.SupportsVertexTextures && _vertexShader != null)
+                VertexSamplerStates.PlatformSetSamplers(this, _vertexShader);
+            if (GraphicsCapabilities.SupportsHullTextures && _hullShader != null)
+                HullSamplerStates.PlatformSetSamplers(this, _hullShader);
+            if (GraphicsCapabilities.SupportsDomainTextures && _domainShader != null)
+                DomainSamplerStates.PlatformSetSamplers(this, _domainShader);
+            if (GraphicsCapabilities.SupportsGeometryTextures && _geometryShader != null)
+                GeometrySamplerStates.PlatformSetSamplers(this, _geometryShader);
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
@@ -1351,7 +1356,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GraphicsExtensions.CheckGLError();
         }
-
+        
         private void PlatformDrawInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
         {
             if (!GraphicsCapabilities.SupportsInstancing)
@@ -1450,7 +1455,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _computeConstantBuffers.SetConstantBuffers(this, _shaderProgram);
             _computeShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
 
-            ComputeSamplerStates.PlatformSetSamplers(this, _computeShader);
+            if (GraphicsCapabilities.SupportsComputeTextures)
+                ComputeSamplerStates.PlatformSetSamplers(this, _computeShader);
 
             unchecked
             {

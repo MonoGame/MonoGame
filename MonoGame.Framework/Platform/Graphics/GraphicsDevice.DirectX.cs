@@ -108,6 +108,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             MaxTextureSlots = 16;
             MaxVertexTextureSlots = 16;
+            MaxHullTextureSlots = 16;
+            MaxDomainTextureSlots = 16;
+            MaxGeometryTextureSlots = 16;
+            MaxComputeTextureSlots = 16;
 
 #if WINDOWS_UAP
 			CreateDeviceIndependentResources();
@@ -115,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			Dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
 #endif
 #if WINDOWS
-            CreateDeviceResources();
+        CreateDeviceResources();
 #endif
 
             _maxVertexBufferSlots = _d3dDevice.FeatureLevel >= FeatureLevel.Level_11_0 ? SharpDX.Direct3D11.InputAssemblerStage.VertexInputResourceSlotCount : 16;
@@ -1176,13 +1180,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 Textures.ClearTargets(_currentRenderTargetBindings, _d3dContext.PixelShader);
 
                 if (GraphicsCapabilities.SupportsVertexTextures)
-                {
                     VertexTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.VertexShader);
+                if (GraphicsCapabilities.SupportsHullTextures)
                     HullTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.HullShader);
+                if (GraphicsCapabilities.SupportsDomainTextures)
                     DomainTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.DomainShader);
+                if (GraphicsCapabilities.SupportsGeometryTextures)
                     GeometryTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.GeometryShader);
+                if (GraphicsCapabilities.SupportsComputeTextures)
                     ComputeTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.ComputeShader);
-                }
             }
 
             for (var i = 0; i < _currentRenderTargetCount; i++)
@@ -1517,22 +1523,24 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 VertexTextures.PlatformSetTextures(this, _d3dContext.VertexShader);
                 VertexSamplerStates.PlatformSetSamplers(this, _d3dContext.VertexShader);
+            }
 
-                if (_hullShader != null)
-                {
-                    HullTextures.PlatformSetTextures(this, _d3dContext.HullShader);
-                    HullSamplerStates.PlatformSetSamplers(this, _d3dContext.HullShader);
-                }
-                if (_domainShader != null)
-                {
-                    DomainTextures.PlatformSetTextures(this, _d3dContext.DomainShader);
-                    DomainSamplerStates.PlatformSetSamplers(this, _d3dContext.DomainShader);
-                }
-                if (_geometryShader != null)
-                {
-                    GeometryTextures.PlatformSetTextures(this, _d3dContext.GeometryShader);
-                    GeometrySamplerStates.PlatformSetSamplers(this, _d3dContext.GeometryShader);
-                }
+            if (GraphicsCapabilities.SupportsHullTextures && _hullShader != null)
+            {
+                HullTextures.PlatformSetTextures(this, _d3dContext.HullShader);
+                HullSamplerStates.PlatformSetSamplers(this, _d3dContext.HullShader);
+            }
+
+            if (GraphicsCapabilities.SupportsDomainTextures && _domainShader != null)
+            {
+                DomainTextures.PlatformSetTextures(this, _d3dContext.DomainShader);
+                DomainSamplerStates.PlatformSetSamplers(this, _d3dContext.DomainShader);
+            }
+
+            if (GraphicsCapabilities.SupportsGeometryTextures && _geometryShader != null)
+            {
+                GeometryTextures.PlatformSetTextures(this, _d3dContext.GeometryShader);
+                GeometrySamplerStates.PlatformSetSamplers(this, _d3dContext.GeometryShader);
             }
 
             _vertexShaderResources.ApplyAllResourcesToDevice(this);
@@ -1769,8 +1777,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _computeConstantBuffers.SetConstantBuffers(this);
 
-            ComputeTextures.PlatformSetTextures(this, _d3dContext.ComputeShader);
-            ComputeSamplerStates.PlatformSetSamplers(this, _d3dContext.ComputeShader);
+            if (GraphicsCapabilities.SupportsComputeTextures)
+            {
+                ComputeTextures.PlatformSetTextures(this, _d3dContext.ComputeShader);
+                ComputeSamplerStates.PlatformSetSamplers(this, _d3dContext.ComputeShader);
+            }
 
             _computeShaderResources.ApplyAllResourcesToDevice(this);
         }
