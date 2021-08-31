@@ -4,15 +4,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public unsafe static class DefaultColorProcessors
     {
-        private static byte ApplyAlpha(byte color, byte alpha)
-        {
-            var fc = color / 255.0f;
-            var fa = alpha / 255.0f;
-            var fr = (int)(255.0f * fc * fa);
-
-            return (byte)MathHelper.Clamp(fr, byte.MinValue, byte.MaxValue);
-        }
-
         /// <summary>
         /// Zeroes RGB of pixels having zero alpha(standard XNA behavior)
         /// </summary>
@@ -41,10 +32,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 byte* ptr = b;
                 for (var i = 0; i < data.Length; i += 4, ptr += 4)
                 {
-                    var a = ptr[3];
-                    ptr[0] = ApplyAlpha(ptr[0], a);
-                    ptr[1] = ApplyAlpha(ptr[1], a);
-                    ptr[2] = ApplyAlpha(ptr[2], a);
+                    var falpha = ptr[3] / 255.0f;
+                    ptr[0] = (byte)(ptr[0] * falpha);
+                    ptr[1] = (byte)(ptr[1] * falpha);
+                    ptr[2] = (byte)(ptr[2] * falpha);
                 }
             }
         };
