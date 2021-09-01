@@ -113,6 +113,15 @@ namespace Microsoft.Xna.Framework.Graphics
             MaxGeometryTextureSlots = 16;
             MaxComputeTextureSlots = 16;
 
+            // DX 11 supports 128 register slots for all stages, and 8 UAV slots
+            MaxPixelShaderResourceSlots = 128;
+            MaxVertexShaderResourceSlots = 128;
+            MaxHullShaderResourceSlots = 128;
+            MaxDomainShaderResourceSlots = 128;
+            MaxGeometryShaderResourceSlots = 128;
+            MaxComputeShaderResourceSlots = 128;
+            MaxComputeShaderUAVSlots = 8;
+
 #if WINDOWS_UAP
 			CreateDeviceIndependentResources();
 			CreateDeviceResources();

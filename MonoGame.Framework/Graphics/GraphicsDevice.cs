@@ -176,12 +176,12 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly ConstantBufferCollection _geometryConstantBuffers = new ConstantBufferCollection(ShaderStage.Geometry, 16);
         private readonly ConstantBufferCollection _computeConstantBuffers = new ConstantBufferCollection(ShaderStage.Compute, 16);
 
-        private readonly ShaderResourceCollection _vertexShaderResources = new ShaderResourceCollection(ShaderStage.Vertex, 16, 8);
-        private readonly ShaderResourceCollection _pixelShaderResources = new ShaderResourceCollection(ShaderStage.Pixel, 16, 8);
-        private readonly ShaderResourceCollection _hullShaderResources = new ShaderResourceCollection(ShaderStage.Hull, 16, 8);
-        private readonly ShaderResourceCollection _domainShaderResources = new ShaderResourceCollection(ShaderStage.Domain, 16, 8);
-        private readonly ShaderResourceCollection _geometryShaderResources = new ShaderResourceCollection(ShaderStage.Geometry, 16, 8);
-        private readonly ShaderResourceCollection _computeShaderResources = new ShaderResourceCollection(ShaderStage.Compute, 16, 8);
+        private ShaderResourceCollection _vertexShaderResources;
+        private ShaderResourceCollection _pixelShaderResources;
+        private ShaderResourceCollection _hullShaderResources;
+        private ShaderResourceCollection _domainShaderResources;
+        private ShaderResourceCollection _geometryShaderResources;
+        private ShaderResourceCollection _computeShaderResources;
 
         /// <summary>
         /// The cache of effects from unique byte streams.
@@ -214,6 +214,16 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int MaxDomainTextureSlots;
         internal int MaxGeometryTextureSlots;
         internal int MaxComputeTextureSlots;
+
+        public const int MaxResourceSlotsPerShaderStage = 128; // this number is used in MGFXC to shift u-register bindings (see ShaderData.conductor.cs)
+
+        internal int MaxPixelShaderResourceSlots;
+        internal int MaxVertexShaderResourceSlots;
+        internal int MaxHullShaderResourceSlots;
+        internal int MaxDomainShaderResourceSlots;
+        internal int MaxGeometryShaderResourceSlots;
+        internal int MaxComputeShaderResourceSlots;
+        internal int MaxComputeShaderUAVSlots;
 
         public bool IsDisposed
         {
@@ -389,6 +399,13 @@ namespace Microsoft.Xna.Framework.Graphics
             GeometrySamplerStates = new SamplerStateCollection(this, MaxGeometryTextureSlots);
             ComputeSamplerStates = new SamplerStateCollection(this, MaxComputeTextureSlots);
 #endif
+
+            _vertexShaderResources = new ShaderResourceCollection(ShaderStage.Vertex, MaxVertexShaderResourceSlots, 0);
+            _pixelShaderResources = new ShaderResourceCollection(ShaderStage.Pixel, MaxPixelShaderResourceSlots, 0);
+            _hullShaderResources = new ShaderResourceCollection(ShaderStage.Hull, MaxHullShaderResourceSlots, 0);
+            _domainShaderResources = new ShaderResourceCollection(ShaderStage.Domain, MaxDomainShaderResourceSlots, 0);
+            _geometryShaderResources = new ShaderResourceCollection(ShaderStage.Geometry, MaxGeometryShaderResourceSlots, 0);
+            _computeShaderResources = new ShaderResourceCollection(ShaderStage.Compute, MaxComputeShaderResourceSlots, MaxComputeShaderUAVSlots);
 
             _blendStateAdditive = BlendState.Additive.Clone();
             _blendStateAlphaBlend = BlendState.AlphaBlend.Clone();

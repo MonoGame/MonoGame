@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // OpenGL doesn't separate register types like this. If a shader resource is assigned to register u0, and another resource is assigned to register t0,
             // things are fine in DX, but in GL we have a binding slot conflict. To resolve this u-registers have been shifted by 16, if set explicitly (see ShaderConductor shiftAllUABuffersBindings option in MGFXC).
             // Unshift those binding slots now, to avoid an array index overflow.
-            resources[index % 16] = new ResourceInfo
+            resources[index % GraphicsDevice.MaxResourceSlotsPerShaderStage] = new ResourceInfo
             {
                 resource = resource,
                 bindingSlot = index,

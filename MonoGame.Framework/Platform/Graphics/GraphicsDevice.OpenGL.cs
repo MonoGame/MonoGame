@@ -284,6 +284,29 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger(GetPName.MaxComputeTextureImageUnits, out MaxComputeTextureSlots);
             GraphicsExtensions.CheckGLError();
 
+            GL.GetInteger(GetPName.MaxFragmentShaderStorageBlocks, out MaxPixelShaderResourceSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxVertexShaderStorageBlocks, out MaxVertexShaderResourceSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxTessControlShaderStorageBlocks, out MaxHullShaderResourceSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxTessEvaluationShaderStorageBlocks, out MaxDomainShaderResourceSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxGeometryShaderStorageBlocks, out MaxGeometryShaderResourceSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxComputeShaderStorageBlocks, out MaxComputeShaderResourceSlots);
+            GraphicsExtensions.CheckGLError();
+
+            // limit to our maximum allowed number of resource slots
+            MaxPixelShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxPixelShaderResourceSlots);
+            MaxVertexShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxVertexShaderResourceSlots);
+            MaxHullShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxHullShaderResourceSlots);
+            MaxDomainShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxDomainShaderResourceSlots);
+            MaxGeometryShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxGeometryShaderResourceSlots);
+            MaxComputeShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxComputeShaderResourceSlots);
+
+            MaxComputeShaderUAVSlots = MaxComputeShaderResourceSlots;
+
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
