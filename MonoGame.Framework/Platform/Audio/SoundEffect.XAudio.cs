@@ -196,7 +196,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 duration = TimeSpan.FromSeconds((float)loopLength / sampleRate);
 
-                CreateBuffers(  new WaveFormatAdpcm(sampleRate, channels, blockAlignment),
+                CreateBuffers(  new WaveFormatAdpcm(sampleRate, channels, (blockAlignment + 22) * channels),
                                 ToDataStream(0, buffer, buffer.Length),
                                 loopStart,
                                 loopLength);
