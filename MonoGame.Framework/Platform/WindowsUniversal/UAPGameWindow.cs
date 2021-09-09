@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
@@ -272,7 +273,16 @@ namespace Microsoft.Xna.Framework
                 _viewBounds.Height == height)
                 return;
 
-            var viewSize = new Windows.Foundation.Size(width / _dinfo.RawPixelsPerViewPixel, height / _dinfo.RawPixelsPerViewPixel);
+            double rawPixelsPerViewPixel = 1d;
+            if (CoreWindow.GetForCurrentThread() != null)
+                rawPixelsPerViewPixel = _dinfo.RawPixelsPerViewPixel;
+            else
+                Task.Run(async () =>
+                {
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                        CoreDispatcherPriority.Normal, () => { rawPixelsPerViewPixel = _dinfo.RawPixelsPerViewPixel; });
+                }).Wait();
+            var viewSize = new Windows.Foundation.Size(width / rawPixelsPerViewPixel, height / rawPixelsPerViewPixel);
 
             //_appView.SetPreferredMinSize(viewSize);
             if (!_appView.TryResizeView(viewSize))
