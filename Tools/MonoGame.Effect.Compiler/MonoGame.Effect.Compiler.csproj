@@ -11,6 +11,7 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgfxc</AssemblyName>
     <UseAppHost>true</UseAppHost>
+    <RollForward>Major</RollForward>
   </PropertyGroup>
   
   <ItemGroup>
