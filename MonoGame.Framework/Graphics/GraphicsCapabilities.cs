@@ -80,6 +80,9 @@ namespace Microsoft.Xna.Framework.Graphics
         internal bool SupportsDepthClamp { get; private set; }
 
         internal bool SupportsVertexTextures { get; private set; }
+        internal bool SupportsHullTextures { get; private set; }
+        internal bool SupportsDomainTextures { get; private set; }
+        internal bool SupportsGeometryTextures { get; private set; }
 
         /// <summary>
         /// True, if the underlying platform supports floating point textures. 

@@ -137,6 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private Vector4 _lastClearColor = Vector4.Zero;
         private float _lastClearDepth = 1.0f;
         private int _lastClearStencil = 0;
+        private int _lastPatchVertexCount = -1;
 
         // Get a hashed value based on the currently bound shaders
         // throws an exception if no shaders are bound
@@ -144,13 +145,23 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                if (_vertexShader == null && _pixelShader == null)
+                if (_vertexShader == null && _pixelShader == null && _hullShader == null && _domainShader == null && _geometryShader == null)
                     throw new InvalidOperationException("There is no shader bound!");
-                if (_vertexShader == null)
-                    return _pixelShader.HashKey;
-                if (_pixelShader == null)
-                    return _vertexShader.HashKey;
-                return _vertexShader.HashKey ^ _pixelShader.HashKey;
+
+                int hash = 0;
+
+                if (_vertexShader != null)
+                    hash ^= _vertexShader.HashKey;
+                if (_pixelShader != null)
+                    hash ^= _pixelShader.HashKey;
+                if (_hullShader != null)
+                    hash ^= _hullShader.HashKey;
+                if (_domainShader != null)
+                    hash ^= _domainShader.HashKey;
+                if (_geometryShader != null)
+                    hash ^= _geometryShader.HashKey;
+
+                return hash;
             }
         }
 
@@ -259,6 +270,15 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
+
+            GL.GetInteger(GetPName.MaxVertexTextureImageUnits, out MaxVertexTextureSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxTessControlTextureImageUnits, out MaxHullTextureSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxTessEvaluationTextureImageUnits, out MaxDomainTextureSlots);
+            GraphicsExtensions.CheckGLError();
+            GL.GetInteger(GetPName.MaxGeometryTextureImageUnits, out MaxGeometryTextureSlots);
+            GraphicsExtensions.CheckGLError(); 
 
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
@@ -872,8 +892,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             switch (primitiveType)
             {
-                case PrimitiveType.PointList:
-                    return GLPrimitiveType.Points;
                 case PrimitiveType.LineList:
                     return GLPrimitiveType.Lines;
                 case PrimitiveType.LineStrip:
@@ -882,6 +900,49 @@ namespace Microsoft.Xna.Framework.Graphics
                     return GLPrimitiveType.Triangles;
                 case PrimitiveType.TriangleStrip:
                     return GLPrimitiveType.TriangleStrip;
+                case PrimitiveType.PointList:
+                    return GLPrimitiveType.Points;
+                case PrimitiveType.LineListWithAdjacency:
+                    return GLPrimitiveType.LinesAdjacency;
+                case PrimitiveType.LineStripWithAdjacency:
+                    return GLPrimitiveType.LineStripAdjacency;
+                case PrimitiveType.TriangleListWithAdjacency:
+                    return GLPrimitiveType.TrianglesAdjacency;
+                case PrimitiveType.TriangleStripWithAdjacency:
+                    return GLPrimitiveType.TriangleStripAdjacency;
+                case PrimitiveType.PatchListWith1ControlPoints:
+                case PrimitiveType.PatchListWith2ControlPoints:
+                case PrimitiveType.PatchListWith3ControlPoints:
+                case PrimitiveType.PatchListWith4ControlPoints:
+                case PrimitiveType.PatchListWith5ControlPoints:
+                case PrimitiveType.PatchListWith6ControlPoints:
+                case PrimitiveType.PatchListWith7ControlPoints:
+                case PrimitiveType.PatchListWith8ControlPoints:
+                case PrimitiveType.PatchListWith9ControlPoints:
+                case PrimitiveType.PatchListWith10ControlPoints:
+                case PrimitiveType.PatchListWith11ControlPoints:
+                case PrimitiveType.PatchListWith12ControlPoints:
+                case PrimitiveType.PatchListWith13ControlPoints:
+                case PrimitiveType.PatchListWith14ControlPoints:
+                case PrimitiveType.PatchListWith15ControlPoints:
+                case PrimitiveType.PatchListWith16ControlPoints:
+                case PrimitiveType.PatchListWith17ControlPoints:
+                case PrimitiveType.PatchListWith18ControlPoints:
+                case PrimitiveType.PatchListWith19ControlPoints:
+                case PrimitiveType.PatchListWith20ControlPoints:
+                case PrimitiveType.PatchListWith21ControlPoints:
+                case PrimitiveType.PatchListWith22ControlPoints:
+                case PrimitiveType.PatchListWith23ControlPoints:
+                case PrimitiveType.PatchListWith24ControlPoints:
+                case PrimitiveType.PatchListWith25ControlPoints:
+                case PrimitiveType.PatchListWith26ControlPoints:
+                case PrimitiveType.PatchListWith27ControlPoints:
+                case PrimitiveType.PatchListWith28ControlPoints:
+                case PrimitiveType.PatchListWith29ControlPoints:
+                case PrimitiveType.PatchListWith30ControlPoints:
+                case PrimitiveType.PatchListWith31ControlPoints:
+                case PrimitiveType.PatchListWith32ControlPoints:
+                    return GLPrimitiveType.Patches;
             }
 
             throw new ArgumentException();
@@ -893,7 +954,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private unsafe void ActivateShaderProgram()
         {
             // Lookup the shader program.
-            var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader);
+            var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader, HullShader, DomainShader, GeometryShader);
             if (shaderProgram.Program == -1)
                 return;
             // Set the new program if it has changed.
@@ -1017,35 +1078,52 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("A vertex shader must be set!");
             if (_pixelShader == null)
                 throw new InvalidOperationException("A pixel shader must be set!");
+            if (_hullShader != null && _domainShader == null)
+                throw new InvalidOperationException("If a hull shader is set a domain shader must also be set!");
+            if (_domainShader != null && _hullShader == null)
+                throw new InvalidOperationException("If a domain shader is set a hull shader must also be set!");
 
-            if (_vertexShaderDirty || _pixelShaderDirty)
+            if (_vertexShaderDirty || _pixelShaderDirty || _hullShaderDirty || _domainShaderDirty || _geometryShaderDirty)
             {
                 ActivateShaderProgram();
 
-                if (_vertexShaderDirty)
+                unchecked
                 {
-                    unchecked
-                    {
+                    if (_vertexShaderDirty)
                         _graphicsMetrics._vertexShaderCount++;
-                    }
-                }
-
-                if (_pixelShaderDirty)
-                {
-                    unchecked
-                    {
+                    if (_pixelShaderDirty)
                         _graphicsMetrics._pixelShaderCount++;
-                    }
+                    if (_hullShaderDirty)
+                        _graphicsMetrics._hullShaderCount++;
+                    if (_domainShaderDirty)
+                        _graphicsMetrics._domainShaderCount++;
+                    if (_geometryShaderDirty)
+                        _graphicsMetrics._geometryShaderCount++;
                 }
 
-                _vertexShaderDirty = _pixelShaderDirty = false;
+                _vertexShaderDirty = _pixelShaderDirty = _hullShaderDirty = _domainShaderDirty = _geometryShaderDirty = false;
             }
 
             _vertexConstantBuffers.SetConstantBuffers(this, _shaderProgram);
             _pixelConstantBuffers.SetConstantBuffers(this, _shaderProgram);
 
-            Textures.SetTextures(this);
-            SamplerStates.PlatformSetSamplers(this);
+            if (_hullShader != null)
+                _hullConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+            if (_domainShader != null)
+                _domainConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+            if (_geometryShader != null)
+                _geometryConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+
+            SamplerStates.PlatformSetSamplers(this, _pixelShader);
+
+            if (GraphicsCapabilities.SupportsVertexTextures && _vertexShader != null)
+                VertexSamplerStates.PlatformSetSamplers(this, _vertexShader);
+            if (GraphicsCapabilities.SupportsHullTextures && _hullShader != null)
+                HullSamplerStates.PlatformSetSamplers(this, _hullShader);
+            if (GraphicsCapabilities.SupportsDomainTextures && _domainShader != null)
+                DomainSamplerStates.PlatformSetSamplers(this, _domainShader);
+            if (GraphicsCapabilities.SupportsGeometryTextures && _geometryShader != null)
+                GeometrySamplerStates.PlatformSetSamplers(this, _geometryShader);
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
@@ -1058,11 +1136,16 @@ namespace Microsoft.Xna.Framework.Graphics
             var indexElementSize = shortIndices ? 2 : 4;
 			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
 			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
-			var target = PrimitiveTypeGL(primitiveType);
 
             ApplyAttribs(_vertexShader, baseVertex);
 
-            GL.DrawElements(target,
+            // Set vertex count for tesselation patch
+            var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+            if (primitiveTypeGL == GLPrimitiveType.Patches)
+                SetTesselationPatchVertexCount(primitiveType);
+
+            // Draw
+            GL.DrawElements(primitiveTypeGL,
                                      indexElementCount,
                                      indexElementType,
                                      indexOffsetInBytes);
@@ -1090,8 +1173,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 vertexDeclaration.GraphicsDevice = this;
                 vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject(), ShaderProgramHash);
 
+                // Set vertex count for tesselation patch
+                var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+                if (primitiveTypeGL == GLPrimitiveType.Patches)
+                    SetTesselationPatchVertexCount(primitiveType);
                 //Draw
-                GL.DrawArrays(PrimitiveTypeGL(primitiveType),
+                GL.DrawArrays(primitiveTypeGL,
                               vertexOffset,
                               vertexCount);
                 GraphicsExtensions.CheckGLError();
@@ -1112,7 +1199,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertexStart < 0)
                 vertexStart = 0;
 
-			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
+            // Set vertex count for tesselation patch
+            var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+            if (primitiveTypeGL == GLPrimitiveType.Patches)
+                SetTesselationPatchVertexCount(primitiveType);
+
+            // Draw
+            GL.DrawArrays(primitiveTypeGL,
 			              vertexStart,
 			              vertexCount);
             GraphicsExtensions.CheckGLError();
@@ -1142,9 +1235,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 vertexDeclaration.GraphicsDevice = this;
                 vertexDeclaration.Apply(_vertexShader, vertexAddr, ShaderProgramHash);
 
+                // Set vertex count for tesselation patch
+                var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+                if (primitiveTypeGL == GLPrimitiveType.Patches)
+                    SetTesselationPatchVertexCount(primitiveType);
+
                 //Draw
                 GL.DrawElements(
-                    PrimitiveTypeGL(primitiveType),
+                    primitiveTypeGL,
                     GetElementCountArray(primitiveType, primitiveCount),
                     DrawElementsType.UnsignedShort,
                     (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(short))));
@@ -1182,9 +1280,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 vertexDeclaration.GraphicsDevice = this;
                 vertexDeclaration.Apply(_vertexShader, vertexAddr, ShaderProgramHash);
 
+                // Set vertex count for tesselation patch
+                var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+                if (primitiveTypeGL == GLPrimitiveType.Patches)
+                    SetTesselationPatchVertexCount(primitiveType);
+
                 //Draw
                 GL.DrawElements(
-                    PrimitiveTypeGL(primitiveType),
+                    primitiveTypeGL,
                     GetElementCountArray(primitiveType, primitiveCount),
                     DrawElementsType.UnsignedInt,
                     (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(int))));
@@ -1210,16 +1313,20 @@ namespace Microsoft.Xna.Framework.Graphics
             var indexElementSize = shortIndices ? 2 : 4;
             var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
             var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
-            var target = PrimitiveTypeGL(primitiveType);
 
             ApplyAttribs(_vertexShader, baseVertex);
+
+            // Set vertex count for tesselation patch
+            var primitiveTypeGL = PrimitiveTypeGL(primitiveType);
+            if (primitiveTypeGL == GLPrimitiveType.Patches)
+                SetTesselationPatchVertexCount(primitiveType);
 
             if (baseInstance > 0)
             {
                 if (!GraphicsCapabilities.SupportsBaseIndexInstancing)
                     throw new PlatformNotSupportedException("Instanced geometry drawing with base instance requires at least OpenGL 4.2. Try upgrading your graphics card drivers.");
 
-                GL.DrawElementsInstancedBaseInstance(target,
+                GL.DrawElementsInstancedBaseInstance(primitiveTypeGL,
                                           indexElementCount,
                                           indexElementType,
                                           indexOffsetInBytes,
@@ -1227,13 +1334,23 @@ namespace Microsoft.Xna.Framework.Graphics
                                           baseInstance);
             }
             else
-                GL.DrawElementsInstanced(target,
+                GL.DrawElementsInstanced(primitiveTypeGL,
                                      indexElementCount,
                                      indexElementType,
                                      indexOffsetInBytes,
                                      instanceCount);
 
             GraphicsExtensions.CheckGLError();
+        }
+        private void SetTesselationPatchVertexCount(PrimitiveType primitiveType)
+        {
+            int patchVertexCount = primitiveType - PrimitiveType.PatchListWith1ControlPoints + 1;
+            if (patchVertexCount != _lastPatchVertexCount)
+            {
+                GL.PatchParameteri(PatchParameterName.PatchVertices, patchVertexCount);
+                GraphicsExtensions.CheckGLError();
+                _lastPatchVertexCount = patchVertexCount;
+            }
         }
 
         private void PlatformGetBackBufferData<T>(Rectangle? rectangle, T[] data, int startIndex, int count) where T : struct
