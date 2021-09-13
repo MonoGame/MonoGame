@@ -273,7 +273,7 @@ namespace Microsoft.Xna.Framework
                 _viewBounds.Height == height)
                 return;
 
-            double rawPixelsPerViewPixel = 1d;
+            double rawPixelsPerViewPixel = 1.0d;
             if (CoreWindow.GetForCurrentThread() != null)
                 rawPixelsPerViewPixel = _dinfo.RawPixelsPerViewPixel;
             else
