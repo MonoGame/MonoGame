@@ -194,6 +194,7 @@ namespace MonoGame.Tools.Pipeline
             cmdRename = new Command();
             cmdRename.MenuText = "Rename";
             cmdRename.Image = Global.GetEtoIcon("Commands.Rename.png");
+            cmdRename.Shortcut = Keys.F2;
 
             cmdDelete = new Command();
             cmdDelete.MenuText = "Delete";
