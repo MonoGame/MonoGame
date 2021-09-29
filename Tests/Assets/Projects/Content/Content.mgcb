@@ -20,3 +20,9 @@
 /processorParam:TextureFormat=Compressed
 /build:ContentFont.spritefont
 
+#begin SweetVictory (1).mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:SweetVictory (1).mp3;SweetVictory.mp3
+

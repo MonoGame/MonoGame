@@ -12,18 +12,16 @@ namespace MonoGame.Tools.Tests
 {
     class TestSongCollection
     {
+
         [Test]
-        public void testSongConstructor()
+        public void TestSongConstructor()
         {
             SongCollection collection = new SongCollection();
-            void loadContent(ContentManager content)
-            {
-                Song songs = content.Load<Song>("bark_mono.wav");
-                collection.Add(songs);
-                Assert.AreEqual(1, collection.Count);
-                collection.Clone();
-                Assert.AreEqual(2, collection.Count);
-            }
+            System.Uri firstUri = new System.Uri("C:/Users/sujee/openSourceProject/MonoGame/Tests/Assets/Audio/rock_loop_stereo.ogg", System.UriKind.Relative);
+            Song firstSong = Song.FromUri("mySecondSong", firstUri);
+            collection.Add(firstSong);
+            Assert.AreEqual(firstSong, collection[0]);
+            Assert.AreEqual(1, collection.Count);
         }
     }
 }

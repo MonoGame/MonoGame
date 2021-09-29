@@ -47,6 +47,7 @@
         <configuration/>
         <executions>
           <execution>
+            <?m2e ignore?>
             <id>compile</id>
             <phase>process-sources</phase>
             <goals>
@@ -54,6 +55,8 @@
             </goals>
           </execution>
           <execution>
+            <?m2e ignore?>
+            <?m2e ignore?>
             <id>test-compile</id>
             <phase>process-test-sources</phase>
             <goals>
