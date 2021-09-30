@@ -481,6 +481,15 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(new Vector2(0.0f, 1.0f), Vector2.Round(vector2));
             Assert.AreEqual(new Vector2(0.0f, 1.0f), roundResult);
         }
+
+        [Test]
+        public void TestTostring() {
+            Vector2 vector = new Vector2(0.5f, 10.5f);
+            Vector2 vector2 = new Vector2();
+            Assert.AreEqual("{X:0.5 Y:10.5}", vector.ToString());
+            Assert.NotNull(vector.ToString());
+            Assert.AreEqual("{X:0 Y:0}",vector2.ToString());
+        }
 #endif
     }
 }

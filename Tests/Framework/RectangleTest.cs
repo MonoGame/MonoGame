@@ -254,6 +254,8 @@ namespace MonoGame.Tests.Framework
         public void ToStringTest()
         {
             StringAssert.IsMatch("{X:-10 Y:10 Width:100 Height:1000}",new Rectangle(-10,10,100,1000).ToString());
+            string input = "{X:-10 Y:10 Width:100 Height:1000}";
+            Assert.AreNotEqual(input, new Rectangle(10, 10, 100, 100).ToString());
         }
 
 #if !XNA

@@ -169,6 +169,16 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(new Vector3(0.0f, 1.0f, 1.0f), Vector3.Round(vector3));
             Assert.AreEqual(new Vector3(0.0f, 1.0f, 1.0f), roundResult);
         }
+
+        [Test]
+        public void TestTostring()
+        {
+            Vector3 vector = new Vector3(0.5f, 10.5f,11.5f);
+            Vector3 vector2 = new Vector3();
+            Assert.AreEqual("{X:0.5 Y:10.5 Z:11.5}", vector.ToString());
+            Assert.NotNull(vector.ToString());
+            Assert.AreEqual("{X:0 Y:0 Z:0}", vector2.ToString());
+        }
 #endif
     }
 }
