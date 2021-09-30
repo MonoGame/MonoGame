@@ -91,6 +91,26 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(normal, plane.Normal);
             Assert.AreEqual(d, plane.D);
         }
+
+
+        /// <summary>
+        /// This method test the ToString in Plane
+        /// </summary>
+        [Test]
+        public void TestToString() {
+            Plane plane = new Plane(new Vector3(255, 255, 255), float.MaxValue);
+            Assert.AreEqual("{Normal:{X:255 Y:255 Z:255} D:3.4028235E+38}", plane.ToString());
+            
+            var plane2 = Plane.Normalize(new Plane(new Vector3(0, 1, 1), 2.5f));
+            var matrix = Matrix.CreateRotationX(MathHelper.PiOver2);
+            Plane output = Plane.Transform(plane2, matrix);
+            Assert.AreEqual("{Normal:{X:0 Y:-0.7071068 Z:0.7071067} D:1.767767}", output.ToString());
+
+            var plane3 = Plane.Normalize(new Plane(new Vector3(0, 1, 1), 2.5f));
+            var quaternion = Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.PiOver2);
+            Plane output2 = Plane.Transform(plane3, quaternion);
+            Assert.AreEqual("{Normal:{X:0 Y:-0.7071068 Z:0.7071067} D:1.767767}", output.ToString());
+        }
 #endif
     }
 }

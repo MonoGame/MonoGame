@@ -170,6 +170,9 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(new Vector3(0.0f, 1.0f, 1.0f), roundResult);
         }
 
+        /// <summary>
+        /// This method test ToString of Vector3
+        /// </summary>
         [Test]
         public void TestTostring()
         {

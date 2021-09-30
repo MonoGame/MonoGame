@@ -60,6 +60,22 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(position, ray.Position);
             Assert.AreEqual(direction, ray.Direction);
         }
+
+        /// <summary>
+        /// This method tests ToString method of Ray
+        /// </summary>
+        [Test]
+        public void TestToString()
+        {
+            Ray ray = new Ray(new Vector3(1,1,2), new Vector3(2,3,3));
+            Ray ray2 = new Ray(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+            Ray ray3 = new Ray(new Vector3(), new Vector3());
+            StringAssert.IsMatch("{{Position:{X:1 Y:1 Z:2} Direction:{X:2 Y:3 Z:3}}}", ray.ToString());
+            string input = "{{Position:{X:1 Y:1 Z:2} Direction:{X:2 Y:3 Z:3}}}";
+            Assert.AreNotEqual(input, ray2.ToString());
+            Assert.IsNotNull(ray2.ToString());
+            Assert.AreEqual("{{Position:{X:0 Y:0 Z:0} Direction:{X:0 Y:0 Z:0}}}",ray3.ToString());
+        }
 #endif
     }
 }

@@ -482,6 +482,9 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(new Vector2(0.0f, 1.0f), roundResult);
         }
 
+        /// <summary>
+        /// This method test ToString of Vector2
+        /// </summary>
         [Test]
         public void TestTostring() {
             Vector2 vector = new Vector2(0.5f, 10.5f);
