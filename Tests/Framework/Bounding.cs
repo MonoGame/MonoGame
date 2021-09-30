@@ -193,6 +193,45 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(center, boundingSphere.Center);
             Assert.AreEqual(radius, boundingSphere.Radius);
         }
+
+        /// <summary>
+        /// Test the ToString method in the BoundingBox class
+        /// </summary>
+        [Test]
+        public void TestBoundingBoxToString() {
+            BoundingBox boundingBox = new BoundingBox(new Vector3(10, 10, 10), new Vector3(0, 0, 0));
+            string input = "{{Min:{X:10 Y:10 Z:10} Max:{X:0 Y:0 Z:0}}}";
+            Assert.AreEqual(input, boundingBox.ToString());
+            BoundingBox boundingBox2 = new BoundingBox(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+            Assert.NotNull(boundingBox2.ToString());
+        }
+
+        /// <summary>
+        /// Test the ToString method in BoundingSphereclass
+        /// </summary>
+        [Test]
+        public void TestBoundingSphereToString()
+        {
+            BoundingSphere boundingSphere = new BoundingSphere(new Vector3(255, 255, 255), 350.2f);
+            string input = "{Center:{X:255 Y:255 Z:255} Radius:350.2}";
+            string checkInput = "{Center:{X:450 Y:255 Z:255} Radius:350.2}";
+            Assert.AreEqual(input, boundingSphere.ToString());
+            BoundingSphere boundingSphere2 = new BoundingSphere(new Vector3(0, 0, 0), 0);
+            Assert.NotNull(boundingSphere2.ToString());
+            Assert.AreNotEqual(checkInput, boundingSphere.ToString());
+        }
+
+        /// <summary>
+        /// Test the ToString method in BoundingFrustum
+        /// </summary>
+        [Test]
+        public void TestBoundingFrustumToString()
+        {
+            var view = Matrix.CreateLookAt(new Vector3(0, 0, 0), Vector3.Zero, Vector3.Zero);
+            var projection = Matrix.CreatePerspectiveFieldOfView(1, 1, 1, 2);
+            var testFrustum = new BoundingFrustum(view * projection);
+            Assert.NotNull(testFrustum.ToString());
+        }
 #endif
     }
 }
