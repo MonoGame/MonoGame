@@ -23,6 +23,20 @@ namespace MonoGame.Tests.Graphics
             effect.Parameters["SpecularPower"].SetValue(50);
             var val= effect.Parameters["SpecularPower"].GetValueSingle();
             Assert.AreEqual(50f, val);
+
+            var effect2 = new BasicEffect(game.GraphicsDevice);
+            effect2.TextureEnabled = true;
+            effect2.Texture = null;
+            effect2.Parameters["SpecularPower"].SetValue(100f);
+            var val2 = effect2.Parameters["SpecularPower"].GetValueSingle();
+            Assert.AreEqual(100f, val2);
+
+            var effect3 = new BasicEffect(game.GraphicsDevice);
+            effect3.TextureEnabled = true;
+            effect3.Texture = null;
+            effect3.Parameters["SpecularPower"].SetValue(0.99f);
+            var val3 = effect3.Parameters["SpecularPower"].GetValueSingle();
+            Assert.AreEqual(0.99f, val3);
         }
 
     }
