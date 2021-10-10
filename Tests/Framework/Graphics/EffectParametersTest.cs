@@ -11,6 +11,9 @@ namespace MonoGame.Tests.Graphics
 {
     internal class EffectParametersTest : GraphicsDeviceTestFixtureBase
     {
+        /// <summary>
+        /// Test case to check the set value with int input
+        /// </summary>
         [Test]
         public void TestSetValue()
         {

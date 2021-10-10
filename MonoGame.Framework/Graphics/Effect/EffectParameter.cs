@@ -446,6 +446,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (int value)
 		{
+            //If the given value is int, make sure that it will be converted into an float
+            if (ParameterType == EffectParameterType.Single)
+            {
+                SetValue((float)value);
+                return;
+            }
+
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
                 throw new InvalidCastException();
 
