@@ -53,6 +53,27 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        public void BoundingSphere()
+        {
+            BoundingSphere sphere = new BoundingSphere(Vector3.Zero, 1);
+
+            //Test misses
+            Assert.IsNull(new Segment(-Vector3.UnitX * 3, -Vector3.UnitX * 1.8f).Intersects(sphere));
+            Assert.IsNull(new Segment(-Vector3.UnitX * 3, Vector3.UnitY * 3).Intersects(sphere));
+            Assert.IsNull(new Segment(-Vector3.UnitX * 1.8f, -Vector3.UnitX * 3).Intersects(sphere));
+
+            //Test normal intersections
+            Assert.AreEqual(1.0f, new Segment(-Vector3.UnitX * 2, Vector3.Zero).Intersects(sphere));
+            Assert.AreEqual(1.0f, new Segment(-Vector3.UnitX * 2, Vector3.UnitX * 2).Intersects(sphere));
+
+            //Test inside out
+            Assert.AreEqual(0.0f, new Segment(Vector3.Zero, Vector3.UnitX * 3).Intersects(sphere));
+            Assert.AreEqual(0.0f, new Segment(Vector3.Zero, Vector3.One).Intersects(sphere));
+            Assert.AreEqual(0.0f, new Segment(Vector3.Zero, Vector3.One * 0.5f).Intersects(sphere));
+
+        }
+
+        [Test]
         public void TestIsEqual()
         {
             var a = new Segment(Vector3.Zero, Vector3.One);

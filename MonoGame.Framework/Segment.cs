@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework
         public float? Intersects(BoundingSphere sphere)
         {
             float distance = this.Distance;
-            float? d1 = new Ray(Start, End - Start).Intersects(sphere);
+            float? d1 = new Ray(Start, (End - Start) / distance).Intersects(sphere);
             if (d1.HasValue && d1 < distance) return d1;
 
             return null;
