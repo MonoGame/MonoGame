@@ -115,6 +115,69 @@ namespace Microsoft.Xna.Framework
         {
             result = Intersects(box);
         }
+        /// <summary>
+        /// Check if this <see cref="Segment"/> intersects the specified <see cref="BoundingSphere"/>.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingBox"/> to test for intersection.</param>
+        /// <returns>
+        /// The distance along the ray of the intersection or <code>null</code> if this
+        /// <see cref="Segment"/> does not intersect the <see cref="BoundingSphere"/>.
+        /// </returns>
+        public float? Intersects(BoundingSphere sphere)
+        {
+            float distance = this.Distance;
+            float? d1 = new Ray(Start, End - Start).Intersects(sphere);
+            if (d1.HasValue && d1 < distance) return d1;
+            float? d2 = new Ray(End, Start - End).Intersects(sphere);
+            if (d2.HasValue && d1 < distance) return d2;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Check if this <see cref="Segment"/> intersects the specified <see cref="Plane"/>.
+        /// </summary>
+        /// <param name="plane">The <see cref="Plane"/> to test for intersection.</param>
+        /// <returns>
+        /// The distance along the ray of the intersection or <code>null</code> if this
+        /// <see cref="Segment"/> does not intersect the <see cref="Plane"/>.
+        /// </returns>
+        public float? Intersects(Plane plane)
+        {
+            float distance = this.Distance;
+            float? d1 = new Ray(Start, End - Start).Intersects(plane);
+            if (d1.HasValue && d1 < distance) return d1;
+            float? d2 = new Ray(End, Start - End).Intersects(plane);
+            if (d2.HasValue && d1 < distance) return d2;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Check if this <see cref="Segment"/> intersects the specified <see cref="Plane"/>.
+        /// </summary>
+        /// <param name="plane">The <see cref="Plane"/> to test for intersection.</param>
+        /// <param name="result">
+        /// The distance along the ray of the intersection or <code>null</code> if this
+        /// <see cref="Segment"/> does not intersect the <see cref="Plane"/>.
+        /// </param>
+        public void Intersects(ref Plane plane, out float? result)
+        {
+            result = Intersects(plane);
+        }
+
+        /// <summary>
+        /// Check if this <see cref="Segment"/> intersects the specified <see cref="BoundingSphere"/>.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingBox"/> to test for intersection.</param>
+        /// <param name="result">
+        /// The distance along the ray of the intersection or <code>null</code> if this
+        /// <see cref="Segment"/> does not intersect the <see cref="BoundingSphere"/>.
+        /// </param>
+        public void Intersects(ref BoundingSphere sphere, out float? result)
+        {
+            result = Intersects(sphere);
+        }
 
         #endregion
     }
