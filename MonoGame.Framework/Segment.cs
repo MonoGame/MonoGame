@@ -143,7 +143,8 @@ namespace Microsoft.Xna.Framework
         public float? Intersects(Plane plane)
         {
             float distance = this.Distance;
-            float? d1 = new Ray(Start, End - Start).Intersects(plane);
+
+            float? d1 = new Ray(Start, (End - Start)/distance).Intersects(plane);
             if (d1.HasValue && d1 < distance) return d1;
 
             return null;

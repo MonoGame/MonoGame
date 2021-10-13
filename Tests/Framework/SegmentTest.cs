@@ -38,6 +38,21 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        public void PlaneIntersects()
+        {
+            var p1 = new Plane(Vector3.Zero, Vector3.UnitY);
+
+            //test parallel
+            Assert.AreEqual(null, new Segment(Vector3.Up, Vector3.One).Intersects(p1));
+            Assert.AreEqual(null, new Segment(Vector3.Zero, Vector3.UnitX).Intersects(p1)); //should the value be 0 when the segment is parallel?
+
+            //test perpendicular
+            Assert.AreEqual(null, new Segment(Vector3.UnitY * 2, Vector3.UnitY).Intersects(p1));
+            Assert.AreEqual(1.0f, new Segment(Vector3.UnitY, -Vector3.UnitY).Intersects(p1));
+            Assert.AreEqual(1.0f, new Segment(Vector3.UnitY, -Vector3.UnitY * 10).Intersects(p1));
+        }
+
+        [Test]
         public void TestIsEqual()
         {
             var a = new Segment(Vector3.Zero, Vector3.One);
