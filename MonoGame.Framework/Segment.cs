@@ -95,10 +95,10 @@ namespace Microsoft.Xna.Framework
         public float? Intersects(BoundingBox box)
         {
             float distance = this.Distance;
-            float? d1 = new Ray(Start, End - Start).Intersects(box);
+            var dif = End - Start;
+            dif.Normalize();
+            float? d1 = new Ray(Start, dif).Intersects(box);
             if (d1.HasValue && d1 < distance) return d1;
-            float? d2 = new Ray(End, Start - End).Intersects(box);
-            if (d2.HasValue && d1 < distance) return d2;
 
             return null;
         }
@@ -128,8 +128,6 @@ namespace Microsoft.Xna.Framework
             float distance = this.Distance;
             float? d1 = new Ray(Start, End - Start).Intersects(sphere);
             if (d1.HasValue && d1 < distance) return d1;
-            float? d2 = new Ray(End, Start - End).Intersects(sphere);
-            if (d2.HasValue && d1 < distance) return d2;
 
             return null;
         }
@@ -147,8 +145,6 @@ namespace Microsoft.Xna.Framework
             float distance = this.Distance;
             float? d1 = new Ray(Start, End - Start).Intersects(plane);
             if (d1.HasValue && d1 < distance) return d1;
-            float? d2 = new Ray(End, Start - End).Intersects(plane);
-            if (d2.HasValue && d1 < distance) return d2;
 
             return null;
         }
