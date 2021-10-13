@@ -179,6 +179,59 @@ namespace Microsoft.Xna.Framework
             result = Intersects(sphere);
         }
 
+
+        /// <summary>
+        /// Check if two segments are not equal.
+        /// </summary>
+        /// <param name="a">A ray to check for inequality.</param>
+        /// <param name="b">A ray to check for inequality.</param>
+        /// <returns><code>true</code> if the two rays are not equal, <code>false</code> if they are.</returns>
+        public static bool operator != (Segment a, Segment b)
+        {
+            return !a.Equals(b);
+        }
+
+        /// <summary>
+        /// Check if two segments are equal.
+        /// </summary>
+        /// <param name="a">A ray to check for equality.</param>
+        /// <param name="b">A ray to check for equality.</param>
+        /// <returns><code>true</code> if the two rays are equals, <code>false</code> if they are not.</returns>
+        public static bool operator == (Segment a, Segment b)
+        {
+            return a.Equals(b);
+        }
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    "Start( ", this.Start.DebugDisplayString, " )  \r\n",
+                    "End( ", this.End.DebugDisplayString, " )"
+                );
+            }
+        }
+
+        /// <summary>
+        /// Get a <see cref="String"/> representation of this <see cref="Segment"/>.
+        /// </summary>
+        /// <returns>A <see cref="String"/> representation of this <see cref="Segment"/>.</returns>
+        public override string ToString()
+        {
+            return "{{Start:" + Start.ToString() + " End:" + End.ToString() + "}}";
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Segment"/>.
+        /// </summary>
+        /// <param name="start">Receives the start position of the segment.</param>
+        /// <param name="end">Receives the start position of the segment.</param>
+        public void Deconstruct(out Vector3 start, out Vector3 end)
+        {
+            start = Start;
+            end = End;
+        }
         #endregion
     }
 }
