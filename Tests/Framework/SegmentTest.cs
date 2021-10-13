@@ -36,5 +36,19 @@ namespace MonoGame.Tests.Framework
             Assert.IsNull(new Segment(center - Vector3.UnitX * 30, center - Vector3.UnitX * 40).Intersects(box));
             Assert.IsNull(new Segment(center - Vector3.UnitX * 30, center - Vector3.UnitX * 30 + Vector3.One * 20).Intersects(box));
         }
+
+        [Test]
+        public void TestIsEqual()
+        {
+            var a = new Segment(Vector3.Zero, Vector3.One);
+            var b = new Segment(Vector3.One, Vector3.Zero);
+            var c = new Segment(Vector3.Zero, Vector3.UnitX);
+            var d = new Segment(Vector3.Zero, Vector3.UnitX);
+
+            Assert.True(a.Equals(a));
+            Assert.False(a.Equals(b));
+            Assert.True(c.Equals(d));
+            Assert.False(a.Equals(c));
+        }
     }
 }

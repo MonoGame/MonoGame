@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public bool Equals(Segment other)
         {
-            return this.Start.Equals(other.Start) && this.Start.Equals(other.Start);
+            return this.Start.Equals(other.Start) && this.End.Equals(other.End);
         }
 
         /// <summary>
