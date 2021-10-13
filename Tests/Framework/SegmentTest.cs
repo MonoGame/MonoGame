@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using NUnit.Framework;
+using System;
 
 namespace MonoGame.Tests.Framework
 {
@@ -71,6 +72,13 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(0.0f, new Segment(Vector3.Zero, Vector3.One).Intersects(sphere));
             Assert.AreEqual(0.0f, new Segment(Vector3.Zero, Vector3.One * 0.5f).Intersects(sphere));
 
+        }
+
+        [Test]
+        public void DistanceTest()
+        {
+            Assert.AreEqual((float)Math.Sqrt(3), new Segment(Vector3.Zero, Vector3.One).Distance);
+            Assert.AreEqual(1.0f, new Segment(Vector3.Zero, Vector3.UnitX).Distance);
         }
 
         [Test]
