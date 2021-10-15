@@ -190,17 +190,36 @@ namespace Microsoft.Xna.Framework
 			result = Intersects(box);
         }
 
-        /*
+        /// <summary>
+        /// Check if this <see cref="Ray"/> intersects the specified <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <param name="frustum">The <see cref="BoundingFrustum"/> to test for intersection.</param>
+        /// <returns>
+        /// The distance along the ray of the intersection or <code>null</code> if this
+        /// <see cref="Ray"/> does not intersect the <see cref="BoundingFrustum"/>.
+        /// </returns>
         public float? Intersects(BoundingFrustum frustum)
         {
             if (frustum == null)
-			{
-				throw new ArgumentNullException("frustum");
-			}
-			
-			return frustum.Intersects(this);			
+            {
+                throw new ArgumentNullException("frustum");
+            }
+
+            return frustum.Intersects(this);
         }
-        */
+
+        /// <summary>
+        /// Check if this <see cref="Ray"/> intersects the specified <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <param name="frustum">The <see cref="BoundingFrustum"/> to test for intersection.</param>
+        /// <param name="result">
+        /// The distance along the ray of the intersection or <code>null</code> if this
+        /// <see cref="Ray"/> does not intersect the <see cref="BoundingFrustum"/>.
+        /// </param>
+        public void Intersects(ref BoundingFrustum frustum, out float? result)
+        {
+            result = Intersects(frustum);
+        }
 
         /// <summary>
         /// Check if this <see cref="Ray"/> intersects the specified <see cref="BoundingSphere"/>.
