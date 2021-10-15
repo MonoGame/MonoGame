@@ -459,7 +459,6 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Distance at which ray intersects with this <see cref="BoundingFrustum"/> or null if no intersection happens as an output parameter.</param>
         public void Intersects(ref Ray ray, out float? result)
         {
-            const float Epsilon = 1e-6f;
             result = null;
             ContainmentType ctype;
             this.Contains(ref ray.Position, out ctype);
@@ -480,7 +479,7 @@ namespace Microsoft.Xna.Framework
                 direction.Normalize();
                 direction = direction * d.Value;
 
-                Vector3 point = ray.Position + direction * (1 + Epsilon);
+                Vector3 point = ray.Position + direction;
 
                 if (this.Contains(point) == ContainmentType.Contains && result == null || d < result)
                 {
