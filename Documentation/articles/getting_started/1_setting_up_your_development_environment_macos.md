@@ -63,7 +63,7 @@ brew install p7zip wget
 Create wine prefix:
 
 ```sh
-wget -qO- https://raw.githubusercontent.com/MonoGame/MonoGame/develop/Tools/MonoGame.Effect.Compiler/mgfxc_wine_setup.sh | bash
+wget -qO- https://raw.githubusercontent.com/MonoGame/MonoGame/master/Tools/MonoGame.Effect.Compiler/mgfxc_wine_setup.sh | bash
 ```
 
 If you ever need to undo the script, simply delete the `.winemonogame` folder in your home directory.

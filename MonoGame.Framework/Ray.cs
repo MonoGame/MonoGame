@@ -166,7 +166,7 @@ namespace Microsoft.Xna.Framework
                 if (!tMax.HasValue || tMaxZ < tMax) tMax = tMaxZ;
             }
 
-            // having a positive tMin and a negative tMax means the ray is inside the box
+            // having a positive tMax and a negative tMin means the ray is inside the box
             // we expect the intesection distance to be 0 in that case
             if ((tMin.HasValue && tMin < 0) && tMax > 0) return 0;
 
@@ -220,6 +220,7 @@ namespace Microsoft.Xna.Framework
         {
             result = Intersects(frustum);
         }
+
 
         /// <summary>
         /// Check if this <see cref="Ray"/> intersects the specified <see cref="BoundingSphere"/>.

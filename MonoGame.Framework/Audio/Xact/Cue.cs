@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Audio
             get 
             {
                 if (_curSound != null)
-                    return _curSound.Playing;
+                    return _curSound.Playing || _curSound.IsPaused;
 
                 return false;
             }
