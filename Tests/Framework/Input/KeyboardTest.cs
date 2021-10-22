@@ -32,7 +32,12 @@ namespace MonoGame.Tests.Input
         [TestCase(new[] { Keys.Right, Keys.Down, Keys.LeftAlt, Keys.LeftShift }, true, true)]
         [TestCase(new[] { Keys.Delete, Keys.U, Keys.RightWindows, Keys.L, Keys.NumPad2 }, false, false)]
         [TestCase(new[] { Keys.F9, Keys.F12, Keys.VolumeUp, Keys.OemAuto, Keys.NumPad3 }, false, false)]
-        [TestCase(new[] { Keys.OemMinus, Keys.OemTilde, Keys.Tab, Keys.Zoom }, true, false)]
+        [TestCase(new[] { Keys.OemMinus, Keys.OemTilde, Keys.Tab, Keys.Zoom }, false, false)]
+        [TestCase(new[] { Keys.NumPad5 }, false, false)]
+        [TestCase(new[] { Keys.NumPad5 }, false, true)]
+        [TestCase(new[] { Keys.PrintScreen }, false, false)]
+        [TestCase(new[] { Keys.NumPad5, Keys.PrintScreen }, false, false)]
+        [TestCase(new[] { Keys.NumPad5, Keys.PrintScreen }, false, true)]
         public void TestState(Keys[] keys, bool capsLock, bool numLock)
         {
             var keyList = keys.ToList();
