@@ -536,11 +536,6 @@ namespace Microsoft.Xna.Framework
             }
 
             // Advance the accumulated elapsed time.
-            if (_gameTimer == null)
-            {
-                _gameTimer = new Stopwatch();
-                _gameTimer.Start();
-            }
             var currentTicks = _gameTimer.Elapsed.Ticks;
             _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
             _previousTicks = currentTicks;
