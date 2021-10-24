@@ -36,8 +36,7 @@ namespace Microsoft.Xna.Framework.Content
 
         private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
-            'w', // Windows (XNA & DirectX)
-            'x', // Xbox360 (XNA)
+            // content identifiers
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
@@ -52,15 +51,17 @@ namespace Microsoft.Xna.Framework.Content
             'G', // Google Stadia
             'b', // WebAssembly and Bridge.NET
 
+            // XNA content identifiers
+            'w', // Windows (XNA & DirectX)
+            'x', // Xbox360 (XNA)
+            'm', // WindowsPhone7.0 (XNA)
+
             // NOTE: There are additional idenfiers for consoles that 
             // are not defined in this repository.  Be sure to ask the
             // console port maintainers to ensure no collisions occur.
-
             
             // Legacy identifiers... these could be reused in the
             // future if we feel enough time has passed.
-
-            'm', // WindowsPhone7.0 (XNA)
             'p', // PlayStationMobile
             'v', // PSVita
             'g', // Windows (OpenGL)
