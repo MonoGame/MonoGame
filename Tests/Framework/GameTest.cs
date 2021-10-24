@@ -168,6 +168,8 @@ namespace MonoGame.Tests {
             [Test]
             public void GameTickTest()
             {
+                Game.Run();
+
                 // should not throw an exception
                 Game.ResetElapsedTime();
                 Assert.DoesNotThrow(() => Game.Tick());
