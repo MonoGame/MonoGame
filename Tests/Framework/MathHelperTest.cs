@@ -153,5 +153,16 @@ namespace MonoGame.Tests.Framework
             var actualValue = MathHelper.WrapAngle(angle);
             Assert.AreEqual(expectedValue, actualValue);
         }
+
+
+        [Test]
+        public void ToRadiansDTest()
+        {
+            Assert.AreEqual(MathHelper.ToRadiansD(0), 0);
+            Assert.AreEqual(MathHelper.ToRadiansD(90), 1.5707963267948966);
+            Assert.AreEqual(MathHelper.ToRadiansD(180), 3.1415926535897931);
+            Assert.AreEqual(MathHelper.ToRadiansD(270), 4.71238898038469);
+            Assert.AreEqual(MathHelper.ToRadiansD(360), 6.2831853071795862);
+        }
     }
 }

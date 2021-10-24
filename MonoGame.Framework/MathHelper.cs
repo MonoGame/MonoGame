@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework
         { 
             return (float)(radians * 57.295779513082320876798154814105);
         }
-        
+
         /// <summary>
         /// Converts degrees to radians.
         /// </summary>
@@ -288,14 +288,29 @@ namespace Microsoft.Xna.Framework
         /// <returns>The angle in radians.</returns>
         /// <remarks>
         /// This method uses double precission internally,
-        /// though it returns single float
+        /// returns single float
         /// Factor = pi / 180
         /// </remarks>
         public static float ToRadians(float degrees)
         { 
             return (float)(degrees * 0.017453292519943295769236907684886);
         }
-	 
+
+        /// <summary>
+        /// Converts degrees to radians.
+        /// </summary>
+        /// <param name="degrees">The angle in degrees.</param>
+        /// <returns>The angle in radians.</returns>
+        /// <remarks>
+        /// This method uses double precission internally,
+        /// returns single double
+        /// Factor = pi / 180
+        /// </remarks>
+        public static double ToRadiansD(double degrees)
+        {
+            return (double)(degrees * 0.017453292519943295769236907684886);
+        }
+
         /// <summary>
         /// Reduces a given angle to a value between π and -π.
         /// </summary>
