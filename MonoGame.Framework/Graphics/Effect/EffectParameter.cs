@@ -448,7 +448,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             if (ParameterType == EffectParameterType.Single)
             {
-                SetValue((float)value);
+                ((float[])Data)[0] = value;
+                StateKey = unchecked(NextStateKey++);
                 return;
             }
 
