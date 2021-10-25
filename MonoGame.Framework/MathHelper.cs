@@ -247,7 +247,7 @@ namespace Microsoft.Xna.Framework
         {
             return value1 < value2 ? value1 : value2;
         }
-        
+
         /// <summary>
         /// Interpolates between two values using a cubic equation.
         /// </summary>
@@ -266,21 +266,6 @@ namespace Microsoft.Xna.Framework
             return result;
         }
         
-        /// <summary>
-        /// Converts radians to degrees.
-        /// </summary>
-        /// <param name="radians">The angle in radians.</param>
-        /// <returns>The angle in degrees.</returns>
-        /// <remarks>
-        /// This method uses double precission internally,
-        /// though it returns single float
-        /// Factor = 180 / pi
-        /// </remarks>
-        public static float ToDegrees(float radians)
-        { 
-            return (float)(radians * 57.295779513082320876798154814105);
-        }
-
         /// <summary>
         /// Converts degrees to radians.
         /// </summary>

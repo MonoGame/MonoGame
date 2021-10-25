@@ -154,7 +154,6 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(expectedValue, actualValue);
         }
 
-
         [Test]
         public void ToRadiansDTest()
         {
@@ -163,6 +162,6 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(MathHelper.ToRadiansD(180), 3.1415926535897931);
             Assert.AreEqual(MathHelper.ToRadiansD(270), 4.71238898038469);
             Assert.AreEqual(MathHelper.ToRadiansD(360), 6.2831853071795862);
-        }
+        }        
     }
 }
