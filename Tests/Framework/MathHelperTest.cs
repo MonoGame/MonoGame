@@ -155,6 +155,27 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        public void MedianTest()
+        {
+            Assert.AreEqual(MathHelper.Median(1, 6.5f), 3.75f);
+            Assert.AreEqual(MathHelper.Median(0, 10), 5);
+            Assert.AreEqual(MathHelper.Median(5, 11), 8);
+            Assert.AreEqual(MathHelper.Median(-5, 5), 0);
+            Assert.AreEqual(MathHelper.Median(-5, 15), 5);
+            Assert.AreEqual(MathHelper.Median(0f, 5f), 2.5f);
+            Assert.AreEqual(MathHelper.Median(0f, 10f), 5);
+            Assert.AreEqual(MathHelper.Median(-2.5f, 8), 2.75f);
+            Assert.AreEqual(MathHelper.Median(-5f, 5f), 0);
+            Assert.AreEqual(MathHelper.Median(-5f, 10f), 2.5f);
+            Assert.AreEqual(MathHelper.Median(-0.5f, -0.5f), -0.5f);
+            Assert.AreEqual(MathHelper.Median(-0.5f, 0.0f), -0.25f);
+            Assert.AreEqual(MathHelper.Median(0.0f, -0.5f), -.25f);
+            Assert.AreEqual(MathHelper.Median(0, 0), 0);
+            Assert.AreEqual(MathHelper.Median(-5, 5), 0);
+            Assert.AreEqual(MathHelper.Median(5, -5), 0);
+        }
+
+        [Test]
         public void ToDegreesTest()
         {
             Assert.AreEqual(MathHelper.ToDegrees(0), 0);

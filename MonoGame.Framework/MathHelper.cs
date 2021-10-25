@@ -249,6 +249,28 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Returns the median of two values.
+        /// </summary>
+        /// <param name="value1">Source value.</param>
+        /// <param name="value2">Source value.</param>
+        /// <returns>The median value.</returns>
+        public static float Median(float value1, float value2)
+        {
+            return (value1 + value2) / 2;
+        }
+
+        /// <summary>
+        /// Returns the median of two values.
+        /// </summary>
+        /// <param name="value1">Source value.</param>
+        /// <param name="value2">Source value.</param>
+        /// <returns>The median value.</returns>
+        public static int Median(int value1, int value2)
+        {
+            return (value1 + value2) / 2;
+        }
+
+        /// <summary>
         /// Interpolates between two values using a cubic equation.
         /// </summary>
         /// <param name="value1">Source value.</param>
