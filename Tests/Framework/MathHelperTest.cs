@@ -155,6 +155,20 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        public void ToDegreesTest()
+        {
+            Assert.AreEqual(MathHelper.ToDegrees(0), 0);
+            Assert.AreEqual(MathHelper.ToDegrees(1.5707963267948966f), 90);
+            Assert.AreEqual(MathHelper.ToDegrees(3.1415926535897931f), 180);
+            Assert.AreEqual(MathHelper.ToDegrees(4.71238898038469f), 270);
+            Assert.AreEqual(MathHelper.ToDegrees(6.2831853071795862f), 360);
+            Assert.AreEqual(MathHelper.ToDegrees(1.5707963267948966), 90);
+            Assert.AreEqual(MathHelper.ToDegrees(3.1415926535897931), 180);
+            Assert.AreEqual(MathHelper.ToDegrees(4.71238898038469), 270);
+            Assert.AreEqual(MathHelper.ToDegrees(6.2831853071795862), 360);
+        }
+
+        [Test]
         public void ToRadiansDTest()
         {
             Assert.AreEqual(MathHelper.ToRadiansD(0), 0);
