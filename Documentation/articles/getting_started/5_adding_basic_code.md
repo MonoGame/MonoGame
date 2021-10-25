@@ -57,7 +57,7 @@ _spriteBatch.Draw(
 );
 ```
 
-This change adds a few extra parameters to the spriteBatch.Draw call, but don't worry about that for now. This new code sets the actual center (width / 2 and height / 2) of the image as its origin (drawing point). 
+This change adds a few extra parameters to the spriteBatch.Draw call, but don't worry about that for now. This new code sets the actual center (width / 2 and height / 2) of the image as its origin (drawing point).
 
 Now the image will get drawn to the center of the screen.
 
@@ -93,18 +93,19 @@ The following is a line-by-line analysis of the above code.
 ```csharp
 var kstate = Keyboard.GetState();
 ```
-This code fetches the current keyboard state ('Keyboard.GetState()') and stores it into a variable called **kstate**.
 
+This code fetches the current keyboard state ('Keyboard.GetState()') and stores it into a variable called **kstate**.
 
 ```csharp
 if (kstate.IsKeyDown(Keys.Up))
 ```
-This checks to see if the Up Arrow key is pressed.
 
+This checks to see if the Up Arrow key is pressed.
 
 ```csharp
     ballPosition.Y -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 ```
+
 If the Up Arrow key is pressed, the ball moves using the value you assigned to **ballSpeed**. The reason why **ballSpeed** is multiplied by **gameTime.ElapsedGameTime.TotalSeconds** is because, when not using fixed time step, the time between Update calls varies. To account for this, the ballSpeed is multiplied by the amount of time that has passed since the last Update call. The result is that the ball appears to move at the same speed regardless of what framerate the game happens to be running at.
 
 > Try experimenting with what happens if you don't multiply the **ballSpeed** by **gameTime.ElapsedGameTime.TotalSeconds**, to see the difference it makes.
@@ -135,6 +136,50 @@ base.Update(gameTime);
 Now run the game to test for yourself that the ball cannot go beyond the window bounds anymore.
 
 Happy Coding ^^
+
+## Joystick Usage Example
+
+Here is an example on how you can use your own gamepad for user input.
+
+Inside your update method, you'd have:
+
+```cs
+
+// Gamepad
+GamePadCapabilities capabilities = GamePad.GetCapabilities(PlayerIndex.One);
+
+// handle for controller
+if (capabilities.IsConnected)
+{
+    GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+
+    if (gamePadState.ThumbSticks.Left.X < -0.5f)
+    {
+        position.X -= 10.0f;
+    }
+    if (gamePadState.ThumbSticks.Left.X > 0.5f)
+    {
+        position.X += 10.0f;
+    }
+    if (gamePadState.ThumbSticks.Left.Y < -0.5f)
+    {
+        position.Y += 10.0f;
+    }
+    if (gamePadState.ThumbSticks.Left.Y > 0.5)
+    {
+        position.Y -= 10.0f;
+    }
+
+
+    if (capabilities.GamePadType == GamePadType.GamePad)
+    {
+        if (gamePadState.IsButtonDown(Buttons.B))
+        {
+            Exit();
+        }
+    }
+}
+```
 
 ## Further Reading
 
