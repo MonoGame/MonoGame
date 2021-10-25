@@ -574,6 +574,14 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
 		OemBackslash = 226,
         /// <summary>
+        /// Forward Slash key
+        /// </summary>
+        ForwardSlash = 227,
+        /// <summary>
+        /// Pound key
+        /// </summary>
+        Pound = 228,
+        /// <summary>
         /// IME PROCESS key.
         /// </summary>
 		ProcessKey = 229,
