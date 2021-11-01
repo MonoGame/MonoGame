@@ -105,12 +105,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 FramebufferAttachment.StencilAttachment,
             };
 
-            internal virtual void InvalidateDrawFramebuffer()
-            {
-                Debug.Assert(this.SupportsInvalidateFramebuffer);
-                GL.InvalidateFramebuffer (FramebufferTarget.Framebuffer, 3, FramebufferAttachements);
-            }
-
             internal virtual void InvalidateReadFramebuffer()
             {
                 Debug.Assert(this.SupportsInvalidateFramebuffer);
