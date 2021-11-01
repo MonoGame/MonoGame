@@ -161,12 +161,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         rbSwap = pixelFormat.dwBBitMask == 0x1F;
                         return SurfaceFormat.Bgr565;
                     }
-                    else if (pixelFormat.dwRgbBitCount == 24)
-                    {
-                        rbSwap = pixelFormat.dwBBitMask == 0xFF;
-                        return SurfaceFormat.Color;
-                    }
-                    else if (pixelFormat.dwRgbBitCount == 32)
+                    else if (pixelFormat.dwRgbBitCount == 24 || pixelFormat.dwRgbBitCount == 32)
                     {
                         rbSwap = pixelFormat.dwBBitMask == 0xFF;
                         return SurfaceFormat.Color;
