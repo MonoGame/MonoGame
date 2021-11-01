@@ -33,8 +33,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool Undo()
         {
-            Toggle();
-            return true;
+            return Do();
         }
 
         private void Toggle()
