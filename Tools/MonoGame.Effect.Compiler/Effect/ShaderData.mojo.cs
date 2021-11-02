@@ -35,21 +35,22 @@ namespace MonoGame.Effect
 				throw new Exception (errors [0].error);
 			}
 
+            AttributesConvert(parseData, dxshader);
 			// Conver the attributes.
 			//
 			// TODO: Could this be done using DX shader reflection?
 			//
-			{
-				var attributes = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute> (
-						parseData.attributes, parseData.attribute_count);
+			//{
+			//	var attributes = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute> (
+			//			parseData.attributes, parseData.attribute_count);
 
-				dxshader._attributes = new Attribute[attributes.Length];
-				for (var i = 0; i < attributes.Length; i++) {
-					dxshader._attributes [i].name = attributes [i].name;
-					dxshader._attributes [i].index = attributes [i].index;
-					dxshader._attributes [i].usage = EffectObject.ToXNAVertexElementUsage (attributes [i].usage);
-				}
-			}
+			//	dxshader._attributes = new Attribute[attributes.Length];
+			//	for (var i = 0; i < attributes.Length; i++) {
+			//		dxshader._attributes [i].name = attributes [i].name;
+			//		dxshader._attributes [i].index = attributes [i].index;
+			//		dxshader._attributes [i].usage = EffectObject.ToXNAVertexElementUsage (attributes [i].usage);
+			//	}
+			//}
 
 			var symbols = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol> (
 					parseData.symbols, parseData.symbol_count);
@@ -191,5 +192,23 @@ namespace MonoGame.Effect
 
 			return dxshader;
 		}
-	}
+
+        // Conver the attributes.
+        //
+        // TODO: Could this be done using DX shader reflection?
+        //
+        private static void AttributesConvert(MojoShader.MOJOSHADER_parseData parseData, ShaderData dxshader)
+        {
+            var attributes = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
+                    parseData.attributes, parseData.attribute_count);
+
+            dxshader._attributes = new Attribute[attributes.Length];
+            for (var i = 0; i < attributes.Length; i++)
+            {
+                dxshader._attributes[i].name = attributes[i].name;
+                dxshader._attributes[i].index = attributes[i].index;
+                dxshader._attributes[i].usage = EffectObject.ToXNAVertexElementUsage(attributes[i].usage);
+            }
+        }
+    }
 }
