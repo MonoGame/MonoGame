@@ -36,21 +36,6 @@ namespace MonoGame.Effect
 			}
 
             AttributesConvert(parseData, dxshader);
-			// Conver the attributes.
-			//
-			// TODO: Could this be done using DX shader reflection?
-			//
-			//{
-			//	var attributes = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute> (
-			//			parseData.attributes, parseData.attribute_count);
-
-			//	dxshader._attributes = new Attribute[attributes.Length];
-			//	for (var i = 0; i < attributes.Length; i++) {
-			//		dxshader._attributes [i].name = attributes [i].name;
-			//		dxshader._attributes [i].index = attributes [i].index;
-			//		dxshader._attributes [i].usage = EffectObject.ToXNAVertexElementUsage (attributes [i].usage);
-			//	}
-			//}
 
 			var symbols = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol> (
 					parseData.symbols, parseData.symbol_count);
@@ -68,36 +53,7 @@ namespace MonoGame.Effect
 			}
 			);//(a, b) => ((int)(a.info.elements > 1))a.register_index.CompareTo(b.register_index));
 
-            // NOTE: It seems the latest versions of MojoShader only 
-            // output vec4 register sets.  We leave the code below, but
-            // the runtime has been optimized for this case.
-
-			// For whatever reason the register indexing is 
-			// incorrect from MojoShader.
-			{
-				uint bool_index = 0;
-				uint float4_index = 0;
-				uint int4_index = 0;
-
-				for (var i = 0; i < symbols.Length; i++) {
-					switch (symbols [i].register_set) {
-					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
-						symbols [i].register_index = bool_index;
-						bool_index += symbols [i].register_count;
-						break;
-
-					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
-						symbols [i].register_index = float4_index;
-						float4_index += symbols[i].register_count;
-						break;
-
-					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
-						symbols [i].register_index = int4_index;
-						int4_index += symbols [i].register_count;
-						break;
-					}
-				}
-			}
+            symbols = RegisterSets(symbols);
 
 			// Get the samplers.
 			var samplers = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler> (
@@ -209,6 +165,42 @@ namespace MonoGame.Effect
                 dxshader._attributes[i].index = attributes[i].index;
                 dxshader._attributes[i].usage = EffectObject.ToXNAVertexElementUsage(attributes[i].usage);
             }
+        }
+
+        // NOTE: It seems the latest versions of MojoShader only 
+        //         // output vec4 register sets.  We leave the code below, but
+        //         // the runtime has been optimized for this case.
+
+        //// For whatever reason the register indexing is 
+        //// incorrect from MojoShader.
+        //
+        private static MojoShader.MOJOSHADER_symbol[] RegisterSets(MojoShader.MOJOSHADER_symbol[] symbols)
+        {
+            uint bool_index = 0;
+            uint float4_index = 0;
+            uint int4_index = 0;
+
+            for (var i = 0; i < symbols.Length; i++)
+            {
+                switch (symbols[i].register_set)
+                {
+                    case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
+                        symbols[i].register_index = bool_index;
+                        bool_index += symbols[i].register_count;
+                        break;
+
+                    case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
+                        symbols[i].register_index = float4_index;
+                        float4_index += symbols[i].register_count;
+                        break;
+
+                    case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
+                        symbols[i].register_index = int4_index;
+                        int4_index += symbols[i].register_count;
+                        break;
+                }
+            }
+            return symbols;
         }
     }
 }
