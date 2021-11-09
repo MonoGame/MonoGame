@@ -199,6 +199,8 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformSetIsMuted()
         {
+            //code smell duplication. Duplication with PlatformSetvolume. In order to avoid duplication
+            //called PlatformSetVolume in here. 
             PlatformSetVolume();
         }
 
