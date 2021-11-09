@@ -199,10 +199,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformSetIsMuted()
         {
-            if (_volumeController == null)
-                return;
-
-            SetChannelVolumes();
+            PlatformSetVolume();
         }
 
         private TimeSpan PlatformGetPlayPosition()
