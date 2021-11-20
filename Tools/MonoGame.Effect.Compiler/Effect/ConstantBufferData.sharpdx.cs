@@ -85,6 +85,7 @@ namespace MonoGame.Effect
                     break;
 
                 case SharpDX.D3DCompiler.ShaderVariableType.Int:
+                case SharpDX.D3DCompiler.ShaderVariableType.UInt:
                     param.type = EffectObject.D3DXPARAMETER_TYPE.INT;
                     break;
 

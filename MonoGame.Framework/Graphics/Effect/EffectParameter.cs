@@ -213,7 +213,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return ((int[])Data)[0];
 #endif
         }
-
+        
         public int[] GetValueInt32Array()
         {
             if (Elements != null && Elements.Count > 0)
@@ -232,6 +232,44 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 case EffectParameterClass.Scalar:
                     return new int[] { GetValueInt32() };
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public uint GetValueUnsignedInt32()
+        {
+            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
+                throw new InvalidCastException();
+#if OPENGL
+            // MojoShader encodes integers into a float.
+            if (MojoDataLayout)
+                return (uint)((float[])Data)[0];
+            else
+                return ((uint[])Data)[0];
+#else
+            return ((uint[])Data)[0];
+#endif
+        }
+
+        public uint[] GetValueUnsignedInt32Array()
+        {
+            if (Elements != null && Elements.Count > 0)
+            {
+                var ret = new uint[RowCount * ColumnCount * Elements.Count];
+                for (int i = 0; i < Elements.Count; i++)
+                {
+                    var elmArray = Elements[i].GetValueUnsignedInt32Array();
+                    for (var j = 0; j < elmArray.Length; j++)
+                        ret[RowCount * ColumnCount * i + j] = elmArray[j];
+                }
+                return ret;
+            }
+
+            switch (ParameterClass)
+            {
+                case EffectParameterClass.Scalar:
+                    return new uint[] { GetValueUnsignedInt32() };
                 default:
                     throw new NotImplementedException();
             }
@@ -475,7 +513,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
                 throw new InvalidCastException();
-
 #if OPENGL
             // MojoShader encodes integers into a float.
             if (MojoDataLayout)
@@ -489,6 +526,30 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public void SetValue(int[] value)
+        {
+            for (var i = 0; i < value.Length; i++)
+                Elements[i].SetValue(value[i]);
+
+            StateKey = unchecked(NextStateKey++);
+        }
+
+        public void SetValue(uint value)
+        {
+            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
+                throw new InvalidCastException();
+#if OPENGL
+            // MojoShader encodes integers into a float.
+            if (MojoDataLayout)
+                ((float[])Data)[0] = value;
+            else
+                ((uint[])Data)[0] = value;
+#else
+            ((uint[])Data)[0] = value;
+#endif
+            StateKey = unchecked(NextStateKey++);
+        }
+
+        public void SetValue(uint[] value)
         {
             for (var i = 0; i < value.Length; i++)
                 Elements[i].SetValue(value[i]);
@@ -1056,7 +1117,7 @@ namespace Microsoft.Xna.Framework.Graphics
         */
 
         public void SetValue (Single value)
-        {
+            {
             if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
             ((float[])Data)[0] = value;
