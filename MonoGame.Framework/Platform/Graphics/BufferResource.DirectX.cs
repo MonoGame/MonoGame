@@ -59,6 +59,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 SharpDX.DXGI.Format format;
                 var flags = SharpDX.Direct3D11.UnorderedAccessViewBufferFlags.None;
 
+                if (StructuredBufferType == StructuredBufferType.Counter)
+                    flags |= SharpDX.Direct3D11.UnorderedAccessViewBufferFlags.Counter;
+                if (StructuredBufferType == StructuredBufferType.Append)
+                    flags |= SharpDX.Direct3D11.UnorderedAccessViewBufferFlags.Append;
+
                 switch (BufferType)
                 {
                     case BufferType.StructuredBuffer:
@@ -303,7 +308,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var shaderStageDX = device.GetDXShaderStage(stage);
 
             if (writeAcess)
-                (shaderStageDX as SharpDX.Direct3D11.ComputeShaderStage).SetUnorderedAccessView(bindingSlot, GetUnorderedAccessView());
+                (shaderStageDX as SharpDX.Direct3D11.ComputeShaderStage).SetUnorderedAccessView(bindingSlot, GetUnorderedAccessView(), CounterBufferResetValue);
             else
                 shaderStageDX.SetShaderResource(bindingSlot, GetShaderResourceView());
         }

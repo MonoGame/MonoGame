@@ -35,7 +35,8 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         public string name;
         public int elementSize;
-        public int slot;
+        public int bindingSlot;
+        public int bindingSlotForCounter; // in OpenGL structured buffers with append/consume/counter functionality are emulated using a separate counter buffer
         public ShaderResourceType type;
 
         // TODO: This should be moved to EffectPass.
@@ -135,7 +136,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 ShaderResources[b].name = reader.ReadString();
                 ShaderResources[b].elementSize = reader.ReadUInt16();
-                ShaderResources[b].slot = reader.ReadByte();
+                ShaderResources[b].bindingSlot = reader.ReadByte();
+                ShaderResources[b].bindingSlotForCounter = reader.ReadByte();
                 ShaderResources[b].type = (ShaderResourceType)reader.ReadByte();
                 ShaderResources[b].parameter = reader.ReadByte();
             }

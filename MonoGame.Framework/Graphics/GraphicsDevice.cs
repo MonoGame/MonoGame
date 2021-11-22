@@ -1218,27 +1218,27 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal void SetShaderResource(ShaderStage stage, int slot, ShaderResource resource, bool writeAcess)
+        internal void SetShaderResource(ShaderStage stage, ShaderResource resource, ref ShaderResourceInfo resourceInfo)
         {
             switch (stage)
             {
                 case ShaderStage.Vertex:
-                    _vertexShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
+                    _vertexShaderResources.SetResourceForBindingSlot(resource, ref resourceInfo);
                     break;
                 case ShaderStage.Pixel:
-                    _pixelShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
+                    _pixelShaderResources.SetResourceForBindingSlot(resource, ref resourceInfo);
                     break;
                 case ShaderStage.Hull:
-                    _hullShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
+                    _hullShaderResources.SetResourceForBindingSlot(resource, ref resourceInfo);
                     break;
                 case ShaderStage.Domain:
-                    _domainShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
+                    _domainShaderResources.SetResourceForBindingSlot(resource, ref resourceInfo);
                     break;
                 case ShaderStage.Geometry:
-                    _geometryShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
+                    _geometryShaderResources.SetResourceForBindingSlot(resource, ref resourceInfo);
                     break;
                 case ShaderStage.Compute:
-                    _computeShaderResources.SetResourceForBindingSlot(resource, slot, writeAcess);
+                    _computeShaderResources.SetResourceForBindingSlot(resource, ref resourceInfo);
                     break;
                 default:
                     throw new ArgumentException();

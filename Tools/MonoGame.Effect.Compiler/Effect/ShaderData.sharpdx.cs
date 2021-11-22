@@ -168,6 +168,9 @@ namespace MonoGame.Effect
                                 bufferType = ShaderResourceType.StructuredBuffer;
                                 break;
                             case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWStructured:
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWStructuredWithCounter:
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewAppendStructured:
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewConsumeStructured:
                                 bufferType = ShaderResourceType.RWStructuredBuffer;
                                 break;
                             case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWTyped:

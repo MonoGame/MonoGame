@@ -21,14 +21,14 @@ namespace Microsoft.Xna.Framework.Graphics
             DeleteGLTexture();
         }
 
-        internal override void PlatformApply(GraphicsDevice device, ShaderProgram program, int bindingSlot, bool writeAcess)
+        internal override void PlatformApply(GraphicsDevice device, ShaderProgram program, ref ResourceBinding resourceBinding, bool writeAcess)
         {
             if (glTexture < 0)
                 throw new InvalidOperationException("No valid texture");
 
             var bufferAccess = ShaderAccess == ShaderAccess.ReadWrite ? BufferAccess.ReadWrite : BufferAccess.ReadOnly;
 
-            GL.BindImageTexture(bindingSlot, glTexture, 0, true, 0, bufferAccess, glInternalFormat);
+            GL.BindImageTexture(resourceBinding.bindingSlot, glTexture, 0, true, 0, bufferAccess, glInternalFormat);
             GraphicsExtensions.CheckGLError();
         }
 

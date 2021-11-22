@@ -228,6 +228,7 @@ namespace MonoGame.Effect
             public string name;
             public int byteSize;
             public int slot; // register binding
+            public int slotForCounter; // register binding for append/consume/counter buffer
             public bool readOnly;
         }
 
@@ -356,7 +357,6 @@ namespace MonoGame.Effect
 
             byte[] nameBuffer = new byte[MaxNameLength];
        
-
             for (int i = 0; i < bufferCount; i++)
             {
                 GetStorageBuffer(ref result, i, nameBuffer, MaxNameLength, out int byteSize, out int slot, out bool readOnly);
@@ -370,6 +370,29 @@ namespace MonoGame.Effect
                 };
 
                 buffers.Add(buffer);
+            }
+
+            // find counter buffers for append/consume/counter structured buffers,
+            // remove them from the list, but store their binding slot with the corresponding buffer
+            for (int i = 0; i < buffers.Count; i++)
+            {
+                var buffer = buffers[i];
+                string counterBufferPrefix = "counter.var.";
+
+                if (buffer.name.StartsWith(counterBufferPrefix))
+                {
+                    string correspondingName = buffer.name.Substring(counterBufferPrefix.Length);
+                    int correspondingIndex = buffers.FindIndex(b => b.name == correspondingName);
+                    if (correspondingIndex > 0)
+                    {
+                        StorageBuffer corresponsingBuffer = buffers[correspondingIndex];
+                        corresponsingBuffer.slotForCounter = buffer.slot;
+                        buffers[correspondingIndex] = corresponsingBuffer;
+
+                        buffers.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
 
             return buffers;

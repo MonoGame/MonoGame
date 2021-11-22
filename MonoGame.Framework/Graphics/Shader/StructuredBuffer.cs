@@ -7,18 +7,31 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    public enum StructuredBufferType
+    {
+        Basic, // no internal counter
+        Append, // internal counter to allow Append() and Consume() from compute shader
+        Counter, // internal counter to allow IncrementCounter() and DecrementCounter() from compute shader
+    }
+
     public partial class StructuredBuffer : BufferResource
     {
         public new int ElementCount { get { return base.ElementCount; } }
 
-        public StructuredBuffer(GraphicsDevice graphicsDevice, Type type, int elementCount, BufferUsage bufferUsage, ShaderAccess shaderAccess) :
+        public new StructuredBufferType StructuredBufferType { get { return base.StructuredBufferType;  } }
+
+        public int CounterResetValue { get { return CounterBufferResetValue; } set { CounterBufferResetValue = value; } }
+
+        public StructuredBuffer(GraphicsDevice graphicsDevice, Type structureType, int elementCount, BufferUsage bufferUsage, ShaderAccess shaderAccess, StructuredBufferType bufferType = StructuredBufferType.Basic, int counterResetValue = -1) :
             base(graphicsDevice,
                 elementCount,
-                ReflectionHelpers.ManagedSizeOf(type),
+                ReflectionHelpers.ManagedSizeOf(structureType),
                 bufferUsage,
                 false,
                 BufferType.StructuredBuffer,
-                shaderAccess)
+                shaderAccess,
+                bufferType,
+                counterResetValue)
         {
         }
 

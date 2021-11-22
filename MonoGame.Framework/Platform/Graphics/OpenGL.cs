@@ -138,6 +138,7 @@ namespace MonoGame.OpenGL
         ShaderStorageBuffer = 0x90D2,
         IndirectDrawBuffer = 0x8F3F,
         IndirectDispatchBuffer = 0x90EE,
+        AtomicCounterBuffer = 0x92C0,
     }
 
     internal enum RenderbufferTarget

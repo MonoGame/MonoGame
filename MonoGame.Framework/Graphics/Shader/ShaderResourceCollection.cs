@@ -6,18 +6,19 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public sealed partial class ShaderResourceCollection
+    internal struct ResourceBinding
     {
-        struct ResourceInfo
-        {
-            public ShaderResource resource;
+        public ShaderResource resource;
 #if OPENGL
             public int bindingSlot;
+            public int bindingSlotForCounter; // in OpenGL structured buffers with append/consume/counter functionality are emulated using a separate counter buffer
 #endif
-        }
+    }
 
-        private readonly ResourceInfo[] _readonlyResources;
-        private readonly ResourceInfo[] _writeableResources;
+    public sealed partial class ShaderResourceCollection
+    {
+        private readonly ResourceBinding[] _readonlyResources;
+        private readonly ResourceBinding[] _writeableResources;
 
         private int _readonlyValid;
         private int _writeableValid;
@@ -31,12 +32,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             _stage = stage;
 
-            _readonlyResources = new ResourceInfo[maxReadableResources];
-            _writeableResources = new ResourceInfo[maxWriteableResources];
+            _readonlyResources = new ResourceBinding[maxReadableResources];
+            _writeableResources = new ResourceBinding[maxWriteableResources];
         }
 
-        public void SetResourceForBindingSlot(ShaderResource resource, int index, bool writeAccess)
+        internal void SetResourceForBindingSlot(ShaderResource resource, ref ShaderResourceInfo resourceInfo)
         {
+            bool writeAccess = resourceInfo.writeAccess;
+            int bindingSlot = resourceInfo.bindingSlot;
+
             if (writeAccess && _stage != ShaderStage.Compute)
                 throw new ArgumentException("Only a compute shader can use RWStructuredBuffer currently. Uae a regular StructuredBuffer instead and assign it the same buffer.");
 
@@ -47,31 +51,32 @@ namespace Microsoft.Xna.Framework.Graphics
             // OpenGL doesn't separate register types like this. If a shader resource is assigned to register u0, and another resource is assigned to register t0,
             // things are fine in DX, but in GL we have a binding slot conflict. To resolve this u-registers have been shifted by 16, if set explicitly (see ShaderConductor shiftAllUABuffersBindings option in MGFXC).
             // Unshift those binding slots now, to avoid an array index overflow.
-            resources[index % GraphicsDevice.MaxResourceSlotsPerShaderStage] = new ResourceInfo
+            resources[bindingSlot % GraphicsDevice.MaxResourceSlotsPerShaderStage] = new ResourceBinding
             {
                 resource = resource,
-                bindingSlot = index,
+                bindingSlot = bindingSlot,
+                bindingSlotForCounter = resourceInfo.bindingSlotForCounter,
             };
 #else
-            resources[index] = new ResourceInfo
+            resources[bindingSlot] = new ResourceBinding
             {
                 resource = resource,
             };
 #endif
 
             if (writeAccess)
-                _writeableValid |= 1 << index;
+                _writeableValid |= 1 << bindingSlot;
             else
-                _readonlyValid |= 1 << index;
+                _readonlyValid |= 1 << bindingSlot;
         }
 
         internal void Clear()
         {
             for (var i = 0; i < _readonlyResources.Length; i++)
-                _readonlyResources[i] = new ResourceInfo();
+                _readonlyResources[i] = new ResourceBinding();
 
             for (var i = 0; i < _writeableResources.Length; i++)
-                _writeableResources[i] = new ResourceInfo();
+                _writeableResources[i] = new ResourceBinding();
 
             _readonlyValid = 0;
             _writeableValid = 0;
@@ -96,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (resource != null && !resource.IsDisposed)
                     {
 #if OPENGL || WEB
-                        resource.PlatformApply(device, shaderProgram, resourceInfo.bindingSlot, false);
+                        resource.PlatformApply(device, shaderProgram, ref resourceInfo, false);
 #else
                         resource.PlatformApply(device, _stage, i, false);
 #endif
@@ -120,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (resource != null && !resource.IsDisposed)
                     {
 #if OPENGL || WEB
-                        resource.PlatformApply(device, shaderProgram, resourceInfo.bindingSlot, true);
+                        resource.PlatformApply(device, shaderProgram, ref resourceInfo, true);
 #else
                         resource.PlatformApply(device, _stage, i, true);
 #endif

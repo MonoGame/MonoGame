@@ -10,8 +10,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class BufferResource
     {
-        //internal uint vao;
         internal int buffer;
+        internal int counterBuffer; // for structured buffers with append/consume and counter support
 
         private void PlatformConstruct()
         {
@@ -54,6 +54,18 @@ namespace Microsoft.Xna.Framework.Graphics
                               new IntPtr(ElementStride * ElementCount), IntPtr.Zero,
                               _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
                 GraphicsExtensions.CheckGLError();
+            }
+
+            if (counterBuffer == 0 && StructuredBufferType != StructuredBufferType.Basic)
+            {
+                GL.GenBuffers(1, out this.counterBuffer);
+                GraphicsExtensions.CheckGLError();
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, this.counterBuffer);
+                GraphicsExtensions.CheckGLError();
+                GL.BufferData(BufferTarget.ShaderStorageBuffer, new IntPtr(4), IntPtr.Zero, BufferUsageHint.StreamDraw);
+                GraphicsExtensions.CheckGLError();
+
+                SetCounterBufferValue(0);
             }
         }
 
@@ -200,10 +212,35 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal override void PlatformApply(GraphicsDevice device, ShaderProgram program, int bindingSlot, bool writeAcess)
+        private void SetCounterBufferValue(int val)
         {
-            GL.BindBufferBase(BufferTarget.ShaderStorageBuffer, bindingSlot, buffer);
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, counterBuffer);
             GraphicsExtensions.CheckGLError();
+
+            unsafe
+            {
+                int* data = stackalloc int[1];
+                data[0] = val;
+                IntPtr ptr = (IntPtr)data;
+
+                GL.BufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, new IntPtr(4), (IntPtr)data);
+                GraphicsExtensions.CheckGLError();
+            }
+        }
+
+        internal override void PlatformApply(GraphicsDevice device, ShaderProgram program, ref ResourceBinding resourceBinding, bool writeAcess)
+        {
+            GL.BindBufferBase(BufferTarget.ShaderStorageBuffer, resourceBinding.bindingSlot, buffer);
+            GraphicsExtensions.CheckGLError();
+            
+            if (counterBuffer > 0)
+            {            
+                if (CounterBufferResetValue != -1)
+                    SetCounterBufferValue(CounterBufferResetValue);
+
+                GL.BindBufferBase(BufferTarget.ShaderStorageBuffer, resourceBinding.bindingSlotForCounter, counterBuffer);
+                GraphicsExtensions.CheckGLError();
+            }
         }
 
         protected override void Dispose(bool disposing)
