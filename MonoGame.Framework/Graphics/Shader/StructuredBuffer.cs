@@ -35,6 +35,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
+        public void CopyCounterValue(BufferResource destinationBuffer, int byteOffset)
+        {
+            if (StructuredBufferType == StructuredBufferType.Basic)
+                throw new InvalidOperationException("CopyCounterValue only works for structured buffers of type StructuredBufferType.Append or StructuredBufferType.Counter. This buffer was created with StructuredBufferType.Basic.");
+            
+            GraphicsDevice.CopyStructuredBufferCounterValue(this, destinationBuffer, byteOffset);
+        }
+
         /// <summary>
         /// Get the data from this StructuredBuffer.
         /// </summary>

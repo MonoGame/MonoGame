@@ -1574,5 +1574,17 @@ namespace Microsoft.Xna.Framework.Graphics
             height = mode.Height;
         }
 #endif
+
+        internal void CopyStructuredBufferCounterValue(StructuredBuffer sourceBuffer, BufferResource destinationBuffer, int destinationByteOffset)
+        {
+            GL.BindBuffer(BufferTarget.CopyReadBuffer, sourceBuffer.counterBuffer);
+            GraphicsExtensions.CheckGLError();
+
+            GL.BindBuffer(BufferTarget.CopyWriteBuffer, destinationBuffer.buffer);
+            GraphicsExtensions.CheckGLError();
+
+            GL.CopyBufferSubData(BufferTarget.CopyReadBuffer, BufferTarget.CopyWriteBuffer, IntPtr.Zero, new IntPtr(destinationByteOffset), new UIntPtr(4));
+            GraphicsExtensions.CheckGLError();
+        }
     }
 }

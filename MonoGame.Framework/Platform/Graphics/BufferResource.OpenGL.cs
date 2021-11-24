@@ -221,7 +221,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 int* data = stackalloc int[1];
                 data[0] = val;
-                IntPtr ptr = (IntPtr)data;
 
                 GL.BufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, new IntPtr(4), (IntPtr)data);
                 GraphicsExtensions.CheckGLError();

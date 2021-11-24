@@ -139,6 +139,8 @@ namespace MonoGame.OpenGL
         IndirectDrawBuffer = 0x8F3F,
         IndirectDispatchBuffer = 0x90EE,
         AtomicCounterBuffer = 0x92C0,
+        CopyReadBuffer = 0x8F36,
+        CopyWriteBuffer = 0x8F37,
     }
 
     internal enum RenderbufferTarget
@@ -1394,6 +1396,12 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
+        internal delegate void CopyBufferSubDataDelegate(BufferTarget readTarget, BufferTarget writeTarget, IntPtr readOffset, IntPtr writeOffset, UIntPtr size);
+        internal static CopyBufferSubDataDelegate CopyBufferSubData;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
         internal delegate void VertexAttribPointerDelegate(int location, int elementCount, VertexAttribPointerType type, bool normalize,
             int stride, IntPtr data);
         internal static VertexAttribPointerDelegate VertexAttribPointer;
@@ -1736,6 +1744,10 @@ namespace MonoGame.OpenGL
             {
                 GL.MemoryBarrier = LoadFunction<GL.MemoryBarrierDelegate>("glMemoryBarrier");
             }
+            if (GL.CopyBufferSubData == null && Extensions.Contains("GL_ARB_copy_buffer"))
+            {
+                CopyBufferSubData = LoadFunction<GL.CopyBufferSubDataDelegate>("glCopyBufferSubData");
+            } 
         }
 
         internal static void LoadFrameBufferObjectEXTEntryPoints()

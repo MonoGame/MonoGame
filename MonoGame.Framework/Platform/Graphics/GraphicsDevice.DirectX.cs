@@ -1951,5 +1951,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new Rectangle(x, y, width, height);
         }
+
+        internal void CopyStructuredBufferCounterValue(StructuredBuffer sourceBuffer, BufferResource destinationBuffer, int destinationByteOffset)
+        {
+            lock (_d3dContext)
+            {
+                _d3dContext.CopyStructureCount(destinationBuffer.Buffer, destinationByteOffset, sourceBuffer.GetUnorderedAccessView());
+            }
+        }
     }
 }
