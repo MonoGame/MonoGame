@@ -14,8 +14,15 @@ namespace Microsoft.Xna.Framework.Graphics
         public uint StartVertexLocation;
         public uint StartInstanceLocation;
 
+        public const int ByteOffsetVertexCountPerInstance = 0;
+        public const int ByteOffsetInstanceCount          = 4;
+        public const int ByteOffsetStartVertexLocation    = 8;
+        public const int ByteOffsetStartInstanceLocation  = 12;
+
         public const int Count = 4;
+        public const int ByteSize = Count * 4;
         public int ArgumentCount { get { return Count; } }
+        public int TotalByteSize { get { return ByteSize; } }
 
         public int WriteToArray(uint[] array, int offset)
         {
@@ -32,11 +39,19 @@ namespace Microsoft.Xna.Framework.Graphics
         public uint IndexCountPerInstance;
         public uint InstanceCount;
         public uint StartIndexLocation;
-        public int BaseVertexLocation;
+        public  int BaseVertexLocation;
         public uint StartInstanceLocation;
 
+        public const int ByteOffsetIndexCountPerInstance = 0;
+        public const int ByteOffsetInstanceCount         = 4;
+        public const int ByteOffsetStartIndexLocation    = 8;
+        public const int ByteOffsetBaseVertexLocation    = 12;
+        public const int ByteOffsetStartInstanceLocation = 16;
+
         public const int Count = 5;
+        public const int ByteSize = Count * 4;
         public int ArgumentCount { get { return Count; } }
+        public int TotalByteSize { get { return ByteSize; } }
 
         public int WriteToArray(uint[] array, int offset)
         {
@@ -55,8 +70,14 @@ namespace Microsoft.Xna.Framework.Graphics
         public uint GroupCountY;
         public uint GroupCountZ;
 
+        public const int ByteOffsetGroupCountX = 0;
+        public const int ByteOffsetGroupCountY = 4;
+        public const int ByteOffsetGroupCountZ = 8;
+
         public const int Count = 3;
+        public const int ByteSize = Count * 4;
         public int ArgumentCount { get { return Count; } }
+        public int TotalByteSize { get { return ByteSize; } }
 
         public int WriteToArray(uint[] array, int offset)
         {
