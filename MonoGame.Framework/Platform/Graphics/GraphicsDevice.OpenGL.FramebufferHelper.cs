@@ -111,12 +111,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.InvalidateFramebuffer (FramebufferTarget.Framebuffer, 3, FramebufferAttachements);
             }
 
-            internal virtual void InvalidateReadFramebuffer()
-            {
-                Debug.Assert(this.SupportsInvalidateFramebuffer);
-                GL.InvalidateFramebuffer(FramebufferTarget.Framebuffer, 3, FramebufferAttachements);
-            }
-
             internal virtual void DeleteFramebuffer(int framebuffer)
             {
                 GL.DeleteFramebuffers(1, ref framebuffer);
