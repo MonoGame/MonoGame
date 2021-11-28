@@ -28,8 +28,10 @@ namespace Microsoft.Xna.Framework.Content
             var dimensions = new int[rank];
             var count = 1;
             for (int d = 0; d < dimensions.Length; d++)
-                count *= dimensions[d] = input.ReadInt32();
-
+            {
+                dimensions[d] = input.ReadInt32();
+                count *= dimensions[d];
+            }
 
             var array = existingInstance;
             if (array == null)

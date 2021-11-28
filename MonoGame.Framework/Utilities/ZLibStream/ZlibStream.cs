@@ -3038,7 +3038,8 @@ namespace MonoGame.Framework.Utilities
                         // compute minimum size table less than or equal to l bits
                         z = g - w;
                         z = (z > l) ? l : z; // table size upper limit
-                        if ((f = 1 << (j = k - w)) > a + 1)
+                        j = k - w;
+                        if ((f = 1 << j) > a + 1)
                         {
                             // try a k-w bit table
                             // too few codes for k-w bit table
@@ -4701,7 +4702,8 @@ namespace MonoGame.Framework.Utilities
                         r = f;
                         _codec.AvailableBytesIn--;
                         _codec.TotalBytesIn++;
-                        if (((method = _codec.InputBuffer[_codec.NextIn++]) & 0xf) != Z_DEFLATED)
+                        method = _codec.InputBuffer[_codec.NextIn++];
+                        if ((method & 0xf) != Z_DEFLATED)
                         {
                             mode = InflateManagerMode.BAD;
                             _codec.Message = String.Format("unknown compression method (0x{0:X2})", method);

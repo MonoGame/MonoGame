@@ -184,7 +184,8 @@ namespace Microsoft.Xna.Framework.Audio
             get { return volume; }
             set
             {
-                AL.Source(alSourceId, ALSourcef.Gain, volume = value);
+                volume = value;
+                AL.Source(alSourceId, ALSourcef.Gain, volume);
                 ALHelper.CheckError("Failed to set volume.");
             }
         }

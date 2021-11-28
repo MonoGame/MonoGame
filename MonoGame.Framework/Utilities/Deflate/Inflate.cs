@@ -1534,7 +1534,8 @@ namespace MonoGame.Framework.Utilities.Deflate
                         r = f;
                         _codec.AvailableBytesIn--;
                         _codec.TotalBytesIn++;
-                        if (((method = _codec.InputBuffer[_codec.NextIn++]) & 0xf) != Z_DEFLATED)
+                        method = _codec.InputBuffer[_codec.NextIn++];
+                        if ((method & 0xf) != Z_DEFLATED)
                         {
                             mode = InflateManagerMode.BAD;
                             _codec.Message = String.Format("unknown compression method (0x{0:X2})", method);
