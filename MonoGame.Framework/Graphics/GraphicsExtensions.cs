@@ -504,13 +504,8 @@ namespace Microsoft.Xna.Framework.Graphics
             out PixelFormat glFormat,
             out PixelType glType)
 		{
-            // Textures that can be written to from a shader require a sized internal format like PixelInternalFormat.Rgba8,
-            // base internal formats like PixelInternalFormat.Rgba are not allowed.
-            // Could we replace base formats with sized formats generally, or are the base formats needed for something?
-            // It is unclear at this point if the used compressed formats will work for writeable textures.
-            // This needs more testing/research.
-            glInternalFormat = isWriteable ? PixelInternalFormat.Rgba8 : PixelInternalFormat.Rgba;
-			glFormat = PixelFormat.Rgba;
+            glInternalFormat = PixelInternalFormat.Rgba8;
+            glFormat = PixelFormat.Rgba;
 			glType = PixelType.UnsignedByte;
 
 		    var supportsSRgb = graphicsDevice.GraphicsCapabilities.SupportsSRgb;
@@ -526,14 +521,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			switch (format) {
 			case SurfaceFormat.Color:
-				glInternalFormat = isWriteable ? PixelInternalFormat.Rgba8 : PixelInternalFormat.Rgba;
-				glFormat = PixelFormat.Rgba;
+                glInternalFormat = PixelInternalFormat.Rgba8;
+                glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedByte;
 				break;
             case SurfaceFormat.ColorSRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Color;
-                glInternalFormat = isWriteable ? PixelInternalFormat.Srgb8 : PixelInternalFormat.Srgb;
+                glInternalFormat = PixelInternalFormat.Srgb8;
                 glFormat = PixelFormat.Rgba;
                 glType = PixelType.UnsignedByte;
                 break;
@@ -546,7 +541,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 			case SurfaceFormat.Bgra4444:
 #if IOS || ANDROID
-				glInternalFormat = isWriteable ? PixelInternalFormat.Rgba4 : PixelInternalFormat.Rgba;
+				glInternalFormat = PixelInternalFormat.Rgba4;
 #else
                 glInternalFormat = PixelInternalFormat.Rgba4;
 #endif
@@ -554,7 +549,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				glType = PixelType.UnsignedShort4444;
 				break;
 			case SurfaceFormat.Bgra5551:
-				glInternalFormat = isWriteable ? PixelInternalFormat.Rgb5A1 : PixelInternalFormat.Rgba;
+                if (isWriteable)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rgba;
 				glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedShort5551;
 				break;
