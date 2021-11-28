@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Content
 
             var array = existingInstance;
             if (array == null)
-                array = Array.CreateInstance(typeof(T), dimensions);//new T[count];
+                array = Array.CreateInstance(typeof(T), dimensions);
             else if (dimensions.Length != array.Rank)
                 throw new RankException("existingInstance");
 

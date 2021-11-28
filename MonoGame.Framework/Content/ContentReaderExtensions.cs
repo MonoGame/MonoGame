@@ -7,6 +7,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// Content Reader Extensions class
+    /// </summary>
     public static class ContentReaderExtensions
     {
         /// <summary>

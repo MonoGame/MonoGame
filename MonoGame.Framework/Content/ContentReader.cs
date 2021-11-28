@@ -9,6 +9,9 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// Content Reader class, inherits from Binary Reader class
+    /// </summary>
     public sealed class ContentReader : BinaryReader
     {
         private ContentManager contentManager;
@@ -101,6 +104,11 @@ namespace Microsoft.Xna.Framework.Content
                 fixup.Value(sharedResources[fixup.Key]);
         }
 
+        /// <summary>
+        /// Returns the external file reference
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns> Returns ContentReader</returns>
         public T ReadExternalReference<T>()
         {
             var externalReference = ReadString();
@@ -113,6 +121,10 @@ namespace Microsoft.Xna.Framework.Content
             return default(T);
         }
 
+        /// <summary>
+        /// Reads all the rows and columns from the matrix
+        /// </summary>
+        /// <returns> Matrix Result </returns>
         public Matrix ReadMatrix()
         {
             Matrix result = new Matrix();
@@ -181,6 +193,13 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
+        /// <summary>
+        /// Reads 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="typeReader"></param>
+        /// <param name="existingInstance"></param>
+        /// <returns></returns>
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
             if (!ReflectionHelpers.IsValueType(typeReader.TargetType))
@@ -212,7 +231,7 @@ namespace Microsoft.Xna.Framework.Content
         {
             return (T)ReadRawObject<T>(typeReader, default(T));
         }
-
+        
         public T ReadRawObject<T>(T existingInstance)
         {
             Type objectType = typeof(T);
@@ -245,6 +264,10 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+        /// <summary>
+        /// Reads X and Y from stream and sets to the Vector
+        /// </summary>
+        /// <returns> Vector containing X and Y </returns>
         public Vector2 ReadVector2()
         {
             Vector2 result = new Vector2();
@@ -272,6 +295,10 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
+        /// <summary>
+        /// Reads the color in RGBA format
+        /// </summary>
+        /// <returns> Returns the color in Color type</returns>
         public Color ReadColor()
         {
             Color result = new Color();
