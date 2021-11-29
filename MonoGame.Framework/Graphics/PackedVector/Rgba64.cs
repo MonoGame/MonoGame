@@ -59,10 +59,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 		public Vector4 ToVector4()
 		{
 			return new Vector4(
-                (float) (((packedValue) & 0xFFFF) / 65535.0f),
-                (float) (((packedValue >> 16) & 0xFFFF) / 65535.0f),
-                (float) (((packedValue >> 32) & 0xFFFF) / 65535.0f),
-                (float) (((packedValue >> 48) & 0xFFFF) / 65535.0f)
+                (((packedValue) & 0xFFFF) / 65535.0f),
+                (((packedValue >> 16) & 0xFFFF) / 65535.0f),
+                (((packedValue >> 32) & 0xFFFF) / 65535.0f),
+                (((packedValue >> 48) & 0xFFFF) / 65535.0f)
             );
 		}
 
@@ -113,20 +113,32 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 			return packedValue.GetHashCode();
 		}
 
+        /// <summary>
+		/// Compares a lhs packed vector with the rhs packed vector.
+		/// </summary>
+		/// <param name="lhs">The lhs packed vector to compare.</param>
+        /// <param name="rhs">The rhs packed vector to compare.</param>
+		/// <returns>True if the lhs packed vector is equal to the rhs packed vector.</returns>
 		public static bool operator ==(Rgba64 lhs, Rgba64 rhs)
 		{
 			return lhs.packedValue == rhs.packedValue;
 		}
 
-		public static bool operator !=(Rgba64 lhs, Rgba64 rhs)
+        /// <summary>
+        /// Compares a lhs packed vector with the rhs packed vector.
+        /// </summary>
+       /// <param name="lhs">The lhs packed vector to compare.</param>
+        /// <param name="rhs">The rhs packed vector to compare.</param>
+        /// <returns>True if the lhs packed vector is not equal to the rhs packed vector.</returns>
+        public static bool operator !=(Rgba64 lhs, Rgba64 rhs)
 		{
 			return lhs.packedValue != rhs.packedValue;
 		}
 
 		private static ulong Pack(float x, float y, float z, float w)
 		{
-			return (ulong) (
-				(((ulong)MathF.Round(MathHelper.Clamp(x * 0xFFFF, 0, 65535f)) ) ) |
+			return (
+				((ulong)MathF.Round(MathHelper.Clamp(x * 0xFFFF, 0, 65535f)) ) |
 				(((ulong)MathF.Round(MathHelper.Clamp(y * 0xFFFF, 0, 65535f)) ) << 16) |
                 (((ulong)MathF.Round(MathHelper.Clamp(z * 0xFFFF, 0, 65535f)) ) << 32) |
 				(((ulong)MathF.Round(MathHelper.Clamp(w * 0xFFFF, 0, 65535f)) ) << 48)
