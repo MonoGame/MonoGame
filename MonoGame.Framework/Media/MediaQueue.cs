@@ -78,7 +78,7 @@ namespace Microsoft.Xna.Framework.Media
 		internal void Clear()
 		{
 			Song song;
-			for(; songs.Count > 0; )
+            while (songs.Count > 0)
 			{
 				song = songs[0];
 #if !DIRECTX
