@@ -100,10 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             finally
             {
-                if (data != null)
-                {
-                    data = null;
-                }
+                data = null;
             }
         }
     }
