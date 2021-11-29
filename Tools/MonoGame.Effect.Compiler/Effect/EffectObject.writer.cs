@@ -30,8 +30,8 @@ namespace MonoGame.Effect
             writer.Write(profile);
 
             // Write the rest to a memory stream.
-            using (MemoryStream memStream = new MemoryStream())
-            using (BinaryWriterEx memWriter = new BinaryWriterEx(memStream))
+            using(MemoryStream memStream = new MemoryStream())
+            using(BinaryWriter memWriter = new BinaryWriter(memStream))
             {
                 // Write MojoShader flag
                 memWriter.Write(options.IsDefined("MOJO"));
@@ -154,14 +154,14 @@ namespace MonoGame.Effect
             writer.Write(Header.ToCharArray());
         }
 
-        private static void WriteParameters(BinaryWriterEx writer, d3dx_parameter[] parameters, int count)
+        private static void WriteParameters(BinaryWriter writer, d3dx_parameter[] parameters, int count)
         {
             writer.Write(count);
             for (var i = 0; i < count; i++)
                 WriteParameter(writer, parameters[i]);
         }
 
-        private static void WriteParameter(BinaryWriterEx writer, d3dx_parameter param)
+        private static void WriteParameter(BinaryWriter writer, d3dx_parameter param)
         {
             var class_ = ToXNAParameterClass(param.class_);
             var type = ToXNAParameterType(param.type);
@@ -192,7 +192,7 @@ namespace MonoGame.Effect
             }
         }
 
-        private static void WriteAnnotations(BinaryWriterEx writer, d3dx_parameter[] annotations)
+        private static void WriteAnnotations(BinaryWriter writer, d3dx_parameter[] annotations)
         {
             var count = annotations == null ? 0 : annotations.Length;
             writer.Write(count);

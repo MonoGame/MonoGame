@@ -509,8 +509,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
         */
 
-        public void SetValue (int value)
-        {
+		public void SetValue (int value)
+		{
+            if (ParameterType == EffectParameterType.Single)
+            {
+                SetValue((float)value);
+                return;
+            }
+
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
                 throw new InvalidCastException();
 #if OPENGL

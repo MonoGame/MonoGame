@@ -45,11 +45,6 @@ namespace MonoGame.Framework.Utilities
         WebGL,
 
         /// <summary>
-        /// MonoGame PSVita platform.
-        /// </summary>
-        PSVita,
-
-        /// <summary>
         /// MonoGame Xbox One platform.
         /// </summary>
         XboxOne,

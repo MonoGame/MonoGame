@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!graphicsDevice.EffectCache.TryGetValue(effectKey, out cloneSource))
             {
                 using (var stream = new MemoryStream(effectCode, index + headerSize, count - headerSize, false))
-            	using (var reader = new BinaryReaderEx(stream))
+            	using (var reader = new BinaryReader(stream))
             {
                 // Create one.
                 cloneSource = new Effect(graphicsDevice);
