@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Cartesian coordinate of the specified point with respect to the axis being used.</returns>
         public static float Barycentric(float value1, float value2, float value3, float amount1, float amount2)
         {
-            return value1 + (value2 - value1) * amount1 + (value3 - value1) * amount2;
+            return value1 + ((value2 - value1) * amount1) + ((value3 - value1) * amount2);
         }
 
 	/// <summary>
@@ -81,10 +81,10 @@ namespace Microsoft.Xna.Framework
             // Internally using doubles not to lose precission
             double amountSquared = amount * amount;
             double amountCubed = amountSquared * amount;
-            return (float)(0.5 * (2.0 * value2 +
-                (value3 - value1) * amount +
-                (2.0 * value1 - 5.0 * value2 + 4.0 * value3 - value4) * amountSquared +
-                (3.0 * value2 - value1 - 3.0 * value3 + value4) * amountCubed));
+            return (float)(0.5 * ((2.0 * value2) +
+                ((value3 - value1) * amount) +
+                (((2.0 * value1) - (5.0 * value2) + (4.0 * value3) - value4) * amountSquared) +
+                (((3.0 * value2) - value1 - (3.0 * value3) + value4) * amountCubed)));
         }
 
  	/// <summary>
@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework
             value = (value > max) ? max : value;
 
             // Then we check to see if we're less than the min.
-            value = (value < min) ? min : value;
+            value = value < min ? min : value;
 
             // There's no check to see if min > max.
             return value;
@@ -114,8 +114,8 @@ namespace Microsoft.Xna.Framework
         /// <param name="max">The maximum value. If <c>value</c> is greater than <c>max</c>, <c>max</c> will be returned.</param>
         /// <returns>The clamped value.</returns>
         public static int Clamp(int value, int min, int max)
-        { 
-            value = (value > max) ? max : value; 
+        {
+            value = (value > max) ? max : value;
             value = (value < min) ? min : value; 
             return value;
         }
@@ -149,14 +149,22 @@ namespace Microsoft.Xna.Framework
             double sSquared = s * s;
 
             if (amount == 0f)
+            {
                 result = value1;
+            }
             else if (amount == 1f)
+            {
                 result = value2;
+            }
             else
-                result = (2 * v1 - 2 * v2 + t2 + t1) * sCubed +
-                    (3 * v2 - 3 * v1 - 2 * t1 - t2) * sSquared +
-                    t1 * s +
-                    v1;
+            {
+                double v = (t1 * s);
+                result = (((2 * v1) - (2 * v2) + t2 + t1) * sCubed)
+                         + (((3 * v2) - (3 * v1) - (2 * t1) - t2) * sSquared)
+                         + v
+                         + v1;
+            }
+
             return (float)result;
         }
         
@@ -175,7 +183,7 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public static float Lerp(float value1, float value2, float amount)
         {
-            return value1 + (value2 - value1) * amount;
+            return value1 + ((value2 - value1) * amount);
         }
 
 
@@ -260,8 +268,8 @@ namespace Microsoft.Xna.Framework
             // It is expected that 0 < amount < 1
             // If amount < 0, return value1
             // If amount > 1, return value2
-            float result = MathHelper.Clamp(amount, 0f, 1f);
-            result = MathHelper.Hermite(value1, 0f, value2, 0f, result);
+            float result = Clamp(amount, 0f, 1f);
+            result = Hermite(value1, 0f, value2, 0f, result);
 
             return result;
         }
@@ -304,23 +312,27 @@ namespace Microsoft.Xna.Framework
         public static float WrapAngle(float angle)
         {
             if ((angle > -Pi) && (angle <= Pi))
+            {
                 return angle;
+            }
+
             angle %= TwoPi;
             if (angle <= -Pi)
+            {
                 return angle + TwoPi;
-            if (angle > Pi)
-                return angle - TwoPi;
-            return angle;
+            }
+
+            return angle > Pi ? angle - TwoPi : angle;
         }
 
- 	/// <summary>
+        /// <summary>
         /// Determines if value is powered by two.
         /// </summary>
         /// <param name="value">A value.</param>
         /// <returns><c>true</c> if <c>value</c> is powered by two; otherwise <c>false</c>.</returns>
-	public static bool IsPowerOfTwo(int value)
-	{
-	     return (value > 0) && ((value & (value - 1)) == 0);
-	}
+        public static bool IsPowerOfTwo(int value)
+        {
+            return (value > 0) && ((value & (value - 1)) == 0);
+        }
     }
 }
