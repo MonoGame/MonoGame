@@ -27,6 +27,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindTexture(glTarget, glTexture);
                 GraphicsExtensions.CheckGLError();
 
+                GL.TexParameter(glTarget, TextureParameterName.TextureMinFilter, mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+                GraphicsExtensions.CheckGLError();
+
+                GL.TexParameter(glTarget, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                GraphicsExtensions.CheckGLError();
+
                 bool isWriteable = ShaderAccess == ShaderAccess.ReadWrite;
                 format.GetGLFormat(GraphicsDevice, isWriteable, out glInternalFormat, out glFormat, out glType);
 

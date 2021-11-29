@@ -1931,6 +1931,35 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        private void CopyTextureDataInternal(Texture srcTexture, Texture dstTexture, int srcArrayIndex, int dstArrayIndex, int srcMipLevel, int dstMipLevel, int srcMipLevelCount, int dstMipLevelCount, int copyWidth, int copyHeight, int copyDepth, int srcOffsetX, int srcOffsetY, int srcOffsetZ, int dstOffsetX, int dstOffsetY, int dstOffsetZ)
+        {
+            lock (_d3dContext)
+            {
+                var srcRegion = new ResourceRegion(srcOffsetX, srcOffsetY, srcOffsetZ, srcOffsetX + copyWidth, srcOffsetY + copyHeight, srcOffsetZ + copyDepth);
+                int srcSubresIndex = srcArrayIndex * srcMipLevelCount + srcMipLevel;
+                int dstSubresIndex = dstArrayIndex * dstMipLevelCount + dstMipLevel;
+
+                _d3dContext.CopySubresourceRegion(srcTexture.GetTexture(), srcSubresIndex, srcRegion, dstTexture.GetTexture(), dstSubresIndex, dstOffsetX, dstOffsetY, dstOffsetZ);
+            }
+        }
+
+        private void CopyBufferDataInternal(BufferResource scBuffer, BufferResource dstBuffer, int numBytesToCopy, int srcOffsetInBytes, int dstOffsetInBytes)
+        {
+            lock (_d3dContext)
+            {
+                var sourceRegion = new ResourceRegion(srcOffsetInBytes, 0, 0, srcOffsetInBytes + numBytesToCopy, 1, 1);
+                _d3dContext.CopySubresourceRegion(scBuffer.Buffer, 0, sourceRegion, dstBuffer.Buffer, 0, dstOffsetInBytes, 0, 0);
+            }
+        }
+
+        private void CopyStructuredBufferCounterValueInternal(StructuredBuffer srcBuffer, BufferResource dstBuffer, int dstByteOffset)
+        {
+            lock (_d3dContext)
+            {
+                _d3dContext.CopyStructureCount(dstBuffer.Buffer, dstByteOffset, srcBuffer.GetUnorderedAccessView());
+            }
+        }
+
         /// <summary>
         /// Sends queued-up commands in the command buffer to the graphics processing unit (GPU).
         /// </summary>
@@ -1952,12 +1981,5 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Rectangle(x, y, width, height);
         }
 
-        internal void CopyStructuredBufferCounterValue(StructuredBuffer sourceBuffer, BufferResource destinationBuffer, int destinationByteOffset)
-        {
-            lock (_d3dContext)
-            {
-                _d3dContext.CopyStructureCount(destinationBuffer.Buffer, destinationByteOffset, sourceBuffer.GetUnorderedAccessView());
-            }
-        }
     }
 }

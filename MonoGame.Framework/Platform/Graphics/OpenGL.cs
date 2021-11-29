@@ -1354,6 +1354,12 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
+        internal delegate void CopyImageSubDataDelegate(int srcId, TextureTarget srcTarget, int srcLevel, int srcX, int srcY, int srcZ, int dstId, TextureTarget dstTarget, int dstLevel, int dstX, int dstY, int dstZ, int srcWidth, int srcHeight, int srcDepth);
+        internal static CopyImageSubDataDelegate CopyImageSubData;
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
         internal delegate void DeleteTexturesDelegate(int count, ref int id);
         internal static DeleteTexturesDelegate DeleteTextures;
 
@@ -1747,7 +1753,11 @@ namespace MonoGame.OpenGL
             if (GL.CopyBufferSubData == null && Extensions.Contains("GL_ARB_copy_buffer"))
             {
                 CopyBufferSubData = LoadFunction<GL.CopyBufferSubDataDelegate>("glCopyBufferSubData");
-            } 
+            }
+            if (GL.CopyImageSubData == null && Extensions.Contains("GL_ARB_copy_image"))
+            {
+                CopyImageSubData = LoadFunction<GL.CopyImageSubDataDelegate>("glCopyImageSubData");
+            }
         }
 
         internal static void LoadFrameBufferObjectEXTEntryPoints()

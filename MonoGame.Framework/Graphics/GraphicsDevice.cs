@@ -1807,6 +1807,76 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformGetBackBufferData(rect, data, startIndex, elementCount);
         }
 
+        internal void CopyTextureData(Texture srcTexture, Texture dstTexture, int srcArrayIndex, int dstArrayIndex, int srcArraySize, int dstArraySize, int srcMipLevel, int dstMipLevel, int srcMipLevelCount, int dstMipLevelCount, int srcWidth, int srcHeight, int srcDepth, int dstWidth, int dstHeight, int dstDepth, int copyWidth, int copyHeight, int copyDepth, int srcOffsetX, int srcOffsetY, int srcOffsetZ, int dstOffsetX, int dstOffsetY, int dstOffsetZ)
+        {
+            if (srcArrayIndex < 0 || srcArrayIndex >= srcArraySize)
+                throw new InvalidOperationException("source array index or cubemap face out of range");
+            if (dstArrayIndex < 0 || dstArrayIndex >= dstArraySize)
+                throw new InvalidOperationException("destination array index or cubemap face out of range");
+            if (srcMipLevel < 0 || srcMipLevel >= srcMipLevelCount)
+                throw new InvalidOperationException("source mipmap level out of range");
+            if (dstMipLevel < 0 || dstMipLevel >= dstMipLevelCount)
+                throw new InvalidOperationException("destination mipmap level out of range");
+            if (srcOffsetX < 0 || srcOffsetY < 0 || srcOffsetZ < 0)
+                throw new InvalidOperationException("source offsets must not be negative");
+            if (dstOffsetX < 0 || dstOffsetY < 0 || dstOffsetZ < 0)
+                throw new InvalidOperationException("destination offsets must not be negative");
+
+            int srcMipFactor = 1 << srcMipLevel;
+            int dstMipFactor = 1 << dstMipLevel;
+
+            int srcMipWidth  = Math.Max(1, srcWidth  / srcMipFactor);
+            int srcMipHeight = Math.Max(1, srcHeight / srcMipFactor);
+            int srcMipDepth  = Math.Max(1, srcDepth  / srcMipFactor);
+
+            int dstMipWidth  = Math.Max(1, dstWidth  / dstMipFactor);
+            int dstMipHeight = Math.Max(1, dstHeight / dstMipFactor);
+            int dstMipDepth  = Math.Max(1, dstDepth  / dstMipFactor);
+
+            copyWidth  = (copyWidth  == -1 ? srcMipWidth  : copyWidth);
+            copyHeight = (copyHeight == -1 ? srcMipHeight : copyHeight);
+            copyDepth  = (copyDepth  == -1 ? srcMipDepth  : copyDepth);
+
+            if (srcOffsetX + copyWidth  > srcMipWidth)
+                throw new InvalidOperationException("source texture width is too small for the requested amount of pixels to be copied from the requested x-offset");
+            if (srcOffsetY + copyHeight > srcMipHeight)
+                throw new InvalidOperationException("source texture height is too small for the requested amount of pixels to be copied from the requested y-offset");
+            if (srcOffsetZ + copyDepth  > srcMipDepth)
+                throw new InvalidOperationException("source texture depth is too small for the requested amount of pixels to be copied from the requested z-offset");
+            if (dstOffsetX + copyWidth  > dstMipWidth)
+                throw new InvalidOperationException("destination texture width is too small for the requested amount of pixels to be copied to the requested x-offset");
+            if (dstOffsetY + copyHeight > dstMipHeight)
+                throw new InvalidOperationException("destination texture height is too small for the requested amount of pixels to be copied to the requested y-offset");
+            if (dstOffsetZ + copyDepth  > dstMipDepth)
+                throw new InvalidOperationException("destination texture depth is too small for the requested amount of pixels to be copied to the requested z-offset");
+
+            CopyTextureDataInternal(srcTexture, dstTexture, srcArrayIndex, dstArrayIndex, srcMipLevel, dstMipLevel, srcMipLevelCount, dstMipLevelCount, copyWidth, copyHeight, copyDepth, srcOffsetX, srcOffsetY, srcOffsetZ, dstOffsetX, dstOffsetY, dstOffsetZ);
+        }
+
+        internal void CopyBufferData(BufferResource srcBuffer, BufferResource dstBuffer, int numBytesToCopy, int srcOffsetInBytes, int dstOffsetInBytes)
+        {
+            if (srcOffsetInBytes < 0 || dstOffsetInBytes < 0)
+                throw new InvalidOperationException("source and destination byte offset must not be negative");
+            if (srcOffsetInBytes + numBytesToCopy > srcBuffer.ElementCount * srcBuffer.ElementStride)
+                throw new InvalidOperationException("source buffer is too small for the requested amount of data to be copied to the requested byte offset");
+            if (dstOffsetInBytes + numBytesToCopy > dstBuffer.ElementCount * dstBuffer.ElementStride)
+                throw new InvalidOperationException("destination buffer is too small for the requested amount of data to be copied to the requested byte offset");
+
+            CopyBufferDataInternal(srcBuffer, dstBuffer, numBytesToCopy, srcOffsetInBytes, dstOffsetInBytes);
+        }
+
+        internal void CopyStructuredBufferCounterValue(StructuredBuffer srcBuffer, BufferResource dstBuffer, int dstByteOffset)
+        {
+            if (srcBuffer.StructuredBufferType == StructuredBufferType.Basic)
+                throw new InvalidOperationException("CopyCounterValue only works for structured buffers of type StructuredBufferType.Append or StructuredBufferType.Counter. This buffer was created with StructuredBufferType.Basic");
+            if (dstByteOffset < 0)
+                throw new InvalidOperationException("destination byte offset must not be negative");
+            if (dstBuffer.ElementCount * dstBuffer.ElementStride < dstByteOffset + 4)
+                throw new InvalidOperationException("destination buffer is too small for the requested amount of data to be copied to the requested byte offset");
+
+            CopyStructuredBufferCounterValueInternal(srcBuffer, dstBuffer, dstByteOffset);
+        }
+
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
             switch (primitiveType)

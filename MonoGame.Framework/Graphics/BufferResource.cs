@@ -51,6 +51,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
+        /// Copy data from this buffer to another buffer. The copying happens on the GPU.
+        /// </summary>
+        public void CopyData(BufferResource destinationBuffer, int numBytesToCopy, int sourceByteOffset, int destinationByteOffset)
+        {
+            GraphicsDevice.CopyBufferData(this, destinationBuffer, numBytesToCopy, sourceByteOffset, destinationByteOffset);
+        }
+
+        /// <summary>
         /// The GraphicsDevice is resetting, so GPU resources must be recreated.
         /// </summary>
         internal protected override void GraphicsDeviceResetting()

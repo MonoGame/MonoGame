@@ -1511,6 +1511,34 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        private void CopyTextureDataInternal(Texture srcTexture, Texture dstTexture, int srcArrayIndex, int dstArrayIndex, int srcMipLevel, int dstMipLevel, int srcMipLevelCount, int dstMipLevelCount, int copyWidth, int copyHeight, int copyDepth, int srcOffsetX, int srcOffsetY, int srcOffsetZ, int dstOffsetX, int dstOffsetY, int dstOffsetZ)
+        {
+            if (srcArrayIndex > 0)
+                srcOffsetZ = srcArrayIndex;
+            if (dstArrayIndex > 0)
+                dstOffsetZ = dstArrayIndex;
+
+            GL.CopyImageSubData(srcTexture.glTexture, srcTexture.glTarget, srcMipLevel, srcOffsetX, srcOffsetY, srcOffsetZ, dstTexture.glTexture, dstTexture.glTarget, dstMipLevel, dstOffsetX, dstOffsetY, dstOffsetZ, copyWidth, copyHeight, copyDepth);
+            GraphicsExtensions.CheckGLError();
+        }
+
+        private void CopyBufferDataInternal(BufferResource srcBuffer, BufferResource dstBuffer, int numBytesToCopy, int srcOffsetInBytes, int dstOffsetInBytes)
+        {
+            GL.BindBuffer(BufferTarget.CopyReadBuffer, srcBuffer.counterBuffer);
+            GraphicsExtensions.CheckGLError();
+
+            GL.BindBuffer(BufferTarget.CopyWriteBuffer, dstBuffer.buffer);
+            GraphicsExtensions.CheckGLError();
+
+            GL.CopyBufferSubData(BufferTarget.CopyReadBuffer, BufferTarget.CopyWriteBuffer, new IntPtr(srcOffsetInBytes), new IntPtr(dstOffsetInBytes), new UIntPtr((uint)numBytesToCopy));
+            GraphicsExtensions.CheckGLError();
+        }
+
+        private void CopyStructuredBufferCounterValueInternal(StructuredBuffer srcBuffer, BufferResource dstBuffer, int dstByteOffset)
+        {
+            CopyBufferData(srcBuffer, dstBuffer, 4, 0, dstByteOffset);
+        }
+
         private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
         {
             return new Rectangle(x, y, width, height);
@@ -1574,17 +1602,7 @@ namespace Microsoft.Xna.Framework.Graphics
             height = mode.Height;
         }
 #endif
+        
 
-        internal void CopyStructuredBufferCounterValue(StructuredBuffer sourceBuffer, BufferResource destinationBuffer, int destinationByteOffset)
-        {
-            GL.BindBuffer(BufferTarget.CopyReadBuffer, sourceBuffer.counterBuffer);
-            GraphicsExtensions.CheckGLError();
-
-            GL.BindBuffer(BufferTarget.CopyWriteBuffer, destinationBuffer.buffer);
-            GraphicsExtensions.CheckGLError();
-
-            GL.CopyBufferSubData(BufferTarget.CopyReadBuffer, BufferTarget.CopyWriteBuffer, IntPtr.Zero, new IntPtr(destinationByteOffset), new UIntPtr(4));
-            GraphicsExtensions.CheckGLError();
-        }
     }
 }
