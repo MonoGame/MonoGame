@@ -71,6 +71,15 @@
     <None Update="dxcompiler.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="libdxcompiler.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libShaderConductor.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libShaderConductorWrapper.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="ShaderConductor.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
