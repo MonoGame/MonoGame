@@ -74,6 +74,9 @@
     <None Update="libdxcompiler.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="libdxcompiler.so.3.7">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="libShaderConductor.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
