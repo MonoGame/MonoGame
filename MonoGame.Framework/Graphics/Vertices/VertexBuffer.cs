@@ -23,12 +23,27 @@ namespace Microsoft.Xna.Framework.Graphics
                 vertexDeclaration.GraphicsDevice = graphicsDevice;
         }
 
-        public VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, ShaderAccess shaderAccess = ShaderAccess.None) :
-           this(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, false, shaderAccess)
+        protected VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, bool dynamic) :
+            this(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, dynamic, ShaderAccess.None)
         {
         }
 
-        public VertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage, ShaderAccess shaderAccess = ShaderAccess.None) :
+        public VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage) :
+            this(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, false, ShaderAccess.None)
+        {
+        }
+
+        public VertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage) :
+            this(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, false, ShaderAccess.None)
+        {
+        }
+
+        public VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, ShaderAccess shaderAccess) :
+           this(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, false, shaderAccess)
+        {
+        }
+        
+        public VertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage, ShaderAccess shaderAccess) :
             this(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, false, shaderAccess)
         {
         }

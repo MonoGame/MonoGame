@@ -30,12 +30,22 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _depth; }
         }
 
-		public Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, ShaderAccess shaderAccess = ShaderAccess.None)
-            : this(graphicsDevice, width, height, depth, mipMap, format, false, shaderAccess)
+		public Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
+            : this(graphicsDevice, width, height, depth, mipMap, format, false, ShaderAccess.None)
 		{
 		}
 
-        protected Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget, ShaderAccess shaderAccess) :
+        public Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, ShaderAccess shaderAccess)
+            : this(graphicsDevice, width, height, depth, mipMap, format, false, shaderAccess)
+        {
+        }
+
+        protected Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
+            : this(graphicsDevice, width, height, depth, mipMap, format, renderTarget, ShaderAccess.None)
+        {
+        }
+
+        protected Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget, ShaderAccess shaderAccess) :
             base(shaderAccess)
 		{
 		    if (graphicsDevice == null)

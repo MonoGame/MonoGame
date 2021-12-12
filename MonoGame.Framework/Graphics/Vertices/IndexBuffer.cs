@@ -13,25 +13,40 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public IndexElementSize IndexElementSize { get { return ElementStride == 4 ? IndexElementSize.ThirtyTwoBits : IndexElementSize.SixteenBits; } }
 
-   		protected IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage, bool dynamic, ShaderAccess shaderAccess = ShaderAccess.None)
-            : this(graphicsDevice, SizeForType(graphicsDevice, indexType), indexCount, usage, dynamic, shaderAccess)
+        protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage, bool dynamic, ShaderAccess shaderAccess) :
+            base(graphicsDevice, indexCount, indexElementSize == IndexElementSize.ThirtyTwoBits ? 4 : 2, usage, dynamic, BufferType.IndexBuffer, shaderAccess)
         {
         }
 
-		protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage, bool dynamic, ShaderAccess shaderAccess) :
-            base(graphicsDevice, indexCount, indexElementSize == IndexElementSize.ThirtyTwoBits ? 4 : 2, usage, dynamic, BufferType.IndexBuffer, shaderAccess)
+        protected IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage, bool dynamic) :
+            this(graphicsDevice, SizeForType(graphicsDevice, indexType), indexCount, usage, dynamic)
         {
-		}
+        }
 
-		public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage, ShaderAccess shaderAccess = ShaderAccess.None) :
-			this(graphicsDevice, indexElementSize, indexCount, bufferUsage, false, shaderAccess)
-		{
-		}
+        protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage, bool dynamic) :
+            this(graphicsDevice, indexElementSize, indexCount, usage, dynamic, ShaderAccess.None)
+        {
+        }
 
-		public IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage, ShaderAccess shaderAccess = ShaderAccess.None) :
-			this(graphicsDevice, SizeForType(graphicsDevice, indexType), indexCount, usage, false, shaderAccess)
-		{
-		}
+        public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage) :
+            this(graphicsDevice, indexElementSize, indexCount, usage, false)
+        {
+        }
+
+        public IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage) :
+            this(graphicsDevice, indexType, indexCount, usage, false)
+        {
+        }
+
+        public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage, ShaderAccess shaderAccess) :
+            this(graphicsDevice, indexElementSize, indexCount, usage, false, shaderAccess)
+        {
+        }
+
+        public IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage, ShaderAccess shaderAccess) :
+            this(graphicsDevice, SizeForType(graphicsDevice, indexType), indexCount, usage, false, shaderAccess)
+        {
+        }
 
         /// <summary>
         /// Gets the relevant IndexElementSize enum value for the given type.

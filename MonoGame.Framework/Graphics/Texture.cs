@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			get { return _levelCount; }
 		}
 
-        public Texture(ShaderAccess shaderAcess) :
+        internal Texture(ShaderAccess shaderAcess) :
             base(shaderAcess)
         {
         }
