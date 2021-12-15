@@ -35,22 +35,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var characters = options.Characters;
 
                 var glyphList = new List<Glyph>();
-                var glyphMaps = new Dictionary<uint, GlyphMap>();
+                var glyphMaps = new Dictionary<uint, GlyphData>();
 
                 // Rasterize each character in turn.
                 foreach (char character in characters)
                 {
                     uint glyphIndex = face.GetCharIndex(character);
-                    if (!glyphMaps.TryGetValue(glyphIndex, out GlyphMap glyphMap))
+                    if (!glyphMaps.TryGetValue(glyphIndex, out GlyphData glyphData))
                     {
-                        glyphMap = new GlyphMap()
-                        {
-                            Data = ImportGlyph(glyphIndex, face)
-                        };
-                        glyphMaps.Add(glyphIndex, glyphMap);
+                        glyphData = ImportGlyph(glyphIndex, face);
+                        glyphMaps.Add(glyphIndex, glyphData);
                     }
 
-                    var glyph = new Glyph(character, glyphMap.Data);
+                    var glyph = new Glyph(character, glyphData);
                     glyphList.Add(glyph);
                 }
                 Glyphs = glyphList;
@@ -192,12 +189,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 else
                     destination[startIndex + 7 - i] = byte.MinValue;
             }
-        }
-
-        class GlyphMap
-        {
-            public GlyphData Data;
-            public List<Glyph> Glyphs = new List<Glyph>();
         }
     }
 }
