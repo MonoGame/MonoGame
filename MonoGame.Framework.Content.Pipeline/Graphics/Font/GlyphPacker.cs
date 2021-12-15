@@ -3,9 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -38,17 +36,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			int outputHeight = 0;
 
             // Choose positions for each glyph, one at a time.
-            // Keep a record of glyphs in a dictionary so we can look them up based on
-            // their index later for some optimisations
-            Dictionary<int, ArrangedGlyph> glyphDict = new Dictionary<int, ArrangedGlyph>();
-            for (int i = 0; i < glyphs.Count; i++)
-            {
-                glyphDict.Add(i, glyphs[i]);
-            }
-
 			for (int i = 0; i < glyphs.Count; i++)
 			{
-				PositionGlyph(glyphDict, i, outputWidth);
+				PositionGlyph(glyphs, i, outputWidth);
 
 				outputHeight = Math.Max(outputHeight, glyphs[i].Y + glyphs[i].Height);
 			}
@@ -100,7 +90,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 
 		// Works out where to position a single glyph.
-		static void PositionGlyph(Dictionary<int, ArrangedGlyph> glyphs, int index, int outputWidth)
+		static void PositionGlyph(List<ArrangedGlyph> glyphs, int index, int outputWidth)
 		{
             int x = 0;
             int y = 0;
@@ -166,24 +156,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 
 		// Checks if a proposed glyph position collides with anything that we already arranged.
-		static int FindIntersectingGlyph(Dictionary<int, ArrangedGlyph> glyphs, int index, int x, int y)
+		static int FindIntersectingGlyph(List<ArrangedGlyph> glyphs, int index, int x, int y)
 		{
 			int w = glyphs[index].Width;
 			int h = glyphs[index].Height;
 
 			for (int i = 0; i < index; i++)
 			{
-                var targetGlyph = glyphs[i];
-				if (targetGlyph.X >= x + w)
+				if (glyphs[i].X >= x + w)
 					continue;
 
-				if (targetGlyph.X + targetGlyph.Width <= x)
+				if (glyphs[i].X + glyphs[i].Width <= x)
 					continue;
 
-				if (targetGlyph.Y >= y + h)
+				if (glyphs[i].Y >= y + h)
 					continue;
 
-				if (targetGlyph.Y + targetGlyph.Height <= y)
+				if (glyphs[i].Y + glyphs[i].Height <= y)
 					continue;
 
 				return i;
