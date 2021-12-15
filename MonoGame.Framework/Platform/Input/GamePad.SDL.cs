@@ -65,6 +65,8 @@ namespace Microsoft.Xna.Framework.Input
 
             Gamepads.Add(id, gamepad);
             
+            RefreshTranslationTable();
+
             if (gamepad.HapticDevice == IntPtr.Zero)
                 return;
 
@@ -89,8 +91,6 @@ namespace Microsoft.Xna.Framework.Input
                 gamepad.HapticDevice = IntPtr.Zero;
                 Sdl.ClearError();
             }
-
-            RefreshTranslationTable();
         }
 
         internal static void RemoveDevice(int instanceid)

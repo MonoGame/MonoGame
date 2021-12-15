@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Mac</BaseOutputPath>
     <DefineConstants>MONOMAC;MAC</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-mac</AssemblyName>
-    <MacBundleName>$(AssemblyName)</MacBundleName>
-    <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
+    <MacBundleName>$(AssemblyTitle)</MacBundleName>
+    <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +18,6 @@
     <Compile Remove="Platform\**\*" />
 
     <Compile Include="Platform\Mac\**\*.cs" />
-    <Compile Include="Platform\Utilities\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,7 +30,6 @@
   <ItemGroup>
     <PackageReference Include="Eto.Forms" Version="2.5.10" />
     <PackageReference Include="Eto.Platform.Mac64" Version="2.5.10" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20158.1" />
   </ItemGroup>
 
   <ItemGroup>

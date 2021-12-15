@@ -119,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data.Length < (startIndex + elementCount))
                 throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
 
-            PlatformSetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, options);
+            PlatformSetData<T>(offsetInBytes, data, startIndex, elementCount, options);
         }
 	}
 }

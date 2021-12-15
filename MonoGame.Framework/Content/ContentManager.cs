@@ -38,7 +38,6 @@ namespace Microsoft.Xna.Framework.Content
         {
             'w', // Windows (XNA & DirectX)
             'x', // Xbox360 (XNA)
-            'm', // WindowsPhone7.0 (XNA)
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
@@ -48,7 +47,6 @@ namespace Microsoft.Xna.Framework.Content
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
-            'v', // PSVita
             'O', // XboxOne
             'S', // Nintendo Switch
             'G', // Google Stadia
@@ -62,7 +60,9 @@ namespace Microsoft.Xna.Framework.Content
             // Legacy identifiers... these could be reused in the
             // future if we feel enough time has passed.
 
+            'm', // WindowsPhone7.0 (XNA)
             'p', // PlayStationMobile
+            'v', // PSVita
             'g', // Windows (OpenGL)
             'l', // Linux
         };
@@ -453,6 +453,58 @@ namespace Microsoft.Xna.Framework.Content
 			disposableAssets.Clear();
 		    loadedAssets.Clear();
 		}
+
+        /// <summary>
+        /// Unloads a single asset.
+        /// </summary>
+        /// <param name="assetName">The name of the asset to unload. This cannot be null.</param>
+        public virtual void UnloadAsset(string assetName)
+        {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException("assetName");
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
+
+            //Check if the asset exists
+            object asset;
+            if (loadedAssets.TryGetValue(assetName, out asset))
+            {
+                //Check if it's disposable and remove it from the disposable list if so
+                var disposable = asset as IDisposable;
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                    disposableAssets.Remove(disposable);
+                }
+
+                loadedAssets.Remove(assetName);
+            }
+        }
+
+        /// <summary>
+        /// Unloads a set of assets.
+        /// </summary>
+        /// <param name="assetNames">The names of the assets to unload.</param>
+        public virtual void UnloadAssets(IList<string> assetNames)
+        {
+            if (assetNames == null)
+            {
+                throw new ArgumentNullException("assetNames");
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
+
+            for (int i = 0; i < assetNames.Count; i++)
+            {
+                UnloadAsset(assetNames[i]);
+            }
+        }
 
 		public string RootDirectory
 		{

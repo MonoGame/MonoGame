@@ -127,6 +127,8 @@ namespace Microsoft.Xna.Framework
 
             if (Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
                 Windows.Phone.UI.Input.HardwareButtons.BackPressed += this.HardwareButtons_BackPressed;
+            else
+                SystemNavigationManager.GetForCurrentView().BackRequested += this.BackRequested;
 
             SetViewBounds(_appView.VisibleBounds.Width, _appView.VisibleBounds.Height);
 
@@ -214,7 +216,7 @@ namespace Microsoft.Xna.Framework
 
         private void Dispatcher_AcceleratorKeyActivated(CoreDispatcher sender, AcceleratorKeyEventArgs args)
         {
-            // NOTE: Dispatcher event is used becuase KeyDown event doesn't handle Alt key
+            // NOTE: Dispatcher event is used because KeyDown event doesn't handle Alt key
             var key = InputEvents.KeyTranslate(args.VirtualKey, args.KeyStatus);
             switch (args.EventType)
             {
@@ -314,6 +316,12 @@ namespace Microsoft.Xna.Framework
             else
                 _backPressed = true;
 
+            e.Handled = true;
+        }
+
+        private void BackRequested(object sender, BackRequestedEventArgs e)
+        {
+            // Prevent XBOX from suspending the app when the user press 'B' button.
             e.Handled = true;
         }
 

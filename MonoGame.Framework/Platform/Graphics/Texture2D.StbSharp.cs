@@ -6,12 +6,13 @@ using StbImageSharp;
 using StbImageWriteSharp;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D
     {
-        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
+        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, Action<byte[]> colorProcessor)
         {
             // Rewind stream if it is at end
             if (stream.CanSeek && stream.Length == stream.Position)
@@ -35,18 +36,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            // XNA blacks out any pixels with an alpha of zero.
-            fixed (byte* b = &result.Data[0])
+            if (colorProcessor != null)
             {
-                for (var i = 0; i < result.Data.Length; i += 4)
-                {
-                    if (b[i + 3] == 0)
-                    {
-                        b[i + 0] = 0;
-                        b[i + 1] = 0;
-                        b[i + 2] = 0;
-                    }
-                }
+                colorProcessor(result.Data);
             }
 
             Texture2D texture = null;

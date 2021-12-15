@@ -10,8 +10,8 @@ Effects compiled directly are not files and can not be loaded by the `ContentMan
 
 ## Installation
 
-MGFXC can be installed as a [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
-Make sure you have the .NET Core SDK installed. You can download it [here](https://dotnet.microsoft.com/download).
+MGFXC can be installed as a [.NET tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
+Make sure you have the .NET SDK installed. You can download it [here](https://dotnet.microsoft.com/download).
 
 In a terminal run `dotnet tool install -g dotnet-mgfxc` to install MGFXC.
 
@@ -42,11 +42,10 @@ The `/Profile` option defines the platform we're targeting with this effect file
 - DirectX_11
 - OpenGL
 - PlayStation4
-- PSVita
 - XboxOne
 - Switch
 
-NOTE: PlayStation 4, Xbox One, PS Vita, and Switch support is only available to licensed console developers.
+NOTE: PlayStation 4, Xbox One, and Switch support is only available to licensed console developers.
 
 ### Help
 

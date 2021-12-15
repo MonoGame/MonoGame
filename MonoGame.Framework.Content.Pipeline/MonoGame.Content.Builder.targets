@@ -50,11 +50,9 @@
 			'$(MonoGamePlatform)' != 'MacOSX' And       
 			'$(MonoGamePlatform)' != 'WindowsStoreApp' And       
 			'$(MonoGamePlatform)' != 'NativeClient' And       
-			'$(MonoGamePlatform)' != 'PlayStationMobile' And       
 			'$(MonoGamePlatform)' != 'WindowsPhone8' And       
 			'$(MonoGamePlatform)' != 'RaspberryPi' And       
 			'$(MonoGamePlatform)' != 'PlayStation4' And       
-			'$(MonoGamePlatform)' != 'PSVita' And       
 			'$(MonoGamePlatform)' != 'XboxOne' And 
 			'$(MonoGamePlatform)' != 'WindowsGL'" />
 

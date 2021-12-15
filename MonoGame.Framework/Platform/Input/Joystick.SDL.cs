@@ -12,9 +12,18 @@ namespace Microsoft.Xna.Framework.Input
         internal static Dictionary<int, IntPtr> Joysticks = new Dictionary<int, IntPtr>();
         private static int _lastConnectedIndex = -1;
 
+        internal static void AddDevices()
+        {
+            int numJoysticks = Sdl.Joystick.NumJoysticks();
+            for (int i = 0; i < numJoysticks; i++)
+                AddDevice(i);
+        }
+
         internal static void AddDevice(int deviceId)
         {
             var jdevice = Sdl.Joystick.Open(deviceId);
+            if (Joysticks.ContainsValue(jdevice)) return;
+
             var id = 0;
 
             while (Joysticks.ContainsKey(id))

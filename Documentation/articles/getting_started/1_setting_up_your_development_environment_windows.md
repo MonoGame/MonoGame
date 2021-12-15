@@ -6,7 +6,7 @@ This section provides a step-by-step guide for setting up your development envir
 
 Before installing Monogame, you'll need to install [Visual Studio 2019](https://visualstudio.microsoft.com/vs/) or later (any edition, including Community) with the following components, depending on your target platform:
 
-* .NET Core cross-platform development - For Desktop OpenGL and DirectX platforms
+* .NET cross-platform development - For Desktop OpenGL and DirectX platforms
 * Mobile Development with .NET - For Android and iOS platforms
 * Universal Windows Platform development - For Windows 10 and Xbox UWP platforms
 * .Net Desktop Development - For Desktop OpenGL and DirectX platforms to target normal .NET Framework
@@ -36,7 +36,7 @@ dotnet tool install --global dotnet-mgcb-editor
 mgcb-editor --register
 ```
 
-## [Optional] Install MonoGame templates for .NET Core CLI or Rider IDE
+## [Optional] Install MonoGame templates for .NET CLI or Rider IDE
 
 ```sh
 dotnet new --install MonoGame.Templates.CSharp

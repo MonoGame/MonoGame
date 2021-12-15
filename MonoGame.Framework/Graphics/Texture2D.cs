@@ -275,6 +275,27 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="graphicsDevice">The graphics device to use to create the texture.</param>
         /// <param name="path">The path to the image file.</param>
+        /// <param name="colorProcessor">Function that is applied to the data in RGBA format before the texture is sent to video memory. Could be null(no processing then).</param>
+        /// <returns>The <see cref="Texture2D"/> created from the given file.</returns>
+        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
+        /// the images should be identical.
+        /// </remarks>
+        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string path, Action<byte[]> colorProcessor)
+        {
+            if (path == null)
+                throw new ArgumentNullException("path");
+
+            using (var stream = File.OpenRead(path))
+                return FromStream(graphicsDevice, stream, colorProcessor);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="Texture2D"/> from a file, supported formats bmp, gif, jpg, png, tif and dds (only for simple textures).
+        /// May work with other formats, but will not work with tga files.
+        /// This internally calls <see cref="FromStream"/>.
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device to use to create the texture.</param>
+        /// <param name="path">The path to the image file.</param>
         /// <returns>The <see cref="Texture2D"/> created from the given file.</returns>
         /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
         /// the images should be identical.  This call does not premultiply the image alpha, but areas of zero alpha will
@@ -282,11 +303,35 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string path)
         {
-            if (path == null)
-                throw new ArgumentNullException("path");
+            return FromFile(graphicsDevice, path, DefaultColorProcessors.ZeroTransparentPixels);
+        }
 
-            using (var stream = File.OpenRead(path))
-                return FromStream(graphicsDevice, stream);
+        /// <summary>
+        /// Creates a <see cref="Texture2D"/> from a stream, supported formats bmp, gif, jpg, png, tif and dds (only for simple textures).
+        /// May work with other formats, but will not work with tga files.
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device to use to create the texture.</param>
+        /// <param name="stream">The stream from which to read the image data.</param>
+        /// <param name="colorProcessor">Function that is applied to the data in RGBA format before the texture is sent to video memory. Could be null(no processing then).</param>
+        /// <returns>The <see cref="Texture2D"/> created from the image stream.</returns>
+        /// <remarks>Note that different image decoders may generate slight differences between platforms, but perceptually 
+        /// the images should be identical.
+        /// </remarks>
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, Action<byte[]> colorProcessor)
+		{
+            if (graphicsDevice == null)
+                throw new ArgumentNullException("graphicsDevice");
+            if (stream == null)
+                throw new ArgumentNullException("stream");
+
+            try
+            {
+                return PlatformFromStream(graphicsDevice, stream, colorProcessor);
+            }
+            catch(Exception e)
+            {
+                throw new InvalidOperationException("This image format is not supported", e);
+            }
         }
 
         /// <summary>
@@ -301,20 +346,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// result in black color data.
         /// </remarks>
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
-		{
-            if (graphicsDevice == null)
-                throw new ArgumentNullException("graphicsDevice");
-            if (stream == null)
-                throw new ArgumentNullException("stream");
-
-            try
-            {
-                return PlatformFromStream(graphicsDevice, stream);
-            }
-            catch(Exception e)
-            {
-                throw new InvalidOperationException("This image format is not supported", e);
-            }
+        {
+            return FromStream(graphicsDevice, stream, DefaultColorProcessors.ZeroTransparentPixels);
         }
 
         /// <summary>

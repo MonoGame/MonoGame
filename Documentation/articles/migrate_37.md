@@ -42,7 +42,7 @@ You can remove these references and add a reference to the MonoGame NuGet packag
 
 ## Tooling
 
-MonoGame tools are now distributed as [.NET Core Tools](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
+MonoGame tools are now distributed as [.NET Tools](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
 You do not need the tools to build content for your games. The templates reference the `MonoGame.Content.Builder.Task`
 NuGet package that automatically builds your content when building your game.
 

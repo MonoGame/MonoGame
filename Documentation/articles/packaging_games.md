@@ -4,11 +4,11 @@ Once your game is ready to be published, it is recommended that you package it p
 
 ## Desktop games
 
-To publish desktop games, it is recommended that you build your project as a [self-contained](https://docs.microsoft.com/en-us/dotnet/core/deploying/#publish-self-contained) .NET Core app. As such, your game will require absolutely no external dependencies and should run out-of-the-box as-is.
+To publish desktop games, it is recommended that you build your project as a [self-contained](https://docs.microsoft.com/en-us/dotnet/core/deploying/#publish-self-contained) .NET app. As such, your game will require absolutely no external dependencies and should run out-of-the-box as-is.
 
 ### Building and packaging for Windows
 
-From the .NET Core CLI:
+From the .NET CLI:
 
 `dotnet publish -c Release -r win-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
 
@@ -18,7 +18,7 @@ If you are targeting WindowsDX, note that players will need [the DirectX June 20
 
 ### Building and packaging for Linux
 
-From the .NET Core CLI:
+From the .NET CLI:
 
 `dotnet publish -c Release -r linux-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
 
@@ -28,7 +28,7 @@ We recommend using the .tar.gz archiving format to preserve the execution permis
 
 ### Build and packaging for macOS
 
-From the .NET Core CLI:
+From the .NET CLI:
 
 `dotnet publish -c Release -r osx-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
 
@@ -89,9 +89,9 @@ After completing these steps, your .app folder should appear as an executable ap
 
 For archiving, we recommend using the .tar.gz format to preserve the execution permissions.
 
-## Special notes about .NET Core parameters
+## Special notes about .NET parameters
 
-.NET Core proposes several parameters when publishing apps that may sound helpful, but have many issues when it comes to games (because they were never meant for games in the first place, but for small lightweight applications).
+.NET proposes several parameters when publishing apps that may sound helpful, but have many issues when it comes to games (because they were never meant for games in the first place, but for small lightweight applications).
 
 ### ReadyToRun (R2R)
 
@@ -101,14 +101,14 @@ Ready2Run code is of low quality and makes the Just-In-Time compiler (JIT) trigg
 
 Disabling ReadyToRun solves this issue (at the cost of a slightly longer startup time, but typically very negligible).
 
-ReadyToRun is disabled by default. You can configure it by setting the `PublishReadyToRun` property in your csproj file. MonoGame templates for .NET Core projects explicitly set this to `false`.
+ReadyToRun is disabled by default. You can configure it by setting the `PublishReadyToRun` property in your csproj file. MonoGame templates for .NET projects explicitly set this to `false`.
 
 ### Tiered compilation
 
 [Tiered compilation](https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-core-3-0#tiered-compilation) is a companion system to ReadyToRun and works on the same principle to enhance startup time. We suggest disabling it to avoid any stutter while your game is running.
 
 Tiered compilation is **enabled by default**. To disable it set the `TieredCompilation` property to `false` in your csproj.
-MonoGame templates for .NET Core projects disable tiered compilation.
+MonoGame templates for .NET projects disable tiered compilation.
 
 ### SingleFilePublish
 

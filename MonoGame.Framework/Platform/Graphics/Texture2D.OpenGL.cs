@@ -32,6 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             this.glTarget = TextureTarget.Texture2D;
             format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
+
             Threading.BlockOnUIThread(() =>
             {
                 GenerateGLTextureIfRequired();
@@ -40,7 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 int level = 0;
                 while (true)
                 {
-                    if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
+                    if (glFormat == GLPixelFormat.CompressedTextureFormats)
                     {
                         int imageSize = 0;
                         // PVRTC has explicit calculations for imageSize
@@ -82,117 +83,147 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
 
-        private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformSetDataBody<T>(int level, T[] data, int startIndex, int elementCount)
+            where T : struct
         {
             int w, h;
             GetSizeForLevel(Width, Height, level, out w, out h);
-            Threading.BlockOnUIThread(() =>
+
+            var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            // Use try..finally to make sure dataHandle is freed in case of an error
+            try
             {
-                var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
-                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                // Use try..finally to make sure dataHandle is freed in case of an error
-                try
+                var startBytes = startIndex * elementSizeInByte;
+                var dataPtr = new IntPtr(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                // Store the current bound texture.
+                var prevTexture = GraphicsExtensions.GetBoundTexture2D();
+
+                if (prevTexture != glTexture)
                 {
-                    var startBytes = startIndex * elementSizeInByte;
-                    var dataPtr = new IntPtr(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-                    // Store the current bound texture.
-                    var prevTexture = GraphicsExtensions.GetBoundTexture2D();
-
-                    if (prevTexture != glTexture)
-                    {
-                        GL.BindTexture(TextureTarget.Texture2D, glTexture);
-                        GraphicsExtensions.CheckGLError();
-                    }
-
-                    GenerateGLTextureIfRequired();
-                    GL.PixelStore(PixelStoreParameter.UnpackAlignment, Math.Min(_format.GetSize(), 8));
-
-                    if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
-                    {
-                        GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, elementCount * elementSizeInByte, dataPtr);
-                    }
-                    else
-                    {
-                        GL.TexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, glFormat, glType, dataPtr);
-                    }
+                    GL.BindTexture(TextureTarget.Texture2D, glTexture);
                     GraphicsExtensions.CheckGLError();
+                }
+
+                GenerateGLTextureIfRequired();
+                GL.PixelStore(PixelStoreParameter.UnpackAlignment, Math.Min(_format.GetSize(), 8));
+
+                if (glFormat == GLPixelFormat.CompressedTextureFormats)
+                {
+                    GL.CompressedTexImage2D(
+                        TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, elementCount * elementSizeInByte, dataPtr);
+                }
+                else
+                {
+                    GL.TexImage2D(
+                        TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, glFormat, glType, dataPtr);
+                }
+                GraphicsExtensions.CheckGLError();
 
 #if !ANDROID
-                    // Required to make sure that any texture uploads on a thread are completed
-                    // before the main thread tries to use the texture.
-                    GL.Finish();
-                    GraphicsExtensions.CheckGLError();
+                // Required to make sure that any texture uploads on a thread are completed
+                // before the main thread tries to use the texture.
+                GL.Finish();
+                GraphicsExtensions.CheckGLError();
 #endif
-                    // Restore the bound texture.
-                    if (prevTexture != glTexture)
-                    {
-                        GL.BindTexture(TextureTarget.Texture2D, prevTexture);
-                        GraphicsExtensions.CheckGLError();
-                    }
-                }
-                finally
+                // Restore the bound texture.
+                if (prevTexture != glTexture)
                 {
-                    dataHandle.Free();
+                    GL.BindTexture(TextureTarget.Texture2D, prevTexture);
+                    GraphicsExtensions.CheckGLError();
                 }
-            });
+            }
+            finally
+            {
+                dataHandle.Free();
+            }
         }
 
-        private void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformSetDataBody<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount)
+            where T : struct
         {
-            Threading.BlockOnUIThread(() =>
+            var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            // Use try..finally to make sure dataHandle is freed in case of an error
+            try
             {
-                var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
-                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                // Use try..finally to make sure dataHandle is freed in case of an error
-                try
+                var startBytes = startIndex * elementSizeInByte;
+                var dataPtr = new IntPtr(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+
+                // Store the current bound texture.
+                var prevTexture = GraphicsExtensions.GetBoundTexture2D();
+                if (prevTexture != glTexture)
                 {
-                    var startBytes = startIndex * elementSizeInByte;
-                    var dataPtr = new IntPtr(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-                    // Store the current bound texture.
-                    var prevTexture = GraphicsExtensions.GetBoundTexture2D();
-
-                    if (prevTexture != glTexture)
-                    {
-                        GL.BindTexture(TextureTarget.Texture2D, glTexture);
-                        GraphicsExtensions.CheckGLError();
-                    }
-
-                    GenerateGLTextureIfRequired();
-                    GL.PixelStore(PixelStoreParameter.UnpackAlignment, Math.Min(_format.GetSize(), 8));
-
-                    if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
-                    {
-                        GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, rect.X, rect.Y, rect.Width, rect.Height,
-                            (PixelInternalFormat)glInternalFormat, elementCount * elementSizeInByte, dataPtr);
-                    }
-                    else
-                    {
-                        GL.TexSubImage2D(TextureTarget.Texture2D, level, rect.X, rect.Y,
-                            rect.Width, rect.Height, glFormat, glType, dataPtr);
-                    }
+                    GL.BindTexture(TextureTarget.Texture2D, glTexture);
                     GraphicsExtensions.CheckGLError();
+                }
+
+                GenerateGLTextureIfRequired();
+                GL.PixelStore(PixelStoreParameter.UnpackAlignment, Math.Min(_format.GetSize(), 8));
+
+                if (glFormat == GLPixelFormat.CompressedTextureFormats)
+                {
+                    GL.CompressedTexSubImage2D(
+                        TextureTarget.Texture2D, level, rect.X, rect.Y, rect.Width, rect.Height,
+                        glInternalFormat, elementCount * elementSizeInByte, dataPtr);
+                }
+                else
+                {
+                    GL.TexSubImage2D(
+                        TextureTarget.Texture2D, level, rect.X, rect.Y, rect.Width, rect.Height,
+                        glFormat, glType, dataPtr);
+                }
+                GraphicsExtensions.CheckGLError();
 
 #if !ANDROID
-                    // Required to make sure that any texture uploads on a thread are completed
-                    // before the main thread tries to use the texture.
-                    GL.Finish();
-                    GraphicsExtensions.CheckGLError();
+                // Required to make sure that any texture uploads on a thread are completed
+                // before the main thread tries to use the texture.
+                GL.Finish();
+                GraphicsExtensions.CheckGLError();
 #endif
-                    // Restore the bound texture.
-                    if (prevTexture != glTexture)
-                    {
-                        GL.BindTexture(TextureTarget.Texture2D, prevTexture);
-                        GraphicsExtensions.CheckGLError();
-                    }
-                }
-                finally
+                // Restore the bound texture.
+                if (prevTexture != glTexture)
                 {
-                    dataHandle.Free();
+                    GL.BindTexture(TextureTarget.Texture2D, prevTexture);
+                    GraphicsExtensions.CheckGLError();
                 }
+            }
+            finally
+            {
+                dataHandle.Free();
+            }
+        }
+
+        private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount)
+            where T : struct
+        {
+            Threading.BlockOnUIThread(SetDataState<T>.Action, new SetDataState<T>
+            {
+                texture = this,
+                level = level,
+                data = data,
+                startIndex = startIndex,
+                elementCount = elementCount
             });
         }
 
-        private void PlatformGetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount)
+            where T : struct
+        {
+            Threading.BlockOnUIThread(SetDataRectState<T>.Action, new SetDataRectState<T>
+            {
+                texture = this,
+                level = level,
+                arraySlice = arraySlice,
+                rect = rect,
+                data = data,
+                startIndex = startIndex,
+                elementCount = elementCount
+            });
+        }
+
+        private void PlatformGetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount)
+            where T : struct
         {
             Threading.EnsureUIThread();
 
@@ -215,7 +246,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
             GL.PixelStore(PixelStoreParameter.PackAlignment, Math.Min(tSizeInByte, 8));
 
-            if (glFormat == (PixelFormat) GLPixelFormat.CompressedTextureFormats)
+            if (glFormat == GLPixelFormat.CompressedTextureFormats)
             {
                 // Note: for compressed format Format.GetSize() returns the size of a 4x4 block
                 var pixelToT = Format.GetSize() / tSizeInByte;
@@ -299,8 +330,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, CGImage cgImage)
         {
-			var width = cgImage.Width;
-			var height = cgImage.Height;
+            var width = cgImage.Width;
+            var height = cgImage.Height;
 
             var data = new byte[width * height * 4];
 
@@ -411,16 +442,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                 GraphicsExtensions.CheckGLError();
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-                                (_levelCount > 1) ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+
+                GL.TexParameter(
+                    TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+                    (_levelCount > 1) ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
                 GraphicsExtensions.CheckGLError();
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
-                                (int)TextureMagFilter.Linear);
+
+                GL.TexParameter(
+                    TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+                    (int)TextureMagFilter.Linear);
                 GraphicsExtensions.CheckGLError();
+
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)wrap);
                 GraphicsExtensions.CheckGLError();
+
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
                 GraphicsExtensions.CheckGLError();
+
                 // Set mipmap levels
 #if !GLES
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, 0);
@@ -439,6 +477,34 @@ namespace Microsoft.Xna.Framework.Graphics
                     GraphicsExtensions.CheckGLError();
                 }
             }
+        }
+
+        struct SetDataState<T>
+            where T : struct
+        {
+            public Texture2D texture;
+            public int level;
+            public T[] data;
+            public int startIndex;
+            public int elementCount;
+
+            internal static Action<SetDataState<T>> Action =
+                (s) => s.texture.PlatformSetDataBody(s.level, s.data, s.startIndex, s.elementCount);
+        }
+
+        struct SetDataRectState<T>
+            where T : struct
+        {
+            public Texture2D texture;
+            public int level;
+            public int arraySlice;
+            public Rectangle rect;
+            public T[] data;
+            public int startIndex;
+            public int elementCount;
+
+            public static Action<SetDataRectState<T>> Action =
+                (s) => s.texture.PlatformSetDataBody(s.level, s.arraySlice, s.rect, s.data, s.startIndex, s.elementCount);
         }
     }
 }

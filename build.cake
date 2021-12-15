@@ -1,6 +1,6 @@
 #tool nuget:?package=vswhere&version=2.6.7
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
-#addin nuget:?package=Cake.FileHelpers&version=3.2.1
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0
+#addin nuget:?package=Cake.FileHelpers&version=3.3.0
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -48,6 +48,39 @@ private bool GetMSBuildWith(string requires)
     return false;
 }
 
+private void ParseVersion()
+{
+    if (!string.IsNullOrEmpty(EnvironmentVariable("GITHUB_ACTIONS")))
+    {
+        version = "3.8.1." + EnvironmentVariable("GITHUB_RUN_NUMBER");
+
+        var repositoryUrl = EnvironmentVariable("GITHUB_REPOSITORY");
+        var branch = EnvironmentVariable("GITHUB_REF");
+
+        if (!string.IsNullOrEmpty(repositoryUrl) && 
+            repositoryUrl != "MonoGame/MonoGame") // If we are building a PR
+        {
+            var split = repositoryUrl.Split('/');
+            version = version + "-" + split[0];
+        }
+        else if (repositoryUrl == "MonoGame/MonoGame" &&
+            !string.IsNullOrEmpty(branch) ||
+            branch != " refs/heads/master") // If we are building our repository
+        {
+            var branchName = branch.Split('/')[2];
+            version = version + "-" + branchName;
+        }
+    }
+    else
+    {
+        var branch = EnvironmentVariable("BRANCH_NAME") ?? string.Empty;    
+        if (!branch.Contains("master"))
+            version += "-develop";
+    }
+
+    Console.WriteLine("Version: " + version);
+}
+
 //////////////////////////////////////////////////////////////////////
 // TASKS
 //////////////////////////////////////////////////////////////////////
@@ -58,14 +91,7 @@ Task("Prep")
     // Set MGFXC_WINE_PATH for building shaders on macOS and Linux
     System.Environment.SetEnvironmentVariable("MGFXC_WINE_PATH", EnvironmentVariable("HOME") + "/.winemonogame");
 
-    // We tag the version with the build branch to make it
-    // easier to spot special builds in NuGet feeds.
-    var branch = EnvironmentVariable("GIT_BRANCH") ?? string.Empty;    
-    if (!branch.Contains("master"))
-	version += "-develop";
-	
-    Console.WriteLine("Build Branch: {0}", branch);
-    Console.WriteLine("Build Version: {0}", version);
+    ParseVersion();
 
     msPackSettings = new MSBuildSettings();
     msPackSettings.Verbosity = Verbosity.Minimal;
@@ -99,6 +125,7 @@ Task("BuildDesktopGL")
 
 Task("TestDesktopGL")
     .IsDependentOn("BuildDesktopGL")
+    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/DesktopGL/Debug");
@@ -188,7 +215,16 @@ Task("BuildTools")
     var newVersion = "<key>CFBundleShortVersionString</key>\n\t<string>" + version + "</string>";
     ReplaceRegexInFiles(plistPath, versionReg, newVersion, System.Text.RegularExpressions.RegexOptions.Singleline);
     
-    PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.csproj");
+    if (IsRunningOnWindows())
+        PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Windows.csproj");
+    
+    PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj");
+    
+    // if (IsRunningOnMacOs()) TODO: Update CAKE
+    if (IsRunningOnUnix() && DirectoryExists("/Applications"))
+        PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj");
+
+    PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.csproj");
 });
 
 Task("TestTools")
@@ -243,6 +279,9 @@ Task("PackVSMacTemplates")
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
+
+Task("SanityCheck")
+    .IsDependentOn("Prep");
 
 Task("BuildAll")
     .IsDependentOn("BuildDesktopGL")

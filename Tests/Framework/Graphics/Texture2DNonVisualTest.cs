@@ -9,7 +9,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 using StbImageSharp;
-using StbImageWriteSharp;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -29,6 +28,7 @@ namespace MonoGame.Tests.Graphics
         [TestCase("Assets/Textures/8bit.png")]
         [TestCase("Assets/Textures/24bit.png")]
         [TestCase("Assets/Textures/32bit.png")]
+        [TestCase("Assets/Textures/sample_1280x853.hdr")]
         public void FromStreamShouldWorkTest(string filename)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))
@@ -70,6 +70,57 @@ namespace MonoGame.Tests.Graphics
             // XNA misses this check and throws a NullReferenceException
             Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(null, new MemoryStream()));
 #endif
+        }
+
+        [Test]
+        public void FromStreamCustomProcessor()
+        {
+            // This test sets the color of every other color to custom color
+            var customValue = Color.BurlyWood;
+
+            var flag = false;
+            using (var stream = File.OpenRead("Assets/Textures/red_128.png"))
+            using (var texture = Texture2D.FromStream(gd, stream, data =>
+            {
+                for(var i = 0; i < data.Length; i += 4)
+                {
+                    if (flag)
+                    {
+                        data[i + 0] = customValue.R;
+                        data[i + 1] = customValue.G;
+                        data[i + 2] = customValue.B;
+                        data[i + 3] = customValue.A;
+                    }
+
+                    flag = !flag;
+                }
+            }))
+            {
+                Assert.AreEqual(8, texture.Width);
+                Assert.AreEqual(8, texture.Height);
+                Assert.AreEqual(1, texture.LevelCount);
+                var pngData = new Color[8 * 8];
+                texture.GetData(pngData);
+
+                flag = false;
+                for (var i = 0; i < pngData.Length; i++)
+                {
+                    if (!flag)
+                    {
+                        // Value unchanged
+                        Assert.AreEqual(255, pngData[i].R);
+                        Assert.AreEqual(0, pngData[i].G);
+                        Assert.AreEqual(0, pngData[i].B);
+                        Assert.AreEqual(128, pngData[i].A);
+                    } else
+                    {
+                        // Custom value
+                        Assert.AreEqual(customValue, pngData[i]);
+                    }
+
+                    flag = !flag;
+                }
+            }
         }
 
         [TestCase]

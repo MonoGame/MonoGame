@@ -505,7 +505,7 @@ namespace Microsoft.Xna.Framework
             }
             else
             {
-                Vector3.Multiply(ref vector, (float)(1f / ((float)Math.Sqrt((double)num))), out vector);
+                Vector3.Multiply(ref vector, 1f / MathF.Sqrt(num), out vector);
             }
             Vector3.Cross(ref cameraUpVector, ref vector, out vector3);
             vector3.Normalize();
@@ -572,7 +572,7 @@ namespace Microsoft.Xna.Framework
 		    }
 		    else
 		    {
-		        Vector3.Multiply(ref vector2, (float) (1f / ((float) Math.Sqrt((double) num2))), out vector2);
+		        Vector3.Multiply(ref vector2, 1f / MathF.Sqrt(num2), out vector2);
 		    }
 		    Vector3 vector4 = rotateAxis;
 		    Vector3.Dot(ref rotateAxis, ref vector2, out num);
@@ -648,8 +648,8 @@ namespace Microsoft.Xna.Framework
             float x = axis.X;
 		    float y = axis.Y;
 		    float z = axis.Z;
-		    float num2 = (float) Math.Sin((double) angle);
-		    float num = (float) Math.Cos((double) angle);
+		    float num2 = MathF.Sin(angle);
+		    float num = MathF.Cos(angle);
 		    float num11 = x * x;
 		    float num10 = y * y;
 		    float num9 = z * z;
@@ -1089,8 +1089,8 @@ namespace Microsoft.Xna.Framework
         {
             result = Matrix.Identity;
 
-			var val1 = (float)Math.Cos(radians);
-			var val2 = (float)Math.Sin(radians);
+			var val1 = MathF.Cos(radians);
+			var val2 = MathF.Sin(radians);
 			
             result.M22 = val1;
             result.M23 = val2;
@@ -1119,8 +1119,8 @@ namespace Microsoft.Xna.Framework
         {
             result = Matrix.Identity;
 
-            var val1 = (float)Math.Cos(radians);
-			var val2 = (float)Math.Sin(radians);
+            var val1 = MathF.Cos(radians);
+			var val2 = MathF.Sin(radians);
 			
             result.M11 = val1;
             result.M13 = -val2;
@@ -1149,8 +1149,8 @@ namespace Microsoft.Xna.Framework
         {
             result = Matrix.Identity;
 
-			var val1 = (float)Math.Cos(radians);
-			var val2 = (float)Math.Sin(radians);
+			var val1 = MathF.Cos(radians);
+			var val2 = MathF.Sin(radians);
 			
             result.M11 = val1;
             result.M12 = val2;
@@ -1483,9 +1483,9 @@ namespace Microsoft.Xna.Framework
             float ys = (Math.Sign(M21 * M22 * M23 * M24) < 0) ? -1 : 1;
             float zs = (Math.Sign(M31 * M32 * M33 * M34) < 0) ? -1 : 1;
 
-            scale.X = xs * (float)Math.Sqrt(this.M11 * this.M11 + this.M12 * this.M12 + this.M13 * this.M13);
-            scale.Y = ys * (float)Math.Sqrt(this.M21 * this.M21 + this.M22 * this.M22 + this.M23 * this.M23);
-            scale.Z = zs * (float)Math.Sqrt(this.M31 * this.M31 + this.M32 * this.M32 + this.M33 * this.M33);
+            scale.X = xs * MathF.Sqrt(this.M11 * this.M11 + this.M12 * this.M12 + this.M13 * this.M13);
+            scale.Y = ys * MathF.Sqrt(this.M21 * this.M21 + this.M22 * this.M22 + this.M23 * this.M23);
+            scale.Z = zs * MathF.Sqrt(this.M31 * this.M31 + this.M32 * this.M32 + this.M33 * this.M33);
 
             if (scale.X == 0.0 || scale.Y == 0.0 || scale.Z == 0.0)
             {

@@ -115,7 +115,7 @@ namespace Microsoft.Xna.Framework
                         _isExiting++;
                         break;
                     case Sdl.EventType.JoyDeviceAdded:
-                        Joystick.AddDevice(ev.JoystickDevice.Which);
+                        Joystick.AddDevices();
                         break;
                     case Sdl.EventType.JoyDeviceRemoved:
                         Joystick.RemoveDevice(ev.JoystickDevice.Which);
@@ -132,10 +132,6 @@ namespace Microsoft.Xna.Framework
                         const int wheelDelta = 120;
                         Mouse.ScrollY += ev.Wheel.Y * wheelDelta;
                         Mouse.ScrollX += ev.Wheel.X * wheelDelta;
-                        break;
-                    case Sdl.EventType.MouseMotion:
-                        Window.MouseState.X = ev.Motion.X;
-                        Window.MouseState.Y = ev.Motion.Y;
                         break;
                     case Sdl.EventType.KeyDown:
                     {

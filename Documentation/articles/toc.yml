@@ -8,7 +8,7 @@
 - name: Tools
   href: tools/toc.yml
   topicHref: tools/tools.md
-- name: Adding Content
+- name: Content Pipeline
   href: content/toc.yml
   topicHref: content/content.md
 - name: Platforms

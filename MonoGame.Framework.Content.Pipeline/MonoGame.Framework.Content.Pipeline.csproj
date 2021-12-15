@@ -102,7 +102,7 @@
 
     <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so" Visible="false">
       <Link>libFreeImage.so</Link>
-      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <PackagePath>runtimes\linux-x64\native\libFreeImage.so</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so" Visible="false">
@@ -127,7 +127,7 @@
     </Content>
     <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.so" Visible="false">
       <Link>libfreetype6.so</Link>
-      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <PackagePath>runtimes\linux-x64\native\libfreetype6.so</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng16.so.16" Visible="false">
@@ -147,7 +147,7 @@
 
     <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" Visible="false">
       <Link>libFreeImage.dylib</Link>
-      <PackagePath>runtimes\osx\native</PackagePath>
+      <PackagePath>runtimes\osx\native\libFreeImage.dylib</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib" Visible="false">
@@ -172,7 +172,7 @@
     </Content>
     <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib" Visible="false">
       <Link>libfreetype6.dylib</Link>
-      <PackagePath>runtimes\osx\native</PackagePath>
+      <PackagePath>runtimes\osx\native\libfreetype6.dylib</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng16.16.dylib" Visible="false">

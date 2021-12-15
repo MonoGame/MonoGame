@@ -59,7 +59,7 @@ with.
       </CharacterRegion>
     </CharacterRegions>
     <!--
-    ResourceFiles control the charaters which will be in the font. It does this
+    ResourceFiles control the characters which will be in the font. It does this
     by scanning the text in each of the resource files and adding those specific
     characters to the font. 
     -->

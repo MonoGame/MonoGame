@@ -213,7 +213,7 @@ namespace Microsoft.Xna.Framework.Audio
                         _voice.Stop((int)PlayFlags.Tails);
                 }
             }
-
+            
             _paused = false;
         }
 
@@ -307,7 +307,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
             // which avoids the native call and is actually more accurate.
-             var pitch = (float)Math.Pow(2.0, value);
+             var pitch = MathF.Pow(2.0f, value);
              _voice.SetFrequencyRatio(pitch);
         }
 
