@@ -3,7 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -35,10 +37,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			int outputWidth = GuessOutputWidth(sourceGlyphs);
 			int outputHeight = 0;
 
-			// Choose positions for each glyph, one at a time.
+            // Choose positions for each glyph, one at a time.
+            // Keep a record of glyphs in a dictionary so we can look them up based on
+            // their index later for some optimisations
+            Dictionary<int, ArrangedGlyph> glyphDict = new Dictionary<int, ArrangedGlyph>();
+            for (int i = 0; i < glyphs.Count; i++)
+            {
+                glyphDict.Add(i, glyphs[i]);
+            }
+
 			for (int i = 0; i < glyphs.Count; i++)
 			{
-				PositionGlyph(glyphs, i, outputWidth);
+				PositionGlyph(glyphDict, i, outputWidth);
 
 				outputHeight = Math.Max(outputHeight, glyphs[i].Y + glyphs[i].Height);
 			}
@@ -90,12 +100,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 
 		// Works out where to position a single glyph.
-		static void PositionGlyph(List<ArrangedGlyph> glyphs, int index, int outputWidth)
+		static void PositionGlyph(Dictionary<int, ArrangedGlyph> glyphs, int index, int outputWidth)
 		{
-			int x = 0;
-			int y = 0;
+            int x = 0;
+            int y = 0;
 
-			while (true)
+            bool incrementSet = false;
+            int nextYIncrement = int.MaxValue;
+
+            // Find a starting Y value
+            int startY = 0;
+            for (int i = 0; i < index; i++)
+            {
+                // If a glyph thats smaller than us is placed here, we know there's no point
+                // searching before it, as there will be no spaces suitable for us
+                // So we iterate over all the glyphs present to confirm where we should start
+                // This saves countless comparisons later on
+                if (glyphs[i].Width <= glyphs[index].Width &&
+                    glyphs[i].Height <= glyphs[index].Height)
+                {
+                    startY = Math.Max(startY, glyphs[i].Y);
+                }
+            }
+
+            y = startY;
+            while (true)
 			{
 				// Is this position free for us to use?
 				int intersects = FindIntersectingGlyph(glyphs, index, x, y);
@@ -108,6 +137,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 					return;
 				}
 
+                // With every glyph we hit, calculate its bottom position, keep track of the smallest
+                // Y movement required to hit the bottom of a glyph during our checks along this row.
+                // If we fail to find a spot on this row, we know there wont be any space before the new
+                // bottom value of the smallest glyph we found, so we increment our Y by that amount
+                // instead of by 1 to save on watsed checks
+                int intersectsBottom = glyphs[intersects].Y + glyphs[intersects].Height;
+                int incrementToHitBottom = intersectsBottom - y;
+                if (incrementToHitBottom < nextYIncrement)
+                {
+                    nextYIncrement = incrementToHitBottom;
+                    incrementSet = true;
+                }
+
 				// Skip past the existing glyph that we collided with.
 				x = glyphs[intersects].X + glyphs[intersects].Width;
 
@@ -115,30 +157,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 				if (x + glyphs[index].Width > outputWidth)
 				{
 					x = 0;
-					y++;
+					y += incrementSet ? nextYIncrement : 1;
+                    nextYIncrement = int.MaxValue;
+                    incrementSet = false;
 				}
 			}
 		}
 
 
 		// Checks if a proposed glyph position collides with anything that we already arranged.
-		static int FindIntersectingGlyph(List<ArrangedGlyph> glyphs, int index, int x, int y)
+		static int FindIntersectingGlyph(Dictionary<int, ArrangedGlyph> glyphs, int index, int x, int y)
 		{
 			int w = glyphs[index].Width;
 			int h = glyphs[index].Height;
 
 			for (int i = 0; i < index; i++)
 			{
-				if (glyphs[i].X >= x + w)
+                var targetGlyph = glyphs[i];
+				if (targetGlyph.X >= x + w)
 					continue;
 
-				if (glyphs[i].X + glyphs[i].Width <= x)
+				if (targetGlyph.X + targetGlyph.Width <= x)
 					continue;
 
-				if (glyphs[i].Y >= y + h)
+				if (targetGlyph.Y >= y + h)
 					continue;
 
-				if (glyphs[i].Y + glyphs[i].Height <= y)
+				if (targetGlyph.Y + targetGlyph.Height <= y)
 					continue;
 
 				return i;
