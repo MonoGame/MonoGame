@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
-    <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
+    <TargetFramework>net6.0</TargetFramework>
+    <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Linux</BaseOutputPath>
     <DefineConstants>GTK</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
@@ -33,8 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Eto.Forms" Version="2.5.10" />
-    <PackageReference Include="Eto.Platform.Gtk" Version="2.5.10" />
+    <PackageReference Include="Eto.Forms" Version="2.6.0" />
+    <PackageReference Include="Eto.Platform.Gtk" Version="2.6.0" />
     <PackageReference Include="GtkSharp" Version="3.24.24.34" />
   </ItemGroup>
 

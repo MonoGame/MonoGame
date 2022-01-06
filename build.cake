@@ -1,6 +1,6 @@
-#tool nuget:?package=vswhere&version=2.6.7
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0
-#addin nuget:?package=Cake.FileHelpers&version=3.3.0
+#tool nuget:?package=vswhere&version=2.8.4
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.13.2
+#addin nuget:?package=Cake.FileHelpers&version=5.0.0
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -153,7 +153,7 @@ Task("BuildAndroid")
     return DirectoryExists("/Library/Frameworks/Xamarin.Android.framework");
 }).Does(() =>
 {
-    PackMSBuild("MonoGame.Framework/MonoGame.Framework.Android.csproj");
+    PackDotnet("MonoGame.Framework/MonoGame.Framework.Android.csproj");
 });
 
 Task("BuildiOS")
@@ -163,7 +163,7 @@ Task("BuildiOS")
     return DirectoryExists("/Library/Frameworks/Xamarin.iOS.framework");
 }).Does(() =>
 {
-    PackMSBuild("MonoGame.Framework/MonoGame.Framework.iOS.csproj");
+    PackDotnet("MonoGame.Framework/MonoGame.Framework.iOS.csproj");
 });
 
 Task("BuildUWP")
@@ -206,8 +206,8 @@ Task("BuildTools")
     PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj");
     
     // if (IsRunningOnMacOs()) TODO: Update CAKE
-    if (IsRunningOnUnix() && DirectoryExists("/Applications"))
-        PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj");
+    // if (IsRunningOnUnix() && DirectoryExists("/Applications"))
+    //     PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj");
 
     PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.csproj");
 });
@@ -257,8 +257,8 @@ Task("PackVSMacTemplates")
     .WithCriteria(() => IsRunningOnUnix() && DirectoryExists("/Applications") && DirectoryExists("/Library"))
     .Does(() =>
 {
-    DotNetCoreRestore("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj");
-    MSBuild("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj", mdPackSettings);
+    // DotNetCoreRestore("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj");
+    // MSBuild("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj", mdPackSettings);
 });
 
 //////////////////////////////////////////////////////////////////////
