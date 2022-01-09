@@ -934,196 +934,100 @@ namespace Microsoft.Xna.Framework.Graphics
             var firstGlyphOfLine = true;
 
             fixed (SpriteFont.Glyph* pGlyphs = spriteFont.Glyphs)
-                if (rtl)
-                    for (var i = 0; i < text.Length; ++i)
+                for (var i = 0; i < text.Length; ++i)
+                {
+                    var c = text[i];
+
+                    if (c == '\r')
+                        continue;
+
+                    if (c == '\n')
                     {
-                        var c = text[i];
-
-                        if (c == '\r')
-                            continue;
-
-                        if (c == '\n')
-                        {
-                            offset.X = 0;
-                            offset.Y += spriteFont.LineSpacing;
-                            firstGlyphOfLine = true;
-                            continue;
-                        }
-
-                        var currentGlyphIndex = spriteFont.GetGlyphIndexOrDefault(c);
-                        var pCurrentGlyph = pGlyphs + currentGlyphIndex;
-
-                        // The first character on a line might have a negative left side bearing.
-                        // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
-                        //  so that text does not hang off the left side of its rectangle.
-                        if (firstGlyphOfLine)
-                        {
-                            offset.X = Math.Max(pCurrentGlyph->RightSideBearing, 0);
-                            firstGlyphOfLine = false;
-                        }
-                        else
-                        {
-                            offset.X += spriteFont.Spacing + pCurrentGlyph->RightSideBearing;
-                        }
-
-                        var p = offset;
-
-                        if (!flippedHorz)
-                            p.X += pCurrentGlyph->BoundsInTexture.Width;
-                        p.X += pCurrentGlyph->Cropping.X;
-
-                        if (flippedVert)
-                            p.Y += pCurrentGlyph->BoundsInTexture.Height - spriteFont.LineSpacing;
-                        p.Y += pCurrentGlyph->Cropping.Y;
-
-                        Vector2.Transform(ref p, ref transformation, out p);
-
-                        var item = _batcher.CreateBatchItem();
-                        item.Texture = spriteFont.Texture;
-                        item.SortKey = sortKey;
-
-                        _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * spriteFont.Texture.TexelWidth;
-                        _texCoordTL.Y = pCurrentGlyph->BoundsInTexture.Y * spriteFont.Texture.TexelHeight;
-                        _texCoordBR.X = (pCurrentGlyph->BoundsInTexture.X + pCurrentGlyph->BoundsInTexture.Width) * spriteFont.Texture.TexelWidth;
-                        _texCoordBR.Y = (pCurrentGlyph->BoundsInTexture.Y + pCurrentGlyph->BoundsInTexture.Height) * spriteFont.Texture.TexelHeight;
-
-                        if ((effects & SpriteEffects.FlipVertically) != 0)
-                        {
-                            var temp = _texCoordBR.Y;
-                            _texCoordBR.Y = _texCoordTL.Y;
-                            _texCoordTL.Y = temp;
-                        }
-                        if ((effects & SpriteEffects.FlipHorizontally) != 0)
-                        {
-                            var temp = _texCoordBR.X;
-                            _texCoordBR.X = _texCoordTL.X;
-                            _texCoordTL.X = temp;
-                        }
-
-                        if (rotation == 0f)
-                        {
-                            item.Set(p.X,
-                                    p.Y,
-                                    pCurrentGlyph->BoundsInTexture.Width * scale.X,
-                                    pCurrentGlyph->BoundsInTexture.Height * scale.Y,
-                                    color,
-                                    _texCoordTL,
-                                    _texCoordBR,
-                                    layerDepth);
-                        }
-                        else
-                        {
-                            item.Set(p.X,
-                                    p.Y,
-                                    0,
-                                    0,
-                                    pCurrentGlyph->BoundsInTexture.Width * scale.X,
-                                    pCurrentGlyph->BoundsInTexture.Height * scale.Y,
-                                    sin,
-                                    cos,
-                                    color,
-                                    _texCoordTL,
-                                    _texCoordBR,
-                                    layerDepth);
-                        }
-
-                        offset.X += pCurrentGlyph->Width + pCurrentGlyph->RightSideBearing;
+                        offset.X = 0;
+                        offset.Y += spriteFont.LineSpacing;
+                        firstGlyphOfLine = true;
+                        continue;
                     }
-                else
-                    for (var i = 0; i < text.Length; ++i)
+
+                    var currentGlyphIndex = spriteFont.GetGlyphIndexOrDefault(c);
+                    var pCurrentGlyph = pGlyphs + currentGlyphIndex;
+
+                    // The first character on a line might have a negative left side bearing.
+                    // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
+                    //  so that text does not hang off the left side of its rectangle.
+                    if (firstGlyphOfLine)
                     {
-                        var c = text[i];
-
-                        if (c == '\r')
-                            continue;
-
-                        if (c == '\n')
-                        {
-                            offset.X = 0;
-                            offset.Y += spriteFont.LineSpacing;
-                            firstGlyphOfLine = true;
-                            continue;
-                        }
-
-                        var currentGlyphIndex = spriteFont.GetGlyphIndexOrDefault(c);
-                        var pCurrentGlyph = pGlyphs + currentGlyphIndex;
-
-                        // The first character on a line might have a negative left side bearing.
-                        // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
-                        //  so that text does not hang off the left side of its rectangle.
-                        if (firstGlyphOfLine)
-                        {
-                            offset.X = Math.Max(pCurrentGlyph->LeftSideBearing, 0);
-                            firstGlyphOfLine = false;
-                        }
-                        else
-                        {
-                            offset.X += spriteFont.Spacing + pCurrentGlyph->LeftSideBearing;
-                        }
-
-                        var p = offset;
-
-                        if (flippedHorz)
-                            p.X += pCurrentGlyph->BoundsInTexture.Width;
-                        p.X += pCurrentGlyph->Cropping.X;
-
-                        if (flippedVert)
-                            p.Y += pCurrentGlyph->BoundsInTexture.Height - spriteFont.LineSpacing;
-                        p.Y += pCurrentGlyph->Cropping.Y;
-
-                        Vector2.Transform(ref p, ref transformation, out p);
-
-                        var item = _batcher.CreateBatchItem();
-                        item.Texture = spriteFont.Texture;
-                        item.SortKey = sortKey;
-
-                        _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * spriteFont.Texture.TexelWidth;
-                        _texCoordTL.Y = pCurrentGlyph->BoundsInTexture.Y * spriteFont.Texture.TexelHeight;
-                        _texCoordBR.X = (pCurrentGlyph->BoundsInTexture.X + pCurrentGlyph->BoundsInTexture.Width) * spriteFont.Texture.TexelWidth;
-                        _texCoordBR.Y = (pCurrentGlyph->BoundsInTexture.Y + pCurrentGlyph->BoundsInTexture.Height) * spriteFont.Texture.TexelHeight;
-
-                        if ((effects & SpriteEffects.FlipVertically) != 0)
-                        {
-                            var temp = _texCoordBR.Y;
-                            _texCoordBR.Y = _texCoordTL.Y;
-                            _texCoordTL.Y = temp;
-                        }
-                        if ((effects & SpriteEffects.FlipHorizontally) != 0)
-                        {
-                            var temp = _texCoordBR.X;
-                            _texCoordBR.X = _texCoordTL.X;
-                            _texCoordTL.X = temp;
-                        }
-
-                        if (rotation == 0f)
-                        {
-                            item.Set(p.X,
-                                    p.Y,
-                                    pCurrentGlyph->BoundsInTexture.Width * scale.X,
-                                    pCurrentGlyph->BoundsInTexture.Height * scale.Y,
-                                    color,
-                                    _texCoordTL,
-                                    _texCoordBR,
-                                    layerDepth);
-                        }
-                        else
-                        {
-                            item.Set(p.X,
-                                    p.Y,
-                                    0,
-                                    0,
-                                    pCurrentGlyph->BoundsInTexture.Width * scale.X,
-                                    pCurrentGlyph->BoundsInTexture.Height * scale.Y,
-                                    sin,
-                                    cos,
-                                    color,
-                                    _texCoordTL,
-                                    _texCoordBR,
-                                    layerDepth);
-                        }
-
-                        offset.X += pCurrentGlyph->Width + pCurrentGlyph->RightSideBearing;
+                        offset.X = Math.Max(pCurrentGlyph->LeftSideBearing, 0);
+                        firstGlyphOfLine = false;
                     }
+                    else
+                    {
+                        offset.X += spriteFont.Spacing + pCurrentGlyph->LeftSideBearing;
+                    }
+
+                    var p = offset;
+
+                    if (rtl ^ flippedHorz)
+                        p.X += pCurrentGlyph->BoundsInTexture.Width;
+                    p.X += pCurrentGlyph->Cropping.X;
+
+                    if (flippedVert)
+                        p.Y += pCurrentGlyph->BoundsInTexture.Height - spriteFont.LineSpacing;
+                    p.Y += pCurrentGlyph->Cropping.Y;
+
+                    Vector2.Transform(ref p, ref transformation, out p);
+
+                    var item = _batcher.CreateBatchItem();
+                    item.Texture = spriteFont.Texture;
+                    item.SortKey = sortKey;
+
+                    _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * spriteFont.Texture.TexelWidth;
+                    _texCoordTL.Y = pCurrentGlyph->BoundsInTexture.Y * spriteFont.Texture.TexelHeight;
+                    _texCoordBR.X = (pCurrentGlyph->BoundsInTexture.X + pCurrentGlyph->BoundsInTexture.Width) * spriteFont.Texture.TexelWidth;
+                    _texCoordBR.Y = (pCurrentGlyph->BoundsInTexture.Y + pCurrentGlyph->BoundsInTexture.Height) * spriteFont.Texture.TexelHeight;
+
+                    if ((effects & SpriteEffects.FlipVertically) != 0)
+                    {
+                        var temp = _texCoordBR.Y;
+                        _texCoordBR.Y = _texCoordTL.Y;
+                        _texCoordTL.Y = temp;
+                    }
+                    if ((effects & SpriteEffects.FlipHorizontally) != 0)
+                    {
+                        var temp = _texCoordBR.X;
+                        _texCoordBR.X = _texCoordTL.X;
+                        _texCoordTL.X = temp;
+                    }
+
+                    if (rotation == 0f)
+                    {
+                        item.Set(p.X,
+                                p.Y,
+                                pCurrentGlyph->BoundsInTexture.Width * scale.X,
+                                pCurrentGlyph->BoundsInTexture.Height * scale.Y,
+                                color,
+                                _texCoordTL,
+                                _texCoordBR,
+                                layerDepth);
+                    }
+                    else
+                    {
+                        item.Set(p.X,
+                                p.Y,
+                                0,
+                                0,
+                                pCurrentGlyph->BoundsInTexture.Width * scale.X,
+                                pCurrentGlyph->BoundsInTexture.Height * scale.Y,
+                                sin,
+                                cos,
+                                color,
+                                _texCoordTL,
+                                _texCoordBR,
+                                layerDepth);
+                    }
+
+                    offset.X += pCurrentGlyph->Width + pCurrentGlyph->RightSideBearing;
+                }
 
             // We need to flush if we're using Immediate sort mode.
             FlushIfNeeded();
