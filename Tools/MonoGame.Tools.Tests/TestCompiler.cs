@@ -63,6 +63,7 @@ namespace MonoGame.Tests.ContentPipeline
             TargetPlatform.WindowsPhone8,
             TargetPlatform.RaspberryPi,
             TargetPlatform.PlayStation4,
+            TargetPlatform.PlayStation5,
             TargetPlatform.XboxOne,
             TargetPlatform.Switch,
             TargetPlatform.Web
