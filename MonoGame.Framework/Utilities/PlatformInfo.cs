@@ -36,6 +36,8 @@ namespace MonoGame.Framework.Utilities
                 return MonoGamePlatform.XboxOne;
 #elif PLAYSTATION4
                 return MonoGamePlatform.PlayStation4;
+#elif PLAYSTATION5
+                return MonoGamePlatform.PlayStation5;
 #elif STADIA
                 return MonoGamePlatform.Stadia;
 #endif

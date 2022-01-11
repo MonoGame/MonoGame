@@ -78,7 +78,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Sony PlayStation4
         /// </summary>
         PlayStation4,
-       
+
+        /// <summary>
+        /// Sony PlayStation5
+        /// </summary>
+        PlayStation5,
+
         /// <summary>
         /// Xbox One
         /// </summary>

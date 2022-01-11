@@ -53,6 +53,7 @@
 			'$(MonoGamePlatform)' != 'WindowsPhone8' And       
 			'$(MonoGamePlatform)' != 'RaspberryPi' And       
 			'$(MonoGamePlatform)' != 'PlayStation4' And       
+			'$(MonoGamePlatform)' != 'PlayStation5' And       
 			'$(MonoGamePlatform)' != 'XboxOne' And 
 			'$(MonoGamePlatform)' != 'WindowsGL'" />
 
