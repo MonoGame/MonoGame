@@ -1775,11 +1775,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // are not still set as inputs in other shader stages, as this is not allowed.
             if (!_shaderResourcesSetForCompute)
             {
-                ClearShaderResourcesForStage(ShaderStage.Vertex, _vertexShaderResources);
-                ClearShaderResourcesForStage(ShaderStage.Pixel, _pixelShaderResources);
-                ClearShaderResourcesForStage(ShaderStage.Hull, _hullShaderResources);
-                ClearShaderResourcesForStage(ShaderStage.Domain, _domainShaderResources);
-                ClearShaderResourcesForStage(ShaderStage.Geometry, _geometryShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Vertex, _vertexShaderResources, VertexTextures);
+                ClearShaderResourcesForStage(ShaderStage.Pixel, _pixelShaderResources, Textures);
+                ClearShaderResourcesForStage(ShaderStage.Hull, _hullShaderResources, HullTextures);
+                ClearShaderResourcesForStage(ShaderStage.Domain, _domainShaderResources, DomainTextures);
+                ClearShaderResourcesForStage(ShaderStage.Geometry, _geometryShaderResources, GeometryTextures);
 
                 _shaderResourcesSetForCompute = true;
             }
@@ -1823,11 +1823,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void ClearShaderResourcesForStage(ShaderStage stage, ShaderResourceCollection resourceCollection)
+        private void ClearShaderResourcesForStage(ShaderStage stage, ShaderResourceCollection resourceCollection, TextureCollection textureCollection)
         {
             var dxStage = GetDXShaderStage(stage);
             for (int i = 0; i < resourceCollection.MaxReadableResources; i++)
                 dxStage.SetShaderResource(i, null);
+
+            textureCollection.Clear();
         }
 
         private void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct
