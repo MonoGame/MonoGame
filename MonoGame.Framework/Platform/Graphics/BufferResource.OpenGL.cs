@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         void GenerateIfRequired()
         {
-            if (buffer == 0)
+            if (buffer == 0 && ElementStride != 0)
             {
                 GL.GenBuffers(1, out this.buffer);
                 GraphicsExtensions.CheckGLError();

@@ -111,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         void GenerateIfRequired()
         {
-            if (_buffer != null)
+            if (_buffer != null || ElementStride == 0)
                 return;
 
             // TODO: To use Immutable resources we would need to delay creation of 
