@@ -54,7 +54,7 @@ private void ParseVersion()
     {
         version = "3.8.1." + EnvironmentVariable("GITHUB_RUN_NUMBER");
         if (EnvironmentVariable("GITHUB_REF") != "refs/heads/master")
-            Settings.Version += "-develop";
+            version += "-develop";
     }
     else
     {
