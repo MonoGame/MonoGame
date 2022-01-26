@@ -64,8 +64,8 @@ private void ParseVersion()
             version = version + "-" + split[0];
         }
         else if (repositoryUrl == "MonoGame/MonoGame" &&
-            !string.IsNullOrEmpty(branch) ||
-            branch != " refs/heads/master") // If we are building our repository
+            !string.IsNullOrEmpty(branch) &&
+            branch != "refs/heads/master") // If we are building our repository
         {
             var branchName = branch.Split('/')[2];
             version = version + "-" + branchName;
