@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.VertexShader = _vertexShader;
 
 				// Update the texture parameters.
-                SetShaderSamplers(_vertexShader, device.VertexTextures, device.VertexSamplerStates);
+                SetShaderSamplers(_vertexShader, device.VertexShaderResources, device.VertexSamplerStates);
                 SetConstantBuffers(_vertexShader, device);
                 SetShaderResources(_vertexShader, device);
             }
@@ -106,7 +106,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.PixelShader = _pixelShader;
 
                 // Update the texture parameters.
-                SetShaderSamplers(_pixelShader, device.Textures, device.SamplerStates);
+                SetShaderSamplers(_pixelShader, device.PixelShaderResources, device.SamplerStates);
                 SetConstantBuffers(_pixelShader, device);
                 SetShaderResources(_pixelShader, device);
             }
@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_hullShader != null)
             {
                 // Update the texture parameters.
-                SetShaderSamplers(_hullShader, device.HullTextures, device.HullSamplerStates);
+                SetShaderSamplers(_hullShader, device.HullShaderResources, device.HullSamplerStates);
                 SetConstantBuffers(_hullShader, device);
                 SetShaderResources(_hullShader, device);
             }
@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_domainShader != null)
             {
                 // Update the texture parameters.
-                SetShaderSamplers(_domainShader, device.DomainTextures, device.DomainSamplerStates);
+                SetShaderSamplers(_domainShader, device.DomainShaderResources, device.DomainSamplerStates);
                 SetConstantBuffers(_domainShader, device);
                 SetShaderResources(_domainShader, device);
             }
@@ -136,7 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_geometryShader != null)
             {
                 // Update the texture parameters.
-                SetShaderSamplers(_geometryShader, device.GeometryTextures, device.GeometrySamplerStates);
+                SetShaderSamplers(_geometryShader, device.GeometryShaderResources, device.GeometrySamplerStates);
                 SetConstantBuffers(_geometryShader, device);
                 SetShaderResources(_geometryShader, device);
             }
@@ -167,20 +167,20 @@ namespace Microsoft.Xna.Framework.Graphics
             device.GeometryShader = null;
 
             // Update the texture parameters.
-            SetShaderSamplers(_computeShader, device.ComputeTextures, device.ComputeSamplerStates);
+            SetShaderSamplers(_computeShader, device.ComputeShaderResources, device.ComputeSamplerStates);
             SetConstantBuffers(_computeShader, device);
             SetShaderResources(_computeShader, device);
         }
 
-        private void SetShaderSamplers(Shader shader, TextureCollection textures, SamplerStateCollection samplerStates)
+        private void SetShaderSamplers(Shader shader, ShaderResourceCollection shaderResources, SamplerStateCollection samplerStates)
         {
             foreach (var sampler in shader.Samplers)
             {
                 var param = _effect.Parameters[sampler.parameter];
                 var texture = param.Data as Texture;
 
-                textures[sampler.textureSlot] = texture;
-
+                shaderResources.SetResourceForBindingSlot(texture, sampler.textureSlot, false, true, -1);
+                
                 // If there is a sampler state set it.
                 if (sampler.state != null)
                     samplerStates[sampler.samplerSlot] = sampler.state;
@@ -199,6 +199,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void SetShaderResources(Shader shader, GraphicsDevice device)
         {
+            var resourceCollection = device.GetResourceCollectionForShaderStage(shader.Stage);
+
             for (var r = 0; r < shader.ShaderResources.Length; r++)
             {
                 var resourceInfo = shader.ShaderResources[r];
@@ -214,7 +216,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         + "16 byte alignment is generally most efficient" );
                 }
 #endif
-                device.SetShaderResource(shader.Stage, resource, ref resourceInfo);
+                resourceCollection.SetResourceForBindingSlot(resource, resourceInfo.bindingSlot, resourceInfo.writeAccess, bindingSlotForCounter: resourceInfo.bindingSlotForCounter);
             }
         }
     }

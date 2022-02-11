@@ -22,13 +22,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        internal void PlatformSetSamplers(GraphicsDevice device, Shader shader)
+        internal void PlatformSetSamplers(GraphicsDevice device, Shader shader, ShaderResourceCollection shaderResources)
         {
             for (int i = 0; i < shader.Samplers.Length; i++)
             {
                 var samplerInfo = shader.Samplers[i];
                 var samplerState = _actualSamplers[samplerInfo.samplerSlot];
-                var texture = device.Textures[samplerInfo.textureSlot];
+                var texture = (Texture) shaderResources[samplerInfo.textureSlot];
                 
                 if (samplerState != null && texture != null)
                 {

@@ -17,7 +17,9 @@
     <Compile Include="Platform\Graphics\RenderTargetCube.DirectX.cs" />
     <Compile Include="Platform\Graphics\SamplerStateCollection.DirectX.cs" />
     <Compile Include="Platform\Graphics\BufferResource.DirectX.cs" />
+    <Compile Include="Platform\Graphics\ShaderResource.DirectX.cs" />
     <Compile Include="Platform\Graphics\Shader\ConstantBuffer.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Shader\ShaderResourceCollection.DirectX.cs" />
     <Compile Include="Platform\Graphics\Shader\Shader.DirectX.cs" />
     <Compile Include="Platform\Graphics\States\BlendState.DirectX.cs" />
     <Compile Include="Platform\Graphics\States\DepthStencilState.DirectX.cs" />
@@ -25,8 +27,7 @@
     <Compile Include="Platform\Graphics\States\SamplerState.DirectX.cs" />
     <Compile Include="Platform\Graphics\Texture.DirectX.cs" />
     <Compile Include="Platform\Graphics\Texture2D.DirectX.cs" />
-    <Compile Include="Platform\Graphics\Texture3D.DirectX.cs" />
-    <Compile Include="Platform\Graphics\TextureCollection.DirectX.cs" />
+    <Compile Include="Platform\Graphics\Texture3D.DirectX.cs" />   
     <Compile Include="Platform\Graphics\TextureCube.DirectX.cs" />
     <Compile Include="Platform\Graphics\Vertices\ImmutableVertexInputLayout.cs" />
     <Compile Include="Platform\Graphics\Vertices\InputLayoutCache.cs" />

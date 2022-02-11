@@ -270,43 +270,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Context.MakeCurrent(windowInfo);
 #endif
-            GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, out MaxTextureSlots);
-            GraphicsExtensions.CheckGLError();
-
-            GL.GetInteger(GetPName.MaxVertexTextureImageUnits, out MaxVertexTextureSlots);
-            GraphicsExtensions.CheckGLError();
-            GL.GetInteger(GetPName.MaxTessControlTextureImageUnits, out MaxHullTextureSlots);
-            GraphicsExtensions.CheckGLError();
-            GL.GetInteger(GetPName.MaxTessEvaluationTextureImageUnits, out MaxDomainTextureSlots);
-            GraphicsExtensions.CheckGLError();
-            GL.GetInteger(GetPName.MaxGeometryTextureImageUnits, out MaxGeometryTextureSlots);
-            GraphicsExtensions.CheckGLError();
-            GL.GetInteger(GetPName.MaxComputeTextureImageUnits, out MaxComputeTextureSlots);
-            GraphicsExtensions.CheckGLError();
-
-            GL.GetInteger(GetPName.MaxFragmentShaderStorageBlocks, out MaxPixelShaderResourceSlots);
-            GraphicsExtensions.CheckGLError();
-            GL.GetInteger(GetPName.MaxVertexShaderStorageBlocks, out MaxVertexShaderResourceSlots);
-            GraphicsExtensions.CheckGLError();
-            GL.GetInteger(GetPName.MaxTessControlShaderStorageBlocks, out MaxHullShaderResourceSlots);
-            GraphicsExtensions.CheckGLError();
-            GL.GetInteger(GetPName.MaxTessEvaluationShaderStorageBlocks, out MaxDomainShaderResourceSlots);
-            GraphicsExtensions.CheckGLError();
-            GL.GetInteger(GetPName.MaxGeometryShaderStorageBlocks, out MaxGeometryShaderResourceSlots);
-            GraphicsExtensions.CheckGLError();
-            GL.GetInteger(GetPName.MaxComputeShaderStorageBlocks, out MaxComputeShaderResourceSlots);
-            GraphicsExtensions.CheckGLError();
-
-            // limit to our maximum allowed number of resource slots
-            MaxPixelShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxPixelShaderResourceSlots);
-            MaxVertexShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxVertexShaderResourceSlots);
-            MaxHullShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxHullShaderResourceSlots);
-            MaxDomainShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxDomainShaderResourceSlots);
-            MaxGeometryShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxGeometryShaderResourceSlots);
-            MaxComputeShaderResourceSlots = Math.Min(MaxResourceSlotsPerShaderStage, MaxComputeShaderResourceSlots);
-
-            MaxComputeShaderUAVSlots = MaxComputeShaderResourceSlots;
-
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
@@ -625,7 +588,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _rasterizerStateDirty = true;
 
             // Textures will need to be rebound to render correctly in the new render target.
-            Textures.Dirty();
+            VertexShaderResources.DirtyReadonly();
+            PixelShaderResources.DirtyReadonly();
+            HullShaderResources.DirtyReadonly();
+            DomainShaderResources.DirtyReadonly();
+            GeometryShaderResources.DirtyReadonly();
         }
 
         private class RenderTargetBindingArrayComparer : IEqualityComparer<RenderTargetBinding[]>
@@ -910,7 +877,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _rasterizerStateDirty = true;
 
             // Textures will need to be rebound to render correctly in the new render target.
-            Textures.Dirty();
+            VertexShaderResources.DirtyReadonly();
+            PixelShaderResources.DirtyReadonly();
+            HullShaderResources.DirtyReadonly();
+            DomainShaderResources.DirtyReadonly();
+            GeometryShaderResources.DirtyReadonly();
 
             return _currentRenderTargetBindings[0].RenderTarget as IRenderTarget;
         }
@@ -1134,33 +1105,31 @@ namespace Microsoft.Xna.Framework.Graphics
             _vertexConstantBuffers.SetConstantBuffers(this, _shaderProgram);
             _pixelConstantBuffers.SetConstantBuffers(this, _shaderProgram);
 
+            VertexShaderResources.PlatformApplyAllResourcesToDevice(this, _shaderProgram);
+            PixelShaderResources.PlatformApplyAllResourcesToDevice(this, _shaderProgram);
+
+            SamplerStates.PlatformSetSamplers(this, _pixelShader, PixelShaderResources);
+            if (GraphicsCapabilities.SupportsVertexTextures)
+                VertexSamplerStates.PlatformSetSamplers(this, _vertexShader, VertexShaderResources);
+
             if (_hullShader != null)
+            {
                 _hullConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+                HullShaderResources.PlatformApplyAllResourcesToDevice(this, _shaderProgram);
+                HullSamplerStates.PlatformSetSamplers(this, _hullShader, HullShaderResources);
+            }
             if (_domainShader != null)
+            {
                 _domainConstantBuffers.SetConstantBuffers(this, _shaderProgram);
+                DomainShaderResources.PlatformApplyAllResourcesToDevice(this, _shaderProgram);
+                DomainSamplerStates.PlatformSetSamplers(this, _domainShader, DomainShaderResources);
+            }
             if (_geometryShader != null)
+            {
                 _geometryConstantBuffers.SetConstantBuffers(this, _shaderProgram);
-
-            _vertexShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
-            _pixelShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
-
-            if (_hullShader != null)
-                _hullShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
-            if (_domainShader != null)
-                _domainShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
-            if (_geometryShader != null)
-                _geometryShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
-
-            SamplerStates.PlatformSetSamplers(this, _pixelShader);
-
-            if (GraphicsCapabilities.SupportsVertexTextures && _vertexShader != null)
-                VertexSamplerStates.PlatformSetSamplers(this, _vertexShader);
-            if (GraphicsCapabilities.SupportsHullTextures && _hullShader != null)
-                HullSamplerStates.PlatformSetSamplers(this, _hullShader);
-            if (GraphicsCapabilities.SupportsDomainTextures && _domainShader != null)
-                DomainSamplerStates.PlatformSetSamplers(this, _domainShader);
-            if (GraphicsCapabilities.SupportsGeometryTextures && _geometryShader != null)
-                GeometrySamplerStates.PlatformSetSamplers(this, _geometryShader);
+                GeometryShaderResources.PlatformApplyAllResourcesToDevice(this, _shaderProgram);
+                GeometrySamplerStates.PlatformSetSamplers(this, _geometryShader, GeometryShaderResources);
+            }      
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
@@ -1476,10 +1445,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             _computeConstantBuffers.SetConstantBuffers(this, _shaderProgram);
-            _computeShaderResources.ApplyAllResourcesToDevice(this, _shaderProgram);
-
-            if (GraphicsCapabilities.SupportsComputeTextures)
-                ComputeSamplerStates.PlatformSetSamplers(this, _computeShader);
+            ComputeShaderResources.PlatformApplyAllResourcesToDevice(this, _shaderProgram);
+            ComputeSamplerStates.PlatformSetSamplers(this, _computeShader, ComputeShaderResources);
 
             unchecked
             {

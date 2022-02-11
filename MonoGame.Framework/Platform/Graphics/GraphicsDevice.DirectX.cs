@@ -106,22 +106,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
-            MaxTextureSlots = 16;
-            MaxVertexTextureSlots = 16;
-            MaxHullTextureSlots = 16;
-            MaxDomainTextureSlots = 16;
-            MaxGeometryTextureSlots = 16;
-            MaxComputeTextureSlots = 16;
-
-            // DX 11 supports 128 register slots for all stages, and 8 UAV slots
-            MaxPixelShaderResourceSlots = 128;
-            MaxVertexShaderResourceSlots = 128;
-            MaxHullShaderResourceSlots = 128;
-            MaxDomainShaderResourceSlots = 128;
-            MaxGeometryShaderResourceSlots = 128;
-            MaxComputeShaderResourceSlots = 128;
-            MaxComputeShaderUAVSlots = 8;
-
 #if WINDOWS_UAP
 			CreateDeviceIndependentResources();
 			CreateDeviceResources();
@@ -1186,18 +1170,16 @@ namespace Microsoft.Xna.Framework.Graphics
             // to the device as a texture resource.
             lock (_d3dContext)
             {
-                Textures.ClearTargets(_currentRenderTargetBindings, _d3dContext.PixelShader);
+                PixelShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.PixelShader);
 
                 if (GraphicsCapabilities.SupportsVertexTextures)
-                    VertexTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.VertexShader);
-                if (GraphicsCapabilities.SupportsHullTextures)
-                    HullTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.HullShader);
-                if (GraphicsCapabilities.SupportsDomainTextures)
-                    DomainTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.DomainShader);
-                if (GraphicsCapabilities.SupportsGeometryTextures)
-                    GeometryTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.GeometryShader);
-                if (GraphicsCapabilities.SupportsComputeTextures)
-                    ComputeTextures.ClearTargets(_currentRenderTargetBindings, _d3dContext.ComputeShader);
+                {
+                    VertexShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.VertexShader);
+                    HullShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.HullShader);
+                    DomainShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.DomainShader);
+                    GeometryShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.GeometryShader);
+                    ComputeShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.ComputeShader);
+                }
             }
 
             for (var i = 0; i < _currentRenderTargetCount; i++)
@@ -1518,49 +1500,33 @@ namespace Microsoft.Xna.Framework.Graphics
             _vertexConstantBuffers.SetConstantBuffers(this);
             _pixelConstantBuffers.SetConstantBuffers(this);
 
-            if (_hullShader != null)
-                _hullConstantBuffers.SetConstantBuffers(this);
-            if (_domainShader != null)
-                _domainConstantBuffers.SetConstantBuffers(this);
-            if (_geometryShader != null)
-                _geometryConstantBuffers.SetConstantBuffers(this);
+            VertexShaderResources.PlatformApplyAllResourcesToDevice(this);
+            VertexSamplerStates.PlatformSetSamplers(this, _d3dContext.VertexShader);
 
-            Textures.PlatformSetTextures(this, _d3dContext.PixelShader);
+            PixelShaderResources.PlatformApplyAllResourcesToDevice(this);
             SamplerStates.PlatformSetSamplers(this, _d3dContext.PixelShader);
+            
 
-            if (GraphicsCapabilities.SupportsVertexTextures)
+            if (_hullShader != null)
             {
-                VertexTextures.PlatformSetTextures(this, _d3dContext.VertexShader);
-                VertexSamplerStates.PlatformSetSamplers(this, _d3dContext.VertexShader);
-            }
-
-            if (GraphicsCapabilities.SupportsHullTextures && _hullShader != null)
-            {
-                HullTextures.PlatformSetTextures(this, _d3dContext.HullShader);
+                _hullConstantBuffers.SetConstantBuffers(this);
+                HullShaderResources.PlatformApplyAllResourcesToDevice(this);
                 HullSamplerStates.PlatformSetSamplers(this, _d3dContext.HullShader);
             }
 
-            if (GraphicsCapabilities.SupportsDomainTextures && _domainShader != null)
+            if (_domainShader != null)
             {
-                DomainTextures.PlatformSetTextures(this, _d3dContext.DomainShader);
+                _domainConstantBuffers.SetConstantBuffers(this);
+                DomainShaderResources.PlatformApplyAllResourcesToDevice(this);
                 DomainSamplerStates.PlatformSetSamplers(this, _d3dContext.DomainShader);
             }
 
-            if (GraphicsCapabilities.SupportsGeometryTextures && _geometryShader != null)
+            if (_geometryShader != null)
             {
-                GeometryTextures.PlatformSetTextures(this, _d3dContext.GeometryShader);
+                _geometryConstantBuffers.SetConstantBuffers(this);
+                GeometryShaderResources.PlatformApplyAllResourcesToDevice(this);
                 GeometrySamplerStates.PlatformSetSamplers(this, _d3dContext.GeometryShader);
             }
-
-            _vertexShaderResources.ApplyAllResourcesToDevice(this);
-            _pixelShaderResources.ApplyAllResourcesToDevice(this);
-
-            if (_hullShader != null)
-                _hullShaderResources.ApplyAllResourcesToDevice(this);
-            if (_domainShader != null)
-                _domainShaderResources.ApplyAllResourcesToDevice(this);
-            if (_geometryShader != null)
-                _geometryShaderResources.ApplyAllResourcesToDevice(this);
 
             _shaderResourcesSetForCompute = false;
         }
@@ -1775,31 +1741,25 @@ namespace Microsoft.Xna.Framework.Graphics
             // are not still set as inputs in other shader stages, as this is not allowed.
             if (!_shaderResourcesSetForCompute)
             {
-                ClearShaderResourcesForStage(ShaderStage.Vertex, _vertexShaderResources, VertexTextures);
-                ClearShaderResourcesForStage(ShaderStage.Pixel, _pixelShaderResources, Textures);
-                ClearShaderResourcesForStage(ShaderStage.Hull, _hullShaderResources, HullTextures);
-                ClearShaderResourcesForStage(ShaderStage.Domain, _domainShaderResources, DomainTextures);
-                ClearShaderResourcesForStage(ShaderStage.Geometry, _geometryShaderResources, GeometryTextures);
+                ClearShaderResourcesForStage(ShaderStage.Vertex, VertexShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Pixel, PixelShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Hull, HullShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Domain, DomainShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Geometry, GeometryShaderResources);
 
                 _shaderResourcesSetForCompute = true;
             }
 
             _computeConstantBuffers.SetConstantBuffers(this);
-
-            if (GraphicsCapabilities.SupportsComputeTextures)
-            {
-                ComputeTextures.PlatformSetTextures(this, _d3dContext.ComputeShader);
-                ComputeSamplerStates.PlatformSetSamplers(this, _d3dContext.ComputeShader);
-            }
-
-            _computeShaderResources.ApplyAllResourcesToDevice(this);
+            ComputeShaderResources.PlatformApplyAllResourcesToDevice(this);
+            ComputeSamplerStates.PlatformSetSamplers(this, _d3dContext.ComputeShader);
         }
 
         private void UnbindWriteableComputeResources()
         {
-            // Unbind all buffers (UAV's), otherwise they could not be used as shader inputs
+            // Unbind all resources (UAV's), otherwise they could not be used as shader inputs
             var computeStage = (GetDXShaderStage(ShaderStage.Compute) as SharpDX.Direct3D11.ComputeShaderStage);
-            for (int i = 0; i < _computeShaderResources.MaxWriteableResources; i++)
+            for (int i = 0; i < ComputeShaderResources.MaxWriteableResources; i++)
                 computeStage.SetUnorderedAccessView(i, null);
         }
 
@@ -1823,13 +1783,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void ClearShaderResourcesForStage(ShaderStage stage, ShaderResourceCollection resourceCollection, TextureCollection textureCollection)
+        private void ClearShaderResourcesForStage(ShaderStage stage, ShaderResourceCollection resourceCollection)
         {
             var dxStage = GetDXShaderStage(stage);
             for (int i = 0; i < resourceCollection.MaxReadableResources; i++)
                 dxStage.SetShaderResource(i, null);
-
-            textureCollection.Clear();
         }
 
         private void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct

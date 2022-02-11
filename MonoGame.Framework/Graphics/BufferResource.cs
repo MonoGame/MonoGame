@@ -28,8 +28,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal StructuredBufferType StructuredBufferType { get; private set; }
 
-        internal int CounterBufferResetValue = -1; 
-
         internal BufferResource(GraphicsDevice graphicsDevice, int elementCount, int elementStride, BufferUsage bufferUsage, bool dynamic, BufferType bufferType, ShaderAccess shaderAccess, StructuredBufferType structuredBufferType = StructuredBufferType.Basic, int counterBufferResetValue = -1) :
             base(shaderAccess)
 		{

@@ -114,11 +114,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             SupportsDepthClamp = GL.Extensions.Contains("GL_ARB_depth_clamp");
 
-            SupportsVertexTextures = device.MaxVertexTextureSlots > 0;
-            SupportsHullTextures = device.MaxHullTextureSlots > 0;
-            SupportsDomainTextures = device.MaxDomainTextureSlots > 0;
-            SupportsGeometryTextures = device.MaxGeometryTextureSlots > 0;
-            SupportsComputeTextures = device.MaxComputeTextureSlots > 0;
+            int maxVertexTextureSlots;
+            GL.GetInteger(GetPName.MaxVertexTextureImageUnits, out maxVertexTextureSlots);
+            GraphicsExtensions.CheckGLError();
+            SupportsVertexTextures = maxVertexTextureSlots > 0;
 
             GL.GetInteger((GetPName)GetParamName.MaxSamples, out _maxMultiSampleCount);
 

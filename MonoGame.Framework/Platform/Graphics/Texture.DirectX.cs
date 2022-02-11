@@ -11,8 +11,6 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private Resource _texture;
 
-        private ShaderResourceView _resourceView;
-        private UnorderedAccessView _unorderedAccessView;
 
         /// <summary>
         /// Gets the handle to a shared resource.
@@ -37,37 +35,22 @@ namespace Microsoft.Xna.Framework.Graphics
             return _texture;
         }
 
-        internal ShaderResourceView GetShaderResourceView()
+        internal override ShaderResourceView CreateShaderResourceView()
         {
-            if (_resourceView == null)
-                _resourceView = new ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
-
-            return _resourceView;
+            return new ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
         }
 
-        internal UnorderedAccessView GetUnorderedAccessView()
+        internal override UnorderedAccessView CreateUnorderedAccessView()
         {
-            if (_unorderedAccessView == null)
-                _unorderedAccessView = new UnorderedAccessView(GraphicsDevice._d3dDevice, GetTexture(), GetUnorderedAccessViewDescription(0));
-
-            return _unorderedAccessView;
+            return new UnorderedAccessView(GraphicsDevice._d3dDevice, GetTexture(), GetUnorderedAccessViewDescription(0));
         }
 
         internal abstract UnorderedAccessViewDescription GetUnorderedAccessViewDescription(int mipSlice);
 
-        internal override void PlatformApply(GraphicsDevice device, ShaderStage stage, int bindingSlot, bool writeAcess)
-        {
-            var shaderStageDX = device.GetDXShaderStage(stage);
-
-            if (writeAcess)
-                (shaderStageDX as SharpDX.Direct3D11.ComputeShaderStage).SetUnorderedAccessView(bindingSlot, GetUnorderedAccessView());
-            else
-                shaderStageDX.SetShaderResource(bindingSlot, GetShaderResourceView());
-        }
-
         private void PlatformGraphicsDeviceResetting()
         {
             SharpDX.Utilities.Dispose(ref _resourceView);
+            SharpDX.Utilities.Dispose(ref _unorderedAccessView);
             SharpDX.Utilities.Dispose(ref _texture);
         }
 
@@ -76,6 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (disposing)
             {
                 SharpDX.Utilities.Dispose(ref _resourceView);
+                SharpDX.Utilities.Dispose(ref _unorderedAccessView);
                 SharpDX.Utilities.Dispose(ref _texture);
             }
 
