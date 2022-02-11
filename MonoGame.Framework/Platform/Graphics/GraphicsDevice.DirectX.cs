@@ -1221,7 +1221,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            Textures.Dirty();
+            Textures.DirtyReadonly();
             SamplerStates.Dirty();
             _depthStencilStateDirty = true;
             _blendStateDirty = true;
