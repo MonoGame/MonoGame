@@ -46,10 +46,5 @@ namespace Microsoft.Xna.Framework.Graphics
             
             dirty = 0;
         }
-
-        internal void DirtyReadonly()
-        {
-            _readonlyDirty = ~0;
-        }
     }
 }
