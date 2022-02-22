@@ -286,7 +286,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void CheckBufferCount()
         {
             if ((PendingBufferCount < TargetPendingBufferCount) && (_state == SoundState.Playing))
-                _buffersNeeded = TargetPendingBufferCount - PendingBufferCount;
+                _buffersNeeded++;
         }
 
         internal void UpdateQueue()
