@@ -186,6 +186,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             for (var i = 0; i < errorsAndWarningArray.Length; i++)
             {
                 var line = errorsAndWarningArray[i];
+                line = line.Replace("{", "{{").Replace("}", "}}"); // curly braces are used for text formatting -> escape them 
+
                 var match = errorOrWarningRegex.Match(line);
 
                 if (match.Success)
@@ -209,12 +211,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     // If the previous lines contained an error we will simply log all the following lines.
                     if (errorOrWarningHappend)
                     {
-                        // ShaderConductor outputs the faulty line, plus a pointer character in the following line, which points at the exact character location of the error.
-                        // This only works for monospace fonts. The MGCB editor doesn't use a momospace font currently for displaying errors and warnings,
-                        // so there's no point in logging the line containing this pointer.
-                        bool isPointer = line.EndsWith("^") && String.IsNullOrWhiteSpace(line.Substring(0, line.Length - 1));
-                        if (!isPointer)
-                            context.Logger.LogMessage(line);
+                        context.Logger.LogMessage(line);
                     }
                     else
                     {
