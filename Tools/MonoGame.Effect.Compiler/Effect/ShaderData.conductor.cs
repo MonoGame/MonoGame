@@ -11,12 +11,11 @@ namespace MonoGame.Effect
 	internal partial class ShaderData
 	{
         public static ShaderData CreateGLSL_Conductor(
-            string sourceCode, int sharedIndex, 
+            ShaderResult shaderResult, int sharedIndex, 
             ShaderStage shaderStage, string shaderFunction,
             int shaderModelMajor, int shaderModelMinor, string shaderModelExtension,
-            List<ConstantBufferData> cbuffers, Dictionary<string, SamplerStateInfo> samplerStates,
-            bool debug, bool isESSL,
-            ref string errorsAndWarnings)
+            List<ConstantBufferData> cbuffers, 
+            bool isESSL, ref string errorsAndWarnings)
         {
             var shaderData = new ShaderData(shaderStage, sharedIndex, new byte[0]);
 
@@ -26,7 +25,7 @@ namespace MonoGame.Effect
             var sourceDesc = new ShaderConductor.SourceDesc()
             {
                 entryPoint = shaderFunction,
-                source = sourceCode,
+                source = shaderResult.FileContent,
                 stage = ConvertToConductorShaderStage(shaderStage),
             };
 
@@ -90,6 +89,10 @@ namespace MonoGame.Effect
                 IntPtr errorBlob = ShaderConductor.GetShaderConductorBlobData(result.errorWarningMsg);
                 int errorBlobSize = ShaderConductor.GetShaderConductorBlobSize(result.errorWarningMsg);
                 string errorMsg = Marshal.PtrToStringAnsi(errorBlob, errorBlobSize);
+
+                // remove warnings about shader parameter initializers being ignored
+                // we will parse shader parameter default values ourselves
+                errorMsg = RemoveShaderParamInitializerWarnings(errorMsg);
 
                 // avoid duplicate warnings (we get the same warnings for every shader stage)
                 if (!errorsAndWarnings.Contains(errorMsg))
@@ -168,7 +171,7 @@ namespace MonoGame.Effect
 
             for (var i = 0; i < uniformBuffers.Count; i++)
             {
-                var cb = new ConstantBufferData(uniformBuffers[i]);
+                var cb = new ConstantBufferData(uniformBuffers[i], shaderResult.ShaderParamInitializations, ref errorsAndWarnings);
 
                 // Look for a duplicate cbuffer in the list
                 for (var c = 0; c < cbuffers.Count; c++)
@@ -204,7 +207,7 @@ namespace MonoGame.Effect
                 shaderData._samplers[i].type = ConvertSamplerTypeToMojo(samplers[i]);
                 shaderData._samplers[i].parameter = -1; //sampler mapping to parameter is unknown atm
 
-                if (samplerStates.TryGetValue(samplers[i].originalName, out SamplerStateInfo state))
+                if (shaderResult.ShaderInfo.SamplerStates.TryGetValue(samplers[i].originalName, out SamplerStateInfo state))
                     shaderData._samplers[i].state = state.State;
             }
 
@@ -241,6 +244,31 @@ namespace MonoGame.Effect
             ShaderConductor.DestroyShaderConductorBlob(result.errorWarningMsg);
 
             return shaderData;
+        }
+
+        private static string RemoveShaderParamInitializerWarnings(string errorMsg)
+        {
+            try
+            {
+                string modifiedMsg = errorMsg;
+                while (true)
+                {
+                    int indMsg = modifiedMsg.IndexOf("will be placed in $Globals so initializer ignored");
+                    if (indMsg < 0)
+                        return modifiedMsg;
+
+                    int indMsgStart = modifiedMsg.LastIndexOf('\n', indMsg) + 1;
+                    int indMsgEnd = modifiedMsg.IndexOf('\n', indMsg) + 1;
+                    indMsgEnd = modifiedMsg.IndexOf('\n', indMsgEnd) + 1;  // include next line
+                    indMsgEnd = modifiedMsg.IndexOf('\n', indMsgEnd) + 1;  // include next line
+
+                    modifiedMsg = modifiedMsg.Remove(indMsgStart, indMsgEnd - indMsgStart);
+                }
+            }
+            catch (Exception)
+            {
+                return errorMsg + "Failed to remove warnings about initializers. ShaderConductor probably changed the warning syntax.\n";
+            }
         }
 
         //==============================================================

@@ -138,16 +138,12 @@ namespace MonoGame.Effect
             {
                 ParseShaderModel(shaderProfile, GetShaderModelRegex(shaderStage), out int smMajor, out int smMinor, out string smExtension);
 
-                var shaderInfo = shaderResult.ShaderInfo;
-                var sourceCode = shaderResult.FileContent;
-
                 var shaderData = ShaderData.CreateGLSL_Conductor(
-                    sourceCode, effect.Shaders.Count,
+                    shaderResult, effect.Shaders.Count,
                     shaderStage, shaderFunction,
                     smMajor, smMinor, smExtension,
-                    effect.ConstantBuffers, shaderInfo.SamplerStates,
-                    shaderResult.Debug, IsESSL,
-                    ref errorsAndWarnings);
+                    effect.ConstantBuffers, 
+                    IsESSL, ref errorsAndWarnings);
 
                 // See if we already created this same shader.
                 foreach (var shader in effect.Shaders)
