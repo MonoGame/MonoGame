@@ -208,7 +208,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _maxVertexBufferSlots;
 
         internal const int MaxResourceSlotsPerStage = 16;
-        internal const int MaxComputeShaderUAVSlots = 8;
+        internal const int MaxUavSlotsPerStage = 8;
         internal const int UavRegisterShiftMGFXC = 128; // this number is used in MGFXC to shift u-register bindings (see ShaderData.conductor.cs)
         public bool IsDisposed
         {
@@ -362,11 +362,11 @@ namespace Microsoft.Xna.Framework.Graphics
             ComputeSamplerStates = new SamplerStateCollection(this, MaxResourceSlotsPerStage);
 
             VertexShaderResources = new ShaderResourceCollection(ShaderStage.Vertex, MaxResourceSlotsPerStage, 0);
-            PixelShaderResources = new ShaderResourceCollection(ShaderStage.Pixel, MaxResourceSlotsPerStage, 0);
+            PixelShaderResources = new ShaderResourceCollection(ShaderStage.Pixel, MaxResourceSlotsPerStage, MaxUavSlotsPerStage);
             HullShaderResources = new ShaderResourceCollection(ShaderStage.Hull, MaxResourceSlotsPerStage, 0);
             DomainShaderResources = new ShaderResourceCollection(ShaderStage.Domain, MaxResourceSlotsPerStage, 0);
             GeometryShaderResources = new ShaderResourceCollection(ShaderStage.Geometry, MaxResourceSlotsPerStage, 0);
-            ComputeShaderResources = new ShaderResourceCollection(ShaderStage.Compute, MaxResourceSlotsPerStage, MaxComputeShaderUAVSlots);
+            ComputeShaderResources = new ShaderResourceCollection(ShaderStage.Compute, MaxResourceSlotsPerStage, MaxUavSlotsPerStage);
 
             _blendStateAdditive = BlendState.Additive.Clone();
             _blendStateAlphaBlend = BlendState.AlphaBlend.Clone();

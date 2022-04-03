@@ -12,6 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var shaderStageDX = device.GetDXShaderStage(_stage);
 
+            // set readable resources
             if (_readonlyDirty != 0) // If there are no readable resources then skip it.
             {
                 for (var i = 0; i < _readonlyResources.Length; i++)
@@ -36,27 +37,59 @@ namespace Microsoft.Xna.Framework.Graphics
                 _readonlyDirty = 0;
             }
 
+            // set writeable resources (only compute and pixel shader supported with DX 11)
             if (_writeableResources != null && _writeableDirty != 0) // If there are no writeable resources then skip it.
             {
-                var computeStage = (SharpDX.Direct3D11.ComputeShaderStage)shaderStageDX; // only compute shader can write to resources currently
-
-                for (var i = 0; i < _writeableResources.Length; i++)
+                if (_stage == ShaderStage.Compute)
                 {
-                    var mask = 1 << i;
-                    if ((_writeableDirty & mask) == 0)
-                        continue;
+                    var computeStage = (SharpDX.Direct3D11.ComputeShaderStage)shaderStageDX; 
 
-                    var resourceInfo = _writeableResources[i];
-                    var resource = resourceInfo.resource;
-                    if (resource == null || resource.IsDisposed)
-                        computeStage.SetUnorderedAccessView(i, null);
-                    else
-                        computeStage.SetUnorderedAccessView(i, resource.GetUnorderedAccessView(), resource.CounterBufferResetValue);
+                    for (var i = 0; i < _writeableResources.Length; i++)
+                    {
+                        var mask = 1 << i;
+                        if ((_writeableDirty & mask) == 0)
+                            continue;
 
-                    // Early out if this is the last one.
-                    _writeableDirty &= ~mask;
-                    if (_writeableDirty == 0)
-                        break;
+                        var resourceInfo = _writeableResources[i];
+                        var resource = resourceInfo.resource;
+                        if (resource == null || resource.IsDisposed)
+                            computeStage.SetUnorderedAccessView(i, null);
+                        else
+                            computeStage.SetUnorderedAccessView(i, resource.GetUnorderedAccessView(), resource.CounterBufferResetValue);
+
+                        // Early out if this is the last one.
+                        _writeableDirty &= ~mask;
+                        if (_writeableDirty == 0)
+                            break;
+                    }
+                }
+                else if (_stage == ShaderStage.Pixel)
+                {
+                    var outputMerger = device._d3dContext.OutputMerger;
+                    var activeRenderTargets = device._currentRenderTargets;
+
+                    for (var i = 0; i < _writeableResources.Length; i++)
+                    {
+                        var mask = 1 << i;
+                        if ((_writeableDirty & mask) == 0)
+                            continue;
+
+                        // don't overwrite render targets bound to this slot
+                        if (activeRenderTargets[i] != null)
+                            continue;
+
+                        var resourceInfo = _writeableResources[i];
+                        var resource = resourceInfo.resource;
+                        if (resource == null || resource.IsDisposed)
+                            outputMerger.SetUnorderedAccessView(i, null);
+                        else
+                            outputMerger.SetUnorderedAccessView(i, resource.GetUnorderedAccessView(), resource.CounterBufferResetValue);
+
+                        // Early out if this is the last one.
+                        _writeableDirty &= ~mask;
+                        if (_writeableDirty == 0)
+                            break;
+                    }
                 }
 
                 _writeableDirty = 0;

@@ -45,8 +45,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetResourceForBindingSlot(ShaderResource resource, int bindingSlot, bool writeAccess, bool useSampler = false, int bindingSlotForCounter = -1)
         {
-            if (writeAccess && _stage != ShaderStage.Compute)
-                throw new ArgumentException("Only a compute shader can use RWStructuredBuffer currently. Uae a regular StructuredBuffer instead and assign it the same buffer.");
+            if (writeAccess && (_stage != ShaderStage.Compute && _stage != ShaderStage.Pixel))
+                throw new ArgumentException("Only compute and pixel shaders can use writeable buffers and textures (RWStructuredBuffer, RWTexture, ...). This stage only supports readonly resources. For readonly access just add another shader parameter without RW and assign it the same resource.");
 
             var resources = writeAccess ? _writeableResources : _readonlyResources;
 
