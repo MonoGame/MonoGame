@@ -25,7 +25,7 @@ MonoGame has the following effects built-in and fully supported on current platf
 * EnvironmentMapEffect
 * SkinnedEffect
 
-Under the hood these effects use the same system and tools as one would for a custom Effect.  The source and pre-compiled versions of these effects can be found in the ['MonoGame.Framework\Platform\Graphics\Effect\Resources'](https://github.com/MonoGame/MonoGame/tree/develop/MonoGame.Framework/Graphics/Effect/Resources) folder.
+Under the hood these effects use the same system and tools as one would for a custom Effect.  The source and pre-compiled versions of these effects can be found in the ['MonoGame.Framework\Platform\Graphics\Effect\Resources'](https://github.com/MonoGame/MonoGame/tree/develop/MonoGame.Framework/Platform/Graphics/Effect/Resources) folder.
 
 If your game requires an extra little bit of performance you can easily hand edit the existing effects to remove unnecessary features or optimize for specific hardware and rebuild them with the MGFX tool.
 
