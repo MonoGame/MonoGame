@@ -27,11 +27,27 @@ namespace MonoGame.Effect
                 param.semantic = string.Empty;
                 param.bufferOffset = vdesc.Description.StartOffset;
 
-                var size = param.columns * param.rows * 4;
+                uint fieldSize = 4;
+                var size = param.columns * param.rows * fieldSize;
                 var data = new byte[size];
 
                 if (vdesc.Description.DefaultValue != IntPtr.Zero)
+                {
                     Marshal.Copy(vdesc.Description.DefaultValue, data, 0, (int)size);
+
+                    // matrices need to be transposed
+                    if (param.rows > 1 && param.columns > 1)
+                    {
+                        var dataCopy = (byte[])data.Clone();
+                        for (uint ind = 0; ind < param.columns * param.rows; ind++)
+                        {
+                            uint row = ind / param.columns;
+                            uint col = ind % param.columns;
+                            uint destInd = col * param.rows + row;
+                            Array.Copy(dataCopy, ind * fieldSize, data, destInd * fieldSize, fieldSize);
+                        }
+                    }
+                }
 
                 param.data = data;
 
