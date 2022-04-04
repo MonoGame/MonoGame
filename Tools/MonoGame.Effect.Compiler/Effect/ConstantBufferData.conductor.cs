@@ -170,17 +170,16 @@ namespace MonoGame.Effect
                                 Array.Clear(data, 0, data.Length);
                                 break;
                             }
-
+                            
                             // transpose matrices
                             uint destInd = i;
                             if (param.rows > 1 && param.columns > 1)
                             {
-                                uint c = i % param.rows;
-                                uint r = i / param.rows;
-
-                                destInd = c * param.columns + r;
+                                uint row = i / param.columns;
+                                uint col = i % param.columns;
+                                destInd = col * param.rows + row;
                             }
-
+                            
                             Array.Copy(valData, 0, data, destInd * 4, 4);
                         }
                     }
