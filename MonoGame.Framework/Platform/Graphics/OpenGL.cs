@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MonoGame.Framework.Utilities;
+using System.Linq;
 
 #if __IOS__ || __TVOS__ || MONOMAC
 using ObjCRuntime;
@@ -1444,7 +1445,7 @@ namespace MonoGame.OpenGL
             string extstring = GL.GetString(StringName.Extensions);
             var error = GL.GetError();
             if (!string.IsNullOrEmpty(extstring) && error == ErrorCode.NoError)
-                Extensions.AddRange(extstring.Split(' '));
+                Extensions.AddRange(extstring.Split(' ').Where(e => !Extensions.Contains(e)));
 
             LogExtensions();
             // now load Extensions :)
