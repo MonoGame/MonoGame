@@ -993,6 +993,16 @@ internal static class Sdl
         {
             return InteropHelpers.Utf8ToString(SDL_GameControllerName(gamecontroller));
         }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int d_sdl_gamecontrollerrumble(IntPtr gamecontroller, ushort left, ushort right, uint duration);
+        public static d_sdl_gamecontrollerrumble Rumble = FuncLoader.LoadFunction<d_sdl_gamecontrollerrumble>(NativeLibrary, "SDL_GameControllerRumble");
+        public static d_sdl_gamecontrollerrumble RumbleTriggers = FuncLoader.LoadFunction<d_sdl_gamecontrollerrumble>(NativeLibrary, "SDL_GameControllerRumbleTriggers");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate byte d_sdl_gamecontrollerhasrumble(IntPtr gamecontroller);
+        public static d_sdl_gamecontrollerhasrumble HasRumble = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasrumble>(NativeLibrary, "SDL_GameControllerHasRumble");
+        public static d_sdl_gamecontrollerhasrumble HasRumbleTriggers = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasrumble>(NativeLibrary, "SDL_GameControllerHasRumbleTriggers");
     }
 
     public static class Haptic
