@@ -205,9 +205,8 @@ Task("BuildTools")
     
     PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj");
     
-    // if (IsRunningOnMacOs()) TODO: Update CAKE
-    // if (IsRunningOnUnix() && DirectoryExists("/Applications"))
-    //     PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj");
+    if (IsRunningOnMacOs())
+        PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj");
 
     PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.csproj");
 });
