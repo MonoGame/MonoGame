@@ -3,10 +3,10 @@
     "classifications": [
         "MonoGame"
     ],
-    "name": "MonoGame NetStandard Library",
-    "groupIdentity": "MonoGame.Library.NetStandard",
-    "identity": "MonoGame.Library.NetStandard.CSharp",
-    "shortName": "mgnetstandard",
+    "name": "MonoGame Game Library",
+    "groupIdentity": "MonoGame.Library",
+    "identity": "MonoGame.Library.CSharp",
+    "shortName": "mglib",
     "tags": {
         "language": "C#",
         "type": "project"
@@ -18,5 +18,5 @@
     ],
     "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
-    "description": "A MonoGame NetStandard library project. Can be used to share game code between platforms."
+    "description": "A MonoGame game library project that can be used to share game code between platforms."
 }
