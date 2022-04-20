@@ -69,6 +69,7 @@ namespace Microsoft.Xna.Framework.Input
                 capabilities.HasXButton = true;
                 capabilities.HasYButton = true;
                 capabilities.HasBackButton = true;
+                capabilities.HasStartButton = true;
                 capabilities.HasDPadUpButton = true;
                 capabilities.HasDPadDownButton = true;
                 capabilities.HasDPadLeftButton = true;
@@ -88,7 +89,6 @@ namespace Microsoft.Xna.Framework.Input
                 capabilities.HasBButton = true;
                 capabilities.HasXButton = true;
                 capabilities.HasYButton = true;
-                capabilities.HasBackButton = true;
                 capabilities.HasDPadUpButton = true;
                 capabilities.HasDPadDownButton = true;
                 capabilities.HasDPadLeftButton = true;
@@ -150,6 +150,11 @@ namespace Microsoft.Xna.Framework.Input
                         buttons |= Buttons.LeftTrigger;
                     if (controller.ExtendedGamepad.RightTrigger.IsPressed)
                         buttons |= Buttons.RightTrigger;
+
+                    if (controller.ExtendedGamepad.ButtonMenu.IsPressed)
+                        buttons |= Buttons.Start;
+                    if (controller.ExtendedGamepad.ButtonOptions.IsPressed)
+                        buttons |= Buttons.Back;
 
                     if (controller.ExtendedGamepad.DPad.Up.IsPressed)
                     {
