@@ -31,11 +31,11 @@ namespace MonoGame.Tools.Pipeline
         private static readonly string [] _mgcbSearchPaths = new []       
         {
 #if DEBUG
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../MonoGame.Content.Builder/Debug"),
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../../MonoGame.Content.Builder/Debug"),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location ?? ""), "../../../MonoGame.Content.Builder/Debug"),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location ?? ""), "../../../../../../MonoGame.Content.Builder/Debug"),
 #else
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../MonoGame.Content.Builder/Release"),
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../../MonoGame.Content.Builder/Release"),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location ?? ""), "../../../MonoGame.Content.Builder/Release"),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location ?? ""), "../../../../../../MonoGame.Content.Builder/Release"),
 #endif
         };
 
@@ -104,21 +104,14 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
-            var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var macPath = Path.Combine(root, "..", "Resources");
-            var windowsAndLinuxPath = Path.Combine(root, "Templates");
+            var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location ?? "");
+            var templatesPath = Path.Combine(root, "Templates");
 
 #if IDE
             LoadTemplates(root);
 #else
-            if (Directory.Exists(macPath))
-            {
-                LoadTemplates(macPath);
-            }
-            else
-            {
-                LoadTemplates(windowsAndLinuxPath);
-            }
+            if (Directory.Exists(templatesPath))
+                LoadTemplates(templatesPath);
 #endif
 
             UpdateMenu();

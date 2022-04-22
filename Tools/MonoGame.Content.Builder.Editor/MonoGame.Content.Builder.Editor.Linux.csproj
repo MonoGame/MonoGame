@@ -9,6 +9,10 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-linux</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>mgcb-editor-linux</ToolCommandName>
+    <PackageId>dotnet-mgcb-editor-linux</PackageId>
+    <UseAppHost>true</UseAppHost>
   </PropertyGroup>
 
   <ItemGroup>

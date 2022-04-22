@@ -3,12 +3,12 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Eto.Forms;
-using Eto.Drawing;
+using System.IO;
 using System.Reflection;
+using Eto.Drawing;
+using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -37,12 +37,6 @@ namespace MonoGame.Tools.Pipeline
         private Clipboard _clipboard;
         private ContextMenu _contextMenu;
         private FileFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
-        private string[] monoLocations = {
-            "/usr/bin/mono",
-            "/usr/local/bin/mono",
-            "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono",
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mono"),
-        };
 
         public MainWindow()
         {
@@ -279,8 +273,16 @@ namespace MonoGame.Tools.Pipeline
             var dialog = new NewItemDialog(PipelineController.Instance.Templates.GetEnumerator(), folder);
             var result = dialog.Show(this);
 
-            template = dialog.Selected;
-            name = dialog.Name + Path.GetExtension(template.TemplateFile);
+            if (result)
+            {
+                template = dialog.Selected;
+                name = dialog.Name + Path.GetExtension(template.TemplateFile);
+            }
+            else
+            {
+                template = null;
+                name = "";
+            }
 
             return result;
         }

@@ -11,6 +11,9 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-windows</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>mgcb-editor-windows</ToolCommandName>
+    <PackageId>dotnet-mgcb-editor-windows</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

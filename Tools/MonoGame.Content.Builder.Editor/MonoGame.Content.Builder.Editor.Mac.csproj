@@ -12,6 +12,12 @@
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
     <MacBundleName>$(AssemblyTitle)</MacBundleName>
     <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>mgcb-editor-mac</ToolCommandName>
+    <PackageId>dotnet-mgcb-editor-mac</PackageId>
+    <UseAppHost>true</UseAppHost>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishSingleFile>false</PublishSingleFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -54,6 +60,12 @@
 
   <ItemGroup>
     <BundleResource Include="Icon.icns" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Icon.icns" PackagePath="tools\$(TargetFramework)\any\" />
+    <Content Include="Info.plist" PackagePath="tools\$(TargetFramework)\any\" />
+    <Content Include="$(OutputPath)$(AssemblyName)" PackagePath="tools\$(TargetFramework)\any\" />
   </ItemGroup>
 
   <Import Project="MonoGame.Content.Builder.Editor.targets" />
