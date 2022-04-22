@@ -30,7 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <MGToolManifest Include="**\config\dotnet-tools.json" />
+      <MGToolManifest Include="**\.config\dotnet-tools.json" />
     </ItemGroup>
 
     <!-- For SDK-style project files -->
