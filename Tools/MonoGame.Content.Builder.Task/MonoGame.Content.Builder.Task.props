@@ -3,7 +3,7 @@
   <PropertyGroup>
     <DotnetCommand Condition="'$(DotnetCommand)' == ''">dotnet</DotnetCommand>
     <EnableMGCBItems Condition="'$(EnableMGCBItems)' == ''">true</EnableMGCBItems>
-    <MGCBPath Condition="'$(MGCBPath)' == ''">$(MSBuildThisFileDirectory)\..\tools\net6.0\any\mgcb.dll</MGCBPath>
+    <MGCBCommand Condition="'$(MGCBCommand)' == ''">mgcb</MGCBCommand>
   </PropertyGroup>
 
 </Project>

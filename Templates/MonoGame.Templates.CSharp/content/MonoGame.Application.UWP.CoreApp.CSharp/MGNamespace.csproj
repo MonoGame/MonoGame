@@ -114,8 +114,8 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.9</Version>
     </PackageReference>
-    <PackageReference Include="MonoGame.Framework.WindowsUniversal" Version="3.8.0.1-develop" />
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1-develop" />
+    <PackageReference Include="MonoGame.Framework.WindowsUniversal" Version="3.8.1.1" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.1" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

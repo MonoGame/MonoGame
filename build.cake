@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("build-target", "Default");
-var version = Argument("build-version", EnvironmentVariable("BUILD_NUMBER") ?? "3.8.0.1");
+var version = Argument("build-version", EnvironmentVariable("BUILD_NUMBER") ?? "3.8.1.1");
 var configuration = Argument("build-configuration", "Release");
 
 //////////////////////////////////////////////////////////////////////

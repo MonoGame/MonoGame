@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0-android</TargetFramework>
     <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
@@ -8,10 +7,8 @@
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1-develop" />
-    <PackageReference Include="MonoGame.Framework.Android" Version="3.8.0.1-develop" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.1" />
+    <PackageReference Include="MonoGame.Framework.Android" Version="3.8.1.1" />
   </ItemGroup>
-
 </Project>

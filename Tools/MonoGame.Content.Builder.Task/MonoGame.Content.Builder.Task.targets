@@ -134,10 +134,14 @@
   -->
   <Target Name="RunContentBuilder" DependsOnTargets="PrepareContentBuilder">
 
+    <!-- Remove this line if they make dotnet tool restore part of dotnet restore build -->
+    <!-- https://github.com/dotnet/sdk/issues/4241 -->
+    <Exec Command="dotnet tool restore" />
+
     <!-- Execute MGCB from the project directory so we use the correct manifest. -->
     <Exec
       Condition="'%(ContentReference.FullPath)' != ''"
-      Command="$(DotnetCommand) &quot;$(MGCBPath)&quot; $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
+      Command="$(DotnetCommand) $(MGCBCommand) $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
       WorkingDirectory="$(MSBuildProjectDirectory)" />
 
     <ItemGroup>
