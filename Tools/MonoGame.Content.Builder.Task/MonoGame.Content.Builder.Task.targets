@@ -136,7 +136,7 @@
 
     <!-- Remove this line if they make dotnet tool restore part of dotnet restore build -->
     <!-- https://github.com/dotnet/sdk/issues/4241 -->
-    <Exec Command="dotnet tool restore" />
+    <Exec Command="$(DotnetCommand) tool restore" />
 
     <!-- Execute MGCB from the project directory so we use the correct manifest. -->
     <Exec
