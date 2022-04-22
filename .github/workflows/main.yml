@@ -19,9 +19,24 @@ jobs:
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '5.0.x'
+          dotnet-version: '6.0.x'
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'microsoft'
+          java-version: '11'
       - name: Restore dotnet tools
         run: dotnet tool restore
+      - name: Install required workloads
+        run:   |
+              if [ "$RUNNER_OS" == "Linux" ]; then
+                    echo "MICROSOFT SUPPORT ANDROID WORKLOAD ON LINUX PLZZZ!"
+              elif [ "$RUNNER_OS" == "Windows" ]; then
+                    dotnet.exe workload install android ios macos
+              else
+                    dotnet workload install android ios macos
+              fi
+        shell: bash
       - name: Run build.cake
         run: dotnet cake build.cake
         env:

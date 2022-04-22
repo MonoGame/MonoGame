@@ -1,13 +1,13 @@
-#tool nuget:?package=vswhere&version=2.6.7
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0
-#addin nuget:?package=Cake.FileHelpers&version=3.3.0
+#tool nuget:?package=vswhere&version=2.8.4
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.13.2
+#addin nuget:?package=Cake.FileHelpers&version=5.0.0
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("build-target", "Default");
-var version = Argument("build-version", EnvironmentVariable("BUILD_NUMBER") ?? "3.8.0.1");
+var version = Argument("build-version", EnvironmentVariable("BUILD_NUMBER") ?? "3.8.1.1");
 var configuration = Argument("build-configuration", "Release");
 
 //////////////////////////////////////////////////////////////////////
@@ -15,8 +15,8 @@ var configuration = Argument("build-configuration", "Release");
 //////////////////////////////////////////////////////////////////////
 
 MSBuildSettings msPackSettings, mdPackSettings;
-DotNetCoreMSBuildSettings dnBuildSettings;
-DotNetCorePackSettings dnPackSettings;
+DotNetMSBuildSettings dnBuildSettings;
+DotNetPackSettings dnPackSettings;
 
 private void PackMSBuild(string filePath)
 {
@@ -25,7 +25,7 @@ private void PackMSBuild(string filePath)
 
 private void PackDotnet(string filePath)
 {
-    DotNetCorePack(filePath, dnPackSettings);
+    DotNetPack(filePath, dnPackSettings);
 }
 
 private bool GetMSBuildWith(string requires)
@@ -91,12 +91,12 @@ Task("Prep")
     mdPackSettings.WithProperty("Version", version);
     mdPackSettings.WithTarget("PackageAddin");
 
-    dnBuildSettings = new DotNetCoreMSBuildSettings();
+    dnBuildSettings = new DotNetMSBuildSettings();
     dnBuildSettings.WithProperty("Version", version);
 
-    dnPackSettings = new DotNetCorePackSettings();
+    dnPackSettings = new DotNetPackSettings();
     dnPackSettings.MSBuildSettings = dnBuildSettings;
-    dnPackSettings.Verbosity = DotNetCoreVerbosity.Minimal;
+    dnPackSettings.Verbosity = DotNetVerbosity.Minimal;
     dnPackSettings.Configuration = configuration;
 });
 
@@ -104,7 +104,7 @@ Task("BuildDesktopGL")
     .IsDependentOn("Prep")
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
+    DotNetRestore("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
     PackDotnet("MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj");
 });
 
@@ -114,7 +114,7 @@ Task("TestDesktopGL")
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/DesktopGL/Debug");
-    DotNetCoreRun("../../../../Tests/MonoGame.Tests.DesktopGL.csproj", "", new DotNetCoreRunSettings
+    DotNetRun("../../../../Tests/MonoGame.Tests.DesktopGL.csproj", "", new DotNetRunSettings
     {
         WorkingDirectory = "Artifacts/Tests/DesktopGL/Debug",
 	    ArgumentCustomization = args => args.Append("--teamcity")
@@ -126,7 +126,7 @@ Task("BuildWindowsDX")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
-    DotNetCoreRestore("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
+    DotNetRestore("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
     PackDotnet("MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj");
 });
 
@@ -136,7 +136,7 @@ Task("TestWindowsDX")
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/WindowsDX/Debug");
-    DotNetCoreRun("../../../../Tests/MonoGame.Tests.WindowsDX.csproj", "", new DotNetCoreRunSettings
+    DotNetRun("../../../../Tests/MonoGame.Tests.WindowsDX.csproj", "", new DotNetRunSettings
     {
         WorkingDirectory = "Artifacts/Tests/WindowsDX/Debug",
 	    ArgumentCustomization = args => args.Append("--teamcity")
@@ -153,7 +153,7 @@ Task("BuildAndroid")
     return DirectoryExists("/Library/Frameworks/Xamarin.Android.framework");
 }).Does(() =>
 {
-    PackMSBuild("MonoGame.Framework/MonoGame.Framework.Android.csproj");
+    PackDotnet("MonoGame.Framework/MonoGame.Framework.Android.csproj");
 });
 
 Task("BuildiOS")
@@ -163,7 +163,7 @@ Task("BuildiOS")
     return DirectoryExists("/Library/Frameworks/Xamarin.iOS.framework");
 }).Does(() =>
 {
-    PackMSBuild("MonoGame.Framework/MonoGame.Framework.iOS.csproj");
+    PackDotnet("MonoGame.Framework/MonoGame.Framework.iOS.csproj");
 });
 
 Task("BuildUWP")
@@ -205,8 +205,7 @@ Task("BuildTools")
     
     PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj");
     
-    // if (IsRunningOnMacOs()) TODO: Update CAKE
-    if (IsRunningOnUnix() && DirectoryExists("/Applications"))
+    if (IsRunningOnMacOs())
         PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj");
 
     PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.csproj");
@@ -217,7 +216,7 @@ Task("TestTools")
     .Does(() =>
 {
     CreateDirectory("Artifacts/Tests/Tools/" + configuration);
-    DotNetCoreRun("../../../../Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj", "", new DotNetCoreRunSettings
+    DotNetRun("../../../../Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj", "", new DotNetRunSettings
     {
         WorkingDirectory = "Artifacts/Tests/Tools/" + configuration,
 	    ArgumentCustomization = args => args.Append("--teamcity"),
@@ -257,8 +256,8 @@ Task("PackVSMacTemplates")
     .WithCriteria(() => IsRunningOnUnix() && DirectoryExists("/Applications") && DirectoryExists("/Library"))
     .Does(() =>
 {
-    DotNetCoreRestore("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj");
-    MSBuild("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj", mdPackSettings);
+    // DotNetCoreRestore("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj");
+    // MSBuild("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj", mdPackSettings);
 });
 
 //////////////////////////////////////////////////////////////////////

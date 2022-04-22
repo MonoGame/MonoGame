@@ -10,8 +10,6 @@
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
-    <LangVersion>5</LangVersion>
   </PropertyGroup>
 
 </Project>

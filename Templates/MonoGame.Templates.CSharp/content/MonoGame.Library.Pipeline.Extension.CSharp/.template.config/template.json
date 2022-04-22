@@ -22,8 +22,8 @@
     "symbols": {
         "framework": {
             "type": "parameter",
-            "defaultValue": "netstandard2.0",
-            "replaces": "netstandard2.0"
+            "defaultValue": "net6.0",
+            "replaces": "net6.0"
         }
     }
 }
