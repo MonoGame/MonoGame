@@ -102,6 +102,7 @@ Task("Prep")
 
 Task("BuildConsoleCheck")
     .IsDependentOn("Prep")
+    .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
     DotNetRestore("MonoGame.Framework/MonoGame.Framework.ConsoleCheck.csproj");
