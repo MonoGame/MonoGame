@@ -160,6 +160,9 @@ Task("BuildiOS")
     .IsDependentOn("Prep")
     .WithCriteria(() =>
 {
+    if (IsRunningOnWindows())
+        return GetMSBuildWith("Component.Xamarin");
+
     return DirectoryExists("/Library/Frameworks/Xamarin.iOS.framework");
 }).Does(() =>
 {
@@ -168,7 +171,7 @@ Task("BuildiOS")
 
 Task("BuildUWP")
     .IsDependentOn("Prep")
-    .WithCriteria(() => GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.17763"))
+    .WithCriteria(() => GetMSBuildWith("Microsoft.VisualStudio.Component.Windows10SDK.19041"))
     .Does(() =>
 {
     PackMSBuild("MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj");
@@ -242,7 +245,7 @@ Task("PackVSTemplates")
 
     var result = StartProcess(
         dotnet,
-        "vstemplate " +
+        "vstemplate --force " +
        $"-s Artifacts/MonoGame.Templates.CSharp/Release/MonoGame.Templates.CSharp.{version}.nupkg " +
        $"--vsix Artifacts/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.{version}.vsix " +
         "@Templates/VisualStudio/settings.rsp");
