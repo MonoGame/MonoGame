@@ -100,6 +100,14 @@ Task("Prep")
     dnPackSettings.Configuration = configuration;
 });
 
+Task("BuildConsoleCheck")
+    .IsDependentOn("Prep")
+    .Does(() =>
+{
+    DotNetRestore("MonoGame.Framework/MonoGame.Framework.ConsoleCheck.csproj");
+    DotNetBuild("MonoGame.Framework/MonoGame.Framework.ConsoleCheck.csproj");
+});
+
 Task("BuildDesktopGL")
     .IsDependentOn("Prep")
     .Does(() =>
@@ -268,6 +276,7 @@ Task("SanityCheck")
     .IsDependentOn("Prep");
 
 Task("BuildAll")
+    .IsDependentOn("BuildConsoleCheck")
     .IsDependentOn("BuildDesktopGL")
     .IsDependentOn("BuildWindowsDX")
     .IsDependentOn("BuildAndroid")
