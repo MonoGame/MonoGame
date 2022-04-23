@@ -14,7 +14,7 @@ var configuration = Argument("build-configuration", "Release");
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
 
-MSBuildSettings msPackSettings, mdPackSettings;
+MSBuildSettings msPackSettings, mdPackSettings, msBuildSettings;
 DotNetMSBuildSettings dnBuildSettings;
 DotNetPackSettings dnPackSettings;
 
@@ -90,6 +90,11 @@ Task("Prep")
     mdPackSettings.Configuration = configuration;
     mdPackSettings.WithProperty("Version", version);
     mdPackSettings.WithTarget("PackageAddin");
+
+    msBuildSettings = new MSBuildSettings();
+    msBuildSettings.Verbosity = Verbosity.Minimal;
+    msBuildSettings.Configuration = configuration;
+    msBuildSettings.WithProperty("Version", version);
 
     dnBuildSettings = new DotNetMSBuildSettings();
     dnBuildSettings.WithProperty("Version", version);
@@ -239,19 +244,8 @@ Task("PackVSTemplates")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
-    var dotnet = Context.Tools.Resolve("dotnet.exe");
-    if (StartProcess(dotnet, "tool restore") != 0)
-        throw new Exception("dotnet tool restore failed.");
-
-    var result = StartProcess(
-        dotnet,
-        "vstemplate --force " +
-       $"-s Artifacts/MonoGame.Templates.CSharp/Release/MonoGame.Templates.CSharp.{version}.nupkg " +
-       $"--vsix Artifacts/MonoGame.Templates.CSharp/MonoGame.Templates.CSharp.{version}.vsix " +
-        "@Templates/VisualStudio/settings.rsp");
-
-    if (result != 0)
-        throw new Exception("dotnet-vstemplate failed to create VSIX.");
+    DotNetRestore("Templates/MonoGame.Framework.Templates.Extension/MonoGame.Framework.Templates.Extension.csproj");
+    MSBuild("Templates/MonoGame.Framework.Templates.Extension/MonoGame.Framework.Templates.Extension.csproj", msBuildSettings);
 });
 
 Task("PackVSMacTemplates")
