@@ -1,21 +1,15 @@
 {
     "author": "MonoGame Team",
     "classifications": [
-        "MonoGame"
+        "MonoGame", "Games", "Desktop", "Windows", "Xbox", "UWP", "XAML"
     ],
-    "name": "MonoGame Windows Universal Application (XAML)",
-    "groupIdentity": "MonoGame.Application.UWP.XAML",
+    "name": "MonoGame Windows Universal XAML Application",
     "identity": "MonoGame.Application.UWP.XAML.CSharp",
     "shortName": "mguwpxaml",
     "tags": {
         "language": "C#",
         "type": "project"
     },
-    "primaryOutputs": [
-        {
-            "path": "MGNamespace.csproj"
-        }
-    ],
     "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
     "description": "A MonoGame game project for Windows Universal using DirectX and setup in a XAML page."
