@@ -1,14 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net452</TargetFramework>
     <DefineConstants>WINDOWS;XNADESIGNPROVIDED;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>true</UseWindowsForms>
-    <Description>The MonoGame runtime for Windows using DirectX API's.</Description>
-    <PackageTags>monogame;.net core;core;.net standard;standard;windowsdx</PackageTags>
-    <PackageId>MonoGame.Framework.WindowsDX</PackageId>
-    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <Description>Fake console assembly that checks if MonoGame's code is still compatible with the private console implementations and building against .NET 4.5.2 and C# 5.</Description>
+    <LangVersion>5</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -80,6 +78,10 @@
     <PackageReference Version="4.0.1" Include="SharpDX.XInput" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+  </ItemGroup>
+  
   <Import Project="Platform\DirectX.targets" />
   <Import Project="Platform\XAudio.targets" />
 </Project>
