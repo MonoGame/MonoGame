@@ -321,7 +321,7 @@ namespace Microsoft.Xna.Framework
 
         private void BackRequested(object sender, BackRequestedEventArgs e)
         {
-            // Prevent XBOX from suspending the app when the user press 'B' button.
+            // Prevent Xbox from suspending the app when the user press 'B' button.
             e.Handled = true;
         }
 

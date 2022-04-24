@@ -1,7 +1,7 @@
 # MonoGame Tests
 
 The MonoGame Tests run against XNA on Windows and MonoGame on Windows,
-Mac OS X and Linux.  They serve as an assurance that MonoGame conforms
+macOS and Linux.  They serve as an assurance that MonoGame conforms
 as closely as possible to XNA.
 
 Simple unit tests make assertions about MonoGame's core class
@@ -10,7 +10,7 @@ those regards.  Additionally, visual tests verify via frame capture and
 comparison that MonoGame renders equivalently to XNA.
 
 Currently, on Windows, the tests can be run using NUnit and target
-either XNA or MonoGame.  On Mac OS X and Linux, the tests target
+either XNA or MonoGame.  On macOS and Linux, the tests target
 MonoGame and are implemented in an executable assembly that can be run
 and debugged directly.  After execution using the custom test runner,
 and HTML report of the results will be loaded in your default browser,

@@ -8,8 +8,8 @@ Before installing Monogame, you'll need to install [Visual Studio 2019](https://
 
 * .NET cross-platform development - For Desktop OpenGL and DirectX platforms
 * Mobile Development with .NET - For Android and iOS platforms
-* Universal Windows Platform development - For Windows 10 and Xbox UWP platforms
-* .Net Desktop Development - For Desktop OpenGL and DirectX platforms to target normal .NET Framework
+* Universal Windows Platform development - For Windows 11, Windows 10 and Xbox UWP platforms
+* .NET Desktop Development - For Desktop OpenGL and DirectX platforms to target normal .NET Framework
 
 ![Visual Studio optional components](~/images/getting_started/1_installer_vs_components.png)
 
