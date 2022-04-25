@@ -56,7 +56,7 @@ namespace MonoGame.Content.Builder.Editor.Launcher
         private const string verb = "open";
         private const string commandText = "Open with MGCB Editor";
 
-        private readonly static string _executablePath = Path.Combine(Path.GetDirectoryName(typeof(WindowsPlatform).Assembly.Location), "mgcb-editor-windows", "mgcb-editor-windows.exe");
+        private readonly static string _executablePath = Path.Combine(Path.GetDirectoryName(typeof(WindowsPlatform).Assembly.Location), "mgcb-editor-windows-data", "mgcb-editor-windows.exe");
         private readonly static string _startMenuLink = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "MGCB Editor.lnk");
 
         public void Register(InvocationContext context)

@@ -33,7 +33,7 @@ namespace MonoGame.Content.Builder.Editor.Launcher
                 Name = "mgcb-editor",
                 Handler = CommandHandler.Create<InvocationContext, string>((context, project) =>
                 {
-                    runAction = () => platform.Run(context, project);
+                    runAction = () => platform.Run(context, project ?? "");
                 })
             };
 

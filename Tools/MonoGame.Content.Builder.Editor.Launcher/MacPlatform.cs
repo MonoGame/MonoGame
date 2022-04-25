@@ -31,7 +31,7 @@ namespace MonoGame.Content.Builder.Editor.Launcher
             Directory.Delete(_systemAppPath, true);
 
         public void Run(InvocationContext context, string project) => // TODO: Figure out how to pass the project argument
-            Process.StartProcess("open", "\"" + LocalAppPath + "\"");
+            Process.StartProcess("open", $"-a \"{LocalAppPath}\" {project}");
 
         private void InstallApp(string sourceDirName, string destDirName)
         {

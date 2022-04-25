@@ -9,7 +9,7 @@ namespace MonoGame.Content.Builder.Editor.Launcher
 {
     public class LinuxPlatform : IPlatform
     {
-        private static readonly string _localPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mgcb-editor-linux");
+        private static readonly string _localPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mgcb-editor-linux-data");
         private static readonly string _localApp = Path.Combine(_localPath, "mgcb-editor-linux.dll");
         private static readonly string _localIconPath = Path.Combine(_localPath, "monogame.svg");
         private static readonly string _localMimePath = Path.Combine(_localPath, "x-mgcb.xml");
