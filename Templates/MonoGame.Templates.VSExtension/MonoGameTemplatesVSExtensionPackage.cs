@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
 
-namespace MonoGame.Templates
+namespace MonoGame.Templates.VSExtension
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -24,8 +24,8 @@ namespace MonoGame.Templates
     /// </para>
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [Guid(MonoGameTemplatesPackage.PackageGuidString)]
-    public sealed class MonoGameTemplatesPackage : AsyncPackage
+    [Guid(MonoGameTemplatesVSExtensionPackage.PackageGuidString)]
+    public sealed class MonoGameTemplatesVSExtensionPackage : AsyncPackage
     {
         /// <summary>
         /// MonoGameTemplatesPackage GUID string.

@@ -244,8 +244,8 @@ Task("PackVSTemplates")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
-    DotNetRestore("Templates/MonoGame.Templates.VisualStudio/MonoGame.Templates.VSExtension.csproj");
-    MSBuild("Templates/MonoGame.Templates.VisualStudio/MonoGame.Templates.VSExtension.csproj", msBuildSettings);
+    DotNetRestore("Templates/MonoGame.Templates.VSExtension/MonoGame.Templates.VSExtension.csproj");
+    MSBuild("Templates/MonoGame.Templates.VSExtension/MonoGame.Templates.VSExtension.csproj", msBuildSettings);
 });
 
 Task("PackVSMacTemplates")
