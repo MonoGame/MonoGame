@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
 
-namespace MonoGame.Framework.Templates.Extension
+namespace MonoGame.Templates
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -24,11 +24,11 @@ namespace MonoGame.Framework.Templates.Extension
     /// </para>
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [Guid(MonoGameFrameworkTemplatesExtensionPackage.PackageGuidString)]
-    public sealed class MonoGameFrameworkTemplatesExtensionPackage : AsyncPackage
+    [Guid(MonoGameTemplatesPackage.PackageGuidString)]
+    public sealed class MonoGameTemplatesPackage : AsyncPackage
     {
-         /// <summary>
-        /// MonoGame.Framework.Templates.ExtensionPackage GUID string.
+        /// <summary>
+        /// MonoGameTemplatesPackage GUID string.
         /// </summary>
         public const string PackageGuidString = "618bc6bc-7a4c-4c3f-8b0f-d4479c8e8690";
 

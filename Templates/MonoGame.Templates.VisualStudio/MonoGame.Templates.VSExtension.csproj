@@ -13,8 +13,8 @@
     <ProjectGuid>{9EBC26EB-8412-4723-B715-1F5BCCECD77A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MonoGame.Framework.Templates.Extension</RootNamespace>
-    <AssemblyName>MonoGame.Framework.Templates.Extension</AssemblyName>
+    <RootNamespace>MonoGame.Templates</RootNamespace>
+    <AssemblyName>MonoGame.Templates</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <RuntimeIdentifier>win</RuntimeIdentifier>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
@@ -40,14 +40,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Artifacts\MonoGame.Framework.Templates.Extension\</OutputPath>
+    <OutputPath>..\..\Artifacts\MonoGame.Templates.VisualStudio\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MonoGame.Framework.Templates.ExtensionPackage.cs" />
+    <Compile Include="MonoGameTemplatesVSExtensionPackage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
