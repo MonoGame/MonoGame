@@ -7,12 +7,6 @@
       "commands": [
         "dotnet-cake"
       ]
-    },
-    "dotnet-vstemplate": {
-      "version": "1.0.17",
-      "commands": [
-        "vstemplate"
-      ]
     }
   }
 }

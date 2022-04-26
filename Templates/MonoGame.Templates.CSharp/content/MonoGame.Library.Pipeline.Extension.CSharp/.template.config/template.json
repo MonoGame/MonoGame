@@ -1,10 +1,9 @@
 {
     "author": "MonoGame Team",
     "classifications": [
-        "MonoGame"
+        "MonoGame", "Games", "Extensions"
     ],
-    "name": "MonoGame Pipeline Extension",
-    "groupIdentity": "MonoGame.Library.Pipeline",
+    "name": "MonoGame Content Pipeline Extension",
     "identity": "MonoGame.Library.Pipeline.Extension.CSharp",
     "shortName": "mgpipeline",
     "tags": {
@@ -18,12 +17,5 @@
     ],
     "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
-    "description": "A MonoGame content pipeline extension library project.",
-    "symbols": {
-        "framework": {
-            "type": "parameter",
-            "defaultValue": "net6.0",
-            "replaces": "net6.0"
-        }
-    }
+    "description": "A MonoGame content pipeline extension library project."
 }

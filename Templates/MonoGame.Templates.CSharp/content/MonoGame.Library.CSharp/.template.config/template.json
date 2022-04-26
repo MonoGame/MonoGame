@@ -1,10 +1,9 @@
 {
     "author": "MonoGame Team",
     "classifications": [
-        "MonoGame"
+        "MonoGame", "Games", "Library"
     ],
     "name": "MonoGame Game Library",
-    "groupIdentity": "MonoGame.Library",
     "identity": "MonoGame.Library.CSharp",
     "shortName": "mglib",
     "tags": {
