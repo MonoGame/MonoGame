@@ -171,7 +171,7 @@
     DependsOnTargets="RunContentBuilder"
     Condition="'$(EnableMGCBItems)' == 'true' OR '@(MonoGameContentReference)' != ''"
     Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
-    BeforeTargets="PrepareForBuild">
+    BeforeTargets="BeforeBuild">
 
     <!-- Call CreateItem on each piece of ExtraContent so it's easy to switch the item type by platform. -->
     <CreateItem
