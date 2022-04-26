@@ -11,17 +11,10 @@
     <AssemblyName>mgcb-editor-mac</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
     <MacBundleName>$(AssemblyTitle)</MacBundleName>
+    <PublishSingleFile>false</PublishSingleFile>
     <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <EnableCodeSigning>false</EnableCodeSigning>
-    <UseSGen>false</UseSGen>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <EnableCodeSigning>false</EnableCodeSigning>
-    <UseSGen>false</UseSGen>
-  </PropertyGroup>
   <ItemGroup>
     <None Remove="Platform\**\*" />
     <Compile Remove="Platform\**\*" />
@@ -42,7 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
+      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
+    </ProjectReference>
     <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
       <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
     </ProjectReference>

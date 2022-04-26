@@ -17,6 +17,7 @@ var configuration = Argument("build-configuration", "Release");
 MSBuildSettings msPackSettings, mdPackSettings, msBuildSettings;
 DotNetMSBuildSettings dnBuildSettings;
 DotNetPackSettings dnPackSettings;
+DotNetPublishSettings dnPublishSettings;
 
 private void PackMSBuild(string filePath)
 {
@@ -26,6 +27,11 @@ private void PackMSBuild(string filePath)
 private void PackDotnet(string filePath)
 {
     DotNetPack(filePath, dnPackSettings);
+}
+
+private void PublishDotnet(string filePath)
+{
+    DotNetPublish(filePath, dnPublishSettings);
 }
 
 private bool GetMSBuildWith(string requires)
@@ -103,6 +109,12 @@ Task("Prep")
     dnPackSettings.MSBuildSettings = dnBuildSettings;
     dnPackSettings.Verbosity = DotNetVerbosity.Minimal;
     dnPackSettings.Configuration = configuration;
+
+    dnPublishSettings = new DotNetPublishSettings();
+    dnPublishSettings.MSBuildSettings = dnBuildSettings;
+    dnPublishSettings.Verbosity = DotNetVerbosity.Minimal;
+    dnPublishSettings.Configuration = configuration;
+    dnPublishSettings.SelfContained = false;
 });
 
 Task("BuildConsoleCheck")
@@ -218,14 +230,22 @@ Task("BuildTools")
     ReplaceRegexInFiles(plistPath, versionReg, newVersion, System.Text.RegularExpressions.RegexOptions.Singleline);
     
     if (IsRunningOnWindows())
-        PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Windows.csproj");
-    
-    PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj");
-    
-    if (IsRunningOnMacOs())
+    {
+        PublishDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Windows.csproj");
+        PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.Windows.csproj");
+    }
+    else if (IsRunningOnMacOs())
+    {
         PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj");
+        PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.Mac.csproj");
+    }
+    else
+    {
+        PublishDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj");
+        PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.Linux.csproj");
+    }
 
-    PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.csproj");
+    PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher.Bootstrap/MonoGame.Content.Builder.Editor.Launcher.Bootstrap.csproj");
 });
 
 Task("TestTools")

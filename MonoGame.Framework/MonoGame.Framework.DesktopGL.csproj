@@ -8,6 +8,7 @@
     <PackageTags>monogame;.net core;core;.net standard;standard;desktopgl</PackageTags>
     <PackageId>MonoGame.Framework.DesktopGL</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <CopyContentFiles>True</CopyContentFiles>
   </PropertyGroup>
 
   <!-- NETFX reference assemblies let us target .NET Framework on Mac/Linux without Mono -->
@@ -92,7 +93,7 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">
     <Content Include="..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll">
       <Link>x86\soft_oal.dll</Link>
       <PackagePath>runtimes\win-x86\native</PackagePath>

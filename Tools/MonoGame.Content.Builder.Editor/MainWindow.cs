@@ -37,12 +37,6 @@ namespace MonoGame.Tools.Pipeline
         private Clipboard _clipboard;
         private ContextMenu _contextMenu;
         private FileFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
-        private string[] monoLocations = {
-            "/usr/bin/mono",
-            "/usr/local/bin/mono",
-            "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono",
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mono"),
-        };
 
         public MainWindow()
         {
@@ -278,9 +272,17 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new NewItemDialog(PipelineController.Instance.Templates.GetEnumerator(), folder);
             var result = dialog.Show(this);
-
-            template = dialog.Selected;
-            name = dialog.Name + Path.GetExtension(template.TemplateFile);
+            
+            if (result)
+            {
+                template = dialog.Selected;
+                name = dialog.Name + Path.GetExtension(template.TemplateFile);
+            }
+            else
+            {
+                template = null;
+                name = "";
+            }
 
             return result;
         }

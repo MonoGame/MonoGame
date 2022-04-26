@@ -49,5 +49,21 @@
       JsonInputPath="%(MGToolManifest.Identity)"
       JPath="tools.dotnet-mgcb.version"
       JValue="$(Version)" />
+    <JsonPoke
+      JsonInputPath="%(MGToolManifest.Identity)"
+      JPath="tools.dotnet-mgcb-editor.version"
+      JValue="$(Version)" />
+    <JsonPoke
+      JsonInputPath="%(MGToolManifest.Identity)"
+      JPath="tools.dotnet-mgcb-editor-windows.version"
+      JValue="$(Version)" />
+    <JsonPoke
+      JsonInputPath="%(MGToolManifest.Identity)"
+      JPath="tools.dotnet-mgcb-editor-mac.version"
+      JValue="$(Version)" />
+    <JsonPoke
+      JsonInputPath="%(MGToolManifest.Identity)"
+      JPath="tools.dotnet-mgcb-editor-linux.version"
+      JValue="$(Version)" />
   </Target>
 </Project>
