@@ -15,7 +15,8 @@ var configuration = Argument("build-configuration", "Release");
 //////////////////////////////////////////////////////////////////////
 
 MSBuildSettings msPackSettings, mdPackSettings, msBuildSettings;
-DotNetMSBuildSettings dnBuildSettings;
+DotNetMSBuildSettings dnMsBuildSettings;
+DotNetBuildSettings dnBuildSettings;
 DotNetPackSettings dnPackSettings;
 DotNetPublishSettings dnPublishSettings;
 
@@ -102,16 +103,21 @@ Task("Prep")
     msBuildSettings.Configuration = configuration;
     msBuildSettings.WithProperty("Version", version);
 
-    dnBuildSettings = new DotNetMSBuildSettings();
-    dnBuildSettings.WithProperty("Version", version);
+    dnMsBuildSettings = new DotNetMSBuildSettings();
+    dnMsBuildSettings.WithProperty("Version", version);
+
+    dnBuildSettings = new DotNetBuildSettings();
+    dnBuildSettings.MSBuildSettings = dnMsBuildSettings;
+    dnBuildSettings.Verbosity = DotNetVerbosity.Minimal;
+    dnBuildSettings.Configuration = configuration;
 
     dnPackSettings = new DotNetPackSettings();
-    dnPackSettings.MSBuildSettings = dnBuildSettings;
+    dnPackSettings.MSBuildSettings = dnMsBuildSettings;
     dnPackSettings.Verbosity = DotNetVerbosity.Minimal;
     dnPackSettings.Configuration = configuration;
 
     dnPublishSettings = new DotNetPublishSettings();
-    dnPublishSettings.MSBuildSettings = dnBuildSettings;
+    dnPublishSettings.MSBuildSettings = dnMsBuildSettings;
     dnPublishSettings.Verbosity = DotNetVerbosity.Minimal;
     dnPublishSettings.Configuration = configuration;
     dnPublishSettings.SelfContained = false;
