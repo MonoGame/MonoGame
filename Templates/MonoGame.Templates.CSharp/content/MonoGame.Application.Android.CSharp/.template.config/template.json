@@ -4,6 +4,7 @@
         "MonoGame", "Games", "Mobile", "Android"
     ],
     "name": "MonoGame Android Application",
+    "groupIdentity": "MonoGame.Application.Android",
     "identity": "MonoGame.Application.Android.CSharp",
     "shortName": "mgandroid",
     "tags": {
