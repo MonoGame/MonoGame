@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <BaseOutputPath>..\..\Artifacts\VisualStudioForMac</BaseOutputPath>
+    <CreatePackage>true</CreatePackage>
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 

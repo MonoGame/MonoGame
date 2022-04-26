@@ -279,11 +279,11 @@ Task("PackVSTemplates")
 
 Task("PackVSMacTemplates")
     .IsDependentOn("PackDotNetTemplates")
-    .WithCriteria(() => IsRunningOnUnix() && DirectoryExists("/Applications") && DirectoryExists("/Library"))
+    .WithCriteria(() => IsRunningOnMacOs())
     .Does(() =>
 {
-    // DotNetCoreRestore("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj");
-    // MSBuild("Templates/VisualStudioForMac/MonoGame.IDE.VisualStudioForMac.csproj", mdPackSettings);
+    DotNetRestore("Templates/MonoGame.Templates.VSMacExtension/MonoGame.Templates.VSMacExtension.csproj");
+    DotNetBuild("Templates/MonoGame.Templates.VSMacExtension/MonoGame.Templates.VSMacExtension.csproj", dnBuildSettings);
 });
 
 //////////////////////////////////////////////////////////////////////
