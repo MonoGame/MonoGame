@@ -13,18 +13,18 @@ namespace MonoGame.Content.Builder.Editor.Launcher
         [STAThread]
         public static void Main(string[] args)
         {
-            var projectPath = args.Length > 0 ? args[0] : "";
             var currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var mgcbEditorApp =
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? Path.Combine(currentPath, "mgcb-editor-windows-data", "mgcb-editor-windows.exe") :
                 RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Path.Combine(currentPath, "MGCB Editor.app") :
                 RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? Path.Combine(currentPath, "mgcb-editor-linux-data", "mgcb-editor-linux") :
                 throw new NotImplementedException("Unsupported Operating System");
+            var mgcbEditorArgs = args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]) ? $"\"{args[0]}\"" : "";
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                Process.Start("open", $"-a \"{mgcbEditorApp}\" \"{projectPath}\"");
+                Process.Start("open", $"-a \"{mgcbEditorApp}\" {mgcbEditorArgs}");
             else
-                Process.Start(mgcbEditorApp, $"\"{projectPath}\"");
+                Process.Start(mgcbEditorApp, mgcbEditorArgs);
         }
     }
 }
