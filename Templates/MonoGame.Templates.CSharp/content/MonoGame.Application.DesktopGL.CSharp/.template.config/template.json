@@ -4,6 +4,7 @@
         "MonoGame", "Games", "Desktop", "Windows", "Linux", "macOS"
     ],
     "name": "MonoGame Cross-Platform Desktop Application",
+    "groupIdentity": "MonoGame.Application.DesktopGL",
     "identity": "MonoGame.Application.DesktopGL.CSharp",
     "shortName": "mgdesktopgl",
     "tags": {

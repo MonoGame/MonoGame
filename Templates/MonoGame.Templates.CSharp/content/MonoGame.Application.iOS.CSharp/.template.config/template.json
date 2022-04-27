@@ -4,6 +4,7 @@
         "MonoGame", "Games", "Mobile", "iOS"
     ],
     "name": "MonoGame iOS Application",
+    "groupIdentity": "MonoGame.Application.iOS",
     "identity": "MonoGame.Application.iOS.CSharp",
     "shortName": "mgios",
     "tags": {

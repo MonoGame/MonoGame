@@ -4,6 +4,7 @@
         "MonoGame", "Games", "Library"
     ],
     "name": "MonoGame Shared Library Project",
+    "groupIdentity": "MonoGame.Library.Shared",
     "identity": "MonoGame.Library.Shared.CSharp",
     "shortName": "mgshared",
     "tags": {
