@@ -28,7 +28,7 @@ namespace MonoGame.Templates.VSExtension
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(MonoGameTemplatesVSExtensionPackage.PackageGuidString)]
-    [ProvideEditorExtension(typeof(EditorFactory), ".mgcb", int.MaxValue)]
+    [ProvideEditorExtension(typeof(EditorFactory), ".mgcb", int.MaxValue, DefaultName = "MGCB Editor")]
     public sealed class MonoGameTemplatesVSExtensionPackage : AsyncPackage
     {
         /// <summary>
