@@ -18,7 +18,7 @@ There are pre-converted samples available on the repository as well.
 
 ## MonoGame.Extended Samples
 
-[MonoGame.Extended](https://github.com/craftworkgames/MonoGame.Extended) is an extension for MonoGame that makes it easier to make games. They have [demos](https://github.com/craftworkgames/MonoGame.Extended/tree/develop/Source/Demos) and [games](https://github.com/craftworkgames/MonoGame.Extended/tree/develop/Source/Games) that can be tried out.
+[MonoGame.Extended](https://github.com/craftworkgames/MonoGame.Extended) is an extension for MonoGame that makes it easier to make games. They have [demos](https://github.com/craftworkgames/MonoGame.Extended-samples/tree/master/src/Demos) and [games](https://github.com/craftworkgames/MonoGame.Extended-samples/tree/master/src/Games) that can be tried out.
 
 ## CartBlanche's Samples
 
