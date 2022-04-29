@@ -887,21 +887,20 @@ namespace Microsoft.Xna.Framework.Graphics
             var flipAdjustment = Vector2.Zero;
 
             var flippedVert = (effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
-            var flippedHorz = (effects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
+            var flippedHorz = ((effects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally) ^ rtl;
 
-            if (flippedVert || flippedHorz)
+            if (flippedVert || flippedHorz || rtl)
             {
                 Vector2 size;
 
                 var source = new SpriteFont.CharacterSource(text);
                 spriteFont.MeasureString(ref source, out size);
 
-                if (flippedHorz)
+                if (flippedHorz ^ rtl)
                 {
                     origin.X *= -1;
                     flipAdjustment.X = -size.X;
                 }
-
                 if (flippedVert)
                 {
                     origin.Y *= -1;
@@ -967,7 +966,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     var p = offset;
 
-                    if (rtl ^ flippedHorz)
+                    if (flippedHorz)
                         p.X += pCurrentGlyph->BoundsInTexture.Width;
                     p.X += pCurrentGlyph->Cropping.X;
 
