@@ -90,6 +90,7 @@ Task("Prep")
     msPackSettings.Configuration = configuration;
     msPackSettings.Restore = true;
     msPackSettings.WithProperty("Version", version);
+    msPackSettings.WithProperty("OutputDirectory", "Artifacts/NuGet");
     msPackSettings.WithTarget("Pack");
 
     mdPackSettings = new MSBuildSettings();
@@ -114,6 +115,7 @@ Task("Prep")
     dnPackSettings = new DotNetPackSettings();
     dnPackSettings.MSBuildSettings = dnMsBuildSettings;
     dnPackSettings.Verbosity = DotNetVerbosity.Minimal;
+    dnPackSettings.OutputDirectory = "Artifacts/NuGet";
     dnPackSettings.Configuration = configuration;
 
     dnPublishSettings = new DotNetPublishSettings();
@@ -238,17 +240,17 @@ Task("BuildTools")
     if (IsRunningOnWindows())
     {
         PublishDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Windows.csproj");
-        PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.Windows.csproj");
+        DotNetBuild("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.Windows.csproj", dnBuildSettings);
     }
     else if (IsRunningOnMacOs())
     {
         PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj");
-        PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.Mac.csproj");
+        DotNetBuild("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.Mac.csproj", dnBuildSettings);
     }
     else
     {
         PublishDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj");
-        PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.Linux.csproj");
+        DotNetBuild("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.Linux.csproj", dnBuildSettings);
     }
 
     PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher.Bootstrap/MonoGame.Content.Builder.Editor.Launcher.Bootstrap.csproj");
