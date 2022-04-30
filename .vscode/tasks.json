@@ -79,7 +79,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj",
+                "${workspaceFolder}/MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj",
                 "/property:GenerateFullPaths=true"
             ],
             "problemMatcher": "$msCompile"
