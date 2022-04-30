@@ -10,6 +10,8 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
+        const int DeviceNotConnectedHResult = unchecked((int)0x8007048f);
+
         internal static bool Back;
 
         private static readonly SharpDX.XInput.Controller[] _controllers = new[]
@@ -48,7 +50,22 @@ namespace Microsoft.Xna.Framework.Input
                 return new GamePadCapabilities();
             }
 
-            var capabilities = controller.GetCapabilities(SharpDX.XInput.DeviceQueryType.Any);
+            SharpDX.XInput.Capabilities capabilities;
+            try
+            {
+                capabilities = controller.GetCapabilities(SharpDX.XInput.DeviceQueryType.Any);
+            }
+            catch (SharpDX.SharpDXException ex)
+            {
+                if (ex.HResult == DeviceNotConnectedHResult)
+                {
+                    _connected[index] = false;
+                    SetDisconnectedTimeout(index);
+                    return new GamePadCapabilities();
+                }
+                throw;
+            }
+
             var ret = new GamePadCapabilities();
             switch (capabilities.SubType)
             {
@@ -288,8 +305,7 @@ namespace Microsoft.Xna.Framework.Input
             }
             catch (SharpDX.SharpDXException ex)
             {
-                const int deviceNotConnectedHResult = unchecked((int)0x8007048f);
-                if (ex.HResult == deviceNotConnectedHResult)
+                if (ex.HResult == DeviceNotConnectedHResult)
                 {
                     _connected[index] = false;
                     SetDisconnectedTimeout(index);
