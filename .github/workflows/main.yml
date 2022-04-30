@@ -9,7 +9,8 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-20.04]
     steps:
-      - uses: actions/checkout@v2
+      - name: Clone repository
+        uses: actions/checkout@v2
         with:
           submodules: recursive
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
@@ -39,10 +40,19 @@ jobs:
         run: dotnet cake build.cake
         env:
           GITHUB_ACTIONS: true
-      - uses: actions/upload-artifact@main
+      - name: Package nuget artifacts
+        uses: actions/upload-artifact@main
         with:
-          name: Nuget Packages ${{ matrix.os }}
+          name: nuget-${{ matrix.os }}
           path: |
-            Artifacts/**/*.nupkg
+            Artifacts/NuGet/*.nupkg
+          if-no-files-found: error
+      - name: Package Visual Studio extension artifact
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@main
+        with:
+          name: Visual Studio Extension
+          path: |
+            Artifacts/MonoGame.Templates.VSExtension/*.vsix
           if-no-files-found: error
 

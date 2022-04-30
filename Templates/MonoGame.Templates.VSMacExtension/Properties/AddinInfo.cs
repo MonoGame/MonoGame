@@ -1,7 +1,7 @@
 using System;
 using Mono.Addins;
 using Mono.Addins.Description;
-[assembly: Addin("MonoGame.Templates.VSMacExtension", Version = "3.8.1.137-develop")]
+[assembly: Addin("MonoGame.Templates.VSMacExtension", Version = "1.0.0")]
 [assembly: AddinName("MonoGame Extension")]
 [assembly: AddinCategory("Game Development")]
 [assembly: AddinDescription("MonoGame Extension ofr VisualStudio for Mac")]

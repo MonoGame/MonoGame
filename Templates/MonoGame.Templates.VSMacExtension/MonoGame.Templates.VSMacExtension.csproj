@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AddinFile Include="..\..\Artifacts\MonoGame.Templates.CSharp\Release\*.nupkg">
+    <AddinFile Include="..\..\Artifacts\NuGet\MonoGame.Templates.CSharp.*.nupkg">
       <Link>Templates\MonoGame.Templates.CSharp.nupkg</Link>
     </AddinFile>
   </ItemGroup>

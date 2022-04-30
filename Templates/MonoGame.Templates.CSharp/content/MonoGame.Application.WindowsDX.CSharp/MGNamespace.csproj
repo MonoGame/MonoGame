@@ -14,7 +14,7 @@
     <TrimmerRootAssembly Include="MonoGame.Framework" Visible="false" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.1" />
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.1" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.1-develop" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.1-develop" />
   </ItemGroup>
 </Project>
