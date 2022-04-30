@@ -2,16 +2,143 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "mgcb-editor-mac",
+            "label": "Build MonoGame Framework (Android)",
+            "command": "dotnet",
+            "type": "process",
+            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
+            "args": [
+                "build",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.Android.csproj",
+                "/property:GenerateFullPaths=true"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build MonoGame Framework (ConsoleCheck)",
+            "command": "dotnet",
+            "type": "process",
+            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
+            "args": [
+                "build",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.ConsoleCheck.csproj",
+                "/property:GenerateFullPaths=true"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build MonoGame Framework (DesktopGL)",
+            "command": "dotnet",
+            "type": "process",
+            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
+            "args": [
+                "build",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj",
+                "/property:GenerateFullPaths=true"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build MonoGame Framework (IOS)",
+            "command": "dotnet",
+            "type": "process",
+            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
+            "args": [
+                "build",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.IOS.csproj",
+                "/property:GenerateFullPaths=true"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build MonoGame Framework (WindowsDX)",
+            "command": "dotnet",
+            "type": "process",
+            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
+            "args": [
+                "build",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj",
+                "/property:GenerateFullPaths=true"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build MonoGame Framework (WindowsUniversal)",
+            "command": "dotnet",
+            "type": "process",
+            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
+            "args": [
+                "build",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj",
+                "/property:GenerateFullPaths=true"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build MonoGame Framework Content Pipeline",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "${workspaceFolder}MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj",
+                "/property:GenerateFullPaths=true"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build mgcb-editor",
+            "command": "dotnet",
+            "type": "process",
+            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
+            "osx": {                
+                "args": [
+                    "build",
+                    "${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj",
+                    "/property:GenerateFullPaths=true",
+                    "/consoleloggerparameters:NoSummary"
+                ]
+            },
+            "linux": {
+                "args": [
+                    "build",
+                    "${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj",
+                    "/property:GenerateFullPaths=true",
+                    "/consoleloggerparameters:NoSummary"
+                ]
+            }, 
+            "windows": {
+                "args": [
+                    "build",
+                    "${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Windows.csproj",
+                    "/property:GenerateFullPaths=true",
+                    "/consoleloggerparameters:NoSummary"
+                ]
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Run mgcb-editor",
+            "command": "dotnet",
+            "type": "process",
+            "osx": {
+                "args": [
+                    "run",
+                    "--project ${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj"
+                ]
+            },
+            "linux": {
+                "args": [
+                    "run",
+                    "--project ${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj"
+                ]
+            },
+            "windows": {
+                "args": [
+                    "run",
+                    "--project ${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Windows.csproj"
+                ]
+            },
+            "problemMatcher": "$msCompile"
         }
+        
     ]
 }
