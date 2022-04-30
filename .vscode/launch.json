@@ -11,16 +11,16 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "mgcb-editor",
-            "program": "${workspaceFolder}//Artifacts/MonoGame.Content.Builder/Debug/mgcb",
+            "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder/Debug/mgcb",
             "windows": {
                 "program": "${workspaceFolder}//Artifacts/MonoGame.Content.Builder/Debug/mgcb",
                 "args": [],
-                "cwd": "${workspaceFolder}//Artifacts/MonoGame.Content.Builder.Editor/Debug",
+                "cwd": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Debug",
             },
             "linux": {
-                "program": "${workspaceFolder}//Artifacts/MonoGame.Content.Builder/Debug/mgcb",
+                "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder/Debug/mgcb",
                 "args": [],
-                "cwd": "${workspaceFolder}//Artifacts/MonoGame.Content.Builder.Editor/Debug",
+                "cwd": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Debug",
             },
             "osx": {
                 "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Mac/Debug/MGCB Editor.app/Contents/MacOS/mgcb-editor-mac",
