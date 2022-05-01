@@ -5,7 +5,6 @@
             "label": "Build MonoGame Framework (Android)",
             "command": "dotnet",
             "type": "process",
-            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
             "args": [
                 "build",
                 "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.Android.csproj",
@@ -17,7 +16,6 @@
             "label": "Build MonoGame Framework (ConsoleCheck)",
             "command": "dotnet",
             "type": "process",
-            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
             "args": [
                 "build",
                 "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.ConsoleCheck.csproj",
@@ -29,7 +27,6 @@
             "label": "Build MonoGame Framework (DesktopGL)",
             "command": "dotnet",
             "type": "process",
-            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
             "args": [
                 "build",
                 "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj",
@@ -41,7 +38,6 @@
             "label": "Build MonoGame Framework (IOS)",
             "command": "dotnet",
             "type": "process",
-            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
             "args": [
                 "build",
                 "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.IOS.csproj",
@@ -53,7 +49,6 @@
             "label": "Build MonoGame Framework (WindowsDX)",
             "command": "dotnet",
             "type": "process",
-            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
             "args": [
                 "build",
                 "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj",
@@ -65,7 +60,6 @@
             "label": "Build MonoGame Framework (WindowsUniversal)",
             "command": "dotnet",
             "type": "process",
-            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
             "args": [
                 "build",
                 "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj",
@@ -88,7 +82,6 @@
             "label": "Build mgcb-editor",
             "command": "dotnet",
             "type": "process",
-            "dependsOn": ["Build MonoGame Framework Content Pipeline"],
             "osx": {                
                 "args": [
                     "build",
@@ -116,29 +109,98 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Run mgcb-editor",
+            "label": "Clean MonoGame Framework (Android)",
             "command": "dotnet",
             "type": "process",
-            "osx": {
+            "args": [
+                "clean",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.Android.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Clean MonoGame Framework (ConsoleCheck)",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.ConsoleCheck.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Clean MonoGame Framework (DesktopGL)",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Clean MonoGame Framework (IOS)",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.IOS.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Clean MonoGame Framework (WindowsDX)",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.WindowsDX.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Clean MonoGame Framework (WindowsUniversal)",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/MonoGame.Framework/MonoGame.Framework.WindowsUniversal.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Clean MonoGame Framework Content Pipeline",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Clean mgcb-editor",
+            "command": "dotnet",
+            "type": "process",
+            "osx": {                
                 "args": [
-                    "run",
-                    "--project ${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj"
+                    "clean",
+                    "${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj"
                 ]
             },
             "linux": {
                 "args": [
-                    "run",
-                    "--project ${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj"
+                    "clean",
+                    "${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Linux.csproj"
                 ]
-            },
+            }, 
             "windows": {
                 "args": [
-                    "run",
-                    "--project ${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Windows.csproj"
+                    "clean",
+                    "${workspaceFolder}/Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Windows.csproj"
                 ]
             },
             "problemMatcher": "$msCompile"
         }
-        
     ]
 }
