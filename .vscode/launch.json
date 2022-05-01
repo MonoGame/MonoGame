@@ -3,24 +3,23 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 
-    //The echo command is valid on all three platforms
     "version": "0.2.0",
     "configurations": [
         {
             "name": "MGCB Editor",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "mgcb-editor",
-            "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder/Debug/mgcb",
+            "preLaunchTask": "Build mgcb-editor",
+            "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder/Debug/Windows/mgcb-editor-windows.exe",
             "windows": {
-                "program": "${workspaceFolder}//Artifacts/MonoGame.Content.Builder/Debug/mgcb",
+                "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder/Debug/Windows/mgcb-editor-windows.exe",
                 "args": [],
-                "cwd": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Debug",
+                "cwd": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Windows/Debug",
             },
             "linux": {
-                "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder/Debug/mgcb",
+                "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Linux/Debug/mgcb-editor-linux",
                 "args": [],
-                "cwd": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Debug",
+                "cwd": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Linux/Debug",
             },
             "osx": {
                 "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Mac/Debug/MGCB Editor.app/Contents/MacOS/mgcb-editor-mac",
@@ -29,56 +28,6 @@
             },
             "console": "internalConsole",
             "stopAtEntry": false
-        },
-        {
-            "name": "Build DesktopGL",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "Build MonoGame Framework (DesktopGL)",
-            "program": "echo ",
-            "args": [],
-            "console": "internalConsole",
-            "stopAtEntry": false
-        },
-        {
-            "name": "Build IOS",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "Build MonoGame Framework (IOS)",
-            "program": "echo ",
-            "args": [],
-            "console": "internalConsole",
-            "stopAtEntry": false
-        },
-        {
-            "name": "Build WindowsDX",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "Build MonoGame Framework (WindowsDX)",
-            "program": "echo ",
-            "args": [],
-            "console": "internalConsole",
-            "stopAtEntry": false
-        },
-        {
-            "name": "Build WindowsUniversal",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "Build MonoGame Framework (WindowsUniversal)",
-            "program": "echo ",
-            "args": [],
-            "console": "internalConsole",
-            "stopAtEntry": false
-        },
-        {
-            "name": "Build MonoGame Framework Content Pipeline",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "Build MonoGame Framework Content Pipeline",
-            "program": "echo ",
-            "args": [],
-            "console": "internalConsole",
-            "stopAtEntry": false
-        },
+        }
     ]
 }
