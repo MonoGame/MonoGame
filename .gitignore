@@ -8,6 +8,9 @@ Installers/Linux/tmp_run/
 *.run
 *.deb
 
+#Visual Studio Code files
+.vscode/
+
 #Visual Studio files
 *.pidb
 *.userprefs
