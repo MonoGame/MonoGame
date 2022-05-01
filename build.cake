@@ -8,6 +8,7 @@
 
 var target = Argument("build-target", "Default");
 var version = Argument("build-version", EnvironmentVariable("BUILD_NUMBER") ?? "3.8.1.1");
+var repositoryUrl = Argument("repository-url", "https://github.com/MonoGame/MonoGame");
 var configuration = Argument("build-configuration", "Release");
 
 //////////////////////////////////////////////////////////////////////
@@ -60,8 +61,13 @@ private void ParseVersion()
     if (!string.IsNullOrEmpty(EnvironmentVariable("GITHUB_ACTIONS")))
     {
         version = "3.8.1." + EnvironmentVariable("GITHUB_RUN_NUMBER");
-        if (EnvironmentVariable("GITHUB_REF") != "refs/heads/master")
+
+        if (EnvironmentVariable("GITHUB_REPOSITORY") != "MonoGame/MonoGame")
+            version += "-" + EnvironmentVariable("GITHUB_REPOSITORY_OWNER");
+        else if (EnvironmentVariable("GITHUB_REF") != "refs/heads/master")
             version += "-develop";
+
+        repositoryUrl = "https://github.com/" + EnvironmentVariable("GITHUB_REPOSITORY");
     }
     else
     {
@@ -90,21 +96,26 @@ Task("Prep")
     msPackSettings.Configuration = configuration;
     msPackSettings.Restore = true;
     msPackSettings.WithProperty("Version", version);
+    msPackSettings.WithProperty("OutputDirectory", "Artifacts/NuGet");
+    msPackSettings.WithProperty("RepositoryUrl", repositoryUrl);
     msPackSettings.WithTarget("Pack");
 
     mdPackSettings = new MSBuildSettings();
     mdPackSettings.Verbosity = Verbosity.Minimal;
     mdPackSettings.Configuration = configuration;
     mdPackSettings.WithProperty("Version", version);
+    mdPackSettings.WithProperty("RepositoryUrl", repositoryUrl);
     mdPackSettings.WithTarget("PackageAddin");
 
     msBuildSettings = new MSBuildSettings();
     msBuildSettings.Verbosity = Verbosity.Minimal;
     msBuildSettings.Configuration = configuration;
     msBuildSettings.WithProperty("Version", version);
+    msBuildSettings.WithProperty("RepositoryUrl", repositoryUrl);
 
     dnMsBuildSettings = new DotNetMSBuildSettings();
     dnMsBuildSettings.WithProperty("Version", version);
+    dnMsBuildSettings.WithProperty("RepositoryUrl", repositoryUrl);
 
     dnBuildSettings = new DotNetBuildSettings();
     dnBuildSettings.MSBuildSettings = dnMsBuildSettings;
@@ -114,6 +125,7 @@ Task("Prep")
     dnPackSettings = new DotNetPackSettings();
     dnPackSettings.MSBuildSettings = dnMsBuildSettings;
     dnPackSettings.Verbosity = DotNetVerbosity.Minimal;
+    dnPackSettings.OutputDirectory = "Artifacts/NuGet";
     dnPackSettings.Configuration = configuration;
 
     dnPublishSettings = new DotNetPublishSettings();
@@ -242,7 +254,7 @@ Task("BuildTools")
     }
     else if (IsRunningOnMacOs())
     {
-        PackDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj");
+        PublishDotnet("Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.Mac.csproj");
         PackDotnet("Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.Mac.csproj");
     }
     else

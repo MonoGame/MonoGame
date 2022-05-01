@@ -4,12 +4,14 @@ on: [push, pull_request]
 
 jobs:
   build:
+    name: build-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-20.04]
+        os: [windows-latest, macos-latest, ubuntu-latest]
     steps:
-      - uses: actions/checkout@v2
+      - name: Clone repository
+        uses: actions/checkout@v2
         with:
           submodules: recursive
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
@@ -39,10 +41,61 @@ jobs:
         run: dotnet cake build.cake
         env:
           GITHUB_ACTIONS: true
-      - uses: actions/upload-artifact@main
+      - name: Package nuget artifacts
+        uses: actions/upload-artifact@main
         with:
-          name: Nuget Packages ${{ matrix.os }}
+          name: nuget-${{ matrix.os }}
           path: |
-            Artifacts/**/*.nupkg
+            Artifacts/NuGet/*.nupkg
           if-no-files-found: error
+      - name: Package Visual Studio extension artifact
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@main
+        with:
+          name: Visual Studio Extension
+          path: |
+            Artifacts/MonoGame.Templates.VSExtension/*.vsix
+          if-no-files-found: error
+  check-deploy:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    if: ${{ github.event_name == 'push' }}
+    outputs:
+      isGitHubTokenSet: ${{ steps.isGitHubTokenSet.outputs.defined }}
+    steps:
+      - id: isGitHubTokenSet
+        if: "${{ env.GITHUB_TOKEN != '' }}"
+        run: echo "::set-output name=defined::true"
+        env:
+            GITHUB_TOKEN: ${{ secrets.PUSH_NUGET }}
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    needs: [ check-deploy ]
+    if: needs.check-deploy.outputs.isGitHubTokenSet == 'true'
+    steps:
+      - name: Download NuGet artifacts from Windows
+        uses: actions/download-artifact@v3
+        with:
+          name: nuget-windows-latest
+          path: nuget-windows
+      - name: Download NuGet artifacts from macOS
+        uses: actions/download-artifact@v3
+        with:
+          name: nuget-macos-latest
+          path: nuget-macos
+      - name: Download NuGet artifacts from Ubuntu
+        uses: actions/download-artifact@v3
+        with:
+          name: nuget-ubuntu-latest
+          path: nuget-ubuntu
+      - name: Move NuGet packages to one folder
+        run: mkdir nuget && cp -Rf nuget-windows/. nuget && cp -Rf nuget-macos/. nuget && cp -Rf nuget-ubuntu/. nuget
+      - name: Push packages
+        run: dotnet nuget push nuget/*.nupkg --source https://nuget.pkg.github.com/$GITHUB_REPOSITORY_OWNER/index.json --api-key ${GITHUB_TOKEN}
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUSH_NUGET }}
+
+
+
 
