@@ -104,8 +104,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformPlay()
         {
-            SourceId = 0;
-            HasSourceId = false;
+            if (HasSourceId)
+                PlatformStop(true);
             SourceId = controller.ReserveSource();
             HasSourceId = true;
 
