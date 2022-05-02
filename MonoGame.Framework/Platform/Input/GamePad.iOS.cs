@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Input
         static bool IndexIsUsed(GCControllerPlayerIndex index)
         {
             foreach (var ctrl in GCController.Controllers)
-                if (ctrl.PlayerIndex == (int)index) return true;
+                if (ctrl.PlayerIndex == index) return true;
 
             return false;
         }
@@ -28,11 +28,11 @@ namespace Microsoft.Xna.Framework.Input
                 return;
             foreach (var controller in GCController.Controllers)
             {
-                if (controller.PlayerIndex == (int)index)
+                if (controller.PlayerIndex == index)
                     break;
-                if (controller.PlayerIndex == (int)GCControllerPlayerIndex.Unset)
+                if (controller.PlayerIndex == GCControllerPlayerIndex.Unset)
                 {
-                    controller.PlayerIndex = (int)index;
+                    controller.PlayerIndex = index;
                     break;
                 }
             }
@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Input
             {
                 if (controller == null)
                     continue;
-                if (controller.PlayerIndex == (int)ind)
+                if (controller.PlayerIndex == ind)
                     return GetCapabilities(controller);
             }
             return new GamePadCapabilities { IsConnected = false };
@@ -69,6 +69,7 @@ namespace Microsoft.Xna.Framework.Input
                 capabilities.HasXButton = true;
                 capabilities.HasYButton = true;
                 capabilities.HasBackButton = true;
+                capabilities.HasStartButton = true;
                 capabilities.HasDPadUpButton = true;
                 capabilities.HasDPadDownButton = true;
                 capabilities.HasDPadLeftButton = true;
@@ -88,7 +89,6 @@ namespace Microsoft.Xna.Framework.Input
                 capabilities.HasBButton = true;
                 capabilities.HasXButton = true;
                 capabilities.HasYButton = true;
-                capabilities.HasBackButton = true;
                 capabilities.HasDPadUpButton = true;
                 capabilities.HasDPadDownButton = true;
                 capabilities.HasDPadLeftButton = true;
@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Input
                 if (controller == null)
                     continue;
 
-                if (controller.PlayerIndex != (int)ind)
+                if (controller.PlayerIndex != ind)
                     continue;
 
                 connected = true;
@@ -150,6 +150,11 @@ namespace Microsoft.Xna.Framework.Input
                         buttons |= Buttons.LeftTrigger;
                     if (controller.ExtendedGamepad.RightTrigger.IsPressed)
                         buttons |= Buttons.RightTrigger;
+
+                    if (controller.ExtendedGamepad.ButtonMenu.IsPressed)
+                        buttons |= Buttons.Start;
+                    if (controller.ExtendedGamepad.ButtonOptions.IsPressed)
+                        buttons |= Buttons.Back;
 
                     if (controller.ExtendedGamepad.DPad.Up.IsPressed)
                     {

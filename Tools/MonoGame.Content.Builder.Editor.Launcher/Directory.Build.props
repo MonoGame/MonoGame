@@ -1,0 +1,13 @@
+<Project>
+
+  <!-- This is needed to differentiate intermediate output directories if you have
+       multiple projects in the same folder and build them in the same solution.
+       See more: https://github.com/NuGet/Home/issues/4463#issuecomment-404806889 -->
+  <PropertyGroup>
+    <MSBuildProjectExtensionsPath>obj\$(MSBuildProjectName)\</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+
+  <!-- Continue up the folder tree for any additional Directory.Build.props files. -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)..\'))" />
+
+</Project>
