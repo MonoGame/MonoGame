@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
 using Microsoft.Xna.Framework;
@@ -194,8 +195,30 @@ namespace MonoGame.Tests.Audio
             Assert.False(cue.IsStopped);
             Assert.False(cue.IsStopping);
 
-            cue.Play ();
-            cue.Stop (AudioStopOptions.Immediate);
+            // Make sure play, pause, resume and stop are working
+            cue.Play();
+            SleepWhileAudioEngineUpdates(100);
+            Assert.True(cue.IsPlaying);
+            Assert.False(cue.IsPaused);
+            Assert.False(cue.IsStopped);
+
+            cue.Pause();
+            SleepWhileAudioEngineUpdates(100);
+            Assert.True(cue.IsPlaying);
+            Assert.True(cue.IsPaused);
+            Assert.False(cue.IsStopped);
+
+            cue.Resume();
+            SleepWhileAudioEngineUpdates(100);
+            Assert.True(cue.IsPlaying);
+            Assert.False(cue.IsPaused);
+            Assert.False(cue.IsStopped);
+
+            cue.Stop(AudioStopOptions.Immediate);
+            SleepWhileAudioEngineUpdates(100);
+            Assert.False(cue.IsPlaying);
+            Assert.False(cue.IsPaused);
+            Assert.True(cue.IsStopped);
 
             cue = _soundBank.GetCue ("blast_mono");
 
@@ -230,8 +253,40 @@ namespace MonoGame.Tests.Audio
             Assert.Throws<ArgumentNullException>(() => _soundBank.PlayCue("blast_mono", null, null));
             Assert.Throws<ArgumentNullException>(() => _soundBank.PlayCue("blast_mono", new AudioListener(), null));
 
-            // TODO: Add actual playback tests!
-            //_soundBank.PlayCue("blast_mono");
+#if !XNA
+            // Make sure play, pause, resume and stop are working
+            _soundBank.PlayCue("blast_mono");
+            SleepWhileAudioEngineUpdates(100);
+            Assert.AreEqual(1, _audioEngine.ActiveCues.Count);
+
+            if (_audioEngine.ActiveCues.Count == 1)
+            {
+                var cue = _audioEngine.ActiveCues[0];
+                Assert.True(cue.IsPlaying);
+                Assert.False(cue.IsPaused);
+                Assert.False(cue.IsStopped);
+
+                cue.Pause();
+                SleepWhileAudioEngineUpdates(100);
+                Assert.True(cue.IsPlaying);
+                Assert.True(cue.IsPaused);
+                Assert.False(cue.IsStopped);
+
+                cue.Resume();
+                SleepWhileAudioEngineUpdates(100);
+                Assert.True(cue.IsPlaying);
+                Assert.False(cue.IsPaused);
+                Assert.False(cue.IsStopped);
+
+                cue.Stop(AudioStopOptions.Immediate);
+                SleepWhileAudioEngineUpdates(100);
+                Assert.False(cue.IsPlaying);
+                Assert.False(cue.IsPaused);
+                Assert.True(cue.IsStopped);
+
+                Assert.AreEqual(0, _audioEngine.ActiveCues.Count);
+            }
+#endif
         }
 
         [Test]
@@ -297,6 +352,16 @@ namespace MonoGame.Tests.Audio
             Assert.Throws<IndexOutOfRangeException>(() => cue.SetVariable("Cue Private", 1.0f));
 
             cue.Dispose();
+        }
+
+        private void SleepWhileAudioEngineUpdates(int ms)
+        {
+            int cycles = ms / 10;
+            for (int i = 0; i < cycles; i++)
+            {
+                _audioEngine.Update();
+                Thread.Sleep(10);
+            }
         }
     }
 }

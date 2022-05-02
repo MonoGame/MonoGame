@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFrameworks>net452;net5.0-windows</TargetFrameworks>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <DefineConstants>WINDOWS;XNADESIGNPROVIDED;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>true</UseWindowsForms>
     <Description>The MonoGame runtime for Windows using DirectX API's.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;windowsdx</PackageTags>
     <PackageId>MonoGame.Framework.WindowsDX</PackageId>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -65,10 +66,6 @@
     <Content Include="MonoGame.Framework.WindowsDX.targets" PackagePath="build" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <UseWindowsForms>true</UseWindowsForms>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -81,10 +78,6 @@
     <PackageReference Version="4.0.1" Include="SharpDX.MediaFoundation" />
     <PackageReference Version="4.0.1" Include="SharpDX.XAudio2" />
     <PackageReference Version="4.0.1" Include="SharpDX.XInput" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
   </ItemGroup>
 
   <Import Project="Platform\DirectX.targets" />

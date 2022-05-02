@@ -215,9 +215,12 @@ namespace Microsoft.Xna.Framework
             set
             {
                 if (value < TimeSpan.Zero)
-                    throw new ArgumentOutOfRangeException("The time must be positive.", default(Exception));
+                    throw new ArgumentOutOfRangeException(
+                        "The time must be positive.", default(Exception));
+                
                 if (value < _targetElapsedTime)
-                    throw new ArgumentOutOfRangeException("The time must be at least TargetElapsedTime", default(Exception));
+                    throw new ArgumentOutOfRangeException(
+                        "The time must be at least TargetElapsedTime", default(Exception));
 
                 _maxElapsedTime = value;
             }
@@ -256,6 +259,10 @@ namespace Microsoft.Xna.Framework
                 if (value <= TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
                         "The time must be positive and non-zero.", default(Exception));
+
+                if (value > _maxElapsedTime)
+                    throw new ArgumentOutOfRangeException(
+                        "The time can not be larger than MaxElapsedTime", default(Exception));
 
                 if (value != _targetElapsedTime)
                 {
@@ -397,8 +404,12 @@ namespace Microsoft.Xna.Framework
         public void ResetElapsedTime()
         {
             Platform.ResetElapsedTime();
-            _gameTimer.Reset();
-            _gameTimer.Start();
+            if (_gameTimer != null)
+            {
+                _gameTimer.Reset();
+                _gameTimer.Start();
+            }
+
             _accumulatedElapsedTime = TimeSpan.Zero;
             _gameTime.ElapsedGameTime = TimeSpan.Zero;
             _previousTicks = 0L;
@@ -525,6 +536,11 @@ namespace Microsoft.Xna.Framework
             }
 
             // Advance the accumulated elapsed time.
+            if (_gameTimer == null)
+            {
+                _gameTimer = new Stopwatch();
+                _gameTimer.Start();
+            }
             var currentTicks = _gameTimer.Elapsed.Ticks;
             _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
             _previousTicks = currentTicks;

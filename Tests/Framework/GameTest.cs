@@ -164,7 +164,16 @@ namespace MonoGame.Tests {
 				//Assert.That(_game, Has.Property("UpdateCount").GreaterThan(11));
 				//Assert.That(_game, Has.Property("DrawCount").EqualTo(10));
 			}
-		}
+
+            [Test]
+            public void GameTickTest()
+            {
+                // should not throw an exception
+                Game.ResetElapsedTime();
+                Assert.DoesNotThrow(() => Game.Tick());
+                Game.ResetElapsedTime();
+            }
+        }
 
         [TestFixture]
         public class Misc
@@ -213,6 +222,8 @@ namespace MonoGame.Tests {
 
                 g.Dispose();
             }
+
+
 
             private class ExitTestGame : CountCallsGame
             {
