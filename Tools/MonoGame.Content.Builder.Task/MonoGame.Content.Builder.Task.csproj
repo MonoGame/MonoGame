@@ -2,6 +2,7 @@
   
   <PropertyGroup>
     <TargetFrameworks>net6.0</TargetFrameworks>
+    <RollForward>Major</RollForward>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Task</BaseOutputPath>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>

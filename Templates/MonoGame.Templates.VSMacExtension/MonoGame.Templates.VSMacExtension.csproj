@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <RollForward>Major</RollForward>
     <BaseOutputPath>..\..\Artifacts\VisualStudioForMac</BaseOutputPath>
     <CreatePackage>true</CreatePackage>
     <ImplicitUsings>true</ImplicitUsings>
