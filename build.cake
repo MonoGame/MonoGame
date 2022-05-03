@@ -291,6 +291,18 @@ Task("PackVSTemplates")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
+    var shortVersion = version;
+	if (shortVersion.Contains("-")) shortVersion = shortVersion.Substring(0, shortVersion.IndexOf("-"));
+
+    var versionReg = "<Identity Version=\"([^\"]*)\"";
+    var filePath = "Templates/MonoGame.Templates.VSExtension/source.extension.vsixmanifest";
+    var newVersion = "<Identity Version=\"" + shortVersion + "\"";
+    ReplaceRegexInFiles(filePath, versionReg, newVersion, System.Text.RegularExpressions.RegexOptions.Singleline);
+
+    versionReg = "[0-9](\\.[0-9])*";
+    filePath = "Templates/MonoGame.Templates.VSExtension/Templates.pkgdef";
+    ReplaceRegexInFiles(filePath, versionReg, shortVersion, System.Text.RegularExpressions.RegexOptions.Singleline);
+
     DotNetRestore("Templates/MonoGame.Templates.VSExtension/MonoGame.Templates.VSExtension.csproj");
     MSBuild("Templates/MonoGame.Templates.VSExtension/MonoGame.Templates.VSExtension.csproj", msBuildSettings);
 });
