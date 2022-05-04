@@ -12,7 +12,7 @@ title: Introduction
 
 Welcome to the MonoGame documentation hub!
 
-MonoGame is a simple and powerful .NET library for creating games for desktop PCs, video game consoles, and mobile devices.
+MonoGame is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices.
 
 Based on [Microsoft's XNA Framework](https://msdn.microsoft.com/en-us/library/bb200104.aspx), it provides the following features:
 
@@ -26,6 +26,14 @@ Based on [Microsoft's XNA Framework](https://msdn.microsoft.com/en-us/library/bb
 This documentation helps you get started, providing overviews of key features and tools and a complete API reference.
 
 Please use the links at the top and left to navigate the documentation sections.
+
+## What is MonoGame exactly?
+
+MonoGame is a "bring your own tools" kind of framework, which means that it provides the building blocks to build your own engine and tools, but it isn't quite an engine itself.
+
+If you are expecting a scene editor (like Unity), MonoGame is not that.
+
+If you love coding and having a control over you game logic, MonoGame might be your jam.
 
 ## We Need Your Help!
 

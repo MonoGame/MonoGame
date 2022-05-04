@@ -2,7 +2,7 @@
 
 ## Target Frameworks
 
-Specifying the target Android versions can be confusing.  MonoGame is built to target Android 4.2 (API Level 17), but can run on lower Android versions.  If you build MonoGame from source, you will need the SDK Platform for API Level 17 installed in the Android SDK Manager.
+Specifying the target Android versions can be confusing.  MonoGame sets a default target to Android 12 (API Level 31), but can run on lower Android versions.  If you build MonoGame from source, you will need the SDK Platform for API Level 31 installed in the Android SDK Manager.
 
 Since MonoGame targets Android 4.2, the Target Framework in your Android project must be set to 4.2 or higher.  To allow your game to run on lower Android versions, set the Minimum Android version to the desired version in the project properties.
 

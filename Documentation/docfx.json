@@ -80,6 +80,7 @@
       "_appTitle": "MonoGame Documentation",
       "_appLogoPath": "images/mg-logo-white.svg",
       "_appFaviconPath": "images/favicon-192x192.png",
+      "_appFooter": "<p>© 2012 Microsoft Corporation. All rights reserved.</p><p>© The MonoGame Team.</p>",
       "baseDir": "MonoGame-docfx"
     },
     "fileMetadataFiles": [
