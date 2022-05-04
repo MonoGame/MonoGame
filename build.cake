@@ -161,7 +161,7 @@ Task("TestDesktopGL")
     DotNetRun("../../../../Tests/MonoGame.Tests.DesktopGL.csproj", "", new DotNetRunSettings
     {
         WorkingDirectory = "Artifacts/Tests/DesktopGL/Debug",
-	    ArgumentCustomization = args => args.Append("--teamcity")
+        ArgumentCustomization = args => args.Append("--teamcity")
     });
 });
 
@@ -183,7 +183,7 @@ Task("TestWindowsDX")
     DotNetRun("../../../../Tests/MonoGame.Tests.WindowsDX.csproj", "", new DotNetRunSettings
     {
         WorkingDirectory = "Artifacts/Tests/WindowsDX/Debug",
-	    ArgumentCustomization = args => args.Append("--teamcity")
+        ArgumentCustomization = args => args.Append("--teamcity")
     });
 });
 
@@ -274,7 +274,7 @@ Task("TestTools")
     DotNetRun("../../../../Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj", "", new DotNetRunSettings
     {
         WorkingDirectory = "Artifacts/Tests/Tools/" + configuration,
-	    ArgumentCustomization = args => args.Append("--teamcity"),
+        ArgumentCustomization = args => args.Append("--teamcity"),
         Configuration = configuration
     });
 });
@@ -291,8 +291,7 @@ Task("PackVSTemplates")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
-    var shortVersion = version;
-	if (shortVersion.Contains("-")) shortVersion = shortVersion.Substring(0, shortVersion.IndexOf("-"));
+    var shortVersion = version.Split('-')[0];
 
     var versionReg = "<Identity Version=\"([^\"]*)\"";
     var filePath = "Templates/MonoGame.Templates.VSExtension/source.extension.vsixmanifest";
