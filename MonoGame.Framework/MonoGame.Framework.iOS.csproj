@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0-ios</TargetFramework>
-    <RollForward>Major</RollForward>
     <DefineConstants>IOS;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>

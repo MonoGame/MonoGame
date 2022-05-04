@@ -4,7 +4,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <RollForward>Major</RollForward>
     <BaseOutputPath>..\Artifacts\MonoGame.Framework.Content.Pipeline</BaseOutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>The Monogame Content Pipeline for Windows, Mac and Linux is used to compile raw content to xnb files.</Description>
