@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0-ios</TargetFramework>
-    <RollForward>Major</RollForward>
     <OutputType>Exe</OutputType>
     <SupportedOSPlatformVersion>11.2</SupportedOSPlatformVersion>
     <ImplicitUsings>true</ImplicitUsings>
