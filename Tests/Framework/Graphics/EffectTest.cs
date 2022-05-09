@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
@@ -123,6 +124,18 @@ namespace MonoGame.Tests.Graphics
             Assert.That(effect.Parameters[14].GetValueVector3().Equals(Color.Honeydew.ToVector3()));
 
             texture.Dispose();
+            effect.Dispose();
+        }
+
+        [Test]
+        public void EffectConstructorWithIndexShouldPass()
+        {
+            var bytecode = EffectResource.BasicEffect.Bytecode;
+            var index = 1024;
+            var bytecode2 = new byte[index + bytecode.Length];
+            Buffer.BlockCopy(bytecode, 0, bytecode2, index, bytecode.Length);
+            var effect = new Effect(game.GraphicsDevice, bytecode2, index, bytecode.Length);
+
             effect.Dispose();
         }
     }
