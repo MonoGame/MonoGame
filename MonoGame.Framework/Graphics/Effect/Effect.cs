@@ -92,15 +92,21 @@ namespace Microsoft.Xna.Framework.Graphics
  
             //Read the header
             MGFXHeader header = ReadHeader(effectCode, index);
-			var effectKey = header.EffectKey;
-			int headerSize = header.HeaderSize;
+            if (header.Signature != MGFXHeader.MGFXSignature)
+                throw new Exception("This does not appear to be a MonoGame MGFX file!");
+            if (header.Profile != Shader.Profile)
+                throw new Exception("This MGFX effect was built for a different platform!");
+            if (header.Version > MGFXHeader.MGFXVersion)
+                throw new Exception("This MGFX effect seems to be for a newer release of MonoGame.");
+            if (header.Version < MGFXHeader.MGFXVersion)
+                throw new Exception("This MGFX effect is for an older release of MonoGame and needs to be rebuilt.");
 
             // First look for it in the cache.
             //
             Effect cloneSource;
-            if (!graphicsDevice.EffectCache.TryGetValue(effectKey, out cloneSource))
+            if (!graphicsDevice.EffectCache.TryGetValue(header.EffectKey, out cloneSource))
             {
-                using (var stream = new MemoryStream(effectCode, index + headerSize, count - headerSize, false))
+                using (var stream = new MemoryStream(effectCode, index + header.HeaderSize, count - header.HeaderSize, false))
             	using (var reader = new BinaryReader(stream))
             {
                 // Create one.
@@ -112,7 +118,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (tail != MGFXHeader.MGFXSignature) throw new ArgumentException("The MGFX effect code was not parsed correctly.", "effectCode");                    
 
                 // Cache the effect for later in its original unmodified state.
-                    graphicsDevice.EffectCache.Add(effectKey, cloneSource);
+                    graphicsDevice.EffectCache.Add(header.EffectKey, cloneSource);
                 }
             }
 
@@ -123,23 +129,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private MGFXHeader ReadHeader(byte[] effectCode, int index)
         {
+            int offset = 0;
             MGFXHeader header;
-            header.Signature = BitConverter.ToInt32(effectCode, index); index += 4;
-            header.Version = (int)effectCode[index++];
-            header.Profile = (int)effectCode[index++];
-            header.EffectKey = BitConverter.ToInt32(effectCode, index); index += 4;
-            header.HeaderSize = index;
+            header.Signature = BitConverter.ToInt32(effectCode, index + offset); offset += 4;
+            header.Version = (int)effectCode[index + offset]; offset++;
+            header.Profile = (int)effectCode[index + offset]; offset++;
+            header.EffectKey = BitConverter.ToInt32(effectCode, index + offset); offset += 4;
+            header.HeaderSize = offset;
 
-            if (header.Signature != MGFXHeader.MGFXSignature)
-                throw new Exception("This does not appear to be a MonoGame MGFX file!");
-            if (header.Version < MGFXHeader.MGFXVersion)
-                throw new Exception("This MGFX effect is for an older release of MonoGame and needs to be rebuilt.");
-            if (header.Version > MGFXHeader.MGFXVersion)
-                throw new Exception("This MGFX effect seems to be for a newer release of MonoGame.");
-
-            if (header.Profile != Shader.Profile)
-                throw new Exception("This MGFX effect was built for a different platform!");          
-            
             return header;
         }
 
