@@ -36,7 +36,7 @@ wine64 regedit crashdialog.reg
 popd
 
 # get dotnet
-DOTNET_URL="https://download.visualstudio.microsoft.com/download/pr/46b35cfe-4b3f-4e69-8831-0937196699b1/221f862c003a0175722c131b0941e3c4/dotnet-sdk-5.0.203-win-x64.zip"
+DOTNET_URL="https://download.visualstudio.microsoft.com/download/pr/e71628cc-8b6c-498f-ae7a-c0dc60019696/aaadc51ad300f1aa58250427e5373527/dotnet-sdk-6.0.202-win-x86.zip"
 curl $DOTNET_URL --output "$SCRIPT_DIR/dotnet-sdk.zip"
 7z x "$SCRIPT_DIR/dotnet-sdk.zip" -o"$WINEPREFIX/drive_c/windows/system32/"
 
