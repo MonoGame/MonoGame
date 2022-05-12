@@ -28,6 +28,8 @@ namespace MonoGame.Tools.Pipeline
 
         private FileSystemWatcher _projectFileWatcher;
         private bool _reloadProjectPrompted;
+        private bool _projectFileWatcherIgnoreEvent;
+        private DateTime _lastWriteTime;
 
         private readonly List<ContentItemTemplate> _templateItems;
 
@@ -316,23 +318,39 @@ namespace MonoGame.Tools.Pipeline
 
         private void ProjectFileWatcherOnChanged(object sender, FileSystemEventArgs e)
         {
-            if (!_reloadProjectPrompted )
+            var previousWriteTime = _lastWriteTime;
+            _lastWriteTime = File.GetLastWriteTime(e.FullPath);
+
+            if (_lastWriteTime - previousWriteTime < TimeSpan.FromSeconds(0.1))
+            {
+                // Probably a duplicated event. Ignore
+                return;
+            }
+
+            if (_projectFileWatcherIgnoreEvent)
+            {
+                // Expected trigger from saving the project file. Ignore
+                _projectFileWatcherIgnoreEvent = false;
+                return;
+            }
+
+            if (!_reloadProjectPrompted)
             {
                 _reloadProjectPrompted = true;
                 var d = Application.Current.Dispatcher;
                 if (d.CheckAccess())
-                    PromptReloadProject();
+                    PromptReloadProject(e.FullPath);
                 else
-                    d.BeginInvoke((Action)PromptReloadProject);
+                    d.BeginInvoke(() => PromptReloadProject(e.FullPath));
             }
         }
 
-        private void PromptReloadProject()
+        private void PromptReloadProject(string fullPath)
         {
             if (MainWindow.Instance.ShowReloadProjectDialog() == AskResult.Yes)
             {
                 ProjectDirty = false;
-                OpenProject(Path.Combine(_projectFileWatcher.Path, _projectFileWatcher.Filter));
+                OpenProject(fullPath);
             }
             else
             {
@@ -414,8 +432,8 @@ namespace MonoGame.Tools.Pipeline
 				View.SetTreeRoot(_project);
             }
 
-            if(_projectFileWatcher != null)
-                _projectFileWatcher.EnableRaisingEvents = false;
+            // Make sure the file watcher doesn't trigger from our file save
+            _projectFileWatcherIgnoreEvent = true;
 
             // Do the save.
             ProjectDirty = false;
@@ -430,9 +448,6 @@ namespace MonoGame.Tools.Pipeline
             PipelineSettings.Default.Save();
             View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
             UpdateMenu();
-
-            if (_projectFileWatcher != null)
-                _projectFileWatcher.EnableRaisingEvents = true;
 
             return true;
         }
