@@ -4,21 +4,21 @@ This tutorial will go over the code that is generated when you start a blank pro
 
 > For help with creating a project, please look at the Creating a New Project section of the [Getting Started guide](0_getting_started.md).
 
-Within the Game.cs class file, which is the core of any MonoGame project, you will find several critical sections necessary for your game to run:
+Within the **Game.cs** class file, which is the core of any MonoGame project, you will find several critical sections necessary for your game to run:
 
-* Using statements - which provide easy access to the various components of MonoGame.
+* **Using statements** - which provide easy access to the various components of MonoGame.
 
-* The Game Class definition - the heart of any MonoGame project.
+* The **Game Class** definition - the heart of any MonoGame project.
 
-* The Game constructor and key variables - which tell the project how to start.
+* The **Game constructor** and key variables - which tell the project how to start.
 
-* The Initialize method - to initialize the game upon its startup.
+* The **Initialize** method - to initialize the game upon its startup.
 
-* The Load and Unload Content methods - which are used to add and remove assets from the running game from the [Content project](4_adding_content.md).
+* The **Load and Unload Content** methods - which are used to add and remove assets from the running game from the [Content project](4_adding_content.md).
 
-* The Update method - which is called on a regular interval to update your game state, e.g. take player input, move ships, or animate entities.
+* The **Update** method - which is called on a regular interval to update your game state, e.g. take player inputs, move ships, or animate entities.
 
-* The Draw method - which is called on a regular interval to take the current game state and draw your game entities to the screen.
+* The **Draw** method - which is called on a regular interval to take the current game state and draw your game entities to the screen.
 
 Read further for more details and examples while looking through the code of your new project.
 
@@ -35,7 +35,7 @@ using Microsoft.Xna.Framework.Input;
 
 These using statements make it easier to use the code that MonoGame has to offer.
 
-They are prefixed with Microsoft.Xna.Framework because MonoGame is an open source implementation of Microsoft's XNA framework, and in order to maintain compatibility with the XNA code, it uses the same namespaces.
+> They are prefixed with Microsoft.Xna.Framework because MonoGame is an open source re-implementation of Microsoft's XNA framework, and in order to maintain compatibility with the XNA code, it uses the same namespaces.
 
 ## The Game1 Class
 

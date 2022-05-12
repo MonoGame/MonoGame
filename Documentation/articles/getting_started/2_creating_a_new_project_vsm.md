@@ -1,8 +1,8 @@
 # Creating a Project with Visual Studio for Mac
 
-This guide will walk you through building a starter game with MonoGame using a Mac and Visual Studio for Mac.
+This guide will walk you through building a starter game with MonoGame using a Mac and Visual Studio for Mac. It is assumed that you properly installed Visual Studio 2022 for Mac and MonoGame.
 
-Start Visual Studio for Mac and select **New** on the right side.
+Start Visual Studio 2022 for Mac and select **New** on the right side.
 
 ![New Solution](~/images/getting_started/vsmac-mg-new-1.png)
 

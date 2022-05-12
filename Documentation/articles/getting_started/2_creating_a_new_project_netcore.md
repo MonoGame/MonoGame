@@ -1,6 +1,8 @@
-# .NET CLI
+# .NET CLI (Rider or Visual Studio Code)
 
-This guide will walk you through building a starter game with MonoGame using only the command line/terminal on your operating system and a lightweight coding tool of your choice (such as [Visual Studio Code](https://code.visualstudio.com/).
+This guide will walk you through building a starter game with MonoGame using only the command line/terminal on your operating system and a lightweight coding tool of your choice (such as [Visual Studio Code](https://code.visualstudio.com/) or Rider).
+
+It is assumed that you properly installed the .NET 6 SDK and MonoGame.
 
 ## Create a MonoGame Project
 

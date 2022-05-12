@@ -6,14 +6,17 @@ MonoGame supports building games for the following **systems**:
 | --------------------------- | -------------------------- | ------------------------------------------------------------------------------ |
 | Windows<br/>macOS<br/>Linux | iOS<br/>iPadOS<br/>Android | Xbox<br/>PlayStation 4<br/>PlayStation 5<br/>Nintendo Switch<br/>Google Stadia |
 
-*Gaming consoles are restricted to registered developers and are not publicly available nor publicly documented. To get access to those platforms, please contact your console account manager(s). MonoGame documentation for closed platforms is available in their respective repositories.
+**Gaming consoles are restricted to registered developers and are not publicly available nor publicly documented. To get access to those platforms, please contact your console account manager(s). MonoGame documentation for closed platforms is available in their respective repositories.*
 
 ## Understanding MonoGame's platform types
 
-There are different implementations of MonoGame that we call target **platforms** (or just platforms).
+There are different implementations of MonoGame that we call **target platforms** (or just **platforms**).
+
 The platforms mostly correspond to the systems MonoGame supports but some platforms support multiple systems. For instance, the *DesktopGL* platform can be used to build games that will run either on Windows, macOS, or Linux with the same base code and project.
 
-Below is a list of public platforms with their corresponding NuGet package, the `dotnet new` template identifier, and an explanation of the platform.
+Each platform comes with its own project template that you can choose when starting a project.
+
+Below is a list of public platforms with their corresponding NuGet package, the `dotnet new` template identifier, and an explanation of the platform. 
 
 - [WindowsDX](#windowsdx)
 - [DesktopGL](#desktopgl)
@@ -21,7 +24,7 @@ Below is a list of public platforms with their corresponding NuGet package, the 
 - [Android](#android)
 - [iOS](#ios)
 
-MonoGame provides additional templates for shared game logic and extensions to the MonoGame Content Pipeline.
+Beside these target platforms, MonoGame provides additional templates for shared game logic and extensions to the MonoGame Content Pipeline that can be used across all platforms.
 
 - [.NET Standard Library](#net-standard-library)
 - [Shared Project](#shared-project)
@@ -35,9 +38,9 @@ MonoGame provides additional templates for shared game logic and extensions to t
 | --------------------- | ---------------------------- | --------------- |
 | Windows               | MonoGame.Framework.WindowsDX | mgwindowsdx     |
 
-WindowsDX uses WinForms to manage the game window, DirectX (9.0c or newer) is used for graphics, and XAudio is used for audio.
+WindowsDX uses WinForms to manage the game window, **DirectX** (9.0c or newer) is used for graphics, and XAudio is used for audio.
 
-You can target Windows 8.1 and up with this platform.
+You can target **Windows*** 8.1 and up with this platform.
 
 WindowsDX requires the [DirectX June 2010](https://www.microsoft.com/en-us/download/details.aspx?id=8109) runtime to both build and run games. Make sure that your players have it installed (otherwise you might be missing sound and gamepad rumble support).
 
@@ -47,9 +50,9 @@ WindowsDX requires the [DirectX June 2010](https://www.microsoft.com/en-us/downl
 | --------------------- | ---------------------------- | --------------- |
 | Windows, macOS, Linux | MonoGame.Framework.DesktopGL | mgdesktopgl     |
 
-DesktopGL uses SDL for windowing, OpenGL for graphics, and OpenAL-Soft for audio. 
+DesktopGL uses SDL for windowing, **OpenGL** for graphics, and OpenAL-Soft for audio. 
 
-DesktopGL supports Windows (8.1 and up), macOS (Catalina 10.15 and up) and Linux (64bit-only).
+DesktopGL supports **Windows** (8.1 and up), **macOS** (Catalina 10.15 and up) and **Linux** (64bit-only).
 
 DesktopGL requires at least OpenGL 2.0 with the ARB_framebuffer_object extension (or alternatively at least OpenGL 3.0).
 
@@ -67,7 +70,7 @@ DesktopGL currently does not have a `VideoPlayer` implementation.
 
 The WindowsUniversal platform runs on [Universal Windows Platform (UWP)](https://docs.microsoft.com/en-us/windows/uwp/get-started/universal-application-platform-guide).
 
-WindowsUniversal uses DirectX for graphics, and XAudio for audio just like the WindowsDX platform.
+WindowsUniversal uses **DirectX** for graphics, and XAudio for audio just like the WindowsDX platform.
 
 UWP comes in two flavors, each with its own project template:
 
@@ -75,7 +78,7 @@ UWP comes in two flavors, each with its own project template:
 
 - **Core app template**: a raw app without any XAML, more straightforward if you don't need XAML controls.
 
-This platform is meant to publish games on the Windows Store, for both Windows and Xbox (through the [Xbox Live Creators Program](https://www.xbox.com/en-US/developers/creators-program)).
+This platform is meant to publish games on the **Windows Store**, for both **Windows** and **Xbox** (through the [Xbox Live Creators Program](https://www.xbox.com/en-US/developers/creators-program)).
 
 Note that UWP games running on Xbox get [restricted access](https://docs.microsoft.com/en-us/windows/uwp/xbox-apps/system-resource-allocation) to the console capabilities. To unlock those restrictions, MonoGame has a dedicated Xbox platform for registered [ID@Xbox](https://www.xbox.com/en-US/Developers/id) developers targeting the XDK (this platform is private and requires you to contact your ID@Xbox manager).
 
@@ -87,7 +90,7 @@ Building for UWP requires the Windows SDK version 19041 or better to be installe
 | --------------------- | -------------------------- | --------------- |
 | Android               | MonoGame.Framework.Android | mgandroid       |
 
-The Android platform uses [Xamarin.Android](https://docs.microsoft.com/en-us/xamarin/android/). OpenGL is used for graphics, and OpenAL for audio.
+The Android platform uses [Xamarin.Android](https://docs.microsoft.com/en-us/xamarin/android/). **OpenGL** is used for graphics, and OpenAL for audio.
 
 Building for Android requires the .NET Xamarin component to be installed. You can install it with the Visual Studio installer (if you're using Visual Studio) or with the CLI command ```dotnet workload install android``` (if you're working with Rider, VS Code, or the CLI).
 
@@ -99,7 +102,7 @@ Building for Android also requires the Java 11 JDK (we recommand that you use [t
 | --------------------- | ---------------------- | --------------- |
 | iOS, iPadOS           | MonoGame.Framework.iOS | mgios           |
 
-The iOS platform uses [Xamarin.iOS](https://docs.microsoft.com/en-us/xamarin/ios/). OpenGL is used for graphics, and OpenAL for audio.
+The iOS platform uses [Xamarin.iOS](https://docs.microsoft.com/en-us/xamarin/ios/). **OpenGL** is used for graphics, and OpenAL for audio.
 
 Building for Android requires the .NET Xamarin component to be installed. You can install it with the Visual Studio installer (if you're using Visual Studio) or with the CLI command `dotnet workload install ios` (if you're working with Rider, VS Code, or the CLI).
 
@@ -113,13 +116,13 @@ You can an iOS game on Windows by [pairing your Visual Studio 2022 with a mac on
 
 **Template ID**: mgnetstandard
 
-A project template with a [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) project to share game logic for cross-platform development.
+A project template to create [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) libraries to distribute code through a DLL. This can be used to redistribute libraries or to share code between multiple projects (like different platforms).
 
 ### Shared Project
 
 **Template ID**: mgshared
 
-A project template with a [shared project](https://docs.microsoft.com/en-us/xamarin/cross-platform/app-fundamentals/shared-projects) library to support cross-platform development.
+A project template to create a [shared project](https://docs.microsoft.com/en-us/xamarin/cross-platform/app-fundamentals/shared-projects) which can be used to share code between multiple other projects. The difference with .NET Standard libraries is that shared project don't produce an intermediate DLL and the code is directly shared and built into the other projects it reference.
 
 ### Content Pipeline Extension
 

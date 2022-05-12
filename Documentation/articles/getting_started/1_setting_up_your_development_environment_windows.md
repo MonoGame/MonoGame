@@ -2,41 +2,37 @@
 
 This section provides a step-by-step guide for setting up your development environment for Windows.
 
-## Install Visual Studio 2019
+MonoGame can work with most .NET compatible tools, but we recommend Visual Studio 2022 (prior versions are not supported).
 
-Before installing Monogame, you'll need to install [Visual Studio 2019](https://visualstudio.microsoft.com/vs/) or later (any edition, including Community) with the following components, depending on your target platform:
+Alternatively, you can use Rider or Visual Studio Code.
 
-* .NET cross-platform development - For Desktop OpenGL and DirectX platforms
-* Mobile Development with .NET - For Android and iOS platforms
-* Universal Windows Platform development - For Windows 11, Windows 10 and Xbox UWP platforms
-* .NET Desktop Development - For Desktop OpenGL and DirectX platforms to target normal .NET Framework
+## [Recommended] Install Visual Studio 2022
+
+Before using Monogame, you'll need to install [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) or later (any edition, including Community) with the following workloads, depending on your desired [target platform(s)](~/platforms/0_platforms.md):
+
+* .NET desktop development (mandatory for all platforms)
+* Mobile Development with .NET (optional, if you wish to target Android, iOS, or iPadOS)
+* Universal Windows Platform development (optional, if you wish to build for the Windows Store, or Xbox)
 
 ![Visual Studio optional components](~/images/getting_started/1_installer_vs_components.png)
 
-![.NET Desktop component](~/images/getting_started/1_netdesktopcomponet.png)
-
 If you are targeting the standard Windows DirectX backend, you'll also need [the DirectX June 2010 runtime](https://www.microsoft.com/en-us/download/details.aspx?id=8109) for audio and gamepads to work properly.
 
-## Install MonoGame extension for Visual Studio 2019
+### Install MonoGame extension for Visual Studio 2022
 
-To create new projects from within Visual Studio, you will need to install the Visual Studio 2019 extension, which can be installed from "*Extensions -> Manage Extensions*" in the Visual Studio menu bar.
+To create new projects from within Visual Studio 2022, you will need to install the MonoGame extension, which can be installed from "*Extensions -> Manage Extensions*" in the Visual Studio 2022 menu bar.
 
 ![Visual Studio Extension Manager](~/images/getting_started/1_VisualStudioExtensionManager.png)
 
-Once it's open, simply search for **MonoGame** in the top right search window, as shown above, and install the "MonoGame project templates".  You now have the MonoGame templates installed, ready to create new projects.
+Once it's open, simply search for **MonoGame** in the top right search window, as shown above, and install the "MonoGame Framework C# project templates" (make sure that it is version 3.8.1 or above).  You now have the MonoGame templates installed, ready to create new projects.
 
-## Install MGCB Editor
+**Next up:** [Creating a new project](2_creating_a_new_project_vs.md)
 
-MGCB Editor is a tool for editing .mgcb files, which are used for building content.
+## [Alternative] Install the .NET 6 SDK (compatible with Rider and Visual Studio Code)
 
-To register the MGCB Editor tool with Windows and Visual Studio 2019, run the following from the Command Prompt.
+If you prefer to use Rider or Visual Studio Code, and after installing any of them, you will need to [install the .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
 
-```sh
-dotnet tool install --global dotnet-mgcb-editor
-mgcb-editor --register
-```
-
-## [Optional] Install MonoGame templates for .NET CLI or Rider IDE
+Once the .NET 6 SDK is installed, you can open a Command Prompt and install MonoGame templates by typing the following command:
 
 ```sh
 dotnet new --install MonoGame.Templates.CSharp

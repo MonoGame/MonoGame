@@ -1,6 +1,6 @@
 # Adding Content
 
-This tutorial will go over adding content to your game.
+This tutorial will go over adding content such as images or sounds to your game.
 
 > For help with creating a project, please look at the [Creating a New Project](0_getting_started.md) section of the Getting Started guide.
 
