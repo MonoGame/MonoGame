@@ -306,6 +306,7 @@ namespace MonoGame.Tools.Pipeline
                 _projectFileWatcher.Path = dirName;
                 _projectFileWatcher.Filter = fileName;
             }
+            _projectFileWatcherIgnoreEvent = false;
 
             UpdateTree();
             View.UpdateTreeItem(_project);
