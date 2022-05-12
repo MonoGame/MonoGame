@@ -11,7 +11,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Eto.Forms;
 using MonoGame.Content.Builder;
 using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
@@ -345,7 +344,7 @@ namespace MonoGame.Tools.Pipeline
             if (!_reloadProjectPrompted)
             {
                 _reloadProjectPrompted = true;
-                Application.Instance.Invoke(() => PromptReloadProject(e.FullPath));
+                View.Invoke(() => PromptReloadProject(e.FullPath));
             }
         }
 
@@ -380,6 +379,13 @@ namespace MonoGame.Tools.Pipeline
             // save the project if they need too.
             if (!AskSaveProject())
                 return;
+
+            // Uninitialize the File Watcher
+            if (_projectFileWatcher != null)
+            {
+                _projectFileWatcher.Changed -= ProjectFileWatcherOnChanged;
+                _projectFileWatcher = null;
+            }
 
             ProjectOpen = false;
             ProjectDirty = false;
