@@ -11,8 +11,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Eto.Forms;
 using MonoGame.Content.Builder;
-using Application = System.Windows.Application;
 using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
@@ -129,6 +129,26 @@ namespace MonoGame.Tools.Pipeline
             return new PipelineController(view);
         }
 
+        public void SetupProjectFileWatcher(string projectFilePath)
+        {
+            // Setup a file watcher to watch for changes to the project file outside of the editor
+            var dirName = Path.GetDirectoryName(projectFilePath)!;
+            var fileName = Path.GetFileName(projectFilePath);
+            if (_projectFileWatcher == null)
+            {
+                _projectFileWatcher = new FileSystemWatcher(dirName);
+                _projectFileWatcher.Filter = fileName;
+                _projectFileWatcher.EnableRaisingEvents = true;
+                _projectFileWatcher.Changed += ProjectFileWatcherOnChanged;
+            }
+            else
+            {
+                _projectFileWatcher.Path = dirName;
+                _projectFileWatcher.Filter = fileName;
+            }
+            _projectFileWatcherIgnoreEvent = false;
+        }
+
         public void OnProjectModified()
         {            
             Debug.Assert(ProjectOpen, "OnProjectModified called with no project open?");
@@ -182,6 +202,8 @@ namespace MonoGame.Tools.Pipeline
             _project.OriginalPath = projectFilePath;
             ProjectOpen = true;
             ProjectDirty = true;
+
+            SetupProjectFileWatcher(projectFilePath);
 
             UpdateTree();
 
@@ -290,23 +312,8 @@ namespace MonoGame.Tools.Pipeline
                 View.ShowError("Error Opening Project", Path.GetFileName(projectFilePath) + ": " + errortext);
                 return;
             }
-            
-            // Setup a file watcher to watch for changes to the project file outside of the editor
-            var dirName = Path.GetDirectoryName(projectFilePath)!;
-            var fileName = Path.GetFileName(projectFilePath);
-            if (_projectFileWatcher == null)
-            {
-                _projectFileWatcher = new FileSystemWatcher(dirName);
-                _projectFileWatcher.Filter = fileName;
-                _projectFileWatcher.EnableRaisingEvents = true;
-                _projectFileWatcher.Changed += ProjectFileWatcherOnChanged;
-            }
-            else
-            {
-                _projectFileWatcher.Path = dirName;
-                _projectFileWatcher.Filter = fileName;
-            }
-            _projectFileWatcherIgnoreEvent = false;
+
+            SetupProjectFileWatcher(projectFilePath);
 
             UpdateTree();
             View.UpdateTreeItem(_project);
@@ -338,11 +345,7 @@ namespace MonoGame.Tools.Pipeline
             if (!_reloadProjectPrompted)
             {
                 _reloadProjectPrompted = true;
-                var d = Application.Current.Dispatcher;
-                if (d.CheckAccess())
-                    PromptReloadProject(e.FullPath);
-                else
-                    d.BeginInvoke(() => PromptReloadProject(e.FullPath));
+                Application.Instance.Invoke(() => PromptReloadProject(e.FullPath));
             }
         }
 
@@ -431,6 +434,8 @@ namespace MonoGame.Tools.Pipeline
 
                 _project.OriginalPath = newFilePath;
 				View.SetTreeRoot(_project);
+
+                SetupProjectFileWatcher(newFilePath); // New file needs a new file watcher
             }
 
             // Make sure the file watcher doesn't trigger from our file save
