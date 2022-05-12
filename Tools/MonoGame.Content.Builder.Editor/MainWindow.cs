@@ -230,7 +230,7 @@ namespace MonoGame.Tools.Pipeline
 
         public AskResult ShowReloadProjectDialog()
         {
-            var result = MessageBox.Show(this, "The project file has been updated outside of the editor, do you want to reload the project? (Your changes will be lost)", "Reload Project", MessageBoxButtons.YesNo, MessageBoxType.Question);
+            var result = MessageBox.Show(this, "The project file has been updated outside of the editor, do you want to reload the project? (Any unsaved changes will be lost)", "Reload Project", MessageBoxButtons.YesNo, MessageBoxType.Question);
 
             if (result == DialogResult.Yes)
                 return AskResult.Yes;
