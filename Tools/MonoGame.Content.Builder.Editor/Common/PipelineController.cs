@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using MonoGame.Content.Builder;
+using Application = System.Windows.Application;
 using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
@@ -24,6 +25,9 @@ namespace MonoGame.Tools.Pipeline
 
         private Task _buildTask;
         private Process _buildProcess;
+
+        private FileSystemWatcher _projectFileWatcher;
+        private bool _reloadProjectPrompted;
 
         private readonly List<ContentItemTemplate> _templateItems;
 
@@ -284,6 +288,22 @@ namespace MonoGame.Tools.Pipeline
                 View.ShowError("Error Opening Project", Path.GetFileName(projectFilePath) + ": " + errortext);
                 return;
             }
+            
+            // Setup a file watcher to watch for changes to the project file outside of the editor
+            var dirName = Path.GetDirectoryName(projectFilePath)!;
+            var fileName = Path.GetFileName(projectFilePath);
+            if (_projectFileWatcher == null)
+            {
+                _projectFileWatcher = new FileSystemWatcher(dirName);
+                _projectFileWatcher.Filter = fileName;
+                _projectFileWatcher.EnableRaisingEvents = true;
+                _projectFileWatcher.Changed += ProjectFileWatcherOnChanged;
+            }
+            else
+            {
+                _projectFileWatcher.Path = dirName;
+                _projectFileWatcher.Filter = fileName;
+            }
 
             UpdateTree();
             View.UpdateTreeItem(_project);
@@ -292,6 +312,34 @@ namespace MonoGame.Tools.Pipeline
                 OnProjectLoaded();
 
             UpdateMenu();
+        }
+
+        private void ProjectFileWatcherOnChanged(object sender, FileSystemEventArgs e)
+        {
+            if (!_reloadProjectPrompted )
+            {
+                _reloadProjectPrompted = true;
+                var d = Application.Current.Dispatcher;
+                if (d.CheckAccess())
+                    PromptReloadProject();
+                else
+                    d.BeginInvoke((Action)PromptReloadProject);
+            }
+        }
+
+        private void PromptReloadProject()
+        {
+            if (MainWindow.Instance.ShowReloadProjectDialog() == AskResult.Yes)
+            {
+                ProjectDirty = false;
+                OpenProject(Path.Combine(_projectFileWatcher.Path, _projectFileWatcher.Filter));
+            }
+            else
+            {
+                ProjectDirty = true;
+                UpdateMenu();
+            }
+            _reloadProjectPrompted = false;
         }
 
         public void ClearRecentList()
@@ -366,6 +414,9 @@ namespace MonoGame.Tools.Pipeline
 				View.SetTreeRoot(_project);
             }
 
+            if(_projectFileWatcher != null)
+                _projectFileWatcher.EnableRaisingEvents = false;
+
             // Do the save.
             ProjectDirty = false;
             var parser = new PipelineProjectParser(this, _project);
@@ -379,6 +430,9 @@ namespace MonoGame.Tools.Pipeline
             PipelineSettings.Default.Save();
             View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
             UpdateMenu();
+
+            if (_projectFileWatcher != null)
+                _projectFileWatcher.EnableRaisingEvents = true;
 
             return true;
         }
