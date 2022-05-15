@@ -16,6 +16,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly string _name;
 
+        private readonly bool _isMojoShader;
+
         private ulong _stateKey;
 
         private bool _dirty;
@@ -30,6 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Share the immutable types.
             _name = cloneSource._name;
+            _isMojoShader = cloneSource._isMojoShader;
             _parameters = cloneSource._parameters;
             _offsets = cloneSource._offsets;
 
@@ -42,7 +45,8 @@ namespace Microsoft.Xna.Framework.Graphics
                               int sizeInBytes,
                               int[] parameterIndexes,
                               int[] parameterOffsets,
-                              string name)
+                              string name,
+                              bool isMojoShader)
         {
             GraphicsDevice = device;
 
@@ -52,6 +56,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _offsets = parameterOffsets;
 
             _name = name;
+
+            _isMojoShader = isMojoShader;
 
             PlatformInitialize();
         }

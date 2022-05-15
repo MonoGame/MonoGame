@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 10;
+            public const int MGFXVersion = 11;
 
             public int Signature;
             public int Version;
@@ -236,7 +236,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			// TODO: Maybe we should be reading in a string 
 			// table here to save some bytes in the file.
-			
+            
+            var isMojoShader = reader.ReadBoolean();
+
             ConstantBuffers = new ConstantBuffer[reader.ReadInt32()];
 
             for (var c = 0; c < ConstantBuffers.Length; c++)
@@ -259,7 +261,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                                 sizeInBytes,
                                                 parameters,
                                                 offsets,
-                                                name);                 
+                                                name,
+                                                isMojoShader);
             }
 
             _shaders = new Shader[reader.ReadInt32()];
@@ -267,7 +270,7 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var s = 0; s < _shaders.Length; s++)
                 _shaders[s] = new Shader(GraphicsDevice, reader);
 
-            Parameters = ReadParameters(reader);
+            Parameters = ReadParameters(reader, isMojoShader);
 
             var techniques = new EffectTechnique[reader.ReadInt32()];
 
@@ -377,7 +380,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return new EffectPassCollection(passes);
 		}
 
-		private static EffectParameterCollection ReadParameters(BinaryReader reader)
+		private static EffectParameterCollection ReadParameters(BinaryReader reader, bool isMojoShader)
 		{
             var count = reader.ReadInt32();
             if (count == 0)
@@ -394,8 +397,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				var rowCount = (int)reader.ReadByte();
 				var columnCount = (int)reader.ReadByte();
 
-				var elements = ReadParameters(reader);
-				var structMembers = ReadParameters(reader);
+				var elements = ReadParameters(reader, isMojoShader);
+				var structMembers = ReadParameters(reader, isMojoShader);
 
 				object data = null;
 				if (elements.Count == 0 && structMembers.Count == 0)
@@ -442,7 +445,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
 				parameters[i] = new EffectParameter(
-					class_, type, name, rowCount, columnCount, semantic, 
+					class_, type, name, isMojoShader, rowCount, columnCount, semantic, 
 					annotations, elements, structMembers, data);
 			}
 

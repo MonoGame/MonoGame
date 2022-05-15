@@ -17,6 +17,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal EffectParameter(   EffectParameterClass class_, 
                                     EffectParameterType type, 
                                     string name, 
+                                    bool isMojoShader,
                                     int rowCount, 
                                     int columnCount,
                                     string semantic, 
@@ -27,6 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             ParameterClass = class_;
             ParameterType = type;
+            IsMojoShader = isMojoShader;
 
             Name = name;
             Semantic = semantic;
@@ -47,6 +49,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Share all the immutable types.
             ParameterClass = cloneSource.ParameterClass;
             ParameterType = cloneSource.ParameterType;
+            IsMojoShader = cloneSource.IsMojoShader;
             Name = cloneSource.Name;
             Semantic = cloneSource.Semantic;
             Annotations = cloneSource.Annotations;
@@ -71,6 +74,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		public EffectParameterClass ParameterClass { get; private set; }
 
 		public EffectParameterType ParameterType { get; private set; }
+
+        /// <summary>
+        /// Under most platforms we properly store integers and 
+        /// booleans in an integer type.
+        /// MojoShader encodes integers and booleans into a float.
+        /// </summary>
+        internal bool IsMojoShader;
 
 		public int RowCount { get; private set; }
 
@@ -173,12 +183,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Bool)
                 throw new InvalidCastException();
 
-#if OPENGL
-            // MojoShader encodes even booleans into a float.
-            return ((float[])Data)[0] != 0.0f;
-#else
-            return ((int[])Data)[0] != 0;
-#endif
+            // MojoShader encodes booleans into a float.
+            if (IsMojoShader)
+                return ((float[])Data)[0] != 0.0f;
+            else
+                return ((int[])Data)[0] != 0;
         }
         
         /*
@@ -193,12 +202,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
                 throw new InvalidCastException();
 
-#if OPENGL
             // MojoShader encodes integers into a float.
-            return (int)((float[])Data)[0];
-#else
-            return ((int[])Data)[0];
-#endif
+            if (IsMojoShader)
+                return (int)((float[])Data)[0];
+            else
+                return ((int[])Data)[0];
         }
 
         public int[] GetValueInt32Array()
@@ -427,12 +435,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Bool)
                 throw new InvalidCastException();
 
-#if OPENGL
-            // MojoShader encodes even booleans into a float.
-            ((float[])Data)[0] = value ? 1 : 0;
-#else
-            ((int[])Data)[0] = value ? 1 : 0;
-#endif
+            // MojoShader encodes booleans into a float.
+            if (IsMojoShader)
+                ((float[])Data)[0] = value ? 1 : 0;
+            else
+                ((int[])Data)[0] = value ? 1 : 0;
 
             StateKey = unchecked(NextStateKey++);
 		}
@@ -446,21 +453,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (int value)
 		{
-            if (ParameterType == EffectParameterType.Single)
-            {
-                SetValue((float)value);
-                return;
-            }
-
-            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
+            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32
+                                                              || ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
-#if OPENGL
             // MojoShader encodes integers into a float.
-            ((float[])Data)[0] = value;
-#else
-            ((int[])Data)[0] = value;
-#endif
+            if (IsMojoShader || ParameterType == EffectParameterType.Single)
+                ((float[])Data)[0] = value;
+            else
+                ((int[])Data)[0] = value;
+
             StateKey = unchecked(NextStateKey++);
 		}
 

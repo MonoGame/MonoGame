@@ -13,7 +13,7 @@ namespace MonoGame.Effect
 	{
 
         private const string Header = "MGFX";
-        private const int Version = 10;
+        private const int Version = 11;
 
         /// <summary>
         /// Writes the effect for loading later.
@@ -33,6 +33,10 @@ namespace MonoGame.Effect
             using(MemoryStream memStream = new MemoryStream())
             using(BinaryWriter memWriter = new BinaryWriter(memStream))
             {
+                // Write isMojoShader flag.
+                var isMojoShader = (options.Profile == ShaderProfile.OpenGL);
+                memWriter.Write(isMojoShader);
+
             // Write all the constant buffers.
                 memWriter.Write(ConstantBuffers.Count);
             foreach (var cbuffer in ConstantBuffers)
