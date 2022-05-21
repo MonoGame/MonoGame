@@ -1,0 +1,20 @@
+name: Close inactive issues
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  close-issues:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v5
+        with:
+          days-before-issue-stale: 350
+          days-before-issue-close: 15
+          stale-issue-message: "Greetings! It looks like this issue doesn't have much traction. It has been marked as _stale_ and will be closed automatically if no further information or confirmation are provided within 15 days. Please make sure that you verify this issue against the latest version. Providing a sample project exposing this issue might help improving its resolution."
+          close-issue-message: "Greetings! This issue was closed because it has been inactive for a year. If you feel like this issue still needs to be investigated, please test it against the latest version and open a new issue if it is still a valid concern. Providing a sample project might help this issue to get more traction."
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
