@@ -16,7 +16,7 @@ By the end of this tutorial set, you will have a working project to build for yo
 
 - With [Visual Studio 2022](2_creating_a_new_project_vs.md)
 - With [Visual Studio 2022 for Mac](2_creating_a_new_project_vsm.md)
-- With [the .NET command line interface](2_creating_a_new_project_netcore.md) (compatible with Rider and Visual Studio Code)
+- With [the .NET command line interface](2_creating_a_new_project_netcore.md) (compatible with JetBrains Rider and Visual Studio Code)
 
 ## 3. Building your game
 

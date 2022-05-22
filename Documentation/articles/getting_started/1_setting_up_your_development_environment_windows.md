@@ -4,11 +4,11 @@ This section provides a step-by-step guide for setting up your development envir
 
 MonoGame can work with most .NET compatible tools, but we recommend Visual Studio 2022 (prior versions are not supported).
 
-Alternatively, you can use Rider or Visual Studio Code.
+Alternatively, you can use JetBrains Rider or Visual Studio Code.
 
 ## [Recommended] Install Visual Studio 2022
 
-Before using Monogame, you'll need to install [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) or later (any edition, including Community) with the following workloads, depending on your desired [target platform(s)](~/platforms/0_platforms.md):
+Before using Monogame, you'll need to install [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) or later (any edition, including Community) with the following workloads, depending on your desired [target platform(s)](~/platforms.md):
 
 * .NET desktop development (mandatory for all platforms)
 * Mobile Development with .NET (optional, if you wish to target Android, iOS, or iPadOS)
@@ -28,9 +28,9 @@ Once it's open, simply search for **MonoGame** in the top right search window, a
 
 **Next up:** [Creating a new project](2_creating_a_new_project_vs.md)
 
-## [Alternative] Install the .NET 6 SDK (compatible with Rider and Visual Studio Code)
+## [Alternative] Install the .NET 6 SDK (compatible with JetBrains Rider and Visual Studio Code)
 
-If you prefer to use Rider or Visual Studio Code, and after installing any of them, you will need to [install the .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
+If you prefer to use JetBrains Rider or Visual Studio Code, and after installing any of them, you will need to [install the .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
 
 Once the .NET 6 SDK is installed, you can open a Command Prompt and install MonoGame templates by typing the following command:
 

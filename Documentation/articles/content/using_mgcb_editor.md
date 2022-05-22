@@ -1,6 +1,8 @@
 # Using MGCB Editor
 
-The [MGCB Editor](~/articles/tools/mgcb_editor.md) is used to organize and build content for use with MonoGame. It is installed as part of the MonoGame SDK Installer or can be built [directly from source](https://github.com/MonoGame/MonoGame/tree/develop/Tools/MonoGame.Content.Builder.Editor) if needed.
+The [MGCB Editor](~/articles/tools/mgcb_editor.md) is used to organize and build content for use with MonoGame. It is accessed by double-clicking an .mgcb file from within Visual Studio 2022 solution explorer (providing that you installed MonoGame's Visual Studio extension).
+
+Alternativily, you can build it [directly from source](https://github.com/MonoGame/MonoGame/tree/develop/Tools/MonoGame.Content.Builder.Editor) if needed.
 
 ## Create A Project
 
@@ -58,15 +60,15 @@ Images come in a variety of formats such as png or jpg, most of which are native
 
 Additionally, the following options are configurable per image asset when imported:
 
-| Property | Description |
-| --- | --- |
-|ColorKeyColor|Background color used for transparency|
-|ColorKeyEnabled|If enabled, any colors identified using the Color Key will be marked as transparent (Alpha 0). The default value is **false**|
-|GenerateMipmaps|If enabled, this will generate MipMaps for the selected texture. The default value is **false**|
-|MakeSquare|if enabled this will make best efforts to expand the image to a square. The default value is **false**|
-|PremultiplyAlpha|If enabled this will treat the selected texture as an Alpha Mask. The default value is **false**|
-|ResizeToPowerOfTwo|If enabled this will resize the image dimensions to the next largest power of 2 size, e.g. 128x128 or 512x512. The default value is **false**|
-|TextureFormat|Selected format of the Texture to process, e.g. raw Color, DXT. The default value is **color**
+| Property           | Description                                                                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| ColorKeyColor      | Background color used for transparency                                                                                                        |
+| ColorKeyEnabled    | If enabled, any colors identified using the Color Key will be marked as transparent (Alpha 0). The default value is **false**                 |
+| GenerateMipmaps    | If enabled, this will generate MipMaps for the selected texture. The default value is **false**                                               |
+| MakeSquare         | if enabled this will make best efforts to expand the image to a square. The default value is **false**                                        |
+| PremultiplyAlpha   | If enabled this will treat the selected texture as an Alpha Mask. The default value is **false**                                              |
+| ResizeToPowerOfTwo | If enabled this will resize the image dimensions to the next largest power of 2 size, e.g. 128x128 or 512x512. The default value is **false** |
+| TextureFormat      | Selected format of the Texture to process, e.g. raw Color, DXT. The default value is **color**                                                |
 
 ### Audio
 
@@ -76,31 +78,31 @@ MonoGame supports several audio formats to cope with a wide variety of audio nee
 
 Audio can be configured to use either the **Sound Effect** processor which imports audio as a [SoundEffect](xref:Microsoft.Xna.Framework.Audio.SoundEffect) which is generally used for short and quick audio sounds. Alternatively, by selecting the **Song** processor, the audio will be imported as a **Song** which is used for long-running audio using the Media Player class.
 
-| Property | Description |
-| --- | --- |
-|DebugMode|Depending on the setting, this will either leave the audio uncompressed (for speed) when debugging or optimized for a production build. The default value is **false**|
-|Quality|The quality of compression to be used when compiling the asset. The default value is **best**|
+| Property  | Description                                                                                                                                                            |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DebugMode | Depending on the setting, this will either leave the audio uncompressed (for speed) when debugging or optimized for a production build. The default value is **false** |
+| Quality   | The quality of compression to be used when compiling the asset. The default value is **best**                                                                          |
 
 ### Models
 
 ![Image Properties](~/images/content/MGCB-ModelProperties.png)
 
-| Property | Description |
-| --- | --- |
-|ColorKeyColor|Background color used for transparency|
-|ColorKeyEnabled|If enabled, any colors identified using the Color Key will be marked as transparent (Alpha 0). The default value is **false**|
-|DefaultEffect|The default effect class to apply to this model. The default value is **BasicEffect**|
-|GenerateMipmaps|If enabled, this will generate MipMaps for the selected texture. The default value is **false**|
-|GenerateTangentFrames|Generate model tangents for use in Normal Mapping. The default value is **false**|
-|PremultiplyTextureAlpha|If enabled this will treat the selected texture as an Alpha Mask. The default value is **false**|
-|PremultiplyVertexColors|If enabled this will treat the selected texture as a Vertex Color Mask. The default value is **false**|
-|ResizeTexturesToPowerOfTwo|If enabled this will resize the models texture(s) dimensions to the next largest power of 2 size, e.g. 128x128 or 512x512|
-|RotationX|Default model X Axis Rotation–Number, in degrees of rotation. The default value is **0**|
-|RotationY|Default model Y Axis Rotation–Number, in degrees of rotation. The default value is **0**|
-|RotationZ|Default model Z Axis Rotation–Number, in degrees of rotation. The default value is **0**|
-|Scale|Default model scale. The default value is **1.0f**|
-|SwapWindingOrder| Boolean value indicating if the winding order is swapped. This is useful for models that appear to be drawn inside out. The default value is **false**.|
-|TextureFormat|Selected format of the Texture to process, e.g. raw Color, DXT. The default value is **compressed**
+| Property                   | Description                                                                                                                                             |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ColorKeyColor              | Background color used for transparency                                                                                                                  |
+| ColorKeyEnabled            | If enabled, any colors identified using the Color Key will be marked as transparent (Alpha 0). The default value is **false**                           |
+| DefaultEffect              | The default effect class to apply to this model. The default value is **BasicEffect**                                                                   |
+| GenerateMipmaps            | If enabled, this will generate MipMaps for the selected texture. The default value is **false**                                                         |
+| GenerateTangentFrames      | Generate model tangents for use in Normal Mapping. The default value is **false**                                                                       |
+| PremultiplyTextureAlpha    | If enabled this will treat the selected texture as an Alpha Mask. The default value is **false**                                                        |
+| PremultiplyVertexColors    | If enabled this will treat the selected texture as a Vertex Color Mask. The default value is **false**                                                  |
+| ResizeTexturesToPowerOfTwo | If enabled this will resize the models texture(s) dimensions to the next largest power of 2 size, e.g. 128x128 or 512x512                               |
+| RotationX                  | Default model X Axis Rotation–Number, in degrees of rotation. The default value is **0**                                                                |
+| RotationY                  | Default model Y Axis Rotation–Number, in degrees of rotation. The default value is **0**                                                                |
+| RotationZ                  | Default model Z Axis Rotation–Number, in degrees of rotation. The default value is **0**                                                                |
+| Scale                      | Default model scale. The default value is **1.0f**                                                                                                      |
+| SwapWindingOrder           | Boolean value indicating if the winding order is swapped. This is useful for models that appear to be drawn inside out. The default value is **false**. |
+| TextureFormat              | Selected format of the Texture to process, e.g. raw Color, DXT. The default value is **compressed**                                                     |
 
 ### [Fonts](adding_ttf_fonts.md)
 
@@ -110,10 +112,10 @@ MonoGame uses a Font descriptor file to describe the type of font to import, the
 
 > It is recommended you keep a copy of the Font file in the content folder for reference to avoid issues with missing Fonts, that way any developer on the project can re-add the Font to their machine when needed.
 
-| Property | Description |
-| --- | --- |
-|PremultiplyAlpha|If enabled this will treat the font texture that is generated as an Alpha Mask. The default value is **false**|
-|TextureFormat|Selected format of the font Texture to process, e.g. raw Color, DXT. The default value is **compressed**|
+| Property         | Description                                                                                                    |
+| ---------------- | -------------------------------------------------------------------------------------------------------------- |
+| PremultiplyAlpha | If enabled this will treat the font texture that is generated as an Alpha Mask. The default value is **false** |
+| TextureFormat    | Selected format of the font Texture to process, e.g. raw Color, DXT. The default value is **compressed**       |
 
 See the [TrueType fonts](adding_ttf_fonts.md) section for more detail on working with Fonts. Additionally, check out the [Localization](localization.md) section for details on working with managing translated text within your project using [resx](https://msdn.microsoft.com/en-us/library/aa992030(v=vs.100).aspx) files.
 
@@ -123,10 +125,10 @@ See the [TrueType fonts](adding_ttf_fonts.md) section for more detail on working
 
 Effects in MonoGame are shaders that have been built with a supported shader language (HLSL / GLSL) which will be pre-processed into a common shader language / effect used by MonoGame.
 
-| Property | Description |
-| --- | --- |
-|DebugMode|Depending on the setting, this will either leave the audio uncompressed (for speed) when debugging, or optimise for a production build. The default value is **false**|
-|Defines|Custom compiler defines to enable specific code paths (#if) in the shader file, if appropriate. The default value is **empty**|
+| Property  | Description                                                                                                                                                            |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DebugMode | Depending on the setting, this will either leave the audio uncompressed (for speed) when debugging, or optimise for a production build. The default value is **false** |
+| Defines   | Custom compiler defines to enable specific code paths (#if) in the shader file, if appropriate. The default value is **empty**                                         |
 
 See the [Effects](custom_effects.md) section for more detail on the built-in effects with MonoGame and how to generate your own custom effects.
 

@@ -4,7 +4,7 @@ This section provides a step-by-step guide for setting up your development envir
 
 MonoGame can work with most .NET compatible tools, but we recommend Visual Studio 2022 for Mac (prior versions are not supported).
 
-Alternatively, you can use Rider or Visual Studio Code.
+Alternatively, you can use JetBrains Rider or Visual Studio Code.
 
 ## Install Visual Studio for Mac
 
@@ -58,9 +58,9 @@ If you ever need to undo the script, simply delete the `.winemonogame` folder in
 
 **Next up:** [Creating a new project](2_creating_a_new_project_vsm.md)
 
-## [Alternative] Install the .NET 6 SDK (compatible with Rider and Visual Studio Code)
+## [Alternative] Install the .NET 6 SDK (compatible with JetBrains Rider and Visual Studio Code)
 
-If you prefer to use Rider or Visual Studio Code, and after installing any of them, you will need to [install the .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
+If you prefer to use JetBrains Rider or Visual Studio Code, and after installing any of them, you will need to [install the .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
 
 Once the .NET 6 SDK is installed, you can open a terminal and install MonoGame templates by typing the following command:
 

@@ -34,7 +34,7 @@ TODO!
 
 ### API Reference
 
-The API reference documentation is a big part of the documentation effort for MonoGame.  The documentation is written in the [C# XML format](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/xml-documentation-comments) and is inline to the MonoGame source code. The final web pages with API documentation are generated using [SharpDoc](https://github.com/xoofx/SharpDoc).
+The API reference documentation is a big part of the documentation effort for MonoGame.  The documentation is written in the [C# XML format](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/xml-documentation-comments) and is inline to the MonoGame source code. The final web pages with API documentation are generated using [DocFX]([DocFX - static documentation generator | DocFX website](https://dotnet.github.io/docfx/)).
 
 #### Every Word Should Contain Value
 

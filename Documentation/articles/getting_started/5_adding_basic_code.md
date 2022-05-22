@@ -93,18 +93,19 @@ The following is a line-by-line analysis of the above code.
 ```csharp
 var kstate = Keyboard.GetState();
 ```
-This code fetches the current keyboard state ('Keyboard.GetState()') and stores it into a variable called **kstate**.
 
+This code fetches the current keyboard state ('Keyboard.GetState()') and stores it into a variable called **kstate**.
 
 ```csharp
 if (kstate.IsKeyDown(Keys.Up))
 ```
-This checks to see if the Up Arrow key is pressed.
 
+This checks to see if the Up Arrow key is pressed.
 
 ```csharp
     ballPosition.Y -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 ```
+
 If the Up Arrow key is pressed, the ball moves using the value you assigned to **ballSpeed**. The reason why **ballSpeed** is multiplied by **gameTime.ElapsedGameTime.TotalSeconds** is because, when not using fixed time step, the time between Update calls varies. To account for this, the ballSpeed is multiplied by the amount of time that has passed since the last Update call. The result is that the ball appears to move at the same speed regardless of what framerate the game happens to be running at.
 
 > Try experimenting with what happens if you don't multiply the **ballSpeed** by **gameTime.ElapsedGameTime.TotalSeconds**, to see the difference it makes.
