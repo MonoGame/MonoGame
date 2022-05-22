@@ -1,10 +1,10 @@
 # Setting up your development environment for macOS
 
-This section provides a step-by-step guide for setting up your development environment for macOS.
+This section provides a step-by-step guide for setting up your development environment on macOS.
 
-MonoGame can work with most .NET compatible tools, but we recommend Visual Studio 2022 for Mac (prior versions are not supported).
+MonoGame can work with most .NET compatible tools, but we recommend [Visual Studio 2022 for Mac](https://visualstudio.microsoft.com/vs/mac/) (prior versions are not supported).
 
-Alternatively, you can use JetBrains Rider or Visual Studio Code.
+Alternatively, you can use [JetBrains Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/).
 
 ## Install Visual Studio for Mac
 
@@ -14,7 +14,7 @@ Go to the following URL to download and install Visual Studio 2022 for Mac: http
 
 Download the MonoGame extension for Visual Studio 2022 for Mac from the following link: https://github.com/MonoGame/MonoGame/releases/download/v3.8/MonoDevelop.MonoGame_IDE_VisualStudioForMac_v3.8.0.1643-vsm8.0.mpack
 
-Open up Visual Studio 2022 for Mac and you should be able to see a window like so:
+Open up Visual Studio 2022 for Mac and you should be able to see a window as shown below:
 
 ![VS for Mac installer](~/images/getting_started/vsmac-mg-install-1.png)
 
@@ -32,7 +32,7 @@ Finally, click on the Install button once again.
 
 ## [Optional] Set up Wine for effect compilation
 
-Effect (shader) compilation requires access to DirectX, so it won't work natively on macOS systems, but it can be used through Wine. Here are instructions to get this working.
+Effect (shader) compilation requires access to DirectX, so it will not work natively on macOS systems, but it can be used through Wine. Here are instructions to get this working.
 
 Install brew
 
@@ -60,9 +60,9 @@ If you ever need to undo the script, simply delete the `.winemonogame` folder in
 
 ## [Alternative] Install the .NET 6 SDK (compatible with JetBrains Rider and Visual Studio Code)
 
-If you prefer to use JetBrains Rider or Visual Studio Code, and after installing any of them, you will need to [install the .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
+If you prefer to use JetBrains Rider or Visual Studio Code, after installing any of them you will need to [install the .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
 
-Once the .NET 6 SDK is installed, you can open a terminal and install MonoGame templates by typing the following command:
+Once the .NET 6 SDK is installed, you can open a terminal and install the MonoGame templates by typing the following command:
 
 ```sh
 dotnet new --install MonoGame.Templates.CSharp

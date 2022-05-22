@@ -1,10 +1,10 @@
 # .NET CLI (JetBrains Rider or Visual Studio Code)
 
-This guide will walk you through building a starter game with MonoGame using only the command line/terminal on your operating system and a lightweight coding tool of your choice (such as [Visual Studio Code](https://code.visualstudio.com/) or JetBrains Rider).
+This guide will walk you through building a starter game with MonoGame using only the command line/terminal on your operating system and a lightweight coding tool of your choice (such as [Visual Studio Code](https://code.visualstudio.com/) or [JetBrains Rider](https://www.jetbrains.com/rider/)).
 
-It is assumed that you properly installed the .NET 6 SDK and MonoGame.
+> It is assumed that you have already properly installed the .NET 6 SDK and MonoGame.
 
-> Be aware that iOS/iPadOS, and Android development might be limited when using the .NET CLI. Many development features of those targets are exclusive to Visual Studio 2022.
+> Be aware that for iOS/iPadOS, and Android, development might be limited when using the .NET CLI. Many of the development features for those targets are exclusive to Visual Studio 2022.
 
 ## Create a MonoGame Project
 

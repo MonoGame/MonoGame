@@ -6,17 +6,17 @@ This tutorial will go over adding content such as images or sounds to your game.
 
 ## MonoGame Content Builder Tool (MGCB Editor)
 
-This tutorial assumes that you are using Visual Studio 2022 with its MonoGame extension installed. If you aren't using the extension, you will need to manually install and use the [MGCB Editor](~/articles/tools/mgcb_editor.md).
+This tutorial assumes that you are using Visual Studio 2022 with its MonoGame extension installed. If you are not using the extension, you will need to manually install and use the [MGCB Editor](~/articles/tools/mgcb_editor.md).
 
 > This is technically optional, since you can edit the .mgcb files manually if you wish, but the editor is highly recommended for ease of use.
 
 ## Adding content
 
-First, you'll need some content for your game. For this tutorial, use the following image of a ball:
+First, you will need some content for your game. For this tutorial, use the following image of a ball:
 
 ![Open Content](~/images/getting_started/ball.png)
 
-Do **right-click > Save Image As** and save it somewhere locally with the name “ball.png”.
+Copy the image to your machine by using **right-click > Save Image As** and save it somewhere locally with the name “ball.png”.
 
 Now open up your game project and look at the Solution Explorer window. Expand the **Content** folder and open up **Content.mgcb** file by double-clicking on it.
 
@@ -38,7 +38,7 @@ Make sure the "Content" MGCB file is selected to the left, then click the **Add 
 
 ![Add Content](~/images/getting_started/3_add_content.png)
 
-You should now be prompted to select a file. Select the “ball.png” image that you downloaded a moment ago. Once you've confirmed your selection, you will be asked whether to copy the file, add a link to it, or skip it. Make sure "Copy the file to the directory" is selected and click **Add**.
+You should now be prompted to select a file. Select the “**ball.png**” image that you downloaded a moment ago. Once you have confirmed your selection, you will be asked whether to copy the file, add a link to it, or skip it. Make sure "**Copy the file to the directory**" option is selected and click **Add**.
 
 ![Copy Content](~/images/getting_started/3_copy_content.png)
 
@@ -50,7 +50,7 @@ Now click the **Save** toolbar button and close the MGCB Editor tool.
 
 ## Adding the content in your game
 
-Now that you have added the asset to the Content project, it's time to load it into your game. First, open up the **Game1.cs** class file and declare a new **ballTexture** variable of type **Texture2D** in the **Game1** class, so you can store the ball image into memory.
+Now that you have added the asset to the Content project, it is time to load it into your game. First, open up the **Game1.cs** class file and declare a new **ballTexture** variable of type **Texture2D** in the **Game1** class, so you can store the ball image into memory.
 
 ```csharp
 public class Game1 : Game
@@ -61,7 +61,7 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
 ```
 
-Next, find the LoadContent method. Here, use **Content.Load()** to load the "ball" sprite and store it in **ballTexture**. **Content.Load()** requires you to specify what type of content you're trying to load in, and in this case it's a Texture2D.
+Next, find the **LoadContent** method. Here, use **Content.Load()** function to load the "ball" sprite and store it in the **ballTexture** parameter. **Content.Load()** requires you to specify what type of content you are trying to load, in this case it is a **Texture2D**.
 
 ```csharp
 protected override void LoadContent()
@@ -74,7 +74,7 @@ protected override void LoadContent()
 }
 ```
 
-Finally, find the Draw method and draw the ball onto the screen. This is done by:
+Finally, find the Draw method to draw the ball onto the screen. This is done by:
 
 - Opening a SpriteBatch (an image drawing collection function).
 
