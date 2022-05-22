@@ -200,13 +200,29 @@ namespace Microsoft.Xna.Framework.Graphics
             return ((int[])Data)[0];
 #endif
         }
-        
-        /*
-		public int[] GetValueInt32Array ()
-		{
-			throw new NotImplementedException();
-		}
-        */
+
+        public int[] GetValueInt32Array()
+        {
+            if (Elements != null && Elements.Count > 0)
+            {
+                var ret = new int[RowCount * ColumnCount * Elements.Count];
+                for (int i = 0; i < Elements.Count; i++)
+                {
+                    var elmArray = Elements[i].GetValueInt32Array();
+                    for (var j = 0; j < elmArray.Length; j++)
+                        ret[RowCount * ColumnCount * i + j] = elmArray[j];
+                }
+                return ret;
+            }
+
+            switch (ParameterClass)
+            {
+                case EffectParameterClass.Scalar:
+                    return new int[] { GetValueInt32() };
+                default:
+                    throw new NotImplementedException();
+            }
+        }
 
 		public Matrix GetValueMatrix ()
 		{
@@ -430,6 +446,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (int value)
 		{
+            if (ParameterType == EffectParameterType.Single)
+            {
+                SetValue((float)value);
+                return;
+            }
+
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
                 throw new InvalidCastException();
 
@@ -442,12 +464,13 @@ namespace Microsoft.Xna.Framework.Graphics
             StateKey = unchecked(NextStateKey++);
 		}
 
-        /*
-		public void SetValue (int[] value)
-		{
-			throw new NotImplementedException();
-		}
-        */
+        public void SetValue(int[] value)
+        {
+            for (var i = 0; i < value.Length; i++)
+                Elements[i].SetValue(value[i]);
+
+            StateKey = unchecked(NextStateKey++);
+        }
 
         public void SetValue(Matrix value)
         {

@@ -1,0 +1,13 @@
+{
+  "_disableAffix": {
+    "index.md": true
+  },
+  "_disableContribution": {
+    "../CHANGELOG.md": true
+  },
+  "_disableBreadcrumb": {
+    "index.md": true,
+    "../CHANGELOG.md": true,
+    "articles/**": true
+  }
+}

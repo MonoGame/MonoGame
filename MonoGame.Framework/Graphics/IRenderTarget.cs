@@ -36,20 +36,12 @@
 // purpose and non-infringement.
 #endregion License
 
-#if DIRECTX
-using SharpDX.Direct3D11;
-#endif
-
-#if OPENGL
-using MonoGame.OpenGL;
-#endif
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
     /// Represents a render target.
     /// </summary>
-    internal interface IRenderTarget
+    internal partial interface IRenderTarget
     {
         /// <summary>
         /// Gets the width of the render target in pixels
@@ -68,35 +60,5 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <value>The usage mode of the render target.</value>
         RenderTargetUsage RenderTargetUsage { get; }
-
-#if DIRECTX
-        /// <summary>
-        /// Gets the <see cref="RenderTargetView"/> for the specified array slice.
-        /// </summary>
-        /// <param name="arraySlice">The array slice.</param>
-        /// <returns>The <see cref="RenderTargetView"/>.</returns>
-        /// <remarks>
-        /// For texture cubes: The array slice is the index of the cube map face.
-        /// </remarks>
-        RenderTargetView GetRenderTargetView(int arraySlice);
-
-        /// <summary>
-        /// Gets the <see cref="DepthStencilView"/>.
-        /// </summary>
-        /// <returns>The <see cref="DepthStencilView"/>. Can be <see langword="null"/>.</returns>
-        DepthStencilView GetDepthStencilView();
-#endif
-
-#if OPENGL
-        int GLTexture { get; }
-        TextureTarget GLTarget { get; }
-        int GLColorBuffer { get; set; }
-        int GLDepthBuffer { get; set; }
-        int GLStencilBuffer { get; set; }
-        int MultiSampleCount { get; }
-        int LevelCount { get; }
-
-        TextureTarget GetFramebufferTarget(RenderTargetBinding renderTargetBinding);
-#endif
     }
 }

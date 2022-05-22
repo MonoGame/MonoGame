@@ -67,8 +67,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static ushort Pack(float x, float y)
         {
-            var byte2 = (((ushort) Math.Round(MathHelper.Clamp(x, -1.0f, 1.0f) * 127.0f)) & 0xFF) << 0;
-            var byte1 = (((ushort) Math.Round(MathHelper.Clamp(y, -1.0f, 1.0f) * 127.0f)) & 0xFF) << 8;
+            var byte2 = (((ushort) MathF.Round(MathHelper.Clamp(x, -1.0f, 1.0f) * 127.0f)) & 0xFF) << 0;
+            var byte1 = (((ushort) MathF.Round(MathHelper.Clamp(y, -1.0f, 1.0f) * 127.0f)) & 0xFF) << 8;
 
             return (ushort)(byte2 | byte1);
         }
@@ -78,7 +78,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             _packed = Pack(vector.X, vector.Y);
         }
 
-        Vector4 IPackedVector.ToVector4()
+        /// <summary>
+        /// Gets the packed vector in Vector4 format.
+        /// </summary>
+        /// <returns>The packed vector in Vector4 format</returns>
+        public Vector4 ToVector4()
         {
             return new Vector4(ToVector2(), 0.0f, 1.0f);
         }

@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Input
         Unknown,
 
         /// <summary>
-        /// GamePad is the XBOX controller.
+        /// GamePad is the Xbox controller.
         /// </summary>
         GamePad,
 

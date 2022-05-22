@@ -5,7 +5,6 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Allows for platform specific handling of the Back button. 
     /// </summary>
-    /// <seealso cref="http://www.monogame.net/documentation/?page=Platform_Specific_Notes"/>
     public interface IPlatformBackButton
     {
         /// <summary>

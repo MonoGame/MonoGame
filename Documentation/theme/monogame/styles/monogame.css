@@ -1,0 +1,30 @@
+.article {
+  margin-top: 80px;
+}
+
+.mg-link {
+  display: block;
+  padding: 15px 15px 0 15px;
+  color: var(--header-ft-color);
+}
+.mg-link:hover,
+.mg-link:focus {
+  color: var(--header-ft-color);
+}
+
+.mg-link-block {
+  float: right;
+}
+
+@media (min-width: 768px) {
+  #navbar {
+    display: inline-block !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .mg-link-block {
+    display: none;
+  }
+}
+

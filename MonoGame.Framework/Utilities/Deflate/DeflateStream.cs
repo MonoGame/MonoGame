@@ -27,7 +27,7 @@
 
 using System;
 
-namespace MonoGame.Utilities.Deflate
+namespace MonoGame.Framework.Utilities.Deflate
 {
     /// <summary>
     /// A class for compressing and decompressing streams using the Deflate algorithm.
@@ -434,7 +434,7 @@ namespace MonoGame.Utilities.Deflate
                 if (!_disposed)
                 {
                     if (disposing && (this._baseStream != null))
-                        this._baseStream.Close();
+                        this._baseStream.Dispose();
                     _disposed = true;
                 }
             }
@@ -520,9 +520,9 @@ namespace MonoGame.Utilities.Deflate
         {
             get
             {
-                if (this._baseStream._streamMode == MonoGame.Utilities.Deflate.ZlibBaseStream.StreamMode.Writer)
+                if (this._baseStream._streamMode == MonoGame.Framework.Utilities.Deflate.ZlibBaseStream.StreamMode.Writer)
                     return this._baseStream._z.TotalBytesOut;
-                if (this._baseStream._streamMode == MonoGame.Utilities.Deflate.ZlibBaseStream.StreamMode.Reader)
+                if (this._baseStream._streamMode == MonoGame.Framework.Utilities.Deflate.ZlibBaseStream.StreamMode.Reader)
                     return this._baseStream._z.TotalBytesIn;
                 return 0;
             }

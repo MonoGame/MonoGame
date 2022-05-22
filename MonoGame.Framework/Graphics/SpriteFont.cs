@@ -28,8 +28,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _defaultGlyphIndex = -1;
 		
 		private readonly Texture2D _texture;
-        
-		internal Glyph[] Glyphs { get { return _glyphs; } }
+
+		/// <summary>
+		/// All the glyphs in this SpriteFont.
+		/// </summary>
+		public Glyph[] Glyphs { get { return _glyphs; } }
 
 		class CharComparer: IEqualityComparer<char>
 		{
@@ -46,7 +49,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			static public readonly CharComparer Default = new CharComparer();
 		}
 
-		internal SpriteFont (
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SpriteFont" /> class.
+		/// </summary>
+		/// <param name="texture">The font texture.</param>
+		/// <param name="glyphBounds">The rectangles in the font texture containing letters.</param>
+		/// <param name="cropping">The cropping rectangles, which are applied to the corresponding glyphBounds to calculate the bounds of the actual character.</param>
+		/// <param name="characters">The characters.</param>
+		/// <param name="lineSpacing">The line spacing (the distance from baseline to baseline) of the font.</param>
+		/// <param name="spacing">The spacing (tracking) between characters in the font.</param>
+		/// <param name="kerning">The letters kernings (X - left side bearing, Y - width and Z - right side bearing).</param>
+		/// <param name="defaultCharacter">The character that will be substituted when a given character is not included in the font.</param>
+		public SpriteFont (
 			Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters,
 			int lineSpacing, float spacing, List<Vector3> kerning, char? defaultCharacter)
 		{
@@ -73,17 +87,21 @@ namespace Microsoft.Xna.Framework.Graphics
                     WidthIncludingBearings = kerning[i].X + kerning[i].Y + kerning[i].Z
 				};
                 
-                if(regions.Count ==0 || regions.Peek().End +1 !=characters[i])
+                if(regions.Count == 0 || characters[i] > (regions.Peek().End+1))
                 {
                     // Start a new region
                     regions.Push(new CharacterRegion(characters[i], i));
                 } 
-                else
+                else if(characters[i] == (regions.Peek().End+1))
                 {
                     var currentRegion = regions.Pop();
                     // include character in currentRegion
                     currentRegion.End++;
                     regions.Push(currentRegion);
+                }
+                else // characters[i] < (regions.Peek().End+1)
+                {
+                    throw new InvalidOperationException("Invalid SpriteFont. Character map must be in ascending order.");
                 }
 			}
 
@@ -102,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Returns a copy of the dictionary containing the glyphs in this SpriteFont.
         /// </summary>
-        /// <returns>A new Dictionary containing all of the glyphs inthis SpriteFont</returns>
+        /// <returns>A new Dictionary containing all of the glyphs in this SpriteFont</returns>
         /// <remarks>Can be used to calculate character bounds when implementing custom SpriteFont rendering.</remarks>
         public Dictionary<char, Glyph> GetGlyphs()
         {
@@ -260,12 +278,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     else if (pRegions[m].Start > c)
                     {
-                        r = m;
-                        if (l == r)
-                        {
-                            regionIdx = l;
-                            break;
-                        }
+                        r = m - 1;
                     }
                     else
                     {
@@ -350,11 +363,11 @@ namespace Microsoft.Xna.Framework.Graphics
             /// </summary>
 			public Rectangle Cropping;
             /// <summary>
-            /// The amount of space between the left side ofthe character and its first pixel in the X dimention.
+            /// The amount of space between the left side of the character and its first pixel in the X dimension.
             /// </summary>
             public float LeftSideBearing;
             /// <summary>
-            /// The amount of space between the right side of the character and its last pixel in the X dimention.
+            /// The amount of space between the right side of the character and its last pixel in the X dimension.
             /// </summary>
             public float RightSideBearing;
             /// <summary>

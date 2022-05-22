@@ -7,10 +7,24 @@ namespace Microsoft.Xna.Framework.Graphics
         internal static readonly EffectParameterCollection Empty = new EffectParameterCollection(new EffectParameter[0]);
 
         private readonly EffectParameter[] _parameters;
+        private readonly Dictionary<string, int> _indexLookup;
 
         internal EffectParameterCollection(EffectParameter[] parameters)
         {
             _parameters = parameters;
+            _indexLookup = new Dictionary<string, int>(_parameters.Length);
+            for (int i = 0; i < _parameters.Length; i++)
+            {
+                string name = _parameters[i].Name;
+                if(!string.IsNullOrWhiteSpace(name))
+                    _indexLookup.Add(name, i);
+            }
+        }
+
+        private EffectParameterCollection(EffectParameter[] parameters, Dictionary<string, int> indexLookup)
+        {
+            _parameters = parameters;
+            _indexLookup = indexLookup;
         }
 
         internal EffectParameterCollection Clone()
@@ -22,7 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < _parameters.Length; i++)
                 parameters[i] = new EffectParameter(_parameters[i]);
 
-            return new EffectParameterCollection(parameters);
+            return new EffectParameterCollection(parameters, _indexLookup);
         }
 
         public int Count
@@ -37,16 +51,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public EffectParameter this[string name]
         {
-            get 
+            get
             {
-                // TODO: Add a name to parameter lookup table.
-				foreach (var parameter in _parameters) 
-                {
-					if (parameter.Name == name) 
-						return parameter;
-				}
-
-				return null;
+                int index;
+                if (_indexLookup.TryGetValue(name, out index))
+                    return _parameters[index];
+                return null;
 			}
         }
 

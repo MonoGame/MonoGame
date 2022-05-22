@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Framework.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 
@@ -25,20 +25,19 @@ namespace Microsoft.Xna.Framework.Content
 
 		private string _rootDirectory = string.Empty;
 		private IServiceProvider serviceProvider;
-		private IGraphicsDeviceService graphicsDeviceService;
         private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
-        private byte[] scratchBuffer;
 
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
+
+        internal static readonly ByteBufferPool ScratchBufferPool = new ByteBufferPool(1024 * 1024, Environment.ProcessorCount);
 
         private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
             'w', // Windows (XNA & DirectX)
             'x', // Xbox360 (XNA)
-            'm', // WindowsPhone7.0 (XNA)
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
@@ -48,9 +47,11 @@ namespace Microsoft.Xna.Framework.Content
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
-            'v', // PSVita
+            '5', // PlayStation5
             'O', // XboxOne
             'S', // Nintendo Switch
+            'G', // Google Stadia
+            'b', // WebAssembly and Bridge.NET
 
             // NOTE: There are additional idenfiers for consoles that 
             // are not defined in this repository.  Be sure to ask the
@@ -60,7 +61,9 @@ namespace Microsoft.Xna.Framework.Content
             // Legacy identifiers... these could be reused in the
             // future if we feel enough time has passed.
 
+            'm', // WindowsPhone7.0 (XNA)
             'p', // PlayStationMobile
+            'v', // PSVita
             'g', // Windows (OpenGL)
             'l', // Linux
         };
@@ -191,7 +194,6 @@ namespace Microsoft.Xna.Framework.Content
                     Unload();
                 }
 
-                scratchBuffer = null;
 				disposed = true;
 			}
 		}
@@ -314,15 +316,6 @@ namespace Microsoft.Xna.Framework.Content
 			string originalAssetName = assetName;
 			object result = null;
 
-			if (this.graphicsDeviceService == null)
-			{
-				this.graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-				if (this.graphicsDeviceService == null)
-				{
-					throw new InvalidOperationException("No Graphics Device Service");
-				}
-			}
-			
             // Try to load as XNB file
             var stream = OpenStream(assetName);
             using (var xnbReader = new BinaryReader(stream))
@@ -389,7 +382,7 @@ namespace Microsoft.Xna.Framework.Content
                 decompressedStream = stream;
             }
 
-            var reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
+            var reader = new ContentReader(this, decompressedStream,
                                                         originalAssetName, version, recordDisposableObject);
             
             return reader;
@@ -440,15 +433,6 @@ namespace Microsoft.Xna.Framework.Content
 				throw new ObjectDisposedException("ContentManager");
 			}
 
-			if (this.graphicsDeviceService == null)
-			{
-				this.graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-				if (this.graphicsDeviceService == null)
-				{
-					throw new InvalidOperationException("No Graphics Device Service");
-				}
-			}
-
             var stream = OpenStream(assetName);
             using (var xnbReader = new BinaryReader(stream))
             {
@@ -470,6 +454,58 @@ namespace Microsoft.Xna.Framework.Content
 			disposableAssets.Clear();
 		    loadedAssets.Clear();
 		}
+
+        /// <summary>
+        /// Unloads a single asset.
+        /// </summary>
+        /// <param name="assetName">The name of the asset to unload. This cannot be null.</param>
+        public virtual void UnloadAsset(string assetName)
+        {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException("assetName");
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
+
+            //Check if the asset exists
+            object asset;
+            if (loadedAssets.TryGetValue(assetName, out asset))
+            {
+                //Check if it's disposable and remove it from the disposable list if so
+                var disposable = asset as IDisposable;
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                    disposableAssets.Remove(disposable);
+                }
+
+                loadedAssets.Remove(assetName);
+            }
+        }
+
+        /// <summary>
+        /// Unloads a set of assets.
+        /// </summary>
+        /// <param name="assetNames">The names of the assets to unload.</param>
+        public virtual void UnloadAssets(IList<string> assetNames)
+        {
+            if (assetNames == null)
+            {
+                throw new ArgumentNullException("assetNames");
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
+
+            for (int i = 0; i < assetNames.Count; i++)
+            {
+                UnloadAsset(assetNames[i]);
+            }
+        }
 
 		public string RootDirectory
 		{
@@ -498,13 +534,5 @@ namespace Microsoft.Xna.Framework.Content
 				return this.serviceProvider;
 			}
 		}
-
-        internal byte[] GetScratchBuffer(int size)
-        {            
-            size = Math.Max(size, 1024 * 1024);
-            if (scratchBuffer == null || scratchBuffer.Length < size)
-                scratchBuffer = new byte[size];
-            return scratchBuffer;
-        }
-	}
+    }
 }

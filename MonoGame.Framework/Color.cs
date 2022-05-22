@@ -18,7 +18,6 @@ namespace Microsoft.Xna.Framework
     {
         static Color()
         {
-            TransparentBlack = new Color(0);
             Transparent = new Color(0);
             AliceBlue = new Color(0xfffff8f0);
             AntiqueWhite = new Color(0xffd7ebfa);
@@ -430,14 +429,6 @@ namespace Microsoft.Xna.Framework
         }
 
         #region Color Bank
-        /// <summary>
-        /// TransparentBlack color (R:0,G:0,B:0,A:0).
-        /// </summary>
-        public static Color TransparentBlack
-        {
-            get;
-            private set;
-        }
         
         /// <summary>
         /// Transparent color (R:0,G:0,B:0,A:0).
@@ -1748,24 +1739,29 @@ namespace Microsoft.Xna.Framework
                 (int)MathHelper.LerpPrecise(value1.A, value2.A, amount));
         }
 		
-	/// <summary>
+	    /// <summary>
         /// Multiply <see cref="Color"/> by value.
         /// </summary>
         /// <param name="value">Source <see cref="Color"/>.</param>
         /// <param name="scale">Multiplicator.</param>
         /// <returns>Multiplication result.</returns>
-	public static Color Multiply(Color value, float scale)
-	{
-	    return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
-	}
+	    public static Color Multiply(Color value, float scale)
+	    {
+	        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+	    }
 	
-	/// <summary>
+	    /// <summary>
         /// Multiply <see cref="Color"/> by value.
         /// </summary>
         /// <param name="value">Source <see cref="Color"/>.</param>
         /// <param name="scale">Multiplicator.</param>
         /// <returns>Multiplication result.</returns>
-	public static Color operator *(Color value, float scale)
+	    public static Color operator *(Color value, float scale)
+        {
+            return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+        }
+
+        public static Color operator *(float scale, Color value)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
         }
@@ -1869,5 +1865,61 @@ namespace Microsoft.Xna.Framework
         }
 
         #endregion
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/>.
+        /// </summary>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
+        public void Deconstruct(out byte r, out byte g, out byte b)
+        {
+            r = R;
+            g = G;
+            b = B;
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/>.
+        /// </summary>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
+        public void Deconstruct(out float r, out float g, out float b)
+        {
+            r = R / 255f;
+            g = G / 255f;
+            b = B / 255f;
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/> with Alpha.
+        /// </summary>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
+        /// <param name="a">Alpha component value from 0 to 255.</param>
+        public void Deconstruct(out byte r, out byte g, out byte b, out byte a)
+        {
+            r = R;
+            g = G;
+            b = B;
+            a = A;
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/> with Alpha.
+        /// </summary>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
+        /// <param name="a">Alpha component value from 0.0f to 1.0f.</param>
+        public void Deconstruct(out float r, out float g, out float b, out float a)
+        {
+            r = R / 255f;
+            g = G / 255f;
+            b = B / 255f;
+            a = A / 255f;
+        }
     }
 }

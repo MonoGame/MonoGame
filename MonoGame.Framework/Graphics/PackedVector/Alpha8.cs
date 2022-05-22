@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// Gets the packed vector in Vector4 format.
         /// </summary>
         /// <returns>The packed vector in Vector4 format</returns>
-        Vector4 IPackedVector.ToVector4()
+        public Vector4 ToVector4()
         {
             return new Vector4(
                 0.0f,
@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static byte Pack(float alpha)
         {
-            return (byte) Math.Round(
+            return (byte) MathF.Round(
                 MathHelper.Clamp(alpha, 0, 1) * 255.0f
             );
         }

@@ -227,5 +227,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             Items.RemoveAt(index);
         }
+
+        /// <summary>
+        /// Removes a range of values from the channel.
+        /// </summary>
+        /// <param name="index">The zero-based starting index of the range of elements to remove.</param>
+        /// <param name="count"> The number of elements to remove.</param>
+        internal override void RemoveRange(int index, int count)
+        {
+            items.RemoveRange(index, count);
+        }
     }
 }

@@ -71,10 +71,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             const long minNeg = -maxPos;
 
 			// clamp the value between min and max values
-            var word4 = (ulong)((int)Math.Round(MathHelper.Clamp(vectorX * maxPos, minNeg, maxPos)) & mask);
-            var word3 = (ulong)((int)Math.Round(MathHelper.Clamp(vectorY * maxPos, minNeg, maxPos)) & mask) << 0x10;
-            var word2 = (ulong)((int)Math.Round(MathHelper.Clamp(vectorZ * maxPos, minNeg, maxPos)) & mask) << 0x20;
-            var word1 = (ulong)((int)Math.Round(MathHelper.Clamp(vectorW * maxPos, minNeg, maxPos)) & mask) << 0x30;
+            var word4 = (ulong)((int)MathF.Round(MathHelper.Clamp(vectorX * maxPos, minNeg, maxPos)) & mask);
+            var word3 = (ulong)((int)MathF.Round(MathHelper.Clamp(vectorY * maxPos, minNeg, maxPos)) & mask) << 0x10;
+            var word2 = (ulong)((int)MathF.Round(MathHelper.Clamp(vectorZ * maxPos, minNeg, maxPos)) & mask) << 0x20;
+            var word1 = (ulong)((int)MathF.Round(MathHelper.Clamp(vectorW * maxPos, minNeg, maxPos)) & mask) << 0x30;
 
 			return (word4 | word3 | word2 | word1);
 		}

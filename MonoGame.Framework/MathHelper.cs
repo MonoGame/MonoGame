@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework
     	/// <summary>
         /// Represents the mathematical constant e(2.71828175).
         /// </summary>
-        public const float E = (float)Math.E;
+        public const float E = MathF.E;
         
         /// <summary>
         /// Represents the log base ten of e(0.4342945).
@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Represents the value of pi(3.14159274).
         /// </summary>
-        public const float Pi = (float)Math.PI;
+        public const float Pi = MathF.PI;
         
         /// <summary>
         /// Represents the value of pi divided by two(1.57079637).
@@ -45,6 +45,12 @@ namespace Microsoft.Xna.Framework
         /// Represents the value of pi times two(6.28318548).
         /// </summary>
         public const float TwoPi = (float)(Math.PI * 2.0);
+        
+        /// <summary>
+        /// Represents the value of pi times two(6.28318548).
+        /// This is an alias of TwoPi.
+        /// </summary>
+        public const float Tau = TwoPi;
         
         /// <summary>
         /// Returns the Cartesian coordinate for one axis of a point that is defined by a given triangle and two normalized barycentric (areal) coordinates.

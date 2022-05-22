@@ -81,8 +81,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
 			// clamp the value between min and max values
             // Round rather than truncate.
-            var word2 = (uint)((int)MathHelper.Clamp((float)Math.Round(vectorX * maxPos), minNeg, maxPos) & 0xFFFF);
-            var word1 = (uint)(((int)MathHelper.Clamp((float)Math.Round(vectorY * maxPos), minNeg, maxPos) & 0xFFFF) << 0x10);
+            var word2 = (uint)((int)MathHelper.Clamp(MathF.Round(vectorX * maxPos), minNeg, maxPos) & 0xFFFF);
+            var word1 = (uint)(((int)MathHelper.Clamp(MathF.Round(vectorY * maxPos), minNeg, maxPos) & 0xFFFF) << 0x10);
 
 			return (word2 | word1);
 		}
@@ -92,7 +92,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             short2Packed = PackInTwo(vector.X, vector.Y);
 		}
 
-		Vector4 IPackedVector.ToVector4 ()
+        /// <summary>
+        /// Gets the packed vector in Vector4 format.
+        /// </summary>
+        /// <returns>The packed vector in Vector4 format</returns>
+		public Vector4 ToVector4 ()
 		{
             const float maxVal = 0x7FFF;
 

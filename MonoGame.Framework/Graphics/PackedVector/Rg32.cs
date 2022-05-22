@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// Gets the packed vector in Vector4 format.
         /// </summary>
         /// <returns>The packed vector in Vector4 format</returns>
-        Vector4 IPackedVector.ToVector4()
+        public Vector4 ToVector4()
         {
             return new Vector4(ToVector2(), 0.0f, 1.0f);
         }
@@ -131,8 +131,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         private static uint Pack(float x, float y)
         {
             return (uint) (
-                (((int) Math.Round(MathHelper.Clamp(x, 0, 1) * 65535.0f) & 0xFFFF) ) |
-                (((int) Math.Round(MathHelper.Clamp(y, 0, 1) * 65535.0f) & 0xFFFF) << 16)
+                (((int) MathF.Round(MathHelper.Clamp(x, 0, 1) * 65535.0f) & 0xFFFF) ) |
+                (((int) MathF.Round(MathHelper.Clamp(y, 0, 1) * 65535.0f) & 0xFFFF) << 16)
             );
         }
     }

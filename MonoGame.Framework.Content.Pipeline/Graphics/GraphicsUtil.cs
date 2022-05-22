@@ -30,14 +30,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // Resize
             var newfi = FreeImage.Rescale(fi, newWidth, newHeight, FREE_IMAGE_FILTER.FILTER_BICUBIC);
-            FreeImage.UnloadEx(ref fi);
+            FreeImage.Unload(fi);
 
             // Convert back to PixelBitmapContent<Vector4>
             src = new PixelBitmapContent<Vector4>(newWidth, newHeight);
             bytes = new byte[SurfaceFormat.Vector4.GetSize() * newWidth * newHeight];
             FreeImage.ConvertToRawBits(bytes, newfi, SurfaceFormat.Vector4.GetSize() * newWidth, 128, 0, 0, 0, true);
             src.SetPixelData(bytes);
-            FreeImage.UnloadEx(ref newfi);
+            FreeImage.Unload(newfi);
             // Convert back to source type if required
             if (format != SurfaceFormat.Vector4)
             {
@@ -166,6 +166,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Test the alpha channel to figure out if we have alpha.
             var alphaRange = CalculateAlphaRange(face);
 
+            // TODO: This isn't quite right.
+            //
+            // We should be generating DXT1 textures for cutout alpha
+            // as DXT1 supports 1bit alpha and it uses less memory.
+            //
+            // XNA never generated DXT3 for textures... it always picked
+            // between DXT1 for cutouts and DXT5 for fractional alpha.
+            //
+            // DXT3 however can produce better results for high frequency
+            // alpha like a chain link fence where is DXT5 is better for 
+            // low frequency alpha like clouds.  I don't know how we can 
+            // pick the right thing in this case without a hint.
+            //
             if (isSpriteFont)
                 CompressFontDXT3(content);
             else if (alphaRange == AlphaRange.Opaque)

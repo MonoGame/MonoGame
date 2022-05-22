@@ -3,7 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.InteropServices;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns>The IndexElementSize enum value that matches the type</returns>
         static IndexElementSize SizeForType(GraphicsDevice graphicsDevice, Type type)
         {
-            switch (Utilities.ReflectionHelpers.ManagedSizeOf(type))
+            switch (ReflectionHelpers.ManagedSizeOf(type))
             {
                 case 2:
                     return IndexElementSize.SixteenBits;
@@ -119,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data.Length < (startIndex + elementCount))
                 throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
 
-            PlatformSetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, options);
+            PlatformSetData<T>(offsetInBytes, data, startIndex, elementCount, options);
         }
 	}
 }

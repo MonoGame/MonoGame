@@ -54,17 +54,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private VertexPositionColorTexture[] _vertexArray;
 
-		public SpriteBatcher (GraphicsDevice device)
+        public SpriteBatcher(GraphicsDevice device, int capacity = 0)
 		{
             _device = device;
 
-			_batchItemList = new SpriteBatchItem[InitialBatchSize];
+            if (capacity <= 0)
+                capacity = InitialBatchSize;
+            else
+                capacity = (capacity + 63) & (~63); // ensure chunks of 64.
+
+            _batchItemList = new SpriteBatchItem[capacity];
             _batchItemCount = 0;
 
-            for (int i = 0; i < InitialBatchSize; i++)
+            for (int i = 0; i < capacity; i++)
                 _batchItemList[i] = new SpriteBatchItem();
 
-            EnsureArrayCapacity(InitialBatchSize);
+            EnsureArrayCapacity(capacity);
 		}
 
         /// <summary>

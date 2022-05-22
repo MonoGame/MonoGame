@@ -124,6 +124,11 @@ namespace Microsoft.Xna.Framework.Audio
                 sound.Stop(options);
         }
 
+        /// <summary>
+        /// Set the volume for this <see cref="AudioCategory"/>.
+        /// </summary>
+        /// <param name="volume">The new volume of the category.</param>
+        /// <exception cref="ArgumentException">If the volume is less than zero.</exception>
         public void SetVolume(float volume)
         {
             if (volume < 0)
