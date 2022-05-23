@@ -43,7 +43,7 @@ These using statements make it easier to use the code that MonoGame has to offer
 public class Game1 : Game
 ```
 
-The main Game1 class inherits from the Game class, which provides all the core methods for your game (ie. Load/Unload Content, Update, Draw etc.). You usually only have one Game class per game, so its name isn't that important.
+The main **Game1** class inherits from the **Game** class, which provides all the core methods for your game (ie. Load/Unload Content, Update, Draw etc.). You usually only have one Game class per game, so its name is not that important.
 
 ## Instance Variables
 
@@ -52,7 +52,7 @@ GraphicsDeviceManager graphics;
 SpriteBatch spriteBatch;
 ```
 
-The two default variables that the blank template starts with are GraphicsDeviceManager and SpriteBatch. Both of these variables are used for drawing to the screen, as you will see in a later tutorial.
+The two default variables that the blank template starts with are the **GraphicsDeviceManager** and **SpriteBatch**. Both of these variables that are used for drawing to the screen, as you will see in a later tutorial.
 
 ## Constructor
 
@@ -64,7 +64,7 @@ public Game1()
 }
 ```
 
-The main game constructor is used to initialize the starting variables. In this case, a new GraphicsDeviceManager is created, and the root directory containing the game's content files is set.
+The main game constructor is used to initialize the starting variables. In this case, a new **GraphicsDeviceManager** is created, and the root directory containing the game's content files is set.
 
 ## Initialize Method
 
@@ -77,7 +77,7 @@ protected override void Initialize()
 }
 ```
 
-This method is called after the constructor but before the main game loop (Update/Draw). This is where you can query any required services and load any non-graphic related content.
+The **Initialize** method is called after the constructor but before the main game loop (Update/Draw). This is where you can query any required services and load any non-graphic related content.
 
 ## LoadContent Method
 
@@ -91,7 +91,7 @@ protected override void LoadContent()
 }
 ```
 
-This method is used to load your game content. It is called only once per game, within the Initialize method, before the main game loop starts.
+The **LoadContent** method is used to load your game content. It is called only once per game, within the **Initialize** method, before the main game loop starts.
 
 ## Update Method
 
@@ -107,7 +107,7 @@ protected override void Update(GameTime gameTime)
 }
 ```
 
-This method is called multiple times per second, and is used to update your game state (checking for collisions, gathering input, playing audio, etc.).
+The **Update** method is called multiple times per second, and it is used to update your game state (checking for collisions, gathering input, playing audio, etc.).
 
 ## Draw Method
 
@@ -122,6 +122,6 @@ protected override void Draw(GameTime gameTime)
 }
 ```
 
-Similar to the Update method, this method is also called multiple times per second.
+Similar to the Update method, the **Draw** method is also called multiple times per second.  This, as the name suggests, is responsible for drawing content to the screen.
 
 **Next up:** [Adding Content](4_adding_content.md)

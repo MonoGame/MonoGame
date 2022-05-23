@@ -4,8 +4,9 @@ MonoGame supports more than one method of using fonts, the following is an expla
 
 ## Using TrueType Fonts with MonoGame
 
-To be able to use a TrueType font, MonoGame requires the TrueType font file and a .spritefont file.
-TrueType fonts may be installed on the system, or added manually in the same directory as the .spritefont file.
+To be able to use a TrueType font, MonoGame requires the **TrueType font file** and a **.spritefont** file.
+
+> TrueType fonts may be installed on the system, or added manually in to the same directory as the .spritefont file.
 
 1. Create the .spritefont file by selecting "Edit -> Add -> New Item" from the MGCB Editor menu, then select **SpriteFont Description** from the list and click **Create**.
    

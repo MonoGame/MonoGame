@@ -85,7 +85,7 @@ Set the target platform for this build. It must be a member of the [TargetPlatfo
 
 If not set, it will default to Windows.
 
-NOTE: PlayStation 4, PlayStation, Xbox One, Stadia, and Switch support is only available to licensed console developers.
+NOTE: PlayStation 4, PlayStation 5, Xbox One, Stadia, and Switch support is only available to licensed console developers.
 
 ### Target Graphics Profile
 
