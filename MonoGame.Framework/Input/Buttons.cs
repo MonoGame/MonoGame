@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Input
     public enum Buttons
     {
         /// <summary>
-        /// Reserved.
+        /// No button set.
         /// </summary>
         None = 0,
 
