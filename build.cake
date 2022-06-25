@@ -311,9 +311,8 @@ Task("PackVSMacTemplates")
     .WithCriteria(() => IsRunningOnMacOs())
     .Does(() =>
 {
-    // Uncomment this once VS for Mac 2022 goes stable :D
-    // DotNetRestore("Templates/MonoGame.Templates.VSMacExtension/MonoGame.Templates.VSMacExtension.csproj");
-    // DotNetBuild("Templates/MonoGame.Templates.VSMacExtension/MonoGame.Templates.VSMacExtension.csproj", dnBuildSettings);
+    DotNetRestore("Templates/MonoGame.Templates.VSMacExtension/MonoGame.Templates.VSMacExtension.csproj");
+    DotNetBuild("Templates/MonoGame.Templates.VSMacExtension/MonoGame.Templates.VSMacExtension.csproj", dnBuildSettings);
 });
 
 //////////////////////////////////////////////////////////////////////

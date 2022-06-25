@@ -56,6 +56,14 @@ jobs:
           path: |
             Artifacts/MonoGame.Templates.VSExtension/*.vsix
           if-no-files-found: error
+      - name: Package Visual Studio Mac extension artifact
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@main
+        with:
+          name: Visual Studio for Mac Extension
+          path: |
+            Artifacts/MonoGame.Templates.VSMacExtension/**/*.mpack
+          if-no-files-found: error
   deploy:
     name: deploy
     runs-on: ubuntu-latest
