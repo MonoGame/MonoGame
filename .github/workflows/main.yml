@@ -62,7 +62,7 @@ jobs:
         with:
           name: Visual Studio for Mac Extension
           path: |
-            Artifacts/MonoGame.Templates.VSMacExtension/**/*.mpack
+            Artifacts/MonoGame.Templates.VSMacExtension/Release/net6.0/*.mpack
           if-no-files-found: error
   deploy:
     name: deploy
