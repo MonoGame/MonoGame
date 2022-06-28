@@ -12,7 +12,7 @@ Go to the following URL to download and install Visual Studio 2022 for Mac: http
 
 ### Install MonoGame extension for Visual Studio for Mac
 
-Download the MonoGame extension for Visual Studio 2022 for Mac from the following link: https://github.com/MonoGame/MonoGame/releases/download/v3.8/MonoDevelop.MonoGame_IDE_VisualStudioForMac_v3.8.0.1643-vsm8.0.mpack
+Download the MonoGame extension for Visual Studio 2022 for Mac from the following link: https://github.com/MonoGame/MonoGame/releases/tag/v3.8.1
 
 Open up Visual Studio 2022 for Mac and you should be able to see a window as shown below:
 
