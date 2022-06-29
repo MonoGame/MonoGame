@@ -1049,7 +1049,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     else
                     {
-                        _swapChain.Present(1, PresentFlags.None);
+                        int interval = Math.Max(1, PresentationParameters.PresentationInterval.GetSyncInterval());
+                        _swapChain.Present(interval, PresentFlags.None);
                     }
                 }
             }
