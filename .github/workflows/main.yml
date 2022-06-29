@@ -93,7 +93,18 @@ jobs:
         run: dotnet nuget push nuget/*.nupkg --source https://nuget.pkg.github.com/$GITHUB_REPOSITORY_OWNER/index.json --api-key ${GITHUB_TOKEN}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Make a release
+        uses: ncipollo/release-action@v1
+        with:
+          name: 'MonoGame ${{ github.ref_name }}'
+          body: 'This is the official MonoGame ${{ github.ref_name }} release source code and Visual Studio 2022 extensions for installing templates.'
+          tag: ${{ github.ref_name }}
+          draft: true
+          allowUpdates: true
+          removeArtifacts: true
+          artifacts: "**/*.vsix,**/*.mpack"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          if: github.ref_type == 'tag'
 
 
 
