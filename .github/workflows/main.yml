@@ -102,9 +102,9 @@ jobs:
           draft: true
           allowUpdates: true
           removeArtifacts: true
-          artifacts: "**/*.vsix,**/*.mpack"
+          artifacts: "**/*.vsix,**/*.mpack,nuget/*.nupkg"
           token: ${{ secrets.GITHUB_TOKEN }}
-          if: github.ref_type == 'tag'
+        if: github.ref_type == 'tag'
 
 
 
