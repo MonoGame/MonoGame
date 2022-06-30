@@ -69,6 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+      contents: write
     needs: [ build ]
     if: ${{ github.event_name == 'push' }}
     steps:
