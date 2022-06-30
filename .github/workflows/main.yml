@@ -94,6 +94,16 @@ jobs:
         run: dotnet nuget push nuget/*.nupkg --source https://nuget.pkg.github.com/$GITHUB_REPOSITORY_OWNER/index.json --api-key ${GITHUB_TOKEN}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download VS extension
+        uses: actions/download-artifact@v3
+        with:
+          name: Visual Studio Extension
+          path: extension-win
+      - name: Download VS for Mac extension
+        uses: actions/download-artifact@v3
+        with:
+          name: Visual Studio for Mac Extension
+          path: extension-mac
       - name: Make a release
         uses: ncipollo/release-action@v1
         with:
