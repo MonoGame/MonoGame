@@ -175,7 +175,7 @@ namespace Microsoft.Xna.Framework
 
 #if ANDROID
         [CLSCompliant(false)]
-        public static AndroidGameActivity Activity { get; internal set; }
+        public static Android.App.Activity Activity { get; internal set; }
 #endif
         private static Game _instance = null;
         internal static Game Instance { get { return Game._instance; } }

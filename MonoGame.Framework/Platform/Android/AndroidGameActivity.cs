@@ -10,16 +10,35 @@ using Android.Views;
 
 namespace Microsoft.Xna.Framework
 {
-	[CLSCompliant(false)]
-    public class AndroidGameActivity : Activity
+    public interface IAndroidGameActivity
     {
-        internal Game Game { private get; set; }
+        /// <summary>
+        /// One time initialization.
+        /// </summary>
+        /// <remarks>
+        /// Used internally by the framework.
+        /// </remarks>
+        void InitializeGame(Game game);
+
+        bool AutoPauseAndResumeMediaPlayer { get; }
+        bool RenderOnUIThread { get; }
+    }
+
+    [CLSCompliant(false)]
+    public class AndroidGameActivity : Activity, IAndroidGameActivity
+    {
+        void IAndroidGameActivity.InitializeGame(Game game)
+        {
+            _game = game;
+        }
+
+        private Game _game;
 
         private ScreenReceiver screenReceiver;
         private OrientationListener _orientationListener;
 
-        public bool AutoPauseAndResumeMediaPlayer = true;
-        public bool RenderOnUIThread = true; 
+        public bool AutoPauseAndResumeMediaPlayer { get; set; } = true;
+        public bool RenderOnUIThread { get; set; } = true; 
 
 		/// <summary>
 		/// OnCreate called when the activity is launched from cold or after the app
@@ -57,7 +76,7 @@ namespace Microsoft.Xna.Framework
         protected override void OnPause()
         {
             base.OnPause();
-            EventHelpers.Raise(this, Paused, EventArgs.Empty);
+            RaiseOnPause(this, _game);
 
             if (_orientationListener.CanDetectOrientation())
                 _orientationListener.Disable();
@@ -67,18 +86,10 @@ namespace Microsoft.Xna.Framework
         protected override void OnResume()
         {
             base.OnResume();
-            EventHelpers.Raise(this, Resumed, EventArgs.Empty);
+            RaiseOnResume(this, _game);
 
-            if (Game != null)
-            {
-                var deviceManager = (IGraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
-                if (deviceManager == null)
-                    return;
-                ((GraphicsDeviceManager)deviceManager).ForceSetFullScreen();
-                ((AndroidGameWindow)Game.Window).GameView.RequestFocus();
-                if (_orientationListener.CanDetectOrientation())
-                    _orientationListener.Enable();
-            }
+            if (_orientationListener.CanDetectOrientation())
+                _orientationListener.Enable();
         }
 
 		protected override void OnDestroy ()
@@ -86,19 +97,41 @@ namespace Microsoft.Xna.Framework
             UnregisterReceiver(screenReceiver);
             ScreenReceiver.ScreenLocked = false;
             _orientationListener = null;
-            if (Game != null)
-                Game.Dispose();
-            Game = null;
+            if (_game != null)
+                _game.Dispose();
+            _game = null;
 			base.OnDestroy ();
 		}
+
+        public static void RaiseOnPause(Object sender, Game game)
+        {
+            EventHelpers.Raise(sender, Paused, EventArgs.Empty);
+        }
+
+        public static void RaiseOnResume(Object sender, Game game)
+        {
+            EventHelpers.Raise(sender, Resumed, EventArgs.Empty);
+
+            if (game != null)
+            {
+                var deviceManager = (IGraphicsDeviceManager)game.Services.GetService(typeof(IGraphicsDeviceManager));
+                if (deviceManager == null)
+                    return;
+                ((GraphicsDeviceManager)deviceManager).ForceSetFullScreen();
+                ((AndroidGameWindow)game.Window).GameView.RequestFocus();                
+            }
+        }
     }
+
+    
 
 	[CLSCompliant(false)]
 	public static class ActivityExtensions
     {
-        public static ActivityAttribute GetActivityAttribute(this AndroidGameActivity obj)
+        public static ActivityAttribute GetActivityAttribute<T>(this T obj)
+            where T:Activity, IAndroidGameActivity
         {			
-            var attr = obj.GetType().GetCustomAttributes(typeof(ActivityAttribute), true);
+            var attr = obj.GetType().GetCustomAttributes(typeof(T), true);
 			if (attr != null)
 			{
             	return ((ActivityAttribute)attr[0]);
