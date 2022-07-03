@@ -56,11 +56,20 @@ jobs:
           path: |
             Artifacts/MonoGame.Templates.VSExtension/*.vsix
           if-no-files-found: error
+      - name: Package Visual Studio Mac extension artifact
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@main
+        with:
+          name: Visual Studio for Mac Extension
+          path: |
+            Artifacts/MonoGame.Templates.VSMacExtension/Release/net6.0/*.mpack
+          if-no-files-found: error
   deploy:
     name: deploy
     runs-on: ubuntu-latest
     permissions:
       packages: write
+      contents: write
     needs: [ build ]
     if: ${{ github.event_name == 'push' }}
     steps:
@@ -85,7 +94,28 @@ jobs:
         run: dotnet nuget push nuget/*.nupkg --source https://nuget.pkg.github.com/$GITHUB_REPOSITORY_OWNER/index.json --api-key ${GITHUB_TOKEN}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Download VS extension
+        uses: actions/download-artifact@v3
+        with:
+          name: Visual Studio Extension
+          path: extension-win
+      - name: Download VS for Mac extension
+        uses: actions/download-artifact@v3
+        with:
+          name: Visual Studio for Mac Extension
+          path: extension-mac
+      - name: Make a release
+        uses: ncipollo/release-action@v1
+        with:
+          name: 'MonoGame ${{ github.ref_name }}'
+          body: 'This is the official MonoGame ${{ github.ref_name }} release source code and Visual Studio 2022 extensions for installing templates.'
+          tag: ${{ github.ref_name }}
+          draft: true
+          allowUpdates: true
+          removeArtifacts: true
+          artifacts: "**/*.vsix,**/*.mpack,nuget/*.nupkg"
+          token: ${{ secrets.GITHUB_TOKEN }}
+        if: github.ref_type == 'tag'
 
 
 
