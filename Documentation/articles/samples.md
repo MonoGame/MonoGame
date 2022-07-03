@@ -1,6 +1,6 @@
 # Samples & Demos
 
-The samples and demos below are recommend for learning how to use MonoGame.
+The samples and demos below are recommended for learning how to use MonoGame.
 
 ## Official MonoGame Samples
 
@@ -8,7 +8,6 @@ These are [the official samples](https://github.com/MonoGame/MonoGame.Samples) t
 
 - [Platformer 2D](https://github.com/MonoGame/MonoGame.Samples/tree/develop/Platformer2D)
 - [NeonShooter](https://github.com/MonoGame/MonoGame.Samples/tree/develop/NeonShooter)
-- [SpaceWar](https://github.com/MonoGame/MonoGame.Samples/tree/develop/SpaceWar)
 
 ## XNA Game Studio Archive
 
@@ -32,6 +31,7 @@ This is a [large library of MonoGame samples](https://github.com/CartBlanche/Mon
 - Shaders
 
 It also includes games such as:
+
 - Tetris
 - Pacman
 - Role Playing Game

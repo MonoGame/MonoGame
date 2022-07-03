@@ -12,6 +12,7 @@
     <PackageId>MonoGame.Framework.WindowsUniversal</PackageId>
     <SharpDXVersion>4.0.1</SharpDXVersion>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <PackageOutputPath>..\Artifacts\NuGet</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

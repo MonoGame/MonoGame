@@ -853,7 +853,7 @@ namespace Microsoft.Xna.Framework
             static int GetAttribute(EGLConfig config, IEGL10 egl, EGLDisplay eglDisplay,int attribute)
             {
                 int[] data = new int[1];
-                egl.EglGetConfigAttrib(eglDisplay, config, EGL11.EglRedSize, data);
+                egl.EglGetConfigAttrib(eglDisplay, config, attribute, data);
                 return data[0];
             }
 
