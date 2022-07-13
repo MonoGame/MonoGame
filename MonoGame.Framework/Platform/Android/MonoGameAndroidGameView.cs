@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework
 
         bool disposed = false;
         ISurfaceHolder mHolder;
-        System.Drawing.Size size;
+        Point size;
 
         ManualResetEvent _waitForPausedStateProcessed = new ManualResetEvent(false);
         ManualResetEvent _waitForResumedStateProcessed = new ManualResetEvent(false);
@@ -1225,9 +1225,9 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>The size of the current view.</summary>
-        /// <value>A <see cref="T:System.Drawing.Size" /> which is the size of the current view.</value>
+        /// <value>A <see cref="T:Point" /> representing the size of the current view.</value>
         /// <exception cref="T:System.ObjectDisposed">The instance has been disposed</exception>
-        public virtual System.Drawing.Size Size
+        public virtual Point Size
         {
             get
             {
