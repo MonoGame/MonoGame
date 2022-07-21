@@ -31,6 +31,11 @@ namespace Microsoft.Xna.Framework.Graphics
             return glTarget;
         }
 
+        private void PlatformFromNativeHandle(IntPtr handle)
+        {
+            throw new NotImplementedException();
+        }
+
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
         {

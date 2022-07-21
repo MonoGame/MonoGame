@@ -8,6 +8,11 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTarget2D
     {
+        private void PlatformFromNativeHandle(IntPtr handle)
+        {
+            throw new NotImplementedException();
+        }
+		
         private void PlatformConstruct(
             GraphicsDevice graphicsDevice, 
             int width, 
