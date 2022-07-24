@@ -64,7 +64,7 @@ private void ParseVersion()
 
         if (EnvironmentVariable("GITHUB_REPOSITORY") != "MonoGame/MonoGame")
             version += "-" + EnvironmentVariable("GITHUB_REPOSITORY_OWNER");
-        else if (EnvironmentVariable("GITHUB_REF_TYPE") == "branch" && EnvironmentVariable("GITHUB_REF") != "refs/heads/master"))
+        else if (EnvironmentVariable("GITHUB_REF_TYPE") == "branch" && EnvironmentVariable("GITHUB_REF") != "refs/heads/master")
             version += "-develop";
 
         repositoryUrl = "https://github.com/" + EnvironmentVariable("GITHUB_REPOSITORY");
