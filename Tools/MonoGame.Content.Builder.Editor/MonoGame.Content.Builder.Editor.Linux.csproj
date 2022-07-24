@@ -2,12 +2,15 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
-    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Gtk</BaseOutputPath>
+    <TargetFramework>net6.0</TargetFramework>
+    <RollForward>Major</RollForward>
+    <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Linux</BaseOutputPath>
     <DefineConstants>GTK</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <AssemblyName>mgcb-editor-gtk</AssemblyName>
+    <AssemblyName>mgcb-editor-linux</AssemblyName>
+    <AssemblyTitle>MGCB Editor</AssemblyTitle>
+    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,23 +25,25 @@
     <Compile Remove="Platform\**\*" />
 
     <Compile Include="Platform\Linux\**\*.cs" />
-    <Compile Include="Platform\Utilities\**\*.cs" />
+  </ItemGroup>
 
-    <Content Include="Platform\Linux\Content\**\*">
-      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+  <ItemGroup>
+    <Content Include="Templates\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Templates\%(Filename)%(Extension)</Link>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Eto.Forms" Version="2.5.2" />
-    <PackageReference Include="Eto.Platform.Gtk" Version="2.5.2" />
-    <PackageReference Include="GtkSharp" Version="3.22.25.98" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20158.1" />
+    <PackageReference Include="Eto.Forms" Version="2.6.0" />
+    <PackageReference Include="Eto.Platform.Gtk" Version="2.6.0" />
+    <PackageReference Include="GtkSharp" Version="3.24.24.34" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
+      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
+    </ProjectReference>
     <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
       <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
     </ProjectReference>

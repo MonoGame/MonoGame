@@ -3,10 +3,10 @@
   <Import Project="..\MonoGame.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <BaseOutputPath>..\Artifacts\MonoGame.Framework.Content.Pipeline</BaseOutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>The Monogame Content Pipeline for Windows, Mac and Linux is used to compile raw content to xnb files.</Description>
+    <Description>The Monogame Content Pipeline for Windows, Mac and Linux is used to compile raw content to xnb files.</Description>
     <PackageTags>monogame;content;content pipeline</PackageTags>
     <PackageId>MonoGame.Framework.Content.Pipeline</PackageId>
     <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
@@ -45,8 +45,8 @@
       <Link>Utilities\ContentExtensions.cs</Link>
     </Compile>
     
-    <Compile Include="..\ThirdParty\StbImageSharp\src\StbImageSharp\**\*.cs" LinkBase="Utilities\StbImageSharp" />
-    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\StbImageWriteSharp\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
+    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -87,22 +87,21 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />
     <PackageReference Include="AssimpNet" Version="4.1.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">
-    <Content Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" PackagePath="lib\netstandard2.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" PackagePath="lib\netstandard2.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\netstandard2.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" PackagePath="lib\netstandard2.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" PackagePath="lib\netstandard2.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" PackagePath="lib\netstandard2.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" PackagePath="lib\netstandard2.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" PackagePath="lib\net6.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" PackagePath="lib\net6.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\net6.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" PackagePath="lib\net6.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" PackagePath="lib\net6.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" PackagePath="lib\net6.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" PackagePath="lib\net6.0" Visible="false" />
 
     <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so" Visible="false">
       <Link>libFreeImage.so</Link>
-      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <PackagePath>runtimes\linux-x64\native\libFreeImage.so</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so" Visible="false">
@@ -127,7 +126,7 @@
     </Content>
     <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.so" Visible="false">
       <Link>libfreetype6.so</Link>
-      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <PackagePath>runtimes\linux-x64\native\libfreetype6.so</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng16.so.16" Visible="false">
@@ -147,7 +146,7 @@
 
     <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" Visible="false">
       <Link>libFreeImage.dylib</Link>
-      <PackagePath>runtimes\osx\native</PackagePath>
+      <PackagePath>runtimes\osx\native\libFreeImage.dylib</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib" Visible="false">
@@ -172,7 +171,7 @@
     </Content>
     <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib" Visible="false">
       <Link>libfreetype6.dylib</Link>
-      <PackagePath>runtimes\osx\native</PackagePath>
+      <PackagePath>runtimes\osx\native\libfreetype6.dylib</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng16.16.dylib" Visible="false">
@@ -220,46 +219,22 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\Switch\Tools\MonoGame.Effect.Compiler\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\Switch\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\XBoxOne\Tools\MonoGame.Effect.Compiler\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\XBoxOne\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\PlayStation4\Tools\MonoGame.Effect.Compiler\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\PlayStation4\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\PSVita\Tools\MonoGame.Effect.Compiler\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\PSVita\Tools\MonoGame.Framework.Content.Pipeline\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-  </ItemGroup>
-
   <PropertyGroup>
     <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
     <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
   
   <ItemGroup>
-    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*"
-             Exclude="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*.nupkg"
-             Visible="false">
+    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*" Exclude="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*.nupkg" Visible="false">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   
+  <Import Project="..\Switch\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Switch\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PSVita\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PSVita\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\Stadia\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Stadia\MonoGame.Framework.Content.Pipeline.targets')" />
 
 </Project>

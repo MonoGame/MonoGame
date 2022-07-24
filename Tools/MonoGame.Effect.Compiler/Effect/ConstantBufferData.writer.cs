@@ -1,5 +1,7 @@
 using System.IO;
 
+using MonoGame.Framework.Utilities;
+
 namespace MonoGame.Effect
 {
     internal partial class ConstantBufferData
@@ -10,10 +12,10 @@ namespace MonoGame.Effect
 
             writer.Write((ushort)Size);
 
-            writer.Write((byte)ParameterIndex.Count);
+            writer.Write(ParameterIndex.Count);
             for (var i=0; i < ParameterIndex.Count; i++)
             {
-                writer.Write((byte)ParameterIndex[i]);
+                writer.Write(ParameterIndex[i]);
                 writer.Write((ushort)ParameterOffset[i]);
             }
         }

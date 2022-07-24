@@ -1,30 +1,30 @@
 # Adding Content
 
-This tutorial will go over adding content to your game.
+This tutorial will go over adding content such as images or sounds to your game.
 
-> For help on creating a project please look at the [Creating a New Project](0_getting_started.md) of the Getting Started guide.
+> For help with creating a project, please look at the [Creating a New Project](0_getting_started.md) section of the Getting Started guide.
 
 ## MonoGame Content Builder Tool (MGCB Editor)
 
-If you have not already, you will need to install the MGCB-Editor for managing your content, for details on getting access to the tool, see the [installation instructions here](~/articles/tools/mgcb_editor.md).
+This tutorial assumes that you are using Visual Studio 2022 with its MonoGame extension installed. If you are not using the extension, you will need to manually install and use the [MGCB Editor](~/articles/tools/mgcb_editor.md).
 
-> This is optional, as you can edit the .mgcb files manually if you wish, however, it is recommended to use the tool for the extra features it gives.
+> This is technically optional, since you can edit the .mgcb files manually if you wish, but the editor is highly recommended for ease of use.
 
 ## Adding content
 
-First, you are going to need some content for your game. For this tutorial use the following image of a ball:
+First, you will need some content for your game. For this tutorial, use the following image of a ball:
 
 ![Open Content](~/images/getting_started/ball.png)
 
-Do **right-click > Save Image As** and save it somewhere locally with the name “ball.png”.
+Copy the image to your machine by using **right-click > Save Image As** and save it somewhere locally with the name “ball.png”.
 
-Now open up your game project and look at the Solution explorer window. Expand the **Content** folder and open up **Content.mgcb** file by double-clicking on it.
+Now open up your game project and look at the Solution Explorer window. Expand the **Content** folder and open up **Content.mgcb** file by double-clicking on it.
 
 ![Open Content](~/images/getting_started/3_open_content.png)
 
-You should now see the MGCB Editor window open up. If it does not open up (you see a text file open), then you can right-click on **Content.mgcb** and select **Open With**, then select **mgcb-editor-wpf** in the list, click **Set as Default** and then click **OK**.
+You should now see the MGCB Editor window open up. If a text file opens instead, then right-click on **Content.mgcb** and select **Open With**, then select **MGCB Editor** in the list, click **Set as Default** and then click **OK**, then try again.
 
-> If you do not see the **mgcb-editor-wpf** option when you right-click and select **Open With**, then please review the [Tools documentation](~/articles/tools/tools.md) for installing the MGCB Editor tool for your operating system.
+> If you do not see the **MGCB Editor** option when you right-click and select **Open With**, then please review the [Tools documentation](~/articles/tools/tools.md) for installing the MGCB Editor tool for your operating system.
 
 ![MGCB Editor](~/images/getting_started/3_mgcb_editor_tool.png)
 
@@ -34,15 +34,15 @@ Your game content is managed from this external tool. You can add content to you
 - **Edit > Add > Existing Item...** menu button
 - **right-click > Add > Existing Item...** context menu
 
-In this case let us use the **Add Existing Item** toolbar button.
+Make sure the "Content" MGCB file is selected to the left, then click the **Add Existing Item** toolbar button.
 
 ![Add Content](~/images/getting_started/3_add_content.png)
 
-You should now be prompted to select a file. Select the “ball.png” image that you downloaded a moment ago, once selected you will be asked "what action you want to do when adding the file?", just leave it as the default and click **OK**.
+You should now be prompted to select a file. Select the “**ball.png**” image that you downloaded a moment ago. Once you have confirmed your selection, you will be asked whether to copy the file, add a link to it, or skip it. Make sure "**Copy the file to the directory**" option is selected and click **Add**.
 
 ![Copy Content](~/images/getting_started/3_copy_content.png)
 
-Now click **Save** toolbar button and close the MGCB Editor tool.
+Now click the **Save** toolbar button and close the MGCB Editor tool.
 
 ![Save Content](~/images/getting_started/3_save_content.png)
 
@@ -50,7 +50,7 @@ Now click **Save** toolbar button and close the MGCB Editor tool.
 
 ## Adding the content in your game
 
-Now that we have added the assets to the Content project, it is time to load it in your game. First open up the **Game1.cs** class file and declare a new **ballTexture** variable of type **Texture2D** in the **Game1** class, so we can store the ball image into memory.
+Now that you have added the asset to the Content project, it is time to load it into your game. First, open up the **Game1.cs** class file and declare a new **ballTexture** variable of type **Texture2D** in the **Game1** class, so you can store the ball image into memory.
 
 ```csharp
 public class Game1 : Game
@@ -61,7 +61,7 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
 ```
 
-Next find the LoadContent method and use it to retrieve the "ball" sprite from the Content project into the **ballTexture** private variable using the **Content.Load()** method and specifying the type of data we are requesting, in this case a Texture2D image:
+Next, find the **LoadContent** method. Here, use **Content.Load()** function to load the "ball" sprite and store it in the **ballTexture** parameter. **Content.Load()** requires you to specify what type of content you are trying to load, in this case it is a **Texture2D**.
 
 ```csharp
 protected override void LoadContent()
@@ -74,15 +74,15 @@ protected override void LoadContent()
 }
 ```
 
-Finally, find the Draw method, and let us draw the ball onto the screen. This is done by:
+Finally, find the Draw method to draw the ball onto the screen. This is done by:
 
 - Opening a SpriteBatch (an image drawing collection function).
 
-- Adding the images we want to draw and where we want them drawn to.
+- Adding the images you want to draw and specifying where you want to draw them.
 
-- Then finally closing the SpriteBatch to commit the textures we want drawn to the screen.
+- Then finally closing the SpriteBatch to commit the textures you want drawn to the screen.
 
-> **Note**, if you add multiple images, they will be drawn in the order you place them from back to front (each drawn on top of each other).
+> **Note**: if you add multiple images, they will be drawn in the order you place them from back to front (each drawn on top of each other).
 
 As shown below:
 
@@ -100,7 +100,7 @@ protected override void Draw(GameTime gameTime)
 }
 ```
 
-Now run the game and you should get the following:
+Now run the game. You should get the following:
 
 ![Game](~/images/getting_started/3_game.png)
 

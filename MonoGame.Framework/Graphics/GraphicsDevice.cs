@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private IndexBuffer _indexBuffer;
         private bool _indexBufferDirty;
 
-        private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
+        private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[8];
         private int _currentRenderTargetCount;
         private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
 
@@ -1435,6 +1435,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return primitiveCount * 3;
                 case PrimitiveType.TriangleStrip:
                     return primitiveCount + 2;
+                case PrimitiveType.PointList:
+                    return primitiveCount;
             }
 
             throw new NotSupportedException();

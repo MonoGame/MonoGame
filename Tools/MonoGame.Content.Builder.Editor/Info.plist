@@ -42,8 +42,6 @@
 	<string>MGCB Editor</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>10.7</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>LSApplicationCategoryType</key>
@@ -53,7 +51,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>net.monogame.mgcb-editor</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.3</string>
+	<string>3.8.1.1-develop</string>
 	<key>CFBundleIconFile</key>
 	<string>Icon.icns</string>
 </dict>

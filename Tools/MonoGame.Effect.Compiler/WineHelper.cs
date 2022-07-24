@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace MonoGame.Effect.Compiler
 {
@@ -20,7 +21,7 @@ namespace MonoGame.Effect.Compiler
                 Console.Error.WriteLine("Setup instructions:");
                 Console.Error.WriteLine("- Create 64 bit wine prefix");
                 Console.Error.WriteLine("- Install d3dcompiler_47 using winetricks");
-                Console.Error.WriteLine("- Install .NET Core 3");
+                Console.Error.WriteLine("- Install .NET 6");
                 Console.Error.WriteLine("- Setup MGFXC_WINE_PATH environmental variable to point to a valid wine prefix");
                 Console.Error.WriteLine("");
                 return -1;
@@ -47,6 +48,9 @@ namespace MonoGame.Effect.Compiler
 
             proc.Start();
             proc.WaitForExit();
+
+            if (!File.Exists(options.OutputFile) || (new FileInfo(options.OutputFile)).Length == 0)
+                return 1;
 
             return proc.ExitCode;
         }

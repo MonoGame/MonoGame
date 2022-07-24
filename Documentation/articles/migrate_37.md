@@ -7,8 +7,7 @@ Previously MonoGame installed on your machine through an installer, but from 3.8
 ## WindowsDX and DesktopGL
 
 WindowsDX and DesktopGL templates now use SDK-style projects.
-To migrate old projects we recommend creating a new project with the 3.8+ templates and
-copying the csproj to your project folder.  Make sure you back up your old project.
+To migrate old projects we recommend creating a new project with the 3.8+ templates and copying the csproj to your project folder.  Make sure you back up your old project.
 
 > For more information about SDK-style projects see the [documentation](https://docs.microsoft.com/en-us/dotnet/core/tools/csproj).
 
@@ -35,20 +34,15 @@ You can remove these references and add a reference to the MonoGame NuGet packag
 
 ```xml
 <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.{Platform}" Version="3.8.0" />
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0" />
+    <PackageReference Include="MonoGame.Framework.{Platform}" Version="3.8.1" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1" />
 </ItemGroup>
 ```
 
 ## Tooling
 
-MonoGame tools are now distributed as [.NET Core Tools](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
-You do not need the tools to build content for your games. The templates reference the `MonoGame.Content.Builder.Task`
-NuGet package that automatically builds your content when building your game.
+MonoGame tools (MGCB, 2MGFX, and the Pipeline Tool) are now distributed as [.NET Tools](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools) automatically when using any of the MonoGame 3.8.1 templates.
 
-- [MonoGame Content Builder](~/articles/tools/mgcb.md) (MGCB): `dotnet tool install -g dotnet-mgcb`
-- [MGCB Editor](~/articles/tools/mgcb_editor.md) (Previously Pipeline Tool): `dotnet tool install -g dotnet-mgcb-editor`
-- [MonoGame Effect Compiler](~/articles/tools/mgfxc.md) (MGFXC; previously 2MGFX): `dotnet tool install -g dotnet-mgfxc`
+The templates also build your .mgcb files automatically thanks to the `MonoGame.Content.Builder.Task` NuGet package.
 
-After installing `mgcb-editor` run `mgcb-editor --register` to register MGCB Editor as the default app for mgcb
-files.
+The Pipeline Tool has been renamed MonoGame Content Builder Editor (MGCB Editor) and does not require an installation anymore (providing that you are using the MonoGame 3.8.1 templates). The Visual Studio 2022 extensions make .mgcb files within your solution clickable and will open the MGCB Editor on them.

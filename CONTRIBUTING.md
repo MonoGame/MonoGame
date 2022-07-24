@@ -11,13 +11,13 @@ Please read this document completely before contributing.
 
 MonoGame has a `master` branch for stable releases and a `develop` branch for daily development.  New features and fixes are always submitted to the `develop` branch.
 
-If you are looking for ways to help, you should start by looking at the [Help Wanted tasks](https://github.com/mono/MonoGame/issues?q=is%3Aissue+is%3Aopen+label%3A%22Help+Wanted%22).  Please let us know if you plan to work on an issue so that others are not duplicating work.
+If you are looking for ways to help, you should start by looking at the [Help Wanted tasks](https://github.com/mono/MonoGame/issues?q=is%3Aissue+is%3Aopen+label%3A%22Help+Wanted%22).  Please let us know if you plan to work on an issue so that others are not duplicating your work.
 
 The MonoGame project follows standard [GitHub flow](https://guides.github.com/introduction/flow/index.html).  You should learn and be familiar with how to [use Git](https://help.github.com/articles/set-up-git/), how to [create a fork of MonoGame](https://help.github.com/articles/fork-a-repo/), and how to [submit a Pull Request](https://help.github.com/articles/using-pull-requests/).
 
-After you submit a PR, the [MonoGame build server](http://teamcity.monogame.net/?guest=1) will build your changes and verify all tests pass.  Project maintainers and contributors will review your changes and provide constructive feedback to improve your submission.
+After you submit a PR, the [MonoGame build server](http://teamcity.monogame.net/?guest=1) will build your changes and verify that all tests pass.  Project maintainers and contributors will review your changes and provide constructive feedback to improve your submission.
 
-Once we are satisfied that your changes are good for MonoGame, we will merge it.
+Once we are satisfied that your changes are good for MonoGame, we will merge your PR.
 
 
 ## Quick Guidelines
@@ -25,9 +25,9 @@ Once we are satisfied that your changes are good for MonoGame, we will merge it.
 Here are a few simple rules and suggestions to remember when contributing to MonoGame.
 
 * :bangbang: **NEVER** commit code that you didn't personally write.
-* :bangbang: **NEVER** use decompiler tools to steal code and submit them as your own work.
+* :bangbang: **NEVER** use decompiler tools to steal code and submit it as your own work.
 * :bangbang: **NEVER** decompile XNA assemblies and steal Microsoft's copyrighted code.
-* **PLEASE** try keep your PRs focused on a single topic and of a reasonable size or we may ask you to break it up.
+* **PLEASE** try to keep your PRs focused on a single topic and of a reasonable size or we may ask you to break it up.
 * **PLEASE** be sure to write simple and descriptive commit messages.
 * **DO NOT** surprise us with new APIs or big new features. Open an issue to discuss your ideas first.
 * **DO NOT** reorder type members as it makes it difficult to compare code changes in a PR.
@@ -49,12 +49,19 @@ There has been confusion on this point in the past, so we want to make this clea
 * It **DOES NOT** matter what country you live in or what your local laws say.  
 * It **DOES NOT** matter that XNA is discontinued.  
 * It **DOES NOT** matter how small the bit of code you have stolen is.  
-* It **DOES NOT** matter what your opinion is of stealing code.
+* It **DOES NOT** matter what your opinion of stealing code is.
 
 If you did not write the code, you do not have ownership of the code and you shouldn't submit it to MonoGame.
 
 If we find a contribution to be in violation of copyright, it will be immediately removed.  We will bar that contributor from the MonoGame project.
 
+## Code guidelines
+
+Due to limitations on private target platforms, MonoGame enforces the use of C# 5.0 features.
+
+It is however allowed to use the latest class library, but if contributions make use of classes that are not present in .NET 4.5, it will be required from the contribution to implement backward-compatible switches.
+
+These limitations should be lifted at some point.
 
 ## Licensing
 

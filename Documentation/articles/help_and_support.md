@@ -4,9 +4,7 @@ There is a wealth of [community created content, blogs and tutorials](tutorials.
 
 If you want to find an answer to a more specific problem, you can ask it on our [community site](https://community.monogame.net/).
 
-You can also chat to other MonoGame users via [Gitter](https://gitter.im/MonoGame/MonoGame) or [Discord](https://discord.gg/xCehJFD) using the links below
-
-[![Gitter](~/images/third_party/gitterlogo.jpg)](https://gitter.im/MonoGame/MonoGame)
+You can also chat to other MonoGame users via  [Discord](https://discord.gg/xCehJFD) using the links below
 
 [![Discord](~/images/third_party/discordlogo.png)](https://discord.gg/xCehJFD)
 

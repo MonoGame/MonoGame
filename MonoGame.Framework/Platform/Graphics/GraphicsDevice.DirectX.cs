@@ -47,11 +47,10 @@ namespace Microsoft.Xna.Framework.Graphics
         SharpDX.Direct2D1.Bitmap1 _bitmapTarget;
         SharpDX.DXGI.SwapChain1 _swapChain;
 
-#if WINDOWS_UAP
+        // Tearing (disabling V-Sync) support
+        bool _isTearingSupported;
+
 		SwapChainPanel _swapChainPanel;
-#else
-		SwapChainBackgroundPanel _swapChainBackgroundPanel;
-#endif
 
 		float _dpi; 
 #endif
@@ -62,7 +61,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
         // The active render targets.
-        readonly SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[4];
+        readonly SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[8];
 
         // The active depth view.
         SharpDX.Direct3D11.DepthStencilView _currentDepthStencilView;
@@ -251,10 +250,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void CreateSizeDependentResources()
         {
-#if WINDOWS_UAP
-            CheckForTearingSupport();
-#endif
-
             // Clamp MultiSampleCount
             PresentationParameters.MultiSampleCount =
                 GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
@@ -320,7 +315,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var swapChainFlags = SwapChainFlags.None;
 #if WINDOWS_UAP
-            if (PresentationParameters.PresentationInterval == PresentInterval.Immediate)
+            _isTearingSupported = IsTearingSupported();
+            if (_isTearingSupported)
             {
                 swapChainFlags = SwapChainFlags.AllowTearing;
             }
@@ -496,28 +492,28 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if  WINDOWS_UAP
-        private void CheckForTearingSupport()
+        private bool IsTearingSupported()
         {
-            // Check if tearing is supported
-            if (PresentationParameters.PresentationInterval == PresentInterval.Immediate)
+            RawBool allowTearing;
+            using (var dxgiFactory2 = new Factory2())
             {
-                RawBool allowTearing;
-                using (var dxgiFactory2 = new Factory2())
+                unsafe
                 {
-                    unsafe
+                    var factory5 = dxgiFactory2.QueryInterface<Factory5>();
+                    try
                     {
-                        var factory5 = dxgiFactory2.QueryInterface<Factory5>();
-                        try
-                        {
-                            factory5.CheckFeatureSupport(SharpDX.DXGI.Feature.PresentAllowTearing, new IntPtr(&allowTearing), sizeof(RawBool));
-                        }
-                        catch (SharpDXException ex)
-                        {
-                            PresentationParameters.PresentationInterval = PresentInterval.Default;
-                        }
+                        factory5.CheckFeatureSupport(SharpDX.DXGI.Feature.PresentAllowTearing, new IntPtr(&allowTearing), sizeof(RawBool));
+
+                        return allowTearing;
+                    }
+                    catch (SharpDXException ex)
+                    {
+                        // can't request feature
                     }
                 }
             }
+
+            return false;
         }
 
         private void SetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
@@ -1047,7 +1043,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // frames that will never be displayed to the screen.
                 lock (_d3dContext)
                 {
-                    if (PresentationParameters.PresentationInterval == PresentInterval.Immediate)
+                    if (PresentationParameters.PresentationInterval == PresentInterval.Immediate && _isTearingSupported)
                     {
                         _swapChain.Present(0, PresentFlags.AllowTearing);
                     }
@@ -1243,6 +1239,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return PrimitiveTopology.TriangleList;
                 case PrimitiveType.TriangleStrip:
                     return PrimitiveTopology.TriangleStrip;
+                case PrimitiveType.PointList:
+                    return PrimitiveTopology.PointList;
             }
 
             throw new ArgumentException();

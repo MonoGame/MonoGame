@@ -14,25 +14,11 @@ namespace Microsoft.Xna.Framework.Input
         private class GamePadInfo
         {
             public IntPtr Device;
-            public IntPtr HapticDevice;
-            public int HapticType;
             public int PacketNumber;
         }
 
         private static readonly Dictionary<int, GamePadInfo> Gamepads = new Dictionary<int, GamePadInfo>();
         private static readonly Dictionary<int, int> _translationTable = new Dictionary<int, int>();
-
-        private static Sdl.Haptic.Effect _hapticLeftRightEffect = new Sdl.Haptic.Effect
-        {
-            type = Sdl.Haptic.EffectId.LeftRight,
-            leftright = new Sdl.Haptic.LeftRight
-            {
-                Type = Sdl.Haptic.EffectId.LeftRight,
-                Length = Sdl.Haptic.Infinity,
-                LargeMagnitude = ushort.MaxValue,
-                SmallMagnitude = ushort.MaxValue
-            }
-        };
 
         public static void InitDatabase()
         {
@@ -57,38 +43,12 @@ namespace Microsoft.Xna.Framework.Input
         {
             var gamepad = new GamePadInfo();
             gamepad.Device = Sdl.GameController.Open(deviceId);
-            gamepad.HapticDevice = Sdl.Haptic.OpenFromJoystick(Sdl.GameController.GetJoystick(gamepad.Device));
 
             var id = 0;
             while (Gamepads.ContainsKey(id))
                 id++;
 
             Gamepads.Add(id, gamepad);
-            
-            if (gamepad.HapticDevice == IntPtr.Zero)
-                return;
-
-            try
-            {
-                if (Sdl.Haptic.EffectSupported(gamepad.HapticDevice, ref _hapticLeftRightEffect) == 1)
-                {
-                    Sdl.Haptic.NewEffect(gamepad.HapticDevice, ref _hapticLeftRightEffect);
-                    gamepad.HapticType = 1;
-                }
-                else if (Sdl.Haptic.RumbleSupported(gamepad.HapticDevice) == 1)
-                {
-                    Sdl.Haptic.RumbleInit(gamepad.HapticDevice);
-                    gamepad.HapticType = 2;
-                }
-                else
-                    Sdl.Haptic.Close(gamepad.HapticDevice);
-            }
-            catch
-            {
-                Sdl.Haptic.Close(gamepad.HapticDevice);
-                gamepad.HapticDevice = IntPtr.Zero;
-                Sdl.ClearError();
-            }
 
             RefreshTranslationTable();
         }
@@ -132,8 +92,6 @@ namespace Microsoft.Xna.Framework.Input
 
         private static void DisposeDevice(GamePadInfo info)
         {
-            if (info.HapticType > 0)
-                Sdl.Haptic.Close(info.HapticDevice);
             Sdl.GameController.Close(info.Device);
         }
 
@@ -162,7 +120,7 @@ namespace Microsoft.Xna.Framework.Input
             caps.IsConnected = true;
             caps.DisplayName = Sdl.GameController.GetName(gamecontroller);
             caps.Identifier = Sdl.Joystick.GetGUID(Sdl.GameController.GetJoystick(gamecontroller)).ToString();
-            caps.HasLeftVibrationMotor = caps.HasRightVibrationMotor = (Gamepads[index].HapticType != 0);
+            caps.HasLeftVibrationMotor = caps.HasRightVibrationMotor = Sdl.GameController.HasRumble(gamecontroller) != 0;
             caps.GamePadType = GamePadType.GamePad;
 
             foreach (var map in mapping)
@@ -316,23 +274,10 @@ namespace Microsoft.Xna.Framework.Input
 
             var gamepad = Gamepads[index];
 
-            if (gamepad.HapticType == 0)
-                return false;
-
-            if (leftMotor <= 0.0f && rightMotor <= 0.0f)
-                Sdl.Haptic.StopAll(gamepad.HapticDevice);
-            else if (gamepad.HapticType == 1)
-            {
-                _hapticLeftRightEffect.leftright.LargeMagnitude = (ushort)(65535f * leftMotor);
-                _hapticLeftRightEffect.leftright.SmallMagnitude = (ushort)(65535f * rightMotor);
-
-                Sdl.Haptic.UpdateEffect(gamepad.HapticDevice, 0, ref _hapticLeftRightEffect);
-                Sdl.Haptic.RunEffect(gamepad.HapticDevice, 0, 1);
-            }
-            else if (gamepad.HapticType == 2)
-                Sdl.Haptic.RumblePlay(gamepad.HapticDevice, Math.Max(leftMotor, rightMotor), Sdl.Haptic.Infinity);
-
-            return true;
+            return Sdl.GameController.Rumble(gamepad.Device, (ushort)(65535f * leftMotor),
+                       (ushort)(65535f * rightMotor), uint.MaxValue) == 0 &&
+                   Sdl.GameController.RumbleTriggers(gamepad.Device, (ushort)(65535f * leftTrigger),
+                       (ushort)(65535f * rightTrigger), uint.MaxValue) == 0;
         }
     }
 }

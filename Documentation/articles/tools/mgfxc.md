@@ -1,17 +1,17 @@
 # MonoGame Effects Compiler (MGFXC)
 
-The MGFXC tool is used to compile [DirectX Effect files](https://docs.microsoft.com/en-us/windows/win32/direct3d9/writing-an-effect)
-for usage with MonoGame.
+The MGFXC tool is used to compile [DirectX Effect files](https://docs.microsoft.com/en-us/windows/win32/direct3d9/writing-an-effect) (shaders) for usage with MonoGame. It will compile shaders into mgfxo files ready to be consumed by the ```Effect``` class.
 
-The MGCB Editor uses MGFXC to compile effects and wrap them into an file, so they can be loaded using the `ContentManager`.
+The MGCB Editor uses MGFXC to compile effects and wrap them into an xnb file, so they can be loaded using the `ContentManager`.
+
 If you compile effects directly with MGFXC you can load effects using the `Microsoft.Framework.Xna.Graphics.Effect` constructor that takes a byte array with the effect code.
 
-Effects compiled directly are not files and can not be loaded by the `ContentManager`.
+Effects compiled directly are not content files and can not be loaded by the `ContentManager`.
 
 ## Installation
 
-MGFXC can be installed as a [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
-Make sure you have the .NET Core SDK installed. You can download it [here](https://dotnet.microsoft.com/download).
+MGFXC can be installed as a [.NET tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools).
+Make sure you have the .NET SDK installed. You can download it [here](https://dotnet.microsoft.com/download).
 
 In a terminal run `dotnet tool install -g dotnet-mgfxc` to install MGFXC.
 
@@ -42,11 +42,10 @@ The `/Profile` option defines the platform we're targeting with this effect file
 - DirectX_11
 - OpenGL
 - PlayStation4
-- PSVita
 - XboxOne
 - Switch
 
-NOTE: PlayStation 4, Xbox One, PS Vita, and Switch support is only available to licensed console developers.
+NOTE: PlayStation 4, Xbox One, and Switch support is only available to licensed console developers.
 
 ### Help
 

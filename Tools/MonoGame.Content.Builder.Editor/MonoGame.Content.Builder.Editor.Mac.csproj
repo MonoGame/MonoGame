@@ -1,14 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RollForward>Major</RollForward>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Mac</BaseOutputPath>
     <DefineConstants>MONOMAC;MAC</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <AssemblyName>mgcb-editor-mac</AssemblyName>
-    <MacBundleName>$(AssemblyName)</MacBundleName>
+    <AssemblyTitle>MGCB Editor</AssemblyTitle>
+    <MacBundleName>$(AssemblyTitle)</MacBundleName>
+    <PublishSingleFile>false</PublishSingleFile>
     <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
@@ -17,17 +21,24 @@
     <Compile Remove="Platform\**\*" />
 
     <Compile Include="Platform\Mac\**\*.cs" />
-    <Compile Include="Platform\Utilities\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Eto.Forms" Version="2.5.2" />
-    <PackageReference Include="Eto.Platform.Mac64" Version="2.5.2" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20158.1" />
+    <Content Include="Templates\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Templates\%(Filename)%(Extension)</Link>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
+    <PackageReference Include="Eto.Forms" Version="2.6.1" />
+    <PackageReference Include="Eto.Platform.Mac64" Version="2.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
+      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
+    </ProjectReference>
     <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
       <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
     </ProjectReference>
@@ -36,9 +47,11 @@
   <ItemGroup>
     <None Remove="Icon.icns" />
   </ItemGroup>
+
   <ItemGroup>
     <BundleResource Include="Icon.icns" />
   </ItemGroup>
+
   <Import Project="MonoGame.Content.Builder.Editor.targets" />
 
 </Project>

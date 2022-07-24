@@ -6,44 +6,39 @@ using StbImageSharp;
 using StbImageWriteSharp;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D
     {
-        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
+        private unsafe static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, Action<byte[]> colorProcessor)
         {
-            byte[] bytes;
-
             // Rewind stream if it is at end
             if (stream.CanSeek && stream.Length == stream.Position)
             {
                 stream.Seek(0, SeekOrigin.Begin);
             }
 
-            // Copy it's data to memory
-            // As some platforms dont provide full stream functionality and thus streams can't be read as it is
-            using (var ms = new MemoryStream())
+            ImageResult result;
+            if (stream.CanSeek)
             {
-                stream.CopyTo(ms);
-                bytes = ms.ToArray();
+                result = ImageResult.FromStream(stream, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
+            }
+            else
+            {
+                // If stream doesnt provide seek functionaly, use MemoryStream instead
+                using (var ms = new MemoryStream())
+                {
+                    stream.CopyTo(ms);
+                    ms.Seek(0, SeekOrigin.Begin);
+                    result = ImageResult.FromStream(ms, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
+                }
             }
 
-            // The data returned is always four channel BGRA
-            var result = ImageResult.FromMemory(bytes, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
-
-            // XNA blacks out any pixels with an alpha of zero.
-            fixed (byte* b = &result.Data[0])
+            if (colorProcessor != null)
             {
-                for (var i = 0; i < result.Data.Length; i += 4)
-                {
-                    if (b[i + 3] == 0)
-                    {
-                        b[i + 0] = 0;
-                        b[i + 1] = 0;
-                        b[i + 2] = 0;
-                    }
-                }
+                colorProcessor(result.Data);
             }
 
             Texture2D texture = null;

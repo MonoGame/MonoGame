@@ -345,6 +345,7 @@ namespace MonoGame.OpenGL
 
     internal enum GLPrimitiveType
     {
+        Points = 0x0000,
         Lines = 0x0001,
         LineStrip = 0x0003,
         Triangles = 0x0004,
@@ -1440,11 +1441,13 @@ namespace MonoGame.OpenGL
 
         internal static void LoadExtensions()
         {
-            string extstring = GL.GetString(StringName.Extensions);
-            var error = GL.GetError();
-            if (!string.IsNullOrEmpty(extstring) && error == ErrorCode.NoError)
-                Extensions.AddRange(extstring.Split(' '));
-
+            if (Extensions.Count == 0)
+            {
+                string extstring = GL.GetString(StringName.Extensions);
+                var error = GL.GetError();
+                if (!string.IsNullOrEmpty(extstring) && error == ErrorCode.NoError)
+                    Extensions.AddRange(extstring.Split(' '));
+            }
             LogExtensions();
             // now load Extensions :)
             if (GL.GenRenderbuffers == null && Extensions.Contains("GL_EXT_framebuffer_object"))
@@ -1587,7 +1590,7 @@ namespace MonoGame.OpenGL
         {
             int length = 0;
             GetProgram(programId, GetProgramParameterName.LogLength, out length);
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(length, length);
             GetProgramInfoLogInternal (programId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
@@ -1595,7 +1598,7 @@ namespace MonoGame.OpenGL
         internal static string GetShaderInfoLog (int shaderId) {
             int length = 0;
             GetShader(shaderId, ShaderParameter.LogLength, out length);
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(length, length);
             GetShaderInfoLogInternal (shaderId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }

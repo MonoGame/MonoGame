@@ -24,8 +24,19 @@ TEMP_DIR="${TMPDIR:-/tmp}"
 SCRIPT_DIR="$TEMP_DIR/winemg2"
 mkdir -p "$SCRIPT_DIR"
 
+# disable wine crash dialog
+cat > "$SCRIPT_DIR"/crashdialog.reg <<_EOF_
+REGEDIT4
+[HKEY_CURRENT_USER\\Software\\Wine\\WineDbg]
+"ShowCrashDialog"=dword:00000000
+_EOF_
+
+pushd $SCRIPT_DIR
+wine64 regedit crashdialog.reg
+popd
+
 # get dotnet
-DOTNET_URL="https://download.visualstudio.microsoft.com/download/pr/adeab8b1-1c44-41b2-b12a-156442f307e9/65ebf805366410c63edeb06e53959383/dotnet-sdk-3.1.201-win-x64.zip"
+DOTNET_URL="https://download.visualstudio.microsoft.com/download/pr/e71628cc-8b6c-498f-ae7a-c0dc60019696/aaadc51ad300f1aa58250427e5373527/dotnet-sdk-6.0.202-win-x86.zip"
 curl $DOTNET_URL --output "$SCRIPT_DIR/dotnet-sdk.zip"
 7z x "$SCRIPT_DIR/dotnet-sdk.zip" -o"$WINEPREFIX/drive_c/windows/system32/"
 
@@ -36,8 +47,8 @@ curl $FIREFOX_URL --output "$SCRIPT_DIR/firefox.exe"
 cp -f "$SCRIPT_DIR/firefox_data/core/d3dcompiler_47.dll" "$WINEPREFIX/drive_c/windows/system32/d3dcompiler_47.dll"
 
 # append MGFXC_WINE_PATH env variable
-echo "export MGFXC_WINE_PATH=$HOME/.winemonogame" >> ~/.profile
-echo "export MGFXC_WINE_PATH=$HOME/.winemonogame" >> ~/.zprofile
+echo -e "\nexport MGFXC_WINE_PATH=$HOME/.winemonogame" >> ~/.profile
+echo -e "\nexport MGFXC_WINE_PATH=$HOME/.winemonogame" >> ~/.zprofile
 
 # cleanup
 rm -rf "$SCRIPT_DIR"

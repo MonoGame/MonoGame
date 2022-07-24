@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.Utilities;
+using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
@@ -25,6 +26,8 @@ namespace Microsoft.Xna.Framework
 
         private int _isExiting;
         private SdlGameWindow _view;
+
+        private readonly List<string> _dropList;
 
         public SdlGamePlatform(Game game)
             : base(game)
@@ -48,6 +51,8 @@ namespace Microsoft.Xna.Framework
             // Needed so VS can debug the project on Windows
             if (version >= 205 && CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
                 Sdl.SetHint("SDL_WINDOWS_DISABLE_THREAD_NAMING", "1");
+
+            _dropList = new List<string>();
 
             Sdl.Init((int)(
                 Sdl.InitFlags.Video |
@@ -110,7 +115,7 @@ namespace Microsoft.Xna.Framework
                         _isExiting++;
                         break;
                     case Sdl.EventType.JoyDeviceAdded:
-                        Joystick.AddDevice(ev.JoystickDevice.Which);
+                        Joystick.AddDevices();
                         break;
                     case Sdl.EventType.JoyDeviceRemoved:
                         Joystick.RemoveDevice(ev.JoystickDevice.Which);
@@ -127,10 +132,6 @@ namespace Microsoft.Xna.Framework
                         const int wheelDelta = 120;
                         Mouse.ScrollY += ev.Wheel.Y * wheelDelta;
                         Mouse.ScrollX += ev.Wheel.X * wheelDelta;
-                        break;
-                    case Sdl.EventType.MouseMotion:
-                        Window.MouseState.X = ev.Motion.X;
-                        Window.MouseState.Y = ev.Motion.Y;
                         break;
                     case Sdl.EventType.KeyDown:
                     {
@@ -207,6 +208,12 @@ namespace Microsoft.Xna.Framework
                         break;
                     case Sdl.EventType.WindowEvent:
 
+                        // If the ID is not the same as our main window ID
+                        // that means that we received an event from the
+                        // dummy window, so don't process the event.
+                        if (ev.Window.WindowID != _view.Id)
+                            break;
+
                         switch (ev.Window.EventID)
                         {
                             case Sdl.Window.EventId.Resized:
@@ -226,6 +233,28 @@ namespace Microsoft.Xna.Framework
                                 _isExiting++;
                                 break;
                         }
+                        break;
+
+                    case Sdl.EventType.DropFile:
+                        if (ev.Drop.WindowId != _view.Id)
+                            break;
+
+                        string path = InteropHelpers.Utf8ToString(ev.Drop.File);
+                        Sdl.Drop.SDL_Free(ev.Drop.File);
+                        _dropList.Add(path);
+
+                        break;
+
+                    case Sdl.EventType.DropComplete:
+                        if (ev.Drop.WindowId != _view.Id)
+                            break;
+
+                        if (_dropList.Count > 0)
+                        {
+                            _view.OnFileDrop(new FileDropEventArgs(_dropList.ToArray()));
+                            _dropList.Clear();
+                        }
+
                         break;
                 }
             }

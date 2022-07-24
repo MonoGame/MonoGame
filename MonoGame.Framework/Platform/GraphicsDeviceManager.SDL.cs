@@ -43,6 +43,12 @@ namespace Microsoft.Xna.Framework
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMajorVersion, 2);
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMinorVersion, 1);
 
+            if (presentationParameters.MultiSampleCount > 0)
+            {
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleBuffers, 1);
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleSamples, presentationParameters.MultiSampleCount);
+            }
+
             ((SdlGameWindow)SdlGameWindow.Instance).CreateWindow();
         }
     }

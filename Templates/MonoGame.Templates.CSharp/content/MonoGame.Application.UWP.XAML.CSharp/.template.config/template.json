@@ -1,9 +1,9 @@
 {
     "author": "MonoGame Team",
     "classifications": [
-        "MonoGame"
+        "MonoGame", "Games", "Desktop", "Windows", "Xbox", "UWP", "XAML"
     ],
-    "name": "MonoGame Windows Universal Application (XAML)",
+    "name": "MonoGame Windows Universal XAML Application",
     "groupIdentity": "MonoGame.Application.UWP.XAML",
     "identity": "MonoGame.Application.UWP.XAML.CSharp",
     "shortName": "mguwpxaml",

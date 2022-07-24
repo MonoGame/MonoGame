@@ -155,6 +155,14 @@ namespace Microsoft.Xna.Framework
 
 #endif
 
+        /// <summary>
+        /// This event is raised when user drops a file into the game window
+        /// </summary>
+        /// <remarks>
+        /// This event is only supported on desktop platforms.
+        /// </remarks>
+        public event EventHandler<FileDropEventArgs> FileDrop;
+
         #endregion Events
 
         /// <summary>
@@ -242,7 +250,12 @@ namespace Microsoft.Xna.Framework
 	    }
 #endif
 
-		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
+        internal void OnFileDrop(FileDropEventArgs e)
+        {
+            EventHelpers.Raise(this, FileDrop, e);
+        }
+
+        protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 
 	    /// <summary>
 	    /// Set the title of this window to the given string.

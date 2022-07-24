@@ -797,6 +797,8 @@ namespace Microsoft.Xna.Framework
             public int Alpha;
             public int Depth;
             public int Stencil;
+            public int SampleBuffers;
+            public int Samples;
 
             public int[] ToConfigAttribs()
             {
@@ -831,6 +833,16 @@ namespace Microsoft.Xna.Framework
                     attribs.Add(EGL11.EglStencilSize);
                     attribs.Add(Stencil);
                 }
+                if (SampleBuffers != 0)
+                {
+                    attribs.Add(EGL11.EglSampleBuffers);
+                    attribs.Add(SampleBuffers);
+                }
+                if (Samples != 0)
+                {
+                    attribs.Add(EGL11.EglSamples);
+                    attribs.Add(Samples);
+                }
                 attribs.Add(EGL11.EglRenderableType);
                 attribs.Add(4);
                 attribs.Add(EGL11.EglNone);
@@ -841,7 +853,7 @@ namespace Microsoft.Xna.Framework
             static int GetAttribute(EGLConfig config, IEGL10 egl, EGLDisplay eglDisplay,int attribute)
             {
                 int[] data = new int[1];
-                egl.EglGetConfigAttrib(eglDisplay, config, EGL11.EglRedSize, data);
+                egl.EglGetConfigAttrib(eglDisplay, config, attribute, data);
                 return data[0];
             }
 
@@ -855,12 +867,14 @@ namespace Microsoft.Xna.Framework
                     Alpha = GetAttribute(config, egl, eglDisplay, EGL11.EglAlphaSize),
                     Depth = GetAttribute(config, egl, eglDisplay, EGL11.EglDepthSize),
                     Stencil = GetAttribute(config, egl, eglDisplay, EGL11.EglStencilSize),
+                    SampleBuffers = GetAttribute(config, egl, eglDisplay, EGL11.EglSampleBuffers),
+                    Samples = GetAttribute(config, egl, eglDisplay, EGL11.EglSamples)
                 };
             }
 
             public override string ToString()
             {
-                return string.Format("Red:{0} Green:{1} Blue:{2} Alpha:{3} Depth:{4} Stencil:{5}", Red, Green, Blue, Alpha, Depth, Stencil);
+                return string.Format("Red:{0} Green:{1} Blue:{2} Alpha:{3} Depth:{4} Stencil:{5} SampleBuffers:{6} Samples:{7}", Red, Green, Blue, Alpha, Depth, Stencil, SampleBuffers, Samples);
             }
         }
 
@@ -880,6 +894,8 @@ namespace Microsoft.Xna.Framework
 
             int depth = 0;
             int stencil = 0;
+            int sampleBuffers = 0;
+            int samples = 0;
             switch (_game.graphicsDeviceManager.PreferredDepthStencilFormat)
             {
                 case DepthFormat.Depth16:
@@ -896,9 +912,16 @@ namespace Microsoft.Xna.Framework
                     break;
             }
 
+            if (_game.graphicsDeviceManager.PreferMultiSampling)
+            {
+                sampleBuffers = 1;
+                samples = 4;
+            }
+
             List<SurfaceConfig> configs = new List<SurfaceConfig>();
             if (depth > 0)
             {
+                configs.Add(new SurfaceConfig() { Red = 8, Green = 8, Blue = 8, Alpha = 8, Depth = depth, Stencil = stencil, SampleBuffers = sampleBuffers, Samples = samples });
                 configs.Add(new SurfaceConfig() { Red = 8, Green = 8, Blue = 8, Alpha = 8, Depth = depth, Stencil = stencil });
                 configs.Add(new SurfaceConfig() { Red = 5, Green = 6, Blue = 5, Depth = depth, Stencil = stencil });
                 configs.Add(new SurfaceConfig() { Depth = depth, Stencil = stencil });
@@ -913,6 +936,7 @@ namespace Microsoft.Xna.Framework
             }
             else
             {
+                configs.Add(new SurfaceConfig() { Red = 8, Green = 8, Blue = 8, Alpha = 8, SampleBuffers = sampleBuffers, Samples = samples });
                 configs.Add(new SurfaceConfig() { Red = 8, Green = 8, Blue = 8, Alpha = 8 });
                 configs.Add(new SurfaceConfig() { Red = 5, Green = 6, Blue = 5 });
             }
@@ -1132,14 +1156,14 @@ namespace Microsoft.Xna.Framework
                 return true;
 
             handled = Keyboard.KeyDown(keyCode);
-#if !OUYA
+
             // we need to handle the Back key here because it doesnt work any other way
             if (keyCode == Keycode.Back)
             {
                 GamePad.Back = true;
                 handled = true;
             }
-#endif
+
             if (keyCode == Keycode.VolumeUp)
             {
                 AudioManager audioManager = (AudioManager)Context.GetSystemService(Context.AudioService);

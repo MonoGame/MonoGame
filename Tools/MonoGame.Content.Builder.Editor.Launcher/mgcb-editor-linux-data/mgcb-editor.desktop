@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=MGCB Editor
+GenericName=MGCB Editor
+Comment=Creates platform specific content files.
+Exec={Exec}
+TryExec={TryExec}
+Icon=monogame
+StartupNotify=true
+Terminal=false
+Type=Application
+MimeType=text/x-mgcb;
+Categories=Development;
+StartupWMClass=mgcb-editor-linux

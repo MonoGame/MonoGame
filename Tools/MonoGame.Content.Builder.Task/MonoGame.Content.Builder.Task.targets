@@ -75,7 +75,7 @@
       <ContentReference>
         <ContentDir>%(ContentFolder)/</ContentDir>
         <ContentOutputDir>%(FullDir)bin/$(MonoGamePlatform)/%(OutputFolder)</ContentOutputDir>
-        <ContentIntermediateOutputDir>%(FullDir)obj/$(MonoGamePlatform)/%(OutputFolder)</ContentIntermediateOutputDir>
+        <ContentIntermediateOutputDir>%(FullDir)obj/$(MonoGamePlatform)/$(TargetFramework)/%(OutputFolder)</ContentIntermediateOutputDir>
       </ContentReference>
 
     </ItemGroup>
@@ -134,10 +134,14 @@
   -->
   <Target Name="RunContentBuilder" DependsOnTargets="PrepareContentBuilder">
 
+    <!-- Remove this line if they make dotnet tool restore part of dotnet restore build -->
+    <!-- https://github.com/dotnet/sdk/issues/4241 -->
+    <Exec Command="$(DotnetCommand) tool restore" />
+
     <!-- Execute MGCB from the project directory so we use the correct manifest. -->
     <Exec
       Condition="'%(ContentReference.FullPath)' != ''"
-      Command="$(DotnetCommand) $(MGCBPath) $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
+      Command="$(DotnetCommand) $(MGCBCommand) $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
       WorkingDirectory="$(MSBuildProjectDirectory)" />
 
     <ItemGroup>
@@ -167,7 +171,7 @@
     DependsOnTargets="RunContentBuilder"
     Condition="'$(EnableMGCBItems)' == 'true' OR '@(MonoGameContentReference)' != ''"
     Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
-    BeforeTargets="PrepareForBuild">
+    BeforeTargets="BeforeBuild">
 
     <!-- Call CreateItem on each piece of ExtraContent so it's easy to switch the item type by platform. -->
     <CreateItem

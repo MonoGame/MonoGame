@@ -1,0 +1,121 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: build-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'microsoft'
+          java-version: '11'
+      - name: Disable annotations
+        run: echo "::remove-matcher owner=csc::"
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+      - name: Install required workloads
+        run:   |
+              if [ "$RUNNER_OS" == "Linux" ]; then
+                    echo "MICROSOFT SUPPORT ANDROID WORKLOAD ON LINUX PLZZZ!"
+              elif [ "$RUNNER_OS" == "Windows" ]; then
+                    dotnet.exe workload install android ios macos
+              else
+                    dotnet workload install android ios macos
+              fi
+        shell: bash
+      - name: Run build.cake
+        run: dotnet cake build.cake
+        env:
+          GITHUB_ACTIONS: true
+      - name: Package nuget artifacts
+        uses: actions/upload-artifact@main
+        with:
+          name: nuget-${{ matrix.os }}
+          path: |
+            Artifacts/NuGet/*.nupkg
+          if-no-files-found: error
+      - name: Package Visual Studio extension artifact
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@main
+        with:
+          name: Visual Studio Extension
+          path: |
+            Artifacts/MonoGame.Templates.VSExtension/*.vsix
+          if-no-files-found: error
+      - name: Package Visual Studio Mac extension artifact
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@main
+        with:
+          name: Visual Studio for Mac Extension
+          path: |
+            Artifacts/MonoGame.Templates.VSMacExtension/Release/net6.0/*.mpack
+          if-no-files-found: error
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: write
+    needs: [ build ]
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - name: Download NuGet artifacts from Windows
+        uses: actions/download-artifact@v3
+        with:
+          name: nuget-windows-latest
+          path: nuget-windows
+      - name: Download NuGet artifacts from macOS
+        uses: actions/download-artifact@v3
+        with:
+          name: nuget-macos-latest
+          path: nuget-macos
+      - name: Download NuGet artifacts from Ubuntu
+        uses: actions/download-artifact@v3
+        with:
+          name: nuget-ubuntu-latest
+          path: nuget-ubuntu
+      - name: Move NuGet packages to one folder
+        run: mkdir nuget && cp -Rf nuget-windows/. nuget && cp -Rf nuget-macos/. nuget && cp -Rf nuget-ubuntu/. nuget
+      - name: Push packages
+        run: dotnet nuget push nuget/*.nupkg --source https://nuget.pkg.github.com/$GITHUB_REPOSITORY_OWNER/index.json --api-key ${GITHUB_TOKEN}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download VS extension
+        uses: actions/download-artifact@v3
+        with:
+          name: Visual Studio Extension
+          path: extension-win
+      - name: Download VS for Mac extension
+        uses: actions/download-artifact@v3
+        with:
+          name: Visual Studio for Mac Extension
+          path: extension-mac
+      - name: Make a release
+        uses: ncipollo/release-action@v1
+        with:
+          name: 'MonoGame ${{ github.ref_name }}'
+          body: 'This is the official MonoGame ${{ github.ref_name }} release source code and Visual Studio 2022 extensions for installing templates.'
+          tag: ${{ github.ref_name }}
+          draft: true
+          allowUpdates: true
+          removeArtifacts: true
+          artifacts: "**/*.vsix,**/*.mpack,nuget/*.nupkg"
+          token: ${{ secrets.GITHUB_TOKEN }}
+        if: github.ref_type == 'tag'
+
+
+

@@ -80,8 +80,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 			const float minNeg = ~(int)maxPos; // two's complement
 
             // clamp the value between min and max values
-            var word2 = ((uint) Math.Round(MathHelper.Clamp(vectorX, minNeg, maxPos)) & 0xFFFF);
-            var word1 = (((uint) Math.Round(MathHelper.Clamp(vectorY, minNeg, maxPos)) & 0xFFFF) << 0x10);
+            var word2 = ((uint) MathF.Round(MathHelper.Clamp(vectorX, minNeg, maxPos)) & 0xFFFF);
+            var word1 = (((uint) MathF.Round(MathHelper.Clamp(vectorY, minNeg, maxPos)) & 0xFFFF) << 0x10);
 
             return (word2 | word1);
 		}

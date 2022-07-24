@@ -8,14 +8,15 @@
 - name: Tools
   href: tools/toc.yml
   topicHref: tools/tools.md
-- name: Adding Content
+- name: Content Pipeline
   href: content/toc.yml
   topicHref: content/content.md
-- name: Platforms
-  href: platforms/toc.yml
-  topicHref: platforms/0_platforms.md
+- name: Supported platforms
+  href: platforms.md
 - name: Migrating from 3.7
   href: migrate_37.md
+- name: Migrating from 3.8.0
+  href: migrate_38.md
 - name: Migrating from XNA
   href: migrate_xna.md
 - name: Packaging

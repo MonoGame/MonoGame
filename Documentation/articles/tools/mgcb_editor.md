@@ -19,26 +19,18 @@ The MGCB Editor has the following features:
 
 ## Installation Instructions
 
-The MGCB Editor is published as a [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools), Make sure you have the .NET Core SDK installed if you wish to install the editor. You can download it [here](https://dotnet.microsoft.com/download).
+The MGCB Editor is automatically installed (if you are using MonoGame's templates) and accessible by double-clicking an .mgcb file from Visual Studio 2022 (if you have the extension installed).
 
-In a command prompt/terminal window, run the following command to install the MGCB Editor:
-
-```
-dotnet tool install -g dotnet-mgcb-editor
-```
-
-> For development branches, you will need to ensure you have the dev channel NuGet registered and include the version number in the command, for example:
->
-> ```
-> dotnet nuget add source -n MonoGame http://teamcity.monogame.net/guestAuth/app/nuget/feed/_Root/default/v3/index.json
-> 
-> dotnet tool install --global dotnet-mgcb-editor --version 3.8.0.1476-develop
-> ```
-
-After installing `mgcb-editor` run the following to register the MGCB Editor as the default app for mgcb files.
+Alternatively, you can open the MGCB Editor from the .NET command line. This will only work if you are using the MonoGame templates and executing the command from the root directory of your project:
 
 ```
-mgcb-editor --register
+dotnet mgcb-editor
+```
+
+If it is the first time you run the tool, you might need to restore tools first (.NET should invite you to do so if you try the above command):
+
+```
+dotnet tool restore
 ```
 
 See [Using MGCB Editor](~/articles/content/using_mgcb_editor.md) for more information.

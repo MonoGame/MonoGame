@@ -19,7 +19,7 @@
 <!-- System stats -->
 
 #### What version of MonoGame does the bug occur on:
-- MonoGame 3.7
+- MonoGame 3.8.1
 
 #### What operating system are you using:
 - Windows

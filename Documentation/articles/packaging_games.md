@@ -4,11 +4,11 @@ Once your game is ready to be published, it is recommended that you package it p
 
 ## Desktop games
 
-To publish desktop games, it is recommended that you build your project as a [self-contained](https://docs.microsoft.com/en-us/dotnet/core/deploying/#publish-self-contained) .NET Core app. As such, your game will require absolutely no external dependencies and should run out-of-the-box as-is.
+To publish desktop games, it is recommended that you build your project as a [self-contained](https://docs.microsoft.com/en-us/dotnet/core/deploying/#publish-self-contained) .NET application. As such, your game will require absolutely no external dependencies and should run out-of-the-box as-is.
 
 ### Building and packaging for Windows
 
-From the .NET Core CLI:
+From the .NET CLI:
 
 `dotnet publish -c Release -r win-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
 
@@ -18,7 +18,7 @@ If you are targeting WindowsDX, note that players will need [the DirectX June 20
 
 ### Building and packaging for Linux
 
-From the .NET Core CLI:
+From the .NET CLI:
 
 `dotnet publish -c Release -r linux-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
 
@@ -28,11 +28,11 @@ We recommend using the .tar.gz archiving format to preserve the execution permis
 
 ### Build and packaging for macOS
 
-From the .NET Core CLI:
+From the .NET CLI:
 
 `dotnet publish -c Release -r osx-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
 
-We recommend you distribute your game as an [application bundle](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/BundleTypes/BundleTypes.html). Application bundles are directories with the following file structure:
+We recommend that you distribute your game as an [application bundle](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/BundleTypes/BundleTypes.html). Application bundles are directories with the following file structure:
 
 ```
 YourGame.app                    (this is your root folder)
@@ -74,9 +74,9 @@ The Info.plist file is a standard macOS file containing metadata about your game
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.games</string>
     <key>LSMinimumSystemVersion</key>
-    <string>10.13</string>
+    <string>10.15</string>
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright © 2020</string>
+    <string>Copyright © 2022</string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
 </dict>
@@ -87,36 +87,38 @@ For more information about Info.plist files, see the [documentation](https://dev
 
 After completing these steps, your .app folder should appear as an executable application on macOS.
 
-For archiving, we recommend using the .tar.gz format to preserve the execution permissions.
+For archiving, we recommend using the .tar.gz format to preserve the execution permissions (you will likely run into permission issues if you use .zip at any point).
 
-## Special notes about .NET Core parameters
+## Special notes about .NET parameters
 
-.NET Core proposes several parameters when publishing apps that may sound helpful, but have many issues when it comes to games (because they were never meant for games in the first place, but for small lightweight applications).
+.NET proposes several parameters when publishing apps that may sound helpful, but have many issues when it comes to games (because they were never meant for games in the first place, but for small lightweight applications).
 
 ### ReadyToRun (R2R)
 
 [ReadyToRun](https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-core-3-0#readytorun-images) is advertised as improving application startup time, but slightly increasing binary size. We recommend not using it for games, because it produces micro stutters when your game is running.
 
-Ready2Run code is of low quality and makes the Just-In-Time compiler (JIT) trigger regularly to promote the code to a higher quality. Whenever the JIT runs, it produces potentially very visible stutters.
+Ready2Run code is of low quality and makes the Just-In-Time compiler (JIT) to trigger regularly to promote the code to a higher quality. Whenever the JIT runs, it produces potentially very visible stutters.
 
 Disabling ReadyToRun solves this issue (at the cost of a slightly longer startup time, but typically very negligible).
 
-ReadyToRun is disabled by default. You can configure it by setting the `PublishReadyToRun` property in your csproj file. MonoGame templates for .NET Core projects explicitly set this to `false`.
+ReadyToRun is disabled by default. You can configure it by setting the `PublishReadyToRun` property in your csproj file.
+
+MonoGame templates for .NET projects explicitly set this to `false`.
 
 ### Tiered compilation
 
 [Tiered compilation](https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-core-3-0#tiered-compilation) is a companion system to ReadyToRun and works on the same principle to enhance startup time. We suggest disabling it to avoid any stutter while your game is running.
 
 Tiered compilation is **enabled by default**. To disable it set the `TieredCompilation` property to `false` in your csproj.
-MonoGame templates for .NET Core projects disable tiered compilation.
+MonoGame templates for .NET projects explicitly set this to `false`.
 
 ### SingleFilePublish
 
 SingleFilePublish packages your game into a single executable file with all dependencies and content integrated.
 
-While it sounds convenient, be aware that it's not magical and is in fact a hidden self-extracting zip archive. As such, it may make app startup take **a lot** longer if your game is large, and may fail to launch on systems where user permissions don't allow extracting files (or if there is not enough storage space available).
+While it sounds very convenient, be aware that it's not magical and is in fact a hidden self-extracting zip archive. As such, it may make app startup take **a lot** longer if your game is large, and may fail to launch on systems where user permissions don't allow extracting files (or if there is not enough storage space available).
 
-We recommend not using it for better compatibility across systems.
+We highly recommend not using it for better compatibility across systems.
 
 ## Windows Store games
 

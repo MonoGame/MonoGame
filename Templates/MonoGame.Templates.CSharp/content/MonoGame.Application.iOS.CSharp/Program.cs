@@ -20,7 +20,7 @@ namespace MGNamespace
         /// </summary>
         static void Main(string[] args)
         {
-            UIApplication.Main(args, null, "AppDelegate");
+            UIApplication.Main(args, null, typeof(Program));
         }
 
         public override void FinishedLaunching(UIApplication app)

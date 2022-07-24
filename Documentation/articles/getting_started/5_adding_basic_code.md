@@ -1,12 +1,12 @@
 # Adding Basic Code
 
-This tutorial will go over adding basic logic to your game. This tutorial continues where [Adding Content](4_adding_content.md) left off.
+This tutorial will go over adding basic logic to your game, continuing from where [Adding Content](4_adding_content.md) left off.
 
 ---
 
 ## Positioning the content
 
-First, we need to add few new variables in the Game1.cs class file, one for position and one for speed.
+First, you need to add few new variables in the Game1.cs class file: one for position and one for speed.
 
 ```csharp
 public class Game1 : Game
@@ -16,7 +16,7 @@ public class Game1 : Game
     float ballSpeed;
 ```
 
-Next let us initialize them. Find the **Initialize** method and add the following lines.
+Next, you need to initialize them. Find the **Initialize** method and add the following lines.
 
 ```csharp
 // TODO: Add your initialization logic here
@@ -27,11 +27,9 @@ ballSpeed = 100f;
 base.Initialize();
 ```
 
-With this, we are setting the ball starting position to the center of the screen based off the dimensions of the screen determined by the current **BackBufferWidth** and **BackBufferHeight**.
+With this, you are setting the ball's starting position to the center of the screen based on the dimensions of the screen determined by the current **BackBufferWidth** and **BackBufferHeight** that was obtained from the Graphics Device (the current resolution the game is running at).
 
-The last thing we need to do is modify the position the ball is getting drawn to.
-
-Find the **Draw** method and update the **spriteBatch.Draw** call to:
+Lastly, change the Draw method to draw the ball at the correct position.  Find the **Draw** method and update the **spriteBatch.Draw** call to:
 
 ```csharp
 _spriteBatch.Draw(ballTexture, ballPosition, Color.White);
@@ -41,7 +39,7 @@ Now run the game.
 
 ![Draw Ball 1](~/images/getting_started/4_ball_not_center.png)
 
-As you can see the ball is not quite centered yet. This is because MonoGame uses (0, 0) as the origin point of the image for drawing by default (Top Left hand corner). We can modify this by taking into account the height and width of the image when drawing, as follows:
+As you can see, the ball is not quite centered yet. That is because the default origin of a texture is its top-left corner, or (0, 0) relative to the texture, so the ball texture is drawn with its top-left corner exactly centered, rather than its actual center. You can specify a different origin when drawing, as shown in the following code snippet. The new origin takes into account the height and width of the image when drawing:
 
 ```csharp
 _spriteBatch.Draw(
@@ -57,7 +55,7 @@ _spriteBatch.Draw(
 );
 ```
 
-We have added a few extra parameters to the spriteBatch.Draw call, but do not worry about that for now, with this update we are setting the actual center (width / 2 and height / 2) of the image as it's origin (drawing point). 
+This change adds a few extra parameters to the spriteBatch.Draw call, but do not worry about that for now. This new code sets the actual center (width / 2 and height / 2) of the image as its origin (drawing point). 
 
 Now the image will get drawn to the center of the screen.
 
@@ -67,78 +65,96 @@ Now the image will get drawn to the center of the screen.
 
 ## Getting user input
 
-Next let's setup some movement. Find the **Update** method in the Game1.cs class file and add:
+Time to set up some movement. Find the **Update** method in the Game1.cs class file and add:
 
 ```csharp
 // TODO: Add your update logic here
 var kstate = Keyboard.GetState();
 
 if (kstate.IsKeyDown(Keys.Up))
+{
     ballPosition.Y -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+}
 
 if(kstate.IsKeyDown(Keys.Down))
+{
     ballPosition.Y += ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+}
 
 if (kstate.IsKeyDown(Keys.Left))
+{
     ballPosition.X -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+}
 
 if(kstate.IsKeyDown(Keys.Right))
+{
     ballPosition.X += ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+}
 
 base.Update(gameTime);
 ```
 
-Let's discuss the code a bit.
-
-With this we are getting the current keyboard state ('Keyboard.GetState()') and storing it into a variable called **kstate**.
+The following is a line-by-line analysis of the above code.
 
 ```csharp
 var kstate = Keyboard.GetState();
 ```
 
-Next is just a simple check to see if the Up arrow key is pressed.
+This code fetches the current keyboard state ('Keyboard.GetState()') and stores it into a variable called **kstate**.
 
 ```csharp
 if (kstate.IsKeyDown(Keys.Up))
 ```
 
-If the Up Arrow key is pressed, we move the ball by the value we set **ballSpeed**. The reason why we then multiply the **ballSpeed** by **gameTime.ElapsedGameTime.TotalSeconds** is because Update is not a fixed time and the time between update calls is not always the same, so in order to get smooth movement on the screen we multiply speed by the time since the last update method was called.
+This line checks to see if the Up Arrow key is pressed.
 
 ```csharp
     ballPosition.Y -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 ```
 
-> Try it yourself by simply moving by the **ballSpeed** alone to see the difference and compare.
+If the **Up Arrow** key is pressed, the ball moves using the value you assigned to **ballSpeed**. The reason why **ballSpeed** is multiplied by **gameTime.ElapsedGameTime.TotalSeconds** is because, when not using fixed time step, the time between Update calls varies. To account for this, the ballSpeed is multiplied by the amount of time that has passed since the last Update call. The result is that the ball appears to move at the same speed regardless of what framerate the game happens to be running at.
 
-The sections repeat the above for the Down, Left and Right arrow keys.
+> Try experimenting with what happens if you do not multiply the **ballSpeed** by **gameTime.ElapsedGameTime.TotalSeconds**, to see the difference it makes.
 
-If you now run the game and you should be able to move the ball with the arrow keys.
+The rest of the lines of code do the same thing but for the Down, Left and Right Arrow keys, and down, left, and right movement, respectively.
 
-You will probably notice that you can get out of the window, so let's make it so that the ball can not escape the window. We will do this by setting bounds onto the ballPosition after it has already been moved to ensure it cannot go further than the width or height of the screen.
+If you run the game, you should be able to move the ball with the arrow keys.
+
+You will probably notice that the ball is not confined to the window. You can fix that by setting bounds onto the ballPosition after it has already been moved to ensure it cannot go further than the width or height of the screen.
 
 ```csharp
 if(kstate.IsKeyDown(Keys.Right))
+{
     ballPosition.X += ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+}
 
-if(ballPosition.X > graphics.PreferredBackBufferWidth - ballTexture.Width / 2)
-    ballPosition.X = graphics.PreferredBackBufferWidth - ballTexture.Width / 2;
+if(ballPosition.X > _graphics.PreferredBackBufferWidth - ballTexture.Width / 2)
+{
+    ballPosition.X = _graphics.PreferredBackBufferWidth - ballTexture.Width / 2;
+}
 else if(ballPosition.X < ballTexture.Width / 2)
+{
     ballPosition.X = ballTexture.Width / 2;
+}
 
-if(ballPosition.Y > graphics.PreferredBackBufferHeight - ballTexture.Height / 2)
-    ballPosition.Y = graphics.PreferredBackBufferHeight - ballTexture.Height / 2;
+if(ballPosition.Y > _graphics.PreferredBackBufferHeight - ballTexture.Height / 2)
+{
+    ballPosition.Y = _graphics.PreferredBackBufferHeight - ballTexture.Height / 2;
+}
 else if(ballPosition.Y < ballTexture.Height / 2)
+{
     ballPosition.Y = ballTexture.Height / 2;
+}
 
 base.Update(gameTime);
 ```
 
-Now run the game and the ball will not be able to go beyond the window bounds anymore.
+Now run the game to test for yourself that the ball cannot go beyond the window bounds any more.
 
 Happy Coding ^^
 
 ## Further Reading
 
-Check out the [Tutorials section](~/articles/tutorials.md) for many more helpful guides and tutorials on building games with MonoGame.  We have an expansive library of helpful content all provided by other MonoGame developers in the community.
+Check out the [Tutorials section](~/articles/tutorials.md) for many more helpful guides and tutorials on building games with MonoGame.  We have an expansive library of helpful content, all provided by other MonoGame developers in the community.
 
 Additionally, be sure to check out the official [MonoGame Samples](~/articles/samples.md) page for fully built sample projects built with MonoGame and targeting our most common platforms.

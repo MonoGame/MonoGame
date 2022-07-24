@@ -133,7 +133,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return _depthStencilView;
         }
 
-        internal void ResolveSubresource()
+        internal virtual void ResolveSubresource()
         {
             lock (GraphicsDevice._d3dContext)
             {
@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var desc = base.GetTexture2DDescription();
 
-            if (MultiSampleCount == 0)
+            if (MultiSampleCount == 0 || Shared)
                 desc.BindFlags |= BindFlags.RenderTarget;
 
             if (Mipmap)

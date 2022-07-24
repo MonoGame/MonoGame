@@ -1,20 +1,20 @@
-- name: Setting up your Development Environment
+- name: 1. Setting up your development environment
   items:
   - name: Windows
     href: 1_setting_up_your_development_environment_windows.md
   - name: macOS
     href: 1_setting_up_your_development_environment_macos.md
-  - name: Ubuntu 20.04
+  - name: Linux
     href: 1_setting_up_your_development_environment_ubuntu.md
-- name: Creating a new project
+- name: 2. Creating a new project
   items:
-  - name: Visual Studio 2019
+  - name: Visual Studio 2022
     href: 2_creating_a_new_project_vs.md
-  - name: Visual Studio for Mac
+  - name: Visual Studio 2022 for Mac
     href: 2_creating_a_new_project_vsm.md
-  - name: .NET Core CLI
+  - name: .NET CLI (Rider or Visual Studio Code)
     href: 2_creating_a_new_project_netcore.md
-- name: Understanding the Code
+- name: 3. Understanding the Code
   href: 3_understanding_the_code.md
 - name: Adding Content
   href: 4_adding_content.md

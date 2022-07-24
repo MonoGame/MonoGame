@@ -37,12 +37,6 @@ namespace MonoGame.Tools.Pipeline
         private Clipboard _clipboard;
         private ContextMenu _contextMenu;
         private FileFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
-        private string[] monoLocations = {
-            "/usr/bin/mono",
-            "/usr/local/bin/mono",
-            "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono",
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "mono"),
-        };
 
         public MainWindow()
         {
@@ -216,12 +210,16 @@ namespace MonoGame.Tools.Pipeline
 
         public void OutputAppend(string text)
         {
+#if !IDE
             Application.Instance.AsyncInvoke(() => buildOutput.WriteLine(text));
+#endif
         }
 
         public void OutputClear()
         {
+#if !IDE
             Application.Instance.Invoke(() => buildOutput.ClearOutput());
+#endif
         }
 
         public bool ShowDeleteDialog(List<IProjectItem> items)
@@ -274,9 +272,17 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new NewItemDialog(PipelineController.Instance.Templates.GetEnumerator(), folder);
             var result = dialog.Show(this);
-
-            template = dialog.Selected;
-            name = dialog.Name + Path.GetExtension(template.TemplateFile);
+            
+            if (result)
+            {
+                template = dialog.Selected;
+                name = dialog.Name + Path.GetExtension(template.TemplateFile);
+            }
+            else
+            {
+                template = null;
+                name = "";
+            }
 
             return result;
         }
@@ -563,7 +569,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdHelp_Executed(object sender, EventArgs e)
         {
-            Process.Start(new ProcessStartInfo() { FileName = "https://docs.monogame.net/articles/tools/pipeline.html", UseShellExecute = true, Verb = "open" });
+            Process.Start(new ProcessStartInfo() { FileName = "https://docs.monogame.net/articles/tools/mgcb_editor.html", UseShellExecute = true, Verb = "open" });
         }
 
         private void CmdAbout_Executed(object sender, EventArgs e)

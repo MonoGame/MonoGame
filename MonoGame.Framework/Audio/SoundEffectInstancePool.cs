@@ -64,7 +64,10 @@ namespace Microsoft.Xna.Framework.Audio
         internal static void Remove(SoundEffectInstance inst)
         {
             lock (_locker)
-                _playingInstances.Add(inst);
+            {
+                if (!_playingInstances.Contains(inst))
+                    _playingInstances.Add(inst);
+            }
         }
 
         /// <summary>

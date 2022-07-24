@@ -155,5 +155,20 @@ namespace MonoGame.Tests.Graphics
 
             rt.Dispose();
         }
+
+#if DIRECTX
+        [TestCase(1)]
+        [TestCase(2)]
+        public void GetSharedHandle(int preferredMultiSampleCount)
+        {
+            var rt = new RenderTarget2D(gd, 16, 16, false, SurfaceFormat.Color, DepthFormat.None, preferredMultiSampleCount, RenderTargetUsage.PlatformContents, true);            
+            var sharedHandle = rt.GetSharedHandle();
+            Assert.AreNotEqual(sharedHandle, IntPtr.Zero);
+
+            var resource = SharpDX.CppObject.FromPointer<SharpDX.DXGI.Resource>(sharedHandle);
+
+            rt.Dispose();
+        }
+#endif
     }
 }

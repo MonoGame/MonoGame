@@ -68,13 +68,13 @@ namespace Microsoft.Xna.Framework.Audio
 
             // get the emitter offset from origin
             Vector3 posOffset = emitter.Position - listener.Position;
-            // set up orientation matrix
-            Matrix orientation = Matrix.CreateWorld(Vector3.Zero, listener.Forward, listener.Up);
+            // set up matrix to transform world space coordinates to listener space coordinates
+            Matrix worldSpaceToListenerSpace = Matrix.Transpose(Matrix.CreateWorld(Vector3.Zero, listener.Forward, listener.Up));
             // set up our final position and velocity according to orientation of listener
             Vector3 finalPos = new Vector3(x + posOffset.X, y + posOffset.Y, z + posOffset.Z);
-            finalPos = Vector3.Transform(finalPos, orientation);
-            Vector3 finalVel = emitter.Velocity;
-            finalVel = Vector3.Transform(finalVel, orientation);
+            finalPos = Vector3.Transform(finalPos, worldSpaceToListenerSpace);
+            Vector3 finalVel = emitter.Velocity - listener.Velocity;
+            finalVel = Vector3.Transform(finalVel, worldSpaceToListenerSpace);
 
             // set the position based on relative positon
             AL.Source(SourceId, ALSource3f.Position, finalPos.X, finalPos.Y, finalPos.Z);
@@ -104,8 +104,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformPlay()
         {
-            SourceId = 0;
-            HasSourceId = false;
+            if (HasSourceId)
+                PlatformStop(true);
             SourceId = controller.ReserveSource();
             HasSourceId = true;
 
@@ -170,6 +170,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformStop(bool immediate)
         {
             FreeSource();
+            if (pauseCount > 0) pauseCount = 0;
             SoundState = SoundState.Stopped;
         }
 

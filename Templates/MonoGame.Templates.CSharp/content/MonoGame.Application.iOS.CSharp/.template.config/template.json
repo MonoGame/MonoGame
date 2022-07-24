@@ -1,9 +1,9 @@
 {
     "author": "MonoGame Team",
     "classifications": [
-        "MonoGame"
+        "MonoGame", "Games", "Mobile", "iOS"
     ],
-    "name": "MonoGame iPhone/iPad Application",
+    "name": "MonoGame iOS Application",
     "groupIdentity": "MonoGame.Application.iOS",
     "identity": "MonoGame.Application.iOS.CSharp",
     "shortName": "mgios",
@@ -18,8 +18,5 @@
     ],
     "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
-    "description": "A MonoGame game project for iOS.",
-    "guids": [
-        "CA7AB65C-57DE-412C-AF42-E7E6EDDF2D5F"
-    ]
+    "description": "A MonoGame game project for iOS compatible with iPhone and iPad devices."
 }
