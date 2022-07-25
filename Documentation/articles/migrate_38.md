@@ -4,7 +4,7 @@ Migrating from 3.8.0 should be straightforward for most platforms.
 
 The major difference is that 3.8.1 now requires .NET 6 and Visual Studio 2022. You can follow the [environment setup tutorial](./getting_started/0_getting_started.md) to make sure that you are not missing any components.
 
-The MGCB Editor is no more global .NET tool and we recommend that you use the new Visual Studio 2022 extension which helps accessing it without the need of CLI commands.
+The MGCB Editor is no longer a global .NET tool and we recommend that you use the new Visual Studio 2022 extension which helps accessing it without the need of CLI commands.
 
 ## WindowsDX, DesktopGL, and UWP
 
