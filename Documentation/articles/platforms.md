@@ -122,7 +122,7 @@ A project template to create [.NET Standard](https://docs.microsoft.com/en-us/do
 
 **Template ID**: mgshared
 
-A project template to create a [shared project](https://docs.microsoft.com/en-us/xamarin/cross-platform/app-fundamentals/shared-projects) which can be used to share code between multiple other projects. The difference with .NET Standard libraries is that shared project don't produce an intermediate DLL and the code is directly shared and built into the other projects it reference.
+A project template to create a [shared project](https://docs.microsoft.com/en-us/xamarin/cross-platform/app-fundamentals/shared-projects) which can be used to share code between multiple other projects. The difference with .NET Standard libraries is that shared projects don't produce an intermediate DLL and the code is directly shared and built into the other projects it reference.
 
 ### Content Pipeline Extension
 
