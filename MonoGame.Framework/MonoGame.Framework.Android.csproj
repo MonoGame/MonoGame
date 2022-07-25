@@ -12,11 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="obj\**\*" />
     <Compile Remove="Platform\**\*" />
