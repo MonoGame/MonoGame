@@ -4,6 +4,16 @@
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <Using Include="Microsoft.Xna.Framework.Audio" />
+    <Using Include="Microsoft.Xna.Framework" />
+    <Using Include="Microsoft.Xna.Framework.Content" />
+    <Using Include="Microsoft.Xna.Framework.Graphics" />
+    <Using Include="Microsoft.Xna.Framework.Media" />
+    <Using Include="Microsoft.Xna.Framework.Input" />
+    <Using Include="Microsoft.Xna.Framework.Input.Touch" />
+    <Using Include="MonoGame.Framework.Utilities" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.1-develop">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
