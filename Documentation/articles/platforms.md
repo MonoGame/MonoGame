@@ -108,7 +108,7 @@ Building for Android requires the .NET Xamarin component to be installed. You ca
 
 The latest version of Xcode will also be required.
 
-You can an iOS game on Windows by [pairing your Visual Studio 2022 with a mac on your local network](https://docs.microsoft.com/en-us/xamarin/ios/get-started/installation/windows/connecting-to-mac/). This feature is not avaible for Rider, Visual Studio Code, or the CLI.
+You can test and deploy an iOS game on Windows by [pairing your Visual Studio 2022 with a mac on your local network](https://docs.microsoft.com/en-us/xamarin/ios/get-started/installation/windows/connecting-to-mac/). This feature is not avaible for Rider, Visual Studio Code, or the CLI.
 
 ## Other templates
 
