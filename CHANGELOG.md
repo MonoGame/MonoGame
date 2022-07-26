@@ -1,6 +1,21 @@
 ﻿# Changelog
+ 
+## 3.8.1 HOTFIX Release - July 26, 2022
 
-## 3.8.1 Release - July 1, 2022
+## What's Changed
+ - Fix MonoGame publisher name for the VS marketplace by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7847
+ - Corrected 'Framwork' to 'Framework' by @benjitrosch in https://github.com/MonoGame/MonoGame/pull/7850
+ - added missing words to platforms.md by @MrGrak in https://github.com/MonoGame/MonoGame/pull/7852
+ - Fixed grammatical error from 'project' to 'projects' by @benjitrosch in https://github.com/MonoGame/MonoGame/pull/7855
+ - Grammar Hotfix on README by @Emersont1 in https://github.com/MonoGame/MonoGame/pull/7856
+ - Remove redundant dependencies by @vpenades in https://github.com/MonoGame/MonoGame/pull/7854
+ - Fixes Visual Studio freezing with the extension by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7857
+ - Updated migration guide by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7858
+ - More migration guide updates by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7859
+ - Wild cards don't work in dotnet-tools.json by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7860
+ - Removed explicit global usings by @vpenades in https://github.com/MonoGame/MonoGame/pull/7853
+
+## 3.8.1 Release - July 24, 2022
 
 ## What's Changed
  - Update build version to 3.8.1.xxxx by @tomspilman in https://github.com/MonoGame/MonoGame/pull/7296
