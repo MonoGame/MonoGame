@@ -23,7 +23,7 @@ Then edit your MonoGame ```PackageReference``` to point to 3.8.1:
 <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.*" />
 ```
 
-### Accessing MCGB Editor without a global tool
+### Accessing MGCB and MCGB Editor without a global tool
 
 MGCB Editor is no longer a .NET global tool, and doesn't need to be installed or registered.
 
@@ -68,7 +68,18 @@ However, if you are migrating from 3.8.0, you will need to setup a configuration
 }
 ```
 
-With this file, .NET will automatically install the MGCB Editor for you when launching Visual Studio 2022. If you installed the Visual Studio extension, you should also be able to just double-click an ```.mgcb``` file to open the MGCB Editor.
+You will also need to add this to your ```.csproj```:
+
+```xml
+  <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
+    <Message Text="Restoring dotnet tools" Importance="High" />
+    <Exec Command="dotnet tool restore" />
+  </Target>
+```
+
+With these changes, .NET will automatically install the MGCB Editor for you when launching Visual Studio 2022. Then, if you installed the Visual Studio extension, you should also be able to just double-click an ```.mgcb``` file to open the MGCB Editor. You can also open the MGCB Editor with the CLI via ```dotnet mgcb-editor``` when executed from within the project directory.
+
+This new configuration has the advantage of allowing to have per-project versions of MGCB and its Editor (instead of per-machine like a global tool).
 
 ## iOS/iPadOS, and Android
 
