@@ -3,7 +3,6 @@
     <TargetFramework>net6.0-ios</TargetFramework>
     <OutputType>Exe</OutputType>
     <SupportedOSPlatformVersion>11.2</SupportedOSPlatformVersion>
-    <ImplicitUsings>true</ImplicitUsings>
     <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
   <ItemGroup>
