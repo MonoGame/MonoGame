@@ -35,31 +35,31 @@ However, if you are migrating from 3.8.0, you will need to setup a configuration
   "isRoot": true,
   "tools": {
     "dotnet-mgcb": {
-      "version": "3.8.1.*",
+      "version": "3.8.1.263",
       "commands": [
         "mgcb"
       ]
     },
     "dotnet-mgcb-editor": {
-      "version": "3.8.1.*",
+      "version": "3.8.1.263",
       "commands": [
         "mgcb-editor"
       ]
     },
     "dotnet-mgcb-editor-linux": {
-      "version": "3.8.1.*",
+      "version": "3.8.1.263",
       "commands": [
         "mgcb-editor-linux"
       ]
     },
     "dotnet-mgcb-editor-windows": {
-      "version": "3.8.1.*",
+      "version": "3.8.1.263",
       "commands": [
         "mgcb-editor-windows"
       ]
     },
     "dotnet-mgcb-editor-mac": {
-      "version": "3.8.1.*",
+      "version": "3.8.1.263",
       "commands": [
         "mgcb-editor-mac"
       ]
@@ -67,6 +67,8 @@ However, if you are migrating from 3.8.0, you will need to setup a configuration
   }
 }
 ```
+
+Please note that you can't use the ```3.8.1.*``` wildcard in the ```dotnet-tools.json``` file (tool versions have to be fully qualified). We strongly recommand that the versions match the MonoGame version referenced in your ```.csproj``` (if you're using the ```*``` wildcard, make sure that they don't end up mismatching if the nugets are updated without you noticing).
 
 You will also need to add this to your ```.csproj```:
 
@@ -77,7 +79,9 @@ You will also need to add this to your ```.csproj```:
   </Target>
 ```
 
-With these changes, .NET will automatically install the MGCB Editor for you when launching Visual Studio 2022. Then, if you installed the Visual Studio extension, you should also be able to just double-click an ```.mgcb``` file to open the MGCB Editor. You can also open the MGCB Editor with the CLI via ```dotnet mgcb-editor``` when executed from within the project directory.
+With these changes, .NET will automatically install the MGCB Editor for you when launching Visual Studio 2022 (if you want to install it manually and skip adding the Target, run ```dotnet tool restore``` within the project directory).
+
+Then, if you installed the Visual Studio extension, you should also be able to just double-click an ```.mgcb``` file to open the MGCB Editor. You can also open the MGCB Editor with the CLI via ```dotnet mgcb-editor``` when executed from within the project directory.
 
 This new configuration has the advantage of allowing to have per-project versions of MGCB and its Editor (instead of per-machine like a global tool).
 
