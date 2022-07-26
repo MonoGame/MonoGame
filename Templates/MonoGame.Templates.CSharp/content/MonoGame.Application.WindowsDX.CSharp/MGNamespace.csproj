@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
@@ -12,16 +12,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
-  <ItemGroup>
-    <Using Include="Microsoft.Xna.Framework.Audio" />
-    <Using Include="Microsoft.Xna.Framework" />
-    <Using Include="Microsoft.Xna.Framework.Content" />
-    <Using Include="Microsoft.Xna.Framework.Graphics" />
-    <Using Include="Microsoft.Xna.Framework.Media" />
-    <Using Include="Microsoft.Xna.Framework.Input" />
-    <Using Include="Microsoft.Xna.Framework.Input.Touch" />
-    <Using Include="MonoGame.Framework.Utilities" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.1-develop" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.1-develop" />
