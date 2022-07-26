@@ -81,13 +81,15 @@ namespace MonoGame.Templates.VSExtension
             process.StartInfo.RedirectStandardOutput = true;
 
             process.Start();
-
+            
+            // this while loop freezes Visual Studio
+            /*
             while (!process.StandardOutput.EndOfStream)
             {
                 string str = process.StandardOutput.ReadLine();
                 System.Diagnostics.Debug.WriteLine(str);
             }
-
+            */
             return VSConstants.S_OK;
         }
 
