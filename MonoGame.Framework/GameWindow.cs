@@ -263,6 +263,10 @@ namespace Microsoft.Xna.Framework
 	    /// <param name="title">The new title of the window.</param>
 		protected abstract void SetTitle (string title);
 
+#if DESKTOPGL
+        public abstract void MaximizeWindow();
+#endif 
+
 #if DIRECTX && WINDOWS
         public static GameWindow Create(Game game, int width, int height)
         {

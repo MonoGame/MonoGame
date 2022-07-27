@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework
             get
             {
                 int x = 0, y = 0;
-                Sdl.Window.GetPosition(Handle, out x, out y);
+                Sdl.Window.GetPosition(Handle, out x, out y);                
                 return new Rectangle(x, y, _width, _height);
             }
         }
@@ -313,6 +313,11 @@ namespace Microsoft.Xna.Framework
         protected override void SetTitle(string title)
         {
             Sdl.Window.SetTitle(_handle, title);
+        }
+
+        public override void MaximizeWindow()
+        {
+            Sdl.Window.MaximizeWindow(_handle);
         }
 
         public void Dispose()
