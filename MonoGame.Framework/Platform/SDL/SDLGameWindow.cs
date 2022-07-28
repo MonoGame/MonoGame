@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework
             get
             {
                 int x = 0, y = 0;
-                Sdl.Window.GetPosition(Handle, out x, out y);                
+                Sdl.Window.GetPosition(Handle, out x, out y);
                 return new Rectangle(x, y, _width, _height);
             }
         }
