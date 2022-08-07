@@ -64,3 +64,8 @@ Check out the awesome work of the larger MonoGame community with their own tutor
 - [Running MonoGame on Android Wear](http://crossplatform.io/running-monogame-on-android-wear/)
 - [Text rendering in MonoGame](https://roy-t.nl/2018/07/04/Text-Rendering.html)
 - [Randomchaos-MonoGame-Samples](https://github.com/NemoKradXNA/Randomchaos-MonoGame-Samples)
+
+## Books
+
+- [MonoGame Mastery: Build a Multi-Platform 2D Game and Reusable Game Engine, 1st Edition](https://www.amazon.com/MonoGame-Mastery-Multi-Platform-Reusable-Engine/dp/1484263081)
+- [Game Development with MonoGame: Build a 2D Game Using Your Own Reusable and Performant Game Engine, 1st Edition](https://www.amazon.com/Game-Development-MonoGame-Reusable-Performant/dp/1484277708/)
