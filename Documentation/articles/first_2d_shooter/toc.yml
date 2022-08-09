@@ -1,0 +1,26 @@
+- name: 1. Creating the GameManager class
+  href: 1_creating_gamemanager_class.md
+- name: 2. Handling Sprite assets
+  href: 2_handling_sprites.md
+- name: 3. Creating the Entity Class
+  href: 3_creating_entity_class.md
+- name: 4. Creating the Entity Manager
+  href: 4_creating_entitymanager.md
+- name: 5. Creating the Player
+  href: 5_creating_the_player.md
+- name: 6. Bullets and Shooting
+  href: 6_bullets_and_shooting.md
+- name: 7. Creating the Enemy
+  href: 7_creating_the_enemy.md
+- name: 8. Collisions and Interactions
+  href: 8_collisions_and_interactions.md
+- name: 9. Spawning Enemies with Wave Manager
+  href: 9_wave_manager_class.md
+- name: 10. User Interface, Scores, and Player lives
+  href: 10_user_interface_scores_lives.md
+- name: 11. Sounds and Music
+  href: 11_sounds_music.md
+- name: 12. Packaging and Delivery for Desktop
+  href: 12_package_delivery.md
+
+

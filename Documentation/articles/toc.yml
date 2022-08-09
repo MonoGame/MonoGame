@@ -11,6 +11,9 @@
 - name: Content Pipeline
   href: content/toc.yml
   topicHref: content/content.md
+- name: Your First Game
+  href: first_2d_shooter/toc.yml
+  topicHref: first_2d_shooter/0_creating_your_first_game.md
 - name: Supported platforms
   href: platforms.md
 - name: Migrating from 3.7
