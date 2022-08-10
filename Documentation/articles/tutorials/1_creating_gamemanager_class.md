@@ -10,7 +10,7 @@ To start, create a new folder within the same directory as your Game1.cs main fi
 
 Next, create a new .cs file called "GameManager" inside the Components folders:
 
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Content/1_FolderComponents.png)
+![](~/images/first_2d_shooter/1_FolderComponents.png)
 
 Edit the GameManager class with the following code, where the namespace is your project name:
 
@@ -64,8 +64,8 @@ Now you can run the game and see your changes to the window. In Visual Studio 20
 
 If you used the values that we used in the GameManager class, you should have a different sized window that is taller.
 
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Content/1_WindowSize.png)
+![](~/images/first_2d_shooter/1_WindowSize.png)
 
 If your window is too small, or too large you can change the values in GameManager to fit your liking and those changes will be reflected when you rerun your game.
 
-Once you have adjusted your window, you can move on to the next section, [Part 2: Handling Sprites](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Articles/2_Part%202%20Handling%20Sprites.md)
+Once you have adjusted your window, you can move on to the next section, [Part 2: Handling Sprites](~/articles/tutorials/2_handling_sprites.md)

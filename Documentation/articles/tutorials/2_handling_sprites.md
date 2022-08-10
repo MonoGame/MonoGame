@@ -3,7 +3,7 @@ This section will go over how to handle sprites in a more organized way and easi
 
 One thing to keep in mind as we go through this tutorial is the viewpoint of the sprites and how they are visualized in code. Here is an image to make you visualize it easier.
 
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Content/2_Coords.png)
+![](~/images/first_2d_shooter/2_Coords.png)
 
 This being said, people often use the first quadrant of a graph, or goes from bottom left to top right for sizing. With sprites it actually goes from top to bottom, where the top = 0 and the bottom is = screen length.
 
@@ -12,29 +12,29 @@ Before you start, download these images as a PNG as it will be part of the game 
 
 Right click the image, then click **Save as Image**. Make sure to save it as a PNG. Alternatively, you can download the whole assets folder from the github [here](https://github.com/AlexJeter17/MonoGameStarShooter/tree/main/Docs/Sprites).
 
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Sprites/PlayerShip.png) PlayerShip 
+![](~/images/first_2d_shooter/Sprites/PlayerShip.png) PlayerShip 
 
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Sprites/EnemyTier1.png) EnemyTier1
+![](~/images/first_2d_shooter/Sprites/EnemyTier1.png) EnemyTier1
 
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Sprites/EnemyTier2.png) EnemyTier2
+![](~/images/first_2d_shooter/Sprites/EnemyTier2.png) EnemyTier2
 
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Sprites/Bullet.png) Bullet
+![](~/images/first_2d_shooter/Sprites/Bullet.png) Bullet
 
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Sprites/StarBackground.jpg) StarBackground
+![](~/images/first_2d_shooter/Sprites/StarBackground.jpg) StarBackground
 
 
 
-Make sure to add these images into your Content mgcb editor of your project. If you don't know how to add content, see this article [Adding Content](https://docs.monogame.net/articles/getting_started/4_adding_content.html)
+Make sure to add these images into your Content mgcb editor of your project. If you don't know how to add content, see this article [Adding Content](~/articles/getting_started/4_adding_content.md)
 
 ## Creating a new Class to contain your Sprites
-In the [Adding Content](https://docs.monogame.net/articles/getting_started/4_adding_content.html) you learned how to add a sprite using the MGCB editor and render it into MonoGame. However it does come with the flaw when you start building a large game, and that multiple sprites are required and loading them all in code, one line at a time inside our LoadContent function is too tedious and messy
+In the [Adding Content](~/articles/getting_started/4_adding_content.md) you learned how to add a sprite using the MGCB editor and render it into MonoGame. However it does come with the flaw when you start building a large game, and that multiple sprites are required and loading them all in code, one line at a time inside our LoadContent function is too tedious and messy
 
 Instead of loading our textures inside of Game1.cs, we can load these onto a separate file, and then just load the file in Game1.cs. That way it is much more organized and easier to read.
 
 ### Setup
 Create a new class file inside your Components folder, just like how you setup the GameManager class in the last part. Your components folder should look like this:
 
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Content/2_FolderSprite.png)
+![](~/images/first_2d_shooter/2_FolderSprite.png)
 
 
 Click on the new SpriteArt class we just created in our Components folder. This should open up the .cs file for you to edit.
@@ -79,7 +79,7 @@ Now you have to load the textures from the content folder. Here you can create a
 ```csharp
 //SpriteArt.cs
 ...
-    public static Texture2D Player { get; private set; } 
+    public static Texture2D Player;
     //Function to load our content
     public static void Load(ContentManager content)
     {
@@ -93,18 +93,18 @@ You can load the rest of the assets you downloaded here. Make sure that you have
 ...
     //Create our texture references here. If we want to get a certain sprite
     //you can use SpriteArt.Player to retrieve its texture
-    public static Texture2D Player { get; private set; }
-    public static Texture2D Enemy1 { get; private set; }
-    public static Texture2D Enemy2 { get; private set; }
-    public static Texture2D Bullet { get; private set; }
-    public static Texture2D background { get; private set; }
+    public static Texture2D Player;
+    public static Texture2D Enemy1;
+    public static Texture2D Enemy2;
+    public static Texture2D Bullet;
+    public static Texture2D background;
     
     //Function to load our content
     public static void Load(ContentManager content)
     {
         Player = content.Load<Texture2D>("PlayerShip");
         Enemy1 = content.Load<Texture2D>("EnemyTier1");
-        Enemy2 = content.Load<Texture2D>("EnemyTier1");
+        Enemy2 = content.Load<Texture2D>("EnemyTier2");
         Bullet = content.Load<Texture2D>("Bullet");
         background = content.Load<Texture2D>("StarBackground");
     }
@@ -143,10 +143,15 @@ You can now draw any of the images that was loaded into Game1.cs. Using the Play
 
 Now when you run the game, you should see the Player image on the top left screen.
 
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Content/2_PlayerSprite.png)
+![](~/images/first_2d_shooter/2_PlayerSprite.png)
 
-Once you are finished, you can go over to the next section where you create the fundamental code for all the objects in the game: [Part 3: Creating an Entity class](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Articles/3_Part%203%20Creating%20an%20Entity%20class.md)
+Once you are finished, you can go over to the next section where you create the fundamental code for all the objects in the game: [Part 3: Creating an Entity class](~/articles/tutorials/3_creating_entity_class.md)
+
+## References and community tutorials
+
+[MGCB Editor](~/articles/tools/mgcb_editor.md): This will show you how to get the MGCB editor downloaded and set up if you do not have it already.
+
+[RB Whitakers 2d tutorial](http://rbwhitaker.wikidot.com/monogame-2d-tutorials): This will help you understand what is going on with sprites and give you a stronger depth of all the types of sprites.
 
 
-## Additional Resources
-[Sprites and Assets]()
+

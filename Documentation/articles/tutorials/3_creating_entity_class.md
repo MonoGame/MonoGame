@@ -1,5 +1,5 @@
 # Part 3: Creating an Entity class
-Continuing from [Part 2: Handling Sprites](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Articles/2_Part%202%20Handling%20Sprites.md), this section will go over how to create a abstract Entity class that will represent all the objects in the game. This includes the player, enemies, and bullets.
+Continuing from [Part 2: Handling Sprites](~/articles/tutorials/2_handling_sprites.md), this section will go over how to create a abstract Entity class that will represent all the objects in the game. This includes the player, enemies, and bullets.
 
 Having a common class for all of the objects in the game will allow you to reuse code easily without having to rewrite it everytime you need it. You can run the same methods between all your objects in game and still have the flexibility of adding new and different types of objects into your game.
 
@@ -70,7 +70,7 @@ There are 3 important values in this draw method that we'll take a look at. The 
 
 Scaling on the other hand is handled by the GameManager. So whatever value you have in GameManager it will translate back here.
 
-In the next section [Part 4: Creating the Entity Manager](https://github.com/AlexJeter17/MonoGameStarShooter/blob/c520d0341a6dcfdf8a2db12b0007155423c476e1/Docs/Articles/4_Part%204%20Creating%20the%20Entity%20Manager.md) you will create a managing class for all entities in the game.
+In the next section [Part 4: Creating the Entity Manager](~/articles/tutorials/4_creating_entitymanager.md) you will create a managing class for all entities in the game.
 
 
 

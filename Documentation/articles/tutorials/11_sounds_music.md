@@ -39,11 +39,11 @@ First create the reference variables for each of the sounds in SpriteArt class a
 ```csharp
 //SpriteArt.cs
 ...
-public static Song song { get; private set; };
-public static SoundEffect explosion { get; private set; };
-public static SoundEffect hpDown { get; private set; };
-public static SoundEffect shootSound { get; private set; };
-public static SoundEffect gameOver { get; private set; };
+public static Song song;
+public static SoundEffect explosion;
+public static SoundEffect hpDown;
+public static SoundEffect shootSound;
+public static SoundEffect gameOver;
 ```
 
 The song variable comes from the Song class and will take in the .mp3 file to play as background home screen music.
@@ -172,5 +172,10 @@ if (Keyboard.GetState().IsKeyDown(Keys.Enter) && !GameManager.inGame)
 
 Now when you play the game, you should be able to hear the sound effects and the main menu music.
 
-Once you are ready, you can move on to the final section of this tutorial which is packaging your game to share with people. [Part 12: Packaging and Delivering for Desktop](https://hackmd.io/-H9VGZWaRLO1xyZM40_Taw)
+Once you are ready, you can move on to the final section of this tutorial which is packaging your game to share with people. [Part 12: Packaging and Delivering for Desktop](~/articles/tutorials/12_package_delivery.md)
 
+## References and community tutorials
+
+[Audio - Monogame](https://gamefromscratch.com/monogame-tutorial-audio/): This tutorial shows how to connect sounds with your keyboard amongst other cool sound ideas.
+
+[MonoGame Microsoft.Xna.Framework.Audio](https://docs.monogame.net/api/Microsoft.Xna.Framework.Audio.html): This link shows all of monogames audio files it supports and shows links to each type so you can choose the best and most effeciant sounds for your game.

@@ -10,21 +10,25 @@ The User Interface is start of the game, so we will be interpreting some new log
 This article will answer all these questions and hopefully lead you into more of your own creative ideas for starting a game.
 
 **The goal of this article is to ensure you have a basic and working User Interface. That will look something like this:**
-![](https://i.imgur.com/6cAgYYF.gif)
+![](~/images/first_2d_shooter/10_MainScreen.gif)
 
 
 ## Set up your SpriteFont!
 
 We will be uploading a font in a similar manner to the way we create sprites.
 1. **Open up content.mgcb**
+
 2. **Right click on the content file, press add and then new item.**
-![](https://i.imgur.com/TKv5NvS.png)
+
+![](~/images/first_2d_shooter/10_MGCB_Add_Font1.png)
 
 3. **Click Spritefont description and give the file a name then click create.**
-![](https://i.imgur.com/K1culLo.png)
+
+![](~/images/first_2d_shooter/10_MGCB_New_File.png)
 
 4. **Double click on the new file in content.mgcb and youll see this:**
-![](https://i.imgur.com/wecshue.png)
+
+![](~/images/first_2d_shooter/10_MGCB_Edit_Font_File.png)
 
 5. **Now change the SIZE to 30**
 
@@ -184,13 +188,13 @@ namespace StarShooterDemo
     static class UserInterface
     {
         public static bool hasStarted = false;
-        private static string titleString = "MonoGame Star Shooter Tutorial!";
+        private static string titleString = "My First Game!";
     }
 }
 ```
 `public static bool hasStarted = false` is the variable that controls the one time initialization for the titleString content. It is similar to the variable for initalizing the player in the EntityManager class.
 
-`private static string titleString = "My First Game1"` is a string that will be displayed as the header when starting the game and when a game over occurs. The string will later be modified to display the score at the end of a game.
+`private static string titleString = "My First Game!"` is a string that will be displayed as the header when starting the game and when a game over occurs. The string will later be modified to display the score at the end of a game.
 
 ### Creating the Home Screen
 
@@ -282,7 +286,8 @@ protected override void Draw(GameTime gameTime)
 {
     _spriteBatch.Begin();
     _spriteBatch.Draw(SpriteArt.backGround, new Rectangle(0, 0, GameManager.screenWidth, GameManager.screenHeight), Color.WhiteSmoke);
-     
+    EntityManager.Draw(_spriteBatch);
+    
     if (GameManager.inGame) // if inGame is true
     {
         UserInterface.gameScreen(_spriteBatch, font);
@@ -291,10 +296,7 @@ protected override void Draw(GameTime gameTime)
     {
         UserInterface.HomeScreen(_spriteBatch, font);
     }
-    
-    EntityManager.Draw(_spriteBatch);
     _spriteBatch.End();
-
     base.Draw(gameTime);
 }
 ```
@@ -309,6 +311,12 @@ The draw methods for EntityManager and Background are untouched otherwise, howev
 
 Now you can run the game and see the user interface in action:
 
-<img src="https://i.imgur.com/6cAgYYF.gif" width="230"/> <img src="https://i.imgur.com/DRbLJMA.gif" width="230"/> <img src="https://i.imgur.com/6VxyjaB.gif" width="230"/>
+<img src="~/images/first_2d_shooter/10_MainScreen.gif" width="230"/> <img src="~/images/first_2d_shooter/10_InGameScreen.gif" width="230"/> <img src="~/images/first_2d_shooter/10_GameOver.gif" width="230"/>
 
-Congrats! You now have a working user Interface! For [Part 11: Sounds and music](https://hackmd.io/-H9VGZWaRLO1xyZM40_Taw) you will learn how play sounds and music inside your game
+Congrats! You now have a working user Interface! For [Part 11: Sounds and music](~/articles/first_2d_shooter/11_sounds_music.md) you will learn how play sounds and music inside your game.
+
+## References and community tutorials
+
+[TrueType fonts](~/articles/getting_started/5_adding_basic_code.md): This shows you how to add more fonts if you wanted to dive deeper and add more pop to your game.
+
+[RB Whitakers SpriteFont tutorial](http://rbwhitaker.wikidot.com/monogame-drawing-text-with-spritefonts): Although similar to our version of spriteFonts, RB Whitaker shows a deeper dive and offers support with finding free fonts and utilizing the DrawString() function.

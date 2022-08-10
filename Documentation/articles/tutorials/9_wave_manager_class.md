@@ -137,8 +137,8 @@ protected override void Update(GameTime gameTime)
 
 Now when you run the game you should be able to shoot down all the enemies and will continously spawn:
 
-![](https://i.imgur.com/rioGP7W.gif)
+![](~/images/first_2d_shooter/9_WaveManagerDemo.gif)
 
 
-Now that your game has spawning mechanics for your enemies, you can move on to the next section which is user interface: [Part 10: User Interface!](https://hackmd.io/LTnckC_cSl29XFo7DUog-Q)
+Now that your game has spawning mechanics for your enemies, you can move on to the next section which is user interface: [Part 10: User Interface, Scores, and Lives](~/articles/tutorials/10_user_interface_scores_lives.md)
 

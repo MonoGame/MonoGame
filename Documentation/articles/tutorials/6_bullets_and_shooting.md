@@ -149,6 +149,6 @@ If there still is a cooldown remaining, then just subtract it by one until it hi
 
 Now when you run the game you should be able to move your player and shoot with spacebar:
 
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Content/6_ShootingDemo.gif)
+![](~/images/first_2d_shooter/6_ShootingDemo.gif)
 
-Once you are finished you can continue on to [Part 7: Creating the enemy](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Articles/7_Part%207%20Creating%20the%20Enemy.md)
+Once you are finished you can continue on to [Part 7: Creating the enemy](~/articles/tutorials/7_creating_the_enemy.md)

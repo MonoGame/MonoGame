@@ -1,5 +1,5 @@
 # Part 5: Creating the Player
-In this section you will be using the Entity class from the previous section in [Part 3: Creating the Entity class](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Articles/3_Part%203%20Creating%20an%20Entity%20class.md) to create the Player class, implement keyboard player movement, and initilize the player in the Game Class.
+In this section you will be using the Entity class from the previous section in [Part 3: Creating the Entity class](~/articles/tutorials/3_creating_entity_class.md) to create the Player class, implement keyboard player movement, and initilize the player in the Game Class.
 
 ## Create a new class file
 Just like how you created the files for Entity and SpriteArt, under the Componenets folder add a new class and name it "Player"
@@ -23,7 +23,6 @@ namespace SpaceShooterDemo
 >In Part 3: Creating the Entity, you created the **abstract** class. By using inheritence you are able to gain the methods and variables from the Entity class in order to utilize them in the Player class. Using the code above, the player now contains the position, texture, and the other methods from Entity.
 
 
->NOTE: Player will be red underlined, please continue with the article as we will resolve it in 2 steps!
 
 
 ## Keyboard Controls
@@ -133,7 +132,7 @@ Now lets place this method into the Game1.cs file. Look for the Update method an
 ...
 ```
 Run your game, and you should be able to see the player and be able to control it:
-![](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Content/5_Player.gif)
+![](~/images/first_2d_shooter/5_Player.gif)
 
 ## GameManager Settings
 A small addition you can make is to give the player properties to the GameManager so that you have one file that controls all the properties. You will be able to change these on a whim without having to go through the files.
@@ -153,4 +152,8 @@ int sideSpeed = GameManager.playerSpeed;
 
 
 
-To see how to make the bullet class follow this link: [Part 6: Shooting!](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Articles/6_Part%206%20Bullets%20and%20Shooting.md)
+To see how to make the bullet class follow this link: [Part 6: Shooting](~/articles/tutorials/6_bullets_and_shooting.md)
+
+## References and community tutorials
+
+[MonoGame - adding basic code](~/articles/getting_started/5_adding_basic_code.md): This section has a good idea of more user movement to enhacne oyur game and get a better understanding of what your sprite is doing.

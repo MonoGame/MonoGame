@@ -3,7 +3,7 @@ In this section of the tutorial you will be going over how to add collisions and
 
 ## Overview
 This is a basic idea of how collisions will work and how the hitboxes look:
-![](https://i.imgur.com/miM9Dbg.png)
+![](~/images/first_2d_shooter/8_CollisionsVisual.png)
 
 The idea of adding collisions is by creating boxes around the sprite that determines the hitbox. You can then use these boxes and calculate if they are touching. If they are touching then you can call some logic that handles those interactions.
 
@@ -156,7 +156,7 @@ Here we check each enemy and bullet entity against each other and if they collid
 
 Now when you run the game, and if you have kept the enemy initial spawn from the last part you will be able to shoot down the enemy:
 
-![](https://i.imgur.com/DGvxEfn.gif)
+![](~/images/first_2d_shooter/8_CollisionsBasic.gif)
 
 
 ## Adding Hit Effects
@@ -273,8 +273,8 @@ public override void Update()
 ```
 Now when you run the game and hit the enemy you should see a knockback effect and a red tint applied when hitting the enemy:
 
-![](https://i.imgur.com/Bx5yLuZ.gif)
+![](~/images/first_2d_shooter/8_CollisionsHitEffect.gif)
 
 ## Next Steps
 
-Once you are finished, the next part will go over infinitely spawning enemies: [Part 9: Wave Spawning](https://github.com/AlexJeter17/MonoGameStarShooter/blob/main/Docs/Articles/9_Part%209%20Wave%20Manager%20Class.md)
+Once you are finished, the next part will go over infinitely spawning enemies: [Part 9: Wave Spawning](~/articles/tutorials/9_wave_manager_class.md)

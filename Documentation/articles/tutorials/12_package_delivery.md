@@ -4,7 +4,7 @@ In this tutorial, you will be packaging the game for desktop and share the game 
 
 This section will be a step by step guide to packaging on Windows, however packaging to other desktop systems share the same steps in this guide.
 
-You can find the system specific commands for packaging in other desktop systems here: [Package games for distribution](https://docs.monogame.net/articles/packaging_games.html)
+You can find the system specific commands for packaging in other desktop systems here: [Package games for distribution](~/articles/packaging_games.html)
 
 ## Step 1
 
@@ -14,7 +14,7 @@ Since we are using visual studio, our project file is located at
 > ./source/repos/MonoGameStarShooter
 
 <!-- ![](https://i.imgur.com/7SW8AIL.png) -->
-![](https://i.imgur.com/AoWPsl8.png)
+![](~/images/first_2d_shooter/12_CLI_Navigate.png)
 
 ## Step 2
 Now copy and paste this into your command line
@@ -24,7 +24,7 @@ dotnet publish -c Release -r win-x64 /p:PublishReadyToRun=false /p:TieredCompila
 
 It will be building your project but it will take a while:
 
-![](https://i.imgur.com/nnrHgYB.png)
+![](~/images/first_2d_shooter/12_CLI_Build.png)
 
 
 ## Step 3
@@ -37,14 +37,14 @@ To run the game, unzip the file and launch the executable inside the folder.
 
 ## Additional Notes
 
-If you want to know more about packaging and what the commands will do, please see the [Package games for distribution](https://docs.monogame.net/articles/packaging_games.html) article for more information.
+If you want to know more about packaging and what the commands will do, please see the [Package games for distribution](~/articles/packaging_games.md) article for more information.
 
 ## Congratulations!
 
 You have finished making a game from start to finish using MonoGame! 
 
-Want to learn more? Visit the [Community Tutorials](https://docs.monogame.net/articles/tutorials.html) section for more resources.
+Want to learn more? Visit the [Community Tutorials](~/articles/tutorials.md) section for more resources.
+
+For more Samples of great monogame ideas go to [Samples and Demos](~/articles/samples.md).
 
 Interested in connecting with other members of the community and showcase your projects? Visit the [MonoGame Discord Server](https://discord.com/invite/monogame) here!
-
-
