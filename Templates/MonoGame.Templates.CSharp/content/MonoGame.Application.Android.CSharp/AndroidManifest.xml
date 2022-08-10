@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="MGNamespace.MGNamespace" android:versionCode="1" android:versionName="1.0">
+  <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="31" />
+  <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+  <application android:label="MGNamespace"></application>
+</manifest>

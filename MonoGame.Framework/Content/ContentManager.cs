@@ -47,6 +47,7 @@ namespace Microsoft.Xna.Framework.Content
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
+            '5', // PlayStation5
             'O', // XboxOne
             'S', // Nintendo Switch
             'G', // Google Stadia

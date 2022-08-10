@@ -199,7 +199,7 @@ namespace Microsoft.Xna.Framework
             set
             {
                 if (value < TimeSpan.Zero)
-                    throw new ArgumentOutOfRangeException("The time must be positive.", default(Exception));
+                    throw new ArgumentOutOfRangeException("The time must be positive.");
 
                 _inactiveSleepTime = value;
             }
@@ -216,11 +216,11 @@ namespace Microsoft.Xna.Framework
             {
                 if (value < TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
-                        "The time must be positive.", default(Exception));
+                        "The time must be positive.");
                 
                 if (value < _targetElapsedTime)
                     throw new ArgumentOutOfRangeException(
-                        "The time must be at least TargetElapsedTime", default(Exception));
+                        "The time must be at least TargetElapsedTime");
 
                 _maxElapsedTime = value;
             }
@@ -258,11 +258,11 @@ namespace Microsoft.Xna.Framework
 
                 if (value <= TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
-                        "The time must be positive and non-zero.", default(Exception));
+                        "The time must be positive and non-zero.");
 
                 if (value > _maxElapsedTime)
                     throw new ArgumentOutOfRangeException(
-                        "The time can not be larger than MaxElapsedTime", default(Exception));
+                        "The time can not be larger than MaxElapsedTime");
 
                 if (value != _targetElapsedTime)
                 {

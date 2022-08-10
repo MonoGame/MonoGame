@@ -67,11 +67,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	    /// <remarks>Flicks does not contain position information. The velocity of it can be read from <see cref="GestureSample.Delta"/></remarks>
         Flick = 4,
         /// <summary>
-        /// The use touched a point and then performed a free-form drag.
+        /// The user touched a point and then performed a free-form drag.
         /// </summary>
         FreeDrag = 8,
         /// <summary>        
-        /// The use touched a single point for approximately one second.
+        /// The user touched a single point for approximately one second.
         /// </summary>
         /// <remarks>As this is a single event, it will not be contionusly fired while the user is holding the touch-point.</remarks>
         Hold = 16,

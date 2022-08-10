@@ -1,8 +1,10 @@
-# Creating a Project with Visual Studio 2019
+# Creating a Project with Visual Studio 2022
 
-This guide will walk you through building a starter game with MonoGame using Windows and Visual Studio 2019.
+This guide will walk you through building a starter game with MonoGame using Windows and Visual Studio 2022. 
 
-Start Visual Studio and select **New Project...** in the upper left corner.
+> It is assumed that you have already properly installed Visual Studio 2022 and MonoGame.
+
+Start Visual Studio 2022 and select **New Project...** in the upper left corner.
 
 ![New Solution](~/images/getting_started/vswin-mg-new-1.png)
 
@@ -10,7 +12,7 @@ You should see the "Create a new project" dialog pop up. From here, select the *
 
 ![New Template](~/images/getting_started/vswin-mg-new-2.png)
 
-Next, type in a name for your project. For this tutorial, **Pong** will be used (note: project names cannot contain spaces). After you've entered the name, click on the **...** button next to the Location text field and choose the folder you want to save the project in. Finally, click **OK** to create the project.
+Next, type in a name for your project. For this tutorial, **Pong** will be used (note: project names cannot contain spaces). After you have entered the name, click on the **...** button next to the Location text field and choose the folder you want to save the project in. Finally, click **OK** to create the project.
 
 ![Project Name](~/images/getting_started/vswin-mg-new-3.png)
 

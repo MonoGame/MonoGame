@@ -4,8 +4,8 @@
 
 using System;
 using Eto;
-using Eto.Forms;
 using Eto.Drawing;
+using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -377,9 +377,11 @@ namespace MonoGame.Tools.Pipeline
             toolClean = cmdClean.CreateToolItem();
             toolCancelBuild = cmdCancelBuild.CreateToolItem();
 
-            ToolBar = toolbar = new ToolBar();
+            toolbar = new ToolBar();
+#if !MAC
+            ToolBar = toolbar;
             ToolBar.Style = "ToolBar";
-            
+                 
             ToolBar.Items.Add(cmdNew);
             ToolBar.Items.Add(cmdOpen);
             ToolBar.Items.Add(cmdSave);
@@ -396,6 +398,7 @@ namespace MonoGame.Tools.Pipeline
             ToolBar.Items.Add(toolRebuild);
             ToolBar.Items.Add(toolClean);
             toolbar.Items.Add(toolCancelBuild);
+#endif
         }
     }
 }

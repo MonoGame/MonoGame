@@ -55,6 +55,11 @@ namespace MonoGame.Framework.Utilities
         PlayStation4,
 
         /// <summary>
+        /// MonoGame PlayStation 5 platform.
+        /// </summary>
+        PlayStation5,
+
+        /// <summary>
         /// MonoGame Nintendo Switch platform.
         /// </summary>
         NintendoSwitch,

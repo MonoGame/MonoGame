@@ -2,48 +2,62 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-	[StructLayout(LayoutKind.Sequential)]
-	public struct ABCFloat
-	{
-		public float A;
-		public float B;
-		public float C;
-	}
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ABCFloat
+    {
+        public float A;
+        public float B;
+        public float C;
+    }
 
-	// Represents a single character within a font.
-	internal class Glyph
-	{
-		// Constructor.
-        public Glyph(char character, BitmapContent bitmap, Rectangle? subrect = null)
-		{
-			this.Character = character;
-			this.Bitmap = bitmap;
-			this.Subrect = subrect.GetValueOrDefault(new Rectangle(0, 0, bitmap.Width, bitmap.Height));
-			this.Width = bitmap.Width;
-			this.Height = bitmap.Height;
-		}
-            
-		// Unicode codepoint.
-		public char Character;
+    // Represents a single character within a font.
+    internal class Glyph
+    {
+        // Constructor.
+        public Glyph(char character, GlyphData data)
+        {
+            Character = character;
+            Data = data;
+        }
 
-		// Glyph image data (may only use a portion of a larger bitmap).
+        // Unicode codepoint.
+        public char Character;
+
+        // Image and layout data
+        public GlyphData Data;
+    }
+
+    internal class GlyphData
+    {
+        // Constructor.
+        public GlyphData(uint glyphIndex, BitmapContent bitmap, Rectangle? subrect = null)
+        {
+            GlyphIndex = glyphIndex;
+            Bitmap = bitmap;
+            Subrect = subrect.GetValueOrDefault(new Rectangle(0, 0, bitmap.Width, bitmap.Height));
+            Width = bitmap.Width;
+            Height = bitmap.Height;
+        }
+
+        // Font-specific index of glyph
+        public uint GlyphIndex;
+
+        // Glyph image data (may only use a portion of a larger bitmap).
         public BitmapContent Bitmap;
-		public Rectangle Subrect;
+        public Rectangle Subrect;
 
-		// Layout information.
-		public float XOffset;
-		public float YOffset;
+        // Layout information.
+        public float XOffset;
+        public float YOffset;
         public int Width;
         public int Height;
 
-		public float XAdvance;
+        public float XAdvance;
 
-		public ABCFloat CharacterWidths;
-	}
+        public ABCFloat CharacterWidths;
+    }
 }

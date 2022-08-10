@@ -25,9 +25,9 @@ MonoGame has the following effects built-in and fully supported on current platf
 * EnvironmentMapEffect
 * SkinnedEffect
 
-Under the hood these effects use the same system and tools as one would for a custom Effect.  The source and pre-compiled versions of these effects can be found in the ['MonoGame.Framework\Platform\Graphics\Effect\Resources'](https://github.com/MonoGame/MonoGame/tree/develop/MonoGame.Framework/Graphics/Effect/Resources) folder.
+Under the hood these effects use the same system and tools as one would for a custom Effect.  The source and pre-compiled versions of these effects can be found in the ['MonoGame.Framework\Platform\Graphics\Effect\Resources'](https://github.com/MonoGame/MonoGame/tree/develop/MonoGame.Framework/Platform/Graphics/Effect/Resources) folder.
 
-If your game requires an extra little bit of performance you can easily hand edit the existing effects to remove unnecessary features or optimize for specific hardware and rebuild them with the MGFX tool.
+> If your game requires an extra little bit of performance you can easily hand edit the existing effects to remove unnecessary features or optimize for specific hardware and rebuild them with the MGFX tool.
 
 ## Custom Effects
 
@@ -40,21 +40,27 @@ To use a custom effect with MonoGame you must do one of the following:
 
 These are some tips for writing or converting effects for use with MonoGame.
 
-* The supported shader models when targeting DX are the following:
-  * `vs_4_0_level_9_1` and `ps_4_0_level_9_1`
-  * `vs_4_0_level_9_3` and `ps_4_0_level_9_3`
-  * `vs_4_0` and `ps_4_0` (requires `HiDef` `GraphicsProfile` at runtime)
-  * `vs_4_1` and `ps_4_1` (requires `HiDef` `GraphicsProfile` at runtime)
-  * `vs_5_0` and `ps_5_0` (requires `HiDef` `GraphicsProfile` at runtime)
-* When targeting GL platforms we automatically translate FX files to GLSL using a library called [MojoShader](http://icculus.org/mojoshader/).  The supported feature levels are the following:
-  * `vs_2_0` and `ps_2_0`
-  * `vs_3_0` and `ps_3_0`
-* You can use preprocessor checks to add conditional code or compilation depending on defined symbols. MonoGame defines the following symbols when compiling effects:
-  * `2MGFX`
-  * `HLSL` and `SM4` for DirectX
-  * `OpenGL` and `GLSL` for OpenGL
+| The supported shader models when targeting DX are the following:|
+|---|
+|  * `vs_4_0_level_9_1` and `ps_4_0_level_9_1`|
+|  * `vs_4_0_level_9_3` and `ps_4_0_level_9_3`|
+|  * `vs_4_0` and `ps_4_0` (requires `HiDef` `GraphicsProfile` at runtime)|
+|  * `vs_4_1` and `ps_4_1` (requires `HiDef` `GraphicsProfile` at runtime)|
+|  * `vs_5_0` and `ps_5_0` (requires `HiDef` `GraphicsProfile` at runtime)|
+---
+|When targeting GL platforms we automatically translate FX files to GLSL using a library called [MojoShader](http://icculus.org/mojoshader/).  The supported feature levels are the following:|
+|---|
+|  * `vs_2_0` and `ps_2_0`|
+|  * `vs_3_0` and `ps_3_0`|
+---
+|You can use preprocessor checks to add conditional code or compilation depending on defined symbols. MonoGame defines the following symbols when compiling effects:|
+|---|
+|  * `2MGFX`                        |
+|  * `HLSL` and `SM4` for DirectX   |
+|  * `OpenGL` and `GLSL` for OpenGL |
+---
   
-  As an example, you can conditionally set shader models depending on the platform with the following code:
+As an example, you can conditionally set shader models depending on the platform with the following code:
 
   ```hlsl
   #if OPENGL
@@ -81,4 +87,4 @@ Custom symbols can be defined from the [MGCB Editor](~/articles/tools/mgcb_edito
 * Note that on GL platforms default values on Effect parameters do not work.  Either set the parameter from code or use a real constant like a #define.
 * The effect compiler is aggressive about removing unused parameters, be sure the parameters you are setting are actually used.
 * Preshaders are not supported.
-* If you think you've found a bug porting a shader, [please let us know](https://github.com/MonoGame/MonoGame/issues).
+* If you think you have found a bug porting a shader, [please let us know](https://github.com/MonoGame/MonoGame/issues).

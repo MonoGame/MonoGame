@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Input
                 alert.Dismissed += (sender, e) =>
                 {
                     if (!tcs.Task.IsCompleted)
-                        tcs.SetResult(e.ButtonIndex == 0 ? null : alert.GetTextField(0).Text);
+                        tcs.SetResult(e.ButtonIndex == System.IntPtr.Zero ? null : alert.GetTextField(0).Text);
                 };
 
                 // UIAlertView's textfield does not show keyboard in iOS8

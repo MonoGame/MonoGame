@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Templates.VSMacExtension</BaseOutputPath>
+    <CreatePackage>true</CreatePackage>
+    <ImplicitUsings>true</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudioMac.Sdk" Version="17.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Icons/*.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Icons/*.png">
+      <LogicalName>%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AddinFile Include="..\..\Artifacts\NuGet\MonoGame.Templates.CSharp.*.nupkg">
+      <Link>Templates\MonoGame.Templates.CSharp.nupkg</Link>
+    </AddinFile>
+  </ItemGroup>
+
+  <Target Name="_GenerateAddinInfo" BeforeTargets="CoreCompile">
+     <ItemGroup>
+       <AddinInfo Include="using System%3B" />
+       <AddinInfo Include="using Mono.Addins%3B" />
+       <AddinInfo Include="using Mono.Addins.Description%3B" />
+       <AddinInfo Include="[assembly: Addin(&quot;MonoGame.Templates.VSMacExtension&quot;, Version = &quot;$(Version)&quot;)]" />
+       <AddinInfo Include="[assembly: AddinName(&quot;MonoGame Extension&quot;)]" />
+       <AddinInfo Include="[assembly: AddinCategory(&quot;Game Development&quot;)]" />
+       <AddinInfo Include="[assembly: AddinDescription(&quot;MonoGame Extension ofr VisualStudio for Mac&quot;)]" />
+       <AddinInfo Include="[assembly: AddinAuthor(&quot;MonoGame Team&quot;)]" />
+     </ItemGroup>
+     <WriteLinesToFile File="Properties\AddinInfo.cs" Lines="@(AddinInfo)" Overwrite="true" />
+  </Target>
+
+</Project>
