@@ -10,6 +10,7 @@ The User Interface is start of the game, so we will be interpreting some new log
 This article will answer all these questions and hopefully lead you into more of your own creative ideas for starting a game.
 
 **The goal of this article is to ensure you have a basic and working User Interface. That will look something like this:**
+
 ![](~/images/first_2d_shooter/10_MainScreen.gif)
 
 
