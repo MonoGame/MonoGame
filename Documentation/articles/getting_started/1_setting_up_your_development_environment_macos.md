@@ -48,6 +48,15 @@ brew install wine-stable
 brew install p7zip wget
 ```
 
+Before wine is usable, you will need to open it manually first - otherwise, you will get an error that Apple couldn't verify it.
+
+ - Open Finder
+ - Navigate to Applications
+ - Control+Click on Wine Stable
+ - Choose to open it
+
+If you choose, you may close it now - it has been unblocked.
+
 Create wine prefix:
 
 ```sh
