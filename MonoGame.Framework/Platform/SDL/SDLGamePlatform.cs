@@ -36,20 +36,15 @@ namespace Microsoft.Xna.Framework
             _keys = new List<Keys>();
             Keyboard.SetKeys(_keys);
 
-            Sdl.Version sversion;
-            Sdl.GetVersion(out sversion);
+            Sdl.GetVersion(out Sdl.version);
 
-            Sdl.Major = sversion.Major;
-            Sdl.Minor = sversion.Minor;
-            Sdl.Patch = sversion.Patch;
+            var minVersion = new Sdl.Version() { Major = 2, Minor = 0, Patch = 5 };
 
-            var version = 100 * Sdl.Major + 10 * Sdl.Minor + Sdl.Patch;
-
-            if (version <= 204)
-                Debug.WriteLine("Please use SDL 2.0.5 or higher.");
+            if (Sdl.version < minVersion)
+                Debug.WriteLine("Please use SDL " + minVersion + " or higher.");
 
             // Needed so VS can debug the project on Windows
-            if (version >= 205 && CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
+            if (Sdl.version >= minVersion && CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
                 Sdl.SetHint("SDL_WINDOWS_DISABLE_THREAD_NAMING", "1");
 
             _dropList = new List<string>();

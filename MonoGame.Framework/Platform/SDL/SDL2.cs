@@ -25,9 +25,7 @@ internal static class Sdl
             return FuncLoader.LoadLibraryExt("sdl2");
     }
 
-    public static int Major;
-    public static int Minor;
-    public static int Patch;
+    public static Version version;
 
     [Flags]
     public enum InitFlags
