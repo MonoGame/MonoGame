@@ -27,5 +27,13 @@ namespace MonoGame.Tests.Framework
             Assert.IsTrue(newVersionNomenclature > oldVersionNomenclature);
             Assert.IsTrue(newVersionNomenclature >= oldVersionNomenclature);
         }
+
+        [Test]
+        public void Sdl2VersionString()
+        {
+            var version = new Sdl.Version() { Major = 2, Minor = 0, Patch = 5 };
+
+            Assert.AreEqual(version.ToString(), "2.0.5");
+        }
     }
 }

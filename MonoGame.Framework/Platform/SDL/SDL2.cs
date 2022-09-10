@@ -185,6 +185,11 @@ internal static class Sdl
             return version1 == version2 || version1 < version2;
         }
 
+        public override string ToString()
+        {
+            return Major + "." + Minor + "." + Patch;
+        }
+
         private static int ConcatenateVersion(Version version)
         {
             // Account for a change in SDL2 version convention. After version 2.0.22,
