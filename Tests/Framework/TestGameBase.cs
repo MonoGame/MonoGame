@@ -31,7 +31,7 @@ namespace MonoGame.Tests {
             Content.RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
 #endif
             // We do all the tests using the reference device to
-            // avoid driver glitches and get consistant rendering.
+            // avoid driver glitches and get consistent rendering.
             GraphicsAdapter.UseReferenceDevice = true;
 
             Services.AddService<IFrameInfoSource>(this);
@@ -231,12 +231,12 @@ namespace MonoGame.Tests {
             Exit();
 #else
             // NOTE: We avoid Game.Exit() here as we marked it
-            // obsolute on platforms that disallow exit in 
+            // obsolete on platforms that disallow exit in 
             // shipping games.
             //
             // We however need it here to halt the app after we
             // complete running all the unit tests.  So we do the
-            // next best thing can call the interal platform code
+            // next best thing can call the internal platform code
             // directly which produces the same result.
             Platform.Exit();
             SuppressDraw();
