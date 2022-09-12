@@ -58,8 +58,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.31902.203" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.1.4058" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.*" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.*" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Templates.pkgdef">
