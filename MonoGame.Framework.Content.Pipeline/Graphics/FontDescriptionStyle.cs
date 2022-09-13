@@ -9,23 +9,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// <summary>
     /// Flags that describe style information to be applied to text.
     /// You can combine these flags by using a bitwise OR operator (|).
+    /// 
+    /// FW (12.09.2022):
+    /// Reorg the flags and added underline and strikeout. 
     /// </summary>
     [Flags]
     public enum FontDescriptionStyle
     {
         /// <summary>
+        /// Normal text.
+        /// </summary>
+        Regular = 0x01,
+
+        /// <summary>
         /// Bold text.
         /// </summary>
-        Bold,
+        Bold = 0x02,
 
         /// <summary>
         /// Italic text.
         /// </summary>
-        Italic,
+        Italic = 0x04,
 
         /// <summary>
-        /// Normal text.
+        /// Underlined text.
         /// </summary>
-        Regular,
+        Underline = 0x08,
+
+        /// <summary>
+        /// Strikeout text.
+        /// </summary>
+        Strikeout = 0x10,
     }
 }

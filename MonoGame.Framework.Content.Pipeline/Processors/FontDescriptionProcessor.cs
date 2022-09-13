@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public override SpriteFontContent Process(FontDescription input, ContentProcessorContext context)
         {
             var output = new SpriteFontContent(input);
-            var fontFile = FindFont(input.FontName, input.Style.ToString());
+            var fontFile = FindFont(input.FontName, input.Style);
 
             if (string.IsNullOrWhiteSpace(fontFile))
             {
@@ -63,18 +63,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             if (!File.Exists(fontFile))
+            {
                 throw new FileNotFoundException("Could not find \"" + input.FontName + "\" font file.");
-
+            }
             context.Logger.LogMessage("Building Font {0}", fontFile);
 
             // Get the platform specific texture profile.
             var texProfile = TextureProfile.ForPlatform(context.TargetPlatform);
 
             {
-                if (!File.Exists(fontFile))
-                {
-                    throw new Exception(string.Format("Could not load {0}", fontFile));
-                }
+                //if (!File.Exists(fontFile))
+                //{
+                //    throw new Exception(string.Format("Could not load {0}", fontFile));
+                //}
                 var lineSpacing = 0f;
                 int yOffsetMin = 0;
                 var glyphs = ImportFont(input, out lineSpacing, out yOffsetMin, context, fontFile);
@@ -132,7 +133,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     var r = data[idx];
 
                     // Special case of simply copying the R component into the A, since R is the value of white alpha we want
-                    data[idx + 0] = r;
+                    //data[idx + 0] = r; // Not necessary.
                     data[idx + 1] = r;
                     data[idx + 2] = r;
                     data[idx + 3] = r;
@@ -230,10 +231,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return glyphs.ToArray();
         }
 
-        private string FindFont(string name, string style)
+        private string FindFont(string name, FontDescriptionStyle style)
         {
             if (CurrentPlatform.OS == OS.Windows)
             {
+                // FW (12.09.2022):
+                // Remove the regular bit, to get the right serialized string later.
+                // Also remove strikeout and underline, because this should be done
+                // by the drawing library (SharpFont).
+                style &= ~FontDescriptionStyle.Regular;
+                style &= ~FontDescriptionStyle.Underline;
+                style &= ~FontDescriptionStyle.Strikeout;
+
+                // FW (12.09.2022):
+                // Create the file name. Use also the style to get the right file.
+                var stylestr = style.ToString().Replace(",", string.Empty);
+                name = $"{name} {stylestr}".Trim();
+
                 var fontDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts");
                 foreach (var key in new RegistryKey[] { Registry.LocalMachine, Registry.CurrentUser })
                 {
