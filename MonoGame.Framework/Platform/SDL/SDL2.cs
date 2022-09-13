@@ -25,9 +25,7 @@ internal static class Sdl
             return FuncLoader.LoadLibraryExt("sdl2");
     }
 
-    public static int Major;
-    public static int Minor;
-    public static int Patch;
+    public static Version version;
 
     [Flags]
     public enum InitFlags
@@ -143,6 +141,66 @@ internal static class Sdl
         public byte Major;
         public byte Minor;
         public byte Patch;
+
+        public static bool operator >(Version version1, Version version2)
+        {
+            return ConcatenateVersion(version1) > ConcatenateVersion(version2);
+        }
+
+        public static bool operator <(Version version1, Version version2)
+        {
+            return ConcatenateVersion(version1) < ConcatenateVersion(version2);
+        }
+
+
+        public static bool operator ==(Version version1, Version version2)
+        {
+            return version1.Major == version2.Major &&
+                version1.Minor == version2.Minor &&
+                version1.Patch == version2.Patch;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Version))
+                return false;
+
+            return version == (Version)obj;
+        }
+
+        public static bool operator !=(Version version1, Version version2)
+        {
+            return !(version1 == version2);
+        }
+
+        public static bool operator >=(Version version1, Version version2)
+        {
+            return version1 == version2 || version1 > version2;
+        }
+
+        public static bool operator <=(Version version1, Version version2)
+        {
+            return version1 == version2 || version1 < version2;
+        }
+
+        public override string ToString()
+        {
+            return Major + "." + Minor + "." + Patch;
+        }
+
+        private static int ConcatenateVersion(Version version)
+        {
+            // Account for a change in SDL2 version convention. After version 2.0.22,
+            // SDL switched formats from 2.0.x to 2.x.y (with y being optional)
+            if (version.Major == 2 && version.Minor == 0 && version.Patch < 23)
+            {
+                return version.Major * 1_000_000 + version.Patch * 1000;
+            }
+            else
+            {
+                return version.Major * 1_000_000 + version.Minor * 1000 + version.Patch;
+            }
+        }
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
