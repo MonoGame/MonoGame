@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                // If stream doesnt provide seek functionaly, use MemoryStream instead
+                // If stream doesn't provide seek functionality, use MemoryStream instead
                 using (var ms = new MemoryStream())
                 {
                     stream.CopyTo(ms);
