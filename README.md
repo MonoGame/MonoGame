@@ -6,6 +6,9 @@ It is an open-source re-implementation of the discontinued [Microsoft's XNA Fram
 
 [![Join the chat at https://discord.gg/monogame](https://img.shields.io/discord/355231098122272778?color=%237289DA&label=MonoGame&logo=discord&logoColor=white)](https://discord.gg/monogame)
 
+[![kandi X-Ray](https://kandi.openweaver.com/badges/xray.svg)](https://kandi.openweaver.com/csharp/MonoGame/MonoGame)
+[![kandi Featured](https://kandi.openweaver.com/badges/featured.svg)](https://kandi.openweaver.com/collections/csharp/csharp-game-development)
+
 * [Build Status](#build-status)
 * [Supported Platforms](#supported-platforms)
 * [Support and Contributions](#support-and-contributions)
