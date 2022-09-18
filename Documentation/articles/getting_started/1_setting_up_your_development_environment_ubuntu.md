@@ -6,7 +6,7 @@ The only development environment that MonoGame officially supports on Linux is [
 
 ## Install .NET 6 SDK
 
-To install the .NET 6 SDK on your Linux distribution, please follow [Microsoft's instructions]([https://docs.microsoft.com/dotnet/core/install/linux?WT.mc_id=dotnet-35129-website).
+To install the .NET 6 SDK on your Linux distribution, please follow [Microsoft's instructions](https://docs.microsoft.com/dotnet/core/install/linux).
 
 ## Install Visual Studio Code
 
@@ -38,7 +38,7 @@ Effect (shader) compilation requires access to DirectX, so it will not work nati
 Install wine64:
 
 ```sh
-sudo apt install wine64 p7zip-full
+sudo apt install wine64 p7zip-full curl
 ```
 
 Create wine prefix:
