@@ -107,7 +107,7 @@ protected override void Update(GameTime gameTime)
 }
 ```
 
-The **Update** method is called multiple times per second, and it is used to update your game state (checking for collisions, gathering input, playing audio, etc.).
+The **Update** method is called multiple times per second, and it is used to update your game state (checking for collisions, gathering input, playing audio, etc.). The if statement allows the game to be exited by pressing either the escape key on a keyboard or the back button on a gamepad which is especially useful if you change your game to run in fullscreen mode.
 
 ## Draw Method
 
@@ -122,6 +122,6 @@ protected override void Draw(GameTime gameTime)
 }
 ```
 
-Similar to the Update method, the **Draw** method is also called multiple times per second.  This, as the name suggests, is responsible for drawing content to the screen.
+Similar to the Update method, the **Draw** method is also called multiple times per second.  This, as the name suggests, is responsible for drawing content to the screen. The call to the **Clear** method essentially sets the background color of the game window.
 
 **Next up:** [Adding Content](4_adding_content.md)
