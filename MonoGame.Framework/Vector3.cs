@@ -1395,6 +1395,20 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Adds two vectors.
+        /// </summary>
+        /// <param name="value1">Source <see cref="Vector3"/> on the left of the add sign.</param>
+        /// <param name="value2">Source <see cref="Vector3Int"/> on the right of the add sign.</param>
+        /// <returns>Sum of the vectors.</returns>
+        public static Vector3 operator +(Vector3 value1, Vector3Int value2)
+        {
+            value1.X += (float)value2.X;
+            value1.Y += (float)value2.Y;
+            value1.Z += (float)value2.Z;
+            return value1;
+        }
+
+        /// <summary>
         /// Inverts values in the specified <see cref="Vector3"/>.
         /// </summary>
         /// <param name="value">Source <see cref="Vector3"/> on the right of the sub sign.</param>
@@ -1420,6 +1434,20 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Subtracts a <see cref="Vector3"/> from a <see cref="Vector3Int"/>.
+        /// </summary>
+        /// <param name="value1">Source <see cref="Vector3"/> on the left of the sub sign.</param>
+        /// <param name="value2">Source <see cref="Vector3"/> on the right of the sub sign.</param>
+        /// <returns>Result of the vector subtraction.</returns>
+        public static Vector3 operator -(Vector3 value1, Vector3Int value2)
+        {
+            value1.X -= (float)value2.X;
+            value1.Y -= (float)value2.Y;
+            value1.Z -= (float)value2.Z;
+            return value1;
+        }
+
+        /// <summary>
         /// Multiplies the components of two vectors by each other.
         /// </summary>
         /// <param name="value1">Source <see cref="Vector3"/> on the left of the mul sign.</param>
@@ -1430,6 +1458,20 @@ namespace Microsoft.Xna.Framework
             value1.X *= value2.X;
             value1.Y *= value2.Y;
             value1.Z *= value2.Z;
+            return value1;
+        }
+
+        /// <summary>
+        /// Multiplies the components of two vectors by each other.
+        /// </summary>
+        /// <param name="value1">Source <see cref="Vector3"/> on the left of the mul sign.</param>
+        /// <param name="value2">Source <see cref="Vector3Int"/> on the right of the mul sign.</param>
+        /// <returns>Result of the vector multiplication.</returns>
+        public static Vector3 operator *(Vector3 value1, Vector3Int value2)
+        {
+            value1.X *= (float)value2.X;
+            value1.Y *= (float)value2.Y;
+            value1.Z *= (float)value2.Z;
             return value1;
         }
 
@@ -1472,6 +1514,20 @@ namespace Microsoft.Xna.Framework
             value1.X /= value2.X;
             value1.Y /= value2.Y;
             value1.Z /= value2.Z;
+            return value1;
+        }
+
+        /// <summary>
+        /// Divides the components of a <see cref="Vector3"/> by the components of another <see cref="Vector3Int"/>.
+        /// </summary>
+        /// <param name="value1">Source <see cref="Vector3"/> on the left of the div sign.</param>
+        /// <param name="value2">Divisor <see cref="Vector3Int"/> on the right of the div sign.</param>
+        /// <returns>The result of dividing the vectors.</returns>
+        public static Vector3 operator /(Vector3 value1, Vector3Int value2)
+        {
+            value1.X /= (float)value2.X;
+            value1.Y /= (float)value2.Y;
+            value1.Z /= (float)value2.Z;
             return value1;
         }
 
