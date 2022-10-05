@@ -12,7 +12,7 @@ pool:
 variables:
   solution: '**/MonoGame.Framework.DesktopGL.sln'
   buildPlatform: 'Any CPU'
-#  buildConfiguration: 'Release'
+  buildConfiguration: 'Release'
 
 name: $(Date:yyyy.MM.dd.hhmmss)$(Rev:.r)
 steps:
