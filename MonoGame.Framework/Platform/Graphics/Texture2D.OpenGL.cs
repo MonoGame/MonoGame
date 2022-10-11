@@ -230,7 +230,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.EnsureUIThread();
 
 #if GLES
-            // TODO: check for for non renderable formats (formats that can't be attached to FBO)
+            // TODO: check for non renderable formats (formats that can't be attached to FBO)
 
             var framebufferId = 0;
             GL.GenFramebuffers(1, out framebufferId);
