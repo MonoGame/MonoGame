@@ -13,8 +13,6 @@ namespace MonoGame.Effect
 {
     class OpenGLShaderProfile : ShaderProfile
     {
-        private bool _useMojo;
-
         protected virtual bool IsESSL => false;
 
         private static readonly Regex GlslPixelShaderRegex = DirectX11ShaderProfile.HlslPixelShaderRegex;
@@ -39,8 +37,7 @@ namespace MonoGame.Effect
             macros.Add("GLSL", "1");
             macros.Add("OPENGL", "1");
 
-            _useMojo = options.IsDefined("MOJO");
-            if (!_useMojo)
+            if(!options.UseMojoShader)
                 macros.Add("SM4", "1");
         }
 
@@ -67,63 +64,52 @@ namespace MonoGame.Effect
 
         internal override void ValidateShaderModels(PassInfo pass)
         {
-            int maxSM = _useMojo ? 3 : 5;
-
             int major, minor;
             string extension;
 
-            if (_useMojo)
+            if (!string.IsNullOrEmpty(pass.vsFunction))
             {
-                if (!string.IsNullOrEmpty(pass.vsFunction))
-                {
-                    ParseShaderModel(pass.vsModel, GlslVertexShaderRegex, out major, out minor, out extension);
-                    if (major > maxSM)
-                        throw new Exception(String.Format("Invalid profile '{0}'. Vertex shader '{1}' must be SM {2}.0 or lower!", pass.vsModel, pass.vsFunction, maxSM));
-                }
-
-                if (!string.IsNullOrEmpty(pass.psFunction))
-                {
-                    ParseShaderModel(pass.psModel, GlslPixelShaderRegex, out major, out minor, out extension);
-                    if (major > maxSM)
-                        throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be SM {2}.0 or lower!", pass.vsModel, pass.psFunction, maxSM));
-                }
+                ParseShaderModel(pass.vsModel, GlslVertexShaderRegex, out major, out minor, out extension);
+                if (major > 5)
+                    throw new Exception(String.Format("Invalid profile '{0}'. Vertex shader '{1}' must be SM 5 or lower!", pass.vsModel, pass.vsFunction));
             }
-            else
+            if (!string.IsNullOrEmpty(pass.psFunction))
             {
-                if (!string.IsNullOrEmpty(pass.hsFunction))
-                {
-                    ParseShaderModel(pass.hsModel, GlslHullShaderRegex, out major, out minor, out extension);
-                    if (major <= 4)
-                        throw new Exception(String.Format("Invalid profile '{0}'. Hull shader '{1}' must be SM 5.0!", pass.hsModel, pass.hsFunction));
-                }
-
-                if (!string.IsNullOrEmpty(pass.dsFunction))
-                {
-                    ParseShaderModel(pass.dsModel, GlslDomainShaderRegex, out major, out minor, out extension);
-                    if (major <= 4)
-                        throw new Exception(String.Format("Invalid profile '{0}'. Domain shader '{1}' must be SM 5.0!", pass.vsModel, pass.dsFunction));
-                }
-
-                if (!string.IsNullOrEmpty(pass.gsFunction))
-                {
-                    ParseShaderModel(pass.gsModel, GlslGeometryShaderRegex, out major, out minor, out extension);
-                    if (major <= 3)
-                        throw new Exception(String.Format("Invalid profile '{0}'. Geometry shader '{1}' must be SM 4.0 or higher!", pass.gsModel, pass.gsFunction));
-                }
-
-                if (!string.IsNullOrEmpty(pass.csFunction))
-                {
-                    ParseShaderModel(pass.csModel, GlslComputeShaderRegex, out major, out minor, out extension);
-                    if (major <= 4)
-                        throw new Exception(String.Format("Invalid profile '{0}'. Compute shader '{1}' must be SM 5.0 or higher!", pass.csModel, pass.csFunction));
-                }
+                ParseShaderModel(pass.psModel, GlslPixelShaderRegex, out major, out minor, out extension);
+                if (major > 5)
+                    throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be SM 5 or lower!", pass.vsModel, pass.psFunction));
+            }
+            if (!string.IsNullOrEmpty(pass.hsFunction))
+            {
+                ParseShaderModel(pass.hsModel, GlslHullShaderRegex, out major, out minor, out extension);
+                if (major <= 4)
+                    throw new Exception(String.Format("Invalid profile '{0}'. Hull shader '{1}' must be SM 5.0!", pass.hsModel, pass.hsFunction));
+            }
+            if (!string.IsNullOrEmpty(pass.dsFunction))
+            {
+                ParseShaderModel(pass.dsModel, GlslDomainShaderRegex, out major, out minor, out extension);
+                if (major <= 4)
+                    throw new Exception(String.Format("Invalid profile '{0}'. Domain shader '{1}' must be SM 5.0!", pass.vsModel, pass.dsFunction));
+            }
+            if (!string.IsNullOrEmpty(pass.gsFunction))
+            {
+                ParseShaderModel(pass.gsModel, GlslGeometryShaderRegex, out major, out minor, out extension);
+                if (major <= 3)
+                    throw new Exception(String.Format("Invalid profile '{0}'. Geometry shader '{1}' must be SM 4.0 or higher!", pass.gsModel, pass.gsFunction));
+            }
+            if (!string.IsNullOrEmpty(pass.csFunction))
+            {
+                ParseShaderModel(pass.csModel, GlslComputeShaderRegex, out major, out minor, out extension);
+                if (major <= 4)
+                    throw new Exception(String.Format("Invalid profile '{0}'. Compute shader '{1}' must be SM 5.0 or higher!", pass.csModel, pass.csFunction));
             }
         }
 
-        internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ShaderStage shaderStage, EffectObject effect, ref string errorsAndWarnings)
+        internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ShaderStage shaderStage, EffectObject effect, Options options, ref string errorsAndWarnings)
         {
-            if (_useMojo)
+            if (options.UseMojoShader)
             {
+                // Compile with MojoShader
                 // For now GLSL is only supported via translation
                 // using MojoShader which works from HLSL bytecode.
                 var bytecode = EffectObject.CompileHLSL(shaderResult, shaderFunction, shaderProfile, ref errorsAndWarnings);
@@ -132,17 +118,18 @@ namespace MonoGame.Effect
                 var shaderData = ShaderData.CreateGLSL_Mojo(bytecode, shaderStage, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);
                 effect.Shaders.Add(shaderData);
 
-                return shaderData;
+                return shaderData;     
             }
             else
             {
+                // Compile with ShaderConductor
                 ParseShaderModel(shaderProfile, GetShaderModelRegex(shaderStage), out int smMajor, out int smMinor, out string smExtension);
 
                 var shaderData = ShaderData.CreateGLSL_Conductor(
                     shaderResult, effect.Shaders.Count,
                     shaderStage, shaderFunction,
                     smMajor, smMinor, smExtension,
-                    effect.ConstantBuffers, 
+                    effect.ConstantBuffers,
                     IsESSL, ref errorsAndWarnings);
 
                 // See if we already created this same shader.
@@ -157,10 +144,10 @@ namespace MonoGame.Effect
             }
         }
 
-        internal void MakeSeparateSamplersForDifferentTextures(List<ShaderData> shaders)
+        internal void MakeSeparateSamplersForDifferentTextures(List<ShaderData> shaders, Options options)
         {
             // MojoShader handles this differently
-            if (_useMojo)
+            if (options.UseMojoShader)
                 return;
 
             // When a sampler samples from multiple textures, we have to create separate samplers for every texture.

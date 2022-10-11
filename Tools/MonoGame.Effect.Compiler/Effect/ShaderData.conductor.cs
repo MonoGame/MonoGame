@@ -29,6 +29,13 @@ namespace MonoGame.Effect
                 stage = ConvertToConductorShaderStage(shaderStage),
             };
 
+            if (shaderModelMajor < 4)
+            {
+                string warningMsg = ":::warning: shader model 2 or 3 shader is being compiled by ShaderConductor, it is recommended to use shader model 4 or higher instead.\n";
+                if (!errorsAndWarnings.Contains(warningMsg))
+                    errorsAndWarnings += warningMsg;
+            }
+
             int shaderModelMajorDX = Math.Max(shaderModelMajor, 4);
             int shaderModelMinorDX = shaderModelMajor < 4 ? 0 : shaderModelMinor;
 

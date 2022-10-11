@@ -60,11 +60,11 @@ namespace MonoGame.Effect
 
         internal abstract void ValidateShaderModels(PassInfo pass);
 
-        internal abstract ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ShaderStage shaderStage, EffectObject effect, ref string errorsAndWarnings);
+        internal abstract ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ShaderStage shaderStage, EffectObject effect, Options options, ref string errorsAndWarnings);
 
         internal abstract Regex GetShaderModelRegex(ShaderStage stage);
 
-        protected static void ParseShaderModel(string text, Regex regex, out int major, out int minor, out string extension)
+        internal static void ParseShaderModel(string text, Regex regex, out int major, out int minor, out string extension)
         {
             var match = regex.Match(text);
             if (!match.Success)

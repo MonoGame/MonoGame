@@ -34,7 +34,7 @@ namespace MonoGame.Effect
             using(BinaryWriter memWriter = new BinaryWriter(memStream))
             {
                 // Write MojoShader flag
-                memWriter.Write(options.IsDefined("MOJO"));
+                memWriter.Write(options.UseMojoShader);
 
                 // Write all the constant buffers.
                 memWriter.Write(ConstantBuffers.Count);

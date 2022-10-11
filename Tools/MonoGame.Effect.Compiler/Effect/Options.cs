@@ -32,5 +32,7 @@ namespace MonoGame.Effect
         public IEnumerable<string> GetDefines() => (Defines ?? "")
             .Split(';', StringSplitOptions.RemoveEmptyEntries)
             .Select(d => d.Trim());
+
+        public bool UseMojoShader;
     }
 }

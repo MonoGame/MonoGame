@@ -709,8 +709,65 @@ namespace MonoGame.Effect
             }
         }
 
+        static public bool DoesEffectNeedSM4OrHigher(ShaderResult shaderResult)
+        {
+            var shaderInfo = shaderResult.ShaderInfo;
 
-        static public EffectObject CompileEffect(ShaderResult shaderResult, out string errorsAndWarnings)
+            for (var t = 0; t < shaderInfo.Techniques.Count; t++)
+            {
+                var tinfo = shaderInfo.Techniques[t]; ;
+                for (var p = 0; p < tinfo.Passes.Count; p++)
+                {
+                    var pinfo = tinfo.Passes[p];
+
+                    if (!string.IsNullOrEmpty(pinfo.psFunction))
+                    {
+                        ShaderProfile.ParseShaderModel(pinfo.psModel, shaderResult.Profile.GetShaderModelRegex(ShaderStage.PixelShader), out int smMajor, out int smMinor, out string smExtension);
+                        if (smMajor >= 4)
+                            return true;
+                    }
+
+                    if (!string.IsNullOrEmpty(pinfo.vsFunction))
+                    {
+                        ShaderProfile.ParseShaderModel(pinfo.vsModel, shaderResult.Profile.GetShaderModelRegex(ShaderStage.VertexShader), out int smMajor, out int smMinor, out string smExtension);
+                        if (smMajor >= 4)
+                            return true;
+                    }
+
+                    if (!string.IsNullOrEmpty(pinfo.hsFunction))
+                    {
+                        ShaderProfile.ParseShaderModel(pinfo.hsModel, shaderResult.Profile.GetShaderModelRegex(ShaderStage.HullShader), out int smMajor, out int smMinor, out string smExtension);
+                        if (smMajor >= 4)
+                            return true;
+                    }
+
+                    if (!string.IsNullOrEmpty(pinfo.dsFunction))
+                    {
+                        ShaderProfile.ParseShaderModel(pinfo.dsModel, shaderResult.Profile.GetShaderModelRegex(ShaderStage.DomainShader), out int smMajor, out int smMinor, out string smExtension);
+                        if (smMajor >= 4)
+                            return true;
+                    }
+
+                    if (!string.IsNullOrEmpty(pinfo.gsFunction))
+                    {
+                        ShaderProfile.ParseShaderModel(pinfo.gsModel, shaderResult.Profile.GetShaderModelRegex(ShaderStage.GeometryShader), out int smMajor, out int smMinor, out string smExtension);
+                        if (smMajor >= 4)
+                            return true;
+                    }
+
+                    if (!string.IsNullOrEmpty(pinfo.csFunction))
+                    {
+                        ShaderProfile.ParseShaderModel(pinfo.csModel, shaderResult.Profile.GetShaderModelRegex(ShaderStage.ComputeShader), out int smMajor, out int smMinor, out string smExtension);
+                        if (smMajor >= 4)
+                            return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        static public EffectObject CompileEffect(ShaderResult shaderResult, Options options, out string errorsAndWarnings)
         {
             var effect = new EffectObject();
             errorsAndWarnings = string.Empty;
@@ -751,37 +808,37 @@ namespace MonoGame.Effect
                     if (!string.IsNullOrEmpty(pinfo.psFunction))
                     {
                         pass.state_count += 1;
-                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.psFunction, pinfo.psModel, ShaderStage.PixelShader, ref errorsAndWarnings);
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.psFunction, pinfo.psModel, ShaderStage.PixelShader, options, ref errorsAndWarnings);
                     }
 
                     if (!string.IsNullOrEmpty(pinfo.vsFunction))
                     {
                         pass.state_count += 1;
-                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.vsFunction, pinfo.vsModel, ShaderStage.VertexShader, ref errorsAndWarnings);
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.vsFunction, pinfo.vsModel, ShaderStage.VertexShader, options, ref errorsAndWarnings);
                     }
 
                     if (!string.IsNullOrEmpty(pinfo.hsFunction))
                     {
                         pass.state_count += 1;
-                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.hsFunction, pinfo.hsModel, ShaderStage.HullShader, ref errorsAndWarnings);
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.hsFunction, pinfo.hsModel, ShaderStage.HullShader, options, ref errorsAndWarnings);
                     }
 
                     if (!string.IsNullOrEmpty(pinfo.dsFunction))
                     {
                         pass.state_count += 1;
-                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.dsFunction, pinfo.dsModel, ShaderStage.DomainShader, ref errorsAndWarnings);
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.dsFunction, pinfo.dsModel, ShaderStage.DomainShader, options, ref errorsAndWarnings);
                     }
 
                     if (!string.IsNullOrEmpty(pinfo.gsFunction))
                     {
                         pass.state_count += 1;
-                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.gsFunction, pinfo.gsModel, ShaderStage.GeometryShader, ref errorsAndWarnings);
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.gsFunction, pinfo.gsModel, ShaderStage.GeometryShader, options, ref errorsAndWarnings);
                     }
 
                     if (!string.IsNullOrEmpty(pinfo.csFunction))
                     {
                         pass.state_count += 1;
-                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.csFunction, pinfo.csModel, ShaderStage.ComputeShader, ref errorsAndWarnings);
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderResult, pinfo.csFunction, pinfo.csModel, ShaderStage.ComputeShader, options, ref errorsAndWarnings);
                     }
 
                     pass.states = new d3dx_state[pass.state_count];
@@ -796,7 +853,7 @@ namespace MonoGame.Effect
 
             // In OpenGL, when a single sampler samples from multiple textures, we have to create separate samplers for every texture.
             if (shaderResult.Profile is OpenGLShaderProfile profileGL)
-                profileGL.MakeSeparateSamplersForDifferentTextures(effect.Shaders);
+                profileGL.MakeSeparateSamplersForDifferentTextures(effect.Shaders, options);
 
             // Make the list of parameters by combining all the
             // constant buffers ignoring the buffer offsets.
@@ -910,14 +967,14 @@ namespace MonoGame.Effect
             return effect;
         }
 
-        private d3dx_state CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ShaderStage shaderStage, ref string errorsAndWarnings)
+        private d3dx_state CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ShaderStage shaderStage, Options options, ref string errorsAndWarnings)
         {
             // Check if this shader has already been created.
             var shaderData = Shaders.Find(shader => shader.ShaderFunctionName == shaderFunction && shader.ShaderProfile == shaderProfile);
             if (shaderData == null)
             {
                 // Compile and create the shader.
-                shaderData = shaderResult.Profile.CreateShader(shaderResult, shaderFunction, shaderProfile, shaderStage, this, ref errorsAndWarnings);
+                shaderData = shaderResult.Profile.CreateShader(shaderResult, shaderFunction, shaderProfile, shaderStage, this, options, ref errorsAndWarnings);
                 shaderData.ShaderFunctionName = shaderFunction;
                 shaderData.ShaderProfile = shaderProfile;
             }
@@ -963,7 +1020,7 @@ namespace MonoGame.Effect
 
             return state;
         }
-       
+
         internal static int GetShaderIndex(STATE_CLASS type, d3dx_state[] states)
         {
             foreach (var state in states)
