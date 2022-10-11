@@ -186,7 +186,7 @@ namespace MonoGame.Effect
 
                     if (error)
                     {
-                        errorsAndWarnings += "warning: failed parsing default value for shader parameter: '"
+                        errorsAndWarnings += ":::warning: failed parsing default value for shader parameter: '"
                             + paramInit.name + " = " + paramInit.value
                             + "'\nNo expressions or identifiers allowed, simple numbers only.\n";
                     }

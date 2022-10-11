@@ -177,7 +177,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         {
             // Split the errors and warnings into individual lines.
             var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] { "\n", "\r", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            var errorOrWarningRegex = new Regex(@"(.*):(([0-9]+):([0-9]+)):\s*(error|warning):\s*(.*)", RegexOptions.Compiled);
+            var errorOrWarningRegex = new Regex(@"(.*):(([0-9]*):([0-9]*)):\s*(error|warning):\s*(.*)", RegexOptions.Compiled);
 
             string unhandledMessages = "";
             bool errorOrWarningHappend = false;
