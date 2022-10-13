@@ -1724,62 +1724,21 @@ namespace MonoGame.OpenGL
                     GL.BlitFramebuffer = LoadFunction<GL.BlitFramebufferDelegate>("glBlitFramebufferNV");
                 }
             }
-            if (GL.BlendFuncSeparatei == null && Extensions.Contains("GL_ARB_draw_buffers_blend"))
-            {
-                GL.BlendFuncSeparatei = LoadFunction<GL.BlendFuncSeparateiDelegate>("BlendFuncSeparateiARB");
-            }
-            if (GL.BlendEquationSeparatei == null && Extensions.Contains("GL_ARB_draw_buffers_blend"))
-            {
-                GL.BlendEquationSeparatei = LoadFunction<GL.BlendEquationSeparateiDelegate>("BlendEquationSeparateiARB");
-            }
-            if (GL.GetUniformBlockIndex == null && Extensions.Contains("GL_ARB_uniform_buffer_object"))
-            {
-                GL.GetUniformBlockIndex = LoadFunction<GL.GetUniformBlockIndexDelegate>("glGetUniformBlockIndex");
-            }
-            if (GL.UniformBlockBinding == null && Extensions.Contains("GL_ARB_uniform_buffer_object"))
-            {
-                GL.UniformBlockBinding = LoadFunction<GL.UniformBlockBindingDelegate>("glUniformBlockBinding");
-            }
-            if (GL.GetProgramResourceIndex == null && Extensions.Contains("GL_ARB_shader_storage_buffer_object"))
-            {
-                GL.GetProgramResourceIndex = LoadFunction<GL.GetProgramResourceIndexDelegate>("glGetProgramResourceIndex");
-            }
-            if (GL.ShaderStorageBlockBinding == null && Extensions.Contains("GL_ARB_shader_storage_buffer_object"))
-            {
-                GL.ShaderStorageBlockBinding = LoadFunction<GL.ShaderStorageBlockBindingDelegate>("glShaderStorageBlockBinding");
-            }
-            if (GL.DispatchCompute == null && Extensions.Contains("GL_ARB_compute_shader"))
-            {
-                GL.DispatchCompute = LoadFunction<GL.DispatchComputeDelegate>("glDispatchCompute");
-            }
-            if (GL.BindImageTexture == null && Extensions.Contains("GL_ARB_shader_image_load_store"))
-            {
-                GL.BindImageTexture = LoadFunction<GL.BindImageTextureDelegate>("glBindImageTexture");
-            }
-            if (GL.DrawElementsIndirect == null && Extensions.Contains("GL_ARB_draw_indirect"))
-            {
-                GL.DrawElementsIndirect = LoadFunction<GL.DrawElementsIndirectDelegate>("glDrawElementsIndirect");
-            }
-            if (GL.DrawArraysIndirect == null && Extensions.Contains("GL_ARB_draw_indirect"))
-            {
-                GL.DrawArraysIndirect = LoadFunction<GL.DrawArraysIndirectDelegate>("glDrawArraysIndirect");
-            }
-            if (GL.DispatchComputeIndirect == null && Extensions.Contains("GL_ARB_compute_shader"))
-            {
-                GL.DispatchComputeIndirect = LoadFunction<GL.DispatchComputeIndirectDelegate>("glDispatchComputeIndirect");
-            }
-            if (GL.MemoryBarrier == null && Extensions.Contains("GL_ARB_shader_image_load_store"))
-            {
-                GL.MemoryBarrier = LoadFunction<GL.MemoryBarrierDelegate>("glMemoryBarrier");
-            }
-            if (GL.CopyBufferSubData == null && Extensions.Contains("GL_ARB_copy_buffer"))
-            {
-                CopyBufferSubData = LoadFunction<GL.CopyBufferSubDataDelegate>("glCopyBufferSubData");
-            }
-            if (GL.CopyImageSubData == null && Extensions.Contains("GL_ARB_copy_image"))
-            {
-                CopyImageSubData = LoadFunction<GL.CopyImageSubDataDelegate>("glCopyImageSubData");
-            }
+
+            GL.BlendFuncSeparatei = LoadFunction<GL.BlendFuncSeparateiDelegate>("BlendFuncSeparateiARB");
+            GL.BlendEquationSeparatei = LoadFunction<GL.BlendEquationSeparateiDelegate>("BlendEquationSeparateiARB");
+            GL.GetUniformBlockIndex = LoadFunction<GL.GetUniformBlockIndexDelegate>("glGetUniformBlockIndex");
+            GL.UniformBlockBinding = LoadFunction<GL.UniformBlockBindingDelegate>("glUniformBlockBinding");
+            GL.GetProgramResourceIndex = LoadFunction<GL.GetProgramResourceIndexDelegate>("glGetProgramResourceIndex");
+            GL.ShaderStorageBlockBinding = LoadFunction<GL.ShaderStorageBlockBindingDelegate>("glShaderStorageBlockBinding");
+            GL.DispatchCompute = LoadFunction<GL.DispatchComputeDelegate>("glDispatchCompute");
+            GL.BindImageTexture = LoadFunction<GL.BindImageTextureDelegate>("glBindImageTexture");
+            GL.DrawElementsIndirect = LoadFunction<GL.DrawElementsIndirectDelegate>("glDrawElementsIndirect");
+            GL.DrawArraysIndirect = LoadFunction<GL.DrawArraysIndirectDelegate>("glDrawArraysIndirect");
+            GL.DispatchComputeIndirect = LoadFunction<GL.DispatchComputeIndirectDelegate>("glDispatchComputeIndirect");
+            GL.MemoryBarrier = LoadFunction<GL.MemoryBarrierDelegate>("glMemoryBarrier");
+            CopyBufferSubData = LoadFunction<GL.CopyBufferSubDataDelegate>("glCopyBufferSubData");
+            CopyImageSubData = LoadFunction<GL.CopyImageSubDataDelegate>("glCopyImageSubData");
         }
 
         internal static void LoadFrameBufferObjectEXTEntryPoints()
