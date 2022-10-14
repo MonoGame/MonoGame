@@ -148,6 +148,10 @@ namespace MonoGame.Effect
             if (outGlPerVertexRemoved && !(shaderStage == ShaderStage.HullShader))
                 GLSLManipulator.AddPosFixupUniformAndCode(ref glsl);
 
+            // ShaderConductor treats gl_InvocationID as uint when it must be int
+            if (shaderStage == ShaderStage.HullShader || shaderStage == ShaderStage.DomainShader)
+                GLSLManipulator.FixGlInvocationID(ref glsl); 
+
             shaderData.ShaderCode = Encoding.ASCII.GetBytes(glsl);
 
             //==============================================================
