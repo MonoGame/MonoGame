@@ -8,7 +8,7 @@ Alternatively, you can build it [directly from source](https://github.com/MonoGa
 
 To start a new project just select “New...” from the “File” menu.
 
-![MGCB Editor new project](~/images/content/mgcb_new.png)
+![MGCB Editor new project](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/mgcb_new.png)
 
 This will give you a new empty project to add content to.
 
@@ -16,7 +16,7 @@ This will give you a new empty project to add content to.
 
 If you are starting from an existing XNA project, the MGCB Editor supports importing your existing **.contentproj**. Again you can access this from the “**File**” menu:
 
-![MGCB Editor import XNA](~/images/content/mgcb_import.png)
+![MGCB Editor import XNA](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/mgcb_import.png)
 
 This creates a new project, adding all your content and content settings from the XNA project. If you happened to be using custom processors, you may need to edit the assembly references to link to the correct paths which we discuss next.
 
@@ -24,7 +24,7 @@ This creates a new project, adding all your content and content settings from th
 
 You can edit the content project settings directly from the property grid editor after selecting the project node in the tree view:
 
-![Project settings](~/images/content/mgcb_project.png)
+![Project settings](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/mgcb_project.png)
 
 This is where you set up the folders for output, the platform to target, the assembly references for custom processors, etc.
 
@@ -34,11 +34,11 @@ This is where you set up the folders for output, the platform to target, the ass
 
 Once you have a project set up you can add content to it for building. You can do this from the “**Edit**” menu:
 
-![Edit menu](~/images/content/mgcb_addexisting.png)
+![Edit menu](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/mgcb_addexisting.png)
 
 Selecting “**New Item...**” will bring up the New Item dialog which displays a list of new items that can be created:
 
-![New item](~/images/content/mgcb_newitem.png)
+![New item](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/mgcb_newitem.png)
 
 When you select “**Existing Item...**”, you can select an existing item from disk to add to the content project.
 
@@ -54,7 +54,7 @@ The MonoGame Content Builder (MGCB) pipeline supports many different file types 
 
 ### Images
 
-![Image Properties](~/images/content/MGCB-ImageProperties.png)
+![Image Properties](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/MGCB-ImageProperties.png)
 
 Images come in a variety of formats such as png or jpg, most of which are natively supported by the MonoGame content pipeline.
 
@@ -72,7 +72,7 @@ Additionally, the following options are configurable per image asset when import
 
 ### Audio
 
-![Image Properties](~/images/content/MGCB-AudioProperties.png)
+![Image Properties](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/MGCB-AudioProperties.png)
 
 MonoGame supports several audio formats to cope with a wide variety of audio needs, from Wav files for effects to MP3's for songs/background music. The type of audio you use will depend on the audio needs for your project.
 
@@ -85,7 +85,7 @@ Audio can be configured to use either the **Sound Effect** processor which impor
 
 ### Models
 
-![Image Properties](~/images/content/MGCB-ModelProperties.png)
+![Image Properties](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/MGCB-ModelProperties.png)
 
 | Property                   | Description                                                                                                                                             |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -106,7 +106,7 @@ Audio can be configured to use either the **Sound Effect** processor which impor
 
 ### [Fonts](adding_ttf_fonts.md)
 
-![Font Properties](~/images/content/MGCB-Fontproperties.png)
+![Font Properties](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/MGCB-Fontproperties.png)
 
 MonoGame uses a **Font descriptor** file to describe the type of font to import, the font in question needs to be installed in the machines Font library for it to enable the project to build, else this will result in a Font importer error.
 
@@ -121,7 +121,7 @@ See the [TrueType fonts](adding_ttf_fonts.md) section for more detail on working
 
 ### [Effects](custom_effects.md)
 
-![Effect Properties](~/images/content/MGCB-EffectProperties.png)
+![Effect Properties](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/MGCB-EffectProperties.png)
 
 Effects in MonoGame are shaders that have been built with a supported shader language (HLSL / GLSL) which will then be pre-processed into a common shader language / effect used by MonoGame.
 
@@ -134,7 +134,7 @@ See the [Effects](custom_effects.md) section for more detail on the built-in eff
 
 ### Video
 
-![Image Properties](~/images/content/MGCB-VideoProperties.png)
+![Image Properties](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/MGCB-VideoProperties.png)
 
 MonoGame uses a custom video player which converts video files into a format that can be used and rendered by MonoGame using a series of VideoTextures.
 
@@ -142,7 +142,7 @@ There are no configurable properties for the Video Player currently.
 
 ### Text (e.g. XML)
 
-![Image Properties](~/images/content/MGCB-TextProperties.png)
+![Image Properties](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/MGCB-TextProperties.png)
 
 One of the most powerful processors in MonoGame is the text processor, ideally used for XML files used to manage Game Class content in text files rather than writing it all in code.
 
@@ -176,7 +176,7 @@ Once you have built your content, you have a few different ways to add it to you
 
 The simplest method is to set up your game project from one of the templates that come with the SDK. When you create a new project, it will include a Content.mgcb file with its Build Action set to **MonoGameContentReference** and a reference to `MonoGame.Content.Builder.Task` which processes *MonoGameContentReference* items.
 
-![MonoGame Content Reference](~/images/content/MGCB-ContentReference.png)
+![MonoGame Content Reference](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/MGCB-ContentReference.png)
 
 > This build action is defined in the .targets file [here](https://github.com/MonoGame/MonoGame/blob/develop/Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.targets).
 
@@ -192,20 +192,20 @@ If you do not want to use the automated process, you can build the content proje
 
 If you are using Visual Studio, you can bypass the content pipeline all together and simply the files to your C# game project directly (or as links). Create a folder in the project called Content then right-click on the folder and select Add > Existing Item.
 
-![Add existing item](~/images/content/existing_item.png)
+![Add existing item](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/existing_item.png)
 
 You will now see a file dialog from which you can add your content files. 
 
 > Note that if you do not want Visual Studio to make a local copy of the files. Make sure to use “**Add As Link**” when “Linking” files.
 > 
-> ![Add as link](~/images/content/add_as_link.png)
+> ![Add as link](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/add_as_link.png)
 
 Once the files are added you will need to select them all and change their properties in the properties window to:
 
 * "Build Action" to **Content**
 * "Copy to Output Directory" to **Copy if newer**
 
-![Copy if newer](~/images/content/copy_if_newer.png)
+![Copy if newer](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/copy_if_newer.png)
 
 ### Add With Wildcard
 
