@@ -62,4 +62,4 @@ This is why using the content pipeline and XNB's is superior. You feed uncompres
 
 Hopefully, you have a good idea of why you should use the content pipeline in your games. Using the raw assets is ok when you are putting together a simple demo or proof of concept but sooner or later you will need to start optimizing your content. My advice would be to use the Pipeline tooling from the outset so you get used to it.
 
-Information on the [Pipeline tool](~/articles/tools/mgcb_editor.md) can be found here.
+Information on the [Pipeline tool](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/articles/tools/mgcb_editor.md) can be found here.
