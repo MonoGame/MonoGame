@@ -10,7 +10,7 @@ To be able to use a TrueType font, MonoGame requires the **TrueType font file** 
 
 1. Create the .spritefont file by selecting "Edit -> Add -> New Item" from the MGCB Editor menu, then select **SpriteFont Description** from the list and click **Create**.
    
-   ![Adding TTF fonts step 2](~/images/content/adding_ttf_fonts.PNG)
+   ![Adding TTF fonts step 2](https://github.com/MonoGame/MonoGame/blob/develop/Documentation/images/content/adding_ttf_fonts.PNG)
 
 2. Open the newly created .spritefont file in your text editor of choice, find this line and change it to your selected .ttf font.
    If the font is installed on the system, just type the name of the font.
