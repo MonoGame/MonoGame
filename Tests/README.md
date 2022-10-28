@@ -9,15 +9,41 @@ properties, methods and behavior to guarantee compatibility with XNA in
 those regards.  Additionally, visual tests verify via frame capture and
 comparison that MonoGame renders equivalently to XNA.
 
-Currently, on Windows, the tests can be run using NUnit and target
+
+*Note: Currently there is no way to skip or select certain tests to run
+using the custom runner.  This functionality is coming soon.*
+
+## Running Tests
+
+Currently, on Windows+Visual Studio, the tests can be run using NUnit and target
 either XNA or MonoGame.  On macOS and Linux, the tests target
 MonoGame and are implemented in an executable assembly that can be run
 and debugged directly.  After execution using the custom test runner,
 and HTML report of the results will be loaded in your default browser,
 and a log of stdout can be found in bin\$(Configuration)\stdout.txt.
 
-*Note: Currently there is no way to skip or select certain tests to run
-using the custom runner.  This functionality is coming soon.*
+In Visual Studio 2022 (Windows) or Visual Studio for Mac, use the Test Explorer
+to run the tests.
+
+To run them from the command-line (Windows/Mac/Linux):
+
+```bash
+dotnet test ./Tests/MonoGame.Tests.DesktopGL.csproj
+```
+
+To list all the tests:
+
+**Note** These are quick hints, for extensive help use `dotnet test --help`.
+
+```bash
+dotnet test ./Tests/MonoGame.Tests.DesktopGL.csproj -t
+```
+
+To run/filter specific classes/namespaces, an example:
+
+```bash
+dotnet test ./Tests/MonoGame.Tests.DesktopGL.csproj --filter MonoGame.Tests.Visual
+```
 
 ## Rendering Tests
 
