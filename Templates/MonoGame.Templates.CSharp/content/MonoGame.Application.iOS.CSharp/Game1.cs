@@ -1,4 +1,7 @@
-﻿
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+
 namespace MGNamespace;
 
 public class Game1 : Game
