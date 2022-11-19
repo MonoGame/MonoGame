@@ -215,16 +215,17 @@ namespace Microsoft.Xna.Framework.Windows
         void HandleDropMessage(ref Message m)
         {
             IntPtr hdrop = m.WParam;
-            StringBuilder builder = new StringBuilder();
 
             uint count = DragQueryFile(hdrop, uint.MaxValue, null, 0);
 
             string[] files = new string[count];
             for (uint i = 0; i < count; i++)
             {
-                DragQueryFile(hdrop, i, builder, int.MaxValue);
+                var nameLength = DragQueryFile(hdrop, i, null, 0);
+                var builder = new StringBuilder((int)nameLength + 1);
+
+                DragQueryFile(hdrop, i, builder, (uint)builder.Capacity);
                 files[i] = builder.ToString();
-                builder.Clear();
             }
 
             _window.OnFileDrop(new FileDropEventArgs(files));
