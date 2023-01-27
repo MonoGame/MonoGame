@@ -108,13 +108,14 @@ namespace Microsoft.Xna.Framework
             Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
             // when running NUnit tests entry assembly can be null
-            if (Assembly.GetEntryAssembly() != null)
+            var entryAssembly = Assembly.GetEntryAssembly();
+            if (entryAssembly != null)
             {
                 using (
                     var stream =
-                        Assembly.GetEntryAssembly().GetManifestResourceStream(Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace + ".Icon.bmp") ??
-                        Assembly.GetEntryAssembly().GetManifestResourceStream("Icon.bmp") ??
-                        Assembly.GetExecutingAssembly().GetManifestResourceStream("MonoGame.bmp"))
+                        entryAssembly.GetManifestResourceStream(entryAssembly.GetName().Name + ".Icon.bmp") ??
+                        entryAssembly.GetManifestResourceStream("Icon.bmp") ??
+                        typeof(SdlGameWindow).Assembly.GetManifestResourceStream("MonoGame.bmp"))
                 {
                     if (stream != null)
                         using (var br = new BinaryReader(stream))
