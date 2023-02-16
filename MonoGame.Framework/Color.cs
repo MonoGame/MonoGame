@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework
     {
         static Color()
         {
+            TransparentBlack = new Color(0);
             Transparent = new Color(0);
             AliceBlue = new Color(0xfffff8f0);
             AntiqueWhite = new Color(0xffd7ebfa);
@@ -429,6 +430,15 @@ namespace Microsoft.Xna.Framework
         }
 
         #region Color Bank
+        /// <summary>
+        /// TransparentBlack color (R:0,G:0,B:0,A:0).
+        /// </summary>
+        [Obsolete("Use Color.Transparent instead. In future versions this method can be removed.")]
+        public static Color TransparentBlack
+        {
+            get;
+            private set;
+        }
         
         /// <summary>
         /// Transparent color (R:0,G:0,B:0,A:0).
