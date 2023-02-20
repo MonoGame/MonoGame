@@ -28,9 +28,13 @@ We recommend using the .tar.gz archiving format to preserve the execution permis
 
 ### Build and packaging for macOS
 
-From the .NET CLI:
+From the .NET CLI (x64):
 
 `dotnet publish -c Release -r osx-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
+
+If targeting M1:
+
+`dotnet publish -c Release -r osx-arm64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
 
 We recommend that you distribute your game as an [application bundle](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/BundleTypes/BundleTypes.html). Application bundles are directories with the following file structure:
 
