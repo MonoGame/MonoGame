@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
                 // Add special per platform directories
                 if (CurrentPlatform.OS == OS.Windows)
-                    directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts"));
+                    directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts)));
                 else if (CurrentPlatform.OS == OS.MacOSX)
                 {
                     directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Library", "Fonts"));
