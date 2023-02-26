@@ -59,7 +59,7 @@ By default, the SpriteFont processor uses a limited set of characters to generat
 
 As a result MonoGame has a **LocalizedFontProcessor** which does something slightly different. The process looks at the resx files you provide it with and generates an optimized **spritefont** which only contains the characters your game uses.
 
-To make use of this functionality you ned to tell the spritefont which resx files to use. Open the **.spritefont** with a xml/text editor and add lines like this inside the Asset node:
+To make use of this functionality you need to tell the spritefont which resx files to use. Open the **.spritefont** with a xml/text editor and add lines like this inside the Asset node:
 
 ```xml
 <ResourceFiles>
@@ -68,14 +68,20 @@ To make use of this functionality you ned to tell the spritefont which resx file
 </ResourceFiles>
 ```
 
-> Note the paths are relative to the .spritefont directory. In the example above the resx files are in the directory above the .spritefont.
+> Note the paths are relative to the content project directory. In the example above the resx files are in the directory above the .mgcb prjoect file.
+
+The standard **FontDescription** asset type does not support this addition. Change the asset type to **LocalizedFontDescription** in the Asset node at the top:
+
+```xml
+  <Asset Type="Graphics:LocalizedFontDescription">
+```
 
 You should end up with a .spritefont file like this
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent xmlns:Graphics="Microsoft.Xna.Framework.Content.Pipeline.Graphics">
-  <Asset Type="Graphics:FontDescription">
+  <Asset Type="Graphics:LocalizedFontDescription">
     <FontName>Verdana</FontName>
     <Size>14</Size>
     <Spacing>1</Spacing>
