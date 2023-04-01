@@ -1,91 +1,44 @@
-# Setting up your development environment for Ubuntu 20.04
+# Setting up your development environment for Linux
 
-This section provides a step-by-step guide for setting up your development environment for Ubuntu 20.04.
+This section provides a step-by-step guide for setting up your development environment on Linux.
 
-## Install .NET SDK
+The only development environment that MonoGame officially supports on Linux is [Visual Studio Code](https://code.visualstudio.com/).
 
-Add repository:
+## Install .NET 6 SDK
 
-```sh
-wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O /tmp/packages-microsoft-prod.deb
-sudo dpkg -i /tmp/packages-microsoft-prod.deb
-sudo apt update
-```
-
-Install packages:
-
-```sh
-sudo apt-get install -y apt-transport-https
-sudo apt-get install -y dotnet-sdk-5.0
-```
-
-## [Optional] Install mono
-
-Mono is a C# runtime, just like .NET. If you're targeting Linux only, it's unnecessary, but if you're targeting some other platforms like Android, it's required.
-
-Add repository:
-
-```sh
-sudo apt install gnupg ca-certificates
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-echo "deb https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-sudo apt update
-```
-
-Install packages:
-
-```sh
-sudo apt install -y mono-devel
-```
+To install the .NET 6 SDK on your Linux distribution, please follow [Microsoft's instructions](https://docs.microsoft.com/dotnet/core/install/linux).
 
 ## Install Visual Studio Code
 
-Add repository:
+To install Visual Studio on your Linux distribution, please follow [Microsoft's instructions](https://code.visualstudio.com/docs/setup/linux).
 
-```sh
-curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/packages.microsoft.gpg
-sudo install -o root -g root -m 644 /tmp/packages.microsoft.gpg /etc/apt/trusted.gpg.d/
-sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
-sudo apt update
-```
+## Install Visual Studio Code C# extension:
 
-Install packages:
-
-```sh
-sudo apt-get install code
-```
-
-Install C# extension:
+In order to code and build C# projects, you will also need to install a Visual Studio Code C# extension. You can do this with the following command within the Visual Studio Code command line interface:
 
 ```sh
 code --install-extension ms-dotnettools.csharp
 ```
+> Or alternatively, select the "Extensions" tab on the left hand side in VSCOde and search for the C# Extension published by Microsoft.
 
 ## Install MonoGame templates
 
-This will install templates for .NET CLI and the Rider IDE. There is no template support for MonoDevelop.
+The following command will install templates for the .NET CLI and Rider IDE. 
+
+> There is no template support for MonoDevelop.
 
 ```sh
 dotnet new --install MonoGame.Templates.CSharp
 ```
 
-## Install MGCB Editor
-
-MGCB Editor is a tool for editing .mgcb files, which are used for building content.
-
-```sh
-dotnet tool install --global dotnet-mgcb-editor
-mgcb-editor --register
-```
-
 ## [Optional] Set up Wine for effect compilation
 
-Effect compilation requires access to DirectX, so it won't work natively on Linux systems, but it can be used through Wine.
+Effect (shader) compilation requires access to DirectX, so it will not work natively on Linux systems, but it can be used through Wine. Here are instructions to get this working (providing that your distribution is using apt).
 
 Install wine64:
 
 ```sh
-sudo apt install wine64 p7zip-full
+sudo apt install wine64 p7zip-full curl
 ```
 
 Create wine prefix:

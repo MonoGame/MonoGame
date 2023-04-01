@@ -76,18 +76,16 @@ Set the target platform for this build. It must be a member of the [TargetPlatfo
 * iOS
 * Android
 * DesktopGL
-* MacOSX
 * WindowsStoreApp
-* NativeClient
 * PlayStation4
-* WindowsPhone8
-* RaspberryPi
+* PlayStation5
 * XboxOne
 * Switch
+* Stadia
 
 If not set, it will default to Windows.
 
-NOTE: PlayStation 4, Xbox One, and Switch support is only available to licensed console developers.
+NOTE: PlayStation 4, PlayStation 5, Xbox One, Stadia, and Switch support is only available to licensed console developers.
 
 ### Target Graphics Profile
 
@@ -96,6 +94,7 @@ NOTE: PlayStation 4, Xbox One, and Switch support is only available to licensed 
 ```
 
 Set the target graphics profile for this build. It must be a member of the [GraphicsProfile](xref:Microsoft.Xna.Framework.Graphics.GraphicsProfile) enum:
+
 * HiDef
 * Reach
 

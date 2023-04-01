@@ -48,6 +48,7 @@ Check out the awesome work of the larger MonoGame community with their own tutor
 ## Others
 
 - [Dark Genesis Blog MonoGame content](http://darkgenesis.zenithmoon.com/tag/monogame/)
+- [awesome-monogame - A large list of MonoGame libraries and more by aloisdeniel](https://github.com/aloisdeniel/awesome-monogame)
 - [A collection of tutorials, libraries and more, many of which are MonoGame related](https://github.com/UnterrainerInformatik/GameDevelopmentLinks)
 - [How to create animations and sprite sheets for MonoGame](https://www.codeandweb.com/texturepacker/tutorials/how-to-create-sprite-sheets-and-animations-with-monogame)
 - [Making a platformer in F# with MonoGame](http://bruinbrown.wordpress.com/2013/10/06/making-a-platformer-in-f-with-monogame/)
