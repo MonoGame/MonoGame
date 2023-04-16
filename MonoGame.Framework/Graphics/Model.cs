@@ -130,8 +130,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 foreach (Effect effect in mesh.Effects)
                 {
 					IEffectMatrices effectMatricies = effect as IEffectMatrices;
-					if (effectMatricies == null) {
-						throw new InvalidOperationException();
+					if (effectMatricies == null)
+                    {
+						throw new InvalidOperationException($"Effect must implement {nameof(IEffectMatrices)} to support this call.");
 					}
                     effectMatricies.World = sharedDrawBoneMatrices[mesh.ParentBone.Index] * world;
                     effectMatricies.View = view;
