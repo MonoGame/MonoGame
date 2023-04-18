@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Input
 
                     if (controller.ExtendedGamepad.ButtonMenu.IsPressed)
                         buttons |= Buttons.Start;
-                    if (controller.ExtendedGamepad.ButtonOptions.IsPressed)
+                    if (controller.ExtendedGamepad.ButtonOptions?.IsPressed == true)
                         buttons |= Buttons.Back;
 
                     if (controller.ExtendedGamepad.DPad.Up.IsPressed)
