@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // Set the new normals on the vertex channel.
             for (var i = 0; i < channel.Count; i++)
-                channel[i] = normals[geom.Indices[i]];
+                channel[i] = normals[geom.Vertices.PositionIndices[i]];
         }
 
         /// <summary>
