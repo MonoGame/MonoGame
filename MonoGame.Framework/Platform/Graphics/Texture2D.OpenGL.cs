@@ -31,7 +31,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
             this.glTarget = TextureTarget.Texture2D;
-            format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
+
+            bool isWriteable = ShaderAccess == ShaderAccess.ReadWrite;
+            format.GetGLFormat(GraphicsDevice, isWriteable, out glInternalFormat, out glFormat, out glType);
 
             Threading.BlockOnUIThread(() =>
             {

@@ -44,8 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Pre-calculate hash code for fast comparisons and lookup in dictionaries.
                 unchecked
                 {
-                    _hashCode = elements[0].GetHashCode();
-                    for (int i = 1; i < elements.Length; i++)
+                    for (int i = 0; i < elements.Length; i++)
                         _hashCode = (_hashCode * 397) ^ elements[i].GetHashCode();
 
                     _hashCode = (_hashCode * 397) ^ elements.Length;
@@ -126,6 +125,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly Data _data;
 
+        private static VertexDeclaration _emptyDeclaration;
+
+        /// <summary>
+        /// A vertex declaration without any vertex elements.
+        /// This is useful if a vertex shader doesn't need any input data from the vertex buffer,
+        /// because it takes all input from other sources like structured buffers or textures.
+        /// </summary>
+        public static VertexDeclaration Empty
+        {
+            get { return _emptyDeclaration ?? (_emptyDeclaration = new VertexDeclaration(new VertexElement[0])); }
+        }
+        
         /// <summary>
         /// Gets the internal vertex elements array.
         /// </summary>
@@ -157,8 +168,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </exception>
         public VertexDeclaration(int vertexStride, params VertexElement[] elements)
         {
-            if ((elements == null) || (elements.Length == 0))
-                throw new ArgumentNullException("elements", "Elements cannot be empty");
+            if (elements == null)
+                throw new ArgumentNullException("elements", "Elements cannot be null");
 
             lock (_vertexDeclarationCache)
             {

@@ -185,6 +185,79 @@ namespace Microsoft.Xna.Framework.Graphics
         SRgb8A8Etc2 = 95,
 
         #endregion
+
+        /// <summary>
+        /// Unsigned 32-bit R pixel format using 32 bits per channel.
+        /// </summary>
+        R32Uint,
+        /// <summary>
+        /// Signed 32-bit R pixel format using 32 bits per channel.
+        /// </summary>
+        R32Int,
+        /// <summary>
+        /// Unsigned 16-bit R pixel format using 16 bits per channel.
+        /// </summary>
+        R16Uint,
+        /// <summary>
+        /// Signed 16-bit R pixel format using 16 bits per channel.
+        /// </summary>
+        R16Int,
+        /// <summary>
+        /// Unsigned 8-bit R pixel format using 8 bits per channel.
+        /// </summary>
+        R8Uint,
+        /// <summary>
+        /// Signed 8-bit R pixel format using 8 bits per channel.
+        /// </summary>
+        R8Int,
+        /// <summary>
+        /// Unsigned 64-bit RG pixel format using 32 bits per channel.
+        /// </summary>
+        Rg64Uint,
+        /// <summary>
+        /// Signed 64-bit RG pixel format using 32 bits per channel.
+        /// </summary>
+        Rg64Int,
+        /// <summary>
+        /// Unsigned 32-bit RG pixel format using 16 bits per channel.
+        /// </summary>
+        Rg32Uint,
+        /// <summary>
+        /// Signed 32-bit RG pixel format using 16 bits per channel.
+        /// </summary>
+        Rg32Int,
+        /// <summary>
+        /// Unsigned 16-bit RG pixel format using 8 bits per channel.
+        /// </summary>
+        Rg16Uint,
+        /// <summary>
+        /// Signed 16-bit RG pixel format using 8 bits per channel.
+        /// </summary>
+        Rg16Int,
+        /// <summary>
+        /// Unsigned 128-bit RGBA pixel format using 32 bits per channel.
+        /// </summary>
+        Rgba128Uint,
+        /// <summary>
+        /// Signed 128-bit RGBA pixel format using 32 bits per channel.
+        /// </summary>
+        Rgba128Int,
+        /// <summary>
+        /// Unsigned 64-bit RGBA pixel format using 16 bits per channel.
+        /// </summary>
+        Rgba64Uint,
+        /// <summary>
+        /// Signed 64-bit RGBA pixel format using 16 bits per channel.
+        /// </summary>
+        Rgba64Int,
+        /// <summary>
+        /// Unsigned 32-bit RGBA pixel format using 8 bits per channel.
+        /// </summary>
+        Rgba32Uint,
+        /// <summary>
+        /// Signed 32-bit RGBA pixel format using 8 bits per channel.
+        /// </summary>
+        Rgba32Int,
     }
 }
 

@@ -138,5 +138,6 @@
   </ItemGroup>
 
   <Import Project="Platform\OpenGL.targets" />
+  <Import Project="Platform\OpenGLResources.targets" />
   <Import Project="Platform\OpenAL.targets" />
 </Project>

@@ -17,12 +17,12 @@ namespace Microsoft.Xna.Framework.Graphics
         public bool IsContentLost { get { return false; } }
 
         public DynamicVertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage)
-            : base(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, true)
+            : base(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, true, ShaderAccess.None)
         {
         }
 		
 		public DynamicVertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage)
-            : base(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, true)
+            : base(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, true, ShaderAccess.None)
         {
         }
 

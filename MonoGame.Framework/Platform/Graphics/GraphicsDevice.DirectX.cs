@@ -12,6 +12,7 @@ using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.Mathematics.Interop;
 using SharpDX.DXGI;
+using System.Runtime.CompilerServices;
 
 #if WINDOWS_UAP
 using Windows.UI.Xaml.Controls;
@@ -31,6 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal SharpDX.Direct3D11.RenderTargetView _renderTargetView;
         internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
         private int _vertexBufferSlotsUsed;
+        private bool _shaderResourcesSetForCompute; // keep track of who is setting buffer resources: normal draw or compute
 
 #if WINDOWS_UAP
 
@@ -61,7 +63,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
         // The active render targets.
-        readonly SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[8];
+        internal readonly SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[8];
 
         // The active depth view.
         SharpDX.Direct3D11.DepthStencilView _currentDepthStencilView;
@@ -104,16 +106,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
-            MaxTextureSlots = 16;
-            MaxVertexTextureSlots = 16;
-
 #if WINDOWS_UAP
 			CreateDeviceIndependentResources();
 			CreateDeviceResources();
 			Dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
 #endif
 #if WINDOWS
-            CreateDeviceResources();
+        CreateDeviceResources();
 #endif
 
             _maxVertexBufferSlots = _d3dDevice.FeatureLevel >= FeatureLevel.Level_11_0 ? SharpDX.Direct3D11.InputAssemblerStage.VertexInputResourceSlotCount : 16;
@@ -1171,8 +1170,16 @@ namespace Microsoft.Xna.Framework.Graphics
             // to the device as a texture resource.
             lock (_d3dContext)
             {
-                VertexTextures.ClearTargets(this, _currentRenderTargetBindings);
-                Textures.ClearTargets(this, _currentRenderTargetBindings);
+                PixelShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.PixelShader);
+
+                if (GraphicsCapabilities.SupportsVertexTextures)
+                {
+                    VertexShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.VertexShader);
+                    HullShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.HullShader);
+                    DomainShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.DomainShader);
+                    GeometryShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.GeometryShader);
+                    ComputeShaderResources.ClearTargets(_currentRenderTargetBindings, _d3dContext.ComputeShader);
+                }
             }
 
             for (var i = 0; i < _currentRenderTargetCount; i++)
@@ -1214,7 +1221,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            Textures.Dirty();
+            Textures.DirtyReadonly();
             SamplerStates.Dirty();
             _depthStencilStateDirty = true;
             _blendStateDirty = true;
@@ -1241,9 +1248,102 @@ namespace Microsoft.Xna.Framework.Graphics
                     return PrimitiveTopology.TriangleStrip;
                 case PrimitiveType.PointList:
                     return PrimitiveTopology.PointList;
+                case PrimitiveType.LineListWithAdjacency:
+                    return PrimitiveTopology.LineListWithAdjacency;
+                case PrimitiveType.LineStripWithAdjacency:
+                    return PrimitiveTopology.LineStripWithAdjacency;
+                case PrimitiveType.TriangleListWithAdjacency:
+                    return PrimitiveTopology.TriangleListWithAdjacency;
+                case PrimitiveType.TriangleStripWithAdjacency:
+                    return PrimitiveTopology.TriangleStripWithAdjacency;
+                case PrimitiveType.PatchListWith1ControlPoints:
+                    return PrimitiveTopology.PatchListWith1ControlPoints;
+                case PrimitiveType.PatchListWith2ControlPoints:
+                    return PrimitiveTopology.PatchListWith2ControlPoints;
+                case PrimitiveType.PatchListWith3ControlPoints:
+                    return PrimitiveTopology.PatchListWith3ControlPoints;
+                case PrimitiveType.PatchListWith4ControlPoints:
+                    return PrimitiveTopology.PatchListWith4ControlPoints;
+                case PrimitiveType.PatchListWith5ControlPoints:
+                    return PrimitiveTopology.PatchListWith5ControlPoints;
+                case PrimitiveType.PatchListWith6ControlPoints:
+                    return PrimitiveTopology.PatchListWith6ControlPoints;
+                case PrimitiveType.PatchListWith7ControlPoints:
+                    return PrimitiveTopology.PatchListWith7ControlPoints;
+                case PrimitiveType.PatchListWith8ControlPoints:
+                    return PrimitiveTopology.PatchListWith8ControlPoints;
+                case PrimitiveType.PatchListWith9ControlPoints:
+                    return PrimitiveTopology.PatchListWith9ControlPoints;
+                case PrimitiveType.PatchListWith10ControlPoints:
+                    return PrimitiveTopology.PatchListWith10ControlPoints;
+                case PrimitiveType.PatchListWith11ControlPoints:
+                    return PrimitiveTopology.PatchListWith11ControlPoints;
+                case PrimitiveType.PatchListWith12ControlPoints:
+                    return PrimitiveTopology.PatchListWith12ControlPoints;
+                case PrimitiveType.PatchListWith13ControlPoints:
+                    return PrimitiveTopology.PatchListWith13ControlPoints;
+                case PrimitiveType.PatchListWith14ControlPoints:
+                    return PrimitiveTopology.PatchListWith14ControlPoints;
+                case PrimitiveType.PatchListWith15ControlPoints:
+                    return PrimitiveTopology.PatchListWith15ControlPoints;
+                case PrimitiveType.PatchListWith16ControlPoints:
+                    return PrimitiveTopology.PatchListWith16ControlPoints;
+                case PrimitiveType.PatchListWith17ControlPoints:
+                    return PrimitiveTopology.PatchListWith17ControlPoints;
+                case PrimitiveType.PatchListWith18ControlPoints:
+                    return PrimitiveTopology.PatchListWith18ControlPoints;
+                case PrimitiveType.PatchListWith19ControlPoints:
+                    return PrimitiveTopology.PatchListWith19ControlPoints;
+                case PrimitiveType.PatchListWith20ControlPoints:
+                    return PrimitiveTopology.PatchListWith20ControlPoints;
+                case PrimitiveType.PatchListWith21ControlPoints:
+                    return PrimitiveTopology.PatchListWith21ControlPoints;
+                case PrimitiveType.PatchListWith22ControlPoints:
+                    return PrimitiveTopology.PatchListWith22ControlPoints;
+                case PrimitiveType.PatchListWith23ControlPoints:
+                    return PrimitiveTopology.PatchListWith23ControlPoints;
+                case PrimitiveType.PatchListWith24ControlPoints:
+                    return PrimitiveTopology.PatchListWith24ControlPoints;
+                case PrimitiveType.PatchListWith25ControlPoints:
+                    return PrimitiveTopology.PatchListWith25ControlPoints;
+                case PrimitiveType.PatchListWith26ControlPoints:
+                    return PrimitiveTopology.PatchListWith26ControlPoints;
+                case PrimitiveType.PatchListWith27ControlPoints:
+                    return PrimitiveTopology.PatchListWith27ControlPoints;
+                case PrimitiveType.PatchListWith28ControlPoints:
+                    return PrimitiveTopology.PatchListWith28ControlPoints;
+                case PrimitiveType.PatchListWith29ControlPoints:
+                    return PrimitiveTopology.PatchListWith29ControlPoints;
+                case PrimitiveType.PatchListWith30ControlPoints:
+                    return PrimitiveTopology.PatchListWith30ControlPoints;
+                case PrimitiveType.PatchListWith31ControlPoints:
+                    return PrimitiveTopology.PatchListWith31ControlPoints;
+                case PrimitiveType.PatchListWith32ControlPoints:
+                    return PrimitiveTopology.PatchListWith32ControlPoints;
+                default:
+                    throw new ArgumentException();
             }
+        }
 
-            throw new ArgumentException();
+        internal CommonShaderStage GetDXShaderStage(ShaderStage stage)
+        {
+            switch (stage)
+            {
+                case ShaderStage.Vertex:
+                    return _d3dContext.VertexShader;
+                case ShaderStage.Pixel:
+                    return _d3dContext.PixelShader;
+                case ShaderStage.Hull:
+                    return _d3dContext.HullShader;
+                case ShaderStage.Domain:
+                    return _d3dContext.DomainShader;
+                case ShaderStage.Geometry:
+                    return _d3dContext.GeometryShader;
+                case ShaderStage.Compute:
+                    return _d3dContext.ComputeShader;
+                default:
+                    throw new ArgumentException();
+            }
         }
 
         internal void PlatformBeginApplyState()
@@ -1333,6 +1433,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("A vertex shader must be set!");
             if (_pixelShader == null)
                 throw new InvalidOperationException("A pixel shader must be set!");
+            if (_hullShader != null && _domainShader == null)
+                throw new InvalidOperationException("If a hull shader is set a domain shader must also be set!");
+            if (_domainShader != null && _hullShader == null)
+                throw new InvalidOperationException("If a domain shader is set a hull shader must also be set!");
 
             if (_vertexShaderDirty)
             {
@@ -1360,13 +1464,71 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
+            if (_hullShaderDirty)
+            {
+                _d3dContext.HullShader.Set(_hullShader == null ? null : _hullShader.HullShader);
+                _hullShaderDirty = false;
+
+                unchecked
+                {
+                    _graphicsMetrics._hullShaderCount++;
+                }
+            }
+
+            if (_domainShaderDirty)
+            {
+                _d3dContext.DomainShader.Set(_domainShader == null ? null : _domainShader.DomainShader);
+                _domainShaderDirty = false;
+
+                unchecked
+                {
+                    _graphicsMetrics._domainShaderCount++;
+                }
+            }
+
+            if (_geometryShaderDirty)
+            {
+                _d3dContext.GeometryShader.Set(_geometryShader == null ? null : _geometryShader.GeometryShader);
+                _geometryShaderDirty = false;
+
+                unchecked
+                {
+                    _graphicsMetrics._geometryShaderCount++;
+                }
+            }
+
             _vertexConstantBuffers.SetConstantBuffers(this);
             _pixelConstantBuffers.SetConstantBuffers(this);
 
-            VertexTextures.SetTextures(this);
-            VertexSamplerStates.PlatformSetSamplers(this);
-            Textures.SetTextures(this);
-            SamplerStates.PlatformSetSamplers(this);
+            VertexShaderResources.PlatformApplyAllResourcesToDevice(this);
+            VertexSamplerStates.PlatformSetSamplers(this, _d3dContext.VertexShader);
+
+            PixelShaderResources.PlatformApplyAllResourcesToDevice(this);
+            SamplerStates.PlatformSetSamplers(this, _d3dContext.PixelShader);
+            
+
+            if (_hullShader != null)
+            {
+                _hullConstantBuffers.SetConstantBuffers(this);
+                HullShaderResources.PlatformApplyAllResourcesToDevice(this);
+                HullSamplerStates.PlatformSetSamplers(this, _d3dContext.HullShader);
+            }
+
+            if (_domainShader != null)
+            {
+                _domainConstantBuffers.SetConstantBuffers(this);
+                DomainShaderResources.PlatformApplyAllResourcesToDevice(this);
+                DomainSamplerStates.PlatformSetSamplers(this, _d3dContext.DomainShader);
+            }
+
+            if (_geometryShader != null)
+            {
+                _geometryConstantBuffers.SetConstantBuffers(this);
+                GeometryShaderResources.PlatformApplyAllResourcesToDevice(this);
+                GeometrySamplerStates.PlatformSetSamplers(this, _d3dContext.GeometryShader);
+            }
+
+            _shaderResourcesSetForCompute = false;
         }
 
         private int SetUserVertexBuffer<T>(T[] vertexData, int vertexOffset, int vertexCount, VertexDeclaration vertexDecl)
@@ -1537,6 +1699,97 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        private void PlatformDrawInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+        {
+            lock (_d3dContext)
+            {
+                ApplyState(true);
+
+                _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
+                _d3dContext.DrawInstancedIndirect(indirectDrawBuffer.Buffer, alignedByteOffsetForArgs);
+            }
+        }
+
+        private void PlatformDrawIndexedInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+        {
+            lock (_d3dContext)
+            {
+                ApplyState(true);
+
+                _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
+                _d3dContext.DrawIndexedInstancedIndirect(indirectDrawBuffer.Buffer, alignedByteOffsetForArgs);
+            }
+        }
+
+        private void ApplyComputeState()
+        {
+            PlatformBeginApplyState();
+
+            if (_computeShaderDirty)
+            {
+                _d3dContext.ComputeShader.Set(_computeShader == null ? null : _computeShader.ComputeShader);
+                _computeShaderDirty = false;
+
+                unchecked
+                {
+                    _graphicsMetrics._computeShaderCount++;
+                }
+            }
+
+            // If the device was just used for normal drawing, rather than compute, we need to unbind the buffers from non-compute stages.
+            // This is neccessary to make sure buffers that are written to in compute shaders,
+            // are not still set as inputs in other shader stages, as this is not allowed.
+            if (!_shaderResourcesSetForCompute)
+            {
+                ClearShaderResourcesForStage(ShaderStage.Vertex, VertexShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Pixel, PixelShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Hull, HullShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Domain, DomainShaderResources);
+                ClearShaderResourcesForStage(ShaderStage.Geometry, GeometryShaderResources);
+
+                _shaderResourcesSetForCompute = true;
+            }
+
+            _computeConstantBuffers.SetConstantBuffers(this);
+            ComputeShaderResources.PlatformApplyAllResourcesToDevice(this);
+            ComputeSamplerStates.PlatformSetSamplers(this, _d3dContext.ComputeShader);
+        }
+
+        private void UnbindWriteableComputeResources()
+        {
+            // Unbind all resources (UAV's), otherwise they could not be used as shader inputs
+            var computeStage = (GetDXShaderStage(ShaderStage.Compute) as SharpDX.Direct3D11.ComputeShaderStage);
+            for (int i = 0; i < ComputeShaderResources.MaxWriteableResources; i++)
+                computeStage.SetUnorderedAccessView(i, null);
+        }
+
+        private void PlatformDispatchCompute(int threadGroupCountX, int threadGroupCountY, int threadGroupCountZ)
+        {
+            lock (_d3dContext)
+            {
+                ApplyComputeState();
+                _d3dContext.Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
+                UnbindWriteableComputeResources();
+            }
+        }
+
+        private void PlatformDispatchComputeIndirect(IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+        {
+            lock (_d3dContext)
+            {
+                ApplyComputeState();
+                _d3dContext.DispatchIndirect(indirectDrawBuffer.Buffer, alignedByteOffsetForArgs);
+                UnbindWriteableComputeResources();
+            }
+        }
+
+        private void ClearShaderResourcesForStage(ShaderStage stage, ShaderResourceCollection resourceCollection)
+        {
+            var dxStage = GetDXShaderStage(stage);
+            for (int i = 0; i < resourceCollection.MaxReadableResources; i++)
+                dxStage.SetShaderResource(i, null);
+        }
+
         private void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct
         {
             // TODO share code with Texture2D.GetData and do pooling for staging textures
@@ -1638,6 +1891,35 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        private void CopyTextureDataInternal(Texture srcTexture, Texture dstTexture, int srcArrayIndex, int dstArrayIndex, int srcMipLevel, int dstMipLevel, int srcMipLevelCount, int dstMipLevelCount, int copyWidth, int copyHeight, int copyDepth, int srcOffsetX, int srcOffsetY, int srcOffsetZ, int dstOffsetX, int dstOffsetY, int dstOffsetZ)
+        {
+            lock (_d3dContext)
+            {
+                var srcRegion = new ResourceRegion(srcOffsetX, srcOffsetY, srcOffsetZ, srcOffsetX + copyWidth, srcOffsetY + copyHeight, srcOffsetZ + copyDepth);
+                int srcSubresIndex = srcArrayIndex * srcMipLevelCount + srcMipLevel;
+                int dstSubresIndex = dstArrayIndex * dstMipLevelCount + dstMipLevel;
+
+                _d3dContext.CopySubresourceRegion(srcTexture.GetTexture(), srcSubresIndex, srcRegion, dstTexture.GetTexture(), dstSubresIndex, dstOffsetX, dstOffsetY, dstOffsetZ);
+            }
+        }
+
+        private void CopyBufferDataInternal(BufferResource scBuffer, BufferResource dstBuffer, int numBytesToCopy, int srcOffsetInBytes, int dstOffsetInBytes)
+        {
+            lock (_d3dContext)
+            {
+                var sourceRegion = new ResourceRegion(srcOffsetInBytes, 0, 0, srcOffsetInBytes + numBytesToCopy, 1, 1);
+                _d3dContext.CopySubresourceRegion(scBuffer.Buffer, 0, sourceRegion, dstBuffer.Buffer, 0, dstOffsetInBytes, 0, 0);
+            }
+        }
+
+        private void CopyStructuredBufferCounterValueInternal(StructuredBuffer srcBuffer, BufferResource dstBuffer, int dstByteOffset)
+        {
+            lock (_d3dContext)
+            {
+                _d3dContext.CopyStructureCount(dstBuffer.Buffer, dstByteOffset, srcBuffer.GetUnorderedAccessView());
+            }
+        }
+
         /// <summary>
         /// Sends queued-up commands in the command buffer to the graphics processing unit (GPU).
         /// </summary>
@@ -1658,5 +1940,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new Rectangle(x, y, width, height);
         }
+
     }
 }

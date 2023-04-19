@@ -31,12 +31,27 @@ namespace Microsoft.Xna.Framework.Graphics
         public int parameter;
     }
 
+    internal struct ShaderResourceInfo
+    {
+        public string name;
+        public int elementSize;
+        public int bindingSlot;
+        public int bindingSlotForCounter; // in OpenGL structured buffers with append/consume/counter functionality are emulated using a separate counter buffer
+        public ShaderResourceType type;
+
+        // TODO: This should be moved to EffectPass.
+        public int parameter;
+
+        public bool writeAccess { get { return ShaderResource.IsResourceTypeWriteable(type); } }
+    }
+
     internal struct VertexAttribute
     {
         public VertexElementUsage usage;
         public int index;
         public string name;
         public int location;
+        public int size;
     }
 
     internal partial class Shader : GraphicsResource
@@ -55,6 +70,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public int[] CBuffers { get; private set; }
 
+        public ShaderResourceInfo[] ShaderResources { get; private set; }
+
         public ShaderStage Stage { get; private set; }
 
         public VertexAttribute[] Attributes { get; private set; }
@@ -63,8 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             GraphicsDevice = device;
 
-            var isVertexShader = reader.ReadBoolean();
-            Stage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
+            Stage = (ShaderStage)reader.ReadInt32();
 
             var shaderLength = reader.ReadInt32();
             var shaderBytecode = reader.ReadBytes(shaderLength);
@@ -111,6 +127,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 Attributes[a].usage = (VertexElementUsage)reader.ReadByte();
                 Attributes[a].index = reader.ReadByte();
                 Attributes[a].location = reader.ReadInt16();
+                Attributes[a].size = reader.ReadByte();
+            }
+
+            var shaderResourceCount = (int)reader.ReadByte();
+            ShaderResources = new ShaderResourceInfo[shaderResourceCount];
+            for (var b = 0; b < shaderResourceCount; b++)
+            {
+                ShaderResources[b].name = reader.ReadString();
+                ShaderResources[b].elementSize = reader.ReadUInt16();
+                ShaderResources[b].bindingSlot = reader.ReadByte();
+                ShaderResources[b].bindingSlotForCounter = reader.ReadByte();
+                ShaderResources[b].type = (ShaderResourceType)reader.ReadByte();
+                ShaderResources[b].parameter = reader.ReadByte();
             }
 
             PlatformConstruct(Stage, shaderBytecode);

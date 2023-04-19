@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public bool IsContentLost { get { return false; } }
 		
 		public DynamicIndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage) :
-			base(graphicsDevice, indexElementSize, indexCount, usage, true)
+			base(graphicsDevice, indexElementSize, indexCount, usage, true, ShaderAccess.None)
 		{
 		}
 

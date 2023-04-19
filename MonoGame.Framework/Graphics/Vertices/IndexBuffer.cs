@@ -7,44 +7,46 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class IndexBuffer : GraphicsResource
+    public partial class IndexBuffer : BufferResource
     {
-        private readonly bool _isDynamic;
+        public int IndexCount { get { return ElementCount; } }
 
-        public BufferUsage BufferUsage { get; private set; }
-        public int IndexCount { get; private set; }
-        public IndexElementSize IndexElementSize { get; private set; }
+        public IndexElementSize IndexElementSize { get { return ElementStride == 4 ? IndexElementSize.ThirtyTwoBits : IndexElementSize.SixteenBits; } }
 
-   		protected IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage, bool dynamic)
-            : this(graphicsDevice, SizeForType(graphicsDevice, indexType), indexCount, usage, dynamic)
+        protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage, bool dynamic, ShaderAccess shaderAccess) :
+            base(graphicsDevice, indexCount, indexElementSize == IndexElementSize.ThirtyTwoBits ? 4 : 2, usage, dynamic, BufferType.IndexBuffer, shaderAccess)
         {
         }
 
-		protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage, bool dynamic)
+        protected IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage, bool dynamic) :
+            this(graphicsDevice, SizeForType(graphicsDevice, indexType), indexCount, usage, dynamic)
         {
-			if (graphicsDevice == null)
-            {
-                throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
-            }
-			this.GraphicsDevice = graphicsDevice;
-			this.IndexElementSize = indexElementSize;	
-            this.IndexCount = indexCount;
-            this.BufferUsage = usage;
-			
-            _isDynamic = dynamic;
+        }
 
-            PlatformConstruct(indexElementSize, indexCount);
-		}
+        protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage, bool dynamic) :
+            this(graphicsDevice, indexElementSize, indexCount, usage, dynamic, ShaderAccess.None)
+        {
+        }
 
-		public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage) :
-			this(graphicsDevice, indexElementSize, indexCount, bufferUsage, false)
-		{
-		}
+        public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage) :
+            this(graphicsDevice, indexElementSize, indexCount, usage, false)
+        {
+        }
 
-		public IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage) :
-			this(graphicsDevice, SizeForType(graphicsDevice, indexType), indexCount, usage, false)
-		{
-		}
+        public IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage) :
+            this(graphicsDevice, indexType, indexCount, usage, false)
+        {
+        }
+
+        public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage, ShaderAccess shaderAccess) :
+            this(graphicsDevice, indexElementSize, indexCount, usage, false, shaderAccess)
+        {
+        }
+
+        public IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage, ShaderAccess shaderAccess) :
+            this(graphicsDevice, SizeForType(graphicsDevice, indexType), indexCount, usage, false, shaderAccess)
+        {
+        }
 
         /// <summary>
         /// Gets the relevant IndexElementSize enum value for the given type.
@@ -67,14 +69,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        /// <summary>
-        /// The GraphicsDevice is resetting, so GPU resources must be recreated.
-        /// </summary>
-        internal protected override void GraphicsDeviceResetting()
-        {
-            PlatformGraphicsDeviceResetting();
-        }
-
         public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
             if (data == null)
@@ -84,7 +78,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (BufferUsage == BufferUsage.WriteOnly)
                 throw new NotSupportedException("This IndexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 
-            PlatformGetData<T>(offsetInBytes, data, startIndex, elementCount);
+            PlatformGetData<T>(offsetInBytes, data, startIndex, elementCount, ElementStride);
         }
 
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -114,12 +108,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
+            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
+
             if (data == null)
                 throw new ArgumentNullException("data");
             if (data.Length < (startIndex + elementCount))
                 throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
+            if (ElementStride < elementSizeInBytes)
+                throw new ArgumentOutOfRangeException("The index stride must be greater than or equal to the size of the specified data (" + elementSizeInBytes + ").");    
 
-            PlatformSetData<T>(offsetInBytes, data, startIndex, elementCount, options);
+            PlatformSetData<T>(offsetInBytes, data, startIndex, elementCount, elementSizeInBytes, options, ElementCount * ElementStride, elementSizeInBytes);
         }
 	}
 }

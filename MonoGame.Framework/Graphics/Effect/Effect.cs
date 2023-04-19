@@ -26,13 +26,13 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 10;
+            public const int MGFXVersion = 12;
 
             public int Signature;
             public int Version;
             public int Profile;
             public int EffectKey;
-            public int HeaderSize;
+            public int HeaderSize;  
         }
 
         public EffectParameterCollection Parameters { get; private set; }
@@ -42,6 +42,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public EffectTechnique CurrentTechnique { get; set; }
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
+
+        internal bool _isMojoShader;
 
         private Shader[] _shaders;
 
@@ -67,7 +69,6 @@ namespace Microsoft.Xna.Framework.Graphics
             : this(graphicsDevice, effectCode, 0, effectCode.Length)
         {
         }
-
 
         public Effect (GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
             : this(graphicsDevice)
@@ -162,7 +163,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Make a copy of the immutable constant buffers.
             ConstantBuffers = new ConstantBuffer[cloneSource.ConstantBuffers.Length];
             for (var i = 0; i < cloneSource.ConstantBuffers.Length; i++)
-                ConstantBuffers[i] = new ConstantBuffer(cloneSource.ConstantBuffers[i]);
+                ConstantBuffers[i] = new ConstantBuffer(cloneSource.ConstantBuffers[i], this);
 
             // Find and set the current technique.
             for (var i = 0; i < cloneSource.Techniques.Count; i++)
@@ -176,6 +177,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Take a reference to the original shader list.
             _shaders = cloneSource._shaders;
+
+            _isMojoShader = cloneSource._isMojoShader;
         }
 
         /// <summary>
@@ -234,17 +237,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private void ReadEffect (BinaryReader reader)
 		{
-			// TODO: Maybe we should be reading in a string 
-			// table here to save some bytes in the file.
-			
+            // TODO: Maybe we should be reading in a string 
+            // table here to save some bytes in the file.
+
+            // Read if compiled with MojoShader or ShaderConductor 
+            _isMojoShader = reader.ReadBoolean();
+
             ConstantBuffers = new ConstantBuffer[reader.ReadInt32()];
 
             for (var c = 0; c < ConstantBuffers.Length; c++)
-            {
-                var name = reader.ReadString();
+            {				
+				var name = reader.ReadString ();
+                var instanceName = reader.ReadString();
 
                 // Create the backing system memory buffer.
-                var sizeInBytes = (int)reader.ReadInt16();
+                var sizeInBytes = (int)reader.ReadInt16 ();
+                var bindingSlot = (int)reader.ReadByte();
 
                 // Read the parameter index values.
                 var parameters = new int[reader.ReadInt32()];
@@ -257,9 +265,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 ConstantBuffers[c] = new ConstantBuffer(GraphicsDevice,
                                                 sizeInBytes,
+                                                bindingSlot,
                                                 parameters,
                                                 offsets,
-                                                name);                 
+                                                name,
+                                                instanceName,
+                                                this);
             }
 
             _shaders = new Shader[reader.ReadInt32()];
@@ -267,7 +278,7 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var s = 0; s < _shaders.Length; s++)
                 _shaders[s] = new Shader(GraphicsDevice, reader);
 
-            Parameters = ReadParameters(reader);
+            Parameters = ReadParameters(reader, _isMojoShader);
 
             var techniques = new EffectTechnique[reader.ReadInt32()];
 
@@ -315,7 +326,23 @@ namespace Microsoft.Xna.Framework.Graphics
                 shaderIndex = reader.ReadInt32();
                 Shader pixelShader = shaderIndex < 0 ? null : shaders[shaderIndex];
 
-				BlendState blend = null;
+                // Get the hull shader.
+                shaderIndex = (int)reader.ReadInt32();
+                Shader hullShader = shaderIndex < 0 ? null : shaders[shaderIndex];
+
+                // Get the domain shader.
+                shaderIndex = (int)reader.ReadInt32();
+                Shader domainShader = shaderIndex < 0 ? null : shaders[shaderIndex];
+
+                // Get the geometry shader.
+                shaderIndex = (int)reader.ReadInt32();
+                Shader geometryShader = shaderIndex < 0 ? null : shaders[shaderIndex];
+
+                // Get the compute shader.
+                shaderIndex = (int)reader.ReadInt32();
+                Shader computeShader = shaderIndex < 0 ? null : shaders[shaderIndex];
+
+                BlendState blend = null;
 				DepthStencilState depth = null;
 				RasterizerState raster = null;
 				if (reader.ReadBoolean())
@@ -371,13 +398,13 @@ namespace Microsoft.Xna.Framework.Graphics
 					};
 				}
 
-                passes[i] = new EffectPass(effect, name, vertexShader, pixelShader, blend, depth, raster, annotations);
+                passes[i] = new EffectPass(effect, name, vertexShader, pixelShader, hullShader, domainShader, geometryShader, computeShader, blend, depth, raster, annotations);
 			}
 
             return new EffectPassCollection(passes);
 		}
 
-		private static EffectParameterCollection ReadParameters(BinaryReader reader)
+		private static EffectParameterCollection ReadParameters(BinaryReader reader, bool isMojo)
 		{
             var count = reader.ReadInt32();
             if (count == 0)
@@ -394,8 +421,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				var rowCount = (int)reader.ReadByte();
 				var columnCount = (int)reader.ReadByte();
 
-				var elements = ReadParameters(reader);
-				var structMembers = ReadParameters(reader);
+				var elements = ReadParameters(reader, isMojo);
+				var structMembers = ReadParameters(reader, isMojo);
 
 				object data = null;
 				if (elements.Count == 0 && structMembers.Count == 0)
@@ -404,20 +431,22 @@ namespace Microsoft.Xna.Framework.Graphics
 					{						
                         case EffectParameterType.Bool:
                         case EffectParameterType.Int32:
-#if !OPENGL
-                            // Under most platforms we properly store integers and 
-                            // booleans in an integer type.
-                            //
-                            // MojoShader on the otherhand stores everything in float
-                            // types which is why this code is disabled under OpenGL.
-					        {
-					            var buffer = new int[rowCount * columnCount];								
+                            {
+#if OPENGL
+                                // Under most platforms we properly store integers and 
+                                // booleans in an integer type.
+                                //
+                                // MojoShader on the otherhand stores everything in float
+                                // types which is why we redirect to the EffectParameterType.Single case
+                                if (isMojo)
+                                    goto case EffectParameterType.Single;
+#endif
+                                var buffer = new int[rowCount * columnCount];
                                 for (var j = 0; j < buffer.Length; j++)
                                     buffer[j] = reader.ReadInt32();
                                 data = buffer;
                                 break;
-					        }
-#endif
+                            }
 
 						case EffectParameterType.Single:
 							{
@@ -443,7 +472,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				parameters[i] = new EffectParameter(
 					class_, type, name, rowCount, columnCount, semantic, 
-					annotations, elements, structMembers, data);
+					annotations, elements, structMembers, data, isMojo);
 			}
 
 			return new EffectParameterCollection(parameters);

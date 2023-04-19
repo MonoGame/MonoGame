@@ -129,6 +129,43 @@ namespace Microsoft.Xna.Framework
                     return SharpDX.DXGI.Format.BC2_UNorm_SRgb;
                 case SurfaceFormat.Dxt5SRgb:
                     return SharpDX.DXGI.Format.BC3_UNorm_SRgb;
+
+                case SurfaceFormat.R32Uint:
+                    return SharpDX.DXGI.Format.R32_UInt;
+                case SurfaceFormat.R32Int:
+                    return SharpDX.DXGI.Format.R32_SInt;
+                case SurfaceFormat.R16Uint:
+                    return SharpDX.DXGI.Format.R16_UInt;
+                case SurfaceFormat.R16Int:
+                    return SharpDX.DXGI.Format.R16_SInt;
+                case SurfaceFormat.R8Uint:
+                    return SharpDX.DXGI.Format.R8_UInt;
+                case SurfaceFormat.R8Int:
+                    return SharpDX.DXGI.Format.R8_SInt;
+                case SurfaceFormat.Rg64Uint:
+                    return SharpDX.DXGI.Format.R32G32_UInt;
+                case SurfaceFormat.Rg64Int:
+                    return SharpDX.DXGI.Format.R32G32_SInt;
+                case SurfaceFormat.Rg32Uint:
+                    return SharpDX.DXGI.Format.R16G16_UInt;
+                case SurfaceFormat.Rg32Int:
+                    return SharpDX.DXGI.Format.R16G16_SInt;
+                case SurfaceFormat.Rg16Uint:
+                    return SharpDX.DXGI.Format.R8G8_UInt;
+                case SurfaceFormat.Rg16Int:
+                    return SharpDX.DXGI.Format.R8G8_SInt;
+                case SurfaceFormat.Rgba128Uint:
+                    return SharpDX.DXGI.Format.R32G32B32A32_UInt;
+                case SurfaceFormat.Rgba128Int:
+                    return SharpDX.DXGI.Format.R32G32B32A32_SInt;
+                case SurfaceFormat.Rgba64Uint:
+                    return SharpDX.DXGI.Format.R16G16B16A16_UInt;
+                case SurfaceFormat.Rgba64Int:
+                    return SharpDX.DXGI.Format.R16G16B16A16_SInt;
+                case SurfaceFormat.Rgba32Uint:
+                    return SharpDX.DXGI.Format.R8G8B8A8_UInt;
+                case SurfaceFormat.Rgba32Int:
+                    return SharpDX.DXGI.Format.R8G8B8A8_SInt;
             }
         }
 

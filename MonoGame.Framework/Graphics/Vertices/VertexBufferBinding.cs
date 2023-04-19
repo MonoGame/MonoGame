@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (vertexBuffer == null)
                 throw new ArgumentNullException("vertexBuffer");
-            if (vertexOffset < 0 || vertexOffset >= vertexBuffer.VertexCount)
+            if (vertexOffset < 0 || (vertexOffset >= vertexBuffer.VertexCount && vertexBuffer.VertexCount != 0))
                 throw new ArgumentOutOfRangeException("vertexOffset");
             if (instanceFrequency < 0)
                 throw new ArgumentOutOfRangeException("instanceFrequency");

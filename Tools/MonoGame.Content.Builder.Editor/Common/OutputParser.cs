@@ -16,7 +16,7 @@ namespace MonoGame.Tools.Pipeline
         BuildAsset,
         BuildError,
         BuildWarning,
-        BuildErrorContinue,
+        BuildErrorWarningContinue,
         BuildEnd,
         BuildTime,
         BuildTerminated,
@@ -44,7 +44,7 @@ namespace MonoGame.Tools.Pipeline
         Regex _reFileError = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\W*?: (?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildEnd = new Regex(@"^(Build)\W+(?<buildInfo>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildTime = new Regex(@"^(Time elapsed)\W+(?<buildElapsedTime>.*?)\.\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        
+
 
         public OutputParser()
         {
@@ -62,7 +62,7 @@ namespace MonoGame.Tools.Pipeline
         }
 
         internal void Parse(string text)
-        {   
+        {
             ParseLine(text);
         }
 
@@ -148,8 +148,10 @@ namespace MonoGame.Tools.Pipeline
                 var column = columnBegin.Value;
                 if(columnEnd.Success)
                     column += "-" + columnEnd.Value;
-                var errorCode = m.Groups["errorCode"];
-                Filename = m.Groups["filename"].Value.Replace("\\\\","/").Replace("\\", "/");
+                var errorCode = m.Groups["errorCode"].Value;
+                if (errorCode == "S0000") // ShaderConductor doesn't generate error codes, we always get a generic S0000 code, let's just output "error" instead
+                    errorCode = "error";
+                Filename = m.Groups["filename"].Value.Replace("\\\\", "/").Replace("\\", "/");
                 ErrorMessage = string.Format("{0} ({1},{2}): {3}", errorCode, lineNum, column, m.Groups["errorMessage"].Value);
             }
             else if (_reFileWarningWithLineNum.IsMatch(line))
@@ -158,11 +160,13 @@ namespace MonoGame.Tools.Pipeline
                 var m = _reFileWarningWithLineNum.Match(line);
                 var lineNum = m.Groups["line"];
                 var columnBegin = m.Groups["column"];
-                var columnEnd = m.Groups["columnEnd"];                
+                var columnEnd = m.Groups["columnEnd"];
                 var column = columnBegin.Value;
                 if(columnEnd.Success)
                     column += "-" + columnEnd.Value;
-                var errorCode = m.Groups["warningCode"];
+                var errorCode = m.Groups["warningCode"].Value;
+                if (errorCode == "S0000") // ShaderConductor doesn't generate error codes, we always get a generic S0000 code, let's just output "warning" instead
+                    errorCode = "warning";
                 Filename = m.Groups["filename"].Value.Replace("\\\\", "/").Replace("\\", "/");
                 ErrorMessage = string.Format("{0} ({1},{2}): {3}", errorCode, lineNum, column, m.Groups["warningMessage"].Value);
             }
@@ -179,9 +183,9 @@ namespace MonoGame.Tools.Pipeline
                 var m = _reBuildAsset.Match(line);
                 Filename = m.Groups["filename"].Value;
             }
-            else if (prevState == OutputState.BuildError || prevState == OutputState.BuildErrorContinue)
+            else if (prevState == OutputState.BuildError || prevState == OutputState.BuildWarning || prevState == OutputState.BuildErrorWarningContinue)
             {
-                State = OutputState.BuildErrorContinue;
+                State = OutputState.BuildErrorWarningContinue;
                 Filename = prevFilename;
                 ErrorMessage = line.TrimEnd();
             }

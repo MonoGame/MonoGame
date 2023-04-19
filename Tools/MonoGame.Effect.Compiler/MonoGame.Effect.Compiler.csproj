@@ -69,11 +69,44 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="dxcompiler.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libdxcompiler.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libdxcompiler.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libdxcompiler.so.3.7">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libShaderConductor.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libShaderConductor.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libShaderConductorWrapper.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libShaderConductorWrapper.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ShaderConductor.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ShaderConductorWrapper.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" />
     <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" />
     <Reference Include="..\..\ThirdParty\Dependencies\CppNet\CppNet.dll" />
   </ItemGroup>
-  
+
   <Import Project="..\..\Switch\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Switch\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\XBoxOne\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\XBoxOne\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\PlayStation4\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\PlayStation4\MonoGame.Effect.Compiler.targets')" />

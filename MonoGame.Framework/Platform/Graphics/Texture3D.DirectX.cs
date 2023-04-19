@@ -57,6 +57,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
+            if (ShaderAccess == ShaderAccess.ReadWrite)
+                description.BindFlags |= BindFlags.UnorderedAccess;
+
             return new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, description);
         }
 
@@ -148,6 +151,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
-	}
+
+        internal override UnorderedAccessViewDescription GetUnorderedAccessViewDescription(int mipLevel)
+        {
+            return new UnorderedAccessViewDescription
+            {
+                Dimension = UnorderedAccessViewDimension.Texture3D,
+                Format = SharpDXHelper.ToFormat(_format),
+                Texture3D = new UnorderedAccessViewDescription.Texture3DResource
+                {
+                    MipSlice = mipLevel,
+                    FirstWSlice = 0,
+                    WSize = Depth
+                }
+            };
+        }
+    }
 }
 

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using MonoGame.Effect.TPGParser;
 
 namespace MonoGame.Effect
@@ -23,10 +24,13 @@ namespace MonoGame.Effect
 
         public List<string> AdditionalOutputFiles { get; private set; }
 
+        public List<(string type, string name, string value)> ShaderParamInitializations { get; private set; } 
+
         public ShaderProfile Profile { get; private set; }
 
         public bool Debug { get; private set; }
 
+        private static Regex initVarRegex = new Regex(@"(?<type>(int|uint|float|bool))(([1-4](x[1-4])?)?)\s+(?<name>[_a-zA-Z][_a-zA-Z0-9]*)\s*=\s*(?<value>[^;]+);", RegexOptions.Compiled);
 
         static public ShaderResult FromFile(string path, Options options, IEffectCompilerOutput output)
         {
@@ -39,7 +43,7 @@ namespace MonoGame.Effect
             var macros = new Dictionary<string, string>();
             macros.Add("MGFX", "1");
 
-            options.Profile.AddMacros(macros);
+            options.Profile.AddMacros(macros, options);
 
             // If we're building shaders for debug set that flag too.
             if (options.Debug)
@@ -47,8 +51,7 @@ namespace MonoGame.Effect
 
             if (!string.IsNullOrEmpty(options.Defines))
             {
-                var defines = options.Defines.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (var define in defines)
+                foreach (var define in options.GetDefines())
                 {
                     var name = define;
                     var value = "1";
@@ -74,16 +77,9 @@ namespace MonoGame.Effect
             var dependencies = new List<string>();
             newFile = Preprocessor.Preprocess(effectSource, fullPath, macros, dependencies, output);
 
-            // Parse the resulting file for techniques and passes.
+            // Parse the resulting file for techniques and passes.  
             var tree = new Parser(new Scanner()).Parse(newFile, fullPath);
-            if (tree.Errors.Count > 0)
-            {
-                var errors = String.Empty;
-                foreach (var error in tree.Errors)
-                    errors += string.Format("{0}({1},{2}) : {3}\r\n", error.File, error.Line, error.Column, error.Message);
-
-                throw new Exception(errors);
-            }
+            HandleParseErrors(tree);
 
             // Evaluate the results of the parse tree.
             var shaderInfo = tree.Eval() as ShaderInfo;
@@ -103,6 +99,12 @@ namespace MonoGame.Effect
             if (!string.IsNullOrEmpty(options.OutputFile))
                 result.OutputFilePath = Path.GetFullPath(options.OutputFile);
             result.AdditionalOutputFiles = new List<string>();
+
+            // ShaderConductor doesn't support defaul values for shader parameters.
+            // This will probably not change since SPIRV itself doesn't support this.
+            // We will extract the default values by parsing the HLSL source ourselves
+            if (options.Profile is OpenGLShaderProfile)
+                result.ShaderParamInitializations = FindAllShaderParameterInitializers(cleanFile);
 
             // Remove empty techniques.
             for (var i = 0; i < shaderInfo.Techniques.Count; i++)
@@ -124,7 +126,19 @@ namespace MonoGame.Effect
 
             return result;
         }
-                
+
+        public static void HandleParseErrors(ParseTree tree)
+        {
+            if (tree.Errors.Count > 0)
+            {
+                var errors = String.Empty;
+                foreach (var error in tree.Errors)
+                    errors += string.Format("{0}({1},{2}) : {3}\r\n", error.File, error.Line, error.Column, error.Message);
+
+                throw new Exception(errors);
+            }
+        }
+
         public static void WhitespaceNodes(TokenType type, List<ParseNode> nodes, ref string sourceFile)
         {
             for (var i = 0; i < nodes.Count; i++)
@@ -139,7 +153,7 @@ namespace MonoGame.Effect
                 // Get the full content of this node.
                 var start = n.Token.StartPos;
                 var end = n.Token.EndPos;
-                var length = end - n.Token.StartPos;
+                var length = end - start;
                 var content = sourceFile.Substring(start, length);
 
                 // Replace the content of this node with whitespace.
@@ -155,6 +169,67 @@ namespace MonoGame.Effect
                 newfile += sourceFile.Substring(end);
                 sourceFile = newfile;
             }
+        }
+
+        public static List<(string type, string name, string value)> FindAllShaderParameterInitializers(string source)
+        {
+            var paramList = new List<(string type, string name, string value)>();
+            var nestingDepthList = BuildNestingDepthListForCurlyBraces(source);
+            var matches = initVarRegex.Matches(source);
+
+            foreach (Match match in matches)
+            {
+                // only accept initializers at the root level, otherwise it's probably a local function variable
+                // if we ever support initializers inside constant buffer declarations, this needs to be enhanced
+                if (FindNestingDepthAtPos(nestingDepthList, match.Index) == 0)
+                {
+                    paramList.Add((match.Groups["type"].Value,
+                                   match.Groups["name"].Value,
+                                   match.Groups["value"].Value));
+                }
+            }
+
+            return paramList;
+        }
+
+        public static List<(int, int)> BuildNestingDepthListForCurlyBraces(string source)
+        {
+            // return list of all opening/closing curly braces and their nesting depth 
+            var nestingDepthList = new List<(int pos, int depth)>();
+            int depth = 0;
+            nestingDepthList.Add((0, depth));
+
+            for (var i = 0; i < source.Length; i++)
+            {
+                char c = source[i];
+                if (c == '{')
+                {
+                    depth++;
+                    nestingDepthList.Add((i, depth));
+                }
+                else if (c == '}')
+                {
+                    depth--;
+                    nestingDepthList.Add((i, depth));
+                }
+            }
+
+            return nestingDepthList;
+        }
+
+        public static int FindNestingDepthAtPos(List<(int, int)> nestingDepthList, int ind)
+        {
+            int nestingDepth = 0;
+            for (int i = 1; i < nestingDepthList.Count; i++)
+            {
+                int bracePos = nestingDepthList[i].Item1;
+                if (bracePos > ind)
+                {
+                    nestingDepth = nestingDepthList[i - 1].Item2;
+                    break;
+                }
+            }
+            return nestingDepth;
         }
     }
 }

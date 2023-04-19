@@ -229,6 +229,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_shared)
                 desc.OptionFlags |= ResourceOptionFlags.Shared;
 
+            if (ShaderAccess == ShaderAccess.ReadWrite)
+                desc.BindFlags |= BindFlags.UnorderedAccess;
+
             return desc;
         }
         internal override Resource CreateTexture()
@@ -236,6 +239,19 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = GetTexture2DDescription();
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+        }
+
+        internal override UnorderedAccessViewDescription GetUnorderedAccessViewDescription(int mipSlice)
+        {
+            return new UnorderedAccessViewDescription
+            {
+                Dimension = UnorderedAccessViewDimension.Texture2D,
+                Format = SharpDXHelper.ToFormat(_format),
+                Texture2D = new UnorderedAccessViewDescription.Texture2DResource
+                {
+                    MipSlice = mipSlice
+                }
+            };
         }
 
         private void PlatformReload(Stream textureStream)

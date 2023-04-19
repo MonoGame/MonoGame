@@ -16,6 +16,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             this.glTarget = TextureTarget.TextureCubeMap;
 
+            bool isWriteable = ShaderAccess == ShaderAccess.ReadWrite;
+            if (isWriteable)
+                throw new InvalidOperationException("TextureCube with write access from shaders is not supported");
+
             Threading.BlockOnUIThread(() =>
             {
                 GL.GenTextures(1, out this.glTexture);
@@ -38,7 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
                 GraphicsExtensions.CheckGLError();
 
-                format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
+                format.GetGLFormat(GraphicsDevice, isWriteable, out glInternalFormat, out glFormat, out glType);
 
                 for (var i = 0; i < 6; i++)
                 {
