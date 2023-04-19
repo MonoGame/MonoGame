@@ -54,7 +54,7 @@ MonoGame, thanks to the excellent assimp project, supports a much wider range of
 
 > A nice trick to upgrade the old .fbx is to open them in Visual Studio 2012+ and then save it again under a new name. [This article](https://www.codeproject.com/articles/1041397/updating-old-fbx-files-for-the-modern-era) walks through some of the quick, easy, and FREE methods for updating older .fbx files.
 
-When the MonoGame content pipeline processes a Model file, it is converted into an optimized internal format that will contain the Vertices, Texture Coordinates, and Normals. The pipeline will also pull out the textures used in the model and put those through the pipeline too, so you automatically get optimized textures automatically.
+When the MonoGame content pipeline processes a Model file, it is converted into an optimized internal format that will contain the Vertices, Texture Coordinates, and Normals. The pipeline will also pull out the textures used in the model and put those through the pipeline too, so you get optimized textures automatically.
 
 ## Summary
 
