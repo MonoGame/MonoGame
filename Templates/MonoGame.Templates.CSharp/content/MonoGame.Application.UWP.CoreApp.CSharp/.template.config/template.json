@@ -5,6 +5,7 @@
     ],
     "name": "MonoGame Windows Universal CoreApp Application",
     "groupIdentity": "MonoGame.Application.UWP.CoreApp",
+    "identity": "MonoGame.Application.UWP.CoreApp.CSharp",
     "shortName": "mguwpcore",
     "tags": {
         "language": "C#",
