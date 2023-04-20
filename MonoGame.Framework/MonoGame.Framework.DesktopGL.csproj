@@ -77,9 +77,6 @@
     
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
-
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\**\*.cs" LinkBase="ThirdParty\NVorbis" />
-    <Compile Remove="..\ThirdParty\NVorbis\NVorbis\Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>

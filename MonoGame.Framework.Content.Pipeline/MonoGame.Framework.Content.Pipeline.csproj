@@ -87,8 +87,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">
-    <Content Include="..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" PackagePath="lib\net6.0" Visible="false" />
-    <Content Include="..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" PackagePath="lib\net6.0" Visible="false" />
     <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\net6.0" Visible="false" />
     <Content Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" PackagePath="lib\net6.0" Visible="false" />
     <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" PackagePath="lib\net6.0" Visible="false" />
