@@ -69,8 +69,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" />
-    <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" />
+    <PackageReference Include="SharpDX" Version="4.0.1" />
+    <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="..\..\ThirdParty\Dependencies\CppNet\CppNet.dll" />
   </ItemGroup>
   
