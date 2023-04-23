@@ -68,7 +68,7 @@ To make use of this functionality you need to tell the spritefont which resx fil
 </ResourceFiles>
 ```
 
-> Note the paths are relative to the content project directory. In the example above the resx files are in the directory above the .mgcb prjoect file.
+> Note the paths are relative to the content project directory. In the example above the resx files are in the directory above the .mgcb project file.
 
 The standard **FontDescription** asset type does not support this addition. Change the asset type to **LocalizedFontDescription** in the Asset node at the top:
 
