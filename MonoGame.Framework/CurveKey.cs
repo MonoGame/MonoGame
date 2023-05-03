@@ -186,7 +186,11 @@ namespace Microsoft.Xna.Framework
 
         public override bool Equals(object obj)
         {
-            return (obj as CurveKey) != null && Equals((CurveKey)obj);
+            if (obj is CurveKey other)
+            {
+                return Equals(other);
+            }
+            return false;
         }
 
         public override int GetHashCode()

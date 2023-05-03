@@ -428,8 +428,8 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (obj is BoundingSphere)
-                return this.Equals((BoundingSphere)obj);
+            if (obj is BoundingSphere other)
+                return this.Equals(other);
 
             return false;
         }

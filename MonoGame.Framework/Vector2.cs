@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
@@ -540,9 +541,9 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (obj is Vector2)
+            if (obj is Vector2 other)
             {
-                return Equals((Vector2)obj);
+                return Equals(other);
             }
 
             return false;
@@ -984,7 +985,13 @@ namespace Microsoft.Xna.Framework
         /// <returns>A <see cref="String"/> representation of this <see cref="Vector2"/>.</returns>
         public override string ToString()
         {
-            return "{X:" + X + " Y:" + Y + "}";
+            StringBuilder sb = new StringBuilder(32);
+            sb.Append("{X:");
+            sb.Append(this.X);
+            sb.Append(" Y:");
+            sb.Append(this.Y);
+            sb.Append("}");
+            return sb.ToString();
         }
 
         /// <summary>

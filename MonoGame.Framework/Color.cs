@@ -425,7 +425,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            return ((obj is Color) && this.Equals((Color)obj));
+            return ((obj is Color other) && this.Equals(other));
         }
 
         #region Color Bank

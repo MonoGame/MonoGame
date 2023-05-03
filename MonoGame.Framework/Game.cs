@@ -921,20 +921,20 @@ namespace Microsoft.Xna.Framework
 
         private void CategorizeComponent(IGameComponent component)
         {
-            if (component is IUpdateable)
-                _updateables.Add((IUpdateable)component);
-            if (component is IDrawable)
-                _drawables.Add((IDrawable)component);
+            if (component is IUpdateable updateable)
+                _updateables.Add(updateable);
+            if (component is IDrawable drawable)
+                _drawables.Add(drawable);
         }
 
         // FIXME: I am open to a better name for this method.  It does the
         //        opposite of CategorizeComponent.
         private void DecategorizeComponent(IGameComponent component)
         {
-            if (component is IUpdateable)
-                _updateables.Remove((IUpdateable)component);
-            if (component is IDrawable)
-                _drawables.Remove((IDrawable)component);
+            if (component is IUpdateable updateable)
+                _updateables.Remove(updateable);
+            if (component is IDrawable drawable)
+                _drawables.Remove(drawable);
         }
 
         /// <summary>
@@ -1201,10 +1201,10 @@ namespace Microsoft.Xna.Framework
 
             public override bool Equals(object obj)
             {
-                if (!(obj is AddJournalEntry<T>))
+                if (!(obj is AddJournalEntry<T> other))
                     return false;
 
-                return object.Equals(Item, ((AddJournalEntry<T>)obj).Item);
+                return object.Equals(Item, (other).Item);
             }
         }
     }

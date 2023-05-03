@@ -320,7 +320,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is Rectangle) && this == ((Rectangle)obj);
+            return (obj is Rectangle other) && this == other;
         }
 
         /// <summary>
@@ -487,7 +487,17 @@ namespace Microsoft.Xna.Framework
         /// <returns><see cref="String"/> representation of this <see cref="Rectangle"/>.</returns>
         public override string ToString()
         {
-            return "{X:" + X + " Y:" + Y + " Width:" + Width + " Height:" + Height + "}";
+            System.Text.StringBuilder sb = new(64);
+            sb.Append("{X:");
+            sb.Append(this.X);
+            sb.Append(" Y:");
+            sb.Append(this.Y);
+            sb.Append(" Width:");
+            sb.Append(this.Width);
+            sb.Append(" Heigth:");
+            sb.Append(this.Height);
+            sb.Append("}");
+            return sb.ToString();
         }
 
         /// <summary>

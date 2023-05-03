@@ -561,8 +561,8 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (obj is Quaternion)
-                return Equals((Quaternion)obj);
+            if (obj is Quaternion other)
+                return Equals(other);
             return false;
         }
 
@@ -1001,7 +1001,17 @@ namespace Microsoft.Xna.Framework
         /// <returns>A <see cref="String"/> representation of this <see cref="Quaternion"/>.</returns>
         public override string ToString()
         {
-            return "{X:" + X + " Y:" + Y + " Z:" + Z + " W:" + W + "}";
+            System.Text.StringBuilder sb = new(64);
+            sb.Append("{X:");
+            sb.Append(this.X);
+            sb.Append(" Y:");
+            sb.Append(this.Y);
+            sb.Append(" Z:");
+            sb.Append(this.Z);
+            sb.Append(" W:");
+            sb.Append(this.W);
+            sb.Append("}");
+            return sb.ToString();
         }
 
         /// <summary>

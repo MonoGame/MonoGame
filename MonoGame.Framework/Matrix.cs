@@ -1661,9 +1661,9 @@ namespace Microsoft.Xna.Framework
         public override bool Equals(object obj)
         {
             bool flag = false;
-		    if (obj is Matrix)
+		    if (obj is Matrix other)
 		    {
-		        flag = this.Equals((Matrix) obj);
+		        flag = this.Equals(other);
 		    }
 		    return flag;
         }
