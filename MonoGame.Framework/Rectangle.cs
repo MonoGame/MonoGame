@@ -487,17 +487,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><see cref="String"/> representation of this <see cref="Rectangle"/>.</returns>
         public override string ToString()
         {
-            System.Text.StringBuilder sb = new(64);
-            sb.Append("{X:");
-            sb.Append(this.X);
-            sb.Append(" Y:");
-            sb.Append(this.Y);
-            sb.Append(" Width:");
-            sb.Append(this.Width);
-            sb.Append(" Heigth:");
-            sb.Append(this.Height);
-            sb.Append("}");
-            return sb.ToString();
+            return "{X:" + X + " Y:" + Y + " Width:" + Width + " Height:" + Height + "}";
         }
 
         /// <summary>

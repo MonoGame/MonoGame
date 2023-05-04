@@ -1243,17 +1243,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>A <see cref="String"/> representation of this <see cref="Vector4"/>.</returns>
         public override string ToString()
         {
-            System.Text.StringBuilder sb = new(64);
-            sb.Append("{X:");
-            sb.Append(this.X);
-            sb.Append(" Y:");
-            sb.Append(this.Y);
-            sb.Append(" Z:");
-            sb.Append(this.Z);
-            sb.Append(" W:");
-            sb.Append(this.W);
-            sb.Append("}");
-            return sb.ToString();
+            return "{X:" + X + " Y:" + Y + " Z:" + Z + " W:" + W + "}";
         }
 
         /// <summary>
