@@ -1,7 +1,7 @@
 ﻿// This code originated from:
 //
 //    http://theinstructionlimit.com/ogg-streaming-using-opentk-and-nvorbis
-//    https://github.com/renaudbedard/nvorbis/
+//    https://github.com/NVorbis/NVorbis
 //
 // It was released to the public domain by the author (Renaud Bedard).
 // No other license is intended or required.
@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using NVorbis;
@@ -160,7 +159,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void SeekToPosition(TimeSpan pos)
         {
-            Reader.DecodedTime = pos;
+            Reader.TimePosition = pos;
             AL.SourceStop(alSourceId);
             ALHelper.CheckError("Failed to stop source.");
         }
@@ -170,7 +169,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (Reader == null)
                 return TimeSpan.Zero;
 
-            return Reader.DecodedTime;
+            return Reader.TimePosition;
         }
 
         public TimeSpan GetLength()

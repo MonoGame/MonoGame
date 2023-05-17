@@ -203,7 +203,7 @@ namespace MonoGame.Tools.Pipeline
 
             if (overGroup) // TODO: Group collapsing/expanding?
                 SetCursor(CursorType.Arrow);
-            else if ((new Rectangle(_separatorPos - _separatorWidth / 2, 0, _separatorWidth, Height)).Contains(_mouseLocation))
+            else if (new Rectangle(_separatorPos - _separatorWidth / 2, 0, _separatorWidth, _height).Contains(_mouseLocation))
                 SetCursor(CursorType.VerticalSplit);
             else
                 SetCursor(CursorType.Arrow);

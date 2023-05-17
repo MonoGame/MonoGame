@@ -316,8 +316,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Higher values make the environment map only visible around the silhouette 
         /// edges of the object, while lower values make it visible everywhere. 
         /// Setting this property to 0 disables Fresnel entirely, making the 
-        /// environment map equally visible regardless of view angle. The default is 
-        /// 1. Fresnel only affects the environment map RGB (the intensity of which is 
+        /// environment map equally visible regardless of view angle. The default is 1. 
+        /// Fresnel only affects the environment map RGB (the intensity of which is 
         /// controlled by EnvironmentMapAmount). The alpha contribution (controlled by 
         /// EnvironmentMapSpecular) is not affected by the Fresnel setting.
         /// </summary>

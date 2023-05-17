@@ -22,7 +22,7 @@ namespace MonoGame.Content.Builder.Editor.Launcher
             var mgcbEditorArgs = args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]) ? $"\"{args[0]}\"" : "";
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                Process.Start("open", $"-a \"{mgcbEditorApp}\" {mgcbEditorArgs}");
+                Process.Start("open", $"-n \"{mgcbEditorApp}\" --args {mgcbEditorArgs}");
             else
                 Process.Start(mgcbEditorApp, mgcbEditorArgs);
         }
