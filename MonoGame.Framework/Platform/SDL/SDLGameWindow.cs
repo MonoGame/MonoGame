@@ -222,12 +222,10 @@ namespace Microsoft.Xna.Framework
             Sdl.Rectangle displayRect;
             Sdl.Display.GetBounds(displayIndex, out displayRect);
 
-            if (_willBeFullScreen != IsFullScreen || _hardwareSwitch != _game.graphicsDeviceManager.HardwareModeSwitch)
-            {
-                var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? Sdl.Window.State.Fullscreen : Sdl.Window.State.FullscreenDesktop;
-                Sdl.Window.SetFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
-                _hardwareSwitch = _game.graphicsDeviceManager.HardwareModeSwitch;
-            }
+            // setting fullscreen to false before resizing if going out of fullscreen
+            if (!_willBeFullScreen && IsFullScreen)
+                Sdl.Window.SetFullscreen(Handle, 0);
+
             // If going to exclusive full-screen mode, force the window to minimize on focus loss (Windows only)
             if (CurrentPlatform.OS == OS.Windows)
             {
@@ -244,6 +242,15 @@ namespace Microsoft.Xna.Framework
             {
                 _width = displayRect.Width;
                 _height = displayRect.Height;
+            }
+
+            // setting fullscreen to true after resizing if going to fullscreen
+            // check here if hardware mode changed, because it affects only fullscreen mode
+            if ((_willBeFullScreen && !IsFullScreen) || _hardwareSwitch != _game.graphicsDeviceManager.HardwareModeSwitch)
+            {
+                var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? Sdl.Window.State.Fullscreen : Sdl.Window.State.FullscreenDesktop;
+                Sdl.Window.SetFullscreen(Handle, _willBeFullScreen ? fullscreenFlag : 0);
+                _hardwareSwitch = _game.graphicsDeviceManager.HardwareModeSwitch;
             }
 
             int ignore, minx = 0, miny = 0;
