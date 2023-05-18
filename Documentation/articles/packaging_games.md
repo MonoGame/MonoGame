@@ -45,7 +45,7 @@ YourGame.app                    (this is your root folder)
             - YourGame.icns     (this is your app icon, in ICNS format)
         - MacOS
             - amd64             (this is where your game executable for amd64 belongs, place files from the osx-x64/publish directory here)
-            - amd64             (this is where your game executable for arm64 belongs, place files from the osx-arm64/publish directory here)
+            - arm64             (this is where your game executable for arm64 belongs, place files from the osx-arm64/publish directory here)
             - YourGame          (the entry point script of your app, see bellow for contents)
         - Info.plist            (the metadata of your app, see bellow for contents)
 ```

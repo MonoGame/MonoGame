@@ -132,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					IEffectMatrices effectMatricies = effect as IEffectMatrices;
 					if (effectMatricies == null)
                     {
-						throw new InvalidOperationException($"This model contains a custom effect which does not implement the {nameof(IEffectMatrices)} interface, so it cannot be drawn using {nameof(Model)}.{nameof(Draw)}. Instead, call {nameof(ModelMesh)}.{nameof(ModelMesh.Draw)} after setting the appropriate effect parameters.");
+						throw new InvalidOperationException("This model contains a custom effect which does not implement the IEffectMatrices interface, so it cannot be drawn using Model.Draw. Instead, call ModelMesh.Draw after setting the appropriate effect parameters.");
 					}
                     effectMatricies.World = sharedDrawBoneMatrices[mesh.ParentBone.Index] * world;
                     effectMatricies.View = view;
