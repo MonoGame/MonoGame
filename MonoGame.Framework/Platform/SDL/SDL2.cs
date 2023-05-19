@@ -162,7 +162,7 @@ internal static class Sdl
 
         public override bool Equals(object obj)
         {
-            if (!(obj is Version))
+            if (obj is not Version)
                 return false;
 
             return version == (Version)obj;

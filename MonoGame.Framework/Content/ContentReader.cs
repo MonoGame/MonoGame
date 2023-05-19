@@ -141,10 +141,7 @@ namespace Microsoft.Xna.Framework.Content
             if (disposable == null)
                 return;
 
-            if (recordDisposableObject != null)
-                recordDisposableObject(disposable);
-            else
-                contentManager.RecordDisposable(disposable);
+            recordDisposableObject?.Invoke(disposable);
         }
 
         public T ReadObject<T>()
