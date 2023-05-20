@@ -130,7 +130,7 @@ namespace Microsoft.Xna.Framework
                         break;
                     case Sdl.EventType.KeyDown:
                     {
-                        var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+                        var key = KeyboardUtil.ToXna(ev.Key.Keysym.Scancode);
                         if (!_keys.Contains(key))
                             _keys.Add(key);
                         char character = (char)ev.Key.Keysym.Sym;
@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework
                     }
                     case Sdl.EventType.KeyUp:
                     {
-                        var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+                        var key = KeyboardUtil.ToXna(ev.Key.Keysym.Scancode);
                         _keys.Remove(key);
                         _view.OnKeyUp(new InputKeyEventArgs(key));
                         break;
