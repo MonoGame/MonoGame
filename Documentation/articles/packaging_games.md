@@ -30,7 +30,10 @@ We recommend using the .tar.gz archiving format to preserve the execution permis
 
 From the .NET CLI:
 
-`dotnet publish -c Release -r osx-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained`
+```
+dotnet publish -c Release -r osx-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained
+dotnet publish -c Release -r osx-arm64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained
+```
 
 We recommend that you distribute your game as an [application bundle](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/BundleTypes/BundleTypes.html). Application bundles are directories with the following file structure:
 
@@ -40,8 +43,23 @@ YourGame.app                    (this is your root folder)
         - Resources
             - Content           (this is where all your content and XNB's should go)
             - YourGame.icns     (this is your app icon, in ICNS format)
-        - MacOS                 (this is where your game belongs, except for content files)
-        - Info.plist             (the metadata of your app)
+        - MacOS
+            - amd64             (this is where your game executable for amd64 belongs, place files from the osx-x64/publish directory here)
+            - arm64             (this is where your game executable for arm64 belongs, place files from the osx-arm64/publish directory here)
+            - YourGame          (the entry point script of your app, see bellow for contents)
+        - Info.plist            (the metadata of your app, see bellow for contents)
+```
+
+The contents of the entry point script:
+```sh
+#!/bin/bash
+
+cd "$(dirname $BASH_SOURCE)/../Resources"
+if [[ $(uname -p) == 'arm' ]]; then
+  ./../MacOS/arm64/YourGame
+else
+  ./../MacOS/amd64/YourGame
+fi
 ```
 
 The Info.plist file is a standard macOS file containing metadata about your game. Here's an example file with required and recommended values set:
@@ -79,6 +97,12 @@ The Info.plist file is a standard macOS file containing metadata about your game
     <string>Copyright © 2022</string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
+    <key>LSRequiresNativeExecution</key>
+    <true/>
+    <key>LSArchitecturePriority</key>
+    <array>
+        <string>arm64</string>
+    </array>
 </dict>
 </plist>
 ```
