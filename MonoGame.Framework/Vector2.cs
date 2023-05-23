@@ -19,15 +19,6 @@ namespace Microsoft.Xna.Framework
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Vector2 : IEquatable<Vector2>
     {
-        #region Private Fields
-
-        private static readonly Vector2 zeroVector = new Vector2(0f, 0f);
-        private static readonly Vector2 unitVector = new Vector2(1f, 1f);
-        private static readonly Vector2 unitXVector = new Vector2(1f, 0f);
-        private static readonly Vector2 unitYVector = new Vector2(0f, 1f);
-
-        #endregion
-
         #region Public Fields
 
         /// <summary>
@@ -49,51 +40,31 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Returns a <see cref="Vector2"/> with components 0, 0.
         /// </summary>
-        public static Vector2 Zero
-        {
-            get { return zeroVector; }
-        }
+        public static Vector2 Zero => new();
 
         /// <summary>
         /// Returns a <see cref="Vector2"/> with components 1, 1.
         /// </summary>
-        public static Vector2 One
-        {
-            get { return unitVector; }
-        }
+        public static Vector2 One => new(1f);
 
         /// <summary>
         /// Returns a <see cref="Vector2"/> with components 1, 0.
         /// </summary>
-        public static Vector2 UnitX
-        {
-            get { return unitXVector; }
-        }
+        public static Vector2 UnitX => new(1f, 0f);
 
         /// <summary>
         /// Returns a <see cref="Vector2"/> with components 0, 1.
         /// </summary>
-        public static Vector2 UnitY
-        {
-            get { return unitYVector; }
-        }
+        public static Vector2 UnitY => new(0f, 1f);
+
+        public static Vector2 Left => new(-1f, 0f);
+        public static Vector2 Right => new(1f, 0f);
+        public static Vector2 Up => new(0f, -1f);
+        public static Vector2 Down => new(0f, 1f);
 
         #endregion
 
-        #region Internal Properties
-
-        internal string DebugDisplayString
-        {
-            get
-            {
-                return string.Concat(
-                    this.X.ToString(), "  ",
-                    this.Y.ToString()
-                );
-            }
-        }
-
-        #endregion
+        internal readonly string DebugDisplayString => ToString();
 
         #region Constructors
 
@@ -104,8 +75,8 @@ namespace Microsoft.Xna.Framework
         /// <param name="y">The y coordinate in 2d-space.</param>
         public Vector2(float x, float y)
         {
-            this.X = x;
-            this.Y = y;
+            X = x;
+            Y = y;
         }
 
         /// <summary>
@@ -114,8 +85,8 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">The x and y coordinates in 2d-space.</param>
         public Vector2(float value)
         {
-            this.X = value;
-            this.Y = value;
+            X = value;
+            Y = value;
         }
 
         #endregion
@@ -538,22 +509,14 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="obj">The <see cref="Object"/> to compare.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
-        public override bool Equals(object obj)
-        {
-            if (obj is Vector2)
-            {
-                return Equals((Vector2)obj);
-            }
-
-            return false;
-        }
+        public override readonly bool Equals(object obj) => obj is Vector2 vec && Equals(vec);
 
         /// <summary>
         /// Compares whether current instance is equal to specified <see cref="Vector2"/>.
         /// </summary>
         /// <param name="other">The <see cref="Vector2"/> to compare.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
-        public bool Equals(Vector2 other)
+        public readonly bool Equals(Vector2 other)
         {
             return (X == other.X) && (Y == other.Y);
         }
@@ -594,7 +557,7 @@ namespace Microsoft.Xna.Framework
         /// Gets the hash code of this <see cref="Vector2"/>.
         /// </summary>
         /// <returns>Hash code of this <see cref="Vector2"/>.</returns>
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             unchecked
             {
@@ -635,7 +598,7 @@ namespace Microsoft.Xna.Framework
         /// Returns the length of this <see cref="Vector2"/>.
         /// </summary>
         /// <returns>The length of this <see cref="Vector2"/>.</returns>
-        public float Length()
+        public readonly float Length()
         {
             return MathF.Sqrt((X * X) + (Y * Y));
         }
@@ -644,7 +607,7 @@ namespace Microsoft.Xna.Framework
         /// Returns the squared length of this <see cref="Vector2"/>.
         /// </summary>
         /// <returns>The squared length of this <see cref="Vector2"/>.</returns>
-        public float LengthSquared()
+        public readonly float LengthSquared()
         {
             return (X * X) + (Y * Y);
         }
@@ -704,7 +667,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
         /// <param name="result">The result of linear interpolation of the specified vectors as an output parameter.</param>
         public static void LerpPrecise(ref Vector2 value1, ref Vector2 value2, float amount, out Vector2 result)
-        { 
+        {
             result.X = MathHelper.LerpPrecise(value1.X, value2.X, amount);
             result.Y = MathHelper.LerpPrecise(value1.Y, value2.Y, amount);
         }
@@ -838,6 +801,22 @@ namespace Microsoft.Xna.Framework
             float val = 1.0f / MathF.Sqrt((X * X) + (Y * Y));
             X *= val;
             Y *= val;
+        }
+
+        public readonly Vector2 Normalized()
+        {
+            Vector2 vec = new();
+            float val = 1.0f / MathF.Sqrt((X * X) + (Y * Y));
+            vec.X *= val;
+            vec.Y *= val;
+            return vec;
+        }
+
+        public readonly Vector2 SafeNormalized(Vector2 whenZero)
+        {
+            Vector2 vec = new();
+            float ls = X * X + Y * Y;
+            return ls == 0 ? whenZero : vec / MathF.Sqrt(ls);
         }
 
         /// <summary>
@@ -982,18 +961,18 @@ namespace Microsoft.Xna.Framework
         /// {X:[<see cref="X"/>] Y:[<see cref="Y"/>]}
         /// </summary>
         /// <returns>A <see cref="String"/> representation of this <see cref="Vector2"/>.</returns>
-        public override string ToString()
+        public override readonly string ToString()
         {
-            return "{X:" + X + " Y:" + Y + "}";
+            return $"({X}, {Y})";
         }
 
         /// <summary>
         /// Gets a <see cref="Point"/> representation for this object.
         /// </summary>
         /// <returns>A <see cref="Point"/> representation for this object.</returns>
-        public Point ToPoint()
+        public readonly Point ToPoint()
         {
-            return new Point((int) X,(int) Y);
+            return new Point((int)X, (int)Y);
         }
 
         /// <summary>
@@ -1002,9 +981,14 @@ namespace Microsoft.Xna.Framework
         /// <param name="position">Source <see cref="Vector2"/>.</param>
         /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
         /// <returns>Transformed <see cref="Vector2"/>.</returns>
-        public static Vector2 Transform(Vector2 position, Matrix matrix)
+        public static Vector2 Transform(Vector2 position, in Matrix matrix)
         {
             return new Vector2((position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41, (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42);
+        }
+
+        public readonly Vector2 TransformedBy(in Matrix matrix)
+        {
+            return Vector2.Transform(this, matrix);
         }
 
         /// <summary>
@@ -1027,9 +1011,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">Source <see cref="Vector2"/>.</param>
         /// <param name="rotation">The <see cref="Quaternion"/> which contains rotation transformation.</param>
         /// <returns>Transformed <see cref="Vector2"/>.</returns>
-        public static Vector2 Transform(Vector2 value, Quaternion rotation)
+        public static Vector2 Transform(Vector2 value, in Quaternion rotation)
         {
-            Transform(ref value, ref rotation, out value);
+            Transform(ref value, in rotation, out value);
             return value;
         }
 
@@ -1039,17 +1023,19 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">Source <see cref="Vector2"/>.</param>
         /// <param name="rotation">The <see cref="Quaternion"/> which contains rotation transformation.</param>
         /// <param name="result">Transformed <see cref="Vector2"/> as an output parameter.</param>
-        public static void Transform(ref Vector2 value, ref Quaternion rotation, out Vector2 result)
+        public static void Transform(ref Vector2 value, in Quaternion rotation, out Vector2 result)
         {
             var rot1 = new Vector3(rotation.X + rotation.X, rotation.Y + rotation.Y, rotation.Z + rotation.Z);
             var rot2 = new Vector3(rotation.X, rotation.X, rotation.W);
             var rot3 = new Vector3(1, rotation.Y, rotation.Z);
-            var rot4 = rot1*rot2;
-            var rot5 = rot1*rot3;
+            var rot4 = rot1 * rot2;
+            var rot5 = rot1 * rot3;
 
-            var v = new Vector2();
-            v.X = (float)((double)value.X * (1.0 - (double)rot5.Y - (double)rot5.Z) + (double)value.Y * ((double)rot4.Y - (double)rot4.Z));
-            v.Y = (float)((double)value.X * ((double)rot4.Y + (double)rot4.Z) + (double)value.Y * (1.0 - (double)rot4.X - (double)rot5.Z));
+            var v = new Vector2
+            {
+                X = (float)(value.X * (1.0 - rot5.Y - rot5.Z) + value.Y * ((double)rot4.Y - rot4.Z)),
+                Y = (float)(value.X * ((double)rot4.Y + rot4.Z) + value.Y * (1.0 - rot4.X - rot5.Z))
+            };
             result.X = v.X;
             result.Y = v.Y;
         }
@@ -1066,15 +1052,15 @@ namespace Microsoft.Xna.Framework
         public static void Transform(
             Vector2[] sourceArray,
             int sourceIndex,
-            ref Matrix matrix,
+            in Matrix matrix,
             Vector2[] destinationArray,
             int destinationIndex,
             int length)
         {
             if (sourceArray == null)
-                throw new ArgumentNullException("sourceArray");
+                throw new ArgumentNullException(nameof(sourceArray));
             if (destinationArray == null)
-                throw new ArgumentNullException("destinationArray");
+                throw new ArgumentNullException(nameof(destinationArray));
             if (sourceArray.Length < sourceIndex + length)
                 throw new ArgumentException("Source array length is lesser than sourceIndex + length");
             if (destinationArray.Length < destinationIndex + length)
@@ -1103,16 +1089,16 @@ namespace Microsoft.Xna.Framework
         (
             Vector2[] sourceArray,
             int sourceIndex,
-            ref Quaternion rotation,
+            in Quaternion rotation,
             Vector2[] destinationArray,
             int destinationIndex,
             int length
         )
         {
             if (sourceArray == null)
-                throw new ArgumentNullException("sourceArray");
+                throw new ArgumentNullException(nameof(sourceArray));
             if (destinationArray == null)
-                throw new ArgumentNullException("destinationArray");
+                throw new ArgumentNullException(nameof(destinationArray));
             if (sourceArray.Length < sourceIndex + length)
                 throw new ArgumentException("Source array length is lesser than sourceIndex + length");
             if (destinationArray.Length < destinationIndex + length)
@@ -1123,8 +1109,7 @@ namespace Microsoft.Xna.Framework
                 var position = sourceArray[sourceIndex + x];
                 var destination = destinationArray[destinationIndex + x];
 
-                Vector2 v;
-                Transform(ref position,ref rotation,out v); 
+                Transform(ref position, in rotation, out Vector2 v);
 
                 destination.X = v.X;
                 destination.Y = v.Y;
@@ -1141,10 +1126,10 @@ namespace Microsoft.Xna.Framework
         /// <param name="destinationArray">Destination array.</param>
         public static void Transform(
             Vector2[] sourceArray,
-            ref Matrix matrix,
+            in Matrix matrix,
             Vector2[] destinationArray)
         {
-            Transform(sourceArray, 0, ref matrix, destinationArray, 0, sourceArray.Length);
+            Transform(sourceArray, 0, in matrix, destinationArray, 0, sourceArray.Length);
         }
 
         /// <summary>
@@ -1156,11 +1141,11 @@ namespace Microsoft.Xna.Framework
         public static void Transform
         (
             Vector2[] sourceArray,
-            ref Quaternion rotation,
+            in Quaternion rotation,
             Vector2[] destinationArray
         )
         {
-            Transform(sourceArray, 0, ref rotation, destinationArray, 0, sourceArray.Length);
+            Transform(sourceArray, 0, in rotation, destinationArray, 0, sourceArray.Length);
         }
 
         /// <summary>
@@ -1171,7 +1156,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Transformed normal.</returns>
         public static Vector2 TransformNormal(Vector2 normal, Matrix matrix)
         {
-            return new Vector2((normal.X * matrix.M11) + (normal.Y * matrix.M21),(normal.X * matrix.M12) + (normal.Y * matrix.M22));
+            return new Vector2((normal.X * matrix.M11) + (normal.Y * matrix.M21), (normal.X * matrix.M12) + (normal.Y * matrix.M22));
         }
 
         /// <summary>
@@ -1201,16 +1186,16 @@ namespace Microsoft.Xna.Framework
         (
             Vector2[] sourceArray,
             int sourceIndex,
-            ref Matrix matrix,
+            in Matrix matrix,
             Vector2[] destinationArray,
             int destinationIndex,
             int length
         )
         {
             if (sourceArray == null)
-                throw new ArgumentNullException("sourceArray");
+                throw new ArgumentNullException(nameof(sourceArray));
             if (destinationArray == null)
-                throw new ArgumentNullException("destinationArray");
+                throw new ArgumentNullException(nameof(destinationArray));
             if (sourceArray.Length < sourceIndex + length)
                 throw new ArgumentException("Source array length is lesser than sourceIndex + length");
             if (destinationArray.Length < destinationIndex + length)
@@ -1234,14 +1219,14 @@ namespace Microsoft.Xna.Framework
         public static void TransformNormal
             (
             Vector2[] sourceArray,
-            ref Matrix matrix,
+            in Matrix matrix,
             Vector2[] destinationArray
             )
         {
             if (sourceArray == null)
-                throw new ArgumentNullException("sourceArray");
+                throw new ArgumentNullException(nameof(sourceArray));
             if (destinationArray == null)
-                throw new ArgumentNullException("destinationArray");
+                throw new ArgumentNullException(nameof(destinationArray));
             if (destinationArray.Length < sourceArray.Length)
                 throw new ArgumentException("Destination array length is lesser than source array length");
 
@@ -1259,7 +1244,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public void Deconstruct(out float x, out float y)
+        public readonly void Deconstruct(out float x, out float y)
         {
             x = X;
             y = Y;
@@ -1268,7 +1253,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Returns a <see cref="System.Numerics.Vector2"/>.
         /// </summary>
-        public System.Numerics.Vector2 ToNumerics()
+        public readonly System.Numerics.Vector2 ToNumerics()
         {
             return new System.Numerics.Vector2(this.X, this.Y);
         }
