@@ -312,6 +312,12 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Convert a <see cref="System.Drawing.Color" /> to a <see cref="Color" />.
+        /// </summary>
+        /// <param name="color"></param>
+        public static implicit operator Color(System.Drawing.Color color) => new(color.R, color.G, color.B, color.A);
+
+        /// <summary>
         /// Gets or sets the blue component.
         /// </summary>
         [DataMember]
