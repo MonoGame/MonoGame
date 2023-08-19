@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                             platform == TargetPlatform.Web)
                 {
                     if (format != TextureProcessorOutputFormat.DxtCompressed)
-                        throw new PlatformNotSupportedException(format + " platform only supports DXT texture compression");
+                        throw new PlatformNotSupportedException(platform + " platform only supports DXT texture compression");
                 }
             }
 
