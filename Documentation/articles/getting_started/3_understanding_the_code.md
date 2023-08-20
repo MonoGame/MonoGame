@@ -52,7 +52,7 @@ GraphicsDeviceManager graphics;
 SpriteBatch spriteBatch;
 ```
 
-The two default variables that the blank template starts with are the **GraphicsDeviceManager** and **SpriteBatch**. Both of these variables that are used for drawing to the screen, as you will see in a later tutorial.
+The two default variables that the blank template starts with are the **GraphicsDeviceManager** and **SpriteBatch**. Both of these variables are used for drawing to the screen, as you will see in a later tutorial.
 
 ## Constructor
 
