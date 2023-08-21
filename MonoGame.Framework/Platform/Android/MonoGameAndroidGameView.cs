@@ -419,7 +419,7 @@ namespace Microsoft.Xna.Framework
             }
             catch (MonoGameGLException ex)
             {
-                Log.Error("AndroidGameView", "GL Exception occured during RunIteration {0}", ex.Message);
+                Log.Error("AndroidGameView", "GL Exception occurred during RunIteration {0}", ex.Message);
             }
 
             if (updates > 0)
