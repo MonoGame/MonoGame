@@ -9,8 +9,7 @@ By the end of this tutorial set, you will have a working project to build for yo
 ## 1. Setting up your development environment
 
 - [Windows](1_setting_up_your_development_environment_windows.md)
-- [macOS](1_setting_up_your_development_environment_macos.md)
-- [Linux](1_setting_up_your_development_environment_ubuntu.md)
+- [macOS and Linux](1_setting_up_your_development_environment_unix.md)
 
 ## 2. Creating a new project
 

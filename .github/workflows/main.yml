@@ -60,14 +60,6 @@ jobs:
           path: |
             Artifacts/MonoGame.Templates.VSExtension/*.vsix
           if-no-files-found: error
-      - name: Package Visual Studio Mac extension artifact
-        if: runner.os == 'macOS'
-        uses: actions/upload-artifact@main
-        with:
-          name: Visual Studio for Mac Extension
-          path: |
-            Artifacts/MonoGame.Templates.VSMacExtension/Release/**/*.mpack
-          if-no-files-found: error
   deploy:
     name: deploy
     runs-on: ubuntu-latest
@@ -103,11 +95,6 @@ jobs:
         with:
           name: Visual Studio Extension
           path: extension-win
-      - name: Download VS for Mac extension
-        uses: actions/download-artifact@v3
-        with:
-          name: Visual Studio for Mac Extension
-          path: extension-mac
       - name: Make a release
         uses: ncipollo/release-action@v1
         with:
@@ -117,7 +104,7 @@ jobs:
           draft: true
           allowUpdates: true
           removeArtifacts: true
-          artifacts: "**/*.vsix,**/*.mpack,nuget/*.nupkg"
+          artifacts: "**/*.vsix,nuget/*.nupkg"
           token: ${{ secrets.GITHUB_TOKEN }}
         if: github.ref_type == 'tag'
 
