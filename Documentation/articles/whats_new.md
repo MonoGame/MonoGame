@@ -14,9 +14,9 @@ MonoGame 3.8.1 now comes with an optional Visual Studio extension which will ins
 
 This extension is avaible for Visual Studio 2022, and Visual Studio 2022 for Mac.
 
-## Visual Studio 2019 and prior are no more supported
+## Visual Studio 2019 and prior are no longer supported
 
-Because .NET 6 isn't supported by Visual Studio 2019, starting with MonoGame 3.8.1 it will no more be possible to build games with it.
+Because .NET 6 isn't supported by Visual Studio 2019, starting with MonoGame 3.8.1 it will no longer be possible to build games with it.
 
 Moving forward, we will only support Visual Studio 2022, and Visual Studio 2022 for Mac.
 

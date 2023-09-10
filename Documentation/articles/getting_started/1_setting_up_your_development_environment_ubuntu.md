@@ -31,7 +31,7 @@ The following command will install templates for the .NET CLI and Rider IDE.
 dotnet new --install MonoGame.Templates.CSharp
 ```
 
-## [Optional] Set up Wine for effect compilation
+## [Optional] Setup Wine for effect compilation
 
 Effect (shader) compilation requires access to DirectX, so it will not work natively on Linux systems, but it can be used through Wine. Here are instructions to get this working (providing that your distribution is using apt).
 
