@@ -306,15 +306,6 @@ Task("PackVSTemplates")
     MSBuild("Templates/MonoGame.Templates.VSExtension/MonoGame.Templates.VSExtension.csproj", msBuildSettings);
 });
 
-Task("PackVSMacTemplates")
-    .IsDependentOn("PackDotNetTemplates")
-    .WithCriteria(() => IsRunningOnMacOs())
-    .Does(() =>
-{
-    DotNetRestore("Templates/MonoGame.Templates.VSMacExtension/MonoGame.Templates.VSMacExtension.csproj");
-    DotNetBuild("Templates/MonoGame.Templates.VSMacExtension/MonoGame.Templates.VSMacExtension.csproj", dnBuildSettings);
-});
-
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
@@ -335,7 +326,6 @@ Task("BuildAll")
 Task("Pack")
     .IsDependentOn("BuildAll")
     .IsDependentOn("PackDotNetTemplates")
-    .IsDependentOn("PackVSMacTemplates")
     .IsDependentOn("PackVSTemplates");
 
 Task("Test")
