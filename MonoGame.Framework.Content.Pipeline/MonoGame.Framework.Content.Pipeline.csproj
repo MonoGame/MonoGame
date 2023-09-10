@@ -14,6 +14,7 @@
     <CopyContentFiles>True</CopyContentFiles>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <DefineConstants>STBSHARP_INTERNAL</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
