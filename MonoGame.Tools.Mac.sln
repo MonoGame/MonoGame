@@ -27,8 +27,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Ed
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor.Launcher.Bootstrap", "Tools\MonoGame.Content.Builder.Editor.Launcher.Bootstrap\MonoGame.Content.Builder.Editor.Launcher.Bootstrap.csproj", "{E7E8B7C4-8EDE-492B-9283-166A23F32E15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Templates.VSMacExtension", "Templates\MonoGame.Templates.VSMacExtension\MonoGame.Templates.VSMacExtension.csproj", "{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,18 +157,6 @@ Global
 		{E7E8B7C4-8EDE-492B-9283-166A23F32E15}.Release|x64.Build.0 = Release|Any CPU
 		{E7E8B7C4-8EDE-492B-9283-166A23F32E15}.Release|x86.ActiveCfg = Release|Any CPU
 		{E7E8B7C4-8EDE-492B-9283-166A23F32E15}.Release|x86.Build.0 = Release|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Debug|x64.Build.0 = Debug|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Debug|x86.Build.0 = Debug|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Release|x64.ActiveCfg = Release|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Release|x64.Build.0 = Release|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Release|x86.ActiveCfg = Release|Any CPU
-		{5E9F1C86-8C62-4C8B-B354-AFEC30D643D4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
