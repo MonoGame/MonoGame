@@ -465,7 +465,7 @@ internal static class Sdl
 
         public static void SetTitle(IntPtr handle, string title)
         {
-            var bytes = Encoding.UTF8.GetBytes(title);
+            var bytes = Encoding.UTF8.GetBytes(title + '\0');
             SDL_SetWindowTitle(handle, ref bytes[0]);
         }
 
