@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework
             _height = GraphicsDeviceManager.DefaultBackBufferHeight;
 
             _handle = Sdl.Window.Create(
-                AssemblyHelper.GetDefaultWindowTitle(),
+                Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title,
                 winx, winy, _width, _height, initflags
             );
 
