@@ -76,7 +76,7 @@ if (kstate.IsKeyDown(Keys.Up))
     ballPosition.Y -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 }
 
-if(kstate.IsKeyDown(Keys.Down))
+if (kstate.IsKeyDown(Keys.Down))
 {
     ballPosition.Y += ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 }
@@ -86,7 +86,7 @@ if (kstate.IsKeyDown(Keys.Left))
     ballPosition.X -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 }
 
-if(kstate.IsKeyDown(Keys.Right))
+if (kstate.IsKeyDown(Keys.Right))
 {
     ballPosition.X += ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 }
@@ -123,25 +123,25 @@ If you run the game, you should be able to move the ball with the arrow keys.
 You will probably notice that the ball is not confined to the window. You can fix that by setting bounds onto the ballPosition after it has already been moved to ensure it cannot go further than the width or height of the screen.
 
 ```csharp
-if(kstate.IsKeyDown(Keys.Right))
+if (kstate.IsKeyDown(Keys.Right))
 {
     ballPosition.X += ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 }
 
-if(ballPosition.X > _graphics.PreferredBackBufferWidth - ballTexture.Width / 2)
+if (ballPosition.X > _graphics.PreferredBackBufferWidth - ballTexture.Width / 2)
 {
     ballPosition.X = _graphics.PreferredBackBufferWidth - ballTexture.Width / 2;
 }
-else if(ballPosition.X < ballTexture.Width / 2)
+else if (ballPosition.X < ballTexture.Width / 2)
 {
     ballPosition.X = ballTexture.Width / 2;
 }
 
-if(ballPosition.Y > _graphics.PreferredBackBufferHeight - ballTexture.Height / 2)
+if (ballPosition.Y > _graphics.PreferredBackBufferHeight - ballTexture.Height / 2)
 {
     ballPosition.Y = _graphics.PreferredBackBufferHeight - ballTexture.Height / 2;
 }
-else if(ballPosition.Y < ballTexture.Height / 2)
+else if (ballPosition.Y < ballTexture.Height / 2)
 {
     ballPosition.Y = ballTexture.Height / 2;
 }

@@ -1,6 +1,6 @@
 # Why use the Content Pipeline
 
-The MonoGame team continues to put a lot of effort into a cross-platform content pipeline, but would you use the Content Pipeline when MonoGame also supports loading assets natively, like .png, .mp3, .wav? Well, it all boils down to a couple of words, performance and efficiency.
+The MonoGame team continues to put a lot of effort into a cross-platform content pipeline, but why would you use the Content Pipeline when MonoGame also supports loading assets natively, like .png, .mp3, .wav? Well, it all boils down to a couple of words, performance and efficiency.
 
 ## Textures
 
@@ -32,7 +32,7 @@ All platforms support different audio formats, if you are handling this yourself
 
 > The build times are only for the first time the asset is processed, the Content Pipeline will preserve the generated content for subsequent builds until the source is changed
 
-Most platforms have audio processing that is optimized to certain compressed formats. By not using them you loose performance and system memory.  If you save the sound effects as ADPCM, these run pretty optimally on Windows systems. The problem however, is that once you try to take your game to another platform where ACPCM is not optimal. You will need to manually re-export all your game content into the new optimal format for that platform (assuming you kept all your original content uncompressed)
+Most platforms have audio processing that is optimized to certain compressed formats. By not using them you loose performance and system memory.  If you save the sound effects as ADPCM, these run pretty optimally on Windows systems. The problem however, is that once you try to take your game to another platform where ADPCM is not optimal. You will need to manually re-export all your game content into the new optimal format for that platform (assuming you kept all your original content uncompressed).
 
 ## Shaders
 

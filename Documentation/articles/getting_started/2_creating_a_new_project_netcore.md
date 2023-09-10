@@ -4,7 +4,7 @@ This guide will walk you through building a starter game with MonoGame using onl
 
 > It is assumed that you have already properly installed the .NET 6 SDK and MonoGame.
 
-> Be aware that for iOS/iPadOS, and Android, development might be limited when using the .NET CLI. Many of the development features for those targets are exclusive to Visual Studio 2022.
+> Be aware that for iOS/iPadOS and Android, development might be limited when using the .NET CLI. Many of the development features for those targets are exclusive to Visual Studio 2022.
 
 ## Create a MonoGame Project
 
