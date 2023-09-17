@@ -31,7 +31,7 @@ When installing Visual Studio, the following workloads are required depending on
 
 ### Install MonoGame extension for Visual Studio 2022
 
-To create new projects from within Visual Studio 2022, you will need to install the MonoGame extension, which can be installed from "*Extensions -> Manage Extensions*" in the Visual Studio 2022 menu bar.
+To create new MonoGame projects from within Visual Studio 2022, you will need to install the MonoGame extension, which can be installed from "*Extensions -> Manage Extensions*" in the Visual Studio 2022 menu bar.
 
 ![Visual Studio Extension Manager](~/images/getting_started/1_VisualStudioExtensionManager.png)
 
