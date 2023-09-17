@@ -16,7 +16,7 @@ Before using MonoGame, you will need to install [Visual Studio 2022](https://vis
 > [!NOTE]
 > You can install any edition of Visual Studio, including the Community edition.
 
-WHen installing Visual Studio, the following workloads are required depending on your desired [target platform(s)](~/platforms.md):
+When installing Visual Studio, the following workloads are required depending on your desired [target platform(s)](~/platforms.md):
 
 * .NET desktop development (mandatory for all platforms)
 * Mobile Development with .NET (optional, if you wish to target Android, iOS, or iPadOS)
