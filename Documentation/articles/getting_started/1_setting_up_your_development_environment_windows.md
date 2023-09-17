@@ -59,7 +59,7 @@ You now have the MonoGame templates installed and are ready to create new projec
 
 ## [Alternative] Install the .NET 6 SDK (compatible with JetBrains Rider and Visual Studio Code)
 
-If you prefer to use JetBrains Rider or Visual Studio Code, and after installing any of them, you will also need to [install the .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
+If you prefer to use JetBrains Rider or Visual Studio Code, and after installing either of them, you will also need to [install the .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
 
 Once the .NET 6 SDK is installed, you can open a Command Prompt and install the MonoGame templates by typing the following command:
 
