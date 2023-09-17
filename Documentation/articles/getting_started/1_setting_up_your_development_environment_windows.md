@@ -2,7 +2,10 @@
 
 This section provides a step-by-step guide for setting up your development environment on Windows.
 
-MonoGame can work with most .NET compatible tools, but we recommend [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) (prior versions are not supported with MonoGame 3.8.1).
+MonoGame can work with most .NET compatible tools, but we recommend [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
+
+> [!IMPORTANT]
+> Prior version of Visual Studio are not supported with MonoGame 3.8.1
 
 Alternatively, you can use [JetBrains Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/).
 
