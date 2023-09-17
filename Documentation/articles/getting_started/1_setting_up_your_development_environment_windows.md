@@ -26,7 +26,8 @@ When installing Visual Studio, the following workloads are required depending on
 
 ![Visual Studio optional components](~/images/getting_started/1_installer_vs_components.png)
 
-If you are targeting the standard Windows DirectX backend, you will also need [the DirectX June 2010 runtime](https://www.microsoft.com/en-us/download/details.aspx?id=8109) for audio and gamepads to work properly.
+> [!IMPORTANT]
+> If you are targeting the standard Windows DirectX backend, you will also need [the DirectX June 2010 runtime](https://www.microsoft.com/en-us/download/details.aspx?id=8109) for audio and gamepads to work properly.
 
 ### Install MonoGame extension for Visual Studio 2022
 
