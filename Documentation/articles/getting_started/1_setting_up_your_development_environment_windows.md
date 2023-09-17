@@ -13,9 +13,6 @@ Alternatively, you can use [JetBrains Rider](https://www.jetbrains.com/rider/) o
 
 Before using MonoGame, you will need to install [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 
-> [!NOTE]
-> You can install any edition of Visual Studio, including the Community edition.
-
 When installing Visual Studio, the following workloads are required depending on your desired [target platform(s)](~/platforms.md):
 
 * Mandatory for all platforms:
