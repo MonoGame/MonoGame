@@ -31,11 +31,29 @@ When installing Visual Studio, the following workloads are required depending on
 
 ### Install MonoGame extension for Visual Studio 2022
 
-To create new MonoGame projects from within Visual Studio 2022, you will need to install the **MonoGame Framework C# project templates** extension, which can be installed from "*Extensions -> Manage Extensions*" in the Visual Studio 2022 menu bar.
+To create new MonoGame projects from within Visual Studio 2022, you will need to install the **MonoGame Framework C# project templates** extension.  The following steps demonstrate how to install the extension.
+
+1. Launch Visual Studio 2022
+2. Select **Continue without code**.  This will launch Visual Studio without any project or solution opened.
+
+![Visual Studio Launcher Continue Without Code](~/images/getting_started/1_ContinueWithoutCode.png)
+
+3. Click "*Extensions -> Manage Extensions* in the Visual Studio 2022 menu bar.  This will open the Manage Extensions dialog window.
+
+![Extensions -> Manage Extensions Menu Selection](~/images/getting_started/1_VisualStudioExtensionMenu.png)
+
+4. Use the search box in the top-right corner of the Manage Extensions dialog window to search for **MonoGame**, then click the **MonoGame Framework C# project templates** extension as shown below and download it to install it.
 
 ![Visual Studio Extension Manager](~/images/getting_started/1_VisualStudioExtensionManager.png)
 
-Once it is open, simply search for **MonoGame** in the top right search window, as shown above, and install the "MonoGame Framework C# project templates" (make sure that it is version 3.8.1 or above).  You now have the MonoGame templates installed, ready to create new projects.
+
+5. After it is downloaded, an alert will appear at the bottom of the Manage Extensions window that states "Your changes will be scheduled.  The modifications will begin when all Microsoft Visual Studio windows are closed."  Click the **Close** button, then close Visual Studio 2022.
+
+6. After closing Visual Studio 2022, a VSIX Installer window will open confirming that you want to install the **MonoGame Framework C# project templates** extension.  Click the **Modify** button to accept the install.
+
+![VSIX Installer Window](~/images/getting_started/1_VSIXInstallerWindow.png)
+
+You now have the MonoGame templates installed and are ready to create new projects.
 
 **Next up:** [Creating a new project](2_creating_a_new_project_vs.md)
 
