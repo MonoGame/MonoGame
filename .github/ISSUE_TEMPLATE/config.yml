@@ -2,7 +2,7 @@ blank_issues_enabled: false
 contact_links:
     - name: Community Forums
       url: https://monogame.net/community
-      about: Ask the community for help on the community forums
+      about: Ask the community for help on the community forums.
     - name: Community Discord
       url: https://discord.gg/monogame
-      about: Ask the community for help on the community discord
+      about: Ask the community for help on the community discord.
