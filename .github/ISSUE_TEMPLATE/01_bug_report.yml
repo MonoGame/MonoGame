@@ -60,7 +60,16 @@ body:
       required: true
   attributes:
     label: Steps to Reproduce
-    placeholder: Reproduction steps
+    placeholder: |
+      Reproduction steps
+      Include code inside markdown code blocks like the following:
+
+      ```cs
+      public void Foo()
+      {
+          return bar;
+      }
+      ```
     description: |
       Please include the steps we can take to reproduce the problem.
       Where possible, include text as text rather than screenshots so it can be searchable.
@@ -83,7 +92,7 @@ body:
     placeholder: When I perform this action, I expect this result to occur.
     description: Provide a description of the expected behavior.
 - type: textarea
-  id: actual-behavior
+  id: resulting-behavior
   validations:
     required: true
   attributes:
