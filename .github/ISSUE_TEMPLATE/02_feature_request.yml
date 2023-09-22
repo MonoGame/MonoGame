@@ -1,6 +1,6 @@
 name: Feature Request
 description: Propose a feature to be added or removed from MonoGame.
-title: "[Feature Request]: "
+labels: ["Feature Request"]
 body:
 - type: markdown
   attributes:
