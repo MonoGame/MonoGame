@@ -29,15 +29,14 @@ body:
   attributes:
     label: Which MonoGame platform are you using?
     options:
+      - N/A
       - MonoGame Android Application (mgandroid)
       - MonoGame Cross-Platform Desktop Application (mgdesktopgl)
       - MonoGame Windows Universal CoreApp Application (mguwpcore)
       - MonoGame Windows Universal XAML Application (mguwpxaml)
       - MonoGame Windows Desktop Application (mgwindowsdx)
       - MonoGame iOS Application (mgios)
-      - MonoGame Game Library (mgnetstandard)
       - MonoGame Content Pipeline Extension (mgpipeline)
-      - MonoGame Shared Library Project (mgshared)
 - type: input
   id: operating-system
   validations:
