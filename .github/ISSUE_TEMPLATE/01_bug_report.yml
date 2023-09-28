@@ -104,6 +104,6 @@ body:
   validations:
     required: false
   attributes:
-    label: Images
+    label: Files
     description: |
-      Please upload any images here that can be useful in describing or reproducing this issue.  If the file type cannot be supported, it can be zipped and then uploaded instead.
+      Please upload any files or images here that can be useful in describing or reproducing this issue.  If the file type cannot be supported, it can be zipped and then uploaded instead.
