@@ -595,7 +595,10 @@ namespace MonoGame.Tools.Pipeline
 #if IDE
                 MonoDevelop.Ide.IdeApp.Workbench.OpenDocument(filePath, MonoDevelop.Ide.Gui.OpenDocumentOptions.Default);
 #else
-                Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                if (File.Exists(filePath))
+                    Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                else
+                    ShowError("File not found", "The file was not found, did you forget to update file path in project?");
 #endif
             }
         }
@@ -622,7 +625,10 @@ namespace MonoGame.Tools.Pipeline
             if (PipelineController.Instance.SelectedItem != null)
             {
                 var filePath = PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.Location);
-                Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                if (Directory.Exists(filePath))
+                    Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                else
+                    ShowError("Directory Not Found", "The containing directory was not found, did you forget to update file path in project?");
             }
         }
 

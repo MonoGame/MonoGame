@@ -18,10 +18,12 @@ namespace Microsoft.Xna.Framework
             get { return !IsBorderless && _resizable; }
             set
             {
-                if (Sdl.Patch > 4)
+                var nonResizeableVersion = new Sdl.Version() { Major = 2, Minor = 0, Patch = 4 };
+
+                if (Sdl.version > nonResizeableVersion)
                     Sdl.Window.SetResizable(_handle, value);
                 else
-                    throw new Exception("SDL 2.0.4 does not support changing resizable parameter of the window after it's already been created, please use a newer version of it.");
+                    throw new Exception("SDL " + nonResizeableVersion + " does not support changing resizable parameter of the window after it's already been created, please use a newer version of it.");
 
                 _resizable = value;
             }
@@ -106,13 +108,14 @@ namespace Microsoft.Xna.Framework
             Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
             // when running NUnit tests entry assembly can be null
-            if (Assembly.GetEntryAssembly() != null)
+            var entryAssembly = Assembly.GetEntryAssembly();
+            if (entryAssembly != null)
             {
                 using (
                     var stream =
-                        Assembly.GetEntryAssembly().GetManifestResourceStream(Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace + ".Icon.bmp") ??
-                        Assembly.GetEntryAssembly().GetManifestResourceStream("Icon.bmp") ??
-                        Assembly.GetExecutingAssembly().GetManifestResourceStream("MonoGame.bmp"))
+                        entryAssembly.GetManifestResourceStream(entryAssembly.GetName().Name + ".Icon.bmp") ??
+                        entryAssembly.GetManifestResourceStream("Icon.bmp") ??
+                        typeof(SdlGameWindow).Assembly.GetManifestResourceStream("MonoGame.bmp"))
                 {
                     if (stream != null)
                         using (var br = new BinaryReader(stream))
@@ -157,7 +160,7 @@ namespace Microsoft.Xna.Framework
             _height = GraphicsDeviceManager.DefaultBackBufferHeight;
 
             _handle = Sdl.Window.Create(
-                AssemblyHelper.GetDefaultWindowTitle(),
+                Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title,
                 winx, winy, _width, _height, initflags
             );
 
@@ -266,7 +269,7 @@ namespace Microsoft.Xna.Framework
             // after the window gets resized, window position information
             // becomes wrong (for me it always returned 10 8). Solution is
             // to not try and set the window position because it will be wrong.
-            if ((Sdl.Patch > 4 || !AllowUserResizing) && !_wasMoved)
+            if ((Sdl.version > new Sdl.Version() { Major = 2, Minor = 0, Patch = 4 }  || !AllowUserResizing) && !_wasMoved)
                 Sdl.Window.SetPosition(Handle, centerX, centerY);
 
             if (IsFullScreen != _willBeFullScreen)

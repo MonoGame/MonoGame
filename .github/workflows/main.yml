@@ -18,6 +18,10 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.x'
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '7.0.x'
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
@@ -61,6 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+      contents: write
     needs: [ build ]
     if: ${{ github.event_name == 'push' }}
     steps:
@@ -85,7 +90,23 @@ jobs:
         run: dotnet nuget push nuget/*.nupkg --source https://nuget.pkg.github.com/$GITHUB_REPOSITORY_OWNER/index.json --api-key ${GITHUB_TOKEN}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Download VS extension
+        uses: actions/download-artifact@v3
+        with:
+          name: Visual Studio Extension
+          path: extension-win
+      - name: Make a release
+        uses: ncipollo/release-action@v1
+        with:
+          name: 'MonoGame ${{ github.ref_name }}'
+          body: 'This is the official MonoGame ${{ github.ref_name }} release source code and Visual Studio 2022 extensions for installing templates.'
+          tag: ${{ github.ref_name }}
+          draft: true
+          allowUpdates: true
+          removeArtifacts: true
+          artifacts: "**/*.vsix,nuget/*.nupkg"
+          token: ${{ secrets.GITHUB_TOKEN }}
+        if: github.ref_type == 'tag'
 
 
 

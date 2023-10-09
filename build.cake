@@ -64,7 +64,7 @@ private void ParseVersion()
 
         if (EnvironmentVariable("GITHUB_REPOSITORY") != "MonoGame/MonoGame")
             version += "-" + EnvironmentVariable("GITHUB_REPOSITORY_OWNER");
-        else if (EnvironmentVariable("GITHUB_REF") != "refs/heads/master")
+        else if (EnvironmentVariable("GITHUB_REF_TYPE") == "branch" && EnvironmentVariable("GITHUB_REF") != "refs/heads/master")
             version += "-develop";
 
         repositoryUrl = "https://github.com/" + EnvironmentVariable("GITHUB_REPOSITORY");
@@ -306,16 +306,6 @@ Task("PackVSTemplates")
     MSBuild("Templates/MonoGame.Templates.VSExtension/MonoGame.Templates.VSExtension.csproj", msBuildSettings);
 });
 
-Task("PackVSMacTemplates")
-    .IsDependentOn("PackDotNetTemplates")
-    .WithCriteria(() => IsRunningOnMacOs())
-    .Does(() =>
-{
-    // Uncomment this once VS for Mac 2022 goes stable :D
-    // DotNetRestore("Templates/MonoGame.Templates.VSMacExtension/MonoGame.Templates.VSMacExtension.csproj");
-    // DotNetBuild("Templates/MonoGame.Templates.VSMacExtension/MonoGame.Templates.VSMacExtension.csproj", dnBuildSettings);
-});
-
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
@@ -336,7 +326,6 @@ Task("BuildAll")
 Task("Pack")
     .IsDependentOn("BuildAll")
     .IsDependentOn("PackDotNetTemplates")
-    .IsDependentOn("PackVSMacTemplates")
     .IsDependentOn("PackVSTemplates");
 
 Task("Test")

@@ -17,10 +17,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageReference Include="MonoGame.Library.SDL" Version="2.26.5.5" />
+    <PackageReference Include="NVorbis" Version="0.10.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -79,9 +77,6 @@
     
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
-
-    <Compile Include="..\ThirdParty\NVorbis\NVorbis\**\*.cs" LinkBase="ThirdParty\NVorbis" />
-    <Compile Remove="..\ThirdParty\NVorbis\NVorbis\Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -99,45 +94,22 @@
       <PackagePath>runtimes\win-x86\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\SDL\Windows\x86\SDL2.dll">
-      <Link>x86\SDL2.dll</Link>
-      <PackagePath>runtimes\win-x86\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-
     <Content Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
       <Link>x64\soft_oal.dll</Link>
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
-      <Link>x64\SDL2.dll</Link>
-      <PackagePath>runtimes\win-x64\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-
     <Content Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
       <Link>x64\libopenal.so.1</Link>
       <PackagePath>runtimes\linux-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
-      <Link>x64\libSDL2-2.0.so.0</Link>
-      <PackagePath>runtimes\linux-x64\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-
     <Content Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib">
       <Link>libopenal.1.dylib</Link>
       <PackagePath>runtimes\osx\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2.dylib">
-      <Link>libSDL2.dylib</Link>
-      <PackagePath>runtimes\osx\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-
+    
     <Content Include="MonoGame.Framework.DesktopGL.targets" PackagePath="build" />
   </ItemGroup>
 
