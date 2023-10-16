@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var tmpPtr = tmpHandle.AddrOfPinnedObject();
                     for (var i = 0; i < elementCount; i++)
                     {
-                        data[startIndex + i] = (T)Marshal.PtrToStructure(tmpPtr, typeof(T));
+                        data[startIndex + i] = Marshal.PtrToStructure<T>(tmpPtr);
                         tmpPtr = (IntPtr)(tmpPtr.ToInt64() + vertexStride);
                     }
                 }
