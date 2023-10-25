@@ -17,7 +17,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MonoGame.Library.SDL" Version="2.26.5.5" />
+    <PackageReference Include="MonoGame.Library.SDL" Version="2.28.4.8" />
     <PackageReference Include="NVorbis" Version="0.10.4" />
   </ItemGroup>
 
