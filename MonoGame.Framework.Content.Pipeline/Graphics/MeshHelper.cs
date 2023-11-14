@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Generates vertex normals by accumulation of triangle face normals.
         /// </summary>
-        /// <param name="mesh">The mesh which will recieve the normals.</param>
+        /// <param name="mesh">The mesh which will receive the normals.</param>
         /// <param name="overwriteExistingNormals">Overwrite or skip over geometry with existing normals.</param>
         /// <remarks>
         /// This calls <see cref="CalculateNormals(GeometryContent, bool)"/> to do the work.
@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Generates vertex normals by accumulation of triangle face normals.
         /// </summary>
-        /// <param name="geom">The geometry which will recieve the normals.</param>
+        /// <param name="geom">The geometry which will receive the normals.</param>
         /// <param name="overwriteExistingNormals">Overwrite or skip over geometry with existing normals.</param>
         /// <remarks>
         /// We use a "Mean Weighted Equally" method generate vertex normals from triangle 
