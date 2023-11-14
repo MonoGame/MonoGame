@@ -5,7 +5,7 @@
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
-    /// A struct that countains information on the left and the right trigger buttons.
+    /// A struct that contains information on the left and the right trigger buttons.
     /// </summary>
     public struct GamePadTriggers
     {
