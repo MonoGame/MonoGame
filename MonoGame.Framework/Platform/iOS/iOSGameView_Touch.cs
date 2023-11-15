@@ -123,19 +123,22 @@ namespace Microsoft.Xna.Framework {
 					var touch = touchesArray[touchIndex];
 					var id = touch.Handle.GetHashCode();
 					FillTouch(touch, id, false);
-					var coalescedTouches = evt.GetCoalescedTouches(touch);
-					if (coalescedTouches != null)
-					{
-							// Per the document https://developer.apple.com/documentation/uikit/uievent/1613808-coalescedtouches,
-							// there may be a few coalesced touch events between two subsequence frames. The frequence of these
-							// events is perhaps more than the display frequency, and perhaps max out at 240Hz for Apple Pencil
-							// and so on.
-							for (int coalescedIndex = 0; coalescedIndex < coalescedTouches.Length; ++coalescedIndex)
-							{
-									FillTouch(coalescedTouches[coalescedIndex], id, true);
-							}
-					}
 
+					if (TouchPanel.EnableCoalescedTouch)
+					{
+						var coalescedTouches = evt.GetCoalescedTouches(touch);
+						if (coalescedTouches != null)
+						{
+								// Per the document https://developer.apple.com/documentation/uikit/uievent/1613808-coalescedtouches,
+								// there may be a few coalesced touch events between two subsequence frames. The frequence of these
+								// events is perhaps more than the display frequency, and perhaps max out at 240Hz for Apple Pencil
+								// and so on.
+								for (int coalescedIndex = 0; coalescedIndex < coalescedTouches.Length; ++coalescedIndex)
+								{
+										FillTouch(coalescedTouches[coalescedIndex], id, true);
+								}
+						}
+					}
 			}
 	}
 

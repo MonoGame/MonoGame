@@ -169,6 +169,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         internal void AddCoalescedEvent(int id, TouchLocationState state, Vector2 position)
         {
+            if (OnCoalescedTouchEvent == null)
+            {
+                return;
+            }
+
             //Try to find the touch id.
             int touchId;
             if (!_touchIds.TryGetValue(id, out touchId))
