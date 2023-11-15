@@ -55,6 +55,20 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         private TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
 
+
+        /// <summary>
+        /// Raised when a new touch event is processed. Clients can use this
+        /// to obtain per-frame touch events beyond the scope of gestures/touch panel.
+        /// </summary>
+        public event EventHandler<TouchLocation> OnTouchEvent;
+
+        /// <summary>
+        /// Raised when a new, raw, high-frequency touch event is processed. This may be
+        /// sent in addition to OnTouchEvent. This is optional side-channel and controlled
+        /// via <code>TouchPanel.EnableCoalescedTouch</code> flag.
+        /// </summary>
+        public event EventHandler<TouchLocation> OnCoalescedTouchEvent;
+
         internal readonly GameWindow Window;
 
         internal TouchPanelState(GameWindow window)
@@ -153,6 +167,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return result;
         }
 
+        internal void AddCoalescedEvent(int id, TouchLocationState state, Vector2 position)
+        {
+            //Try to find the touch id.
+            int touchId;
+            if (!_touchIds.TryGetValue(id, out touchId))
+            {
+                return;
+            }
+            var evt = new TouchLocation(touchId, state, position * _touchScale, CurrentTimestamp);
+            EventHelpers.Raise(this, OnCoalescedTouchEvent, evt);
+        }
+
         internal void AddEvent(int id, TouchLocationState state, Vector2 position)
         {
             AddEvent(id, state, position, false);
@@ -191,7 +217,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 // If we got here that means either the device is sending
                 // us bad, out of order, or old touch events.  In any case
-                // just ignore them.
+                // just ignore them (but release existing ones, so we are
+                // not trapped forever in a bad state).
                 return;
             }
 
@@ -200,14 +227,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // Add the new touch event keeping the list from getting
                 // too large if no one happens to be requesting the state.
                 var evt = new TouchLocation(touchId, state, position * _touchScale, CurrentTimestamp);
+                EventHelpers.Raise(this, OnTouchEvent, evt);
 
                 if (!isMouse || EnableMouseTouchPoint)
                 {
                     ApplyTouch(_touchState, evt);
                 }
 
-                //If we have gestures enabled then collect events for those too.
-                //We also have to keep tracking any touches while we know about touches so we don't miss releases even if gesture recognition is disabled
+                // If we have gestures enabled then collect events for those too.
+                // We also have to keep tracking any touches while we know about touches
+                // so we don't miss releases even if gesture recognition is disabled
                 if ((EnabledGestures != GestureType.None || _gestureState.Count > 0) && (!isMouse || EnableMouseGestures))
                 {
                     ApplyTouch(_gestureState, evt);
@@ -311,6 +340,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         public bool EnableMouseTouchPoint { get; set; }
 
         public bool EnableMouseGestures { get; set; }
+
+        /// <summary>
+        /// Gets or sets if coalesced touch event processing is enabled.
+        /// </summary>
+        public bool EnableCoalescedTouch => OnCoalescedTouchEvent != null;
 
         /// <summary>
         /// Returns true if a touch gesture is available.

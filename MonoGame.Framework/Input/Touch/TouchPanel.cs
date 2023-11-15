@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009-2010 The XnaTouch Team
+// XnaTouch - Copyright ï¿½ 2009-2010 The XnaTouch Team
 //
 // All rights reserved.
 // 
@@ -66,6 +66,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         public static TouchPanelCapabilities GetCapabilities()
         {
             return PrimaryWindow.TouchPanelState.GetCapabilities();
+        }
+
+        internal static void AddCoalescedEvent(int id, TouchLocationState state, Vector2 position)
+        {
+            PrimaryWindow.TouchPanelState.AddCoalescedEvent(id, state, position);
         }
 
         internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
@@ -151,6 +156,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
         public static bool IsGestureAvailable
         {
             get { return PrimaryWindow.TouchPanelState.IsGestureAvailable; }
+        }
+
+        /// <summary>
+        /// Returns true if coalesced events are sent to any listeners. MonoGame framework
+        /// does not use coalesced events for its processing.
+        /// </summary>
+        public static bool EnableCoalescedTouch
+        {
+            get { return PrimaryWindow.TouchPanelState.EnableCoalescedTouch; }
         }
     }
 }
