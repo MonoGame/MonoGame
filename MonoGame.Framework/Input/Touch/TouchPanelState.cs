@@ -349,7 +349,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// Gets or sets if coalesced touch event processing is enabled.
         /// </summary>
-        public bool EnableCoalescedTouch => OnCoalescedTouchEvent != null;
+        public bool EnableCoalescedTouch
+        { 
+            get
+            {
+              return OnCoalescedTouchEvent != null;
+            }
+        }
 
         /// <summary>
         /// Returns true if a touch gesture is available.
