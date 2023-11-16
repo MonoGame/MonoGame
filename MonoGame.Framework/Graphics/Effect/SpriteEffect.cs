@@ -63,12 +63,14 @@ namespace Microsoft.Xna.Framework.Graphics
         protected internal override void OnApply()
         {
             var vp = GraphicsDevice.Viewport;
-            if ((vp.Width != _lastViewport.Width) || (vp.Height != _lastViewport.Height))
+            if (vp.X != _lastViewport.X || vp.Y != _lastViewport.Y || 
+                vp.Width != _lastViewport.Width || vp.Height != _lastViewport.Height || 
+                vp.MinDepth != _lastViewport.MinDepth || vp.MaxDepth != _lastViewport.MaxDepth)
             {
                 // Normal 3D cameras look into the -z direction (z = 1 is in front of z = 0). The
                 // sprite batch layer depth is the opposite (z = 0 is in front of z = 1).
-                // --> We get the correct matrix with near plane 0 and far plane -1.
-                Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out _projection);
+                // --> We get the correct matrix with near plane 0 and far plane -1 (MinDepth, -MaxDepth).
+                Matrix.CreateOrthographicOffCenter(vp.X, vp.X + vp.Width, vp.Y + vp.Height, vp.Y, vp.MinDepth, -vp.MaxDepth, out _projection);
 
                 if (GraphicsDevice.UseHalfPixelOffset)
                 {
