@@ -116,7 +116,8 @@ namespace MonoGame.InteractiveTests.iOS {
 		public override void LoadView()
 		{
 			View = new UIView();
-			_tableView = new UITableView(new RectangleF(PointF.Empty, View.Frame.Size));
+			_tableView = new UITableView(new RectangleF(PointF.Empty, new SizeF((float)View.Frame.Size.Width,
+				(float)View.Frame.Size.Height)));
 			_tableView.AutoresizingMask =
 				UIViewAutoresizing.FlexibleHeight |
 				UIViewAutoresizing.FlexibleWidth;
@@ -239,7 +240,7 @@ namespace MonoGame.InteractiveTests.iOS {
 					throw new ArgumentNullException("owner");
 				_owner = owner;
 			}
-
+/*
 			public override int NumberOfSections(UITableView tableView)
 			{
 				var tests = (IEnumerable<InteractiveTest>)_owner._interactiveTests;
@@ -262,7 +263,7 @@ namespace MonoGame.InteractiveTests.iOS {
 
 				return categories[section];
 			}
-
+*/
 			public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
 			{
 				var tests = (IEnumerable<InteractiveTest>)_owner._interactiveTests;

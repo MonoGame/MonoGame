@@ -69,12 +69,13 @@ non-infringement.
 using System;
 
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
 using MonoGame.InteractiveTests.TestUI;
 using System.Drawing;
+
+using Color = System.Drawing.Color;
 
 namespace MonoGame.InteractiveTests {
 	[InteractiveTest("Guide", Categories.GamerServices)]
@@ -86,8 +87,6 @@ namespace MonoGame.InteractiveTests {
 				DisplayOrientation.Portrait |
 				DisplayOrientation.LandscapeLeft |
 				DisplayOrientation.LandscapeRight;
-
-			Components.Add (new GamerServicesComponent (this));
 
 			Content.RootDirectory = "Content";
 		}
@@ -132,7 +131,7 @@ namespace MonoGame.InteractiveTests {
 			exitButton.Content.SizeToFit ();
 			exitButton.SizeToFit ();
 			exitButton.Tapped += (sender, e) => {
-				Exit ();
+				// TODO: remove button?
 			};
 
 			_labelEndShowKeyboardInput = new Label

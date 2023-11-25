@@ -72,6 +72,7 @@ using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+using Color = System.Drawing.Color;
 
 namespace MonoGame.InteractiveTests.TestUI {
 	[InteractiveTest("Test UI Test", Categories.Meta)]
@@ -117,7 +118,7 @@ namespace MonoGame.InteractiveTests.TestUI {
 			exitButton.Content.SizeToFit ();
 			exitButton.SizeToFit ();
 			exitButton.Tapped += (sender, e) => {
-				Exit ();
+				// TODO: remove?
 			};
 
 			var label = new Label {
@@ -186,7 +187,7 @@ namespace MonoGame.InteractiveTests.TestUI {
 
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear (Color.DarkBlue);
+			GraphicsDevice.Clear (new Microsoft.Xna.Framework(Color.DarkBlue));
 			base.Draw(gameTime);
 		}
 	}
