@@ -72,8 +72,8 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
