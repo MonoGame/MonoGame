@@ -11,6 +11,8 @@ Global
 		Release|iPhone = Release|iPhone
 		Release|iPhoneSimulator = Release|iPhoneSimulator
 		Debug|iPhone = Debug|iPhone
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D78F890A-6E51-434F-BDD3-4C3E11879018}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
@@ -21,11 +23,15 @@ Global
 		{D78F890A-6E51-434F-BDD3-4C3E11879018}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{D78F890A-6E51-434F-BDD3-4C3E11879018}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{D78F890A-6E51-434F-BDD3-4C3E11879018}.Debug|iPhone.Build.0 = Debug|iPhone
+		{D78F890A-6E51-434F-BDD3-4C3E11879018}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D78F890A-6E51-434F-BDD3-4C3E11879018}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D78F890A-6E51-434F-BDD3-4C3E11879018}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D78F890A-6E51-434F-BDD3-4C3E11879018}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {6114323F-ED6A-4C99-B4D2-4DD65811B1D3}
+		SolutionGuid = {990DBA1A-4E37-44AA-84C8-C81B58A0C3B6}
 	EndGlobalSection
 EndGlobal

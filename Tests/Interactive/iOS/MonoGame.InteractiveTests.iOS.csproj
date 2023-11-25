@@ -8,7 +8,7 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <SupportedOSPlatformVersion>10.0</SupportedOSPlatformVersion>
     <Configurations>Debug;Release</Configurations>
-    <Platforms>AnyCPU;iPhone</Platforms>
+    <Platforms>iPhoneSimulator;iPhone;AnyCPU</Platforms>
     <RunAOTCompilation>True</RunAOTCompilation>    
     <WarningLevel>4</WarningLevel>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
@@ -89,6 +89,12 @@
  <PropertyGroup>
     <StartupObject>MonoGame.InteractiveTests.iOS.Application</StartupObject>
   </PropertyGroup>
+ <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+   <CreatePackage>false</CreatePackage>
+ </PropertyGroup>
+ <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+   <CreatePackage>false</CreatePackage>
+ </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -128,12 +134,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
-      <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>MonoGame.Framework.iOS</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Assets\MonoGame.Tests.Assets.iOS.csproj">
-      <Project>{F759DE08-E160-4BB4-9A09-404D5694A4EC}</Project>
-      <Name>MonoGame.Tests.Assets.iOS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
