@@ -207,21 +207,21 @@ namespace MonoGame.InteractiveTests {
 
 		private void TestShowKeyboardInput (string title, string description, string defaultText)
 		{
-			var result = Guide.BeginShowKeyboardInput(
-				PlayerIndex.One,
-				title,
-				description,
-				defaultText,
-				Guide_ShowKeyboardInputCallback, null);
+			// var result = Guide.BeginShowKeyboardInput(
+			// 	PlayerIndex.One,
+			// 	title,
+			// 	description,
+			// 	defaultText,
+			// 	Guide_ShowKeyboardInputCallback, null);
 
-			_labelEndShowKeyboardInput.Text =
-				"EndShow: " + (Guide.EndShowKeyboardInput (result) ?? "<null>");
+			// _labelEndShowKeyboardInput.Text =
+			// 	"EndShow: " + (Guide.EndShowKeyboardInput (result) ?? "<null>");
 		}
 
 		private void Guide_ShowKeyboardInputCallback(IAsyncResult result)
 		{
-			_labelShowKeyboardInputCallback.Text =
-				"CallBack: " + (Guide.EndShowKeyboardInput (result) ?? "<null>");
+			// _labelShowKeyboardInputCallback.Text =
+			// 	"CallBack: " + (Guide.EndShowKeyboardInput (result) ?? "<null>");
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -231,7 +231,7 @@ namespace MonoGame.InteractiveTests {
 
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear (Color.Indigo);
+			GraphicsDevice.Clear (Microsoft.Xna.Framework.Color.Indigo);
 			base.Draw(gameTime);
 		}
 	}

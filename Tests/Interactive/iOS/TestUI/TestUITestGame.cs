@@ -187,7 +187,7 @@ namespace MonoGame.InteractiveTests.TestUI {
 
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear (new Microsoft.Xna.Framework(Color.DarkBlue));
+			GraphicsDevice.Clear (Microsoft.Xna.Framework.Color.DarkBlue);
 			base.Draw(gameTime);
 		}
 	}

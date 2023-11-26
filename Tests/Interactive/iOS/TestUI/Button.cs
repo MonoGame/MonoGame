@@ -72,6 +72,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
 using System.Drawing;
 
+using Color = System.Drawing.Color;
+
 namespace MonoGame.InteractiveTests.TestUI {
 	class Button : View {
 		public Button ()

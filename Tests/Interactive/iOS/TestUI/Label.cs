@@ -100,7 +100,7 @@ namespace MonoGame.InteractiveTests.TestUI {
 		{
 			if (Font != null && !string.IsNullOrWhiteSpace(Text)) {
 				context.SpriteBatch.DrawString (
-					Font, Text, new Vector2(Padding.Left, Padding.Top), new Microsoft.Xna.Framework.Color(TextColor));
+					Font, Text, new Vector2(Padding.Left, Padding.Top), View.FromDrawingColor(TextColor));
 			}
 		}
 	}

@@ -12,6 +12,12 @@
     <SupportedOSPlatformVersion>11.2</SupportedOSPlatformVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <CreatePackage>false</CreatePackage>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <CreatePackage>false</CreatePackage>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="obj\**\*" />
