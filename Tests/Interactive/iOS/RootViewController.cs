@@ -240,11 +240,11 @@ namespace MonoGame.InteractiveTests.iOS {
 					throw new ArgumentNullException("owner");
 				_owner = owner;
 			}
-/*
-			public override int NumberOfSections(UITableView tableView)
+
+			public override nint NumberOfSections(UITableView tableView)
 			{
 				var tests = (IEnumerable<InteractiveTest>)_owner._interactiveTests;
-				return tests.Select (x => x.Category).Distinct().Count ();
+				return (nint) tests.Select (x => x.Category).Distinct().Count ();
 			}
 
 			public override int RowsInSection(UITableView tableView, int section)
@@ -263,7 +263,7 @@ namespace MonoGame.InteractiveTests.iOS {
 
 				return categories[section];
 			}
-*/
+
 			public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
 			{
 				var tests = (IEnumerable<InteractiveTest>)_owner._interactiveTests;
