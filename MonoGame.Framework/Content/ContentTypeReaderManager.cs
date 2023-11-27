@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework.Content
                         else
                             throw new ContentLoadException(
                                     "Could not find ContentTypeReader Type. Please ensure the name of the Assembly that contains the Type matches the assembly in the full type name: " +
-                                    originalReaderTypeString + " (" + readerTypeString + ") " + s);
+                                    originalReaderTypeString + " (" + readerTypeString + ") ");
                     }
 
                     var targetType = contentReaders[i].TargetType;
@@ -225,6 +225,9 @@ namespace Microsoft.Xna.Framework.Content
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", _assemblyName));
+
+            // Required for iOS. ContentTypeReader `ListReader<Char>` shows up as `Microsoft.Xna.Framework.Content.ListReader`1[System.Char]`
+            // and not `Microsoft.Xna.Framework.Content.ListReader`1[[System.Char, mscorlib]]`
             preparedType = preparedType.Replace(", mscorlib", "");
 
             if (_isRunningOnNetCore)
@@ -237,8 +240,6 @@ namespace Microsoft.Xna.Framework.Content
 
         // Static map of type names to creation functions. Required as iOS requires all types at compile time
         private static Dictionary<string, Func<ContentTypeReader>> typeCreators = new Dictionary<string, Func<ContentTypeReader>>();
-
-        static List<ContentTypeReader> readers = new List<ContentTypeReader>();
 
         /// <summary>
         /// Adds the type creator.
