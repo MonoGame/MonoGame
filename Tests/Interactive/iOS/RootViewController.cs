@@ -247,21 +247,21 @@ namespace MonoGame.InteractiveTests.iOS {
 				return (nint) tests.Select (x => x.Category).Distinct().Count ();
 			}
 
-			public override int RowsInSection(UITableView tableView, int section)
+			public override nint RowsInSection(UITableView tableView, nint section)
 			{
 				var tests = (IEnumerable<InteractiveTest>)_owner._interactiveTests;
 				var categories = tests.Select (x => x.Category).OrderBy(x => x).ToArray ();
-				var category = categories[section];
+				var category = categories[(int)section];
 
-				return tests.Where (x => x.Category == category).Count ();
+				return (nint) tests.Where (x => x.Category == category).Count ();
 			}
 
-			public override string TitleForHeader(UITableView tableView, int section)
+			public override string TitleForHeader(UITableView tableView, nint section)
 			{
 				var tests = (IEnumerable<InteractiveTest>)_owner._interactiveTests;
 				var categories = tests.Select (x => x.Category).OrderBy(x => x).ToArray ();
 
-				return categories[section];
+				return categories[(int) section];
 			}
 
 			public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
