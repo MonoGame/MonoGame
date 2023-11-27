@@ -16,6 +16,7 @@
     <AssemblyName>MonoGameInteractiveTestsiOS</AssemblyName>
     <DefineConstants>IOS;</DefineConstants>
     <RuntimeIdentifier Condition="'$(TargetFramework)' == 'net7.0-ios'">ios-arm64</RuntimeIdentifier>
+    <MonoGamePlatform>iOS</MonoGamePlatform>    
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -129,8 +130,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
     </ProjectReference>
-    <ProjectReference Include="..\..\Assets\MonoGame.Tests.Assets.iOS.csproj">
-    </ProjectReference>
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />    
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\Assets\Fonts\Default.xnb">
