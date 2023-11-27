@@ -5,8 +5,6 @@ VisualStudioVersion = 25.0.1706.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.InteractiveTests.iOS", "MonoGame.InteractiveTests.iOS.csproj", "{D78F890A-6E51-434F-BDD3-4C3E11879018}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.iOS", "..\..\..\MonoGame.Framework\MonoGame.Framework.iOS.csproj", "{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|iPhoneSimulator = Debug|iPhoneSimulator
@@ -29,18 +27,6 @@ Global
 		{D78F890A-6E51-434F-BDD3-4C3E11879018}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D78F890A-6E51-434F-BDD3-4C3E11879018}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D78F890A-6E51-434F-BDD3-4C3E11879018}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Release|iPhone.ActiveCfg = Release|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Release|iPhone.Build.0 = Release|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Debug|iPhone.ActiveCfg = Debug|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Debug|iPhone.Build.0 = Debug|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DBC87B4D-9BE4-47AE-83B2-F72B223BBBB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
