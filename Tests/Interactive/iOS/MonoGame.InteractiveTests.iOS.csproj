@@ -15,14 +15,7 @@
     <RootNamespace>MonoGame.InteractiveTests</RootNamespace>
     <AssemblyName>MonoGameInteractiveTestsiOS</AssemblyName>
     <DefineConstants>IOS;</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-    <ProjectGuid>{D78F890A-6E51-434F-BDD3-4C3E11879018}</ProjectGuid>
-    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <OutputType>Exe</OutputType>
-    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <RuntimeIdentifier Condition="'$(TargetFramework)' == 'net7.0-ios'">ios-arm64</RuntimeIdentifier>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
