@@ -42,35 +42,38 @@ namespace Microsoft.Xna.Framework.Content
             return null;
         }
 
+        // Trick to prevent the linker removing the code, but not actually execute the code
+        static bool falseflag = false;
+
         internal ContentTypeReader[] LoadAssetReaders(ContentReader reader)
         {
 #pragma warning disable 0219, 0649
-            // Trick to prevent the linker removing the code.
-            if (readers.Count == 0)
+            // Trick to prevent the linker removing the code, but not actually execute the code
+            if (falseflag)
             {
                 // Dummy variables required for it to work on iDevices ** DO NOT DELETE ** 
                 // This forces the classes not to be optimized out when deploying to iDevices
-                readers.Add(new ByteReader());
-                readers.Add(new SByteReader());
-                readers.Add(new DateTimeReader();
-                readers.Add(new DecimalReader());
-                readers.Add(new BoundingSphereReader());
-                readers.Add(new BoundingFrustumReader());
-                readers.Add(new RayReader());
-                readers.Add(new ListReader<Char>());
-                readers.Add(new ListReader<Rectangle>());
-                readers.Add(new ArrayReader<Rectangle>());
-                readers.Add(new ListReader<Vector3>());
-                readers.Add(new ListReader<StringReader>());
-                readers.Add(new ListReader<Int32>());
-                readers.Add(new SpriteFontReader());
-                readers.Add(new Texture2DReader());
-                readers.Add(new CharReader());
-                readers.Add(new RectangleReader());
-                readers.Add(new StringReader());
-                readers.Add(new Vector2Reader());
-                readers.Add(new Vector3Reader());
-                readers.Add(new Vector4Reader());
+                var hByteReader = new ByteReader();
+                var hSByteReader = new SByteReader();
+                var hDateTimeReader = new DateTimeReader();
+                var hDecimalReader = new DecimalReader();
+                var hBoundingSphereReader = new BoundingSphereReader();
+                var hBoundingFrustumReader = new BoundingFrustumReader();
+                var hRayReader = new RayReader();
+                var hCharListReader = new ListReader<Char>();
+                var hRectangleListReader = new ListReader<Rectangle>();
+                var hRectangleArrayReader = new ArrayReader<Rectangle>();
+                var hVector3ListReader = new ListReader<Vector3>();
+                var hStringListReader = new ListReader<StringReader>();
+                var hIntListReader = new ListReader<Int32>();
+                var hSpriteFontReader = new SpriteFontReader();
+                var hTexture2DReader = new Texture2DReader();
+                var hCharReader = new CharReader();
+                var hRectangleReader = new RectangleReader();
+                var hStringReader = new StringReader();
+                var hVector2Reader = new Vector2Reader();
+                var hVector3Reader = new Vector3Reader();
+                var hVector4Reader = new Vector4Reader();
                 var hCurveReader = new CurveReader();
                 var hIndexBufferReader = new IndexBufferReader();
                 var hBoundingBoxReader = new BoundingBoxReader();
@@ -136,7 +139,7 @@ namespace Microsoft.Xna.Framework.Content
 
                         readerTypeString = PrepareType(readerTypeString);
 
-                        var l_readerType = Type.GetType(readerTypeString);
+                        var l_readerType = Type.GetType(originalReaderTypeString) ?? Type.GetType(readerTypeString);
                         if (l_readerType != null)
                         {
                             ContentTypeReader typeReader;
@@ -165,7 +168,7 @@ namespace Microsoft.Xna.Framework.Content
                         else
                             throw new ContentLoadException(
                                     "Could not find ContentTypeReader Type. Please ensure the name of the Assembly that contains the Type matches the assembly in the full type name: " +
-                                    originalReaderTypeString + " (" + readerTypeString + ")");
+                                    originalReaderTypeString + " (" + readerTypeString + ") " + s);
                     }
 
                     var targetType = contentReaders[i].TargetType;
@@ -222,6 +225,7 @@ namespace Microsoft.Xna.Framework.Content
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", _assemblyName));
+            preparedType = preparedType.Replace(", mscorlib", "");
 
             if (_isRunningOnNetCore)
                 preparedType = preparedType.Replace("mscorlib", "System.Private.CoreLib");
