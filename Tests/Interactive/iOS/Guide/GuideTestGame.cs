@@ -69,12 +69,13 @@ non-infringement.
 using System;
 
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
 using MonoGame.InteractiveTests.TestUI;
 using System.Drawing;
+
+using Color = System.Drawing.Color;
 
 namespace MonoGame.InteractiveTests {
 	[InteractiveTest("Guide", Categories.GamerServices)]
@@ -86,8 +87,6 @@ namespace MonoGame.InteractiveTests {
 				DisplayOrientation.Portrait |
 				DisplayOrientation.LandscapeLeft |
 				DisplayOrientation.LandscapeRight;
-
-			Components.Add (new GamerServicesComponent (this));
 
 			Content.RootDirectory = "Content";
 		}
@@ -132,7 +131,8 @@ namespace MonoGame.InteractiveTests {
 			exitButton.Content.SizeToFit ();
 			exitButton.SizeToFit ();
 			exitButton.Tapped += (sender, e) => {
-				Exit ();
+                _universe.Stop();
+                OnExiting(sender, e);
 			};
 
 			_labelEndShowKeyboardInput = new Label
@@ -208,21 +208,21 @@ namespace MonoGame.InteractiveTests {
 
 		private void TestShowKeyboardInput (string title, string description, string defaultText)
 		{
-			var result = Guide.BeginShowKeyboardInput(
-				PlayerIndex.One,
-				title,
-				description,
-				defaultText,
-				Guide_ShowKeyboardInputCallback, null);
+			// var result = Guide.BeginShowKeyboardInput(
+			// 	PlayerIndex.One,
+			// 	title,
+			// 	description,
+			// 	defaultText,
+			// 	Guide_ShowKeyboardInputCallback, null);
 
-			_labelEndShowKeyboardInput.Text =
-				"EndShow: " + (Guide.EndShowKeyboardInput (result) ?? "<null>");
+			// _labelEndShowKeyboardInput.Text =
+			// 	"EndShow: " + (Guide.EndShowKeyboardInput (result) ?? "<null>");
 		}
 
 		private void Guide_ShowKeyboardInputCallback(IAsyncResult result)
 		{
-			_labelShowKeyboardInputCallback.Text =
-				"CallBack: " + (Guide.EndShowKeyboardInput (result) ?? "<null>");
+			// _labelShowKeyboardInputCallback.Text =
+			// 	"CallBack: " + (Guide.EndShowKeyboardInput (result) ?? "<null>");
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -232,7 +232,7 @@ namespace MonoGame.InteractiveTests {
 
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear (Color.Indigo);
+			GraphicsDevice.Clear (Microsoft.Xna.Framework.Color.Indigo);
 			base.Draw(gameTime);
 		}
 	}

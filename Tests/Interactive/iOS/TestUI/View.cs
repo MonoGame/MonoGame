@@ -75,9 +75,16 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
+using Color = System.Drawing.Color;
+
 namespace MonoGame.InteractiveTests.TestUI {
 	class View {
-		private readonly ViewCollection _subviews;
+		// HACK: Just to start things off.
+        public static Microsoft.Xna.Framework.Color FromDrawingColor(System.Drawing.Color that)
+        {
+			return new Microsoft.Xna.Framework.Color((int) that.R, (int) that.G, (int) that.B);
+        }
+        private readonly ViewCollection _subviews;
 		private readonly ReadOnlyCollection<View> _readOnlySubviews;
 		private bool _needsLayout;
 		public View ()
@@ -227,7 +234,7 @@ namespace MonoGame.InteractiveTests.TestUI {
 			if (BackgroundColor.A > 0) {
 				var swatch = Universe.Content.Load<Texture2D>(@"Textures\white-1");
 				context.SpriteBatch.Draw (
-					swatch, Vector2.Zero, null, BackgroundColor, 0, Vector2.Zero,
+					swatch, Vector2.Zero, null, View.FromDrawingColor(BackgroundColor), 0, Vector2.Zero,
 					new Vector2 (Frame.Width, Frame.Height), SpriteEffects.None, 0);
 			}
 		}

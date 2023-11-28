@@ -226,6 +226,10 @@ namespace Microsoft.Xna.Framework.Content
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", _assemblyName));
 
+            // Required for iOS. ContentTypeReader `ListReader<Char>` shows up as `Microsoft.Xna.Framework.Content.ListReader`1[System.Char]`
+            // and not `Microsoft.Xna.Framework.Content.ListReader`1[[System.Char, mscorlib]]`
+            preparedType = preparedType.Replace(", mscorlib", "");
+
             if (_isRunningOnNetCore)
                 preparedType = preparedType.Replace("mscorlib", "System.Private.CoreLib");
             else

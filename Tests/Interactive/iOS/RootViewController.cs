@@ -72,8 +72,8 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -95,9 +95,6 @@ namespace MonoGame.InteractiveTests.iOS {
 		{
 			_interactiveTests = DiscoverInteractiveTests ();
 			Title = "Interactive Tests";
-
-			
-
 		}
 
 		private static InteractiveTest[] DiscoverInteractiveTests () {
@@ -116,7 +113,8 @@ namespace MonoGame.InteractiveTests.iOS {
 		public override void LoadView()
 		{
 			View = new UIView();
-			_tableView = new UITableView(new RectangleF(PointF.Empty, View.Frame.Size));
+			_tableView = new UITableView(new RectangleF(PointF.Empty, new SizeF((float)View.Frame.Size.Width,
+				(float)View.Frame.Size.Height)));
 			_tableView.AutoresizingMask =
 				UIViewAutoresizing.FlexibleHeight |
 				UIViewAutoresizing.FlexibleWidth;
@@ -149,19 +147,15 @@ namespace MonoGame.InteractiveTests.iOS {
 			View.Window.Hidden = true;
 		}
 
+		public delegate void OnExiting(object sender, EventArgs e);
+		public OnExiting Exiting;
+
 		private void ActiveGame_Exiting (object sender, EventArgs e)
 		{
-			_activeGame.Dispose ();
 			_activeGame = null;
-
 			_activeTest = null;
 
-			// HACK: TouchPanel should probably clear itself at the
-			//       end of a Game run.
-			TouchPanel.EnabledGestures = GestureType.None;
-
-			View.Window.MakeKeyAndVisible ();
-			View.LayoutSubviews ();
+			Exiting.Invoke(sender, e);
 		}
 
 		private class InteractiveTest {
@@ -240,27 +234,27 @@ namespace MonoGame.InteractiveTests.iOS {
 				_owner = owner;
 			}
 
-			public override int NumberOfSections(UITableView tableView)
+			public override nint NumberOfSections(UITableView tableView)
 			{
 				var tests = (IEnumerable<InteractiveTest>)_owner._interactiveTests;
-				return tests.Select (x => x.Category).Distinct().Count ();
+				return (nint) tests.Select (x => x.Category).Distinct().Count ();
 			}
 
-			public override int RowsInSection(UITableView tableView, int section)
+			public override nint RowsInSection(UITableView tableView, nint section)
 			{
 				var tests = (IEnumerable<InteractiveTest>)_owner._interactiveTests;
 				var categories = tests.Select (x => x.Category).OrderBy(x => x).ToArray ();
-				var category = categories[section];
+				var category = categories[(int)section];
 
-				return tests.Where (x => x.Category == category).Count ();
+				return (nint) tests.Where (x => x.Category == category).Count ();
 			}
 
-			public override string TitleForHeader(UITableView tableView, int section)
+			public override string TitleForHeader(UITableView tableView, nint section)
 			{
 				var tests = (IEnumerable<InteractiveTest>)_owner._interactiveTests;
 				var categories = tests.Select (x => x.Category).OrderBy(x => x).ToArray ();
 
-				return categories[section];
+				return categories[(int) section];
 			}
 
 			public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)

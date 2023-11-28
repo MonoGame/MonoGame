@@ -72,6 +72,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing;
 
+using Color = System.Drawing.Color;
+
 namespace MonoGame.InteractiveTests.TestUI {
 	class Label : View {
 		public Label ()
@@ -98,7 +100,7 @@ namespace MonoGame.InteractiveTests.TestUI {
 		{
 			if (Font != null && !string.IsNullOrWhiteSpace(Text)) {
 				context.SpriteBatch.DrawString (
-					Font, Text, new Vector2(Padding.Left, Padding.Top), TextColor);
+					Font, Text, new Vector2(Padding.Left, Padding.Top), View.FromDrawingColor(TextColor));
 			}
 		}
 	}
