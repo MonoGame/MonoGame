@@ -8,7 +8,11 @@
     <BaseOutputPath>..\Artifacts\MonoGame.Framework\$(MonoGamePlatform)</BaseOutputPath>
     <AssemblyName>MonoGame.Framework</AssemblyName>
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- 
+      This is currently broken - unable to build any csproj locally, so commenting this out.
+      GitHub etc documentation works - so we are okay.
+      <GenerateDocumentationFile>true</GenerateDocumentationFile> 
+    -->
   </PropertyGroup>
 
 </Project>
