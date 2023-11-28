@@ -147,15 +147,15 @@ namespace MonoGame.InteractiveTests.iOS {
 			View.Window.Hidden = true;
 		}
 
+		public delegate void OnExiting(object sender, EventArgs e);
+		public OnExiting Exiting;
+
 		private void ActiveGame_Exiting (object sender, EventArgs e)
 		{
-			_activeGame.Dispose ();
 			_activeGame = null;
-
 			_activeTest = null;
 
-			View.Window.MakeKeyAndVisible ();
-			View.LayoutSubviews ();
+			Exiting.Invoke(sender, e);
 		}
 
 		private class InteractiveTest {

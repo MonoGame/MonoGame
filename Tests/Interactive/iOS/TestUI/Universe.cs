@@ -103,6 +103,7 @@ namespace MonoGame.InteractiveTests.TestUI {
 
 		public bool HandleGestureSample (GestureSample gestureSample, GameTime gameTime)
 		{
+			if (!_isActive) return false;
 			bool handled = false;
 			var position = new PointF (gestureSample.Position.X, gestureSample.Position.Y);
 			foreach (var view in _views.HitTest (position)) {
@@ -117,7 +118,8 @@ namespace MonoGame.InteractiveTests.TestUI {
 
 		public void Update(GameTime gameTime)
 		{
-			if (AutoHandleInput) {
+            if (!_isActive) return;
+            if (AutoHandleInput) {
 				while (_isActive && TouchPanel.IsGestureAvailable) {
 					var gestureSample = TouchPanel.ReadGesture ();
 					HandleGestureSample (gestureSample, gameTime);
@@ -127,7 +129,8 @@ namespace MonoGame.InteractiveTests.TestUI {
 
 		public void Draw(DrawContext context, GameTime gameTime)
 		{
-			_views.Draw (context, gameTime);
+            if (!_isActive) return;
+            _views.Draw (context, gameTime);
 		}
 
 		public void Stop()
