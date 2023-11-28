@@ -389,7 +389,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Exit the game at the end of this tick.
         /// </summary>
-#if IOS
+#if IOS && !TEST
         [Obsolete("This platform's policy does not allow programmatically closing.", true)]
 #endif
         public void Exit()
