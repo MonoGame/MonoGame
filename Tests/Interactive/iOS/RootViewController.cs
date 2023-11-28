@@ -95,9 +95,6 @@ namespace MonoGame.InteractiveTests.iOS {
 		{
 			_interactiveTests = DiscoverInteractiveTests ();
 			Title = "Interactive Tests";
-
-			
-
 		}
 
 		private static InteractiveTest[] DiscoverInteractiveTests () {
@@ -156,10 +153,6 @@ namespace MonoGame.InteractiveTests.iOS {
 			_activeGame = null;
 
 			_activeTest = null;
-
-			// HACK: TouchPanel should probably clear itself at the
-			//       end of a Game run.
-			TouchPanel.EnabledGestures = GestureType.None;
 
 			View.Window.MakeKeyAndVisible ();
 			View.LayoutSubviews ();

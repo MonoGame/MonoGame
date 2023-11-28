@@ -78,6 +78,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 namespace MonoGame.InteractiveTests.TestUI {
 	class Universe {
 
+		private bool _isActive = true;
 		private readonly ViewCollection _views;
 		public Universe (ContentManager content)
 		{
@@ -117,7 +118,7 @@ namespace MonoGame.InteractiveTests.TestUI {
 		public void Update(GameTime gameTime)
 		{
 			if (AutoHandleInput) {
-				while (TouchPanel.IsGestureAvailable) {
+				while (_isActive && TouchPanel.IsGestureAvailable) {
 					var gestureSample = TouchPanel.ReadGesture ();
 					HandleGestureSample (gestureSample, gameTime);
 				}
@@ -127,6 +128,12 @@ namespace MonoGame.InteractiveTests.TestUI {
 		public void Draw(DrawContext context, GameTime gameTime)
 		{
 			_views.Draw (context, gameTime);
+		}
+
+		public void Stop()
+		{
+			_isActive = false;
+			AutoHandleInput = false;
 		}
 	}
 }
