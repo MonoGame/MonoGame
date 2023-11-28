@@ -118,9 +118,8 @@ namespace MonoGame.InteractiveTests.TestUI {
 			exitButton.Content.SizeToFit ();
 			exitButton.SizeToFit ();
 			exitButton.Tapped += (sender, e) => {
-				_universe.Stop();
-                OnExiting(sender, e);
-            };
+        Exit();
+      };
 
 			var label = new Label {
 				BackgroundColor = Color.Indigo,

@@ -131,8 +131,7 @@ namespace MonoGame.InteractiveTests {
 			exitButton.Content.SizeToFit ();
 			exitButton.SizeToFit ();
 			exitButton.Tapped += (sender, e) => {
-                _universe.Stop();
-                OnExiting(sender, e);
+				Exit();
 			};
 
 			_labelEndShowKeyboardInput = new Label
