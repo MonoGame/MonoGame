@@ -74,37 +74,35 @@ using Foundation;
 using UIKit;
 
 namespace MonoGame.InteractiveTests.iOS {
-	[Register ("AppDelegate")]
-	public partial class AppDelegate : UIApplicationDelegate {
+  [Register ("AppDelegate")]
+  public partial class AppDelegate : UIApplicationDelegate {
 
-		UIWindow _window;
-		UINavigationController _navigationController;
-		RootViewController _rootViewController;
-		
-		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
-		{
+    UIWindow _window;
+    UINavigationController _navigationController;
+    RootViewController _rootViewController;
+    
+    public override bool FinishedLaunching (UIApplication app, NSDictionary options)
+    {
+      CreateHomePage_();
+      return true;
+    }
 
-			CreateHomePage_();
-
-			return true;
-		}
-
-        private void CreateHomePage_()
+    private void CreateHomePage_()
+    {
+        _window = new UIWindow(UIScreen.MainScreen.Bounds);
+        if (_rootViewController != null)
         {
-            _window = new UIWindow(UIScreen.MainScreen.Bounds);
-            if (_rootViewController != null)
-			{
-                _rootViewController.View.RemoveFromSuperview();
-                _rootViewController.RemoveFromParentViewController();
-            }
-            _rootViewController = new RootViewController();
-            _navigationController = new UINavigationController(_rootViewController);
-            _window.RootViewController = _navigationController;
-            _rootViewController.Exiting += (s, e) => {
-				CreateHomePage_();
-            };
-            _window.MakeKeyAndVisible();
+            _rootViewController.View.RemoveFromSuperview();
+            _rootViewController.RemoveFromParentViewController();
         }
+        _rootViewController = new RootViewController();
+        _navigationController = new UINavigationController(_rootViewController);
+        _window.RootViewController = _navigationController;
+        _rootViewController.Exiting += (s, e) => {
+          CreateHomePage_();
+        };
+        _window.MakeKeyAndVisible();
+    }
     }
 }
 
