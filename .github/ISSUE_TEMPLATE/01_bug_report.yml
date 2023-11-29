@@ -10,7 +10,7 @@ body:
   attributes:
     label: Prerequisites
     options:
-      - label: I have verified this issue is not present in the `develop` branch
+      - label: I have verified this issue is present in the `develop` branch
         required: true
       - label: I have searched [open](https://github.com/MonoGame/MonoGame/issues) and [closed](https://github.com/MonoGame/MonoGame/issues?q=is%3Aissue+is%3Aclosed) issues to ensure it has not already been reported.
         required: true
