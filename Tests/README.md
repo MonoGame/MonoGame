@@ -158,6 +158,31 @@ the test fixture is already set up):
   future, as requirements change.
 - Use the Paths static class to reduce typos in resource paths.
 
+## Interactive Tests
+
+Certain mobile platforms such as iOS have interactive tests (deploying 
+the test, clicking on the test etc). 
+
+### iOS Interactive Tests
+
+To run the test and launch via a simulator:
+
+```bash
+cd Tests/Interactive/iOS
+dotnet run --project=MonoGame.InteractiveTests.iOS.csproj
+```
+
+To run the test on a specific device (or a specific simulator):
+
+```bash
+# Obtain the connected device(s)
+/Applications/Xcode.app/Contents/Developer/usr/bin/xctrace list devices
+
+cd Tests/Interactive/iOS
+dotnet run --project= MonoGame.InteractiveTests.iOS.csproj /p:_DeviceName="<name of device"
+```
+
+
 ## Special Considerations
 
 - For new test fixtures, call Paths.SetStandardWorkingDirectory() in
@@ -181,3 +206,4 @@ There are a few things to know about running these tests under NUnit:
   running a visual test) otherwise choose 'single separate process'
   - This setting can be found in:
     ```Tools > Settings > Test Loader > Assembly Isolation```
+
