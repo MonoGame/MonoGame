@@ -56,7 +56,7 @@ If you'd like to help the project by supporting us financially, consider support
 
 Money goes towards hosting, new hardware and if enough people subscribe a dedicated developer.
 
-There are several options on our [Patreon Page](https://www.patreon.com/MonoGame/).
+There are several options on our [Donation Page](https://www.patreon.com/MonoGame/).
 
 ## Source Code
 
@@ -87,7 +87,7 @@ A high level breakdown of the components of the framework:
 * Use our [community forums](http://community.monogame.net/) for support questions.
 * You can [join the Discord server](https://discord.gg/monogame) and chat live with the core developers and other users.
 * The [official documentation](https://monogame.net/articles/index.html) is on our website.
-* Here are the [Getting Started](https://monogame.net/articles/getting_started/index.html) instructions for each platform, or you can download a specific release from [here](https://github.com/MonoGame/MonoGame/releases).
+* Download release [packages](https://github.com/MonoGame/MonoGame/releases).
 * Follow [@MonoGameTeam](https://twitter.com/monogameteam) on Twitter.
 
 ## License
