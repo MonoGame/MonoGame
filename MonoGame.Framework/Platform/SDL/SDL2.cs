@@ -393,12 +393,14 @@ internal static class Sdl
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr d_sdl_createwindow(string title, int x, int y, int w, int h, int flags);
+        private delegate IntPtr d_sdl_createwindow(ref byte title, int x, int y, int w, int h, int flags);
         private static d_sdl_createwindow SDL_CreateWindow = FuncLoader.LoadFunction<d_sdl_createwindow>(NativeLibrary, "SDL_CreateWindow");
 
         public static IntPtr Create(string title, int x, int y, int w, int h, int flags)
         {
-            return GetError(SDL_CreateWindow(title, x, y, w, h, flags));
+            var bytes = Encoding.UTF8.GetBytes(title + '\0');
+
+            return GetError(SDL_CreateWindow(ref bytes[0], x, y, w, h, flags));
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
