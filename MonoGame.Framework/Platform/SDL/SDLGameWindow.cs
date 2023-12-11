@@ -223,12 +223,17 @@ namespace Microsoft.Xna.Framework
             Sdl.Rectangle displayRect;
             Sdl.Display.GetBounds(displayIndex, out displayRect);
 
-            if (_willBeFullScreen != IsFullScreen || _hardwareSwitch != _game.graphicsDeviceManager.HardwareModeSwitch)
-            {
-                var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? Sdl.Window.State.Fullscreen : Sdl.Window.State.FullscreenDesktop;
-                Sdl.Window.SetFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
-                _hardwareSwitch = _game.graphicsDeviceManager.HardwareModeSwitch;
-            }
+            var changeFullscreenType = _hardwareSwitch != _game.graphicsDeviceManager.HardwareModeSwitch && IsFullScreen;
+            _hardwareSwitch = _game.graphicsDeviceManager.HardwareModeSwitch;
+
+            // setting fullscreen to false before resizing if going windowed
+            if (!_willBeFullScreen && IsFullScreen)
+                Sdl.Window.SetFullscreen(Handle, 0);
+
+            // setting fullscreen to desktop fullscreen or if hardware mode changed to false
+            if ((_willBeFullScreen && !IsFullScreen) || (changeFullscreenType && !_hardwareSwitch))
+                Sdl.Window.SetFullscreen(Handle, Sdl.Window.State.FullscreenDesktop);
+
             // If going to exclusive full-screen mode, force the window to minimize on focus loss (Windows only)
             if (CurrentPlatform.OS == OS.Windows)
             {
@@ -247,8 +252,11 @@ namespace Microsoft.Xna.Framework
                 _height = displayRect.Height;
             }
 
-            int ignore, minx = 0, miny = 0;
-            Sdl.Window.GetBorderSize(_handle, out miny, out minx, out ignore, out ignore);
+            // setting fullscreen to hardware fullscreen after resizing if using hardware mode
+            if (((_willBeFullScreen && !IsFullScreen) || changeFullscreenType) && _hardwareSwitch)
+                Sdl.Window.SetFullscreen(Handle, Sdl.Window.State.Fullscreen);
+
+            Sdl.Window.GetBorderSize(_handle, out var miny, out var minx, out _, out _);
 
             var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), minx);
             var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), miny);
