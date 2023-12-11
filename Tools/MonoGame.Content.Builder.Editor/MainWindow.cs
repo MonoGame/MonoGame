@@ -122,7 +122,7 @@ namespace MonoGame.Tools.Pipeline
                 filePath = dialog.FileName;
                 if (dialog.CurrentFilter == _mgcbFileFilter && !filePath.EndsWith(".mgcb"))
                     filePath += ".mgcb";
-                
+
                 return true;
             }
 
@@ -200,7 +200,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void EndTreeUpdate()
         {
-            
+
         }
 
         public void UpdateProperties()
@@ -226,6 +226,16 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new DeleteDialog(PipelineController.Instance, items);
             return dialog.Show(this);
+        }
+
+        public AskResult ShowReloadProjectDialog()
+        {
+            var result = MessageBox.Show(this, "The project file has been updated outside of the editor, do you want to reload the project? (Any unsaved changes will be lost)", "Reload Project", MessageBoxButtons.YesNo, MessageBoxType.Question);
+
+            if (result == DialogResult.Yes)
+                return AskResult.Yes;
+
+            return AskResult.No;
         }
 
         public bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname)
@@ -272,7 +282,7 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new NewItemDialog(PipelineController.Instance.Templates.GetEnumerator(), folder);
             var result = dialog.Show(this);
-            
+
             if (result)
             {
                 template = dialog.Selected;
@@ -372,7 +382,7 @@ namespace MonoGame.Tools.Pipeline
             cmdCopyAssetName.Enabled = info.CopyAssetPath;
             cmdRebuildItem.Enabled = info.RebuildItem;
 
-            // Visibility of menu items can't be changed so 
+            // Visibility of menu items can't be changed so
             // we need to recreate the context menu each time.
 
             // Context Menu
