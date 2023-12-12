@@ -68,9 +68,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return PrimaryWindow.TouchPanelState.GetCapabilities();
         }
 
-        internal static void AddCoalescedEvent(int id, TouchLocationState state, Vector2 position)
+        internal static void AddHighResolutionTouchEvent(int id, TouchLocationState state, Vector2 position)
         {
-            PrimaryWindow.TouchPanelState.AddCoalescedEvent(id, state, position);
+            PrimaryWindow.TouchPanelState.AddHighResolutionTouchEvent(id, state, position);
         }
 
         internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
@@ -159,12 +159,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
         }
 
         /// <summary>
-        /// Returns true if coalesced events are sent to any listeners. MonoGame framework
-        /// does not use coalesced events for its processing.
+        /// Gets or sets if high-frequency events are sent to any listeners (if the underlying OS supports it).
+        /// If <see langword="false"/>, no additional CPU usage is incurred i.e. no high-frequency events are obtained
+        /// from the underlying platform.
         /// </summary>
-        public static bool EnableCoalescedTouch
+        public static bool EnableHighFrequencyTouch
         {
-            get { return PrimaryWindow.TouchPanelState.EnableCoalescedTouch; }
+            get { return PrimaryWindow.TouchPanelState.EnableHighFrequencyTouch; }
+            set { PrimaryWindow.TouchPanelState.EnableHighFrequencyTouch = value;  }
         }
     }
 }
