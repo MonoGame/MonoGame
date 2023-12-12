@@ -98,8 +98,6 @@
     <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Contents.json" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />    
   </ItemGroup>
@@ -119,6 +117,7 @@
     <Compile Include="TestUI\Label.cs" />
     <Compile Include="TestUI\PaddingF.cs" />
     <Compile Include="TestUI\Button.cs" />
+    <Compile Include="TouchTest\TouchTestGame.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Guide\" />
@@ -126,6 +125,7 @@
     <Folder Include="Content\" />
     <Folder Include="Content\Fonts\" />
     <Folder Include="Content\Textures\" />
+    <Folder Include="TouchTest\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
