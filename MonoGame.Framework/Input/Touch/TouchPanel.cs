@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009-2010 The XnaTouch Team
+// XnaTouch - Copyright Â© 2009-2010 The XnaTouch Team
 //
 // All rights reserved.
 // 
@@ -66,6 +66,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         public static TouchPanelCapabilities GetCapabilities()
         {
             return PrimaryWindow.TouchPanelState.GetCapabilities();
+        }
+
+        internal static void AddHighResolutionTouchEvent(int id, TouchLocationState state, Vector2 position)
+        {
+            PrimaryWindow.TouchPanelState.AddHighResolutionTouchEvent(id, state, position);
         }
 
         internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
@@ -151,6 +156,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
         public static bool IsGestureAvailable
         {
             get { return PrimaryWindow.TouchPanelState.IsGestureAvailable; }
+        }
+
+        /// <summary>
+        /// Gets or sets if high-frequency events are sent to any listeners (if the underlying OS supports it).
+        /// If <see langword="false"/>, no additional CPU usage is incurred i.e. no high-frequency events are obtained
+        /// from the underlying platform.
+        /// </summary>
+        public static bool EnableHighFrequencyTouch
+        {
+            get { return PrimaryWindow.TouchPanelState.EnableHighFrequencyTouch; }
+            set { PrimaryWindow.TouchPanelState.EnableHighFrequencyTouch = value;  }
         }
     }
 }

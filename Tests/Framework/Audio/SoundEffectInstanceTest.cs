@@ -10,6 +10,7 @@ using NUnit.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Threading;
+using System.Diagnostics;
 
 namespace MonoGame.Tests.Audio
 {
@@ -57,11 +58,20 @@ namespace MonoGame.Tests.Audio
 
         private static void SleepWhileDispatching(int ms)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             int cycles = ms / 10;
             for (int i = 0; i < cycles; i++)
             {
                 FrameworkDispatcher.Update();
                 Thread.Sleep(10);
+
+                if (stopwatch.Elapsed.TotalMilliseconds > ms)
+                {
+                    stopwatch.Stop();
+                    break;
+                }
             }
         }
 

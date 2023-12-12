@@ -1,6 +1,6 @@
 ﻿# MonoGame
 
-MonoGame is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language. It has been successfully used to create games such as [Streets of Rage 4](https://store.steampowered.com/app/985890/Streets_of_Rage_4/), [Carrion](https://store.steampowered.com/app/953490/CARRION/), [Celeste](https://store.steampowered.com/app/504230/Celeste/), [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/), and [many others](https://www.monogame.net/showcase/).
+MonoGame is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language. It has been successfully used to create games such as [Streets of Rage 4](https://store.steampowered.com/app/985890/Streets_of_Rage_4/), [Carrion](https://store.steampowered.com/app/953490/CARRION/), [Celeste](https://store.steampowered.com/app/504230/Celeste/), [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/), and [many others](https://monogame.net/showcase.html).
 
 It is an open-source re-implementation of the discontinued [Microsoft's XNA Framework](https://msdn.microsoft.com/en-us/library/bb200104.aspx).
 
@@ -56,7 +56,7 @@ If you'd like to help the project by supporting us financially, consider support
 
 Money goes towards hosting, new hardware and if enough people subscribe a dedicated developer.
 
-There are several options on our [Donation Page](http://www.monogame.net/donate/).
+There are several options on our [Donation Page](https://www.patreon.com/MonoGame/).
 
 ## Source Code
 
@@ -99,8 +99,8 @@ and read [CONTRIBUTING.md](./CONTRIBUTING.md) to submit PRs from your fork of Mo
 * Our [issue tracker](https://github.com/MonoGame/MonoGame/issues) is on GitHub.
 * Use our [community forums](http://community.monogame.net/) for support questions.
 * You can [join the Discord server](https://discord.gg/monogame) and chat live with the core developers and other users.
-* The [official documentation](http://www.monogame.net/documentation/) is on our website.
-* Download release and development [packages](http://www.monogame.net/downloads/).
+* The [official documentation](https://monogame.net/articles/index.html) is on our website.
+* Download release [packages](https://github.com/MonoGame/MonoGame/releases).
 * Follow [@MonoGameTeam](https://twitter.com/monogameteam) on Twitter.
 
 ## License
