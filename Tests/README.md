@@ -181,7 +181,7 @@ To run the test on a specific device (or a specific simulator):
 /Applications/Xcode.app/Contents/Developer/usr/bin/xctrace list devices
 
 cd Tests/Interactive/iOS
-dotnet run --project= MonoGame.InteractiveTests.iOS.csproj /p:_DeviceName="<name of device"
+dotnet run --project= MonoGame.InteractiveTests.iOS.csproj /p:_DeviceName="<name of device>"
 ```
 
 
