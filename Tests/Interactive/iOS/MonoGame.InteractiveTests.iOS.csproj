@@ -6,7 +6,7 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>false</ImplicitUsings>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <SupportedOSPlatformVersion>10.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>11.0</SupportedOSPlatformVersion>
     <Configurations>Debug;Release</Configurations>
     <Platforms>iPhoneSimulator;iPhone;AnyCPU</Platforms>
     <RunAOTCompilation>True</RunAOTCompilation>    
