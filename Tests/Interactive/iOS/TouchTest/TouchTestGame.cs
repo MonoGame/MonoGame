@@ -1,4 +1,5 @@
 #region License
+
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009-2012 The MonoGame Team
@@ -64,99 +65,117 @@ change. To the extent permitted under your local laws, the contributors exclude
 the implied warranties of merchantability, fitness for a particular purpose and
 non-infringement.
 */
+
 #endregion License
 
 using System;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
-
 using MonoGame.InteractiveTests.TestUI;
 using System.Drawing;
-
 using Color = System.Drawing.Color;
 
-namespace MonoGame.InteractiveTests {
-	[InteractiveTest("Touch Test", Categories.General)]
-	public class TouchTestGame : Game {
-		public TouchTestGame ()
-		{
-			var graphics = new GraphicsDeviceManager(this);
-			graphics.SupportedOrientations =
-				DisplayOrientation.Portrait |
-				DisplayOrientation.LandscapeLeft |
-				DisplayOrientation.LandscapeRight;
+namespace MonoGame.InteractiveTests
+{
+[InteractiveTest("Touch Test", Categories.General)]
+public class TouchTestGame : Game
+{
+    public TouchTestGame()
+    {
+        var graphics = new GraphicsDeviceManager(this);
+        graphics.SupportedOrientations =
+            DisplayOrientation.Portrait |
+            DisplayOrientation.LandscapeLeft |
+            DisplayOrientation.LandscapeRight;
 
-			Content.RootDirectory = "Content";
-		}
+        Content.RootDirectory = "Content";
+    }
 
-		protected override void Initialize()
-		{
-			base.Initialize();
-			
-		}
+    protected override void Initialize()
+    {
+        base.Initialize();
+        TouchPanel.EnabledGestures = GestureType.DoubleTap | GestureType.Tap;
+        TouchPanel.EnableHighFrequencyTouch = true;
+        TouchPanel.GetState(Window).OnTouchEvent += OnTouchEvent;
+    }
 
-		private SpriteFont _font;
-		protected override void LoadContent()
-		{
-			base.LoadContent();
+    private int _numTouchEvents;
+    private int _numHighFreqTouchEvents;
 
-			_font = Content.Load<SpriteFont> (@"Fonts\Default");
-			InitializeGui();
-		}
+    private void OnTouchEvent(object sender, TouchLocation e)
+    {
+        ++_numTouchEvents;
+        if (e.IsHighFrequencyEvent())
+        {
+            ++_numHighFreqTouchEvents;
+        }
+    }
 
-		private Universe _universe;
-		private Label _labelTouchInfo;
-		private void InitializeGui()
-		{
-			_universe = new Universe (Content)
-			{
-				AutoHandleInput = true
-			};
-			Components.Add (new UniverseComponent (this, _universe));
+    private SpriteFont _font;
 
-			var exitButton = new Button
-			{
-				BackgroundColor = Color.Black,
-				Content = new Label {
-					Font = _font,
-					Text = "Exit",
-					TextColor = Color.White
-				},
-				Location = PointF.Empty
-			};
+    protected override void LoadContent()
+    {
+        base.LoadContent();
 
-			exitButton.Content.SizeToFit ();
-			exitButton.SizeToFit ();
-			exitButton.Tapped += (sender, e) => {
-                _universe.Stop();
-                OnExiting(sender, e);
-			};
+        _font = Content.Load<SpriteFont>(@"Fonts\Default");
+        InitializeGui();
+    }
 
+    private Universe _universe;
+    private Label _labelTouchInfo;
 
-            _labelTouchInfo = new Label
+    private void InitializeGui()
+    {
+        _universe = new Universe(Content)
+        {
+            AutoHandleInput = true
+        };
+        Components.Add(new UniverseComponent(this, _universe));
+
+        var exitButton = new Button
+        {
+            BackgroundColor = Color.Black,
+            Content = new Label
             {
-                Frame = new RectangleF(20, 60, 320, 20),
                 Font = _font,
+                Text = "Exit",
                 TextColor = Color.White
-            };
+            },
+            Location = PointF.Empty
+        };
 
-            _universe.Add (exitButton);
-			_universe.Add (_labelTouchInfo);
-		}
+        exitButton.Content.SizeToFit();
+        exitButton.SizeToFit();
+        exitButton.Tapped += (sender, e) =>
+        {
+            _universe.Stop();
+            OnExiting(sender, e);
+        };
 
+        _labelTouchInfo = new Label
+        {
+            Frame = new RectangleF(20, 60, 320, 20),
+            Font = _font,
+            TextColor = Color.White
+        };
 
-		protected override void Update(GameTime gameTime)
-		{
-			base.Update(gameTime);
-		}
+        _universe.Add(exitButton);
+        _universe.Add(_labelTouchInfo);
+    }
 
-		protected override void Draw(GameTime gameTime)
-		{
-			GraphicsDevice.Clear (Microsoft.Xna.Framework.Color.Indigo);
-			base.Draw(gameTime);
-		}
-	}
+    protected override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+    }
+
+    protected override void Draw(GameTime gameTime)
+    {
+        GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Indigo);
+        _labelTouchInfo.Text =
+            $"Num. touch events: {_numTouchEvents} vs " +
+            $"high-frequency events {_numHighFreqTouchEvents}";
+        base.Draw(gameTime);
+    }
 }
-
+}
