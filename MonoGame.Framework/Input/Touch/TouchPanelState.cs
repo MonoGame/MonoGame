@@ -163,7 +163,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         internal void AddHighResolutionTouchEvent(int id, TouchLocationState state, Vector2 position)
         {
             //Try to find the touch id.
-            if (!_touchIds.TryGetValue(id, out int touchId))
+            int touchId;
+            if (!_touchIds.TryGetValue(id, out touchId))
             {
                 return;
             }
