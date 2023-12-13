@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009-2010 The MonoGame Team
+// MonoGame - Copyright ï¿½ 2009-2010 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -63,6 +63,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         // Used for gesture recognition.
         private Vector2 _velocity;
+        // Use for high-frequency (optional) touch events processing
+        private bool _isHighFrequency;
         private Vector2 _pressPosition;
         private TimeSpan _pressTimestamp;
         private TimeSpan _timestamp;
@@ -144,17 +146,22 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public TouchLocation(   int id, TouchLocationState state, Vector2 position, 
                                 TouchLocationState previousState, Vector2 previousPosition)
-            : this(id, state, position, previousState, previousPosition, TimeSpan.Zero)
+            : this(id, state, position, previousState, previousPosition, TimeSpan.Zero, false)
         {
         }
 
         internal TouchLocation(int id, TouchLocationState state, Vector2 position, TimeSpan timestamp)
-            : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero, timestamp)
+            : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero, timestamp, false)
+        {
+        }
+
+        internal TouchLocation(int id, TouchLocationState state, Vector2 position, TimeSpan timestamp, bool isHighFrequency)
+            : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero, timestamp, isHighFrequency)
         {
         }
 
         internal TouchLocation(int id, TouchLocationState state, Vector2 position,
-            TouchLocationState previousState, Vector2 previousPosition, TimeSpan timestamp)
+            TouchLocationState previousState, Vector2 previousPosition, TimeSpan timestamp, bool isHighFrequency)
         {
             _id = id;
             _state = state;
@@ -167,6 +174,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             _timestamp = timestamp;
             _velocity = Vector2.Zero;
+
+            _isHighFrequency = isHighFrequency;
 
             // If this is a pressed location then store the 
             // current position and timestamp as pressed.
@@ -253,6 +262,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return _state != _previousState || delta.LengthSquared() > 0.001f;
         }
 
+
+        public bool IsHighFrequencyEvent()
+        {
+            return _isHighFrequency;
+        }
+
         public override bool Equals(object obj)
         {
 			if (obj is TouchLocation)
@@ -267,6 +282,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     _position.Equals(other._position) &&
                     _previousPosition.Equals(other._previousPosition);
         }
+
+
 
         public override int GetHashCode()
         {
@@ -294,6 +311,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			    aPreviousLocation._pressTimestamp = TimeSpan.Zero;
                 aPreviousLocation._velocity = Vector2.Zero;
                 aPreviousLocation.SameFrameReleased = false;
+                aPreviousLocation._isHighFrequency = false;
                 return false;
 			}
 
@@ -309,6 +327,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             aPreviousLocation._pressTimestamp = _pressTimestamp;
             aPreviousLocation._velocity = _velocity;
             aPreviousLocation.SameFrameReleased = SameFrameReleased;
+            aPreviousLocation._isHighFrequency = _isHighFrequency;
             return true;
         }
 

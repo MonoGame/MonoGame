@@ -114,7 +114,7 @@ the test fixture is already set up):
 
 
 1. Implement any new drawing logic needed in a new subclass of one of
-   the \*Component base classes.
+   the **Component** base classes.
 
 2. Compose your test Game in a new [Test] method.  As this stage, you
    can run the new test directly to visually verify the rendering.
@@ -128,11 +128,13 @@ the test fixture is already set up):
 
 5. The first time a visual test is run, it will fail for lack of
    reference images to compare the captured images to.  However, it will
-   write the captured frames to bin\$(Configuration)\CapturedFrames\{TestDir}.
+   write the captured frames to ```bin\$(Configuration)\CapturedFrames\{TestDir}```
 
 6. Proof the images generated from the first run to ensure that they are
    correct, then add them to the test project in
-   Assets\ReferenceImages\$TestDir.  **Be sure to add them in the
+   ```Assets\ReferenceImages\$TestDir```
+
+    **Be sure to add them in the
    projects for all platforms!**  These files should have their build
    actions set to "Compile" and "Copy if newer".
 
@@ -140,7 +142,7 @@ the test fixture is already set up):
    place and the test should now pass.
 
 8. XOR diffs between the reference images and captured frames are output
-   into bin\$(Configuration)\Diffs\{TestDir} for debugging purposes.
+   into ```bin\$(Configuration)\Diffs\{TestDir}``` for debugging purposes.
 
 
 ### Notes For Implementing Correct Visual Tests
@@ -170,12 +172,12 @@ the test fixture is already set up):
 
 There are a few things to know about running these tests under NUnit:
 
-- You must run the -x86 versions of NUnit, because XNA won't work with
+- You must run the **-x86** versions of NUnit, because XNA won't work with
   the 64-bit versions.
 - You must disable shadow copying because having it enabled makes it
   impossible for the ContentManager to find any assets.
-  - GUI: Tools > Settings > Test Loader > Advanced
-  - CLI: /noshadow
+  - ```GUI: Tools > Settings > Test Loader > Advanced```
+  - ```CLI: /noshadow```
 - For debugger support, Run tests directly in the NUnit process, (note
   that this may cause a few-seconds-long hang when exiting NUnit after
   running a visual test) otherwise choose 'single separate process'
