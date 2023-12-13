@@ -85,7 +85,7 @@ A high level breakdown of the components of the framework:
 After the initial setup, use the following commands to sync to the latest changes.
 
 ```bash
-git pull origin develop
+git rebase upstream/develop
 git submodule sync --recursive
 git submodule update
 ```

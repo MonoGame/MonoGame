@@ -28,7 +28,7 @@ to run the tests.
 To run them from the command-line (Windows/Mac/Linux):
 
 ```bash
-dotnet test ./Tests/MonoGame.Tests.DesktopGL.csproj
+dotnet test Tests/MonoGame.Tests.DesktopGL.csproj
 ```
 
 To list all the tests:
@@ -36,13 +36,13 @@ To list all the tests:
 **Note** These are quick hints, for extensive help use `dotnet test --help`.
 
 ```bash
-dotnet test ./Tests/MonoGame.Tests.DesktopGL.csproj -t
+dotnet test Tests/MonoGame.Tests.DesktopGL.csproj -t
 ```
 
 To run/filter specific classes/namespaces, an example:
 
 ```bash
-dotnet test ./Tests/MonoGame.Tests.DesktopGL.csproj --filter MonoGame.Tests.Visual
+dotnet test Tests/MonoGame.Tests.DesktopGL.csproj --filter MonoGame.Tests.Visual
 ```
 
 ## Rendering Tests
