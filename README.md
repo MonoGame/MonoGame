@@ -80,21 +80,6 @@ A high level breakdown of the components of the framework:
 * [mgfxc](Tools/MonoGame.Effect.Compiler) is the command line effect compiler tool.
 * The [mgcb-editor](Tools/MonoGame.Content.Builder.Editor) tool is a GUI frontend for content processing.
 
-### Syncing/Submitting PRs
-
-After the initial setup, use the following commands to sync to the latest changes.
-
-```bash
-git rebase origin/develop
-git submodule sync --recursive
-git submodule update
-```
-
-(Note: `origin` above may be called `upstream` or other remote names you might have assigned).
-
-Check out the official [GitHub docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) 
-and read [CONTRIBUTING.md](./CONTRIBUTING.md) to submit PRs from your fork of MonoGame.
-
 ## Helpful Links
 
 * The official website is [monogame.net](http://www.monogame.net).
