@@ -160,8 +160,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         /// <summary>
         /// Gets or sets if high-frequency events are sent to any listeners (if the underlying OS supports it).
-        /// If <see langword="false"/>, no additional CPU usage is incurred i.e. no high-frequency events are obtained
-        /// from the underlying platform.
+        /// By default, it's <see langword="false"/> and hence no additional CPU usage is incurred.
         /// </summary>
         public static bool EnableHighFrequencyTouch
         {

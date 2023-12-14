@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// MonoGame - Copyright � 2009-2010 The MonoGame Team
+// MonoGame - Copyright (C) 2009-2010 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -262,7 +262,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return _state != _previousState || delta.LengthSquared() > 0.001f;
         }
 
-
+        /// <summary>
+        /// Returns true if the touch panel is configured to process high frequence touch events.
+        /// </summary>
         public bool IsHighFrequencyEvent()
         {
             return _isHighFrequency;

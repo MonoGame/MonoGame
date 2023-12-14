@@ -337,6 +337,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         /// <summary>
         /// Gets or sets if high-frequency touch event processing is enabled.
+        /// See <see cref="TouchPanel.EnableHighFrequencyTouch" /> for more details.
         /// </summary>
         public bool EnableHighFrequencyTouch { get; set; }
 

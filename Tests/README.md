@@ -9,41 +9,15 @@ properties, methods and behavior to guarantee compatibility with XNA in
 those regards.  Additionally, visual tests verify via frame capture and
 comparison that MonoGame renders equivalently to XNA.
 
-
-*Note: Currently there is no way to skip or select certain tests to run
-using the custom runner.  This functionality is coming soon.*
-
-## Running Tests
-
-Currently, on Windows+Visual Studio, the tests can be run using NUnit and target
+Currently, on Windows, the tests can be run using NUnit and target
 either XNA or MonoGame.  On macOS and Linux, the tests target
 MonoGame and are implemented in an executable assembly that can be run
 and debugged directly.  After execution using the custom test runner,
 and HTML report of the results will be loaded in your default browser,
 and a log of stdout can be found in bin\$(Configuration)\stdout.txt.
 
-In Visual Studio 2022 (Windows) or Visual Studio for Mac, use the Test Explorer
-to run the tests.
-
-To run them from the command-line (Windows/Mac/Linux):
-
-```bash
-dotnet test Tests/MonoGame.Tests.DesktopGL.csproj
-```
-
-To list all the tests:
-
-**Note** These are quick hints, for extensive help use `dotnet test --help`.
-
-```bash
-dotnet test Tests/MonoGame.Tests.DesktopGL.csproj -t
-```
-
-To run/filter specific classes/namespaces, an example:
-
-```bash
-dotnet test Tests/MonoGame.Tests.DesktopGL.csproj --filter MonoGame.Tests.Visual
-```
+*Note: Currently there is no way to skip or select certain tests to run
+using the custom runner.  This functionality is coming soon.*
 
 ## Rendering Tests
 
@@ -114,7 +88,7 @@ the test fixture is already set up):
 
 
 1. Implement any new drawing logic needed in a new subclass of one of
-   the **Component** base classes.
+   the \*Component base classes.
 
 2. Compose your test Game in a new [Test] method.  As this stage, you
    can run the new test directly to visually verify the rendering.
@@ -128,13 +102,11 @@ the test fixture is already set up):
 
 5. The first time a visual test is run, it will fail for lack of
    reference images to compare the captured images to.  However, it will
-   write the captured frames to ```bin\$(Configuration)\CapturedFrames\{TestDir}```
+   write the captured frames to bin\$(Configuration)\CapturedFrames\{TestDir}.
 
 6. Proof the images generated from the first run to ensure that they are
    correct, then add them to the test project in
-   ```Assets\ReferenceImages\$TestDir```
-
-    **Be sure to add them in the
+   Assets\ReferenceImages\$TestDir.  **Be sure to add them in the
    projects for all platforms!**  These files should have their build
    actions set to "Compile" and "Copy if newer".
 
@@ -142,7 +114,7 @@ the test fixture is already set up):
    place and the test should now pass.
 
 8. XOR diffs between the reference images and captured frames are output
-   into ```bin\$(Configuration)\Diffs\{TestDir}``` for debugging purposes.
+   into bin\$(Configuration)\Diffs\{TestDir} for debugging purposes.
 
 
 ### Notes For Implementing Correct Visual Tests
@@ -172,12 +144,12 @@ the test fixture is already set up):
 
 There are a few things to know about running these tests under NUnit:
 
-- You must run the **-x86** versions of NUnit, because XNA won't work with
+- You must run the -x86 versions of NUnit, because XNA won't work with
   the 64-bit versions.
 - You must disable shadow copying because having it enabled makes it
   impossible for the ContentManager to find any assets.
-  - ```GUI: Tools > Settings > Test Loader > Advanced```
-  - ```CLI: /noshadow```
+  - GUI: Tools > Settings > Test Loader > Advanced
+  - CLI: /noshadow
 - For debugger support, Run tests directly in the NUnit process, (note
   that this may cause a few-seconds-long hang when exiting NUnit after
   running a visual test) otherwise choose 'single separate process'
