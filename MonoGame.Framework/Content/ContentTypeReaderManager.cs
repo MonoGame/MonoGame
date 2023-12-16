@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Content
 
         private static readonly string _assemblyName;
 
-        private static readonly bool _isRunningOnNetCore = Type.GetType("System.Private.CoreLib") != null;
+        private static readonly bool _isRunningOnNetCore = typeof(object).Assembly.GetName().Name == "System.Private.CoreLib";
 
         static ContentTypeReaderManager()
         {
@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Content
             // Trick to prevent the linker removing the code, but not actually execute the code
             if (falseflag)
             {
-                // Dummy variables required for it to work on iDevices ** DO NOT DELETE ** 
+                // Dummy variables required for it to work on iDevices ** DO NOT DELETE **
                 // This forces the classes not to be optimized out when deploying to iDevices
                 var hByteReader = new ByteReader();
                 var hSByteReader = new SByteReader();
@@ -152,7 +152,7 @@ namespace Microsoft.Xna.Framework.Content
                                 catch (TargetInvocationException ex)
                                 {
                                     // If you are getting here, the Mono runtime is most likely not able to JIT the type.
-                                    // In particular, MonoTouch needs help instantiating types that are only defined in strings in Xnb files. 
+                                    // In particular, MonoTouch needs help instantiating types that are only defined in strings in Xnb files.
                                     throw new InvalidOperationException(
                                         "Failed to get default constructor for ContentTypeReader. To work around, add a creation function to ContentTypeReaderManager.AddTypeCreator() " +
                                         "with the following failed type string: " + originalReaderTypeString, ex);
@@ -198,7 +198,7 @@ namespace Microsoft.Xna.Framework.Content
         /// </summary>
         /// <remarks>
         /// Supports multiple generic types (e.g. Dictionary&lt;TKey,TValue&gt;) and nested generic types (e.g. List&lt;List&lt;int&gt;&gt;).
-        /// </remarks> 
+        /// </remarks>
         /// <param name="type">
         /// A <see cref="System.String"/>
         /// </param>
