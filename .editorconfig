@@ -10,3 +10,8 @@ trim_trailing_whitespace = true
 [*.cs]
 indent_style = space
 indent_size = 4
+csharp_style_namespace_declarations = block_scoped:suggestion
+insert_final_newline = true
+trim_trailing_whitespace = true
+# ReSharper properties
+resharper_indent_inside_namespace = true

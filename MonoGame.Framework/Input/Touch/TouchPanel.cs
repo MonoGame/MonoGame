@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright (C) 2009-2010 The XnaTouch Team
+// XnaTouch - Copyright © 2009-2010 The XnaTouch Team
 //
 // All rights reserved.
 // 
@@ -161,6 +161,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// Gets or sets if high-frequency events are sent to any listeners (if the underlying OS supports it).
         /// By default, it's <see langword="false"/> and hence no additional CPU usage is incurred.
+        /// This is currently supported on iOS (including support for Apple Pencil) and Android (tablets/phones).
         /// </summary>
         public static bool EnableHighFrequencyTouch
         {
