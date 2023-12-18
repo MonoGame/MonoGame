@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework
 
         protected TimeSpan _inactiveSleepTime = TimeSpan.FromMilliseconds(20.0);
         protected bool _needsToResetElapsedTime = false;
+        bool ignoredInitialActivation = false;
         bool disposed;
         protected bool InFullScreenMode = false;
         protected bool IsDisposed { get { return disposed; } }
@@ -60,7 +61,14 @@ namespace Microsoft.Xna.Framework
             get { return _isActive; }
             internal set
             {
-                if (_isActive != value)
+                if (!ignoredInitialActivation)
+                {
+                    ignoredInitialActivation = true;
+
+                    _isActive = false;
+                    EventHelpers.Raise(this, _isActive ? Activated : Deactivated, EventArgs.Empty);
+                }
+                else if (_isActive != value)
                 {
                     _isActive = value;
                     EventHelpers.Raise(this, _isActive ? Activated : Deactivated, EventArgs.Empty);
