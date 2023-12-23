@@ -6,7 +6,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework
@@ -223,8 +222,8 @@ namespace Microsoft.Xna.Framework
             Sdl.Rectangle displayRect;
             Sdl.Display.GetBounds(displayIndex, out displayRect);
 
-            var changeFullscreenType = _hardwareSwitch != _game.graphicsDeviceManager.HardwareModeSwitch && IsFullScreen;
-            _hardwareSwitch = _game.graphicsDeviceManager.HardwareModeSwitch;
+            var changeFullscreenType = _hardwareSwitch != _game.GraphicsDeviceManager.HardwareModeSwitch && IsFullScreen;
+            _hardwareSwitch = _game.GraphicsDeviceManager.HardwareModeSwitch;
 
             // setting fullscreen to false before resizing if going windowed
             if (!_willBeFullScreen && IsFullScreen)
@@ -240,7 +239,7 @@ namespace Microsoft.Xna.Framework
                 Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", _willBeFullScreen && _hardwareSwitch ? "1" : "0");
             }
 
-            if (!_willBeFullScreen || _game.graphicsDeviceManager.HardwareModeSwitch)
+            if (!_willBeFullScreen || _game.GraphicsDeviceManager.HardwareModeSwitch)
             {
                 Sdl.Window.SetSize(Handle, clientWidth, clientHeight);
                 _width = clientWidth;

@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
-{ 
+{
     /// <summary>
     /// Represents the right-handed 4x4 floating point matrix, which can store translation, scale and rotation information.
     /// </summary>
@@ -270,9 +270,9 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         #region Private Members
-        private static Matrix identity = new Matrix(1f, 0f, 0f, 0f, 
-		                                            0f, 1f, 0f, 0f, 
-		                                            0f, 0f, 1f, 0f, 
+        private static Matrix identity = new Matrix(1f, 0f, 0f, 0f,
+		                                            0f, 1f, 0f, 0f,
+		                                            0f, 0f, 1f, 0f,
 		                                            0f, 0f, 0f, 1f);
         #endregion
 
@@ -866,6 +866,20 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
         /// </summary>
+        /// <param name="viewingVolume">The viewing volume.</param>
+        /// <param name="zNearPlane">Depth of the near plane.</param>
+        /// <param name="zFarPlane">Depth of the far plane.</param>
+        /// <returns>The new projection <see cref="Matrix"/> for customized orthographic view.</returns>
+        public static Matrix CreateOrthographicOffCenter(RectangleF viewingVolume, float zNearPlane, float zFarPlane)
+        {
+            Matrix matrix;
+            CreateOrthographicOffCenter(viewingVolume.Left, viewingVolume.Right, viewingVolume.Bottom, viewingVolume.Top, zNearPlane, zFarPlane, out matrix);
+            return matrix;
+        }
+
+        /// <summary>
+        /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
+        /// </summary>
         /// <param name="left">Lower x-value at the near plane.</param>
         /// <param name="right">Upper x-value at the near plane.</param>
         /// <param name="bottom">Lower y-coordinate at the near plane.</param>
@@ -936,7 +950,7 @@ namespace Microsoft.Xna.Framework
             result.M11 = (2.0f * nearPlaneDistance) / width;
             result.M12 = result.M13 = result.M14 = 0.0f;
             result.M22 = (2.0f * nearPlaneDistance) / height;
-            result.M21 = result.M23 = result.M24 = 0.0f;            
+            result.M21 = result.M23 = result.M24 = 0.0f;
             result.M33 = negFarRange;
             result.M31 = result.M32 = 0.0f;
             result.M34 = -1.0f;
@@ -994,7 +1008,7 @@ namespace Microsoft.Xna.Framework
             result.M12 = result.M13 = result.M14 = 0.0f;
             result.M22 = yScale;
             result.M21 = result.M23 = result.M24 = 0.0f;
-            result.M31 = result.M32 = 0.0f;            
+            result.M31 = result.M32 = 0.0f;
             result.M33 = negFarRange;
             result.M34 = -1.0f;
             result.M41 = result.M42 = result.M44 = 0.0f;
@@ -1091,7 +1105,7 @@ namespace Microsoft.Xna.Framework
 
 			var val1 = MathF.Cos(radians);
 			var val2 = MathF.Sin(radians);
-			
+
             result.M22 = val1;
             result.M23 = val2;
             result.M32 = -val2;
@@ -1121,7 +1135,7 @@ namespace Microsoft.Xna.Framework
 
             var val1 = MathF.Cos(radians);
 			var val2 = MathF.Sin(radians);
-			
+
             result.M11 = val1;
             result.M13 = -val2;
             result.M31 = val2;
@@ -1151,7 +1165,7 @@ namespace Microsoft.Xna.Framework
 
 			var val1 = MathF.Cos(radians);
 			var val2 = MathF.Sin(radians);
-			
+
             result.M11 = val1;
             result.M12 = val2;
             result.M21 = -val2;
@@ -1260,7 +1274,7 @@ namespace Microsoft.Xna.Framework
 
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> that flattens geometry into a specified <see cref="Plane"/> as if casting a shadow from a specified light source. 
+        /// Creates a new <see cref="Matrix"/> that flattens geometry into a specified <see cref="Plane"/> as if casting a shadow from a specified light source.
         /// </summary>
         /// <param name="lightDirection">A vector specifying the direction from which the light that will cast the shadow is coming.</param>
         /// <param name="plane">The plane onto which the new matrix should flatten geometry so as to cast a shadow.</param>
@@ -1274,7 +1288,7 @@ namespace Microsoft.Xna.Framework
 
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> that flattens geometry into a specified <see cref="Plane"/> as if casting a shadow from a specified light source. 
+        /// Creates a new <see cref="Matrix"/> that flattens geometry into a specified <see cref="Plane"/> as if casting a shadow from a specified light source.
         /// </summary>
         /// <param name="lightDirection">A vector specifying the direction from which the light that will cast the shadow is coming.</param>
         /// <param name="plane">The plane onto which the new matrix should flatten geometry so as to cast a shadow.</param>
@@ -1294,17 +1308,17 @@ namespace Microsoft.Xna.Framework
             result.M21 = y * lightDirection.X;
             result.M22 = (y * lightDirection.Y) + dot;
             result.M23 = y * lightDirection.Z;
-            result.M24 = 0;            
+            result.M24 = 0;
             result.M31 = z * lightDirection.X;
             result.M32 = z * lightDirection.Y;
             result.M33 = (z * lightDirection.Z) + dot;
-            result.M34 = 0;            
+            result.M34 = 0;
             result.M41 = d * lightDirection.X;
             result.M42 = d * lightDirection.Y;
             result.M43 = d * lightDirection.Z;
             result.M44 = dot;
         }
-        
+
         /// <summary>
         /// Creates a new translation <see cref="Matrix"/>.
         /// </summary>
@@ -1382,7 +1396,7 @@ namespace Microsoft.Xna.Framework
 			result.M43 = zPosition;
 			result.M44 = 1;
         }
-        
+
         /// <summary>
         /// Creates a new reflection <see cref="Matrix"/>.
         /// </summary>
@@ -1456,8 +1470,8 @@ namespace Microsoft.Xna.Framework
                         Vector3.Cross(ref forward, ref up, out x);
                         Vector3.Cross(ref x, ref forward, out y);
                         x.Normalize();
-                        y.Normalize();            
-                        
+                        y.Normalize();
+
                         result = new Matrix();
                         result.Right = x;
                         result.Up = y;
@@ -1500,7 +1514,7 @@ namespace Microsoft.Xna.Framework
 
             rotation = Quaternion.CreateFromRotationMatrix(m1);
             return true;
-        }	
+        }
 
 		/// <summary>
         /// Returns a determinant of this <see cref="Matrix"/>.
@@ -1678,7 +1692,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains inversion of the specified matrix. 
+        /// Creates a new <see cref="Matrix"/> which contains inversion of the specified matrix.
         /// </summary>
         /// <param name="matrix">Source <see cref="Matrix"/>.</param>
         /// <returns>The inverted matrix.</returns>
@@ -1690,7 +1704,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains inversion of the specified matrix. 
+        /// Creates a new <see cref="Matrix"/> which contains inversion of the specified matrix.
         /// </summary>
         /// <param name="matrix">Source <see cref="Matrix"/>.</param>
         /// <param name="result">The inverted matrix as output parameter.</param>
@@ -1723,7 +1737,7 @@ namespace Microsoft.Xna.Framework
 			float num25 = (float) ((double) num5 * (double) num18 - (double) num6 * (double) num20 + (double) num8 * (double) num22);
 			float num26 = (float) -((double) num5 * (double) num19 - (double) num6 * (double) num21 + (double) num7 * (double) num22);
 			float num27 = (float) (1.0 / ((double) num1 * (double) num23 + (double) num2 * (double) num24 + (double) num3 * (double) num25 + (double) num4 * (double) num26));
-			
+
 			result.M11 = num23 * num27;
 			result.M21 = num24 * num27;
 			result.M31 = num25 * num27;
@@ -1752,27 +1766,27 @@ namespace Microsoft.Xna.Framework
 			result.M24 = (float) ((double) num1 * (double) num34 - (double) num3 * (double) num37 + (double) num4 * (double) num38) * num27;
 			result.M34 = (float) -((double) num1 * (double) num35 - (double) num2 * (double) num37 + (double) num4 * (double) num39) * num27;
 			result.M44 = (float) ((double) num1 * (double) num36 - (double) num2 * (double) num38 + (double) num3 * (double) num39) * num27;
-			
-			
+
+
 			/*
-			
-			
+
+
             ///
             // Use Laplace expansion theorem to calculate the inverse of a 4x4 matrix
-            // 
-            // 1. Calculate the 2x2 determinants needed the 4x4 determinant based on the 2x2 determinants 
+            //
+            // 1. Calculate the 2x2 determinants needed the 4x4 determinant based on the 2x2 determinants
             // 3. Create the adjugate matrix, which satisfies: A * adj(A) = det(A) * I
             // 4. Divide adjugate matrix with the determinant to find the inverse
-            
+
             float det1, det2, det3, det4, det5, det6, det7, det8, det9, det10, det11, det12;
             float detMatrix;
-            FindDeterminants(ref matrix, out detMatrix, out det1, out det2, out det3, out det4, out det5, out det6, 
+            FindDeterminants(ref matrix, out detMatrix, out det1, out det2, out det3, out det4, out det5, out det6,
                              out det7, out det8, out det9, out det10, out det11, out det12);
-            
+
             float invDetMatrix = 1f / detMatrix;
-            
+
             Matrix ret; // Allow for matrix and result to point to the same structure
-            
+
             ret.M11 = (matrix.M22*det12 - matrix.M23*det11 + matrix.M24*det10) * invDetMatrix;
             ret.M12 = (-matrix.M12*det12 + matrix.M13*det11 - matrix.M14*det10) * invDetMatrix;
             ret.M13 = (matrix.M42*det6 - matrix.M43*det5 + matrix.M44*det4) * invDetMatrix;
@@ -1789,7 +1803,7 @@ namespace Microsoft.Xna.Framework
             ret.M42 = (matrix.M11*det10 - matrix.M12*det8 + matrix.M13*det7) * invDetMatrix;
             ret.M43 = (-matrix.M41*det4 + matrix.M42*det2 - matrix.M43*det1) * invDetMatrix;
             ret.M44 = (matrix.M31*det4 - matrix.M32*det2 + matrix.M33*det1) * invDetMatrix;
-            
+
             result = ret;
             */
         }
@@ -2177,7 +2191,7 @@ namespace Microsoft.Xna.Framework
                 matrix1.M41 == matrix2.M41 &&
                 matrix1.M42 == matrix2.M42 &&
                 matrix1.M43 == matrix2.M43 &&
-                matrix1.M44 == matrix2.M44                  
+                matrix1.M44 == matrix2.M44
                 );
         }
 
@@ -2201,11 +2215,11 @@ namespace Microsoft.Xna.Framework
                 matrix1.M31 != matrix2.M31 ||
                 matrix1.M32 != matrix2.M32 ||
                 matrix1.M33 != matrix2.M33 ||
-                matrix1.M34 != matrix2.M34 || 
+                matrix1.M34 != matrix2.M34 ||
                 matrix1.M41 != matrix2.M41 ||
                 matrix1.M42 != matrix2.M42 ||
                 matrix1.M43 != matrix2.M43 ||
-                matrix1.M44 != matrix2.M44                  
+                matrix1.M44 != matrix2.M44
                 );
         }
 
@@ -2441,7 +2455,7 @@ namespace Microsoft.Xna.Framework
         public static void Transpose(ref Matrix matrix, out Matrix result)
         {
             Matrix ret;
-            
+
             ret.M11 = matrix.M11;
             ret.M12 = matrix.M21;
             ret.M13 = matrix.M31;
@@ -2461,7 +2475,7 @@ namespace Microsoft.Xna.Framework
             ret.M42 = matrix.M24;
             ret.M43 = matrix.M34;
             ret.M44 = matrix.M44;
-            
+
             result = ret;
         }
 
@@ -2482,10 +2496,10 @@ namespace Microsoft.Xna.Framework
         #region Private Static Methods
 
         /// <summary>
-        /// Helper method for using the Laplace expansion theorem using two rows expansions to calculate major and 
+        /// Helper method for using the Laplace expansion theorem using two rows expansions to calculate major and
         /// minor determinants of a 4x4 matrix. This method is used for inverting a matrix.
         /// </summary>
-        private static void FindDeterminants(ref Matrix matrix, out float major, 
+        private static void FindDeterminants(ref Matrix matrix, out float major,
                                              out float minor1, out float minor2, out float minor3, out float minor4, out float minor5, out float minor6,
                                              out float minor7, out float minor8, out float minor9, out float minor10, out float minor11, out float minor12)
         {
@@ -2501,7 +2515,7 @@ namespace Microsoft.Xna.Framework
                 double det10 = (double)matrix.M32 * (double)matrix.M43 - (double)matrix.M33 * (double)matrix.M42;
                 double det11 = (double)matrix.M32 * (double)matrix.M44 - (double)matrix.M34 * (double)matrix.M42;
                 double det12 = (double)matrix.M33 * (double)matrix.M44 - (double)matrix.M34 * (double)matrix.M43;
-                
+
                 major = (float)(det1*det12 - det2*det11 + det3*det10 + det4*det9 - det5*det8 + det6*det7);
                 minor1 = (float)det1;
                 minor2 = (float)det2;
@@ -2516,7 +2530,7 @@ namespace Microsoft.Xna.Framework
                 minor11 = (float)det11;
                 minor12 = (float)det12;
         }
-		
+
         #endregion
     }
 }

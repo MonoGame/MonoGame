@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Used to initialize and control the presentation of the graphics device.
     /// </summary>
-    public partial class GraphicsDeviceManager : IGraphicsDeviceService, IDisposable, IGraphicsDeviceManager
+    internal partial class GraphicsDeviceManager : IDisposable, IGraphicsDeviceManager
     {
         private readonly Game _game;
         private GraphicsDevice _graphicsDevice;
@@ -54,17 +54,14 @@ namespace Microsoft.Xna.Framework
         /// <param name="game">The game instance to attach.</param>
         public GraphicsDeviceManager(Game game)
         {
-            if (game == null)
-                throw new ArgumentNullException("game", "Game cannot be null.");
-
-            _game = game;
+            _game = game ?? throw new ArgumentNullException(nameof(game), "Game cannot be null.");
 
             _supportedOrientations = DisplayOrientation.Default;
             _preferredBackBufferFormat = SurfaceFormat.Color;
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
-            // Assume the window client size as the default back 
+            // Assume the window client size as the default back
             // buffer resolution in the landscape orientation.
             var clientBounds = _game.Window.ClientBounds;
             if (clientBounds.Width >= clientBounds.Height)
@@ -85,15 +82,8 @@ namespace Microsoft.Xna.Framework
             // to reach unless changed.  So lets mimic that without the manifest bit.
             GraphicsProfile = GraphicsProfile.Reach;
 
-            // Let the plaform optionally overload construction defaults.
+            // Let the platform optionally overload construction defaults.
             PlatformConstruct();
-
-            if (_game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
-                throw new ArgumentException("A graphics device manager is already registered.  The graphics device manager cannot be changed once it is set.");
-            _game.graphicsDeviceManager = this;
-
-            _game.Services.AddService(typeof(IGraphicsDeviceManager), this);
-            _game.Services.AddService(typeof(IGraphicsDeviceService), this);
         }
 
         ~GraphicsDeviceManager()
@@ -101,7 +91,7 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
-        private void CreateDevice()
+        public void CreateDevice()
         {
             if (_graphicsDevice != null)
                 return;
@@ -142,11 +132,6 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationChanged += OnPresentationChanged;
 
             OnDeviceCreated(EventArgs.Empty);
-        }
-
-        void IGraphicsDeviceManager.CreateDevice()
-        {
-            CreateDevice();
         }
 
         public bool BeginDraw()
@@ -419,6 +404,13 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <inheritdoc />
+        public bool AllowResize
+        {
+            get => _game.Window.AllowUserResizing;
+            set => _game.Window.AllowUserResizing = value;
+        }
+
         /// <summary>
         /// Returns the graphics device for this manager.
         /// </summary>
@@ -446,6 +438,27 @@ namespace Microsoft.Xna.Framework
                 _shouldApplyChanges = true;
                 _wantFullScreen = value;
             }
+        }
+
+        /// <inheritdoc />
+        public bool IsMouseVisible
+        {
+            get => _game.IsMouseVisible;
+            set => _game.IsMouseVisible = value;
+        }
+
+        /// <inheritdoc />
+        public bool IsFixedTimeStep
+        {
+            get => _game.IsFixedTimeStep;
+            set => _game.IsFixedTimeStep = value;
+        }
+
+        /// <inheritdoc />
+        public TimeSpan TargetElapsedTime
+        {
+            get => _game.TargetElapsedTime;
+            set => _game.TargetElapsedTime = value;
         }
 
         /// <summary>

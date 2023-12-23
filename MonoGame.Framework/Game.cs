@@ -3,8 +3,12 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Xml.Linq;
+
 #if WINDOWS_UAP
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
@@ -23,13 +27,11 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public partial class Game : IDisposable
     {
-        private GameComponentCollection _components;
-        private GameServiceContainer _services;
-        private ContentManager _content;
-        internal GamePlatform Platform;
+        private GameComponentCollection _components = [];
+        private GraphicsDeviceManager _graphicsDeviceManager;
 
-        private SortingFilteringCollection<IDrawable> _drawables =
-            new SortingFilteringCollection<IDrawable>(
+        private readonly SortingFilteringCollection<IDrawable> _drawableComponents =
+            new(
                 d => d.Visible,
                 (d, handler) => d.VisibleChanged += handler,
                 (d, handler) => d.VisibleChanged -= handler,
@@ -37,17 +39,14 @@ namespace Microsoft.Xna.Framework
                 (d, handler) => d.DrawOrderChanged += handler,
                 (d, handler) => d.DrawOrderChanged -= handler);
 
-        private SortingFilteringCollection<IUpdateable> _updateables =
-            new SortingFilteringCollection<IUpdateable>(
+        private readonly SortingFilteringCollection<IUpdatable> _updatableComponents =
+            new(
                 u => u.Enabled,
                 (u, handler) => u.EnabledChanged += handler,
                 (u, handler) => u.EnabledChanged -= handler,
                 (u1, u2) => Comparer<int>.Default.Compare(u1.UpdateOrder, u2.UpdateOrder),
                 (u, handler) => u.UpdateOrderChanged += handler,
                 (u, handler) => u.UpdateOrderChanged -= handler);
-
-        private IGraphicsDeviceManager _graphicsDeviceManager;
-        private IGraphicsDeviceService _graphicsDeviceService;
 
         private bool _initialized = false;
         private bool _isFixedTimeStep = true;
@@ -60,6 +59,9 @@ namespace Microsoft.Xna.Framework
         private bool _shouldExit;
         private bool _suppressDraw;
 
+        internal GamePlatform Platform { get; private set; }
+        public IGraphicsDeviceManager GraphicsDeviceManager => _graphicsDeviceManager;
+
         partial void PlatformConstruct();
 
         /// <summary>
@@ -67,24 +69,17 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public Game()
         {
-            _instance = this;
-
-            LaunchParameters = new LaunchParameters();
-            _services = new GameServiceContainer();
-            _components = new GameComponentCollection();
-            _content = new ContentManager(_services);
-
             Platform = GamePlatform.PlatformCreate(this);
             Platform.Activated += OnActivated;
             Platform.Deactivated += OnDeactivated;
-            _services.AddService(typeof(GamePlatform), Platform);
+
+            _graphicsDeviceManager = new GraphicsDeviceManager(this);
 
             // Calling Update() for first time initializes some systems
             FrameworkDispatcher.Update();
 
             // Allow some optional per-platform construction to occur too.
             PlatformConstruct();
-
         }
 
         ~Game()
@@ -95,7 +90,8 @@ namespace Microsoft.Xna.Framework
 		[System.Diagnostics.Conditional("DEBUG")]
 		internal void Log(string Message)
 		{
-			if (Platform != null) Platform.Log(Message);
+			if (Platform != null)
+                Platform.Log(Message);
 		}
 
         #region IDisposable Implementation
@@ -117,21 +113,14 @@ namespace Microsoft.Xna.Framework
                     // Dispose loaded game components
                     for (int i = 0; i < _components.Count; i++)
                     {
-                        var disposable = _components[i] as IDisposable;
-                        if (disposable != null)
+                        if (_components[i] is IDisposable disposable)
                             disposable.Dispose();
                     }
                     _components = null;
 
-                    if (_content != null)
-                    {
-                        _content.Dispose();
-                        _content = null;
-                    }
-
                     if (_graphicsDeviceManager != null)
                     {
-                        (_graphicsDeviceManager as GraphicsDeviceManager).Dispose();
+                        _graphicsDeviceManager.Dispose();
                         _graphicsDeviceManager = null;
                     }
 
@@ -139,7 +128,6 @@ namespace Microsoft.Xna.Framework
                     {
                         Platform.Activated -= OnActivated;
                         Platform.Deactivated -= OnDeactivated;
-                        _services.RemoveService(typeof(GamePlatform));
 
                         Platform.Dispose();
                         Platform = null;
@@ -154,7 +142,6 @@ namespace Microsoft.Xna.Framework
                 Activity = null;
 #endif
                 _isDisposed = true;
-                _instance = null;
             }
         }
 
@@ -177,13 +164,11 @@ namespace Microsoft.Xna.Framework
         [CLSCompliant(false)]
         public static AndroidGameActivity Activity { get; internal set; }
 #endif
-        private static Game _instance = null;
-        internal static Game Instance { get { return Game._instance; } }
 
         /// <summary>
         /// The start up parameters for this <see cref="Game"/>.
         /// </summary>
-        public LaunchParameters LaunchParameters { get; private set; }
+        public LaunchParameters LaunchParameters { get; } = new LaunchParameters();
 
         /// <summary>
         /// A collection of game components attached to this <see cref="Game"/>.
@@ -217,7 +202,7 @@ namespace Microsoft.Xna.Framework
                 if (value < TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
                         "The time must be positive.");
-                
+
                 if (value < _targetElapsedTime)
                     throw new ArgumentOutOfRangeException(
                         "The time must be at least TargetElapsedTime");
@@ -275,7 +260,7 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// Indicates if this game is running with a fixed time between frames.
-        /// 
+        ///
         /// When set to <code>true</code> the target time between frames is
         /// given by <see cref="TargetElapsedTime"/>.
         /// </summary>
@@ -286,50 +271,12 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Get a container holding service providers attached to this <see cref="Game"/>.
-        /// </summary>
-        public GameServiceContainer Services {
-            get { return _services; }
-        }
-
-
-        /// <summary>
-        /// The <see cref="ContentManager"/> of this <see cref="Game"/>.
-        /// </summary>
-        /// <exception cref="ArgumentNullException">If Content is set to <code>null</code>.</exception>
-        public ContentManager Content
-        {
-            get { return _content; }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException();
-
-                _content = value;
-            }
-        }
-
-        /// <summary>
         /// Gets the <see cref="GraphicsDevice"/> used for rendering by this <see cref="Game"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// There is no <see cref="Graphics.GraphicsDevice"/> attached to this <see cref="Game"/>.
         /// </exception>
-        public GraphicsDevice GraphicsDevice
-        {
-            get
-            {
-                if (_graphicsDeviceService == null)
-                {
-                    _graphicsDeviceService = (IGraphicsDeviceService)
-                        Services.GetService(typeof(IGraphicsDeviceService));
-
-                    if (_graphicsDeviceService == null)
-                        throw new InvalidOperationException("No Graphics Device Service");
-                }
-                return _graphicsDeviceService.GraphicsDevice;
-            }
-        }
+        public GraphicsDevice GraphicsDevice => GraphicsDeviceManager.GraphicsDevice;
 
         /// <summary>
         /// The system window that this game is displayed on.
@@ -422,7 +369,7 @@ namespace Microsoft.Xna.Framework
         {
             _suppressDraw = true;
         }
-        
+
         /// <summary>
         /// Run the game for one frame, then exit.
         /// </summary>
@@ -441,7 +388,7 @@ namespace Microsoft.Xna.Framework
                 _initialized = true;
             }
 
-            BeginRun();            
+            BeginRun();
 
             //Not quite right..
             Tick ();
@@ -500,9 +447,9 @@ namespace Microsoft.Xna.Framework
         }
 
         private TimeSpan _accumulatedElapsedTime;
-        private readonly GameTime _gameTime = new GameTime();
+        private readonly GameTime _gameTime = new();
         private Stopwatch _gameTimer;
-        private long _previousTicks = 0;
+        private long _previousTicks;
         private int _updateFrameLag;
 #if WINDOWS_UAP
         private readonly object _locker = new object();
@@ -512,15 +459,15 @@ namespace Microsoft.Xna.Framework
         /// Run one iteration of the game loop.
         ///
         /// Makes at least one call to <see cref="Update"/>
-        /// and exactly one call to <see cref="Draw"/> if drawing is not supressed.
+        /// and exactly one call to <see cref="Draw"/> if drawing is not suppressed.
         /// When <see cref="IsFixedTimeStep"/> is set to <code>false</code> this will
         /// make exactly one call to <see cref="Update"/>.
         /// </summary>
         public void Tick()
         {
             // NOTE: This code is very sensitive and can break very badly
-            // with even what looks like a safe change.  Be sure to test 
-            // any change fully in both the fixed and variable timestep 
+            // with even what looks like a safe change.  Be sure to test
+            // any change fully in both the fixed and variable timestep
             // modes across multiple devices and platforms.
 
         RetryTick:
@@ -682,7 +629,7 @@ namespace Microsoft.Xna.Framework
         {
             // TODO: This should be removed once all platforms use the new GraphicsDeviceManager
 #if !(WINDOWS && DIRECTX)
-            applyChanges(graphicsDeviceManager);
+            applyChanges(GraphicsDeviceManager);
 #endif
 
             // According to the information given on MSDN (see link below), all
@@ -692,14 +639,8 @@ namespace Microsoft.Xna.Framework
             // Initialize all existing components
             InitializeExistingComponents();
 
-            _graphicsDeviceService = (IGraphicsDeviceService)
-                Services.GetService(typeof(IGraphicsDeviceService));
-
-            if (_graphicsDeviceService != null &&
-                _graphicsDeviceService.GraphicsDevice != null)
-            {
+            if (GraphicsDevice != null)
                 LoadContent();
-            }
         }
 
         private static readonly Action<IDrawable, GameTime> DrawAction =
@@ -715,10 +656,10 @@ namespace Microsoft.Xna.Framework
         protected virtual void Draw(GameTime gameTime)
         {
 
-            _drawables.ForEachFilteredItem(DrawAction, gameTime);
+            _drawableComponents.ForEachFilteredItem(DrawAction, gameTime);
         }
 
-        private static readonly Action<IUpdateable, GameTime> UpdateAction =
+        private static readonly Action<IUpdatable, GameTime> UpdateAction =
             (updateable, gameTime) => updateable.Update(gameTime);
 
         /// <summary>
@@ -730,7 +671,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="gameTime">The elapsed time since the last call to <see cref="Update"/>.</param>
         protected virtual void Update(GameTime gameTime)
         {
-            _updateables.ForEachFilteredItem(UpdateAction, gameTime);
+            _updatableComponents.ForEachFilteredItem(UpdateAction, gameTime);
 		}
 
         /// <summary>
@@ -742,7 +683,7 @@ namespace Microsoft.Xna.Framework
         {
             EventHelpers.Raise(sender, Exiting, args);
         }
-		
+
         /// <summary>
         /// Called when the game gains focus. Raises the <see cref="Activated"/> event.
         /// </summary>
@@ -753,7 +694,7 @@ namespace Microsoft.Xna.Framework
 			AssertNotDisposed();
             EventHelpers.Raise(sender, Activated, args);
 		}
-		
+
         /// <summary>
         /// Called when the game loses focus. Raises the <see cref="Deactivated"/> event.
         /// </summary>
@@ -803,7 +744,7 @@ namespace Microsoft.Xna.Framework
         //        be added by third parties without changing MonoGame itself.
 
 #if !(WINDOWS && DIRECTX)
-        internal void applyChanges(GraphicsDeviceManager manager)
+        internal void applyChanges(IGraphicsDeviceManager manager)
         {
 			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
 
@@ -826,7 +767,7 @@ namespace Microsoft.Xna.Framework
             if (Platform.BeforeUpdate(gameTime))
             {
                 FrameworkDispatcher.Update();
-				
+
                 Update(gameTime);
 
                 //The TouchPanel needs to know the time for when touches arrive
@@ -850,7 +791,7 @@ namespace Microsoft.Xna.Framework
         internal void DoInitialize()
         {
             AssertNotDisposed();
-            if (GraphicsDevice == null && graphicsDeviceManager != null)
+            if (GraphicsDevice == null && _graphicsDeviceManager != null)
                 _graphicsDeviceManager.CreateDevice();
 
             Platform.BeforeInitialize();
@@ -860,7 +801,7 @@ namespace Microsoft.Xna.Framework
             // 1. Categorize components into IUpdateable and IDrawable lists.
             // 2. Subscribe to Added/Removed events to keep the categorized
             //    lists synced and to Initialize future components as they are
-            //    added.            
+            //    added.
             CategorizeComponents();
             _components.ComponentAdded += Components_ComponentAdded;
             _components.ComponentRemoved += Components_ComponentRemoved;
@@ -873,25 +814,6 @@ namespace Microsoft.Xna.Framework
 		}
 
         #endregion Internal Methods
-
-        internal GraphicsDeviceManager graphicsDeviceManager
-        {
-            get
-            {
-                if (_graphicsDeviceManager == null)
-                {
-                    _graphicsDeviceManager = (IGraphicsDeviceManager)
-                        Services.GetService(typeof(IGraphicsDeviceManager));
-                }
-                return (GraphicsDeviceManager)_graphicsDeviceManager;
-            }
-            set
-            {
-                if (_graphicsDeviceManager != null)
-                    throw new InvalidOperationException("GraphicsDeviceManager already registered for this Game object");
-                _graphicsDeviceManager = value;
-            }
-        }
 
         // NOTE: InitializeExistingComponents really should only be called once.
         //       Game.Initialize is the only method in a position to guarantee
@@ -915,26 +837,26 @@ namespace Microsoft.Xna.Framework
         //        opposite of CategorizeComponents.
         private void DecategorizeComponents()
         {
-            _updateables.Clear();
-            _drawables.Clear();
+            _updatableComponents.Clear();
+            _drawableComponents.Clear();
         }
 
         private void CategorizeComponent(IGameComponent component)
         {
-            if (component is IUpdateable)
-                _updateables.Add((IUpdateable)component);
-            if (component is IDrawable)
-                _drawables.Add((IDrawable)component);
+            if (component is IUpdatable updateable)
+                _updatableComponents.Add(updateable);
+            if (component is IDrawable drawable)
+                _drawableComponents.Add(drawable);
         }
 
         // FIXME: I am open to a better name for this method.  It does the
         //        opposite of CategorizeComponent.
         private void DecategorizeComponent(IGameComponent component)
         {
-            if (component is IUpdateable)
-                _updateables.Remove((IUpdateable)component);
-            if (component is IDrawable)
-                _drawables.Remove((IDrawable)component);
+            if (component is IUpdatable updateable)
+                _updatableComponents.Remove(updateable);
+            if (component is IDrawable drawable)
+                _drawableComponents.Remove(drawable);
         }
 
         /// <summary>
@@ -945,8 +867,8 @@ namespace Microsoft.Xna.Framework
         class SortingFilteringCollection<T> : ICollection<T>
         {
             private readonly List<T> _items;
-            private readonly List<AddJournalEntry<T>> _addJournal;
-            private readonly Comparison<AddJournalEntry<T>> _addJournalSortComparison;
+            private readonly List<AddJournalEntry> _addJournal;
+            private readonly Comparison<AddJournalEntry> _addJournalSortComparison;
             private readonly List<int> _removeJournal;
             private readonly List<T> _cachedFilteredItems;
             private bool _shouldRebuildCache;
@@ -967,7 +889,7 @@ namespace Microsoft.Xna.Framework
                 Action<T, EventHandler<EventArgs>> sortChangedUnsubscriber)
             {
                 _items = new List<T>();
-                _addJournal = new List<AddJournalEntry<T>>();
+                _addJournal = new List<AddJournalEntry>();
                 _removeJournal = new List<int>();
                 _cachedFilteredItems = new List<T>();
                 _shouldRebuildCache = true;
@@ -982,7 +904,7 @@ namespace Microsoft.Xna.Framework
                 _addJournalSortComparison = CompareAddJournalEntry;
             }
 
-            private int CompareAddJournalEntry(AddJournalEntry<T> x, AddJournalEntry<T> y)
+            private int CompareAddJournalEntry(AddJournalEntry x, AddJournalEntry y)
             {
                 int result = _sort(x.Item, y.Item);
                 if (result != 0)
@@ -1020,13 +942,13 @@ namespace Microsoft.Xna.Framework
             {
                 // NOTE: We subscribe to item events after items in _addJournal
                 //       have been merged.
-                _addJournal.Add(new AddJournalEntry<T>(_addJournal.Count, item));
+                _addJournal.Add(new AddJournalEntry(_addJournal.Count, item));
                 InvalidateCache();
             }
 
             public bool Remove(T item)
             {
-                if (_addJournal.Remove(AddJournalEntry<T>.CreateKey(item)))
+                if (_addJournal.Remove(AddJournalEntry.CreateKey(item)))
                     return true;
 
                 var index = _items.IndexOf(item);
@@ -1080,9 +1002,9 @@ namespace Microsoft.Xna.Framework
                 return _items.GetEnumerator();
             }
 
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            IEnumerator IEnumerable.GetEnumerator()
             {
-                return ((System.Collections.IEnumerable)_items).GetEnumerator();
+                return ((IEnumerable)_items).GetEnumerator();
             }
 
             private static readonly Comparison<int> RemoveJournalSortComparison =
@@ -1168,7 +1090,7 @@ namespace Microsoft.Xna.Framework
                 var item = (T)sender;
                 var index = _items.IndexOf(item);
 
-                _addJournal.Add(new AddJournalEntry<T>(_addJournal.Count, item));
+                _addJournal.Add(new AddJournalEntry(_addJournal.Count, item));
                 _removeJournal.Add(index);
 
                 // Until the item is back in place, we don't care about its
@@ -1176,35 +1098,29 @@ namespace Microsoft.Xna.Framework
                 UnsubscribeFromItemEvents(item);
                 InvalidateCache();
             }
-        }
 
-        private struct AddJournalEntry<T>
-        {
-            public readonly int Order;
-            public readonly T Item;
-
-            public AddJournalEntry(int order, T item)
+            private readonly struct AddJournalEntry(int order, T item)
             {
-                Order = order;
-                Item = item;
-            }
+                public readonly int Order = order;
+                public readonly T Item = item;
 
-            public static AddJournalEntry<T> CreateKey(T item)
-            {
-                return new AddJournalEntry<T>(-1, item);
-            }
+                public static AddJournalEntry CreateKey(T item)
+                {
+                    return new AddJournalEntry(-1, item);
+                }
 
-            public override int GetHashCode()
-            {
-                return Item.GetHashCode();
-            }
+                public override int GetHashCode()
+                {
+                    return Item.GetHashCode();
+                }
 
-            public override bool Equals(object obj)
-            {
-                if (!(obj is AddJournalEntry<T>))
-                    return false;
+                public override bool Equals(object obj)
+                {
+                    if (!(obj is AddJournalEntry))
+                        return false;
 
-                return object.Equals(Item, ((AddJournalEntry<T>)obj).Item);
+                    return object.Equals(Item, ((AddJournalEntry)obj).Item);
+                }
             }
         }
     }

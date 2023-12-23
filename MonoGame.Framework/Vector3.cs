@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework
 #endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public struct Vector3 : IEquatable<Vector3>
+    public struct Vector3 : IEquatable<Vector3>, IEquatableByRef<Vector3>
     {
         #region Private Fields
 
@@ -202,9 +202,9 @@ namespace Microsoft.Xna.Framework
             this.Y = value.Y;
             this.Z = z;
         }
-        
+
         #endregion
-        
+
         #region Public Methods
 
         /// <summary>
@@ -546,9 +546,17 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public bool Equals(Vector3 other)
         {
-            return  X == other.X && 
+            return  X == other.X &&
                     Y == other.Y &&
                     Z == other.Z;
+        }
+
+        /// <inheritdoc />
+        public bool Equals(ref Vector3 other)
+        {
+            return X.Equals(other.X) &&
+                   Y.Equals(other.Y) &&
+                   Z.Equals(other.Z);
         }
 
         /// <summary>
@@ -1182,7 +1190,7 @@ namespace Microsoft.Xna.Framework
 
             for (var i = 0; i < sourceArray.Length; i++)
             {
-                var position = sourceArray[i];                
+                var position = sourceArray[i];
                 destinationArray[i] =
                     new Vector3(
                         (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + matrix.M41,
@@ -1374,7 +1382,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value1"><see cref="Vector3"/> instance on the left of the not equal sign.</param>
         /// <param name="value2"><see cref="Vector3"/> instance on the right of the not equal sign.</param>
-        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
         public static bool operator !=(Vector3 value1, Vector3 value2)
         {
             return !(value1 == value2);

@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework
 #endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public struct Vector2 : IEquatable<Vector2>
+    public struct Vector2 : IEquatable<Vector2>, IEquatableByRef<Vector2>
     {
         #region Private Fields
 
@@ -253,7 +253,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value1"><see cref="Vector2"/> instance on the left of the not equal sign.</param>
         /// <param name="value2"><see cref="Vector2"/> instance on the right of the not equal sign.</param>
-        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
         public static bool operator !=(Vector2 value1, Vector2 value2)
         {
             return value1.X != value2.X || value1.Y != value2.Y;
@@ -558,6 +558,12 @@ namespace Microsoft.Xna.Framework
             return (X == other.X) && (Y == other.Y);
         }
 
+        /// <inheritdoc />
+        public bool Equals(ref Vector2 other)
+        {
+            return X.Equals(other.X) && Y.Equals(other.Y);
+        }
+
         /// <summary>
         /// Round the members of this <see cref="Vector2"/> towards negative infinity.
         /// </summary>
@@ -704,7 +710,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
         /// <param name="result">The result of linear interpolation of the specified vectors as an output parameter.</param>
         public static void LerpPrecise(ref Vector2 value1, ref Vector2 value2, float amount, out Vector2 result)
-        { 
+        {
             result.X = MathHelper.LerpPrecise(value1.X, value2.X, amount);
             result.Y = MathHelper.LerpPrecise(value1.Y, value2.Y, amount);
         }
@@ -1124,7 +1130,7 @@ namespace Microsoft.Xna.Framework
                 var destination = destinationArray[destinationIndex + x];
 
                 Vector2 v;
-                Transform(ref position,ref rotation,out v); 
+                Transform(ref position,ref rotation,out v);
 
                 destination.X = v.X;
                 destination.Y = v.Y;

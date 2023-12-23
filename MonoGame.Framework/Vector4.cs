@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework
 #endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public struct Vector4 : IEquatable<Vector4>
+    public struct Vector4 : IEquatable<Vector4>, IEquatableByRef<Vector4>
     {
         #region Private Fields
 
@@ -509,6 +509,15 @@ namespace Microsoft.Xna.Framework
                 && this.X == other.X
                 && this.Y == other.Y
                 && this.Z == other.Z;
+        }
+
+        /// <inheritdoc />
+        public bool Equals(ref Vector4 other)
+        {
+            return this.W.Equals(other.W)
+                   && this.X.Equals(other.X)
+                   && this.Y.Equals(other.Y)
+                   && this.Z.Equals(other.Z);
         }
 
         /// <summary>
@@ -1311,7 +1320,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value1"><see cref="Vector4"/> instance on the left of the not equal sign.</param>
         /// <param name="value2"><see cref="Vector4"/> instance on the right of the not equal sign.</param>
-        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
         public static bool operator !=(Vector4 value1, Vector4 value2)
         {
             return !(value1 == value2);

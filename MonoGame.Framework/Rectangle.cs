@@ -5,15 +5,16 @@
 using System;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Drawing;
 
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// Describes a 2D-rectangle. 
+    /// Describes a 2D-rectangle.
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public struct Rectangle : IEquatable<Rectangle>
+    public struct Rectangle : IEquatable<Rectangle>, IEquatableByRef<Rectangle>
     {
         #region Private Fields
 
@@ -230,7 +231,7 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         #region Public Methods
-       
+
         /// <summary>
         /// Gets whether or not the provided coordinates lie within the bounds of this <see cref="Rectangle"/>.
         /// </summary>
@@ -252,7 +253,7 @@ namespace Microsoft.Xna.Framework
         {
             return ((((this.X <= x) && (x < (this.X + this.Width))) && (this.Y <= y)) && (y < (this.Y + this.Height)));
         }
-		
+
         /// <summary>
         /// Gets whether or not the provided <see cref="Point"/> lies within the bounds of this <see cref="Rectangle"/>.
         /// </summary>
@@ -334,6 +335,17 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        ///     Indicates whether the current value or object is equal to another value or object of the same type by
+        ///     reference.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if the current value or object is equal to the <paramref name="other" /> parameter; otherwise,
+        ///     <c>false</c>.
+        /// </returns>
+        /// <param name="other">A value or object to compare with this value or object.</param>
+        public bool Equals(ref Rectangle other) => X == other.X && Y == other.Y && Width == other.Width && Height == other.Height;
+
+        /// <summary>
         /// Gets the hash code of this <see cref="Rectangle"/>.
         /// </summary>
         /// <returns>Hash code of this <see cref="Rectangle"/>.</returns>
@@ -351,7 +363,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Adjusts the edges of this <see cref="Rectangle"/> by specified horizontal and vertical amounts. 
+        /// Adjusts the edges of this <see cref="Rectangle"/> by specified horizontal and vertical amounts.
         /// </summary>
         /// <param name="horizontalAmount">Value to adjust the left and right edges.</param>
         /// <param name="verticalAmount">Value to adjust the top and bottom edges.</param>
@@ -364,7 +376,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Adjusts the edges of this <see cref="Rectangle"/> by specified horizontal and vertical amounts. 
+        /// Adjusts the edges of this <see cref="Rectangle"/> by specified horizontal and vertical amounts.
         /// </summary>
         /// <param name="horizontalAmount">Value to adjust the left and right edges.</param>
         /// <param name="verticalAmount">Value to adjust the top and bottom edges.</param>

@@ -13,14 +13,13 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public class GameServiceContainer : IServiceProvider
     {
-        Dictionary<Type, object> services;
+        private readonly Dictionary<Type, object> _services = new();
 
         /// <summary>
         /// Create an empty <see cref="GameServiceContainer"/>.
         /// </summary>
         public GameServiceContainer()
         {
-            services = new Dictionary<Type, object>();
         }
 
         /// <summary>
@@ -37,13 +36,15 @@ namespace Microsoft.Xna.Framework
         public void AddService(Type type, object provider)
         {
             if (type == null)
-                throw new ArgumentNullException("type");
+                throw new ArgumentNullException(nameof(type));
+
             if (provider == null)
-                throw new ArgumentNullException("provider");
+                throw new ArgumentNullException(nameof(provider));
+
             if (!ReflectionHelpers.IsAssignableFrom(type, provider))
                 throw new ArgumentException("The provider does not match the specified service type!");
 
-            services.Add(type, provider);
+            _services.Add(type, provider);
         }
 
         /// <summary>
@@ -58,13 +59,9 @@ namespace Microsoft.Xna.Framework
         public object GetService(Type type)
         {
             if (type == null)
-                throw new ArgumentNullException("type");
-						
-            object service;
-            if (services.TryGetValue(type, out service))
-                return service;
+                throw new ArgumentNullException(nameof(type));
 
-            return null;
+            return _services.GetValueOrDefault(type);
         }
 
         /// <summary>
@@ -77,9 +74,9 @@ namespace Microsoft.Xna.Framework
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            services.Remove(type);
+            _services.Remove(type);
         }
-        
+
         /// <summary>
         /// Add a service provider to this container.
         /// </summary>
@@ -101,13 +98,9 @@ namespace Microsoft.Xna.Framework
         /// A service provider of the specified type or <code>null</code> if
         /// no suitable service provider is registered in this container.
         /// </returns>
- 	public T GetService<T>() where T : class
+ 	    public T GetService<T>() where T : class
         {
             var service = GetService(typeof(T));
-
-            if (service == null)
-                return null;
-
             return (T)service;
         }
     }

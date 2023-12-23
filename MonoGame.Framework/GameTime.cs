@@ -67,6 +67,24 @@ namespace Microsoft.Xna.Framework
             ElapsedGameTime = elapsedRealTime;
 		    IsRunningSlowly = isRunningSlowly;
 		}
+
+        /// <summary>
+        ///     Returns the elapsed seconds.
+        /// </summary>
+        /// <returns>The amount of elapsed seconds.</returns>
+        public float GetElapsedSeconds()
+        {
+            return (float)ElapsedGameTime.TotalSeconds;
+        }
+
+        /// <summary>
+        ///     Returns the elapsed milliseconds.
+        /// </summary>
+        /// <returns>The amount of elapsed milliseconds.</returns>
+        public float GetElapsedMilliseconds()
+        {
+            return (float)ElapsedGameTime.TotalMilliseconds;
+        }
     }
 }
 
