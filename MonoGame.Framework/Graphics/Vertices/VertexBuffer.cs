@@ -195,7 +195,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("data");
 
             var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
-            var bufferSize = VertexCount * VertexDeclaration.VertexStride;
+            var bufferSize = (long)VertexCount * VertexDeclaration.VertexStride;
 
             if (vertexStride == 0)
                 vertexStride = elementSizeInBytes;
