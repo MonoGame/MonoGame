@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertexStride == 0)
                 vertexStride = elementSizeInBytes;
 
-            var vertexByteSize = VertexCount * VertexDeclaration.VertexStride;
+            var vertexByteSize = (long)VertexCount * VertexDeclaration.VertexStride;
             if (vertexStride > vertexByteSize)
                 throw new ArgumentOutOfRangeException("vertexStride", "Vertex stride can not be larger than the vertex buffer size.");
 
