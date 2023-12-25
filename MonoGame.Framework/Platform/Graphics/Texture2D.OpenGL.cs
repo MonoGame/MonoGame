@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Use try..finally to make sure dataHandle is freed in case of an error
             try
             {
-                var startBytes = startIndex * elementSizeInByte;
+                var startBytes = (long)startIndex * elementSizeInByte;
                 var dataPtr = new IntPtr(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
                 // Store the current bound texture.
                 var prevTexture = GraphicsExtensions.GetBoundTexture2D();
@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Use try..finally to make sure dataHandle is freed in case of an error
             try
             {
-                var startBytes = startIndex * elementSizeInByte;
+                var startBytes = (long)startIndex * elementSizeInByte;
                 var dataPtr = new IntPtr(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
                 // Store the current bound texture.

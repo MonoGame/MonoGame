@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Use try..finally to make sure dataHandle is freed in case of an error
             try
             {
-                var startBytes = startIndex * elementSizeInByte;
+                var startBytes = (long)startIndex * elementSizeInByte;
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
                 var region = new ResourceRegion();
                 region.Top = 0;
@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Use try..finally to make sure dataHandle is freed in case of an error
             try
             {
-                var startBytes = startIndex * elementSizeInByte;
+                var startBytes = (long)startIndex * elementSizeInByte;
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
                 var region = new ResourceRegion();
                 region.Top = rect.Top;

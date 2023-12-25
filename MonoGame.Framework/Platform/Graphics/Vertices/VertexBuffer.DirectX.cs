@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 try
                 {
-                    var startBytes = startIndex * TsizeInBytes;
+                    var startBytes = (long)startIndex * TsizeInBytes;
                     var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
                     lock (GraphicsDevice._d3dContext)
@@ -158,7 +158,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 try
                 {
-                    var startBytes = startIndex * elementSizeInBytes;
+                    var startBytes = (long)startIndex * elementSizeInBytes;
                     var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
                     var d3dContext = GraphicsDevice._d3dContext;

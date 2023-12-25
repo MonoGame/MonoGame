@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                     try
                     {
-                        var startBytes = startIndex * TsizeInBytes;
+                        var startBytes = (long)startIndex * TsizeInBytes;
                         var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
                         SharpDX.DataPointer DataPointer = new SharpDX.DataPointer(dataPtr, elementCount * TsizeInBytes);
 
@@ -136,7 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 try
                 {
-                    var startBytes = startIndex * elementSizeInBytes;
+                    var startBytes = (long)startIndex * elementSizeInBytes;
                     var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
                     var box = new SharpDX.DataBox(dataPtr, elementCount * elementSizeInBytes, 0);
