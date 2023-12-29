@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -40,6 +40,7 @@
     <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilter.cs" />
     <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilterMode.cs" />
     <Compile Include="..\..\MonoGame.Framework\Graphics\Vertices\VertexElementUsage.cs" />
+    <Compile Include="..\..\MonoGame.Framework\IEquatableByRef.cs" />
     <Compile Include="..\..\MonoGame.Framework\MathHelper.cs" />
     <Compile Include="..\..\MonoGame.Framework\Matrix.cs" />
     <Compile Include="..\..\MonoGame.Framework\Plane.cs" />
@@ -48,6 +49,7 @@
     <Compile Include="..\..\MonoGame.Framework\Quaternion.cs" />
     <Compile Include="..\..\MonoGame.Framework\Ray.cs" />
     <Compile Include="..\..\MonoGame.Framework\Rectangle.cs" />
+    <Compile Include="..\..\MonoGame.Framework\RectangleF.cs" />
     <Compile Include="..\..\MonoGame.Framework\Vector2.cs" />
     <Compile Include="..\..\MonoGame.Framework\Vector3.cs" />
     <Compile Include="..\..\MonoGame.Framework\Vector4.cs" />

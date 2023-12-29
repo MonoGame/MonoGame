@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,7 +13,7 @@ namespace MonoGame.Tests.ContentPipeline
     {
         class TestContentManager : ContentManager
         {
-            class FakeGraphicsService : IGraphicsDeviceService
+            class FakeGraphicsService : IGraphicsDeviceManager
             {
                 public GraphicsDevice GraphicsDevice { get; private set; }
 
@@ -22,13 +23,64 @@ namespace MonoGame.Tests.ContentPipeline
                 public event EventHandler<EventArgs> DeviceReset;
                 public event EventHandler<EventArgs> DeviceResetting;
 #pragma warning restore 67
+
+                /// <inheritdoc />
+                public GraphicsProfile GraphicsProfile { get; set; }
+
+                /// <inheritdoc />
+                public bool AllowResize { get; set; }
+
+                /// <inheritdoc />
+                public bool IsFullScreen { get; set; }
+
+                /// <inheritdoc />
+                public bool IsMouseVisible { get; set; }
+
+                /// <inheritdoc />
+                public bool IsFixedTimeStep { get; set; }
+
+                /// <inheritdoc />
+                public TimeSpan TargetElapsedTime { get; set; }
+
+                /// <inheritdoc />
+                public bool HardwareModeSwitch { get; set; }
+
+                /// <inheritdoc />
+                public bool PreferHalfPixelOffset { get; set; }
+
+                /// <inheritdoc />
+                public bool PreferMultiSampling { get; set; }
+
+                /// <inheritdoc />
+                public SurfaceFormat PreferredBackBufferFormat { get; set; }
+
+                /// <inheritdoc />
+                public int PreferredBackBufferHeight { get; set; }
+
+                /// <inheritdoc />
+                public int PreferredBackBufferWidth { get; set; }
+
+                /// <inheritdoc />
+                public DepthFormat PreferredDepthStencilFormat { get; set; }
+
+                /// <inheritdoc />
+                public bool SynchronizeWithVerticalRetrace { get; set; }
+
+                /// <inheritdoc />
+                public DisplayOrientation SupportedOrientations { get; set; }
+
+                /// <inheritdoc />
+                public void ApplyChanges()
+                {
+                    throw new NotImplementedException();
+                }
             }
 
             class FakeServiceProvider : IServiceProvider
             {
                 public object GetService(Type serviceType)
                 {
-                    if (serviceType == typeof(IGraphicsDeviceService))
+                    if (serviceType == typeof(IGraphicsDeviceManager))
                         return new FakeGraphicsService();
 
                     throw new NotImplementedException();
