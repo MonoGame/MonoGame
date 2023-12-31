@@ -15,17 +15,15 @@ It is an open-source re-implementation of the discontinued [Microsoft's XNA Fram
 
 ## Build Status
 
-We use [GitHub Actions](https://github.com/MonoGame/MonoGame/actions) to automate builds and packages distribution of the latest MonoGame changes. We also rely on a [build server](http://teamcity.monogame.net/?guest=1) to run tests in order to avoid regressions.  The table below shows the current build status for the ```develop``` branch.
+We use [GitHub Actions](https://github.com/MonoGame/MonoGame/actions) to automate builds and packages distribution of the latest MonoGame changes. We also rely on a [build server](http://teamcity.monogame.net/?guest=1) to run tests in order to avoid regressions. The table below shows the current build status for the ```develop``` branch.
 
-| Name                            | Status                                                                                                                                                                                         |
-|:------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Builds                          | [![Build](https://github.com/MonoGame/MonoGame/actions/workflows/main.yml/badge.svg?branch=develop)](https://github.com/MonoGame/MonoGame/actions/workflows/main.yml)                          |
-| Windows Tests                   | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_TestWindows/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_TestWindows&guest=1) |
-| Mac Tests                       | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_TestMac/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_TestMac&guest=1)         |
+| Name | Status |
+|:---- | ------ |
+| Builds | [![Build](https://github.com/MonoGame/MonoGame/actions/workflows/main.yml/badge.svg?branch=develop)](https://github.com/MonoGame/MonoGame/actions/workflows/main.yml) |
 
 ## Supported Platforms
 
-We support a growing list of platforms across the desktop, mobile, and console space.  If there is a platform we don't support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
+We support a growing list of platforms across the desktop, mobile, and console space. If there is a platform we don't support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
 
 * Desktop PCs
   * Windows 8.1 and up (OpenGL & DirectX)
@@ -44,9 +42,9 @@ We support a growing list of platforms across the desktop, mobile, and console s
 
 ## Support and Contributions
 
-If you think you have found a bug or have a feature request, use our [issue tracker](https://github.com/MonoGame/MonoGame/issues). Before opening a new issue, please search to see if your problem has already been reported.  Try to be as detailed as possible in your issue reports.
+If you think you have found a bug or have a feature request, use our [issue tracker](https://github.com/MonoGame/MonoGame/issues). Before opening a new issue, please search to see if your problem has already been reported. Try to be as detailed as possible in your issue reports.
 
-If you need help using MonoGame or have other questions we suggest you post on our [community forums](http://community.monogame.net).  Please do not use the GitHub issue tracker for personal support requests.
+If you need help using MonoGame or have other questions we suggest you post on our [community forums](http://community.monogame.net). Please do not use the GitHub issue tracker for personal support requests.
 
 If you are interested in contributing fixes or features to MonoGame, please read our [contributors guide](CONTRIBUTING.md) first.
 
@@ -92,4 +90,4 @@ A high level breakdown of the components of the framework:
 
 ## License
 
-The MonoGame project is under the [Microsoft Public License](https://opensource.org/licenses/MS-PL) except for a few portions of the code.  See the [LICENSE.txt](LICENSE.txt) file for more details.  Third-party libraries used by MonoGame are under their own licenses.  Please refer to those libraries for details on the license they use.
+The MonoGame project is under the [Microsoft Public License](https://opensource.org/licenses/MS-PL) except for a few portions of the code. See the [LICENSE.txt](LICENSE.txt) file for more details. Third-party libraries used by MonoGame are under their own licenses. Please refer to those libraries for details on the license they use.
