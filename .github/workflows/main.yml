@@ -11,7 +11,7 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
@@ -19,7 +19,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Setup Java
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
           java-version: '11'
@@ -66,17 +66,17 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     steps:
       - name: Download NuGet artifacts from Windows
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: nuget-windows-latest
           path: nuget-windows
       - name: Download NuGet artifacts from macOS
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: nuget-macos-latest
           path: nuget-macos
       - name: Download NuGet artifacts from Ubuntu
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: nuget-ubuntu-latest
           path: nuget-ubuntu
@@ -87,7 +87,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Download VS extension
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: Visual Studio Extension
           path: extension-win
