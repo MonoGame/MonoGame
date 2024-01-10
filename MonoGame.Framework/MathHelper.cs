@@ -322,41 +322,5 @@ namespace Microsoft.Xna.Framework
 	    {
 	         return (value > 0) && ((value & (value - 1)) == 0);
 	    }
-
-        /// <summary>
-        /// Rotates a vector by the specified number of radians
-        /// </summary>
-        /// <param name="value">The vector to be rotated.</param>
-        /// <param name="radians">The amount to rotate the vector.</param>
-        /// <returns>A rotated copy of value.</returns>
-        /// <remarks>
-        /// A positive value and negative value
-        /// would rotate counterclockwise and clockwise,
-        /// respectively
-        /// </remarks>
-        public static Vector2 RotateVector(Vector2 value, float radians)
-        {
-            float cos = MathF.Cos(radians);
-            float sin = MathF.Sin(radians);
-
-            return new Vector2(value.X * cos - value.Y * sin, value.X * sin + value.Y * cos);
-        }
-
-        /// <summary>
-        /// Rotates a vector around another vector representing a point
-        /// </summary>
-        /// <param name="value">The vector to be rotated</param>
-        /// <param name="origin">The origin location to be rotated around</param>
-        /// <param name="radians">The amount to rotate by in radians</param>
-        /// <returns>The rotated vector</returns>
-        /// <remarks>
-        /// A positive value and negative value
-        /// would rotate counterclockwise and clockwise,
-        /// respectively
-        /// </remarks>
-        public static Vector2 RotateVectorOrigin(Vector2 value, Vector2 origin, float radians)
-        {
-            return RotateVector(value - origin, radians) + origin;
-        }
     }
 }
