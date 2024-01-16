@@ -51,13 +51,6 @@ namespace MonoGame.Effect
             // using MojoShader which works from HLSL bytecode.
             var bytecode = EffectObject.CompileHLSL(shaderResult, shaderFunction, shaderProfile, ref errorsAndWarnings);
 
-            // First look to see if we already created this same shader.
-            foreach (var shader in effect.Shaders)
-            {
-                if (bytecode.SequenceEqual(shader.Bytecode))
-                    return shader;
-            }
-
             var shaderInfo = shaderResult.ShaderInfo;
             var shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);
             effect.Shaders.Add(shaderData);

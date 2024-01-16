@@ -1,9 +1,6 @@
 [submodule "ThirdParty/Dependencies"]
 	path = ThirdParty/Dependencies
 	url = https://github.com/MonoGame/MonoGame.Dependencies.git
-[submodule "ThirdParty/NVorbis"]
-	path = ThirdParty/NVorbis
-url=https://github.com/NVorbis/NVorbis.git
 [submodule "ThirdParty/SDL_GameControllerDB"]
 	path = ThirdParty/SDL_GameControllerDB
 	url = https://github.com/gabomdq/SDL_GameControllerDB.git

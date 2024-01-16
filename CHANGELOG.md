@@ -1,6 +1,168 @@
 ﻿# Changelog
+ 
+## 3.8.1 HOTFIX Release - July 26, 2022
 
-## 3.8 Release - 2020-08-10
+## What's Changed
+ - Fix MonoGame publisher name for the VS marketplace by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7847
+ - Corrected 'Framwork' to 'Framework' by @benjitrosch in https://github.com/MonoGame/MonoGame/pull/7850
+ - added missing words to platforms.md by @MrGrak in https://github.com/MonoGame/MonoGame/pull/7852
+ - Fixed grammatical error from 'project' to 'projects' by @benjitrosch in https://github.com/MonoGame/MonoGame/pull/7855
+ - Grammar Hotfix on README by @Emersont1 in https://github.com/MonoGame/MonoGame/pull/7856
+ - Remove redundant dependencies by @vpenades in https://github.com/MonoGame/MonoGame/pull/7854
+ - Fixes Visual Studio freezing with the extension by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7857
+ - Updated migration guide by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7858
+ - More migration guide updates by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7859
+ - Wild cards don't work in dotnet-tools.json by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7860
+ - Removed explicit global usings by @vpenades in https://github.com/MonoGame/MonoGame/pull/7853
+
+## 3.8.1 Release - July 24, 2022
+
+## What's Changed
+ - Update build version to 3.8.1.xxxx by @tomspilman in https://github.com/MonoGame/MonoGame/pull/7296
+ - Fix broken links by @rejurime in https://github.com/MonoGame/MonoGame/pull/7297
+ - [DesktopGL] Fix setting backbuffer size not working in constructor by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7299
+ - Add quotation marks around MGCBPath by @bjornenalfa in https://github.com/MonoGame/MonoGame/pull/7304
+ - [Templates] Update FSharp projects by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7302
+ - fix Texture.GetSharedHandle() by @nkast in https://github.com/MonoGame/MonoGame/pull/7306
+ - [MGCB Editor] Update registration handling files by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7311
+ - Updated to the latest version of StbSharp by @rds1983 in https://github.com/MonoGame/MonoGame/pull/7312
+ - Support MSAA in SwapChainRenderTarget by @nkast in https://github.com/MonoGame/MonoGame/pull/7307
+ - Updated link for the XNA 3.1 to XNA 4.0 cheatsheet by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/7321
+ - Updated and added links to latest MonoGame 3.8 content in tutorials.md by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/7322
+ - Explicitly document BackToFront and FrontToBack use an unstable sort. by @goosenoises in https://github.com/MonoGame/MonoGame/pull/7323
+ - Update mgfxc_wine_setup.sh by @Kwyrky in https://github.com/MonoGame/MonoGame/pull/7327
+ - Fix multisampling in DesktopGL by @sk-zk in https://github.com/MonoGame/MonoGame/pull/7338
+ - [MGCB Editor] macOS fixes by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7337
+ - Fix shader error messages for OpenGL by @cpt-max in https://github.com/MonoGame/MonoGame/pull/7340
+ - Added IEffectBones interface, implemented by SkinnedEffect. by @vpenades in https://github.com/MonoGame/MonoGame/pull/7344
+ - Update NVTT (fixes #5866) by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7354
+ - Edited the Getting Started parts of the documentation for grammar, clarity, and style by @HopefulFrog in https://github.com/MonoGame/MonoGame/pull/7374
+ - Updated Matrix.CreatePerspective - to support infinite far planes. by @vpenades in https://github.com/MonoGame/MonoGame/pull/7367
+ - Add missing underscore in code section by @pbedn in https://github.com/MonoGame/MonoGame/pull/7349
+ - Update CONTRIBUTING.md by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7394
+ - Added ICurveEvaluator{T} interface. by @vpenades in https://github.com/MonoGame/MonoGame/pull/7387
+ - Update Eto.Froms for VS for Mac addin by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7365
+ - Fix for MGFXO file format to increases collection size limits. by @vpenades in https://github.com/MonoGame/MonoGame/pull/7397
+ - NUnit Test Attachments To preview Test images in VS. by @vpenades in https://github.com/MonoGame/MonoGame/pull/7413
+ - [macOS] Properly check current folder if we are inside of .app bundle by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7416
+ - fix 7402: enqueue buffer ref before sending to OAL by @lodicolo in https://github.com/MonoGame/MonoGame/pull/7403
+ - Fixes 3D Audio Direction Issues On Platforms Using OpenAL by @squarebananas in https://github.com/MonoGame/MonoGame/pull/7404
+ - Fixes Stopping Looped Sounds On Platforms Using XAudio by @squarebananas in https://github.com/MonoGame/MonoGame/pull/7405
+ - Fixes Buffer Bindings Cache Issue On Platforms Using OpenGL by @squarebananas in https://github.com/MonoGame/MonoGame/pull/7406
+ - Fixes 3D Audio Direction Issues On Platforms Using X3DAudio by @squarebananas in https://github.com/MonoGame/MonoGame/pull/7389
+ - Proposal for adding basic interoperability with System.Numerics.Vectors by @vpenades in https://github.com/MonoGame/MonoGame/pull/7417
+ - [VSMac] Mark .spritefont files as .xml files by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7426
+ - Updated console references by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7432
+ - Removed residual OUYA references by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7433
+ - [VSMac] Fix freeze upon opening a mgcb file and bump dependencies by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7435
+ - [MGCB Editor] Fix help link (fixes #7428) by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7438
+ - Changed uses of Math to MathF where it was used for floats by @initram in https://github.com/MonoGame/MonoGame/pull/7390
+ - [MGCB.Task] Separate obj folder per target framework (fixes #7409) by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7441
+ - Revert "Changed uses of Math to MathF where it was used for floats" by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7442
+ - File drop event on DesktopGL and WindowsDX platforms by @Quant1um in https://github.com/MonoGame/MonoGame/pull/7362
+ - [MGCB Editor] Bump Eto.Forms version (fixes #7418) by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7439
+ - Update SDL to 2.0.14 by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7445
+ - Help with compatibility toward NativeAOT by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7462
+ - Generic Threading.BlockOnUIThread for reducing garbage allocs by @TechPizzaDev in https://github.com/MonoGame/MonoGame/pull/7384
+ - Fix UWP Vsync support by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7463
+ - [DesktopGL] Improve mouse handling outside gamewindow by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7440
+ - Updated to the latest StbSharp 2.22.5, which added support for HDR images by @rds1983 in https://github.com/MonoGame/MonoGame/pull/7467
+ - Fix type collisions and default implementations for consoles by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7466
+ - Removed threading limitations by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7472
+ - Fixed a typo in the comments. charaters --> characters by @rbwhitaker in https://github.com/MonoGame/MonoGame/pull/7473
+ - fixed grammar in CONTRIBUTING.md by @algobytewise in https://github.com/MonoGame/MonoGame/pull/7469
+ - Fixed a small handful of typos in the comments of SpriteFont. by @rbwhitaker in https://github.com/MonoGame/MonoGame/pull/7479
+ - Update copyright year to 2021 in LICENSE.txt by @monegit in https://github.com/MonoGame/MonoGame/pull/7482
+ - Fixes PacketNumber For Non-Haptic Gamepads On Platforms Using SDL by @squarebananas in https://github.com/MonoGame/MonoGame/pull/7487
+ - Fixes Duplicate/Missing Gamepads On Platforms Using SDL by @squarebananas in https://github.com/MonoGame/MonoGame/pull/7486
+ - Bump GtkSharp to fix crashes on Arch Linux by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7493
+ - Update NVorbis submodule by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7495
+ - Added selective ContentManager asset unloading by @kimimaru4000 in https://github.com/MonoGame/MonoGame/pull/6663
+ - Update Mac Extension Link by @gideongrinberg in https://github.com/MonoGame/MonoGame/pull/7497
+ - Remove deprecated property Color.TransparentBlack by @nkast in https://github.com/MonoGame/MonoGame/pull/7505
+ - Remove duplicate check with wrong argument name by @nkast in https://github.com/MonoGame/MonoGame/pull/7504
+ - fix spelling error by @nkast in https://github.com/MonoGame/MonoGame/pull/7503
+ - Prevent App suspension when the user press 'B' button on UWP (xbox controller) by @nkast in https://github.com/MonoGame/MonoGame/pull/7500
+ - fix PipelineBuildEvent deserialization by @nkast in https://github.com/MonoGame/MonoGame/pull/7502
+ - Support drawing point primitives by @roy-t in https://github.com/MonoGame/MonoGame/pull/7477
+ - Update samples.md by @Michael1993 in https://github.com/MonoGame/MonoGame/pull/7358
+ - Merged the two requirements files into the REQUIREMENTS.md by @RicoGuerra in https://github.com/MonoGame/MonoGame/pull/7484
+ - Upgrade tooling to .NET 5 by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7437
+ - Upgraded projects and documentation to NET5 by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7514
+ - Changed Math to MathF by @initram in https://github.com/MonoGame/MonoGame/pull/7451
+ - Shared MSAA RenderTarget by @nkast in https://github.com/MonoGame/MonoGame/pull/7506
+ - Added pixels processing function parameter to the Texture2D.FromStream/TextureFromFile by @rds1983 in https://github.com/MonoGame/MonoGame/pull/7369
+ - Docs/content pipeline update by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/7370
+ - Don't recompile the same shader multiple times. by @cpt-max in https://github.com/MonoGame/MonoGame/pull/7392
+ - Update Game.cs by @SAJenkin in https://github.com/MonoGame/MonoGame/pull/7528
+ - Fix FontDescriptionProcessor kerning by @nkast in https://github.com/MonoGame/MonoGame/pull/7501
+ - Fix assembly trimming in templates by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7529
+ - Fixed GLDesktop PlatformStop() resolving issue #7372 by @JacksonDorsett in https://github.com/MonoGame/MonoGame/pull/7453
+ - Fix VSCode launch configuration for MGCB Editor on Mac by @the-maverick-m in https://github.com/MonoGame/MonoGame/pull/7535
+ - OpenGL debug context for better error messages by @cpt-max in https://github.com/MonoGame/MonoGame/pull/7536
+ - cask is no longer a brew command by @miluchen in https://github.com/MonoGame/MonoGame/pull/7543
+ - Fix iOS GamePlatform to run pending background tasks #7520 by @Mindfulplays in https://github.com/MonoGame/MonoGame/pull/7522
+ - Removed PS Vita support by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7531
+ - Optimized ApplyAlpha by removing two unnecessary arithmetic operations by @rds1983 in https://github.com/MonoGame/MonoGame/pull/7555
+ - [Feature] GitHub Actions integration by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7511
+ - [Content Pipeline] Fix library names when packaging the nuget by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7557
+ - Null song parameters for MediaPlayer.Play are not allowed in XNA by @james0x0A in https://github.com/MonoGame/MonoGame/pull/7558
+ - Fixes XACT ADPCM Compression Playback by @squarebananas in https://github.com/MonoGame/MonoGame/pull/7564
+ - Fixes XACT Cue.IsPlaying Behaviour When Paused by @squarebananas in https://github.com/MonoGame/MonoGame/pull/7563
+ - Fixes EffectParameter SetValue Using Int For Float Parameters by @squarebananas in https://github.com/MonoGame/MonoGame/pull/7568
+ - Added a keyboard shortcut (F2) to rename a file. by @rbwhitaker in https://github.com/MonoGame/MonoGame/pull/7575
+ - Fix NRE for Game._gameTimer by @JacksonDorsett in https://github.com/MonoGame/MonoGame/pull/7587
+ - Enable setting 8 render targets when targetting Windows by @bjornenalfa in https://github.com/MonoGame/MonoGame/pull/7549
+ - Fixed Comment for Intersects Method by @JacksonDorsett in https://github.com/MonoGame/MonoGame/pull/7592
+ - remove unused usings from Content readers by @nkast in https://github.com/MonoGame/MonoGame/pull/7595
+ - remove CLSCompliant(false) from internal members by @nkast in https://github.com/MonoGame/MonoGame/pull/7594
+ - remove unused reader/writer classes by @nkast in https://github.com/MonoGame/MonoGame/pull/7597
+ - Added PlayStation 5 support by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7645
+ - Fix back and start buttons on iOS by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7694
+ - Update stuff to .NET 6 by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7688
+ - net6 mobile and UWP fixes by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7697
+ - Fixed a broken link in custom_effects docs. by @davidhesselbom in https://github.com/MonoGame/MonoGame/pull/7663
+ - terminology, spelling & grammar corrections by @mikeirvingweb in https://github.com/MonoGame/MonoGame/pull/7657
+ - Fix comment typos in enum GestureType by @Brett208 in https://github.com/MonoGame/MonoGame/pull/7658
+ - Update SDL_GameControllerDB by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7702
+ - Console check fake project by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7698
+ - Improve GamePad support on macOS and introduce support for rumble by @carlfriess in https://github.com/MonoGame/MonoGame/pull/7690
+ - Fix mgcb building content during nuget package restore by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7709
+ - Visual Studio 2022 Extension for templates by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7699
+ - Fix up mgcb-editor dotnet tool by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7708
+ - Optimized SpriteFont GlyphPacker by @TechPizzaDev in https://github.com/MonoGame/MonoGame/pull/7464
+ - Add thread locking to the UWP gamepads dictionary by @squarebananas in https://github.com/MonoGame/MonoGame/pull/7655
+ - Multisampling on Android by @j0nat in https://github.com/MonoGame/MonoGame/pull/7561
+ - proposal: additional vertex structs by @lodicolo in https://github.com/MonoGame/MonoGame/pull/7421
+ - Fixes UWP Set Window Size Thread Access Error by @squarebananas in https://github.com/MonoGame/MonoGame/pull/7570
+ - Fix templates for VS for Mac 2022 by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7764
+ - Fix memory leak on desktop gl static variable by @adnanioricce in https://github.com/MonoGame/MonoGame/pull/7684
+ - Make the VS extension to open .mgcb by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7765
+ - Fix broken links to Extended samples in docs by @NogginBox in https://github.com/MonoGame/MonoGame/pull/7767
+ - RTL text rendering overload for SpriteBatch.DrawString by @BlueElectivire in https://github.com/MonoGame/MonoGame/pull/7644
+ - fix GamePad.GetCapabilities(...) race codition by @nkast in https://github.com/MonoGame/MonoGame/pull/7770
+ - Update templates by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7771
+ - Build system upgrades by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7772
+ - Add automatic upload of artifacts to GitHub packages by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7773
+ - [Actions] Use GITHUB_TOKEN for deploy job by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7775
+ - Fix obsolete call on iOS by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7777
+ - Fix SoundEffectInstance pooling by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7776
+ - Update wine script for NET 6 by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7790
+ - Auto versioning of VS extension by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7788
+ - Added RollForward directive by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7789
+ - Cleaned up rollforward from mobiles by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7791
+ - Remove default Inner Exceptions by @nkast in https://github.com/MonoGame/MonoGame/pull/7800
+ - fix list of supported surfaces by @nkast in https://github.com/MonoGame/MonoGame/pull/7801
+ - Update submodules by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7806
+ - Add Buttons.None by @TimerbaevRR in https://github.com/MonoGame/MonoGame/pull/7818
+ - Fix Buttons.None by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7822
+ - [Actions] Fix UWP package path by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7825
+ - [Actions] Build VS for Mac addin by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/7824
+ - [WIP] Documentation update for 3.8.1 by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7798
+ - Removed trimming property from templates by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7829
+ - Create a release when pushing a tag by @mrhelmut in https://github.com/MonoGame/MonoGame/pull/7828
+
+## 3.8 Release - August 10, 2020
 
 ### Added
  - New Plane constructor. [#6085](https://github.com/MonoGame/MonoGame/pull/6085)
@@ -144,7 +306,7 @@
  - Fix loading of content with special characters in a file name. [#7267](https://github.com/MonoGame/MonoGame/pull/7267)
 
 
-## 3.7.1 Release - 12/8/2018
+## 3.7.1 Release - December 8, 2018
 
  - MGCB now generates content building statistics. [#6401](https://github.com/MonoGame/MonoGame/pull/6401)
  - Fixes to dependency loading in Pipeline Tool. [#6450](https://github.com/MonoGame/MonoGame/pull/6450)
@@ -169,7 +331,7 @@
  - Restored Buttons[] constructor in GamePadState fixing XNA compatibility. [#6572](https://github.com/MonoGame/MonoGame/pull/6572)
 
 
-## 3.7 Release - 9/23/2018
+## 3.7 Release - September 23, 2018
 
  - Remove Scale and Rotation properties from Matrix. [#5584](https://github.com/MonoGame/MonoGame/pull/5584)
  - Added Switch as a platform. [#5596](https://github.com/MonoGame/MonoGame/pull/5596)
@@ -262,7 +424,7 @@
  - Fixed audio interruption bug on iOS. [#6433](https://github.com/MonoGame/MonoGame/pull/6433)
 
 
-## 3.6 Release - 2/28/2017
+## 3.6 Release - February 28, 2017
 
  - Fixed XML deserialization of Curve type. [#5494](https://github.com/MonoGame/MonoGame/pull/5494)
  - Fix #5498 Pipeline Tool template loading on MacOS. [#5501](https://github.com/MonoGame/MonoGame/pull/5501)
@@ -334,7 +496,7 @@
  - Added mipmap generation for DirectX render targets. [#4189](https://github.com/MonoGame/MonoGame/pull/4189)
  
 
-## 3.5.1 Release - 3/30/2016
+## 3.5.1 Release - March 30, 2016
 
  - Fixed negative values when pressing up on left thumbstick on Mac.
  - Removed exception and just return empty state when requesting an invalid GamePad index.
@@ -342,7 +504,7 @@
  - Fixed Texture2D.SaveAsPng on Mac.
 
 
-## 3.5 Release - 3/17/2016
+## 3.5 Release - March 17, 2016
 
  - Content Pipeline Integration for Xamarin Studio and MonoDevleop on Mac and Linux.
  - Automatic inclusion of XNBs into your final project on Mac and Linux.
@@ -374,7 +536,7 @@
  - Better VS project template installation under Windows.
 
 
-## 3.4 Release - 4/29/2015
+## 3.4 Release - April 29, 2015
 
  - Removed old XNA content pipeline extensions.
  - Added all missing PackedVector types.
@@ -403,7 +565,7 @@
  - New Mac installer packages.
 
 
-## 3.3 Release - 3/16/2015
+## 3.3 Release - March 16, 2015
 
  - Support for vertex texture fetch on Windows.
  - New modern classes for KeyboardInput and MessageBox.
@@ -454,7 +616,7 @@
  - Added MGCB command line tool to Windows installer.
 
 
-## 3.2 Release - 4/7/2014
+## 3.2 Release - April 7, 2014
 
  - Implemented missing PackedVector types.
  - VS2013 support for MonoGame templates.
@@ -504,7 +666,7 @@
  - Tons of content pipeline improvements making it close to complete.
 
 
-## 3.0.1 Release - 3/3/2013
+## 3.0.1 Release - March 3, 2013
 
  - Fix template error.
  - Fix offsetInBytes parameter in IndexBuffer/VertexBuffer SetData.
@@ -520,7 +682,7 @@
  - IsRunningSlowly Fix.
 
 
-## 3.0 Release - 1/21/2013
+## 3.0 Release - January 1, 2013
 
  - 3D (many thanks to Infinite Flight Studios for the code and Sickhead Games in taking the time to merge the code in).
  - New platforms: Windows 8, Windows Phone 8, OUYA, PlayStation Mobile (including Vita).
@@ -535,7 +697,7 @@
  - Closer XNA 4 compatibility.
 
 
-## 2.5.1 Release - 6/18/2012
+## 2.5.1 Release - June 18, 2012
 
  - Updated android to use enumerations rather than hardocded ids as part of the Mono for Android 4.2 update.
  - Changed the Android video player to make use of the ViewView.
@@ -557,7 +719,7 @@
  - Fixed MonoDevelop.MonoGame AddIn so it works on Linux.
  
 
-## 2.5 Release - 3/29/2012
+## 2.5 Release - March 29, 2012
 
 ### Fixes and Features
  - Minor fixes to the Networking stack to make it more reliable when looking for games.
@@ -611,7 +773,7 @@
  - Added a new Installer to install the MonoDevelop and / or Visual Studio Templates and binaries.
 
 
-## 2.1 Release - 10/28/2011
+## 2.1 Release - October 28, 2011
 
 ### Features
  - Content Manager rewritten to use partial classes and implementation of cached assets that are loaded.  Greatly improves memory footprint.
@@ -649,14 +811,14 @@
  - All new implementation which shares quite a bit of code between MacOS and Linux.
 
 
-## 2.0 Release - 10/28/2011
+## 2.0 Release - October 28, 2011
 
  - Project renamed MonoGame.
  - Project moved to GitHub.
  - Support for Linux, Mac, Linux, and OpenGL on Windows.
 
 
-## 0.7 Release - 12/2/2009
+## 0.7 Release - December 2, 2009
 
  - First stable release.
  - Originally named XnaTouch.

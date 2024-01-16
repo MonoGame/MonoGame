@@ -38,7 +38,6 @@ namespace Microsoft.Xna.Framework.Content
         {
             'w', // Windows (XNA & DirectX)
             'x', // Xbox360 (XNA)
-            'm', // WindowsPhone7.0 (XNA)
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
@@ -48,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
-            'v', // PSVita
+            '5', // PlayStation5
             'O', // XboxOne
             'S', // Nintendo Switch
             'G', // Google Stadia
@@ -62,7 +61,9 @@ namespace Microsoft.Xna.Framework.Content
             // Legacy identifiers... these could be reused in the
             // future if we feel enough time has passed.
 
+            'm', // WindowsPhone7.0 (XNA)
             'p', // PlayStationMobile
+            'v', // PSVita
             'g', // Windows (OpenGL)
             'l', // Linux
         };

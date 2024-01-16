@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009-2011 The MonoGame Team
@@ -131,7 +131,7 @@ namespace Microsoft.Xna.Framework
         private void CreateDisplayLink()
         {
             if (_displayLink != null)
-                _displayLink.RemoveFromRunLoop(NSRunLoop.Main, NSRunLoop.NSDefaultRunLoopMode);
+                _displayLink.RemoveFromRunLoop(NSRunLoop.Main, NSRunLoopMode.Default);
 
             _displayLink = UIScreen.MainScreen.CreateDisplayLink(_viewController.View as iOSGameView, new Selector("doTick"));
 
@@ -140,7 +140,7 @@ namespace Microsoft.Xna.Framework
             // the duration of a frame on iOS (Which is 1/60.0f at the time of writing this).
             _displayLink.FrameInterval = (int)Math.Round(60f * Game.TargetElapsedTime.TotalSeconds);
 
-            _displayLink.AddToRunLoop(NSRunLoop.Main, NSRunLoop.NSDefaultRunLoopMode);
+            _displayLink.AddToRunLoop(NSRunLoop.Main, NSRunLoopMode.Default);
         }
 
 
@@ -225,6 +225,7 @@ namespace Microsoft.Xna.Framework
             //        directly to NSTimer.CreateRepeatingTimer.
             _viewController.View.MakeCurrent();
             Game.Tick ();
+            Threading.Run();
 
             if (!IsPlayingVideo)
             {
