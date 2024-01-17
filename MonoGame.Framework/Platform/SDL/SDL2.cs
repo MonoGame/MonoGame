@@ -392,6 +392,33 @@ internal static class Sdl
             public IntPtr window;
         }
 
+        [Flags]
+        public enum Flags : uint
+        {
+            Fullscreen = 0x00000001,
+            FullsceenDesktop = (Fullscreen | 0x00001000),
+            OpenGL = 0x00000002,
+            Vulkan = 0x10000000,
+            Metal = 0x10000000,
+            Shown = 0x00000004,
+            Hidden = 0x00000008,
+            Borderless = 0x00000010,
+            Resizable = 0x00000020,
+            Minimized = 0x00000040,
+            Maximized = 0x00000080,
+            InputGrabbed = 0x00000100,
+            InputFocus = 0x00000200,
+            MouseFocus = 0x00000400,
+            Foreign = 0x00000800,
+            AllowHighDPI = 0x00002000,
+            MouseCapture = 0x00004000,
+            AlwaysOnTop = 0x00008000,
+            SkipTaskbar = 0x00010000,
+            Utility = 0x00020000,
+            Tooltip = 0x00040000,
+            PopupMenu = 0x00080000,
+        }
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_createwindow(string title, int x, int y, int w, int h, int flags);
         private static d_sdl_createwindow SDL_CreateWindow = FuncLoader.LoadFunction<d_sdl_createwindow>(NativeLibrary, "SDL_CreateWindow");
@@ -419,7 +446,7 @@ internal static class Sdl
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int d_sdl_getwindowflags(IntPtr window);
+        public delegate Flags d_sdl_getwindowflags(IntPtr window);
         public static d_sdl_getwindowflags GetWindowFlags = FuncLoader.LoadFunction<d_sdl_getwindowflags>(NativeLibrary, "SDL_GetWindowFlags");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
