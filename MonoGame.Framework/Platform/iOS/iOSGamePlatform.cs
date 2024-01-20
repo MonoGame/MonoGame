@@ -1,7 +1,7 @@
 ﻿#region License
 /*
 Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2011 The MonoGame Team
+MonoGame - Copyright © 2009-2011 MonoGame Foundation, Inc
 
 All rights reserved.
 
