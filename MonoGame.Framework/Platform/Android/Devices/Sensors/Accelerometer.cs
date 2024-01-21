@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 namespace Microsoft.Devices.Sensors
 {
     /// <summary>
-    /// Provides Android applications access to the device�s accelerometer sensor.
+    /// Provides Android applications access to the device's accelerometer sensor.
     /// </summary>
     public sealed class Accelerometer : SensorBase<AccelerometerReading>
     {
