@@ -26,6 +26,8 @@
     <Compile Remove="Properties/**/*" />
     <Compile Remove="Interactive/**/*" />
     <Compile Remove="Runner/iOS/**/*" />
+
+    <Compile Remove="Framework/SDL/**/*" />
   </ItemGroup>
 
   <ItemGroup>
