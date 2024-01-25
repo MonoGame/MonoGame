@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Templates.CSharp</BaseOutputPath>
+    <PackageType>Template</PackageType>
+    <Title>MonoGame project templates</Title>
+    <Description>This package contains a set of C# templates written for the MonoGame framework.</Description>
+    <PackageId>MonoGame.Templates.CSharp</PackageId>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <NoWarn>NU5128</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="content\**\*" Exclude="content\**\.DS_Store;content\**\bin;content\**\obj" />
+    <Compile Remove="**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JsonPoke.MSBuild" Version="1.0.9">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <Target Name="SetMGPackageReferenceVersions" BeforeTargets="CoreBuild">
+    <ItemGroup>
+      <MGProjects Include="**\*.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <MGToolManifest Include="**\.config\dotnet-tools.json" />
+    </ItemGroup>
+
+    <!-- For SDK-style project files -->
+    <XmlPoke
+      XmlInputPath="%(MGProjects.Identity)"
+      Query="Project/ItemGroup/PackageReference[starts-with(@Include, &quot;MonoGame&quot;)]/@Version"
+      Value="$(Version)" />
+    <!-- For old-style project files that set the xml namespace -->
+    <XmlPoke
+      XmlInputPath="%(MGProjects.Identity)"
+      Namespaces="&lt;Namespace Prefix='n' Uri='http://schemas.microsoft.com/developer/msbuild/2003' /&gt;"
+      Query="n:Project/n:ItemGroup/n:PackageReference[starts-with(@Include, &quot;MonoGame&quot;)]/@Version"
+      Value="$(Version)" />
+    <!-- For dotnet tools -->
+    <JsonPoke
+      JsonInputPath="%(MGToolManifest.Identity)"
+      JPath="tools.dotnet-mgcb.version"
+      JValue="$(Version)" />
+    <JsonPoke
+      JsonInputPath="%(MGToolManifest.Identity)"
+      JPath="tools.dotnet-mgcb-editor.version"
+      JValue="$(Version)" />
+    <JsonPoke
+      JsonInputPath="%(MGToolManifest.Identity)"
+      JPath="tools.dotnet-mgcb-editor-windows.version"
+      JValue="$(Version)" />
+    <JsonPoke
+      JsonInputPath="%(MGToolManifest.Identity)"
+      JPath="tools.dotnet-mgcb-editor-mac.version"
+      JValue="$(Version)" />
+    <JsonPoke
+      JsonInputPath="%(MGToolManifest.Identity)"
+      JPath="tools.dotnet-mgcb-editor-linux.version"
+      JValue="$(Version)" />
+  </Target>
+</Project>

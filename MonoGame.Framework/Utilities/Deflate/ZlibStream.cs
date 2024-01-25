@@ -28,7 +28,7 @@
 using System;
 using System.IO;
 
-namespace MonoGame.Utilities.Deflate
+namespace MonoGame.Framework.Utilities.Deflate
 {
 
     /// <summary>
@@ -44,7 +44,7 @@ namespace MonoGame.Utilities.Deflate
     /// </para>
     ///
     /// <para> Using this stream, applications can compress or decompress data via
-    /// stream <c>Read()</c> and <c>Write()</c> operations.  Either compresssion or
+    /// stream <c>Read()</c> and <c>Write()</c> operations.  Either compression or
     /// decompression can occur through either reading or writing. The compression
     /// format used is ZLIB, which is documented in <see
     /// href="http://www.ietf.org/rfc/rfc1950.txt">IETF RFC 1950</see>, "ZLIB Compressed
@@ -416,7 +416,7 @@ namespace MonoGame.Utilities.Deflate
                 if (!_disposed)
                 {
                     if (disposing && (this._baseStream != null))
-                        this._baseStream.Close();
+                        this._baseStream.Dispose();
                     _disposed = true;
                 }
             }
@@ -500,9 +500,9 @@ namespace MonoGame.Utilities.Deflate
         {
             get
             {
-                if (this._baseStream._streamMode == MonoGame.Utilities.Deflate.ZlibBaseStream.StreamMode.Writer)
+                if (this._baseStream._streamMode == MonoGame.Framework.Utilities.Deflate.ZlibBaseStream.StreamMode.Writer)
                     return this._baseStream._z.TotalBytesOut;
-                if (this._baseStream._streamMode == MonoGame.Utilities.Deflate.ZlibBaseStream.StreamMode.Reader)
+                if (this._baseStream._streamMode == MonoGame.Framework.Utilities.Deflate.ZlibBaseStream.StreamMode.Reader)
                     return this._baseStream._z.TotalBytesIn;
                 return 0;
             }

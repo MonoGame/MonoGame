@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RollForward>Major</RollForward>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Mac</BaseOutputPath>
+    <DefineConstants>MONOMAC;MAC</DefineConstants>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+    <AssemblyName>mgcb-editor-mac</AssemblyName>
+    <AssemblyTitle>MGCB Editor</AssemblyTitle>
+    <MacBundleName>$(AssemblyTitle)</MacBundleName>
+    <PublishSingleFile>false</PublishSingleFile>
+    <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Platform\**\*" />
+    <Compile Remove="Platform\**\*" />
+
+    <Compile Include="Platform\Mac\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Templates\%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Eto.Forms" Version="2.6.1" />
+    <PackageReference Include="Eto.Platform.Mac64" Version="2.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
+      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
+      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Icon.icns" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <BundleResource Include="Icon.icns" />
+  </ItemGroup>
+
+  <Import Project="MonoGame.Content.Builder.Editor.targets" />
+
+</Project>

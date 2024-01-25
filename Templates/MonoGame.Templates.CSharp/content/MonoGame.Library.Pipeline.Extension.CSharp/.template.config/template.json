@@ -1,0 +1,34 @@
+{
+    "author": "MonoGame Team",
+    "classifications": [
+        "MonoGame", "Games", "Extensions"
+    ],
+    "name": "MonoGame Content Pipeline Extension",
+    "groupIdentity": "MonoGame.Library.Pipeline",
+    "identity": "MonoGame.Library.Pipeline.Extension.CSharp",
+    "shortName": "mgpipeline",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [
+        {
+            "path": "MGNamespace.csproj"
+        }
+    ],
+    "sourceName": "MGNamespace",
+    "preferNameDirectory": "true",
+    "description": "A MonoGame content pipeline extension library project.",
+    "postActions": [
+        {
+            "description": "Restore NuGet packages required by this project.",
+            "manualInstructions": [
+                {
+                    "text": "Run 'dotnet restore'"
+                }
+            ],
+            "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+            "continueOnError": true
+        }
+    ]
+}

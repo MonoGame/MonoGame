@@ -1,61 +1,87 @@
-﻿
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
-using System.IO;
 using System.Reflection;
 
-namespace Microsoft.Xna.Framework.Utilities
+namespace MonoGame.Framework.Utilities
 {
-	internal static class ReflectionHelpers
-	{
-		public static bool IsValueType(Type targetType)
-		{
-			if (targetType == null)
-			{
-				throw new NullReferenceException("Must supply the targetType parameter");
-			}
-#if WINRT
-			return targetType.GetTypeInfo().IsValueType;
+    internal static partial class ReflectionHelpers
+    {
+        public static bool IsValueType(Type targetType)
+        {
+            if (targetType == null)
+            {
+                throw new NullReferenceException("Must supply the targetType parameter");
+            }
+#if NET45            
+            return targetType.GetTypeInfo().IsValueType;
 #else
-			return targetType.IsValueType;
+            return targetType.IsValueType;
 #endif
-		}
+        }
 
-		public static Type GetBaseType(Type targetType)
-		{
-			if (targetType == null)
-			{
-				throw new NullReferenceException("Must supply the targetType parameter");
-			}
-#if WINRT
-			var type = targetType.GetTypeInfo().BaseType;
+        public static Type GetBaseType(Type targetType)
+        {
+            if (targetType == null)
+            {
+                throw new NullReferenceException("Must supply the targetType parameter");
+            }
+#if NET45            
+            return targetType.GetTypeInfo().BaseType;
 #else
-			var type = targetType.BaseType;
+            return targetType.BaseType;
 #endif
-			return type;
-		}
+        }
+
+        /// <summary>
+        /// Returns the Assembly of a Type
+        /// </summary>
+        public static Assembly GetAssembly(Type targetType)
+        {
+            if (targetType == null)
+            {
+                throw new NullReferenceException("Must supply the targetType parameter");
+            }
+#if NET45            
+            return targetType.GetTypeInfo().Assembly;
+#else
+            return targetType.Assembly;
+#endif
+        }
 
         /// <summary>
         /// Returns true if the given type represents a non-object type that is not abstract.
         /// </summary>
-		public static bool IsConcreteClass(Type t)
-		{
-			if (t == null)
-			{
-				throw new NullReferenceException("Must supply the t (type) parameter");
-			}
+        public static bool IsConcreteClass(Type t)
+        {
+            if (t == null)
+            {
+                throw new NullReferenceException("Must supply the t (type) parameter");
+            }
 
             if (t == typeof(object))
                 return false;
-#if WINRT
-			var ti = t.GetTypeInfo();
-			if (ti.IsClass && !ti.IsAbstract)
-				return true;
-#else
-			if (t.IsClass && !t.IsAbstract)
-				return true;
+#if NET45            
+            var ti = t.GetTypeInfo();
+            if (ti.IsClass && !ti.IsAbstract)
+                return true;
+#else            
+            if (t.IsClass && !t.IsAbstract)
+                return true;
 #endif
-			return false;
-		}
+            return false;
+        }
+
+        public static MethodInfo GetMethodInfo(Type type, string methodName)
+        {
+#if NET45            
+            return type.GetTypeInfo().GetDeclaredMethod(methodName);
+#else
+            return type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+#endif
+        }
 
         public static MethodInfo GetPropertyGetMethod(PropertyInfo property)
         {
@@ -64,7 +90,7 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new NullReferenceException("Must supply the property parameter");
             }
 
-#if WINRT
+#if NET45            
             return property.GetMethod;
 #else
             return property.GetGetMethod();
@@ -78,24 +104,24 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new NullReferenceException("Must supply the property parameter");
             }
 
-#if WINRT
+#if NET45            
             return property.SetMethod;
 #else
             return property.GetSetMethod();
 #endif
         }
 
-		public static T GetCustomAttribute<T>(MemberInfo member) where T : Attribute
-		{
-			if (member == null)
-				throw new NullReferenceException("Must supply the member parameter");
+        public static T GetCustomAttribute<T>(MemberInfo member) where T : Attribute
+        {
+            if (member == null)
+                throw new NullReferenceException("Must supply the member parameter");
 
-#if WINRT
-			return member.GetCustomAttribute(typeof(T)) as T;
+#if NET45            
+            return member.GetCustomAttribute(typeof(T)) as T;
 #else
             return Attribute.GetCustomAttribute(member, typeof(T)) as T;
 #endif
-		}
+        }
 
         /// <summary>
         /// Returns true if the get method of the given property exist and are public.
@@ -110,6 +136,7 @@ namespace Microsoft.Xna.Framework.Utilities
             }
 
             var getMethod = GetPropertyGetMethod(property);
+
             if (getMethod == null || !getMethod.IsPublic)
                 return false;
 
@@ -119,15 +146,15 @@ namespace Microsoft.Xna.Framework.Utilities
         /// <summary>
         /// Returns true if the given type can be assigned the given value
         /// </summary>
-		public static bool IsAssignableFrom(Type type, object value)
-		{
-			if (type == null)
-				throw new ArgumentNullException("type");
-			if (value == null)
-				throw new ArgumentNullException("value");
+        public static bool IsAssignableFrom(Type type, object value)
+        {
+            if (type == null)
+                throw new ArgumentNullException("type");
+            if (value == null)
+                throw new ArgumentNullException("value");
 
             return IsAssignableFromType(type, value.GetType());
-		}
+        }
 
         /// <summary>
         /// Returns true if the given type can be assigned a value with the given object type
@@ -138,15 +165,14 @@ namespace Microsoft.Xna.Framework.Utilities
                 throw new ArgumentNullException("type");
             if (objectType == null)
                 throw new ArgumentNullException("objectType");
-#if WINRT
+#if NET45
             if (type.GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo()))
                 return true;
 #else
             if (type.IsAssignableFrom(objectType))
-                return true;
+                return true;     
 #endif
             return false;
         }
-
-	}
+    }
 }

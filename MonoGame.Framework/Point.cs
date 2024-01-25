@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -187,7 +188,14 @@ namespace Microsoft.Xna.Framework
         /// <returns>Hash code of this <see cref="Point"/>.</returns>
         public override int GetHashCode()
         {
-            return X ^ Y;
+            unchecked
+            {
+                var hash = 17;
+                hash = hash * 23 + X.GetHashCode();
+                hash = hash * 23 + Y.GetHashCode();
+                return hash;
+            }
+
         }
 
         /// <summary>
@@ -204,9 +212,21 @@ namespace Microsoft.Xna.Framework
         /// Gets a <see cref="Vector2"/> representation for this object.
         /// </summary>
         /// <returns>A <see cref="Vector2"/> representation for this object.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector2 ToVector2()
         {
             return new Vector2(X, Y);
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Point"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void Deconstruct(out int x, out int y)
+        {
+            x = X;
+            y = Y;
         }
 
         #endregion

@@ -9,54 +9,54 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
     public struct GraphicsMetrics
     {
-        internal ulong _clearCount;
-        internal ulong _drawCount;
-        internal ulong _pixelShaderCount;
-        internal ulong _primitiveCount;
-        internal ulong _spriteCount;
-        internal ulong _targetCount;
-        internal ulong _textureCount;
-        internal ulong _vertexShaderCount;
+        internal long _clearCount;
+        internal long _drawCount;
+        internal long _pixelShaderCount;
+        internal long _primitiveCount;
+        internal long _spriteCount;
+        internal long _targetCount;
+        internal long _textureCount;
+        internal long _vertexShaderCount;
 
         /// <summary>
         /// Number of times Clear was called.
         /// </summary>
-        public ulong ClearCount { get { return _clearCount; } }
+        public long ClearCount { get { return _clearCount; } }
 
         /// <summary>
         /// Number of times Draw was called.
         /// </summary>
-        public ulong DrawCount { get { return _drawCount; } }
+        public long DrawCount { get { return _drawCount; } }
 
         /// <summary>
         /// Number of times the pixel shader was changed on the GPU.
         /// </summary>
-        public ulong PixelShaderCount { get { return _pixelShaderCount; } }
+        public long PixelShaderCount { get { return _pixelShaderCount; } }
 
         /// <summary>
         /// Number of rendered primitives.
         /// </summary>
-        public ulong PrimitiveCount { get { return _primitiveCount; } }
+        public long PrimitiveCount { get { return _primitiveCount; } }
 
         /// <summary>
         /// Number of sprites and text characters rendered via <see cref="SpriteBatch"/>.
         /// </summary>
-        public ulong SpriteCount { get { return _spriteCount; } }
+        public long SpriteCount { get { return _spriteCount; } }
 
         /// <summary>
         /// Number of times a target was changed on the GPU.
         /// </summary>
-        public ulong TargetCount {get { return _targetCount; } }
+        public long TargetCount {get { return _targetCount; } }
 
         /// <summary>
         /// Number of times a texture was changed on the GPU.
         /// </summary>
-        public ulong TextureCount { get { return _textureCount; } }
+        public long TextureCount { get { return _textureCount; } }
 
         /// <summary>
         /// Number of times the vertex shader was changed on the GPU.
         /// </summary>
-        public ulong VertexShaderCount { get { return _vertexShaderCount; } }
+        public long VertexShaderCount { get { return _vertexShaderCount; } }
 
         /// <summary>
         /// Returns the difference between two sets of metrics.

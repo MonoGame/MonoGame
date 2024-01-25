@@ -18,7 +18,6 @@ namespace Microsoft.Xna.Framework
     {
         static Color()
         {
-            TransparentBlack = new Color(0);
             Transparent = new Color(0);
             AliceBlue = new Color(0xfffff8f0);
             AntiqueWhite = new Color(0xffd7ebfa);
@@ -162,16 +161,21 @@ namespace Microsoft.Xna.Framework
             Yellow = new Color(0xff00ffff);
             YellowGreen = new Color(0xff32cd9a);
         }
-	// ARGB
+
+        // Stored as RGBA with R in the least significant octet:
+        // |-------|-------|-------|-------
+        // A       B       G       R
         private uint _packedValue;
 	  
-        private Color(uint packedValue)
+        /// <summary>
+        /// Constructs an RGBA color from a packed value.
+        /// The value is a 32-bit unsigned integer, with R in the least significant octet.
+        /// </summary>
+        /// <param name="packedValue">The packed value.</param>
+        [CLSCompliant(false)]
+        public Color(uint packedValue)
         {
             _packedValue = packedValue;
-			// ARGB
-			//_packedValue = (packedValue << 8) | ((packedValue & 0xff000000) >> 24);
-			// ABGR			
-			//_packedValue = (packedValue & 0xff00ff00) | ((packedValue & 0x000000ff) << 16) | ((packedValue & 0x00ff0000) >> 16);
         }
 
         /// <summary>
@@ -179,13 +183,8 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="color">A <see cref="Vector4"/> representing color.</param>
         public Color(Vector4 color)
+            : this((int)(color.X * 255), (int)(color.Y * 255), (int)(color.Z * 255), (int)(color.W * 255))
         {
-            _packedValue = 0;
-			
-			R = (byte)MathHelper.Clamp(color.X * 255, Byte.MinValue, Byte.MaxValue);
-            G = (byte)MathHelper.Clamp(color.Y * 255, Byte.MinValue, Byte.MaxValue);
-            B = (byte)MathHelper.Clamp(color.Z * 255, Byte.MinValue, Byte.MaxValue);
-            A = (byte)MathHelper.Clamp(color.W * 255, Byte.MinValue, Byte.MaxValue);
         }
 
         /// <summary>
@@ -193,13 +192,8 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="color">A <see cref="Vector3"/> representing color.</param>
         public Color(Vector3 color)
+            : this((int)(color.X * 255), (int)(color.Y * 255), (int)(color.Z * 255))
         {
-            _packedValue = 0;
-
-            R = (byte)MathHelper.Clamp(color.X * 255, Byte.MinValue, Byte.MaxValue);
-            G = (byte)MathHelper.Clamp(color.Y * 255, Byte.MinValue, Byte.MaxValue);
-            B = (byte)MathHelper.Clamp(color.Z * 255, Byte.MinValue, Byte.MaxValue);
-            A = 255;
         }
 
         /// <summary>
@@ -209,12 +203,16 @@ namespace Microsoft.Xna.Framework
         /// <param name="alpha">The alpha component value from 0 to 255.</param>
         public Color(Color color, int alpha)
         {
-            _packedValue = 0;
+            if ((alpha & 0xFFFFFF00) != 0)
+            {
+                var clampedA = (uint)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
 
-            R = color.R;
-            G = color.G;
-            B = color.B;
-            A = (byte)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
+                _packedValue = (color._packedValue & 0x00FFFFFF) | (clampedA << 24);
+            }
+            else
+            {
+                _packedValue = (color._packedValue & 0x00FFFFFF) | ((uint)alpha << 24);
+            }
         }
 
         /// <summary>
@@ -222,49 +220,60 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="color">A <see cref="Color"/> for RGB values of new <see cref="Color"/> instance.</param>
         /// <param name="alpha">Alpha component value from 0.0f to 1.0f.</param>
-        public Color(Color color, float alpha)
+        public Color(Color color, float alpha):
+            this(color, (int)(alpha * 255))
         {
-            _packedValue = 0;
-
-            R = color.R;
-            G = color.G;
-            B = color.B;
-            A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars which representing red, green and blue values. Alpha value will be opaque.
+        /// Constructs an RGBA color from scalars representing red, green and blue values. Alpha value will be opaque.
         /// </summary>
         /// <param name="r">Red component value from 0.0f to 1.0f.</param>
         /// <param name="g">Green component value from 0.0f to 1.0f.</param>
         /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
         public Color(float r, float g, float b)
+            : this((int)(r * 255), (int)(g * 255), (int)(b * 255))
         {
-            _packedValue = 0;
-			
-            R = (byte)MathHelper.Clamp(r * 255, Byte.MinValue, Byte.MaxValue);
-            G = (byte)MathHelper.Clamp(g * 255, Byte.MinValue, Byte.MaxValue);
-            B = (byte)MathHelper.Clamp(b * 255, Byte.MinValue, Byte.MaxValue);
-            A = 255;
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars which representing red, green and blue values. Alpha value will be opaque.
+        /// Constructs an RGBA color from scalars representing red, green, blue and alpha values.
+        /// </summary>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
+        /// <param name="alpha">Alpha component value from 0.0f to 1.0f.</param>
+        public Color(float r, float g, float b, float alpha)
+            : this((int)(r * 255), (int)(g * 255), (int)(b * 255), (int)(alpha * 255))
+        {
+        }
+
+        /// <summary>
+        /// Constructs an RGBA color from scalars representing red, green and blue values. Alpha value will be opaque.
         /// </summary>
         /// <param name="r">Red component value from 0 to 255.</param>
         /// <param name="g">Green component value from 0 to 255.</param>
         /// <param name="b">Blue component value from 0 to 255.</param>
         public Color(int r, int g, int b)
         {
-            _packedValue = 0;
-            R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
-            G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
-            B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
-            A = (byte)255;
+            _packedValue = 0xFF000000; // A = 255
+
+            if (((r | g | b) & 0xFFFFFF00) != 0)
+            {
+                var clampedR = (uint)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
+                var clampedG = (uint)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
+                var clampedB = (uint)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
+
+                _packedValue |= (clampedB << 16) | (clampedG << 8) | (clampedR);
+            }
+            else
+            {
+                _packedValue |= ((uint)b << 16) | ((uint)g << 8) | ((uint)r);
+            }
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars which representing red, green, blue and alpha values.
+        /// Constructs an RGBA color from scalars representing red, green, blue and alpha values.
         /// </summary>
         /// <param name="r">Red component value from 0 to 255.</param>
         /// <param name="g">Green component value from 0 to 255.</param>
@@ -272,28 +281,34 @@ namespace Microsoft.Xna.Framework
         /// <param name="alpha">Alpha component value from 0 to 255.</param>
         public Color(int r, int g, int b, int alpha)
         {
-            _packedValue = 0;
-            R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
-            G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
-            B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
-            A = (byte)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
+            if (((r | g | b | alpha) & 0xFFFFFF00) != 0)
+            {
+                var clampedR = (uint)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
+                var clampedG = (uint)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
+                var clampedB = (uint)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
+                var clampedA = (uint)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
+
+                _packedValue = (clampedA << 24) | (clampedB << 16) | (clampedG << 8) | (clampedR);
+            }
+            else
+            {
+                _packedValue = ((uint)alpha << 24) | ((uint)b << 16) | ((uint)g << 8) | ((uint)r);
+            }
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars which representing red, green, blue and alpha values.
+        /// Constructs an RGBA color from scalars representing red, green, blue and alpha values.
         /// </summary>
-        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
-        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
-        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
-        /// <param name="alpha">Alpha component value from 0.0f to 1.0f.</param>
-        public Color(float r, float g, float b, float alpha)
+        /// <remarks>
+        /// This overload sets the values directly without clamping, and may therefore be faster than the other overloads.
+        /// </remarks>
+        /// <param name="r"></param>
+        /// <param name="g"></param>
+        /// <param name="b"></param>
+        /// <param name="alpha"></param>
+        public Color(byte r, byte g, byte b, byte alpha)
         {
-            _packedValue = 0;
-			
-            R = (byte)MathHelper.Clamp(r * 255, Byte.MinValue, Byte.MaxValue);
-            G = (byte)MathHelper.Clamp(g * 255, Byte.MinValue, Byte.MaxValue);
-            B = (byte)MathHelper.Clamp(b * 255, Byte.MinValue, Byte.MaxValue);
-            A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
+            _packedValue = ((uint)alpha << 24) | ((uint)b << 16) | ((uint)g << 8) | (r);
         }
 
         /// <summary>
@@ -380,10 +395,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public static bool operator ==(Color a, Color b)
         {
-            return (a.A == b.A &&
-                a.R == b.R &&
-                a.G == b.G &&
-                a.B == b.B);
+            return (a._packedValue == b._packedValue);
         }
 	
 	/// <summary>
@@ -394,7 +406,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
         public static bool operator !=(Color a, Color b)
         {
-            return !(a == b);
+            return (a._packedValue != b._packedValue);
         }
 
         /// <summary>
@@ -417,14 +429,6 @@ namespace Microsoft.Xna.Framework
         }
 
         #region Color Bank
-        /// <summary>
-        /// TransparentBlack color (R:0,G:0,B:0,A:0).
-        /// </summary>
-        public static Color TransparentBlack
-        {
-            get;
-            private set;
-        }
         
         /// <summary>
         /// Transparent color (R:0,G:0,B:0,A:0).
@@ -1721,14 +1725,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Performs linear interpolation of <see cref="Color"/> using <see cref="MathHelper.LerpPrecise"/> on MathHelper.
-        /// Less efficient but more precise compared to <see cref="Color.Lerp"/>.
-        /// See remarks section of <see cref="MathHelper.LerpPrecise"/> on MathHelper for more info.
+        /// <see cref="Color.Lerp"/> should be used instead of this function.
         /// </summary>
-        /// <param name="value1">Source <see cref="Color"/>.</param>
-        /// <param name="value2">Destination <see cref="Color"/>.</param>
-        /// <param name="amount">Interpolation factor.</param>
         /// <returns>Interpolated <see cref="Color"/>.</returns>
+        [Obsolete("Color.Lerp should be used instead of this function.")]
         public static Color LerpPrecise(Color value1, Color value2, Single amount)
         {
             amount = MathHelper.Clamp(amount, 0, 1);
@@ -1739,24 +1739,29 @@ namespace Microsoft.Xna.Framework
                 (int)MathHelper.LerpPrecise(value1.A, value2.A, amount));
         }
 		
-	/// <summary>
+	    /// <summary>
         /// Multiply <see cref="Color"/> by value.
         /// </summary>
         /// <param name="value">Source <see cref="Color"/>.</param>
         /// <param name="scale">Multiplicator.</param>
         /// <returns>Multiplication result.</returns>
-	public static Color Multiply(Color value, float scale)
-	{
-	    return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
-	}
+	    public static Color Multiply(Color value, float scale)
+	    {
+	        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+	    }
 	
-	/// <summary>
+	    /// <summary>
         /// Multiply <see cref="Color"/> by value.
         /// </summary>
         /// <param name="value">Source <see cref="Color"/>.</param>
         /// <param name="scale">Multiplicator.</param>
         /// <returns>Multiplication result.</returns>
-	public static Color operator *(Color value, float scale)
+	    public static Color operator *(Color value, float scale)
+        {
+            return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+        }
+
+        public static Color operator *(float scale, Color value)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
         }
@@ -1779,7 +1784,7 @@ namespace Microsoft.Xna.Framework
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
         }
 	
-	/// <summary>
+        /// <summary>
         /// Gets or sets packed value of this <see cref="Color"/>.
         /// </summary>
         [CLSCompliant(false)]
@@ -1844,7 +1849,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
         public static Color FromNonPremultiplied(int r, int g, int b, int a)
         {
-            return new Color((byte)(r * a / 255),(byte)(g * a / 255), (byte)(b * a / 255), a);
+            return new Color(r * a / 255, g * a / 255, b * a / 255, a);
         }
 
         #region IEquatable<Color> Members
@@ -1860,5 +1865,61 @@ namespace Microsoft.Xna.Framework
         }
 
         #endregion
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/>.
+        /// </summary>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
+        public void Deconstruct(out byte r, out byte g, out byte b)
+        {
+            r = R;
+            g = G;
+            b = B;
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/>.
+        /// </summary>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
+        public void Deconstruct(out float r, out float g, out float b)
+        {
+            r = R / 255f;
+            g = G / 255f;
+            b = B / 255f;
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/> with Alpha.
+        /// </summary>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
+        /// <param name="a">Alpha component value from 0 to 255.</param>
+        public void Deconstruct(out byte r, out byte g, out byte b, out byte a)
+        {
+            r = R;
+            g = G;
+            b = B;
+            a = A;
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/> with Alpha.
+        /// </summary>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
+        /// <param name="a">Alpha component value from 0.0f to 1.0f.</param>
+        public void Deconstruct(out float r, out float g, out float b, out float a)
+        {
+            r = R / 255f;
+            g = G / 255f;
+            b = B / 255f;
+            a = A / 255f;
+        }
     }
 }

@@ -78,14 +78,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     // TODO: When we eventually expose the internal Shader 
                     // API then we will need to deal with non-array elements.
-                    throw new NotImplementedException();   
+                    throw new NotImplementedException();
                 }
             }
 
+
             // Take care of the single copy case!
-            else if (rows == 1 || (rows == 4 && columns == 4))
+            else if (rows == 1 || (rows == 4 && columns == 4)) {
                 Buffer.BlockCopy(data as Array, 0, _buffer, offset, rows*columns*elementSize);
-            else
+            } else
             {
                 var source = data as Array;
 

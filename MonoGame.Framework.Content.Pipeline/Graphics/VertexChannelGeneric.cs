@@ -89,6 +89,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             TypeDescriptor.AddAttributes(typeof(Vector3), new TypeConverterAttribute(typeof(Vector3TypeConverter)));
             TypeDescriptor.AddAttributes(typeof(Vector4), new TypeConverterAttribute(typeof(Vector4TypeConverter)));
             //TypeDescriptor.AddAttributes(typeof(IPackedVector), new TypeConverterAttribute(typeof(PackedVectorTypeConverter)));
+            TypeDescriptor.AddAttributes(typeof(Byte4), new TypeConverterAttribute(typeof(Byte4TypeConverter)));
         }
 
         /// <summary>
@@ -226,6 +227,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         void IList<T>.RemoveAt(int index)
         {
             Items.RemoveAt(index);
+        }
+
+        /// <summary>
+        /// Removes a range of values from the channel.
+        /// </summary>
+        /// <param name="index">The zero-based starting index of the range of elements to remove.</param>
+        /// <param name="count"> The number of elements to remove.</param>
+        internal override void RemoveRange(int index, int count)
+        {
+            items.RemoveRange(index, count);
         }
     }
 }

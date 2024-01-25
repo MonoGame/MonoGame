@@ -1,0 +1,13 @@
+<Project>
+  <ItemGroup>
+    <Compile Include="Platform\Microsoft\Devices\Sensors\AccelerometerFailedException.cs" />
+    <Compile Include="Platform\Microsoft\Devices\Sensors\AccelerometerReading.cs" />
+    <Compile Include="Platform\Microsoft\Devices\Sensors\CalibrationEventArgs.cs" />
+    <Compile Include="Platform\Microsoft\Devices\Sensors\CompassReading.cs" />
+    <Compile Include="Platform\Microsoft\Devices\Sensors\ISensorReading.cs" />
+    <Compile Include="Platform\Microsoft\Devices\Sensors\SensorBase.cs" />
+    <Compile Include="Platform\Microsoft\Devices\Sensors\SensorFailedException.cs" />
+    <Compile Include="Platform\Microsoft\Devices\Sensors\SensorReadingEventArgs.cs" />
+    <Compile Include="Platform\Microsoft\Devices\Sensors\SensorState.cs" />
+  </ItemGroup>
+</Project>

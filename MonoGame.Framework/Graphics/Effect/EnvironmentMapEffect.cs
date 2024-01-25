@@ -36,8 +36,6 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter worldInverseTransposeParam;
         EffectParameter worldViewProjParam;
 
-        int _shaderIndex = -1;
-
         #endregion
 
         #region Fields
@@ -318,8 +316,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Higher values make the environment map only visible around the silhouette 
         /// edges of the object, while lower values make it visible everywhere. 
         /// Setting this property to 0 disables Fresnel entirely, making the 
-        /// environment map equally visible regardless of view angle. The default is 
-        /// 1. Fresnel only affects the environment map RGB (the intensity of which is 
+        /// environment map equally visible regardless of view angle. The default is 1. 
+        /// Fresnel only affects the environment map RGB (the intensity of which is 
         /// controlled by EnvironmentMapAmount). The alpha contribution (controlled by 
         /// EnvironmentMapSpecular) is not affected by the Fresnel setting.
         /// </summary>
@@ -458,7 +456,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override bool OnApply()
+        protected internal override void OnApply()
         {
             // Recompute the world+view+projection matrix or fog vector?
             dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
@@ -502,15 +500,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 dirtyFlags &= ~EffectDirtyFlags.ShaderIndex;
 
-                if (_shaderIndex != shaderIndex)
-                {
-                    _shaderIndex = shaderIndex;
-                    CurrentTechnique = Techniques[_shaderIndex];
-                    return true;
-                }
+                CurrentTechnique = Techniques[shaderIndex];
             }
-
-            return false;
         }
 
 

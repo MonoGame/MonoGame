@@ -1,0 +1,87 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RollForward>Major</RollForward>
+    <Description>The MonoGame Framework Effect Compiler (MGFXC) command line tool is used to compile shaders.</Description>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Effect.Compiler</BaseOutputPath>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>mgfxc</ToolCommandName>
+    <PackageId>dotnet-mgfxc</PackageId>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>mgfxc</AssemblyName>
+    <UseAppHost>true</UseAppHost>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\MonoGame.Framework\BoundingBox.cs" />
+    <Compile Include="..\..\MonoGame.Framework\BoundingFrustum.cs" />
+    <Compile Include="..\..\MonoGame.Framework\BoundingSphere.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Color.cs" />
+    <Compile Include="..\..\MonoGame.Framework\ContainmentType.cs" />
+    <Compile Include="..\..\MonoGame.Framework\EventHelpers.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\ColorWriteChannels.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\EffectParameterClass.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\EffectParameterType.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\GraphicsResource.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\Blend.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\BlendFunction.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\BlendState.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\CompareFunction.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\CullMode.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\DepthStencilState.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\FillMode.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\RasterizerState.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\SamplerState.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\StencilOperation.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TargetBlendState.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureAddressMode.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilter.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilterMode.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\Vertices\VertexElementUsage.cs" />
+    <Compile Include="..\..\MonoGame.Framework\MathHelper.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Matrix.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Plane.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Point.cs" />
+    <Compile Include="..\..\MonoGame.Framework\PlaneIntersectionType.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Quaternion.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Ray.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Rectangle.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Vector2.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Vector3.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Vector4.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Design\Vector2TypeConverter.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Design\Vector3TypeConverter.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Design\Vector4TypeConverter.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Design\VectorConversion.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Graphics\PackedVector\IPackedVector.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Platform\Utilities\CurrentPlatform.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs" />
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\LoadedTypeCollection.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
+    <PackageReference Include="SharpDX" Version="4.0.1" />
+    <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="..\..\ThirdParty\Dependencies\CppNet\CppNet.dll" />
+  </ItemGroup>
+
+  <Import Project="..\..\Switch\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Switch\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\..\XBoxOne\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\XBoxOne\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\..\PlayStation4\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\PlayStation4\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\..\PlayStation5\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\PlayStation5\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\..\Stadia\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Stadia\MonoGame.Effect.Compiler.targets')" />
+
+</Project>

@@ -58,8 +58,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public string OutputDirectory { get; private set; }
         public string IntermediateDirectory { get; private set; }
 
+        public ContentStatsCollection ContentStats { get; private set; }
+
         private ContentCompiler _compiler;
-        private MethodInfo _compileMethod;
 
         public ContentBuildLogger Logger { get; set; }
 
@@ -105,18 +106,22 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             OutputDirectory = PathHelper.NormalizeDirectory(outputDir);
             IntermediateDirectory = PathHelper.NormalizeDirectory(intermediateDir);
 
-	    RegisterCustomConverters ();
+	        RegisterCustomConverters();
+
+            // Load the previous content stats.            
+            ContentStats = new ContentStatsCollection();
+            ContentStats.PreviousStats = ContentStatsCollection.Read(intermediateDir);
         }
 
-	public void AssignTypeConverter<TType, TTypeConverter> ()
-	{
-		TypeDescriptor.AddAttributes (typeof (TType), new TypeConverterAttribute (typeof (TTypeConverter)));
-	}
+	    public void AssignTypeConverter<TType, TTypeConverter> ()
+	    {
+		    TypeDescriptor.AddAttributes (typeof (TType), new TypeConverterAttribute (typeof (TTypeConverter)));
+	    }
 
-	private void RegisterCustomConverters ()
-	{
-		AssignTypeConverter<Microsoft.Xna.Framework.Color, StringToColorConverter> ();
-	}
+	    private void RegisterCustomConverters ()
+	    {
+		    AssignTypeConverter<Microsoft.Xna.Framework.Color, StringToColorConverter> ();
+	    }
 
         public void AddAssembly(string assemblyFilePath)
         {
@@ -607,6 +612,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 // Do we need to rebuild?
                 if (rebuild)
                 {
+                    var startTime = DateTime.UtcNow;
+
                     // Import and process the content.
                     var processedObject = ProcessContent(pipelineEvent);
 
@@ -619,6 +626,16 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
                     // Store the new event into the intermediate folder.
                     pipelineEvent.Save(eventFilepath);
+
+                    var buildTime = DateTime.UtcNow - startTime;
+
+                    // Record stat for this file.
+                    ContentStats.RecordStats(pipelineEvent.SourceFile, pipelineEvent.DestFile, pipelineEvent.Processor, processedObject.GetType(), (float)buildTime.TotalSeconds);
+                }
+                else
+                {
+                    // Copy the stats from the previous build.
+                    ContentStats.CopyPreviousStats(pipelineEvent.SourceFile);
                 }
             }
             finally
@@ -652,6 +669,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
                 }
                 catch (PipelineException)
+                {
+                    throw;
+                }
+                catch (InvalidContentException)
                 {
                     throw;
                 }

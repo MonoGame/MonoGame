@@ -51,6 +51,42 @@ namespace Microsoft.Xna.Framework.Graphics
             return levels;
         }
 
+        internal static void GetSizeForLevel(int width, int height, int level, out int w, out int h)
+        {
+            w = width;
+            h = height;
+            while (level > 0)
+            {
+                --level;
+                w /= 2;
+                h /= 2;
+            }
+            if (w == 0)
+                w = 1;
+            if (h == 0)
+                h = 1;
+        }
+
+        internal static void GetSizeForLevel(int width, int height, int depth, int level, out int w, out int h, out int d)
+        {
+            w = width;
+            h = height;
+            d = depth;
+            while (level > 0)
+            {
+                --level;
+                w /= 2;
+                h /= 2;
+                d /= 2;
+            }
+            if (w == 0)
+                w = 1;
+            if (h == 0)
+                h = 1;
+            if (d == 0)
+                d = 1;
+        }
+
         internal int GetPitch(int width)
         {
             Debug.Assert(width > 0, "The width is negative!");
@@ -65,6 +101,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.RgbPvrtc2Bpp:
                 case SurfaceFormat.RgbaPvrtc2Bpp:
                 case SurfaceFormat.RgbEtc1:
+                case SurfaceFormat.Rgb8Etc2:
+                case SurfaceFormat.Srgb8Etc2:
+                case SurfaceFormat.Rgb8A1Etc2:
+                case SurfaceFormat.Srgb8A1Etc2:
                 case SurfaceFormat.Dxt3:
                 case SurfaceFormat.Dxt3SRgb:
                 case SurfaceFormat.Dxt5:

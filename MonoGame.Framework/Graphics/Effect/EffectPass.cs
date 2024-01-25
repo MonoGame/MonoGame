@@ -63,20 +63,16 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Apply()
         {
             // Set/get the correct shader handle/cleanups.
-            //
-            // TODO: This "reapply" if the shader index changes
-            // trick is sort of ugly.  We should probably rework
-            // this to use some sort of "technique/pass redirect".
-            //
-            if (_effect.OnApply())
+
+            var current = _effect.CurrentTechnique;
+            _effect.OnApply();
+            if (_effect.CurrentTechnique != current)
             {
                 _effect.CurrentTechnique.Passes[0].Apply();
                 return;
             }
 
             var device = _effect.GraphicsDevice;
-
-#if OPENGL || DIRECTX
 
             if (_vertexShader != null)
             {
@@ -109,8 +105,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     device.SetConstantBuffer(ShaderStage.Pixel, c, cb);
                 }
             }
-
-#endif
 
             // Set the render states if we have some.
             if (_rasterizerState != null)

@@ -3,11 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Xna.Framework.Utilities;
-using System.Collections.Generic;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -70,15 +70,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 return false;
 
             // Skip over indexer properties.
-            if (property.Name == "Item")
-            {
-                var getMethod = ReflectionHelpers.GetPropertyGetMethod(property);
-                var setMethod = ReflectionHelpers.GetPropertySetMethod(property);
-
-                if ((getMethod != null && getMethod.GetParameters().Length > 0) ||
-                    (setMethod != null && setMethod.GetParameters().Length > 0))
-                    return false;
-            }
+            if (property.Name == "Item" && property.GetIndexParameters().Length > 0)
+                return false;
 
             // Are we explicitly asked to ignore this item?
             if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(property) != null)

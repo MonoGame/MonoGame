@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Audio;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -21,7 +22,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>Resulting game asset.</returns>
         public override AudioContent Import(string filename, ContentImporterContext context)
         {
-            var content = new AudioContent(filename, AudioFileType.Wav);
+            if (string.IsNullOrEmpty(filename))
+                throw new ArgumentNullException("filename");
+            if (context == null)
+                throw new ArgumentNullException("context");
+
+            if (!File.Exists(filename))
+                throw new FileNotFoundException(string.Format("Could not locate audio file {0}.", Path.GetFileName(filename)));
+            
+            var content = new AudioContent(filename, AudioFileType.Ogg);
             return content;
         }
     }

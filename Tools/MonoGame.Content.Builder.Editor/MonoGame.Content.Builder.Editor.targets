@@ -1,0 +1,35 @@
+<Project>
+
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)\..\MonoGame.Content.Builder\CommandLineParser.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)\..\..\LICENSE.txt">
+      <Link>LICENSE.txt</Link>
+      <LogicalName>LICENSE.txt</LogicalName>
+    </EmbeddedResource>
+
+    <!-- The resources for icons and buttons -->
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)\App.ico" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)\Icons\*">
+      <LogicalName>Icons.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+
+    <!-- The resources for treeview -->
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)\Icons\TreeView\*">
+      <LogicalName>TreeView.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    
+    <!-- The resources for output filtering -->
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)\Icons\Build\*">
+      <LogicalName>Build.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+
+    <!-- The resources for menubar and toolbar -->
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)\Icons\Commands\*">
+      <LogicalName>Commands.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

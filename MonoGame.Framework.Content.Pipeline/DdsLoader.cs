@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
@@ -14,6 +15,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// </summary>
     class DdsLoader
     {
+        [Flags]
         enum Ddsd : uint
         {
             Caps = 0x1,             // Required in every DDS file
@@ -26,6 +28,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             Depth = 0x800000,       // Required in a depth texture
         }
 
+        [Flags]
         enum DdsCaps : uint
         {
             Complex = 0x8,       // Optional; must be used on any file that contains more than one surface (a mipmap, a cubic environment map, or mipmapped volume texture)
@@ -33,6 +36,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             Texture = 0x1000,    // Required
         }
 
+        [Flags]
         enum DdsCaps2 : uint
         {
             Cubemap = 0x200,
@@ -47,6 +51,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             CubemapAllFaces = Cubemap | CubemapPositiveX | CubemapNegativeX | CubemapPositiveY | CubemapNegativeY | CubemapPositiveZ | CubemapNegativeZ,
         }
 
+        [Flags]
         enum Ddpf : uint
         {
             AlphaPixels = 0x1,
@@ -69,6 +74,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         enum FourCC : uint
         {
+            A32B32G32R32F = 116,
             Dxt1 = 0x31545844,
             Dxt2 = 0x32545844,
             Dxt3 = 0x33545844,
@@ -108,9 +114,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             rbSwap = false;
             if (pixelFormat.dwFlags.HasFlag(Ddpf.FourCC))
             {
-                // It is a compressed format
                 switch (pixelFormat.dwFourCC)
                 {
+                    case FourCC.A32B32G32R32F:
+                        return SurfaceFormat.Vector4;
                     case FourCC.Dxt1:
                         return SurfaceFormat.Dxt1;
                     case FourCC.Dxt2:
@@ -141,7 +148,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     }
                     else if (pixelFormat.dwRgbBitCount == 32)
                     {
-                        rbSwap = pixelFormat.dwBBitMask == 0xFF00;
+                        rbSwap = pixelFormat.dwBBitMask == 0xFF;
                         return SurfaceFormat.Color;
                     }
                     throw new ContentLoadException("Unsupported RGBA pixel format");
@@ -154,9 +161,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         rbSwap = pixelFormat.dwBBitMask == 0x1F;
                         return SurfaceFormat.Bgr565;
                     }
+                    else if (pixelFormat.dwRgbBitCount == 24)
+                    {
+                        rbSwap = pixelFormat.dwBBitMask == 0xFF;
+                        return SurfaceFormat.Color;
+                    }
+                    else if (pixelFormat.dwRgbBitCount == 32)
+                    {
+                        rbSwap = pixelFormat.dwBBitMask == 0xFF;
+                        return SurfaceFormat.Color;
+                    }
                     throw new ContentLoadException("Unsupported RGB pixel format");
                 }
             }
+            //else if (pixelFormat.dwFlags.HasFlag(Ddpf.Luminance))
+            //{
+            //    return SurfaceFormat.Alpha8;
+            //}
             throw new ContentLoadException("Unsupported pixel format");
         }
 
@@ -184,6 +205,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 case SurfaceFormat.Dxt5:
                     return new Dxt5BitmapContent(width, height);
+
+                case SurfaceFormat.Vector4:
+                    return new PixelBitmapContent<Vector4>(width, height);
             }
             throw new ContentLoadException("Unsupported SurfaceFormat " + format);
         }
@@ -194,21 +218,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // https://msdn.microsoft.com/en-us/library/bb943991.aspx
             int pitch = 0;
             int rows = 0;
-            if (format == SurfaceFormat.Dxt1)
+
+            switch (format)
             {
-                pitch = MathHelper.Max(1, ((width + 3) / 4)) * 8;
-                rows = (height + 3) / 4;
+                case SurfaceFormat.Color:
+                case SurfaceFormat.Bgra4444:
+                case SurfaceFormat.Bgra5551:
+                case SurfaceFormat.Bgr565:
+                case SurfaceFormat.Vector4:
+                    pitch = width * format.GetSize();
+                    rows = height;
+                    break;
+
+                case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt3:
+                case SurfaceFormat.Dxt5:
+                    pitch = ((width + 3) / 4) * format.GetSize();
+                    rows = (height + 3) / 4;
+                    break;
+
+                default:
+                    throw new ContentLoadException("Unsupported SurfaceFormat " + format);
             }
-            else if (format == SurfaceFormat.Dxt3 || format == SurfaceFormat.Dxt5)
-            {
-                pitch = MathHelper.Max(1, ((width + 3) / 4)) * 16;
-                rows = (height + 3) / 4;
-            }
-            else if (format == SurfaceFormat.Color)
-            {
-                pitch = (width * 32 + 7) / 8;
-                rows = height;
-            }
+
             return pitch * rows;
         }
 
@@ -271,19 +303,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 int faceCount = 1;
                 int mipMapCount = (int)(header.dwCaps.HasFlag(DdsCaps.MipMap) ? header.dwMipMapCount : 1);
-                if (header.dwCaps.HasFlag(DdsCaps.Complex))
+                if (header.dwCaps2.HasFlag(DdsCaps2.Cubemap))
                 {
-                    if (header.dwCaps2.HasFlag(DdsCaps2.Cubemap))
-                    {
-                        if (!header.dwCaps2.HasFlag(DdsCaps2.CubemapAllFaces))
-                            throw new ContentLoadException("Incomplete cubemap in DDS file");
-                        faceCount = 6;
-                        output = new TextureCubeContent() { Identity = identity };
-                    }
-                    else
-                    {
-                        output = new Texture2DContent() { Identity = identity };
-                    }
+                    if (!header.dwCaps2.HasFlag(DdsCaps2.CubemapAllFaces))
+                        throw new ContentLoadException("Incomplete cubemap in DDS file");
+                    faceCount = 6;
+                    output = new TextureCubeContent() { Identity = identity };
                 }
                 else
                 {
@@ -302,7 +327,39 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     {
                         var content = CreateBitmapContent(format, w, h);
                         var byteCount = GetBitmapSize(format, w, h);
+                        // A 24-bit format is slightly different
+                        if (header.ddspf.dwRgbBitCount == 24)
+                            byteCount = 3 * w * h;
                         var bytes = reader.ReadBytes(byteCount);
+                        if (rbSwap)
+                        {
+                            switch (format)
+                            {
+                                case SurfaceFormat.Bgr565:
+                                    ByteSwapBGR565(bytes);
+                                    break;
+                                case SurfaceFormat.Bgra4444:
+                                    ByteSwapBGRA4444(bytes);
+                                    break;
+                                case SurfaceFormat.Bgra5551:
+                                    ByteSwapBGRA5551(bytes);
+                                    break;
+                                case SurfaceFormat.Color:
+                                    if (header.ddspf.dwRgbBitCount == 32)
+                                        ByteSwapRGBX(bytes);
+                                    else if (header.ddspf.dwRgbBitCount == 24)
+                                        ByteSwapRGB(bytes);
+                                    break;
+                            }
+                        }
+                        if ((format == SurfaceFormat.Color) && header.ddspf.dwFlags.HasFlag(Ddpf.Rgb) && !header.ddspf.dwFlags.HasFlag(Ddpf.AlphaPixels))
+                        {
+                            // Fill or add alpha with opaque
+                            if (header.ddspf.dwRgbBitCount == 32)
+                                ByteFillAlpha(bytes);
+                            else if (header.ddspf.dwRgbBitCount == 24)
+                                ByteExpandAlpha(ref bytes);
+                        }
                         content.SetPixelData(bytes);
                         mipMaps.Add(content);
                         w = MathHelper.Max(1, w / 2);
@@ -313,6 +370,162 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             return output;
+        }
+
+        static void ByteFillAlpha(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 4)
+            {
+                bytes[i + 3] = 255;
+            }
+        }
+
+        static void ByteExpandAlpha(ref byte[] bytes)
+        {
+            var rgba = new byte[bytes.Length + (bytes.Length / 3)];
+            int j = 0;
+            for (int i = 0; i < bytes.Length; i += 3)
+            {
+                rgba[j] = bytes[i];
+                rgba[j + 1] = bytes[i + 1];
+                rgba[j + 2] = bytes[i + 2];
+                rgba[j + 3] = 255;
+                j += 4;
+            }
+            bytes = rgba;
+        }
+
+        static void ByteSwapRGB(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 3)
+            {
+                byte r = bytes[i];
+                bytes[i] = bytes[i + 2];
+                bytes[i + 2] = r;
+            }
+        }
+
+        static void ByteSwapRGBX(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 4)
+            {
+                byte r = bytes[i];
+                bytes[i] = bytes[i + 2];
+                bytes[i + 2] = r;
+            }
+        }
+
+        static void ByteSwapBGRA4444(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 2)
+            {
+                var r = bytes[i] & 0xF0;
+                var b = bytes[i + 1] & 0xF0;
+                bytes[i] = (byte)((bytes[i] & 0x0F) | b);
+                bytes[i + 1] = (byte)((bytes[i + 1] & 0x0F) | r);
+            }
+        }
+
+        static void ByteSwapBGRA5551(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 2)
+            {
+                var r = (bytes[i] & 0xF8) >> 3;
+                var b = (bytes[i + 1] & 0x3E) >> 1;
+                bytes[i] = (byte)((bytes[i] & 0x07) | (b << 3));
+                bytes[i + 1] = (byte)((bytes[i + 1] & 0xC1) | (r << 1));
+            }
+        }
+
+        static void ByteSwapBGR565(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 2)
+            {
+                var r = (bytes[i] & 0xF8) >> 3;
+                var b = bytes[i + 1] & 0x1F;
+                bytes[i] = (byte)((bytes[i] & 0x07) | (b << 3));
+                bytes[i + 1] = (byte)((bytes[i + 1] & 0xE0) | r);
+            }
+        }
+
+        internal static void WriteUncompressed(string filename, BitmapContent bitmapContent)
+        {
+            using (var writer = new BinaryWriter(new FileStream(filename, FileMode.Create, FileAccess.Write)))
+            {
+                // Write signature ("DDS ")
+                writer.Write((byte)0x44);
+                writer.Write((byte)0x44);
+                writer.Write((byte)0x53);
+                writer.Write((byte)0x20);
+
+                var header = new DdsHeader();
+                header.dwSize = 124;
+                header.dwFlags = Ddsd.Caps | Ddsd.Width | Ddsd.Height | Ddsd.Pitch | Ddsd.PixelFormat;
+                header.dwWidth = (uint)bitmapContent.Width;
+                header.dwHeight = (uint)bitmapContent.Height;
+                header.dwPitchOrLinearSize = (uint)(bitmapContent.Width * 4);
+                header.dwDepth = (uint)0;
+                header.dwMipMapCount = (uint)0;
+                
+                writer.Write((uint)header.dwSize);
+                writer.Write((uint)header.dwFlags);
+                writer.Write((uint)header.dwHeight);
+                writer.Write((uint)header.dwWidth);
+                writer.Write((uint)header.dwPitchOrLinearSize);
+                writer.Write((uint)header.dwDepth);
+                writer.Write((uint)header.dwMipMapCount);
+
+                // 11 unsed and reserved DWORDS.
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+
+                SurfaceFormat format;
+                if (!bitmapContent.TryGetFormat(out format) || format != SurfaceFormat.Color)
+                    throw new NotSupportedException("Unsupported bitmap content!");
+
+                header.ddspf.dwSize = 32;
+                header.ddspf.dwFlags = Ddpf.AlphaPixels | Ddpf.Rgb;
+                header.ddspf.dwFourCC = 0;
+                header.ddspf.dwRgbBitCount = 32;
+                header.ddspf.dwRBitMask = 0x000000ff;
+                header.ddspf.dwGBitMask = 0x0000ff00;
+                header.ddspf.dwBBitMask = 0x00ff0000;
+                header.ddspf.dwABitMask = 0xff000000;
+
+                // Write the DDS_PIXELFORMAT
+                writer.Write((uint)header.ddspf.dwSize);
+                writer.Write((uint)header.ddspf.dwFlags);
+                writer.Write((uint)header.ddspf.dwFourCC);
+                writer.Write((uint)header.ddspf.dwRgbBitCount);
+                writer.Write((uint)header.ddspf.dwRBitMask);
+                writer.Write((uint)header.ddspf.dwGBitMask);
+                writer.Write((uint)header.ddspf.dwBBitMask);
+                writer.Write((uint)header.ddspf.dwABitMask);
+
+                header.dwCaps = DdsCaps.Texture;
+                header.dwCaps2 = 0;
+
+                // Continue reading DDS_HEADER
+                writer.Write((uint)header.dwCaps);
+                writer.Write((uint)header.dwCaps2);
+
+                // More reserved unused DWORDs.
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+
+                // Write out the face data.
+                writer.Write(bitmapContent.GetPixelData());
+            }
         }
     }
 }

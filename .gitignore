@@ -45,6 +45,9 @@ project.lock.json
 /MonoGame.Framework/MonoGame.Framework.WindowsUniversal.project.lock.json
 artifacts/
 
+# JetBrains Rider
+.idea/
+
 #Tooling
 _ReSharper*/
 *.resharper
@@ -68,23 +71,10 @@ monodroid*.msi
 # Output docs
 Documentation/Output/
 
-# Protobuild Generated Files
-MonoGame.Framework.Content.Pipeline/*.csproj
-MonoGame.Framework/*.csproj
-Tools/2MGFX/*.csproj
-Tools/MGCB/*.csproj
-Tools/Pipeline/*.csproj
-ThirdParty/Lidgren.Network/*.csproj
-Test/*.csproj
-!Test/MonoGame.Test.XNA.csproj
-/*.sln
-*.speccache
-*.ncrunchproject
-*.ncrunchsolution
-
 #Mac Package Files
 *.pkg
 *.mpack
+**/packages
 
 #Nuget Packages
 **/*.nupkg
@@ -93,3 +83,10 @@ Test/*.csproj
 *.zip
 
 Installers/MacOS/Scripts/Framework/postinstall
+IDE/MonoDevelop/MonoDevelop.MonoGame/templates/Common/MonoGame.Framework.dll.config
+
+# CAKE
+.cake/**
+
+# docfx
+_*

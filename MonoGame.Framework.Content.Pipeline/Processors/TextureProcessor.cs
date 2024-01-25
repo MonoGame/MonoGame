@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     return input;
             }
 
-            if (ColorKeyEnabled || ResizeToPowerOfTwo || MakeSquare || PremultiplyAlpha)
+            if (ColorKeyEnabled || ResizeToPowerOfTwo || MakeSquare || PremultiplyAlpha || GenerateMipmaps)
             {
                 // Convert to floating point format for modifications. Keep the original format for conversion back later on if required.
                 var originalType = input.Faces[0][0].GetType();
@@ -59,6 +59,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     context.Logger.LogImportantMessage("Could not convert input texture for processing. " + ex.ToString());
                     throw ex; 
                 }
+
+                if (GenerateMipmaps)
+                    input.GenerateMipmaps(true);
 
                 for (int f = 0; f < input.Faces.Count; ++f)
                 {
@@ -111,38 +114,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     input.ConvertBitmapType(originalType);
             }
 
-            if (TextureFormat == TextureProcessorOutputFormat.NoChange)
-                return input;
-			
-			try 
-			{
-			    if (TextureFormat != TextureProcessorOutputFormat.Color)
-				{
-					input.ConvertBitmapType(typeof(PixelBitmapContent<Vector4>));
-                	GraphicsUtil.CompressTexture(context.TargetProfile, input, TextureFormat, context, GenerateMipmaps, false);
-				}
-                else
-                {
-                    input.ConvertBitmapType(typeof(PixelBitmapContent<Color>));
-                    if (GenerateMipmaps)
-                        input.GenerateMipmaps(false);
-                }
-			}
-			catch (EntryPointNotFoundException ex)
-            {
-				context.Logger.LogImportantMessage ("Could not find the entry point to compress the texture. " + ex.ToString());
-				throw ex;
-			}
-			catch (DllNotFoundException ex)
-            {
-				context.Logger.LogImportantMessage ("Could not compress texture. Required shared lib is missing. " + ex.ToString());
-				throw ex;
-			}
-			catch (Exception ex)
-			{
-				context.Logger.LogImportantMessage ("Could not convert texture. " + ex.ToString());
-				throw ex;
-			}
+            // Get the texture profile for the platform and let it convert the texture.
+            var texProfile = TextureProfile.ForPlatform(context.TargetPlatform);
+            texProfile.ConvertTexture(context, input, TextureFormat, false);	
 
             return input;
         }

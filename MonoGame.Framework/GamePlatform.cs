@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
@@ -16,8 +17,7 @@ namespace Microsoft.Xna.Framework
         protected TimeSpan _inactiveSleepTime = TimeSpan.FromMilliseconds(20.0);
         protected bool _needsToResetElapsedTime = false;
         bool disposed;
-        protected bool _alreadyInFullScreenMode = false;
-        protected bool _alreadyInWindowedMode = false;
+        protected bool InFullScreenMode = false;
         protected bool IsDisposed { get { return disposed; } }
 
         #endregion
@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework
                 if (_isActive != value)
                 {
                     _isActive = value;
-                    Raise(_isActive ? Activated : Deactivated, EventArgs.Empty);
+                    EventHelpers.Raise(this, _isActive ? Activated : Deactivated, EventArgs.Empty);
                 }
             }
         }
@@ -108,13 +108,6 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
 
-        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
-            where TEventArgs : EventArgs
-        {
-            if (handler != null)
-                handler(this, e);
-        }
-
         /// <summary>
         /// Raises the AsyncRunLoopEnded event.  This method must be called by
         /// derived classes when the asynchronous run loop they start has
@@ -122,7 +115,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         protected void RaiseAsyncRunLoopEnded()
         {
-            Raise(AsyncRunLoopEnded, EventArgs.Empty);
+            EventHelpers.Raise(this, AsyncRunLoopEnded, EventArgs.Empty);
         }
 
         #endregion Events
@@ -138,11 +131,6 @@ namespace Microsoft.Xna.Framework
         public virtual void BeforeInitialize()
         {
             IsActive = true;
-            if (this.Game.GraphicsDevice == null) 
-            {
-                var graphicsDeviceManager = Game.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			   
-                graphicsDeviceManager.CreateDevice();
-            }
         }
 
         /// <summary>
@@ -257,6 +245,15 @@ namespace Microsoft.Xna.Framework
         public virtual void Present() { }
 
         protected virtual void OnIsMouseVisibleChanged() {}
+
+        /// <summary>
+        /// Called by the GraphicsDeviceManager to notify the platform
+        /// that the presentation parameters have changed.
+        /// </summary>
+        /// <param name="pp">The new presentation parameters.</param>
+        internal virtual void OnPresentationChanged(PresentationParameters pp)
+        {
+        }
 
         #endregion Methods
 

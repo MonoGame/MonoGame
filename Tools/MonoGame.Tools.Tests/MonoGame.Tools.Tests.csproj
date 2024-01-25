@@ -1,0 +1,1083 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RollForward>Major</RollForward>
+    <Description>The unit tests for the MonoGame framework.</Description>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <DefineConstants>DESKTOPGL</DefineConstants>
+    <BaseOutputPath>..\..\Artifacts\Tests\Tools</BaseOutputPath>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <UseAppHost>true</UseAppHost>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnitLite" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
+    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\DxtUtil.cs">
+      <Link>DxtUtil.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="../../Tests/Assets/**/*" CopyToOutputDirectory="PreserveNewest">
+      <Link>Assets/%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="../../MonoGame.Framework/Platform/Graphics/Effect/Resources/*.fx" CopyToOutputDirectory="PreserveNewest">
+      <Link>Assets/Effects/Stock/%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="../../MonoGame.Framework/Platform/Graphics/Effect/Resources/*.fxh" CopyToOutputDirectory="PreserveNewest">
+      <Link>Assets/Effects/Stock/%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="..\..\Tests\Assets\tests.xsl">
+      <Link>Assets\.\tests.xsl</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\rgbf.tif">
+      <Link>Assets\Textures\rgbf.tif</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\SampleCube64DXT1Mips.dds">
+      <Link>Assets\Textures\SampleCube64DXT1Mips.dds</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\Logo_BMPV5.bmp">
+      <Link>Assets\Textures\Logo_BMPV5.bmp</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\RGBA16.png">
+      <Link>Assets\Textures\RGBA16.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\lines-128.xnb">
+      <Link>Assets\Textures\lines-128.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\color_32bit.png">
+      <Link>Assets\Textures\color_32bit.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px.dds">
+      <Link>Assets\Textures\LogoOnly_64px.dds</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px.bmp">
+      <Link>Assets\Textures\LogoOnly_64px.bmp</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\white-64.xnb">
+      <Link>Assets\Textures\white-64.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\red_128.png">
+      <Link>Assets\Textures\red_128.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px.gif">
+      <Link>Assets\Textures\LogoOnly_64px.gif</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\lines-32.xnb">
+      <Link>Assets\Textures\lines-32.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\8bit.png">
+      <Link>Assets\Textures\8bit.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\random_16px_dxt.xnb">
+      <Link>Assets\Textures\random_16px_dxt.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\GlassPane.xnb">
+      <Link>Assets\Textures\GlassPane.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\Logo555.bmp">
+      <Link>Assets\Textures\Logo555.bmp</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\Sunset.dds">
+      <Link>Assets\Textures\Sunset.dds</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\sample_1280x853.hdr">
+      <Link>Assets\Textures\sample_1280x853.hdr</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\lines-diag-128.xnb">
+      <Link>Assets\Textures\lines-diag-128.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\lines-diag-64.xnb">
+      <Link>Assets\Textures\lines-diag-64.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\MonoGameIcon.xnb">
+      <Link>Assets\Textures\MonoGameIcon.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\color_24bit.png">
+      <Link>Assets\Textures\color_24bit.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\Logo_65x64_16bit.xnb">
+      <Link>Assets\Textures\Logo_65x64_16bit.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\32bit.png">
+      <Link>Assets\Textures\32bit.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\Surge.xnb">
+      <Link>Assets\Textures\Surge.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px-4bits.bmp">
+      <Link>Assets\Textures\LogoOnly_64px-4bits.bmp</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px-mipmaps.dds">
+      <Link>Assets\Textures\LogoOnly_64px-mipmaps.dds</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\white-32.xnb">
+      <Link>Assets\Textures\white-32.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px.tga">
+      <Link>Assets\Textures\LogoOnly_64px.tga</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\1bit.png">
+      <Link>Assets\Textures\1bit.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\Logo565.bmp">
+      <Link>Assets\Textures\Logo565.bmp</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\color_64bit.png">
+      <Link>Assets\Textures\color_64bit.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\SampleCube64DXT1Mips.xnb">
+      <Link>Assets\Textures\SampleCube64DXT1Mips.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\fun-background.xnb">
+      <Link>Assets\Textures\fun-background.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px.png">
+      <Link>Assets\Textures\LogoOnly_64px.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px.jpg">
+      <Link>Assets\Textures\LogoOnly_64px.jpg</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\random_16px_dxt_alpha.xnb">
+      <Link>Assets\Textures\random_16px_dxt_alpha.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\lines-64.xnb">
+      <Link>Assets\Textures\lines-64.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px-R8G8B8.dds">
+      <Link>Assets\Textures\LogoOnly_64px-R8G8B8.dds</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px-monochrome.bmp">
+      <Link>Assets\Textures\LogoOnly_64px-monochrome.bmp</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\white-1.xnb">
+      <Link>Assets\Textures\white-1.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px.tif">
+      <Link>Assets\Textures\LogoOnly_64px.tif</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\color_48bit.png">
+      <Link>Assets\Textures\color_48bit.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\blue_0.png">
+      <Link>Assets\Textures\blue_0.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\red_668_dxt.xnb">
+      <Link>Assets\Textures\red_668_dxt.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\24bit.png">
+      <Link>Assets\Textures\24bit.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\LogoOnly_64px-X8R8G8B8.dds">
+      <Link>Assets\Textures\LogoOnly_64px-X8R8G8B8.dds</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\white-128.xnb">
+      <Link>Assets\Textures\white-128.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Textures\lines-diag-32.xnb">
+      <Link>Assets\Textures\lines-diag-32.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\ScissorRectangle\Draw_without_render_target_change.png">
+      <Link>Assets\ReferenceImages\ScissorRectangle\Draw_without_render_target_change.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\ScissorRectangle\Draw_with_scissor_rect.png">
+      <Link>Assets\ReferenceImages\ScissorRectangle\Draw_with_scissor_rect.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\ScissorRectangle\Draw_with_render_target_change.png">
+      <Link>Assets\ReferenceImages\ScissorRectangle\Draw_with_render_target_change.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_Color_False_.png">
+      <Link>Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_Color_False_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_ColorSRgb_True_.png">
+      <Link>Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_ColorSRgb_True_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Texture2D\SetDataRowPitch.png">
+      <Link>Assets\ReferenceImages\Texture2D\SetDataRowPitch.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_Color_True_.png">
+      <Link>Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_Color_True_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_ColorSRgb_False_.png">
+      <Link>Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_ColorSRgb_False_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Texture2D\TextureArrayAsRenderTargetAndShaderResource.png">
+      <Link>Assets\ReferenceImages\Texture2D\TextureArrayAsRenderTargetAndShaderResource.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Multiline_noNewline.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Multiline_noNewline.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Scaled.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Scaled.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Draw_with_LayerDepth.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Draw_with_LayerDepth.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Multiline_Newline.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Multiline_Newline.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Origins_rotated.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Origins_rotated.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Rotated.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Rotated.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipVertically_.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipVertically_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Plain.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Plain.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Multiline_CarriageReturn.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Multiline_CarriageReturn.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Hullabaloo.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Hullabaloo.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Font_spacing_is_respected.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Font_spacing_is_respected.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Hullabaloo2.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Hullabaloo2.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Multiline_verbatimString.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Multiline_verbatimString.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteFont\Origins_scaled.png">
+      <Link>Assets\ReferenceImages\SpriteFont\Origins_scaled.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Viewport\Does_not_clip_device_clear.png">
+      <Link>Assets\ReferenceImages\Viewport\Does_not_clip_device_clear.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Viewport\Affects_draw_origin.png">
+      <Link>Assets\ReferenceImages\Viewport\Affects_draw_origin.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Viewport\Clips_SpriteBatch_draws.png">
+      <Link>Assets\ReferenceImages\Viewport\Clips_SpriteBatch_draws.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RenderTarget2D\GenerateMips.png">
+      <Link>Assets\ReferenceImages\RenderTarget2D\GenerateMips.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\VisualTestFillMode_WireFrame_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\VisualTestFillMode_WireFrame_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\VisualTestDepthClipEnable_True_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\VisualTestDepthClipEnable_True_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\VisualTestCullMode_None_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\VisualTestCullMode_None_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\VisualTestFillMode_Solid_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\VisualTestFillMode_Solid_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\VisualTestScissorTestEnable_True_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\VisualTestScissorTestEnable_True_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_-1.0f_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_-1.0f_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\VisualTestCullMode_CullClockwiseFace_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\VisualTestCullMode_CullClockwiseFace_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\VisualTestScissorTestEnable_False_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\VisualTestScissorTestEnable_False_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\VisualTestDepthClipEnable_False_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\VisualTestDepthClipEnable_False_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_1.0f_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_1.0f_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\VisualTestCullMode_CullCounterClockwiseFace_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\VisualTestCullMode_CullCounterClockwiseFace_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_-0.0004f_.png">
+      <Link>Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_-0.0004f_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\SpaceshipModel-01.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\SpaceshipModel-01.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\SpaceshipModel-15.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\SpaceshipModel-15.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\SpaceshipModel-03.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\SpaceshipModel-03.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\SpaceshipModel-17.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\SpaceshipModel-17.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\TexturedQuad_lighting_False_.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\TexturedQuad_lighting_False_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\SpaceshipModel-13.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\SpaceshipModel-13.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\SpaceshipModel-07.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\SpaceshipModel-07.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\SpaceshipModel-11.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\SpaceshipModel-11.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\SpaceshipModel-05.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\SpaceshipModel-05.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\Colored3DCube.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\Colored3DCube.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\TexturedQuad_lighting_True_.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\TexturedQuad_lighting_True_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\SpaceshipModel-09.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\SpaceshipModel-09.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-4.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-4.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-5.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-5.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-1.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-1.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-2.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-2.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-3.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-3.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Miscellaneous\SpaceshipModel-19.png">
+      <Link>Assets\ReferenceImages\Miscellaneous\SpaceshipModel-19.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\GraphicsDevice\GetBackBufferData_null_.png">
+      <Link>Assets\ReferenceImages\GraphicsDevice\GetBackBufferData_null_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\GraphicsDevice\VertexTextureVisualTest.png">
+      <Link>Assets\ReferenceImages\GraphicsDevice\VertexTextureVisualTest.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\GraphicsDevice\Clear-3.png">
+      <Link>Assets\ReferenceImages\GraphicsDevice\Clear-3.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\GraphicsDevice\Clear-2.png">
+      <Link>Assets\ReferenceImages\GraphicsDevice\Clear-2.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\GraphicsDevice\GetBackBufferData__X_100 Y_100 Width_250 Height_250__.png">
+      <Link>Assets\ReferenceImages\GraphicsDevice\GetBackBufferData__X_100 Y_100 Width_250 Height_250__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\GraphicsDevice\Clear-1.png">
+      <Link>Assets\ReferenceImages\GraphicsDevice\Clear-1.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\GraphicsDevice\Clear-5.png">
+      <Link>Assets\ReferenceImages\GraphicsDevice\Clear-5.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\GraphicsDevice\Clear-4.png">
+      <Link>Assets\ReferenceImages\GraphicsDevice\Clear-4.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\GraphicsDevice\DrawInstancedPrimitivesVisualTest.png">
+      <Link>Assets\ReferenceImages\GraphicsDevice\DrawInstancedPrimitivesVisualTest.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\GraphicsDevice\Clear-6.png">
+      <Link>Assets\ReferenceImages\GraphicsDevice\Clear-6.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\GraphicsDevice\Clear-7.png">
+      <Link>Assets\ReferenceImages\GraphicsDevice\Clear-7.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\DepthStencilState\VisualTestDepthBufferEnable_True_.png">
+      <Link>Assets\ReferenceImages\DepthStencilState\VisualTestDepthBufferEnable_True_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\DepthStencilState\VisualTestDepthBufferEnable_False_.png">
+      <Link>Assets\ReferenceImages\DepthStencilState\VisualTestDepthBufferEnable_False_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\DepthStencilState\VisualTestStencilBuffer.png">
+      <Link>Assets\ReferenceImages\DepthStencilState\VisualTestStencilBuffer.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\BlendState\VisualTests.png">
+      <Link>Assets\ReferenceImages\BlendState\VisualTests.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_source_and_dest_rect_10_10_40_40_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_source_and_dest_rect_10_10_40_40_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_rotated_1.41f_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_rotated_1.41f_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_additive_blend.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_additive_blend.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_stretched_1.25f_0.8f_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_stretched_1.25f_0.8f_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_BackToFront_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_BackToFront_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_4_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_4_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_alpha_blending__White__80_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_alpha_blending__White__80_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_rotated_0.38f_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_rotated_0.38f_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_3_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_3_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_stretched_0.75f_2.0f_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_stretched_0.75f_2.0f_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_filter_color__Teal__.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_filter_color__Teal__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteEffects_FlipVertically_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteEffects_FlipVertically_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_stretched_1.5f_1.5f_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_stretched_1.5f_1.5f_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_2_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_2_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_filter_color__GreenYellow__.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_filter_color__GreenYellow__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_stretched_0.5f_0.5f_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_stretched_0.5f_0.5f_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_rotated_2.17f_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_rotated_2.17f_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_filter_color__Red__.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_filter_color__Red__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_without_blend.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_without_blend.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_Deferred_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_Deferred_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_source_and_dest_rect_30_30_30_50_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_source_and_dest_rect_30_30_30_50_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_FrontToBack_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_FrontToBack_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_source_rect.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_source_rect.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_1_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_1_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_normal.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_normal.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_0_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_0_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_Immediate_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_Immediate_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_viewport_changing_Immediate_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_viewport_changing_Immediate_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_rotated_2.81f_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_rotated_2.81f_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_alpha_blending__Red__120_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_alpha_blending__Red__120_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_alpha_blending__GreenYellow__200_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_alpha_blending__GreenYellow__200_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\DrawWithLayerDepth.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\DrawWithLayerDepth.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_many.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_many.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteEffects_FlipHorizontally_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteEffects_FlipHorizontally_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_source_and_dest_rect_20_30_80_60_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_source_and_dest_rect_20_30_80_60_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_viewport_changing_Deferred_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_viewport_changing_Deferred_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_Texture_.png">
+      <Link>Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_Texture_.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Model\ShouldDrawSampleModel.png">
+      <Link>Assets\ReferenceImages\Model\ShouldDrawSampleModel.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Shader\Shader__BlackOut__.png">
+      <Link>Assets\ReferenceImages\Shader\Shader__BlackOut__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Shader\Shader__HighContrast__.png">
+      <Link>Assets\ReferenceImages\Shader\Shader__HighContrast__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Shader\Shader__NoEffect__.png">
+      <Link>Assets\ReferenceImages\Shader\Shader__NoEffect__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Shader\Shader__Bevels__.png">
+      <Link>Assets\ReferenceImages\Shader\Shader__Bevels__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Shader\Shader__Invert__.png">
+      <Link>Assets\ReferenceImages\Shader\Shader__Invert__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Shader\Shader__RainbowH__.png">
+      <Link>Assets\ReferenceImages\Shader\Shader__RainbowH__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Shader\Shader__ColorFlip__.png">
+      <Link>Assets\ReferenceImages\Shader\Shader__ColorFlip__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\Shader\Shader__Grayscale__.png">
+      <Link>Assets\ReferenceImages\Shader\Shader__Grayscale__.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SamplerState\VisualTestAddressModes.png">
+      <Link>Assets\ReferenceImages\SamplerState\VisualTestAddressModes.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\ReferenceImages\SamplerState\VisualTestComparisonFunction.png">
+      <Link>Assets\ReferenceImages\SamplerState\VisualTestComparisonFunction.png</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Projects\BuildSimpleProject.csproj">
+      <Link>Assets\Projects\BuildSimpleProject.csproj</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Projects\Content\Content.mgcb">
+      <Link>Assets\Projects\Content\Content.mgcb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Projects\Content\ContentFont.spritefont">
+      <Link>Assets\Projects\Content\ContentFont.spritefont</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\Spaceship.xnb">
+      <Link>Assets\Models\Spaceship.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\enemy_0.xnb">
+      <Link>Assets\Models\enemy_0.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\Box.blend">
+      <Link>Assets\Models\Box.blend</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\NonSkeletonAnimated.fbx">
+      <Link>Assets\Models\NonSkeletonAnimated.fbx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\BlenderDefaultCube.xnb">
+      <Link>Assets\Models\BlenderDefaultCube.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\Dude\dude_2011.fbx">
+      <Link>Assets\Models\Dude\dude_2011.fbx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\Dude\upBodyC.tga">
+      <Link>Assets\Models\Dude\upBodyC.tga</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\Dude\jacket.tga">
+      <Link>Assets\Models\Dude\jacket.tga</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\Dude\dude.fbx">
+      <Link>Assets\Models\Dude\dude.fbx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\Dude\head.tga">
+      <Link>Assets\Models\Dude\head.tga</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\Dude\pants.tga">
+      <Link>Assets\Models\Dude\pants.tga</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\03_IncludingPrivateMembers.xml">
+      <Link>Assets\Xml\03_IncludingPrivateMembers.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\23_GetterOnlyPolymorphicArrayProperties.xml">
+      <Link>Assets\Xml\23_GetterOnlyPolymorphicArrayProperties.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\04_ExcludingPublicMembersOutput.xml">
+      <Link>Assets\Xml\04_ExcludingPublicMembersOutput.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\06_NullReferences.xml">
+      <Link>Assets\Xml\06_NullReferences.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\16_SharedResources.xml">
+      <Link>Assets\Xml\16_SharedResources.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\13_PolymorphicTypes.xml">
+      <Link>Assets\Xml\13_PolymorphicTypes.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\01_TheBasics.xml">
+      <Link>Assets\Xml\01_TheBasics.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\11_Dictionaries.xml">
+      <Link>Assets\Xml\11_Dictionaries.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\12_MathTypes.xml">
+      <Link>Assets\Xml\12_MathTypes.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\04_ExcludingPublicMembers.xml">
+      <Link>Assets\Xml\04_ExcludingPublicMembers.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\19_FontDescription.xml">
+      <Link>Assets\Xml\19_FontDescription.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\22_GetterOnlyProperties.xml">
+      <Link>Assets\Xml\22_GetterOnlyProperties.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\20_SystemTypes.xml">
+      <Link>Assets\Xml\20_SystemTypes.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\28_XnaCurve.xml">
+      <Link>Assets\Xml\28_XnaCurve.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\02_Inheritance.xml">
+      <Link>Assets\Xml\02_Inheritance.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\18_PrimitiveTypes.xml">
+      <Link>Assets\Xml\18_PrimitiveTypes.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\08_AllowNull.xml">
+      <Link>Assets\Xml\08_AllowNull.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\05_RenamingXmlElements.xml">
+      <Link>Assets\Xml\05_RenamingXmlElements.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\09_Collections.xml">
+      <Link>Assets\Xml\09_Collections.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\07_OptionalElements.xml">
+      <Link>Assets\Xml\07_OptionalElements.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\10_CollectionItemName.xml">
+      <Link>Assets\Xml\10_CollectionItemName.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\14_Namespaces.xml">
+      <Link>Assets\Xml\14_Namespaces.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\27_Colors.xml">
+      <Link>Assets\Xml\27_Colors.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\24_GenericTypes.xml">
+      <Link>Assets\Xml\24_GenericTypes.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\26_ChildCollections.xml">
+      <Link>Assets\Xml\26_ChildCollections.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\15_FlattenContent.xml">
+      <Link>Assets\Xml\15_FlattenContent.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\21_CustomFormatting.xml">
+      <Link>Assets\Xml\21_CustomFormatting.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\25_StructArrayNoElements.xml">
+      <Link>Assets\Xml\25_StructArrayNoElements.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Xml\17_ExternalReferences.xml">
+      <Link>Assets\Xml\17_ExternalReferences.xml</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_mono_44khz_8bit.xnb">
+      <Link>Assets\Audio\tone_mono_44khz_8bit.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_mono_44khz_imaadpcm.wav">
+      <Link>Assets\Audio\tone_mono_44khz_imaadpcm.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_stereo_44khz_16bit.wav">
+      <Link>Assets\Audio\tone_stereo_44khz_16bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\blast_mono_22hz_adpcm_ms.wav">
+      <Link>Assets\Audio\blast_mono_22hz_adpcm_ms.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_stereo_44khz_msadpcm.wav">
+      <Link>Assets\Audio\tone_stereo_44khz_msadpcm.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_mono_44khz_msadpcm.wav">
+      <Link>Assets\Audio\tone_mono_44khz_msadpcm.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_stereo_44khz_8bit.wav">
+      <Link>Assets\Audio\tone_stereo_44khz_8bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_mono_44khz_float.wav">
+      <Link>Assets\Audio\tone_mono_44khz_float.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\blast_mono.wav">
+      <Link>Assets\Audio\blast_mono.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_stereo_44khz_16bit.xnb">
+      <Link>Assets\Audio\tone_stereo_44khz_16bit.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\bark_mono_11hz_8bit.wav">
+      <Link>Assets\Audio\bark_mono_11hz_8bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\bark_mono_44hz_8bit.wav">
+      <Link>Assets\Audio\bark_mono_44hz_8bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_mono_44khz_imaadpcm.xnb">
+      <Link>Assets\Audio\tone_mono_44khz_imaadpcm.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_mono_44khz_8bit.wav">
+      <Link>Assets\Audio\tone_mono_44khz_8bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\blast_mono_44hz_adpcm_ms.wav">
+      <Link>Assets\Audio\blast_mono_44hz_adpcm_ms.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\blast_mono_11hz.wav">
+      <Link>Assets\Audio\blast_mono_11hz.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_stereo_44khz_msadpcm.xnb">
+      <Link>Assets\Audio\tone_stereo_44khz_msadpcm.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_stereo_44khz_24bit.wav">
+      <Link>Assets\Audio\tone_stereo_44khz_24bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\rock_loop_stereo_11hz_8bit.wav">
+      <Link>Assets\Audio\rock_loop_stereo_11hz_8bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\rock_loop_stereo.mp3">
+      <Link>Assets\Audio\rock_loop_stereo.mp3</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_mono_44khz_float.xnb">
+      <Link>Assets\Audio\tone_mono_44khz_float.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_stereo_44khz_8bit.xnb">
+      <Link>Assets\Audio\tone_stereo_44khz_8bit.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\rock_loop_stereo_44hz_8bit.wav">
+      <Link>Assets\Audio\rock_loop_stereo_44hz_8bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\rock_loop_stereo_44hz_adpcm_ms.wav">
+      <Link>Assets\Audio\rock_loop_stereo_44hz_adpcm_ms.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_mono_44khz_msadpcm.xnb">
+      <Link>Assets\Audio\tone_mono_44khz_msadpcm.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\rock_loop_stereo_22hz.wav">
+      <Link>Assets\Audio\rock_loop_stereo_22hz.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\bark_mono_44hz_16bit.wav">
+      <Link>Assets\Audio\bark_mono_44hz_16bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_stereo_44khz_float.xnb">
+      <Link>Assets\Audio\tone_stereo_44khz_float.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\bark_mono_44hz_32bit.wav">
+      <Link>Assets\Audio\bark_mono_44hz_32bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\bark_mono.wav">
+      <Link>Assets\Audio\bark_mono.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_stereo_44khz_imaadpcm.wav">
+      <Link>Assets\Audio\tone_stereo_44khz_imaadpcm.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\rock_loop_stereo_11hz.wav">
+      <Link>Assets\Audio\rock_loop_stereo_11hz.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_mono_44khz_24bit.wav">
+      <Link>Assets\Audio\tone_mono_44khz_24bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_mono_44khz_16bit.xnb">
+      <Link>Assets\Audio\tone_mono_44khz_16bit.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\blast_mono_22hz.wav">
+      <Link>Assets\Audio\blast_mono_22hz.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\rock_loop_mono.wav">
+      <Link>Assets\Audio\rock_loop_mono.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\blast_mono_11hz_adpcm_ms.wav">
+      <Link>Assets\Audio\blast_mono_11hz_adpcm_ms.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\rock_loop_stereo.ogg">
+      <Link>Assets\Audio\rock_loop_stereo.ogg</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_stereo_44khz_float.wav">
+      <Link>Assets\Audio\tone_stereo_44khz_float.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\bark_mono_22hz_8bit.wav">
+      <Link>Assets\Audio\bark_mono_22hz_8bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_stereo_44khz_imaadpcm.xnb">
+      <Link>Assets\Audio\tone_stereo_44khz_imaadpcm.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\rock_loop_stereo_22hz_8bit.wav">
+      <Link>Assets\Audio\rock_loop_stereo_22hz_8bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\Tests.xap">
+      <Link>Assets\Audio\Tests.xap</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\rock_loop_stereo.wma">
+      <Link>Assets\Audio\rock_loop_stereo.wma</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\bark_mono_88hz_16bit.wav">
+      <Link>Assets\Audio\bark_mono_88hz_16bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\rock_loop_stereo.wav">
+      <Link>Assets\Audio\rock_loop_stereo.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\tone_mono_44khz_16bit.wav">
+      <Link>Assets\Audio\tone_mono_44khz_16bit.wav</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\Win\Tests.xwb">
+      <Link>Assets\Audio\Win\Tests.xwb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\Win\Tests.xsb">
+      <Link>Assets\Audio\Win\Tests.xsb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Audio\Win\Tests.xgs">
+      <Link>Assets\Audio\Win\Tests.xgs</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\Motorwerk.spritefont">
+      <Link>Assets\Fonts\Motorwerk.spritefont</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\SegoeKeycaps.spritefont">
+      <Link>Assets\Fonts\SegoeKeycaps.spritefont</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\QuartzMS.xnb">
+      <Link>Assets\Fonts\QuartzMS.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\JingJing.xnb">
+      <Link>Assets\Fonts\JingJing.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\QuartzMS.spritefont">
+      <Link>Assets\Fonts\QuartzMS.spritefont</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\Strings.resx">
+      <Link>Assets\Fonts\Strings.resx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\SegoeKeycaps.xnb">
+      <Link>Assets\Fonts\SegoeKeycaps.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\DataFont.xnb">
+      <Link>Assets\Fonts\DataFont.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\JingJing.spritefont">
+      <Link>Assets\Fonts\JingJing.spritefont</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\Localized.spritefont">
+      <Link>Assets\Fonts\Localized.spritefont</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\Motorwerk.xnb">
+      <Link>Assets\Fonts\Motorwerk.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\Lindsey.xnb">
+      <Link>Assets\Fonts\Lindsey.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\Lindsey.spritefont">
+      <Link>Assets\Fonts\Lindsey.spritefont</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Fonts\Default.xnb">
+      <Link>Assets\Fonts\Default.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\HighContrast.fx">
+      <Link>Assets\Effects\HighContrast.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\Instancing.fx">
+      <Link>Assets\Effects\Instancing.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\RainbowH.fx">
+      <Link>Assets\Effects\RainbowH.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DefinesTest.fx">
+      <Link>Assets\Effects\DefinesTest.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\Bevels.fx">
+      <Link>Assets\Effects\Bevels.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\CustomSpriteBatchEffect.fx">
+      <Link>Assets\Effects\CustomSpriteBatchEffect.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX.mgcb">
+      <Link>Assets\Effects\DirectX.mgcb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\Include.fxh">
+      <Link>Assets\Effects\Include.fxh</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\Grayscale.fx">
+      <Link>Assets\Effects\Grayscale.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\ColorFlip.fx">
+      <Link>Assets\Effects\ColorFlip.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\Invert.fx">
+      <Link>Assets\Effects\Invert.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\NoEffect.fx">
+      <Link>Assets\Effects\NoEffect.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\VertexTextureEffect.fx">
+      <Link>Assets\Effects\VertexTextureEffect.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\BlackOut.fx">
+      <Link>Assets\Effects\BlackOut.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\TextureArrayEffect.fx">
+      <Link>Assets\Effects\TextureArrayEffect.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\README.txt">
+      <Link>Assets\Effects\README.txt</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\PreprocessorTest.fx">
+      <Link>Assets\Effects\PreprocessorTest.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\ParserTest.fx">
+      <Link>Assets\Effects\ParserTest.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\PreprocessorInclude.fxh">
+      <Link>Assets\Effects\PreprocessorInclude.fxh</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\OpenGL.mgcb">
+      <Link>Assets\Effects\OpenGL.mgcb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\CustomSpriteBatchEffectComparisonSampler.fx">
+      <Link>Assets\Effects\CustomSpriteBatchEffectComparisonSampler.fx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\XNA.csproj">
+      <Link>Assets\Effects\XNA.csproj</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\TextureArrayEffect.xnb">
+      <Link>Assets\Effects\DirectX\TextureArrayEffect.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\CustomSpriteBatchEffectComparisonSampler.xnb">
+      <Link>Assets\Effects\DirectX\CustomSpriteBatchEffectComparisonSampler.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\HighContrast.xnb">
+      <Link>Assets\Effects\DirectX\HighContrast.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\Grayscale.xnb">
+      <Link>Assets\Effects\DirectX\Grayscale.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\NoEffect.xnb">
+      <Link>Assets\Effects\DirectX\NoEffect.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\ColorFlip.xnb">
+      <Link>Assets\Effects\DirectX\ColorFlip.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\ParserTest.xnb">
+      <Link>Assets\Effects\DirectX\ParserTest.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\CustomSpriteBatchEffect.xnb">
+      <Link>Assets\Effects\DirectX\CustomSpriteBatchEffect.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\BlackOut.xnb">
+      <Link>Assets\Effects\DirectX\BlackOut.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\RainbowH.xnb">
+      <Link>Assets\Effects\DirectX\RainbowH.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\VertexTextureEffect.xnb">
+      <Link>Assets\Effects\DirectX\VertexTextureEffect.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\Bevels.xnb">
+      <Link>Assets\Effects\DirectX\Bevels.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\Invert.xnb">
+      <Link>Assets\Effects\DirectX\Invert.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\DirectX\Instancing.xnb">
+      <Link>Assets\Effects\DirectX\Instancing.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\XNA\HighContrast.xnb">
+      <Link>Assets\Effects\XNA\HighContrast.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\XNA\Grayscale.xnb">
+      <Link>Assets\Effects\XNA\Grayscale.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\XNA\NoEffect.xnb">
+      <Link>Assets\Effects\XNA\NoEffect.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\XNA\ColorFlip.xnb">
+      <Link>Assets\Effects\XNA\ColorFlip.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\XNA\CustomSpriteBatchEffect.xnb">
+      <Link>Assets\Effects\XNA\CustomSpriteBatchEffect.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\XNA\BlackOut.xnb">
+      <Link>Assets\Effects\XNA\BlackOut.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\XNA\RainbowH.xnb">
+      <Link>Assets\Effects\XNA\RainbowH.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\XNA\Bevels.xnb">
+      <Link>Assets\Effects\XNA\Bevels.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\XNA\Invert.xnb">
+      <Link>Assets\Effects\XNA\Invert.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\XNA\Instancing.xnb">
+      <Link>Assets\Effects\XNA\Instancing.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\OpenGL\HighContrast.xnb">
+      <Link>Assets\Effects\OpenGL\HighContrast.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\OpenGL\Grayscale.xnb">
+      <Link>Assets\Effects\OpenGL\Grayscale.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\OpenGL\NoEffect.xnb">
+      <Link>Assets\Effects\OpenGL\NoEffect.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\OpenGL\ColorFlip.xnb">
+      <Link>Assets\Effects\OpenGL\ColorFlip.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\OpenGL\CustomSpriteBatchEffect.xnb">
+      <Link>Assets\Effects\OpenGL\CustomSpriteBatchEffect.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\OpenGL\BlackOut.xnb">
+      <Link>Assets\Effects\OpenGL\BlackOut.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\OpenGL\RainbowH.xnb">
+      <Link>Assets\Effects\OpenGL\RainbowH.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\OpenGL\Bevels.xnb">
+      <Link>Assets\Effects\OpenGL\Bevels.xnb</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Effects\OpenGL\Invert.xnb">
+      <Link>Assets\Effects\OpenGL\Invert.xnb</Link>
+    </Content>
+    <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\AlphaTestEffect.fx">
+      <Link>Assets\Effects\Stock\AlphaTestEffect.fx</Link>
+    </Content>
+    <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\SpriteEffect.fx">
+      <Link>Assets\Effects\Stock\SpriteEffect.fx</Link>
+    </Content>
+    <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\BasicEffect.fx">
+      <Link>Assets\Effects\Stock\BasicEffect.fx</Link>
+    </Content>
+    <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\DualTextureEffect.fx">
+      <Link>Assets\Effects\Stock\DualTextureEffect.fx</Link>
+    </Content>
+    <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\EnvironmentMapEffect.fx">
+      <Link>Assets\Effects\Stock\EnvironmentMapEffect.fx</Link>
+    </Content>
+    <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\SkinnedEffect.fx">
+      <Link>Assets\Effects\Stock\SkinnedEffect.fx</Link>
+    </Content>
+    <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\Macros.fxh">
+      <Link>Assets\Effects\Stock\Macros.fxh</Link>
+    </Content>
+    <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\Common.fxh">
+      <Link>Assets\Effects\Stock\Common.fxh</Link>
+    </Content>
+    <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\Lighting.fxh">
+      <Link>Assets\Effects\Stock\Lighting.fxh</Link>
+    </Content>
+    <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\Structures.fxh">
+      <Link>Assets\Effects\Stock\Structures.fxh</Link>
+    </Content>
+  </ItemGroup>
+</Project>

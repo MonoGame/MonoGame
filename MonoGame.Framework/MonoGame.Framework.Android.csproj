@@ -1,0 +1,99 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
+    <DefineConstants>ANDROID;GLES;STBSHARP_INTERNAL</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <MGOpenGL>GLES</MGOpenGL>
+    <Description>The MonoGame runtime for Android.</Description>
+    <PackageTags>monogame;.net core;core;.net standard;standard;android</PackageTags>
+    <PackageId>MonoGame.Framework.Android</PackageId>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\**\*" />
+    <Compile Remove="obj\**\*" />
+    <Compile Remove="Platform\**\*" />
+    <Compile Remove="Properties\**\*" />
+    <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Platform\**\*" />
+    <None Remove="Utilities\System.Numerics.Vectors\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="GraphicsDeviceManager.cs" />
+    <Compile Remove="Graphics\GraphicsAdapter.cs" />
+    <Compile Remove="Graphics\OcclusionQuery.cs" />
+    <Compile Remove="Input\Keyboard.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Platform\Android\AndroidCompatibility.cs" />
+    <Compile Include="Platform\Android\AndroidGameActivity.cs" />
+    <Compile Include="Platform\Android\AndroidGamePlatform.cs" />
+    <Compile Include="Platform\Android\AndroidGameWindow.cs" />
+    <Compile Include="Platform\Android\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="Platform\Android\Devices\Sensors\Compass.cs" />
+    <Compile Include="Platform\Android\Input\Keyboard.cs" />
+    <Compile Include="Platform\Android\Input\Touch\AndroidTouchEventManager.cs" />
+    <Compile Include="Platform\Android\IResumeManager.cs" />
+    <Compile Include="Platform\Android\MonoGameAndroidGameView.cs" />
+    <Compile Include="Platform\Android\OrientationListener.cs" />
+    <Compile Include="Platform\Android\ResumeManager.cs" />
+    <Compile Include="Platform\Android\ScreenReceiver.cs" />
+    <Compile Include="Platform\Audio\Xact\WaveBank.Default.cs" />
+    <Compile Include="Platform\GamePlatform.Mobile.cs" />
+    <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
+    <Compile Include="Platform\Graphics\OpenGL.Android.cs" />
+    <Compile Include="Platform\Graphics\OpenGL.Common.cs" />
+    <Compile Include="Platform\Graphics\Texture2D.StbSharp.cs" />
+    <Compile Include="Platform\GraphicsDeviceManager.Legacy.cs" />
+    <Compile Include="Platform\Input\GamePad.Android.cs" />
+    <Compile Include="Platform\Input\Joystick.Default.cs" />
+    <Compile Include="Platform\Input\KeyboardInput.Android.cs" />
+    <Compile Include="Platform\Input\MessageBox.Android.cs" />
+    <Compile Include="Platform\Input\Mouse.Default.cs" />
+    <Compile Include="Platform\Input\MouseCursor.Default.cs" />
+    <Compile Include="Platform\Media\MediaLibrary.Android.cs" />
+    <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
+    <Compile Include="Platform\Media\Song.Android.cs" />
+    <Compile Include="Platform\Media\Video.Android.cs" />
+    <Compile Include="Platform\Media\VideoPlayer.Android.cs" />
+    <Compile Include="Platform\PrimaryThreadLoader.cs" />
+    <Compile Include="Platform\TitleContainer.Android.cs" />
+    <Compile Include="Platform\Utilities\FuncLoader.Android.cs" />
+    <Compile Include="Platform\Utilities\InteropHelpers.cs" />
+    <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
+
+    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="MonoGame.Framework.Android.targets" Pack="true" PackagePath="build" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\armeabi-v7a\libopenal32.so">
+      <Link>libs\armeabi-v7a\libopenal32.so</Link>
+    </EmbeddedNativeLibrary>
+    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\arm64-v8a\libopenal32.so">
+      <Link>libs\arm64-v8a\libopenal32.so</Link>
+    </EmbeddedNativeLibrary>
+    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\x86\libopenal32.so">
+      <Link>libs\x86\libopenal32.so</Link>
+    </EmbeddedNativeLibrary>
+    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\x86_64\libopenal32.so">
+      <Link>libs\x86_64\libopenal32.so</Link>
+    </EmbeddedNativeLibrary>
+  </ItemGroup>
+
+  <Import Project="Platform\OpenGL.targets" />
+  <Import Project="Platform\OpenAL.targets" />
+  <Import Project="Platform\Microsoft.Devices.Sensors.targets" />
+</Project>

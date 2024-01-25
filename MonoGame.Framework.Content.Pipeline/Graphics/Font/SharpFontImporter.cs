@@ -65,11 +65,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var characters = options.Characters;
 
                 var glyphList = new List<Glyph>();
+                var glyphMaps = new Dictionary<uint, GlyphData>();
 
                 // Rasterize each character in turn.
                 foreach (char character in characters)
                 {
-                    var glyph = ImportGlyph(character, face, Italiced, Emboldened, draw3Times);
+                    uint glyphIndex = face.GetCharIndex(character);
+                    if (!glyphMaps.TryGetValue(glyphIndex, out GlyphData glyphData))
+                    {
+                        glyphData = ImportGlyph(character, face, Italiced, Emboldened, draw3Times);
+                        glyphMaps.Add(glyphIndex, glyphData);
+                    }
+
+                    var glyph = new Glyph(character, glyphData);
                     glyphList.Add(glyph);
                 }
                 Glyphs = glyphList;
@@ -109,9 +117,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         // Rasterizes a single character glyph.
-        private Glyph ImportGlyph(char character, Face face, bool italice, bool embolden, bool draw3Times)
+        private GlyphData ImportGlyph(uint glyphIndex, Face face, bool italice, bool embolden, bool draw3Times)
         {
-            uint glyphIndex = face.GetCharIndex(character);
             face.LoadGlyph(glyphIndex, LoadFlags.Default, LoadTarget.Normal);
             face.Glyph.RenderGlyph(RenderMode.Normal);
 
@@ -155,7 +162,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     Italice(ref gpixelAlphas, ref abc, finalWidth, finalHeight, ref finalWidth);
                 glyphBitmap = new PixelBitmapContent<byte>(finalWidth, finalHeight);
                 glyphBitmap.SetPixelData(gpixelAlphas);
-
             }
 
             if (glyphBitmap == null)
@@ -174,7 +180,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             abc.C += (face.Glyph.Metrics.HorizontalAdvance >> 6) - (abc.A + abc.B) + finalWidth - face.Glyph.Bitmap.Width;
 
             // Construct the output Glyph object.
-            return new Glyph(character, glyphBitmap)
+            return new GlyphData(glyphIndex, glyphBitmap)
             {
                 XOffset = -(face.Glyph.Advance.X >> 6),
                 XAdvance = abc.A + abc.B + abc.C,//face.Glyph.Metrics.HorizontalAdvance >> 6,

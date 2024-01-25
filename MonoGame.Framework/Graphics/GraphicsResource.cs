@@ -103,8 +103,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 // ...
 
                 // Do not trigger the event if called from the finalizer
-                if (disposing && Disposing != null)
-                    Disposing(this, EventArgs.Empty);
+                if (disposing)
+                    EventHelpers.Raise(this, Disposing, EventArgs.Empty);
 
                 // Remove from the global list of graphics resources
                 if (graphicsDevice != null)

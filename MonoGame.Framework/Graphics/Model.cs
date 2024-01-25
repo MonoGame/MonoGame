@@ -53,6 +53,15 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="graphicsDevice">A valid reference to <see cref="GraphicsDevice"/>.</param>
         /// <param name="bones">The collection of bones.</param>
         /// <param name="meshes">The collection of meshes.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="graphicsDevice"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="bones"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="meshes"/> is null.
+        /// </exception>
         public Model(GraphicsDevice graphicsDevice, List<ModelBone> bones, List<ModelMesh> meshes)
 		{
             if (graphicsDevice == null)
@@ -121,8 +130,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 foreach (Effect effect in mesh.Effects)
                 {
 					IEffectMatrices effectMatricies = effect as IEffectMatrices;
-					if (effectMatricies == null) {
-						throw new InvalidOperationException();
+					if (effectMatricies == null)
+                    {
+						throw new InvalidOperationException("This model contains a custom effect which does not implement the IEffectMatrices interface, so it cannot be drawn using Model.Draw. Instead, call ModelMesh.Draw after setting the appropriate effect parameters.");
 					}
                     effectMatricies.World = sharedDrawBoneMatrices[mesh.ParentBone.Index] * world;
                     effectMatricies.View = view;
@@ -163,6 +173,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Copies bone transforms relative to <see cref="Model.Root"/> bone from a given array to this model.
         /// </summary>
         /// <param name="sourceBoneTransforms">The array of prepared bone transform data.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="sourceBoneTransforms"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="sourceBoneTransforms"/> is invalid.
+        /// </exception>
         public void CopyBoneTransformsFrom(Matrix[] sourceBoneTransforms)
         {
             if (sourceBoneTransforms == null)
@@ -181,6 +197,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Copies bone transforms relative to <see cref="Model.Root"/> bone from this model to a given array.
         /// </summary>
         /// <param name="destinationBoneTransforms">The array receiving the transformed bones.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="destinationBoneTransforms"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="destinationBoneTransforms"/> is invalid.
+        /// </exception>
         public void CopyBoneTransformsTo(Matrix[] destinationBoneTransforms)
         {
             if (destinationBoneTransforms == null)

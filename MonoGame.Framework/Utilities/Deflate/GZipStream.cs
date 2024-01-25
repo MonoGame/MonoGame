@@ -30,7 +30,7 @@
 using System;
 using System.IO;
 
-namespace MonoGame.Utilities.Deflate
+namespace MonoGame.Framework.Utilities.Deflate
 {
     /// <summary>
     ///   A class for compressing and decompressing GZIP streams.
@@ -46,7 +46,7 @@ namespace MonoGame.Utilities.Deflate
     ///
     /// <para>
     ///   Like the <c>System.IO.Compression.GZipStream</c> in the .NET Base Class Library, the
-    ///   <c>MonoGame.Utilities.Deflate.GZipStream</c> can compress while writing, or decompress while
+    ///   <c>MonoGame.Framework.Utilities.Deflate.GZipStream</c> can compress while writing, or decompress while
     ///   reading, but not vice versa.  The compression method used is GZIP, which is
     ///   documented in <see href="http://www.ietf.org/rfc/rfc1952.txt">IETF RFC
     ///   1952</see>, "GZIP file format specification version 4.3".</para>
@@ -298,7 +298,7 @@ namespace MonoGame.Utilities.Deflate
         ///     int n= 1;
         ///     using (System.IO.Stream input = System.IO.File.OpenRead(filename))
         ///     {
-        ///         using (Stream decompressor= new MonoGame.Utilities.Deflate.GZipStream(input, CompressionMode.Decompress, true))
+        ///         using (Stream decompressor= new MonoGame.Framework.Utilities.Deflate.GZipStream(input, CompressionMode.Decompress, true))
         ///         {
         ///             using (var output = System.IO.File.Create(DecompressedFile))
         ///             {
@@ -325,7 +325,7 @@ namespace MonoGame.Utilities.Deflate
         ///     Dim working(WORKING_BUFFER_SIZE) as Byte
         ///     Dim n As Integer = 1
         ///     Using input As Stream = File.OpenRead(filename)
-        ///         Using decompressor As Stream = new MonoGame.Utilities.Deflate.GZipStream(input, CompressionMode.Decompress, True)
+        ///         Using decompressor As Stream = new MonoGame.Framework.Utilities.Deflate.GZipStream(input, CompressionMode.Decompress, True)
         ///             Using output As Stream = File.Create(UncompressedFile)
         ///                 Do
         ///                     n= decompressor.Read(working, 0, working.Length)
@@ -641,7 +641,7 @@ namespace MonoGame.Utilities.Deflate
                 {
                     if (disposing && (this._baseStream != null))
                     {
-                        this._baseStream.Close();
+                        this._baseStream.Dispose();
                         this._Crc32 = _baseStream.Crc32;
                     }
                     _disposed = true;
@@ -728,9 +728,9 @@ namespace MonoGame.Utilities.Deflate
         {
             get
             {
-                if (this._baseStream._streamMode == MonoGame.Utilities.Deflate.ZlibBaseStream.StreamMode.Writer)
+                if (this._baseStream._streamMode == MonoGame.Framework.Utilities.Deflate.ZlibBaseStream.StreamMode.Writer)
                     return this._baseStream._z.TotalBytesOut + _headerByteCount;
-                if (this._baseStream._streamMode == MonoGame.Utilities.Deflate.ZlibBaseStream.StreamMode.Reader)
+                if (this._baseStream._streamMode == MonoGame.Framework.Utilities.Deflate.ZlibBaseStream.StreamMode.Reader)
                     return this._baseStream._z.TotalBytesIn + this._baseStream._gzipHeaderByteCount;
                 return 0;
             }
@@ -751,7 +751,7 @@ namespace MonoGame.Utilities.Deflate
         /// byte[] working = new byte[WORKING_BUFFER_SIZE];
         /// using (System.IO.Stream input = System.IO.File.OpenRead(_CompressedFile))
         /// {
-        ///     using (Stream decompressor= new MonoGame.Utilities.Deflate.GZipStream(input, CompressionMode.Decompress, true))
+        ///     using (Stream decompressor= new MonoGame.Framework.Utilities.Deflate.GZipStream(input, CompressionMode.Decompress, true))
         ///     {
         ///         using (var output = System.IO.File.Create(_DecompressedFile))
         ///         {
@@ -833,7 +833,7 @@ namespace MonoGame.Utilities.Deflate
         public override void Write(byte[] buffer, int offset, int count)
         {
             if (_disposed) throw new ObjectDisposedException("GZipStream");
-            if (_baseStream._streamMode == MonoGame.Utilities.Deflate.ZlibBaseStream.StreamMode.Undefined)
+            if (_baseStream._streamMode == MonoGame.Framework.Utilities.Deflate.ZlibBaseStream.StreamMode.Undefined)
             {
                 //Console.WriteLine("GZipStream: First write");
                 if (_baseStream._wantCompress)

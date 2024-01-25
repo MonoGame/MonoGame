@@ -1,0 +1,236 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\MonoGame.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <BaseOutputPath>..\Artifacts\MonoGame.Framework.Content.Pipeline</BaseOutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>The Monogame Content Pipeline for Windows, Mac and Linux is used to compile raw content to xnb files.</Description>
+    <PackageTags>monogame;content;content pipeline</PackageTags>
+    <PackageId>MonoGame.Framework.Content.Pipeline</PackageId>
+    <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
+    <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
+    <CopyContentFiles>True</CopyContentFiles>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <DefineConstants>STBSHARP_INTERNAL</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\**\*" />
+    <Compile Remove="obj\**\*" />
+    <Compile Remove="Properties\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\MonoGame.Framework\Platform\Utilities\CurrentPlatform.cs">
+      <Link>Utilities\CurrentPlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\Hash.cs">
+      <Link>Utilities\Hash.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\ReflectionHelpers.cs">
+      <Link>Utilities\ReflectionHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Platform\Utilities\AssemblyHelper.cs">
+      <Link>Utilities\AssemblyHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Platform\Utilities\ReflectionHelpers.Default.cs">
+      <Link>Utilities\ReflectionHelpers.Default.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\GraphicsExtensions.cs">
+      <Link>Utilities\GraphicsExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentExtensions.cs">
+      <Link>Utilities\ContentExtensions.cs</Link>
+    </Compile>
+
+    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="CppNet">
+      <HintPath>..\ThirdParty\Dependencies\CppNet\CppNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Nvidia.TextureTools">
+      <HintPath>..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpFont">
+      <HintPath>..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll</HintPath>
+    </Reference>
+    <Reference Include="ATI.TextureConverter">
+      <HintPath>..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll</HintPath>
+    </Reference>
+    <Reference Include="PVRTexLibNET">
+      <HintPath>..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(SolutionName)' != 'MonoGame.Framework.WindowsDX'">
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(SolutionName)' == 'MonoGame.Framework.WindowsDX'">
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj">
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="AssimpNet" Version="4.1.0" />
+    <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
+    <PackageReference Include="SharpDX" Version="4.0.1" />
+    <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">
+    <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\net8.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Nvidia.TextureTools.dll" PackagePath="lib\net8.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" PackagePath="lib\net8.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" PackagePath="lib\net8.0" Visible="false" />
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" PackagePath="lib\net8.0" Visible="false" />
+
+    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so" Visible="false">
+      <Link>libFreeImage.so</Link>
+      <PackagePath>runtimes\linux-x64\native\libFreeImage.so</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so" Visible="false">
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvimage.so" Visible="false">
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvmath.so" Visible="false">
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvtt.so" Visible="false">
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x64\libPVRTexLibWrapper.so" Visible="false">
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.so" Visible="false">
+      <Link>libfreetype6.so</Link>
+      <PackagePath>runtimes\linux-x64\native\libfreetype6.so</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng16.so.16" Visible="false">
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffmpeg" Visible="false">
+      <Link>linux\ffmpeg</Link>
+      <PackagePath>runtimes\linux-x64\native\linux</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffprobe" Visible="false">
+      <Link>linux\ffprobe</Link>
+      <PackagePath>runtimes\linux-x64\native\linux</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" Visible="false">
+      <Link>libFreeImage.dylib</Link>
+      <PackagePath>runtimes\osx\native\libFreeImage.dylib</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib" Visible="false">
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvimage.dylib" Visible="false">
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvmath.dylib" Visible="false">
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvtt.dylib" Visible="false">
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib" Visible="false">
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib" Visible="false">
+      <Link>libfreetype6.dylib</Link>
+      <PackagePath>runtimes\osx\native\libfreetype6.dylib</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng16.16.dylib" Visible="false">
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg" Visible="false">
+      <Link>osx\ffmpeg</Link>
+      <PackagePath>runtimes\osx\native\osx</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe" Visible="false">
+      <Link>osx\ffprobe</Link>
+      <PackagePath>runtimes\osx\native\osx</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffmpeg.exe" Visible="false">
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffprobe.exe" Visible="false">
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImage.dll" Visible="false">
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" Visible="false">
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Windows\nvtt.dll" Visible="false">
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\PVRTexLibNET\Windows\x64\PVRTexLibWrapper.dll" Visible="false">
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\freetype6.dll" Visible="false">
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
+    <NoWarn>NU5100</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*" Exclude="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*.nupkg" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Import Project="..\Switch\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Switch\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PSVita\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PSVita\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\Stadia\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Stadia\MonoGame.Framework.Content.Pipeline.targets')" />
+
+</Project>

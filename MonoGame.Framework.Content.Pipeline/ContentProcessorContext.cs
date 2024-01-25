@@ -27,6 +27,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public abstract ContentBuildLogger Logger { get; }
 
         /// <summary>
+        /// Gets the ContentIdentity representing the source asset imported.
+        /// </summary>
+        public abstract ContentIdentity SourceIdentity { get; }
+
+        /// <summary>
         /// Gets the output path of the content processor.
         /// </summary>
         public abstract string OutputDirectory { get; }

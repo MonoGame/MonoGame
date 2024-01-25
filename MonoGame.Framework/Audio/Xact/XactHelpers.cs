@@ -21,10 +21,10 @@ namespace Microsoft.Xna.Framework.Audio
             //0x5a -12.0
             //0x14 -38.0
             //0x00 -96.0
-            var a = -96.0;
-            var b = 0.432254984608615;
-            var c = 80.1748600297963;
-            var d = 67.7385212334047;
+            const double a = -96.0;
+            const double b = 0.432254984608615;
+            const double c = 80.1748600297963;
+            const double d = 67.7385212334047;
             var dB = (float)(((a - d) / (1 + (Math.Pow(decibles / c, b)))) + d);
 
             return dB;
@@ -41,10 +41,10 @@ namespace Microsoft.Xna.Framework.Audio
             //0x5a -12.0
             //0x14 -38.0
             //0x00 -96.0
-            var a = -96.0;
-            var b = 0.432254984608615;
-            var c = 80.1748600297963;
-            var d = 67.7385212334047;
+            const double a = -96.0;
+            const double b = 0.432254984608615;
+            const double c = 80.1748600297963;
+            const double d = 67.7385212334047;
             var dB = (float)(((a - d) / (1 + (Math.Pow(decibles / c, b)))) + d);
 
             return ParseVolumeFromDecibels(dB);

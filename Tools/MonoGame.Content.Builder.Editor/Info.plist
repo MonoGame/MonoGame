@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIconFile</key>
+			<string>Icon.icns</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.text</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>net.monogame.mgcb</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>mgcb</string>
+			</dict>
+		</dict>
+	</array>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>net.monogame.mgcb</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>MGCB</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+		</dict>
+	</array>
+	<key>LSEnvironment</key>
+    	<dict>
+        	<key>MONO_MANAGED_WATCHER</key>
+        	<string>false</string>
+    	</dict>
+	<key>CFBundleName</key>
+	<string>MGCB Editor</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.developer-tools</string>
+	<key>CFBundleDisplayName</key>
+	<string>MGCB Editor</string>
+	<key>CFBundleIdentifier</key>
+	<string>net.monogame.mgcb-editor</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.8.1.1-develop</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.icns</string>
+</dict>
+</plist>

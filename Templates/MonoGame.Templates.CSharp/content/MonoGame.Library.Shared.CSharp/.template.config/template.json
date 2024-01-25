@@ -1,0 +1,22 @@
+{
+    "author": "MonoGame Team",
+    "classifications": [
+        "MonoGame", "Games", "Library"
+    ],
+    "name": "MonoGame Shared Library Project",
+    "groupIdentity": "MonoGame.Library.Shared",
+    "identity": "MonoGame.Library.Shared.CSharp",
+    "shortName": "mgshared",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "primaryOutputs": [
+        {
+            "path": "MGNamespace.shproj"
+        }
+    ],
+    "sourceName": "MGNamespace",
+    "preferNameDirectory": "true",
+    "description": "A MonoGame shared library project that can be use to share code and content across all targets."
+}

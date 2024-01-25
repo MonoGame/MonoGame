@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>The GPU texture format of the bitmap type.</returns>
         public override bool TryGetFormat(out SurfaceFormat format)
         {
-            format = SurfaceFormat.RgbPvrtc4Bpp;
+            format = SurfaceFormat.RgbPvrtc2Bpp;
             return true;
         }
 

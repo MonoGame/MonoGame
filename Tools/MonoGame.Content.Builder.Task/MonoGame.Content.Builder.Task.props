@@ -1,0 +1,9 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <DotnetCommand Condition="'$(DotnetCommand)' == ''">dotnet</DotnetCommand>
+    <EnableMGCBItems Condition="'$(EnableMGCBItems)' == ''">true</EnableMGCBItems>
+    <MGCBCommand Condition="'$(MGCBCommand)' == ''">mgcb</MGCBCommand>
+  </PropertyGroup>
+
+</Project>

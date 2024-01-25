@@ -1,43 +1,6 @@
-// #region License
-// /*
-// Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-// #endregion License
-// 
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
@@ -91,17 +54,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private VertexPositionColorTexture[] _vertexArray;
 
-		public SpriteBatcher (GraphicsDevice device)
+        public SpriteBatcher(GraphicsDevice device, int capacity = 0)
 		{
             _device = device;
 
-			_batchItemList = new SpriteBatchItem[InitialBatchSize];
+            if (capacity <= 0)
+                capacity = InitialBatchSize;
+            else
+                capacity = (capacity + 63) & (~63); // ensure chunks of 64.
+
+            _batchItemList = new SpriteBatchItem[capacity];
             _batchItemCount = 0;
 
-            for (int i = 0; i < InitialBatchSize; i++)
+            for (int i = 0; i < capacity; i++)
                 _batchItemList[i] = new SpriteBatchItem();
 
-            EnsureArrayCapacity(InitialBatchSize);
+            EnsureArrayCapacity(capacity);
 		}
 
         /// <summary>
@@ -130,7 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Resize and recreate the missing indices for the index and vertex position color buffers.
         /// </summary>
         /// <param name="numBatchItems"></param>
-        private void EnsureArrayCapacity(int numBatchItems)
+        private unsafe void EnsureArrayCapacity(int numBatchItems)
         {
             int neededCapacity = 6 * numBatchItems;
             if (_index != null && neededCapacity <= _index.Length)
@@ -145,26 +113,30 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index.CopyTo(newIndex, 0);
                 start = _index.Length / 6;
             }
-            for (var i = start; i < numBatchItems; i++)
+            fixed (short* indexFixedPtr = newIndex)
             {
-                /*
-                 *  TL    TR
-                 *   0----1 0,1,2,3 = index offsets for vertex indices
-                 *   |   /| TL,TR,BL,BR are vertex references in SpriteBatchItem.
-                 *   |  / |
-                 *   | /  |
-                 *   |/   |
-                 *   2----3
-                 *  BL    BR
-                 */
-                // Triangle 1
-                newIndex[i * 6 + 0] = (short)(i * 4);
-                newIndex[i * 6 + 1] = (short)(i * 4 + 1);
-                newIndex[i * 6 + 2] = (short)(i * 4 + 2);
-                // Triangle 2
-                newIndex[i * 6 + 3] = (short)(i * 4 + 1);
-                newIndex[i * 6 + 4] = (short)(i * 4 + 3);
-                newIndex[i * 6 + 5] = (short)(i * 4 + 2);
+                var indexPtr = indexFixedPtr + (start * 6);
+                for (var i = start; i < numBatchItems; i++, indexPtr += 6)
+                {
+                    /*
+                     *  TL    TR
+                     *   0----1 0,1,2,3 = index offsets for vertex indices
+                     *   |   /| TL,TR,BL,BR are vertex references in SpriteBatchItem.
+                     *   |  / |
+                     *   | /  |
+                     *   |/   |
+                     *   2----3
+                     *  BL    BR
+                     */
+                    // Triangle 1
+                    *(indexPtr + 0) = (short)(i * 4);
+                    *(indexPtr + 1) = (short)(i * 4 + 1);
+                    *(indexPtr + 2) = (short)(i * 4 + 2);
+                    // Triangle 2
+                    *(indexPtr + 3) = (short)(i * 4 + 1);
+                    *(indexPtr + 4) = (short)(i * 4 + 3);
+                    *(indexPtr + 5) = (short)(i * 4 + 2);
+                }
             }
             _index = newIndex;
 
@@ -177,8 +149,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="sortMode">The type of depth sorting desired for the rendering.</param>
         /// <param name="effect">The custom effect to apply to the drawn geometry</param>
-        public void DrawBatch(SpriteSortMode sortMode, Effect effect)
+        public unsafe void DrawBatch(SpriteSortMode sortMode, Effect effect)
 		{
+            if (effect != null && effect.IsDisposed)
+                throw new ObjectDisposedException("effect");
+
 			// nothing to do
             if (_batchItemCount == 0)
 				return;
@@ -200,7 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
             unchecked
             {
-                _device._graphicsMetrics._spriteCount += (ulong)batchCount;
+                _device._graphicsMetrics._spriteCount += batchCount;
             }
 
             // Iterate through the batches, doing short.MaxValue sets of vertices only.
@@ -216,29 +191,36 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     numBatchesToProcess = MaxBatchSize;
                 }
-                // Draw the batches
-                for(int i = 0; i < numBatchesToProcess; i++, batchIndex++) 
+                // Avoid the array checking overhead by using pointer indexing!
+                fixed (VertexPositionColorTexture* vertexArrayFixedPtr = _vertexArray)
                 {
-                    SpriteBatchItem item = _batchItemList[batchIndex];
-                    // if the texture changed, we need to flush and bind the new texture
-                    var shouldFlush = !ReferenceEquals(item.Texture, tex);
-                    if (shouldFlush)
+                    var vertexArrayPtr = vertexArrayFixedPtr;
+
+                    // Draw the batches
+                    for (int i = 0; i < numBatchesToProcess; i++, batchIndex++, index += 4, vertexArrayPtr += 4)
                     {
-                        FlushVertexArray(startIndex, index, effect, tex);
+                        SpriteBatchItem item = _batchItemList[batchIndex];
+                        // if the texture changed, we need to flush and bind the new texture
+                        var shouldFlush = !ReferenceEquals(item.Texture, tex);
+                        if (shouldFlush)
+                        {
+                            FlushVertexArray(startIndex, index, effect, tex);
 
-                        tex = item.Texture;
-                        startIndex = index = 0;
-                        _device.Textures[0] = tex;
+                            tex = item.Texture;
+                            startIndex = index = 0;
+                            vertexArrayPtr = vertexArrayFixedPtr;
+                            _device.Textures[0] = tex;
+                        }
+
+                        // store the SpriteBatchItem data in our vertexArray
+                        *(vertexArrayPtr+0) = item.vertexTL;
+                        *(vertexArrayPtr+1) = item.vertexTR;
+                        *(vertexArrayPtr+2) = item.vertexBL;
+                        *(vertexArrayPtr+3) = item.vertexBR;
+
+                        // Release the texture.
+                        item.Texture = null;
                     }
-
-                    // store the SpriteBatchItem data in our vertexArray
-                    _vertexArray[index++] = item.vertexTL;
-                    _vertexArray[index++] = item.vertexTR;
-                    _vertexArray[index++] = item.vertexBL;
-                    _vertexArray[index++] = item.vertexBR;
-
-                    // Release the texture.
-                    item.Texture = null;
                 }
                 // flush the remaining vertexArray data
                 FlushVertexArray(startIndex, index, effect, tex);

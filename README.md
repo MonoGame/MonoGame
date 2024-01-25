@@ -1,68 +1,95 @@
-# [MonoGame](http://www.monogame.net/) [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_DevelopWin/statusIcon)](http://teamcity.monogame.net/project.html?projectId=MonoGame&guest=1)
+﻿# MonoGame
 
-[MonoGame](http://www.monogame.net/) is an open source implementation of the Microsoft XNA 4.x Framework.
+MonoGame is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language. It has been successfully used to create games such as [Streets of Rage 4](https://store.steampowered.com/app/985890/Streets_of_Rage_4/), [Carrion](https://store.steampowered.com/app/953490/CARRION/), [Celeste](https://store.steampowered.com/app/504230/Celeste/), [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/), and [many others](https://monogame.net/showcase.html).
 
-Our goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
+It is an open-source re-implementation of the discontinued [Microsoft's XNA Framework](https://msdn.microsoft.com/en-us/library/bb200104.aspx).
 
-### Links
+[![Join the chat at https://discord.gg/monogame](https://img.shields.io/discord/355231098122272778?color=%237289DA&label=MonoGame&logo=discord&logoColor=white)](https://discord.gg/monogame)
 
- * Forum can be found at: [community.monogame.net](http://community.monogame.net/)
- * Chat with the community at:&nbsp; [![Join the chat at https://gitter.im/mono/MonoGame](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mono/MonoGame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
- * Documentation is available at: [www.monogame.net/documentation/](http://www.monogame.net/documentation/)
- * [Download Binaries](http://www.monogame.net/downloads/).
- * Follow [@MonoGameTeam on Twitter](https://twitter.com/monogameteam).
+* [Build Status](#build-status)
+* [Supported Platforms](#supported-platforms)
+* [Support and Contributions](#support-and-contributions)
+* [Source Code](#source-code)
+* [Helpful Links](#helpful-links)
+* [License](#license)
 
-### Supported Platforms
+## Build Status
 
-Desktop:
- * Windows Store Apps (8, 8.1 and 10)
- * Windows (OpenGL & DirectX)
- * Linux
- * Mac OS X
+We use [GitHub Actions](https://github.com/MonoGame/MonoGame/actions) to automate builds and packages distribution of the latest MonoGame changes. We also rely on a [build server](http://teamcity.monogame.net/?guest=1) to run tests in order to avoid regressions.  The table below shows the current build status for the ```develop``` branch.
 
-Mobile:
- * Android
- * iOS
- * Windows Phone (8, 8.1 and 10)
+| Name                            | Status                                                                                                                                                                                         |
+|:------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Builds                          | [![Build](https://github.com/MonoGame/MonoGame/actions/workflows/main.yml/badge.svg?branch=develop)](https://github.com/MonoGame/MonoGame/actions/workflows/main.yml)                          |
+| Windows Tests                   | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_TestWindows/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_TestWindows&guest=1) |
+| Mac Tests                       | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_TestMac/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_TestMac&guest=1)         |
 
-Console:
- * PlayStation 4 (contact your Sony account manager for access)
- * PlayStation Vita (contact your Sony account manager for access)
- * OUYA
+## Supported Platforms
 
-### Source Code
+We support a growing list of platforms across the desktop, mobile, and console space.  If there is a platform we don't support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
 
-Getting the source:
- * Clone the source: `git clone https://github.com/mono/MonoGame.git`
- * Run Protobuild.exe to generate project files and solutions.
-   * If on Linux or Mac, run it with mono: `mono Protobuild.exe`
+* Desktop PCs
+  * Windows 8.1 and up (OpenGL & DirectX)
+  * Windows Store Apps (UWP)
+  * Linux (OpenGL)
+  * macOS 10.15 and up (OpenGL)
+* Mobile/Tablet Devices
+  * Android 6.0 and up (OpenGL)
+  * iPhone/iPad 10.0 and up (OpenGL)
+* Consoles (for registered developers)
+  * PlayStation 4
+  * PlayStation 5
+  * Xbox One (both UWP and XDK)
+  * Nintendo Switch
+  * Google Stadia
 
-For pre-requirements for building please look at the [Requirements](REQUIREMENTS.md) file.
+## Support and Contributions
 
-Component locations:
- * Content processors (including command line and GUI tools) are found in Windows/Mac/Linux solutions.
- * MonoDevelop addin is found in [IDE/MonoDevelop/](IDE/MonoDevelop)
- * Visual Studio templates are found in [ProjectTemplates/](ProjectTemplates)
- * NuGet packages are located in [NuGetPackages/](NuGetPackages)
+If you think you have found a bug or have a feature request, use our [issue tracker](https://github.com/MonoGame/MonoGame/issues). Before opening a new issue, please search to see if your problem has already been reported.  Try to be as detailed as possible in your issue reports.
 
-You can generate solutions for platforms that are not buildable from the current OS with: `mono Protobuild.exe --generate $PLATFORM`.
+If you need help using MonoGame or have other questions we suggest you post on our [community forums](http://community.monogame.net).  Please do not use the GitHub issue tracker for personal support requests.
 
-### How to Engage, Contribute and Provide Feedback
+If you are interested in contributing fixes or features to MonoGame, please read our [contributors guide](CONTRIBUTING.md) first.
 
-If you have a bug or a feature request, [please open a new issue](https://github.com/mono/MonoGame/issues). Before opening any issue, please search for existing issues and read the [Issue Guidelines](https://github.com/necolas/issue-guidelines).
+### Subscription
 
-If you are interested in contributing code to MonoGame, please look at the [Contributing Guidelines](CONTRIBUTING.md). For the list of available tasks please look at [Help Wanted](https://github.com/mono/MonoGame/labels/Help%20Wanted) label.
+If you'd like to help the project by supporting us financially, consider supporting us via a subscription for the price of a monthly coffee.
 
-### MonoGame Components
+Money goes towards hosting, new hardware and if enough people subscribe a dedicated developer.
 
- * **MonoGame.Framework** - [Microsoft.Xna.Framework](https://msdn.microsoft.com/en-us/library/microsoft.xna.framework.aspx) namespace components excluding .Net namespace.
- * **MonoGame.Framework.Net** - Contains [Microsoft.Xna.Framework.Net](https://msdn.microsoft.com/en-us/library/microsoft.xna.framework.net.aspx) namespace components.
- * **MonoGame.Framework.Content.Pipeline** - MonoGame content processor.
- * **MonoGame.Tests** - MonoGame Framework NUnit tests.
- * **MGCB** - Command line tool for MonoGame content processing.
- * **Pipeline** - GUI tool for content processing.
- * **MonoDevelop.MonoGame.Addin** - MonoDevelop Addin.
+There are several options on our [Donation Page](https://www.patreon.com/MonoGame/).
 
-### License
+## Source Code
 
-MonoGame is Licensed under the [Ms-PL and MIT Licenses](LICENSE.txt). Some third-party libraries used by MonoGame may be under a different license. Please refer to those libraries for details on the license they use.
+The full source code is available here from GitHub:
+
+* Clone the source: `git clone https://github.com/MonoGame/MonoGame.git`
+* Set up the submodules: `git submodule update --init`
+* Open the solution for your target platform to build the game framework.
+* Open the Tools solution for your development platform to build the pipeline and content tools.
+
+For the prerequisites for building from source, please look at the [Requirements](REQUIREMENTS.md) file.
+
+A high level breakdown of the components of the framework:
+
+* The game framework is found in [MonoGame.Framework](MonoGame.Framework).
+* The content pipeline is located in [MonoGame.Framework.Content.Pipeline](MonoGame.Framework.Content.Pipeline).
+* Project templates are in [Templates](Templates).
+* See [Tests](Tests) for the framework unit tests.
+* See [Tools/Tests](Tools/MonoGame.Tools.Tests) for the content pipeline and other tool tests.
+* [mgcb](Tools/MonoGame.Content.Builder) is the command line tool for content processing.
+* [mgfxc](Tools/MonoGame.Effect.Compiler) is the command line effect compiler tool.
+* The [mgcb-editor](Tools/MonoGame.Content.Builder.Editor) tool is a GUI frontend for content processing.
+
+## Helpful Links
+
+* The official website is [monogame.net](http://www.monogame.net).
+* Our [issue tracker](https://github.com/MonoGame/MonoGame/issues) is on GitHub.
+* Use our [community forums](http://community.monogame.net/) for support questions.
+* You can [join the Discord server](https://discord.gg/monogame) and chat live with the core developers and other users.
+* The [official documentation](https://monogame.net/articles/index.html) is on our website.
+* Download release [packages](https://github.com/MonoGame/MonoGame/releases).
+* Follow [@MonoGameTeam](https://twitter.com/monogameteam) on Twitter.
+
+## License
+
+The MonoGame project is under the [Microsoft Public License](https://opensource.org/licenses/MS-PL) except for a few portions of the code.  See the [LICENSE.txt](LICENSE.txt) file for more details.  Third-party libraries used by MonoGame are under their own licenses.  Please refer to those libraries for details on the license they use.

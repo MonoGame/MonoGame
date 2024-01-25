@@ -18,10 +18,6 @@ namespace Microsoft.Xna.Framework.Media
 
 		public MediaLibrary()
 		{
-#if WINDOWS_PHONE
-            // Load it automaticall on Windows Phone because it has no cost and people might expect the same behaviour as WP7
-            PlatformLoad(null);
-#endif
 		}
 
         /// <summary>

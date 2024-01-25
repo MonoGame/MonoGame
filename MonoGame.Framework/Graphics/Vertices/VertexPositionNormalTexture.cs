@@ -23,10 +23,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 return VertexDeclaration;
             }
         }
+
         public override int GetHashCode()
         {
-            // TODO: FIc gethashcode
-            return 0;
+            unchecked
+            {
+                var hashCode = Position.GetHashCode();
+                hashCode = (hashCode * 397) ^ Normal.GetHashCode();
+                hashCode = (hashCode * 397) ^ TextureCoordinate.GetHashCode();
+                return hashCode;
+            }
         }
 
         public override string ToString()

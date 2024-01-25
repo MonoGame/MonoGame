@@ -88,6 +88,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             children = new NodeContentCollection(this);
             animations = new AnimationContentDictionary();
+            Transform = Matrix.Identity;
         }
     }
 }

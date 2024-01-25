@@ -2,12 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.IO;
-
-#if WINRT
-using System.Reflection;
-#endif
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -42,11 +38,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         if (_bytecode != null)
                             return _bytecode;
-#if WINRT
-                        var assembly = typeof(EffectResource).GetTypeInfo().Assembly;
-#else
-                        var assembly = typeof(EffectResource).Assembly;
-#endif
+
+                        var assembly = ReflectionHelpers.GetAssembly(typeof(EffectResource));
+
                         var stream = assembly.GetManifestResourceStream(_name);
                         using (var ms = new MemoryStream())
                         {
