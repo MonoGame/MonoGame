@@ -143,8 +143,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 CalculateTangentFrames(geom, textureCoordinateChannelName, tangentChannelName, binormalChannelName);                            
         }
 
+        /// <summary>
+        /// Generate the tangents and binormals (tangent frames) for each vertex in the mesh geometry.
+        /// </summary>
+        /// <param name="geom">The mesh geometry which will have add tangent and binormal channels added.</param>
+        /// <param name="textureCoordinateChannelName">The Vector2 texture coordinate channel used to generate tangent frames.</param>
+        /// <param name="tangentChannelName"></param>
+        /// <param name="binormalChannelName"></param>
         public static void CalculateTangentFrames(GeometryContent geom, string textureCoordinateChannelName, string tangentChannelName, string binormalChannelName)
         {
+            if (!geom.Vertices.Channels.Contains(VertexChannelNames.Normal(0)))
+            {
+                return;
+                // TODO: We could generate the normals here, but it's not working.
+                //MeshHelper.CalculateNormals(geom, true);
+            }
+
             var verts = geom.Vertices;
             var indices = geom.Indices;
             var channels = geom.Vertices.Channels;

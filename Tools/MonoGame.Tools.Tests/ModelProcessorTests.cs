@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using NormalMappingProcessor;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -84,15 +86,15 @@ namespace MonoGame.Tests.ContentPipeline
             var processorContext = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
             var processor = new ModelProcessor
             {
-                RotationX = 10, 
+                RotationX = 10,
                 RotationY = 20,
                 RotationZ = 30
             };
             var output = processor.Process(input, processorContext);
 
             // The transform the processor above is applying to the model.
-            var processorXform =    Matrix.CreateRotationZ(MathHelper.ToRadians(30))*
-                                    Matrix.CreateRotationX(MathHelper.ToRadians(10))*
+            var processorXform = Matrix.CreateRotationZ(MathHelper.ToRadians(30)) *
+                                    Matrix.CreateRotationX(MathHelper.ToRadians(10)) *
                                     Matrix.CreateRotationY(MathHelper.ToRadians(20));
 
             // Test some basics.
@@ -174,7 +176,7 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(0, part.StartIndex);
                 Assert.AreEqual(0, part.VertexOffset);
                 Assert.AreEqual(3, part.NumVertices);
-                
+
                 Assert.NotNull(part.IndexBuffer);
                 Assert.AreEqual(3, part.IndexBuffer.Count);
                 Assert.AreEqual(0, part.IndexBuffer[0]);
@@ -248,15 +250,15 @@ namespace MonoGame.Tests.ContentPipeline
                 wieghts.Add(new BoneWeight("bone1", 0.5f));
                 geom.Vertices.Channels.Add(VertexChannelNames.Weights(0), new[]
                 {
-                    wieghts, 
-                    wieghts, 
+                    wieghts,
+                    wieghts,
                     wieghts
                 });
 
                 mesh.Geometry.Add(geom);
                 input.Children.Add(mesh);
 
-                var bone1 = new BoneContent { Name = "bone1", Transform = Matrix.CreateTranslation(0,1,0) };
+                var bone1 = new BoneContent { Name = "bone1", Transform = Matrix.CreateTranslation(0, 1, 0) };
                 input.Children.Add(bone1);
 
                 var anim = new AnimationContent()
@@ -270,7 +272,7 @@ namespace MonoGame.Tests.ContentPipeline
             var processorContext = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
             var processor = new ModelProcessor
             {
-                DefaultEffect = MaterialProcessorDefaultEffect.SkinnedEffect,                
+                DefaultEffect = MaterialProcessorDefaultEffect.SkinnedEffect,
             };
 
             var output = processor.Process(input, processorContext);
@@ -280,6 +282,52 @@ namespace MonoGame.Tests.ContentPipeline
             // the test first before we can enable the assert here.
 
             //Assert.IsInstanceOf(typeof(SkinnedMaterialContent), output.Meshes[0].MeshParts[0].Material);
+        }
+
+        [Test]
+        /// <summary>
+        /// Test to validate a model with missing normals does not throw an exception using the default ModelProcessor.
+        /// </summary>
+        public void MissingNormalsTestDefault()
+        {
+            string level1fbx = "Assets/Models/level1.fbx";
+            var importer = new FbxImporter();
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var nodeContent = importer.Import(level1fbx, context);
+
+            ModelProcessor processor = new ModelProcessor();
+            var processorContext = new TestProcessorContext(TargetPlatform.Windows, "level1.xnb");
+
+            ModelContent output = null;
+            // Validate that the processor does not throw an exception when normals are missing from the mesh
+            Assert.DoesNotThrow(() => output = processor.Process(nodeContent, processorContext));
+
+            // Test some basics.
+            Assert.NotNull(output);
+            Assert.NotNull(output.Meshes);
+        }
+
+        [Test]
+        /// <summary>
+        /// Test to validate a model with missing normals does not throw an exception using a custom ModelProcessor using MeshHelper.CalculateTangentFrames directly.
+        /// </summary>
+        public void MissingNormalsTestCustom()
+        {
+            string level1fbx = "Assets/Models/level1.fbx";
+            var importer = new FbxImporter();
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var nodeContent = importer.Import(level1fbx, context);
+
+            NormalMappingModelProcessor processor = new NormalMappingModelProcessor();
+            var processorContext = new TestProcessorContext(TargetPlatform.Windows, "level1_costum.xnb");
+
+            ModelContent output = null;
+            // Validate that the custom processor does not throw an exception when normals are missing from the mesh
+            Assert.DoesNotThrow(() => output = processor.Process(nodeContent, processorContext));
+
+            // Test some basics.
+            Assert.NotNull(output);
+            Assert.NotNull(output.Meshes);
         }
     }
 }
