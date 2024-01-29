@@ -36,11 +36,6 @@
 
   <ItemGroup>
     <Compile Remove="Graphics\GraphicsAdapter.cs" />
-    <Compile Remove="Media\Video.cs" />
-    <Compile Remove="Media\VideoPlayer.cs" />
-    <Compile Remove="Content\ContentReaders\VideoReader.cs" />
-    <Compile Remove="Input\MessageBox.cs" />
-    <Compile Remove="Input\KeyboardInput.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -60,14 +55,18 @@
     <Compile Include="Platform\Media\MediaLibrary.Default.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
     <Compile Include="Platform\Media\Song.NVorbis.cs" />
+    <Compile Include="Platform\Media\VideoPlayer.Default.cs" />
+    <Compile Include="Platform\Media\Video.Default.cs" />
     <Compile Include="Platform\Input\GamePad.SDL.cs" />
     <Compile Include="Platform\Input\InputKeyEventArgs.cs" />
     <Compile Include="Platform\Input\Joystick.SDL.cs" />
     <Compile Include="Platform\Input\Keyboard.SDL.cs" />
     <Compile Include="Platform\Input\KeyboardUtil.SDL.cs" />
+    <Compile Include="Platform\Input\KeyboardInput.Default.cs" />
     <Compile Include="Platform\Input\KeysHelper.cs" />
     <Compile Include="Platform\Input\Mouse.SDL.cs" />
     <Compile Include="Platform\Input\MouseCursor.SDL.cs" />
+    <Compile Include="Platform\Input\MessageBox.Default.cs" />
     <Compile Include="Platform\Graphics\GraphicsContext.SDL.cs" />
     <Compile Include="Platform\Graphics\OpenGL.SDL.cs" />
     <Compile Include="Platform\Graphics\WindowInfo.SDL.cs" />
