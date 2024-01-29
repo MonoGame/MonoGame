@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundTest2_MacOs", "MacOS\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlockingRun", "MacOS\BlockingRun\BlockingRun.csproj", "{75D4D875-093F-4C00-8EE5-C7B39D2F4C18}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.InteractiveTests.iOS", "iOS\MonoGame.InteractiveTests.iOS.csproj", "{8C337B04-A86D-4E5D-8556-668709749F0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -130,6 +132,12 @@ Global
 		{ECD1D53E-F50A-4299-9B0F-2F64D6063513}.Distribution|Any CPU.Build.0 = Debug|Any CPU
 		{ECD1D53E-F50A-4299-9B0F-2F64D6063513}.Release|x86.ActiveCfg = Release|Any CPU
 		{ECD1D53E-F50A-4299-9B0F-2F64D6063513}.Release|x86.Build.0 = Release|Any CPU
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Debug|x86.ActiveCfg = Debug|iPhoneSimulator
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Debug|x86.Build.0 = Debug|iPhoneSimulator
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Release|x86.ActiveCfg = Release|iPhoneSimulator
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Release|x86.Build.0 = Release|iPhoneSimulator
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Distribution|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Distribution|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = MacOS\TextureScaleColorTest\TextureScaleColorTest.csproj
