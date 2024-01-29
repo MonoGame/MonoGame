@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework
                 switch (ev.Type)
                 {
                     case Sdl.EventType.Quit:
-                        _isExiting++;
+                        Game.Exit();
                         break;
                     case Sdl.EventType.JoyDeviceAdded:
                         Joystick.AddDevices();
@@ -225,7 +225,7 @@ namespace Microsoft.Xna.Framework
                                 _view.Moved();
                                 break;
                             case Sdl.Window.EventId.Close:
-                                _isExiting++;
+                                Game.Exit();
                                 break;
                         }
                         break;
