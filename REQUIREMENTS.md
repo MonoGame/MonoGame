@@ -1,10 +1,10 @@
-Depending on the [platform](Documentation/articles/platforms/0_platforms.md) that you are targeting, MonoGame has different sets of requirements.
+Depending on the [platform](https://monogame.net/articles/platforms/) that you are targeting, MonoGame has different sets of requirements.
 
 For desktop platforms
 ====================
 
-MonoGame requires a .NET 6 SDK installation.
-You can either install it [independently](https://dotnet.microsoft.com/download/dotnet), or by selecting the .NET workload when installing Visual Studio 2022 (version 17.0 and up required).
+MonoGame requires a .NET 8 SDK installation.
+You can either install it [independently](https://dotnet.microsoft.com/download/dotnet), or by selecting the .NET workload when installing Visual Studio 2022 (version 17.8 and up required).
 
 If you are targeting WindowsDX, you are also going to need [the DirectX June 2010 runtime](https://www.microsoft.com/en-us/download/details.aspx?id=8109) for audio and gamepads to work properly.
 
