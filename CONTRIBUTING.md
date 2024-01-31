@@ -71,7 +71,7 @@ We accept contributions in "good faith" that it isn't bound to a conflicting lic
 
 To this end, when submitting new files, include the following in the header if appropriate:
 ```csharp
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 ```
@@ -83,4 +83,4 @@ If you need help, please ask questions on our [community forums](http://communit
 
 Thanks for reading this guide and helping make MonoGame great!
 
- :heart: The MonoGame Team
+ :heart: MonoGame Foundation, Inc
