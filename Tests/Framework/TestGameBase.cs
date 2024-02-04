@@ -32,7 +32,12 @@ namespace MonoGame.Tests {
 #endif
             // We do all the tests using the reference device to
             // avoid driver glitches and get consistent rendering.
-            GraphicsAdapter.UseReferenceDevice = true;
+            // GraphicsAdapter.UseReferenceDevice = true;
+
+            // Keeping above line and comment. However, the
+            // reference driver causes all WindowsDX graphics tests to fail currently.
+            // Hardware may be less predictable/inconsistent, but it can work.     
+            GraphicsAdapter.UseReferenceDevice = false;
 
             Services.AddService<IFrameInfoSource>(this);
 			SuppressExtraUpdatesAndDraws = true;
