@@ -334,10 +334,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// The system window that this game is displayed on.
         /// </summary>
-        [CLSCompliant(false)]
-        #pragma warning disable CS3021
         public GameWindow Window
-        #pragma warning restore CS3021
         {
             get { return Platform.Window; }
         }

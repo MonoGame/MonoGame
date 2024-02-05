@@ -16,10 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <summary>
         /// Gets and sets the packed value.
         /// </summary>
-        [CLSCompliant(false)]
-        #pragma warning disable CS3021
         public byte PackedValue
-        #pragma warning restore CS3021
         {
             get
             {

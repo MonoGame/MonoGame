@@ -172,10 +172,7 @@ namespace Microsoft.Xna.Framework
         /// The value is a 32-bit unsigned integer, with R in the least significant octet.
         /// </summary>
         /// <param name="packedValue">The packed value.</param>
-        [CLSCompliant(false)]
-        #pragma warning disable CS3021
         public Color(uint packedValue)
-        #pragma warning restore CS3021
         {
             _packedValue = packedValue;
         }
@@ -1790,10 +1787,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Gets or sets packed value of this <see cref="Color"/>.
         /// </summary>
-        [CLSCompliant(false)]
-        #pragma warning disable CS3021
         public UInt32 PackedValue
-        #pragma warning restore CS3021
         {
             get { return _packedValue; }
             set { _packedValue = value; }

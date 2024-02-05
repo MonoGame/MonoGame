@@ -31,10 +31,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return a._packed == b._packed;
         }
 
-        [CLSCompliant(false)]
-        #pragma warning disable CS3021
         public ushort PackedValue
-        #pragma warning restore CS3021
         {
             get
             {

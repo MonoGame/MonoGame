@@ -49,10 +49,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return new Vector4(vector.X, vector.Y, 0f, 1f);
         }
 
-        [CLSCompliant(false)]
-        #pragma warning disable CS3021
         public uint PackedValue
-        #pragma warning restore CS3021
         {
             get
             {
