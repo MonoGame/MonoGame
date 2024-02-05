@@ -32,7 +32,9 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 		}
 
         [CLSCompliant(false)]
+		#pragma warning disable CS3021
 		public uint PackedValue
+		#pragma warning restore CS3021
         {
 			get
             {

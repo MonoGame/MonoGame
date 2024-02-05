@@ -76,7 +76,9 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// </summary>
         /// <value>The packed representation of the value.</value>
         [CLSCompliant(false)]
+        #pragma warning disable CS3021
         public ulong PackedValue
+        #pragma warning restore CS3021
         {
             get
             {
