@@ -168,6 +168,18 @@ internal static class Sdl
             return version == (Version)obj;
         }
 
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + Major.GetHashCode();
+                hash = hash * 23 + Minor.GetHashCode();
+                hash = hash * 23 + Patch.GetHashCode();
+                return hash;
+            }
+        }
+
         public static bool operator !=(Version version1, Version version2)
         {
             return !(version1 == version2);
