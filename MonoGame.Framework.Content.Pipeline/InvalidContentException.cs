@@ -89,20 +89,5 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             : this(message, null, innerException)
         {
         }
-
-        /// <summary>
-        /// When overridden in a derived class, returns information about the exception.
-        /// In addition to the base behavior, this method provides serialization functionality.
-        /// </summary>
-        /// <param name="info">Information necessary for serialization and deserialization of the content item.</param>
-        /// <param name="context">Information necessary for the source and destination of a given serialized stream. Also provides an additional caller-defined context.</param>
-        public override void GetObjectData(
-            SerializationInfo info,
-            StreamingContext context
-            )
-        {
-            base.GetObjectData(info, context);
-            // TODO: Complete me...
-        }
     }
 }
