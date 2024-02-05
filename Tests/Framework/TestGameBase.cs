@@ -30,9 +30,10 @@ namespace MonoGame.Tests {
 #if XNA
             Content.RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
 #endif
-            // We do all the tests using the reference device to
+            // We do all the tests using the reference/warp device to
             // avoid driver glitches and get consistent rendering.
             GraphicsAdapter.UseReferenceDevice = true;
+            GraphicsAdapter.UseDriverType = GraphicsAdapter.DriverType.FastSoftware;
 
             Services.AddService<IFrameInfoSource>(this);
 			SuppressExtraUpdatesAndDraws = true;
