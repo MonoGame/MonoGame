@@ -31,7 +31,6 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 			return a.PackedValue == b.PackedValue;
 		}
 
-        [CLSCompliant(false)]
 		public uint PackedValue
         {
 			get

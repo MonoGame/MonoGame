@@ -31,7 +31,6 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 			return a.Equals (b);
 		}
 
-        [CLSCompliant(false)]
         public ulong PackedValue
         {
             get
