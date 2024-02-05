@@ -15,7 +15,6 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             packedValue = HalfTypeHelper.Convert(single);
         }
 
-        [CLSCompliant(false)]
         public ushort PackedValue
         {
             get

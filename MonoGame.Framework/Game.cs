@@ -334,7 +334,6 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// The system window that this game is displayed on.
         /// </summary>
-        [CLSCompliant(false)]
         public GameWindow Window
         {
             get { return Platform.Window; }

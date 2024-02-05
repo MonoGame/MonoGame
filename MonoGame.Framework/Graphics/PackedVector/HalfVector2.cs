@@ -49,7 +49,6 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return new Vector4(vector.X, vector.Y, 0f, 1f);
         }
 
-        [CLSCompliant(false)]
         public uint PackedValue
         {
             get
