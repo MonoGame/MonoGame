@@ -461,6 +461,7 @@ namespace Microsoft.Xna.Framework
         ///   <code>true</code> if <see cref="other"/> is equal to this <see cref="BoundingBox"/>,
         ///   <code>false</code> if it is not.
         /// </returns>
+        ///   <code>true</code> if <paramref name="other"/> is equal to this <see cref="BoundingBox"/>,
         public bool Equals(BoundingBox other)
         {
             return (this.Min == other.Min) && (this.Max == other.Max);
@@ -474,6 +475,7 @@ namespace Microsoft.Xna.Framework
         ///   <code>true</code> if <see cref="obj"/> is equal to this <see cref="BoundingBox"/>,
         ///   <code>false</code> if it is not.
         /// </returns>
+        ///   <code>true</code> if <paramref name="obj"/> is equal to this <see cref="BoundingBox"/>,
         public override bool Equals(object obj)
         {
             return (obj is BoundingBox) && this.Equals((BoundingBox)obj);
@@ -758,6 +760,7 @@ namespace Microsoft.Xna.Framework
         ///   <code>true</code> if <see cref="a"/> is equal to this <see cref="b"/>,
         ///   <code>false</code> if it is not.
         /// </returns>
+        ///   <code>true</code> if <paramref name="a"/> is equal to this <paramref name="b"/>,
         public static bool operator ==(BoundingBox a, BoundingBox b)
         {
             return a.Equals(b);
@@ -772,6 +775,7 @@ namespace Microsoft.Xna.Framework
         ///   <code>true</code> if <see cref="a"/> is not equal to this <see cref="b"/>,
         ///   <code>false</code> if it is.
         /// </returns>
+        ///   <code>true</code> if <paramref name="a"/> is not equal to this <paramref name="b"/>,
         public static bool operator !=(BoundingBox a, BoundingBox b)
         {
             return !a.Equals(b);
