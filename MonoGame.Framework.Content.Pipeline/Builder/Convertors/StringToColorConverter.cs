@@ -40,7 +40,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors
             if (value.GetType() == typeof(string))
             {
                 string strValue = (string)value;
-                int r, g, b, a;
 
                 // Check if the string is in the older XNA "{R:0 G:0 B:0 A:0}" format
                 if (strValue.StartsWith('{') && strValue.EndsWith('}'))
@@ -49,10 +48,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors
                     var parts = strValue.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     if (parts.Length == 4)
                     {
-                        r = int.Parse(parts[0].Split(':')[1]);
-                        g = int.Parse(parts[1].Split(':')[1]);
-                        b = int.Parse(parts[2].Split(':')[1]);
-                        a = int.Parse(parts[3].Split(':')[1]);
+                        var r = int.Parse(parts[0].Split(':')[1]);
+                        var g = int.Parse(parts[1].Split(':')[1]);
+                        var b = int.Parse(parts[2].Split(':')[1]);
+                        var a = int.Parse(parts[3].Split(':')[1]);
                         return new Microsoft.Xna.Framework.Color(r, g, b, a);
                     }
                     else
@@ -66,10 +65,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors
                     string[] values = (strValue).Split(new char[] { ',' }, StringSplitOptions.None);
                     if (values.Length == 4)
                     {
-                        r = int.Parse(values[0].Trim());
-                        g = int.Parse(values[1].Trim());
-                        b = int.Parse(values[2].Trim());
-                        a = int.Parse(values[3].Trim());
+                        var r = int.Parse(values[0].Trim());
+                        var g = int.Parse(values[1].Trim());
+                        var b = int.Parse(values[2].Trim());
+                        var a = int.Parse(values[3].Trim());
                         return new Microsoft.Xna.Framework.Color(r, g, b, a);
                     }
                     else
