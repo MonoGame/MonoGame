@@ -57,9 +57,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors
                         throw new ArgumentException(string.Format("Could not convert from string({0}) to Color, expected format is 'r,g,b,a' or '{R:0 G:0 B:0 A:0}'", value));
                     }
                 }
-                // Assume the string is in the MonoGame "r,g,b,a" format
-                else
-                {
+                else // Assume the string is in the MonoGame "r,g,b,a" format
+                {                    
                     string[] values = (strValue).Split(new char[] { ',' }, StringSplitOptions.None);
                     if (values.Length == 4)
                     {
