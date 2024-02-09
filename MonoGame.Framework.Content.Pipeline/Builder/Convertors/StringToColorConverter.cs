@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Text;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors
@@ -23,7 +22,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors
                 return base.ConvertTo(context, culture, value, destinationType);
 
             var color = (Color)value;
-
             return string.Format("{0},{1},{2},{3}", color.R, color.G, color.B, color.A);
         }
 
