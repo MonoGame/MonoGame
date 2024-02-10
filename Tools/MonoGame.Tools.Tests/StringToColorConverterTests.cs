@@ -11,59 +11,56 @@ namespace MonoGame.Tests.ContentPipeline
 {
     internal class StringToColorConverterTests
     {
-        [Test]
-        public void ConvertFromMGColorString()
+        [TestCase("255,255,255,255", 255, 255, 255, 255)]
+        [TestCase("255,0,255,255", 255, 0, 255, 255)]
+        [TestCase("0,0,0,0", 0, 0, 0, 0)]
+        [TestCase("100,149,237,255", 100, 149, 237, 255)]
+        [TestCase("231,60,0,255", 231, 60, 0, 255)]
+        public void ConvertFromMGString(string input, int r, int g, int b, int a)
         {
             StringToColorConverter _converter = new StringToColorConverter();
-            var input = "255,255,255,255";
 
             var result = _converter.ConvertFrom(null, null, input);
 
             Assert.IsNotNull(result);
             Assert.IsInstanceOf<Color>(result);
             var color = (Color)result;
-            Assert.AreEqual(255, color.R);
-            Assert.AreEqual(255, color.G);
-            Assert.AreEqual(255, color.B);
-            Assert.AreEqual(255, color.A);
+            Assert.AreEqual(r, color.R);
+            Assert.AreEqual(g, color.G);
+            Assert.AreEqual(b, color.B);
+            Assert.AreEqual(a, color.A);
         }
 
-        [Test]
-        public void ConvertFromXNAColorString()
-        {            
-            StringToColorConverter _converter = new StringToColorConverter();
-            var input = "{R:255 G:255 B:255 A:255}";
-            
-            var result = _converter.ConvertFrom(null, null, input);
-         
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<Color>(result);
-            var color = (Color)result;
-            Assert.AreEqual(255, color.R);
-            Assert.AreEqual(255, color.G);
-            Assert.AreEqual(255, color.B);
-            Assert.AreEqual(255, color.A);
-        }
-
-        [Test]
-        public void InvalidStringThrowsFormatException()
+        [TestCase("{R:255 G:255 B:255 A:255}", 255, 255, 255, 255)]
+        [TestCase("{R:255 G:0 B:255 A:255}", 255, 0, 255, 255)]
+        [TestCase("{R:0 G:0 B:0 A:0}", 0, 0, 0, 0)]
+        [TestCase("{R:100 G:149 B:237 A:255}", 100, 149, 237, 255)]
+        [TestCase("{R:231 G:60 B:0 A:255}", 231, 60, 0, 255)]
+        public void ConvertFromXNAString(string input, int r, int g, int b, int a)
         {
             StringToColorConverter _converter = new StringToColorConverter();
 
-            string inputMGShort = "255,255,255";
-            Assert.Throws<FormatException>(() => _converter.ConvertFrom(null, null, inputMGShort));
+            var result = _converter.ConvertFrom(null, null, input);
 
-            string inputMGLong = "255,255,255,255,255";
-            Assert.Throws<FormatException>(() => _converter.ConvertFrom(null, null, inputMGLong));
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<Color>(result);
+            var color = (Color)result;
+            Assert.AreEqual(r, color.R);
+            Assert.AreEqual(g, color.G);
+            Assert.AreEqual(b, color.B);
+            Assert.AreEqual(a, color.A);
+        }
 
-            string inputXNAInvalid = "{R:255G:255B:255A:255}";
-            Assert.Throws<FormatException>(() => _converter.ConvertFrom(null, null, inputXNAInvalid));
+        [TestCase("255,255,255")]
+        [TestCase("255,255,255,255,255")]
+        [TestCase("{R:255G:255B:255A:255}")]
+        [TestCase("{R:255 G:255 B:255}")]
+        [TestCase("{R:255 G:255 B:255 A:255 Q:255}")]
+        public void InvalidStringThrowsArgumentException(string input)
+        {
+            StringToColorConverter _converter = new StringToColorConverter();
 
-            string inputXNAShort = "{R:255 G:255 B:255}";
-            Assert.Throws<FormatException>(() => _converter.ConvertFrom(null, null, inputXNAShort));
-
-            string inputXNALong = "{R:255 G:255 B:255 A:255 Q:255}";
-            Assert.Throws<FormatException>(() => _converter.ConvertFrom(null, null, inputXNALong));
+            Assert.Throws<ArgumentException>(() => _converter.ConvertFrom(null, null, input));
         }
 
     }

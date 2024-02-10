@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors
                     }
                     else
                     {
-                        throw new ArgumentException(string.Format("Could not convert from string({0}) to Color, expected format is 'r,g,b,a' or '{R:0 G:0 B:0 A:0}'", value));
+                        throw new ArgumentException(string.Format("Could not convert from string({0}) to Color, expected format is 'r,g,b,a' or '{{R:0 G:0 B:0 A:0}}'", value));
                     }
                 }
                 else // Assume the string is in the MonoGame "r,g,b,a" format
@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors
                     }
                     else
                     {
-                        throw new ArgumentException(string.Format("Could not convert from string({0}) to Color, expected format is 'r,g,b,a' or '{R:0 G:0 B:0 A:0}'", value));
+                        throw new ArgumentException(string.Format("Could not convert from string({0}) to Color, expected format is 'r,g,b,a' or '{{R:0 G:0 B:0 A:0}}'", value));
                     }
                 }
             }
