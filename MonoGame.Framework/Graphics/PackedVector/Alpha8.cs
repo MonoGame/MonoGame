@@ -107,11 +107,29 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return packedValue.GetHashCode();
         }
 
+        /// <summary>
+        /// Compares the current instance of a class to another instance to determine
+        /// whether they are the same.
+        /// </summary>
+        /// <param name="lhs">The object on the left of the equality operator.</param>
+        /// <param name="rhs">The object on the right of the equality operator.</param>
+        /// <returns>
+        /// <see langword="true"/> if the objects are the same; <see langword="false"/> otherwise.
+        /// </returns>
         public static bool operator ==(Alpha8 lhs, Alpha8 rhs)
         {
             return lhs.packedValue == rhs.packedValue;
         }
 
+        /// <summary>
+        /// Compares teh current instance of a class to another instance to determine
+        /// whether they are different.
+        /// </summary>
+        /// <param name="lhs">The object to the left of the inequality operator.</param>
+        /// <param name="rhs">The object to the right of the inequality operator.</param>
+        /// <returns>
+        /// <see langword="true"/> if the objects are different; <see langword="false"/> otherwise.
+        /// </returns>
         public static bool operator !=(Alpha8 lhs, Alpha8 rhs)
         {
             return lhs.packedValue != rhs.packedValue;
