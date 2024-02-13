@@ -127,11 +127,29 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return _packedValue.GetHashCode();
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether two <see cref="Bgr565"/> values are equal.
+        /// </summary>
+        /// <param name="lhs">The <see cref="Bgr565"/> on the left of the equality operator.</param>
+        /// <param name="rhs">The <see cref="Bgr565"/> on the right of the equality operator.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="lhs"/> and <paramref name="rhs"/> are equal; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
         public static bool operator ==(Bgr565 lhs, Bgr565 rhs)
         {
             return lhs._packedValue == rhs._packedValue;
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether two <see cref="Bgr565"/> values are not equal.
+        /// </summary>
+        /// <param name="lhs">The <see cref="Bgr565"/> on the left of the inequality operator.</param>
+        /// <param name="rhs">The <see cref="Bgr565"/> on the right of the inequality operator.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="lhs"/> and <paramref name="rhs"/> are different; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
         public static bool operator !=(Bgr565 lhs, Bgr565 rhs)
         {
             return lhs._packedValue != rhs._packedValue;
