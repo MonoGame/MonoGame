@@ -62,9 +62,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Gets the packed vector in Vector4 format.
+        /// Expands this <see cref="HalfVector2"/> to a <see cref="Vector4"/>
         /// </summary>
-        /// <returns>The packed vector in Vector4 format</returns>
+        /// <returns>
+        /// The expanded <see cref="HalfVector2"/> as a <see cref="Vector4"/>.
+        /// </returns>
         public Vector4 ToVector4()
         {
             Vector2 vector = this.ToVector2();

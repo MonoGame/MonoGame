@@ -11,9 +11,12 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 	/// </summary>
 	public struct Rgba64 : IPackedVector<ulong>, IEquatable<Rgba64>, IPackedVector
 	{
-		/// <summary>
-		/// Gets and sets the packed value.
-		/// </summary>
+        /// <summary>
+        /// Gets or Sets the packed representation of this <see cref="Rgba64"/>.
+        /// </summary>
+        /// <value>
+        /// The packed representation of this <see cref="Rgba64"/>.
+        /// </value>
 		public ulong PackedValue
 		{
 			get
@@ -28,33 +31,36 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
 		private ulong packedValue;
 
-		/// <summary>
-		/// Creates a new instance of Rgba64.
-		/// </summary>
-		/// <param name="x">The x component</param>
-		/// <param name="y">The y component</param>
-		/// <param name="z">The z component</param>
-		/// <param name="w">The w component</param>
+        /// <summary>
+        /// Creates a new <see cref="Rgba64"/> from the specified component values.
+        /// </summary>
+        /// <param name="x">The initial x-component value.</param>
+        /// <param name="y">The initial y-component value.</param>
+        /// <param name="z">The initial z-component value.</param>
+        /// <param name="w">The initial w-component value.</param>
 		public Rgba64(float x, float y, float z, float w)
 		{
 			packedValue = Pack(x, y, z, w);
 		}
 
-		/// <summary>
-		/// Creates a new instance of Rgba64.
-		/// </summary>
-		/// <param name="vector">
-		/// Vector containing the components for the packed vector.
-		/// </param>
+       /// <summary>
+        /// Creates a new <see cref="Rgba64"/> from the specified <see cref="Vector4"/>.
+        /// </summary>
+        /// <param name="vector">
+        /// The <see cref="Vector4"/> whos components contain the initial values
+        /// for this <see cref="Rgba64"/>.
+        /// </param>
 		public Rgba64(Vector4 vector)
 		{
 			packedValue = Pack(vector.X, vector.Y, vector.Z, vector.W);
 		}
 
-		/// <summary>
-		/// Gets the packed vector in Vector4 format.
-		/// </summary>
-		/// <returns>The packed vector in Vector4 format</returns>
+        /// <summary>
+        /// Expands this <see cref="Rgba64"/> to a <see cref="Vector4"/>
+        /// </summary>
+        /// <returns>
+        /// The expanded <see cref="Rgba64"/> as a <see cref="Vector4"/>.
+        /// </returns>
 		public Vector4 ToVector4()
 		{
 			return new Vector4(
@@ -74,39 +80,51 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 			packedValue = Pack(vector.X, vector.Y, vector.Z, vector.W);
 		}
 
-		/// <summary>
-		/// Compares an object with the packed vector.
-		/// </summary>
-		/// <param name="obj">The object to compare.</param>
-		/// <returns>True if the object is equal to the packed vector.</returns>
+        /// <summary>
+        /// Returns a value that indicates whether this <see cref="Rgba64"/>
+        /// and a specified object are equal.
+        /// </summary>
+        /// <param name="obj">The object to compare with this <see cref="Rgba64"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if this <see cref="Rgba64"/> and
+        /// <paramref name="obj"/> are equal; otherwise, <see langword="false"/>.
+        /// </returns>
 		public override bool Equals(object obj)
 		{
 			return (obj is Rgba64) && Equals((Rgba64) obj);
 		}
 
-		/// <summary>
-		/// Compares another Rgba64 packed vector with the packed vector.
-		/// </summary>
-		/// <param name="other">The Rgba64 packed vector to compare.</param>
-		/// <returns>True if the packed vectors are equal.</returns>
+        /// <summary>
+        /// Returns a value tha indicates whether this <see cref="Rgba64"/>
+        /// and a specified <see cref="Rgba64"/> are equal.
+        /// </summary>
+        /// <param name="other">The other <see cref="Rgba64"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if the two <see cref="Rgba64"/> values
+        /// are equal; otherwise, <see langword="false"/>.
+        /// </returns>
 		public bool Equals(Rgba64 other)
 		{
 			return packedValue == other.packedValue;
 		}
 
-		/// <summary>
-		/// Gets a string representation of the packed vector.
-		/// </summary>
-		/// <returns>A string representation of the packed vector.</returns>
+        /// <summary>
+        /// Returns the string representation of this <see cref="Rgba64"/> value.
+        /// </summary>
+        /// <returns>
+        /// The string representation of this <see cref="Rgba64"/> value.
+        /// </returns>
 		public override string ToString()
 		{
 			return ToVector4().ToString();
 		}
 
-		/// <summary>
-		/// Gets a hash code of the packed vector.
-		/// </summary>
-		/// <returns>The hash code for the packed vector.</returns>
+        /// <summary>
+        /// Returns the hash code for this <see cref="Rgba64"/> value.
+        /// </summary>
+        /// <returns>
+        /// The 32-bit signed integer hash code for this <see cref="Rgba64"/> value.
+        /// </returns>
 		public override int GetHashCode()
 		{
 			return packedValue.GetHashCode();

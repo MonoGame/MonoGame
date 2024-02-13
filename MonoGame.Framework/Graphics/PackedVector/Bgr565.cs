@@ -21,28 +21,34 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Creates a new instance of Bgr565.
+        /// Creates a new <see cref="Bgr565"/> from the specified component values.
         /// </summary>
-        /// <param name="x">The x component</param>
-        /// <param name="y">The y component</param>
-        /// <param name="z">The z component</param>
+        /// <param name="x">The initial x-component value.</param>
+        /// <param name="y">The initial y-component value.</param>
+        /// <param name="z">The initial z-component value.</param>
         public Bgr565(float x, float y, float z)
         {
             _packedValue = Pack(x, y, z);
         }
 
         /// <summary>
-        /// Creates a new instance of Bgr565.
+        /// Creates a new <see cref="Bgr565"/> from the specified <see cref="Vector3"/>.
         /// </summary>
-        /// <param name="vector">Vector containing the components for the packed vector.</param>
+        /// <param name="vector">
+        /// The <see cref="Vector3"/> whos components contain the initial values
+        /// for this <see cref="Bgr565"/>.
+        /// </param>
         public Bgr565(Vector3 vector)
         {
             _packedValue = Pack(vector.X, vector.Y, vector.Z);
         }
 
         /// <summary>
-        /// Gets and sets the packed value.
+        /// Gets or Sets the packed representation of this <see cref="Bgr565"/>.
         /// </summary>
+        /// <value>
+        /// The packed representation of this <see cref="Bgr565"/>
+        /// </value>
         public UInt16 PackedValue
         {
             get
@@ -56,9 +62,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Gets the packed vector in Vector3 format.
+        /// Expands this <see cref="Bgr565"/> to a <see cref="Vector3"/>
         /// </summary>
-        /// <returns>The packed vector in Vector3 format</returns>
+        /// <returns>
+        /// The expanded <see cref="Bgr565"/> as a <see cref="Vector3"/>.
+        /// </returns>
         public Vector3 ToVector3()
         {
             return new Vector3((float)(((_packedValue >> 11) & 0x1F) * (1.0f / 31.0f)),
@@ -79,19 +87,25 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Gets the packed vector in Vector4 format.
+        /// Expands this <see cref="Bgr565"/> to a <see cref="Vector4"/>
         /// </summary>
-        /// <returns>The packed vector in Vector4 format</returns>
+        /// <returns>
+        /// The expanded <see cref="Bgr565"/> as a <see cref="Vector4"/>.
+        /// </returns>
         public Vector4 ToVector4()
         {
             return new Vector4(ToVector3(), 1.0f);
         }
 
         /// <summary>
-        /// Compares an object with the packed vector.
+        /// Returns a value that indicates whether this <see cref="Bgr565"/>
+        /// and a specified object are equal.
         /// </summary>
-        /// <param name="obj">The object to compare.</param>
-        /// <returns>true if the object is equal to the packed vector.</returns>
+        /// <param name="obj">The object to compare with this <see cref="Bgr565"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if this <see cref="Bgr565"/> and
+        /// <paramref name="obj"/> are equal; otherwise, <see langword="false"/>.
+        /// </returns>
         public override bool Equals(object obj)
         {
             if (obj != null && (obj is Bgr565))
@@ -100,28 +114,36 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Compares another Bgr565 packed vector with the packed vector.
+        /// Returns a value tha indicates whether this <see cref="Bgr565"/>
+        /// and a specified <see cref="Bgr565"/> are equal.
         /// </summary>
-        /// <param name="other">The Bgr565 packed vector to compare.</param>
-        /// <returns>true if the packed vectors are equal.</returns>
+        /// <param name="other">The other <see cref="Bgr565"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if the two <see cref="Bgr565"/> values
+        /// are equal; otherwise, <see langword="false"/>.
+        /// </returns>
         public bool Equals(Bgr565 other)
         {
             return _packedValue == other._packedValue;
         }
 
         /// <summary>
-        /// Gets a string representation of the packed vector.
+        /// Returns the string representation of this <see cref="Bgr565"/> value.
         /// </summary>
-        /// <returns>A string representation of the packed vector.</returns>
+        /// <returns>
+        /// The string representation of this <see cref="Bgr565"/> value.
+        /// </returns>
         public override string ToString()
         {
             return ToVector3().ToString();
         }
 
         /// <summary>
-        /// Gets a hash code of the packed vector.
+        /// Returns the hash code for this <see cref="Bgr565"/> value.
         /// </summary>
-        /// <returns>The hash code for the packed vector.</returns>
+        /// <returns>
+        /// The 32-bit signed integer hash code for this <see cref="Bgr565"/> value.
+        /// </returns>
         public override int GetHashCode()
         {
             return _packedValue.GetHashCode();

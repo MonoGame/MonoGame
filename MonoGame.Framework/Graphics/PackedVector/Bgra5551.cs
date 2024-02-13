@@ -13,8 +13,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
     public struct Bgra5551 : IPackedVector<UInt16>, IEquatable<Bgra5551>, IPackedVector
     {
         /// <summary>
-        /// Gets and sets the packed value.
+        /// Gets or Sets the packed representation of this <see cref="Bgra5551"/>.
         /// </summary>
+        /// <value>
+        /// The packed representation of this <see cref="Bgra5551"/>
+        /// </value>
         public UInt16 PackedValue
         {
             get
@@ -30,22 +33,23 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         private UInt16 packedValue;
 
         /// <summary>
-        /// Creates a new instance of Bgra5551.
+        /// Creates a new <see cref="Bgra5551"/> from the specified component values.
         /// </summary>
-        /// <param name="x">The x component</param>
-        /// <param name="y">The y component</param>
-        /// <param name="z">The z component</param>
-        /// <param name="w">The w component</param>
+        /// <param name="x">The initial x-component value.</param>
+        /// <param name="y">The initial y-component value.</param>
+        /// <param name="z">The initial z-component value.</param>
+        /// <param name="w">The initial w-component value.</param>
         public Bgra5551(float x, float y, float z, float w)
         {
             packedValue = Pack(x, y, z, w);
         }
 
         /// <summary>
-        /// Creates a new instance of Bgra5551.
+        /// Creates a new <see cref="Bgra5551"/> from the specified <see cref="Vector4"/>.
         /// </summary>
         /// <param name="vector">
-        /// Vector containing the components for the packed vector.
+        /// The <see cref="Vector4"/> whos components contain the initial values
+        /// for this <see cref="Bgra5551"/>.
         /// </param>
         public Bgra5551(Vector4 vector)
         {
@@ -53,9 +57,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Gets the packed vector in Vector4 format.
+        /// Expands this <see cref="Bgra5551"/> to a <see cref="Vector4"/>
         /// </summary>
-        /// <returns>The packed vector in Vector4 format</returns>
+        /// <returns>
+        /// The expanded <see cref="Bgra5551"/> as a <see cref="Vector4"/>.
+        /// </returns>
         public Vector4 ToVector4()
         {
             return new Vector4(
@@ -76,38 +82,50 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Compares an object with the packed vector.
+        /// Returns a value that indicates whether this <see cref="Bgra5551"/>
+        /// and a specified object are equal.
         /// </summary>
-        /// <param name="obj">The object to compare.</param>
-        /// <returns>True if the object is equal to the packed vector.</returns>
+        /// <param name="obj">The object to compare with this <see cref="Bgra5551"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if this <see cref="Bgra5551"/> and
+        /// <paramref name="obj"/> are equal; otherwise, <see langword="false"/>.
+        /// </returns>
         public override bool Equals(object obj)
         {
             return (obj is Bgra5551) && Equals((Bgra5551) obj);
         }
 
         /// <summary>
-        /// Compares another Bgra5551 packed vector with the packed vector.
+        /// Returns a value tha indicates whether this <see cref="Bgra5551"/>
+        /// and a specified <see cref="Bgra5551"/> are equal.
         /// </summary>
-        /// <param name="other">The Bgra5551 packed vector to compare.</param>
-        /// <returns>True if the packed vectors are equal.</returns>
+        /// <param name="other">The other <see cref="Bgra5551"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if the two <see cref="Bgra5551"/> values
+        /// are equal; otherwise, <see langword="false"/>.
+        /// </returns>
         public bool Equals(Bgra5551 other)
         {
             return packedValue == other.packedValue;
         }
 
         /// <summary>
-        /// Gets a string representation of the packed vector.
+        /// Returns the string representation of this <see cref="Bgra5551"/> value.
         /// </summary>
-        /// <returns>A string representation of the packed vector.</returns>
+        /// <returns>
+        /// The string representation of this <see cref="Bgra5551"/> value.
+        /// </returns>
         public override string ToString()
         {
             return ToVector4().ToString();
         }
 
         /// <summary>
-        /// Gets a hash code of the packed vector.
+        /// Returns the hash code for this <see cref="Bgra5551"/> value.
         /// </summary>
-        /// <returns>The hash code for the packed vector.</returns>
+        /// <returns>
+        /// The 32-bit signed integer hash code for this <see cref="Bgra5551"/> value.
+        /// </returns>
         public override int GetHashCode()
         {
             return packedValue.GetHashCode();

@@ -149,9 +149,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Gets the packed vector in Vector4 format.
+        /// Expands this <see cref="NormalizedByte2"/> to a <see cref="Vector4"/>
         /// </summary>
-        /// <returns>The packed vector in Vector4 format</returns>
+        /// <returns>
+        /// The expanded <see cref="NormalizedByte2"/> as a <see cref="Vector4"/>.
+        /// </returns>
         public Vector4 ToVector4()
         {
             return new Vector4(ToVector2(), 0.0f, 1.0f);

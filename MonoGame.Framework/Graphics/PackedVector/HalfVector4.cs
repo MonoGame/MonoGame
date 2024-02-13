@@ -14,12 +14,12 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         ulong packedValue;
 
         /// <summary>
-        /// Initializes a new instance of the HalfVector4 structure.
+        /// Creates a new <see cref="HalfVector4"/> from the specified component values.
         /// </summary>
-        /// <param name="x">Initial value for the x component.</param>
-        /// <param name="y">Initial value for the y component.</param>
-        /// <param name="z">Initial value for the z component.</param>
-        /// <param name="w">Initial value for the q component.</param>
+        /// <param name="x">The initial x-component value.</param>
+        /// <param name="y">The initial y-component value.</param>
+        /// <param name="z">The initial z-component value.</param>
+        /// <param name="w">The initial w-component value.</param>
         public HalfVector4(float x, float y, float z, float w)
         {
             var vector = new Vector4(x, y, z, w);
@@ -27,9 +27,12 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Initializes a new instance of the HalfVector4 structure.
+        /// Creates a new <see cref="HalfVector4"/> from the specified <see cref="Vector4"/>.
         /// </summary>
-        /// <param name="vector">A vector containing the initial values for the components of the HalfVector4 structure.</param>
+        /// <param name="vector">
+        /// The <see cref="Vector4"/> whos components contain the initial values
+        /// for this <see cref="HalfVector4"/>.
+        /// </param>
         public HalfVector4(Vector4 vector)
         {
             packedValue = PackHelper(ref vector);
@@ -59,9 +62,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Expands the packed representation into a Vector4.
+        /// Expands this <see cref="HalfVector4"/> to a <see cref="Vector4"/>
         /// </summary>
-        /// <returns>The expanded vector.</returns>
+        /// <returns>
+        /// The expanded <see cref="HalfVector4"/> as a <see cref="Vector4"/>.
+        /// </returns>
         public Vector4 ToVector4()
         {
             return new Vector4(
@@ -72,9 +77,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Directly gets or sets the packed representation of the value.
+        /// Gets or Sets the packed representation of this <see cref="HalfVector4"/>.
         /// </summary>
-        /// <value>The packed representation of the value.</value>
+        /// <value>
+        /// The packed representation of this <see cref="HalfVector4"/>
+        /// </value>
         public ulong PackedValue
         {
             get
@@ -88,60 +95,80 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Returns a string representation of the current instance.
+        /// Returns the string representation of this <see cref="HalfVector4"/> value.
         /// </summary>
-        /// <returns>String that represents the object.</returns>
+        /// <returns>
+        /// The string representation of this <see cref="HalfVector4"/> value.
+        /// </returns>
         public override string ToString()
         {
             return ToVector4().ToString();
         }
 
         /// <summary>
-        /// Gets the hash code for the current instance.
+        /// Returns the hash code for this <see cref="HalfVector4"/> value.
         /// </summary>
-        /// <returns>Hash code for the instance.</returns>
+        /// <returns>
+        /// The 32-bit signed integer hash code for this <see cref="HalfVector4"/> value.
+        /// </returns>
         public override int GetHashCode()
         {
             return packedValue.GetHashCode();
         }
 
         /// <summary>
-        /// Returns a value that indicates whether the current instance is equal to a specified object.
+        /// Returns a value that indicates whether this <see cref="HalfVector4"/>
+        /// and a specified object are equal.
         /// </summary>
-        /// <param name="obj">The object with which to make the comparison.</param>
-        /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
+        /// <param name="obj">The object to compare with this <see cref="HalfVector4"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if this <see cref="HalfVector4"/> and
+        /// <paramref name="obj"/> are equal; otherwise, <see langword="false"/>.
+        /// </returns>
         public override bool Equals(object obj)
         {
             return ((obj is HalfVector4) && Equals((HalfVector4)obj));
         }
 
         /// <summary>
-        /// Returns a value that indicates whether the current instance is equal to a specified object.
+        /// Returns a value tha indicates whether this <see cref="HalfVector4"/>
+        /// and a specified <see cref="HalfVector4"/> are equal.
         /// </summary>
-        /// <param name="other">The object with which to make the comparison.</param>
-        /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
+        /// <param name="other">The other <see cref="HalfVector4"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if the two <see cref="HalfVector4"/> values
+        /// are equal; otherwise, <see langword="false"/>.
+        /// </returns>
         public bool Equals(HalfVector4 other)
         {
             return packedValue.Equals(other.packedValue);
         }
 
         /// <summary>
-        /// Compares the current instance of a class to another instance to determine whether they are the same.
+        /// Returns a value that indicates whether two <see cref="HalfVector4"/>
+        /// values are equal.
         /// </summary>
-        /// <param name="a">The object to the left of the equality operator.</param>
-        /// <param name="b">The object to the right of the equality operator.</param>
-        /// <returns>true if the objects are the same; false otherwise.</returns>
+        /// <param name="a">The <see cref="HalfVector4"/> on the left of the equality operator.</param>
+        /// <param name="b">The <see cref="HalfVector4"/> on the right of the equality operator.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="a"/> and <paramref name="b"/>
+        /// are equal; otherwise, <see langword="false"/>.
+        /// </returns>
         public static bool operator ==(HalfVector4 a, HalfVector4 b)
         {
             return a.Equals(b);
         }
 
         /// <summary>
-        /// Compares the current instance of a class to another instance to determine whether they are different.
+        /// Returns a value that indicates whether two <see cref="HalfVector4"/>
+        /// values are not equal.
         /// </summary>
-        /// <param name="a">The object to the left of the equality operator.</param>
-        /// <param name="b">The object to the right of the equality operator.</param>
-        /// <returns>true if the objects are different; false otherwise.</returns>
+        /// <param name="a">The <see cref="HalfVector4"/> on the left of the inequality operator.</param>
+        /// <param name="b">The <see cref="HalfVector4"/> on the right of the inequality operator.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="a"/> and <paramref name="b"/>
+        /// are different; otherwise, <see langword="false"/>.
+        /// </returns>
         public static bool operator !=(HalfVector4 a, HalfVector4 b)
         {
             return !a.Equals(b);
