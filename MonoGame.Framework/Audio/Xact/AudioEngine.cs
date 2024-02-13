@@ -381,6 +381,10 @@ namespace Microsoft.Xna.Framework.Audio
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Allows this object to attempt to free resources and perform other
+        /// cleanup operations before garbage collection reclaims the object.
+        /// </summary>
         ~AudioEngine()
         {
             Dispose(false);
