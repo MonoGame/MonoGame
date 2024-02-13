@@ -13,7 +13,13 @@ namespace Microsoft.Xna.Framework.Audio
     /// </summary>
     public enum MicrophoneState
     {
+        /// <summary>
+        /// The <see cref="Microphone"/> audio capture has started.
+        /// </summary>
         Started,
+        /// <summary>
+        /// The <see cref="Microphone"/> audio capture has stopped.
+        /// </summary>
         Stopped
     }
 
