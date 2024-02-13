@@ -18,6 +18,19 @@ using Android.Provider;
 
 namespace Microsoft.Xna.Framework.Media
 {
+    /// <summary>
+    /// Provides access to an album in the media library
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The <see cref="Album"/> class provides information about an album, 
+    /// including the album's <see cref="Name"/>, <see cref="Artist"/>, and <see cref="Songs"/>.
+    /// </para>
+    /// <para>
+    /// You can obtain an <b>Album</b> object through the <see cref="P:Microsoft.Xna.Framework.Media.AlbumCollection.Item(System.Int32)"/>
+    /// indexer and the <see cref="Song.Album"/> property.
+    /// </para>
+    /// </remarks>
     public sealed class Album : IDisposable
     {
         private Artist artist;
@@ -32,6 +45,12 @@ namespace Microsoft.Xna.Framework.Media
         private Android.Net.Uri thumbnail;
 #endif
 
+        /// <summary>
+        /// Gets the <see cref="Microsoft.Xna.Framework.Media.Artist"/> of the <see cref="Album"/>.
+        /// </summary>
+        /// <value>
+        /// <see cref="Microsoft.Xna.Framework.Media.Artist"/> of this <b>Album</b>.
+        /// </value>
         public Artist Artist
         {
             get
