@@ -120,11 +120,29 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return _packedValue.GetHashCode();
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether two <see cref="Bgra4444"/> values are equal.
+        /// </summary>
+        /// <param name="lhs">The <see cref="Bgra4444"/> on the left of the equality operator.</param>
+        /// <param name="rhs">The <see cref="Bgra4444"/> on the right of the equality operator.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="lhs"/> and <paramref name="rhs"/> are equal; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
         public static bool operator ==(Bgra4444 lhs, Bgra4444 rhs)
         {
             return lhs._packedValue == rhs._packedValue;
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether two <see cref="Bgra4444"/> values are not equal.
+        /// </summary>
+        /// <param name="lhs">The <see cref="Bgra4444"/> on the left of the inequality operator.</param>
+        /// <param name="rhs">The <see cref="Bgra4444"/> on the right of the inequality operator.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="lhs"/> and <paramref name="rhs"/> are different; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
         public static bool operator !=(Bgra4444 lhs, Bgra4444 rhs)
         {
             return lhs._packedValue != rhs._packedValue;
