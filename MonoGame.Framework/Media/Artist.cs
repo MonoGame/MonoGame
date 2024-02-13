@@ -6,6 +6,17 @@ using System;
 
 namespace Microsoft.Xna.Framework.Media
 {
+    /// <summary>
+    /// Provides access to artist information in the media library.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The <see cref="Artist"/> class provides information about an artist, including the artist's <see cref="Name"/>, <see cref="Albums"/>, and <see cref="Songs"/>
+    /// </para>
+    /// <para>
+    /// You can obtain an <b>Artist</b> through the <see cref="Album.Artist"/> and <see cref="Song.Artist"/> properties.
+    /// </para>
+    /// </remarks>
     public sealed class Artist : IDisposable
     {
         private string artist;
@@ -54,6 +65,10 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Artist"/> class.
+        /// </summary>
+        /// <param name="artist">Name of the artist.</param>
         public Artist(string artist)
         {
             this.artist = artist;
