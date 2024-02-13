@@ -64,6 +64,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        /// <summary>Returns whether the cue is stopping playback.</summary>
         public bool IsStopping
         {
             get
@@ -73,13 +74,16 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        /// <summary>Returns whether the cue is preparing to play.</summary>
         public bool IsPreparing 
         {
             get { return false; }
         }
 
+        /// <summary>Returns whether the cue is prepared to play.</summary>
         public bool IsPrepared { get; internal set; }
 
+        /// <summary>Returns whether the cue has been created.</summary>
         public bool IsCreated { get; internal set; }
 
         /// <summary>Gets the friendly name of the cue.</summary>
