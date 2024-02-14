@@ -6,6 +6,18 @@ using System;
 
 namespace Microsoft.Xna.Framework.Media
 {
+    /// <summary>
+    /// Provides access to genre information in the media library.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The <see cref="Genre"/> class provides information about a genre, including the genre's <see cref="Name"/>,
+    /// and the <see cref="Albums"/> and <see cref="Songs"/> in that genre that are on the device.
+    /// </para>
+    /// <para>
+    /// You can obtain a <b>Genre</b> object through the <see cref="Album.Genre"/> and <see cref="Song.Genre"/> properties.
+    /// </para>
+    /// </remarks>
     public sealed class Genre : IDisposable
     {
         private string genre;
@@ -54,6 +66,10 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Genre"/> class.
+        /// </summary>
+        /// <param name="genre">Name of the genre.</param>
         public Genre(string genre)
         {
             this.genre = genre;

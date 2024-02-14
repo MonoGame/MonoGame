@@ -6,6 +6,12 @@ using System;
 
 namespace Microsoft.Xna.Framework.Media
 {
+    /// <summary>
+    /// Provides access to songs, playlists, and pictures in the device's media library.
+    /// </summary>
+    /// <remarks>
+    /// 
+    /// </remarks>
 	public partial class MediaLibrary : IDisposable
 	{
         public AlbumCollection Albums { get { return PlatformGetAlbums();  } }

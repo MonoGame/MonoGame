@@ -7,17 +7,33 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Media
 {
+    /// <summary>
+    /// Provides methods and properties to access and control the queue of playing songs.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <see cref="MediaQueue"/> is a read-only queue of songs.
+    /// With <see cref="MediaQueue"/>, you can control which song is playing in the queue, but you cannot add or remove songs from the queue.
+    /// Either <see cref="MediaPlayer.Play(Song)"/> or the songs already queued up when the game starts determine the songs that are in the queue of playing songs.
+    /// </para>
+    /// </remarks>
 	public sealed class MediaQueue
 	{
         List<Song> songs = new List<Song>();
 		private int _activeSongIndex = -1;
 		private Random random = new Random();
 
+        /// <summary>
+        /// Creates a new instance of <see cref="MediaQueue"/>.
+        /// </summary>
 		public MediaQueue()
 		{
 			
 		}
-		
+
+        /// <summary>
+        /// Gets the current <see cref="Song"/> in the queue of playing songs.
+        /// </summary>
 		public Song ActiveSong
 		{
 			get
@@ -28,7 +44,13 @@ namespace Microsoft.Xna.Framework.Media
 				return songs[_activeSongIndex];
 			}
 		}
-		
+
+        /// <summary>
+        /// Gets or sets the index of the current (active) song in the queue of playing songs.
+        /// </summary>
+        /// <remarks>
+        /// Changing the active song index does not alter the current media state (playing, paused, or stopped).
+        /// </remarks>
 		public int ActiveSongIndex
 		{
 		    get
@@ -41,6 +63,9 @@ namespace Microsoft.Xna.Framework.Media
 		    }
 		}
 
+        /// <summary>
+        /// Gets the count of songs in the <see cref="MediaQueue"/>.
+        /// </summary>
         internal int Count
         {
             get
@@ -49,6 +74,9 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
+        /// <summary>
+        /// Gets the <see cref="Song"/> at the specified index in the MediaQueue
+        /// </summary>
         public Song this[int index]
         {
             get

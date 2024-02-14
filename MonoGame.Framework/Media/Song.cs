@@ -4,9 +4,14 @@
 
 using System;
 using System.IO;
+using static Sdl.Joystick;
+using static Sdl;
 
 namespace Microsoft.Xna.Framework.Media
 {
+    /// <summary>
+    /// Provides access to a song in the song library.
+    /// </summary>
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
         private string _name;
@@ -39,7 +44,10 @@ namespace Microsoft.Xna.Framework.Media
         {
             get { return PlatformGetGenre(); }
         }
-        
+
+        /// <summary>
+        /// Gets a value indicating whether the object is disposed.
+        /// </summary>
         public bool IsDisposed
         {
             get { return disposed; }
@@ -64,6 +72,10 @@ namespace Microsoft.Xna.Framework.Media
             PlatformInitialize(fileName);
         }
 
+        /// <summary>
+        /// Allows this object to attempt to free resources and perform other
+        /// cleanup operations before garbage collection reclaims the object.
+        /// </summary>
         ~Song()
         {
             Dispose(false);
@@ -86,7 +98,10 @@ namespace Microsoft.Xna.Framework.Media
             song._name = name;
             return song;
         }
-		
+
+        /// <summary>
+        /// Immediately releases the unmanaged resources used by this object.
+        /// </summary>
 		public void Dispose()
         {
             Dispose(true);
@@ -106,11 +121,19 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
+        /// <summary>
+        /// Gets the hash code for this instance.
+        /// </summary>
         public override int GetHashCode ()
 		{
 			return base.GetHashCode ();
 		}
 
+        /// <summary>
+        /// Determines whether two instances of <see cref="Song"/> are equal.
+        /// </summary>
+        /// <param name="song">The <see cref="Song"/> to compare with the current object</param>
+        /// <returns><see langword="true"/> if the specified <see cref="Song"/> is equal to the current object; otherwise, <see langword="false"/></returns>
         public bool Equals(Song song)
         {
 #if DIRECTX
@@ -119,9 +142,9 @@ namespace Microsoft.Xna.Framework.Media
 			return ((object)song != null) && (Name == song.Name);
 #endif
 		}
-		
-		
-		public override bool Equals(Object obj)
+
+        /// <inheritdoc/>
+        public override bool Equals(Object obj)
 		{
 			if(obj == null)
 			{
@@ -130,7 +153,10 @@ namespace Microsoft.Xna.Framework.Media
 			
 			return Equals(obj as Song);  
 		}
-		
+
+        /// <summary>
+        /// Determines whether the specified Song instances are equal.
+        /// </summary>
 		public static bool operator ==(Song song1, Song song2)
 		{
 			if((object)song1 == null)
@@ -140,42 +166,73 @@ namespace Microsoft.Xna.Framework.Media
 
 			return song1.Equals(song2);
 		}
-		
-		public static bool operator !=(Song song1, Song song2)
+
+        /// <summary>
+        /// Determines whether the specified Song instances are not equal.
+        /// </summary>
+        public static bool operator !=(Song song1, Song song2)
 		{
-		  return ! (song1 == song2);
+		    return !(song1 == song2);
 		}
 
+        /// <summary>
+        /// Gets the duration of the <see cref="Song"/>.
+        /// </summary>
         public TimeSpan Duration
         {
             get { return PlatformGetDuration(); }
-        }	
+        }
 
+        /// <summary>
+        /// Gets a value that indicates whether the song is DRM protected content.
+        /// </summary>
         public bool IsProtected
         {
             get { return PlatformIsProtected(); }
         }
 
+        /// <summary>
+        /// Gets a value that indicates whether the song has been rated by the user.
+        /// </summary>
         public bool IsRated
         {
             get { return PlatformIsRated(); }
         }
 
+        /// <summary>
+        /// Gets the name of the <see cref="Song"/>.
+        /// </summary>
         public string Name
         {
             get { return PlatformGetName(); }
         }
 
+        /// <summary>
+        /// Gets the song play count.
+        /// </summary>
         public int PlayCount
         {
             get { return PlatformGetPlayCount(); }
         }
 
+        /// <summary>
+        /// Gets the user's rating for the <see cref="Song"/>.
+        /// </summary>
+        /// <value>
+        /// User's rating for this <see cref="Song"/>, or 0 if the song is unrated.
+        /// Ratings range from 1 (dislike the most) to 10 (like the most).
+        /// </value>
         public int Rating
         {
             get { return PlatformGetRating(); }
         }
 
+        /// <summary>
+        /// Gets the track number of the song on the song's <see cref="Album"/>.
+        /// </summary>
+        /// <value>
+        /// Track number of this <see cref="Song"/> on the song's <see cref="Album"/>.
+        /// </value>
         public int TrackNumber
         {
             get { return PlatformGetTrackNumber(); }

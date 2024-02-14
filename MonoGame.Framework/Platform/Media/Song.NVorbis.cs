@@ -98,6 +98,9 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
+        /// <summary>
+        /// Gets the duration of the <see cref="Song"/>.
+        /// </summary>
         public TimeSpan Position
         {
             get

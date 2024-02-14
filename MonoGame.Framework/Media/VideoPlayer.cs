@@ -12,6 +12,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Media
 {
+    /// <summary>
+    /// Provides methods and properties to play back, pause, resume, and stop video.
+    /// <see cref="VideoPlayer"/> also exposes repeat, volume, and play position information.
+    /// </summary>
     public sealed partial class VideoPlayer : IDisposable
     {
         #region Fields
@@ -119,6 +123,9 @@ namespace Microsoft.Xna.Framework.Media
 
         #region Public API
 
+        /// <summary>
+        /// Creates a new instance of <see cref="VideoPlayer"/> class.
+        /// </summary>
         public VideoPlayer()
         {
             _state = MediaState.Stopped;
