@@ -1751,7 +1751,7 @@ namespace Microsoft.Xna.Framework
 	    }
 	
         /// <summary>
-        /// Multiples the RGBA component values of a <see cref="Color"/> by the value specified.
+        /// Multiplies the RGBA component values of a <see cref="Color"/> by the value specified.
         /// </summary>
         /// <param name="value">The source <see cref="Color"/> value whos RGBA components will be multiplied.</param>
         /// <param name="scale">The multiplier to apply to the RGBA components of the specified color.</param>
@@ -1766,7 +1766,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Multiples the RGBA component values of a <see cref="Color"/> by the value specified.
+        /// Multiplies the RGBA component values of a <see cref="Color"/> by the value specified.
         /// </summary>
         /// <param name="value">The source <see cref="Color"/> value whos RGBA components will be multiplied.</param>
         /// <param name="scale">The multiplier to apply to the RGBA components of the specified color.</param>
