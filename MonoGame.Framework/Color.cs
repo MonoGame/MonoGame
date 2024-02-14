@@ -1750,23 +1750,30 @@ namespace Microsoft.Xna.Framework
 	        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
 	    }
 	
-	    /// <summary>
-        /// Multiply <see cref="Color"/> by value.
+        /// <summary>
+        /// Multiples the RGBA component values of a <see cref="Color"/> by the value specified.
         /// </summary>
-        /// <param name="value">Source <see cref="Color"/>.</param>
-        /// <param name="scale">Multiplicator.</param>
-        /// <returns>Multiplication result.</returns>
+        /// <param name="value">The source <see cref="Color"/> value whos RGBA components will be multiplied.</param>
+        /// <param name="scale">The multiplier to apply to the RGBA components of the specified color.</param>
+        /// <returns>
+        /// A new <see cref="Color"/> value where the RGBA component values are the result of multiplying the
+        /// RGBA components of <paramref name="value"/> by <paramref name="scale"/>.	    /// <summary>
+        /// Multiply <see cref="Color"/> by value.
+        /// </returns>
 	    public static Color operator *(Color value, float scale)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
         }
 
-	    /// <summary>
-        /// Multiply <see cref="Color"/> by value.
+        /// <summary>
+        /// Multiples the RGBA component values of a <see cref="Color"/> by the value specified.
         /// </summary>
-        /// <param name="scale">Multiplicator.</param>
-        /// <param name="value">Source <see cref="Color"/>.</param>
-        /// <returns>Multiplication result.</returns>
+        /// <param name="value">The source <see cref="Color"/> value whos RGBA components will be multiplied.</param>
+        /// <param name="scale">The multiplier to apply to the RGBA components of the specified color.</param>
+        /// <returns>
+        /// A new <see cref="Color"/> value where the RGBA component values are the result of multiplying the
+        /// RGBA components of <paramref name="value"/> by <paramref name="scale"/>.
+        /// </returns>
         public static Color operator *(float scale, Color value)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
