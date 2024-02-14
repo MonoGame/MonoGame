@@ -1761,6 +1761,12 @@ namespace Microsoft.Xna.Framework
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
         }
 
+	    /// <summary>
+        /// Multiply <see cref="Color"/> by value.
+        /// </summary>
+        /// <param name="scale">Multiplicator.</param>
+        /// <param name="value">Source <see cref="Color"/>.</param>
+        /// <returns>Multiplication result.</returns>
         public static Color operator *(float scale, Color value)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
