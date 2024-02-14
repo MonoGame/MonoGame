@@ -4,8 +4,6 @@
 
 using System;
 using System.IO;
-using static Sdl.Joystick;
-using static Sdl;
 
 namespace Microsoft.Xna.Framework.Media
 {

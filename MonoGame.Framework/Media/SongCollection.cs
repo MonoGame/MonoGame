@@ -5,7 +5,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Intrinsics.X86;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -134,7 +133,10 @@ namespace Microsoft.Xna.Framework.Media
             return sc;
         }
 
-        /// <inheritdoc cref="ICloneable.Clone"/>
+        /// <summary>
+        /// Determines whether a <see cref="Song"/> is in the <see cref="SongCollection"/>
+        /// </summary>
+        /// <returns><see langword="true"/> if <paramref name="item"/> is found in the <see cref="SongCollection"/>; otherwise, <see langword="false"/>.</returns>
         public bool Contains(Song item)
         {
             return innerlist.Contains(item);
