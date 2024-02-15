@@ -303,11 +303,12 @@ namespace MonoGame.OpenAL
             }
         }
 
-        internal static void GenBuffers(int count, out int buffer)
+        internal unsafe static void GenBuffer(out int buffer)
         {
-            int[] ret;
-            GenBuffers(count, out ret);
-            buffer = ret[0];
+            fixed (int* ptr = &buffer)
+            {
+                alGenBuffers(1, ptr);
+            }
         }
 
         internal static int[] GenBuffers(int count)

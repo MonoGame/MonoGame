@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public OALSoundBuffer()
 		{
-            AL.GenBuffers(1, out openALDataBuffer);
+            AL.GenBuffer(out openALDataBuffer);
             ALHelper.CheckError("Failed to generate OpenAL data buffer.");
 		}
 
