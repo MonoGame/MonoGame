@@ -2,12 +2,17 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using SharpDX.Direct3D11;
 using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed partial class ShaderResourceCollection
     {
+        // cached lists of different sizes to avoid garbage when setting UAV's for the pixel shader stage
+        static UnorderedAccessView[][] uavListsOfAllSizes = new UnorderedAccessView[GraphicsDevice.MaxUavSlotsPerStage+1][];
+        static int[][] intListsOfAllSizes = new int[GraphicsDevice.MaxUavSlotsPerStage+1][];
+
         internal void PlatformApplyAllResourcesToDevice(GraphicsDevice device)
         {
             var shaderStageDX = device.GetDXShaderStage(_stage);
@@ -68,28 +73,39 @@ namespace Microsoft.Xna.Framework.Graphics
                     var outputMerger = device._d3dContext.OutputMerger;
                     var activeRenderTargets = device._currentRenderTargets;
 
-                    for (var i = 0; i < _writeableResources.Length; i++)
+                    // we can't use the same method we used the compute stage, where we set resources to slots one by one
+                    // with the output merger, we have to set all UAV's at once. setting a single one would clear the previous ones
+                    // UAV's have to be set after the render targets
+                    int numRTs = 0;
+                    for (var i = 0; i < activeRenderTargets.Length; i++)
                     {
-                        var mask = 1 << i;
-                        if ((_writeableDirty & mask) == 0)
-                            continue;
-
-                        // don't overwrite render targets bound to this slot
                         if (activeRenderTargets[i] != null)
-                            continue;
-
-                        var resourceInfo = _writeableResources[i];
-                        var resource = resourceInfo.resource;
-                        if (resource == null || resource.IsDisposed)
-                            outputMerger.SetUnorderedAccessView(i, null);
-                        else
-                            outputMerger.SetUnorderedAccessView(i, resource.GetUnorderedAccessView(), resource.CounterBufferResetValue);
-
-                        // Early out if this is the last one.
-                        _writeableDirty &= ~mask;
-                        if (_writeableDirty == 0)
-                            break;
+                            numRTs = i + 1;
                     }
+
+                    // grab a UAV list of the right size from the cashe to avoid garbage
+                    var maxUAVs = _writeableResources.Length - numRTs;
+                    var unorderedAccessViews = uavListsOfAllSizes[maxUAVs] ??= new UnorderedAccessView[maxUAVs];
+                    var uavInitialCounts = intListsOfAllSizes[maxUAVs] ??= new int[maxUAVs];
+                    
+                    for (var i = 0; i < maxUAVs; i++)
+                    {
+                        int slot = numRTs + i;
+                        var resourceInfo = _writeableResources[slot];
+                        var resource = resourceInfo.resource;
+                        if (resource != null && !resource.IsDisposed)
+                        {
+                            unorderedAccessViews[i] = resource.GetUnorderedAccessView();
+                            uavInitialCounts[i] = resource.CounterBufferResetValue;
+                        }
+                        else
+                        {
+                            unorderedAccessViews[i] = null;
+                            uavInitialCounts[i] = 0;
+                        }
+                    }
+
+                    outputMerger.SetUnorderedAccessViews(numRTs, unorderedAccessViews, uavInitialCounts);
                 }
 
                 _writeableDirty = 0;
