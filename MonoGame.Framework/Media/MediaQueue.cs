@@ -15,20 +15,20 @@ namespace Microsoft.Xna.Framework.Media
 
 		public MediaQueue()
 		{
-			
+
 		}
-		
+
 		public Song ActiveSong
 		{
 			get
 			{
 				if (songs.Count == 0 || _activeSongIndex < 0)
 					return null;
-				
+
 				return songs[_activeSongIndex];
 			}
 		}
-		
+
 		public int ActiveSongIndex
 		{
 		    get
@@ -69,26 +69,26 @@ namespace Microsoft.Xna.Framework.Media
 		{
 			if (shuffle)
 				_activeSongIndex = random.Next(songs.Count);
-			else			
+			else
 				_activeSongIndex = (int)MathHelper.Clamp(_activeSongIndex + direction, 0, songs.Count - 1);
-			
+
 			return songs[_activeSongIndex];
 		}
-		
+
 		internal void Clear()
 		{
 			Song song;
 			for(; songs.Count > 0; )
 			{
 				song = songs[0];
-#if !DIRECTX
+#if !DIRECTX && !NATIVE
 				song.Stop();
 #endif
 				songs.Remove(song);
-			}	
+			}
 		}
 
-#if !DIRECTX
+#if !DIRECTX && !NATIVE
         internal void SetVolume(float volume)
         {
             int count = songs.Count;
@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Media
             songs.Add(song);
         }
 
-#if !DIRECTX
+#if !DIRECTX && !NATIVE
         internal void Stop()
         {
             int count = songs.Count;

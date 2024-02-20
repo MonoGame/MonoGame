@@ -144,6 +144,14 @@ Task("BuildConsoleCheck")
     DotNetBuild("MonoGame.Framework/MonoGame.Framework.ConsoleCheck.csproj");
 });
 
+Task("BuildNative")
+    .IsDependentOn("Prep")
+    .Does(() =>
+{
+    DotNetRestore("MonoGame.Framework/MonoGame.Framework.Native.csproj");
+    PackDotnet("MonoGame.Framework/MonoGame.Framework.Native.csproj");
+});
+
 Task("BuildDesktopGL")
     .IsDependentOn("Prep")
     .Does(() =>
@@ -315,6 +323,7 @@ Task("SanityCheck")
 
 Task("BuildAll")
     .IsDependentOn("BuildConsoleCheck")
+    .IsDependentOn("BuildNative")
     .IsDependentOn("BuildDesktopGL")
     .IsDependentOn("BuildWindowsDX")
     .IsDependentOn("BuildAndroid")
