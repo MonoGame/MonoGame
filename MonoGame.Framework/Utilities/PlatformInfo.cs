@@ -7,7 +7,7 @@ namespace MonoGame.Framework.Utilities
     /// <summary>
     /// Utility class that returns information about the underlying platform
     /// </summary>
-    public static class PlatformInfo
+    public static partial class PlatformInfo
     {
         /// <summary>
         /// Underlying game platform type
@@ -40,6 +40,8 @@ namespace MonoGame.Framework.Utilities
                 return MonoGamePlatform.PlayStation5;
 #elif STADIA
                 return MonoGamePlatform.Stadia;
+#else
+                return PlatformGetMonoGamePlatform();
 #endif
             }
         }
@@ -53,8 +55,10 @@ namespace MonoGame.Framework.Utilities
             {
 #if DIRECTX
                 return GraphicsBackend.DirectX;
-#else
+#elif OPENGL
                 return GraphicsBackend.OpenGL;
+#else
+                return PlatformGetGraphicsBackend();
 #endif
             }
         }
