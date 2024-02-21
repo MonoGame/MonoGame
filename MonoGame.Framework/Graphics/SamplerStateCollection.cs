@@ -1,8 +1,6 @@
 // MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
-//
-// Author: Kenneth James Pouncey
 
 using System;
 
@@ -40,15 +38,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		    Clear();
         }
-		
-		public SamplerState this [int index] 
+
+		public SamplerState this [int index]
         {
-			get 
-            { 
-                return _samplers[index]; 
+			get
+            {
+                return _samplers[index];
             }
 
-			set 
+			set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");

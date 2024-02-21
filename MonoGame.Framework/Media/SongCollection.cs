@@ -25,6 +25,7 @@ namespace Microsoft.Xna.Framework.Media
     /// </remarks>
 	public class SongCollection : ICollection<Song>, IEnumerable<Song>, IEnumerable, IDisposable
 	{
+    public static readonly SongCollection Empty = new SongCollection();
 		private bool isReadOnly = false;
 		private List<Song> innerlist = new List<Song>();
 
@@ -43,14 +44,19 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
 		public void Dispose()
         {
+
         }
 
         /// <inheritdoc/>
         public IEnumerator<Song> GetEnumerator()
+
+        }
+
+		    public IEnumerator<Song> GetEnumerator()
         {
             return innerlist.GetEnumerator();
         }
-		
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             return innerlist.GetEnumerator();
@@ -92,7 +98,7 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Adds a <see cref="Song"/> to this <see cref="SongCollection"/>.
         /// </summary>
-		public void Add(Song item)
+		    public void Add(Song item)
         {
 
             if (item == null)
