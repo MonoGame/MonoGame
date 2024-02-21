@@ -26,6 +26,9 @@ namespace Microsoft.Xna.Framework.Media
     /// </remarks>
     public sealed class AlbumCollection : IDisposable
     {
+        /// <summary>
+        /// Returns a <see cref="AlbumCollection"/> with no contents.
+        /// </summary>
         public static readonly AlbumCollection Empty = new AlbumCollection(new List<Album>());
 
         private List<Album> albumCollection;

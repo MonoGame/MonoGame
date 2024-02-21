@@ -25,13 +25,16 @@ namespace Microsoft.Xna.Framework.Media
     /// </remarks>
 	public class SongCollection : ICollection<Song>, IEnumerable<Song>, IEnumerable, IDisposable
 	{
+        /// <summary>
+        /// Returns a <see cref="SongCollection"/> with no contents.
+        /// </summary>
         public static readonly SongCollection Empty = new SongCollection();
 		private bool isReadOnly = false;
 		private List<Song> innerlist = new List<Song>();
 
         internal SongCollection()
         {
-
+            
         }
 
         internal SongCollection(List<Song> songs)
