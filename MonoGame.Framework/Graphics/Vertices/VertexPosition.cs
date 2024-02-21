@@ -81,7 +81,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Compares an object with the vertex.
         /// </summary>
         /// <param name="obj">The object to compare.</param>
-        /// <returns><see langword="true"/> if the object is equal to the vertex; <see langword="false"/> otherwise.</returns>
+        /// <returns>
+        /// <see langword="true"/> if the object is equal to the current vertex; <see langword="false"/> otherwise.
+        /// </returns>
         public override bool Equals(object obj)
         {
             if (obj == null)

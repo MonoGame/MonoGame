@@ -3,7 +3,8 @@ using System.Runtime.InteropServices;
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Describes a custom vertex format structure that contains position, color, and one set of texture coordinates.
+    /// Describes a custom vertex format structure that contains position,
+    /// color, and one set of texture coordinates.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct VertexPositionColorTexture : IVertexType

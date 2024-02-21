@@ -3,7 +3,8 @@
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Describes a custom vertex format structure that contains position, normal data, and one set of texture coordinates.
+    /// Describes a custom vertex format structure that contains position,
+    /// normal data, and one set of texture coordinates.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct VertexPositionNormalTexture : IVertexType
