@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Media
     /// </remarks>
 	public class SongCollection : ICollection<Song>, IEnumerable<Song>, IEnumerable, IDisposable
 	{
-    public static readonly SongCollection Empty = new SongCollection();
+        public static readonly SongCollection Empty = new SongCollection();
 		private bool isReadOnly = false;
 		private List<Song> innerlist = new List<Song>();
 
@@ -48,11 +48,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <inheritdoc/>
-        public IEnumerator<Song> GetEnumerator()
-
-        }
-
-		    public IEnumerator<Song> GetEnumerator()
+		public IEnumerator<Song> GetEnumerator()
         {
             return innerlist.GetEnumerator();
         }
