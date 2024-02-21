@@ -30,29 +30,29 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
 		public MediaQueue()
 		{
-			
+
 		}
 
-        /// <summary>
-        /// Gets the current <see cref="Song"/> in the queue of playing songs.
-        /// </summary>
+    /// <summary>
+    /// Gets the current <see cref="Song"/> in the queue of playing songs.
+    /// </summary>
 		public Song ActiveSong
 		{
 			get
 			{
 				if (songs.Count == 0 || _activeSongIndex < 0)
 					return null;
-				
+
 				return songs[_activeSongIndex];
 			}
 		}
 
-        /// <summary>
-        /// Gets or sets the index of the current (active) song in the queue of playing songs.
-        /// </summary>
-        /// <remarks>
-        /// Changing the active song index does not alter the current media state (playing, paused, or stopped).
-        /// </remarks>
+    /// <summary>
+    /// Gets or sets the index of the current (active) song in the queue of playing songs.
+    /// </summary>
+    /// <remarks>
+    /// Changing the active song index does not alter the current media state (playing, paused, or stopped).
+    /// </remarks>
 		public int ActiveSongIndex
 		{
 		    get
@@ -99,26 +99,26 @@ namespace Microsoft.Xna.Framework.Media
 		{
 			if (shuffle)
 				_activeSongIndex = random.Next(songs.Count);
-			else			
+			else
 				_activeSongIndex = (int)MathHelper.Clamp(_activeSongIndex + direction, 0, songs.Count - 1);
-			
+
 			return songs[_activeSongIndex];
 		}
-		
+
 		internal void Clear()
 		{
 			Song song;
 			for(; songs.Count > 0; )
 			{
 				song = songs[0];
-#if !DIRECTX
+#if !DIRECTX && !NATIVE
 				song.Stop();
 #endif
 				songs.Remove(song);
-			}	
+			}
 		}
 
-#if !DIRECTX
+#if !DIRECTX && !NATIVE
         internal void SetVolume(float volume)
         {
             int count = songs.Count;
@@ -132,7 +132,7 @@ namespace Microsoft.Xna.Framework.Media
             songs.Add(song);
         }
 
-#if !DIRECTX
+#if !DIRECTX && !NATIVE
         internal void Stop()
         {
             int count = songs.Count;
