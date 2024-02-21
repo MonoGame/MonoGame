@@ -122,8 +122,6 @@ namespace Microsoft.Xna.Framework.Media
         /// calls to <see cref="Play(Song)"/>, <see cref="Stop()"/>, <see cref="Pause()"/>,
         /// <see cref="Resume()"/>, <see cref="MoveNext()"/>, and <see cref="MovePrevious"/>
         /// might have no effect, depending on the platform.
-        /// If another application's background music is playing, your game will need to call
-        /// in order to pause the other application's background music in order to play the game's music.
         /// </remarks>
         public static bool GameHasControl
         {
