@@ -17,10 +17,6 @@ namespace Microsoft.Xna.Framework.Media
     /// <para>
     /// <see cref="MediaSource"/> provides access to the source or sources from which the media will be read.
     /// A source can be either the local device, or a device connected through Windows Media Connect.
-    /// On Windows and Windows Phone, the only available **MediaSource** is the local device.
-    /// On Xbox 360, a **MediaSource** can either be the local device or a device connected through Windows Media Connect.
-    /// Windows Media Connect is software that lets you connect your Windows Phone to a computer running Microsoft Windows.
-    /// Connecting this way enables you to view media on the connected computer in the Xbox 360 dashboard.
     /// </para>
     /// </remarks>
 	public sealed class MediaSource

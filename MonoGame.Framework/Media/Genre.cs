@@ -15,7 +15,8 @@ namespace Microsoft.Xna.Framework.Media
     /// and the <see cref="Albums"/> and <see cref="Songs"/> in that genre that are on the device.
     /// </para>
     /// <para>
-    /// You can obtain a <b>Genre</b> object through the <see cref="Album.Genre"/> and <see cref="Song.Genre"/> properties.
+    /// You can obtain a <see cref="Genre"/> object through the
+    /// <see cref="Album.Genre"/> and <see cref="Song.Genre"/> properties.
     /// </para>
     /// </remarks>
     public sealed class Genre : IDisposable
@@ -23,7 +24,7 @@ namespace Microsoft.Xna.Framework.Media
         private string genre;
 
         /// <summary>
-        /// Gets the AlbumCollection for the Genre.
+        /// Gets the <see cref="AlbumCollection"/> for the Genre.
         /// </summary>
         public AlbumCollection Albums
         {
@@ -56,7 +57,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the SongCollection for the Genre.
+        /// Gets the <see cref="SongCollection"/> for the Genre.
         /// </summary>
         public SongCollection Songs
         {
@@ -83,7 +84,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Returns a String representation of the Genre.
+        /// Returns a String representation of the <see cref="Genre"/>.
         /// </summary>
         public override string ToString()
         {

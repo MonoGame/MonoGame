@@ -23,7 +23,8 @@ namespace Microsoft.Xna.Framework.Media
 		private static readonly MediaQueue _queue = new MediaQueue();
 
         /// <summary>
-        /// Raised when the active song changes due to active playback or due to explicit calls to the <see cref="MoveNext()"/> or <see cref="MovePrevious()"/> methods.
+        /// Raised when the active song changes due to active playback or due to explicit calls to the
+        /// <see cref="MoveNext()"/> or <see cref="MovePrevious()"/> methods.
         /// </summary>
 		public static event EventHandler<EventArgs> ActiveSongChanged;
         /// <summary>
@@ -56,7 +57,8 @@ namespace Microsoft.Xna.Framework.Media
         /// Gets or sets the repeat setting for the media player.
         /// </summary>
         /// <remarks>
-        /// When set to <see langword="true"/>, the playback queue will begin playing again after all songs in the queue have been played.
+        /// When set to <see langword="true"/>, the playback queue will begin
+        /// playing again after all songs in the queue have been played.
         /// </remarks>
         public static bool IsRepeating 
         {
@@ -68,7 +70,8 @@ namespace Microsoft.Xna.Framework.Media
         /// Gets or sets the shuffle setting for the media player.
         /// </summary>
         /// <remarks>
-        /// When set to <see langword="true"/>, songs in the playback queue are played in random order rather than from first to last.
+        /// When set to <see langword="true"/>, songs in the playback queue are
+        /// played in random order rather than from first to last.
         /// </remarks>
         public static bool IsShuffled
         {
@@ -115,10 +118,10 @@ namespace Microsoft.Xna.Framework.Media
         /// Determines whether the game has control of the background music.
         /// </summary>
         /// <remarks>
-        /// A gamer can play their own music as the background to your game by using the Xbox 360 dashboard.
-        /// If the game is currently playing custom background music (specified by the gamer using the Xbox 360 dashboard),
+        /// If a gamer is currently playing their own music as the background to your game,
         /// calls to <see cref="Play(Song)"/>, <see cref="Stop()"/>, <see cref="Pause()"/>,
-        /// <see cref="Resume()"/>, <see cref="MoveNext()"/>, and <see cref="MovePrevious"/> have no effect.
+        /// <see cref="Resume()"/>, <see cref="MoveNext()"/>, and <see cref="MovePrevious"/>
+        /// might have no effect, depending on the platform.
         /// If another application's background music is playing, your game will need to call
         /// in order to pause the other application's background music in order to play the game's music.
         /// </remarks>
@@ -139,7 +142,8 @@ namespace Microsoft.Xna.Framework.Media
         /// <remarks>
         /// <para>
         /// Volume adjustment is based on a decibel, not multiplicative, scale.
-        /// Setting <see cref="Volume"/> to 0.0 subtracts 96 dB from the volume. Setting <see cref="Volume"/> to 1.0 subtracts 0 dB from the volume.
+        /// Setting <see cref="Volume"/> to 0.0 subtracts 96 dB from the volume.
+        /// Setting <see cref="Volume"/> to 1.0 subtracts 0 dB from the volume.
         /// Values in between 0.0f and 1.0f subtract dB from the volume proportionally.
         /// </para>
         /// </remarks>

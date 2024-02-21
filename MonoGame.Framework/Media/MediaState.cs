@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         Stopped,
         /// <summary>
-        /// Media is currently playing.
+        /// Media is currently playing and not paused.
         /// </summary>
         Playing,
         /// <summary>

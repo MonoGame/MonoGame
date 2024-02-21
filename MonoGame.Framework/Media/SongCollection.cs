@@ -136,7 +136,8 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Determines whether a <see cref="Song"/> is in the <see cref="SongCollection"/>
         /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="item"/> is found in the <see cref="SongCollection"/>; otherwise, <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="item"/> is found in the <see cref="SongCollection"/>;
+        /// otherwise, <see langword="false"/>.</returns>
         public bool Contains(Song item)
         {
             return innerlist.Contains(item);
@@ -157,11 +158,13 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Searches for the specified <see cref="Song"/> and returns the zero-based index of the first occurence within the entire <see cref="SongCollection"/>.
+        /// Searches for the specified <see cref="Song"/> and returns the zero-based index of the
+        /// first occurence within the entire <see cref="SongCollection"/>.
         /// </summary>
         /// <param name="item">The <see cref="Song"/> to locate</param>
         /// <returns>
-        /// The zero-based index of the first occurence of <paramref name="item"/> within the entire <see cref="SongCollection"/>, if found. otherwise, -1.
+        /// The zero-based index of the first occurence of <paramref name="item"/> within
+        /// the entire <see cref="SongCollection"/>, if found. otherwise, -1.
         /// </returns>
         public int IndexOf(Song item)
         {
@@ -174,8 +177,9 @@ namespace Microsoft.Xna.Framework.Media
         /// <param name="item">The object to remove from the <see cref="SongCollection"/>.</param>
         /// <returns>
         /// <see langword="true"/> if item was successfully removed from the <see cref="SongCollection"/>;
-        /// otherwise, <see langword="false"/>. This method also returns <see langword="false"/> if item is not found in the
-        /// original <see cref="SongCollection"/>.
+        /// otherwise, <see langword="false"/>.
+        /// This method also returns <see langword="false"/> if item
+        /// is not found in the original <see cref="SongCollection"/>.
         /// </returns>
         public bool Remove(Song item)
         {

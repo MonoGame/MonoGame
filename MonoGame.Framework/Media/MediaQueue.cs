@@ -13,8 +13,10 @@ namespace Microsoft.Xna.Framework.Media
     /// <remarks>
     /// <para>
     /// <see cref="MediaQueue"/> is a read-only queue of songs.
-    /// With <see cref="MediaQueue"/>, you can control which song is playing in the queue, but you cannot add or remove songs from the queue.
-    /// Either <see cref="MediaPlayer.Play(Song)"/> or the songs already queued up when the game starts determine the songs that are in the queue of playing songs.
+    /// With <see cref="MediaQueue"/>, you can control which song is playing in the queue,
+    /// but you cannot add or remove songs from the queue.
+    /// Either <see cref="MediaPlayer.Play(Song)"/> or the songs already queued up when the game
+    /// starts determine the songs that are in the queue of playing songs.
     /// </para>
     /// </remarks>
 	public sealed class MediaQueue

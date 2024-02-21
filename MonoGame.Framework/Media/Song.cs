@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the Artist of the Song.
+        /// Gets the <see cref="Media.Artist"/> of the Song.
         /// </summary>
         public Artist Artist
         {
@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the Genre of the Song.
+        /// Gets the <see cref="Media.Genre"/> of the Song.
         /// </summary>
         public Genre Genre
         {
@@ -70,10 +70,7 @@ namespace Microsoft.Xna.Framework.Media
             PlatformInitialize(fileName);
         }
 
-        /// <summary>
-        /// Allows this object to attempt to free resources and perform other
-        /// cleanup operations before garbage collection reclaims the object.
-        /// </summary>
+        /// <summary/>
         ~Song()
         {
             Dispose(false);
@@ -131,7 +128,8 @@ namespace Microsoft.Xna.Framework.Media
         /// Determines whether two instances of <see cref="Song"/> are equal.
         /// </summary>
         /// <param name="song">The <see cref="Song"/> to compare with the current object</param>
-        /// <returns><see langword="true"/> if the specified <see cref="Song"/> is equal to the current object; otherwise, <see langword="false"/></returns>
+        /// <returns><see langword="true"/> if the specified <see cref="Song"/> is equal to the current object;
+        /// otherwise, <see langword="false"/></returns>
         public bool Equals(Song song)
         {
 #if DIRECTX

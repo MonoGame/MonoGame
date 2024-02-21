@@ -65,10 +65,7 @@ namespace Microsoft.Xna.Framework.Media
 #endif
         }
 
-        /// <summary>
-        /// Allows this object to attempt to free resources and perform other
-        /// cleanup operations before garbage collection reclaims the object.
-        /// </summary>
+        /// <summary/>
         ~Video()
         {
             Dispose(false);

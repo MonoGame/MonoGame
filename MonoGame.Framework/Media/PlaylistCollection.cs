@@ -130,11 +130,13 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Searches for the specified <see cref="Playlist"/> and returns the zero-based index of the first occurence within the entire <see cref="PlaylistCollection"/>.
+        /// Searches for the specified <see cref="Playlist"/> and returns the zero-based index
+        /// of the first occurence within the entire <see cref="PlaylistCollection"/>.
         /// </summary>
         /// <param name="item">The <see cref="Playlist"/> to locate</param>
         /// <returns>
-        /// The zero-based index of the first occurence of <paramref name="item"/> within the entire <see cref="PlaylistCollection"/>, if found. otherwise, -1.
+        /// The zero-based index of the first occurence of <paramref name="item"/> within
+        /// the entire <see cref="PlaylistCollection"/>, if found. otherwise, -1.
         /// </returns>
 		public int IndexOf(Playlist item)
         {
@@ -147,8 +149,8 @@ namespace Microsoft.Xna.Framework.Media
         /// <param name="item">The object to remove from the <see cref="PlaylistCollection"/>.</param>
         /// <returns>
         /// <see langword="true"/> if item was successfully removed from the <see cref="PlaylistCollection"/>;
-        /// otherwise, <see langword="false"/>. This method also returns <see langword="false"/> if item is not found in the
-        /// original <see cref="PlaylistCollection"/>.
+        /// otherwise, <see langword="false"/>. This method also returns <see langword="false"/>
+        /// if item is not found in the original <see cref="PlaylistCollection"/>.
         /// </returns>
         public bool Remove(Playlist item)
         {
