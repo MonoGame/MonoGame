@@ -65,6 +65,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>Returns whether the cue is stopping playback.</summary>
+        /// <remarks>Current implementation will always return <see langword="false"/>.</remarks>
         public bool IsStopping
         {
             get
@@ -75,6 +76,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>Returns whether the cue is preparing to play.</summary>
+        /// <remarks>Current implementation will always return <see langword="false"/>.</remarks>
         public bool IsPreparing 
         {
             get { return false; }
@@ -83,12 +85,14 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>Returns whether the cue is prepared to play.</summary>
         /// <remarks>
         /// This property returns <see langword="true"/> only if the cue is prepared but has not yet been played.
-        /// Cues that are played return <see langword="true"/> for <see cref="IsPlaying"/> if they are currently playing
+        /// Cues that are played return <see langword="true"/>
+        /// for <see cref="IsPlaying"/> if they are currently playing
         /// or <see langword="true"/> for <see cref="IsStopped"/> if they are stopped.
         /// </remarks>
         public bool IsPrepared { get; internal set; }
 
         /// <summary>Returns whether the cue has been created.</summary>
+        /// <remarks>Current implementation will always return <see langword="false"/>.</remarks>
         public bool IsCreated { get; internal set; }
 
         /// <summary>Gets the friendly name of the cue.</summary>
