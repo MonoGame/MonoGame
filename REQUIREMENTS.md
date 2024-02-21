@@ -1,4 +1,4 @@
-Depending on the [platform](https://monogame.net/articles/platforms/) that you are targeting, MonoGame has different sets of requirements.
+Depending on the [platform](https://monogame.net/articles/platforms.html) that you are targeting, MonoGame has different sets of requirements.
 
 For desktop platforms
 ====================
