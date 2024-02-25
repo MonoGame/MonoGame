@@ -7,7 +7,7 @@ using System;
 namespace Microsoft.Xna.Framework.Input.Touch
 {
     /// <summary>
-    /// Enumuration of values that represent different gestures that can be processed by <see cref="TouchPanel.ReadGesture"/>.
+    /// Enumeration of values that represent different gestures that can be processed by <see cref="TouchPanel.ReadGesture"/>.
     /// </summary>
 	[Flags]
     public enum GestureType
@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>        
         /// The user touched a single point for approximately one second.
         /// </summary>
-        /// <remarks>As this is a single event, it will not be contionusly fired while the user is holding the touch-point.</remarks>
+        /// <remarks>As this is a single event, it will not be continuously fired while the user is holding the touch-point.</remarks>
         Hold = 16,
         /// <summary>
         /// The user touched the screen and performed either left to right or right to left drag gesture.
@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The user tapped the device twice which is always preceded by a Tap gesture.
         /// </summary>
-        /// <remarks>If the time between two touchs are long enough, insted two seperate single Tap gestures will be generated.</remarks>
+        /// <remarks>If the time between two touches are long enough, instead two separate single Tap gestures will be generated.</remarks>
         DoubleTap = 256,
         /// <summary>
         /// The user touched the screen and performed either top to bottom or bottom to top drag gesture.
