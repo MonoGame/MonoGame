@@ -234,7 +234,6 @@ namespace Microsoft.Xna.Framework
 	    /// <summary>
 	    /// Called when the window receives text input. Raises the <see cref="TextInput"/> event.
 	    /// </summary>
-	    /// <param name="sender">The game window.</param>
 	    /// <param name="e">Parameters to the <see cref="TextInput"/> event.</param>
 		internal void OnTextInput(TextInputEventArgs e)
 		{
