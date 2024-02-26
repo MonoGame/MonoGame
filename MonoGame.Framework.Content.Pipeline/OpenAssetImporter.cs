@@ -218,6 +218,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         // XNA content
         private NodeContent _rootNode;
+        private NodeContent _rootBoneParent;                  // Needed if root bone has parent which is not a bone
         private List<MaterialContent> _materials;
 
         // This is used to enable backwards compatibility with
@@ -585,6 +586,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     Transform = ToXna(GetRelativeTransform(aiNode, aiParent))
                 };
             }
+            else if (aiNode == _rootBone) //if this is skeleton root, register its parent
+                _rootBoneParent = parent;
 
             if (node != null)
             {
@@ -770,8 +773,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 return;
 
             // Convert nodes to bones and attach to root node.
-            var rootBoneContent = (BoneContent)ImportBones(_rootBone, _rootBone.Parent, null);
-            _rootNode.Children.Add(rootBoneContent);
+            var rootBoneContent = (BoneContent)ImportBones(_rootBone, _rootBone.Parent, _rootBoneParent);
+            if (_rootBoneParent == null)
+                _rootNode.Children.Add(rootBoneContent);
+
 
             if (!_scene.HasAnimations)
                 return;
@@ -857,11 +862,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                             // --> Use transformation pivot.
                             node.Transform = pivot.GetTransform(null, null, null);
                         }
+                        else if (parent != null)
+                        {
+                            // If skeleton is not direct child of scene root 
+                            // derive parent offset from its absolute transform
+                            // This works if parent is a mesh, if it is a bone, we have to hope that
+                            // it is in bind pose
+                            Matrix parentOffset = Matrix.Invert(parent.AbsoluteTransform);
+                            node.Transform = Matrix.Invert(offsetMatrix) * parentOffset;
+                        }
                         else
                         {
                             // --> Let's assume that parent's transform is Identity.
-                        node.Transform = Matrix.Invert(offsetMatrix);
-                    }
+                            node.Transform = Matrix.Invert(offsetMatrix);
+                        }
                     }
                     else if (isOffsetMatrixValid && aiParent == _rootBone)
                     {
