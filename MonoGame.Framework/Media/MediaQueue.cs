@@ -12,11 +12,11 @@ namespace Microsoft.Xna.Framework.Media
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <see cref="MediaQueue"/> is a read-only queue of songs.
-    /// With <see cref="MediaQueue"/>, you can control which song is playing in the queue,
+    /// MediaQueue is a read-only queue of songs.
+    /// With MediaQueue, you can control which song is playing in the queue,
     /// but you cannot add or remove songs from the queue.
-    /// Either <see cref="MediaPlayer.Play(Song)"/> or the songs already queued up when the game
-    /// starts determine the songs that are in the queue of playing songs.
+    /// Either <see cref="MediaPlayer.Play(Song)">MediaPlayer.Play(Song)</see> or the songs already queued up
+    /// when the game starts determine the songs that are in the queue of playing songs.
     /// </para>
     /// </remarks>
 	public sealed class MediaQueue
@@ -33,9 +33,9 @@ namespace Microsoft.Xna.Framework.Media
 
 		}
 
-    /// <summary>
-    /// Gets the current <see cref="Song"/> in the queue of playing songs.
-    /// </summary>
+        /// <summary>
+        /// Gets the current <see cref="Song"/> in the queue of playing songs.
+        /// </summary>
 		public Song ActiveSong
 		{
 			get
@@ -47,12 +47,12 @@ namespace Microsoft.Xna.Framework.Media
 			}
 		}
 
-    /// <summary>
-    /// Gets or sets the index of the current (active) song in the queue of playing songs.
-    /// </summary>
-    /// <remarks>
-    /// Changing the active song index does not alter the current media state (playing, paused, or stopped).
-    /// </remarks>
+        /// <summary>
+        /// Gets or sets the index of the current (active) song in the queue of playing songs.
+        /// </summary>
+        /// <remarks>
+        /// Changing the active song index does not alter the current media state (playing, paused, or stopped).
+        /// </remarks>
 		public int ActiveSongIndex
 		{
 		    get
@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Media
 		}
 
         /// <summary>
-        /// Gets the count of songs in the <see cref="MediaQueue"/>.
+        /// Gets the count of songs in the MediaQueue.
         /// </summary>
         internal int Count
         {

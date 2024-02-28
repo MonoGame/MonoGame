@@ -74,9 +74,7 @@ namespace Microsoft.Xna.Framework.Media
         #endregion
 
         #region IDisposable Implementation
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             Dispose(true);

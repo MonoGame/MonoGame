@@ -16,9 +16,7 @@ namespace Microsoft.Xna.Framework.Media
 		private bool isReadOnly = false;
 		private List<Playlist> innerlist = new List<Playlist>();
 
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
         }

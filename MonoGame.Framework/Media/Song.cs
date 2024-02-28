@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Media
         private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
         /// <summary>
-        /// Gets the Album on which the Song appears.
+        /// Gets the <see cref="Album"/> on which the Song appears.
         /// </summary>
         public Album Album
         {
@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Returns a song that can be played via <see cref="MediaPlayer"/>.
         /// </summary>
-        /// <param name="name">The name for the song. See <see cref="Song.Name"/>.</param>
+        /// <param name="name">The name for the song. See <see cref="Song.Name">Song.Name</see>.</param>
         /// <param name="uri">The path to the song file.</param>
         /// <returns></returns>
         public static Song FromUri(string name, Uri uri)
@@ -94,9 +94,7 @@ namespace Microsoft.Xna.Framework.Media
             return song;
         }
 
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
 		public void Dispose()
         {
             Dispose(true);

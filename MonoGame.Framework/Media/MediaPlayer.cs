@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Media
 {
     /// <summary>
     /// Provides methods and properties to play, pause, resume, and stop songs.
-    /// <see cref="MediaPlayer"/> also exposes shuffle, repeat, volume, play position, and visualization capabilities.
+    /// MediaPlayer also exposes shuffle, repeat, volume, play position, and visualization capabilities.
     /// </summary>
     public static partial class MediaPlayer
     {
@@ -274,7 +274,7 @@ namespace Microsoft.Xna.Framework.Media
 		}
 
         /// <summary>
-        /// Stops currently playing song, moves to the previous song in the queue of playing songs and plays it.
+        /// Stops currently playing song, moves to the next song in the queue of playing songs and plays it.
         /// </summary>
         /// <remarks>
         /// <para>

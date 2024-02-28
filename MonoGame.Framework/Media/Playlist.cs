@@ -10,12 +10,12 @@ namespace Microsoft.Xna.Framework.Media
     /// Provides access to a playlist in the media library.
     /// </summary>
     /// <remarks>
-    /// Obtain <see cref="Playlist"/> objects through the <see cref="PlaylistCollection.this"/> indexer.
+    /// Obtain Playlist objects through the <see cref="PlaylistCollection.this">PlaylistCollection.this</see> indexer.
     /// </remarks>
     public sealed class Playlist : IDisposable
     {
         /// <summary>
-        /// Gets the duration of the <see cref="Playlist"/>.
+        /// Gets the duration of the Playlist.
         /// </summary>
         public TimeSpan Duration
         {
@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the name of the <see cref="Playlist"/>.
+        /// Gets the name of the Playlist.
         /// </summary>
         public string Name
         {
@@ -32,9 +32,7 @@ namespace Microsoft.Xna.Framework.Media
 			internal set;
         }
 
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
 		public void Dispose()
         {
         }

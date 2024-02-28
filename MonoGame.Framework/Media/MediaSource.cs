@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Media
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <see cref="MediaSource"/> provides access to the source or sources from which the media will be read.
+    /// MediaSource provides access to the source or sources from which the media will be read.
     /// A source can be either the local device, or a device connected through Windows Media Connect.
     /// </para>
     /// </remarks>

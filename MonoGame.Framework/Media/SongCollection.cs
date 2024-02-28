@@ -42,9 +42,7 @@ namespace Microsoft.Xna.Framework.Media
             this.innerlist = songs;
         }
 
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
 		public void Dispose()
         {
 

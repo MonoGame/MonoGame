@@ -11,12 +11,12 @@ namespace Microsoft.Xna.Framework.Media
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The <see cref="Genre"/> class provides information about a genre, including the genre's <see cref="Name"/>,
+    /// The Genre class provides information about a genre, including the genre's <see cref="Name"/>,
     /// and the <see cref="Albums"/> and <see cref="Songs"/> in that genre that are on the device.
     /// </para>
     /// <para>
-    /// You can obtain a <see cref="Genre"/> object through the
-    /// <see cref="Album.Genre"/> and <see cref="Song.Genre"/> properties.
+    /// You can obtain a Genre object through the
+    /// <see cref="Album.Genre">Album.Genre</see> and <see cref="Song.Genre">Song.Genre</see> properties.
     /// </para>
     /// </remarks>
     public sealed class Genre : IDisposable
@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="Genre"/> class.
+        /// Creates a new instance of Genre class.
         /// </summary>
         /// <param name="genre">Name of the genre.</param>
         public Genre(string genre)
@@ -76,15 +76,13 @@ namespace Microsoft.Xna.Framework.Media
             this.genre = genre;
         }
 
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
         }
 
         /// <summary>
-        /// Returns a String representation of the <see cref="Genre"/>.
+        /// Returns a String representation of the Genre.
         /// </summary>
         public override string ToString()
         {
