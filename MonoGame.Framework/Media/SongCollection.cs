@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Adds a <see cref="Song"/> to this <see cref="SongCollection"/>.
         /// </summary>
-		    public void Add(Song item)
+		public void Add(Song item)
         {
 
             if (item == null)
