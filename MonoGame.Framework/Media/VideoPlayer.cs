@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Microsoft.Xna.Framework.Media
 {
     /// <summary>
-    /// Provides methods and properties to play back, pause, resume, and stop video.
+    /// Provides methods and properties to play back, pause, resume, and stop <see cref="Video"/>.
     /// <see cref="VideoPlayer"/> also exposes repeat, volume, and play position information.
     /// </summary>
     public sealed partial class VideoPlayer : IDisposable
@@ -82,7 +82,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the media playback state, MediaState.
+        /// Gets the media playback state, <see cref="MediaState"/>.
         /// </summary>
         public MediaState State
         { 
@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the Video that is currently playing.
+        /// Gets the <see cref="Media.Video"/> that is currently playing.
         /// </summary>
         public Video Video { get { return _currentVideo; } }
 
@@ -187,7 +187,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Plays a Video.
+        /// Plays a <see cref="Video"/>.
         /// </summary>
         /// <param name="video">Video to play.</param>
         public void Play(Video video)
