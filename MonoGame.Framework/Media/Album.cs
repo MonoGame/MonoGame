@@ -23,12 +23,13 @@ namespace Microsoft.Xna.Framework.Media
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The <see cref="Album"/> class provides information about an album, 
+    /// The <b>Album</b> class provides information about an album, 
     /// including the album's <see cref="Name"/>, <see cref="Artist"/>, and <see cref="Songs"/>.
     /// </para>
     /// <para>
-    /// You can obtain an <b>Album</b> object through the <see cref="P:Microsoft.Xna.Framework.Media.AlbumCollection.Item(System.Int32)"/>
-    /// indexer and the <see cref="Song.Album"/> property.
+    /// You can obtain an <b>Album</b> object through the
+    /// <see cref="P:Microsoft.Xna.Framework.Media.AlbumCollection.Item(System.Int32)"/>
+    /// indexer and the <see cref="Song.Album">Song.Album</see> property.
     /// </para>
     /// </remarks>
     public sealed class Album : IDisposable
@@ -46,10 +47,10 @@ namespace Microsoft.Xna.Framework.Media
 #endif
 
         /// <summary>
-        /// Gets the <see cref="Microsoft.Xna.Framework.Media.Artist"/> of the <see cref="Album"/>.
+        /// Gets the <see cref="Media.Artist"/> of the Album.
         /// </summary>
         /// <value>
-        /// <see cref="Microsoft.Xna.Framework.Media.Artist"/> of this <b>Album</b>.
+        /// <see cref="Media.Artist"/> of this Album.
         /// </value>
         public Artist Artist
         {
@@ -71,7 +72,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the Genre of the Album.
+        /// Gets the <see cref="Media.Genre"/> of the Album.
         /// </summary>
         public Genre Genre
         {
@@ -124,7 +125,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets a SongCollection that contains the songs on the album.
+        /// Gets a <see cref="Media.SongCollection"/> that contains the songs on the Album.
         /// </summary>
         public SongCollection Songs
         {
@@ -161,9 +162,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 #endif
 
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
 #if WINDOWS_UAP

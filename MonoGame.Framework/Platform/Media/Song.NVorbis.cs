@@ -98,6 +98,9 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
+        /// <summary>
+        /// Gets the position of the Song.
+        /// </summary>
         public TimeSpan Position
         {
             get

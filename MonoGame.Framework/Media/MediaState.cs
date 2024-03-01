@@ -6,10 +6,22 @@ using System;
 
 namespace Microsoft.Xna.Framework.Media
 {
+    /// <summary>
+    /// Media playback state
+    /// </summary>
     public enum MediaState
     {
+        /// <summary>
+        /// Media playback is stopped.
+        /// </summary>
         Stopped,
+        /// <summary>
+        /// Media is currently playing and not paused.
+        /// </summary>
         Playing,
+        /// <summary>
+        /// Media playback is paused.
+        /// </summary>
         Paused
     }
 }

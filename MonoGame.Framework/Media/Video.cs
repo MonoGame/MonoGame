@@ -65,6 +65,7 @@ namespace Microsoft.Xna.Framework.Media
 #endif
         }
 
+        /// <summary/>
         ~Video()
         {
             Dispose(false);
@@ -73,7 +74,7 @@ namespace Microsoft.Xna.Framework.Media
         #endregion
 
         #region IDisposable Implementation
-
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             Dispose(true);
