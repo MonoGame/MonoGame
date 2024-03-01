@@ -14,7 +14,8 @@ namespace Microsoft.Xna.Framework.Media
     /// The <see cref="Artist"/> class provides information about an artist, including the artist's <see cref="Name"/>, <see cref="Albums"/>, and <see cref="Songs"/>
     /// </para>
     /// <para>
-    /// You can obtain an <b>Artist</b> through the <see cref="Album.Artist"/> and <see cref="Song.Artist"/> properties.
+    /// You can obtain an <b>Artist</b> through the <see cref="Album.Artist">Album.Artist</see>
+    /// and <see cref="Song.Artist">Song.Artist</see> properties.
     /// </para>
     /// </remarks>
     public sealed class Artist : IDisposable
@@ -22,7 +23,7 @@ namespace Microsoft.Xna.Framework.Media
         private string artist;
 
         /// <summary>
-        /// Gets the AlbumCollection for the Artist.
+        /// Gets the <see cref="AlbumCollection">AlbumCollection</see> for the Artist.
         /// </summary>
         public AlbumCollection Albums
         {
@@ -55,7 +56,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the SongCollection for the Artist.
+        /// Gets the <see cref="SongCollection"/> for the Artist.
         /// </summary>
         public SongCollection Songs
         {
@@ -66,7 +67,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="Artist"/> class.
+        /// Creates a new instance of Artist class.
         /// </summary>
         /// <param name="artist">Name of the artist.</param>
         public Artist(string artist)
@@ -74,9 +75,7 @@ namespace Microsoft.Xna.Framework.Media
             this.artist = artist;
         }
 
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
         }
