@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Content
             'G', // Google Stadia
             'b', // WebAssembly and Bridge.NET
 
-            // NOTE: There are additional idenfiers for consoles that 
+            // NOTE: There are additional identifiers for consoles that 
             // are not defined in this repository.  Be sure to ask the
             // console port maintainers to ensure no collisions occur.
 
