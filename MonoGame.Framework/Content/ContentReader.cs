@@ -332,6 +332,16 @@ namespace Microsoft.Xna.Framework.Content
             return (T)ReadRawObject<T>(typeReader, default(T));
         }
 
+        /// <summary>
+        /// Reads a single managed object from the current stream as an instance of the specified type.  If you specify
+        /// a base class of the actual object type, this method reads data only from the base type.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <param name="existingInstance">An existing object to write into.</param>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public T ReadRawObject<T>(T existingInstance)
         {
             Type objectType = typeof(T);
