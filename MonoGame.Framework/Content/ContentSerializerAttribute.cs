@@ -66,6 +66,10 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+        /// <summary>
+        /// Gets or Sets a value indicating whether to write this element if the member is null and skip past it if not
+        /// found when deserializing XML (default is false).
+        /// </summary>
         public bool Optional { get; set; }
 
         public bool SharedResource { get; set; }
