@@ -370,7 +370,7 @@ namespace Microsoft.Xna.Framework.Content
             loadedAssets[key] = result;
             return result;
 		}
-		
+
         /// <summary />
 		protected virtual Stream OpenStream(string assetName)
 		{
@@ -512,9 +512,7 @@ namespace Microsoft.Xna.Framework.Content
                 disposableAssets.Add(disposable);
         }
 
-        /// <summary>
-        /// Virtual property to allow a derived ContentManager to have it's assets reloaded
-        /// </summary>
+        /// <summary />
         protected virtual Dictionary<string, object> LoadedAssets
         {
             get { return loadedAssets; }
