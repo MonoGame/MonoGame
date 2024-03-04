@@ -396,6 +396,13 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+        /// <summary>
+        /// Reads a <see cref="Vector2"/> from the underlying stream.
+        /// </summary>
+        /// <returns>The <see cref="Vector2"/> that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public Vector2 ReadVector2()
         {
             Vector2 result = new Vector2();
