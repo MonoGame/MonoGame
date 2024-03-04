@@ -444,6 +444,13 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
+        /// <summary>
+        /// Reads a <see cref="Color"/> from the underlying stream.
+        /// </summary>
+        /// <returns>The <see cref="Color"/> that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public Color ReadColor()
         {
             Color result = new Color();
