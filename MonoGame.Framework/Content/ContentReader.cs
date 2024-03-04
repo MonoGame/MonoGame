@@ -113,10 +113,29 @@ namespace Microsoft.Xna.Framework.Content
         /// </summary>
         /// <typeparam name="T">The type of asset to expected to be loaded from the external file.</typeparam>
         /// <returns>
-        /// The asset loaded from the external file at the link read from the underlying stream, if the file exists and
-        /// can be loaded as type <typeparamref name="T"/>; otherwise the default value of <typeparamref name="T"/>
-        /// is returned.
+        /// The asset of type <typeparamref name="T"/> loaded from the external file at the relative link read from
+        /// the underlying stream.  If the relative link read was null or an empty string, then the default
+        /// implementation of type <typeparamref name="T"/> is returned.
         /// </returns>
+        /// <exception cref="ArgumentNullException">The relative link to the external file read is null or an empty string.</exception>
+        /// <exception cref="ObjectDisposedException">
+        /// This was called after the <see cref="ContentManager">ContentReader.ContentManager</see> was disposed.</exception>
+        /// <exception cref="ContentLoadException">
+        /// The type of asset in the external file does not match the type specified by <typeparamref name="T"/>.
+        /// 
+        /// -or-
+        ///
+        /// A content file matching the relative link to the external file could not be found.
+        ///
+        /// -or-
+        ///
+        /// The specified path in the relative link to the external file read is invalid (for example, a directory in
+        /// the path does not exist).
+        ///
+        /// -or-
+        ///
+        /// An error occurred while opening the external file.
+        /// </exception>
         public T ReadExternalReference<T>()
         {
             var externalReference = ReadString();
