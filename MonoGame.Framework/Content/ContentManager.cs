@@ -617,9 +617,22 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         /// <summary>
-        /// Unloads a set of assets.
+        /// Unloads a set of assets loaded by this ContentManager where each element in the provided collection
+        /// represents the name of an asset to unload.
         /// </summary>
-        /// <param name="assetNames">The names of the assets to unload.</param>
+        /// <remarks>
+        /// If the asset being unloaded implements the <see cref="IDisposable"/> interface, then the
+        /// <see cref="IDisposable.Dispose">IDisposable.Dispose </see > method will be called before unloading.
+        /// </remarks>
+        /// <param name="assetNames">The collection containing the names of assets to unload.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If the <paramref name="assetNames"/> parameter is null.
+        ///
+        /// -or-
+        ///
+        /// If an element in the collection null or an empty string.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">This was called after the ContentManger was disposed.</exception>
         public virtual void UnloadAssets(IList<string> assetNames)
         {
             if (assetNames == null)
