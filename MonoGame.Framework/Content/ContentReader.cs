@@ -210,6 +210,16 @@ namespace Microsoft.Xna.Framework.Content
             return InnerReadObject(default(T));
         }
 
+        /// <summary>
+        /// Reads a single managed object from the underlying stream. Can be called recursively.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <param name="typeReader">The <see cref="ContentTypeReader"/> to use to read the object.</param>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
+        /// <exception cref="FormatException">The stream is corrupted.</exception>
+        /// <exception cref="ContentLoadException">Type reader index read from stream is out of bounds</exception>
         public T ReadObject<T>(ContentTypeReader typeReader)
         {
             var result = (T)typeReader.Read(this, default(T));            
