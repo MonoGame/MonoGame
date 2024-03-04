@@ -282,6 +282,13 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
+        /// <summary>
+        /// Reads a <see cref="Quaternion"/> from the underlying stream.
+        /// </summary>
+        /// <returns>The <see cref="Quaternion"/> that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public Quaternion ReadQuaternion()
         {
             Quaternion result = new Quaternion();
