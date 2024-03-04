@@ -574,12 +574,21 @@ namespace Microsoft.Xna.Framework.Content
 		    }
 			disposableAssets.Clear();
 		    loadedAssets.Clear();
-		}
+        }
 
         /// <summary>
-        /// Unloads a single asset.
+        /// Unloads a single asset that was loaded by this ContentManager.
         /// </summary>
-        /// <param name="assetName">The name of the asset to unload. This cannot be null.</param>
+        /// <remarks>
+        /// If the asset being unloaded implements the <see cref="IDisposable"/> interface, then the
+        /// <see cref="IDisposable.Dispose">IDisposable.Dispose </see > method will be called before unloading.
+        /// </remarks>
+        /// <param name="assetName">
+        /// The asset name, relative to the <see cref="RootDirectory">ContentManager.RootDirectory</see>, and not
+        /// including the .xnb extension.
+        /// </param>
+        /// <exception cref="ArgumentNullException">The <paramref name="assetName"/> parameter is null or an empty string.</exception>
+        /// <exception cref="ObjectDisposedException">This was called after the ContentManger was disposed.</exception>
         public virtual void UnloadAsset(string assetName)
         {
             if (string.IsNullOrEmpty(assetName))
