@@ -155,6 +155,13 @@ namespace Microsoft.Xna.Framework.Content
             return default(T);
         }
 
+        /// <summary>
+        /// Reads a <see cref="Matrix"/> value from the underlying stream.
+        /// </summary>
+        /// <returns>The <see cref="Matrix"/> that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public Matrix ReadMatrix()
         {
             Matrix result = new Matrix();
