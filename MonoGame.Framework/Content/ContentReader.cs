@@ -369,6 +369,17 @@ namespace Microsoft.Xna.Framework.Content
             return (T)typeReader.Read(this, existingInstance);
         }
 
+        /// <summary>
+        /// Reads a shared resource ID and records it for subsequent fix-up.
+        /// </summary>
+        /// <typeparam name="T">The type of the shared resource.</typeparam>
+        /// <param name="fixup">The fix-up action to perform.</param>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
+        /// <exception cref="FormatException">The stream is corrupted.</exception>
+        /// <exception cref="ContentLoadException">
+        /// The type of the shared resource read does not match the specified <typeparamref name="T"/> type.
+        /// </exception>
         public void ReadSharedResource<T>(Action<T> fixup)
         {
             int index = Read7BitEncodedInt();
