@@ -557,6 +557,13 @@ namespace Microsoft.Xna.Framework.Content
             }
 		}
 
+        /// <summary>
+        /// Unloads all assets that were loaded by this ContentManger.
+        /// </summary>
+        /// <remarks>
+        /// If an assets implements the <see cref="IDisposable"/> interface, then the <see cref="IDisposable.Dispose">
+        /// IDisposable.Dispose</see> method will be called before unloading.
+        /// </remarks>
 		public virtual void Unload()
 		{
 		    // Look for disposable assets.
