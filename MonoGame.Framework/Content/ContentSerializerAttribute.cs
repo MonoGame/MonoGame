@@ -22,13 +22,13 @@ namespace Microsoft.Xna.Framework.Content
         public bool AllowNull { get; set; }
 
         /// <summary>
-        /// Returns the overriden XML element name or the default "Item".
+        /// Returns the overridden XML element name or the default "Item".
         /// </summary>
         public string CollectionItemName
         {
             get
             {
-                // Return the defaul if unset.
+                // Return the default if unset.
                 if (string.IsNullOrEmpty(_collectionItemName))
                     return "Item";
 
