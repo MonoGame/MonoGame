@@ -211,6 +211,59 @@ namespace Microsoft.Xna.Framework.Content
 			}
 		}
 
+        /// <summary>
+        /// Loads an asset that has been processed by the Content Pipeline.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This method attempts to load the asset based on the <see cref="CultureInfo.CurrentCulture"/>
+        ///         searching for the asset by name and appending it with with the culture name (e.g. "assetName.en-US")
+        ///         or two letter ISO language name (e.g. "assetName.en"). If unsuccessful in finding the asset with
+        ///         the culture information appended, it will fall back to loading the default asset.
+        ///     </para>
+        ///     <para>
+        ///         Before a ContentManager can load an asset, you need to add the asset to your game project using
+        ///         the steps described in
+        ///         <see href="https://monogame.net/articles/content_pipeline/index.html">Adding Content - MonoGame</see>.
+        ///     </para>
+        /// </remarks>
+        /// <typeparam name="T">
+        ///     <para>
+        ///         The type of asset to load.
+        ///     </para>
+        ///     <para>
+        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="SoundEffect"/>,
+        ///         <see cref="Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
+        ///         and <see cref="TextureCube"/> are all supported by default by the standard Content Pipeline
+        ///         processor, but additional types may be loaded by extending the processor.
+        ///     </para>
+        /// </typeparam>
+        /// <param name="assetName">
+        /// The asset name, relative to the <see cref="RootDirectory">ContentManager.RootDirectory</see>, and not
+        /// including the .xnb extension.
+        /// </param>
+        /// <returns>
+        /// The loaded asset. Repeated calls to load the same asset will return the same object instance.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="assetName"/> parameter is null or an empty string.</exception>
+        /// <exception cref="ObjectDisposedException">This was called after the ContentManger was disposed.</exception>
+        /// <exception cref="ContentLoadException">
+        /// The type of the <paramref name="assetName"/> in the file does not match the type of asset requested as
+        /// specified by <typeparamref name="T"/>.
+        /// 
+        /// -or-
+        /// 
+        /// A content file matching the <paramref name="assetName"/> parameter could not be found.
+        ///
+        /// -or-
+        ///
+        /// The specified path in the <paramref name="assetName"/> parameter is invalid (for example, a
+        /// directory in the path does not exist).        
+        ///
+        /// -or-
+        ///
+        /// An error occurred while opening the content file.
+        /// </exception>
         public virtual T LoadLocalized<T> (string assetName)
         {
             string [] cultureNames =
