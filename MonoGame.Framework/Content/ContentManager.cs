@@ -301,7 +301,7 @@ namespace Microsoft.Xna.Framework.Content
             T result = default(T);
             
             // On some platforms, name and slash direction matter.
-            // We store the asset by a /-seperating key rather than how the
+            // We store the asset by a /-separating key rather than how the
             // path to the file was passed to us to avoid
             // loading "content/asset1.xnb" and "content\\ASSET1.xnb" as if they were two 
             // different files. This matches stock XNA behavior.
