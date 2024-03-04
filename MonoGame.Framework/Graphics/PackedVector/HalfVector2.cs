@@ -14,27 +14,27 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         private uint packedValue;
 
         /// <summary>
-        /// Creates a new <see cref="HalfVector2"/> from the specified component values.
+        /// Initializes a new instance of this structure.
         /// </summary>
-        /// <param name="x">The initial x-component value.</param>
-        /// <param name="y">The initial y-component value.</param>
+        /// <param name="x">The initial x-component value for this structure.</param>
+        /// <param name="y">The initial y-component value for this structure.</param>
         public HalfVector2(float x, float y)
         {
             this.packedValue = PackHelper(x, y);
         }
 
         /// <summary>
-        /// Creates a new <see cref="HalfVector2"/> from the specified <see cref="Vector2"/>.
+        /// Initializes a new instance of this structure.
         /// </summary>
         /// <param name="vector">
-        /// The <see cref="Vector2"/> whos components contain the initial values
-        /// for this <see cref="HalfVector2"/>.
+        /// A <see cref="Vector2"/> value who's components contain the initial values for this structure.
         /// </param>
         public HalfVector2(Vector2 vector)
         {
             this.packedValue = PackHelper(vector.X, vector.Y);
         }
 
+        /// <inheritdoc />
         void IPackedVector.PackFromVector4(Vector4 vector)
         {
             this.packedValue = PackHelper(vector.X, vector.Y);
@@ -48,11 +48,9 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Expands this <see cref="HalfVector2"/> to a <see cref="Vector2"/>
+        /// Expands the packed representation to a <see cref="Vector2"/>.
         /// </summary>
-        /// <returns>
-        /// The expanded <see cref="HalfVector2"/> as a <see cref="Vector2"/>.
-        /// </returns>
+        /// <returns>The expanded value.</returns>
         public Vector2 ToVector2()
         {
             Vector2 vector;
@@ -61,24 +59,14 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return vector;
         }
 
-        /// <summary>
-        /// Expands this <see cref="HalfVector2"/> to a <see cref="Vector4"/>
-        /// </summary>
-        /// <returns>
-        /// The expanded <see cref="HalfVector2"/> as a <see cref="Vector4"/>.
-        /// </returns>
+        /// <inheritdoc />
         public Vector4 ToVector4()
         {
             Vector2 vector = this.ToVector2();
             return new Vector4(vector.X, vector.Y, 0f, 1f);
         }
 
-        /// <summary>
-        /// Gets or Sets the packed representation of this <see cref="HalfVector2"/>.
-        /// </summary>
-        /// <value>
-        /// The packed representation of this <see cref="HalfVector2"/>
-        /// </value>
+        /// <inheritdoc />
         public uint PackedValue
         {
             get
@@ -91,81 +79,47 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             }
         }
 
-        /// <summary>
-        /// Returns the string representation of this <see cref="HalfVector2"/> value.
-        /// </summary>
-        /// <returns>
-        /// The string representation of this <see cref="HalfVector2"/> value.
-        /// </returns>
+        /// <inheritdoc />
         public override string ToString()
         {
             return this.ToVector2().ToString();
         }
 
-        /// <summary>
-        /// Returns the hash code for this <see cref="HalfVector2"/> value.
-        /// </summary>
-        /// <returns>
-        /// The 32-bit signed integer hash code for this <see cref="HalfVector2"/> value.
-        /// </returns>
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return this.packedValue.GetHashCode();
         }
 
-        /// <summary>
-        /// Returns a value that indicates whether this <see cref="HalfVector2"/>
-        /// and a specified object are equal.
-        /// </summary>
-        /// <param name="obj">The object to compare with this <see cref="HalfVector2"/>.</param>
-        /// <returns>
-        /// <see langword="true"/> if this <see cref="HalfVector2"/> and
-        /// <paramref name="obj"/> are equal; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return ((obj is HalfVector2) && this.Equals((HalfVector2)obj));
         }
 
-        /// <summary>
-        /// Returns a value tha indicates whether this <see cref="HalfVector2"/>
-        /// and a specified <see cref="HalfVector2"/> are equal.
-        /// </summary>
-        /// <param name="other">The other <see cref="HalfVector2"/>.</param>
-        /// <returns>
-        /// <see langword="true"/> if the two <see cref="HalfVector2"/> values
-        /// are equal; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public bool Equals(HalfVector2 other)
         {
             return this.packedValue.Equals(other.packedValue);
         }
 
         /// <summary>
-        /// Returns a value that indicates whether two <see cref="HalfVector2"/>
-        /// values are equal.
+        /// Returns a value that indicates whether the two values are equal.
         /// </summary>
-        /// <param name="a">The <see cref="HalfVector2"/> on the left of the equality operator.</param>
-        /// <param name="b">The <see cref="HalfVector2"/> on the right of the equality operator.</param>
-        /// <returns>
-        /// <see langword="true"/> if <paramref name="a"/> and <paramref name="b"/>
-        /// are equal; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <param name="a">The value on the left of the equality operator.</param>
+        /// <param name="b">The value on the right of the equality operator.</param>
+        /// <returns>true if the two values are equal; otherwise, false.</returns>
         public static bool operator ==(HalfVector2 a, HalfVector2 b)
         {
             return a.Equals(b);
         }
 
         /// <summary>
-        /// Returns a value that indicates whether two <see cref="HalfVector2"/>
-        /// values are not equal.
+        /// Returns a value that indicates whether the two value are not equal.
         /// </summary>
-        /// <param name="a">The <see cref="HalfVector2"/> on the left of the inequality operator.</param>
-        /// <param name="b">The <see cref="HalfVector2"/> on the right of the inequality operator.</param>
-        /// <returns>
-        /// <see langword="true"/> if <paramref name="a"/> and <paramref name="b"/>
-        /// are different; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <param name="a">The value on the left of the inequality operator.</param>
+        /// <param name="b">The value on the right of the inequality operator.</param>
+        /// <returns>true if the two value are not equal; otherwise, false.</returns>
         public static bool operator !=(HalfVector2 a, HalfVector2 b)
         {
             return !a.Equals(b);

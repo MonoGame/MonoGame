@@ -15,11 +15,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 		private ulong short4Packed;
 
         /// <summary>
-        /// Creates a new <see cref="NormalizedShort4"/> from the specified <see cref="Vector4"/>.
+        /// Initializes a new instance of this structure.
         /// </summary>
         /// <param name="vector">
-        /// The <see cref="Vector4"/> whos components contain the initial values
-        /// for this <see cref="NormalizedShort4"/>.
+        /// A <see cref="Vector4"/> value who's components contain the initial values for this structure.
         /// </param>
         public NormalizedShort4(Vector4 vector)
 		{
@@ -27,53 +26,40 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 		}
 
         /// <summary>
-        /// Creates a new <see cref="NormalizedShort4"/> from the specified component values.
+        /// Initializes a new instance of this structure.
         /// </summary>
-        /// <param name="x">The initial x-component value.</param>
-        /// <param name="y">The initial y-component value.</param>
-        /// <param name="z">The initial z-component value.</param>
-        /// <param name="w">The initial w-component value.</param>
+        /// <param name="x">The initial x-component value for this structure.</param>
+        /// <param name="y">The initial y-component value for this structure.</param>
+        /// <param name="z">The initial z-component value for this structure.</param>
+        /// <param name="w">The initial 2-component value for this structure.</param>
         public NormalizedShort4(float x, float y, float z, float w)
 		{
             short4Packed = PackInFour(x, y, z, w);
 		}
 
         /// <summary>
-        /// Returns a value that indicates whether two <see cref="NormalizedShort4"/>
-        /// values are not equal.
+        /// Returns a value that indicates whether the two value are not equal.
         /// </summary>
-        /// <param name="a">The <see cref="NormalizedShort4"/> on the left of the inequality operator.</param>
-        /// <param name="b">The <see cref="NormalizedShort4"/> on the right of the inequality operator.</param>
-        /// <returns>
-        /// <see langword="true"/> if <paramref name="a"/> and <paramref name="b"/>
-        /// are different; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <param name="a">The value on the left of the inequality operator.</param>
+        /// <param name="b">The value on the right of the inequality operator.</param>
+        /// <returns>true if the two value are not equal; otherwise, false.</returns
         public static bool operator !=(NormalizedShort4 a, NormalizedShort4 b)
 		{
 			return !a.Equals (b);
 		}
 
         /// <summary>
-        /// Returns a value that indicates whether two <see cref="NormalizedShort4"/>
-        /// values are equal.
+        /// Returns a value that indicates whether the two values are equal.
         /// </summary>
-        /// <param name="a">The <see cref="NormalizedShort4"/> on the left of the equality operator.</param>
-        /// <param name="b">The <see cref="NormalizedShort4"/> on the right of the equality operator.</param>
-        /// <returns>
-        /// <see langword="true"/> if <paramref name="a"/> and <paramref name="b"/>
-        /// are equal; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <param name="a">The value on the left of the equality operator.</param>
+        /// <param name="b">The value on the right of the equality operator.</param>
+        /// <returns>true if the two values are equal; otherwise, false.</returns>
         public static bool operator ==(NormalizedShort4 a, NormalizedShort4 b)
 		{
 			return a.Equals (b);
 		}
 
-        /// <summary>
-        /// Gets or Sets the packed representation of this <see cref="NormalizedShort4"/>.
-        /// </summary>
-        /// <value>
-        /// The packed representation of this <see cref="NormalizedShort4"/>
-        /// </value>
+        /// <inheritdoc />
         public ulong PackedValue
         {
             get
@@ -86,51 +72,25 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             }
 		}
 
-        /// <summary>
-        /// Returns a value that indicates whether this <see cref="NormalizedShort4"/>
-        /// and a specified object are equal.
-        /// </summary>
-        /// <param name="obj">The object to compare with this <see cref="NormalizedShort4"/>.</param>
-        /// <returns>
-        /// <see langword="true"/> if this <see cref="NormalizedShort4"/> and
-        /// <paramref name="obj"/> are equal; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return (obj is NormalizedShort4) && Equals((NormalizedShort4)obj);
         }
 
-        /// <summary>
-        /// Returns a value tha indicates whether this <see cref="NormalizedShort4"/>
-        /// and a specified <see cref="NormalizedShort4"/> are equal.
-        /// </summary>
-        /// <param name="other">The other <see cref="NormalizedShort4"/>.</param>
-        /// <returns>
-        /// <see langword="true"/> if the two <see cref="NormalizedShort4"/> values
-        /// are equal; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public bool Equals(NormalizedShort4 other)
         {
             return short4Packed.Equals(other.short4Packed);
         }
 
-        /// <summary>
-        /// Returns the hash code for this <see cref="NormalizedShort4"/> value.
-        /// </summary>
-        /// <returns>
-        /// The 32-bit signed integer hash code for this <see cref="NormalizedShort4"/> value.
-        /// </returns>
+        /// <inheritdoc />
 		public override int GetHashCode ()
 		{
 			return short4Packed.GetHashCode();
 		}
 
-        /// <summary>
-        /// Returns the string representation of this <see cref="NormalizedShort4"/> value.
-        /// </summary>
-        /// <returns>
-        /// The string representation of this <see cref="NormalizedShort4"/> value.
-        /// </returns>
+        /// <inheritdoc />
 		public override string ToString ()
 		{
             return short4Packed.ToString("X");
@@ -156,12 +116,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             short4Packed = PackInFour(vector.X, vector.Y, vector.Z, vector.W);
 		}
 
-        /// <summary>
-        /// Expands this <see cref="NormalizedShort4"/> to a <see cref="Vector4"/>
-        /// </summary>
-        /// <returns>
-        /// The expanded <see cref="NormalizedShort4"/> as a <see cref="Vector4"/>.
-        /// </returns>
+        /// <inheritdoc />
 		public Vector4 ToVector4 ()
 		{
             const float maxVal = 0x7FFF;

@@ -14,11 +14,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         ulong packedValue;
 
         /// <summary>
-        /// Creates a new <see cref="Short4"/> from the specified <see cref="Vector4"/>.
+        /// Initializes a new instance of this structure.
         /// </summary>
         /// <param name="vector">
-        /// The <see cref="Vector4"/> whos components contain the initial values
-        /// for this <see cref="Short4"/>.
+        /// A <see cref="Vector4"/> value who's components contain the initial values for this structure.
         /// </param>
         public Short4(Vector4 vector)
         {
@@ -26,12 +25,12 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Creates a new <see cref="Short4"/> from the specified component values.
+        /// Initializes a new instance of this structure.
         /// </summary>
-        /// <param name="x">The initial x-component value.</param>
-        /// <param name="y">The initial y-component value.</param>
-        /// <param name="z">The initial z-component value.</param>
-        /// <param name="w">The initial w-component value.</param>
+        /// <param name="x">The initial x-component value for this structure.</param>
+        /// <param name="y">The initial y-component value for this structure.</param>
+        /// <param name="z">The initial z-component value for this structure.</param>
+        /// <param name="w">The initial 2-component value for this structure.</param>
         public Short4(float x, float y, float z, float w)
         {
             var vector = new Vector4(x, y, z, w);
@@ -39,41 +38,28 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Returns a value that indicates whether two <see cref="Short4"/>
-        /// values are not equal.
+        /// Returns a value that indicates whether the two value are not equal.
         /// </summary>
-        /// <param name="a">The <see cref="Short4"/> on the left of the inequality operator.</param>
-        /// <param name="b">The <see cref="Short4"/> on the right of the inequality operator.</param>
-        /// <returns>
-        /// <see langword="true"/> if <paramref name="a"/> and <paramref name="b"/>
-        /// are different; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <param name="a">The value on the left of the inequality operator.</param>
+        /// <param name="b">The value on the right of the inequality operator.</param>
+        /// <returns>true if the two value are not equal; otherwise, false.</returns>
         public static bool operator !=(Short4 a, Short4 b)
         {
             return a.PackedValue != b.PackedValue;
         }
 
         /// <summary>
-        /// Returns a value that indicates whether two <see cref="Short4"/>
-        /// values are equal.
+        /// Returns a value that indicates whether the two values are equal.
         /// </summary>
-        /// <param name="a">The <see cref="Short4"/> on the left of the equality operator.</param>
-        /// <param name="b">The <see cref="Short4"/> on the right of the equality operator.</param>
-        /// <returns>
-        /// <see langword="true"/> if <paramref name="a"/> and <paramref name="b"/>
-        /// are equal; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <param name="a">The value on the left of the equality operator.</param>
+        /// <param name="b">The value on the right of the equality operator.</param>
+        /// <returns>true if the two values are equal; otherwise, false.</returns>
         public static bool operator ==(Short4 a, Short4 b)
         {
             return a.PackedValue == b.PackedValue;
         }
 
-        /// <summary>
-        /// Gets or Sets the packed representation of this <see cref="Short4"/>.
-        /// </summary>
-        /// <value>
-        /// The packed representation of this <see cref="Short4"/>
-        /// </value>
+        /// <inheritdoc />
         public ulong PackedValue
         {
             get
@@ -86,15 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             }
         }
 
-        /// <summary>
-        /// Returns a value that indicates whether this <see cref="Short4"/>
-        /// and a specified object are equal.
-        /// </summary>
-        /// <param name="obj">The object to compare with this <see cref="Short4"/>.</param>
-        /// <returns>
-        /// <see langword="true"/> if this <see cref="Short4"/> and
-        /// <paramref name="obj"/> are equal; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             if (obj is Short4)
@@ -102,47 +80,24 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return false;
         }
 
-        /// <summary>
-        /// Returns a value tha indicates whether this <see cref="Short4"/>
-        /// and a specified <see cref="Short4"/> are equal.
-        /// </summary>
-        /// <param name="other">The other <see cref="Short4"/>.</param>
-        /// <returns>
-        /// <see langword="true"/> if the two <see cref="Short4"/> values
-        /// are equal; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public bool Equals(Short4 other)
         {
             return this == other;
         }
 
-        /// <summary>
-        /// Returns the hash code for this <see cref="Short4"/> value.
-        /// </summary>
-        /// <returns>
-        /// The 32-bit signed integer hash code for this <see cref="Short4"/> value.
-        /// </returns>
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return packedValue.GetHashCode();
         }
 
-        /// <summary>
-        /// Returns the string representation of this <see cref="Short4"/> value.
-        /// </summary>
-        /// <returns>
-        /// The string representation of this <see cref="Short4"/> value.
-        /// </returns>
+        /// <inheritdoc />
         public override string ToString()
         {
             return packedValue.ToString("x16");
         }
 
-        /// <summary>
-        /// Packs a vector into a ulong.
-        /// </summary>
-        /// <param name="vector">The vector containing the values to pack.</param>
-        /// <returns>The ulong containing the packed values.</returns>
         static ulong Pack(ref Vector4 vector)
         {
             const long mask = 0xFFFF;
@@ -158,21 +113,13 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return word4 | word3 | word2 | word1;
         }
 
-        /// <summary>
-        /// Sets the packed representation from a Vector4.
-        /// </summary>
-        /// <param name="vector">The vector to create the packed representation from.</param>
+        /// <inheritdoc />
         void IPackedVector.PackFromVector4(Vector4 vector)
         {
             packedValue = Pack(ref vector);
         }
 
-        /// <summary>
-        /// Expands this <see cref="Short4"/> to a <see cref="Vector4"/>
-        /// </summary>
-        /// <returns>
-        /// The expanded <see cref="Short4"/> as a <see cref="Vector4"/>.
-        /// </returns>
+        /// <inheritdoc />
         public Vector4 ToVector4()
         {
             return new Vector4(

@@ -22,35 +22,29 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Creates a new <see cref="Bgra4444"/> from the specified component values.
+        /// Initializes a new instance of this structure.
         /// </summary>
-        /// <param name="x">The initial x-component value.</param>
-        /// <param name="y">The initial y-component value.</param>
-        /// <param name="z">The initial z-component value.</param>
-        /// <param name="w">The initial w-component value.</param>
+        /// <param name="x">The initial x-component value for this structure.</param>
+        /// <param name="y">The initial y-component value for this structure.</param>
+        /// <param name="z">The initial z-component value for this structure.</param>
+        /// <param name="w">The initial 2-component value for this structure.</param>
         public Bgra4444(float x, float y, float z, float w)
         {
             _packedValue = Pack(x, y, z, w);
         }
 
         /// <summary>
-        /// Creates a new <see cref="Bgra4444"/> from the specified <see cref="Vector4"/>.
+        /// Initializes a new instance of this structure.
         /// </summary>
         /// <param name="vector">
-        /// The <see cref="Vector4"/> whos components contain the initial values
-        /// for this <see cref="Bgra4444"/>.
+        /// A <see cref="Vector4"/> value who's components contain the initial values for this structure.
         /// </param>
         public Bgra4444(Vector4 vector)
         {
             _packedValue = Pack(vector.X, vector.Y, vector.Z, vector.W);
         }
 
-        /// <summary>
-        /// Gets or Sets the packed representation of this <see cref="Bgra4444"/>.
-        /// </summary>
-        /// <value>
-        /// The packed representation of this <see cref="Bgra4444"/>
-        /// </value>
+        /// <inheritdoc />
         public UInt16 PackedValue
         {
             get
@@ -63,12 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             }
         }
 
-        /// <summary>
-        /// Expands this <see cref="Bgra4444"/> to a <see cref="Vector4"/>
-        /// </summary>
-        /// <returns>
-        /// The expanded <see cref="Bgra4444"/> as a <see cref="Vector4"/>.
-        /// </returns>
+        /// <inheritdoc />
         public Vector4 ToVector4()
         {
             const float maxVal = 1 / 15.0f;
@@ -79,24 +68,13 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
                                 ((_packedValue >> 12) & 0x0F) * maxVal);
         }
 
-        /// <summary>
-        /// Sets the packed vector from a Vector4.
-        /// </summary>
-        /// <param name="vector">Vector containing the components.</param>
+        /// <inheritdoc />
         void IPackedVector.PackFromVector4(Vector4 vector)
         {
             _packedValue = Pack(vector.X, vector.Y, vector.Z, vector.W);
         }
 
-        /// <summary>
-        /// Returns a value that indicates whether this <see cref="Bgra4444"/>
-        /// and a specified object are equal.
-        /// </summary>
-        /// <param name="obj">The object to compare with this <see cref="Bgra4444"/>.</param>
-        /// <returns>
-        /// <see langword="true"/> if this <see cref="Bgra4444"/> and
-        /// <paramref name="obj"/> are equal; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             if (obj != null && (obj is Bgra4444))
@@ -104,65 +82,41 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return false;
         }
 
-        /// <summary>
-        /// Returns a value tha indicates whether this <see cref="Bgra4444"/>
-        /// and a specified <see cref="Bgra4444"/> are equal.
-        /// </summary>
-        /// <param name="other">The other <see cref="Bgra4444"/>.</param>
-        /// <returns>
-        /// <see langword="true"/> if the two <see cref="Bgra4444"/> values
-        /// are equal; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public bool Equals(Bgra4444 other)
         {
             return _packedValue == other._packedValue;
         }
 
-        /// <summary>
-        /// Returns the string representation of this <see cref="Bgra4444"/> value.
-        /// </summary>
-        /// <returns>
-        /// The string representation of this <see cref="Bgra4444"/> value.
-        /// </returns>
+        /// <inheritdoc />
         public override string ToString()
         {
             return ToVector4().ToString();
         }
 
-        /// <summary>
-        /// Returns the hash code for this <see cref="Bgra4444"/> value.
-        /// </summary>
-        /// <returns>
-        /// The 32-bit signed integer hash code for this <see cref="Bgra4444"/> value.
-        /// </returns>
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return _packedValue.GetHashCode();
         }
 
         /// <summary>
-        /// Returns a value that indicates whether two <see cref="Bgra4444"/> values are equal.
+        /// Returns a value that indicates whether the two values are equal.
         /// </summary>
-        /// <param name="lhs">The <see cref="Bgra4444"/> on the left of the equality operator.</param>
-        /// <param name="rhs">The <see cref="Bgra4444"/> on the right of the equality operator.</param>
-        /// <returns>
-        /// <see langword="true"/> if <paramref name="lhs"/> and <paramref name="rhs"/> are equal; otherwise,
-        /// <see langword="false"/>.
-        /// </returns>
+        /// <param name="lhs">The value on the left of the equality operator.</param>
+        /// <param name="rhs">The value on the right of the equality operator.</param>
+        /// <returns>true if the two values are equal; otherwise, false.</returns>
         public static bool operator ==(Bgra4444 lhs, Bgra4444 rhs)
         {
             return lhs._packedValue == rhs._packedValue;
         }
 
         /// <summary>
-        /// Returns a value that indicates whether two <see cref="Bgra4444"/> values are not equal.
+        /// Returns a value that indicates whether the two value are not equal.
         /// </summary>
-        /// <param name="lhs">The <see cref="Bgra4444"/> on the left of the inequality operator.</param>
-        /// <param name="rhs">The <see cref="Bgra4444"/> on the right of the inequality operator.</param>
-        /// <returns>
-        /// <see langword="true"/> if <paramref name="lhs"/> and <paramref name="rhs"/> are different; otherwise,
-        /// <see langword="false"/>.
-        /// </returns>
+        /// <param name="lhs">The value on the left of the inequality operator.</param>
+        /// <param name="rhs">The value on the right of the inequality operator.</param>
+        /// <returns>true if the two value are not equal; otherwise, false.</returns>
         public static bool operator !=(Bgra4444 lhs, Bgra4444 rhs)
         {
             return lhs._packedValue != rhs._packedValue;

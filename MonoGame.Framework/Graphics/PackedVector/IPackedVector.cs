@@ -36,9 +36,6 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <summary>
         /// Directly gets or sets the packed representation of the value.
         /// </summary>
-        /// <value>
-        /// The packed representation of the value.
-        /// </value>
 		TPacked PackedValue { get; set; }
 	}
 
