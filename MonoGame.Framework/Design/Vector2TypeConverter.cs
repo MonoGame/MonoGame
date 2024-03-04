@@ -9,21 +9,12 @@ using System.Globalization;
 namespace Microsoft.Xna.Framework.Design
 {
     /// <summary>
-    /// Provides a unified way of converting <see cref="Vector2"/> values to other 
-    /// types, as well as for accessing standard values and subproperties.
+    /// Provides a unified way of converting <see cref="Vector2"/> values to other  types, as well as for accessing
+    /// standard values and subproperties.
     /// </summary>
     public class Vector2TypeConverter : TypeConverter
     {
-        /// <summary>
-        /// Returns whether this <see cref="Vector2TypeConverter"/> can convert the 
-        /// object to the specified type, using the specified context.
-        /// </summary>
-        /// <param name="context">An <see cref="ITypeDescriptorContext" /> that provides a format context.</param>
-        /// <param name="destinationType"> A <see cref="Type" /> that represents the type you want to convert to.</param>
-        /// <returns>
-        /// <see langword="true"/> if this converter can perform the conversion; 
-        /// otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             if (VectorConversion.CanConvertTo(context, destinationType))
@@ -34,23 +25,7 @@ namespace Microsoft.Xna.Framework.Design
             return base.CanConvertTo(context, destinationType);
         }
 
-        /// <summary>
-        /// Converts the given value object to the specified type, using the 
-        /// specified context and culture information.
-        /// </summary>
-        /// <param name="context">An <see cref="ITypeDescriptorContext" /> that provides a format context.</param>
-        /// <param name="culture">
-        /// A <see cref="CultureInfo"/>. If <see langword="null"/> is passed, the current culture is assumed.
-        /// </param>
-        /// <param name="value">The <see cref="object"/> to convert.</param>
-        /// <param name="destinationType">The <see cref="Type"/> to covert the <paramref name="value"/> to.</param>
-        /// <returns>A <see cref="object"/> that represents the converted value.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the <paramref name="destinationType"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        /// Thrown if the conversion cannot be performed.
-        /// </exception>
+        /// <inheritdoc />
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             var vec = (Vector2)value;
@@ -73,17 +48,7 @@ namespace Microsoft.Xna.Framework.Design
             return base.ConvertTo(context, culture, value, destinationType);
         }
 
-        /// <summary>
-        /// Returns whether this <see cref="Vector2TypeConverter"/> can convert an
-        /// object of the given type to <see cref="Vector2"/>, using the specified
-        /// context.
-        /// </summary>
-        /// <param name="context">A <see cref="ITypeDescriptorContext"/> that provides the format context.</param>
-        /// <param name="sourceType">A <see cref="Type"/> that represents the type you want to convert from.</param>
-        /// <returns>
-        /// <see langword="true"/> if this <see cref="Vector2TypeConverter"/> can
-        /// perform the conversion; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             if (sourceType == typeof(string))
@@ -92,17 +57,7 @@ namespace Microsoft.Xna.Framework.Design
             return base.CanConvertFrom(context, sourceType);
         }
 
-        /// <summary>
-        /// Converts the given object to <see cref="Vector2"/>, using the specified
-        /// context and culture information.
-        /// </summary>
-        /// <param name="context">A <see cref="ITypeDescriptorContext"/> that provides a format context.</param>
-        /// <param name="culture">The <see cref="CultureInfo"/> to use as the current culture.</param>
-        /// <param name="value">The <see cref="object"/> to convert.</param>
-        /// <returns>A <see cref="object"/> that represents the converted value.</returns>
-        /// <exception cref="NotSupportedException">
-        /// Thrown if the conversion cannot be performed.
-        /// </exception>
+        /// <inheritdoc />
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             var sourceType = value.GetType();
