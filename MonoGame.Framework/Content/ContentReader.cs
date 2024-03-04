@@ -119,7 +119,12 @@ namespace Microsoft.Xna.Framework.Content
         /// </returns>
         /// <exception cref="ArgumentNullException">The relative link to the external file read is null or an empty string.</exception>
         /// <exception cref="ObjectDisposedException">
-        /// This was called after the <see cref="ContentManager">ContentReader.ContentManager</see> was disposed.</exception>
+        /// This was called after the <see cref="ContentManager">ContentReader.ContentManager</see> was disposed.
+        ///
+        /// -or
+        ///
+        /// The stream is closed.
+        /// </exception>
         /// <exception cref="ContentLoadException">
         /// The type of asset in the external file does not match the type specified by <typeparamref name="T"/>.
         /// 
@@ -136,6 +141,8 @@ namespace Microsoft.Xna.Framework.Content
         ///
         /// An error occurred while opening the external file.
         /// </exception>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public T ReadExternalReference<T>()
         {
             var externalReference = ReadString();
