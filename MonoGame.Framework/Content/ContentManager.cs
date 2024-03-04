@@ -141,6 +141,22 @@ namespace Microsoft.Xna.Framework.Content
 			Dispose(false);
 		}
 
+        /// <summary>
+        /// Initializes a new instance of the ContentMangaer.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         By default, the ContentMangaer searches for content in the directory where the executable is located.
+        ///     </para>
+        ///     <para>
+        ///         When creating a new ContentManager, if no instance of <see cref="Game"/> is otherwise required by
+        ///         the application, it is often better to create a new class that implements the
+        ///         <see cref="IServiceProvider"/> interface rather than creating an instance of <see cref="Game"/> just
+        ///         to create a new instance of <see cref="GraphicsDeviceManager"/>.
+        ///     </para>
+        /// </remarks>
+        /// <param name="serviceProvider">The service provider that the ContentManager should use to locate services.</param>
+        /// <exception cref="ArgumentNullException">The <paramref name="serviceProvider"/> parameter is null.</exception>
 		public ContentManager(IServiceProvider serviceProvider)
 		{
 			if (serviceProvider == null)
