@@ -518,6 +518,7 @@ namespace Microsoft.Xna.Framework.Content
             get { return loadedAssets; }
         }
 
+        /// <summary />
 		protected virtual void ReloadGraphicsAssets()
         {
             foreach (var asset in LoadedAssets)
