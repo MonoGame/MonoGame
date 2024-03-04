@@ -37,6 +37,9 @@ namespace Microsoft.Xna.Framework.Content
 			this.version = version;
         }
 
+        /// <summary>
+        /// Gets a reference to the <see cref="ContentManager"/> instance that is using this content reader.
+        /// </summary>
         public ContentManager ContentManager
         {
             get
