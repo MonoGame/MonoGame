@@ -650,6 +650,9 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the root directory that this ContentManager will search for assets in.
+        /// </summary>
 		public string RootDirectory
 		{
 			get
