@@ -371,6 +371,7 @@ namespace Microsoft.Xna.Framework.Content
             return result;
 		}
 		
+        /// <summary />
 		protected virtual Stream OpenStream(string assetName)
 		{
 			Stream stream;
