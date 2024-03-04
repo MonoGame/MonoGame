@@ -534,6 +534,7 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+        /// <summary />
         protected virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
         {
 			string assetName = originalAssetName;
