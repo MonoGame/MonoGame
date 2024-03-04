@@ -18,6 +18,11 @@ using Microsoft.Xna.Framework.Media;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// The ContentManager is a run-time component which loads managed objects from .xnb binary files produced by the
+    /// design time MonoGame Content Builder.  It also manages the lifespan of the lifespan of the loaded objects,
+    /// disposing the content manager will also dispose any assets which are themselves <see cref="IDisposable"/>.
+    /// </summary>
 	public partial class ContentManager : IDisposable
 	{
         const byte ContentCompressedLzx = 0x80;
