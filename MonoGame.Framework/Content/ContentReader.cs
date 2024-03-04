@@ -107,6 +107,16 @@ namespace Microsoft.Xna.Framework.Content
                 fixup.Value(sharedResources[fixup.Key]);
         }
 
+        /// <summary>
+        /// Reads a relative link to an external file from the underlying stream and returns an asset of type
+        /// <typeparamref name="T"/> loaded from the external file.
+        /// </summary>
+        /// <typeparam name="T">The type of asset to expected to be loaded from the external file.</typeparam>
+        /// <returns>
+        /// The asset loaded from the external file at the link read from the underlying stream, if the file exists and
+        /// can be loaded as type <typeparamref name="T"/>; otherwise the default value of <typeparamref name="T"/>
+        /// is returned.
+        /// </returns>
         public T ReadExternalReference<T>()
         {
             var externalReference = ReadString();
