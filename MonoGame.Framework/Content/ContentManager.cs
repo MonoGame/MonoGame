@@ -135,6 +135,7 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+        /// <summary />
 		~ContentManager()
 		{
 			Dispose(false);
