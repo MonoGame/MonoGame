@@ -197,7 +197,8 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         /// <summary>
-        /// Reads a single managed object from the underlying stream. Can be called recursively.
+        /// Reads a single managed object from the underlying stream as an instance of the specified type. Can be
+        /// called recursively.
         /// </summary>
         /// <typeparam name="T">The type of object to read.</typeparam>
         /// <returns>The object that was read.</returns>
@@ -211,7 +212,8 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         /// <summary>
-        /// Reads a single managed object from the underlying stream. Can be called recursively.
+        /// Reads a single managed object from the underlying stream as an instance of the specified type. Can be
+        /// called recursively.
         /// </summary>
         /// <typeparam name="T">The type of object to read.</typeparam>
         /// <param name="typeReader">The <see cref="ContentTypeReader"/> to use to read the object.</param>
@@ -228,7 +230,8 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         /// <summary>
-        /// Reads a single managed object from the underlying stream. Can be called recursively.
+        /// Reads a single managed object from the underlying stream as an instance of the specified type. Can be
+        /// called recursively.
         /// </summary>
         /// <typeparam name="T">The type of object to read.</typeparam>
         /// <param name="existingInstance">An existing object to write into.</param>
@@ -260,7 +263,8 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         /// <summary>
-        /// Reads a single managed object from the underlying stream. Can be called recursively.
+        /// Reads a single managed object from the underlying stream as an instance of the specified type. Can be
+        /// called recursively.
         /// </summary>
         /// <typeparam name="T">The type of object to read.</typeparam>
         /// <param name="typeReader">The <see cref="ContentTypeReader"/> to use to read the object.</param>
