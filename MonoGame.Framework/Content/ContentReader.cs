@@ -353,6 +353,17 @@ namespace Microsoft.Xna.Framework.Content
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Reads a single managed object from the current stream as an instance of the specified type.  If you specify
+        /// a base class of the actual object type, this method reads data only from the base type.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <param name="typeReader">The <see cref="ContentTypeReader"/> to use to read the object.</param>
+        /// <param name="existingInstance">An existing object to write into.</param>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public T ReadRawObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
             return (T)typeReader.Read(this, existingInstance);
