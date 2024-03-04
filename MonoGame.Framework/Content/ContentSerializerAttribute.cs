@@ -55,7 +55,8 @@ namespace Microsoft.Xna.Framework.Content
         public bool FlattenContent { get; set; }
 
         /// <summary>
-        /// Returns true if the default CollectionItemName value was overridden.
+        /// Gets a value that indicates whether an explicit <see cref="CollectionItemName"/> is being used or the
+        /// default value.
         /// </summary>
         public bool HasCollectionItemName
         {
