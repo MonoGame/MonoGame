@@ -167,7 +167,10 @@ namespace Microsoft.Xna.Framework.Content
             AddContentManager(this);
 		}
 
-		public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
+        /// <inheritdoc cref="ContentManager.ContentManager(IServiceProvider)"/>
+        /// <param name="serviceProvider" />
+        /// <param name="rootDirectory">The root directory the ContentManager will search for content in.</param>
+        public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
 		{
 			if (serviceProvider == null)
 			{
