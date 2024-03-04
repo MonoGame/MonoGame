@@ -672,7 +672,10 @@ namespace Microsoft.Xna.Framework.Content
                 return Path.Combine(TitleContainer.Location, RootDirectory);
             }
         }
-		
+
+        /// <summary>
+        /// Gets the service provider instance used by this ContentManager.
+        /// </summary>
 		public IServiceProvider ServiceProvider
 		{
 			get
