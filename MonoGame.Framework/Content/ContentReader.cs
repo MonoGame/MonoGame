@@ -47,7 +47,10 @@ namespace Microsoft.Xna.Framework.Content
                 return contentManager;
             }
         }
-        
+
+        /// <summary>
+        /// Gets the name of the asset currently being read by this content reader.
+        /// </summary>
         public string AssetName
         {
             get
