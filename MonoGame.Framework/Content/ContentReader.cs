@@ -9,6 +9,10 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// Defines a worker object that implements most of <see cref="ContentManager.Load{T}(string)">ContentManger.Load</see>.
+    /// A new content reader is constructed for each asset loaded.
+    /// </summary>
     public sealed class ContentReader : BinaryReader
     {
         private ContentManager contentManager;
