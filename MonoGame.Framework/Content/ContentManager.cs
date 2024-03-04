@@ -562,7 +562,7 @@ namespace Microsoft.Xna.Framework.Content
         /// </summary>
         /// <remarks>
         /// If an asset being unloaded implements the <see cref="IDisposable"/> interface, then the
-        /// <see cref="IDisposable.Dispose"> IDisposable.Dispose</see> method will be called before unloading.
+        /// <see cref="IDisposable.Dispose">IDisposable.Dispose</see> method will be called before unloading.
         /// </remarks>
 		public virtual void Unload()
 		{
