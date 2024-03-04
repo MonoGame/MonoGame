@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Content
         public bool AllowNull { get; set; }
 
         /// <summary>
-        /// Returns the overridden XML element name or the default "Item".
+        /// Gets or Sets the XML element name for each item in a collection (default is "Item"). 
         /// </summary>
         public string CollectionItemName
         {
