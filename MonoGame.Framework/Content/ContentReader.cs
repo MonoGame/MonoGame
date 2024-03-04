@@ -196,6 +196,15 @@ namespace Microsoft.Xna.Framework.Content
                 contentManager.RecordDisposable(disposable);
         }
 
+        /// <summary>
+        /// Reads a single managed object from the underlying stream. Can be called recursively.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
+        /// <exception cref="FormatException">The stream is corrupted.</exception>
+        /// <exception cref="ContentLoadException">Type reader index read from stream is out of bounds</exception>
         public T ReadObject<T>()
         {
             return InnerReadObject(default(T));
