@@ -43,6 +43,9 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the XML element name (default is the name of the managed type member).
+        /// </summary>
         public string ElementName { get; set; }
 
         public bool FlattenContent { get; set; }
