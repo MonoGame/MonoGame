@@ -19,6 +19,9 @@ namespace Microsoft.Xna.Framework.Content
             AllowNull = true;
         }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates whether this member can have a null value (default is true).
+        /// </summary>
         public bool AllowNull { get; set; }
 
         /// <summary>
