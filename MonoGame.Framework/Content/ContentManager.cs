@@ -185,6 +185,7 @@ namespace Microsoft.Xna.Framework.Content
             AddContentManager(this);
 		}
 
+        /// <inheritdoc />
 		public void Dispose()
 		{
 			Dispose(true);
