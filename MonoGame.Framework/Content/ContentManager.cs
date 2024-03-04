@@ -415,6 +415,7 @@ namespace Microsoft.Xna.Framework.Content
 			return stream;
 		}
 
+        /// <summary />
 		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
 		{
 			if (string.IsNullOrEmpty(assetName))
