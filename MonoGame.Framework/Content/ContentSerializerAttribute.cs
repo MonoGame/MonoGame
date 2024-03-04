@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content
         private string _collectionItemName;
 
         /// <summary>
-        /// Creates an instance of the attribute.
+        /// Initializes a new instance of the content serializer attribute.
         /// </summary>
         public ContentSerializerAttribute()
         {
