@@ -48,6 +48,10 @@ namespace Microsoft.Xna.Framework.Content
         /// </summary>
         public string ElementName { get; set; }
 
+        /// <summary>
+        /// Gets or Sets a value indicating whether to write member contents directly into the current XML context
+        /// rather than wrapping the member in a new XML element (default is false).
+        /// </summary>
         public bool FlattenContent { get; set; }
 
         /// <summary>
