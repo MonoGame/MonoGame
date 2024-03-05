@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Content
 			return Read(input, (T)existingInstance);
         }
 
-        /// <inheritdoc />
+        /// <summary />
         protected internal abstract T Read(ContentReader input, T existingInstance);
     }
 }
