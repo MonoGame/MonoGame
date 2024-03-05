@@ -36,6 +36,7 @@ namespace Microsoft.Xna.Framework.Content
             get { return 0; }   // The default version (unless overridden) is zero
         }
 
+        /// <summary />
         protected ContentTypeReader(Type targetType)
         {
             _targetType = targetType;
