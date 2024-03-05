@@ -48,6 +48,7 @@ namespace Microsoft.Xna.Framework.Content
             // Do nothing. Are we supposed to add ourselves to the manager?
         }
 
+        /// <summary />
         protected internal abstract object Read(ContentReader input, object existingInstance);
     }
 
