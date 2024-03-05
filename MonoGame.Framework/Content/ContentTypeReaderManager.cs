@@ -11,6 +11,9 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// Defines a manager that constructs and keeps track of <see cref="ContentTypeReader"/> objects.
+    /// </summary>
     public sealed class ContentTypeReaderManager
     {
         private static readonly object _locker;
