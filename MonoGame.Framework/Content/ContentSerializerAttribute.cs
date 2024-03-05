@@ -5,7 +5,11 @@
 using System;
 
 namespace Microsoft.Xna.Framework.Content
-{	
+{
+    /// <summary>
+    /// Defines a custom <see cref="Attribute"/> that marks a field or property to control how it is serialized or to
+    /// indicate that protected or private data should be included in serialization.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public sealed class ContentSerializerAttribute : Attribute
     {
