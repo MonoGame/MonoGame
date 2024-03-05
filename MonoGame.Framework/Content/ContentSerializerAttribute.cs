@@ -72,6 +72,10 @@ namespace Microsoft.Xna.Framework.Content
         /// </summary>
         public bool Optional { get; set; }
 
+        /// <summary>
+        /// Gets or Sets a value indicating whether this member is reference from multiple parents and should be
+        /// serialized as a unique ID reference (default is false).
+        /// </summary>
         public bool SharedResource { get; set; }
 
         public ContentSerializerAttribute Clone()
