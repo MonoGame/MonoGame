@@ -203,17 +203,13 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         /// <summary>
-        /// Removes Version, Culture and PublicKeyToken from a type string.
+        /// Removes the Version, Culture, and PublicKeyToken from a fully-qualified type name string.
         /// </summary>
         /// <remarks>
         /// Supports multiple generic types (e.g. Dictionary&lt;TKey,TValue&gt;) and nested generic types (e.g. List&lt;List&lt;int&gt;&gt;).
         /// </remarks>
-        /// <param name="type">
-        /// A <see cref="System.String"/>
-        /// </param>
-        /// <returns>
-        /// A <see cref="System.String"/>
-        /// </returns>
+        /// <param name="type">A string containing the fully-qualified type name to prepare.</param>
+        /// <returns>A new string with the Version, Culture and PublicKeyToken removed.</returns>
         public static string PrepareType(string type)
         {
             //Needed to support nested types
