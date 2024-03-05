@@ -78,6 +78,10 @@ namespace Microsoft.Xna.Framework.Content
         /// </summary>
         public bool SharedResource { get; set; }
 
+        /// <summary>
+        /// Creates a copy of this content serializer attribute.
+        /// </summary>
+        /// <returns>The copy of this content serializer attribute.</returns>
         public ContentSerializerAttribute Clone()
         {
             var clone = new ContentSerializerAttribute ();
