@@ -54,6 +54,7 @@ namespace Microsoft.Xna.Framework.Content
 
     public abstract class ContentTypeReader<T> : ContentTypeReader
     {
+        /// <summary />
         protected ContentTypeReader()
             : base(typeof(T))
         {
