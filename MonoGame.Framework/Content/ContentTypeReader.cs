@@ -7,6 +7,10 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// Defines the core behavior of content type readers used for reading a specific managed type from an .xnb binary
+    /// format and provides a base for derived classes.
+    /// </summary>
     public abstract class ContentTypeReader
     {
         private Type _targetType;
