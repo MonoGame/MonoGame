@@ -30,6 +30,11 @@ namespace Microsoft.Xna.Framework.Content
             _assemblyName = ReflectionHelpers.GetAssembly(typeof(ContentTypeReaderManager)).FullName;
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="ContentReader"/> class initialized for the specified type.
+        /// </summary>
+        /// <param name="targetType">The type the <see cref="ContentReader"/> will handle.</param>
+        /// <returns>The <see cref="ContentReader"/> created by this method.</returns>
         public ContentTypeReader GetTypeReader(Type targetType)
         {
             if (targetType.IsArray && targetType.GetArrayRank() > 1)
