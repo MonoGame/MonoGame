@@ -20,6 +20,9 @@ namespace Microsoft.Xna.Framework.Content
             get { return false; }
         }
 
+        /// <summary>
+        /// Gets the type handled by this reader component.
+        /// </summary>
         public Type TargetType
         {
             get { return _targetType; }
