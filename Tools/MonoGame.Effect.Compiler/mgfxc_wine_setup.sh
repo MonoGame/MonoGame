@@ -15,6 +15,16 @@ then
     exit 1
 fi
 
+# wine 8 minimum needed for dotnet8
+# see https://github.com/MonoGame/MonoGame/issues/8103
+# wine --version will output 'wine-#.# (Ubuntu #.#.#)'
+# grep to find only the 'wine-#' then use sed to remove the 'wine-' prefix
+WINE_VERSION=$(wine --version 2>&1 | grep -oP 'wine-\d+' | sed 's/wine-//')
+if (( $WINE_VERSION < 8 )); then
+    echo "Wine version $WINE_VERSION is below the minimum required version (8.0)."
+    exit 1
+fi
+
 # init wine stuff
 export WINEARCH=win64
 export WINEPREFIX=$HOME/.winemonogame
