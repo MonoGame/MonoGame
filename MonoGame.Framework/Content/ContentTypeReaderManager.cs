@@ -243,14 +243,12 @@ namespace Microsoft.Xna.Framework.Content
         private static Dictionary<string, Func<ContentTypeReader>> typeCreators = new Dictionary<string, Func<ContentTypeReader>>();
 
         /// <summary>
-        /// Adds the type creator.
+        /// Registers a function to create a <see cref="ContentTypeReader"/> instance used to read an object of the
+        /// type specified.
         /// </summary>
-        /// <param name='typeString'>
-        /// Type string.
-        /// </param>
-        /// <param name='createFunction'>
-        /// Create function.
-        /// </param>
+        /// <param name='typeString'>A string containing the fully-qualified type name of the object type.</param>
+        /// <param name='createFunction'>The function responsible for creating an instance of the <see cref="ContentTypeReader"/> class.</param>
+        /// <exception cref="ArgumentNullException">If the <paramref name="typeString"/> parameter is null or an empty string.</exception>
         public static void AddTypeCreator(string typeString, Func<ContentTypeReader> createFunction)
         {
             if (!typeCreators.ContainsKey(typeString))
