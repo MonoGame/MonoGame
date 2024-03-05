@@ -255,6 +255,9 @@ namespace Microsoft.Xna.Framework.Content
                 typeCreators.Add(typeString, createFunction);
         }
 
+        /// <summary>
+        /// Clears all content type creators that were registered with <see cref="AddTypeCreator(string, Func{ContentTypeReader})"/>
+        /// </summary>
         public static void ClearTypeCreators()
         {
             typeCreators.Clear();
