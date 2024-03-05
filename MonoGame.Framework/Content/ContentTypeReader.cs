@@ -42,6 +42,7 @@ namespace Microsoft.Xna.Framework.Content
             _targetType = targetType;
         }
 
+        /// <summary />
         protected internal virtual void Initialize(ContentTypeReaderManager manager)
         {
             // Do nothing. Are we supposed to add ourselves to the manager?
