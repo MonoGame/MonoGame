@@ -11,6 +11,10 @@ namespace Microsoft.Xna.Framework.Content
     {
         private Type _targetType;
 
+        /// <summary>
+        /// Gets a value that indicates whether this content type read can deserialize into an object with the same
+        /// type ad defined in the <see cref="TargetType"/> property.
+        /// </summary>
         public virtual bool CanDeserializeIntoExistingObject
         {
             get { return false; }
