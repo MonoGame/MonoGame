@@ -28,6 +28,9 @@ namespace Microsoft.Xna.Framework.Content
             get { return _targetType; }
         }
 
+        /// <summary>
+        /// Gets the format version number for this type.
+        /// </summary>
         public virtual int TypeVersion
         {
             get { return 0; }   // The default version (unless overridden) is zero
