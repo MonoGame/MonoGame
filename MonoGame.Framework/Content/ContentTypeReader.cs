@@ -61,6 +61,7 @@ namespace Microsoft.Xna.Framework.Content
             // Nothing
         }
 
+        /// <inheritdoc />
         protected internal override object Read(ContentReader input, object existingInstance)
         {
 			// as per the documentation http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.content.contenttypereader.read.aspx
