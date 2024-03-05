@@ -34,7 +34,11 @@ namespace Microsoft.Xna.Framework.Content
         /// Creates a new instance of the <see cref="ContentReader"/> class initialized for the specified type.
         /// </summary>
         /// <param name="targetType">The type the <see cref="ContentReader"/> will handle.</param>
-        /// <returns>The <see cref="ContentReader"/> created by this method.</returns>
+        /// <returns>
+        /// The <see cref="ContentReader"/> created by this method if a content reader of the specified type has been
+        /// registered with this content manager; otherwise, null.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If the <paramref name="targetType"/> parameter is null.</exception>
         public ContentTypeReader GetTypeReader(Type targetType)
         {
             if (targetType.IsArray && targetType.GetArrayRank() > 1)
