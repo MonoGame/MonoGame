@@ -33,7 +33,7 @@ Here are a few simple rules and suggestions to remember when contributing to Mon
 * **DO NOT** reorder type members as it makes it difficult to compare code changes in a PR.
 * **DO** try to follow our [coding style](CODESTYLE.md) for new code.
 * **DO** give priority to the existing style of the file you're changing.
-* **DO** try to add to our [unit tests](Test) when adding new features or fixing bugs.
+* **DO** try to add to our [unit tests](Tests) when adding new features or fixing bugs.
 * **DO NOT** send PRs for code style changes or make code changes just for the sake of style.
 * **PLEASE** keep a civil and respectful tone when discussing and reviewing contributions.
 * **PLEASE** tell others about MonoGame and your contributions via social media.
@@ -46,9 +46,9 @@ We prohibit the use of tools like dotPeek, ILSpy, JustDecompiler, or .NET Reflec
 There has been confusion on this point in the past, so we want to make this clear.  It is **NEVER ACCEPTABLE** to decompile copyrighted assemblies and submit that code to the MonoGame project.
 
 * It **DOES NOT** matter how much you change the code.
-* It **DOES NOT** matter what country you live in or what your local laws say.  
-* It **DOES NOT** matter that XNA is discontinued.  
-* It **DOES NOT** matter how small the bit of code you have stolen is.  
+* It **DOES NOT** matter what country you live in or what your local laws say.
+* It **DOES NOT** matter that XNA is discontinued.
+* It **DOES NOT** matter how small the bit of code you have stolen is.
 * It **DOES NOT** matter what your opinion of stealing code is.
 
 If you did not write the code, you do not have ownership of the code and you shouldn't submit it to MonoGame.
