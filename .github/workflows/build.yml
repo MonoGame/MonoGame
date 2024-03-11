@@ -46,10 +46,8 @@ jobs:
               fi
         shell: bash
 
-      - name: Run build.cake
-        run: dotnet cake build.cake
-        env:
-          GITHUB_ACTIONS: true
+      - name: Run MonoGame.Framework.Build
+        run: dotnet run --project build/MonoGame.Framework.Build.csproj -- --target=Default
 
       - name: Package nuget artifacts
         uses: actions/upload-artifact@main
