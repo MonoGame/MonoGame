@@ -49,5 +49,11 @@ jobs:
       - name: Run MonoGame.Framework.Build
         run: dotnet run --project build/MonoGame.Framework.Build.csproj -- --target=Default
 
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
+
       - name: Upload Artifacts
         run: dotnet run --project build/MonoGame.Framework.Build.csproj -- --target=UploadArtifacts
+        env:
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
+          ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
