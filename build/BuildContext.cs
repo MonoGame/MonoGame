@@ -45,7 +45,7 @@ public class BuildContext : FrostingContext
     public BuildContext(ICakeContext context) : base(context)
     {
         BuildConfiguration = context.Argument<string>("build-configuration", "Release");
-        ArtifactsDirectory = context.Argument<string>("artifacts-directory", "Artifacts");
+        ArtifactsDirectory = context.Argument<string>("artifacts-directory", "artifacts");
 
         NuGetsDirectory = $"{ArtifactsDirectory}/NuGet";
 
