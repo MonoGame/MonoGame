@@ -19,7 +19,7 @@ We use [GitHub Actions](https://github.com/MonoGame/MonoGame/actions) to automat
 
 | Name | Status |
 |:---- | ------ |
-| Builds | [![Build](https://github.com/MonoGame/MonoGame/actions/workflows/main.yml/badge.svg?branch=develop)](https://github.com/MonoGame/MonoGame/actions/workflows/main.yml) |
+| Builds | [![Build](https://github.com/MonoGame/MonoGame/actions/workflows/build-and-deploy.yml/badge.svg?branch=develop)](https://github.com/MonoGame/MonoGame/actions/workflows/build-and-deploy.yml) |
 
 ## Supported Platforms
 
