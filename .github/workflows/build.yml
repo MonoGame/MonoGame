@@ -49,19 +49,5 @@ jobs:
       - name: Run MonoGame.Framework.Build
         run: dotnet run --project build/MonoGame.Framework.Build.csproj -- --target=Default
 
-      - name: Package nuget artifacts
-        uses: actions/upload-artifact@main
-        with:
-          name: nuget-${{ matrix.os }}
-          path: |
-            Artifacts/NuGet/*.nupkg
-          if-no-files-found: error
-
-      - name: Package Visual Studio extension artifact
-        if: runner.os == 'Windows'
-        uses: actions/upload-artifact@main
-        with:
-          name: Visual Studio Extension
-          path: |
-            Artifacts/MonoGame.Templates.VSExtension/*.vsix
-          if-no-files-found: error
+      - name: Upload Artifacts
+        run: dotnet run --project build/MonoGame.Framework.Build.csproj -- --target=UploadArtifacts
