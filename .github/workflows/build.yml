@@ -14,24 +14,30 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
+
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
           java-version: '11'
+
       - name: Disable annotations
         run: echo "::remove-matcher owner=csc::"
+
       - name: Restore dotnet tools
         run: dotnet tool restore
+
       - name: Install required workloads
         run:   |
               if [ "$RUNNER_OS" == "Linux" ]; then
@@ -42,10 +48,12 @@ jobs:
                     dotnet workload install android ios macos
               fi
         shell: bash
+
       - name: Run build.cake
         run: dotnet cake build.cake
         env:
           GITHUB_ACTIONS: true
+
       - name: Package nuget artifacts
         uses: actions/upload-artifact@main
         with:
@@ -53,6 +61,7 @@ jobs:
           path: |
             Artifacts/NuGet/*.nupkg
           if-no-files-found: error
+
       - name: Package Visual Studio extension artifact
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@main
@@ -61,6 +70,7 @@ jobs:
           path: |
             Artifacts/MonoGame.Templates.VSExtension/*.vsix
           if-no-files-found: error
+
   deploy:
     name: deploy
     runs-on: ubuntu-latest
