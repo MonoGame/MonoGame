@@ -5,7 +5,16 @@
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Common.Build.GitHubActions.Data;
+using Cake.Common.Tools.DotNet;
+using Cake.Common.Tools.DotNet.Build;
+using Cake.Common.Tools.DotNet.MSBuild;
+using Cake.Common.Tools.DotNet.Pack;
+using Cake.Common.Tools.DotNet.Publish;
+using Cake.Common.Tools.DotNet.Restore;
+using Cake.Common.Tools.DotNet.Test;
+using Cake.Common.Tools.MSBuild;
 using Cake.Core;
+using Cake.Core.Diagnostics;
 using Cake.Frosting;
 using System;
 
@@ -20,6 +29,14 @@ public class BuildContext : FrostingContext
     public string BuildConfiguration { get; }
     public string ArtifactsDirectory { get; }
     public string NuGetsDirectory { get; }
+    public DotNetBuildSettings DotNetBuildSettings { get; }
+    public DotNetMSBuildSettings DotNetMSBuildSettings { get; }
+    public DotNetPackSettings DotNetPackSettings { get; }
+    public DotNetPublishSettings DotNetPublishSettings { get; }
+    public DotNetRestoreSettings DotNetRestoreSettings { get; }
+    public MSBuildSettings MSBuildSettings { get; }
+    public MSBuildSettings MSPackSettings { get; }
+    public DotNetTestSettings DotNetTestSettings { get; }
 
     public BuildContext(ICakeContext context) : base(context)
     {
@@ -63,5 +80,54 @@ public class BuildContext : FrostingContext
 
             RepositoryUrl = context.EnvironmentVariable("repository-url", "https://github.com/MonoGame/MonoGame");
         }
+
+        DotNetMSBuildSettings = new DotNetMSBuildSettings();
+        DotNetMSBuildSettings.WithProperty(nameof(Version), Version);
+        DotNetMSBuildSettings.WithProperty(nameof(RepositoryUrl), RepositoryUrl);
+
+        DotNetBuildSettings = new DotNetBuildSettings();
+        DotNetBuildSettings.MSBuildSettings = DotNetMSBuildSettings;
+        DotNetBuildSettings.Verbosity = DotNetVerbosity.Minimal;
+        DotNetBuildSettings.Configuration = BuildConfiguration;
+
+        DotNetPackSettings = new DotNetPackSettings();
+        DotNetPackSettings.MSBuildSettings = DotNetMSBuildSettings;
+        DotNetPackSettings.Verbosity = DotNetVerbosity.Minimal;
+        DotNetPackSettings.OutputDirectory = NuGetsDirectory;
+        DotNetPackSettings.Configuration = BuildConfiguration;
+
+        DotNetRestoreSettings = new DotNetRestoreSettings();
+        DotNetRestoreSettings.MSBuildSettings = DotNetMSBuildSettings;
+        DotNetRestoreSettings.Verbosity = DotNetVerbosity.Minimal;
+
+        MSBuildSettings = new MSBuildSettings();
+        MSBuildSettings.Verbosity = Verbosity.Minimal;
+        MSBuildSettings.Configuration = BuildConfiguration;
+        MSBuildSettings.WithProperty(nameof(Version), Version);
+        MSBuildSettings.WithProperty(nameof(RepositoryUrl), RepositoryUrl);
+
+        MSPackSettings = new MSBuildSettings();
+        MSPackSettings.Verbosity = Verbosity.Minimal;
+        MSPackSettings.Configuration = BuildConfiguration;
+        MSPackSettings.Restore = true;
+        MSPackSettings.WithProperty(nameof(Version), Version);
+        MSPackSettings.WithProperty(nameof(RepositoryUrl), RepositoryUrl);
+        MSPackSettings.WithProperty("OutputDirectory", NuGetsDirectory);
+        MSPackSettings.WithTarget("Pack");
+
+        DotNetPublishSettings = new DotNetPublishSettings();
+        DotNetPublishSettings.MSBuildSettings = DotNetMSBuildSettings;
+        DotNetPublishSettings.Verbosity = DotNetVerbosity.Minimal;
+        DotNetPublishSettings.Configuration = BuildConfiguration;
+        DotNetPublishSettings.SelfContained = false;
+
+        DotNetTestSettings = new DotNetTestSettings();
+        DotNetTestSettings.MSBuildSettings = DotNetMSBuildSettings;
+        DotNetTestSettings.Verbosity = DotNetVerbosity.Minimal;
+        DotNetTestSettings.Configuration = BuildConfiguration;
+
+        Console.WriteLine($"Version: {Version}");
+        Console.WriteLine($"RepositoryUrl: {RepositoryUrl}");
+        Console.WriteLine($"BuildConfiguration: {BuildConfiguration}");
     }
 }
