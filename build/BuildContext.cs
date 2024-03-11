@@ -137,7 +137,7 @@ public class BuildContext : FrostingContext
 
     public bool GetMSBuildWith(string requires)
     {
-        if (this.IsRunningOnWindows())
+        if (!this.IsRunningOnWindows())
         {
             return false;
         }
