@@ -5,6 +5,7 @@
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Common.Build.GitHubActions.Data;
+using Cake.Common.IO;
 using Cake.Common.Tools.DotNet;
 using Cake.Common.Tools.DotNet.Build;
 using Cake.Common.Tools.DotNet.MSBuild;
@@ -13,8 +14,11 @@ using Cake.Common.Tools.DotNet.Publish;
 using Cake.Common.Tools.DotNet.Restore;
 using Cake.Common.Tools.DotNet.Test;
 using Cake.Common.Tools.MSBuild;
+using Cake.Common.Tools.VSWhere;
+using Cake.Common.Tools.VSWhere.Latest;
 using Cake.Core;
 using Cake.Core.Diagnostics;
+using Cake.Core.IO;
 using Cake.Frosting;
 using System;
 
@@ -129,5 +133,22 @@ public class BuildContext : FrostingContext
         Console.WriteLine($"Version: {Version}");
         Console.WriteLine($"RepositoryUrl: {RepositoryUrl}");
         Console.WriteLine($"BuildConfiguration: {BuildConfiguration}");
+    }
+
+    public bool GetMSBuildWith(string requires)
+    {
+        if (this.IsRunningOnWindows())
+        {
+            return false;
+        }
+
+        DirectoryPath vsLatest = this.VSWhereLatest(new VSWhereLatestSettings() { Requires = requires });
+        if (vsLatest == null)
+        {
+            return false;
+        }
+
+        FilePathCollection files = this.GetFiles(vsLatest.FullPath + "/**/MSBuild.exe");
+        return files.Count > 0;
     }
 }
