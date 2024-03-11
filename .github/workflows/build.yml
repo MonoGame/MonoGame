@@ -35,9 +35,6 @@ jobs:
       - name: Disable annotations
         run: echo "::remove-matcher owner=csc::"
 
-      - name: Restore dotnet tools
-        run: dotnet tool restore
-
       - name: Install required workloads
         run:   |
               if [ "$RUNNER_OS" == "Linux" ]; then
