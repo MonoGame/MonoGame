@@ -150,6 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return (this.width.GetHashCode() ^ this.height.GetHashCode() ^ this.format.GetHashCode());
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "{Width:" + this.width + " Height:" + this.height + " Format:" + this.Format + " AspectRatio:" + this.AspectRatio + "}";
