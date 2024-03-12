@@ -17,8 +17,14 @@ namespace MonoGame.Content.Builder
         [CommandLineParameter(
             Name = "launchdebugger",
             Flag = "d",
-            Description = "Wait for debugger to attach before building content.")]
+            Description = "Launch the debugger before building content.")]
         public bool LaunchDebugger = false;
+
+        [CommandLineParameter(
+            Name = "waitfordebugger",
+            Flag = "w",
+            Description = "Wait for debugger to attach before building content.")]
+        public bool WaitForDebuggerToAttach = false;
 
         [CommandLineParameter(
             Name = "quiet",
