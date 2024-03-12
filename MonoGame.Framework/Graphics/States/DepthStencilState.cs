@@ -83,6 +83,19 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the stencil operation to perform if the stencil test passes and the depth-buffer test fails
+        /// for a counterclockwise triangle.
+        /// The default value is <see cref="StencilOperation.Keep">StencilOperation.Keep</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public StencilOperation CounterClockwiseStencilDepthBufferFail
         {
             get { return _counterClockwiseStencilDepthBufferFail; }
