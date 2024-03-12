@@ -1,20 +1,12 @@
-﻿using Cake.Common;
-using Cake.Common.Tools.DotNet;
-using Cake.Common.Tools.MSBuild;
-using Cake.FileHelpers;
-using Cake.Frosting;
 using System.Text.RegularExpressions;
 
-namespace MonoGame.Framework.Build.Tasks.PackTasks;
+namespace BuildScripts;
 
-[TaskName("PackVSTemplates")]
-[IsDependentOn(typeof(PackDotNetTemplatesTask))]
-public sealed class PackVSTemplatesTask : FrostingTask<BuildContext>
+[TaskName("Build Visual Studio templates")]
+[IsDependentOn(typeof(BuildDotNetTemplatesTask))]
+public sealed class BuildVSTemplatesTask : FrostingTask<BuildContext>
 {
-    public override bool ShouldRun(BuildContext context)
-    {
-        return context.IsRunningOnWindows();
-    }
+    public override bool ShouldRun(BuildContext context) => context.IsRunningOnWindows();
 
     public override void Run(BuildContext context)
     {
@@ -29,7 +21,8 @@ public sealed class PackVSTemplatesTask : FrostingTask<BuildContext>
         filePath = "Templates/MonoGame.Templates.VSExtension/Templates.pkgdef";
         context.ReplaceRegexInFiles(filePath, versionRegEx, shortVersion, RegexOptions.Singleline);
 
-        context.DotNetRestore(ProjectPaths.MonoGameTemplatesVSExtension);
-        context.MSBuild(ProjectPaths.MonoGameTemplatesVSExtension, context.MSBuildSettings);
+        var vsTemplatesProject = context.GetProjectPath(ProjectType.Templates, "MonoGame.Templates.VSExtension");
+        context.DotNetRestore(vsTemplatesProject);
+        context.MSBuild(vsTemplatesProject, context.MSBuildSettings);
     }
 }
