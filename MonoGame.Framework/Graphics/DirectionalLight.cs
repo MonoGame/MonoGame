@@ -77,7 +77,10 @@ namespace Microsoft.Xna.Framework.Graphics
 					directionParameter.SetValue (direction);
 			}
 		}
-		
+
+        /// <summary>
+        /// Gets or Sets the specular color of the light.
+        /// </summary>
 		public Vector3 SpecularColor {
 			get {
 				return specularColor;
