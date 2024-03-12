@@ -228,6 +228,16 @@ namespace MonoGame.Tools.Pipeline
             return dialog.Show(this);
         }
 
+        public AskResult ShowReloadProjectDialog()
+        {
+            var result = MessageBox.Show(this, "The project file has been updated outside of the editor, do you want to reload the project? (Any unsaved changes will be lost)", "Reload Project", MessageBoxButtons.YesNo, MessageBoxType.Question);
+
+            if (result == DialogResult.Yes)
+                return AskResult.Yes;
+
+            return AskResult.No;
+        }
+
         public bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname)
         {
             var dialog = new EditDialog(title, text, oldname, file);
