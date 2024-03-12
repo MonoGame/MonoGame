@@ -381,6 +381,7 @@ namespace Microsoft.Xna.Framework.Audio
             GC.SuppressFinalize(this);
         }
 
+        /// <summary/>
         ~AudioEngine()
         {
             Dispose(false);
