@@ -11,6 +11,9 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// Defines a manager that constructs and keeps track of <see cref="ContentTypeReader"/> objects.
+    /// </summary>
     public sealed class ContentTypeReaderManager
     {
         private static readonly object _locker;
@@ -30,6 +33,15 @@ namespace Microsoft.Xna.Framework.Content
             _assemblyName = ReflectionHelpers.GetAssembly(typeof(ContentTypeReaderManager)).FullName;
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="ContentReader"/> class initialized for the specified type.
+        /// </summary>
+        /// <param name="targetType">The type the <see cref="ContentReader"/> will handle.</param>
+        /// <returns>
+        /// The <see cref="ContentReader"/> created by this method if a content reader of the specified type has been
+        /// registered with this content manager; otherwise, null.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If the <paramref name="targetType"/> parameter is null.</exception>
         public ContentTypeReader GetTypeReader(Type targetType)
         {
             if (targetType.IsArray && targetType.GetArrayRank() > 1)
@@ -194,17 +206,13 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         /// <summary>
-        /// Removes Version, Culture and PublicKeyToken from a type string.
+        /// Removes the Version, Culture, and PublicKeyToken from a fully-qualified type name string.
         /// </summary>
         /// <remarks>
         /// Supports multiple generic types (e.g. Dictionary&lt;TKey,TValue&gt;) and nested generic types (e.g. List&lt;List&lt;int&gt;&gt;).
         /// </remarks>
-        /// <param name="type">
-        /// A <see cref="System.String"/>
-        /// </param>
-        /// <returns>
-        /// A <see cref="System.String"/>
-        /// </returns>
+        /// <param name="type">A string containing the fully-qualified type name to prepare.</param>
+        /// <returns>A new string with the Version, Culture and PublicKeyToken removed.</returns>
         public static string PrepareType(string type)
         {
             //Needed to support nested types
@@ -238,20 +246,21 @@ namespace Microsoft.Xna.Framework.Content
         private static Dictionary<string, Func<ContentTypeReader>> typeCreators = new Dictionary<string, Func<ContentTypeReader>>();
 
         /// <summary>
-        /// Adds the type creator.
+        /// Registers a function to create a <see cref="ContentTypeReader"/> instance used to read an object of the
+        /// type specified.
         /// </summary>
-        /// <param name='typeString'>
-        /// Type string.
-        /// </param>
-        /// <param name='createFunction'>
-        /// Create function.
-        /// </param>
+        /// <param name='typeString'>A string containing the fully-qualified type name of the object type.</param>
+        /// <param name='createFunction'>The function responsible for creating an instance of the <see cref="ContentTypeReader"/> class.</param>
+        /// <exception cref="ArgumentNullException">If the <paramref name="typeString"/> parameter is null or an empty string.</exception>
         public static void AddTypeCreator(string typeString, Func<ContentTypeReader> createFunction)
         {
             if (!typeCreators.ContainsKey(typeString))
                 typeCreators.Add(typeString, createFunction);
         }
 
+        /// <summary>
+        /// Clears all content type creators that were registered with <see cref="AddTypeCreator(string, Func{ContentTypeReader})"/>
+        /// </summary>
         public static void ClearTypeCreators()
         {
             typeCreators.Clear();
