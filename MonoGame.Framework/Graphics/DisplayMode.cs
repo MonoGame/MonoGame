@@ -54,6 +54,9 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return (float)width / (float)height; }
         }
 
+        /// <summary>
+        /// Gets a value indicating the surface format of the display mode.
+        /// </summary>
         public SurfaceFormat Format {
             get { return format; }
         }
