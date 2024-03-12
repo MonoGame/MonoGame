@@ -91,6 +91,10 @@ namespace Microsoft.Xna.Framework.Graphics
 					specularColorParameter.SetValue (specularColor);
 			}
 		}
+
+        /// <summary>
+        /// Gets or Sets a value indicating whether light is enabled.
+        /// </summary>
 		public bool Enabled 
 		{
 			get { return enabled; }
