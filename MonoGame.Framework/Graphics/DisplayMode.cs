@@ -77,7 +77,10 @@ namespace Microsoft.Xna.Framework.Graphics
         public int Width {
             get { return this.width; }
         }
-        
+
+        /// <summary>
+        /// Gets the bounds of the display that is guaranteed to be visible by the users screen.
+        /// </summary>
         public Rectangle TitleSafeArea {
             get { return GraphicsDevice.GetTitleSafeArea(0, 0, width, height); }
         }
