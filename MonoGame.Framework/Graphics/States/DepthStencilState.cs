@@ -490,6 +490,18 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </code>
         /// </remarks>
         public static readonly DepthStencilState Default;
+
+        /// <summary>
+        /// A built-int state object with settings for enabling a read-only depth stencil buffer.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        ///
+        /// <code>
+        /// DepthBufferEnable = true,
+        /// DepthBufferWriteEnable = false
+        /// </code>
+        /// </remarks>
         public static readonly DepthStencilState DepthRead;
         public static readonly DepthStencilState None;
 
