@@ -138,6 +138,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Public Methods
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj is DisplayMode && this == (DisplayMode)obj;
