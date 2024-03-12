@@ -6,6 +6,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Contains blend state for the device.
+    /// </summary>
 	public partial class BlendState : GraphicsResource
 	{
         private readonly TargetBlendState[] _targetBlendState;
@@ -45,6 +48,13 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _targetBlendState[index]; }
         }
 
+        /// <summary>
+        /// Gets or sets the arithmetic operation when blending alpha values.
+        /// The default is <see cref="BlendFunction.Add"/>.
+        /// </summary>
+        /// <value>
+        /// A value from the <see cref="BlendFunction"/> enumeration.
+        /// </value>
 	    public BlendFunction AlphaBlendFunction
 	    {
 	        get { return _targetBlendState[0].AlphaBlendFunction; }
@@ -55,6 +65,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 	    }
 
+        /// <summary>
+        /// Gets or sets the blend factor for the destination alpha, which is the
+        /// percentage of the destination alpha included in the blended result.
+        /// The default is <see cref="Blend.One"/>.
+        /// </summary>
+        /// <value>
+        /// A value from the <see cref="Blend"/> enumeration.
+        /// </value>
 		public Blend AlphaDestinationBlend
         {
             get { return _targetBlendState[0].AlphaDestinationBlend; }
@@ -65,6 +83,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets the alpha blend factor.
+        /// The default is <see cref="Blend.One"/>.
+        /// </summary>
+        /// <value>
+        /// A value from the <see cref="Blend"/> enumeration.
+        /// </value>
 		public Blend AlphaSourceBlend
         {
             get { return _targetBlendState[0].AlphaSourceBlend; }
@@ -75,6 +100,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets the arithmetic operation when blending color values.
+        /// The default is <see cref="BlendFunction.Add"/>.
+        /// </summary>
+        /// <value>
+        /// A value from the <see cref="BlendFunction"/> enumeration.
+        /// </value>
 		public BlendFunction ColorBlendFunction
         {
             get { return _targetBlendState[0].ColorBlendFunction; }
@@ -85,6 +117,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets the blend factor for the destination color.
+        /// The default is <see cref="Blend.One"/>.
+        /// </summary>
+        /// <value>
+        /// A value from the <see cref="Blend"/> enumeration.
+        /// </value>
 		public Blend ColorDestinationBlend
         {
             get { return _targetBlendState[0].ColorDestinationBlend; }
@@ -95,6 +134,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets the blend factor for the source color.
+        /// The default is <see cref="Blend.One"/>.
+        /// </summary>
+        /// <value>
+        /// A value from the <see cref="Blend"/> enumeration.
+        /// </value>
 		public Blend ColorSourceBlend
         {
             get { return _targetBlendState[0].ColorSourceBlend; }
@@ -105,6 +151,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets which color channels (RGBA) are enabled for writing
+        /// during color blending.
+        /// The default value is <see cref="ColorWriteChannels.None"/>.
+        /// </summary>
+        /// <value>
+        /// A value from the <see cref="ColorWriteChannels"/> enumeration.
+        /// </value>
 		public ColorWriteChannels ColorWriteChannels
         {
             get { return _targetBlendState[0].ColorWriteChannels; }
@@ -115,6 +169,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets which color channels (RGBA) are enabled for writing
+        /// during color blending.
+        /// The default value is <see cref="ColorWriteChannels.None"/>.
+        /// </summary>
+        /// <value>
+        /// A value from the <see cref="ColorWriteChannels"/> enumeration.
+        /// </value>
 		public ColorWriteChannels ColorWriteChannels1
         {
             get { return _targetBlendState[1].ColorWriteChannels; }
@@ -125,6 +187,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets which color channels (RGBA) are enabled for writing
+        /// during color blending.
+        /// The default value is <see cref="ColorWriteChannels.None"/>.
+        /// </summary>
+        /// <value>
+        /// A value from the <see cref="ColorWriteChannels"/> enumeration.
+        /// </value>
 		public ColorWriteChannels ColorWriteChannels2
         {
             get { return _targetBlendState[2].ColorWriteChannels; }
@@ -135,6 +205,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets which color channels (RGBA) are enabled for writing
+        /// during color blending.
+        /// The default value is <see cref="ColorWriteChannels.None"/>.
+        /// </summary>
+        /// <value>
+        /// A value from the <see cref="ColorWriteChannels"/> enumeration.
+        /// </value>
 		public ColorWriteChannels ColorWriteChannels3
         {
             get { return _targetBlendState[3].ColorWriteChannels; }
@@ -162,6 +240,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 	    }
 
+        /// <summary>
+        /// Gets or sets a bitmask which defines which samples can be written
+        /// during multisampling. The default is <c>0xffffffff</c>.
+        /// </summary>
         public int MultiSampleMask
         {
             get { return _multiSampleMask; }
@@ -186,11 +268,135 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
+        /// <summary>
+        /// A built-in state object with settings for additive blend that is
+        /// adding the destination data to the source data without using alpha.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Property</term>
+        ///         <description>Value</description>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>ColorSourceBlend</term>
+        ///         <description><see cref="Blend.SourceAlpha"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>AlphaSourceBlend</term>
+        ///         <description><see cref="Blend.SourceAlpha"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>ColorDestinationBlend</term>
+        ///         <description><see cref="Blend.One"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>AlphaDestinationBlend</term>
+        ///         <description><see cref="Blend.One"/></description>
+        ///     </item>
+        /// </list>
+        /// </remarks>
         public static readonly BlendState Additive;
+
+        /// <summary>
+        /// A built-in state object with settings for alpha blend that is
+        /// blending the source and destination data using alpha.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Property</term>
+        ///         <description>Value</description>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>ColorSourceBlend</term>
+        ///         <description><see cref="Blend.One"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>AlphaSourceBlend</term>
+        ///         <description><see cref="Blend.One"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>ColorDestinationBlend</term>
+        ///         <description><see cref="Blend.InverseSourceAlpha"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>AlphaDestinationBlend</term>
+        ///         <description><see cref="Blend.InverseSourceAlpha"/></description>
+        ///     </item>
+        /// </list>
+        /// </remarks>
         public static readonly BlendState AlphaBlend;
+
+        /// <summary>
+        /// A built-in state object with settings for blending with non-premultipled
+        /// alpha that is blending source and destination data by using alpha
+        /// while assuming the color data contains no alpha information.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Property</term>
+        ///         <description>Value</description>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>ColorSourceBlend</term>
+        ///         <description><see cref="Blend.SourceAlpha"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>AlphaSourceBlend</term>
+        ///         <description><see cref="Blend.SourceAlpha"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>ColorDestinationBlend</term>
+        ///         <description><see cref="Blend.InverseSourceAlpha"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>AlphaDestinationBlend</term>
+        ///         <description><see cref="Blend.InverseSourceAlpha"/></description>
+        ///     </item>
+        /// </list>
+        /// </remarks>
         public static readonly BlendState NonPremultiplied;
+
+        /// <summary>
+        /// A built-in state object with settings for opaque blend that is
+        /// overwriting the source with the destination data.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Property</term>
+        ///         <description>Value</description>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>ColorSourceBlend</term>
+        ///         <description><see cref="Blend.One"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>AlphaSourceBlend</term>
+        ///         <description><see cref="Blend.One"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>ColorDestinationBlend</term>
+        ///         <description><see cref="Blend.Zero"/></description>
+        ///     </item>
+        ///     <item>
+        ///         <term>AlphaDestinationBlend</term>
+        ///         <description><see cref="Blend.Zero"/></description>
+        ///     </item>
+        /// </list>
+        /// </remarks>
         public static readonly BlendState Opaque;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BlendState"/> class with
+        /// the default values, using additive color and alpha blending.
+        /// </summary>
         public BlendState()
         {
             _targetBlendState = new TargetBlendState[4];
@@ -245,6 +451,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         partial void PlatformDispose();
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
