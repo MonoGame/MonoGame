@@ -14,12 +14,12 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         ulong packedValue;
 
         /// <summary>
-        /// Initializes a new instance of the HalfVector4 structure.
+        /// Initializes a new instance of this structure.
         /// </summary>
-        /// <param name="x">Initial value for the x component.</param>
-        /// <param name="y">Initial value for the y component.</param>
-        /// <param name="z">Initial value for the z component.</param>
-        /// <param name="w">Initial value for the q component.</param>
+        /// <param name="x">The initial x-component value for this structure.</param>
+        /// <param name="y">The initial y-component value for this structure.</param>
+        /// <param name="z">The initial z-component value for this structure.</param>
+        /// <param name="w">The initial 2-component value for this structure.</param>
         public HalfVector4(float x, float y, float z, float w)
         {
             var vector = new Vector4(x, y, z, w);
@@ -27,28 +27,22 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Initializes a new instance of the HalfVector4 structure.
+        /// Initializes a new instance of this structure.
         /// </summary>
-        /// <param name="vector">A vector containing the initial values for the components of the HalfVector4 structure.</param>
+        /// <param name="vector">
+        /// A <see cref="Vector4"/> value who's components contain the initial values for this structure.
+        /// </param>
         public HalfVector4(Vector4 vector)
         {
             packedValue = PackHelper(ref vector);
         }
 
-        /// <summary>
-        /// Sets the packed representation from a Vector4.
-        /// </summary>
-        /// <param name="vector">The vector to create the packed representation from.</param>
+        /// <inheritdoc />
         void IPackedVector.PackFromVector4(Vector4 vector)
         {
             packedValue = PackHelper(ref vector);
         }
 
-        /// <summary>
-        /// Packs a vector into a ulong.
-        /// </summary>
-        /// <param name="vector">The vector containing the values to pack.</param>
-        /// <returns>The ulong containing the packed values.</returns>
         static ulong PackHelper(ref Vector4 vector)
         {
             ulong num4 = (ulong)HalfTypeHelper.Convert(vector.X);
@@ -58,10 +52,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return num4 | num3 | num2 | num1;
         }
 
-        /// <summary>
-        /// Expands the packed representation into a Vector4.
-        /// </summary>
-        /// <returns>The expanded vector.</returns>
+        /// <inheritdoc />
         public Vector4 ToVector4()
         {
             return new Vector4(
@@ -71,10 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
                 HalfTypeHelper.Convert((ushort)(packedValue >> 0x30)));
         }
 
-        /// <summary>
-        /// Directly gets or sets the packed representation of the value.
-        /// </summary>
-        /// <value>The packed representation of the value.</value>
+        /// <inheritdoc />
         public ulong PackedValue
         {
             get
@@ -87,61 +75,47 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             }
         }
 
-        /// <summary>
-        /// Returns a string representation of the current instance.
-        /// </summary>
-        /// <returns>String that represents the object.</returns>
+        /// <inheritdoc />
         public override string ToString()
         {
             return ToVector4().ToString();
         }
 
-        /// <summary>
-        /// Gets the hash code for the current instance.
-        /// </summary>
-        /// <returns>Hash code for the instance.</returns>
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return packedValue.GetHashCode();
         }
 
-        /// <summary>
-        /// Returns a value that indicates whether the current instance is equal to a specified object.
-        /// </summary>
-        /// <param name="obj">The object with which to make the comparison.</param>
-        /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return ((obj is HalfVector4) && Equals((HalfVector4)obj));
         }
 
-        /// <summary>
-        /// Returns a value that indicates whether the current instance is equal to a specified object.
-        /// </summary>
-        /// <param name="other">The object with which to make the comparison.</param>
-        /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
+        /// <inheritdoc />
         public bool Equals(HalfVector4 other)
         {
             return packedValue.Equals(other.packedValue);
         }
 
         /// <summary>
-        /// Compares the current instance of a class to another instance to determine whether they are the same.
+        /// Returns a value that indicates whether the two values are equal.
         /// </summary>
-        /// <param name="a">The object to the left of the equality operator.</param>
-        /// <param name="b">The object to the right of the equality operator.</param>
-        /// <returns>true if the objects are the same; false otherwise.</returns>
+        /// <param name="a">The value on the left of the equality operator.</param>
+        /// <param name="b">The value on the right of the equality operator.</param>
+        /// <returns>true if the two values are equal; otherwise, false.</returns>
         public static bool operator ==(HalfVector4 a, HalfVector4 b)
         {
             return a.Equals(b);
         }
 
         /// <summary>
-        /// Compares the current instance of a class to another instance to determine whether they are different.
+        /// Returns a value that indicates whether the two value are not equal.
         /// </summary>
-        /// <param name="a">The object to the left of the equality operator.</param>
-        /// <param name="b">The object to the right of the equality operator.</param>
-        /// <returns>true if the objects are different; false otherwise.</returns>
+        /// <param name="a">The value on the left of the inequality operator.</param>
+        /// <param name="b">The value on the right of the inequality operator.</param>
+        /// <returns>true if the two value are not equal; otherwise, false.</returns>
         public static bool operator !=(HalfVector4 a, HalfVector4 b)
         {
             return !a.Equals(b);
