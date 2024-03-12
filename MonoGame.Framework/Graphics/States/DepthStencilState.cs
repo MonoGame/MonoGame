@@ -364,6 +364,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the write mask applied to values written into the stencil buffer.
+        /// The default mask is <see cref="Int32.MaxValue">Int32.MaxValue</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public int StencilWriteMask
         {
             get { return _stencilWriteMask; }
