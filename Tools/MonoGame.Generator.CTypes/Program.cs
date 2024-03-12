@@ -1,104 +1,47 @@
 ﻿using System.Reflection;
-using System.Text;
-
-static string GetCEnumType(string cstype)
-{
-    return cstype switch
-    {
-        "System.Byte" => "csbyte",
-        "System.Int16" => "csshort",
-        "System.UInt16" => "csushort",
-        "System.Int32" => "csint",
-        "System.UInt32" => "csuint",
-        "System.Int64" => "cslong",
-        "System.UInt64" => "csulong",
-        _ => "CS" + cstype
-    };
-};
+using MonoGame.Generator.CTypes;
 
 var repoDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../../");
 var monogamePlatformDir = Path.Combine(repoDirectory, "src/monogame/include");
 var monogameFrameworkPath = Path.Combine(repoDirectory, "Artifacts/MonoGame.Framework/Native/Debug/MonoGame.Framework.dll");
 var assembly = Assembly.LoadFile(monogameFrameworkPath);
-var outputText = new StringBuilder();
-var duplicateChecker = new Dictionary<string, string>();
+var enumWritter = new EnumWritter();
+var structWrittter = new StructWritter(enumWritter);
 
-outputText.AppendLine($"""
-//
-// This code is auto generated, don't modify it by hand.
-// To regenerate it run: Tools/MonoGame.Generator.CTypes
-//
-
-#pragma once
-
-#include "csharp_common.h"
-
-""");
-
-foreach (var enumType in assembly.GetTypes())
+foreach (var type in assembly.GetTypes())
 {
-    if (!enumType.IsEnum)
-        continue;
-
-    if (enumType.IsNested)
-        continue;
-
-    if (!enumType.FullName!.StartsWith("MonoGame") && !enumType.FullName!.StartsWith("Microsoft.Xna.Framework"))
-        continue;
-
-    if (duplicateChecker.TryGetValue(enumType.Name, out string? dupFullName))
+    if (type.FullName!.Contains("MonoGame.Interop"))
     {
-        Console.WriteLine($"""
-        WARNING: Duplicate enum name for {enumType.Name}:
-        - {enumType.FullName}
-        - {dupFullName}
+        // Console.WriteLine(enumType.FullName!);
 
-        """);
-        continue;
-    }
+        
+        //Console.WriteLine(type.Name + ": " + StructWritter.IsValid(type));
 
-    var enumValues = Enum.GetValues(enumType);
+        if (!type.IsClass)
+            continue;
 
-    // Write all values to output
-    outputText.AppendLine($$"""
-    enum CS{{enumType.Name}} : {{GetCEnumType(Enum.GetUnderlyingType(enumType).ToString())}}
-    {
-    """);
-    foreach (var enumValue in enumValues)
-    {
-        outputText.AppendLine($"    {enumValue} = {((Enum)enumValue).ToString("d")},");
-    }
-    outputText.AppendLine("""
-    };
-
-    """);
-
-    outputText.AppendLine($$"""
-    class ECS{{enumType.Name}}
-    {
-    public:
-        static const char* ToString(CS{{enumType.Name}} enumValue)
+        foreach (var method in type.GetMethods())
         {
-            switch (enumValue)
+            if (!method.IsStatic)
+                continue;
+
+            Console.WriteLine(method.Name);
+
+            foreach (var parm in method.GetParameters())
             {
-    """);
-    foreach (var enumValue in enumValues)
-    {
-        outputText.AppendLine($"            case {enumValue}: return \"{enumValue}\";");
-    }
-    outputText.AppendLine("""
+                Console.WriteLine(parm.ParameterType.Name + " " + parm.Name);
+                //Console.WriteLine(parm.ParameterType.Name + ": " + StructWritter.IsValid(parm.ParameterType));
             }
-
-            return "Unknown Value";
         }
-    };
+    }
 
-    """);
-
-    duplicateChecker.Add(enumType.Name, enumType.FullName!);
+    if (EnumWritter.IsValid(type))
+    {
+        enumWritter.Append(type);
+    }
 }
 
 if (!Directory.Exists(monogamePlatformDir))
     Directory.CreateDirectory(monogamePlatformDir);
 
-File.WriteAllText(Path.Combine(monogamePlatformDir, "csharp_enums.h"), outputText.ToString());
+enumWritter.Flush(Path.Combine(monogamePlatformDir));
