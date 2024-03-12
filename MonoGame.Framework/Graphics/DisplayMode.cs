@@ -112,6 +112,13 @@ namespace Microsoft.Xna.Framework.Graphics
             return !(left == right);
         }
 
+        /// <summary>
+        /// Compares the current instance of the DisplayMode class to another instance to determine whether they are
+        /// equal.
+        /// </summary>
+        /// <param name="left">The DisplayMode object on the left of the equality operator.</param>
+        /// <param name="right">The DisplayMode object on the right of the equality operator.</param>
+        /// <returns>true if the objects are equal; otherwise, false.</returns>
         public static bool operator ==(DisplayMode left, DisplayMode right)
         {
             if (ReferenceEquals(left, right)) //Same object or both are null
