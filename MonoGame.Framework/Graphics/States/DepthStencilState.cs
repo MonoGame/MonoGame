@@ -6,6 +6,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Contains depth-stencil state for the device.
+    /// </summary>
     public partial class DepthStencilState : GraphicsResource
     {
         private readonly bool _defaultStateObject;
