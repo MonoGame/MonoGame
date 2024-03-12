@@ -319,6 +319,19 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the mask applied to the reference value and each stencil buffer entry to determine the
+        /// significant bits for the stencil test.
+        /// The default mask is <see cref="Int32.MaxValue">Int32.MaxValue</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public int StencilMask
         {
             get { return _stencilMask; }
