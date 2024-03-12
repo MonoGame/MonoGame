@@ -175,6 +175,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the comparison function for the depth-buffer test.
+        /// The default value is <see cref="CompareFunction.LessEqual">CompareFunction.LessEqual</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public CompareFunction DepthBufferFunction
         {
             get { return _depthBufferFunction; }
