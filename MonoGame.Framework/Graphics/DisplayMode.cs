@@ -34,6 +34,9 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Describes the display mode.
+    /// </summary>
     [DataContract]
     public class DisplayMode
     {
