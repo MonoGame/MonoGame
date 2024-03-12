@@ -30,6 +30,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _stencilWriteMask;
         private bool _twoSidedStencilMode;
 
+        /// <summary>
+        /// Gets or Sets a value that indicates if depth buffering is enabled.
+        /// </summary>
         public bool DepthBufferEnable
         {
             get { return _depthBufferEnable; }
