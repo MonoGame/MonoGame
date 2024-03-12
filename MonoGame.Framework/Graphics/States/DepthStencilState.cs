@@ -386,6 +386,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates whether two-sided stenciling is enabled.
+        /// The default value is false.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public bool TwoSidedStencilMode
         {
             get { return _twoSidedStencilMode; }
