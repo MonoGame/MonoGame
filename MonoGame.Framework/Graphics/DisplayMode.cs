@@ -49,7 +49,10 @@ namespace Microsoft.Xna.Framework.Graphics
         #endregion Fields
 
         #region Properties
-        
+
+        /// <summary>
+        /// Gets a value indicating the aspect ratio of the display mode
+        /// </summary>
         public float AspectRatio {
             get { return (float)width / (float)height; }
         }
