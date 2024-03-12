@@ -18,6 +18,11 @@ using Microsoft.Xna.Framework.Media;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// The ContentManager is a run-time component which loads managed objects from .xnb binary files produced by the
+    /// design time MonoGame Content Builder.  It also manages the lifespan of the loaded objects, disposing the
+    /// content manager will also dispose any assets which are themselves <see cref="IDisposable"/>.
+    /// </summary>
 	public partial class ContentManager : IDisposable
 	{
         const byte ContentCompressedLzx = 0x80;
@@ -53,7 +58,7 @@ namespace Microsoft.Xna.Framework.Content
             'G', // Google Stadia
             'b', // WebAssembly and Bridge.NET
 
-            // NOTE: There are additional idenfiers for consoles that 
+            // NOTE: There are additional identifiers for consoles that 
             // are not defined in this repository.  Be sure to ask the
             // console port maintainers to ensure no collisions occur.
 
@@ -135,19 +140,28 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-		// Use C# destructor syntax for finalization code.
-		// This destructor will run only if the Dispose method
-		// does not get called.
-		// It gives your base class the opportunity to finalize.
-		// Do not provide destructors in types derived from this class.
+        /// <summary />
 		~ContentManager()
 		{
-			// Do not re-create Dispose clean-up code here.
-			// Calling Dispose(false) is optimal in terms of
-			// readability and maintainability.
 			Dispose(false);
 		}
 
+        /// <summary>
+        /// Initializes a new instance of the ContentMangaer.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         By default, the ContentMangaer searches for content in the directory where the executable is located.
+        ///     </para>
+        ///     <para>
+        ///         When creating a new ContentManager, if no instance of <see cref="Game"/> is otherwise required by
+        ///         the application, it is often better to create a new class that implements the
+        ///         <see cref="IServiceProvider"/> interface rather than creating an instance of <see cref="Game"/> just
+        ///         to create a new instance of <see cref="GraphicsDeviceManager"/>.
+        ///     </para>
+        /// </remarks>
+        /// <param name="serviceProvider">The service provider that the ContentManager should use to locate services.</param>
+        /// <exception cref="ArgumentNullException">The <paramref name="serviceProvider"/> parameter is null.</exception>
 		public ContentManager(IServiceProvider serviceProvider)
 		{
 			if (serviceProvider == null)
@@ -158,7 +172,10 @@ namespace Microsoft.Xna.Framework.Content
             AddContentManager(this);
 		}
 
-		public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
+        /// <inheritdoc cref="ContentManager.ContentManager(IServiceProvider)"/>
+        /// <param name="serviceProvider" />
+        /// <param name="rootDirectory">The root directory the ContentManager will search for content in.</param>
+        public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
 		{
 			if (serviceProvider == null)
 			{
@@ -173,18 +190,19 @@ namespace Microsoft.Xna.Framework.Content
             AddContentManager(this);
 		}
 
+        /// <inheritdoc />
 		public void Dispose()
 		{
 			Dispose(true);
-			// Tell the garbage collector not to call the finalizer
-			// since all the cleanup will already be done.
 			GC.SuppressFinalize(this);
             // Once disposed, content manager wont be used again
             RemoveContentManager(this);
 		}
 
-		// If disposing is true, it was called explicitly and we should dispose managed objects.
-		// If disposing is false, it was called by the finalizer and managed objects should not be disposed.
+        /// <inheritdoc cref="Dispose()"/>
+        /// <param name="disposing">
+        /// true to release both managed and unmanaged resources; false to release only unmanaged resources.
+        /// </param>
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!disposed)
@@ -198,6 +216,59 @@ namespace Microsoft.Xna.Framework.Content
 			}
 		}
 
+        /// <summary>
+        /// Loads an asset that has been processed by the Content Pipeline.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This method attempts to load the asset based on the <see cref="CultureInfo.CurrentCulture"/>
+        ///         searching for the asset by name and appending it with with the culture name (e.g. "assetName.en-US")
+        ///         or two letter ISO language name (e.g. "assetName.en"). If unsuccessful in finding the asset with
+        ///         the culture information appended, it will fall back to loading the default asset.
+        ///     </para>
+        ///     <para>
+        ///         Before a ContentManager can load an asset, you need to add the asset to your game project using
+        ///         the steps described in
+        ///         <see href="https://monogame.net/articles/content_pipeline/index.html">Adding Content - MonoGame</see>.
+        ///     </para>
+        /// </remarks>
+        /// <typeparam name="T">
+        ///     <para>
+        ///         The type of asset to load.
+        ///     </para>
+        ///     <para>
+        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="SoundEffect"/>,
+        ///         <see cref="Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
+        ///         and <see cref="TextureCube"/> are all supported by default by the standard Content Pipeline
+        ///         processor, but additional types may be loaded by extending the processor.
+        ///     </para>
+        /// </typeparam>
+        /// <param name="assetName">
+        /// The asset name, relative to the <see cref="RootDirectory">ContentManager.RootDirectory</see>, and not
+        /// including the .xnb extension.
+        /// </param>
+        /// <returns>
+        /// The loaded asset. Repeated calls to load the same asset will return the same object instance.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="assetName"/> parameter is null or an empty string.</exception>
+        /// <exception cref="ObjectDisposedException">This was called after the ContentManger was disposed.</exception>
+        /// <exception cref="ContentLoadException">
+        /// The type of the <paramref name="assetName"/> in the file does not match the type of asset requested as
+        /// specified by <typeparamref name="T"/>.
+        /// 
+        /// -or-
+        /// 
+        /// A content file matching the <paramref name="assetName"/> parameter could not be found.
+        ///
+        /// -or-
+        ///
+        /// The specified path in the <paramref name="assetName"/> parameter is invalid (for example, a
+        /// directory in the path does not exist).        
+        ///
+        /// -or-
+        ///
+        /// An error occurred while opening the content file.
+        /// </exception>
         public virtual T LoadLocalized<T> (string assetName)
         {
             string [] cultureNames =
@@ -221,6 +292,52 @@ namespace Microsoft.Xna.Framework.Content
             return Load<T> (assetName);
         }
 
+
+        /// <summary>
+        /// Loads an asset that has been processed by the Content Pipeline.
+        /// </summary>
+        /// <remarks>
+        /// Before a ContentManager can load an asset, you need to add the asset to your game project using
+        /// the steps described in
+        /// <see href="https://monogame.net/articles/content_pipeline/index.html">Adding Content - MonoGame</see>.
+        /// </remarks>
+        /// <typeparam name="T">
+        ///     <para>
+        ///         The type of asset to load.
+        ///     </para>
+        ///     <para>
+        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="SoundEffect"/>,
+        ///         <see cref="Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
+        ///         and <see cref="TextureCube"/> are all supported by default by the standard Content Pipeline
+        ///         processor, but additional types may be loaded by extending the processor.
+        ///     </para>
+        /// </typeparam>
+        /// <param name="assetName">
+        /// The asset name, relative to the <see cref="RootDirectory">ContentManager.RootDirectory</see>, and not
+        /// including the .xnb extension.
+        /// </param>
+        /// <returns>
+        /// The loaded asset. Repeated calls to load the same asset will return the same object instance.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="assetName"/> parameter is null or an empty string.</exception>
+        /// <exception cref="ObjectDisposedException">This was called after the ContentManger was disposed.</exception>
+        /// <exception cref="ContentLoadException">
+        /// The type of the <paramref name="assetName"/> in the file does not match the type of asset requested as
+        /// specified by <typeparamref name="T"/>.
+        /// 
+        /// -or-
+        /// 
+        /// A content file matching the <paramref name="assetName"/> parameter could not be found.
+        ///
+        /// -or-
+        ///
+        /// The specified path in the <paramref name="assetName"/> parameter is invalid (for example, a
+        /// directory in the path does not exist).        
+        ///
+        /// -or-
+        ///
+        /// An error occurred while opening the content file.
+        /// </exception>
 		public virtual T Load<T>(string assetName)
 		{
             if (string.IsNullOrEmpty(assetName))
@@ -235,7 +352,7 @@ namespace Microsoft.Xna.Framework.Content
             T result = default(T);
             
             // On some platforms, name and slash direction matter.
-            // We store the asset by a /-seperating key rather than how the
+            // We store the asset by a /-separating key rather than how the
             // path to the file was passed to us to avoid
             // loading "content/asset1.xnb" and "content\\ASSET1.xnb" as if they were two 
             // different files. This matches stock XNA behavior.
@@ -258,7 +375,8 @@ namespace Microsoft.Xna.Framework.Content
             loadedAssets[key] = result;
             return result;
 		}
-		
+
+        /// <summary />
 		protected virtual Stream OpenStream(string assetName)
 		{
 			Stream stream;
@@ -302,6 +420,7 @@ namespace Microsoft.Xna.Framework.Content
 			return stream;
 		}
 
+        /// <summary />
 		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
 		{
 			if (string.IsNullOrEmpty(assetName))
@@ -398,14 +517,13 @@ namespace Microsoft.Xna.Framework.Content
                 disposableAssets.Add(disposable);
         }
 
-        /// <summary>
-        /// Virtual property to allow a derived ContentManager to have it's assets reloaded
-        /// </summary>
+        /// <summary />
         protected virtual Dictionary<string, object> LoadedAssets
         {
             get { return loadedAssets; }
         }
 
+        /// <summary />
 		protected virtual void ReloadGraphicsAssets()
         {
             foreach (var asset in LoadedAssets)
@@ -421,6 +539,7 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+        /// <summary />
         protected virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
         {
 			string assetName = originalAssetName;
@@ -443,6 +562,13 @@ namespace Microsoft.Xna.Framework.Content
             }
 		}
 
+        /// <summary>
+        /// Unloads all assets that were loaded by this ContentManger.
+        /// </summary>
+        /// <remarks>
+        /// If an asset being unloaded implements the <see cref="IDisposable"/> interface, then the
+        /// <see cref="IDisposable.Dispose">IDisposable.Dispose</see> method will be called before unloading.
+        /// </remarks>
 		public virtual void Unload()
 		{
 		    // Look for disposable assets.
@@ -453,12 +579,21 @@ namespace Microsoft.Xna.Framework.Content
 		    }
 			disposableAssets.Clear();
 		    loadedAssets.Clear();
-		}
+        }
 
         /// <summary>
-        /// Unloads a single asset.
+        /// Unloads a single asset that was loaded by this ContentManager.
         /// </summary>
-        /// <param name="assetName">The name of the asset to unload. This cannot be null.</param>
+        /// <remarks>
+        /// If the asset being unloaded implements the <see cref="IDisposable"/> interface, then the
+        /// <see cref="IDisposable.Dispose">IDisposable.Dispose </see > method will be called before unloading.
+        /// </remarks>
+        /// <param name="assetName">
+        /// The asset name, relative to the <see cref="RootDirectory">ContentManager.RootDirectory</see>, and not
+        /// including the .xnb extension.
+        /// </param>
+        /// <exception cref="ArgumentNullException">The <paramref name="assetName"/> parameter is null or an empty string.</exception>
+        /// <exception cref="ObjectDisposedException">This was called after the ContentManger was disposed.</exception>
         public virtual void UnloadAsset(string assetName)
         {
             if (string.IsNullOrEmpty(assetName))
@@ -487,9 +622,22 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         /// <summary>
-        /// Unloads a set of assets.
+        /// Unloads a set of assets loaded by this ContentManager where each element in the provided collection
+        /// represents the name of an asset to unload.
         /// </summary>
-        /// <param name="assetNames">The names of the assets to unload.</param>
+        /// <remarks>
+        /// If the asset being unloaded implements the <see cref="IDisposable"/> interface, then the
+        /// <see cref="IDisposable.Dispose">IDisposable.Dispose </see > method will be called before unloading.
+        /// </remarks>
+        /// <param name="assetNames">The collection containing the names of assets to unload.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If the <paramref name="assetNames"/> parameter is null.
+        ///
+        /// -or-
+        ///
+        /// If an element in the collection null or an empty string.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">This was called after the ContentManger was disposed.</exception>
         public virtual void UnloadAssets(IList<string> assetNames)
         {
             if (assetNames == null)
@@ -507,6 +655,9 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the root directory that this ContentManager will search for assets in.
+        /// </summary>
 		public string RootDirectory
 		{
 			get
@@ -526,7 +677,10 @@ namespace Microsoft.Xna.Framework.Content
                 return Path.Combine(TitleContainer.Location, RootDirectory);
             }
         }
-		
+
+        /// <summary>
+        /// Gets the service provider instance used by this ContentManager.
+        /// </summary>
 		public IServiceProvider ServiceProvider
 		{
 			get
