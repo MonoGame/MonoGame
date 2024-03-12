@@ -12,6 +12,11 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public struct TextInputEventArgs
     {
+        /// <summary>
+        /// Creates an instance of <see cref="TextInputEventArgs"/>.
+        /// </summary>
+        /// <param name="character">Character for the key that was pressed.</param>
+        /// <param name="key">The pressed key.</param>
         public TextInputEventArgs(char character, Keys key = Keys.None)
         {
             Character = character;
