@@ -47,9 +47,14 @@ namespace MonoGame.Content.Builder
             }
             if (content.WaitForDebuggerToAttach)
             {
-                Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
-                Console.WriteLine($"Waiting for debugger to attach ({currentProcess.MainModule.FileName} PID {currentProcess.Id}).  Press enter to continue...");
-                Console.ReadLine();
+                var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                Console.WriteLine($"Waiting for debugger to attach ({currentProcess.MainModule.FileName} PID {currentProcess.Id}).  Press any key to continue without debugger.");
+                while (!System.Diagnostics.Debugger.IsAttached) {
+                    if (Console.KeyAvailable) {
+                        break;
+                    }
+                    Thread.Sleep(100);
+                }
             }
 
             // Print a startup message.            
