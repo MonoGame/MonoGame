@@ -60,7 +60,13 @@ namespace Microsoft.Xna.Framework.Graphics
 					diffuseColorParameter.SetValue (diffuseColor);
 			}
 		}
-		
+
+        /// <summary>
+        /// Gets or Sets the light direction.
+        /// </summary>
+        /// <remarks>
+        /// This value must be a unit vector.
+        /// </remarks>
 		public Vector3 Direction {
 			get {
 				return direction;
