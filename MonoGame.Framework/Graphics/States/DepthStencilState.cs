@@ -531,6 +531,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         partial void PlatformDispose();
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
