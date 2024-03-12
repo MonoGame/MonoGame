@@ -8,8 +8,13 @@ using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Design
 {
+    /// <summary>
+    /// Provides a unified way of converting <see cref="Vector4"/> values to other types, as well as for accessing
+    /// standard values and subproperties.
+    /// </summary>    
     public class Vector4TypeConverter : TypeConverter
     {
+        /// <inheritdoc /> 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             if (VectorConversion.CanConvertTo(context, destinationType))
@@ -20,6 +25,7 @@ namespace Microsoft.Xna.Framework.Design
             return base.CanConvertTo(context, destinationType);
         }
 
+        /// <inheritdoc />
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             var vec = (Vector4)value;
@@ -43,6 +49,7 @@ namespace Microsoft.Xna.Framework.Design
             return base.ConvertTo(context, culture, value, destinationType);
         }
 
+        /// <inheritdoc />
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             if (sourceType == typeof(string))
@@ -51,6 +58,7 @@ namespace Microsoft.Xna.Framework.Design
             return base.CanConvertFrom(context, sourceType);
         }
 
+        /// <inheritdoc />
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             var sourceType = value.GetType();
@@ -73,4 +81,3 @@ namespace Microsoft.Xna.Framework.Design
         }
     }
 }
-    
