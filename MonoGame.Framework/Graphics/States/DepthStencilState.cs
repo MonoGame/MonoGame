@@ -43,6 +43,28 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates if writing to the depth buffer is enabled.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This property enables an application to prevent the system from updating the depth buffer with new
+        ///         values.
+        ///     </para>
+        ///     <para>
+        ///         if false, depth comparisons are still made according to the render state
+        ///         <see cref="DepthBufferFunction"/>, assuming that depth buffering is taking place, but depth values
+        ///         are not written to the buffer.
+        ///     </para>
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public bool DepthBufferWriteEnable
         {
             get { return _depthBufferWriteEnable; }
