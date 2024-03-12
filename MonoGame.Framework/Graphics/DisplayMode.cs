@@ -144,6 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return obj is DisplayMode && this == (DisplayMode)obj;
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return (this.width.GetHashCode() ^ this.height.GetHashCode() ^ this.format.GetHashCode());
