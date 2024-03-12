@@ -100,6 +100,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Operators
 
+        /// <summary>
+        /// Compares the current instance of the DisplayMode class to another instance to determine whether they are
+        /// different.
+        /// </summary>
+        /// <param name="left">The DisplayMode object on the left of the inequality operator.</param>
+        /// <param name="right">The DisplayMode object on the right of the inequality operator.</param>
+        /// <returns>true if the objects are different; otherwise, false.</returns>
         public static bool operator !=(DisplayMode left, DisplayMode right)
         {
             return !(left == right);
