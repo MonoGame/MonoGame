@@ -6,7 +6,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-
+    /// <summary>
+    /// Represents a directional light.
+    /// This class cannot be inherited.
+    /// </summary>
 	public sealed class DirectionalLight
 	{
 		internal EffectParameter diffuseColorParameter;
