@@ -7,12 +7,20 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// Helper extension methods for <see cref="ContentReader"/>.
+    /// </summary>
     public static class ContentReaderExtensions
     {
         /// <summary>
-        /// Gets the GraphicsDevice from the ContentManager.ServiceProvider.
+        /// Returns the <see cref="GraphicsDevice"/> instance from the service provider of the
+        /// <see cref="ContentManager"/> associated with this content reader.
         /// </summary>
         /// <returns>The <see cref="GraphicsDevice"/>.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// The <see cref="ContentManager.ServiceProvider">ContentManager.ServiceProvider</see> does not contain a
+        /// <see cref="GraphicsDevice"/> instance.
+        /// </exception>
         public static GraphicsDevice GetGraphicsDevice(this ContentReader contentReader)
         {
             var serviceProvider = contentReader.ContentManager.ServiceProvider;
