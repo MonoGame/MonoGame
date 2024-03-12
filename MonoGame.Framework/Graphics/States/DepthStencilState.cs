@@ -32,6 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// Gets or Sets a value that indicates if depth buffering is enabled.
+        /// The default value is true.
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
