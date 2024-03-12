@@ -68,6 +68,9 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return this.height; }
         }
 
+        /// <summary>
+        /// Gets a value indicating the screen width, in pixels.
+        /// </summary>
         public int Width {
             get { return this.width; }
         }
