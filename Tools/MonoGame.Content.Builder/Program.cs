@@ -45,6 +45,12 @@ namespace MonoGame.Content.Builder
                     Console.Error.WriteLine("The debugger is not implemented under Mono and thus is not supported on your platform.");
                 }
             }
+            if (content.WaitForDebuggerToAttach)
+            {
+                Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                Console.WriteLine($"Waiting for debugger to attach ({currentProcess.MainModule.FileName} PID {currentProcess.Id}).  Press enter to continue...");
+                Console.ReadLine();
+            }
 
             // Print a startup message.            
             var buildStarted = DateTime.Now;
