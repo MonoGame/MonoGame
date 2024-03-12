@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
+using System.Threading;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -47,9 +49,9 @@ namespace MonoGame.Content.Builder
             }
             if (content.WaitForDebuggerToAttach)
             {
-                var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                var currentProcess = Process.GetCurrentProcess();
                 Console.WriteLine($"Waiting for debugger to attach ({currentProcess.MainModule.FileName} PID {currentProcess.Id}).  Press any key to continue without debugger.");
-                while (!System.Diagnostics.Debugger.IsAttached) {
+                while (!Debugger.IsAttached) {
                     if (Console.KeyAvailable) {
                         break;
                     }
