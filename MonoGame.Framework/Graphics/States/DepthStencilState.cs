@@ -425,6 +425,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("You cannot modify the depth stencil state after it has been bound to the graphics device!");
         }
 
+        /// <summary>
+        /// Creates a new instance of the DepthStencilState class with default values.
+        /// </summary>
         public DepthStencilState ()
 		{
             DepthBufferEnable = true;
