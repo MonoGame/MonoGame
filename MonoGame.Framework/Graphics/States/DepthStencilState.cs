@@ -197,6 +197,30 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets a reference value to use for the stencil test.
+        /// The default is 0.
+        /// </summary>
+        /// <remarks>
+        /// The reference value is compared, by the comparison function specified by the <see cref="StencilFunction"/>
+        /// property, to the stencil buffer entry of a pixel.  This can be illustrated by a simple equation:
+        ///
+        /// <code>
+        /// ReferenceStencil StencilFunction (stencil buffer entry)
+        /// </code>
+        ///
+        /// This comparison applies only to the bits in the reference value and stencil buffer entry that are set in
+        /// the stencil mask by this property.  If the comparison is true, the stencil test passes and the pass
+        /// operation (specified by the <see cref="StencilPass"/> property) is performed.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public int ReferenceStencil
         {
             get { return _referenceStencil; }
