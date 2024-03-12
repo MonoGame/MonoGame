@@ -61,6 +61,9 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return format; }
         }
 
+        /// <summary>
+        /// Gets a value indicating the screen height, in pixels.
+        /// </summary>
         public int Height {
             get { return this.height; }
         }
