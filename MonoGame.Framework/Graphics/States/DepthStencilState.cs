@@ -54,6 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// Gets or Sets a value that indicates if writing to the depth buffer is enabled.
+        /// The default value is true.
         /// </summary>
         /// <remarks>
         ///     <para>
