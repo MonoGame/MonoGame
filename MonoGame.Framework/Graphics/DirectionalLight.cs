@@ -46,7 +46,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				this.specularColorParameter = specularColorParameter;
 			}
 		}
-		
+
+        /// <summary>
+        /// Gets or Sets the diffuse color of the light.
+        /// </summary>
 		public Vector3 DiffuseColor {
 			get {
 				return diffuseColor;
