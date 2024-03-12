@@ -481,6 +481,14 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// A built-in state object with default settings for using a depth stencil buffer.
         /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        ///
+        /// <code>
+        /// DepthBufferEnable = true,
+        /// DepthBufferWriteEnable = true
+        /// </code>
+        /// </remarks>
         public static readonly DepthStencilState Default;
         public static readonly DepthStencilState DepthRead;
         public static readonly DepthStencilState None;
