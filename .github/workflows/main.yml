@@ -17,7 +17,7 @@ jobs:
           submodules: recursive
 
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
@@ -65,7 +65,7 @@ jobs:
             uses: actions/checkout@v4
 
           - name: Setup .NET ${{ matrix.dotnet-version }}
-            uses: actions/setup-dotnet@v3
+            uses: actions/setup-dotnet@v4
             with:
               dotnet-version: '8.0.x'
 
