@@ -14,6 +14,11 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
     public class ModelBoneCollection : ReadOnlyCollection<ModelBone>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModelBoneCollection"/>
+        /// class that is a read-only wrapper around the specified list.
+        /// </summary>
+        /// <param name="list">The list to wrap.</param>
         public ModelBoneCollection(IList<ModelBone> list)
             : base(list)
         {
@@ -21,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Retrieves a ModelBone from the collection, given the name of the bone.
+        /// Retrieves a <see cref="ModelBone"/> from the collection, given the name of the bone.
         /// </summary>
         /// <param name="boneName">The name of the bone to retrieve.</param>
         public ModelBone this[string boneName]
@@ -60,7 +65,8 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Returns a ModelMeshCollection.Enumerator that can iterate through a ModelMeshCollection.
+        /// Returns a <see cref="ModelBoneCollection.Enumerator">ModelBoneCollection.Enumerator</see>
+        /// that can iterate through a collection.
         /// </summary>
         /// <returns></returns>
         public new Enumerator GetEnumerator()
@@ -69,7 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Provides the ability to iterate through the bones in an ModelMeshCollection.
+        /// Provides the ability to iterate through the bones in an ModelBoneCollection.
         /// </summary>
         public struct Enumerator : IEnumerator<ModelBone>
         {
@@ -84,12 +90,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
             /// <summary>
-            /// Gets the current element in the ModelMeshCollection.
+            /// Gets the current element in the ModelBoneCollection.
             /// </summary>
             public ModelBone Current { get { return _collection[_position]; } }
 
             /// <summary>
-            /// Advances the enumerator to the next element of the ModelMeshCollection.
+            /// Advances the enumerator to the next element of the ModelBoneCollection.
             /// </summary>
             public bool MoveNext()
             {
@@ -115,6 +121,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 get { return _collection[_position]; }
             }
 
+            /// <inheritdoc/>
             public void Reset()
             {
                 _position = -1;

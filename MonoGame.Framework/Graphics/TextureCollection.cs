@@ -6,6 +6,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a collection of <see cref="Texture"/> objects. This class cannot be inherited.
+    /// </summary>
     public sealed partial class TextureCollection
     {
         private readonly GraphicsDevice _graphicsDevice;
@@ -22,6 +25,9 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformInit();
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Texture"/> at the specified sampler number.
+        /// </summary>
         public Texture this[int index]
         {
             get

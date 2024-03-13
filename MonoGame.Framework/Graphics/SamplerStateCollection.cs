@@ -6,6 +6,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a collection of <see cref="SamplerState"/> objects,
+    /// </summary>
     public sealed partial class SamplerStateCollection
 	{
         private readonly GraphicsDevice _graphicsDevice;
@@ -39,7 +42,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		    Clear();
         }
 
-		public SamplerState this [int index]
+        /// <summary>
+        /// Gets or sets the <see cref="SamplerState"/> at the specified index in the collection.
+        /// </summary>
+        public SamplerState this [int index]
         {
 			get
             {

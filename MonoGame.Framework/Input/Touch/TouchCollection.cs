@@ -267,6 +267,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 get { return _collection[_position]; }
             }
 
+            /// <inheritdoc/>
             public void Reset()
             {
                 _position = -1;
