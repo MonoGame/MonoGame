@@ -40,6 +40,9 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private readonly List<DisplayMode> _modes;
 
+        /// <summary>
+        /// Gets the <see cref="DisplayMode"/> instance with the specified format.
+        /// </summary>
         public IEnumerable<DisplayMode> this[SurfaceFormat format]
         {
             get 
