@@ -22,7 +22,7 @@ namespace MonoGame.Content.Builder
 
         [CommandLineParameter(
             Name = "waitfordebugger",
-            Flag = "w",
+            Flag = "a",
             Description = "Wait for debugger to attach before building content.")]
         public bool WaitForDebuggerToAttach = false;
 
