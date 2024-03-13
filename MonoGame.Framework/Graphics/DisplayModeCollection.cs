@@ -57,6 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <inheritdoc />
         public IEnumerator<DisplayMode> GetEnumerator()
         {
             return _modes.GetEnumerator();
