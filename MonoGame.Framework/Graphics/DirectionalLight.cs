@@ -6,6 +6,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a directional light.
+    /// This class cannot be inherited.
+    /// </summary>
 	public sealed class DirectionalLight
 	{
 		internal EffectParameter diffuseColorParameter;
@@ -16,7 +20,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		Vector3 direction;
 		Vector3 specularColor;
 		bool enabled;
-		
+
+        /// <summary>
+        /// Creates a new instance of the DirectionalLight class with or without a copy of a DirectionalLight instance.
+        /// </summary>
+        /// <param name="directionParameter">The light direction.</param>
+        /// <param name="diffuseColorParameter">The diffuse color.</param>
+        /// <param name="specularColorParameter">The specular color.</param>
+        /// <param name="cloneSource">The cloned source to copy from.</param>
+        /// <remarks>
+        /// The initial parameter values are either copied from the cloned object or set to default values (if the
+        /// coned object is null).  The three Effect Parameters are updated whenever the direction, diffuse color, or
+        /// specular color properties are changed; or you can set these to null if you are using the cloned object.
+        /// </remarks>
 		public DirectionalLight (EffectParameter directionParameter, EffectParameter diffuseColorParameter, EffectParameter specularColorParameter, DirectionalLight cloneSource)
 		{
 			this.diffuseColorParameter = diffuseColorParameter;
@@ -33,7 +49,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				this.specularColorParameter = specularColorParameter;
 			}
 		}
-		
+
+        /// <summary>
+        /// Gets or Sets the diffuse color of the light.
+        /// </summary>
 		public Vector3 DiffuseColor {
 			get {
 				return diffuseColor;
@@ -44,7 +63,13 @@ namespace Microsoft.Xna.Framework.Graphics
 					diffuseColorParameter.SetValue (diffuseColor);
 			}
 		}
-		
+
+        /// <summary>
+        /// Gets or Sets the light direction.
+        /// </summary>
+        /// <remarks>
+        /// This value must be a unit vector.
+        /// </remarks>
 		public Vector3 Direction {
 			get {
 				return direction;
@@ -55,7 +80,10 @@ namespace Microsoft.Xna.Framework.Graphics
 					directionParameter.SetValue (direction);
 			}
 		}
-		
+
+        /// <summary>
+        /// Gets or Sets the specular color of the light.
+        /// </summary>
 		public Vector3 SpecularColor {
 			get {
 				return specularColor;
@@ -66,6 +94,10 @@ namespace Microsoft.Xna.Framework.Graphics
 					specularColorParameter.SetValue (specularColor);
 			}
 		}
+
+        /// <summary>
+        /// Gets or Sets a value indicating whether light is enabled.
+        /// </summary>
 		public bool Enabled 
 		{
 			get { return enabled; }
