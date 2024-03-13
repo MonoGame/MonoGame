@@ -8,12 +8,8 @@ public sealed class DownloadArtifactsTask : AsyncFrostingTask<BuildContext>
 
     public override async Task RunAsync(BuildContext context)
     {
+        context.CreateDirectory("nugets");
         foreach (var os in new[] { "windows", "mac", "linux" })
-        {
-            var artifactDir = $"nuget-{os}";
-            context.CreateDirectory(artifactDir);
-            await context.GitHubActions().Commands.DownloadArtifact(artifactDir, "nugets");
-            context.CopyDirectory(artifactDir, "nugets");
-        }
+            await context.GitHubActions().Commands.DownloadArtifact($"nuget-{os}", "nugets");
     }
 }

@@ -31,5 +31,5 @@ public sealed class BuildTemplatesTask : FrostingTask<BuildContext> { }
 public sealed class BuildAllTask : FrostingTask<BuildContext> { }
 
 [TaskName("Default")]
-[IsDependentOn(typeof(BuildAllTask))]
+[IsDependentOn(typeof(BuildDesktopGLTask))]
 public sealed class DefaultTask : FrostingTask<BuildContext> { }
