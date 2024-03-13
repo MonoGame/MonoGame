@@ -6,6 +6,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Contains depth-stencil state for the device.
+    /// </summary>
     public partial class DepthStencilState : GraphicsResource
     {
         private readonly bool _defaultStateObject;
@@ -27,6 +30,18 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _stencilWriteMask;
         private bool _twoSidedStencilMode;
 
+        /// <summary>
+        /// Gets or Sets a value that indicates if depth buffering is enabled.
+        /// The default value is true.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public bool DepthBufferEnable
         {
             get { return _depthBufferEnable; }
@@ -37,6 +52,29 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates if writing to the depth buffer is enabled.
+        /// The default value is true.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This property enables an application to prevent the system from updating the depth buffer with new
+        ///         values.
+        ///     </para>
+        ///     <para>
+        ///         if false, depth comparisons are still made according to the render state
+        ///         <see cref="DepthBufferFunction"/>, assuming that depth buffering is taking place, but depth values
+        ///         are not written to the buffer.
+        ///     </para>
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public bool DepthBufferWriteEnable
         {
             get { return _depthBufferWriteEnable; }
@@ -47,6 +85,19 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the stencil operation to perform if the stencil test passes and the depth-buffer test fails
+        /// for a counterclockwise triangle.
+        /// The default value is <see cref="StencilOperation.Keep">StencilOperation.Keep</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public StencilOperation CounterClockwiseStencilDepthBufferFail
         {
             get { return _counterClockwiseStencilDepthBufferFail; }
@@ -57,6 +108,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the stencil operation to perform if the stencil test fails for the counterclockwise triangle.
+        /// The default value is <see cref="StencilOperation.Keep">StencilOperation.Keep</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public StencilOperation CounterClockwiseStencilFail
         {
             get { return _counterClockwiseStencilFail; }
@@ -67,6 +130,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the comparison function to use for counterclockwise stencil tests.
+        /// The default value is <see cref="CompareFunction.Always">CompareFunction.Always</see>
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public CompareFunction CounterClockwiseStencilFunction
         {
             get { return _counterClockwiseStencilFunction; }
@@ -77,6 +152,19 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the stencil operation to perform if the stencil and depth-tests pass for a counterclockwise
+        /// triangle.
+        /// The default value is <see cref="StencilOperation.Keep">StencilOperation.Keep</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public StencilOperation CounterClockwiseStencilPass
         {
             get { return _counterClockwiseStencilPass; }
@@ -87,6 +175,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the comparison function for the depth-buffer test.
+        /// The default value is <see cref="CompareFunction.LessEqual">CompareFunction.LessEqual</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public CompareFunction DepthBufferFunction
         {
             get { return _depthBufferFunction; }
@@ -97,6 +197,30 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets a reference value to use for the stencil test.
+        /// The default is 0.
+        /// </summary>
+        /// <remarks>
+        /// The reference value is compared, by the comparison function specified by the <see cref="StencilFunction"/>
+        /// property, to the stencil buffer entry of a pixel.  This can be illustrated by a simple equation:
+        ///
+        /// <code>
+        /// ReferenceStencil StencilFunction (stencil buffer entry)
+        /// </code>
+        ///
+        /// This comparison applies only to the bits in the reference value and stencil buffer entry that are set in
+        /// the stencil mask by this property.  If the comparison is true, the stencil test passes and the pass
+        /// operation (specified by the <see cref="StencilPass"/> property) is performed.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public int ReferenceStencil
         {
             get { return _referenceStencil; }
@@ -107,6 +231,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the stencil operation to perform if the stencil test passes and the depth-test fails.
+        /// The default is <see cref="StencilOperation.Keep">StencilOperation.Keep</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public StencilOperation StencilDepthBufferFail
         {
             get { return _stencilDepthBufferFail; }
@@ -117,6 +253,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates whether stenciling is enabled.
+        /// The default is false.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public bool StencilEnable
         {
             get { return _stencilEnable; }
@@ -127,6 +275,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the stencil operation to perform if the stencil test fails.
+        /// The default is <see cref="StencilOperation.Keep">StencilOperation.Keep</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public StencilOperation StencilFail
         {
             get { return _stencilFail; }
@@ -137,6 +297,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the comparison function for the stencil test.
+        /// The default is <see cref="CompareFunction.Always">CompareFunction.Always</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public CompareFunction StencilFunction
         {
             get { return _stencilFunction; }
@@ -147,6 +319,19 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the mask applied to the reference value and each stencil buffer entry to determine the
+        /// significant bits for the stencil test.
+        /// The default mask is <see cref="Int32.MaxValue">Int32.MaxValue</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public int StencilMask
         {
             get { return _stencilMask; }
@@ -157,6 +342,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the stencil operation to perform if the stencil test passes.
+        /// The default value is <see cref="StencilOperation.Keep">StencilOperation.Keep</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public StencilOperation StencilPass
         {
             get { return _stencilPass; }
@@ -167,6 +364,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets the write mask applied to values written into the stencil buffer.
+        /// The default mask is <see cref="Int32.MaxValue">Int32.MaxValue</see>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public int StencilWriteMask
         {
             get { return _stencilWriteMask; }
@@ -177,6 +386,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates whether two-sided stenciling is enabled.
+        /// The default value is false.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When setting this value for one of the default DepthStencilState instances; <see cref="Default"/>,
+        /// <see cref="DepthRead"/>, or <see cref="None"/>.
+        ///
+        /// -or-
+        ///
+        /// When setting this value after this DepthStencilState has already been bound to the graphics device.
+        /// </exception>
         public bool TwoSidedStencilMode
         {
             get { return _twoSidedStencilMode; }
@@ -204,6 +425,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("You cannot modify the depth stencil state after it has been bound to the graphics device!");
         }
 
+        /// <summary>
+        /// Creates a new instance of the DepthStencilState class with default values.
+        /// </summary>
         public DepthStencilState ()
 		{
             DepthBufferEnable = true;
@@ -254,8 +478,43 @@ namespace Microsoft.Xna.Framework.Graphics
             _twoSidedStencilMode = cloneSource._twoSidedStencilMode;
 	    }
 
+        /// <summary>
+        /// A built-in state object with default settings for using a depth stencil buffer.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        ///
+        /// <code>
+        /// DepthBufferEnable = true,
+        /// DepthBufferWriteEnable = true
+        /// </code>
+        /// </remarks>
         public static readonly DepthStencilState Default;
+
+        /// <summary>
+        /// A built-int state object with settings for enabling a read-only depth stencil buffer.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        ///
+        /// <code>
+        /// DepthBufferEnable = true,
+        /// DepthBufferWriteEnable = false
+        /// </code>
+        /// </remarks>
         public static readonly DepthStencilState DepthRead;
+
+        /// <summary>
+        /// A built in state object with settings for not using a depth stencil buffer.
+        /// </summary>
+        /// <remarks>
+        /// This built-int state object has the following settings:
+        ///
+        /// <code>
+        /// DepthBufferEnable = false,
+        /// DepthBufferWriteEnable = false
+        /// </code>
+        /// </remarks>
         public static readonly DepthStencilState None;
 
 		static DepthStencilState ()
@@ -272,6 +531,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         partial void PlatformDispose();
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
