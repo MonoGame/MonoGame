@@ -33,6 +33,9 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// A collection that manipulates <see cref="DisplayMode"/> instances.
+    /// </summary>
     public class DisplayModeCollection : IEnumerable<DisplayMode>
     {
         private readonly List<DisplayMode> _modes;
