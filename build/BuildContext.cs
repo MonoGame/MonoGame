@@ -12,54 +12,39 @@ public enum ProjectType
 
 public class BuildContext : FrostingContext
 {
-    public static readonly Version DefaultVersionNumber = new("3.8.1.1");
+    public static readonly string DefaultRepositoryUrl = "https://github.com/MonoGame/MonoGame";
+    public static readonly string DefaultBaseVersion = "3.8.1";
 
     public BuildContext(ICakeContext context) : base(context)
     {
+        var repositoryUrl = context.Argument("build-repository", DefaultRepositoryUrl);
         var buildConfiguration = context.Argument("build-configuration", "Release");
-        ArtifactsDirectory = context.Argument("artifacts-directory", "artifacts");
-        NuGetsDirectory = $"{ArtifactsDirectory}/NuGet/";
+        BuildOutput = context.Argument("build-output", "artifacts");
+        Version = context.Argument("build-version", DefaultBaseVersion + ".1-develop");
+        NuGetsDirectory = $"{BuildOutput}/NuGet/";
 
-        string repositoryUrl = "";
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
             var workflow = context.BuildSystem().GitHubActions.Environment.Workflow;
-            var version = $"{DefaultVersionNumber.Major}.{DefaultVersionNumber.Minor}.{DefaultVersionNumber.Build}.{workflow.RunNumber}";
-
-            if (workflow.Repository == "MonoGame/MonoGame" &&
-               workflow.RefType == GitHubActionsRefType.Branch &&
-               workflow.RefName == "refs/heads/master")
-            {
-                Version = $"{version}-develop";
-            }
-            else
-            {
-                Version = $"{version}-{workflow.RepositoryOwner}";
-            }
-
             repositoryUrl = $"https://github.com/{workflow.Repository}";
-        }
-        else
-        {
-            var buildNumber = context.EnvironmentVariable("BUILD_NUMBER", DefaultVersionNumber.ToString());
-            var version = context.Argument("build-version", buildNumber);
-            var branchName = context.EnvironmentVariable("BRANCH_NAME", string.Empty);
 
-            if (!branchName.Contains("master"))
+            if (workflow.Repository != "MonoGame/MonoGame")
             {
-                Version = $"{version}-develop";
+                Version = $"{DefaultBaseVersion}.{workflow.RunNumber}-{workflow.RepositoryOwner}";
+            }
+            else if (workflow.RefType == GitHubActionsRefType.Branch && workflow.RefName != "refs/heads/master")
+            {
+                Version = $"{DefaultBaseVersion}.{workflow.RunNumber}-develop";
             }
             else
             {
-                Version = version;
+                Version = $"{DefaultBaseVersion}.{workflow.RunNumber}";
             }
-
-            repositoryUrl = context.EnvironmentVariable("repository-url", "https://github.com/MonoGame/MonoGame");
         }
 
         DotNetMSBuildSettings = new DotNetMSBuildSettings();
-        DotNetMSBuildSettings.WithProperty(nameof(Version), Version);
-        DotNetMSBuildSettings.WithProperty(nameof(repositoryUrl), repositoryUrl);
+        DotNetMSBuildSettings.WithProperty("Version", Version);
+        DotNetMSBuildSettings.WithProperty("RepositoryUrl", repositoryUrl);
 
         DotNetPackSettings = new DotNetPackSettings
         {
@@ -102,16 +87,16 @@ public class BuildContext : FrostingContext
 
         if (!context.IsRunningOnWindows())
         {
-            //  SET MGFXC_WINE_PATH for building shaders on macOS and Linux
+            // SET MGFXC_WINE_PATH for building shaders on macOS and Linux
             System.Environment.SetEnvironmentVariable("MGFXC_WINE_PATH", context.EnvironmentVariable("HOME") + "/.winemonogame");
         }
         
-        context.CreateDirectory(ArtifactsDirectory);
+        context.CreateDirectory(BuildOutput);
     }
 
     public string Version { get; }
 
-    public string ArtifactsDirectory { get; }
+    public string BuildOutput { get; }
 
     public DirectoryPath NuGetsDirectory { get; }
 
