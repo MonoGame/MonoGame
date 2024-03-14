@@ -46,6 +46,13 @@ public class BuildContext : FrostingContext
         DotNetMSBuildSettings.WithProperty("Version", Version);
         DotNetMSBuildSettings.WithProperty("RepositoryUrl", repositoryUrl);
 
+        DotNetBuildSettings = new DotNetBuildSettings
+        {
+            MSBuildSettings = DotNetMSBuildSettings,
+            Verbosity = DotNetVerbosity.Minimal,
+            Configuration = buildConfiguration
+        };
+
         DotNetPackSettings = new DotNetPackSettings
         {
             MSBuildSettings = DotNetMSBuildSettings,
@@ -101,6 +108,8 @@ public class BuildContext : FrostingContext
     public DirectoryPath NuGetsDirectory { get; }
 
     public DotNetMSBuildSettings DotNetMSBuildSettings { get; }
+
+    public DotNetBuildSettings DotNetBuildSettings { get; }
 
     public DotNetPackSettings DotNetPackSettings { get; }
 

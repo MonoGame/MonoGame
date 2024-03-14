@@ -16,6 +16,7 @@
     <Using Include="Cake.Common.Build.GitHubActions.Data" />
     <Using Include="Cake.Common.Diagnostics" />
     <Using Include="Cake.Common.Tools.DotNet" />
+    <Using Include="Cake.Common.Tools.DotNet.Build" />
     <Using Include="Cake.Common.Tools.DotNet.MSBuild" />
     <Using Include="Cake.Common.Tools.DotNet.Pack" />
     <Using Include="Cake.Common.Tools.DotNet.Publish" />
