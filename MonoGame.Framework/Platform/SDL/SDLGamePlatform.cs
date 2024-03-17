@@ -86,6 +86,9 @@ namespace Microsoft.Xna.Framework
         {
             Sdl.Window.Show(Window.Handle);
 
+			// defaulting active state in case the event pump misses the startup state
+            IsActive = Sdl.Window.GetWindowFlags(Window.Handle).HasFlag(Sdl.Window.Flags.InputFocus);
+
             while (true)
             {
                 SdlRunLoop();

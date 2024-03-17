@@ -162,6 +162,9 @@ namespace MonoGame.Framework
             _resizeTickTimer = new System.Timers.Timer(1) { SynchronizingObject = Form, AutoReset = false };
             _resizeTickTimer.Elapsed += OnResizeTick;
 
+            // defaulting active state in case the event pump misses the startup state
+            _platform.IsActive = System.Windows.Forms.Form.ActiveForm == Form;
+
             Form.Activated += OnActivated;
             Form.Deactivate += OnDeactivate;
             Form.Resize += OnResize;
