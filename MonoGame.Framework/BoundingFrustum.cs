@@ -459,22 +459,34 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Distance at which ray intersects with this <see cref="BoundingFrustum"/> or null if no intersection happens as an output parameter.</param>
         public void Intersects(ref Ray ray, out float? result)
         {
+            result = null;
             ContainmentType ctype;
             this.Contains(ref ray.Position, out ctype);
 
-            switch (ctype)
+            //Sentenal Check if rays origin is inside of the frustrum
+            if (ctype == ContainmentType.Contains)
             {
-                case ContainmentType.Disjoint:
-                    result = null;
-                    return;
-                case ContainmentType.Contains:
-                    result = 0.0f;
-                    return;
-                case ContainmentType.Intersects:
-                    throw new NotImplementedException();
-                default:
-                    throw new ArgumentOutOfRangeException();
+                result = 0.0f;
+                return;
+            } 
+            
+            foreach (Plane p in this._planes)
+            {
+                float? d = ray.Intersects(p);
+                if (d == null) continue;
+
+                Vector3 direction = ray.Direction;
+                direction.Normalize();
+                direction = direction * d.Value;
+
+                Vector3 point = ray.Position + direction;
+
+                if (this.Contains(point) == ContainmentType.Contains && result == null || d < result)
+                {
+                    result = d;
+                }
             }
+            return;
         } 
 
         /// <summary>
