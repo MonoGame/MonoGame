@@ -4,6 +4,9 @@
 
 namespace Microsoft.Xna.Framework.Input
 {
+    /// <summary>
+    /// A struct that represents which directions on the directional pad of a controller are being pressed.
+    /// </summary>
     public struct GamePadDPad
     {
         /// <summary>

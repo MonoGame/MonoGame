@@ -5,8 +5,14 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Input
 {
+    /// <summary>
+    /// Provides access to the message box user interface. 
+    /// </summary>
     public static partial class MessageBox
     {
+        /// <summary>
+        /// Determines if a message box user interface screen is active.
+        /// </summary>
         public static bool IsVisible { get; private set; }
 
         /// <summary>

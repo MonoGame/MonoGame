@@ -86,6 +86,9 @@ namespace Microsoft.Xna.Framework.Input
             return PlatformFromTexture2D(texture, originx, originy);
         }
 
+        /// <summary>
+        /// Gets a handle for this cursor.
+        /// </summary>
         public IntPtr Handle { get; private set; }
 
         private bool _disposed;
@@ -100,6 +103,7 @@ namespace Microsoft.Xna.Framework.Input
             Handle = handle;
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             if (_disposed)

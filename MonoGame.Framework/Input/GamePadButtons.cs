@@ -142,7 +142,12 @@ namespace Microsoft.Xna.Framework.Input
                 return ((_buttons & Buttons.BigButton) == Buttons.BigButton) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
-        
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GamePadButtons"/> structure,
+        /// setting the specified buttons to pressed in.
+        /// </summary>
+        /// <param name="buttons">Buttons to be set as pressed in.</param>
         public GamePadButtons(Buttons buttons)
         {
             _buttons = buttons;

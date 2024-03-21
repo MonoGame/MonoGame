@@ -72,6 +72,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
         }
 
+        /// <summary>
+        /// Returns <see langword="true"/> if a touch device supports pressure.
+        /// </summary>
         public bool HasPressure
         {
             get
