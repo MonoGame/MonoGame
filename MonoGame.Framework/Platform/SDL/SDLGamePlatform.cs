@@ -93,9 +93,25 @@ namespace Microsoft.Xna.Framework
                 Threading.Run();
                 GraphicsDevice.DisposeContexts();
 
-                if (_isExiting > 0)
+                if (_isExiting > 0 && ShouldExit())
+                {
                     break;
+                }
+                else
+                {
+                    _isExiting = 0;
+                }
             }
+        }
+
+        private bool ShouldExit()
+        {
+            if(_keys.Contains(Keys.F4) && (_keys.Contains(Keys.LeftAlt) || _keys.Contains(Keys.RightAlt)))
+            {
+                return Window.AllowAltF4;
+            }
+
+            return true;
         }
 
         private void SdlRunLoop()
