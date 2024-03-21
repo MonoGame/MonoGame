@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework
 
         static Threading()
         {
-            _mainThreadId = Thread.CurrentThread.ManagedThreadId;
+            _mainThreadId = Environment.CurrentManagedThreadId;
         }
 
 #if ANDROID
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>true if the code is currently running on the UI thread.</returns>
         public static bool IsOnUIThread()
         {
-            return _mainThreadId == Thread.CurrentThread.ManagedThreadId;
+            return _mainThreadId == Environment.CurrentManagedThreadId;
         }
 
         /// <summary>
