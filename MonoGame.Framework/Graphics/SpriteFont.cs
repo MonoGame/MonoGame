@@ -11,7 +11,9 @@ using System.Text;
 
 namespace Microsoft.Xna.Framework.Graphics 
 {
-
+    /// <summary>
+    /// Represents a font texture.
+    /// </summary>
 	public sealed class SpriteFont 
     {
 		internal static class Errors 
@@ -379,8 +381,14 @@ namespace Microsoft.Xna.Framework.Graphics
             /// </summary>
             public float WidthIncludingBearings;
 
-			public static readonly Glyph Empty = new Glyph();
+            /// <summary>
+            /// Returns an empty glyph.
+            /// </summary>
+            public static readonly Glyph Empty = new Glyph();
 
+            /// <summary>
+            /// Returns a string representation of this <see cref="Glyph"/>.
+            /// </summary>
 			public override string ToString ()
 			{
                 return "CharacterIndex=" + Character + ", Glyph=" + BoundsInTexture + ", Cropping=" + Cropping + ", Kerning=" + LeftSideBearing + "," + Width + "," + RightSideBearing;

@@ -46,6 +46,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return true;
         }
 
+        /// <summary/>
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)

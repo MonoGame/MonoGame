@@ -15,10 +15,16 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Contains graphics presentation parameters.
+    /// </summary>
     public class PresentationParameters
     {
         #region Constants
 
+        /// <summary>
+        /// Default presentation rate 
+        /// </summary>
         public const int DefaultPresentRate = 60;
 
         #endregion Constants

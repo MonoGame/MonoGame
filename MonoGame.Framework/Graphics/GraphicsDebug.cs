@@ -4,6 +4,9 @@
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a class for debugging graphics.
+    /// </summary>
     public partial class GraphicsDebug
     {
         /// <summary>

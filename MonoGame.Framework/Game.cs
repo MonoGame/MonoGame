@@ -87,6 +87,7 @@ namespace Microsoft.Xna.Framework
 
         }
 
+        /// <summary/>
         ~Game()
         {
             Dispose(false);
@@ -101,6 +102,7 @@ namespace Microsoft.Xna.Framework
         #region IDisposable Implementation
 
         private bool _isDisposed;
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             Dispose(true);
@@ -108,6 +110,7 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, Disposed, EventArgs.Empty);
         }
 
+        /// <summary/>
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
@@ -193,6 +196,9 @@ namespace Microsoft.Xna.Framework
             get { return _components; }
         }
 
+        /// <summary>
+        /// Gets or sets time to sleep between frames when the game is not active
+        /// </summary>
         public TimeSpan InactiveSleepTime
         {
             get { return _inactiveSleepTime; }
