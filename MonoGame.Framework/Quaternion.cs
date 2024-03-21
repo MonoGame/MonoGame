@@ -1013,6 +1013,13 @@ namespace Microsoft.Xna.Framework
             return new Vector4(X,Y,Z,W);
         }
 
+        /// <summary>
+        /// Deconstruction method for <see cref="Quaternion"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="w"></param>
         public void Deconstruct(out float x, out float y, out float z, out float w)
         {
             x = X;
