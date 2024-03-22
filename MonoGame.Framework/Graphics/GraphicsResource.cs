@@ -7,6 +7,9 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Queries and prepares resources.
+    /// </summary>
     public abstract class GraphicsResource : IDisposable
     {
         bool disposed;
@@ -23,6 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
         }
 
+        /// <summary/>
         ~GraphicsResource()
         {
             // Pass false so the managed objects are not released
@@ -40,6 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             // Dispose of managed objects as well
@@ -80,8 +85,15 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Occurs when <see cref="Dispose()"/> is called
+        /// or when this object is finalized and collected by the garbage collector.
+        /// </summary>
 		public event EventHandler<EventArgs> Disposing;
-		
+
+        /// <summary>
+        /// Gets the <see cref="Graphics.GraphicsDevice"/> associated with this <see cref="GraphicsResource"/>.
+        /// </summary>
 		public GraphicsDevice GraphicsDevice
 		{
 			get
@@ -110,7 +122,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 graphicsDevice.AddResourceReference(_selfReference);
             }
 		}
-		
+
+        /// <summary>
+        /// Gets a value that indicates whether the object is disposed.
+        /// </summary>
 		public bool IsDisposed
 		{
 			get
@@ -118,11 +133,20 @@ namespace Microsoft.Xna.Framework.Graphics
 				return disposed;
 			}
 		}
-		
+
+        /// <summary>
+        /// Gets the name of the resource.
+        /// </summary>
 		public string Name { get; set; }
-		
+
+        /// <summary>
+        /// Gets the resource tags for this resource.
+        /// </summary>
 		public Object Tag { get; set; }
 
+        /// <summary>
+        /// Gets a string representation of the current instance.
+        /// </summary>
         public override string ToString()
         {
             return string.IsNullOrEmpty(Name) ? base.ToString() : Name;
