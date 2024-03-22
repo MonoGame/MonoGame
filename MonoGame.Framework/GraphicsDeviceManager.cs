@@ -96,6 +96,7 @@ namespace Microsoft.Xna.Framework
             _game.Services.AddService(typeof(IGraphicsDeviceService), this);
         }
 
+        /// <summary/>
         ~GraphicsDeviceManager()
         {
             Dispose(false);
@@ -149,6 +150,13 @@ namespace Microsoft.Xna.Framework
             CreateDevice();
         }
 
+        /// <summary>
+        /// Begins the drawing process.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> if the drawing process begins successfully;
+        /// <see langword="false"/> otherwise.
+        /// </returns>
         public bool BeginDraw()
         {
             if (_graphicsDevice == null)
@@ -158,6 +166,9 @@ namespace Microsoft.Xna.Framework
             return true;
         }
 
+        /// <summary>
+        /// Ends the drawing process and calls <see cref="GraphicsDevice.Present()"/> for the current graphics device.
+        /// </summary>
         public void EndDraw()
         {
             if (_graphicsDevice != null && _drawBegun)
@@ -259,12 +270,14 @@ namespace Microsoft.Xna.Framework
 
         #region IDisposable Members
 
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary/>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
