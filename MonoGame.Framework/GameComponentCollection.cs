@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -37,6 +37,15 @@ namespace Microsoft.Xna.Framework
             base.ClearItems();
         }
 
+        /// <summary>
+        /// Inserts an element into the collection at the specified index.
+        /// Triggers <see cref="OnComponentAdded(GameComponentCollectionEventArgs)"/>.
+        /// </summary>
+        /// <param name="index">The zero-based index at which item should be inserted.</param>
+        /// <param name="item">The object to insert.</param>
+        /// <exception cref="ArgumentException">
+        /// Specified <see cref="IGameComponent"/> is already present in the collection.
+        /// </exception>
         protected override void InsertItem(int index, IGameComponent item)
         {
             if (base.IndexOf(item) != -1)
@@ -60,6 +69,11 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, ComponentRemoved, eventArgs);
         }
 
+        /// <summary>
+        /// Removes the element at the specified index of the <see cref="GameComponentCollection"/>.
+        /// Triggers <see cref="OnComponentRemoved(GameComponentCollectionEventArgs)"/>.
+        /// </summary>
+        /// <param name="index">The zero-based index of the element to remove.</param>
         protected override void RemoveItem(int index)
         {
             IGameComponent gameComponent = base[index];
@@ -70,6 +84,15 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// Replaces the element at the specified index.
+        /// </summary>
+        /// <remarks>
+        /// This method is not supported and will always throw <see cref="NotSupportedException"/>
+        /// </remarks>
+        /// <param name="index">The zero-based index of the element to replace.</param>
+        /// <param name="item">The new value for the element at the specified index.</param>
+        /// <exception cref="NotSupportedException">Thrown always</exception>
         protected override void SetItem(int index, IGameComponent item)
         {
             throw new NotSupportedException();

@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -166,6 +166,18 @@ internal static class Sdl
                 return false;
 
             return version == (Version)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + Major.GetHashCode();
+                hash = hash * 23 + Minor.GetHashCode();
+                hash = hash * 23 + Patch.GetHashCode();
+                return hash;
+            }
         }
 
         public static bool operator !=(Version version1, Version version2)
@@ -465,7 +477,7 @@ internal static class Sdl
 
         public static void SetTitle(IntPtr handle, string title)
         {
-            var bytes = Encoding.UTF8.GetBytes(title);
+            var bytes = Encoding.UTF8.GetBytes(title + '\0');
             SDL_SetWindowTitle(handle, ref bytes[0]);
         }
 

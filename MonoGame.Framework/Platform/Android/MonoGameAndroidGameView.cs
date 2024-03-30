@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework
 
         public void SurfaceChanged(ISurfaceHolder holder, global::Android.Graphics.Format format, int width, int height)
         {
-            // Set flag to recreate gl surface or rendering can be bad on orienation change or if app 
+            // Set flag to recreate gl surface or rendering can be bad on orientation change or if app 
             // is closed in one orientation and re-opened in another.
             lock (_lockObject)
             {
@@ -391,7 +391,7 @@ namespace Microsoft.Xna.Framework
 
         void processStateRunning(CancellationToken token)
         {
-            // do not run game if surface is not avalible
+            // do not run game if surface is not available
             lock (_lockObject)
             {
                 if (!androidSurfaceAvailable)
@@ -419,7 +419,7 @@ namespace Microsoft.Xna.Framework
             }
             catch (MonoGameGLException ex)
             {
-                Log.Error("AndroidGameView", "GL Exception occured during RunIteration {0}", ex.Message);
+                Log.Error("AndroidGameView", "GL Exception occurred during RunIteration {0}", ex.Message);
             }
 
             if (updates > 0)
@@ -482,7 +482,7 @@ namespace Microsoft.Xna.Framework
                 if (!androidSurfaceAvailable)
                     return;
 
-                // create surface if context is avalible
+                // create surface if context is available
                 if (glContextAvailable && !lostglContext)
                 {
                     try
@@ -496,7 +496,7 @@ namespace Microsoft.Xna.Framework
                     }
                 }
 
-                // create context if not avalible
+                // create context if not available
                 if ((!glContextAvailable || lostglContext))
                 {
                     // Start or Restart due to context loss
@@ -1157,7 +1157,7 @@ namespace Microsoft.Xna.Framework
 
             handled = Keyboard.KeyDown(keyCode);
 
-            // we need to handle the Back key here because it doesnt work any other way
+            // we need to handle the Back key here because it doesn't work any other way
             if (keyCode == Keycode.Back)
             {
                 GamePad.Back = true;

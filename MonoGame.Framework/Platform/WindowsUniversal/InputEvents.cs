@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework
 
             if (inputElement is SwapChainPanel || inputElement is SwapChainBackgroundPanel)
             {
-                // Create a thread to precess input events.
+                // Create a thread to process input events.
                 var workItemHandler = new WorkItemHandler((action) =>
                 {
                     var inputDevices = CoreInputDeviceTypes.Mouse | CoreInputDeviceTypes.Pen | CoreInputDeviceTypes.Touch;
@@ -281,7 +281,7 @@ namespace Microsoft.Xna.Framework
                     // we can detect right shift by checking the scancode value.
                     // left shift is 0x2A, right shift is 0x36. IsExtendedKey is always false.
                     return (keyStatus.ScanCode == 0x36) ? Keys.RightShift : Keys.LeftShift;
-                // Note that the Alt key is now refered to as Menu.
+                // Note that the Alt key is now referred to as Menu.
                 // ALT key doesn't get fired by KeyUp/KeyDown events.
                 // One solution could be to check CoreWindow.GetKeyState(...) on every tick.
                 case Windows.System.VirtualKey.Menu:

@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -569,7 +569,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdHelp_Executed(object sender, EventArgs e)
         {
-            Process.Start(new ProcessStartInfo() { FileName = "https://docs.monogame.net/articles/tools/mgcb_editor.html", UseShellExecute = true, Verb = "open" });
+            Process.Start(new ProcessStartInfo() { FileName = "https://monogame.net/articles/tools/mgcb_editor.html", UseShellExecute = true, Verb = "open" });
         }
 
         private void CmdAbout_Executed(object sender, EventArgs e)
@@ -595,7 +595,10 @@ namespace MonoGame.Tools.Pipeline
 #if IDE
                 MonoDevelop.Ide.IdeApp.Workbench.OpenDocument(filePath, MonoDevelop.Ide.Gui.OpenDocumentOptions.Default);
 #else
-                Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                if (File.Exists(filePath))
+                    Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                else
+                    ShowError("File not found", "The file was not found, did you forget to update file path in project?");
 #endif
             }
         }
@@ -622,7 +625,10 @@ namespace MonoGame.Tools.Pipeline
             if (PipelineController.Instance.SelectedItem != null)
             {
                 var filePath = PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.Location);
-                Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                if (Directory.Exists(filePath))
+                    Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                else
+                    ShowError("Directory Not Found", "The containing directory was not found, did you forget to update file path in project?");
             }
         }
 

@@ -1,8 +1,9 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -415,12 +416,21 @@ namespace MonoGame.Tests.Audio
         /// </summary>
         private static void SleepWhileDispatching(int ms)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             int cycles = ms / 10;
             for (int i = 0; i < cycles; i++)
             {
                 FrameworkDispatcher.Update();
                 Thread.Sleep(10);
-            }
+
+                if (stopwatch.Elapsed.TotalMilliseconds > ms)
+                {
+                    stopwatch.Stop();
+                    break;
+                }
+            }            
         }
 
         /// <summary>

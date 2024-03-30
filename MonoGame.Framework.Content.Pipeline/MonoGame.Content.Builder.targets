@@ -1,5 +1,5 @@
 <!--
-  MonoGame - Copyright (C) The MonoGame Team
+  MonoGame - Copyright (C) MonoGame Foundation, Inc
   This file is subject to the terms and conditions defined in
   file 'LICENSE.txt', which is part of this source code package.
 -->
@@ -79,7 +79,7 @@
     </BuildDependsOn>
   </PropertyGroup>
 
-  <Target Name="RunContentBuilder">
+  <Target Name="RunContentBuilder" DependsOnTargets="Compile">
     <Exec Condition=" '%(ContentReferences.FullPath)' != '' "
           Command="$(MonoGameContentBuilderCmd) $(MonoGameMGCBAdditionalArguments) $(Header) /@:&quot;%(ContentReferences.FullPath)&quot; /outputDir:&quot;%(ContentReferences.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReferences.ContentIntermediateOutputDir)&quot;"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />

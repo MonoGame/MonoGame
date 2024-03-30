@@ -1,42 +1,6 @@
-#region License
-// /*
-// Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009-2010 The MonoGame Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-#endregion License
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 #region Using clause
 using System;
@@ -63,6 +27,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         // Used for gesture recognition.
         private Vector2 _velocity;
+        // Use for high-frequency (optional) touch events processing
+        private bool _isHighFrequency;
         private Vector2 _pressPosition;
         private TimeSpan _pressTimestamp;
         private TimeSpan _timestamp;
@@ -144,17 +110,22 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public TouchLocation(   int id, TouchLocationState state, Vector2 position, 
                                 TouchLocationState previousState, Vector2 previousPosition)
-            : this(id, state, position, previousState, previousPosition, TimeSpan.Zero)
+            : this(id, state, position, previousState, previousPosition, TimeSpan.Zero, false)
         {
         }
 
         internal TouchLocation(int id, TouchLocationState state, Vector2 position, TimeSpan timestamp)
-            : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero, timestamp)
+            : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero, timestamp, false)
+        {
+        }
+
+        internal TouchLocation(int id, TouchLocationState state, Vector2 position, TimeSpan timestamp, bool isHighFrequency)
+            : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero, timestamp, isHighFrequency)
         {
         }
 
         internal TouchLocation(int id, TouchLocationState state, Vector2 position,
-            TouchLocationState previousState, Vector2 previousPosition, TimeSpan timestamp)
+            TouchLocationState previousState, Vector2 previousPosition, TimeSpan timestamp, bool isHighFrequency)
         {
             _id = id;
             _state = state;
@@ -167,6 +138,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             _timestamp = timestamp;
             _velocity = Vector2.Zero;
+
+            _isHighFrequency = isHighFrequency;
 
             // If this is a pressed location then store the 
             // current position and timestamp as pressed.
@@ -253,6 +226,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return _state != _previousState || delta.LengthSquared() > 0.001f;
         }
 
+        /// <summary>
+        /// Returns true if the touch panel is configured to process high frequence touch events.
+        /// </summary>
+        public bool IsHighFrequencyEvent()
+        {
+            return _isHighFrequency;
+        }
+
         public override bool Equals(object obj)
         {
 			if (obj is TouchLocation)
@@ -267,6 +248,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     _position.Equals(other._position) &&
                     _previousPosition.Equals(other._previousPosition);
         }
+
+
 
         public override int GetHashCode()
         {
@@ -294,6 +277,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			    aPreviousLocation._pressTimestamp = TimeSpan.Zero;
                 aPreviousLocation._velocity = Vector2.Zero;
                 aPreviousLocation.SameFrameReleased = false;
+                aPreviousLocation._isHighFrequency = false;
                 return false;
 			}
 
@@ -309,6 +293,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             aPreviousLocation._pressTimestamp = _pressTimestamp;
             aPreviousLocation._velocity = _velocity;
             aPreviousLocation.SameFrameReleased = SameFrameReleased;
+            aPreviousLocation._isHighFrequency = _isHighFrequency;
             return true;
         }
 

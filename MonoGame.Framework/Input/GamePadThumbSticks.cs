@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Input
     {
 #if DIRECTX && !WINDOWS_UAP
         // XInput Xbox 360 Controller dead zones
-        // Dead zones are slighty different between left and right sticks, this may come from Microsoft usability tests
+        // Dead zones are slightly different between left and right sticks, this may come from Microsoft usability tests
         private const float leftThumbDeadZone = SharpDX.XInput.Gamepad.LeftThumbDeadZone / (float)short.MaxValue;
         private const float rightThumbDeadZone = SharpDX.XInput.Gamepad.RightThumbDeadZone / (float)short.MaxValue;
 #else

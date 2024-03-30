@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,25 +7,25 @@ namespace Microsoft.Xna.Framework.Input
     public struct GamePadDPad
     {
         /// <summary>
-        /// Gets a value indicating wethever down is pressed on the directional pad.
+        /// Gets a value indicating whether down is pressed on the directional pad.
         /// </summary>
         /// <value><see cref="ButtonState.Pressed"/> if the down button is pressed; otherwise, <see cref="ButtonState.Released"/>.</value>
         public ButtonState Down { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating wethever left is pressed on the directional pad.
+        /// Gets a value indicating whether left is pressed on the directional pad.
         /// </summary>
         /// <value><see cref="ButtonState.Pressed"/> if the left button is pressed; otherwise, <see cref="ButtonState.Released"/>.</value>
         public ButtonState Left { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating wethever right is pressed on the directional pad.
+        /// Gets a value indicating whether right is pressed on the directional pad.
         /// </summary>
         /// <value><see cref="ButtonState.Pressed"/> if the right button is pressed; otherwise, <see cref="ButtonState.Released"/>.</value>
         public ButtonState Right { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating wethever up is pressed on the directional pad.
+        /// Gets a value indicating whether up is pressed on the directional pad.
         /// </summary>
         /// <value><see cref="ButtonState.Pressed"/> if the up button is pressed; otherwise, <see cref="ButtonState.Released"/>.</value>
         public ButtonState Up { get; private set; }

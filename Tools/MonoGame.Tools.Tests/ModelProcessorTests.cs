@@ -1,14 +1,13 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Graphics;
-using NUnit.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using NUnit.Framework;
+using System;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -280,6 +279,52 @@ namespace MonoGame.Tests.ContentPipeline
             // the test first before we can enable the assert here.
 
             //Assert.IsInstanceOf(typeof(SkinnedMaterialContent), output.Meshes[0].MeshParts[0].Material);
+        }
+
+        [Test]
+        /// <summary>
+        /// Test to validate a model with missing normals does not throw an exception using the default ModelProcessor.
+        /// </summary>
+        public void MissingNormalsTestDefault()
+        {
+            string level1fbx = "Assets/Models/level1.fbx";
+            var importer = new FbxImporter();
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var nodeContent = importer.Import(level1fbx, context);
+
+            ModelProcessor processor = new ModelProcessor();
+            var processorContext = new TestProcessorContext(TargetPlatform.Windows, "level1.xnb");
+
+            ModelContent output = null;
+            // Validate that the processor does not throw an exception when normals are missing from the mesh
+            Assert.DoesNotThrow(() => output = processor.Process(nodeContent, processorContext));
+
+            // Test some basics.
+            Assert.NotNull(output);
+            Assert.NotNull(output.Meshes);
+        }
+
+        [Test]
+        /// <summary>
+        /// Test to validate a model with missing normals does not throw an exception using a custom ModelProcessor using MeshHelper.CalculateTangentFrames directly.
+        /// </summary>
+        public void MissingNormalsTestCustom()
+        {
+            string level1fbx = "Assets/Models/level1.fbx";
+            var importer = new FbxImporter();
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var nodeContent = importer.Import(level1fbx, context);
+
+            NormalMappingModelProcessor processor = new NormalMappingModelProcessor();
+            var processorContext = new TestProcessorContext(TargetPlatform.Windows, "level1_costum.xnb");
+
+            ModelContent output = null;
+            // Validate that the custom processor does not throw an exception when normals are missing from the mesh
+            Assert.DoesNotThrow(() => output = processor.Process(nodeContent, processorContext));
+
+            // Test some basics.
+            Assert.NotNull(output);
+            Assert.NotNull(output.Meshes);
         }
     }
 }

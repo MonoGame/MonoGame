@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -234,7 +234,6 @@ namespace Microsoft.Xna.Framework
 	    /// <summary>
 	    /// Called when the window receives text input. Raises the <see cref="TextInput"/> event.
 	    /// </summary>
-	    /// <param name="sender">The game window.</param>
 	    /// <param name="e">Parameters to the <see cref="TextInput"/> event.</param>
 		internal void OnTextInput(TextInputEventArgs e)
 		{

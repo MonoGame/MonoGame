@@ -1,11 +1,11 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
-    /// A struct that countains information on the left and the right trigger buttons.
+    /// A struct that contains information on the left and the right trigger buttons.
     /// </summary>
     public struct GamePadTriggers
     {
