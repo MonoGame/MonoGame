@@ -12,7 +12,7 @@ Nugets are available on [nuget.org](https://www.nuget.org/profiles/cpt-max).
 * New Shader Compiler based on [ShaderConductor](https://github.com/cpt-max/ShaderConductor) for DesktopGL, as a replacement for MojoShader
 * Shader Model 4 and 5 support not only for DirectX, but also for DesktopGL
 * Compile Shaders natively on Linux without Wine
-* Suppurt for Integer Surface Formats (can be used for per-pixel atomic operations)
+* Support for Integer Surface Formats (can be used for per-pixel atomic operations)
 * Support for uint Shader Parameters
 * Indirect Draw and Indirect Compute (see [Compute Shader Guide](https://github.com/cpt-max/Docs/blob/master/MonoGame%20Compute%20Shader%20Guide.md#indirect-drawing))
 * Vertex Texture Fetch also for DesktopGL
