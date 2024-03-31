@@ -14,7 +14,7 @@ Nugets are available on [nuget.org](https://www.nuget.org/profiles/cpt-max).
 * Compile Shaders natively on Linux without Wine
 * Suppurt for Integer Surface Formats (can be used for per-pixel atomic operations)
 * Support for uint Shader Parameters
-* Indriect Draw and Indirect Compute (see [Compute Shader Guide](https://github.com/cpt-max/Docs/blob/master/MonoGame%20Compute%20Shader%20Guide.md#indirect-drawing))
+* Indirect Draw and Indirect Compute (see [Compute Shader Guide](https://github.com/cpt-max/Docs/blob/master/MonoGame%20Compute%20Shader%20Guide.md#indirect-drawing))
 * Vertex Texture Fetch also for DesktopGL
 * CopyData functions for Textures and Buffers to copy data from one resource to another on the GPU without a shader
 
