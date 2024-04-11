@@ -8,6 +8,6 @@
         <PackageId>MonoGame.Framework.Content.Pipeline.Ref</PackageId>
     </PropertyGroup>
     <ItemGroup>
-        <None Include="$(BaseOutputPath)\MonoGame.Framework.Content.Pipeline.dll" PackagePath="lib\net8.0" Pack="true" />
+        <None Include="$(BaseOutputPath)\MonoGame.Framework.Content.Pipeline.dll" PackagePath="lib\$(TargetFramework)" Pack="true" />
     </ItemGroup>
 </Project>
