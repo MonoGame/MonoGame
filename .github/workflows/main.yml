@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
-          java-version: '11'
+          java-version: '17'
 
       - name: Disable annotations
         run: echo "::remove-matcher owner=csc::"
@@ -46,7 +46,11 @@ jobs:
         shell: bash
 
       - name: Build
-        run: dotnet run --project build/Build.csproj -- --target=Default
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            export AndroidSdkDirectory=/usr/local/lib/android/sdk
+          fi
+          dotnet run --project build/Build.csproj -- --target=Default
 
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v3
