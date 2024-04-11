@@ -48,9 +48,11 @@ jobs:
       - name: Build
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            export AndroidSdkDirectory=/usr/local/lib/android/sdk
+            dotnet run --project build/Build.csproj -- --target=Default -p:AndroidSdkDirectory=/usr/local/lib/android/sdk
+          else
+            dotnet run --project build/Build.csproj -- --target=Default
           fi
-          dotnet run --project build/Build.csproj -- --target=Default
+        shell: bash
 
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v3
