@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+      "ms-dotnettools.csdevkit",
+      "ms-dotnettools.dotnet-maui",
+      "ms-dotnettools.vscodeintellicode-csharp",
+      "ms-vscode.mono-debug",
+    ]
+}

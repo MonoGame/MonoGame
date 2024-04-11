@@ -1,0 +1,17 @@
+﻿{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "MonoGame Team",
+  "classifications": [
+    "MonoGame", "Games", "Mobile", "Android"
+  ],
+  "name": "MonoGame StartKit (Android)",
+  "identity": "MonoGame.StartKit.Android",
+  "groupIdentity": "MonoGame.StartKit",
+  "shortName": "mgskandroid",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "$safeprojectname$",
+  "preferNameDirectory": true
+}

@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+        {
+			"label": "Debug Android Build",
+			"type": "shell",
+			"command": "dotnet build -p:Configuration=Debug ${workspaceFolder}/AutoPong.Android/AutoPong.Android.csproj \"/t:Install;_Run\" /p:AndroidAttachDebugger=true /p:AndroidSdbHostPort=10000",
+		},
+		{
+			"label": "Debug DesktopGL Build",
+			"type": "shell",
+			"command": "dotnet build -p:Configuration=Debug ${workspaceFolder}/AutoPong.DesktopGL/AutoPong.DesktopGL.csproj"
+		},
+        {
+			"label": "Debug iOS Build",
+			"type": "shell",
+			"command": "dotnet build -p:Configuration=Debug ${workspaceFolder}/AutoPong.iOS/AutoPong.iOS.csproj"
+		},
+        {
+			"label": "Debug WindowsDX Build",
+			"type": "shell",
+			"command": "dotnet build -p:Configuration=Debug ${workspaceFolder}/AutoPong.WindowsDX/AutoPong.WindowsDX.csproj"
+		},
+	]
+}

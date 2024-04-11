@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Android Debug",
+            "type": "mono",
+            "request": "attach",
+            "address": "localhost",
+            "port": 10000,
+			"preLaunchTask": "Debug Android Build",
+        },
+        {
+            "name": "DesktopGL Debug",
+            "type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "Debug DesktopGL Build",
+			"program": "${workspaceFolder}/AutoPong.DesktopGL/bin/Debug/net8.0/AutoPong.DesktopGL.exe",
+        },
+        {
+            "name": "iOS Debug",
+            "type": "maui",
+            "request": "launch",
+            "preLaunchTask": "maui: Build",
+        },
+        {
+            "name": "WindowsDX Debug",
+            "type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "Debug WindowsDX Build",
+			"program": "${workspaceFolder}/AutoPong.WindowsDX/bin/Debug/net8.0-windows/AutoPong.WindowsDX.exe",
+        }
+    ]
+}
