@@ -129,6 +129,21 @@ public class BuildContext : FrostingContext
         _ => throw new ArgumentOutOfRangeException(nameof(type))
     };
 
+    public bool IsToolInstalled (string tool)
+    {
+        this.StartProcess(
+            "dotnet",
+            new ProcessSettings()
+            {
+                Arguments = $"tool list",
+                RedirectStandardOutput = true
+            },
+            out IEnumerable<string> processOutput
+        );
+
+        return processOutput.Any(match => match.StartsWith($"{tool} "));
+    }
+
     public bool IsWorkloadInstalled(string workload)
     {
         this.StartProcess(

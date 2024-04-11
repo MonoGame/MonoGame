@@ -10,6 +10,7 @@ namespace BuildScripts;
 [IsDependentOn(typeof(BuildiOSTask))]
 [IsDependentOn(typeof(BuildUWPTask))]
 [IsDependentOn(typeof(BuildContentPipelineTask))]
+[IsDependentOn(typeof(BuildReferenceAssembliesTasks))]
 public sealed class BuildFrameworksTask : FrostingTask<BuildContext> { }
 
 [TaskName("Build Tools")]

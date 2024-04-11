@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.Build.NoTargets/2.0.1">
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <BaseOutputPath>..\..\Artifacts\MonoGame.Framework.Content.Pipeline.Ref</BaseOutputPath>
+        <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+        <Description>The MonoGame Content Pipeline reference assemblies for all platforms.</Description>
+        <PackageTags>monogame;.net core;core;.net standard;standard;</PackageTags>
+        <PackageId>MonoGame.Framework.Content.Pipeline.Ref</PackageId>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="$(BaseOutputPath)\MonoGame.Framework.Content.Pipeline.dll" PackagePath="lib\net8.0" Pack="true" />
+    </ItemGroup>
+</Project>
