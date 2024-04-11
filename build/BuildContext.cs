@@ -45,6 +45,7 @@ public class BuildContext : FrostingContext
         DotNetMSBuildSettings = new DotNetMSBuildSettings();
         DotNetMSBuildSettings.WithProperty("Version", Version);
         DotNetMSBuildSettings.WithProperty("RepositoryUrl", repositoryUrl);
+        DotNetMSBuildSettings.WithProperty("AndroidSdkDirectory", context.EnvironmentVariable("ANDROID_SDK_ROOT"));
 
         DotNetBuildSettings = new DotNetBuildSettings
         {
@@ -96,9 +97,6 @@ public class BuildContext : FrostingContext
         {
             // SET MGFXC_WINE_PATH for building shaders on macOS and Linux
             System.Environment.SetEnvironmentVariable("MGFXC_WINE_PATH", context.EnvironmentVariable("HOME") + "/.winemonogame");
-            // SET the ANDROID_SDK_ROOT path for macOS and Linux
-            System.Environment.SetEnvironmentVariable("ANDROID_SDK_ROOT", context.EnvironmentVariable("ANDROID_SDK_ROOT"));
-            System.Environment.SetEnvironmentVariable("AndroidSdkDirectory", context.EnvironmentVariable("ANDROID_SDK_ROOT"));
         }
         
         context.CreateDirectory(BuildOutput);
