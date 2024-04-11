@@ -45,14 +45,12 @@ jobs:
               fi
         shell: bash
 
-      - name: Build
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            dotnet run --project build/Build.csproj -- --target=Default -p:AndroidSdkDirectory=/usr/local/lib/android/sdk
-          else
-            dotnet run --project build/Build.csproj -- --target=Default
-          fi
+      - name: Env
+        run : env
         shell: bash
+
+      - name: Build
+        run: dotnet run --project build/Build.csproj -- --target=Default
 
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v3
