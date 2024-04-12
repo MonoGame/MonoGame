@@ -4,15 +4,18 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	// Summary:
-	//     Represents bone data for a model. Reference page contains links to related
-	//     conceptual articles.
-	public sealed class ModelBone
+    /// <summary>
+    /// Represents bone data for a model.
+    /// </summary>
+    public sealed class ModelBone
 	{
 		private List<ModelBone> children = new List<ModelBone>();
 		
 		private List<ModelMesh> meshes = new List<ModelMesh>();
 
+        /// <summary>
+        /// List of the meshes for this bone.
+        /// </summary>
 		public List<ModelMesh> Meshes {
 			get {
 				return this.meshes;
@@ -22,26 +25,30 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		// Summary:
-		//     Gets a collection of bones that are children of this bone.
-		public ModelBoneCollection Children { get; private set; }
-		//
-		// Summary:
-		//     Gets the index of this bone in the Bones collection.
+        /// <summary>
+        /// Gets a collection of bones that are children of this bone.
+        /// </summary>
+        public ModelBoneCollection Children { get; private set; }
+
+        /// <summary>
+        /// Gets the index of this bone in the <see cref="Model.Bones">Model.Bones</see> collection.
+        /// </summary>
 		public int Index { get; set; }
-		//
-		// Summary:
-		//     Gets the name of this bone.
+
+        /// <summary>
+        /// Gets the name of this bone.
+        /// </summary>
 		public string Name { get; set; }
-		//
-		// Summary:
-		//     Gets the parent of this bone.
+
+        /// <summary>
+        /// Gets the parent of this bone.
+        /// </summary>
 		public ModelBone Parent { get; set; }
-		//
-		// Summary:
-		//     Gets or sets the matrix used to transform this bone relative to its parent
-		//     bone.
+
 		internal Matrix transform;
+        /// <summary>
+        /// Gets or sets the matrix used to transform this bone relative to its parent bone.
+        /// </summary>
 		public Matrix Transform 
 		{ 
 			get { return this.transform; } 
@@ -55,17 +62,28 @@ namespace Microsoft.Xna.Framework.Graphics
 			get;
 			set;
 		}
-		
+
+        /// <summary>
+        /// Creates a new instance of <see cref="ModelBone"/>.
+        /// </summary>
 		public ModelBone ()	
 		{
 			Children = new ModelBoneCollection(new List<ModelBone>());
 		}
-		
+
+        /// <summary>
+        /// Add a <see cref="ModelMesh"/> to the mesh collection.
+        /// </summary>
+        /// <param name="mesh"><see cref="ModelMesh"/> to be added</param>
 		public void AddMesh(ModelMesh mesh)
 		{
 			meshes.Add(mesh);
 		}
 
+        /// <summary>
+        /// Adds a child bone to this bone.
+        /// </summary>
+        /// <param name="modelBone"><see cref="ModelBone"/> to be added.</param>
 		public void AddChild(ModelBone modelBone)
 		{
 			children.Add(modelBone);
