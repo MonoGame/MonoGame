@@ -45,7 +45,7 @@ public class BuildContext : FrostingContext
         DotNetMSBuildSettings = new DotNetMSBuildSettings();
         DotNetMSBuildSettings.WithProperty("Version", Version);
         DotNetMSBuildSettings.WithProperty("RepositoryUrl", repositoryUrl);
-        
+
         DotNetBuildSettings = new DotNetBuildSettings
         {
             MSBuildSettings = DotNetMSBuildSettings,
@@ -68,7 +68,7 @@ public class BuildContext : FrostingContext
         };
         MSBuildSettings.WithProperty(nameof(Version), Version);
         MSBuildSettings.WithProperty(nameof(repositoryUrl), repositoryUrl);
-        
+
         MSPackSettings = new MSBuildSettings
         {
             Verbosity = Verbosity.Minimal,
