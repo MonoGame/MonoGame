@@ -13,7 +13,7 @@ public sealed class BuildReferenceAssembliesTasks : FrostingTask<BuildContext>
             "dotnet",
             new ProcessSettings()
             {
-                Arguments = $"refasmer -v -O artifacts/MonoGame.Framework.Ref -c artifacts/MonoGame.Framework/DesktopGL/{context.DotNetPackSettings.Configuration}/MonoGame.Framework.dll",
+                Arguments = $"refasmer -v -O Artifacts/MonoGame.Framework.Ref -c Artifacts/MonoGame.Framework/DesktopGL/{context.DotNetPackSettings.Configuration}/MonoGame.Framework.dll",
                 RedirectStandardOutput = true
             },
             out IEnumerable<string> processOutput
@@ -22,7 +22,7 @@ public sealed class BuildReferenceAssembliesTasks : FrostingTask<BuildContext>
             "dotnet",
             new ProcessSettings()
             {
-                Arguments = $"refasmer -v -O artifacts/MonoGame.Framework.Content.Pipeline.Ref -c artifacts/MonoGame.Framework.Content.Pipeline/{context.DotNetPackSettings.Configuration}/MonoGame.Framework.Content.Pipeline.dll",
+                Arguments = $"refasmer -v -O Artifacts/MonoGame.Framework.Content.Pipeline.Ref -c Artifacts/MonoGame.Framework.Content.Pipeline/{context.DotNetPackSettings.Configuration}/MonoGame.Framework.Content.Pipeline.dll",
                 RedirectStandardOutput = true
             },
             out processOutput
