@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="vertexCount">The number of vertices.</param>
         /// <param name="bufferUsage">Behavior options.</param>
         /// <param name="dynamic">Whether this buffer is dynmic.</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException"><paramref name="graphicsDevice"/> is <see langword="null"/></exception>
 		protected VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, bool dynamic)
 		{
 		    if (graphicsDevice == null)
