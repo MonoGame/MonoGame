@@ -45,8 +45,7 @@ public class BuildContext : FrostingContext
         DotNetMSBuildSettings = new DotNetMSBuildSettings();
         DotNetMSBuildSettings.WithProperty("Version", Version);
         DotNetMSBuildSettings.WithProperty("RepositoryUrl", repositoryUrl);
-        DotNetMSBuildSettings.WithProperty("AndroidSdkDirectory", context.EnvironmentVariable("ANDROID_HOME"));
-
+        
         DotNetBuildSettings = new DotNetBuildSettings
         {
             MSBuildSettings = DotNetMSBuildSettings,
@@ -69,8 +68,7 @@ public class BuildContext : FrostingContext
         };
         MSBuildSettings.WithProperty(nameof(Version), Version);
         MSBuildSettings.WithProperty(nameof(repositoryUrl), repositoryUrl);
-        MSBuildSettings.WithProperty("AndroidSdkDirectory", context.EnvironmentVariable("ANDROID_HOME"));
-
+        
         MSPackSettings = new MSBuildSettings
         {
             Verbosity = Verbosity.Minimal,

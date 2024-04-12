@@ -37,16 +37,12 @@ jobs:
       - name: Install required workloads
         run:   |
               if [ "$RUNNER_OS" == "Linux" ]; then
-                    dotnet workload install android
+                    echo "MICROSOFT SUPPORT ANDROID WORKLOAD ON LINUX PLZZZ!"
               elif [ "$RUNNER_OS" == "Windows" ]; then
                     dotnet.exe workload install android ios macos
               else
                     dotnet workload install android ios macos
               fi
-        shell: bash
-
-      - name: Env
-        run : env
         shell: bash
 
       - name: Build
