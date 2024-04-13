@@ -6,6 +6,7 @@
         <Description>The MonoGame Content Pipeline reference assemblies for all platforms.</Description>
         <PackageTags>monogame;.net core;core;.net standard;standard;</PackageTags>
         <PackageId>MonoGame.Framework.Content.Pipeline.Ref</PackageId>
+        <DevelopmentDependency>true</DevelopmentDependency>
     </PropertyGroup>
     <ItemGroup>
         <None Include="$(BaseOutputPath)\MonoGame.Framework.Content.Pipeline.dll" PackagePath="lib\$(TargetFramework)" Pack="true" />
