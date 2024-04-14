@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var outputMerger = device._d3dContext.OutputMerger;
                     var activeRenderTargets = device._currentRenderTargets;
 
-                    // we can't use the same method we used the compute stage, where we set resources to slots one by one
+                    // we can't use the same method we used for the compute stage, where we set resources to slots one by one
                     // with the output merger, we have to set all UAV's at once. setting a single one would clear the previous ones
                     // UAV's have to be set after the render targets
                     int numRTs = 0;
@@ -85,8 +85,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     // grab a UAV list of the right size from the cashe to avoid garbage
                     var maxUAVs = _writeableResources.Length - numRTs;
-                    var unorderedAccessViews = uavListsOfAllSizes[maxUAVs] ??= new UnorderedAccessView[maxUAVs];
-                    var uavInitialCounts = intListsOfAllSizes[maxUAVs] ??= new int[maxUAVs];
+
+                    if (uavListsOfAllSizes[maxUAVs] == null)
+                        uavListsOfAllSizes[maxUAVs] = new UnorderedAccessView[maxUAVs];
+                    if (intListsOfAllSizes[maxUAVs] == null)
+                        intListsOfAllSizes[maxUAVs] = new int[maxUAVs];
+
+                    var unorderedAccessViews = uavListsOfAllSizes[maxUAVs];
+                    var uavInitialCounts = intListsOfAllSizes[maxUAVs];
                     
                     for (var i = 0; i < maxUAVs; i++)
                     {
