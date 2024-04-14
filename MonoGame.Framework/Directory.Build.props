@@ -5,7 +5,7 @@
   <PropertyGroup>
     <MonoGamePlatform>$(MSBuildProjectName.Substring(19))</MonoGamePlatform>
     <BaseIntermediateOutputPath>obj\$(MonoGamePlatform)</BaseIntermediateOutputPath>
-    <BaseOutputPath>..\Artifacts\MonoGame.Framework\$(MonoGamePlatform)</BaseOutputPath>
+    <BaseOutputPath>..\artifacts\MonoGame.Framework\$(MonoGamePlatform)</BaseOutputPath>
     <AssemblyName>MonoGame.Framework</AssemblyName>
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

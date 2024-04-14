@@ -30,14 +30,10 @@ jobs:
       - name: Disable annotations
         run: echo "::remove-matcher owner=csc::"
 
-      - name: Install required tooling
-        run: |
-            dotnet tool install --create-manifest-if-needed jetbrains.refasmer.clitool
-
       - name: Install required workloads
         run:   |
               if [ "$RUNNER_OS" == "Linux" ]; then
-                    echo "MICROSOFT SUPPORT ANDROID WORKLOAD ON LINUX PLZZZ!"
+                    dotnet workload install android
               elif [ "$RUNNER_OS" == "Windows" ]; then
                     dotnet.exe workload install android ios macos
               else

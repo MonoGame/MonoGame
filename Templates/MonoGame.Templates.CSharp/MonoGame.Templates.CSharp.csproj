@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <BaseOutputPath>..\..\Artifacts\MonoGame.Templates.CSharp</BaseOutputPath>
+    <BaseOutputPath>..\..\artifacts\MonoGame.Templates.CSharp</BaseOutputPath>
     <PackageType>Template</PackageType>
     <Title>MonoGame project templates</Title>
     <Description>This package contains a set of C# templates written for the MonoGame framework.</Description>

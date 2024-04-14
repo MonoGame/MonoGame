@@ -5,7 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <RollForward>Major</RollForward>
     <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
-    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor.Launcher\Linux</BaseOutputPath>
+    <BaseOutputPath>..\..\artifacts\MonoGame.Content.Builder.Editor.Launcher\Linux</BaseOutputPath>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>mgcb-editor-linux</ToolCommandName>
     <PackageId>dotnet-mgcb-editor-linux</PackageId>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Linux\Release\publish\**\*">
+    <Content Include="..\..\artifacts\MonoGame.Content.Builder.Editor\Linux\Release\publish\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>mgcb-editor-linux-data\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Content>

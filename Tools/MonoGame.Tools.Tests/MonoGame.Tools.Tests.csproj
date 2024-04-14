@@ -9,7 +9,7 @@
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
     <DefineConstants>DESKTOPGL</DefineConstants>
-    <BaseOutputPath>..\..\Artifacts\Tests\Tools</BaseOutputPath>
+    <BaseOutputPath>..\..\artifacts\Tests\Tools</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <UseAppHost>true</UseAppHost>
   </PropertyGroup>

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.Build.NoTargets/2.0.1">
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <BaseOutputPath>..\..\Artifacts\MonoGame.Framework.Ref</BaseOutputPath>
+        <BaseOutputPath>..\..\artifacts\MonoGame.Framework.Ref</BaseOutputPath>
         <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
         <Description>The MonoGame reference assemblies for all platforms.</Description>
         <PackageTags>monogame;.net core;core;.net standard;standard;</PackageTags>
@@ -9,6 +9,6 @@
         <DevelopmentDependency>true</DevelopmentDependency>
     </PropertyGroup>
     <ItemGroup>
-        <None Include="$(BaseOutputPath)\MonoGame.Framework.dll" PackagePath="lib\$(TargetFramework)" Pack="true" />
+        <None Include="..\..\MonoGame.Framework\obj\DesktopGL\$(Configuration)\ref\MonoGame.Framework.dll" PackagePath="lib\$(TargetFramework)" Pack="true" />
     </ItemGroup>
 </Project>

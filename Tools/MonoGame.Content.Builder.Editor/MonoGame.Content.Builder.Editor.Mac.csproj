@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <RollForward>Major</RollForward>
-    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Mac</BaseOutputPath>
+    <BaseOutputPath>..\..\artifacts\MonoGame.Content.Builder.Editor\Mac</BaseOutputPath>
     <DefineConstants>MONOMAC;MAC</DefineConstants>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>

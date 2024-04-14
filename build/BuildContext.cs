@@ -19,7 +19,7 @@ public class BuildContext : FrostingContext
     {
         var repositoryUrl = context.Argument("build-repository", DefaultRepositoryUrl);
         var buildConfiguration = context.Argument("build-configuration", "Release");
-        BuildOutput = context.Argument("build-output", "Artifacts");
+        BuildOutput = context.Argument("build-output", "artifacts");
         Version = context.Argument("build-version", DefaultBaseVersion + ".1-develop");
         NuGetsDirectory = $"{BuildOutput}/NuGet/";
 

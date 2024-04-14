@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
-    <BaseOutputPath>..\..\Artifacts\MonoGame.Packaging.Flatpak</BaseOutputPath>
+    <BaseOutputPath>..\..\artifacts\MonoGame.Packaging.Flatpak</BaseOutputPath>
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
     <PackageIconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/MonoGame/MonoGame.git</RepositoryUrl>

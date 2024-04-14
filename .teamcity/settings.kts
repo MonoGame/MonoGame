@@ -65,9 +65,9 @@ object DevelopMac : BuildType({
 
     allowExternalStatus = true
     artifactRules = """
-        Artifacts/**/iOS/**/*.nupkg
-        Artifacts/**/Android/**/*.nupkg
-        Artifacts/**/*.mpack
+        artifacts/**/iOS/**/*.nupkg
+        artifacts/**/Android/**/*.nupkg
+        artifacts/**/*.mpack
     """.trimIndent()
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 
@@ -139,9 +139,9 @@ object DevelopWin : BuildType({
 
     allowExternalStatus = true
     artifactRules = """
-        Artifacts/**/*.nupkg
-        Artifacts/**/*.vsix
-        Artifacts/**/*.mpack
+        artifacts/**/*.nupkg
+        artifacts/**/*.vsix
+        artifacts/**/*.mpack
     """.trimIndent()
     buildNumberPattern = "${Version.depParamRefs.buildNumber}"
 

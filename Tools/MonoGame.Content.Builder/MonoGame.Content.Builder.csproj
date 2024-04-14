@@ -5,7 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <RollForward>Major</RollForward>
     <Description>The MonoGame Content Builder (MGCB) command line tool is used for optimizing content for runtime use.</Description>
-    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder</BaseOutputPath>
+    <BaseOutputPath>..\..\artifacts\MonoGame.Content.Builder</BaseOutputPath>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>mgcb</ToolCommandName>
     <PackageId>dotnet-mgcb</PackageId>

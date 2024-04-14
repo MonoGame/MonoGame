@@ -5,7 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <RollForward>Major</RollForward>
     <Description>The MonoGame Framework Effect Compiler (MGFXC) command line tool is used to compile shaders.</Description>
-    <BaseOutputPath>..\..\Artifacts\MonoGame.Effect.Compiler</BaseOutputPath>
+    <BaseOutputPath>..\..\artifacts\MonoGame.Effect.Compiler</BaseOutputPath>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>mgfxc</ToolCommandName>
     <PackageId>dotnet-mgfxc</PackageId>

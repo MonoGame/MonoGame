@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-SET MGFXC="..\..\..\..\..\Artifacts\MonoGame.Effect.Compiler\Release\mgfxc.exe"
+SET MGFXC="..\..\..\..\..\artifacts\MonoGame.Effect.Compiler\Release\mgfxc.exe"
 
 @for /f %%f IN ('dir /b *.fx') do (
 

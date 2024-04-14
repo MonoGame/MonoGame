@@ -4,7 +4,7 @@
     <AssemblyName>MonoGame.Tests</AssemblyName>
     <MonoGamePlatform>$(MSBuildProjectName.Substring(15))</MonoGamePlatform>
     <BaseIntermediateOutputPath>obj\$(MonoGamePlatform)</BaseIntermediateOutputPath>
-    <BaseOutputPath>..\Artifacts\Tests\$(MonoGamePlatform)</BaseOutputPath>
+    <BaseOutputPath>..\artifacts\Tests\$(MonoGamePlatform)</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <UseAppHost>true</UseAppHost>
   </PropertyGroup>

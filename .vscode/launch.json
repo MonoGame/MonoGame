@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "mgcb-editor-mac",
-            "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Mac/Debug/MGCB Editor.app/Contents/MacOS/mgcb-editor-mac",
+            "program": "${workspaceFolder}/artifacts/MonoGame.Content.Builder.Editor/Mac/Debug/MGCB Editor.app/Contents/MacOS/mgcb-editor-mac",
             "args": [],
-            "cwd": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Mac/Debug",
+            "cwd": "${workspaceFolder}/artifacts/MonoGame.Content.Builder.Editor/Mac/Debug",
             "console": "internalConsole",
             "stopAtEntry": false
         },
