@@ -5,7 +5,7 @@
         <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
         <Description>The MonoGame reference assemblies for all platforms.</Description>
         <PackageTags>monogame;.net core;core;.net standard;standard;</PackageTags>
-        <PackageId>MonoGame.Framework.Ref</PackageId>
+        <PackageId>MonoGame.Framework.ReferenceAssembly</PackageId>
         <DevelopmentDependency>true</DevelopmentDependency>
     </PropertyGroup>
     <ItemGroup>

@@ -3,6 +3,6 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.Ref" Version="3.8.1.1-develop" PrivateAssets="All" />
+    <PackageReference Include="MonoGame.Framework.ReferenceAssembly" Version="3.8.1.1-develop" PrivateAssets="All" />
   </ItemGroup>
 </Project>
