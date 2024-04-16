@@ -80,6 +80,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private IndexBuffer _indexBuffer;
         private bool _indexBufferDirty;
 
+        private VertexBufferBinding[] _vertexBufferBindings;
+
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[8];
         private int _currentRenderTargetCount;
         private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
@@ -375,6 +377,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Force set the buffers and shaders on next ApplyState() call
             _vertexBuffers = new VertexBufferBindings(_maxVertexBufferSlots);
+            _vertexBufferBindings = new VertexBufferBinding[_maxVertexBufferSlots];
             _vertexBuffersDirty = true;
             _indexBufferDirty = true;
             _vertexShaderDirty = true;
@@ -940,6 +943,36 @@ namespace Microsoft.Xna.Framework.Graphics
             _vertexBuffersDirty |= (vertexBuffer == null)
                                    ? _vertexBuffers.Clear()
                                    : _vertexBuffers.Set(vertexBuffer, vertexOffset);
+        }
+
+        public void SetVertexBuffers(VertexBufferBinding vertexBuffer)
+        {
+            _vertexBufferBindings[0] = vertexBuffer;
+            _vertexBuffersDirty |= _vertexBuffers.Set(_vertexBufferBindings, 1);
+        }
+
+        public void SetVertexBuffers(VertexBufferBinding vertexBuffer1, VertexBufferBinding vertexBuffer2)
+        {
+            _vertexBufferBindings[0] = vertexBuffer1;
+            _vertexBufferBindings[1] = vertexBuffer2;
+            _vertexBuffersDirty |= _vertexBuffers.Set(_vertexBufferBindings, 2);
+        }
+
+        public void SetVertexBuffers(VertexBufferBinding vertexBuffer1, VertexBufferBinding vertexBuffer2, VertexBufferBinding vertexBuffer3)
+        {
+            _vertexBufferBindings[0] = vertexBuffer1;
+            _vertexBufferBindings[1] = vertexBuffer2;
+            _vertexBufferBindings[2] = vertexBuffer3;
+            _vertexBuffersDirty |= _vertexBuffers.Set(_vertexBufferBindings, 3);
+        }
+
+        public void SetVertexBuffers(VertexBufferBinding vertexBuffer1, VertexBufferBinding vertexBuffer2, VertexBufferBinding vertexBuffer3, VertexBufferBinding vertexBuffer4)
+        {
+            _vertexBufferBindings[0] = vertexBuffer1;
+            _vertexBufferBindings[1] = vertexBuffer2;
+            _vertexBufferBindings[2] = vertexBuffer3;
+            _vertexBufferBindings[3] = vertexBuffer4;
+            _vertexBuffersDirty |= _vertexBuffers.Set(_vertexBufferBindings, 4);
         }
 
         public void SetVertexBuffers(params VertexBufferBinding[] vertexBuffers)
