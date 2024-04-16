@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Creates a new instance of <see cref="ModelBone"/>.
+        /// Creates a new collection of <see cref="ModelBone"/> to denote the child bones in this model.
         /// </summary>
 		public ModelBone ()	
 		{
@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Adds a child bone to this bone.
+        /// Adds a new child bone to this bone.
         /// </summary>
         /// <param name="modelBone"><see cref="ModelBone"/> to be added.</param>
 		public void AddChild(ModelBone modelBone)
@@ -90,31 +90,4 @@ namespace Microsoft.Xna.Framework.Graphics
 			Children = new ModelBoneCollection(children);
 		}
 	}
-
-	//// Summary:
-	////     Represents bone data for a model. Reference page contains links to related
-	////     conceptual articles.
-	//public sealed class ModelBone
-	//{
-	//    // Summary:
-	//    //     Gets a collection of bones that are children of this bone.
-	//    public ModelBoneCollection Children { get { throw new NotImplementedException(); } }
-	//    //
-	//    // Summary:
-	//    //     Gets the index of this bone in the Bones collection.
-	//    public int Index { get { throw new NotImplementedException(); } }
-	//    //
-	//    // Summary:
-	//    //     Gets the name of this bone.
-	//    public string Name { get { throw new NotImplementedException(); } }
-	//    //
-	//    // Summary:
-	//    //     Gets the parent of this bone.
-	//    public ModelBone Parent { get { throw new NotImplementedException(); } }
-	//    //
-	//    // Summary:
-	//    //     Gets or sets the matrix used to transform this bone relative to its parent
-	//    //     bone.
-	//    public Matrix Transform { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-	//}
 }
