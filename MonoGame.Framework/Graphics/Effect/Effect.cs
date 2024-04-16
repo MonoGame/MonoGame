@@ -10,7 +10,7 @@ using MonoGame.Framework.Utilities;
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Used to set and query effects, and to choose techniques.
+    /// Used to set and query shader effects, and to choose techniques.
     /// </summary>
 	public class Effect : GraphicsResource
     {
@@ -39,12 +39,12 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Gets a collection of parameters used for this effect.
+        /// Gets a collection of shader parameters used for this effect.
         /// </summary>
         public EffectParameterCollection Parameters { get; private set; }
 
         /// <summary>
-        /// Gets a collection of techniques that are defined for this effect.
+        /// Gets a collection of shader techniques that are defined for this effect.
         /// </summary>
         public EffectTechniqueCollection Techniques { get; private set; }
 

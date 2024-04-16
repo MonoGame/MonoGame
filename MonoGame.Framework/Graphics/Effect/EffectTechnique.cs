@@ -2,7 +2,7 @@ using System;
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Represents an effect technique.
+    /// Represents a technique used in a shader effect.
     /// </summary>
     /// <remarks>
     /// Creating and assigning a <b>EffectTechnique</b> instance for each technique in your <see cref="Effect"/>
@@ -73,7 +73,4 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = annotations;
         }
     }
-
-
 }
-

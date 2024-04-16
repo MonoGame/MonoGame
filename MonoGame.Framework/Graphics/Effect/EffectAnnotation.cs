@@ -62,4 +62,3 @@ namespace Microsoft.Xna.Framework.Graphics
 		public string Semantic {get; private set;}
 	}
 }
-

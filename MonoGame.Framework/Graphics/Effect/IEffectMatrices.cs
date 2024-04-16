@@ -24,4 +24,3 @@ namespace Microsoft.Xna.Framework.Graphics
 		Matrix World { get; set; }
 	}
 }
-

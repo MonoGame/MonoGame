@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Contains rendering state for drawing with an effect. <para/>
+    /// Contains the rendering state for drawing with an effect. <para/>
     /// An effect can contain one or more passes.
     /// </summary>
     public class EffectPass
@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public string Name { get; private set; }
 
         /// <summary>
-        /// Gets the set of <see cref="EffectAnnotation"/> objects for this <see cref="EffectPass"/>.
+        /// Gets the collection of <see cref="EffectAnnotation"/> objects for this <see cref="EffectPass"/>.
         /// </summary>
         public EffectAnnotationCollection Annotations { get; private set; }
 
