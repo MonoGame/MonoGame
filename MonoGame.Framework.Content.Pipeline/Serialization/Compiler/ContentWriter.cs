@@ -176,14 +176,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         }
 
         /// <summary>
-        /// Clears buffer using BinaryWriter's flush method
-        /// </summary>
-        public override void Flush()
-        {
-            base.Flush();
-        }
-
-        /// <summary>
         /// Write the table of content type writers.
         /// </summary>
         void WriteTypeWriters()
