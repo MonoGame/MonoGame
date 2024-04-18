@@ -299,9 +299,16 @@ namespace Microsoft.Xna.Framework
                 _game.GraphicsDevice.PresentationParameters.BackBufferHeight == height) {
                 return;
             }
+
+            Viewport prevViewport = _game.GraphicsDevice.Viewport;
+            Rectangle prevScissorRect = _game.GraphicsDevice.ScissorRectangle;
+
             _game.GraphicsDevice.PresentationParameters.BackBufferWidth = width;
             _game.GraphicsDevice.PresentationParameters.BackBufferHeight = height;
             _game.GraphicsDevice.Viewport = new Viewport(0, 0, width, height);
+
+            if (_game.GraphicsDevice.RasterizerState.ScissorTestEnable && prevScissorRect == prevViewport.Bounds)
+                _game.GraphicsDevice.ScissorRectangle = new Rectangle(0, 0, width, height);
 
             Sdl.Window.GetSize(Handle, out _width, out _height);
 
