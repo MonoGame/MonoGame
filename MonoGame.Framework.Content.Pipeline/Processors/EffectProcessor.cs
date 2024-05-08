@@ -107,59 +107,48 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] { "\n", "\r", Environment.NewLine },
                                                                       StringSplitOptions.RemoveEmptyEntries);
 
-            var errorOrWarning = new Regex(@"(.*)\(([0-9]*(,[0-9]+(-[0-9]+)?)?)\)\s*:\s*(.*)", RegexOptions.Compiled);
+            // regex groups: 1: filename 2: line and column 3: error or warning message
+            var errorOrWarning = new Regex(@"(.*)\((\d*,\d*)-?\d*\):\s*(.*)", RegexOptions.Compiled);
             ContentIdentity identity = null;
-            var allErrorsAndWarnings = string.Empty;
+            var allErrorsAndWarnings = new System.Text.StringBuilder();
 
             // Process all the lines.
-            for (var i = 0; i < errorsAndWarningArray.Length; i++)
+            foreach (var errorOrWarningLine in errorsAndWarningArray)
             {
-                var match = errorOrWarning.Match(errorsAndWarningArray[i]);
-                if (!match.Success || match.Groups.Count != 4)
+                var groups = errorOrWarning.Match(errorOrWarningLine).Groups;
+
+                if (groups.Count != 4)
                 {
-                    // Just log anything we don't recognize as a warning.
                     if (buildFailed)
-                        allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
+                        allErrorsAndWarnings.AppendLine(errorOrWarningLine);
                     else
-                        context.Logger.LogWarning(string.Empty, input.Identity, errorsAndWarningArray[i]);
+                        context.Logger.LogWarning(string.Empty, input.Identity, errorOrWarningLine);
 
                     continue;
                 }
 
-                var fileName = match.Groups[1].Value;
-                var lineAndColumn = match.Groups[2].Value;
-                var message = match.Groups[3].Value;
+                var filename = groups[1].Value;
+                var lineAndColumn = groups[2].Value;
+                var errorOrWarningMessage = groups[3].Value;
 
-                // Try to ensure a good file name for the error message.
-                if (string.IsNullOrEmpty(fileName))
-                    fileName = input.Identity.SourceFilename;
-                else if (!File.Exists(fileName))
-                {
-                    var folder = Path.GetDirectoryName(input.Identity.SourceFilename);
-                    fileName = Path.Combine(folder, fileName);
-                }
-
-                // If we got an exception then we'll be throwing an exception 
-                // below, so just gather the lines to throw later.
+                var newIdentity = new ContentIdentity(filename, input.Identity.SourceTool, lineAndColumn);
                 if (buildFailed)
                 {
                     if (identity == null)
                     {
-                        identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
-                        allErrorsAndWarnings = errorsAndWarningArray[i] + Environment.NewLine;
+                        identity = newIdentity;
+                        allErrorsAndWarnings.AppendLine(errorOrWarningMessage);
                     }
                     else
-                        allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
+                        allErrorsAndWarnings.Append(errorOrWarningLine);
                 }
                 else
-                {
-                    identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
-                    context.Logger.LogWarning(string.Empty, identity, message, string.Empty);
-                }
+                    context.Logger.LogWarning(string.Empty, newIdentity, errorOrWarningMessage);
+
             }
 
             if (buildFailed)
-                throw new InvalidContentException(allErrorsAndWarnings, identity ?? input.Identity);
+                throw new InvalidContentException(allErrorsAndWarnings.ToString(), identity ?? input.Identity);
         }
     }
 }
