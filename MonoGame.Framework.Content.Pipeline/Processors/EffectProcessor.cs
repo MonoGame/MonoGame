@@ -107,7 +107,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] { "\n", "\r", Environment.NewLine },
                                                                       StringSplitOptions.RemoveEmptyEntries);
 
-            // regex groups: 1: filename 2: line and column 3: error or warning message
             var errorOrWarning = new Regex(@"(.*)\((\d*,\d*)-?\d*\):\s*(.*)", RegexOptions.Compiled);
             ContentIdentity identity = null;
             var allErrorsAndWarnings = new System.Text.StringBuilder();
@@ -115,9 +114,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             // Process all the lines.
             foreach (var errorOrWarningLine in errorsAndWarningArray)
             {
-                var groups = errorOrWarning.Match(errorOrWarningLine).Groups;
-
-                if (groups.Count != 4)
+                var match = errorOrWarning.Match(errorOrWarningLine);
+                if (!match.Success || match.Groups.Count != 4)
                 {
                     // Just log anything we don't recognize as a warning.
                     if (buildFailed)
@@ -128,27 +126,35 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     continue;
                 }
 
-                var filename = groups[1].Value;
-                var lineAndColumn = groups[2].Value;
-                var errorOrWarningMessage = groups[3].Value;
+                var fileName = match.Groups[1].Value;
+                var lineAndColumn = match.Groups[2].Value;
+                var message = match.Groups[3].Value;
 
-                var newIdentity = new ContentIdentity(filename, input.Identity.SourceTool, lineAndColumn);
+                // Try to ensure a good file name for the error message.
+                if (string.IsNullOrEmpty(fileName))
+                    fileName = input.Identity.SourceFilename;
+                else if (!File.Exists(fileName))
+                {
+                    var folder = Path.GetDirectoryName(input.Identity.SourceFilename);
+                    fileName = Path.Combine(folder, fileName);
+                }
 
-                // If we got an exception then we'll be throwing an exception
+                var newIdentity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
+
+                // If we got an exception then we'll be throwing an exception 
                 // below, so just gather the lines to throw later.
                 if (buildFailed)
                 {
                     if (identity == null)
                     {
                         identity = newIdentity;
-                        allErrorsAndWarnings.AppendLine(errorOrWarningMessage);
+                        allErrorsAndWarnings.AppendLine(message);
                     }
                     else
                         allErrorsAndWarnings.AppendLine(errorOrWarningLine);
                 }
                 else
-                    context.Logger.LogWarning(string.Empty, newIdentity, errorOrWarningMessage);
-
+                    context.Logger.LogWarning(string.Empty, newIdentity, message);
             }
 
             if (buildFailed)
