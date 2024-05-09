@@ -119,6 +119,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
                 if (groups.Count != 4)
                 {
+                    // Just log anything we don't recognize as a warning.
                     if (buildFailed)
                         allErrorsAndWarnings.AppendLine(errorOrWarningLine);
                     else
@@ -132,6 +133,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 var errorOrWarningMessage = groups[3].Value;
 
                 var newIdentity = new ContentIdentity(filename, input.Identity.SourceTool, lineAndColumn);
+
+                // If we got an exception then we'll be throwing an exception
+                // below, so just gather the lines to throw later.
                 if (buildFailed)
                 {
                     if (identity == null)
@@ -140,7 +144,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         allErrorsAndWarnings.AppendLine(errorOrWarningMessage);
                     }
                     else
-                        allErrorsAndWarnings.Append(errorOrWarningLine);
+                        allErrorsAndWarnings.AppendLine(errorOrWarningLine);
                 }
                 else
                     context.Logger.LogWarning(string.Empty, newIdentity, errorOrWarningMessage);
