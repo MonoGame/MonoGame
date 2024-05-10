@@ -161,23 +161,28 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Occurs when a GraphicsDevice is about to be lost (for example, immediately before a reset).
         /// </summary>
         public event EventHandler<EventArgs> DeviceLost;
+
         /// <summary>
         /// Occurs after a GraphicsDevice is reset, allowing an application to recreate all resources.
         /// </summary>
 		public event EventHandler<EventArgs> DeviceReset;
+
         /// <summary>
         /// Occurs when a GraphicsDevice is resetting,
         /// allowing the application to cancel the default handling of the reset.
         /// </summary>
 		public event EventHandler<EventArgs> DeviceResetting;
+
         /// <summary>
         /// Occurs when a resource is created.
         /// </summary>
 		public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
+
         /// <summary>
         /// Occurs when a resource is destroyed.
         /// </summary>
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
+
         /// <summary>
         /// Occurs when <see cref="Dispose()"/> is called
         /// or when this object is finalized and collected by the garbage collector.
@@ -337,8 +342,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
             // Initialize the main viewport
-            _viewport = new Viewport (0, 0,
-			                         DisplayMode.Width, DisplayMode.Height);
+            _viewport = new Viewport (0, 0, DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
 
             PlatformSetup();
@@ -1537,8 +1541,8 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <inheritdoc cref="GetBackBufferData{T}(T[])"/>
-        /// <typeparam name="T"/>
-        /// <param name="data"/>
+        /// <typeparam name="T">A byte[] of size (ViewPort.Width * ViewPort.Height * 4)</typeparam>
+        /// <param name="data">Array of data.</param>
         /// <param name="startIndex">The first element to use.</param>
         /// <param name="elementCount">The number of elements to use.</param>
         public void GetBackBufferData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -1547,14 +1551,14 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <inheritdoc cref="GetBackBufferData{T}(T[], int, int)"/>
-        /// <typeparam name="T"/>
+        /// <typeparam name="T">A byte[] of size (ViewPort.Width * ViewPort.Height * 4)</typeparam>
         /// <param name="rect">
         /// The section of the back buffer to copy.
         /// <see langword="null"/> indicates the data will be copied from the entire back buffer.
         /// </param>
-        /// <param name="data"/>
-        /// <param name="startIndex"/>
-        /// <param name="elementCount"/>
+        /// <param name="data">Array of data.</param>
+        /// <param name="startIndex">The first element to use.</param>
+        /// <param name="elementCount">The number of elements to use.</param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="data"/> is <see langword="null"/>
         /// </exception>

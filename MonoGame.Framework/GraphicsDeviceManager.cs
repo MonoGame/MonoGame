@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework
         private readonly Game _game;
         private GraphicsDevice _graphicsDevice;
         private bool _initialized = false;
-
         private int _preferredBackBufferHeight;
         private int _preferredBackBufferWidth;
         private SurfaceFormat _preferredBackBufferFormat;
@@ -30,6 +29,7 @@ namespace Microsoft.Xna.Framework
         private bool _preferHalfPixelOffset = false;
         private bool _wantFullScreen;
         private GraphicsProfile _graphicsProfile;
+        
         // dirty flag for ApplyChanges
         private bool _shouldApplyChanges;
 
