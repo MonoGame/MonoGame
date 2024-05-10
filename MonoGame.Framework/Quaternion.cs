@@ -1016,10 +1016,10 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Deconstruction method for <see cref="Quaternion"/>.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="z"></param>
-        /// <param name="w"></param>
+        /// <param name="x">The x coordinate in 3d-space.</param>
+        /// <param name="y">The y coordinate in 3d-space.</param>
+        /// <param name="z">The z coordinate in 3d-space.</param>
+        /// <param name="w">The rotation component.</param>
         public void Deconstruct(out float x, out float y, out float z, out float w)
         {
             x = X;
