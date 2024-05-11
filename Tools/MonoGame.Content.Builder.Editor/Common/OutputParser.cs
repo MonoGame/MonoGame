@@ -43,7 +43,7 @@ namespace MonoGame.Tools.Pipeline
         Regex _reFileError = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\W*?: (?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildEnd = new Regex(@"^(Build)\W+(?<buildInfo>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildTime = new Regex(@"^(Time elapsed)\W+(?<buildElapsedTime>.*?)\.\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
+        
 
         public OutputParser()
         {
@@ -61,7 +61,7 @@ namespace MonoGame.Tools.Pipeline
         }
 
         internal void Parse(string text)
-        {
+        {   
             ParseLine(text);
         }
 
@@ -90,7 +90,7 @@ namespace MonoGame.Tools.Pipeline
             var prevFilename = Filename;
 
             State = OutputState.Unknown;
-            Filename = null;
+            Filename = null;            
             BuildBeginTime = null;
             BuildInfo = null;
             BuildElapsedTime = null;
