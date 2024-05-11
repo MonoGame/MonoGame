@@ -16,7 +16,7 @@ namespace MonoGame.Effect.Compiler
 
         private static readonly List<(string, string)> sourceFiles = new();
 
-        private static readonly Regex lineColumnRegex = new(@"\((\d+),(\d+)-?\d*\)", RegexOptions.Compiled);
+        private static readonly Regex lineColumnRegex = new(@"\((\d*)(,)?(\d*)?(-)?(\d*)?\)", RegexOptions.Compiled);
 
         public static int Main(string[] args)
         {
@@ -48,6 +48,9 @@ namespace MonoGame.Effect.Compiler
             var nativeSourceFilepath = ConvertToNative(sourceFilepath);
 
             sourceFiles.Add((sourceFilepath, nativeSourceFilepath));
+
+            var sourceDirectory = Path.GetDirectoryName(sourceFilepath);
+            sourceFiles.Add((sourceDirectory, ConvertToNative(sourceDirectory)));
 
             // Validate the input file exits.
             if (!File.Exists(sourceFilepath))
@@ -162,21 +165,35 @@ namespace MonoGame.Effect.Compiler
             foreach (var (originalFilename, newFilename) in sourceFiles)
                 sourceString = sourceString.Replace(originalFilename, newFilename);
 
-            sourceString = lineColumnRegex.Replace(sourceString, "($1,$2)");
+            sourceString = lineColumnRegex.Replace(sourceString, ReplaceRowAndColumn);
 
             return sourceString;
+        }
+
+        private static string ReplaceRowAndColumn(Match match)
+        {
+            var groups = match.Groups;
+            if (groups.Count != 6)
+                return match.Value;
+
+            var result = $"({groups[1]}," + (groups[2].Success && groups[3].Value != "0" ? groups[3] : "1");
+            if (groups[4].Success)
+                result += $",{groups[1]},{int.Parse(groups[5].ValueSpan) + 1}";
+            result += ")";
+
+            return result;
         }
 
         private class ConsoleEffectCompilerOutput : IEffectCompilerOutput
         {
             public void WriteWarning(string file, int line, int column, string message)
             {
-                Console.WriteLine("Warning: {0}({1},{2}): {3}", ConvertToNative(file), line, column, ConvertMessage(message));
+                Console.WriteLine("{0}({1},{2}): warning PREPROCESS01: {3}", ConvertToNative(file), line, column, ConvertMessage(message));
             }
 
             public void WriteError(string file, int line, int column, string message)
             {
-                throw new Exception(string.Format("Error: {0}({1},{2}): {3}", ConvertToNative(file), line, column, ConvertMessage(message)));
+                throw new Exception(string.Format("{0}({1},{2}): error PREPROCESS01: {3}", ConvertToNative(file), line, column, ConvertMessage(message)));
             }
         }
     }

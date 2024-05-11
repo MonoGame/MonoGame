@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Effect - MonoGame")]
     public class EffectProcessor : ContentProcessor<EffectContent, CompiledEffectContent>
     {
+        private static readonly Regex errorOrWarning = new(@"(.*)\((\d*,\d*(?>,\d*,\d*)?)\):\s*(.*)", RegexOptions.Compiled);
         EffectProcessorDebugMode debugMode;
         string defines;
 
@@ -107,7 +108,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] { "\n", "\r", Environment.NewLine },
                                                                       StringSplitOptions.RemoveEmptyEntries);
 
-            var errorOrWarning = new Regex(@"(.*)\((\d*,\d*)-?\d*\):\s*(.*)", RegexOptions.Compiled);
             ContentIdentity identity = null;
             var allErrorsAndWarnings = new System.Text.StringBuilder();
 
