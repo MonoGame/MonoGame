@@ -24,6 +24,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal BufferType BufferType { get; private set; }
 
+        /// <summary>
+        /// A usage hint for optimizing memory placement of this buffer.
+        /// </summary>
         public BufferUsage BufferUsage { get; private set; }
 
         internal StructuredBufferType StructuredBufferType { get; private set; }

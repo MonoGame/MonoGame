@@ -42,6 +42,12 @@ namespace Microsoft.Xna.Framework.Input
             get { return _right; }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GamePadThumbSticks"/> struct,
+        /// setting positions of the sticks. 
+        /// </summary>
+        /// <param name="leftPosition">Position of the left controller stick.</param>
+        /// <param name="rightPosition">Position of the right controller stick.</param>
         public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition)
             : this(leftPosition, rightPosition, GamePadDeadZone.None, GamePadDeadZone.None)
         {

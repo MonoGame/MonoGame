@@ -7,12 +7,31 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a list of 3D vertices to be streamed to the graphics device.
+    /// </summary>
     public partial class VertexBuffer : BufferResource
     {
+        /// <summary>
+        /// Gets the number of vertices.
+        /// </summary>
         public int VertexCount { get { return ElementCount; } }
 
+        /// <summary>
+        /// Defines per-vertex data in a buffer.
+        /// </summary>
         public VertexDeclaration VertexDeclaration { get; private set; }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="VertexBuffer"/>
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device.</param>
+        /// <param name="vertexDeclaration">The vertex declaration, which describes per-vertex data.</param>
+        /// <param name="vertexCount">The number of vertices.</param>
+        /// <param name="bufferUsage">Behavior options.</param>
+        /// <param name="dynamic">Whether this buffer is dynmic.</param>
+        /// <param name="shaderAccess">How will this buffer be used from shaders.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="graphicsDevice"/> is <see langword="null"/></exception>
         protected VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, bool dynamic, ShaderAccess shaderAccess) :
             base(graphicsDevice, vertexCount, vertexDeclaration.VertexStride, bufferUsage, dynamic, BufferType.VertexBuffer, shaderAccess)
         {
@@ -23,26 +42,31 @@ namespace Microsoft.Xna.Framework.Graphics
                 vertexDeclaration.GraphicsDevice = graphicsDevice;
         }
 
+        /// <inheritdoc cref="VertexBuffer(GraphicsDevice, VertexDeclaration, int, BufferUsage, bool, ShaderAccess)"/>
         protected VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, bool dynamic) :
             this(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, dynamic, ShaderAccess.None)
         {
         }
 
+        /// <inheritdoc cref="VertexBuffer(GraphicsDevice, VertexDeclaration, int, BufferUsage, bool, ShaderAccess)"/>
         public VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage) :
             this(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, false, ShaderAccess.None)
         {
         }
 
+        /// <inheritdoc cref="VertexBuffer(GraphicsDevice, VertexDeclaration, int, BufferUsage, bool, ShaderAccess)"/>
         public VertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage) :
             this(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, false, ShaderAccess.None)
         {
         }
 
+        /// <inheritdoc cref="VertexBuffer(GraphicsDevice, VertexDeclaration, int, BufferUsage, bool, ShaderAccess)"/>
         public VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, ShaderAccess shaderAccess) :
            this(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, false, shaderAccess)
         {
         }
-        
+
+        /// <inheritdoc cref="VertexBuffer(GraphicsDevice, VertexDeclaration, int, BufferUsage, bool, ShaderAccess)"/>
         public VertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage, ShaderAccess shaderAccess) :
             this(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, false, shaderAccess)
         {
@@ -94,11 +118,13 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformGetData<T>(offsetInBytes, data, startIndex, elementCount, vertexStride);
         }
 
+        /// <inheritdoc cref="GetData{T}(int, T[], int, int, int)"/>
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
             this.GetData<T>(0, data, startIndex, elementCount, 0);
         }
 
+        /// <inheritdoc cref="GetData{T}(int, T[], int, int, int)"/>
         public void GetData<T>(T[] data) where T : struct
         {
             var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
@@ -184,6 +210,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SetDataInternal<T>(0, data, 0, data.Length, elementSizeInBytes, SetDataOptions.None);
         }
 
+        /// <summary/>
         protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
         {
             if (data == null)

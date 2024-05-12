@@ -218,6 +218,9 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, OrientationChanged, EventArgs.Empty);
 		}
 
+        /// <summary>
+        /// Called when the window needs to be painted.
+        /// </summary>
 		protected void OnPaint ()
 		{
 		}
@@ -254,6 +257,10 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, FileDrop, e);
         }
 
+        /// <summary>
+        /// Sets the supported display orientations.
+        /// </summary>
+        /// <param name="orientations">Supported display orientations</param>
         protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 
 	    /// <summary>

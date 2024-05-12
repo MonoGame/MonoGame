@@ -32,6 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
         }
 
+        /// <summary/>
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
