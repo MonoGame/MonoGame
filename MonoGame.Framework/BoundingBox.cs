@@ -666,7 +666,7 @@ namespace Microsoft.Xna.Framework
         /// </param>
         public void Intersects(ref Plane plane, out PlaneIntersectionType result)
         {
-            // See http://zach.in.tu-clausthal.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
+            // See https://cgvr.informatik.uni-bremen.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
 
             Vector3 positiveVertex;
             Vector3 negativeVertex;

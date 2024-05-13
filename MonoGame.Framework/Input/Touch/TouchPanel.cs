@@ -22,11 +22,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return PrimaryWindow.TouchPanelState.GetState();
         }
 
+        /// <summary>
+        /// Gets the current state of the touch panel.
+        /// </summary>
+        /// <param name="window">Game windows to get state from</param>
         public static TouchPanelState GetState(GameWindow window)
         {
             return window.TouchPanelState;
         }
 
+        /// <summary>
+        /// Gets the touch panel capabilities for an available device.
+        /// </summary>
         public static TouchPanelCapabilities GetCapabilities()
         {
             return PrimaryWindow.TouchPanelState.GetCapabilities();
@@ -102,12 +109,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
             set { PrimaryWindow.TouchPanelState.EnabledGestures = value; }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to enable the mouse touch point.
+        /// </summary>
         public static bool EnableMouseTouchPoint
         {
             get { return PrimaryWindow.TouchPanelState.EnableMouseTouchPoint; }
             set { PrimaryWindow.TouchPanelState.EnableMouseTouchPoint = value; }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to enable mouse gestures.
+        /// </summary>
         public static bool EnableMouseGestures
         {
             get { return PrimaryWindow.TouchPanelState.EnableMouseGestures; }
