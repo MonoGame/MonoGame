@@ -608,7 +608,9 @@ namespace Microsoft.Xna.Framework
         /// <remarks>
         /// Vsync limits the frame rate of the game to the monitor referesh rate to prevent screen tearing.
         /// When called at startup this will automatically set the vsync mode during initialization.  If
-        /// set after startup you must call ApplyChanges() for the vsync mode to be changed.
+        /// set after startup you must call ApplyChanges() for the vsync mode to be changed.  Depending on
+        /// a user's video card settings, vsync settings can be ignored and cause unexpected behaviour in
+        /// frame rate.
         /// </remarks>
         public bool SynchronizeWithVerticalRetrace
         {
